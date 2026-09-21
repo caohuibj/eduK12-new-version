@@ -65,7 +65,17 @@ export const scaleInstrumentSourceV1Schema = z.object({
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
   candidatePreview: z.object({
     status: z.literal('CATALOG_ONLY'),
-    reportPlan: z.string().min(1).optional(),
+    source: z.object({
+      title: z.string().min(1).optional(),
+      citation: z.string().min(1).optional(),
+      url: z.string().url().optional(),
+      publicationYear: z.number().int().min(1800).max(2200).optional(),
+    }).strict().optional(),
+    reportPlan: z.object({
+      dimensionLabels: z.array(z.string().min(1)),
+      limitations: z.array(z.string().min(1)),
+      disclaimer: z.string().min(1),
+    }).strict().optional(),
     blockers: z.array(z.string().min(1)).optional(),
   }).strict().optional(),
   executable: executableSchema.optional(),

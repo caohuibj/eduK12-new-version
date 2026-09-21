@@ -86,6 +86,25 @@ export const SCALE_INSTRUMENT_SOURCE = {
   localization: localizationBody,
   candidatePreview: {
     status: 'CATALOG_ONLY',
-    blockers: ['EXECUTABLE_NOT_REGISTERED'],
+    source: {
+  title: 'Perceived Stress Scale — 10-item (PSS-10)',
+  citation: 'Cohen, S., Kamarck, T., & Mermelstein, R. (1983). A global measure of perceived stress. Journal of Health and Social Behavior, 24, 385–396; 10-item form/scoring commonly referenced to Cohen & Williamson (1988).',
+  url: 'https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/index.html',
+  publicationYear: 1983
+},
+    reportPlan: {
+  dimensionLabels: [
+    '知觉压力'
+  ],
+  limitations: [
+    '当前仅为报告设计；使用许可与中文翻译权利未闭环前不生成可执行 package。',
+    '分数描述过去一个月的主观不可预测、不可控制与负荷感，不等同于精神疾病诊断。',
+    '不提供临床 cut-off、常模或百分位。'
+  ],
+  disclaimer: '计划报告仅描述本次自评的知觉压力水平，不用于诊断或高风险决策。'
+},
+    blockers: [
+  'EXECUTABLE_NOT_REGISTERED'
+],
   },
 } satisfies ScaleInstrumentSourceV1

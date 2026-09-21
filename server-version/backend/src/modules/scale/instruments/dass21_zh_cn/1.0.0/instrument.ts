@@ -113,8 +113,51 @@ export const SCALE_INSTRUMENT_SOURCE = {
   identity: { instrumentKey, instrumentVersion },
   catalog: { ...catalog, identity: catalogIdentity },
   localization: localizationBody,
+  educationalFeedback: {
+    schemaVersion: 1,
+    contentVersion: '1.0.0',
+    blocks: [
+      { id: 'themes', title: '这份问卷关注了什么', body: '问卷涉及情绪与动力、担忧与身体反应、紧绷与烦躁等过去一周体验；这些主题不表示系统判断你一定存在这些情况。' },
+      { id: 'reflection', title: '给自己一点观察空间', body: '可以留意什么事情最消耗精力、什么时刻会稍微轻松，以及接下来一周愿意为自己做的一件小事。' },
+      { id: 'support', title: '什么时候值得找人聊聊', body: '如果困难持续存在、越来越强，或明显影响学习、睡眠、人际关系或日常生活，可以和可信任的成年人、学校心理老师或合适的专业人员谈一谈。' },
+      { id: 'urgent', title: '需要立即帮助时', body: '如果你此刻担心自己可能伤害自己、无法保证自己的安全，或正处在明显危险中，请立即联系身边可信任的成年人、当地紧急服务或可用的危机支持渠道。' },
+    ],
+    choices: [
+      { id: 'body', label: '让身体慢一点', body: '离开屏幕走动几分钟，喝点水，活动肩颈和手臂，找一个相对安静的地方坐一会儿。' },
+      { id: 'small_step', label: '把事情拆小一点', body: '只决定接下来最小的一步；可以先做 10 分钟，再决定是否继续。' },
+      { id: 'space', label: '给大脑留一点空隙', body: '安排几分钟不看消息和短视频，把反复出现的担心先写下来，不要求自己立刻想清所有问题。' },
+      { id: 'talk', label: '找一个人说说', body: '选一个相对信任的人；也可以联系学校心理老师或合适的专业人员。' },
+      { id: 'observe', label: '先观察一周', body: '留意情绪变化明显的时段和让自己稍微舒服的情境，一周后再回看是否出现新的规律。' },
+    ],
+    disclaimer: '这份反馈不会打分或贴心理健康标签，所有内容都不依赖隐藏分数。',
+  },
   candidatePreview: {
     status: 'CATALOG_ONLY',
-    blockers: ['EXECUTABLE_NOT_REGISTERED'],
+    source: {
+  title: 'Depression Anxiety Stress Scales — 21-item (DASS-21)',
+  citation: 'Lovibond, S. H., & Lovibond, P. F. (1995). Manual for the Depression Anxiety Stress Scales (2nd ed.). Psychology Foundation.',
+  url: 'https://www2.psy.unsw.edu.au/dass/',
+  publicationYear: 1995
+},
+    reportPlan: {
+  dimensionLabels: [
+    '抑郁相关体验',
+    '焦虑相关体验',
+    '压力/紧张相关体验'
+  ],
+  limitations: [
+    '学生/普通被试侧不显示数值分数、严重程度等级、百分位、常模位置或心理健康状态判断。',
+    '学生侧反馈不依赖隐藏分数生成自动个体解释；仅提供与所有被试一致的教育性说明和一般支持信息。',
+    '标准 DASS-21 当前产品准入边界为 14 岁及以上；14 岁以下必须使用独立 DASS-Y instrument identity。',
+    '当前不启用严重程度 cut-off、中国常模、百分位或诊断结论。'
+  ],
+  disclaimer: '本问卷关注过去一周的一些情绪和身体体验。学生侧仅提供非分数化、非诊断性的描述与一般支持信息。'
+},
+    blockers: [
+  'EXECUTABLE_NOT_REGISTERED',
+  'RESPONDENT_SAFE_PROJECTION_REQUIRED',
+  'AGE_14_RUNTIME_ADMISSION_REQUIRED',
+  'LOCALIZATION_REVIEW_PENDING'
+],
   },
 } satisfies ScaleInstrumentSourceV1

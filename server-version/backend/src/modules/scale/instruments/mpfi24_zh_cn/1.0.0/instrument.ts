@@ -83,6 +83,26 @@ export const SCALE_INSTRUMENT_SOURCE = {
   localization: localizationBody,
   candidatePreview: {
     status: 'CATALOG_ONLY',
-    blockers: ['EXECUTABLE_NOT_REGISTERED'],
+    source: {
+  title: 'Multidimensional Psychological Flexibility Inventory — 24-item short form (MPFI-24)',
+  citation: 'Rolffs, J. L., Rogge, R. D., & Wilson, K. G. (2018). Disentangling Components of Flexibility via the Hexaflex Model: Development and Validation of the Multidimensional Psychological Flexibility Inventory. Assessment, 25, 458–482.',
+  url: 'https://doi.org/10.1177/1073191116645905',
+  publicationYear: 2018
+},
+    reportPlan: {
+  dimensionLabels: [
+    '心理灵活性',
+    '心理不灵活性'
+  ],
+  limitations: [
+    '当前仅为报告设计；简体中文 exact-form 条目、24 项计分映射及数字再分发 provenance 尚未冻结。',
+    '心理灵活性与不灵活性按相关但不同的过程维度呈现，不合并为单一“好/坏人格”结论。',
+    '不作心理障碍诊断或治疗效果声明。'
+  ],
+  disclaimer: '计划报告用于 ACT 过程层面的描述性反思，不替代临床评估或治疗判断。'
+},
+    blockers: [
+  'EXECUTABLE_NOT_REGISTERED'
+],
   },
 } satisfies ScaleInstrumentSourceV1

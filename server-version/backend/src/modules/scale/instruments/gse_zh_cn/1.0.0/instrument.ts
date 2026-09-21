@@ -93,6 +93,25 @@ export const SCALE_INSTRUMENT_SOURCE = {
   localization: localizationBody,
   candidatePreview: {
     status: 'CATALOG_ONLY',
-    blockers: ['EXECUTABLE_NOT_REGISTERED'],
+    source: {
+  title: 'General Self-Efficacy Scale (GSE)',
+  citation: 'Schwarzer, R., & Jerusalem, M. (1995). Generalized Self-Efficacy Scale. In J. Weinman, S. Wright, & M. Johnston (Eds.), Measures in Health Psychology: A User’s Portfolio.',
+  url: 'https://userpage.fu-berlin.de/health/selfscal.htm',
+  publicationYear: 1995
+},
+    reportPlan: {
+  dimensionLabels: [
+    '一般自我效能'
+  ],
+  limitations: [
+    '当前仅为报告设计；exact-form 中文文本、canonical scoring 与受限在线使用条件尚未冻结为 runtime package。',
+    '自我效能是自我报告信念，不等同于智力、学业成绩、执行功能任务表现或客观能力。',
+    '不提供群体百分位或常模判断。'
+  ],
+  disclaimer: '计划报告描述个体对困难与挑战的总体应对信念，不用于诊断、能力鉴定或高风险决策。'
+},
+    blockers: [
+  'EXECUTABLE_NOT_REGISTERED'
+],
   },
 } satisfies ScaleInstrumentSourceV1

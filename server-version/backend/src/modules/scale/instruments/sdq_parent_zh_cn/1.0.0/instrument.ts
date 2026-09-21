@@ -42,7 +42,23 @@ const catalog: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [],
+  evidence: [
+    {
+      evidenceId: 'sdq-cn-du-2008',
+      evidenceType: 'CROSS_CULTURAL_VALIDITY',
+      population: '上海 12 个行政区幼儿园、小学和中学的 3–17 岁儿童青少年；家长、教师及 11–17 岁自评',
+      ageRange: '3–17 years; self-report 11–17 years',
+      locale: 'zh-CN',
+      territory: 'CN',
+      sampleSize: 1965,
+      studyDesign: 'Community epidemiological psychometric study; parent/teacher/self-report reliability, factor structure, convergent/discriminant validity and local descriptive norms',
+      rating: 'MIXED',
+      citation: 'Du Y, Kou J, Coghill D. (2008). The validity, reliability and normative scores of the parent, teacher and self report versions of the Strengths and Difficulties Questionnaire in China. Child and Adolescent Psychiatry and Mental Health, 2, 8.',
+      doi: '10.1186/1753-2000-2-8',
+      url: 'https://doi.org/10.1186/1753-2000-2-8',
+      notes: '家长/教师完整数据 n=1,965，自评完整三方数据 n=690。五因子结构仅部分复现；该证据不自动激活平台 banding/cut-off 或当前英文 Teacher runtime 的中文 exact-form 声称。',
+    },
+  ],
   referenceApplicability: [],
 }
 const localization: LocalizationManifestV1 = {

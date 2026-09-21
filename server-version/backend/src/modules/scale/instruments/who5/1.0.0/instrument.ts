@@ -43,7 +43,23 @@ const catalog: ScaleCatalogManifestV1 = {
     layoutConstraints: [],
   },
   intendedUse: standardIntendedUse,
-  evidence: [],
+  evidence: [
+    {
+      evidenceId: 'who5-cn-fung-2022',
+      evidenceType: 'CROSS_CULTURAL_VALIDITY',
+      population: '中国大陆大学本科生（广东高校，两项横断面研究）',
+      ageRange: 'Study 1 mean 20.56 years; Study 2 mean 20.41 years',
+      locale: 'zh-CN',
+      territory: 'CN',
+      sampleSize: 1414,
+      studyDesign: 'Two cross-sectional psychometric studies; internal consistency, EFA/CFA, concurrent and construct validity',
+      rating: 'SUFFICIENT',
+      citation: 'Fung SF, Kong CYW, Liu YM, et al. (2022). Validity and Psychometric Evaluation of the Chinese Version of the 5-Item WHO Well-Being Index. Frontiers in Public Health, 10, 872436.',
+      doi: '10.3389/fpubh.2022.872436',
+      url: 'https://doi.org/10.3389/fpubh.2022.872436',
+      notes: 'Study 1 n=903, Study 2 n=511. 该核心大陆 validation 直接支持大学生/青年成人，不直接验证当前产品 9–18 岁 K-12 入口。',
+    },
+  ],
   referenceApplicability: [],
 }
 const localization: LocalizationManifestV1 = {
