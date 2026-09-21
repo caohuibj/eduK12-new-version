@@ -1,0 +1,8 @@
+{
+  "releaseStatus": "PUBLISHED",
+  "review": {
+    "kind": "migration",
+    "baselineCommit": "a3098d845c0b3b30cea747f26d7491d11d0489c0",
+    "contentDigest": "f92428f35fa47b048d3529277950fe9714bf2e9ee053339d9eefe64a8468111a"
+  }
+}
