@@ -107,9 +107,11 @@ async function complete(name, r) {
   if (!checkedProjectionRecovery) {
     // Inject only projection loss after authoritative FINAL; GET must repair it.
     await prisma.$executeRaw`UPDATE assessment_run_executions SET status='STARTED', completed_at=NULL WHERE id=${task.executionId}`
-    const reread = page.waitForResponse(response => response.request().method() === 'GET' && response.url().endsWith(`/composite-assessments/attempts/${attemptId}`))
+    const rereadBody = page.waitForResponse(
+      response => response.request().method() === 'GET' && response.url().endsWith(`/composite-assessments/attempts/${attemptId}`),
+    ).then(response => response.json())
     await page.goto(`${base}/relational/attempts/${attemptId}`)
-    assert.equal((await (await reread).json()).data.status, 'COMPLETED')
+    assert.equal((await rereadBody).data.status, 'COMPLETED')
     const repaired = await prisma.$queryRaw`SELECT status FROM assessment_run_executions WHERE id=${task.executionId}`
     assert.equal(repaired[0].status, 'COMPLETED')
     assert.equal(await prisma.assessmentUnitSnapshot.count({ where: { compositeAttemptId: attemptId } }), 1)
