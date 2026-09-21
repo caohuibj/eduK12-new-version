@@ -10,6 +10,17 @@ const reactionFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const reactionTaskPackage = defineCognitiveTaskPackage({
   testType: 'reaction',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    excessivePremature: 'limited',
+    extremeRtPattern: 'limited',
+    highMissRate: 'limited',
+    insufficientValidTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'reaction',

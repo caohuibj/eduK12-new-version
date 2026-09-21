@@ -9,6 +9,17 @@ const mentalrotationFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const mentalrotationTaskPackage = defineCognitiveTaskPackage({
   testType: 'mentalrotation',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientAngleCoverage: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   { testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, finalSubmission: mentalrotationFinalSubmission, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta }
   ],

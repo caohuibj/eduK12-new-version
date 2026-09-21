@@ -10,6 +10,15 @@ const memoryFinalSubmission = spanTaskCountFinalSubmission('startLength', 'maxLe
 
 export const memoryTaskPackage = defineCognitiveTaskPackage({
   testType: 'memory',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    insufficientCompletedLevels: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    invalidSequencePattern: 'invalid',
+  },
   entries: [
   {
   testType: 'memory',

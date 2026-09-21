@@ -9,6 +9,18 @@ const flankerFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const flankerTaskPackage = defineCognitiveTaskPackage({
   testType: 'flanker',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientCongruentTrials: 'limited',
+    insufficientIncongruentTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   {
   testType: 'flanker',

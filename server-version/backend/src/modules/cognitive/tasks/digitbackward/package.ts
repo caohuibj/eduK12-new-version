@@ -9,6 +9,15 @@ const digitbackwardFinalSubmission = spanTaskCountFinalSubmission('startSpan', '
 
 export const digitbackwardTaskPackage = defineCognitiveTaskPackage({
   testType: 'digitbackward',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    insufficientCompletedLevels: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'digitbackward',

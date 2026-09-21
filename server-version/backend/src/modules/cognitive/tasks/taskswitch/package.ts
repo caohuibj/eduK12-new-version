@@ -9,6 +9,16 @@ const taskswitchFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const taskswitchTaskPackage = defineCognitiveTaskPackage({
   testType: 'taskswitch',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    insufficientRepeatTrials: 'limited',
+    insufficientSwitchTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   {
   testType: 'taskswitch',

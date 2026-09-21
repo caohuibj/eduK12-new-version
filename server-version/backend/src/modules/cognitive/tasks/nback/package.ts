@@ -9,6 +9,16 @@ const nbackFinalSubmission = nbackTaskCountFinalSubmission()
 
 export const nbackTaskPackage = defineCognitiveTaskPackage({
   testType: 'nback',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    ceilingOrFloorByN: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientTargetsByN: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'nback',

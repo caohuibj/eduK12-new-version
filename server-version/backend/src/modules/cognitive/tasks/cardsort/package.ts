@@ -9,6 +9,18 @@ const cardsortFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const cardsortTaskPackage = defineCognitiveTaskPackage({
   testType: 'cardsort',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientRepeatTrials: 'limited',
+    insufficientSwitchTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   {
   testType: 'cardsort',

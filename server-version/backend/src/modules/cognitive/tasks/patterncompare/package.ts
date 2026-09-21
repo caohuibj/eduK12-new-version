@@ -9,6 +9,17 @@ const patterncompareFinalSubmission = absoluteFallbackFinalSubmission()
 
 export const patterncompareTaskPackage = defineCognitiveTaskPackage({
   testType: 'patterncompare',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveLapses: 'limited',
+    insufficientCompletedTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   {
   testType: 'patterncompare',

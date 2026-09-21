@@ -9,6 +9,18 @@ const lexicaldecisionFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const lexicaldecisionTaskPackage = defineCognitiveTaskPackage({
   testType: 'lexicaldecision',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientPseudoWords: 'limited',
+    insufficientRealWords: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   { testType: 'lexicaldecision', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: lexicaldecisionConfigSchema, trialSchema: lexicaldecisionTrialSchema, finalSubmission: lexicaldecisionFinalSubmission, score: scoreLexicaldecisionV1, ...lexicaldecisionRegistryMeta }
   ],

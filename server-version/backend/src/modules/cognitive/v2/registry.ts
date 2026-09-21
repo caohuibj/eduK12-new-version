@@ -5,6 +5,8 @@ import {
 import type { RegistryEntry } from '../cognitive.types'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
 import { buildQualityAssessment } from './quality'
+import { requireCognitiveTaskSemantics } from '../tasks/task-packages'
+import type { CognitiveTaskProtocolPhaseV1, CognitiveTaskQualityEffectV1 } from '../tasks/task-package'
 import { parseCognitivePresentationDefinition } from './presentation'
 import type {
   CognitiveProfile,
@@ -56,15 +58,6 @@ export const validateRegistryReferenceEligibility = (entry: {
 }
 
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
-const nonDegradingProvenanceQualityFlags = new Set(['deviceInfoIncomplete', 'mixedPointerType'])
-
-const qualityEffect = (key: string): QualityDefinition['effect'] => {
-  if (nonDegradingProvenanceQualityFlags.has(key)) return 'none'
-  if (/invalid|corrupt|malformed/i.test(key)) return 'invalid'
-  if (key === 'interpretable') return 'none'
-  return 'limited'
-}
-
 const metricVisibility = (key: string, entry: AnyRegistryEntry): MetricDefinition['visibility'] => {
   const report = entry.reportDefinition
   if (key === report.headlineMetric) return 'headline'
@@ -101,13 +94,20 @@ const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricD
   }])) as Record<string, MetricDefinition>
 }
 
-const adaptQualityDefinitions = (entry: AnyRegistryEntry): Record<string, QualityDefinition> => ({
-  ...Object.fromEntries(Object.entries(entry.qualityDefinitions).map(([key, quality]) => [key, {
-    key,
-    label: quality.label,
-    description: quality.description,
-    effect: qualityEffect(key),
-  }])),
+const adaptQualityDefinitions = (
+  entry: AnyRegistryEntry,
+  effects: Readonly<Record<string, CognitiveTaskQualityEffectV1>>,
+): Record<string, QualityDefinition> => ({
+  ...Object.fromEntries(Object.entries(entry.qualityDefinitions).map(([key, quality]) => {
+    const effect = effects[key]
+    if (!effect) throw new Error(`Missing task-owned quality effect: ${entry.testType}/${key}`)
+    return [key, {
+      key,
+      label: quality.label,
+      description: quality.description,
+      effect,
+    }]
+  })),
   legacyUninterpretable: {
     key: 'legacyUninterpretable',
     label: '结果质量受限',
@@ -135,20 +135,17 @@ const adaptReportDefinition = (entry: AnyRegistryEntry, metrics: Record<string, 
   }
 }
 
-const phasefulTasks = new Set(['picturesequence', 'pairedassociate', 'wordlist'])
-const adaptProtocol = (entry: AnyRegistryEntry) => ({
+const adaptProtocol = (
+  entry: AnyRegistryEntry,
+  phases: readonly CognitiveTaskProtocolPhaseV1[],
+) => ({
   schemaVersion: 1 as const,
   key: `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`,
   version: '1.0.0',
   clock: 'performance' as const,
   randomizationAlgorithmVersion: entry.randomizationAlgorithmVersion,
   trialEnvelopeVersion: 1 as const,
-  phases: phasefulTasks.has(entry.testType)
-    ? [
-        { key: 'learning' as const, persists: true, required: true },
-        { key: 'delayed' as const, persists: true, required: false },
-      ]
-    : [{ key: 'test' as const, persists: true, required: true }],
+  phases: phases.map((phase) => ({ ...phase })),
   measurementCriticalConfigPaths: ['*'],
 })
 
@@ -174,9 +171,10 @@ export const buildCognitiveV2TaskDefinition = (
   entry: AnyRegistryEntry,
   legacyPublicationStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED' = legacyCompatibilityStatus(entry),
 ): TaskDefinition<unknown, unknown> => {
+  const semantics = requireCognitiveTaskSemantics(entry.testType)
   const metrics = adaptMetricDefinitions(entry)
-  const quality = adaptQualityDefinitions(entry)
-  const protocol = adaptProtocol(entry)
+  const quality = adaptQualityDefinitions(entry, semantics.qualityEffects)
+  const protocol = adaptProtocol(entry, semantics.protocolPhases)
   return {
     schemaVersion: 1,
     testType: entry.testType,

@@ -9,6 +9,17 @@ const pairedassociateFinalSubmission = phaseTaskCountFinalSubmission()
 
 export const pairedassociateTaskPackage = defineCognitiveTaskPackage({
   testType: 'pairedassociate',
+  protocolPhases: [
+    { key: 'learning', persists: true, required: true },
+    { key: 'delayed', persists: true, required: false },
+  ],
+  qualityEffects: {
+    constantPositionResponse: 'limited',
+    delayedStageIncomplete: 'limited',
+    excessiveOmissions: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'pairedassociate',

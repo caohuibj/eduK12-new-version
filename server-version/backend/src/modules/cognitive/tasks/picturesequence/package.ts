@@ -9,6 +9,18 @@ const picturesequenceFinalSubmission = phaseTaskCountFinalSubmission()
 
 export const picturesequenceTaskPackage = defineCognitiveTaskPackage({
   testType: 'picturesequence',
+  protocolPhases: [
+    { key: 'learning', persists: true, required: true },
+    { key: 'delayed', persists: true, required: false },
+  ],
+  qualityEffects: {
+    delayedStageIncomplete: 'limited',
+    emptyResponse: 'limited',
+    incompleteResponse: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    unchangedIncorrectOrder: 'limited',
+  },
   entries: [
   {
   testType: 'picturesequence',

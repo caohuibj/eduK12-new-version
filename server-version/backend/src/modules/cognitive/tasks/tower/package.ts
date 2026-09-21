@@ -9,6 +9,15 @@ const towerFinalSubmission = fixedCountFinalSubmission('problemCount')
 
 export const towerTaskPackage = defineCognitiveTaskPackage({
   testType: 'tower',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    excessiveRuleViolations: 'limited',
+    insufficientAttemptedProblems: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   { testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, finalSubmission: towerFinalSubmission, score: scoreTowerV1, ...towerRegistryMeta }
   ],

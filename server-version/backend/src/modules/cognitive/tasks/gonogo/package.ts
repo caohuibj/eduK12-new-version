@@ -9,6 +9,16 @@ const gonogoFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const gonogoTaskPackage = defineCognitiveTaskPackage({
   testType: 'gonogo',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    excessiveOmissions: 'limited',
+    extremeCommissionRate: 'limited',
+    insufficientNoGoTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'gonogo',

@@ -9,6 +9,17 @@ const emotionrecognitionFinalSubmission = fixedCountFinalSubmission('totalTrials
 
 export const emotionrecognitionTaskPackage = defineCognitiveTaskPackage({
   testType: 'emotionrecognition',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantResponse: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientPerCategory: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   { testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, finalSubmission: emotionrecognitionFinalSubmission, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta }
   ],

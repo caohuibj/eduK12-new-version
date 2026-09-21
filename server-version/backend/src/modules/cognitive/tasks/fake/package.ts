@@ -9,6 +9,12 @@ const fakeFinalSubmission = fixedCountFinalSubmission('trialCount')
 
 export const fakeTaskPackage = defineCognitiveTaskPackage({
   testType: 'fake',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    interpretable: 'none',
+  },
   entries: [
   {
   testType: 'fake',

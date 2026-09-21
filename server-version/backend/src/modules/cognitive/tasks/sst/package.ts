@@ -9,6 +9,17 @@ const sstFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const sstTaskPackage = defineCognitiveTaskPackage({
   testType: 'sst',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    highGoOmission: 'limited',
+    insufficientStopTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    pRespondStopOutOfRange: 'limited',
+    strategicSlowingSuspected: 'limited',
+  },
   entries: [
   {
   testType: 'sst',

@@ -9,6 +9,20 @@ const reversallearningFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const reversallearningTaskPackage = defineCognitiveTaskPackage({
   testType: 'reversallearning',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    constantChoice: 'limited',
+    excessiveOmissions: 'limited',
+    insufficientAcquisitionTrials: 'limited',
+    insufficientReversalTrials: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+    noAcquisitionCriterion: 'limited',
+    noReversalCriterion: 'limited',
+  },
   entries: [
   { testType: 'reversallearning', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: reversallearningConfigSchema, trialSchema: reversallearningTrialSchema, finalSubmission: reversallearningFinalSubmission, score: scoreReversallearningV1, ...reversallearningRegistryMeta }
   ],

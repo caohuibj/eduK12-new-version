@@ -9,6 +9,16 @@ const cptFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const cptTaskPackage = defineCognitiveTaskPackage({
   testType: 'cpt',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    highOmissionRate: 'limited',
+    highPerseverationRate: 'limited',
+    insufficientTargets: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+  },
   entries: [
   {
   testType: 'cpt',

@@ -10,6 +10,16 @@ const stroopFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const stroopTaskPackage = defineCognitiveTaskPackage({
   testType: 'stroop',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    insufficientValidCongruentRt: 'limited',
+    insufficientValidIncongruentRt: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    lowAccuracy: 'limited',
+  },
   entries: [
   {
   testType: 'stroop',

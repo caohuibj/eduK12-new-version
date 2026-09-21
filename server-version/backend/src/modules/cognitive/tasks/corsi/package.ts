@@ -9,6 +9,15 @@ const corsiFinalSubmission = spanTaskCountFinalSubmission('startSpan', 'maxSpan'
 
 export const corsiTaskPackage = defineCognitiveTaskPackage({
   testType: 'corsi',
+  protocolPhases: [
+    { key: 'test', persists: true, required: true },
+  ],
+  qualityEffects: {
+    insufficientCompletedLevels: 'limited',
+    interpretable: 'none',
+    interrupted: 'limited',
+    invalidBlockSequence: 'invalid',
+  },
   entries: [
   {
   testType: 'corsi',
