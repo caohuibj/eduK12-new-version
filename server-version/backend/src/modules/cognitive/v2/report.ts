@@ -21,6 +21,7 @@ export interface ReportMetricView {
 
 export interface ThreeLayerReport {
   title: string
+  profileLabel: string | null
   qualityState: QualityState
   conclusion: string
   headline: ReportMetricView[]
@@ -118,10 +119,6 @@ const projectKeys = (
 })
 
 const participantMetricAllowed = (testType: string, key: string): boolean => {
-  // Matrix `reachedDifficulty` only means that at least one item in a design
-  // tier was answered correctly. It is useful as a raw research descriptor,
-  // but a single lucky response can raise it, so it must not be presented as
-  // a participant ability/difficulty level.
   if (testType === 'matrix' && key === 'reachedDifficulty') return false
   return true
 }
@@ -177,6 +174,13 @@ const participantPracticalTips = (testType: string, tips: string[]): string[] =>
   return tips
 }
 
+const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => {
+  if (profile === 'experience') return '体验版'
+  if (profile === 'standard') return '正式版'
+  if (profile === 'research') return '科研版'
+  return null
+}
+
 export const projectThreeLayerReport = (input: {
   testType: string
   configVersion: string
@@ -217,6 +221,7 @@ export const projectThreeLayerReport = (input: {
   })
   return {
     title: input.definition.title,
+    profileLabel: protocolPresentation?.profileLabel ?? legacyProfileLabel(input.profile),
     qualityState: input.score.quality.state,
     conclusion: conclusionFor(
       input.score.quality.state,
