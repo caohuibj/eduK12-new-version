@@ -47,8 +47,25 @@ export const getExecutableScalePackage = (key: string, instrumentVersion: string
   executableByIdentity.get(identityKey(key, instrumentVersion))
 )
 
-/** Preserve the legacy public ordering exactly; generated source order is deterministic. */
-export const listExecutableScalePackages = (): ScalePackageV2[] => [...executableByIdentity.values()]
+const LEGACY_EXECUTABLE_ORDER = [
+  'adexi_v1:2.0.0',
+  'who5:1.0.0',
+  'sdq_parent_zh_cn:1.0.0',
+  'sdq_teacher_zh_cn:1.0.0',
+  'texi_parent_zh_cn:1.0.0',
+  'texi_teacher_zh_cn:1.0.0',
+] as const
+const legacyRank = new Map<string, number>(LEGACY_EXECUTABLE_ORDER.map((key, index) => [key, index]))
+
+/** Historical six-package ordering is an API compatibility contract; new identities sort after it. */
+export const listExecutableScalePackages = (): ScalePackageV2[] => [...executableByIdentity.values()].sort((left, right) => {
+  const leftKey = identityKey(left.key, left.instrumentVersion)
+  const rightKey = identityKey(right.key, right.instrumentVersion)
+  const leftRank = legacyRank.get(leftKey)
+  const rightRank = legacyRank.get(rightKey)
+  if (leftRank !== undefined || rightRank !== undefined) return (leftRank ?? Number.MAX_SAFE_INTEGER) - (rightRank ?? Number.MAX_SAFE_INTEGER)
+  return leftKey.localeCompare(rightKey)
+})
 
 export const hasExecutableScalePackage = (key: string, instrumentVersion: string): boolean => (
   executableByIdentity.has(identityKey(key, instrumentVersion))

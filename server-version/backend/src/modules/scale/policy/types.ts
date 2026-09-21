@@ -47,6 +47,7 @@ export interface InstrumentUsageRequirementsV1 {
   policyVersion: string
   requiredRightsActions: string[]
   allowedDeploymentModes?: string[]
+  allowedCommercialNatures?: Array<'NON_COMMERCIAL' | 'COMMERCIAL'>
   notes: string[]
 }
 
