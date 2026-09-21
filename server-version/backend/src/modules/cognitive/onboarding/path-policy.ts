@@ -17,7 +17,7 @@ export const classifyCognitiveOnboardingPath = (
   filePath: string,
   testType: string,
 ): CognitiveOnboardingPathClass => {
-  const normalized = filePath.replaceAll('\\', '/')
+  const normalized = filePath.replace(/\\\\/g, '/')
   if (GENERATED_PATHS.has(normalized)) return 'GENERATED'
   if (normalized.startsWith(`server-version/backend/src/modules/cognitive/tasks/${testType}/`)) {
     return 'TASK_OWNED'
