@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createFrozenUnitAdmission } from '../../modules/assessment-runtime/admission-snapshot'
 import { createFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
@@ -7,7 +7,7 @@ import { listScalePackages } from '../../modules/scale/scale-package.registry'
 import { scoreScale } from '../../modules/scale/scale-scoring'
 
 describe('PR-1 baseline capture', () => {
-  it('prints fixed compatibility constants for the frozen base', () => {
+  it('emits fixed compatibility constants for fixture hardening', () => {
     const frozenAt = new Date('2026-09-21T00:00:00.000Z')
     const packages = listScalePackages()
     const rows = packages.map((pkg) => ({
@@ -28,7 +28,6 @@ describe('PR-1 baseline capture', () => {
       principal: { userId: 'user-1' },
       frozenAt,
     })
-    process.stdout.write(`PR1_BASELINE_CAPTURE=${JSON.stringify({ rows, runtimeSnapshotHash: runtime.snapshotHash, admissionSnapshotHash: admission.snapshotHash })}\n`)
-    expect(rows).toHaveLength(6)
+    throw new Error(`PR1_BASELINE_CAPTURE=${JSON.stringify({ rows, runtimeSnapshotHash: runtime.snapshotHash, admissionSnapshotHash: admission.snapshotHash })}`)
   })
 })
