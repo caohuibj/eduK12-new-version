@@ -13,8 +13,8 @@ export const resolveCognitiveTaskParticipantPresentation = (input: {
   const row = COGNITIVE_TASK_PRESENTATIONS.find((candidate) => candidate.testType === input.testType)
   if (!row) return null
   const task = row.presentation
-  const protocol = input.profile
-    ? task.exactProfilePresentations?.find((candidate) => (
+  const protocol = input.profile && 'exactProfilePresentations' in task
+    ? task.exactProfilePresentations.find((candidate) => (
         candidate.engineVersion === input.engineVersion
         && candidate.scoringVersion === input.scoringVersion
         && candidate.profile === input.profile
