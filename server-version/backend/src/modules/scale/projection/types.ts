@@ -1,10 +1,16 @@
-import type { ScaleResultV2 } from '../scale-result'
 import type {
   AudienceDisclosurePolicyV1,
   DisclosureCapabilitiesV1,
   EducationalFeedbackDefinitionV1,
   ScaleDisclosureAudience,
 } from '../policy/types'
+import type { ResolvedScaleReference } from '../../assessment-reference/reference'
+import type {
+  ExternalScaleItemScoreV1,
+  ExternalScaleMethodV1,
+  ExternalScaleQualityV1,
+  ExternalScaleScoreV1,
+} from './serialization'
 
 export type ScaleProjectionPurpose = 'resume' | 'result' | 'history' | 'report' | 'export'
 export type ScaleRelationalDisposition = 'NON_RELATIONAL' | 'INDIVIDUAL_ALLOWED' | 'COHORT_ONLY'
@@ -47,36 +53,41 @@ export interface ExternalScaleReportBaseV1 {
 
 export interface ExternalScaleFullReportV1 extends ExternalScaleReportBaseV1 {
   kind: 'full'
-  scores?: ScaleResultV2['scores']
-  references?: ScaleResultV2['references']
+  scores?: ExternalScaleScoreV1[]
+  references?: ResolvedScaleReference[]
   interpretations?: Array<{
     scoreKey: string
-    headline?: string
-    label?: string | null
+    headline: string
+    label: string | null
     interpretation: string
-    guidance: ScaleResultV2['interpretations'][number]['guidance']
+    guidance: Array<{ category: 'reflection' | 'strategy' | 'environment' | 'support'; text: string }>
     limitations: string[]
     referenceVersion: string | null
   }>
-  quality?: ScaleResultV2['quality']
-  itemScores?: ScaleResultV2['itemScores']
-  method?: ScaleResultV2['method']
+  quality?: ExternalScaleQualityV1
+  itemScores?: ExternalScaleItemScoreV1[]
+  method?: ExternalScaleMethodV1
   caveats?: string[]
   disclaimer: string
-  educationalContent?: EducationalFeedbackDefinitionV1
+  educationalContent?: {
+    contentVersion: string
+    blocks: Array<{ id: string; title?: string; body: string }>
+    choices?: Array<{ id: string; label: string; body: string }>
+    disclaimer?: string
+  }
 }
 
 export interface ExternalScaleScoresReportV1 extends ExternalScaleReportBaseV1 {
   kind: 'scores'
-  scores: ScaleResultV2['scores']
+  scores: ExternalScaleScoreV1[]
   disclaimer: string
 }
 
 export interface ExternalScaleEducationalReportV1 extends ExternalScaleReportBaseV1 {
   kind: 'educational'
   contentVersion: string
-  blocks: EducationalFeedbackDefinitionV1['blocks']
-  choices?: EducationalFeedbackDefinitionV1['choices']
+  blocks: Array<{ id: string; title?: string; body: string }>
+  choices?: Array<{ id: string; label: string; body: string }>
   disclaimer?: string
 }
 

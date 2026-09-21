@@ -1,8 +1,11 @@
 import React from 'react'
 import type {
+  ExternalScaleMethod,
+  ExternalScaleQuality,
+  ExternalScaleScoreValue,
+  ScaleInterpretationValue,
   ScaleReferenceValue,
   ScaleResultV2,
-  ScaleScoreValue,
   ScaleUnitReport,
 } from './types'
 
@@ -13,11 +16,11 @@ export type SafeScaleUnitReport = Pick<
   scaleId?: string
   label?: string | null
   result?: ScaleResultV2 | null
-  quality?: ScaleResultV2['quality'] | null
-  scores?: ScaleScoreValue[]
+  quality?: ExternalScaleQuality | null
+  scores?: ExternalScaleScoreValue[]
   references?: ScaleReferenceValue[]
-  interpretations?: ScaleResultV2['interpretations']
-  method?: Partial<ScaleResultV2['method']> | null
+  interpretations?: ScaleInterpretationValue[]
+  method?: ExternalScaleMethod | null
 }
 
 const formatNumber = (value: number | null | undefined, precision = 2): string => (
@@ -30,7 +33,7 @@ const kindLabel = (kind: ScaleReferenceValue['referenceKind']): string => {
   return '参考分布'
 }
 
-const valuePosition = (score: ScaleScoreValue): number | null => {
+const valuePosition = (score: ExternalScaleScoreValue): number | null => {
   if (score.value === null || !score.range || score.range.max <= score.range.min) return null
   return Math.max(0, Math.min(100, ((score.value - score.range.min) / (score.range.max - score.range.min)) * 100))
 }
@@ -87,8 +90,8 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
   }
 
   const result = report.result ?? null
-  const quality = report.quality ?? result?.quality ?? null
-  const scores = result?.scores ?? report.scores ?? []
+  const quality: ExternalScaleQuality | ScaleResultV2['quality'] | null = report.quality ?? result?.quality ?? null
+  const scores: ExternalScaleScoreValue[] = result?.scores ?? report.scores ?? []
   const references = result?.references ?? report.references ?? []
   const interpretations = result?.interpretations ?? report.interpretations ?? []
   const invalid = quality?.status === 'invalid'
@@ -100,7 +103,6 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         {report.method?.reportVersion ? ` · 报告版本 ${report.method.reportVersion}` : ''}
       </p>
 
-      {/* Layer 1: construct feedback and report-defined interpretation. */}
       {!invalid && interpretations.length > 0 && (
         <section data-testid="scale-core-feedback">
           <h3 className="text-base font-semibold text-gray-800 mb-3">核心反馈</h3>
@@ -123,7 +125,6 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         </section>
       )}
 
-      {/* Layer 2: actual score and instrument-theoretical range. */}
       <section data-testid="scale-score-layer">
         <h3 className="text-base font-semibold text-gray-800 mb-3">实际得分</h3>
         {scores.length === 0 ? (
@@ -156,7 +157,6 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         )}
       </section>
 
-      {/* Layer 3: source and reference details. */}
       {!invalid && (
         <section data-testid="scale-reference-layer">
           <h3 className="text-base font-semibold text-gray-800 mb-3">详细参考</h3>

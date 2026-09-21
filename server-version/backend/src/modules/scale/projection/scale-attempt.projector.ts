@@ -1,6 +1,7 @@
 import type { DeviceInputProvenanceV1 } from '../device-input-provenance'
 import type { ScaleAnswer } from '../scale-scoring'
 import type { ScaleResultV2 } from '../scale-result'
+import { projectExternalDeviceProvenance, projectExternalScaleAnswer } from './serialization'
 import { projectScaleResult } from './scale-result.projector'
 import type { ScaleProjectionContext } from './types'
 
@@ -57,45 +58,12 @@ export const projectScaleAttemptForResume = (input: {
   decryptError?: boolean
 }) => ({
   ...attemptBase(input.assessment),
-  ...(input.includeAnswers ? { answers: input.answers.map((answer) => ({ ...answer })) } : {}),
-  ...(input.includeAnswers && input.deviceInputProvenance ? { deviceInputProvenance: { ...input.deviceInputProvenance } } : {}),
+  ...(input.includeAnswers ? { answers: input.answers.map(projectExternalScaleAnswer) } : {}),
+  ...(input.includeAnswers && input.deviceInputProvenance
+    ? { deviceInputProvenance: projectExternalDeviceProvenance(input.deviceInputProvenance) }
+    : {}),
   ...(input.decryptError ? { decryptError: true } : {}),
 })
-
-const legacyFullResultAlias = (report: ReturnType<typeof projectScaleResult>, result: ScaleResultV2 | null): ScaleResultV2 | null => {
-  if (!result || report.kind !== 'full') return null
-  if (!report.scores || !report.references || !report.interpretations || !report.quality || !report.itemScores || !report.method) return null
-  if (report.interpretations.some((entry) => entry.headline === undefined || !Object.prototype.hasOwnProperty.call(entry, 'label'))) return null
-  return {
-    schemaVersion: 2,
-    instrument: {
-      scaleId: report.instrument.scaleId,
-      code: report.instrument.code,
-      name: report.instrument.name,
-      instrumentVersion: report.instrument.instrumentVersion,
-    },
-    method: {
-      ...report.method,
-      referenceVersions: [...report.method.referenceVersions],
-      assessmentContext: report.method.assessmentContext ? { ...report.method.assessmentContext } : null,
-    },
-    quality: { status: report.quality.status, flags: [...report.quality.flags] },
-    itemScores: report.itemScores.map((item) => ({ ...item })),
-    scores: report.scores.map((score) => ({ ...score })),
-    references: report.references.map((reference) => ({ ...reference })),
-    interpretations: report.interpretations.map((entry) => ({
-      scoreKey: entry.scoreKey,
-      headline: entry.headline as string,
-      label: entry.label ?? null,
-      interpretation: entry.interpretation,
-      guidance: entry.guidance.map((guidance) => ({ ...guidance })),
-      limitations: [...entry.limitations],
-      referenceVersion: entry.referenceVersion,
-    })),
-    caveats: [...(report.caveats ?? [])],
-    disclaimer: report.disclaimer,
-  }
-}
 
 export const projectScaleCompletedResponse = (input: {
   assessment: any
@@ -121,10 +89,10 @@ export const projectScaleCompletedResponse = (input: {
   return {
     ...attemptBase(input.assessment, input.result),
     report,
-    // Transitional compatibility for existing full-report consumers. This is
-    // rebuilt from the strict allowlist projection and is never the stored
-    // authoritative result object. Restricted policies receive null.
-    result: legacyFullResultAlias(report, input.result),
+    // External completed responses are report-first. Returning a ScaleResultV2
+    // compatibility alias would require reconstructing raw-answer-bearing
+    // internal item scores, which violates FULL_REPORT(rawAnswers=false).
+    result: null,
     ...(input.decryptError ? { decryptError: true } : {}),
   }
 }

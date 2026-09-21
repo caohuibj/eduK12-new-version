@@ -134,10 +134,13 @@ describe('Scale result audience projection', () => {
     expect(project(90, projectionContext)).toMatchObject({ kind: 'unavailable', reason: 'POLICY_UNAVAILABLE' })
   })
 
-  it('never emits raw answers through FULL_REPORT', () => {
+  it('never emits raw answers through FULL_REPORT even when item scores are allowed', () => {
     const output = project(90, context(fullCaps))
     expect(output.kind).toBe('full')
+    if (output.kind !== 'full') throw new Error('expected full report')
     expect(JSON.stringify(output)).not.toContain('answers')
     expect(output).toHaveProperty('itemScores')
+    expect(output.itemScores?.[0]).toEqual({ itemCode: 'i1', baseScore: 90, score: 90 })
+    expect(output.itemScores?.[0]).not.toHaveProperty('responseValue')
   })
 })

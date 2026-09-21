@@ -1,6 +1,15 @@
 import { safeDecrypt } from '../../utils/encryption'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
+import {
+  projectExternalEducationalFeedback,
+  projectExternalInterpretations,
+  projectExternalScaleItemScores,
+  projectExternalScaleMethod,
+  projectExternalScaleQuality,
+  projectExternalScaleReferences,
+  projectExternalScaleScores,
+} from '../scale/projection/serialization'
 import type { ScaleProjectionContext } from '../scale/projection/types'
 
 /**
@@ -126,19 +135,14 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     || capabilities.resultQualityDetails
     || capabilities.itemScores
     || capabilities.methods
-  const feedback = context.frozenPolicy.educationalFeedback
+  const feedback = projectExternalEducationalFeedback(context.frozenPolicy.educationalFeedback)
 
   if (!capabilities.numericScores && !rich) {
     if (capabilities.educationalContent && feedback) {
       return {
         ...base,
         reportKind: 'educational',
-        educationalFeedback: {
-          contentVersion: feedback.contentVersion,
-          blocks: feedback.blocks.map((block) => ({ ...block })),
-          ...(feedback.choices ? { choices: feedback.choices.map((choice) => ({ ...choice })) } : {}),
-          ...(feedback.disclaimer ? { disclaimer: feedback.disclaimer } : {}),
-        },
+        educationalFeedback: feedback,
       }
     }
     return { ...base, reportKind: 'completion' }
@@ -148,39 +152,26 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     return {
       ...base,
       reportKind: 'scores',
-      scores: report.scores.map((score) => ({ ...score })),
+      scores: projectExternalScaleScores(report.scores),
       disclaimer: report.disclaimer,
     }
   }
 
-  const result = report.result
+  const quality = capabilities.resultQualityDetails ? projectExternalScaleQuality(report.quality) : null
+  const method = capabilities.methods ? projectExternalScaleMethod(report.method) : null
   return {
     ...base,
     reportKind: 'full',
-    ...(capabilities.numericScores ? { scores: report.scores.map((score) => ({ ...score })) } : {}),
-    ...(capabilities.references ? { references: report.references.map((reference) => ({ ...reference })) } : {}),
+    ...(capabilities.numericScores ? { scores: projectExternalScaleScores(report.scores) } : {}),
+    ...(capabilities.references ? { references: projectExternalScaleReferences(report.references, capabilities) } : {}),
     ...(capabilities.individualInterpretations ? {
-      interpretations: report.interpretations.map((entry) => ({
-        scoreKey: entry.scoreKey,
-        headline: capabilities.scoreDerivedLabels ? entry.headline : '结果说明',
-        label: capabilities.scoreDerivedLabels ? entry.label : null,
-        interpretation: entry.interpretation,
-        guidance: entry.guidance.map((guidance) => ({ ...guidance })),
-        limitations: [...entry.limitations],
-        referenceVersion: entry.referenceVersion,
-      })),
+      interpretations: projectExternalInterpretations(report.interpretations, capabilities),
     } : {}),
-    ...(capabilities.resultQualityDetails && report.quality
-      ? { quality: { status: report.quality.status, flags: [...report.quality.flags] }, caveats: [...report.caveats] }
+    ...(quality ? { quality, caveats: report.caveats.map(String) } : {}),
+    ...(capabilities.itemScores && report.result
+      ? { itemScores: projectExternalScaleItemScores(report.result.itemScores, capabilities.rawAnswers) }
       : {}),
-    ...(capabilities.itemScores && result ? { itemScores: result.itemScores.map((item) => ({ ...item })) } : {}),
-    ...(capabilities.methods && report.method ? {
-      method: {
-        ...report.method,
-        referenceVersions: [...report.method.referenceVersions],
-        assessmentContext: report.method.assessmentContext ? { ...report.method.assessmentContext } : null,
-      },
-    } : {}),
+    ...(method ? { method } : {}),
     ...(capabilities.educationalContent && feedback ? { educationalFeedback: feedback } : {}),
     disclaimer: report.disclaimer,
     // No nested result field is ever emitted here. A future field added to the

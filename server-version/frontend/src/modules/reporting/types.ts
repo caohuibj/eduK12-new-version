@@ -24,6 +24,23 @@ export interface ScaleScoreValue {
   prorated: boolean
 }
 
+/** Audience-safe score view. Aggregate surfaces may only have the canonical subset. */
+export interface ExternalScaleScoreValue {
+  key: string
+  label: string
+  value: number | null
+  type?: ScaleScoreValue['type']
+  description?: string
+  direction?: ScaleScoreDirection
+  canonical?: boolean
+  displayPrecision?: number
+  range?: ScaleScoreValue['range']
+  expectedItems?: string[]
+  answeredItems?: string[]
+  status?: ScaleScoreValue['status']
+  prorated?: boolean
+}
+
 export interface ScaleReferenceValue {
   scoreKey: string
   referenceVersion: string
@@ -121,6 +138,31 @@ export interface ScaleResultV2 {
   disclaimer: string
 }
 
+export interface ExternalScaleQuality {
+  status: 'interpretable' | 'limited' | 'invalid'
+  flags: string[]
+}
+
+export interface ExternalScaleMethod {
+  scaleId?: string
+  instrumentVersion?: string
+  scoringVersion?: string
+  reportVersion?: string
+  definitionHash?: string
+  referenceVersions?: string[]
+  assessmentContext?: { schemaVersion: 1; snapshotHash: string } | null
+}
+
+export interface ExternalScaleItemScore {
+  itemCode: string
+  baseScore: number
+  score: number
+  responseValue?: ScaleResponseValue
+  responseTimeMs?: number
+  answeredAt?: string
+  changeCount?: number
+}
+
 export interface EducationalFeedbackContent {
   contentVersion: string
   blocks: Array<{ id: string; title?: string; body: string }>
@@ -138,19 +180,19 @@ interface ExternalScaleReportBase {
 export type ExternalScaleReport =
   | (ExternalScaleReportBase & {
       kind: 'full'
-      scores?: ScaleScoreValue[]
+      scores?: ExternalScaleScoreValue[]
       references?: ScaleReferenceValue[]
       interpretations?: ScaleInterpretationValue[]
-      quality?: ScaleResultV2['quality']
-      itemScores?: ScaleResultV2['itemScores']
-      method?: ScaleResultV2['method']
+      quality?: ExternalScaleQuality
+      itemScores?: ExternalScaleItemScore[]
+      method?: ExternalScaleMethod
       caveats?: string[]
       educationalContent?: EducationalFeedbackContent
       disclaimer: string
     })
   | (ExternalScaleReportBase & {
       kind: 'scores'
-      scores: ScaleScoreValue[]
+      scores: ExternalScaleScoreValue[]
       disclaimer: string
     })
   | (ExternalScaleReportBase & {
@@ -175,15 +217,15 @@ export interface ScaleUnitReport {
   label?: string | null
   scaleName: string
   result: ScaleResultV2 | null
-  quality: ScaleResultV2['quality'] | null
-  scores: ScaleScoreValue[]
+  quality: ExternalScaleQuality | null
+  scores: ExternalScaleScoreValue[]
   references: ScaleReferenceValue[]
   interpretations: ScaleInterpretationValue[]
   caveats: string[]
   disclaimer: string
   completedAt: string | null
   totalTime: number | null
-  method: ScaleResultV2['method'] | null
+  method: ExternalScaleMethod | null
   decryptError?: boolean
   reportKind?: ExternalScaleReport['kind']
   educationalFeedback?: EducationalFeedbackContent

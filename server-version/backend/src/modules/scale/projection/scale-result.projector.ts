@@ -1,6 +1,15 @@
 import type { DisclosureCapabilitiesV1 } from '../policy/types'
 import type { ScaleResultV2 } from '../scale-result'
 import { resolveEffectiveScaleDisclosure } from './context'
+import {
+  projectExternalEducationalFeedback,
+  projectExternalInterpretations,
+  projectExternalScaleItemScores,
+  projectExternalScaleMethod,
+  projectExternalScaleQuality,
+  projectExternalScaleReferences,
+  projectExternalScaleScores,
+} from './serialization'
 import type {
   ExternalScaleReportBaseV1,
   ExternalScaleReportV1,
@@ -42,21 +51,6 @@ const hasRichCapability = (capabilities: DisclosureCapabilitiesV1): boolean => (
   || capabilities.methods
 )
 
-const projectInterpretations = (
-  result: ScaleResultV2,
-  capabilities: DisclosureCapabilitiesV1,
-) => result.interpretations.map((entry) => ({
-  scoreKey: entry.scoreKey,
-  // Keep a stable renderer contract without leaking score-derived labels.
-  // The fallback heading is static and independent of the result value.
-  headline: capabilities.scoreDerivedLabels ? entry.headline : '结果说明',
-  label: capabilities.scoreDerivedLabels ? entry.label : null,
-  interpretation: entry.interpretation,
-  guidance: entry.guidance.map((guidance) => ({ category: guidance.category, text: guidance.text })),
-  limitations: [...entry.limitations],
-  referenceVersion: entry.referenceVersion,
-}))
-
 /** Strict allowlist serializer for completed Scale results. */
 export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScaleReportV1 => {
   const base = baseFor(input)
@@ -67,17 +61,14 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
   if (!input.result) return { ...base, kind: 'completion' }
 
   const capabilities = resolveEffectiveScaleDisclosure(input.context)
-  const feedback = input.context.frozenPolicy.educationalFeedback
+  const feedback = projectExternalEducationalFeedback(input.context.frozenPolicy.educationalFeedback)
 
   if (!capabilities.numericScores && !hasRichCapability(capabilities)) {
     if (capabilities.educationalContent && feedback) {
       return {
         ...base,
         kind: 'educational',
-        contentVersion: feedback.contentVersion,
-        blocks: feedback.blocks.map((block) => ({ ...block })),
-        ...(feedback.choices ? { choices: feedback.choices.map((choice) => ({ ...choice })) } : {}),
-        ...(feedback.disclaimer ? { disclaimer: feedback.disclaimer } : {}),
+        ...feedback,
       }
     }
     return { ...base, kind: 'completion' }
@@ -87,26 +78,28 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
     return {
       ...base,
       kind: 'scores',
-      scores: input.result.scores.map((score) => ({ ...score })),
+      scores: projectExternalScaleScores(input.result.scores),
       disclaimer: input.result.disclaimer,
     }
   }
 
+  const quality = capabilities.resultQualityDetails ? projectExternalScaleQuality(input.result.quality) : null
+  const method = capabilities.methods ? projectExternalScaleMethod(input.result.method) : null
   return {
     ...base,
     kind: 'full',
-    ...(capabilities.numericScores ? { scores: input.result.scores.map((score) => ({ ...score })) } : {}),
-    ...(capabilities.references ? { references: input.result.references.map((reference) => ({ ...reference })) } : {}),
+    ...(capabilities.numericScores ? { scores: projectExternalScaleScores(input.result.scores) } : {}),
+    ...(capabilities.references
+      ? { references: projectExternalScaleReferences(input.result.references, capabilities) }
+      : {}),
     ...(capabilities.individualInterpretations
-      ? { interpretations: projectInterpretations(input.result, capabilities) }
+      ? { interpretations: projectExternalInterpretations(input.result.interpretations, capabilities) }
       : {}),
-    ...(capabilities.resultQualityDetails
-      ? { quality: { status: input.result.quality.status, flags: [...input.result.quality.flags] }, caveats: [...input.result.caveats] }
+    ...(quality ? { quality, caveats: input.result.caveats.map(String) } : {}),
+    ...(capabilities.itemScores
+      ? { itemScores: projectExternalScaleItemScores(input.result.itemScores, capabilities.rawAnswers) }
       : {}),
-    ...(capabilities.itemScores ? { itemScores: input.result.itemScores.map((item) => ({ ...item })) } : {}),
-    ...(capabilities.methods
-      ? { method: { ...input.result.method, referenceVersions: [...input.result.method.referenceVersions], assessmentContext: input.result.method.assessmentContext ? { ...input.result.method.assessmentContext } : null } }
-      : {}),
+    ...(method ? { method } : {}),
     ...(capabilities.educationalContent && feedback ? { educationalContent: feedback } : {}),
     disclaimer: input.result.disclaimer,
   }
