@@ -48,7 +48,7 @@ const main = async () => {
       territory,
       deploymentModes,
       commercialNature,
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as const,
+      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
       authorizationRefs,
       runtimePolicyHash: runtimePolicy.runtimePolicyHash,
       ...(flag('localization-version') ? { localizationVersion: flag('localization-version')! } : {}),
