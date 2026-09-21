@@ -1,0 +1,32 @@
+{
+  "legacyImports": {
+    "src/modules/scale/instruments/texi_teacher_zh_cn/1.0.0/instrument.ts": [
+      "../../../packages/texi-en-v1"
+    ],
+    "src/modules/scale/instruments/sdq_parent_zh_cn/1.0.0/instrument.ts": [
+      "../../../packages/sdq-parent-zh-cn-v1"
+    ],
+    "src/modules/scale/instruments/who5/1.0.0/instrument.ts": [
+      "../../../packages/who5-zh-cn-v1"
+    ],
+    "src/modules/scale/instruments/adexi_v1/2.0.0/instrument.ts": [
+      "../../../packages/adexi-v2"
+    ],
+    "src/modules/scale/instruments/texi_parent_zh_cn/1.0.0/instrument.ts": [
+      "../../../packages/texi-en-v1"
+    ],
+    "src/modules/scale/instruments/sdq_teacher_zh_cn/1.0.0/instrument.ts": [
+      "../../../packages/sdq-teacher-en-t4-10-v1",
+      "../../../packages/sdq-teacher-impact-scorer"
+    ]
+  },
+  "immutableScorers": [
+    {
+      "key": "sdq.teacher.t4_10.v1",
+      "version": "1.0.0",
+      "path": "src/modules/scale/packages/sdq-teacher-impact-scorer.ts",
+      "sha256": "1966ada4007cc6383b669dd5797144c7a722109cabc0eb217452889b8c2d982a",
+      "exportName": "sdqTeacherT410Scorer"
+    }
+  ]
+}

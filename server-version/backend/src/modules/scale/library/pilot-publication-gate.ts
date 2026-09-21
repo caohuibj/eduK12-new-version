@@ -1,3 +1,4 @@
+import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
 /**
  * Scale governance composition for Pilot-era catalog data.
  *
@@ -10,8 +11,7 @@
  * never consulted by participant save/FINAL paths.
  */
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
-import { assertContentLocaleCompatible } from '../content-locale'
-import { evaluateDurableInstrumentRights } from '../scale-package-gates'
+import { evaluateDurableInstrumentRights } from '../deployment/rights'
 import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authorization'
 import { parseLocalizationManifest } from './localization-manifest'
 import {
@@ -111,15 +111,12 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
   })
   gateWarnings.push(...rights.warnings)
 
-  // 5) Content locale remains a deployment-fit diagnostic.
-  const localeGate = assertContentLocaleCompatible({
-    instrumentKey: input.pkg.key,
-    requestedLocale: input.locale,
-  })
-  if (localeGate.contentLocale && localeGate.contentLocale !== input.locale) {
-    localizationErrors.push(`package contentLocale=${localeGate.contentLocale} 与部署 locale=${input.locale} 不一致`)
-  }
-  localizationUsable = localizationErrors.length === 0 && localeGate.ok
+  const contentLocale = getScaleInstrumentSource(input.pkg.key, input.pkg.instrumentVersion)?.executable?.contentLocale
+  if (contentLocale && contentLocale !== input.locale) localizationErrors.push(`contentLocale=${contentLocale} 与部署 locale=${input.locale} 不一致`)
+
+  // 5) Source validation already guarantees executable contentLocale === localization.targetLocale.
+  // Deployment locale fit is therefore fully represented by the localization manifest above.
+  localizationUsable = localizationErrors.length === 0
 
   // 6) Respondent applicability is deployment/claim governance, not whether
   // the package itself can execute.
@@ -141,7 +138,7 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     ? evaluatePilotPublicationPolicy({
         executableCorrectness: { ok: packageErrors.length === 0, errors: packageErrors },
         rights: { ok: rights.ok, errors: rights.errors },
-        localization: { ok: localizationUsable, errors: [...localizationErrors, ...localeGate.errors] },
+        localization: { ok: localizationUsable, errors: localizationErrors },
         respondentMatch: { ok: respondentMatchErrors.length === 0, errors: respondentMatchErrors },
         scientific,
       })
@@ -151,7 +148,6 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         warnings: [
           ...rights.errors.map((message) => `[rights/governance] ${message}`),
           ...localizationErrors.map((message) => `[localization/deployment] ${message}`),
-          ...localeGate.errors.map((message) => `[localization/deployment] ${message}`),
           ...respondentMatchErrors.map((message) => `[respondent/deployment] ${message}`),
         ],
         limitations: ['Catalog manifest 无效：scientific qualification / report eligibility 无法建立，但不改变 package Product Readiness。'],

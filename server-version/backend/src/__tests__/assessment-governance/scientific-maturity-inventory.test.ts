@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { qualificationAllowsScientificMaturity } from '../../modules/assessment-governance/scientific-qualification'
 import { listScalePackages } from '../../modules/scale/scale-package.registry'
-import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../../modules/scale/library/wave0-catalog'
+import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
 import { evaluateScaleScientificQualification } from '../../modules/scale/library/scientific-qualification'
 import { listCognitiveV2TaskDefinitions, getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
 import { evaluateCognitiveScientificQualification } from '../../modules/cognitive/library/scientific-qualification'
@@ -19,13 +19,10 @@ const qualificationMessage = (
 describe('scientific maturity inventory qualification', () => {
   it('never lets any Scale identity declare maturity above its evidence qualification', () => {
     for (const pkg of listScalePackages()) {
-      const manifest = WAVE0_SCALE_CATALOG_MANIFESTS.find((candidate) => (
-        candidate.identity.instrumentKey === pkg.key
-        && candidate.identity.instrumentVersion === pkg.instrumentVersion
-      ))
-      expect(manifest, `${pkg.key}@${pkg.instrumentVersion}: catalog manifest missing`).toBeDefined()
+      const source = getScaleInstrumentSource(pkg.key, pkg.instrumentVersion)
+      expect(source, `${pkg.key}@${pkg.instrumentVersion}: source missing`).toBeDefined()
       const qualification = evaluateScaleScientificQualification(pkg)
-      const declared = manifest!.scientificMaturity
+      const declared = source!.catalog.scientificMaturity
       expect(
         qualificationAllowsScientificMaturity(declared, qualification),
         qualificationMessage(`${pkg.key}@${pkg.instrumentVersion}`, declared, qualification.maxEligibleMaturity),

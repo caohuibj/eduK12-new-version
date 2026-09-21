@@ -31,6 +31,7 @@ import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/refe
 import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
 import { buildQuestionnaireCollectionReport } from '../../modules/reporting/questionnaire-collection-report'
+import { projectCompositeCollectionReport } from '../../modules/composite/composite-report.projector'
 import {
   buildCompositeReport,
   getCompositeForTeacher,
@@ -137,7 +138,7 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
     name: '综合测评 1',
     items: [
       { id: 'item-form', type: 'FORM', formLabel: '年级', scale: null, cognitiveAssignment: null },
-      { id: 'item-scale', type: 'SCALE', scaleId: 'scale-1', scale: { id: 'scale-1', code: 'S-1', name: '量表 A' }, cognitiveAssignment: null },
+      { id: 'item-scale', type: 'SCALE', scaleId: 'scale-1', scale: { id: 'scale-1', code: 'adexi_v1', name: '量表 A', instrumentVersion: '2.0.0' }, cognitiveAssignment: null },
       {
         id: 'item-cog',
         type: 'COGNITIVE',
@@ -148,7 +149,7 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
   },
   scaleAssessments: [{
     compositeItemId: 'item-scale',
-    result: makeScaleResult({ scaleId: 'scale-1', code: 'S-1', name: '量表 A', scoreKey: 'A', value: 12 }),
+    result: makeScaleResult({ scaleId: 'scale-1', code: 'adexi_v1', name: '量表 A', scoreKey: 'A', value: 12 }),
     completedAt: new Date('2026-08-20T01:04:00Z'),
     totalTime: 4000,
   }],
@@ -523,9 +524,9 @@ describe('composite cognitive single-task report', () => {
 
 describe('collection-only mixed unit reports', () => {
   it('uses the same Scale DTO for Composite and Questionnaire/public projections', () => {
-    const result = makeScaleResult({ scaleId: 'scale-a', code: 'S-A', name: '量表 A', scoreKey: 'A', value: 0 })
-    const scale = { id: 'scale-a', code: 'S-A', name: '量表 A' }
-    const composite = buildCompositeReport(completedAttemptForReport({
+    const result = makeScaleResult({ scaleId: 'scale-a', code: 'adexi_v1', name: '量表 A', scoreKey: 'A', value: 0 })
+    const scale = { id: 'scale-a', code: 'adexi_v1', name: '量表 A', instrumentVersion: '2.0.0' }
+    const internalComposite = buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '综合测评 1',
@@ -534,13 +535,15 @@ describe('collection-only mixed unit reports', () => {
       scaleAssessments: [{ compositeItemId: 'item-scale-a', result, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0 }],
       cognitiveSessions: [],
       formAnswers: [],
-    })).unitReports[0]
+    }))
+    const composite = projectCompositeCollectionReport(internalComposite, 'participant').unitReports[0]
     const questionnaire = buildQuestionnaireCollectionReport({
       questionnaire: { name: '问卷', questionnaireScales: [{ id: 'item-scale-a', scaleId: 'scale-a', position: 0, scale }], formItems: [] },
       scaleAssessments: [{ id: 'assessment-a', scaleId: 'scale-a', result, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0, scale }],
       formAnswers: [],
     }).unitReports[0]
     expect(composite).toEqual(questionnaire)
+    expect(composite).not.toHaveProperty('result')
   })
 
   it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', () => {
@@ -666,7 +669,8 @@ describe('buildCompositeReport decrypt degrade', () => {
 
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(attempt)
     const studentReport = await getReport('attempt-1', { userId: 'student-1' })
-    expect(studentReport.modules.find((item: { type: string }) => item.type === 'COGNITIVE')).toMatchObject({ decryptError: true })
+    expect(studentReport.unitReports.find((item: { type: string }) => item.type === 'COGNITIVE')).toMatchObject({ decryptError: true })
+    expect(studentReport).not.toHaveProperty('modules')
   })
 
   it('marks a scale module decryptError when the frozen v2 result ciphertext cannot be decoded', () => {

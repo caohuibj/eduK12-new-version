@@ -15,6 +15,7 @@ const DOMAIN_OPTIONS = [
   ['WELL_BEING', '身心健康'],
   ['EXECUTIVE_FUNCTION', '执行功能'],
   ['SELF_REGULATION', '自我调节'],
+  ['SELF_EFFICACY', '自我效能'],
   ['SOCIAL_EMOTIONAL', '社会情绪'],
   ['BEHAVIORAL_DIFFICULTIES', '行为与困难'],
   ['PARENT_OBSERVATION', '家长观察'],
@@ -293,7 +294,11 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
           <p className="mt-1 text-gray-500">参考版本 {entry.references.packageReferenceCount} 个；适用性记录 {entry.references.applicabilityCount} 条。</p>
         </Section>
         <Section title="报告说明">
-          <p>本量表提供分数与维度解释、教育性引导、限制说明和免责声明；报告不会把描述性分数升级为诊断结论。</p>
+          {entry.report.maxEligibleLevel === null ? (
+            <p>当前展示的是报告设计预览；尚无可执行 report contract，因此不会生成个人结果。完成 exact-form package、授权与报告门后才可启用。</p>
+          ) : (
+            <p>本量表提供分数与维度解释、教育性引导、限制说明和免责声明；报告不会把描述性分数升级为诊断结论。</p>
+          )}
           <p className="mt-2">维度：{entry.report.dimensionLabels.join('、')}</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">{entry.report.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
           <p className="mt-3 rounded-md bg-gray-50 p-3 text-gray-600">{entry.report.disclaimer}</p>
@@ -371,7 +376,7 @@ const ScaleLibrary: React.FC = () => {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">量表库</h1>
-        <p className="mt-1 text-gray-600">浏览六个 Wave 0 量表的适用范围、使用边界、语言、本地化、授权与参考信息。</p>
+        <p className="mt-1 text-gray-600">浏览已接入的可执行量表与 Wave 1 P1 科学候选；候选量表会明确显示证据、报告设计和发布阻断条件，不会被误当作可启动测评。</p>
       </div>
       <FilterPanel
         filters={filters}

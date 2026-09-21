@@ -1,12 +1,12 @@
 import type { AssetDatabase } from '../../services/assetStorage'
-import type { FrozenScaleRuntimeSnapshotV1 } from '../assessment-runtime/runtime-snapshot'
+import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 
 export const retainQuestionnaireScaleAssessmentImages = async (input: {
   questionnaireAssessmentId: string
   snapshots: Array<{
     scaleId: string
-    snapshot: FrozenScaleRuntimeSnapshotV1
+    snapshot: VersionedFrozenScaleRuntimeSnapshot
   }>
   db: AssetDatabase
 }): Promise<void> => {

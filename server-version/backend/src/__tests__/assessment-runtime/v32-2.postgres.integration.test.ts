@@ -603,7 +603,8 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
     },
   })
   const existingScale = await db.scale.findUnique({ where: { code: 'adexi_v1' } })
-  const scale = existingScale ?? await db.scale.create({
+  // Seeded ADEXI is DRAFT; this fixture explicitly publishes its test deployment.
+  const scale = existingScale ? await db.scale.update({ where: { id: existingScale.id }, data: { status: 'PUBLISHED' } }) : await db.scale.create({
     data: {
       id: ids.scaleId,
       code: 'adexi_v1',

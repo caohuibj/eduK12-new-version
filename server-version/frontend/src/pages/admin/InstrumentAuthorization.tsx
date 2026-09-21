@@ -107,24 +107,24 @@ const InstrumentAuthorizationPage: React.FC = () => {
   const runPublishPreview = async () => {
     try {
       setError(null)
-      const response = await instrumentAuthorizationApi.publishPreviewWho5({
-        locale: 'zh-CN',
-        territory: 'CN',
-        deploymentCommercialNature: 'NON_COMMERCIAL',
-        // Preview without proofs must show pending — never fake pass.
+      if (!form.instrumentKey.trim() || !form.instrumentVersion.trim()) throw new Error('请先填写 instrumentKey 与 instrumentVersion')
+      const response = await instrumentAuthorizationApi.publishPreviewScale({
+        instrumentKey: form.instrumentKey.trim(),
+        instrumentVersion: form.instrumentVersion.trim(),
+        locale: form.locales.split(/[,，\s]+/).map(row => row.trim()).filter(Boolean)[0] ?? '',
+        territory: form.territories.split(/[,，\s]+/).map(row => row.trim()).filter(Boolean)[0] ?? '',
+        commercialNature: form.commercialNature === 'COMMERCIAL' ? 'COMMERCIAL' : 'NON_COMMERCIAL',
+        deploymentModes: ['STANDALONE'],
       })
       if (response.code !== 0) throw new Error(response.message || '预览失败')
       const data = response.data
-      const gateSummary = (data.gates || [])
-        .map((gate: { gate: string; evaluation?: string; ok: boolean }) => (
-          `${gate.gate}:${gate.evaluation ?? (gate.ok ? 'ok' : 'fail')}`
-        ))
-        .join(', ')
+      const decisions = (data.admission?.decisions || []).map((decision: { requestedMode: string; allowNewStarts: boolean; reasons: string[] }) =>
+        `${decision.requestedMode}:${decision.allowNewStarts ? 'allow' : 'deny'}[${(decision.reasons || []).join(',')}]`
+      ).join(' | ')
       setPreview(
-        `publishable=${data.publishable}; catalog=${data.catalogStatus}; allowNewStarts=${data.allowNewStarts}; `
-        + `gates=[${gateSummary}]; `
-        + `errors=${(data.errors || []).join(' | ') || 'none'}; `
-        + `warnings=${(data.warnings || []).join(' | ') || 'none'}`,
+        `identity=${data.identity?.instrumentKey}@${data.identity?.instrumentVersion}; `
+        + `allowActivation=${data.allowActivation}; decisions=${decisions || 'none'}; `
+        + `blockers=${(data.blockers || []).join(' | ') || 'none'}`,
       )
     } catch (operationError) {
       setError((operationError as { message?: string }).message || '预览失败')
@@ -212,7 +212,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
       <section className="card space-y-4" aria-labelledby="authorization-gates-title">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="authorization-gates-title" className="text-lg font-semibold">Publish gate 预览与批准</h2>
-          <button type="button" className="btn-secondary" onClick={() => void runPublishPreview()}>Publish 预览（WHO-5 Bundle）</button>
+          <button type="button" className="btn-secondary" onClick={() => void runPublishPreview()}>Scale Publish 预览</button>
         </div>
 
         <label className="block max-w-2xl text-sm text-gray-700">

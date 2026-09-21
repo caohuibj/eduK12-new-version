@@ -26,17 +26,32 @@ describe('ScaleCatalogManifestV1 population + respondent (SL1-C2)', () => {
     expect(result.issues.some((issue) => issue.message.includes('minAge 不能大于 maxAge'))).toBe(true)
   })
 
-  it('rejects an age bound without its pair', () => {
-    const manifest = {
-      ...validCatalogManifestBase(),
-      population: {
-        ...validCatalogManifestBase().population,
-        maxAge: undefined,
-      },
+  it('allows a lower age bound without fabricating an upper bound', () => {
+    const base = validCatalogManifestBase()
+    const { maxAge: _maxAge, ...population } = base.population
+    const result = parseScaleCatalogManifest({
+      ...base,
+      population: { ...population, minAge: 14 },
+    })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.manifest.population.minAge).toBe(14)
+      expect(result.manifest.population.maxAge).toBeUndefined()
     }
-    const result = parseScaleCatalogManifest(manifest)
-    expect(result.ok).toBe(false)
-    expect(result.issues.some((issue) => issue.message.includes('minAge 与 maxAge 必须同时给出或同时省略'))).toBe(true)
+  })
+
+  it('allows an upper age bound without fabricating a lower bound', () => {
+    const base = validCatalogManifestBase()
+    const { minAge: _minAge, ...population } = base.population
+    const result = parseScaleCatalogManifest({
+      ...base,
+      population: { ...population, maxAge: 12 },
+    })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.manifest.population.minAge).toBeUndefined()
+      expect(result.manifest.population.maxAge).toBe(12)
+    }
   })
 
   it('rejects invalid grades (out of range or fractional)', () => {

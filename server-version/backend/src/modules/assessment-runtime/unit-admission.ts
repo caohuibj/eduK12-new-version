@@ -4,6 +4,11 @@ import {
   frozenAdmissionPersistence,
   type FrozenUnitAdmissionV1,
 } from './admission-snapshot'
+import {
+  decryptVersionedFrozenUnitAdmission,
+  versionedFrozenAdmissionPersistence,
+  type VersionedFrozenUnitAdmission,
+} from './admission-snapshot-v2'
 
 export type AdmissionParentForeignKeys = {
   questionnaireAssessmentId?: string | null
@@ -17,7 +22,7 @@ export type StoredAdmissionRow = {
 
 export const assertAdmissionParentBinding = (
   child: AdmissionParentForeignKeys,
-  admission: FrozenUnitAdmissionV1,
+  admission: Pick<VersionedFrozenUnitAdmission, 'parent'>,
 ): void => {
   const questionnaireId = child.questionnaireAssessmentId ?? null
   const compositeId = child.compositeAttemptId ?? null
@@ -41,6 +46,7 @@ export const assertAdmissionParentBinding = (
   }
 }
 
+/** Legacy V1 reader retained for Cognitive/Form callers that have not moved schemas. */
 export const readStoredUnitAdmission = (
   row: StoredAdmissionRow,
   unreadableMessage: string,
@@ -48,6 +54,22 @@ export const readStoredUnitAdmission = (
   if (!row.frozenAdmissionSnapshotEncrypted || !row.frozenAdmissionSnapshotHash) return null
   try {
     return decryptFrozenUnitAdmission(row.frozenAdmissionSnapshotEncrypted, row.frozenAdmissionSnapshotHash)
+  } catch (error) {
+    throw new InstrumentFinalSubmitError(
+      'STALE_ATTEMPT',
+      error instanceof Error ? error.message : unreadableMessage,
+      409,
+    )
+  }
+}
+
+export const readStoredVersionedUnitAdmission = (
+  row: StoredAdmissionRow,
+  unreadableMessage: string,
+): VersionedFrozenUnitAdmission | null => {
+  if (!row.frozenAdmissionSnapshotEncrypted || !row.frozenAdmissionSnapshotHash) return null
+  try {
+    return decryptVersionedFrozenUnitAdmission(row.frozenAdmissionSnapshotEncrypted, row.frozenAdmissionSnapshotHash)
   } catch (error) {
     throw new InstrumentFinalSubmitError(
       'STALE_ATTEMPT',
@@ -72,4 +94,32 @@ export const persistAdmissionOnce = async (input: {
   const stored = readStoredUnitAdmission(current, input.unreadableMessage)
   if (stored) return stored
   throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.unreadableMessage, 409)
+}
+
+export const persistVersionedAdmissionOnce = async <T extends VersionedFrozenUnitAdmission>(input: {
+  snapshot: T
+  writeIfEmpty: (persisted: ReturnType<typeof versionedFrozenAdmissionPersistence>) => Promise<{ count: number }>
+  read: () => Promise<StoredAdmissionRow | null>
+  missingMessage: string
+  unreadableMessage: string
+}): Promise<T> => {
+  const persisted = versionedFrozenAdmissionPersistence(input.snapshot)
+  const updated = await input.writeIfEmpty(persisted)
+  if (updated.count === 1) return input.snapshot
+  const current = await input.read()
+  if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.missingMessage, 404)
+  const stored = readStoredVersionedUnitAdmission(current, input.unreadableMessage)
+  if (!stored) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.unreadableMessage, 409)
+  if (stored.schemaVersion !== input.snapshot.schemaVersion) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照版本冲突', 409)
+  }
+  if (stored.attemptEpoch !== input.snapshot.attemptEpoch
+    || stored.contextSnapshotHash !== input.snapshot.contextSnapshotHash
+    || JSON.stringify(stored.principal) !== JSON.stringify(input.snapshot.principal)
+    || JSON.stringify(stored.parent) !== JSON.stringify(input.snapshot.parent)
+    || (stored.schemaVersion === 2 && input.snapshot.schemaVersion === 2
+      && stored.scalePolicy?.eligibility.identityBindingHash !== input.snapshot.scalePolicy?.eligibility.identityBindingHash)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入并发冻结绑定冲突', 409)
+  }
+  return stored as T
 }

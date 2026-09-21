@@ -154,12 +154,24 @@ export const createFrozenUnitAdmission = (input: {
   if (identityCount(input) !== 1) {
     throw new Error('Frozen unit admission requires exactly one instrument identity')
   }
+  // Snapshot identities are canonical contracts, not arbitrary database rows.
+  // Structural typing allows callers to pass an object with extra properties;
+  // strip those properties before hashing/encryption so the writer can never
+  // emit a snapshot that its own strict parser will later reject.
+  const scale = input.scale
+    ? {
+        id: input.scale.id,
+        code: input.scale.code,
+        name: input.scale.name,
+        instrumentVersion: input.scale.instrumentVersion,
+      }
+    : undefined
   const unsigned = unsignedAdmission({
     schemaVersion: 1,
     runtimeGeneration: 'UNIFIED_V1',
     frozenAt: frozenAt.toISOString(),
     attemptEpoch: input.attemptEpoch,
-    scale: input.scale,
+    scale,
     cognitive: input.cognitive,
     formSection: input.formSection,
     principal: {
