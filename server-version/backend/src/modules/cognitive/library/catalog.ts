@@ -25,6 +25,7 @@ import type {
   CognitiveLibraryCatalogEntry,
   CognitiveScientificStatus,
 } from './catalog-contract'
+import { COGNITIVE_TASK_TYPES } from '../tasks/task-packages'
 
 const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = {
   reaction: {
@@ -400,6 +401,13 @@ if (CATALOG_TEST_TYPES.includes('fake')) {
 
 /** build-time 校验：catalog 与 registry 身份必须互相对应（fail-fast）。 */
 export const validateCatalogIntegrity = (): void => {
+  const generatedProductTypes = COGNITIVE_TASK_TYPES.filter((testType) => testType !== 'fake')
+  if (
+    generatedProductTypes.length !== CATALOG_TEST_TYPES.length
+    || generatedProductTypes.some((testType) => !CATALOG[testType])
+  ) {
+    throw new Error('Generated Cognitive task projection does not match product catalog')
+  }
   for (const testType of CATALOG_TEST_TYPES) {
     if (listCognitiveRegistryEntriesForType(testType).length === 0) {
       throw new Error(`Cognitive library catalog entry has no registry identity: ${testType}`)

@@ -1,3 +1,4 @@
+import { COGNITIVE_SEED_TASK_TYPES } from './cognitive-task-types.generated'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 type CognitiveSeed = {
@@ -283,6 +284,13 @@ export const COGNITIVE_SEEDS: CognitiveSeed[] = [
     config: { totalTrials: 60, stimulusMs: 3000, trialTimeoutMs: 5000, isiMs: 300, validRtFloorMs: 200, emotionCategoryVersion: 'basic-emotion-6-v1.0.0', stimulusSetVersion: 'emotion-faces-ai-zh-v1.0.0', report: NO_REFERENCE_REPORT },
   },
 ]
+
+const seededTaskTypes = new Set(COGNITIVE_SEEDS.map((seed) => seed.testType))
+for (const testType of COGNITIVE_SEED_TASK_TYPES) {
+  if (!seededTaskTypes.has(testType)) {
+    throw new Error(`Generated Cognitive task package has no seed projection: ${testType}`)
+  }
+}
 
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true

@@ -69,6 +69,8 @@ jobs:
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
+      - name: check Cognitive generated manifests
+        run: npm run cognitive:manifest:check
       - name: prisma generate
         run: npx prisma generate
       - name: build (tsc)
@@ -210,6 +212,8 @@ jobs:
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
+      - name: check Cognitive generated manifests
+        run: npm run cognitive:manifest:check
       - name: dependency audit (high and critical)
         run: npm audit --audit-level=high
       - name: prisma generate
