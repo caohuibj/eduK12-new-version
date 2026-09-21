@@ -11,37 +11,9 @@ import { scorePairedassociateV1 } from '../../modules/cognitive/scoring/pairedas
 import golden from '../../../../cognitive-randomization-golden-v1.json'
 
 const report = { reportVersion: '1.0.0' as const, referenceMode: 'none' as const }
-const digitConfig = {
-  startSpan: 2,
-  maxSpan: 4,
-  trialsPerLevel: 2 as const,
-  digitDisplayMs: 800,
-  digitIntervalMs: 200,
-  readyDurationMs: 800,
-  inactivityGuardMs: 30000,
-  stimulusSetVersion: 'digits-v1.0.0',
-  report,
-}
-const pictureConfig = {
-  itemCount: 12 as const,
-  learningRounds: 3 as const,
-  delayedEnabled: false,
-  delayedDelayMs: 0,
-  studyMsPerItem: 900,
-  inactivityGuardMs: 60000,
-  stimulusSetVersion: 'daily-scenes-v1.0.0',
-  report,
-}
-const pairedConfig = {
-  pairCount: 12 as const,
-  learningRounds: 3 as const,
-  delayedEnabled: false,
-  delayedDelayMs: 0,
-  studyDurationMs: 12000,
-  inactivityGuardMs: 90000,
-  stimulusSetVersion: 'nonverbal-pairs-v1.0.0',
-  report,
-}
+const digitConfig = { startSpan: 2, maxSpan: 4, trialsPerLevel: 2 as const, digitDisplayMs: 800, digitIntervalMs: 200, readyDurationMs: 800, inactivityGuardMs: 30000, stimulusSetVersion: 'digits-v1.0.0', report }
+const pictureConfig = { itemCount: 12 as const, learningRounds: 3 as const, delayedEnabled: false, delayedDelayMs: 0, studyMsPerItem: 900, inactivityGuardMs: 60000, stimulusSetVersion: 'daily-scenes-v1.0.0', report }
+const pairedConfig = { pairCount: 12 as const, learningRounds: 3 as const, delayedEnabled: false, delayedDelayMs: 0, studyDurationMs: 12000, inactivityGuardMs: 90000, stimulusSetVersion: 'nonverbal-pairs-v1.0.0', report }
 
 describe('Round 2 PR4 task contracts', () => {
   it('keeps strict schemas and exact three-profile patches', () => {
@@ -67,20 +39,9 @@ describe('Round 2 PR4 task contracts', () => {
     const trials = Array.from({ length: 6 }, (_, trialIndex) => {
       const spanLength = 2 + Math.floor(trialIndex / 2)
       const sequence = digitBackwardSequence(seed, trialIndex, spanLength)
-      return {
-        trialIndex,
-        payload: {
-          spanLength,
-          trialWithinLevel: ((trialIndex % 2) + 1) as 1 | 2,
-          sequence,
-          response: [...sequence].reverse(),
-          responseDurationMs: 800,
-          interrupted: false,
-        },
-      }
+      return { trialIndex, payload: { spanLength, trialWithinLevel: ((trialIndex % 2) + 1) as 1 | 2, sequence, response: [...sequence].reverse(), responseDurationMs: 800, interrupted: false, timedOut: false } }
     })
-    expect(scoreDigitbackwardV1({ config: digitConfig, trials, randomSeed: seed }).metrics)
-      .toMatchObject({ maxSpan: 4, totalCorrectTrials: 6, sequenceDistance: 0 })
+    expect(scoreDigitbackwardV1({ config: digitConfig, trials, randomSeed: seed }).metrics).toMatchObject({ maxSpan: 4, totalCorrectTrials: 6, sequenceDistance: 0 })
     const forged = structuredClone(trials)
     forged[0].payload.sequence.reverse()
     expect(() => scoreDigitbackwardV1({ config: digitConfig, trials: forged, randomSeed: seed })).toThrow(/frozen seed sequence/)
@@ -89,33 +50,20 @@ describe('Round 2 PR4 task contracts', () => {
   it('computes picture pair/position learning and preserves missing delayed retention as null', () => {
     const seed = 'picture-seed'
     const itemIds = pictureSequenceItems(seed, pictureConfig.itemCount)
-    const trials = Array.from({ length: pictureConfig.learningRounds }, (_, trialIndex) => ({
-      trialIndex,
-      payload: {
-        phase: 'learning' as const,
-        roundIndex: trialIndex + 1,
-        itemIds,
-        responseOrder: trialIndex === 0 ? [...itemIds].reverse() : itemIds,
-        responseDurationMs: 2000,
-        interrupted: false,
-      },
-    }))
+    const trials = Array.from({ length: pictureConfig.learningRounds }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, itemIds, responseOrder: trialIndex === 0 ? [...itemIds].reverse() : itemIds, responseDurationMs: 2000, interrupted: false, timedOut: false } }))
     const result = scorePicturesequenceV1({ config: pictureConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ adjacentPairScore: 1, positionScore: 1, delayedRetention: null })
     expect(Number(result.metrics.learningGain)).toBeGreaterThan(0)
 
     const researchConfig = { ...pictureConfig, itemCount: 15 as const, delayedEnabled: true }
     const researchItems = pictureSequenceItems(seed, researchConfig.itemCount)
-    const researchTrials = Array.from({ length: researchConfig.learningRounds }, (_, trialIndex) => ({
-      trialIndex,
-      payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, itemIds: researchItems, responseOrder: researchItems, responseDurationMs: 1, interrupted: false },
-    }))
+    const researchTrials = Array.from({ length: researchConfig.learningRounds }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, itemIds: researchItems, responseOrder: researchItems, responseDurationMs: 1, interrupted: false, timedOut: false } }))
     const missing = scorePicturesequenceV1({ config: researchConfig, trials: researchTrials, randomSeed: seed })
     expect(missing.metrics.delayedRetention).toBeNull()
     expect(missing.qualityFlags.delayedStageIncomplete).toBe(true)
     const interruptedDelayed = scorePicturesequenceV1({
       config: researchConfig,
-      trials: [...researchTrials, { trialIndex: 3, payload: { phase: 'delayed', roundIndex: 1, itemIds: researchItems, responseOrder: [], responseDurationMs: 1, interrupted: true } }],
+      trials: [...researchTrials, { trialIndex: 3, payload: { phase: 'delayed', roundIndex: 1, itemIds: researchItems, responseOrder: [], responseDurationMs: 1, interrupted: true, timedOut: false } }],
       randomSeed: seed,
     })
     expect(interruptedDelayed.metrics.delayedRetention).toBeNull()
@@ -126,19 +74,7 @@ describe('Round 2 PR4 task contracts', () => {
   it('computes paired learning by server-held positions and keeps delayed accuracy null', () => {
     const seed = 'paired-seed'
     const set = pairedAssociateSet(seed, pairedConfig.pairCount)
-    const trials = Array.from({ length: pairedConfig.learningRounds }, (_, trialIndex) => ({
-      trialIndex,
-      payload: {
-        phase: 'learning' as const,
-        roundIndex: trialIndex + 1,
-        responses: set.map((item, index) => ({
-          itemId: item.itemId,
-          selectedPosition: trialIndex === 0 && index % 2 === 0 ? (item.targetPosition + 1) % pairedConfig.pairCount : item.targetPosition,
-        })),
-        responseDurationMs: 3000,
-        interrupted: false,
-      },
-    }))
+    const trials = Array.from({ length: pairedConfig.learningRounds }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, responses: set.map((item, index) => ({ itemId: item.itemId, selectedPosition: trialIndex === 0 && index % 2 === 0 ? (item.targetPosition + 1) % pairedConfig.pairCount : item.targetPosition })), responseDurationMs: 3000, interrupted: false, timedOut: false } }))
     const result = scorePairedassociateV1({ config: pairedConfig, trials, randomSeed: seed })
     expect(result.metrics).toMatchObject({ correctByTrial: [6, 12, 12], immediateAccuracy: 1, delayedAccuracy: null, trialsToCriterion: 2 })
     expect(Number(result.metrics.learningSlope)).toBeGreaterThan(0)
@@ -149,13 +85,10 @@ describe('Round 2 PR4 task contracts', () => {
 
     const researchConfig = { ...pairedConfig, pairCount: 18 as const, learningRounds: 4 as const, delayedEnabled: true }
     const researchSet = pairedAssociateSet(seed, researchConfig.pairCount)
-    const learning = Array.from({ length: 4 }, (_, trialIndex) => ({
-      trialIndex,
-      payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, responses: researchSet.map((item) => ({ itemId: item.itemId, selectedPosition: item.targetPosition })), responseDurationMs: 1, interrupted: false },
-    }))
+    const learning = Array.from({ length: 4 }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, responses: researchSet.map((item) => ({ itemId: item.itemId, selectedPosition: item.targetPosition })), responseDurationMs: 1, interrupted: false, timedOut: false } }))
     const interrupted = scorePairedassociateV1({
       config: researchConfig,
-      trials: [...learning, { trialIndex: 4, payload: { phase: 'delayed', roundIndex: 1, responses: researchSet.map((item) => ({ itemId: item.itemId, selectedPosition: null })), responseDurationMs: 1, interrupted: true } }],
+      trials: [...learning, { trialIndex: 4, payload: { phase: 'delayed', roundIndex: 1, responses: researchSet.map((item) => ({ itemId: item.itemId, selectedPosition: null })), responseDurationMs: 1, interrupted: true, timedOut: false } }],
       randomSeed: seed,
     })
     expect(interrupted.metrics.delayedAccuracy).toBeNull()
@@ -179,20 +112,12 @@ describe('Round 2 PR4 task contracts', () => {
     const pictureSeed = 'picture-quality'
     const itemIds = pictureSequenceItems(pictureSeed, pictureConfig.itemCount)
     const repeated = [...itemIds].reverse()
-    const picture = scorePicturesequenceV1({
-      config: pictureConfig,
-      randomSeed: pictureSeed,
-      trials: Array.from({ length: 3 }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, itemIds, responseOrder: repeated, responseDurationMs: 1, interrupted: false } })),
-    })
+    const picture = scorePicturesequenceV1({ config: pictureConfig, randomSeed: pictureSeed, trials: Array.from({ length: 3 }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, itemIds, responseOrder: repeated, responseDurationMs: 1, interrupted: false, timedOut: false } })) })
     expect(picture.qualityFlags).toMatchObject({ interpretable: false, unchangedIncorrectOrder: true })
 
     const pairedSeed = 'paired-quality'
     const set = pairedAssociateSet(pairedSeed, pairedConfig.pairCount)
-    const paired = scorePairedassociateV1({
-      config: pairedConfig,
-      randomSeed: pairedSeed,
-      trials: Array.from({ length: 3 }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, responses: set.map((item) => ({ itemId: item.itemId, selectedPosition: 0 })), responseDurationMs: 1, interrupted: false } })),
-    })
+    const paired = scorePairedassociateV1({ config: pairedConfig, randomSeed: pairedSeed, trials: Array.from({ length: 3 }, (_, trialIndex) => ({ trialIndex, payload: { phase: 'learning' as const, roundIndex: trialIndex + 1, responses: set.map((item) => ({ itemId: item.itemId, selectedPosition: 0 })), responseDurationMs: 1, interrupted: false, timedOut: false } })) })
     expect(paired.qualityFlags).toMatchObject({ interpretable: false, constantPositionResponse: true })
   })
 })

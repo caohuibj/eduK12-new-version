@@ -32,11 +32,13 @@ export const compositeParentAttemptPath = (
 export const resolveCompositeChildRouteContext = ({
   publicMode,
   relationalMode = false,
+  organizationTask = false,
   parentAttemptId,
   item,
 }: {
   publicMode: boolean
   relationalMode?: boolean
+  organizationTask?: boolean
   parentAttemptId: string
   item: CompositeCurrentItem
 }): CompositeChildRouteContextResult => {
@@ -44,7 +46,7 @@ export const resolveCompositeChildRouteContext = ({
     return { ok: false, message: '综合测评父级记录缺失，请刷新后重试' }
   }
 
-  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId, relationalMode)
+  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId, relationalMode) + (relationalMode && organizationTask ? '?returnTo=%2Forganization-tasks' : '')
 
   if (item.type === 'COGNITIVE') {
     const sessionId = item.cognitiveSession?.sessionId || ''

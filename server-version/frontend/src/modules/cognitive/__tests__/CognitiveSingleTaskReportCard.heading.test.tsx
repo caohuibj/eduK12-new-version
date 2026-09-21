@@ -36,4 +36,34 @@ describe('CognitiveSingleTaskReportCard heading context', () => {
     expect(screen.getByRole('heading', { level: 4, name: '数据质量' })).toBeTruthy()
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
   })
+
+  it('marks experience as a short protocol without hiding its authoritative score', () => {
+    render(<CognitiveSingleTaskReportCard report={{
+      ...report,
+      profile: 'experience',
+      profileLabel: '体验版',
+      productIndex: { label: '任务表现指数', value: 72 },
+      showProductIndex: true,
+      method: { ...report.method, profile: 'experience' },
+    }} />)
+    expect(screen.getByText('体验版 · 短程协议')).toBeTruthy()
+    expect(screen.getByText('72 / 100')).toBeTruthy()
+    expect(screen.getByText(/不代表百分位、年龄等级、学校成绩或诊断结论/)).toBeTruthy()
+  })
+
+  it('does not render quantitative metric sections when the result is uninterpretable', () => {
+    render(<CognitiveSingleTaskReportCard report={{
+      ...report,
+      interpretable: false,
+      qualityState: 'insufficient',
+      productIndex: null,
+      showProductIndex: true,
+      primaryMetrics: [{ key: 'medianRtMs', label: '中位反应时', unit: 'ms', value: 320, formatted: '320 ms' }],
+      secondaryMetrics: [{ key: 'missRate', label: '遗漏率', unit: 'ratio', value: 0.1, formatted: '10%' }],
+    }} />)
+    expect(screen.getByText(/本次数据不足以稳定解释/)).toBeTruthy()
+    expect(screen.queryByText('主要指标')).toBeNull()
+    expect(screen.queryByText('320 ms')).toBeNull()
+    expect(screen.queryByText('10%')).toBeNull()
+  })
 })

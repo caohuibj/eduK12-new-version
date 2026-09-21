@@ -5,6 +5,7 @@ export const mentalrotationTrialSchema = z.object({
   response: z.enum(['same', 'mirror']).nullable(),
   rtMs: z.number().int().nonnegative().nullable(),
   interrupted: z.boolean(),
+  timedOut: z.boolean().optional(),
 }).strict()
 
 export type MentalrotationTrial = z.infer<typeof mentalrotationTrialSchema>

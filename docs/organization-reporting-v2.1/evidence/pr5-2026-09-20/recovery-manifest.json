@@ -1,0 +1,26 @@
+{
+  "candidate": "00b477957b15e34a3f101bb8918b5b9c39c050a2",
+  "checks": [
+    "fresh PostgreSQL14: all repository migrations applied",
+    "production encrypted backup/verify/restore entry points preserve all tested row hashes and counts",
+    "restored database accepts current application migration head",
+    "failed migration rolls back its DDL and preserves historical/runtime/report data",
+    "explicit failed-migration resolution and forward deployment recover without deleting domain history"
+  ],
+  "status": "PASSED",
+  "encryptedBackupBytes": 7822369,
+  "backupSha256": "cfd65da78c3e38c8ff3f8da1f758bf80da152d067dd0324a488ec3c054523dde",
+  "restoredTables": {
+    "users": "1160:e82954de028fe769a1684be88573bf6a",
+    "organization_memberships": "1047:5e6e9d8b121b7793eee4fbc74d107b3d",
+    "organization_governance_audits": "2308:49438717f42dea7bc6a6aa8dd381a326",
+    "assessment_run_executions": "463:aabe2dc7f3dc1ec7bf3f42d2aef2224c",
+    "assessment_run_actor_snapshots": "556:a0bd836a930837a795bd2585c32be04c",
+    "assessment_run_execution_start_claims": "196:0f9053e586151c9be832cddabd194a87",
+    "assessment_unit_snapshots": "187:774f41d8f32bca0096ebbf523650ce92",
+    "reporting_cohort_snapshots": "71:9fa8dead14e1426f796dda6c04a5ba6b",
+    "reporting_analysis_artifacts": "68:343cb9d40b5bc46a5b3f37afe7be8ce0",
+    "assessment_attempt_consents": "88:1fd3a5cc9bffbff945b9d6fa56490908",
+    "pr5_backup_probe": "40000:7ecf3419a999eb3e2ce1980589833187"
+  }
+}

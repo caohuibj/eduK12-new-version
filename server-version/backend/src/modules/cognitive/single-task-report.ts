@@ -104,6 +104,32 @@ const registryCompatReport = (input: {
   }
 }
 
+const experienceHeadlineByTestType: Record<string, string> = {
+  stroop: 'incongruentAccuracy',
+  nback: 'dPrimeByN',
+  sst: 'pRespondStop',
+}
+
+const resolveHeadlineKey = (
+  testType: string,
+  profile: CognitiveProfile | null,
+  reportDefinition: SingleTaskReportDefinition | undefined,
+  primaryKeys: string[],
+  metricDefinitions: Record<string, MetricDefinition>,
+): string | undefined => {
+  const profileHeadline = profile === 'experience' ? experienceHeadlineByTestType[testType] : undefined
+  if (profileHeadline && metricDefinitions[profileHeadline]) return profileHeadline
+  return reportDefinition?.headlineMetric || primaryKeys[0]
+}
+
+// Participant-facing reports must not teach task-specific strategies that can
+// contaminate a later repeated measurement. Environment/device guidance and
+// construct-interpretation notes remain allowed.
+const participantPracticalTips = (testType: string, tips: string[]): string[] => {
+  if (testType === 'memory' || testType === 'stroop') return []
+  return tips
+}
+
 export const buildCognitiveSingleTaskReport = (input: {
   testType: string
   engineVersion: string
@@ -130,7 +156,13 @@ export const buildCognitiveSingleTaskReport = (input: {
   }
   const primaryKeys = (reportDefinition?.primaryMetrics ?? []).filter(metricVisible)
   const secondaryKeys = (reportDefinition?.secondaryMetrics ?? []).filter(metricVisible)
-  const headlineKey = reportDefinition?.headlineMetric || primaryKeys[0]
+  const headlineKey = resolveHeadlineKey(
+    input.testType,
+    input.profile,
+    reportDefinition,
+    primaryKeys,
+    metricDefinitions,
+  )
   const showProductIndex = reportDefinition?.showProductIndex !== false
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
@@ -154,10 +186,10 @@ export const buildCognitiveSingleTaskReport = (input: {
     headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
-    primaryMetrics: primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
-    secondaryMetrics: secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)),
+    primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
+    secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
     caveats: input.frozenReport?.reportCaveats ?? frozen.reportCaveats ?? [],
-    practicalTips: reportDefinition?.practicalTips ?? [],
+    practicalTips: participantPracticalTips(input.testType, reportDefinition?.practicalTips ?? []),
     method: {
       testType: input.testType,
       engineVersion: input.engineVersion,

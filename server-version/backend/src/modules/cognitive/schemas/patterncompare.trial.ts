@@ -14,6 +14,7 @@ export const patterncompareTrialSchema = z
     response: z.enum(['same', 'different']).nullable(),
     rtMs: z.number().min(0).nullable().transform((value) => (value == null ? null : Math.round(value))),
     interrupted: z.boolean(),
+    timedOut: z.boolean(),
   })
   .strict()
   .refine((value) => (value.response == null) === (value.rtMs == null), {

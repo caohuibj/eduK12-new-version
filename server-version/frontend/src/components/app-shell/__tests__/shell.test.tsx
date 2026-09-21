@@ -14,8 +14,19 @@ const auth = vi.hoisted(() => ({
   reauthReturn: null,
   clearReauthentication: vi.fn(),
 }))
+const organization = vi.hoisted(() => ({
+  organizations: [] as Array<{ id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' }>,
+  active: null as null | { organization: { id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' } },
+  activeLoading: false,
+  activeError: null as string | null,
+  selectOrganization: vi.fn(),
+}))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
+vi.mock('../../../contexts/OrganizationContext', () => ({
+  OrganizationProvider: ({ children }: { children: React.ReactNode }) => children,
+  useOrganization: () => organization,
+}))
 vi.mock('../../../pages/FirstLoginPasswordChange', () => ({ default: () => <p>修改临时密码</p> }))
 const student = { id: 's1', role: 'STUDENT', username: 'student' } as User
 beforeEach(() => {
@@ -24,6 +35,11 @@ beforeEach(() => {
   auth.reauthReturn = null
   auth.clearReauthentication.mockReset()
   auth.clearReauthentication.mockImplementation(() => sessionStorage.removeItem('huisurvey:reauth-return'))
+  organization.organizations = []
+  organization.active = null
+  organization.activeLoading = false
+  organization.activeError = null
+  organization.selectOrganization.mockReset()
   sessionStorage.clear()
 })
 function Location() { const location = useLocation(); return <output>{location.pathname}{location.search}</output> }
@@ -91,6 +107,53 @@ describe('one shared chrome', () => {
     expect(toggle).toHaveFocus()
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
+  it('shows server-projected Organization scope independently of legacy user role', async () => {
+    organization.organizations = [
+      { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
+      { id: 'org-b', name: '组织 B', status: 'SUSPENDED' },
+    ]
+    organization.selectOrganization.mockResolvedValue(null)
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    const selector = screen.getByRole('combobox', { name: '当前组织' })
+    expect(selector).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '组织 B（已暂停）' })).toBeInTheDocument()
+    await userEvent.selectOptions(selector, 'org-b')
+    expect(organization.selectOrganization).toHaveBeenCalledWith('org-b')
+  })
+  it('hides Delivery when an explicit export deny overrides an export capability', () => {
+    organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'ACTIVE' }]
+    organization.active = {
+      organization: { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
+      access: {
+        membershipId: 'membership-a',
+        orgRole: 'MEMBER',
+        capabilities: ['REPORT_EXPORT'],
+        personas: [],
+        explicitDenies: ['REPORT_EXPORT'],
+        canGovern: false,
+      },
+    } as any
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    expect(screen.queryByRole('link', { name: 'Safety/CSV' })).not.toBeInTheDocument()
+  })
+  it('keeps Safety responsibility discoverable for a suspended teacher owner', () => {
+    organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'SUSPENDED' }]
+    organization.active = {
+      allowedActions: ['SAFETY', 'DELIVERY'],
+      organization: { id: 'org-a', name: '组织 A', status: 'SUSPENDED' },
+      access: {
+        membershipId: 'membership-a',
+        orgRole: 'MEMBER',
+        capabilities: [],
+        personas: ['TEACHER'],
+        explicitDenies: [],
+        canGovern: false,
+      },
+    } as any
+    render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
+    expect(screen.getByRole('link', { name: 'Safety/CSV' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Reporting' })).not.toBeInTheDocument()
+  })
   it('keeps focused player descendants outside product token scope', () => {
     render(<MemoryRouter initialEntries={['/public/cognitive/sessions/s1']}><AppShell><button>task control</button></AppShell></MemoryRouter>)
     expect(screen.queryByRole('navigation', { name: '主要导航' })).not.toBeInTheDocument()
@@ -98,4 +161,9 @@ describe('one shared chrome', () => {
     expect(screen.getByText('task control').closest('.hui-product')).toBeNull()
     expect(screen.getAllByRole('main')).toHaveLength(1)
   })
+})
+it('uses authentication and reauth identity without legacy-role gating for shared runtimes', () => {
+  auth.user = { id: 'admin-respondent', role: 'ADMIN', username: 'admin' } as User
+  render(<MemoryRouter initialEntries={['/relational/attempts/run-attempt']}><RouteAccess><p>assigned runtime</p></RouteAccess></MemoryRouter>)
+  expect(screen.getByText('assigned runtime')).toBeInTheDocument()
 })

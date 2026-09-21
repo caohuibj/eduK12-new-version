@@ -40,14 +40,13 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
   const problem = phase.startsWith('practice') ? PRACTICE[practiceIndex] : sequence[trialIndex] ?? sequence[sequence.length - 1]
   const solved = sameState(state, problem.targetState)
   const maxMoves = Math.max(problem.minimumMoves + 2, Math.ceil(problem.minimumMoves * maxMovesFactor))
+  const atMoveLimit = moves.length >= maxMoves
   const completeOnce = useCallback(async () => { if (completingRef.current) return; completingRef.current = true; await onTaskComplete?.() }, [onTaskComplete])
-  const resetProblem = (next: TowerProblemSpec) => { setState([...next.initialState] as TowerState); setSelectedPeg(null); setMoves([]); startedRef.current = performance.now() }
+  const resetProblem = (next: TowerProblemSpec) => { setState([...next.initialState] as TowerState); setSelectedPeg(null); setMoves([]); setFeedback(''); startedRef.current = performance.now() }
   const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); resetProblem(PRACTICE[0]); setPhase('practice') }
   const startFormal = () => { completingRef.current = false; setInterrupted(false); resetProblem(sequence[0]); setPhase('formal') }
 
-  useEffect(() => {
-    if (phase === 'formal') resetProblem(sequence[trialIndex] ?? sequence[sequence.length - 1])
-  }, [phase, trialIndex, sequence])
+  useEffect(() => { if (phase === 'formal') resetProblem(sequence[trialIndex] ?? sequence[sequence.length - 1]) }, [phase, trialIndex, sequence])
   useEffect(() => {
     if (phase !== 'formal') return
     const onHidden = () => { if (document.hidden) setInterrupted(true) }
@@ -55,15 +54,13 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => document.removeEventListener('visibilitychange', onHidden)
   }, [phase])
 
-  const finishPractice = (correct: boolean) => {
-    setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback(correct ? '正确完成' : '本题未完成'); setPhase('practice-feedback')
-  }
+  const finishPractice = (correct: boolean) => { setPracticeCorrect((value) => value + (correct ? 1 : 0)); setFeedback(correct ? '正确完成' : '本题未完成'); setPhase('practice-feedback') }
   const nextPractice = () => {
     if (practiceIndex + 1 >= 4) { setPhase('practice-result'); return }
     const next = practiceIndex + 1; setPracticeIndex(next); resetProblem(PRACTICE[next]); setPhase('practice')
   }
   const move = (peg: number) => {
-    if (solved || moves.length >= maxMoves) return
+    if (solved || atMoveLimit) return
     if (selectedPeg == null) { if (state.some((candidate) => candidate === peg)) setSelectedPeg(peg); return }
     const disk = state.findIndex((candidate) => candidate === selectedPeg)
     if (disk < 0) { setSelectedPeg(null); return }
@@ -81,7 +78,7 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     if (phase !== 'formal' || submittingRef.current) return
     submittingRef.current = true
     try {
-      const accepted = await onTrialComplete({ problemId: problem.problemId, moves, gaveUp, interrupted: interrupted || timedOut })
+      const accepted = await onTrialComplete({ problemId: problem.problemId, moves, gaveUp, interrupted, timedOut })
       if (accepted !== false) { setInterrupted(false); if (trialIndex + 1 >= problemCount) await completeOnce() }
     } finally { submittingRef.current = false }
   }, [phase, problem.problemId, moves, interrupted, onTrialComplete, trialIndex, problemCount, completeOnce])
@@ -92,9 +89,9 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => window.clearTimeout(timer)
   }, [phase, trialIndex, moves, inactivityGuardMs, submitFormal])
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">塔式规划</h2><p className="mb-2 text-gray-600">把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，小盘不能放在大盘下方。</p><p className="mb-6 text-xs text-gray-400">练习至少完成 3 / 4；练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
+  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">塔式规划</h2><p className="mb-2 text-gray-600">把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，小盘不能放在大盘下方。</p><p className="mb-6 text-xs text-gray-400">尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
+  if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 
-  return <div className="p-5 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式问题 ${trialIndex + 1} / ${problemCount} · 最短 ${problem.minimumMoves} 步`} · 已记录 {moves.length} / {maxMoves} 步</p><div className="grid gap-5 md:grid-cols-2"><Board state={state} selectedPeg={selectedPeg} onPeg={move} label="当前状态" /><Board state={problem.targetState} label="目标状态" /></div>{feedback && <p className="mt-3 text-sm text-amber-700">{feedback}</p>}<div className="mt-5 flex justify-center gap-3">{phase === 'practice' ? <button className="btn-secondary" onClick={() => finishPractice(false)}>本题无法完成</button> : <><button className="btn-primary" disabled={!solved} onClick={() => void submitFormal(false)}>提交已解问题</button><button className="btn-secondary" onClick={() => void submitFormal(true)}>结束本题</button></>}</div></div>
+  return <div className="p-5 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4` : `正式问题 ${trialIndex + 1} / ${problemCount}`} · 已移动 {moves.length} 步</p><div className="grid gap-5 md:grid-cols-2"><Board state={state} selectedPeg={selectedPeg} onPeg={move} label="当前状态" /><Board state={problem.targetState} label="目标状态" /></div>{feedback && <p className="mt-3 text-sm text-amber-700">{feedback}</p>}{phase === 'formal' && atMoveLimit && !solved && <p className="mt-3 text-sm text-amber-700">已达到本题移动上限，请结束本题。</p>}<div className="mt-5 flex justify-center gap-3">{phase === 'practice' ? <button className="btn-secondary" onClick={() => finishPractice(false)}>本题无法完成</button> : <><button className="btn-primary" disabled={!solved} onClick={() => void submitFormal(false)}>提交已解问题</button><button className="btn-secondary" onClick={() => void submitFormal(true)}>结束本题</button></>}</div></div>
 }

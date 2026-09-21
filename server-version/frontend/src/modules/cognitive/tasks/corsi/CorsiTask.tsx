@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { corsiSequence } from '../shared/prng'
 
 const PRACTICE_SEQUENCES = [[0, 4, 8], [2, 6, 1]]
@@ -11,6 +12,8 @@ type SubPhase = 'ready' | 'display' | 'response'
 const sameSequence = (left: number[], right: number[]) =>
   left.length === right.length && left.every((value, index) => value === right[index])
 
+// Keep the published v1 spatial layout unchanged. A more irregular layout
+// requires an explicit stimulusSet/config version rather than a silent UI edit.
 const BOARD = [
   { left: '8%', top: '10%' },
   { left: '42%', top: '8%' },
@@ -240,21 +243,21 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
     )
   }
 
-  return (
-    <div className="text-center p-8">
+  const taskBody = (
+    <div className="text-center p-4 sm:p-8">
       <p className="text-sm text-gray-500 mb-4">
         {phase === 'practice'
           ? `练习 ${practiceIndex + 1} / ${PRACTICE_SEQUENCES.length}`
-          : `正式试次 ${trialIndex + 1} · 广度 ${span} · 第 ${trialWithinLevel} 题 / 2`}
+          : `广度 ${span} · 第 ${trialWithinLevel} 题 / 2`}
       </p>
       {subPhase === 'ready' && <p className="text-gray-500 mb-4">准备记忆…</p>}
-      <div className="relative mx-auto mb-4 h-72 w-72 rounded-xl bg-slate-100">
+      <div className="relative mx-auto mb-4 aspect-square w-full max-w-72 rounded-xl bg-slate-100">
         {BOARD.map((position, index) => (
           <button
             key={index}
             type="button"
             aria-label={`block-${index}`}
-            className={`absolute h-14 w-14 rounded-lg border ${lit === index ? 'bg-sky-500 border-sky-600' : 'bg-white border-gray-300'}`}
+            className={`absolute h-[19.5%] w-[19.5%] min-h-12 min-w-12 rounded-lg border ${lit === index ? 'bg-sky-500 border-sky-600' : 'bg-white border-gray-300'}`}
             style={{ left: position.left, top: position.top }}
             onClick={() => tap(index)}
           />
@@ -266,7 +269,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
           {inactivityExpired && <p className="text-sm text-amber-700 mb-3">响应超时，正在记录并进入下一题…</p>}
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary min-h-12"
             disabled={inactivityExpired || response.length !== activeSequence.length}
             onClick={() => {
               if (phase === 'practice') submitPractice()
@@ -279,4 +282,8 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
       )}
     </div>
   )
+
+  return phase === 'formal'
+    ? <CognitiveFocusStage ariaLabel="Corsi 正式测验">{taskBody}</CognitiveFocusStage>
+    : taskBody
 }

@@ -18,6 +18,7 @@ import {
 import { ReportingError } from './types'
 import { createReportingExport, downloadReportingExport } from './export'
 import { readOrganizationSafetyCase } from '../assessment-safety/organization-view'
+import { listOrganizationSafetyCases } from '../assessment-safety/organization-discovery'
 
 const createSpecSchema = z.object({
   specKey: z.string().trim().min(1).max(160),
@@ -105,6 +106,14 @@ export const reportingController = {
       res.setHeader('Cache-Control', 'no-store')
       res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`)
       return res.type('text/csv').send(result.csv)
+    } catch (error) { return fail(res, error) }
+  },
+  async listSafetyCases(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try {
+      const data = await listOrganizationSafetyCases({ principal: principal(req), organizationId: req.params.organizationId })
+      res.setHeader('Cache-Control', 'no-store')
+      return res.json({ code: 0, message: '操作成功', data })
     } catch (error) { return fail(res, error) }
   },
   async readSafetyCase(req: Request, res: Response) {
@@ -206,7 +215,7 @@ export const reportingController = {
           specId: data.specId,
         })
         res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: artifact })
+        return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       if (data.analysisKind === 'REPEATED_COHORT') {
         const artifact = await generateOrganizationLongitudinalAnalysis({
@@ -215,7 +224,7 @@ export const reportingController = {
           analysisKind: data.analysisKind,
         })
         res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: artifact })
+        return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       if (data.analysisKind === 'MATCHED_LONGITUDINAL') {
         const artifact = await generateOrganizationLongitudinalAnalysis({
@@ -224,7 +233,7 @@ export const reportingController = {
           analysisKind: data.analysisKind, mode: data.options.mode,
         })
         res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: artifact })
+        return res.json({ code: 0, message: '操作成功', data: artifact })
       }
       const artifact = await generateOrganizationProtectedFeedback({
         principal: principal(req), organizationId: req.params.organizationId,

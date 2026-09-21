@@ -98,14 +98,22 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
       if (submittingRef.current) return
       submittingRef.current = true
       try {
-        const accepted = await onTrialComplete({ phase: isDelayed ? 'delayed' : 'learning', roundIndex: isDelayed ? 1 : trialIndex + 1, itemIds: items, responseOrder: response, responseDurationMs: inactivityGuardMs, interrupted: true })
+        const accepted = await onTrialComplete({
+          phase: isDelayed ? 'delayed' : 'learning',
+          roundIndex: isDelayed ? 1 : trialIndex + 1,
+          itemIds: items,
+          responseOrder: response,
+          responseDurationMs: inactivityGuardMs,
+          interrupted,
+          timedOut: true,
+        })
         if (accepted !== false) await advanceAfterFormal()
       } finally {
         submittingRef.current = false
       }
     }, inactivityGuardMs)
     return () => window.clearTimeout(timer)
-  }, [phase, trialIndex, isDelayed, items, response, inactivityGuardMs, onTrialComplete, advanceAfterFormal])
+  }, [phase, trialIndex, isDelayed, items, response, interrupted, inactivityGuardMs, onTrialComplete, advanceAfterFormal])
 
   useEffect(() => {
     if (!phase.startsWith('formal') && phase !== 'delayed-wait') return
@@ -130,7 +138,15 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     if (submittingRef.current || response.length !== items.length) return
     submittingRef.current = true
     try {
-      const accepted = await onTrialComplete({ phase: isDelayed ? 'delayed' : 'learning', roundIndex: isDelayed ? 1 : trialIndex + 1, itemIds: items, responseOrder: response, responseDurationMs: Math.max(0, Math.round(performance.now() - startedRef.current)), interrupted })
+      const accepted = await onTrialComplete({
+        phase: isDelayed ? 'delayed' : 'learning',
+        roundIndex: isDelayed ? 1 : trialIndex + 1,
+        itemIds: items,
+        responseOrder: response,
+        responseDurationMs: Math.max(0, Math.round(performance.now() - startedRef.current)),
+        interrupted,
+        timedOut: false,
+      })
       if (accepted === false) return
       await advanceAfterFormal()
     } finally { submittingRef.current = false }
@@ -139,11 +155,11 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
   if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">图片序列学习</h2><p className="mb-2 text-gray-600">记住日常场景出现的顺序，再按顺序点击还原。</p><p className="mb-6 text-xs text-gray-400">刺激为内部自制；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
-  if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">延迟保持阶段</h3><p className="text-gray-600">请稍候，之后将在不重复呈现图片的情况下再次排序。</p></div>
+  if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现图片的情况下再次排序。</p></div>
 
   const studying = phase === 'practice-study' || phase === 'formal-study'
   const active = phase.startsWith('practice') ? PRACTICE[practiceIndex] : items
-  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '延迟排序' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
-    {studying ? <><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{active.map((item, index) => <Card key={item} itemId={item} index={index} />)}</div><button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始排序</button></> : <><p className="mb-3">已选择：{response.length} / {active.length}</p><div className="mb-4 flex min-h-16 flex-wrap justify-center gap-2">{response.map((item, index) => <Card key={item} itemId={item} index={index} onClick={() => setResponse((value) => value.filter((candidate) => candidate !== item))} />)}</div><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{choices.filter((item) => !response.includes(item)).map((item) => <Card key={item} itemId={item} onClick={() => choose(item)} />)}</div><button className="btn-primary mt-6" disabled={response.length !== active.length} onClick={() => phase === 'practice-recall' ? submitPractice() : void submitFormal()}>提交排序</button></>}
+  return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase.startsWith('practice') ? `练习 ${practiceIndex + 1} / 4` : isDelayed ? '短延迟排序' : `学习轮次 ${trialIndex + 1} / ${learningRounds}`}</p>
+    {studying ? <><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{active.map((item, index) => <Card key={item} itemId={item} index={index} />)}</div>{phase === 'practice-study' ? <button className="btn-primary mt-6" onClick={beginRecall}>我记好了，开始排序</button> : <p className="mt-6 text-sm text-gray-500">请持续记忆，呈现结束后将自动进入排序。</p>}</> : <><p className="mb-3">已选择：{response.length} / {active.length}</p><div className="mb-4 flex min-h-16 flex-wrap justify-center gap-2">{response.map((item, index) => <Card key={item} itemId={item} index={index} onClick={() => setResponse((value) => value.filter((candidate) => candidate !== item))} />)}</div><div className="grid grid-cols-2 gap-2 md:grid-cols-3">{choices.filter((item) => !response.includes(item)).map((item) => <Card key={item} itemId={item} onClick={() => choose(item)} />)}</div><button className="btn-primary mt-6" disabled={response.length !== active.length} onClick={() => phase === 'practice-recall' ? submitPractice() : void submitFormal()}>提交排序</button></>}
   </div>
 }

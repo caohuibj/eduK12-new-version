@@ -12,6 +12,7 @@ export const towerTrialSchema = z.object({
   moves: z.array(moveSchema).max(40),
   gaveUp: z.boolean(),
   interrupted: z.boolean(),
+  timedOut: z.boolean().optional(),
 }).strict()
 
 export type TowerTrial = z.infer<typeof towerTrialSchema>

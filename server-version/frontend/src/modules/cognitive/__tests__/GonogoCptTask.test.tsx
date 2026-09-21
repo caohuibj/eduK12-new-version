@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { GonogoTask } from '../tasks/gonogo/GonogoTask'
 import { CptTask } from '../tasks/cpt/CptTask'
@@ -16,7 +16,7 @@ const context = {
 }
 
 describe('Go/No-Go and CPT runners', () => {
-  it('starts Go/No-Go from instruction into practice without persisting', async () => {
+  it('starts Go/No-Go from instruction into practice without persisting', () => {
     const onTrialComplete = vi.fn()
     render(<GonogoTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
     expect(screen.getByText('Go/No-Go')).toBeTruthy()
@@ -25,7 +25,7 @@ describe('Go/No-Go and CPT runners', () => {
     expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
-  it('starts CPT from instruction into practice without persisting', async () => {
+  it('starts CPT from instruction into practice without persisting', () => {
     const onTrialComplete = vi.fn()
     render(
       <CptTask
@@ -42,6 +42,42 @@ describe('Go/No-Go and CPT runners', () => {
     fireEvent.click(screen.getByText('开始练习'))
     expect(screen.getByText(/练习 1/)).toBeTruthy()
     expect(onTrialComplete).not.toHaveBeenCalled()
+  })
+
+  it('pauses at a block gate before multi-block CPT formal trials start', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn()
+    try {
+      render(
+        <CptTask
+          taskContext={{
+            ...context,
+            testType: 'cpt',
+            config: { totalTrials: 8, targetRatio: 0.25, blockCount: 2, stimulusMs: 20, isiMs: 20 },
+          }}
+          trialIndex={0}
+          onTrialComplete={onTrialComplete}
+        />,
+      )
+      fireEvent.click(screen.getByText('开始练习'))
+
+      for (let practiceIndex = 0; practiceIndex < 4; practiceIndex += 1) {
+        await act(async () => { vi.advanceTimersByTime(20) })
+        if (practiceIndex % 2 === 0) fireEvent.pointerDown(screen.getByRole('button'))
+        await act(async () => { vi.advanceTimersByTime(20 + 600) })
+      }
+
+      expect(screen.getByText(/练习正确 4 \/ 4/)).toBeTruthy()
+      fireEvent.click(screen.getByText('开始正式测验'))
+      expect(screen.getByText('准备开始持续注意测验')).toBeTruthy()
+      expect(screen.getByText(/区块 1 \/ 2/)).toBeTruthy()
+      expect(onTrialComplete).not.toHaveBeenCalled()
+      fireEvent.click(screen.getByText('开始第 1 区块'))
+      expect(screen.getByLabelText('CPT 正式测验')).toBeTruthy()
+      expect(screen.queryByText(/试次 1 \/ 8/)).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('does not enter formal after a failing practice block and allows retry', () => {

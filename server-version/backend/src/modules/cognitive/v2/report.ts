@@ -38,9 +38,24 @@ export interface ThreeLayerReport {
   practicalTips: string[]
 }
 
+const formatMapValue = (metricKey: string, value: unknown): string => {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return '—'
+  if (/rate/i.test(metricKey)) return `${Math.round(number * 100)}%`
+  if (/rt/i.test(metricKey)) return `${Math.round(number)} ms`
+  return String(Math.round(number * 100) / 100)
+}
+
 const formatMetric = (definition: MetricDefinition, value: unknown): string => {
   if (value === null || value === undefined || value === '') return '—'
-  if (definition.valueType === 'object' || definition.valueType === 'array') return JSON.stringify(value)
+  if (definition.valueType === 'object') {
+    if (typeof value !== 'object' || Array.isArray(value)) return '—'
+    const entries = Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => Number(left) - Number(right))
+      .map(([level, item]) => `${level}-back：${formatMapValue(definition.key, item)}`)
+    return entries.length > 0 ? entries.join('；') : '—'
+  }
+  if (definition.valueType === 'array') return JSON.stringify(value)
   const number = Number(value)
   if (!Number.isFinite(number)) return String(value)
   const rounded = definition.precision === undefined
@@ -72,6 +87,20 @@ const metricView = (
 const visibleForProfile = (definition: MetricDefinition, profile: CognitiveProfile | null): boolean =>
   !profile || definition.availableProfiles.includes(profile)
 
+const eligibleMetric = (
+  key: string,
+  definitions: Record<string, MetricDefinition>,
+  profile: CognitiveProfile | null,
+  quality: Pick<CognitiveScoreResult['quality'], 'flags'>,
+): boolean => {
+  const definition = definitions[key]
+  return Boolean(
+    definition
+      && visibleForProfile(definition, profile)
+      && !metricIsQualityGated(definition, quality),
+  )
+}
+
 const projectKeys = (
   keys: string[],
   visibility: MetricDefinition['visibility'],
@@ -83,15 +112,63 @@ const projectKeys = (
   return Boolean(
     definition
       && definition.visibility === visibility
-      && visibleForProfile(definition, profile)
-      && !metricIsQualityGated(definition, quality),
+      && eligibleMetric(key, definitions, profile, quality),
   )
 })
 
-const conclusionFor = (state: QualityState): string => {
+const participantMetricAllowed = (testType: string, key: string): boolean => {
+  // Matrix `reachedDifficulty` only means that at least one item in a design
+  // tier was answered correctly. It is useful as a raw research descriptor,
+  // but a single lucky response can raise it, so it must not be presented as
+  // a participant ability/difficulty level.
+  if (testType === 'matrix' && key === 'reachedDifficulty') return false
+  return true
+}
+
+const experienceHeadlineByTestType: Record<string, string> = {
+  stroop: 'incongruentAccuracy',
+  nback: 'dPrimeByN',
+  sst: 'pRespondStop',
+}
+
+const resolveHeadlineKeys = (input: {
+  testType: string
+  profile: CognitiveProfile | null
+  definition: ReportDefinition
+  metricDefinitions: Record<string, MetricDefinition>
+  quality: Pick<CognitiveScoreResult['quality'], 'flags'>
+}): string[] => {
+  const experienceHeadline = input.profile === 'experience'
+    ? experienceHeadlineByTestType[input.testType]
+    : undefined
+  if (
+    experienceHeadline
+    && eligibleMetric(experienceHeadline, input.metricDefinitions, input.profile, input.quality)
+    && participantMetricAllowed(input.testType, experienceHeadline)
+  ) {
+    return [experienceHeadline]
+  }
+  return projectKeys(
+    input.definition.headlineMetrics,
+    'headline',
+    input.metricDefinitions,
+    input.profile,
+    input.quality,
+  ).filter((key) => participantMetricAllowed(input.testType, key))
+}
+
+const conclusionFor = (state: QualityState, profile: CognitiveProfile | null): string => {
   if (state === 'invalid') return '本次数据未达到可解释条件，暂不提供表现结论。'
   if (state === 'limited') return '本次结果存在质量限制，请结合展开详情谨慎阅读。'
+  if (profile === 'experience') {
+    return '体验版使用短程协议；以下指标由正式评分器计算，适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。'
+  }
   return '以下结果描述本次任务中的表现，不等同于诊断或正式人口常模。'
+}
+
+const participantPracticalTips = (testType: string, tips: string[]): string[] => {
+  if (testType === 'memory' || testType === 'stroop') return []
+  return tips
 }
 
 export const projectThreeLayerReport = (input: {
@@ -113,13 +190,23 @@ export const projectThreeLayerReport = (input: {
     active,
     effect: input.qualityDefinitions[key]?.effect ?? 'limited',
   }))
-  const headlineKeys = projectKeys(input.definition.headlineMetrics, 'headline', input.metricDefinitions, input.profile, input.score.quality)
+  const headlineKeys = resolveHeadlineKeys({
+    testType: input.testType,
+    profile: input.profile,
+    definition: input.definition,
+    metricDefinitions: input.metricDefinitions,
+    quality: input.score.quality,
+  })
+  const headlineSet = new Set(headlineKeys)
   const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile, input.score.quality)
+    .filter((key) => !headlineSet.has(key))
+    .filter((key) => participantMetricAllowed(input.testType, key))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
+    .filter((key) => participantMetricAllowed(input.testType, key))
   return {
     title: input.definition.title,
     qualityState: input.score.quality.state,
-    conclusion: conclusionFor(input.score.quality.state),
+    conclusion: conclusionFor(input.score.quality.state, input.profile),
     headline: input.score.quality.state === 'invalid'
       ? []
       : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
@@ -139,6 +226,6 @@ export const projectThreeLayerReport = (input: {
       profile: input.profile,
     },
     disclaimer: input.definition.disclaimer,
-    practicalTips: input.definition.practicalTips,
+    practicalTips: participantPracticalTips(input.testType, input.definition.practicalTips),
   }
 }

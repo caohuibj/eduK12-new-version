@@ -231,6 +231,7 @@ async function assertDenyTargetAuthority(
 }
 
 export async function createOrganization(input: {
+  firstAdminUserId?: string
   name: string
   meta: CommandMeta
 }): Promise<{ organization: OrganizationRecord; membership: MembershipRecord }> {
@@ -239,8 +240,16 @@ export async function createOrganization(input: {
   return executeCommand({
     organizationId: null,
     meta: input.meta,
-    payload: { name: input.name },
+    payload: { name: input.name, ...(input.firstAdminUserId ? { firstAdminUserId: input.firstAdminUserId } : {}) },
     work: async (tx, domainEventId) => {
+      if (input.firstAdminUserId) {
+        const admins = await tx.$queryRaw<Array<{ id: string }>>`
+          SELECT "id" FROM "users" WHERE "id" = ${input.firstAdminUserId}
+            AND "is_active" AND NOT "is_frozen"
+            AND ("expires_at" IS NULL OR "expires_at" > statement_timestamp()) FOR SHARE
+        `
+        if (!admins[0]) throw new OrganizationDomainError('INITIAL_ADMIN_UNAVAILABLE', '首位管理员账户不存在或不可用', 404)
+      }
       const organizations = await tx.$queryRaw<OrganizationRecord[]>`
         INSERT INTO "organizations" ("id", "name", "status", "created_by_user_id")
         VALUES (${organizationId}, ${input.name}, 'ACTIVE', ${input.meta.actorUserId})
@@ -253,7 +262,7 @@ export async function createOrganization(input: {
       `
       const memberships = await tx.$queryRaw<MembershipRecord[]>`
         INSERT INTO "organization_memberships" ("id", "organization_id", "user_id", "org_role")
-        VALUES (${membershipId}, ${organizationId}, ${input.meta.actorUserId}, 'ORG_ADMIN')
+        VALUES (${membershipId}, ${organizationId}, ${input.firstAdminUserId ?? input.meta.actorUserId}, 'ORG_ADMIN')
         RETURNING
           "id", "organization_id" AS "organizationId", "user_id" AS "userId",
           "org_role" AS "orgRole", "valid_from" AS "validFrom", "valid_until" AS "validUntil",
