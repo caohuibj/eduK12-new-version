@@ -72,10 +72,10 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
         with:
           ref: ${{ inputs.target_ref || github.sha }}
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
