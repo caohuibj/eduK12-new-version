@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { situationDefinitionSchema } from '../situation-definition'
 import { situationDefinitionV2Schema } from '../situation-branching'
 import { canonicalHash } from '../../assessment-runtime/canonical'
-import type { SituationPackage } from '../situation-package.registry'
+import type { SituationPackage } from '../situation-package'
 
 export const sourceIdentitySchema = z.object({
   instrumentKey: z.string().regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/),

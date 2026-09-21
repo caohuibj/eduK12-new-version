@@ -1,0 +1,20 @@
+[
+  {
+    "key": "sjt-assertiveness-golden",
+    "version": "1.0.0",
+    "baselineCommit": "a3098d845c0b3b30cea747f26d7491d11d0489c0",
+    "contentDigest": "ecb1ec38d236e6fd4aeaff4964cc70df5901d0ac468c1a269216e9afa4359db8"
+  },
+  {
+    "key": "sjt-responsibility-golden",
+    "version": "1.0.0",
+    "baselineCommit": "a3098d845c0b3b30cea747f26d7491d11d0489c0",
+    "contentDigest": "f92428f35fa47b048d3529277950fe9714bf2e9ee053339d9eefe64a8468111a"
+  },
+  {
+    "key": "sjt-anxiety-golden",
+    "version": "1.0.0",
+    "baselineCommit": "a3098d845c0b3b30cea747f26d7491d11d0489c0",
+    "contentDigest": "b77f282466eee822cd92f74987f5055828ae03ef032de5c09ca751d5d1d7a38f"
+  }
+]
