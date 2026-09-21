@@ -56,11 +56,7 @@ export const validateRegistryReferenceEligibility = (entry: {
 }
 
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
-
-const nonDegradingProvenanceQualityFlags = new Set([
-  'deviceInfoIncomplete',
-  'mixedPointerType',
-])
+const nonDegradingProvenanceQualityFlags = new Set(['deviceInfoIncomplete', 'mixedPointerType'])
 
 const qualityEffect = (key: string): QualityDefinition['effect'] => {
   if (nonDegradingProvenanceQualityFlags.has(key)) return 'none'
@@ -69,10 +65,7 @@ const qualityEffect = (key: string): QualityDefinition['effect'] => {
   return 'limited'
 }
 
-const metricVisibility = (
-  key: string,
-  entry: AnyRegistryEntry,
-): MetricDefinition['visibility'] => {
+const metricVisibility = (key: string, entry: AnyRegistryEntry): MetricDefinition['visibility'] => {
   const report = entry.reportDefinition
   if (key === report.headlineMetric) return 'headline'
   if (report.primaryMetrics.includes(key)) return 'user'
@@ -81,18 +74,13 @@ const metricVisibility = (
 }
 
 const metricCategory = (key: string, entry: AnyRegistryEntry): string => {
-  const mapping = listCognitiveEvidenceMappingsForTask(
-    entry.testType,
-    entry.engineVersion,
-    entry.scoringVersion,
-  ).find((candidate) => candidate.metricKey === key)
+  const mapping = listCognitiveEvidenceMappingsForTask(entry.testType, entry.engineVersion, entry.scoringVersion)
+    .find((candidate) => candidate.metricKey === key)
   return mapping?.domain ?? entry.metricDefinitions[key]?.construct ?? entry.category
 }
 
 const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricDefinition> => {
-  const eligibleMetricKeys = new Set(
-    Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys : [],
-  )
+  const eligibleMetricKeys = new Set(Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys : [])
   return Object.fromEntries(Object.entries(entry.metricDefinitions).map(([key, metric]) => [key, {
     key,
     label: metric.label,
@@ -129,8 +117,7 @@ const adaptQualityDefinitions = (entry: AnyRegistryEntry): Record<string, Qualit
 })
 
 const adaptReportDefinition = (entry: AnyRegistryEntry, metrics: Record<string, MetricDefinition>): ReportDefinition => {
-  const headline = entry.reportDefinition.headlineMetric
-    ?? entry.reportDefinition.primaryMetrics[0]
+  const headline = entry.reportDefinition.headlineMetric ?? entry.reportDefinition.primaryMetrics[0]
   const primary = entry.reportDefinition.primaryMetrics.filter((key) => key !== headline && metrics[key])
   const details = [
     ...entry.reportDefinition.secondaryMetrics,
@@ -149,7 +136,6 @@ const adaptReportDefinition = (entry: AnyRegistryEntry, metrics: Record<string, 
 }
 
 const phasefulTasks = new Set(['picturesequence', 'pairedassociate', 'wordlist'])
-
 const adaptProtocol = (entry: AnyRegistryEntry) => ({
   schemaVersion: 1 as const,
   key: `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`,
@@ -166,16 +152,27 @@ const adaptProtocol = (entry: AnyRegistryEntry) => ({
   measurementCriticalConfigPaths: ['*'],
 })
 
+const LEGACY_SUPERSEDED_IDENTITIES = new Set([
+  'reaction/1.0.0/1.0.0',
+  'memory/1.0.0/1.0.0',
+  'stroop/1.0.0/1.0.0',
+])
+
 /**
- * Adapt a RegistryEntry into the pure executable Cognitive V2 contract.
- *
- * The optional legacy lifecycle argument is intentionally ignored so older
- * fixtures can be migrated without reintroducing a second release truth.
- * Product release state belongs exclusively to CognitiveTestConfig.status.
+ * Deprecated compatibility projection for historical audits/fixtures only.
+ * It is not consulted by assignment selection, publish/retire transitions,
+ * MaterialGrant, Composite availability, or any other product release path.
  */
+const legacyCompatibilityStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' | 'RETIRED' => {
+  if (entry.testType === 'fake') return 'DRAFT'
+  const identity = `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+  if (LEGACY_SUPERSEDED_IDENTITIES.has(identity)) return 'RETIRED'
+  return 'PUBLISHED'
+}
+
 export const buildCognitiveV2TaskDefinition = (
   entry: AnyRegistryEntry,
-  _legacyPublicationStatus?: 'DRAFT' | 'PUBLISHED' | 'RETIRED',
+  legacyPublicationStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED' = legacyCompatibilityStatus(entry),
 ): TaskDefinition<unknown, unknown> => {
   const metrics = adaptMetricDefinitions(entry)
   const quality = adaptQualityDefinitions(entry)
@@ -187,9 +184,7 @@ export const buildCognitiveV2TaskDefinition = (
     category: entry.category,
     engineVersion: entry.engineVersion,
     scoringVersion: entry.scoringVersion,
-    ...(entry.presentation
-      ? { presentation: parseCognitivePresentationDefinition(entry.presentation) }
-      : {}),
+    ...(entry.presentation ? { presentation: parseCognitivePresentationDefinition(entry.presentation) } : {}),
     configSchema: entry.configSchema,
     trialSchema: entry.trialSchema,
     protocol,
@@ -220,6 +215,11 @@ export const buildCognitiveV2TaskDefinition = (
     quality,
     references: [],
     report: adaptReportDefinition(entry, metrics),
+    publication: {
+      status: legacyPublicationStatus,
+      referenceRequired: false,
+      evidenceNote: 'DEPRECATED compatibility metadata only; CognitiveTestConfig.status is the product release authority.',
+    },
   }
 }
 

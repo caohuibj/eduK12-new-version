@@ -9,6 +9,8 @@ import type { TaskDefinition } from './types'
 
 export interface CognitiveAuditEntry {
   key: string
+  /** Deprecated compatibility projection; never use as product availability truth. */
+  status: TaskDefinition['publication']['status']
   protocolSignature: string
   scorerCovered: boolean
   referenceMappingCount: number
@@ -20,22 +22,19 @@ export interface CognitiveAuditReport {
   status: 'PASS' | 'FAIL'
   generatedAt: string
   registryCount: number
+  /** Compatibility-only counts retained for historical audit consumers. */
+  publishedCount: number
+  draftCount: number
+  retiredCount: number
   entries: CognitiveAuditEntry[]
   issues: PublicationIssue[]
 }
 
-const taskKey = (definition: TaskDefinition): string => (
-  `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
-)
-
-const registryKey = (entry: { testType: string; engineVersion: string; scoringVersion: string }): string => (
+const taskKey = (definition: TaskDefinition): string => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
+const registryKey = (entry: { testType: string; engineVersion: string; scoringVersion: string }): string =>
   `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
-)
 
-/**
- * Audit executable Cognitive V2 contracts only. Product lifecycle is not part
- * of this registry audit; CognitiveTestConfig.status is the release authority.
- */
+/** Audit executable contracts. Lifecycle fields in this report are compatibility diagnostics only. */
 export const auditCognitiveV2Registry = (
   definitions = listCognitiveV2TaskDefinitions(),
 ): CognitiveAuditReport => {
@@ -59,14 +58,20 @@ export const auditCognitiveV2Registry = (
     seen.add(key)
     const signature = computeProtocolSignature(definition.protocol)
     const attachedSignature = (definition as TaskDefinition & { protocolSignature?: string }).protocolSignature
-    if (attachedSignature) {
-      // Task definitions do not persist a signature; this branch is reserved
-      // for consumers that attach one while auditing a frozen catalog.
-      if (attachedSignature !== signature) entryIssues.push({ path: 'protocolSignature', message: 'protocol signature does not match protocol', severity: 'error' })
+    if (attachedSignature && attachedSignature !== signature) {
+      entryIssues.push({ path: 'protocolSignature', message: 'protocol signature does not match protocol', severity: 'error' })
     }
     if (typeof definition.scorer !== 'function') entryIssues.push({ path: 'scorer', message: 'authoritative scorer is not callable', severity: 'error' })
+    if (definition.publication.status === 'PUBLISHED' && definition.references.length === 0) {
+      entryIssues.push({
+        path: 'references',
+        message: 'compatibility status is PUBLISHED but task has no metric-specific reference mapping; product release remains independent and report must remain non-normative',
+        severity: 'warning',
+      })
+    }
     return {
       key,
+      status: definition.publication.status,
       protocolSignature: signature,
       scorerCovered: typeof definition.scorer === 'function',
       referenceMappingCount: definition.references.length,
@@ -86,11 +91,17 @@ export const auditCognitiveV2Registry = (
     const key = registryKey(registryEntry)
     if (!definitionKeys.has(key)) issues.push({ path: `registry.${key}`, message: 'exact RegistryEntry is missing from the v2 audit', severity: 'error' })
   }
+  const publishedCount = entries.filter((entry) => entry.status === 'PUBLISHED').length
+  const draftCount = entries.filter((entry) => entry.status === 'DRAFT').length
+  const retiredCount = entries.filter((entry) => entry.status === 'RETIRED').length
   const hasErrors = [...issues, ...entries.flatMap((entry) => entry.issues)].some((entry) => entry.severity === 'error')
   return {
     status: hasErrors ? 'FAIL' : 'PASS',
     generatedAt: new Date().toISOString(),
     registryCount: entries.length,
+    publishedCount,
+    draftCount,
+    retiredCount,
     entries,
     issues,
   }

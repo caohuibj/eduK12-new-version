@@ -7,20 +7,13 @@ export interface PublicationIssue {
   severity: 'error' | 'warning'
 }
 
-const issue = (path: string, message: string, severity: PublicationIssue['severity'] = 'error'): PublicationIssue => ({
-  path,
-  message,
-  severity,
-})
-
+const issue = (path: string, message: string, severity: PublicationIssue['severity'] = 'error'): PublicationIssue => ({ path, message, severity })
 const validVisibility = new Set(['headline', 'user', 'detail', 'research_only', 'hidden'])
 const validDirections = new Set(['higher_is_better', 'lower_is_better', 'target_range', 'descriptive', 'signed'])
 const validReferenceValueTypes = new Set(['number', 'integer'])
 const validProfiles = new Set(['experience', 'standard', 'research'])
 
-export const validateTaskDefinition = <TConfig, TTrial>(
-  definition: TaskDefinition<TConfig, TTrial>,
-): PublicationIssue[] => {
+export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): PublicationIssue[] => {
   const issues: PublicationIssue[] = []
   if (definition.schemaVersion !== 1) issues.push(issue('schemaVersion', 'TaskDefinition schemaVersion must be 1'))
   for (const field of ['testType', 'name', 'category', 'engineVersion', 'scoringVersion']) {
@@ -67,18 +60,14 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
     for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
-      if (!qualityKeys.has(qualityKey)) {
-        issues.push(issue(`metrics.${key}.requiresQualityFlags.${index}`, `${qualityKey} is not declared in quality definitions`))
-      }
+      if (!qualityKeys.has(qualityKey)) issues.push(issue(`metrics.${key}.requiresQualityFlags.${index}`, `${qualityKey} is not declared in quality definitions`))
     }
   }
 
   const assertVisibility = (keys: string[], visibility: MetricDefinition['visibility'], path: string) => {
     for (const [index, key] of keys.entries()) {
       const metric = definition.metrics[key]
-      if (metric && metric.visibility !== visibility) {
-        issues.push(issue(`${path}.${index}`, `${key} must be declared with ${visibility} visibility`))
-      }
+      if (metric && metric.visibility !== visibility) issues.push(issue(`${path}.${index}`, `${key} must be declared with ${visibility} visibility`))
     }
   }
   assertVisibility(definition.report.headlineMetrics, 'headline', 'report.headlineMetrics')
@@ -90,11 +79,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (!quality.label || !quality.description) issues.push(issue(`quality.${key}`, 'quality label and description are required'))
   }
 
-  const reportKeys = [
-    ...definition.report.headlineMetrics,
-    ...definition.report.userMetrics,
-    ...definition.report.detailMetrics,
-  ]
+  const reportKeys = [...definition.report.headlineMetrics, ...definition.report.userMetrics, ...definition.report.detailMetrics]
   for (const key of reportKeys) {
     if (!metricKeys.has(key)) issues.push(issue(`report.${key}`, 'report references an unknown metric'))
   }
@@ -129,9 +114,15 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     }
   }
 
-  // Reference/norm availability is scientific/claim governance rather than a
-  // product-release switch. Existing mappings must be internally valid, while
-  // zero mappings remains a valid descriptive/non-normative task contract.
+  // Compatibility-only metadata may still request a reference warning for old
+  // audits, but reference absence is never a product publication blocker.
+  if (definition.publication.referenceRequired && definition.references.length === 0) {
+    issues.push(issue(
+      'references',
+      'referenceRequired is compatibility metadata only; scientific qualification/claim eligibility must resolve reference evidence separately',
+      'warning',
+    ))
+  }
   if (!definition.report.disclaimer) issues.push(issue('report.disclaimer', 'report disclaimer is required'))
   return issues
 }
@@ -141,11 +132,8 @@ export const assertTaskContractValid = <TConfig, TTrial>(definition: TaskDefinit
   if (errors.length > 0) throw new Error(`Cognitive task contract validation failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
 }
 
-/**
- * Release-readiness contract assertion. Lifecycle authorization is deliberately
- * not represented here; callers must use CognitiveTestConfig.status for that.
- */
+/** Contract/readiness only. Product lifecycle authorization must use CognitiveTestConfig.status. */
 export const assertTaskReadyForRelease = assertTaskContractValid
 
-/** @deprecated Use assertTaskReadyForRelease or assertTaskContractValid. */
+/** @deprecated Compatibility alias; it deliberately does NOT inspect publication.status. */
 export const assertTaskCanPublish = assertTaskReadyForRelease
