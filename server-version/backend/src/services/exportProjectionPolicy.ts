@@ -101,33 +101,46 @@ export const resolveExportProjectionBinding = async (
   return finishBinding({ projectionVersion: EXPORT_PROJECTION_VERSION, resourceType, resourceId, audience, scales })
 }
 
+const SAFE_STANDALONE_METADATA = new Set(['U_id', 'U_name', 'U_time', 'U_date'])
+const METHOD_FIELDS = new Set(['INSTRUMENT_VERSION', 'SCORING_VERSION', 'REPORT_VERSION', 'DEFINITION_HASH'])
+
 const standaloneAllowed = (name: string, caps: DisclosureCapabilitiesV1): boolean => {
+  if (SAFE_STANDALONE_METADATA.has(name)) return true
   if (name.startsWith('Q_V_') || name.startsWith('RT_') || name.startsWith('DEVICE_')) return caps.rawAnswers
   if (name.startsWith('Q_S_')) return caps.itemScores
   if (name.startsWith('SCORE_')) return caps.numericScores
   if (name.startsWith('QUALITY_')) return caps.resultQualityDetails
   if (name === 'REFERENCE_VERSIONS') return caps.references
-  if (['INSTRUMENT_VERSION', 'SCORING_VERSION', 'REPORT_VERSION', 'DEFINITION_HASH'].includes(name)) return caps.methods
-  return true
+  if (METHOD_FIELDS.has(name)) return caps.methods
+  // Future standalone Scale fields fail closed until deliberately classified.
+  return false
+}
+
+const questionnaireScaleSuffixAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {
+  if (suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('DEVICE_')) return caps.rawAnswers
+  if (suffix.startsWith('Q_S_')) return caps.itemScores
+  if (suffix.startsWith('SCORE_')) return caps.numericScores
+  if (suffix.startsWith('QUALITY_')) return caps.resultQualityDetails
+  if (suffix === 'REFERENCE_VERSIONS') return caps.references
+  if (METHOD_FIELDS.has(suffix) || suffix === 'CONTEXT_SNAPSHOT_HASH') return caps.methods
+  // Future per-Scale questionnaire columns fail closed by default.
+  return false
 }
 
 const questionnaireAllowed = (
   name: string,
   binding: ExportProjectionBindingV1,
 ): boolean => {
+  if (SAFE_STANDALONE_METADATA.has(name)) return true
+  // Questionnaire form fields are a separate, already-authorized product
+  // surface. This projector only constrains embedded Scale result disclosure.
+  if (/^F\d+_/.test(name)) return true
   if (name === 'CONTEXT_SNAPSHOT_HASH') return binding.scales.every((scale) => scale.capabilities.methods)
   const match = /^S(\d+)_/.exec(name)
-  if (!match) return true
+  if (!match) return false
   const scale = binding.scales[Number(match[1]) - 1]
   if (!scale) return false
-  const suffix = name.slice(match[0].length)
-  if (suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('DEVICE_')) return scale.capabilities.rawAnswers
-  if (suffix.startsWith('Q_S_')) return scale.capabilities.itemScores
-  if (suffix.startsWith('SCORE_')) return scale.capabilities.numericScores
-  if (suffix.startsWith('QUALITY_')) return scale.capabilities.resultQualityDetails
-  if (suffix === 'REFERENCE_VERSIONS') return scale.capabilities.references
-  if (['INSTRUMENT_VERSION', 'SCORING_VERSION', 'REPORT_VERSION', 'DEFINITION_HASH', 'CONTEXT_SNAPSHOT_HASH'].includes(suffix)) return scale.capabilities.methods
-  return true
+  return questionnaireScaleSuffixAllowed(name.slice(match[0].length), scale.capabilities)
 }
 
 const filterData = (data: ExportData, allowed: (field: ExportField) => boolean): ExportData => {
