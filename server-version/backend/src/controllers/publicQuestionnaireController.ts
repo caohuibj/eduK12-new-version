@@ -1,3 +1,4 @@
+import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
 /**
  * 公开访问控制器
  * 
@@ -597,14 +598,14 @@ export const publicQuestionnaireController = {
           const scaleRuntimeSnapshots = await Promise.all(startContent.questionnaireScales.map(async (qs: any) => {
             if (qs.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
             const definition = scaleDefinitionFromRecord(qs.scale)
-            return {
-              qs,
-              snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
-                instrumentKey: qs.scale.code,
-                instrumentVersion: qs.scale.instrumentVersion,
-                definition,
-              }),
-            }
+            const snapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
+              instrumentKey: qs.scale.code,
+              instrumentVersion: qs.scale.instrumentVersion,
+              requestedMode: 'PUBLIC_QUESTIONNAIRE',
+              definition,
+            })
+            if (snapshot.schemaVersion === 2) assertScaleContextCollectable({ policy: snapshot.compiledPolicy.applicability, scalePosition: qs.position, sections: frozenFormSections })
+            return { qs, snapshot }
           }))
           await tx.assessment.createMany({
             data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({

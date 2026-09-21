@@ -29,6 +29,7 @@ import {
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
+import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -2132,7 +2133,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null) => {
+const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[]) => {
   const runtime = {
     scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
     cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
@@ -2157,8 +2158,10 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             instrumentKey: item.scale.code,
             instrumentVersion: item.scale.instrumentVersion,
             definition: scaleDefinitionFromRecord(item.scale),
+            requestedMode: 'COMPOSITE',
           })
         : null
+      if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2170,6 +2173,9 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
+          subjectUserId: attempt.subjectUserId ?? userId,
+          respondentUserId: attempt.respondentUserId ?? userId,
+          respondentType: attempt.respondentType ?? 'SELF',
           ...(frozenScale ? {
             runtimeGeneration: 'UNIFIED_V1' as const,
             runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(frozenScale),
@@ -2311,7 +2317,7 @@ const createAttempt = async (
       })),
     })
   }
-  const runtime = await createChildRecords(db, attempt, composite.items, userId)
+  const runtime = await createChildRecords(db, attempt, composite.items, userId, formSections)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,

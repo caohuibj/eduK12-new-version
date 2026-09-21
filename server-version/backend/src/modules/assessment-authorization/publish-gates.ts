@@ -8,15 +8,6 @@ import {
   type PublicationGateResultV1,
 } from './types'
 
-const who5Keys = new Set([
-  'who5',
-  'wellbeing_who5_youth_self_zh_cn_v1',
-])
-
-export const isWho5Instrument = (instrumentKey: string): boolean => (
-  who5Keys.has(instrumentKey) || instrumentKey.includes('who5')
-)
-
 export const evaluateAuthorizationOverlayStatus = (
   record: InstrumentAuthorizationRecordV1,
   nowIso: string = new Date().toISOString(),
@@ -65,9 +56,15 @@ export const resolveEffectiveAuthorization = (input: {
 
   if (lineage.length === 0) return null
 
+  const revokedVersions = new Map<string, number>()
+  for (const row of lineage) {
+    if (row.status === 'REVOKED') revokedVersions.set(row.authorizationId, Math.max(revokedVersions.get(row.authorizationId) ?? 0, row.version))
+  }
+
   // Prefer the newest eligible (APPROVED | EVIDENCE_PENDING) that is in validity window
   // and not overlay-EXPIRED/REVOKED.
   for (const row of lineage) {
+    if ((revokedVersions.get(row.authorizationId) ?? 0) >= row.version) continue
     const overlay = evaluateAuthorizationOverlayStatus(row, input.nowIso)
     if (!ELIGIBLE_RIGHTS_STATUSES.has(row.status)) continue
     if (overlay === 'EXPIRED' || overlay === 'REVOKED') continue
@@ -136,7 +133,7 @@ const evaluateRequiredBooleanGate = (input: {
 /**
  * Unified Publish validation: science/rights/language/report/safety/golden.
  * EVIDENCE_PENDING warns but does not block already-approved publish.
- * WHO-5 is publishable only when commercialNature is NON_COMMERCIAL.
+ * nonCommercialOnly is a generic Bundle publication requirement.
  * Required gates fail-closed: undefined proof ≠ pass; preview shows pending.
  * Code-definition DRAFT cannot become environment PUBLISHED via overlay.
  */
@@ -300,14 +297,10 @@ export const evaluateBundlePublication = (input: {
       if (overlay === 'EVIDENCE_PENDING' || effective.status === 'EVIDENCE_PENDING') {
         warnings.push(`${instrumentKey}: EVIDENCE_PENDING — warn only, does not block approved publish`)
       }
-      if (isWho5Instrument(instrumentKey) || isWho5Instrument(input.definition.bundleKey)) {
-        if (
-          effective.scope.commercialNature !== 'NON_COMMERCIAL'
-          || input.deploymentCommercialNature !== 'NON_COMMERCIAL'
-          || !req.nonCommercialOnly
-        ) {
+      if (req.nonCommercialOnly) {
+        if (effective.scope.commercialNature !== 'NON_COMMERCIAL' || input.deploymentCommercialNature !== 'NON_COMMERCIAL') {
           rightsOk = false
-          errors.push('WHO-5 仅 NON_COMMERCIAL 可发布')
+          errors.push(`${instrumentKey}: nonCommercialOnly requires NON_COMMERCIAL authorization and deployment`)
           continue
         }
       } else if (

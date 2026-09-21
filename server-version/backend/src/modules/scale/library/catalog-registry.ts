@@ -7,13 +7,14 @@
  *
  * 绑定诊断（fail-closed）：
  * - DUPLICATE_CATALOG_MANIFEST：同一 key+version 重复注册；
- * - CATALOG_PACKAGE_MISSING：orphan catalog entry（该 key 没有任何 package）；
+ * - CATALOG_PACKAGE_MISSING：catalog-first entry 尚无 package；CANDIDATE/REVIEWED
+ *   允许以 warning 存在并保持不可启动，ACCEPTED 必须绑定 package；
  * - CATALOG_PACKAGE_VERSION_MISMATCH：key 存在但没有该 instrumentVersion 的 package；
  * - PACKAGE_WITHOUT_CATALOG：反向 orphan（package 存在但还没有 catalog，SL3 前为
  *   预期状态，warning 不阻断）。
  *
  * manifest 解析失败（INVALID_CATALOG_MANIFEST）产生 error 诊断而不是抛异常，
- * 让调用方（未来的 library read API / publication gate）可以一次性拿到全部问题。
+ * 让调用方（library read API / publication gate）可以一次性拿到全部问题。
  */
 import {
   getScalePackage,
@@ -51,6 +52,10 @@ export interface ScaleCatalogRegistry {
   valid: boolean
   getEntry: (instrumentKey: string, instrumentVersion: string) => ScaleCatalogEntry | undefined
 }
+
+const missingPackageSeverity = (manifest: ScaleCatalogManifestV1): 'error' | 'warning' => (
+  manifest.catalogStatus === 'ACCEPTED' ? 'error' : 'warning'
+)
 
 export const createScaleCatalogRegistry = (manifests: readonly unknown[]): ScaleCatalogRegistry => {
   const diagnostics: CatalogRegistryDiagnostic[] = []
@@ -95,11 +100,14 @@ export const createScaleCatalogRegistry = (manifests: readonly unknown[]): Scale
       })
     } else {
       bindingStatus = 'PACKAGE_MISSING'
+      const severity = missingPackageSeverity(manifest)
       diagnostics.push({
         code: 'CATALOG_PACKAGE_MISSING',
-        severity: 'error',
+        severity,
         path,
-        message: `orphan catalog entry：${bindingKey} 没有已注册的 scale package`,
+        message: severity === 'warning'
+          ? `catalog-first entry：${bindingKey} 尚无 scale package；${manifest.catalogStatus} 状态仅可发现，不可启动`
+          : `orphan catalog entry：${bindingKey} 已是 ACCEPTED，但没有已注册的 scale package`,
       })
     }
     const entry: ScaleCatalogEntry = { manifest, pkg, bindingStatus }

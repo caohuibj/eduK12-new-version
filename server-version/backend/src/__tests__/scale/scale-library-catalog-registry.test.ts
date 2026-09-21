@@ -23,15 +23,27 @@ describe('ScaleCatalogRegistry package binding (SL1-C6)', () => {
     expect(registry.diagnostics.filter((diagnostic) => diagnostic.code === 'DUPLICATE_CATALOG_MANIFEST')).toHaveLength(1)
   })
 
-  it('flags an orphan catalog entry when no package exists for the key at all', () => {
+  it('allows a catalog-only candidate to remain discoverable without an executable package', () => {
     const manifest = base()
     manifest.identity = { ...manifest.identity, instrumentKey: 'totally_unknown_scale' }
+    const registry = createScaleCatalogRegistry([manifest])
+    expect(registry.valid).toBe(true)
+    const diagnostic = registry.diagnostics.find((entry) => entry.code === 'CATALOG_PACKAGE_MISSING')
+    expect(diagnostic?.severity).toBe('warning')
+    expect(diagnostic?.message).toContain('totally_unknown_scale')
+    expect(registry.getEntry('totally_unknown_scale', '1.0.0')?.bindingStatus).toBe('PACKAGE_MISSING')
+  })
+
+  it('rejects an accepted catalog entry when no executable package exists', () => {
+    const manifest = base()
+    manifest.catalogStatus = 'ACCEPTED'
+    manifest.identity = { ...manifest.identity, instrumentKey: 'accepted_orphan_scale' }
     const registry = createScaleCatalogRegistry([manifest])
     expect(registry.valid).toBe(false)
     const diagnostic = registry.diagnostics.find((entry) => entry.code === 'CATALOG_PACKAGE_MISSING')
     expect(diagnostic?.severity).toBe('error')
-    expect(diagnostic?.message).toContain('totally_unknown_scale')
-    expect(registry.getEntry('totally_unknown_scale', '1.0.0')?.bindingStatus).toBe('PACKAGE_MISSING')
+    expect(diagnostic?.message).toContain('accepted_orphan_scale')
+    expect(registry.getEntry('accepted_orphan_scale', '1.0.0')?.bindingStatus).toBe('PACKAGE_MISSING')
   })
 
   it('distinguishes a version mismatch from a fully missing package', () => {

@@ -63,15 +63,14 @@ describe('Wave 0 Scale Library TEXI gate parity', () => {
         })
         const entry = model.entries.find((candidate) => candidate.identity.instrumentKey === instrumentKey)!
 
-        // The generic Wave 0 localization provenance is approved for the English source,
-        // but it must not substitute for the authoritative signed TEXI localization manifest.
-        expect(entry.localization.reviewStatus).toBe('APPROVED')
+        // Source-owned localization remains pending and blocks launch independently of product readiness.
+        expect(entry.localization.reviewStatus).toBe('PENDING')
         expect(entry.availability.status).toBe('RESTRICTED')
         expect(entry.availability.launch).toBeUndefined()
         expect(entry.availability.reasons.join(' ')).toContain('本地化治理条件尚未满足')
-        expect(entry.governance?.gate.publishable).toBe(false)
-        expect(entry.governance?.gate.errors.some((error) => (
-          error.includes('TEXI localization manifest missing or unsigned')
+        expect(entry.governance?.gate.publishable).toBe(true)
+        expect(entry.governance?.gate.warnings.some((error) => (
+          error.includes('reviewStatus=PENDING')
         ))).toBe(true)
       } finally {
         pkg.releaseStatus = originalReleaseStatus

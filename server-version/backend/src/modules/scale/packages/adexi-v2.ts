@@ -1,4 +1,7 @@
 import type { ScaleDefinitionV2 } from '../scale-definition'
+import type { ScaleGoldenCase } from '../onboarding/types'
+
+export type { ScaleGoldenCase } from '../onboarding/types'
 
 const responseOptions = [
   { value: 'never', label: '绝对不符合', score: 1 },
@@ -127,16 +130,6 @@ export const ADEXI_V2_DEFINITION: ScaleDefinitionV2 = {
     disclaimer: '本量表不是诊断工具；结果仅描述本次自评，不能替代专业评估或医疗建议。',
   },
   referencePolicy: { type: 'none' },
-}
-
-export interface ScaleGoldenCase {
-  name: string
-  answers: Array<{ itemCode: string; responseValue: string | number }>
-  expected: {
-    quality: 'interpretable' | 'limited' | 'invalid'
-    scores: Record<string, number | null>
-    totalScoreKeys: string[]
-  }
 }
 
 const answersFor = (value: string): Array<{ itemCode: string; responseValue: string }> => itemCodes.map((itemCode) => ({ itemCode, responseValue: value }))

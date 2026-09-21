@@ -33,6 +33,8 @@ export interface AssessmentContextValues {
 }
 
 export interface AssessmentContextV1 {
+  /** Optional for new relational contexts; absence preserves historical V1 hashes. */
+  subjectUserId?: string
   schemaVersion: 1
   frozenAt: string
   values: AssessmentContextValues
