@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { mentalrotationConfigSchema } from '../../schemas/mentalrotation.config'
 import { mentalrotationTrialSchema } from '../../schemas/mentalrotation.trial'
 import { scoreMentalrotationV1 } from '../../scoring/mentalrotation.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { mentalrotationRegistryMeta } from './definitions'
 
 const mentalrotationFinalSubmission = fixedCountFinalSubmission('totalTrials')

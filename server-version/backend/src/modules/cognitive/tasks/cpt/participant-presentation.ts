@@ -56,6 +56,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "单一反应时不能代表持续注意，请同时看遗漏与误报。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次持续注意任务表现，不是临床诊断或常模。"
   }
 ]

@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { lexicaldecisionConfigSchema } from '../../schemas/lexicaldecision.config'
 import { lexicaldecisionTrialSchema } from '../../schemas/lexicaldecision.trial'
 import { scoreLexicaldecisionV1 } from '../../scoring/lexicaldecision.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { lexicaldecisionRegistryMeta } from './definitions'
 
 const lexicaldecisionFinalSubmission = fixedCountFinalSubmission('totalTrials')

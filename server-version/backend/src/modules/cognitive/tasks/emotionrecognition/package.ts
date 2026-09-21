@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { emotionrecognitionConfigSchema } from '../../schemas/emotionrecognition.config'
 import { emotionrecognitionTrialSchema } from '../../schemas/emotionrecognition.trial'
 import { scoreEmotionrecognitionV1 } from '../../scoring/emotionrecognition.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { emotionrecognitionRegistryMeta } from './definitions'
 
 const emotionrecognitionFinalSubmission = fixedCountFinalSubmission('totalTrials')

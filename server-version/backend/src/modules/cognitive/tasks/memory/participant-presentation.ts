@@ -33,7 +33,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": true,
     "protocols": {},
-    "practicalTips": []
+    "practicalTips": [],
+    "singleHiddenMetrics": [],
+    "disclaimer": "maxSpan 是本次任务容量指标，不是标准化记忆等级。"
   },
   {
     "schemaVersion": 1,
@@ -77,6 +79,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "较长信息可以尝试分组、复述和分段记忆。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "maxSpan 是本次任务容量指标，不是标准化记忆等级。"
   }
 ]

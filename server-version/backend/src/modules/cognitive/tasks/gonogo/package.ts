@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { gonogoConfigSchema } from '../../schemas/gonogo.config'
 import { gonogoTrialSchema } from '../../schemas/gonogo.trial'
 import { scoreGonogoV1 } from '../../scoring/gonogo.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { gonogoRegistryMeta } from './definitions'
 
 const gonogoFinalSubmission = fixedCountFinalSubmission('totalTrials')

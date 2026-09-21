@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { patterncompareConfigSchema } from '../../schemas/patterncompare.config'
 import { patterncompareTrialSchema } from '../../schemas/patterncompare.trial'
 import { scorePatterncompareV1 } from '../../scoring/patterncompare.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { absoluteFallbackFinalSubmission } from '../../v2/final-submission-budget'
 import { patterncompareRegistryMeta } from './definitions'
 
 const patterncompareFinalSubmission = absoluteFallbackFinalSubmission()

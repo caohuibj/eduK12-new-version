@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { corsiConfigSchema } from '../../schemas/corsi.config'
 import { corsiTrialSchema } from '../../schemas/corsi.trial'
 import { scoreCorsiV1 } from '../../scoring/corsi.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { spanTaskCountFinalSubmission } from '../../v2/final-submission-budget'
 import { corsiRegistryMeta } from './definitions'
 
 const corsiFinalSubmission = spanTaskCountFinalSubmission('startSpan', 'maxSpan', 'trialsPerLevel')

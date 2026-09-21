@@ -58,7 +58,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": true,
     "protocols": {},
-    "practicalTips": []
+    "practicalTips": [],
+    "singleHiddenMetrics": [],
+    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。"
   },
   {
     "schemaVersion": 1,
@@ -120,6 +122,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "practicalTips": [
       "面对冲突信息时先确认目标规则，再做响应。",
       "减少多任务切换可降低无关信息干扰。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。"
   }
 ]

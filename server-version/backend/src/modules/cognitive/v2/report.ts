@@ -245,7 +245,7 @@ export const projectThreeLayerReport = (input: {
       protocolSignature: input.protocolSignature,
       profile: input.profile,
     },
-    disclaimer: input.definition.disclaimer,
+    disclaimer: input.participantPresentation?.disclaimer ?? input.definition.disclaimer,
     practicalTips: (input.participantPresentation ? input.participantPresentation.suppressTips : legacySuppressTips(input.testType)) ? [] : input.participantPresentation?.practicalTips ?? input.definition.practicalTips,
   }
 }

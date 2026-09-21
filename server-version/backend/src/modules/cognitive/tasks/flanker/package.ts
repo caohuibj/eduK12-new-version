@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { flankerConfigSchema } from '../../schemas/flanker.config'
 import { flankerTrialSchema } from '../../schemas/flanker.trial'
 import { scoreFlankerV1 } from '../../scoring/flanker.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { flankerRegistryMeta } from './definitions'
 
 const flankerFinalSubmission = fixedCountFinalSubmission('totalTrials')

@@ -34,6 +34,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "倒背要求在短时保持之外进行顺序操作，应与顺背结果分开阅读。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只反映本次数字倒背任务表现，不是完整工作记忆、Wechsler 等价值或年龄常模。"
   }
 ]

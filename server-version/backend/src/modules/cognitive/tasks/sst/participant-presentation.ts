@@ -41,6 +41,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "科研版以 SSRT 为主；体验/正式版不得输出过度确定的个人抑制结论。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次动作停止任务表现，不是临床诊断或常模。"
   }
 ]

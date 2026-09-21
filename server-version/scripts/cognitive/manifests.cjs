@@ -14,7 +14,7 @@ const engine = i => `${i.testType}/${i.engineVersion}`
 function safeFile(root, relative) {
   if (typeof relative !== 'string' || path.isAbsolute(relative) || relative.includes('\\') || relative.split('/').some(p => p === '..' || p === '.')) fail('COG_PACKAGE_PATH_INVALID', String(relative), 'relative contained path required')
   const absolute = path.resolve(root, relative)
-  if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile() || fs.realpathSync(absolute) !== absolute) fail('COG_PACKAGE_FILE_MISSING', relative, 'regular non-symlink file required')
+  if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile() || fs.realpathSync(absolute) !== path.resolve(fs.realpathSync(root), relative)) fail('COG_PACKAGE_FILE_MISSING', relative, 'regular non-symlink file required')
   return absolute
 }
 function reference(root, directory, ref) {
@@ -49,6 +49,9 @@ function discover(root = ROOT, taskRoot = TASK_ROOT) {
     })
     for (const i of d.identities) if (!runners.some(r => engine(r) === engine(i))) fail('COG_RUNNER_MISSING', file, engine(i))
     if (d.task !== 'fake' && !d.catalog) fail('COG_CATALOG_MISSING', file, d.task)
+    if (!d.presentation) fail('COG_PRESENTATION_MISSING', file, d.task)
+    if (d.order !== undefined && (!Number.isSafeInteger(d.order) || d.order < 0)) fail('COG_PACKAGE_SCHEMA_INVALID', file, 'invalid order')
+    for (const i of d.identities) if (i.order !== undefined && (!Number.isSafeInteger(i.order) || i.order < 0)) fail('COG_PACKAGE_SCHEMA_INVALID', file, 'invalid identity order')
     if (!d.seeds || !Array.isArray(d.seeds.orders)) fail('COG_SEED_MISSING', file, d.task)
     return { ...d, directory, file, backendFile, runners, catalogFile: d.catalog ? reference(root,directory,d.catalog) : null, seedFile: reference(root,directory,d.seeds), presentationFile: d.presentation ? reference(root,directory,d.presentation) : null }
   })
@@ -74,7 +77,7 @@ function projections(packages, back = BACK, front = FRONT) {
   projection(`${back}/seeds.ts`,packages.map(p=>({file:p.seedFile,export:p.seeds.export})),`export const cognitiveSeeds = [\n${seeds.map(s=>`  task${s.pi}[${s.index}],`).join('\n')}\n]`)
   const presentations=packages.filter(p=>p.presentationFile)
   if(presentations.length) projection(`${back}/presentation.ts`,presentations.map(p=>({file:p.presentationFile,export:p.presentation.export})),`export const cognitivePresentations = [${presentations.map((_,i)=>`...task${i}`).join(', ')}]`)
-  result.set(`${back}/identities.json`,JSON.stringify({schemaVersion:1,identities:ordered.map(e=>({testType:e.id.testType,engineVersion:e.id.engineVersion,scoringVersion:e.id.scoringVersion})),runners:runners.map(r=>({testType:r.testType,engineVersion:r.engineVersion}))},null,2)+'\n')
+  result.set(`${back}/identities.json`,JSON.stringify({schemaVersion:1,generatedBy:'cognitive:manifest:generate; do not edit',identities:ordered.map(e=>({testType:e.id.testType,engineVersion:e.id.engineVersion,scoringVersion:e.id.scoringVersion})),runners:runners.map(r=>({testType:r.testType,engineVersion:r.engineVersion}))},null,2)+'\n')
   return result
 }
 function generate({ root=ROOT,taskRoot=TASK_ROOT,back=BACK,front=FRONT,check=false }={}) {
@@ -83,6 +86,11 @@ function generate({ root=ROOT,taskRoot=TASK_ROOT,back=BACK,front=FRONT,check=fal
     const target=path.join(root,file)
     if(check){if(!fs.existsSync(target)||fs.readFileSync(target,'utf8')!==content) fail('COG_MANIFEST_DRIFT',file,'regenerate task manifests')}
     else {fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,content)}
+  }
+  if (check) for (const dir of [back,front]) {
+    for (const name of fs.readdirSync(path.join(root,dir))) {
+      if (!outputs.has(`${dir}/${name}`)) fail('COG_MANIFEST_ORPHAN',`${dir}/${name}`,'unexpected generated file')
+    }
   }
   return {packages,outputs}
 }

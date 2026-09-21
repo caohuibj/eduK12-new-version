@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { taskswitchConfigSchema } from '../../schemas/taskswitch.config'
 import { taskswitchTrialSchema } from '../../schemas/taskswitch.trial'
 import { scoreTaskswitchV1 } from '../../scoring/taskswitch.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { taskswitchRegistryMeta } from './definitions'
 
 const taskswitchFinalSubmission = fixedCountFinalSubmission('totalTrials')

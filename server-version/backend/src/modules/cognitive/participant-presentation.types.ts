@@ -12,6 +12,8 @@ export interface CognitiveParticipantPresentationV1 {
   metrics: Record<string, { label: string; explanation?: string; singleExplanation?: string }>
   experienceHeadline?: string
   hiddenMetrics: string[]
+  singleHiddenMetrics: string[]
+  disclaimer: string
   suppressTips: boolean
   practicalTips: string[]
   protocols: Partial<Record<CognitiveProfile, CognitiveProtocolPresentationV1>>

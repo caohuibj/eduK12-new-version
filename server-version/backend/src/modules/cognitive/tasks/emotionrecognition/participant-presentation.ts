@@ -42,6 +42,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "本任务只描述对当前版本六类合成面孔的分类响应；不输出情绪识别能力、共情能力、人格、临床或文化能力结论。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只描述本次六类合成面孔分类表现，不是情绪能力、共情、人格、文化能力或临床判断。"
   }
 ]

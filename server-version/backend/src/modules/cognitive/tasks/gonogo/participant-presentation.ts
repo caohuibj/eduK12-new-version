@@ -45,6 +45,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "Go RT 只解释速度—准确权衡，不能单独代表抑制能力。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次反应抑制任务表现，不是临床诊断或常模。"
   }
 ]

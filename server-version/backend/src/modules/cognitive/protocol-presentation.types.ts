@@ -9,4 +9,3 @@ export interface CognitiveProtocolPresentationV1 {
   reportCaveats: string[]
   showProductIndex?: boolean
 }
-

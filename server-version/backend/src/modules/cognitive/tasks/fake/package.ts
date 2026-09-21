@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { fakeConfigSchema } from '../../schemas/fake.config'
 import { fakeTrialSchema } from '../../schemas/fake.trial'
 import { scoreFakeV1 } from '../../scoring/fake.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { fakeRegistryMeta } from './definitions'
 
 const fakeFinalSubmission = fixedCountFinalSubmission('trialCount')

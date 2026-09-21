@@ -4,14 +4,7 @@ import { reactionConfigSchema } from '../../schemas/reaction.config'
 import { reactionTrialSchema } from '../../schemas/reaction.trial'
 import { scoreReactionV1 } from '../../scoring/reaction.v1'
 import { scoreReactionV1_1 } from '../../scoring/reaction.v1_1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { reactionRegistryMeta, reactionRegistryMetaV11 } from './definitions'
 
 const reactionFinalSubmission = fixedCountFinalSubmission('totalTrials')

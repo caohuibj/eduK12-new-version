@@ -33,7 +33,8 @@
     "release:verify:local": "bash ../scripts/release-verify-local.sh",
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend",
     "cognitive:manifest:generate": "node ../scripts/cognitive/manifests.cjs",
-    "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check"
+    "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check",
+    "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",

@@ -49,7 +49,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": false,
     "protocols": {},
-    "practicalTips": []
+    "practicalTips": [],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次任务表现，不是医学诊断或人口常模。"
   },
   {
     "schemaVersion": 1,
@@ -102,6 +104,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "practicalTips": [
       "在需要快速响应时先减少外部干扰。",
       "比较多次结果时尽量使用相近设备和作答方式。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次任务表现，不是医学诊断或人口常模。任务表现指数不是常模位置。"
   }
 ]

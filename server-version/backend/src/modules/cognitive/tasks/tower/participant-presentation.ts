@@ -33,6 +33,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "解题比例、额外步数和规则违反应分开阅读；首步时长只作方法信息。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只反映本次内部塔式任务表现，不是商业 Tower 测验、计划能力诊断或人口常模。"
   }
 ]

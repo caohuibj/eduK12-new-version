@@ -40,6 +40,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "转换代价必须与 switch/repeat 准确率同屏阅读，避免只看速度。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次认知灵活性任务表现，不是临床诊断或常模。"
   }
 ]

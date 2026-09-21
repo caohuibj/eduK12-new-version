@@ -37,6 +37,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "Corsi 代表视空间广度，不要与数字广度合并成记忆总分。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次视空间记忆任务表现，不是临床诊断或常模。"
   }
 ]

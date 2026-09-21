@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { trailmakingConfigSchema } from '../../schemas/trailmaking.config'
 import { trailmakingTrialSchema } from '../../schemas/trailmaking.trial'
 import { scoreTrailmakingV1 } from '../../scoring/trailmaking.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { trailmakingTaskCountFinalSubmission } from '../../v2/final-submission-budget'
 import { trailmakingRegistryMeta } from './definitions'
 
 const trailmakingFinalSubmission = trailmakingTaskCountFinalSubmission()

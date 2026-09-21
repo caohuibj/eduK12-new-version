@@ -38,6 +38,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "maxReliableN 只是本次配置内表现，不是标准化工作记忆等级。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果反映本次工作记忆更新任务表现，不是临床诊断或常模。"
   }
 ]

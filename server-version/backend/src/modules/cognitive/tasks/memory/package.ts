@@ -4,14 +4,7 @@ import { memoryConfigSchema } from '../../schemas/memory.config'
 import { memoryTrialSchema } from '../../schemas/memory.trial'
 import { scoreMemoryV1 } from '../../scoring/memory.v1'
 import { scoreMemoryV1_1 } from '../../scoring/memory.v1_1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { spanTaskCountFinalSubmission } from '../../v2/final-submission-budget'
 import { memoryRegistryMeta, memoryRegistryMetaV11 } from './definitions'
 
 const memoryFinalSubmission = spanTaskCountFinalSubmission('startLength', 'maxLength', 'trialsPerLevel')

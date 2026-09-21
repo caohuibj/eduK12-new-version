@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "generatedBy": "cognitive:manifest:generate; do not edit",
   "identities": [
     {
       "testType": "fake",

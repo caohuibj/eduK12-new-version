@@ -29,4 +29,3 @@ export const metric = (
   export: { summary: role !== 'research_only', label },
   ...extra,
 })
-

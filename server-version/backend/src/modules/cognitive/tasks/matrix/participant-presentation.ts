@@ -38,6 +38,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "正确率按规则族和难度覆盖一起阅读，不换算 IQ 或智力等级。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。"
   }
 ]

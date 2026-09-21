@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { cptConfigSchema } from '../../schemas/cpt.config'
 import { cptTrialSchema } from '../../schemas/cpt.trial'
 import { scoreCptV1 } from '../../scoring/cpt.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { fixedCountFinalSubmission } from '../../v2/final-submission-budget'
 import { cptRegistryMeta } from './definitions'
 
 const cptFinalSubmission = fixedCountFinalSubmission('totalTrials')

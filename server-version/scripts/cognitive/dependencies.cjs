@@ -17,12 +17,13 @@ function dependencies(file){
 }
 function guard(root=ROOT,packages=discover(root)){
  const done=new Set(),stack=[]
+ const governanceFiles=new Set(packages.flatMap(p=>[p.catalogFile,p.presentationFile].filter(Boolean)).map(p=>path.resolve(root,p)))
  function walk(file,kind){
   const id=kind+':'+file
   if(stack.includes(id))fail('COG_DEPENDENCY_CYCLE',path.relative(root,file),stack.join(' -> '))
   if(done.has(id))return
   const rel=path.relative(root,file).split(path.sep).join('/')
-  if(kind==='backend'&&(/\/frontend\//.test(rel)||/\/(governance|scientific-maturity|scientific-qualification)\.ts$/.test(rel)||/\.service\.ts$/.test(rel)||/\/cognitive-analysis\//.test(rel)))fail('COG_DEPENDENCY_FORBIDDEN',rel,'execution leaf cannot import UI, governance or services')
+  if(kind==='backend'&&(governanceFiles.has(file)||/\/frontend\//.test(rel)||/\/(governance|scientific-maturity|scientific-qualification)\.ts$/.test(rel)||/\.service\.ts$/.test(rel)||/\/cognitive-analysis\//.test(rel)))fail('COG_DEPENDENCY_FORBIDDEN',rel,'execution leaf cannot import UI, governance or services')
   if(kind==='frontend'&&/\/backend\//.test(rel))fail('COG_DEPENDENCY_FORBIDDEN',rel,'runner cannot import backend')
   stack.push(id)
   for(const ref of dependencies(file)){

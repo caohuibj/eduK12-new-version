@@ -29,6 +29,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": false,
     "protocols": {},
-    "practicalTips": []
+    "practicalTips": [],
+    "singleHiddenMetrics": [],
+    "disclaimer": "Fake 任务仅用于验证框架，不反映真实能力。"
   }
 ]

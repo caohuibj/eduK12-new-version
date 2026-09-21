@@ -36,6 +36,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [
       "角度代价只在大小角度都有足够正确反应时解释，并与正确率同屏阅读。"
-    ]
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只反映本次内部几何旋转任务表现，不是完整空间智力、诊断或人口常模。"
   }
 ]

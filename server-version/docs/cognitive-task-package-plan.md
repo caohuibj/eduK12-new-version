@@ -14,7 +14,7 @@ PR #140 is merged. Target: `content/cognitive-expansion`. No merge is authorized
 7. Keep schema/scorer locations where useful. Task package boundaries are logical, with explicit owned files. Use npm scripts consistent with the repository's package-lock files; introducing pnpm is unnecessary.
 8. Preserve registry/catalog/seed ordering explicitly with a legacy order value; new packages use deterministic identity ordering. Sorting existing registries alphabetically would otherwise alter API and UI order.
 9. A synthetic package must exercise the same discovery/generation/adapter functions as production, from a separate fixture root, and must never enter production manifests. Changed-path policy must reject unknown paths and forged generated output.
-10. CI currently does not automatically target cognitive-expansion. Add a focused PR workflow for this base, then verify a run exists for the pushed head. Stop after triggering CI; do not wait for completion or merge.
+10. CI currently does not automatically target cognitive-expansion. Extend the existing CI PR base filter to this branch, including manifest/dependency gates, then verify a run exists for the pushed head. Stop after triggering CI; do not wait for completion or merge.
 
 ## PR1 sequence and checks
 
@@ -34,3 +34,29 @@ Add a versioned deterministic onboarding decision/blocker contract; standard-onl
 ## Validation interpretation
 
 Local database integration requires an isolated database and is not replaced by mocked tests. Mark unavailable checks explicitly. CI completion is a merge prerequisite, not a prerequisite for ending this requested implementation task.
+
+## PR1 implementation evidence
+
+- Remote base rechecked after implementation: still `01f5a46ac21235a9d5fefb950e89ef68b7e82be4`.
+- 28 exact backend identities / 25 runner identities migrated; registry order retained.
+- Compatibility fixture captured before migration: all 28 compiler payloads/hashes,
+  protocol signatures, three profiles per identity, resolved config hashes, FINAL
+  budgets, empty scorer outcomes, quality-flag effects and publication decisions.
+- Historical report fixture independently captured using a detached checkout of
+  the base SHA: 84 frozen profile snapshots and 840 projection digests (with/without
+  snapshot, single report interpretable/insufficient, V2 interpretable/limited/invalid).
+- Backend Cognitive, assessment-runtime and assessment-governance regression:
+  608 passed, 24 database integration tests skipped across four suites because no
+  isolated local database was configured. After final display/fixture refinements,
+  the affected eight suites passed 43 tests, including all compatibility checks.
+- Frontend Cognitive/reporting/composite/teacher regression: 266 passed.
+- Backend TypeScript build, frontend typecheck, frontend production build, changed
+  frontend-file lint, manifest drift check and transitive dependency guard passed.
+- Unknown-task fixture exercises actual generated execution, runner, catalog, seed
+  and presentation imports, explicit learning/delayed protocol, non-name-derived
+  invalid quality, scoring and report metadata. Negative cases include duplicates,
+  missing runner/catalog/presentation, invalid paths/exports, drift, cycles and
+  forbidden imports. Fixture remains absent from production manifests.
+- No edits to scorer algorithms, compiler, DB schema, product-readiness rule or
+  publication-gate rule. Local DB/browser integration remains CI work, not a local
+  PASS claim. CI is to be triggered for the final PR head and left running.

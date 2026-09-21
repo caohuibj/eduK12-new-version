@@ -3,14 +3,7 @@ import type { RegistryEntry } from '../../cognitive.types'
 import { pairedassociateConfigSchema } from '../../schemas/pairedassociate.config'
 import { pairedassociateTrialSchema } from '../../schemas/pairedassociate.trial'
 import { scorePairedassociateV1 } from '../../scoring/pairedassociate.v1'
-import {
-  absoluteFallbackFinalSubmission,
-  fixedCountFinalSubmission,
-  nbackTaskCountFinalSubmission,
-  phaseTaskCountFinalSubmission,
-  spanTaskCountFinalSubmission,
-  trailmakingTaskCountFinalSubmission,
-} from '../../v2/final-submission-budget'
+import { phaseTaskCountFinalSubmission } from '../../v2/final-submission-budget'
 import { pairedassociateRegistryMeta } from './definitions'
 
 const pairedassociateFinalSubmission = phaseTaskCountFinalSubmission()

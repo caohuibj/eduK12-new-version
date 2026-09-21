@@ -1,0 +1,2 @@
+import type { CognitiveParticipantPresentationV1 } from '../../../../../modules/cognitive/participant-presentation.types'
+export const participantPresentations: CognitiveParticipantPresentationV1[] = [{schemaVersion:1,presentationVersion:'1.0.0',testType:'TEST_ONBOARDING_UNKNOWN_V1',engineVersion:'1.0.0',scoringVersion:'1.0.0',title:'Unknown report',metrics:{correctCount:{label:'Unknown successes',explanation:'Task-specific successes'}},hiddenMetrics:[],singleHiddenMetrics:[],disclaimer:'Test fixture',suppressTips:false,practicalTips:[],protocols:{}}]

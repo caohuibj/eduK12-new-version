@@ -144,8 +144,7 @@ export const buildCognitiveSingleTaskReport = (input: {
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
   // For newly frozen assignments, participant-facing protocol wording is read
-  // from the immutable snapshot. The live exact-identity registry remains a
-  // compatibility fallback for assignments frozen before these optional fields.
+  // from the immutable snapshot. Historical formats use a fixed legacy adapter.
   const presentation = frozen.presentationVersion ? frozen.participantPresentation : undefined
   if (frozen.presentationVersion && !presentation) throw new Error('COG_PRESENTATION_SNAPSHOT_INVALID')
   const protocolPresentation = presentation
@@ -158,6 +157,7 @@ export const buildCognitiveSingleTaskReport = (input: {
   })
   const interpretable = input.qualityFlags.interpretable !== false
   const metricVisible = (key: string) => {
+    if (presentation?.singleHiddenMetrics.includes(key)) return false
     const definition = metricDefinitions[key]
     if (!definition) return true
     if (!input.profile || !definition.availableProfiles) return true
@@ -200,7 +200,7 @@ export const buildCognitiveSingleTaskReport = (input: {
     interpretationSummary: interpretable
       ? input.frozenReport?.participantConclusion ?? protocolPresentation?.participantConclusion ?? null
       : null,
-    headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions, presentation) : null,
+    headline: interpretable && headlineKey && metricVisible(headlineKey) ? metricView(headlineKey, input.metrics, metricDefinitions, presentation) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
     primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
@@ -217,7 +217,7 @@ export const buildCognitiveSingleTaskReport = (input: {
       configVersion: input.configVersion,
       profile: input.profile,
     },
-    disclaimer: reportDefinition?.disclaimer ?? '结果反映本次任务表现，不是医学诊断或人口常模。',
+    disclaimer: presentation?.disclaimer ?? reportDefinition?.disclaimer ?? '结果反映本次任务表现，不是医学诊断或人口常模。',
     reference: hiddenReference,
   }
 }
