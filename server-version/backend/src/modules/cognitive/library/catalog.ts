@@ -26,10 +26,10 @@ import type {
   CognitiveScientificStatus,
 } from './catalog-contract'
 import { COGNITIVE_TASK_TYPES } from '../tasks/task-packages'
-iconst CATALOG: Record<string, CognitiveLibraryCatalogEntry> = { ...COGNITIVE_CATALOG_BY_TEST_TYPE }
-   rightsProvenance: 'internal AI-synthetic faces（emotion-faces-ai-zh-v1.0.0）',
-  },
-}
+import { COGNITIVE_CATALOG_BY_TEST_TYPE } from '../tasks/generated/catalog.generated'
+
+const CATALOG: Record<string, CognitiveLibraryCatalogEntry> = { ...COGNITIVE_CATALOG_BY_TEST_TYPE }
+
 
 /** catalog 身份键重复在 Record 层面不可能；此处断言防止将来改为数组/多键结构时退化。 */
 const CATALOG_TEST_TYPES = Object.keys(CATALOG)
