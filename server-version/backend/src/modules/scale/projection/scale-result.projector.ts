@@ -47,7 +47,10 @@ const projectInterpretations = (
   capabilities: DisclosureCapabilitiesV1,
 ) => result.interpretations.map((entry) => ({
   scoreKey: entry.scoreKey,
-  ...(capabilities.scoreDerivedLabels ? { headline: entry.headline, label: entry.label } : {}),
+  // Keep a stable renderer contract without leaking score-derived labels.
+  // The fallback heading is static and independent of the result value.
+  headline: capabilities.scoreDerivedLabels ? entry.headline : '结果说明',
+  label: capabilities.scoreDerivedLabels ? entry.label : null,
   interpretation: entry.interpretation,
   guidance: entry.guidance.map((guidance) => ({ category: guidance.category, text: guidance.text })),
   limitations: [...entry.limitations],

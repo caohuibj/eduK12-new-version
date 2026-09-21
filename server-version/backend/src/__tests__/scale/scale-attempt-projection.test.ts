@@ -34,7 +34,7 @@ describe('Scale attempt strict response projection', () => {
     expect(response).not.toHaveProperty('internalHash')
   })
 
-  it('does not return resume answers to a teacher audience', () => {
+  it('does not return resume answers to an explicitly declared teacher audience', () => {
     const response = scaleAssessmentForResponse({
       id: 'assessment-1',
       scaleId: 'scale-1',
@@ -44,6 +44,21 @@ describe('Scale attempt strict response projection', () => {
       scale,
     }, { audience: 'teacher', purpose: 'history' })
     expect(response).not.toHaveProperty('answers')
+  })
+
+  it('infers the teacher-list audience from the server-selected user relation, not a request parameter', () => {
+    const response = scaleAssessmentForResponse({
+      id: 'assessment-1',
+      scaleId: 'scale-1',
+      status: 'IN_PROGRESS',
+      answers: [{ itemCode: 'i1', responseValue: 'PRIVATE_RESUME_ANSWER' }],
+      result: null,
+      scale,
+      user: { id: 'student-1', username: 'student', nickname: 'Student' },
+    })
+    expect(response.user).toEqual({ id: 'student-1', username: 'student', nickname: 'Student' })
+    expect(response).not.toHaveProperty('answers')
+    expect(JSON.stringify(response)).not.toContain('PRIVATE_RESUME_ANSWER')
   })
 
   it('fails closed for a malformed completed result instead of returning the persisted object', () => {

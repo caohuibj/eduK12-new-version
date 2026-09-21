@@ -174,6 +174,14 @@ const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResu
   }
 }
 
+const inferServerAudience = (assessment: any): ScaleDisclosureAudience => (
+  // The teacher/admin list surface is the only Scale route that selects the
+  // related user object. This is server-owned query shape; request parameters
+  // cannot promote themselves to a broader audience. Explicit options still
+  // win for callers that already know their audience.
+  assessment?.user && typeof assessment.user === 'object' ? 'teacher' : 'respondent'
+)
+
 /**
  * Strict response projection. Resume and completed DTOs use explicit allowlists;
  * completed responses never return raw answers. V2 snapshots use their frozen
@@ -188,7 +196,7 @@ export const scaleAssessmentForResponse = (
   const directProvenance = deviceInputProvenanceV1Schema.safeParse(assessment?.deviceInputProvenance)
   const full = DISCLOSURE_PRESETS.FULL_REPORT()
   const resolved = resolveProjectionPolicyForAssessment(assessment, result.result)
-  const audience = options.audience ?? 'respondent'
+  const audience = options.audience ?? inferServerAudience(assessment)
   const projectionContext = {
     principalId: options.principalId ?? null,
     audience,

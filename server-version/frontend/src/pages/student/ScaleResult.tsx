@@ -4,26 +4,7 @@ import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
 import Dass21StudentReport from '../../modules/reporting/Dass21StudentReport'
-import type { ScaleResultV2, ScaleUnitReport } from '../../modules/reporting/types'
-
-export interface ExternalScaleReport {
-  schemaVersion: 1
-  kind: 'full' | 'scores' | 'educational' | 'completion' | 'unavailable'
-  instrument: { scaleId: string; code: string; name: string; instrumentVersion: string }
-  completedAt: string | null
-  totalTime: number | null
-  scores?: ScaleResultV2['scores']
-  references?: ScaleResultV2['references']
-  interpretations?: ScaleResultV2['interpretations']
-  quality?: ScaleResultV2['quality']
-  method?: Partial<ScaleResultV2['method'] | null>
-  caveats?: string[]
-  disclaimer?: string
-  contentVersion?: string
-  blocks?: Array<{ id: string; title?: string; body: string }>
-  choices?: Array<{ id: string; label: string; body: string }>
-  reason?: 'POLICY_UNAVAILABLE' | 'RESULT_UNAVAILABLE'
-}
+import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
 
 export interface Assessment {
   id: string
@@ -47,8 +28,8 @@ export const toScaleUnitReport = (value: Assessment): SafeScaleUnitReport => {
   if (external) {
     const educationalFeedback = external.kind === 'educational'
       ? {
-          contentVersion: external.contentVersion ?? 'unknown',
-          blocks: external.blocks ?? [],
+          contentVersion: external.contentVersion,
+          blocks: external.blocks,
           ...(external.choices ? { choices: external.choices } : {}),
           ...(external.disclaimer ? { disclaimer: external.disclaimer } : {}),
         }
@@ -63,17 +44,19 @@ export const toScaleUnitReport = (value: Assessment): SafeScaleUnitReport => {
       label: external.instrument.name,
       scaleName: external.instrument.name,
       result: null,
-      quality: external.quality ?? null,
-      scores: external.scores ?? [],
-      references: external.references ?? [],
-      interpretations: external.interpretations ?? [],
-      caveats: external.caveats ?? [],
-      disclaimer: external.disclaimer ?? '',
+      quality: external.kind === 'full' ? external.quality ?? null : null,
+      scores: external.kind === 'full' || external.kind === 'scores' ? external.scores ?? [] : [],
+      references: external.kind === 'full' ? external.references ?? [] : [],
+      interpretations: external.kind === 'full' ? external.interpretations ?? [] : [],
+      caveats: external.kind === 'full' ? external.caveats ?? [] : [],
+      disclaimer: external.kind === 'full' || external.kind === 'scores' || external.kind === 'educational'
+        ? external.disclaimer ?? ''
+        : '',
       completedAt: external.completedAt,
       totalTime: external.totalTime,
-      method: external.method ?? null,
+      method: external.kind === 'full' ? external.method ?? null : null,
       ...(educationalFeedback ? { educationalFeedback } : {}),
-      ...(external.reason ? { reason: external.reason } : {}),
+      ...(external.kind === 'unavailable' ? { reason: external.reason } : {}),
       ...(value.decryptError ? { decryptError: true } : {}),
     }
   }

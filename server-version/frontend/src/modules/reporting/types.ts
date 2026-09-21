@@ -121,6 +121,51 @@ export interface ScaleResultV2 {
   disclaimer: string
 }
 
+export interface EducationalFeedbackContent {
+  contentVersion: string
+  blocks: Array<{ id: string; title?: string; body: string }>
+  choices?: Array<{ id: string; label: string; body: string }>
+  disclaimer?: string
+}
+
+interface ExternalScaleReportBase {
+  schemaVersion: 1
+  instrument: { scaleId: string; code: string; name: string; instrumentVersion: string }
+  completedAt: string | null
+  totalTime: number | null
+}
+
+export type ExternalScaleReport =
+  | (ExternalScaleReportBase & {
+      kind: 'full'
+      scores?: ScaleScoreValue[]
+      references?: ScaleReferenceValue[]
+      interpretations?: ScaleInterpretationValue[]
+      quality?: ScaleResultV2['quality']
+      itemScores?: ScaleResultV2['itemScores']
+      method?: ScaleResultV2['method']
+      caveats?: string[]
+      educationalContent?: EducationalFeedbackContent
+      disclaimer: string
+    })
+  | (ExternalScaleReportBase & {
+      kind: 'scores'
+      scores: ScaleScoreValue[]
+      disclaimer: string
+    })
+  | (ExternalScaleReportBase & {
+      kind: 'educational'
+      contentVersion: string
+      blocks: EducationalFeedbackContent['blocks']
+      choices?: EducationalFeedbackContent['choices']
+      disclaimer?: string
+    })
+  | (ExternalScaleReportBase & { kind: 'completion' })
+  | (ExternalScaleReportBase & {
+      kind: 'unavailable'
+      reason: 'POLICY_UNAVAILABLE' | 'RESULT_UNAVAILABLE'
+    })
+
 export interface ScaleUnitReport {
   itemId?: string
   type: 'SCALE'
@@ -140,6 +185,9 @@ export interface ScaleUnitReport {
   totalTime: number | null
   method: ScaleResultV2['method'] | null
   decryptError?: boolean
+  reportKind?: ExternalScaleReport['kind']
+  educationalFeedback?: EducationalFeedbackContent
+  reason?: 'POLICY_UNAVAILABLE' | 'RESULT_UNAVAILABLE'
 }
 
 export interface FormBackgroundReport {

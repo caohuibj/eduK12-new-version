@@ -105,6 +105,20 @@ describe('Scale result audience projection', () => {
     expect(output).not.toHaveProperty('interpretations')
   })
 
+  it('keeps interpretation text while replacing score-derived labels with static renderer-safe values', () => {
+    const noLabels = { ...fullCaps, scoreDerivedLabels: false }
+    const output = project(90, context(noLabels))
+    expect(output.kind).toBe('full')
+    if (output.kind !== 'full') throw new Error('expected full report')
+    expect(output.interpretations?.[0]).toMatchObject({
+      headline: '结果说明',
+      label: null,
+      interpretation: '高分解释',
+    })
+    expect(JSON.stringify(output)).not.toContain('HIGH')
+    expect(JSON.stringify(output)).not.toContain('较高')
+  })
+
   it('does not let COHORT_ONLY return an individual report', () => {
     const projectionContext = context(fullCaps)
     projectionContext.relationalDisposition = 'COHORT_ONLY'

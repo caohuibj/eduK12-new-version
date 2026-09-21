@@ -162,7 +162,8 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     ...(capabilities.individualInterpretations ? {
       interpretations: report.interpretations.map((entry) => ({
         scoreKey: entry.scoreKey,
-        ...(capabilities.scoreDerivedLabels ? { headline: entry.headline, label: entry.label } : {}),
+        headline: capabilities.scoreDerivedLabels ? entry.headline : '结果说明',
+        label: capabilities.scoreDerivedLabels ? entry.label : null,
         interpretation: entry.interpretation,
         guidance: entry.guidance.map((guidance) => ({ ...guidance })),
         limitations: [...entry.limitations],

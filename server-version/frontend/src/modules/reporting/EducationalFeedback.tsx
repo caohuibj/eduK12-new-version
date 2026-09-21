@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
+import type { EducationalFeedbackContent } from './types'
 
-export interface EducationalFeedbackContent {
-  contentVersion: string
-  blocks: Array<{ id: string; title?: string; body: string }>
-  choices?: Array<{ id: string; label: string; body: string }>
-  disclaimer?: string
-}
+export type { EducationalFeedbackContent } from './types'
 
 const EducationalFeedback: React.FC<{ content: EducationalFeedbackContent }> = ({ content }) => {
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
