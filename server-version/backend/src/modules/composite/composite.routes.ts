@@ -1,5 +1,6 @@
 import { Router, type NextFunction, type Request, type Response } from 'express'
 import { compositeController } from './composite.controller'
+import { compositeExportController } from './composite-export.controller'
 import { compositeImageController } from './composite-image.controller'
 import { compositeVideoController } from './composite-video.controller'
 import { situationalVideoController } from '../situational/situational-video.controller'
@@ -88,9 +89,9 @@ router.get('/:id/public-tokens', authenticate, requireTeacher, compositeControll
 router.post('/:id/public-tokens', authenticate, requireTeacher, compositeController.createToken)
 router.delete('/:id/public-tokens/:tokenId', authenticate, requireTeacher, compositeController.disableToken)
 
-router.get('/:id/export/preview', authenticate, requireTeacher, compositeController.exportPreview)
-router.post('/:id/export', authenticate, requireTeacher, compositeController.exportData)
-router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeController.downloadExport)
+router.get('/:id/export/preview', authenticate, requireTeacher, compositeExportController.preview)
+router.post('/:id/export', authenticate, requireTeacher, compositeExportController.export)
+router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeExportController.download)
 
 router.get('/:id/attempts', authenticate, requireTeacher, compositeController.listAttempts)
 router.get('/:id/attempts/:attemptId/report', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReport)
