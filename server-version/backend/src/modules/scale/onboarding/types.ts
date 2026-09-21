@@ -58,7 +58,17 @@ export interface ScaleExecutableSourceV1 {
 
 export interface ScaleCatalogOnlyPreviewV1 {
   status: 'CATALOG_ONLY'
-  reportPlan?: string
+  source?: {
+    title?: string
+    citation?: string
+    url?: string
+    publicationYear?: number
+  }
+  reportPlan?: {
+    dimensionLabels: string[]
+    limitations: string[]
+    disclaimer: string
+  }
   blockers?: string[]
 }
 

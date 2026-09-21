@@ -1,10 +1,10 @@
 import { withSerializableScaleTransaction } from '../deployment/transactions'
-import { legacyDeploymentGateReasons } from '../deployment/legacy-gates'
 import { scaleLocalizationReasons } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
+import { materializeScaleInstrumentContent } from './materialize'
 import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from './instrument-registry'
 import {
   evaluateScaleDeployment,
@@ -16,6 +16,7 @@ import {
   activateScaleDeploymentRevision,
   listScaleInstrumentAuthorizations,
   readActiveScaleDeployment,
+  readScaleDeploymentRevision,
 } from '../deployment/repository'
 
 export interface InstallScaleInstrumentInput {
@@ -78,7 +79,6 @@ const resolvePlan = async (
   }
 
   const authorizations = await listScaleInstrumentAuthorizations(db, input.instrumentKey, input.instrumentVersion)
-  blockers.push(...legacyDeploymentGateReasons(input.instrumentKey, input.instrumentVersion, deploymentPolicy, authorizations))
   for (const requestedMode of deploymentPolicy.deploymentModes) {
     const decision = evaluateScaleDeployment({
       policy: deploymentPolicy,
@@ -120,9 +120,9 @@ const resolvePlan = async (
 
   const active = scale ? await readActiveScaleDeployment(db, scale.id) : null
   const deploymentPolicyHash = hashScaleDeploymentPolicy(deploymentPolicy)
-  if (active && active.revision === deploymentPolicy.revision && active.policyHash !== deploymentPolicyHash) {
-    blockers.push('DEPLOYMENT_REVISION_CONFLICT')
-  }
+  const existingRevision = scale ? await readScaleDeploymentRevision(db, scale.id, deploymentPolicy.revision) : null
+  if (existingRevision && existingRevision.policyHash !== deploymentPolicyHash) blockers.push('DEPLOYMENT_REVISION_CONFLICT')
+  if (existingRevision && existingRevision.status !== 'ACTIVE') blockers.push('DEPLOYMENT_REVISION_NOT_ACTIVE')
 
   return {
     instrumentKey: input.instrumentKey,
@@ -142,7 +142,7 @@ const resolvePlan = async (
 }
 
 export const planScaleInstrumentInstall = async (
-  db: PrismaClient,
+  db: PrismaClient | Prisma.TransactionClient,
   input: InstallScaleInstrumentInput,
 ): Promise<InstallScaleInstrumentPlan> => resolvePlan(db, input)
 
@@ -161,67 +161,12 @@ export const installScaleInstrument = async (
     const plan = await resolvePlan(tx, input)
     if (!plan.allowActivation) throw new Error(`Scale install blocked: ${plan.blockers.join(',')}`)
 
-    const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)!
-    const executable = source.executable!
-    const definitionHash = hashScaleDefinition(executable.definition)
-    const counts = definitionCounts(executable.definition)
-    let scale = await tx.scale.findUnique({ where: { code: input.instrumentKey } })
-    if (!scale) {
-      scale = await tx.scale.create({
-        data: {
-          code: input.instrumentKey,
-          name: source.catalog.identity.canonicalName,
-          status: 'DRAFT',
-          visibility: 'HIDDEN',
-          instrumentClass: 'STANDARD',
-          instrumentVersion: input.instrumentVersion,
-          definition: executable.definition as unknown as Prisma.InputJsonValue,
-          definitionHash,
-          itemCount: counts.itemCount,
-          dimensionCount: counts.dimensionCount,
-          estimatedTime: source.catalog.administration.estimatedMinutes,
-          creatorId: input.actorUserId,
-          tags: [],
-        },
-      })
-    } else if (!scale.definitionHash) {
-      // Additive repair for an existing STANDARD row with no frozen definition
-      // hash; never reset lifecycle status or visibility.
-      scale = await tx.scale.update({
-        where: { id: scale.id },
-        data: {
-          definition: executable.definition as unknown as Prisma.InputJsonValue,
-          definitionHash,
-          itemCount: counts.itemCount,
-          dimensionCount: counts.dimensionCount,
-          estimatedTime: source.catalog.administration.estimatedMinutes,
-        },
-      })
-    }
-
-    for (const reference of executable.references) {
-      const existing = await tx.assessmentReferenceSet.findUnique({
-        where: {
-          instrumentType_instrumentKey_referenceVersion: {
-            instrumentType: 'SCALE',
-            instrumentKey: input.instrumentKey,
-            referenceVersion: reference.referenceVersion,
-          },
-        },
-      })
-      if (!existing) {
-        await tx.assessmentReferenceSet.create({
-          data: {
-            instrumentType: 'SCALE',
-            instrumentKey: input.instrumentKey,
-            referenceVersion: reference.referenceVersion,
-            status: reference.status,
-            definition: reference as unknown as Prisma.InputJsonValue,
-          },
-        })
-      }
-    }
-
+    const materialized = await materializeScaleInstrumentContent(tx, {
+      instrumentKey: input.instrumentKey,
+      instrumentVersion: input.instrumentVersion,
+      actorUserId: input.actorUserId,
+    })
+    const scale = materialized.scale
     await activateScaleDeploymentRevision({
       db: tx,
       id: randomUUID(),

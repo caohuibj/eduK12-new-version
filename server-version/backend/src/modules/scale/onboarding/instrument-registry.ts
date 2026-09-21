@@ -1,8 +1,8 @@
 import { GENERATED_SCALE_INSTRUMENT_SOURCES } from './instruments.generated'
 import { compileScalePolicy, type CompiledScalePolicyV1 } from '../policy/compile'
 import { projectScalePackage } from './define-instrument'
-import { buildLegacyInstrumentSources } from './legacy-adapter'
 import { materializeCatalogManifest, materializeLocalizationManifest, validateScaleInstrumentSource } from './validate-instrument'
+import './executable-registry'
 import type { ScaleInstrumentSourceV1, ScalePackageV2 } from './types'
 import type { LocalizationManifestV1 } from '../library/localization-manifest'
 import type { ScaleCatalogManifestV1 } from '../library/catalog-manifest'
@@ -54,7 +54,7 @@ export const createScaleInstrumentRegistry = (sources: readonly ScaleInstrumentS
   }
 }
 
-export const SCALE_INSTRUMENT_REGISTRY = createScaleInstrumentRegistry([...buildLegacyInstrumentSources(), ...GENERATED_SCALE_INSTRUMENT_SOURCES])
+export const SCALE_INSTRUMENT_REGISTRY = createScaleInstrumentRegistry(GENERATED_SCALE_INSTRUMENT_SOURCES)
 
 export const getScaleInstrumentSource = SCALE_INSTRUMENT_REGISTRY.getSource
 export const listScaleInstrumentSources = SCALE_INSTRUMENT_REGISTRY.listSources

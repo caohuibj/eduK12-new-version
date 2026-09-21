@@ -30,7 +30,6 @@ import {
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { getScaleInstrumentRuntimePolicy } from '../scale/onboarding/instrument-registry'
 import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -2134,7 +2133,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null) => {
+const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[]) => {
   const runtime = {
     scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
     cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
@@ -2162,6 +2161,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             requestedMode: 'COMPOSITE',
           })
         : null
+      if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2260,11 +2260,6 @@ const createAttempt = async (
 ) => {
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
-  if (finalOnly) for (const item of composite.items) {
-    if (item.type !== 'SCALE' || !item.required) continue
-    const policy = getScaleInstrumentRuntimePolicy(item.scale.code, item.scale.instrumentVersion)
-    if (policy) assertScaleContextCollectable({ policy: policy.applicability, scalePosition: item.position, sections: formSections })
-  }
   const packageFields = finalOnly
     ? [composite.reportPackageKey, composite.reportPackageVersion, composite.reportPackageProfile, composite.reportPackageSnapshotEncrypted]
     : []
@@ -2322,7 +2317,7 @@ const createAttempt = async (
       })),
     })
   }
-  const runtime = await createChildRecords(db, attempt, composite.items, userId)
+  const runtime = await createChildRecords(db, attempt, composite.items, userId, formSections)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,

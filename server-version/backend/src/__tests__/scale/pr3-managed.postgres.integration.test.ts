@@ -281,4 +281,28 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', () =>
     await expect(install.installScaleInstrument(db, input)).rejects.toThrow('DEPLOYMENT_VERSION_CONFLICT')
     await db.scale.update({ where: { id: scaleId }, data: { instrumentVersion: '1.0.0' } })
   })
+  it('verifies backfill resume and rollback against live deployment and immutable revision history', async () => {
+    const { applyScaleOnboardingBackfill, rollbackScaleOnboardingBackfill } = await import('../../modules/scale/onboarding/backfill')
+    const { readActiveScaleDeployment } = await import('../../modules/scale/deployment/repository')
+    const plan = { schemaVersion: 1, actorUserId: actor, entries: [{ instrumentKey: key, instrumentVersion: '1.0.0', deploymentPolicy: { ...input.deploymentPolicy, revision: 2 } }] }
+    let journal: unknown
+    await expect(applyScaleOnboardingBackfill({ db, plan, onCheckpoint: next => {
+      if (next.entries[0].status === 'APPLIED') throw new Error('simulated checkpoint write failure after commit')
+      journal = structuredClone(next)
+    } })).rejects.toThrow('simulated checkpoint write failure')
+    const checkpoint = await applyScaleOnboardingBackfill({ db, plan, checkpoint: journal })
+    expect(checkpoint.entries[0]).toMatchObject({ status: 'APPLIED', previousActiveRevision: 1 })
+    expect(await applyScaleOnboardingBackfill({ db, plan, checkpoint })).toEqual(checkpoint)
+    const tampered = structuredClone(checkpoint)
+    tampered.entries[0].deploymentPolicyHash = '0'.repeat(64)
+    await expect(rollbackScaleOnboardingBackfill({ db, checkpoint: tampered })).rejects.toThrow('policy hash mismatch')
+    expect((await readActiveScaleDeployment(db, scaleId))?.revision).toBe(2)
+    await rollbackScaleOnboardingBackfill({ db, checkpoint })
+    await rollbackScaleOnboardingBackfill({ db, checkpoint })
+    expect((await readActiveScaleDeployment(db, scaleId))?.revision).toBe(1)
+    await expect(applyScaleOnboardingBackfill({ db, plan, checkpoint })).rejects.toThrow('checkpoint no longer matches')
+    expect((await install.planScaleInstrumentInstall(db, { ...input, deploymentPolicy: plan.entries[0].deploymentPolicy })).blockers).toContain('DEPLOYMENT_REVISION_NOT_ACTIVE')
+    expect((await install.planScaleInstrumentInstall(db, { ...input, deploymentPolicy: { ...plan.entries[0].deploymentPolicy, completionWindowMs: 1000 } })).blockers).toContain('DEPLOYMENT_REVISION_CONFLICT')
+  })
+
 })

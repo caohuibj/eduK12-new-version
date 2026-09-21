@@ -98,6 +98,12 @@ export const evaluateScaleDeployment = (input: {
     reasons.push('DEPLOYMENT_MODE_NOT_BOUND')
   }
   if (
+    input.usageRequirements?.allowedCommercialNatures
+    && !input.usageRequirements.allowedCommercialNatures.includes(policy.commercialNature)
+  ) {
+    reasons.push('COMMERCIAL_NATURE_NOT_ALLOWED')
+  }
+  if (
     input.usageRequirements?.allowedDeploymentModes
     && input.usageRequirements.allowedDeploymentModes.length > 0
     && !input.usageRequirements.allowedDeploymentModes.includes(input.requestedMode)

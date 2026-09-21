@@ -3,10 +3,9 @@ import { prisma } from '../config/database'
 import {
   AuthorizationContractError,
   createPrismaAuthorizationRepository,
-  evaluateBundlePublication,
   type InstrumentAuthorizationRecordV1,
 } from '../modules/assessment-authorization'
-import { WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1 } from '../modules/assessment-bundle'
+import { previewScaleInstrument } from '../modules/scale/onboarding/preview'
 import { error, success, unauthorized } from '../utils/response'
 
 const repository = createPrismaAuthorizationRepository(prisma)
@@ -99,25 +98,26 @@ export const instrumentAuthorizationController = {
     }
   },
 
-  async publishPreviewWho5(req: Request, res: Response) {
+  async publishPreviewScale(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const authorizations = await repository.listLatestByInstrument('who5')
       const body = req.body ?? {}
-      const decision = evaluateBundlePublication({
-        definition: WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
+      const instrumentKey = String(body.instrumentKey ?? body.source?.identity?.instrumentKey ?? '')
+      const instrumentVersion = String(body.instrumentVersion ?? body.source?.identity?.instrumentVersion ?? '')
+      if (!instrumentKey || !instrumentVersion) return error(res, 'instrumentKey 与 instrumentVersion 必填')
+      const authorizations = await repository.listLatestByInstrument(instrumentKey)
+      const result = previewScaleInstrument({
+        source: body.source,
+        instrumentKey,
+        instrumentVersion,
         authorizations,
-        locale: String(body.locale ?? 'zh-CN'),
-        territory: String(body.territory ?? 'CN'),
-        deploymentCommercialNature: (body.deploymentCommercialNature ?? 'NON_COMMERCIAL') as
-          'NON_COMMERCIAL' | 'COMMERCIAL' | 'UNSPECIFIED',
-        scientificOk: typeof body.scientificOk === 'boolean' ? body.scientificOk : undefined,
-        languageOk: typeof body.languageOk === 'boolean' ? body.languageOk : undefined,
-        reportOk: typeof body.reportOk === 'boolean' ? body.reportOk : undefined,
-        safetyOk: typeof body.safetyOk === 'boolean' ? body.safetyOk : undefined,
-        goldenOk: typeof body.goldenOk === 'boolean' ? body.goldenOk : undefined,
+        locale: String(body.locale ?? ''),
+        territory: String(body.territory ?? ''),
+        commercialNature: body.commercialNature === 'COMMERCIAL' ? 'COMMERCIAL' : 'NON_COMMERCIAL',
+        deploymentModes: Array.isArray(body.deploymentModes) && body.deploymentModes.length ? body.deploymentModes : ['STANDALONE'],
+        authorizationRefs: Array.isArray(body.authorizationRefs) ? body.authorizationRefs : undefined,
       })
-      return success(res, decision)
+      return success(res, result)
     } catch (err) {
       return handleError(res, err)
     }

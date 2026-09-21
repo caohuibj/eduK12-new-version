@@ -1,4 +1,3 @@
-import { legacyDeploymentGateReasons } from './legacy-gates'
 import { scaleLocalizationReasons } from '../policy/localization'
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from '../onboarding/instrument-registry'
@@ -137,7 +136,6 @@ export const resolveScaleStartDeployment = async (input: {
     input.scale.code,
     input.scale.instrumentVersion,
   )
-  reasons.push(...legacyDeploymentGateReasons(input.scale.code, input.scale.instrumentVersion, deployment.policy, authorizations, (input.now ?? new Date()).toISOString()))
   const modes = input.requestedMode ? [input.requestedMode] : deployment.policy.deploymentModes
   let decision: ScaleDeploymentDecisionV1 | null = null
   for (const requestedMode of modes) {

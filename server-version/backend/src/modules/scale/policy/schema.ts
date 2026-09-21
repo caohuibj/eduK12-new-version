@@ -67,8 +67,11 @@ export const instrumentUsageRequirementsV1Schema = z.object({
   policyVersion: z.string().min(1),
   requiredRightsActions: z.array(z.string().min(1)).default([]),
   allowedDeploymentModes: z.array(z.string().min(1)).optional(),
+  allowedCommercialNatures: z.array(z.enum(['NON_COMMERCIAL', 'COMMERCIAL'])).min(1).optional(),
   notes: z.array(z.string().min(1)).default([]),
-}).strict()
+}).strict().superRefine((requirements, ctx) => {
+  if (requirements.allowedCommercialNatures) uniqueStrings(requirements.allowedCommercialNatures, ctx, 'allowedCommercialNatures')
+})
 
 export const educationalFeedbackDefinitionV1Schema = z.object({
   schemaVersion: z.literal(1),

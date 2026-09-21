@@ -14,12 +14,10 @@ import {
   type ScaleLibraryReadModelContext,
 } from '../modules/scale/library/scale-library-read-model'
 import {
-  buildExpandedScaleLibraryReadModel,
-  filterExpandedScaleLibraryEntries,
-  getExpandedScaleLibraryEntry,
-} from '../modules/scale/library/wave1-p1-read-model'
-import { enrichExistingP1Evidence } from '../modules/scale/library/wave1-p1-existing-evidence'
-import { applyDass21ProductPolicy } from '../modules/scale/library/wave1-dass21-product-policy'
+  buildUnifiedScaleLibraryReadModel,
+  filterUnifiedScaleLibraryEntries,
+  getUnifiedScaleLibraryEntry,
+} from '../modules/scale/library/catalog-only-read-model'
 import { listScaleInstrumentSources } from '../modules/scale/onboarding/instrument-registry'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
@@ -163,9 +161,7 @@ const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibrar
 })
 
 const buildLibraryModel = (context: ScaleLibraryReadModelContext) => {
-  const base = applyDass21ProductPolicy(
-    enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel(context)),
-  )
+  const base = buildUnifiedScaleLibraryReadModel(context)
   const deployments = (context.deployments ?? []) as LibraryDeployment[]
   const byIdentity = new Map(deployments.map((deployment) => [
     `${deployment.code}:${deployment.instrumentVersion}`,
@@ -209,7 +205,7 @@ export const scaleLibraryController = {
       return success(res, {
         schemaVersion: model.schemaVersion,
         generatedAt: model.generatedAt,
-        entries: filterExpandedScaleLibraryEntries(model.entries, filterFromQuery(query)),
+        entries: filterUnifiedScaleLibraryEntries(model.entries, filterFromQuery(query)),
       })
     } catch (err) {
       return handleError(res, err)
@@ -222,7 +218,7 @@ export const scaleLibraryController = {
       const parsed = parseQuery(req)
       if (!parsed.query) return error(res, parsed.message ?? '量表库筛选条件无效')
       const model = buildLibraryModel(await buildContext(req, parsed.query))
-      const entry = getExpandedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
+      const entry = getUnifiedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
       if (!entry) return notFound(res, '量表库条目不存在')
       return success(res, { entry })
     } catch (err) {

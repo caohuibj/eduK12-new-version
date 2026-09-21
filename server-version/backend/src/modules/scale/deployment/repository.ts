@@ -231,3 +231,43 @@ export const listScaleInstrumentAuthorizations = async (
   })
   return rows.map(toAuthorization)
 }
+
+
+/**
+ * Roll back one backfill activation without deleting immutable deployment history.
+ * The applied revision is retired; an explicitly recorded previous revision may be reactivated.
+ */
+export const rollbackScaleDeploymentActivation = async (input: {
+  db: Prisma.TransactionClient
+  scaleId: string
+  appliedRevision: number
+  expectedPolicyHash: string
+  previousRevision: number | null
+  now?: Date
+}): Promise<void> => {
+  const active = await readActiveScaleDeployment(input.db, input.scaleId)
+  if ((active?.revision ?? null) === input.previousRevision) {
+    const applied = await readScaleDeploymentRevision(input.db, input.scaleId, input.appliedRevision)
+    if (!applied || (applied.status === 'RETIRED' && applied.policyHash === input.expectedPolicyHash)) return
+  }
+  if (!active || active.revision !== input.appliedRevision) {
+    throw new Error(`Cannot rollback Scale deployment: active revision is not ${input.appliedRevision}`)
+  }
+  if (active.policyHash !== input.expectedPolicyHash) throw new Error('Cannot rollback Scale deployment: policy hash mismatch')
+  const now = input.now ?? new Date()
+  await input.db.$executeRaw(Prisma.sql`
+    UPDATE "scale_deployment_policies"
+    SET "status" = 'RETIRED', "retired_at" = ${now}
+    WHERE "scale_id" = ${input.scaleId} AND "revision" = ${input.appliedRevision} AND "status" = 'ACTIVE'
+  `)
+  if (input.previousRevision !== null) {
+    const previous = await readScaleDeploymentRevision(input.db, input.scaleId, input.previousRevision)
+    if (!previous) throw new Error(`Previous Scale deployment revision ${input.previousRevision} not found`)
+    if (previous.status !== 'RETIRED') throw new Error(`Previous Scale deployment revision ${input.previousRevision} is not RETIRED`)
+    await input.db.$executeRaw(Prisma.sql`
+      UPDATE "scale_deployment_policies"
+      SET "status" = 'ACTIVE', "retired_at" = NULL
+      WHERE "scale_id" = ${input.scaleId} AND "revision" = ${input.previousRevision} AND "status" = 'RETIRED'
+    `)
+  }
+}

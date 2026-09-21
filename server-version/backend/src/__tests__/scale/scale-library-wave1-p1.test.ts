@@ -9,12 +9,12 @@ import {
   type ScaleLibraryEntry,
 } from '../../modules/scale/library/scale-library-read-model'
 import {
-  buildExpandedScaleLibraryReadModel,
-  filterExpandedScaleLibraryEntries,
-} from '../../modules/scale/library/wave1-p1-read-model'
-import { enrichExistingP1Evidence } from '../../modules/scale/library/wave1-p1-existing-evidence'
-import { applyDass21ProductPolicy } from '../../modules/scale/library/wave1-dass21-product-policy'
-import { WAVE1_P1_SCALE_CATALOG_MANIFESTS } from '../../modules/scale/library/wave1-p1-catalog'
+  buildUnifiedScaleLibraryReadModel as buildExpandedScaleLibraryReadModel,
+  filterUnifiedScaleLibraryEntries as filterExpandedScaleLibraryEntries,
+} from '../../modules/scale/library/catalog-only-read-model'
+import { listScaleInstrumentSources } from '../../modules/scale/onboarding/instrument-registry'
+import { materializeCatalogManifest } from '../../modules/scale/onboarding/validate-instrument'
+const WAVE1_P1_SCALE_CATALOG_MANIFESTS = listScaleInstrumentSources().filter(source => !source.executable).map(materializeCatalogManifest)
 
 const NOW = '2026-09-20T00:00:00.000Z'
 
@@ -124,22 +124,22 @@ describe('Wave 1 P1 scale-library integration', () => {
   })
 
   it('encodes respondent-safe DASS feedback as descriptive and non-numeric', () => {
-    const model = applyDass21ProductPolicy(buildExpandedScaleLibraryReadModel({
+    const model = buildExpandedScaleLibraryReadModel({
       locale: 'zh-CN',
       territory: 'CN',
       viewerRole: 'ADMIN',
       nowIso: NOW,
-    }))
+    })
     const dass = model.entries.find((entry) => entry.identity.instrumentKey === 'dass21_zh_cn')!
 
-    expect(dass.report.limitations.join(' ')).toContain('不显示 DASS 数值分数')
+    expect(dass.report.limitations.join(' ')).toContain('不显示数值分数')
     expect(dass.report.limitations.join(' ')).toContain('不依赖隐藏分数')
     expect(dass.report.limitations.join(' ')).toContain('14 岁及以上')
     expect(dass.report.disclaimer).toContain('非分数化')
-    expect(dass.report.disclaimer).toContain('不代表对个人心理健康状态的认定')
-    expect(dass.availability.reasons.join(' ')).toContain('respondent-safe result projection')
-    expect(dass.availability.reasons.join(' ')).toContain('14+ 年龄准入')
-    expect(dass.governance?.gate.errors.join(' ')).toContain('age >= 14 runtime admission gate')
+    expect(dass.report.disclaimer).toContain('非诊断性')
+    expect(dass.availability.reasons.join(' ')).toContain('RESPONDENT_SAFE_PROJECTION_REQUIRED')
+    expect(dass.availability.reasons.join(' ')).toContain('AGE_14_RUNTIME_ADMISSION_REQUIRED')
+    expect(dass.governance?.gate.errors.join(' ')).toContain('AGE_14_RUNTIME_ADMISSION_REQUIRED')
     expect(dass.governance?.gate.publishable).toBe(false)
   })
 
@@ -156,7 +156,7 @@ describe('Wave 1 P1 scale-library integration', () => {
     expect(gse.rights.status).toBe('EVIDENCE_PENDING')
     expect(gse.availability.status).toBe('NOT_AVAILABLE')
     expect(gse.availability.launch).toBeUndefined()
-    expect(gse.availability.reasons.join(' ')).toContain('尚无经治理审核的可执行 Scale package')
+    expect(gse.availability.reasons.join(' ')).toContain('EXECUTABLE_NOT_REGISTERED')
   })
 
   it('filters Wave 1 entries with the existing library filter semantics', () => {
@@ -177,17 +177,17 @@ describe('Wave 1 P1 scale-library integration', () => {
   })
 
   it('adds Chinese validation evidence to existing WHO-5 and SDQ entries without activating references', () => {
-    const model = enrichExistingP1Evidence(buildExpandedScaleLibraryReadModel({
+    const model = buildExpandedScaleLibraryReadModel({
       locale: 'zh-CN',
       territory: 'CN',
       viewerRole: 'ADMIN',
       nowIso: NOW,
-    }))
+    })
 
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.evidence.recordCount).toBe(1)
     expect(who5.evidence.coverageText).toContain('大学生')
-    expect(who5.evidence.coverageText).toContain('不直接验证当前产品 9–18 岁入口')
+    expect(who5.evidence.coverageText).toContain('不直接验证当前产品 9–18 岁 K-12 入口')
     expect(who5.references.policy).toBe('none')
     expect(who5.governance?.evidence.some((record) => record.evidenceId === 'who5-cn-fung-2022')).toBe(true)
 
@@ -197,6 +197,6 @@ describe('Wave 1 P1 scale-library integration', () => {
     expect(sdqParent.references.policy).toBe('none')
 
     const sdqTeacher = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')!
-    expect(sdqTeacher.evidence.coverageText).toContain('当前 executable Teacher T4–10 package 仍是英文来源')
+    expect(sdqTeacher.evidence.coverageText).toContain('当前英文 Teacher runtime 的中文 exact-form 声称')
   })
 })

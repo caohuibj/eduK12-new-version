@@ -1,7 +1,8 @@
 import { evaluateScientificQualification, type ScientificQualificationDecisionV1 } from '../../assessment-governance/scientific-qualification'
 import type { ScalePackageV2 } from '../scale-package.registry'
 import { evaluateScaleProductReadiness } from './product-readiness'
-import { WAVE0_SCALE_CATALOG_MANIFESTS, getWave0LocalizationManifest } from './wave0-catalog'
+import { getScaleInstrumentSource, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
+import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 
 const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
 
@@ -14,11 +15,9 @@ const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
 export const evaluateScaleScientificQualification = (
   pkg: ScalePackageV2,
 ): ScientificQualificationDecisionV1 => {
-  const manifest = WAVE0_SCALE_CATALOG_MANIFESTS.find((candidate) => (
-    candidate.identity.instrumentKey === pkg.key
-    && candidate.identity.instrumentVersion === pkg.instrumentVersion
-  ))
-  const localization = getWave0LocalizationManifest(pkg.key, pkg.instrumentVersion)
+  const source = getScaleInstrumentSource(pkg.key, pkg.instrumentVersion)
+  const manifest = source ? materializeCatalogManifest(source) : undefined
+  const localization = getScaleInstrumentLocalization(pkg.key, pkg.instrumentVersion)
 
   const hasResearchFoundation = hasText(pkg.definition.source.citation)
     || hasText(pkg.definition.source.title)
