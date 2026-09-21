@@ -175,7 +175,7 @@ const buildLibraryModel = (context: ScaleLibraryReadModelContext) => {
       const deployment = byIdentity.get(`${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`)
       if (!deployment || deployment.allowNewStarts) return entry
       const { launch: _launch, ...availability } = entry.availability
-      const next = {
+      return {
         ...entry,
         availability: {
           ...availability,
@@ -183,17 +183,6 @@ const buildLibraryModel = (context: ScaleLibraryReadModelContext) => {
           reasons: [...new Set([...availability.reasons, '当前部署策略或授权不允许新启动。'])],
         },
       }
-      if (context.viewerRole === 'ADMIN' && next.governance) {
-        next.governance = {
-          ...next.governance,
-          gate: {
-            ...next.governance.gate,
-            publishable: false,
-            errors: [...new Set([...next.governance.gate.errors, ...deployment.startReasons.map((reason) => `new-start:${reason}`)])],
-          },
-        }
-      }
-      return next
     }),
   }
 }
