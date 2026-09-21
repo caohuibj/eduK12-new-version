@@ -165,7 +165,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
 
   const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
   const resolution = await resolveScaleStartDeployment({ db: db as any, scale })
-  if (!resolution.allowNewStarts || resolution.kind === 'DENY') {
+  if (!resolution.allowNewStarts) {
     throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
   }
   if (resolution.kind !== 'MANAGED_V2') return v1
