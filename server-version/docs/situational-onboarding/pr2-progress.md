@@ -44,3 +44,12 @@ The new scientific-governance tests cover exact identity isolation, caller mutat
 Full A13–A20 certification is **NOT RUN** because C02–C05 are pending. No runtime/DB schema/frontend modifications are part of C01.
 
 C01 local result: backend build PASS; SJT contracts PASS; 57 tests / 11 files PASS. An initial parallel run hit the existing CLI five-second timeout; the complete serial rerun passed without changing any timeout or assertion.
+
+## C03/C04 inspected integration points
+
+- `situational-runtime.service.ts`: `startSituationalAttempt` and `createCompositeSituationalAttemptInTransaction` both freeze immediately before storing the encrypted runtime snapshot. Reuse these existing boundaries; concurrent reuse must retain the winning row's governance context.
+- The same service's `instrumentResponse` currently resolves scientific maturity live. C04 must split current catalog projection from historical attempt projection.
+- `assessment-runtime/situational-runtime-snapshot.ts`: the envelope is strict and hashes an explicit `unsignedSnapshot` projection. Add optional, separately authenticated governance context with legacy parsing; preserve old snapshots and definition/compiled hashes. Do not silently discard or exclude governance fields from all integrity protection.
+- That snapshot module still has `assertPilotCapabilities`; C03 should rename it to reflect technical capabilities without changing its checks.
+- `composite.service.ts`: remove the admission `scienceMaturity !== 'PILOT'` condition and replace the current response's literal PILOT in C03. Keep PR1's frozen-attempt publication bypass narrowly scoped.
+- `assessment-run/scientificProvenance.ts` already freezes organization-run provenance from the resource policy. C04 must keep that separate contract consistent rather than overwrite it from current SJT metadata.
