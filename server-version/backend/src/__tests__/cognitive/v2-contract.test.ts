@@ -47,9 +47,7 @@ const definition = (): TaskDefinition<{ trialCount: number }, { correct: boolean
     }),
     audit: { trialCount: trials.length, scorerVersion: '1.0.0' },
   }),
-  finalSubmission: {
-    maxTrials: (config) => config.trialCount,
-  },
+  finalSubmission: { maxTrials: (config) => config.trialCount },
   profiles: {
     experience: { estimatedMinutes: [1, 1], configPatch: {}, reportCaveats: [] },
     standard: { estimatedMinutes: [2, 3], configPatch: {}, reportCaveats: [] },
@@ -207,36 +205,21 @@ describe('Cognitive Assessment v2 contracts', () => {
 
     const objectEligible = {
       ...task,
-      metrics: {
-        ...task.metrics,
-        detailAccuracy: { ...task.metrics.detailAccuracy, valueType: 'object' as const, referenceEligible: true },
-      },
+      metrics: { ...task.metrics, detailAccuracy: { ...task.metrics.detailAccuracy, valueType: 'object' as const, referenceEligible: true } },
     }
-    expect(validateTaskDefinition(objectEligible).some((candidate) => (
-      candidate.path === 'metrics.detailAccuracy.valueType'
-    ))).toBe(true)
+    expect(validateTaskDefinition(objectEligible).some((candidate) => candidate.path === 'metrics.detailAccuracy.valueType')).toBe(true)
 
     const qualityEligible = {
       ...task,
-      metrics: {
-        ...task.metrics,
-        detailAccuracy: { ...task.metrics.detailAccuracy, role: 'quality' as const, referenceEligible: true },
-      },
+      metrics: { ...task.metrics, detailAccuracy: { ...task.metrics.detailAccuracy, role: 'quality' as const, referenceEligible: true } },
     }
-    expect(validateTaskDefinition(qualityEligible).some((candidate) => (
-      candidate.path === 'metrics.detailAccuracy.role'
-    ))).toBe(true)
+    expect(validateTaskDefinition(qualityEligible).some((candidate) => candidate.path === 'metrics.detailAccuracy.role')).toBe(true)
 
     const researchOnlyEligible = {
       ...task,
-      metrics: {
-        ...task.metrics,
-        detailAccuracy: { ...task.metrics.detailAccuracy, role: 'research_only' as const, referenceEligible: true },
-      },
+      metrics: { ...task.metrics, detailAccuracy: { ...task.metrics.detailAccuracy, role: 'research_only' as const, referenceEligible: true } },
     }
-    expect(validateTaskDefinition(researchOnlyEligible).some((candidate) => (
-      candidate.path === 'metrics.detailAccuracy.role'
-    ))).toBe(true)
+    expect(validateTaskDefinition(researchOnlyEligible).some((candidate) => candidate.path === 'metrics.detailAccuracy.role')).toBe(true)
   })
 
   it('passes the explicit registry eligibility field through without deriving it from primary/report status', () => {
@@ -271,19 +254,15 @@ describe('Cognitive Assessment v2 contracts', () => {
 
     const exactApplicability = validateTaskDefinition({
       ...base,
-      references: [{
-        ...mapping,
-        profiles: ['standard'],
-        resolvedConfigHashes: ['a'.repeat(64)],
-      }],
+      references: [{ ...mapping, profiles: ['standard'], resolvedConfigHashes: ['a'.repeat(64)] }],
     })
     expect(exactApplicability.filter((candidate) => candidate.severity === 'error')).toEqual([])
   })
 
-  it('separates structural contract validation from publication status', () => {
+  it('keeps structural release readiness independent from deprecated publication metadata', () => {
     const draft = { ...definition(), publication: { ...definition().publication, status: 'DRAFT' as const } }
     expect(() => assertTaskContractValid(draft)).not.toThrow()
-    expect(() => assertTaskCanPublish(draft)).toThrow(/publication\.status must be PUBLISHED/)
+    expect(() => assertTaskCanPublish(draft)).not.toThrow()
 
     const invalidRequiresFlag = {
       ...definition(),
