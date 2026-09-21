@@ -4,6 +4,7 @@ import { scaleImageController } from '../controllers/scaleImageController'
 import { scaleQualificationController } from '../controllers/scaleQualificationController'
 import { scaleVideoController } from '../controllers/scaleVideoController'
 import { startStandaloneScaleAssessment } from '../modules/scale/scale-start.controller'
+import { restartStandaloneScaleAssessmentWithPolicyController } from '../modules/scale/scale-restart.controller'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -33,7 +34,7 @@ router.post('/:scaleId/assessments', authenticate, requireStudent, startStandalo
 
 // 提交答案
 router.post('/assessments/:assessmentId/submit', authenticate, requireStudent, scaleController.submitFinalAssessment)
-router.post('/assessments/:assessmentId/restart', authenticate, requireStudent, scaleController.restartAssessmentV2)
+router.post('/assessments/:assessmentId/restart', authenticate, requireStudent, restartStandaloneScaleAssessmentWithPolicyController)
 router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, legacyWriteDisabled)
 router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, legacyWriteDisabled)
 
