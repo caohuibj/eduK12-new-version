@@ -39,5 +39,9 @@
       2,
       5
     ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
   }
 }

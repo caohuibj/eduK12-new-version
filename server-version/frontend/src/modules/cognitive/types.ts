@@ -36,6 +36,9 @@ export interface CognitiveAssignmentSummary {
 export type CognitiveSessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED' | 'INVALID'
 
 export interface CognitiveReportMetricView {
+  presentationVersion?: string
+  participantLabel?: string
+  explanation?: string
   key: string
   label: string
   unit?: string

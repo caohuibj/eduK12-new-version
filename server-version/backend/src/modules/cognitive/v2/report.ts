@@ -7,9 +7,14 @@ import type {
   QualityState,
 } from './types'
 import { metricIsQualityGated } from './quality'
-import { resolveCognitiveProtocolPresentation } from '../protocol-presentation'
+import { resolveLegacyCognitiveProtocolPresentation } from '../legacy-protocol-presentation'
+import { legacyExperienceHeadline, legacyMetricAllowed, legacySuppressTips } from '../legacy-report-policy'
+import type { CognitiveParticipantPresentationV1 } from '../participant-presentation.types'
 
 export interface ReportMetricView {
+  presentationVersion?: string
+  participantLabel?: string
+  explanation?: string
   key: string
   label: string
   category: string
@@ -72,11 +77,13 @@ const metricView = (
   key: string,
   metrics: Record<string, unknown>,
   definitions: Record<string, MetricDefinition>,
+  presentation?: CognitiveParticipantPresentationV1,
 ): ReportMetricView => {
   const definition = definitions[key]
   if (!definition) throw new Error(`Report references unknown metric: ${key}`)
   return {
     key,
+    ...(presentation ? { presentationVersion: presentation.presentationVersion, participantLabel: presentation.metrics[key]?.label ?? definition.label, explanation: presentation.metrics[key]?.explanation } : {}),
     label: definition.label,
     category: definition.category,
     direction: definition.direction,
@@ -118,31 +125,24 @@ const projectKeys = (
   )
 })
 
-const participantMetricAllowed = (testType: string, key: string): boolean => {
-  if (testType === 'matrix' && key === 'reachedDifficulty') return false
-  return true
-}
-
-const experienceHeadlineByTestType: Record<string, string> = {
-  stroop: 'incongruentAccuracy',
-  nback: 'dPrimeByN',
-  sst: 'pRespondStop',
-}
+const participantMetricAllowed = (testType: string, key: string, presentation?: CognitiveParticipantPresentationV1): boolean =>
+  presentation ? !presentation.hiddenMetrics.includes(key) : legacyMetricAllowed(testType, key)
 
 const resolveHeadlineKeys = (input: {
   testType: string
+  participantPresentation?: CognitiveParticipantPresentationV1
   profile: CognitiveProfile | null
   definition: ReportDefinition
   metricDefinitions: Record<string, MetricDefinition>
   quality: Pick<CognitiveScoreResult['quality'], 'flags'>
 }): string[] => {
   const experienceHeadline = input.profile === 'experience'
-    ? experienceHeadlineByTestType[input.testType]
+    ? (input.participantPresentation ? input.participantPresentation.experienceHeadline : legacyExperienceHeadline(input.testType))
     : undefined
   if (
     experienceHeadline
     && eligibleMetric(experienceHeadline, input.metricDefinitions, input.profile, input.quality)
-    && participantMetricAllowed(input.testType, experienceHeadline)
+    && participantMetricAllowed(input.testType, experienceHeadline, input.participantPresentation)
   ) {
     return [experienceHeadline]
   }
@@ -152,7 +152,7 @@ const resolveHeadlineKeys = (input: {
     input.metricDefinitions,
     input.profile,
     input.quality,
-  ).filter((key) => participantMetricAllowed(input.testType, key))
+  ).filter((key) => participantMetricAllowed(input.testType, key, input.participantPresentation))
 }
 
 const conclusionFor = (
@@ -169,11 +169,6 @@ const conclusionFor = (
   return '以下结果描述本次任务中的表现，不等同于诊断或正式人口常模。'
 }
 
-const participantPracticalTips = (testType: string, tips: string[]): string[] => {
-  if (testType === 'memory' || testType === 'stroop') return []
-  return tips
-}
-
 const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => {
   if (profile === 'experience') return '体验版'
   if (profile === 'standard') return '正式版'
@@ -182,6 +177,7 @@ const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => 
 }
 
 export const projectThreeLayerReport = (input: {
+  participantPresentation?: CognitiveParticipantPresentationV1
   testType: string
   configVersion: string
   protocolSignature: string
@@ -201,6 +197,7 @@ export const projectThreeLayerReport = (input: {
     effect: input.qualityDefinitions[key]?.effect ?? 'limited',
   }))
   const headlineKeys = resolveHeadlineKeys({
+    participantPresentation: input.participantPresentation,
     testType: input.testType,
     profile: input.profile,
     definition: input.definition,
@@ -210,17 +207,19 @@ export const projectThreeLayerReport = (input: {
   const headlineSet = new Set(headlineKeys)
   const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => !headlineSet.has(key))
-    .filter((key) => participantMetricAllowed(input.testType, key))
+    .filter((key) => participantMetricAllowed(input.testType, key, input.participantPresentation))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
-    .filter((key) => participantMetricAllowed(input.testType, key))
-  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    .filter((key) => participantMetricAllowed(input.testType, key, input.participantPresentation))
+  const protocolPresentation = input.participantPresentation
+    ? (input.profile ? input.participantPresentation.protocols[input.profile] ?? null : null)
+    : resolveLegacyCognitiveProtocolPresentation({
     testType: input.testType,
     engineVersion: input.engineVersion,
     scoringVersion: input.scoringVersion,
     profile: input.profile,
   })
   return {
-    title: input.definition.title,
+    title: input.participantPresentation?.title ?? input.definition.title,
     profileLabel: protocolPresentation?.profileLabel ?? legacyProfileLabel(input.profile),
     qualityState: input.score.quality.state,
     conclusion: conclusionFor(
@@ -230,13 +229,13 @@ export const projectThreeLayerReport = (input: {
     ),
     headline: input.score.quality.state === 'invalid'
       ? []
-      : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
+      : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions, input.participantPresentation)),
     user: input.score.quality.state === 'invalid'
       ? []
-      : userKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
+      : userKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions, input.participantPresentation)),
     detail: input.score.quality.state === 'invalid'
       ? []
-      : detailKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
+      : detailKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions, input.participantPresentation)),
     quality: qualityEntries,
     method: {
       testType: input.testType,
@@ -247,6 +246,6 @@ export const projectThreeLayerReport = (input: {
       profile: input.profile,
     },
     disclaimer: input.definition.disclaimer,
-    practicalTips: participantPracticalTips(input.testType, input.definition.practicalTips),
+    practicalTips: (input.participantPresentation ? input.participantPresentation.suppressTips : legacySuppressTips(input.testType)) ? [] : input.participantPresentation?.practicalTips ?? input.definition.practicalTips,
   }
 }

@@ -178,11 +178,12 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
     profile: freeze.profile,
-    definition: definition.report,
+    participantPresentation: freeze.frozenReport?.participantPresentation,
+    definition: freeze.frozenReport?.v2ReportDefinition ?? definition.report,
     metrics: scored.metrics,
     score: scored,
-    metricDefinitions: definition.metrics,
-    qualityDefinitions: definition.quality,
+    metricDefinitions: freeze.frozenReport?.v2MetricDefinitions ?? definition.metrics,
+    qualityDefinitions: freeze.frozenReport?.v2QualityDefinitions ?? definition.quality,
   })
   const resultSnapshot: CognitiveResultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
