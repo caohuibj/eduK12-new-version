@@ -80,6 +80,20 @@ const responseEnvelope = (assessment: any, scale: any, definition: any, runner: 
   }
 }
 
+const scaleSelect = {
+  id: true,
+  code: true,
+  name: true,
+  description: true,
+  instruction: true,
+  estimatedTime: true,
+  status: true,
+  visibility: true,
+  instrumentVersion: true,
+  instrumentClass: true,
+  definition: true,
+} as const
+
 export const startStandaloneScaleAssessment = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.userId
@@ -88,25 +102,8 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     if (!contextInput.success) return error(res, contextInput.error.errors[0].message)
 
     const { scaleId } = req.params
-    const scale = await prisma.scale.findUnique({
-      where: { id: scaleId },
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        description: true,
-        instruction: true,
-        estimatedTime: true,
-        status: true,
-        visibility: true,
-        instrumentVersion: true,
-        instrumentClass: true,
-        definition: true,
-      },
-    })
+    const scale = await prisma.scale.findUnique({ where: { id: scaleId }, select: scaleSelect })
     if (!scale) return notFound(res, '量表不存在')
-    if (!(await canStudentAccessScale(scale, userId))) return notFound(res, '量表不存在')
-    if (scale.status !== 'PUBLISHED') return error(res, '量表未发布')
 
     const definition = scaleDefinitionFromRecord(scale)
     const runner = scaleRunnerFromRecord(scale)
@@ -120,6 +117,9 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       },
     })
     if (existing) {
+      // Resume is governed by the already-frozen admission. Current product
+      // access, deployment and grant state are new-start controls and must not
+      // retroactively invalidate an in-flight attempt.
       const stored = readScaleAnswers(existing.answers)
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
       return success(res, responseEnvelope(existing, scale, definition, runner), '继续未完成的测评')
@@ -128,16 +128,20 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     let assessment
     try {
       assessment = await prisma.$transaction(async (tx) => {
-        // Resolve the mutable new-start control plane and persist the immutable
-        // runtime/admission inside one Serializable transaction. A concurrent
-        // grant/deployment change must therefore conflict rather than slipping
-        // through between preflight and attempt creation.
+        // Re-read every mutable new-start control inside the Serializable
+        // transaction. Resource access, deployment/grant evaluation, runtime
+        // freezing and admission persistence therefore share one DB snapshot.
+        const currentScale = await tx.scale.findUnique({ where: { id: scaleId }, select: scaleSelect })
+        if (!currentScale || !(await canStudentAccessScale(currentScale, userId, tx))) {
+          throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表不存在', 404)
+        }
         const frozenAt = new Date()
         const context = buildStandaloneContext(contextInput.data, frozenAt)
+        const currentDefinition = scaleDefinitionFromRecord(currentScale)
         const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
-          instrumentKey: scale.code,
-          instrumentVersion: scale.instrumentVersion,
-          definition,
+          instrumentKey: currentScale.code,
+          instrumentVersion: currentScale.instrumentVersion,
+          definition: currentDefinition,
           frozenAt,
         })
         const admission = await standaloneAdmissionPersistenceForRuntime({
@@ -145,12 +149,12 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           attemptEpoch: 1,
           userId,
           scale: {
-            id: scale.id,
-            code: scale.code,
-            name: scale.name,
-            instrumentVersion: scale.instrumentVersion,
-            instrumentClass: scale.instrumentClass,
-            status: scale.status,
+            id: currentScale.id,
+            code: currentScale.code,
+            name: currentScale.name,
+            instrumentVersion: currentScale.instrumentVersion,
+            instrumentClass: currentScale.instrumentClass,
+            status: currentScale.status,
           },
           runtime: runtimeSnapshot,
           contextSnapshotHash: context.hash,
@@ -181,8 +185,8 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
     } catch (err: any) {
       // The partial unique index remains the final concurrent-start boundary.
-      // Serializable conflicts are surfaced as retryable request failures rather
-      // than silently falling back to a stale policy decision.
+      // A concurrent winner is resumed by identity; every other serialization
+      // or policy failure is surfaced rather than silently using stale state.
       if (err?.code !== 'P2002') throw err
       assessment = await prisma.assessment.findFirst({
         where: {
