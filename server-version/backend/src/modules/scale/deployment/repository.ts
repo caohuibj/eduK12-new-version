@@ -147,13 +147,13 @@ export const activateScaleDeploymentRevision = async (input: {
       "authorization_refs", "created_by_user_id", "created_at", "activated_at"
     ) VALUES (
       ${input.id}::uuid,
-      ${input.scaleId}::uuid,
+      ${input.scaleId},
       ${policy.revision},
       'ACTIVE',
       CAST(${JSON.stringify(policy)} AS jsonb),
       ${policyHash},
       CAST(${JSON.stringify(policy.authorizationRefs)} AS jsonb),
-      ${input.createdByUserId}::uuid,
+      ${input.createdByUserId},
       ${now},
       ${now}
     )
