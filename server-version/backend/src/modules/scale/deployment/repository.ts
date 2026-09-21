@@ -241,13 +241,19 @@ export const rollbackScaleDeploymentActivation = async (input: {
   db: Prisma.TransactionClient
   scaleId: string
   appliedRevision: number
+  expectedPolicyHash: string
   previousRevision: number | null
   now?: Date
 }): Promise<void> => {
   const active = await readActiveScaleDeployment(input.db, input.scaleId)
+  if ((active?.revision ?? null) === input.previousRevision) {
+    const applied = await readScaleDeploymentRevision(input.db, input.scaleId, input.appliedRevision)
+    if (!applied || (applied.status === 'RETIRED' && applied.policyHash === input.expectedPolicyHash)) return
+  }
   if (!active || active.revision !== input.appliedRevision) {
     throw new Error(`Cannot rollback Scale deployment: active revision is not ${input.appliedRevision}`)
   }
+  if (active.policyHash !== input.expectedPolicyHash) throw new Error('Cannot rollback Scale deployment: policy hash mismatch')
   const now = input.now ?? new Date()
   await input.db.$executeRaw(Prisma.sql`
     UPDATE "scale_deployment_policies"

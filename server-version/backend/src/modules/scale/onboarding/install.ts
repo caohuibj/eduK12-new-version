@@ -16,6 +16,7 @@ import {
   activateScaleDeploymentRevision,
   listScaleInstrumentAuthorizations,
   readActiveScaleDeployment,
+  readScaleDeploymentRevision,
 } from '../deployment/repository'
 
 export interface InstallScaleInstrumentInput {
@@ -119,9 +120,9 @@ const resolvePlan = async (
 
   const active = scale ? await readActiveScaleDeployment(db, scale.id) : null
   const deploymentPolicyHash = hashScaleDeploymentPolicy(deploymentPolicy)
-  if (active && active.revision === deploymentPolicy.revision && active.policyHash !== deploymentPolicyHash) {
-    blockers.push('DEPLOYMENT_REVISION_CONFLICT')
-  }
+  const existingRevision = scale ? await readScaleDeploymentRevision(db, scale.id, deploymentPolicy.revision) : null
+  if (existingRevision && existingRevision.policyHash !== deploymentPolicyHash) blockers.push('DEPLOYMENT_REVISION_CONFLICT')
+  if (existingRevision && existingRevision.status !== 'ACTIVE') blockers.push('DEPLOYMENT_REVISION_NOT_ACTIVE')
 
   return {
     instrumentKey: input.instrumentKey,

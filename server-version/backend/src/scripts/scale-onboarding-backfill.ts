@@ -1,5 +1,7 @@
 import { readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { canonicalHash } from '../modules/assessment-runtime/canonical'
+import { scaleOnboardingBackfillPlanSchema, scaleOnboardingBackfillCheckpointSchema } from '../modules/scale/onboarding/backfill'
 import { prisma } from '../config/database'
 import {
   applyScaleOnboardingBackfill,
@@ -36,9 +38,16 @@ const main = async () => {
     return
   }
   const checkpointPath = resolve(value('checkpoint') ?? `${planPath}.checkpoint.json`)
-  const checkpoint = (() => { try { return JSON.parse(readFileSync(checkpointPath, 'utf8')) } catch { return undefined } })()
+  const checkpoint = (() => {
+    try { return JSON.parse(readFileSync(checkpointPath, 'utf8')) }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined
+      throw error
+    }
+  })()
   if (has('rollback')) {
     if (!checkpoint) throw new Error('Rollback requires an existing checkpoint')
+    if (scaleOnboardingBackfillCheckpointSchema.parse(checkpoint).planHash !== canonicalHash(scaleOnboardingBackfillPlanSchema.parse(plan))) throw new Error('Rollback checkpoint does not match plan hash')
     const rolledBack = await rollbackScaleOnboardingBackfill({ db: prisma, checkpoint, onCheckpoint: next => writeCheckpoint(checkpointPath, next) })
     process.stdout.write(JSON.stringify({ mode: 'rollback', checkpoint: rolledBack }, null, 2) + '\n')
     return

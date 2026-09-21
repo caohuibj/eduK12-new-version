@@ -40,7 +40,7 @@ const checkpointEntrySchema = z.object({
   appliedRevision: z.number().int().positive(),
   deploymentPolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   previousActiveRevision: z.number().int().positive().nullable(),
-  status: z.enum(['APPLIED', 'NOOP', 'ROLLED_BACK']),
+  status: z.enum(['PREPARED', 'APPLIED', 'NOOP', 'ROLLED_BACK']),
 }).strict()
 export const scaleOnboardingBackfillCheckpointSchema = z.object({
   schemaVersion: z.literal(1),
@@ -116,7 +116,27 @@ export const applyScaleOnboardingBackfill = async (input: {
   for (const entry of parsed.entries) {
     const identity = `${entry.instrumentKey}@${entry.instrumentVersion}`
     const priorCheckpoint = checkpoint.entries.find(row => row.instrumentKey === entry.instrumentKey && row.instrumentVersion === entry.instrumentVersion)
-    if (priorCheckpoint && priorCheckpoint.status !== 'ROLLED_BACK') continue
+    if (priorCheckpoint && priorCheckpoint.status !== 'ROLLED_BACK') {
+      const scale = await input.db.scale.findUnique({ where: { code: entry.instrumentKey } })
+      const active = scale ? await readActiveScaleDeployment(input.db, scale.id) : null
+      if (!scale || scale.id !== priorCheckpoint.scaleId || scale.instrumentVersion !== entry.instrumentVersion
+        || priorCheckpoint.appliedRevision !== entry.deploymentPolicy.revision
+        || priorCheckpoint.deploymentPolicyHash !== canonicalHash(entry.deploymentPolicy)) {
+        throw new Error(`Backfill checkpoint no longer matches deployment for ${identity}`)
+      }
+      const applied = active?.revision === priorCheckpoint.appliedRevision && active.policyHash === priorCheckpoint.deploymentPolicyHash
+      if (applied) {
+        // A crash after commit but before the final checkpoint must retain rollback ownership.
+        if (priorCheckpoint.status === 'PREPARED') {
+          checkpoint = { ...checkpoint, entries: checkpoint.entries.map(row => row === priorCheckpoint ? { ...row, status: 'APPLIED' as const } : row) }
+          await input.onCheckpoint?.(checkpoint)
+        }
+        continue
+      }
+      if (priorCheckpoint.status !== 'PREPARED' || (active?.revision ?? null) !== priorCheckpoint.previousActiveRevision) {
+        throw new Error(`Backfill checkpoint no longer matches deployment for ${identity}`)
+      }
+    }
 
     const preview = await planScaleOnboardingBackfill(input.db, { schemaVersion: 1, actorUserId: parsed.actorUserId, entries: [entry] })
     const row = preview.entries[0]
@@ -136,6 +156,18 @@ export const applyScaleOnboardingBackfill = async (input: {
           policyHash: livePreview.deploymentPolicyHash,
         }
       }
+      // Journal the previous revision before the transaction can commit. A failed
+      // journal write aborts the transaction; a crash afterwards can be reconciled.
+      checkpoint = {
+        ...checkpoint,
+        entries: [...checkpoint.entries.filter(row => !(row.instrumentKey === entry.instrumentKey && row.instrumentVersion === entry.instrumentVersion)), {
+          instrumentKey: entry.instrumentKey, instrumentVersion: entry.instrumentVersion,
+          scaleId: livePreview.scaleId, appliedRevision: entry.deploymentPolicy.revision,
+          deploymentPolicyHash: livePreview.deploymentPolicyHash,
+          previousActiveRevision: previous?.revision ?? null, status: 'PREPARED',
+        }],
+      }
+      await input.onCheckpoint?.(checkpoint)
       await activateScaleDeploymentRevision({
         db: tx,
         id: randomUUID(),
@@ -176,11 +208,12 @@ export const rollbackScaleOnboardingBackfill = async (input: {
 }): Promise<ScaleOnboardingBackfillCheckpoint> => {
   let checkpoint = scaleOnboardingBackfillCheckpointSchema.parse(input.checkpoint)
   for (const entry of [...checkpoint.entries].reverse()) {
-    if (entry.status !== 'APPLIED') continue
+    if (entry.status !== 'APPLIED' && entry.status !== 'PREPARED') continue
     await withSerializableScaleTransaction(input.db, tx => rollbackScaleDeploymentActivation({
       db: tx,
       scaleId: entry.scaleId,
       appliedRevision: entry.appliedRevision,
+      expectedPolicyHash: entry.deploymentPolicyHash,
       previousRevision: entry.previousActiveRevision,
     }))
     checkpoint = {

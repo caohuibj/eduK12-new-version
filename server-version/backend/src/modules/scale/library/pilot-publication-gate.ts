@@ -1,3 +1,4 @@
+import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
 /**
  * Scale governance composition for Pilot-era catalog data.
  *
@@ -109,6 +110,9 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     requireTranslation: needsTranslation,
   })
   gateWarnings.push(...rights.warnings)
+
+  const contentLocale = getScaleInstrumentSource(input.pkg.key, input.pkg.instrumentVersion)?.executable?.contentLocale
+  if (contentLocale && contentLocale !== input.locale) localizationErrors.push(`contentLocale=${contentLocale} 与部署 locale=${input.locale} 不一致`)
 
   // 5) Source validation already guarantees executable contentLocale === localization.targetLocale.
   // Deployment locale fit is therefore fully represented by the localization manifest above.

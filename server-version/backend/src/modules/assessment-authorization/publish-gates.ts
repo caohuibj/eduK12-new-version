@@ -56,9 +56,15 @@ export const resolveEffectiveAuthorization = (input: {
 
   if (lineage.length === 0) return null
 
+  const revokedVersions = new Map<string, number>()
+  for (const row of lineage) {
+    if (row.status === 'REVOKED') revokedVersions.set(row.authorizationId, Math.max(revokedVersions.get(row.authorizationId) ?? 0, row.version))
+  }
+
   // Prefer the newest eligible (APPROVED | EVIDENCE_PENDING) that is in validity window
   // and not overlay-EXPIRED/REVOKED.
   for (const row of lineage) {
+    if ((revokedVersions.get(row.authorizationId) ?? 0) >= row.version) continue
     const overlay = evaluateAuthorizationOverlayStatus(row, input.nowIso)
     if (!ELIGIBLE_RIGHTS_STATUSES.has(row.status)) continue
     if (overlay === 'EXPIRED' || overlay === 'REVOKED') continue

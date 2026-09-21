@@ -33,6 +33,8 @@ export const previewScaleInstrument = (input: {
   const blockers = validation.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}: ${issue.message}`)
   if (!source.executable) blockers.push(...(source.candidatePreview?.blockers ?? ['EXECUTABLE_NOT_REGISTERED']))
   const modes = input.deploymentModes.map(mode => scaleDeploymentModeSchema.parse(mode))
+  if (modes.length === 0) blockers.push('DEPLOYMENT_MODES_MISSING')
+  if (source.executable && source.executable.releaseStatus !== 'PUBLISHED') blockers.push('EXECUTABLE_NOT_PUBLISHED')
   const decisions = []
   let runtimePolicyHash: string | null = null
   if (source.executable) {

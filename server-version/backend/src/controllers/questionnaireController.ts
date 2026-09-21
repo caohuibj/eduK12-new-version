@@ -1,5 +1,4 @@
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
-import { getScaleInstrumentRuntimePolicy } from '../modules/scale/onboarding/instrument-registry'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError, unauthorized } from '../utils/response'
@@ -2430,17 +2429,14 @@ export const questionnaireController = {
         const scaleRuntimeSnapshots = await Promise.all(questionnaire.questionnaireScales.map(async (qs: any) => {
           if (qs.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
           const definition = scaleDefinitionFromRecord(qs.scale)
-            const policy = getScaleInstrumentRuntimePolicy(qs.scale.code, qs.scale.instrumentVersion)
-            if (policy) assertScaleContextCollectable({ policy: policy.applicability, scalePosition: qs.position, sections: frozenFormSections })
-          return {
-            qs,
-            snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
-              instrumentKey: qs.scale.code,
-              instrumentVersion: qs.scale.instrumentVersion,
-              requestedMode: 'QUESTIONNAIRE',
-              definition,
-            }),
-          }
+          const snapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
+            instrumentKey: qs.scale.code,
+            instrumentVersion: qs.scale.instrumentVersion,
+            requestedMode: 'QUESTIONNAIRE',
+            definition,
+          })
+          if (snapshot.schemaVersion === 2) assertScaleContextCollectable({ policy: snapshot.compiledPolicy.applicability, scalePosition: qs.position, sections: frozenFormSections })
+          return { qs, snapshot }
         }))
         await tx.assessment.createMany({
           data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({

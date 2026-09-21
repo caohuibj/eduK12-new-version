@@ -8,6 +8,7 @@ import {
 import { hashScaleDefinition } from '../scale-definition'
 import {
   getScalePackage,
+  listScalePackages,
   type ScalePackageV2,
 } from '../scale-package.registry'
 import {
@@ -246,8 +247,9 @@ const summarizeGateReason = (input: {
   if (!input.deployment) reasons.push('当前环境尚无已发布的可启动量表部署。')
   else if (!deploymentPublished) reasons.push('当前量表部署尚未发布。')
   if (input.pkg.releaseStatus !== 'PUBLISHED') reasons.push('量表包尚未发布，当前仅可浏览目录信息。')
-  if (input.gate.decision.errors.length > 0) {
-    const allErrors = input.gate.decision.errors
+  const operationalErrors = input.gate.decision.warnings.filter(warning => /rights\/governance|localization\/deployment/.test(warning))
+  if (input.gate.decision.errors.length > 0 || operationalErrors.length > 0) {
+    const allErrors = [...input.gate.decision.errors, ...operationalErrors]
     const rightsFailure = allErrors.some((error) => /authorization|rights|commercialNature|electronicAdministration|scoring required|translation required|display required|locale\/territory/i.test(error))
     const localizationFailure = allErrors.some((error) => /localization|contentLocale|targetLocale|translation pending/i.test(error))
     if (rightsFailure) reasons.push('当前 locale/territory 的电子施测、计分或显示授权未满足。')
@@ -293,7 +295,7 @@ const buildEvidenceSummary = (manifest: ScaleCatalogManifestV1): ScaleLibraryEvi
   recordCount: manifest.evidence.length,
   status: manifest.evidence.length > 0 ? 'EVIDENCE_RECORDED' : 'NO_EVIDENCE_RECORDED',
   coverageText: manifest.evidence.length > 0
-    ? 'Scientific Evidence Matrix 已记录科研证据；Wave 0 不把记录升级为本地验证、正式常模或诊断依据。'
+    ? ['Scientific Evidence Matrix 已记录科研证据；不作超出样本的验证、常模或诊断声称。', ...manifest.evidence.map(record => [record.population, record.notes].filter(Boolean).join('：'))].join(' ')
     : 'Wave 0 当前未在 Scientific Evidence Matrix 中录入可用于本地验证的科研证据；不作验证、常模或诊断声称。',
 })
 
@@ -418,6 +420,8 @@ export const buildScaleLibraryReadModel = (context: ScaleLibraryReadModelContext
       context: { ...context, locale, territory, nowIso },
     }))
   })
+  const packageOrder = new Map(listScalePackages().map((pkg, index) => [bindingKey(pkg.key, pkg.instrumentVersion), index]))
+  entries.sort((left, right) => (packageOrder.get(bindingKey(left.identity.instrumentKey, left.identity.instrumentVersion)) ?? Infinity) - (packageOrder.get(bindingKey(right.identity.instrumentKey, right.identity.instrumentVersion)) ?? Infinity))
   return {
     schemaVersion: 1,
     generatedAt: nowIso,
