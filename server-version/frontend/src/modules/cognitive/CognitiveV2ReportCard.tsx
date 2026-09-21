@@ -14,6 +14,12 @@ const PARTICIPANT_METRIC_LABELS: Record<string, string> = {
   lapseRate: '未作答比例',
   correctCount: '正确比较次数',
   completedTrialCount: '完成比较次数',
+  flankerEffectMs: '干扰反应时间差',
+  incongruentAccuracy: '不一致条件正确率',
+  congruentAccuracy: '一致条件正确率',
+  errorCost: '准确率干扰差',
+  medianRtCongruent: '一致条件典型反应时间',
+  medianRtIncongruent: '不一致条件典型反应时间',
 }
 
 const METRIC_EXPLANATIONS: Record<string, string> = {
@@ -21,7 +27,12 @@ const METRIC_EXPLANATIONS: Record<string, string> = {
   rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
   missRate: '遗漏比例：应该响应但没有在有效时间内响应的比例。',
   stroopEffectMs: '冲突干扰时间：冲突条件相对一致条件增加的反应时间。',
-  incongruentAccuracy: '冲突条件正确率：在字义与字体颜色冲突时仍按目标规则正确作答的比例。',
+  flankerEffectMs: '干扰反应时间差：不一致条件相对一致条件增加的典型正确反应时间；应与两种条件的正确率一起阅读。',
+  incongruentAccuracy: '不一致条件正确率：干扰信息与目标信息方向或含义不一致时，仍按目标规则正确作答的比例。',
+  congruentAccuracy: '一致条件正确率：干扰信息与目标信息一致时正确作答的比例。',
+  errorCost: '准确率干扰差：一致条件正确率与不一致条件正确率之间的差异，应结合反应时间一起阅读。',
+  medianRtCongruent: '一致条件典型反应时间：一致条件中正确有效反应的中位时间。',
+  medianRtIncongruent: '不一致条件典型反应时间：不一致条件中正确有效反应的中位时间。',
   commissionRate: '误按比例：本来不应该按时发生按键的比例。',
   omissionRate: '遗漏比例：应该响应但没有响应的比例。',
   dPrime: '目标辨别敏感度：区分目标与非目标表现的信号检测指标。',
