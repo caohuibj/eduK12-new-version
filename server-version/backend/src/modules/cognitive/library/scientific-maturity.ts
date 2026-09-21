@@ -1,19 +1,21 @@
 import { getCognitiveRegistryEntry } from '../cognitive.registry'
-import { RESEARCH_GRADE_IDENTITIES } from './catalog'
 import type { CognitiveScientificStatus } from './catalog-contract'
 
-const identityKey = (testType: string, engineVersion: string, scoringVersion: string): string => (
-  `${testType}/${engineVersion}/${scoringVersion}`
-)
+export const cognitiveScientificMaturityIdentityKey = (
+  testType: string,
+  engineVersion: string,
+  scoringVersion: string,
+): string => `${testType}/${engineVersion}/${scoringVersion}`
 
 /**
- * Current-stage exact identities explicitly reviewed as RESEARCH_READY.
- * Empty by default: publication never implies research readiness.
+ * The single authoritative Cognitive scientific-maturity source.
  *
- * RESEARCH_GRADE_IDENTITIES remains the existing future-higher-bar allowlist;
- * this adapter preserves that source rather than creating a second grade truth.
+ * Entries are exact identity scoped. Missing entries are deliberately PILOT;
+ * a new engine/scoring identity never inherits an older identity's review.
+ * This registry is governance metadata only and must not affect runtime,
+ * product readiness, publication, scoring, FINAL, or report computation.
  */
-export const RESEARCH_READY_IDENTITIES = new Set<string>()
+export const COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY = new Map<string, CognitiveScientificStatus>()
 
 /**
  * Governance-only resolver. New/unreviewed exact identities default to PILOT;
@@ -25,10 +27,8 @@ export const resolveCognitiveScientificMaturity = (
   engineVersion: string,
   scoringVersion: string,
 ): CognitiveScientificStatus => {
+  const identity = cognitiveScientificMaturityIdentityKey(testType, engineVersion, scoringVersion)
   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
-  if (!entry || testType === 'fake') throw new Error(`Unknown cognitive catalog identity: ${identityKey(testType, engineVersion, scoringVersion)}`)
-  const identity = identityKey(testType, engineVersion, scoringVersion)
-  if (RESEARCH_GRADE_IDENTITIES.has(identity)) return 'RESEARCH_GRADE'
-  if (RESEARCH_READY_IDENTITIES.has(identity)) return 'RESEARCH_READY'
-  return 'PILOT'
+  if (!entry || testType === 'fake') throw new Error(`Unknown cognitive catalog identity: ${identity}`)
+  return COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(identity) ?? 'PILOT'
 }
