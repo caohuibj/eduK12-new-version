@@ -30,11 +30,13 @@ const scaleBinding = (input: {
   scaleId: string
   instrumentKey: string
   instrumentVersion: string
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
   audience: ScaleDisclosureAudience
 }): ExportScaleProjectionBindingV1 => {
   const context = createScaleProjectionContext({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
+    instrumentClass: input.instrumentClass,
     audience: input.audience,
     purpose: 'export',
   })
@@ -71,7 +73,7 @@ export const resolveExportProjectionBinding = async (
   if (resourceType === 'SCALE') {
     const scale = await prisma.scale.findUnique({
       where: { id: resourceId },
-      select: { id: true, code: true, instrumentVersion: true },
+      select: { id: true, code: true, instrumentVersion: true, instrumentClass: true },
     })
     if (!scale?.code || !scale.instrumentVersion) throw new Error('量表不存在或版本信息不完整')
     return finishBinding({
@@ -79,7 +81,13 @@ export const resolveExportProjectionBinding = async (
       resourceType,
       resourceId,
       audience,
-      scales: [scaleBinding({ scaleId: scale.id, instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion, audience })],
+      scales: [scaleBinding({
+        scaleId: scale.id,
+        instrumentKey: scale.code,
+        instrumentVersion: scale.instrumentVersion,
+        instrumentClass: scale.instrumentClass,
+        audience,
+      })],
     })
   }
 
@@ -89,14 +97,20 @@ export const resolveExportProjectionBinding = async (
       id: true,
       questionnaireScales: {
         orderBy: { position: 'asc' },
-        select: { scale: { select: { id: true, code: true, instrumentVersion: true } } },
+        select: { scale: { select: { id: true, code: true, instrumentVersion: true, instrumentClass: true } } },
       },
     },
   })
   if (!questionnaire) throw new Error('问卷不存在')
   const scales = questionnaire.questionnaireScales.map(({ scale }) => {
     if (!scale.code || !scale.instrumentVersion) throw new Error('问卷量表版本信息不完整')
-    return scaleBinding({ scaleId: scale.id, instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion, audience })
+    return scaleBinding({
+      scaleId: scale.id,
+      instrumentKey: scale.code,
+      instrumentVersion: scale.instrumentVersion,
+      instrumentClass: scale.instrumentClass,
+      audience,
+    })
   })
   return finishBinding({ projectionVersion: EXPORT_PROJECTION_VERSION, resourceType, resourceId, audience, scales })
 }

@@ -9,6 +9,7 @@ import type { EffectiveScaleDisclosureSnapshot, ScaleProjectionContext, ScalePro
 export const createScaleProjectionContext = (input: {
   instrumentKey?: string | null
   instrumentVersion?: string | null
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
   audience: ScaleDisclosureAudience
   purpose: ScaleProjectionPurpose
   principalId?: string | null
@@ -23,11 +24,13 @@ export const createScaleProjectionContext = (input: {
       frozenPolicy = scaleProjectionPolicyFromCompiled(compileScalePolicy(source))
     } else {
       const executable = getScalePackage(input.instrumentKey, input.instrumentVersion)
-      frozenPolicy = resolveLegacyScaleProjectionPolicy(
-        input.instrumentKey,
-        input.instrumentVersion,
-        executable ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
-      )
+      // Never infer CUSTOM_DESCRIPTIVE merely because a package lookup missed.
+      // Unknown STANDARD identities must fail closed. Custom descriptive
+      // compatibility is available only when the authoritative caller says so.
+      const instrumentClass = input.instrumentClass ?? (executable ? 'STANDARD' : null)
+      frozenPolicy = instrumentClass
+        ? resolveLegacyScaleProjectionPolicy(input.instrumentKey, input.instrumentVersion, instrumentClass)
+        : resolveLegacyScaleProjectionPolicy('', '')
     }
   }
   frozenPolicy ??= resolveLegacyScaleProjectionPolicy('', '')

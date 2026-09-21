@@ -38,6 +38,7 @@ type CompositeScaleItem = {
     id?: string | null
     code?: string | null
     instrumentVersion?: string | null
+    instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
   } | null
 }
 
@@ -53,6 +54,7 @@ const scaleBindingFor = (
   const context = createScaleProjectionContext({
     instrumentKey,
     instrumentVersion,
+    instrumentClass: item.scale?.instrumentClass ?? null,
     audience,
     purpose: 'export',
   })
@@ -104,7 +106,7 @@ export const resolveCompositeExportProjectionBinding = async (
         select: {
           id: true,
           type: true,
-          scale: { select: { id: true, code: true, instrumentVersion: true } },
+          scale: { select: { id: true, code: true, instrumentVersion: true, instrumentClass: true } },
         },
       },
     },
