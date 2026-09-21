@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { towerConfigSchema } from '../../schemas/tower.config'
 import { towerTrialSchema } from '../../schemas/tower.trial'
@@ -16,4 +17,4 @@ const towerFinalSubmission = fixedCountFinalSubmission('problemCount')
 
 export const executionEntries = [
 { testType: 'tower', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: towerConfigSchema, trialSchema: towerTrialSchema, finalSubmission: towerFinalSubmission, score: scoreTowerV1, ...towerRegistryMeta }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

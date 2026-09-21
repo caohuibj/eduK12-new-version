@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { digitbackwardConfigSchema } from '../../schemas/digitbackward.config'
 import { digitbackwardTrialSchema } from '../../schemas/digitbackward.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreDigitbackwardV1,
   ...digitbackwardRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

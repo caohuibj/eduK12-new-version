@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { flankerConfigSchema } from '../../schemas/flanker.config'
 import { flankerTrialSchema } from '../../schemas/flanker.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreFlankerV1,
   ...flankerRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

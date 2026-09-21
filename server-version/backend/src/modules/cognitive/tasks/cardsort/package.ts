@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { cardsortConfigSchema } from '../../schemas/cardsort.config'
 import { cardsortTrialSchema } from '../../schemas/cardsort.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreCardsortV1,
   ...cardsortRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

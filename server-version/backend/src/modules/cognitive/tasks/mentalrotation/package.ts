@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { mentalrotationConfigSchema } from '../../schemas/mentalrotation.config'
 import { mentalrotationTrialSchema } from '../../schemas/mentalrotation.trial'
@@ -16,4 +17,4 @@ const mentalrotationFinalSubmission = fixedCountFinalSubmission('totalTrials')
 
 export const executionEntries = [
 { testType: 'mentalrotation', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: mentalrotationConfigSchema, trialSchema: mentalrotationTrialSchema, finalSubmission: mentalrotationFinalSubmission, score: scoreMentalrotationV1, ...mentalrotationRegistryMeta }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

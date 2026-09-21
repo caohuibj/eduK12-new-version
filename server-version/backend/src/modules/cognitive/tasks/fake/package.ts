@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { fakeConfigSchema } from '../../schemas/fake.config'
 import { fakeTrialSchema } from '../../schemas/fake.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreFakeV1,
   ...fakeRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { gonogoConfigSchema } from '../../schemas/gonogo.config'
 import { gonogoTrialSchema } from '../../schemas/gonogo.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreGonogoV1,
   ...gonogoRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

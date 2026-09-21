@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { stroopConfigSchema } from '../../schemas/stroop.config'
 import { stroopTrialSchema } from '../../schemas/stroop.trial'
@@ -36,4 +37,4 @@ export const executionEntries = [
   score: scoreStroopV1_1,
   ...stroopRegistryMetaV11,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

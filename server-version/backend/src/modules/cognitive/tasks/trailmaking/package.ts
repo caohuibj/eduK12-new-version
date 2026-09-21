@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { trailmakingConfigSchema } from '../../schemas/trailmaking.config'
 import { trailmakingTrialSchema } from '../../schemas/trailmaking.trial'
@@ -16,4 +17,4 @@ const trailmakingFinalSubmission = trailmakingTaskCountFinalSubmission()
 
 export const executionEntries = [
 { testType: 'trailmaking', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: trailmakingConfigSchema, trialSchema: trailmakingTrialSchema, finalSubmission: trailmakingFinalSubmission, score: scoreTrailmakingV1, ...trailmakingRegistryMeta }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

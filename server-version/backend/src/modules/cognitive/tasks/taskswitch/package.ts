@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { taskswitchConfigSchema } from '../../schemas/taskswitch.config'
 import { taskswitchTrialSchema } from '../../schemas/taskswitch.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreTaskswitchV1,
   ...taskswitchRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

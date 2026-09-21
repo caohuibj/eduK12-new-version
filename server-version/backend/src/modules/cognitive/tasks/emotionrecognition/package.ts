@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { emotionrecognitionConfigSchema } from '../../schemas/emotionrecognition.config'
 import { emotionrecognitionTrialSchema } from '../../schemas/emotionrecognition.trial'
@@ -16,4 +17,4 @@ const emotionrecognitionFinalSubmission = fixedCountFinalSubmission('totalTrials
 
 export const executionEntries = [
 { testType: 'emotionrecognition', engineVersion: '1.0.0', scoringVersion: '1.0.0', configSchema: emotionrecognitionConfigSchema, trialSchema: emotionrecognitionTrialSchema, finalSubmission: emotionrecognitionFinalSubmission, score: scoreEmotionrecognitionV1, ...emotionrecognitionRegistryMeta }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]

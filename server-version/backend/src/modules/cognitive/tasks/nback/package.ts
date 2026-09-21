@@ -1,3 +1,4 @@
+import { executionSemantics } from './semantics'
 import type { RegistryEntry } from '../../cognitive.types'
 import { nbackConfigSchema } from '../../schemas/nback.config'
 import { nbackTrialSchema } from '../../schemas/nback.trial'
@@ -25,4 +26,4 @@ export const executionEntries = [
   score: scoreNbackV1,
   ...nbackRegistryMeta,
 }
-] as unknown as RegistryEntry<unknown, unknown>[]
+].map((entry, index) => ({ ...entry, executionSemantics: executionSemantics[index] })) as unknown as RegistryEntry<unknown, unknown>[]
