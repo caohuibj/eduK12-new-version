@@ -149,6 +149,9 @@ export const buildCognitiveSingleTaskReport = (input: {
   const reportDefinition: SingleTaskReportDefinition | undefined = frozen.reportDefinition
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
+  // For newly frozen assignments, participant-facing protocol wording is read
+  // from the immutable snapshot. The live exact-identity registry remains a
+  // compatibility fallback for assignments frozen before these optional fields.
   const protocolPresentation = resolveCognitiveProtocolPresentation({
     testType: input.testType,
     engineVersion: input.engineVersion,
@@ -171,7 +174,8 @@ export const buildCognitiveSingleTaskReport = (input: {
     primaryKeys,
     metricDefinitions,
   )
-  const showProductIndex = protocolPresentation?.showProductIndex
+  const showProductIndex = input.frozenReport?.protocolShowProductIndex
+    ?? protocolPresentation?.showProductIndex
     ?? (reportDefinition?.showProductIndex !== false)
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
@@ -187,19 +191,23 @@ export const buildCognitiveSingleTaskReport = (input: {
   return {
     testType: input.testType,
     profile: input.profile,
-    profileLabel: protocolPresentation?.profileLabel ?? profileLabelOf(input.profile),
+    profileLabel: input.frozenReport?.profileLabel
+      ?? protocolPresentation?.profileLabel
+      ?? profileLabelOf(input.profile),
     title: reportDefinition?.title ?? input.testType,
     interpretable,
     qualityState: interpretable ? 'interpretable' : 'insufficient',
     qualityFlags,
-    interpretationSummary: interpretable ? protocolPresentation?.participantConclusion ?? null : null,
+    interpretationSummary: interpretable
+      ? input.frozenReport?.participantConclusion ?? protocolPresentation?.participantConclusion ?? null
+      : null,
     headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
     primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
     secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
-    caveats: protocolPresentation?.reportCaveats
-      ?? input.frozenReport?.reportCaveats
+    caveats: input.frozenReport?.reportCaveats
+      ?? protocolPresentation?.reportCaveats
       ?? frozen.reportCaveats
       ?? [],
     practicalTips: participantPracticalTips(input.testType, reportDefinition?.practicalTips ?? []),
