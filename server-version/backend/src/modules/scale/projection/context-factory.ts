@@ -1,7 +1,9 @@
 import { getScalePackage } from '../scale-package.registry'
+import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
+import { compileScalePolicy } from '../policy/compile'
 import { DISCLOSURE_PRESETS } from '../policy/disclosure'
 import type { ScaleDisclosureAudience } from '../policy/types'
-import { resolveLegacyScaleProjectionPolicy } from './policy-resolver'
+import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from './policy-resolver'
 import type { EffectiveScaleDisclosureSnapshot, ScaleProjectionContext, ScaleProjectionPurpose, ScaleRelationalDisposition } from './types'
 
 export const createScaleProjectionContext = (input: {
@@ -16,12 +18,17 @@ export const createScaleProjectionContext = (input: {
   const full = DISCLOSURE_PRESETS.FULL_REPORT()
   let frozenPolicy = input.frozenPolicy
   if (!frozenPolicy && input.instrumentKey && input.instrumentVersion) {
-    const executable = getScalePackage(input.instrumentKey, input.instrumentVersion)
-    frozenPolicy = resolveLegacyScaleProjectionPolicy(
-      input.instrumentKey,
-      input.instrumentVersion,
-      executable ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
-    )
+    const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
+    if (source?.executable && source.applicability && source.disclosure) {
+      frozenPolicy = scaleProjectionPolicyFromCompiled(compileScalePolicy(source))
+    } else {
+      const executable = getScalePackage(input.instrumentKey, input.instrumentVersion)
+      frozenPolicy = resolveLegacyScaleProjectionPolicy(
+        input.instrumentKey,
+        input.instrumentVersion,
+        executable ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
+      )
+    }
   }
   frozenPolicy ??= resolveLegacyScaleProjectionPolicy('', '')
   return {
