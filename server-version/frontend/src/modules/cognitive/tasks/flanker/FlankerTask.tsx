@@ -14,14 +14,19 @@ const PRACTICE: FlankerTrialSpec[] = [
   { targetDirection: 'left', flankerDirection: 'right', correctResponse: 'left' },
 ]
 
+const responseLabel = (response: 'left' | 'right') => response === 'left' ? '左' : '右'
+
 const ArrowRow: React.FC<{ trial: FlankerTrialSpec }> = ({ trial }) => {
   const flank = trial.flankerDirection === 'left' ? '←' : '→'
   const target = trial.targetDirection === 'left' ? '←' : '→'
+  const arrows = [flank, flank, target, flank, flank]
   return (
-    <div role="img" aria-label="视觉箭头干扰刺激" className="flex h-24 items-center justify-center gap-2 text-6xl font-bold">
-      <span aria-hidden="true" className="text-gray-400">{flank}{flank}</span>
-      <span aria-hidden="true" className="text-primary">{target}</span>
-      <span aria-hidden="true" className="text-gray-400">{flank}{flank}</span>
+    <div
+      role="img"
+      aria-label="视觉箭头干扰刺激"
+      className="flex h-20 items-center justify-center gap-1 font-mono text-4xl font-bold text-gray-800 sm:h-24 sm:gap-2 sm:text-6xl"
+    >
+      {arrows.map((arrow, index) => <span key={index} aria-hidden="true">{arrow}</span>)}
     </div>
   )
 }
@@ -42,9 +47,20 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
   const rtRef = useRef<number | null>(null)
   const interruptedRef = useRef(false)
   const submittingRef = useRef(false)
+  const practiceAnsweredRef = useRef(false)
 
-  const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setPracticeFeedback(null); setPhase('practice') }
+  const startPractice = () => {
+    practiceAnsweredRef.current = false
+    setPracticeIndex(0)
+    setPracticeCorrect(0)
+    setPracticeFeedback(null)
+    setPhase('practice')
+  }
   const startFormal = () => setPhase('formal')
+
+  useEffect(() => {
+    if (phase === 'practice') practiceAnsweredRef.current = false
+  }, [phase, practiceIndex])
 
   useEffect(() => {
     const onHidden = () => { if (document.hidden) interruptedRef.current = true }
@@ -81,11 +97,21 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
 
   const respond = (response: 'left' | 'right') => {
     if (phase === 'practice') {
-      const correct = response === PRACTICE[practiceIndex].correctResponse
-      setPracticeFeedback(correct ? '正确' : '错误')
+      if (practiceAnsweredRef.current) return
+      practiceAnsweredRef.current = true
+      const practiceTrial = PRACTICE[practiceIndex]
+      const correct = response === practiceTrial.correctResponse
+      setPracticeFeedback(correct
+        ? '正确'
+        : `不正确，正确答案是「${responseLabel(practiceTrial.correctResponse)}」`)
       const nextCorrect = practiceCorrect + (correct ? 1 : 0)
-      if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) { setPracticeCorrect(nextCorrect); setPhase('practice-result') }
-      else { setPracticeCorrect(nextCorrect); setPracticeIndex((value) => value + 1) }
+      if (practiceIndex + 1 >= PRACTICE_TRIAL_COUNT) {
+        setPracticeCorrect(nextCorrect)
+        setPhase('practice-result')
+      } else {
+        setPracticeCorrect(nextCorrect)
+        setPracticeIndex((value) => value + 1)
+      }
       return
     }
     if (!visible || responseRef.current || onsetRef.current == null) return
@@ -110,10 +136,46 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
     respond(response)
   }
 
-  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">Flanker 箭头干扰</h2><p className="mb-2 text-gray-600">只判断中央蓝色箭头的方向，忽略两侧灰色箭头。</p><p className="mb-2 text-sm text-gray-500">键盘可使用 ← / →；触控或鼠标按左右按钮。</p><p className="mb-6 text-xs text-gray-400">本任务依赖视觉箭头刺激；刺激的正确方向不会通过辅助文本直接朗读。练习不计入正式成绩，至少答对 3 题才能开始。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-  if (phase === 'practice-result') { const passed = practiceCorrect >= PRACTICE_PASS_CORRECT; return <div className="p-8 text-center"><p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
+  if (phase === 'instruction') {
+    return (
+      <div className="p-4 text-center sm:p-8">
+        <h2 className="mb-3 text-xl font-semibold">Flanker 箭头干扰</h2>
+        <p className="mb-2 text-gray-600">每次会出现 5 个箭头。只判断正中央箭头指向左还是右，忽略两侧箭头。</p>
+        <p className="mb-2 text-sm text-gray-500">正式阶段共 {total} 个试次。请在保证准确的前提下尽快回答。</p>
+        <p className="mb-2 text-sm text-gray-500">键盘可使用 ← / →；触控或鼠标可使用下方左右按钮。</p>
+        <p className="mb-2 text-xs text-gray-400">正式刺激中的 5 个箭头使用相同视觉样式；中央位置是唯一需要判断的目标。</p>
+        <p className="mb-6 text-xs text-gray-400">练习不计入正式成绩，共 {PRACTICE_TRIAL_COUNT} 题，至少答对 {PRACTICE_PASS_CORRECT} 题才能开始。若无法清楚辨认中央箭头方向，请不要进入正式测验，并联系测验组织者。</p>
+        <button className="btn-primary" onClick={startPractice}>开始练习</button>
+      </div>
+    )
+  }
+
+  if (phase === 'practice-result') {
+    const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
+    return (
+      <div className="p-4 text-center sm:p-8">
+        <p className="mb-2">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>
+        {!passed && <p className="mb-4 text-sm text-gray-500">请再次确认：只看正中央箭头，忽略两侧箭头，然后重新练习。</p>}
+        <button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>
+          {passed ? '开始正式测验' : '重新练习'}
+        </button>
+      </div>
+    )
+  }
 
   const current = phase === 'practice' ? PRACTICE[practiceIndex] : sequence[trialIndex]
-  const content = <div className="p-8 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}</p>{phase === 'practice' && practiceFeedback && <p className="mb-3 text-sm">上一题：{practiceFeedback}</p>}<div className={phase === 'formal' && !visible ? 'invisible' : ''}>{current && <ArrowRow trial={current} />}</div><div className="mt-6 flex justify-center gap-6"><button className="btn-secondary min-h-12 px-10" onPointerDown={(event) => onPointerResponse(event, 'left')} onClick={(event) => { if (event.detail === 0) respond('left') }}>← 左</button><button className="btn-secondary min-h-12 px-10" onPointerDown={(event) => onPointerResponse(event, 'right')} onClick={(event) => { if (event.detail === 0) respond('right') }}>右 →</button></div></div>
+  const content = (
+    <div className="p-4 text-center sm:p-8">
+      <p className="mb-4 text-sm text-gray-500">
+        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}
+      </p>
+      {phase === 'practice' && practiceFeedback && <p className="mb-3 text-sm">上一题：{practiceFeedback}</p>}
+      <div className={phase === 'formal' && !visible ? 'invisible' : ''}>{current && <ArrowRow trial={current} />}</div>
+      <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3 sm:gap-6">
+        <button className="btn-secondary min-h-12 px-4 sm:px-10" onPointerDown={(event) => onPointerResponse(event, 'left')} onClick={(event) => { if (event.detail === 0) respond('left') }}>← 左</button>
+        <button className="btn-secondary min-h-12 px-4 sm:px-10" onPointerDown={(event) => onPointerResponse(event, 'right')} onClick={(event) => { if (event.detail === 0) respond('right') }}>右 →</button>
+      </div>
+    </div>
+  )
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Flanker 正式作答">{content}</CognitiveFocusStage> : content
 }
