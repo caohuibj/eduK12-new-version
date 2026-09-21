@@ -4,6 +4,14 @@ import type { CognitiveSingleTaskReport } from './types'
 const profileLabelOf = (profile: CognitiveSingleTaskReport['profile'], explicit?: string | null) =>
   explicit || (profile === 'experience' ? '体验版' : profile === 'research' ? '科研版' : profile === 'standard' ? '正式版' : '')
 
+const PARTICIPANT_METRIC_LABELS: Record<string, string> = {
+  correctPerMinute: '每分钟正确比较数',
+  medianCorrectRtMs: '典型正确反应时间',
+  lapseRate: '未作答比例',
+  correctCount: '正确比较次数',
+  completedTrialCount: '完成比较次数',
+}
+
 const METRIC_EXPLANATIONS: Record<string, string> = {
   medianRtMs: '典型反应速度：多数有效反应所需的时间。',
   rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
@@ -21,9 +29,17 @@ const METRIC_EXPLANATIONS: Record<string, string> = {
   ssrtMs: '停止反应估计时间：根据停止信号模型估计的动作停止时间。',
   switchCostRtMs: '规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。',
   switchCostAccuracy: '准确率转换代价：切换规则时相对重复规则时的正确率变化。',
+  correctPerMinute: '单位时间内正确完成图形比较的数量，应与准确率一起阅读，避免把快速猜测理解为更快的加工速度。',
+  accuracy: '正确率：正式作答中判断正确的比例。',
+  medianCorrectRtMs: '典型正确反应时间：仅统计正确且达到有效反应时间门槛的试次，中位数越小表示本次正确判断通常更快。',
+  lapseRate: '未作答比例：正式试次中未在有效时间内作答的比例。',
+  correctCount: '正确比较次数：本次正式计时内完成并判断正确的试次数。',
+  completedTrialCount: '完成比较次数：本次正式计时内进入评分的试次数。',
 }
 
 const metricExplanation = (key: string) => METRIC_EXPLANATIONS[key]
+const participantMetricLabel = (metric: CognitiveSingleTaskReport['primaryMetrics'][number]) =>
+  PARTICIPANT_METRIC_LABELS[metric.key] ?? metric.label
 
 const CognitiveSingleTaskReportCard: React.FC<{
   report: CognitiveSingleTaskReport
@@ -44,7 +60,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
   const renderMetric = (metric: CognitiveSingleTaskReport['primaryMetrics'][number]) => (
     <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
       <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-      <div className="text-xs font-medium text-gray-500">{metric.label}</div>
+      <div className="text-xs font-medium text-gray-500">{participantMetricLabel(metric)}</div>
       {metricExplanation(metric.key) ? (
         <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric.key)}</p>
       ) : null}
@@ -84,10 +100,19 @@ const CognitiveSingleTaskReportCard: React.FC<{
         )}
       </section>
 
+      {interpretable && report.interpretationSummary ? (
+        <section className="mb-6 text-left">
+          <SectionHeading className="mb-2 text-sm font-semibold text-gray-600">结果概览</SectionHeading>
+          <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm leading-relaxed text-gray-700">
+            {report.interpretationSummary}
+          </div>
+        </section>
+      ) : null}
+
       {interpretable && report.headline && (
         <div className="mb-6 text-center">
           <div className="text-4xl sm:text-5xl font-bold text-primary">{report.headline.formatted}</div>
-          <div className="text-sm font-medium text-gray-500 mt-1">{report.headline.label}</div>
+          <div className="text-sm font-medium text-gray-500 mt-1">{participantMetricLabel(report.headline)}</div>
           {metricExplanation(report.headline.key) ? (
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">{metricExplanation(report.headline.key)}</p>
           ) : null}
