@@ -1,7 +1,6 @@
 import { getScientificEvidenceRecord } from '../assessment-governance/scientific-evidence'
 import { evaluateScientificQualification, type ScientificQualificationDecisionV1 } from '../assessment-governance/scientific-qualification'
 import type { SituationPackage } from './situation-package.registry'
-import { evaluateSituationalProductReadiness } from './product-readiness'
 
 const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
 
@@ -19,7 +18,6 @@ export const evaluateSituationalScientificQualification = (
     && pkg.definition.license.status !== 'unknown'
   )
   return evaluateScientificQualification({
-    productReadiness: evaluateSituationalProductReadiness(pkg),
     // Self-authored/provenanced content is not automatically research-based.
     // Situational Research Ready still requires an explicit literature,
     // research-design, protocol or preregistration evidence pointer.
