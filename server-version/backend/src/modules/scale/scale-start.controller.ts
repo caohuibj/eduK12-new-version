@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, forbidden, instrumentError, notFound, success } from '../../utils/response'
@@ -62,7 +63,9 @@ const responseEnvelope = (assessment: any, scale: any, definition: any, runner: 
     assessment: {
       ...scaleAssessmentForResponse(assessment),
       contextSnapshotHash: admission?.contextSnapshotHash ?? null,
-      contextFrozenAt: admission?.frozenAt ?? null,
+      contextFrozenAt: admission?.schemaVersion === 2
+        ? admission.scalePolicy?.eligibility.contextFrozenAt ?? admission.frozenAt
+        : admission?.frozenAt ?? null,
     },
     scale: {
       id: scale.id,
@@ -122,35 +125,38 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       return success(res, responseEnvelope(existing, scale, definition, runner), '继续未完成的测评')
     }
 
-    const frozenAt = new Date()
-    const context = buildStandaloneContext(contextInput.data, frozenAt)
-    const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(prisma as any, {
-      instrumentKey: scale.code,
-      instrumentVersion: scale.instrumentVersion,
-      definition,
-      frozenAt,
-    })
-    const admission = await standaloneAdmissionPersistenceForRuntime({
-      db: prisma,
-      attemptEpoch: 1,
-      userId,
-      scale: {
-        id: scale.id,
-        code: scale.code,
-        name: scale.name,
-        instrumentVersion: scale.instrumentVersion,
-        instrumentClass: scale.instrumentClass,
-        status: scale.status,
-      },
-      runtime: runtimeSnapshot,
-      contextSnapshotHash: context.hash,
-      contextValues: context.context?.values ?? null,
-      contextFrozenAt: context.context?.frozenAt ?? null,
-    })
-
     let assessment
     try {
       assessment = await prisma.$transaction(async (tx) => {
+        // Resolve the mutable new-start control plane and persist the immutable
+        // runtime/admission inside one Serializable transaction. A concurrent
+        // grant/deployment change must therefore conflict rather than slipping
+        // through between preflight and attempt creation.
+        const frozenAt = new Date()
+        const context = buildStandaloneContext(contextInput.data, frozenAt)
+        const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
+          instrumentKey: scale.code,
+          instrumentVersion: scale.instrumentVersion,
+          definition,
+          frozenAt,
+        })
+        const admission = await standaloneAdmissionPersistenceForRuntime({
+          db: tx,
+          attemptEpoch: 1,
+          userId,
+          scale: {
+            id: scale.id,
+            code: scale.code,
+            name: scale.name,
+            instrumentVersion: scale.instrumentVersion,
+            instrumentClass: scale.instrumentClass,
+            status: scale.status,
+          },
+          runtime: runtimeSnapshot,
+          contextSnapshotHash: context.hash,
+          contextValues: context.context?.values ?? null,
+          contextFrozenAt: context.context?.frozenAt ?? null,
+        })
         const created = await tx.assessment.create({
           data: {
             scaleId,
@@ -172,8 +178,11 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         })
         await retainFrozenScaleAssessmentImages({ assessmentId: created.id, snapshot: runtimeSnapshot, db: tx as never })
         return created
-      })
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
     } catch (err: any) {
+      // The partial unique index remains the final concurrent-start boundary.
+      // Serializable conflicts are surfaced as retryable request failures rather
+      // than silently falling back to a stale policy decision.
       if (err?.code !== 'P2002') throw err
       assessment = await prisma.assessment.findFirst({
         where: {
