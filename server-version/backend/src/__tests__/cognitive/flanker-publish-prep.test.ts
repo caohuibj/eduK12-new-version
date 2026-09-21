@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
 import { resolveCognitiveProtocolPresentation } from '../../modules/cognitive/protocol-presentation'
+import { flankerSequence } from '../../modules/cognitive/randomization'
 import {
   freezeAssignmentProfile,
   readFrozenReport,
@@ -53,9 +54,19 @@ const build = (profile: 'standard' | 'research') => buildCognitiveSingleTaskRepo
 })
 
 describe('Flanker publish-prep protocol presentation', () => {
-  it('keeps a lower-burden Pilot dose and a doubled Research Ready dose', () => {
+  it('keeps balanced Pilot and Research Ready doses', () => {
     expect(entry.profiles.standard.configPatch).toMatchObject({ totalTrials: 80 })
     expect(entry.profiles.research.configPatch).toMatchObject({ totalTrials: 160 })
+
+    for (const totalTrials of [80, 160]) {
+      const sequence = flankerSequence('publish-prep-balance', totalTrials)
+      const count = (target: 'left' | 'right', flanker: 'left' | 'right') => sequence
+        .filter((trial) => trial.targetDirection === target && trial.flankerDirection === flanker).length
+      expect(count('left', 'left')).toBe(totalTrials / 4)
+      expect(count('right', 'right')).toBe(totalTrials / 4)
+      expect(count('left', 'right')).toBe(totalTrials / 4)
+      expect(count('right', 'left')).toBe(totalTrials / 4)
+    }
   })
 
   it('maps the reviewed exact identity to Pilot and Research Ready tiers', () => {
