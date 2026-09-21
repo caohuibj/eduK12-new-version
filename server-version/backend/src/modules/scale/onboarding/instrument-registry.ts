@@ -1,5 +1,6 @@
 import { GENERATED_SCALE_INSTRUMENT_SOURCES } from './instruments.generated'
 import { compileScalePolicy, type CompiledScalePolicyV1 } from '../policy/compile'
+import { parseScaleInstrumentSourceSchema } from './schema'
 import { projectScalePackage } from './define-instrument'
 import { materializeCatalogManifest, materializeLocalizationManifest, validateScaleInstrumentSource } from './validate-instrument'
 import './executable-registry'
@@ -22,7 +23,8 @@ export interface ScaleInstrumentRegistry {
 
 export const createScaleInstrumentRegistry = (sources: readonly ScaleInstrumentSourceV1[]): ScaleInstrumentRegistry => {
   const byIdentity = new Map<string, ScaleInstrumentSourceV1>()
-  sources.forEach((source) => {
+  sources.forEach((input) => {
+    const source = parseScaleInstrumentSourceSchema(input)
     const key = identityKey(source)
     if (byIdentity.has(key)) throw new Error(`Duplicate ScaleInstrumentSource identity: ${key}`)
     const validation = validateScaleInstrumentSource(source)

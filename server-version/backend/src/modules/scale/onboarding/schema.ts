@@ -63,6 +63,12 @@ export const scaleInstrumentSourceV1Schema = z.object({
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
+  scientificReview: z.object({
+    schemaVersion: z.literal(1), reviewer: z.string().trim().min(1), reviewedAt: z.string().datetime({ offset: true }),
+    approvedMaturity: z.enum(['RESEARCH_READY', 'RESEARCH_GRADE']), territory: z.string().regex(/^[A-Z]{2}$/),
+    intendedUses: z.array(z.enum(['RESEARCH', 'INDIVIDUAL_REFLECTION', 'PROGRESS_MONITORING', 'PROGRAM_EVALUATION', 'SCREENING'])).min(1),
+    evidenceIds: z.array(z.string().min(1)).min(1), scopeHash: z.string().regex(/^[0-9a-f]{64}$/),
+  }).strict().optional(),
   candidatePreview: z.object({
     status: z.literal('CATALOG_ONLY'),
     source: z.object({

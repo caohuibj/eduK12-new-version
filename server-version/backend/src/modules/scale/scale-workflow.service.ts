@@ -20,7 +20,7 @@ import {
 } from '../assessment-reference/reference'
 import { DISCLOSURE_PRESETS } from './policy/disclosure'
 import type { DisclosureCapabilitiesV1, ScaleDisclosureAudience } from './policy/types'
-import { parseVersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot-v2'
+import { decryptFrozenScaleRuntimeSnapshot, parseVersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { projectScaleAttemptForResume, projectScaleCompletedResponse } from './projection/scale-attempt.projector'
 import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from './projection/policy-resolver'
 import type { ScaleProjectionPurpose, ScaleRelationalDisposition } from './projection/types'
@@ -154,11 +154,13 @@ export interface ScaleResponseProjectionOptions {
 }
 
 const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null) => {
-  const snapshotRead = readJsonField<Record<string, unknown>>(assessment?.runtimeSnapshotEncrypted)
-  if (snapshotRead.decryptError) return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }
-  if (snapshotRead.value) {
+  const storedSnapshot = assessment?.runtimeSnapshotEncrypted
+  if (storedSnapshot !== null && storedSnapshot !== undefined) {
     try {
-      const snapshot = parseVersionedFrozenScaleRuntimeSnapshot(snapshotRead.value)
+      // Runtime snapshots use the unified encrypted envelope, unlike result JSON.
+      const snapshot = typeof storedSnapshot === 'string'
+        ? decryptFrozenScaleRuntimeSnapshot(storedSnapshot)
+        : parseVersionedFrozenScaleRuntimeSnapshot(storedSnapshot)
       if (snapshot.schemaVersion === 2) return { policy: scaleProjectionPolicyFromCompiled(snapshot.compiledPolicy), snapshotError: false }
     } catch {
       return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }

@@ -8,7 +8,7 @@
     "scale:instruments:generate": "tsx scripts/generate-scale-instruments.ts",
     "scale:instruments:check": "tsx scripts/generate-scale-instruments.ts --check",
     "scale:instrument:install": "tsx src/scripts/install-scale-instrument.ts",
-    "build": "npm run scale:instruments:check && tsc",
+    "build": "npm run scale:instruments:check && npm run scale:onboarding:check && npm run scale:qualification:check && tsc",
     "start": "node dist/index.js",
     "start:worker": "node dist/workers/main.js",
     "db:migrate": "prisma migrate dev",
@@ -36,7 +36,10 @@
     "release:verify:local": "bash ../scripts/release-verify-local.sh",
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend",
     "scale:onboarding:audit": "tsx src/scripts/scale-onboarding-backfill.ts --audit",
-    "scale:onboarding:backfill": "tsx src/scripts/scale-onboarding-backfill.ts"
+    "scale:onboarding:backfill": "tsx src/scripts/scale-onboarding-backfill.ts",
+    "scale:instrument:publish": "tsx src/scripts/publish-scale-instrument.ts",
+    "scale:onboarding:check": "node scripts/scale-onboarding-check.mjs",
+    "scale:qualification:check": "tsx scripts/check-scale-source-qualification.ts"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",

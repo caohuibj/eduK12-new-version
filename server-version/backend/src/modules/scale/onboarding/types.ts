@@ -85,6 +85,20 @@ export interface ScaleInstrumentSourceV1 {
   disclosure?: AudienceDisclosurePolicyV1
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1
+  scientificReview?: ScaleScientificReviewV1
   candidatePreview?: ScaleCatalogOnlyPreviewV1
   executable?: ScaleExecutableSourceV1
+}
+
+/** Human-reviewed claim; excluded from executable and runtime policy identity. */
+export interface ScaleScientificReviewV1 {
+  schemaVersion: 1
+  reviewer: string
+  reviewedAt: string
+  approvedMaturity: 'RESEARCH_READY' | 'RESEARCH_GRADE'
+  territory: string
+  intendedUses: ScaleCatalogManifestV1['intendedUse']['intendedUses'][number]['use'][]
+  evidenceIds: string[]
+  /** Hash binds the exact executable, localization, population, uses and selected evidence. */
+  scopeHash: string
 }

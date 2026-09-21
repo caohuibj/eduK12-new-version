@@ -188,6 +188,7 @@ const buildResult = async (
 }
 
 const txAdmissionSelect = {
+  runtimeSnapshotEncrypted: true,
   id: true,
   status: true,
   deliveryMode: true,
