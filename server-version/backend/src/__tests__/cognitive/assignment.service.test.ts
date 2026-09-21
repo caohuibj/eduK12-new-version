@@ -133,7 +133,7 @@ describe('listPublishedConfigs', () => {
     }))
   })
 
-  it('hides database-published configs whose v2 definition is still Draft', async () => {
+  it('keeps a database-published config even when legacy v2 compatibility metadata is Draft', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
       id: 'fake-config',
       testType: 'fake',
@@ -142,7 +142,7 @@ describe('listPublishedConfigs', () => {
       status: 'PUBLISHED',
     }])
 
-    await expect(listPublishedConfigs('admin-1', ADMIN)).resolves.toEqual([])
+    await expect(listPublishedConfigs('admin-1', ADMIN)).resolves.toHaveLength(1)
   })
 
   it('keeps a database-published config whose exact v2 definition is Published', async () => {
@@ -435,21 +435,34 @@ describe('publishAssignment / archiveAssignment', () => {
     expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
   })
 
-  it('rejects a database-published config when its exact v2 definition is Draft', async () => {
-    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ ...assignment, course })
+  it('publishes from DB-published config even when legacy v2 compatibility metadata is Draft', async () => {
+    mockPrisma.cognitiveAssignment.findUnique
+      .mockResolvedValueOnce({ ...assignment, course })
+      .mockResolvedValueOnce({ ...assignment, status: 'PUBLISHED', publishedAt: new Date() })
     mockPrisma.course.findUnique.mockResolvedValue(course)
     mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
+    mockPrisma.cognitiveAssignment.updateMany.mockResolvedValue({ count: 1 })
 
-    await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({
-      statusCode: 400,
-      message: expect.stringMatching(/publication\.status must be PUBLISHED/),
-    })
-    expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+    await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).resolves.toMatchObject({ status: 'PUBLISHED' })
+    expect(mockPrisma.cognitiveAssignment.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'asg-1', status: 'DRAFT' },
+        data: expect.objectContaining({ status: 'PUBLISHED' }),
+      }),
+    )
   })
 
-  it('rejects new report-package materialization for a database-published but v2-Draft config', async () => {
+  it('materializes a new report-package wrapper from DB-published config regardless of legacy v2 compatibility status', async () => {
+    const wrapper = {
+      ...assignment,
+      status: 'PUBLISHED' as const,
+      listedStandalone: false,
+      publishedAt: new Date(),
+    }
     mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(config)
     mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+    mockPrisma.cognitiveAssignment.create.mockResolvedValue(wrapper)
 
     await expect(ensureTeacherPublishedAssignment(mockPrisma as any, {
       userId: 'teacher-1',
@@ -458,11 +471,15 @@ describe('publishAssignment / archiveAssignment', () => {
       title: 'Fake package slot',
       instruction: null,
       profile: 'standard',
-    })).rejects.toMatchObject({
-      statusCode: 400,
-      message: expect.stringMatching(/publication\.status must be PUBLISHED/),
-    })
-    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+    })).resolves.toMatchObject({ status: 'PUBLISHED', listedStandalone: false })
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        configId: 'config-1',
+        status: 'PUBLISHED',
+        listedStandalone: false,
+        profile: 'standard',
+      }),
+    }))
   })
 
   it('rejects publishing a non-DRAFT', async () => {

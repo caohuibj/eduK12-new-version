@@ -21,7 +21,7 @@ export interface RegistryReferenceEligibilityIssue {
   message: string
 }
 
-/** Validate the exact RegistryEntry-owned reference allowlist before publication. */
+/** Validate the exact RegistryEntry-owned reference allowlist independently of release state. */
 export const validateRegistryReferenceEligibility = (entry: {
   metricDefinitions: Record<string, { valueType: string; role: string }>
   referenceEligibleMetricKeys?: unknown
@@ -56,11 +56,7 @@ export const validateRegistryReferenceEligibility = (entry: {
 }
 
 const profileList: CognitiveProfile[] = ['experience', 'standard', 'research']
-
-const nonDegradingProvenanceQualityFlags = new Set([
-  'deviceInfoIncomplete',
-  'mixedPointerType',
-])
+const nonDegradingProvenanceQualityFlags = new Set(['deviceInfoIncomplete', 'mixedPointerType'])
 
 const qualityEffect = (key: string): QualityDefinition['effect'] => {
   if (nonDegradingProvenanceQualityFlags.has(key)) return 'none'
@@ -69,10 +65,7 @@ const qualityEffect = (key: string): QualityDefinition['effect'] => {
   return 'limited'
 }
 
-const metricVisibility = (
-  key: string,
-  entry: AnyRegistryEntry,
-): MetricDefinition['visibility'] => {
+const metricVisibility = (key: string, entry: AnyRegistryEntry): MetricDefinition['visibility'] => {
   const report = entry.reportDefinition
   if (key === report.headlineMetric) return 'headline'
   if (report.primaryMetrics.includes(key)) return 'user'
@@ -81,18 +74,13 @@ const metricVisibility = (
 }
 
 const metricCategory = (key: string, entry: AnyRegistryEntry): string => {
-  const mapping = listCognitiveEvidenceMappingsForTask(
-    entry.testType,
-    entry.engineVersion,
-    entry.scoringVersion,
-  ).find((candidate) => candidate.metricKey === key)
+  const mapping = listCognitiveEvidenceMappingsForTask(entry.testType, entry.engineVersion, entry.scoringVersion)
+    .find((candidate) => candidate.metricKey === key)
   return mapping?.domain ?? entry.metricDefinitions[key]?.construct ?? entry.category
 }
 
 const adaptMetricDefinitions = (entry: AnyRegistryEntry): Record<string, MetricDefinition> => {
-  const eligibleMetricKeys = new Set(
-    Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys : [],
-  )
+  const eligibleMetricKeys = new Set(Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys : [])
   return Object.fromEntries(Object.entries(entry.metricDefinitions).map(([key, metric]) => [key, {
     key,
     label: metric.label,
@@ -129,8 +117,7 @@ const adaptQualityDefinitions = (entry: AnyRegistryEntry): Record<string, Qualit
 })
 
 const adaptReportDefinition = (entry: AnyRegistryEntry, metrics: Record<string, MetricDefinition>): ReportDefinition => {
-  const headline = entry.reportDefinition.headlineMetric
-    ?? entry.reportDefinition.primaryMetrics[0]
+  const headline = entry.reportDefinition.headlineMetric ?? entry.reportDefinition.primaryMetrics[0]
   const primary = entry.reportDefinition.primaryMetrics.filter((key) => key !== headline && metrics[key])
   const details = [
     ...entry.reportDefinition.secondaryMetrics,
@@ -149,7 +136,6 @@ const adaptReportDefinition = (entry: AnyRegistryEntry, metrics: Record<string, 
 }
 
 const phasefulTasks = new Set(['picturesequence', 'pairedassociate', 'wordlist'])
-
 const adaptProtocol = (entry: AnyRegistryEntry) => ({
   schemaVersion: 1 as const,
   key: `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`,
@@ -166,9 +152,27 @@ const adaptProtocol = (entry: AnyRegistryEntry) => ({
   measurementCriticalConfigPaths: ['*'],
 })
 
+const LEGACY_SUPERSEDED_IDENTITIES = new Set([
+  'reaction/1.0.0/1.0.0',
+  'memory/1.0.0/1.0.0',
+  'stroop/1.0.0/1.0.0',
+])
+
+/**
+ * Deprecated compatibility projection for historical audits/fixtures only.
+ * It is not consulted by assignment selection, publish/retire transitions,
+ * MaterialGrant, Composite availability, or any other product release path.
+ */
+const legacyCompatibilityStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' | 'RETIRED' => {
+  if (entry.testType === 'fake') return 'DRAFT'
+  const identity = `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+  if (LEGACY_SUPERSEDED_IDENTITIES.has(identity)) return 'RETIRED'
+  return 'PUBLISHED'
+}
+
 export const buildCognitiveV2TaskDefinition = (
   entry: AnyRegistryEntry,
-  publicationStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED' = 'DRAFT',
+  legacyPublicationStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED' = legacyCompatibilityStatus(entry),
 ): TaskDefinition<unknown, unknown> => {
   const metrics = adaptMetricDefinitions(entry)
   const quality = adaptQualityDefinitions(entry)
@@ -180,9 +184,7 @@ export const buildCognitiveV2TaskDefinition = (
     category: entry.category,
     engineVersion: entry.engineVersion,
     scoringVersion: entry.scoringVersion,
-    ...(entry.presentation
-      ? { presentation: parseCognitivePresentationDefinition(entry.presentation) }
-      : {}),
+    ...(entry.presentation ? { presentation: parseCognitivePresentationDefinition(entry.presentation) } : {}),
     configSchema: entry.configSchema,
     trialSchema: entry.trialSchema,
     protocol,
@@ -214,35 +216,15 @@ export const buildCognitiveV2TaskDefinition = (
     references: [],
     report: adaptReportDefinition(entry, metrics),
     publication: {
-      status: publicationStatus,
+      status: legacyPublicationStatus,
       referenceRequired: false,
-      evidenceNote: 'Scientific evidence/reference maturity is governed separately from Product Release.',
+      evidenceNote: 'DEPRECATED compatibility metadata only; CognitiveTestConfig.status is the product release authority.',
     },
   }
 }
 
-const SUPERSEDED_IDENTITIES = new Set([
-  'reaction/1.0.0/1.0.0',
-  'memory/1.0.0/1.0.0',
-  'stroop/1.0.0/1.0.0',
-])
-
-/**
- * Product lifecycle is executable-state only. `recommendedForCreate` remains a
- * catalog/recommendation signal and does not demote a complete task to DRAFT.
- * Legacy scorer identities stay readable for frozen attempts but are RETIRED
- * for new product use. `fake` is test infrastructure and never a real product.
- */
-const defaultStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' | 'RETIRED' => {
-  if (entry.testType === 'fake') return 'DRAFT'
-  const identity = `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
-  if (SUPERSEDED_IDENTITIES.has(identity)) return 'RETIRED'
-  return 'PUBLISHED'
-}
-
 export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
-  listCognitiveRegistryEntries()
-    .map((entry) => buildCognitiveV2TaskDefinition(entry, defaultStatus(entry)))
+  listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry))
 
 export const getCognitiveV2TaskDefinition = (
   testType: string,
@@ -250,5 +232,5 @@ export const getCognitiveV2TaskDefinition = (
   scoringVersion: string,
 ): TaskDefinition<unknown, unknown> | undefined => {
   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
-  return entry ? buildCognitiveV2TaskDefinition(entry, defaultStatus(entry)) : undefined
+  return entry ? buildCognitiveV2TaskDefinition(entry) : undefined
 }

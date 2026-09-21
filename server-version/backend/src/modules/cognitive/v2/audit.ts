@@ -9,6 +9,7 @@ import type { TaskDefinition } from './types'
 
 export interface CognitiveAuditEntry {
   key: string
+  /** Deprecated compatibility projection; never use as product availability truth. */
   status: TaskDefinition['publication']['status']
   protocolSignature: string
   scorerCovered: boolean
@@ -21,6 +22,7 @@ export interface CognitiveAuditReport {
   status: 'PASS' | 'FAIL'
   generatedAt: string
   registryCount: number
+  /** Compatibility-only counts retained for historical audit consumers. */
   publishedCount: number
   draftCount: number
   retiredCount: number
@@ -28,14 +30,11 @@ export interface CognitiveAuditReport {
   issues: PublicationIssue[]
 }
 
-const taskKey = (definition: TaskDefinition): string => (
-  `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
-)
-
-const registryKey = (entry: { testType: string; engineVersion: string; scoringVersion: string }): string => (
+const taskKey = (definition: TaskDefinition): string => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
+const registryKey = (entry: { testType: string; engineVersion: string; scoringVersion: string }): string =>
   `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
-)
 
+/** Audit executable contracts. Lifecycle fields in this report are compatibility diagnostics only. */
 export const auditCognitiveV2Registry = (
   definitions = listCognitiveV2TaskDefinitions(),
 ): CognitiveAuditReport => {
@@ -59,14 +58,16 @@ export const auditCognitiveV2Registry = (
     seen.add(key)
     const signature = computeProtocolSignature(definition.protocol)
     const attachedSignature = (definition as TaskDefinition & { protocolSignature?: string }).protocolSignature
-    if (attachedSignature) {
-      // Task definitions do not persist a signature; this branch is reserved
-      // for consumers that attach one while auditing a frozen catalog.
-      if (attachedSignature !== signature) entryIssues.push({ path: 'protocolSignature', message: 'protocol signature does not match protocol', severity: 'error' })
+    if (attachedSignature && attachedSignature !== signature) {
+      entryIssues.push({ path: 'protocolSignature', message: 'protocol signature does not match protocol', severity: 'error' })
     }
     if (typeof definition.scorer !== 'function') entryIssues.push({ path: 'scorer', message: 'authoritative scorer is not callable', severity: 'error' })
     if (definition.publication.status === 'PUBLISHED' && definition.references.length === 0) {
-      entryIssues.push({ path: 'references', message: 'published task has no metric-specific reference mapping; publication remains allowed but report must remain non-normative', severity: 'warning' })
+      entryIssues.push({
+        path: 'references',
+        message: 'compatibility status is PUBLISHED but task has no metric-specific reference mapping; product release remains independent and report must remain non-normative',
+        severity: 'warning',
+      })
     }
     return {
       key,

@@ -14,32 +14,13 @@ export const COGNITIVE_V2_SCHEMA_VERSION = 1 as const
 export const COGNITIVE_V2_TRIAL_ENVELOPE_VERSION = 1 as const
 
 export type CognitiveProfile = 'experience' | 'standard' | 'research'
-
 export type CognitivePhase = 'test' | 'learning' | 'delayed'
-
 export type QualityState = 'interpretable' | 'limited' | 'invalid'
-
 export type MetricVisibility = 'headline' | 'user' | 'detail' | 'research_only' | 'hidden'
-
-export type MetricDirection =
-  | 'higher_is_better'
-  | 'lower_is_better'
-  | 'target_range'
-  | 'descriptive'
-  | 'signed'
-
+export type MetricDirection = 'higher_is_better' | 'lower_is_better' | 'target_range' | 'descriptive' | 'signed'
 export type MetricRole = 'primary' | 'secondary' | 'quality' | 'research_only'
-
 export type MetricValueType = 'number' | 'integer' | 'object' | 'array'
-
-export type MetricUnit =
-  | 'ms'
-  | 'ratio'
-  | 'count'
-  | 'd-prime'
-  | 'level'
-  | 'score'
-  | 'map'
+export type MetricUnit = 'ms' | 'ratio' | 'count' | 'd-prime' | 'level' | 'score' | 'map'
 
 export interface MetricDefinition {
   key: string
@@ -93,11 +74,7 @@ export interface TrialFlags {
   premature: boolean
 }
 
-export type TrialQualityEvent =
-  | 'visibility_lost'
-  | 'window_blur'
-  | 'resume'
-  | 'runner_restart'
+export type TrialQualityEvent = 'visibility_lost' | 'window_blur' | 'resume' | 'runner_restart'
 
 export interface TrialEnvelope<TPayload = unknown> {
   schemaVersion: typeof COGNITIVE_V2_TRIAL_ENVELOPE_VERSION
@@ -147,10 +124,7 @@ export interface CognitiveScoreResult {
   metrics: Record<string, unknown>
   quality: QualityAssessment
   /** Audit metadata only; this is not a user-facing product/index score. */
-  audit: {
-    trialCount: number
-    scorerVersion: string
-  }
+  audit: { trialCount: number; scorerVersion: string }
 }
 
 export interface CognitiveAssessmentContextReference {
@@ -181,9 +155,7 @@ export interface AuthoritativeScorerInput<TConfig, TTrial> {
   randomSeed: string
 }
 
-export type AuthoritativeScorer<TConfig, TTrial> = (
-  input: AuthoritativeScorerInput<TConfig, TTrial>,
-) => CognitiveScoreResult
+export type AuthoritativeScorer<TConfig, TTrial> = (input: AuthoritativeScorerInput<TConfig, TTrial>) => CognitiveScoreResult
 
 export interface ReferenceApplicability {
   metricKey: string
@@ -215,14 +187,23 @@ export interface ReportDefinition {
   practicalTips: string[]
 }
 
-export interface TaskPublicationDefinition {
+/**
+ * @deprecated Non-authoritative compatibility projection for legacy audits and
+ * fixtures only. Never use this object to decide product availability. The
+ * sole product lifecycle truth is CognitiveTestConfig.status.
+ */
+export interface TaskPublicationCompatibility {
   status: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
   publishedAt?: string
-  /** Published tasks may legitimately have no eligible reference. */
   referenceRequired: boolean
   evidenceNote: string
 }
 
+/**
+ * Executable/scoring/report contract for one exact Cognitive identity.
+ * `publication` is retained only as a deprecated compatibility projection;
+ * product lifecycle authorization must come from CognitiveTestConfig.status.
+ */
 export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   schemaVersion: typeof COGNITIVE_V2_SCHEMA_VERSION
   testType: string
@@ -230,7 +211,6 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   category: string
   engineVersion: string
   scoringVersion: string
-  /** Optional static image presentation. Absence preserves existing task identity. */
   presentation?: CognitivePresentationDefinitionV1
   configSchema: ZodType<TConfig>
   trialSchema: ZodType<TTrial>
@@ -246,7 +226,8 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   quality: Record<string, QualityDefinition>
   references: ReferenceApplicability[]
   report: ReportDefinition
-  publication: TaskPublicationDefinition
+  /** @deprecated Compatibility metadata only; never a release gate. */
+  publication: TaskPublicationCompatibility
 }
 
 /** Used by the reference adapter without copying shared reference definitions. */
