@@ -200,14 +200,21 @@ const availableContextKeys = (values: AssessmentContextValues | null) => (
     : []
 )
 
-const respondentTypeFor = (respondentType: string | null | undefined): ScalePolicyRespondentType => {
-  const normalized = respondentType?.toUpperCase()
+export const resolveScalePolicyRespondentType = (input: {
+  respondentType?: string | null
+  subjectUserId?: string | null
+  respondentUserId?: string | null
+}): ScalePolicyRespondentType | 'UNKNOWN' => {
+  const normalized = input.respondentType?.toUpperCase()
   if (normalized === 'PARENT' || normalized === 'TEACHER' || normalized === 'OBSERVER' || normalized === 'CLINICIAN' || normalized === 'SELF') {
     return normalized
   }
-  // Missing relational metadata means a participant/self surface, never a
-  // guessed parent/teacher role. Observer policies therefore fail closed.
-  return 'SELF'
+  const subject = input.subjectUserId ?? null
+  const respondent = input.respondentUserId ?? null
+  if ((subject === null && respondent === null) || (subject !== null && subject === respondent)) return 'SELF'
+  // A relational binding with an unclassified or asymmetric respondent must
+  // never be widened into SELF. Eligibility treats UNKNOWN as indeterminate.
+  return 'UNKNOWN'
 }
 
 const policyRequiresContext = (runtime: Extract<VersionedFrozenScaleRuntimeSnapshot, { schemaVersion: 2 }>): boolean => {
@@ -279,7 +286,11 @@ export const createScaleAdmissionForRuntime = async (input: {
   }
 
   const eligibility = evaluateInstrumentEligibility(input.runtime.compiledPolicy.applicability, {
-    respondentType: respondentTypeFor(input.respondentType),
+    respondentType: resolveScalePolicyRespondentType({
+      respondentType: input.respondentType,
+      subjectUserId: input.subjectUserId,
+      respondentUserId: input.respondentUserId,
+    }),
     subject: {
       ageMonths: input.contextValues?.ageMonthsAtFreeze,
       gradeLevel: input.contextValues?.gradeLevel,
