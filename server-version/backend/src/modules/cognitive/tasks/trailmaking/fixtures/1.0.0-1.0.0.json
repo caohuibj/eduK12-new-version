@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "trailmaking",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "form": "AB",
+          "partAItemCount": 8,
+          "partBItemCount": 8,
+          "stepTimeoutMs": 15000,
+          "stimulusSetVersion": "trailmaking-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "trailmaking-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-01",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-02",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-03",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-04",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-05",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-06",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-07",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-08",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-01",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-02",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-03",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-04",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-05",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-06",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-07",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "B-08",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 99,
+        "metrics": {
+          "completionTimeMs": 1600,
+          "partACompletionTimeMs": 800,
+          "partBCompletionTimeMs": 800,
+          "setShiftCostMs": 0,
+          "errorCount": 0,
+          "errorRate": 0,
+          "meanCorrectStepTimeMs": 100,
+          "completedStepCount": 16,
+          "omissionRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCompletedSteps": false,
+          "excessiveErrors": false,
+          "timeLimitReached": false,
+          "deviceInfoIncomplete": false,
+          "mixedPointerType": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "form": "AB",
+          "partAItemCount": 8,
+          "partBItemCount": 8,
+          "stepTimeoutMs": 15000,
+          "stimulusSetVersion": "trailmaking-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "trailmaking-golden-v1",
+        "trials": []
+      },
+      "expectedError": "trailmaking v1 expects exactly 16 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "form": "AB",
+          "partAItemCount": 8,
+          "partBItemCount": 8,
+          "stepTimeoutMs": 15000,
+          "stimulusSetVersion": "trailmaking-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "trailmaking-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "attempts": [
+                {
+                  "targetId": "A-01",
+                  "atMs": 100,
+                  "pointerType": "mouse"
+                }
+              ],
+              "deviceClass": "desktop",
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "trailmaking v1 expects exactly 16 trials, got 1"
+    }
+  ]
+}

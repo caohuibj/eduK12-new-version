@@ -101,7 +101,7 @@ export interface RegistryEntry<TConfig, TTrial> {
     randomSeed?: string
   }): CognitiveScoreResult
   profileDefinitionVersion: string
-  profiles: Record<CognitiveProfile, CognitiveProfileDefinition>
+  profiles: Partial<Record<CognitiveProfile, CognitiveProfileDefinition>>
   metricDefinitionVersion: string
   metricDefinitions: Record<string, MetricDefinition>
   /** Exact reference-governance allowlist; omitted eligibility is impossible and empty is fail-closed. */

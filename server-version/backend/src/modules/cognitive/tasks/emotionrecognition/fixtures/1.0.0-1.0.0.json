@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "emotionrecognition",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "stimulusMs": 3000,
+          "trialTimeoutMs": 5000,
+          "isiMs": 300,
+          "validRtFloorMs": 200,
+          "emotionCategoryVersion": "basic-emotion-6-v1.0.0",
+          "stimulusSetVersion": "emotion-faces-ai-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-emotionrecognition-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "stimulusId": "emotion-identity-04-angry",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "angry",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "stimulusId": "emotion-identity-02-angry",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "angry",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "stimulusId": "emotion-identity-03-surprise",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "surprise",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "stimulusId": "emotion-identity-02-sad",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "sad",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "stimulusId": "emotion-identity-03-disgust",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "disgust",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "stimulusId": "emotion-identity-01-happy",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "happy",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "stimulusId": "emotion-identity-01-fear",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "fear",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "stimulusId": "emotion-identity-01-surprise",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "surprise",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "stimulusId": "emotion-identity-04-fear",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "fear",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "stimulusId": "emotion-identity-04-disgust",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "disgust",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "stimulusId": "emotion-identity-03-happy",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "happy",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "stimulusId": "emotion-identity-02-disgust",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "disgust",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "stimulusId": "emotion-identity-04-surprise",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "surprise",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "stimulusId": "emotion-identity-02-happy",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "happy",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "stimulusId": "emotion-identity-04-sad",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "sad",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "stimulusId": "emotion-identity-04-happy",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "happy",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "stimulusId": "emotion-identity-03-angry",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "angry",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "stimulusId": "emotion-identity-01-angry",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "angry",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "stimulusId": "emotion-identity-03-sad",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "sad",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "stimulusId": "emotion-identity-02-fear",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "fear",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "stimulusId": "emotion-identity-02-surprise",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "surprise",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "stimulusId": "emotion-identity-01-sad",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "sad",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "stimulusId": "emotion-identity-01-disgust",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "disgust",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "stimulusId": "emotion-identity-03-fear",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "fear",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "balancedAccuracy": 1,
+          "accuracyByEmotion": {
+            "happy": 1,
+            "sad": 1,
+            "angry": 1,
+            "fear": 1,
+            "disgust": 1,
+            "surprise": 1
+          },
+          "confusionMatrix": {
+            "happy": {
+              "happy": 4,
+              "sad": 0,
+              "angry": 0,
+              "fear": 0,
+              "disgust": 0,
+              "surprise": 0
+            },
+            "sad": {
+              "happy": 0,
+              "sad": 4,
+              "angry": 0,
+              "fear": 0,
+              "disgust": 0,
+              "surprise": 0
+            },
+            "angry": {
+              "happy": 0,
+              "sad": 0,
+              "angry": 4,
+              "fear": 0,
+              "disgust": 0,
+              "surprise": 0
+            },
+            "fear": {
+              "happy": 0,
+              "sad": 0,
+              "angry": 0,
+              "fear": 4,
+              "disgust": 0,
+              "surprise": 0
+            },
+            "disgust": {
+              "happy": 0,
+              "sad": 0,
+              "angry": 0,
+              "fear": 0,
+              "disgust": 4,
+              "surprise": 0
+            },
+            "surprise": {
+              "happy": 0,
+              "sad": 0,
+              "angry": 0,
+              "fear": 0,
+              "disgust": 0,
+              "surprise": 4
+            }
+          },
+          "medianRtMs": 300,
+          "omissionRate": 0,
+          "validResponseCount": 24
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientPerCategory": false,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "stimulusMs": 3000,
+          "trialTimeoutMs": 5000,
+          "isiMs": 300,
+          "validRtFloorMs": 200,
+          "emotionCategoryVersion": "basic-emotion-6-v1.0.0",
+          "stimulusSetVersion": "emotion-faces-ai-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-emotionrecognition-golden",
+        "trials": []
+      },
+      "expectedError": "emotionrecognition v1 expects exactly 24 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "stimulusMs": 3000,
+          "trialTimeoutMs": 5000,
+          "isiMs": 300,
+          "validRtFloorMs": 200,
+          "emotionCategoryVersion": "basic-emotion-6-v1.0.0",
+          "stimulusSetVersion": "emotion-faces-ai-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-emotionrecognition-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "stimulusId": "emotion-identity-04-angry",
+              "stimulusVersion": "emotion-faces-ai-zh-v1.0.0",
+              "responseEmotion": "angry",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "emotionrecognition v1 expects exactly 24 trials, got 1"
+    }
+  ]
+}

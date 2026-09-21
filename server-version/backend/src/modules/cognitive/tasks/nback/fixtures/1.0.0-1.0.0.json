@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "nback",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "nLevels": [
+            1
+          ],
+          "trialCountByN": [
+            16
+          ],
+          "blockCountByN": [
+            1
+          ],
+          "targetRatio": 0.3,
+          "stimulusMs": 400,
+          "isiMs": 800,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-nback",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "X",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "X",
+              "target": true,
+              "responded": true,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "G",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "G",
+              "target": true,
+              "responded": true,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "D",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "D",
+              "target": true,
+              "responded": true,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "X",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "S",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "D",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "T",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "Q",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "B",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "V",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "V",
+              "target": true,
+              "responded": true,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "G",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "G",
+              "target": true,
+              "responded": true,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 89,
+        "metrics": {
+          "dPrimeByN": {
+            "1": 3.115
+          },
+          "maxReliableN": 1,
+          "hitRateByN": {
+            "1": 1
+          },
+          "falseAlarmRateByN": {
+            "1": 0
+          },
+          "medianRtByN": {
+            "1": 320
+          },
+          "loadCostDPrime": null
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientTargetsByN": false,
+          "ceilingOrFloorByN": true,
+          "excessiveOmissions": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "nLevels": [
+            1
+          ],
+          "trialCountByN": [
+            16
+          ],
+          "blockCountByN": [
+            1
+          ],
+          "targetRatio": 0.3,
+          "stimulusMs": 400,
+          "isiMs": 800,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-nback",
+        "trials": []
+      },
+      "expectedError": "nback v1 expects exactly 16 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "nLevels": [
+            1
+          ],
+          "trialCountByN": [
+            16
+          ],
+          "blockCountByN": [
+            1
+          ],
+          "targetRatio": 0.3,
+          "stimulusMs": 400,
+          "isiMs": 800,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-nback",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "nLevel": 1,
+              "blockIndex": 0,
+              "stimulus": "X",
+              "target": false,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "nback v1 expects exactly 16 trials, got 1"
+    }
+  ]
+}

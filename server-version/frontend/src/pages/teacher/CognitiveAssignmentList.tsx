@@ -180,7 +180,7 @@ const CognitiveAssignmentList: React.FC = () => {
             </label>
             <label className="text-sm text-gray-700">
               任务类型
-              <select className="mt-1 w-full border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value })}>
+              <select className="mt-1 w-full border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value, profile: 'standard' })}>
                 <option value="">选择任务类型</option>
                 {configs.map((config) => (
                   <option key={config.id} value={config.id}>

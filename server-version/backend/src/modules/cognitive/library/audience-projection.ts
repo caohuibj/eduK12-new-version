@@ -68,7 +68,7 @@ export interface AdminCatalogView extends TeacherCatalogView {
   sourceNotes: string[]
   rightsProvenance: string
   recommendedForCreate: boolean
-  profileEstimatedMinutes: Record<CognitiveProfile, [number, number]>
+  profileEstimatedMinutes: Partial<Record<CognitiveProfile, [number, number]>>
 }
 
 export interface CatalogProjectionInput {
@@ -147,11 +147,7 @@ export const projectCatalogForAudience = (
     sourceNotes: [...catalog.sourceNotes],
     rightsProvenance: catalog.rightsProvenance,
     recommendedForCreate: registry.recommendedForCreate === true,
-    profileEstimatedMinutes: {
-      experience: [...registry.profiles.experience.estimatedMinutes] as [number, number],
-      standard: [...registry.profiles.standard.estimatedMinutes] as [number, number],
-      research: [...registry.profiles.research.estimatedMinutes] as [number, number],
-    },
+    profileEstimatedMinutes: Object.fromEntries(Object.entries(registry.profiles).filter(([, value]) => value).map(([key, value]) => [key, [...value!.estimatedMinutes]])),
   }
 
   return adminView

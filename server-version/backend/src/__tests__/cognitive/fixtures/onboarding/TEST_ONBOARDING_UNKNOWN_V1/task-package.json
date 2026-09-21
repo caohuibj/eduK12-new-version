@@ -34,5 +34,10 @@
   "presentation": {
     "file": "participant-presentation.ts",
     "export": "participantPresentations"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/__tests__/UnknownOnboardingTask.test.tsx"
+    ]
   }
 }

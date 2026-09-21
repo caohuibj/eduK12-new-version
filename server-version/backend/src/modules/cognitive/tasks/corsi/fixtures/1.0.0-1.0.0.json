@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "corsi",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "startSpan": 3,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "boardSize": 9,
+          "highlightMs": 400,
+          "intervalMs": 200,
+          "readyDurationMs": 400,
+          "inactivityGuardMs": 8000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-corsi",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "spanLength": 3,
+              "trialWithinLevel": 1,
+              "sequence": [
+                6,
+                2,
+                3
+              ],
+              "response": [
+                6,
+                2,
+                3
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "spanLength": 3,
+              "trialWithinLevel": 2,
+              "sequence": [
+                1,
+                4,
+                7
+              ],
+              "response": [
+                1,
+                4,
+                7
+              ],
+              "responseDurationMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "spanLength": 4,
+              "trialWithinLevel": 1,
+              "sequence": [
+                1,
+                7,
+                6,
+                0
+              ],
+              "response": [
+                0,
+                6,
+                7,
+                1
+              ],
+              "responseDurationMs": 1000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "spanLength": 4,
+              "trialWithinLevel": 2,
+              "sequence": [
+                2,
+                6,
+                3,
+                7
+              ],
+              "response": [
+                7,
+                3,
+                6,
+                2
+              ],
+              "responseDurationMs": 1100,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 75,
+        "metrics": {
+          "maxSpan": 3,
+          "totalCorrectTrials": 2,
+          "firstTryPassCount": 1,
+          "medianResponseDurationMs": 950,
+          "sequenceErrorDistance": 1,
+          "trialCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCompletedLevels": false,
+          "invalidBlockSequence": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "startSpan": 3,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "boardSize": 9,
+          "highlightMs": 400,
+          "intervalMs": 200,
+          "readyDurationMs": 400,
+          "inactivityGuardMs": 8000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-corsi",
+        "trials": []
+      },
+      "expectedError": "corsi v1 requires a complete two-trial level"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "startSpan": 3,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "boardSize": 9,
+          "highlightMs": 400,
+          "intervalMs": 200,
+          "readyDurationMs": 400,
+          "inactivityGuardMs": 8000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-corsi",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "spanLength": 3,
+              "trialWithinLevel": 1,
+              "sequence": [
+                6,
+                2,
+                3
+              ],
+              "response": [
+                6,
+                2,
+                3
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "corsi v1 requires a complete two-trial level"
+    }
+  ]
+}

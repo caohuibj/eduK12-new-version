@@ -43,7 +43,7 @@ describe('zero-core unknown task structural onboarding',()=>{
   const {cognitiveCatalog}=await import(resolve(output,'backend/catalog.ts'))
   const entry=cognitiveExecutionEntries[0] as RegistryEntry<unknown,unknown>,definition=buildCognitiveV2TaskDefinition(entry)
   expect(cognitiveRunnerEntries[0].testType).toBe(entry.testType)
-  expect(cognitiveRunnerEntries[0].RunnerComponent()).toBeNull()
+  expect(typeof cognitiveRunnerEntries[0].RunnerComponent).toBe('function')
   expect(cognitiveCatalog[entry.testType].testType).toBe(entry.testType)
   expect(validateTaskDefinition(definition).filter(i=>i.severity==='error')).toEqual([])
   const config=definition.configSchema.parse(cognitiveSeeds[0].config)

@@ -166,10 +166,10 @@ export const buildCognitiveV2TaskDefinition = (
         audit: { trialCount: trials.length, scorerVersion: entry.scoringVersion },
       }
     },
-    profiles: Object.fromEntries(profileList.map((profile) => [profile, {
-      estimatedMinutes: entry.profiles[profile].estimatedMinutes,
-      configPatch: entry.profiles[profile].configPatch,
-      reportCaveats: entry.profiles[profile].reportCaveats,
+    profiles: Object.fromEntries(profileList.filter(profile => Object.prototype.hasOwnProperty.call(entry.profiles, profile)).map((profile) => [profile, {
+      estimatedMinutes: entry.profiles[profile]?.estimatedMinutes,
+      configPatch: entry.profiles[profile]?.configPatch,
+      reportCaveats: entry.profiles[profile]?.reportCaveats,
     }])) as TaskDefinition<unknown, unknown>['profiles'],
     metrics,
     quality,

@@ -1,0 +1,429 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "reversallearning",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "acquisitionTrials": 20,
+          "reversalTrials": 20,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "reversallearning-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 36,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 37,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 38,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 39,
+            "payload": {
+              "choice": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "acquisitionAccuracy": 1,
+          "reversalAccuracy": 1,
+          "reversalCost": 0,
+          "perseverativeErrorCount": 0,
+          "trialsToAcquisitionCriterion": 6,
+          "trialsToReversalCriterion": 6,
+          "feedbackWinRate": 0.775,
+          "omissionRate": 0,
+          "medianRtMs": 400,
+          "validResponseCount": 40
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientAcquisitionTrials": false,
+          "insufficientReversalTrials": false,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantChoice": false,
+          "noAcquisitionCriterion": false,
+          "noReversalCriterion": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "acquisitionTrials": 20,
+          "reversalTrials": 20,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "reversallearning-golden-v1",
+        "trials": []
+      },
+      "expectedError": "reversallearning v1 requires the configured trial count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "acquisitionTrials": 20,
+          "reversalTrials": 20,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "reversallearning-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "choice": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "reversallearning v1 requires the configured trial count"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "reaction",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 5,
+          "foreperiodMinMs": 700,
+          "foreperiodMaxMs": 1500,
+          "timeoutMs": 2000,
+          "readyDurationMs": 1000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "foreperiodMs": 700,
+              "rtMs": 250,
+              "prematureCount": 1,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "foreperiodMs": 800,
+              "rtMs": 300,
+              "prematureCount": 0,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "foreperiodMs": 900,
+              "rtMs": 350,
+              "prematureCount": 0,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "foreperiodMs": 1000,
+              "rtMs": 400,
+              "prematureCount": 0,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "foreperiodMs": 1100,
+              "rtMs": 450,
+              "prematureCount": 0,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 70,
+        "metrics": {
+          "totalTrials": 5,
+          "medianRtMs": 350,
+          "meanRtMs": 350,
+          "sdRtMs": 70.71067811865476,
+          "rtICV": 0.20203050891044216,
+          "fastestRtMs": 250,
+          "missCount": 0,
+          "missRate": 0,
+          "prematureCount": 1,
+          "validTrialCount": 5
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidTrials": false,
+          "highMissRate": false,
+          "interrupted": false,
+          "excessivePremature": true,
+          "extremeRtPattern": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 5,
+          "foreperiodMinMs": 700,
+          "foreperiodMaxMs": 1500,
+          "timeoutMs": 2000,
+          "readyDurationMs": 1000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "reaction v1 expects exactly 5 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 5,
+          "foreperiodMinMs": 700,
+          "foreperiodMaxMs": 1500,
+          "timeoutMs": 2000,
+          "readyDurationMs": 1000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "foreperiodMs": 700,
+              "rtMs": 250,
+              "prematureCount": 1,
+              "interrupted": false,
+              "inputMode": "pointer"
+            }
+          }
+        ]
+      },
+      "expectedError": "reaction v1 expects exactly 5 trials, got 1"
+    }
+  ]
+}

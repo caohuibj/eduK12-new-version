@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "bart",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "balloonCount": 10,
+          "maxPumps": 6,
+          "trialTimeoutMs": 3000,
+          "pumpAnimationMs": 100,
+          "stimulusSetVersion": "bart-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "bart-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "pumpCount": 1,
+              "completed": true,
+              "cashedOut": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "pumpCount": 5,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "pumpCount": 2,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "pumpCount": 1,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "pumpCount": 4,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "pumpCount": 1,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "pumpCount": 5,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "pumpCount": 5,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "pumpCount": 3,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "pumpCount": 5,
+              "completed": true,
+              "cashedOut": true,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "showProductIndex": false,
+        "metrics": {
+          "adjustedPumps": 3.4444,
+          "explosionCount": 1,
+          "cashoutCount": 9,
+          "meanPumpsAllCompleted": 3.2,
+          "cashoutRate": 0.9,
+          "completedBalloonCount": 10,
+          "omissionRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCompletedBalloons": false,
+          "insufficientCashoutBalloons": false,
+          "excessiveOmissions": false,
+          "constantPumpPattern": false,
+          "invalidOutcome": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "balloonCount": 10,
+          "maxPumps": 6,
+          "trialTimeoutMs": 3000,
+          "pumpAnimationMs": 100,
+          "stimulusSetVersion": "bart-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "bart-golden-v1",
+        "trials": []
+      },
+      "expectedError": "bart v1 requires the configured balloon count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "balloonCount": 10,
+          "maxPumps": 6,
+          "trialTimeoutMs": 3000,
+          "pumpAnimationMs": 100,
+          "stimulusSetVersion": "bart-generated-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "bart-golden-v1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "pumpCount": 1,
+              "completed": true,
+              "cashedOut": false,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "bart v1 requires the configured balloon count"
+    }
+  ],
+  "legacyFractionalMetrics": {
+    "baselineCommit": "cffa9de2160b2b01312bfb66fd7fc7b4ab325c9b",
+    "reason": "BART 1.0.0 historically declares average pump counts as integer although its unchanged scorer returns fractional means. This compatibility warning preserves the frozen identity; new versions must declare number.",
+    "keys": [
+      "adjustedPumps",
+      "meanPumpsAllCompleted"
+    ]
+  }
+}

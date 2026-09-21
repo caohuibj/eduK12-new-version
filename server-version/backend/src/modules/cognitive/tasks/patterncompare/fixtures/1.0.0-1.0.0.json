@@ -1,0 +1,397 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "patterncompare",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "durationSec": 30,
+          "trialTimeoutMs": 2500,
+          "isiMs": 250,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-pattern",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "leftPattern": {
+                "shape": "circle",
+                "fill": "outline",
+                "marks": 2,
+                "rotation": 90
+              },
+              "rightPattern": {
+                "shape": "circle",
+                "fill": "outline",
+                "marks": 2,
+                "rotation": 90
+              },
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 90
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "response": "different",
+              "rtMs": 501,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "outline",
+                "marks": 1,
+                "rotation": 0
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "outline",
+                "marks": 1,
+                "rotation": 0
+              },
+              "response": "same",
+              "rtMs": 502,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 3,
+                "rotation": 270
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "response": "different",
+              "rtMs": 503,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 90
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 180
+              },
+              "response": "different",
+              "rtMs": 504,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "response": "same",
+              "rtMs": 505,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "leftPattern": {
+                "shape": "circle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "rightPattern": {
+                "shape": "circle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 270
+              },
+              "response": "same",
+              "rtMs": 506,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "leftPattern": {
+                "shape": "square",
+                "fill": "outline",
+                "marks": 3,
+                "rotation": 270
+              },
+              "rightPattern": {
+                "shape": "square",
+                "fill": "outline",
+                "marks": 3,
+                "rotation": 90
+              },
+              "response": "different",
+              "rtMs": 507,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "leftPattern": {
+                "shape": "circle",
+                "fill": "outline",
+                "marks": 1,
+                "rotation": 90
+              },
+              "rightPattern": {
+                "shape": "circle",
+                "fill": "solid",
+                "marks": 1,
+                "rotation": 90
+              },
+              "response": "different",
+              "rtMs": 508,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "leftPattern": {
+                "shape": "triangle",
+                "fill": "outline",
+                "marks": 1,
+                "rotation": 0
+              },
+              "rightPattern": {
+                "shape": "triangle",
+                "fill": "outline",
+                "marks": 1,
+                "rotation": 0
+              },
+              "response": "same",
+              "rtMs": 509,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "leftPattern": {
+                "shape": "circle",
+                "fill": "solid",
+                "marks": 3,
+                "rotation": 180
+              },
+              "rightPattern": {
+                "shape": "square",
+                "fill": "solid",
+                "marks": 3,
+                "rotation": 180
+              },
+              "response": "different",
+              "rtMs": 510,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "leftPattern": {
+                "shape": "square",
+                "fill": "outline",
+                "marks": 3,
+                "rotation": 270
+              },
+              "rightPattern": {
+                "shape": "square",
+                "fill": "outline",
+                "marks": 3,
+                "rotation": 270
+              },
+              "response": "same",
+              "rtMs": 511,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "correctPerMinute": 24,
+          "accuracy": 1,
+          "medianCorrectRtMs": 505.5,
+          "lapseRate": 0,
+          "correctCount": 12,
+          "completedTrialCount": 12
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCompletedTrials": false,
+          "lowAccuracy": false,
+          "excessiveLapses": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "durationSec": 30,
+          "trialTimeoutMs": 2500,
+          "isiMs": 250,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-pattern",
+        "trials": []
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "correctPerMinute": 0,
+          "accuracy": 0,
+          "medianCorrectRtMs": null,
+          "lapseRate": 1,
+          "correctCount": 0,
+          "completedTrialCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "insufficientCompletedTrials": true,
+          "lowAccuracy": true,
+          "excessiveLapses": true,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "durationSec": 30,
+          "trialTimeoutMs": 2500,
+          "isiMs": 250,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-pattern",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "leftPattern": {
+                "shape": "circle",
+                "fill": "outline",
+                "marks": 2,
+                "rotation": 90
+              },
+              "rightPattern": {
+                "shape": "circle",
+                "fill": "outline",
+                "marks": 2,
+                "rotation": 90
+              },
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "correctPerMinute": 2,
+          "accuracy": 1,
+          "medianCorrectRtMs": 500,
+          "lapseRate": 0,
+          "correctCount": 1,
+          "completedTrialCount": 1
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "insufficientCompletedTrials": true,
+          "lowAccuracy": false,
+          "excessiveLapses": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    }
+  ]
+}

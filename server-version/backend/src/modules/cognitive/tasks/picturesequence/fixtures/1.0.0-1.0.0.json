@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "picturesequence",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "itemCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyMsPerItem": 900,
+          "inactivityGuardMs": 60000,
+          "stimulusSetVersion": "daily-scenes-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-picture",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 1,
+              "itemIds": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseOrder": [
+                "scene-42",
+                "scene-41",
+                "scene-40",
+                "scene-39",
+                "scene-38",
+                "scene-37",
+                "scene-36",
+                "scene-35",
+                "scene-34",
+                "scene-33",
+                "scene-32",
+                "scene-31"
+              ],
+              "responseDurationMs": 2000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 2,
+              "itemIds": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseOrder": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseDurationMs": 2000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 3,
+              "itemIds": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseOrder": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseDurationMs": 2000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "adjacentPairScore": 1,
+          "positionScore": 1,
+          "learningGain": 1,
+          "adjacentPairScoreByRound": [
+            0,
+            1,
+            1
+          ],
+          "positionScoreByRound": [
+            0,
+            1,
+            1
+          ],
+          "delayedRetention": null
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "emptyResponse": false,
+          "incompleteResponse": false,
+          "unchangedIncorrectOrder": false,
+          "delayedStageIncomplete": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "itemCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyMsPerItem": 900,
+          "inactivityGuardMs": 60000,
+          "stimulusSetVersion": "daily-scenes-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-picture",
+        "trials": []
+      },
+      "expectedError": "picturesequence v1 requires every learning round and at most one delayed round"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "itemCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyMsPerItem": 900,
+          "inactivityGuardMs": 60000,
+          "stimulusSetVersion": "daily-scenes-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-picture",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 1,
+              "itemIds": [
+                "scene-31",
+                "scene-32",
+                "scene-33",
+                "scene-34",
+                "scene-35",
+                "scene-36",
+                "scene-37",
+                "scene-38",
+                "scene-39",
+                "scene-40",
+                "scene-41",
+                "scene-42"
+              ],
+              "responseOrder": [
+                "scene-42",
+                "scene-41",
+                "scene-40",
+                "scene-39",
+                "scene-38",
+                "scene-37",
+                "scene-36",
+                "scene-35",
+                "scene-34",
+                "scene-33",
+                "scene-32",
+                "scene-31"
+              ],
+              "responseDurationMs": 2000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "picturesequence v1 requires every learning round and at most one delayed round"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { cognitiveGovernance } from '../generated/scientific'
 import { getCognitiveRegistryEntry } from '../cognitive.registry'
 import type { CognitiveScientificStatus } from './catalog-contract'
 
@@ -15,7 +16,7 @@ export const cognitiveScientificMaturityIdentityKey = (
  * This registry is governance metadata only and must not affect runtime,
  * product readiness, publication, scoring, FINAL, or report computation.
  */
-export const COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY = new Map<string, CognitiveScientificStatus>()
+export const COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY = new Map<string, CognitiveScientificStatus>(cognitiveGovernance.map(g => [cognitiveScientificMaturityIdentityKey(g.testType,g.engineVersion,g.scoringVersion),g.declaredMaturity]))
 
 export interface CognitiveMaturityIdentityView {
   add(identity: string): CognitiveMaturityIdentityView

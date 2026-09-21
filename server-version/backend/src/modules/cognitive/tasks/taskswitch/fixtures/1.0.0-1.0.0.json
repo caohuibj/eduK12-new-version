@@ -1,0 +1,734 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "taskswitch",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 48,
+          "switchRatio": 0.5,
+          "blockCount": 2,
+          "includePureBlocks": false,
+          "cueMs": 200,
+          "stimulusMs": 800,
+          "isiMs": 200,
+          "validRtFloorMs": 150,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-taskswitch",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": null,
+              "switchType": "start",
+              "stimulus": 4,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 4,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 1,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 3,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 1,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 6,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 3,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 4,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 3,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 9,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 1,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 4,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 2,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": null,
+              "switchType": "start",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 4,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 4,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 4,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 4,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 2,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 36,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 37,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 7,
+              "response": "right",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 38,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 6,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 39,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 40,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "magnitude",
+              "switchType": "switch",
+              "stimulus": 1,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 41,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 42,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 3,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 43,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "parity",
+              "previousTaskRule": "parity",
+              "switchType": "repeat",
+              "stimulus": 8,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 44,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "parity",
+              "switchType": "switch",
+              "stimulus": 2,
+              "response": "left",
+              "rtMs": 520,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 45,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 6,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 46,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 47,
+            "payload": {
+              "blockIndex": 1,
+              "taskRule": "magnitude",
+              "previousTaskRule": "magnitude",
+              "switchType": "repeat",
+              "stimulus": 9,
+              "response": "right",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 85,
+        "metrics": {
+          "switchCostRtMs": 120,
+          "switchCostAccuracy": 0,
+          "medianRtSwitch": 520,
+          "medianRtRepeat": 400,
+          "accuracySwitch": 1,
+          "accuracyRepeat": 1,
+          "mixingCost": null
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientSwitchTrials": false,
+          "insufficientRepeatTrials": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 48,
+          "switchRatio": 0.5,
+          "blockCount": 2,
+          "includePureBlocks": false,
+          "cueMs": 200,
+          "stimulusMs": 800,
+          "isiMs": 200,
+          "validRtFloorMs": 150,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-taskswitch",
+        "trials": []
+      },
+      "expectedError": "taskswitch v1 expects exactly 48 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 48,
+          "switchRatio": 0.5,
+          "blockCount": 2,
+          "includePureBlocks": false,
+          "cueMs": 200,
+          "stimulusMs": 800,
+          "isiMs": 200,
+          "validRtFloorMs": 150,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-taskswitch",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "blockIndex": 0,
+              "taskRule": "magnitude",
+              "previousTaskRule": null,
+              "switchType": "start",
+              "stimulus": 4,
+              "response": "left",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "taskswitch v1 expects exactly 48 trials, got 1"
+    }
+  ]
+}

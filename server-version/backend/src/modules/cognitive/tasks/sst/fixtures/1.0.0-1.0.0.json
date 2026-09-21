@@ -1,0 +1,593 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "sst",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "stopRatio": 0.25,
+          "ssdStartMs": 250,
+          "ssdMinMs": 50,
+          "ssdMaxMs": 800,
+          "ssdStepMs": 50,
+          "goTimeoutMs": 1000,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-sst",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 300,
+              "ssdMs": 250,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": null,
+              "rtMs": null,
+              "ssdMs": 200,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 300,
+              "ssdMs": 250,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": null,
+              "rtMs": null,
+              "ssdMs": 200,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 300,
+              "ssdMs": 250,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "right",
+              "response": null,
+              "rtMs": null,
+              "ssdMs": 200,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 300,
+              "ssdMs": 250,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": null,
+              "rtMs": null,
+              "ssdMs": 200,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 36,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 37,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 300,
+              "ssdMs": 250,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 38,
+            "payload": {
+              "trialType": "stop",
+              "goStimulus": "left",
+              "response": null,
+              "rtMs": null,
+              "ssdMs": 200,
+              "stopSignalPresented": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 39,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "left",
+              "response": "left",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 66,
+        "metrics": {
+          "ssrtMs": 195,
+          "pRespondStop": 0.5,
+          "goMedianRtMs": 420,
+          "goOmissionRate": 0,
+          "goChoiceErrorRate": 0,
+          "meanSsdMs": 225,
+          "unsuccessfulStopRtMs": 300
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientStopTrials": false,
+          "pRespondStopOutOfRange": false,
+          "highGoOmission": false,
+          "strategicSlowingSuspected": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "stopRatio": 0.25,
+          "ssdStartMs": 250,
+          "ssdMinMs": 50,
+          "ssdMaxMs": 800,
+          "ssdStepMs": 50,
+          "goTimeoutMs": 1000,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-sst",
+        "trials": []
+      },
+      "expectedError": "sst v1 expects exactly 40 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "stopRatio": 0.25,
+          "ssdStartMs": 250,
+          "ssdMinMs": 50,
+          "ssdMaxMs": 800,
+          "ssdStepMs": 50,
+          "goTimeoutMs": 1000,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-sst",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialType": "go",
+              "goStimulus": "right",
+              "response": "right",
+              "rtMs": 420,
+              "ssdMs": null,
+              "stopSignalPresented": false,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "sst v1 expects exactly 40 trials, got 1"
+    }
+  ]
+}

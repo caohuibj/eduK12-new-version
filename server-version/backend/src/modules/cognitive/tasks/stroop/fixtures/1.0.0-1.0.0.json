@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "stroop",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "congruentRatio": 0.5,
+          "fixationMs": 500,
+          "stimulusDurationMs": 2000,
+          "isiMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "word": "红",
+              "inkColor": "red",
+              "response": "red",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "word": "蓝",
+              "inkColor": "blue",
+              "response": "blue",
+              "rtMs": 350,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "word": "红",
+              "inkColor": "green",
+              "response": "green",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "word": "黄",
+              "inkColor": "blue",
+              "response": "blue",
+              "rtMs": 550,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "congruentAccuracy": 1,
+          "incongruentAccuracy": 1,
+          "medianRtCongruent": 325,
+          "medianRtIncongruent": 525,
+          "stroopEffectMs": 200,
+          "errorCost": 0,
+          "timeoutCount": 0,
+          "validCongruentRtCount": 2,
+          "validIncongruentRtCount": 2
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidCongruentRt": false,
+          "insufficientValidIncongruentRt": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "congruentRatio": 0.5,
+          "fixationMs": 500,
+          "stimulusDurationMs": 2000,
+          "isiMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "stroop v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "congruentRatio": 0.5,
+          "fixationMs": 500,
+          "stimulusDurationMs": 2000,
+          "isiMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "word": "红",
+              "inkColor": "red",
+              "response": "red",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "stroop v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}
