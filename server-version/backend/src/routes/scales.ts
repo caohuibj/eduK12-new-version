@@ -3,6 +3,7 @@ import { scaleController } from '../controllers/scaleController'
 import { scaleImageController } from '../controllers/scaleImageController'
 import { scaleQualificationController } from '../controllers/scaleQualificationController'
 import { scaleVideoController } from '../controllers/scaleVideoController'
+import { startStandaloneScaleAssessment } from '../modules/scale/scale-start.controller'
 import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
@@ -28,7 +29,7 @@ router.get('/tags', authenticate, scaleController.getTags)
 // ==================== 测评流程（学生） ====================
 
 // 开始测评：Scale Assessment v2 是唯一运行入口。
-router.post('/:scaleId/assessments', authenticate, requireStudent, scaleController.startAssessmentV2)
+router.post('/:scaleId/assessments', authenticate, requireStudent, startStandaloneScaleAssessment)
 
 // 提交答案
 router.post('/assessments/:assessmentId/submit', authenticate, requireStudent, scaleController.submitFinalAssessment)
