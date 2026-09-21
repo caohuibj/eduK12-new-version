@@ -3,6 +3,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import {
   evaluateScaleDeployment,
   hashScaleDeploymentPolicy,
+  type ScaleDeploymentModeV1,
   type ScaleDeploymentPolicyV1,
 } from '../../modules/scale/policy/deployment'
 import type { InstrumentAuthorizationRecordV1 } from '../../modules/assessment-authorization/types'
@@ -13,7 +14,7 @@ const policy = (overrides: Partial<ScaleDeploymentPolicyV1> = {}): ScaleDeployme
   revision: 1,
   locale: 'zh-CN',
   territory: 'CN',
-  deploymentMode: 'STANDALONE',
+  deploymentModes: ['STANDALONE', 'QUESTIONNAIRE', 'PUBLIC_QUESTIONNAIRE', 'COMPOSITE'],
   commercialNature: 'NON_COMMERCIAL',
   requiredRightsActions: ['electronicAdministration', 'scoring', 'display'],
   authorizationRefs: ['auth-1'],
@@ -56,9 +57,11 @@ const authorization = (overrides: Partial<InstrumentAuthorizationRecordV1> = {})
 
 const evaluate = (input: {
   deployment?: ScaleDeploymentPolicyV1
+  requestedMode?: ScaleDeploymentModeV1
   authorizations?: InstrumentAuthorizationRecordV1[]
 }) => evaluateScaleDeployment({
   policy: input.deployment ?? policy(),
+  requestedMode: input.requestedMode ?? 'STANDALONE',
   instrumentKey: 'fixture_scale',
   instrumentVersion: '1.0.0',
   compiledRuntimePolicyHash: runtimePolicyHash,
@@ -67,9 +70,18 @@ const evaluate = (input: {
 })
 
 describe('Scale deployment policy', () => {
-  it('is deterministic and allows an exact active grant', () => {
+  it('is deterministic and allows every explicitly bound surface', () => {
     expect(hashScaleDeploymentPolicy(policy())).toBe(hashScaleDeploymentPolicy(policy()))
-    expect(evaluate({})).toMatchObject({ allowNewStarts: true, reasons: [] })
+    for (const requestedMode of ['STANDALONE', 'QUESTIONNAIRE', 'PUBLIC_QUESTIONNAIRE', 'COMPOSITE'] as const) {
+      expect(evaluate({ requestedMode })).toMatchObject({ allowNewStarts: true, reasons: [] })
+    }
+  })
+
+  it('fails closed for an unbound surface', () => {
+    expect(evaluate({
+      requestedMode: 'COMPOSITE',
+      deployment: policy({ deploymentModes: ['STANDALONE'] }),
+    }).reasons).toContain('DEPLOYMENT_MODE_NOT_BOUND')
   })
 
   it('fails closed for missing, expired, revoked and stale authorization bindings', () => {
