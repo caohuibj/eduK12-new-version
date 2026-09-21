@@ -39,6 +39,7 @@ let db: PrismaClient
 let server: Server
 let base = ''
 let actor = ''
+let publisher = ''
 let scaleId = ''
 let install: typeof import('../../modules/scale/onboarding/install')
 let source: any
@@ -72,6 +73,7 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', () =>
       authorizationRefs: [authId], runtimePolicyHash: registry.getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash,
       localizationVersion: source.localization.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE', completionWindowMs: 86400000,
     } }
+    publisher = (await db.user.create({ data: { username: `pr3-publisher-${randomUUID()}`, passwordHash: 'test-only', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' } })).id
     const app = express(); app.use(express.json())
     app.use((req, _res, next) => { req.user = { userId: actor, role: 'STUDENT' } as any; next() })
     app.post('/scales/:scaleId/assessments', (await import('../../modules/scale/scale-start.controller')).startStandaloneScaleAssessment)
@@ -85,10 +87,12 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', () =>
     if (!db) return
     if (scaleId) {
       await db.assessment.deleteMany({ where: { scaleId } })
+      await db.$executeRaw`DELETE FROM "scale_publication_audits" WHERE "scale_id" = ${scaleId}`
       await db.$executeRaw`DELETE FROM "scale_deployment_policies" WHERE "scale_id" = ${scaleId}`
       await db.scale.delete({ where: { id: scaleId } })
     }
     await db.instrumentAuthorization.deleteMany({ where: { instrumentKey: key } })
+    if (publisher) await db.user.delete({ where: { id: publisher } })
     if (actor) await db.user.delete({ where: { id: actor } })
     await db.$disconnect()
   })
@@ -98,7 +102,10 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', () =>
     await install.installScaleInstrument(db, input)
     const row = await db.scale.findUniqueOrThrow({ where: { code: key } }); scaleId = row.id
     expect(row).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: actor })
-    await db.scale.update({ where: { id: scaleId }, data: { status: 'PUBLISHED', visibility: 'PUBLIC' } })
+    const { planStandardScalePublication, publishStandardScale } = await import('../../modules/scale/onboarding/publish')
+    const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const }
+    const preview = await planStandardScalePublication(db, publication)
+    await publishStandardScale(db, { ...publication, expectedProofHash: preview.proofHash })
     expect((await install.installScaleInstrument(db, input)).deploymentAlreadyActive).toBe(true)
     expect(await db.scale.findUnique({ where: { id: scaleId } })).toMatchObject({ status: 'PUBLISHED', visibility: 'PUBLIC', creatorId: actor })
   })

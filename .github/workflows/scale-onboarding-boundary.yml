@@ -1,0 +1,30 @@
+name: Scale onboarding boundary
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    paths:
+      - 'server-version/backend/src/modules/scale/**'
+      - 'server-version/backend/scripts/*scale*'
+      - 'server-version/backend/src/__tests__/scale/**'
+      - 'docs/scale-instruments/**'
+      - '.github/workflows/scale-onboarding-boundary.yml'
+jobs:
+  boundary:
+    runs-on: [self-hosted, linux, eduk12-mac-ci]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+        working-directory: server-version/backend
+      - name: Verify declared change class and content dependencies
+        working-directory: server-version/backend
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CHANGE_CLASS: ${{ contains(github.event.pull_request.labels.*.name, 'scale-platform-capability') && 'platform' || 'content' }}
+        run: npm run scale:onboarding:check -- --base="$BASE_SHA" --mode="$CHANGE_CLASS"
+      - run: npm run scale:instruments:check && npm run scale:qualification:check
+        working-directory: server-version/backend

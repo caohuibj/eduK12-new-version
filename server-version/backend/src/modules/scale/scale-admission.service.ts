@@ -46,6 +46,11 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   submissionId: true,
   submissionPayloadHash: true,
   answers: true,
+  // Completed FINAL replays project the original persisted report from this row.
+  result: true,
+  progress: true,
+  completedAt: true,
+  totalTime: true,
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,

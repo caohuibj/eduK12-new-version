@@ -8,6 +8,7 @@ datasource db {
 }
 
 model User {
+  scalePublicationAudits ScalePublicationAudit[]
   id                                  String                           @id @default(uuid())
   username                            String                           @unique
   passwordHash                        String                           @map("password_hash")
@@ -648,6 +649,7 @@ model MaterialGrant {
 
 // 量表表
 model Scale {
+  publicationAudits ScalePublicationAudit[]
   id                String               @id @default(uuid())
   code              String               @unique // 量表编码
   name              String // 量表名称
@@ -2231,4 +2233,17 @@ model ScaleDeploymentPolicy {
   @@unique([scaleId, revision], map: "scale_deployment_policies_scale_revision_key")
   @@index([status, createdAt(sort: Desc)], map: "scale_deployment_policies_status_created_idx")
   @@map("scale_deployment_policies")
+}
+
+model ScalePublicationAudit {
+  id String @id @default(uuid()) @db.Uuid
+  scaleId String @map("scale_id")
+  actorUserId String @map("actor_user_id")
+  proofHash String @map("proof_hash")
+  proof Json
+  createdAt DateTime @default(now()) @map("created_at")
+  scale Scale @relation(fields: [scaleId], references: [id], onDelete: Restrict)
+  actor User @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  @@index([scaleId, createdAt])
+  @@map("scale_publication_audits")
 }

@@ -1,3 +1,5 @@
+import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
+import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
 import { compileScalePolicy } from '../policy/compile'
 import {
   evaluateScaleDeployment,
@@ -32,6 +34,9 @@ export const previewScaleInstrument = (input: {
   const localization = materializeLocalizationManifest(source)
   const blockers = validation.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}: ${issue.message}`)
   if (!source.executable) blockers.push(...(source.candidatePreview?.blockers ?? ['EXECUTABLE_NOT_REGISTERED']))
+  const qualification = evaluateScaleSourceScientificQualification(source)
+  if (source.executable && !qualificationAllowsScientificMaturity(source.catalog.scientificMaturity, qualification)) blockers.push('SCIENTIFIC_CLAIM_NOT_QUALIFIED')
+  if (source.executable && source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== input.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
   const modes = input.deploymentModes.map(mode => scaleDeploymentModeSchema.parse(mode))
   if (modes.length === 0) blockers.push('DEPLOYMENT_MODES_MISSING')
   if (source.executable && source.executable.releaseStatus !== 'PUBLISHED') blockers.push('EXECUTABLE_NOT_PUBLISHED')
@@ -76,7 +81,7 @@ export const previewScaleInstrument = (input: {
     identity: source.identity,
     sourceValidation: { ok: validation.issues.every(issue => issue.severity !== 'error'), issues: validation.issues },
     executable: source.executable ? { releaseStatus: source.executable.releaseStatus, runtimePolicyHash } : null,
-    scientific: { catalogStatus: catalog.catalogStatus, scientificMaturity: catalog.scientificMaturity, evidenceCount: catalog.evidence.length },
+    scientific: { catalogStatus: catalog.catalogStatus, scientificMaturity: catalog.scientificMaturity, evidenceCount: catalog.evidence.length, qualification, review: source.scientificReview ?? null },
     localization: localization ?? null,
     report: {
       disclosureAudiences: source.disclosure ? Object.keys(source.disclosure.audiences) : [],
