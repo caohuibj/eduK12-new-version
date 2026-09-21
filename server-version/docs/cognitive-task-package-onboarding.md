@@ -74,3 +74,54 @@ New hardware, input modalities, timing contracts, adaptive engines or other
 unsupported execution models require a separate platform capability change.
 Scientific maturity and evidence qualification remain independent from execution
 profile and publication lifecycle. Human review retains scientific authority.
+
+## PR2 offline onboarding gate
+
+Install locked dependencies in both `server-version/backend` and
+`server-version/frontend`. From the backend run:
+
+```sh
+npm run cognitive:manifest:generate
+npm run cognitive:onboarding-check -- reaction
+npm run --silent cognitive:onboarding-check -- reaction --json
+npm run --silent cognitive:onboarding-check -- --all --json
+npm run cognitive:onboarding-check -- reaction --content-only --base <full-commit-sha>
+```
+
+JSON output is newline-delimited: one strict schema-version-1 decision per exact
+scoring identity. Text uses the same decisions. Exit 1 means technical/Pilot errors
+or a scientific declaration above eligibility; next-tier evidence gaps alone do
+not prohibit Pilot release. A passing diagnostic is not a publication operation.
+No command publishes a config or promotes scientific maturity.
+
+A new package must supply `scientific.ts` (declared through the descriptor), exact
+identity fixtures at `fixtures/<engineVersion>-<scoringVersion>.json`, and
+`acceptance.frontendSuites` paths relative to the frontend. Normal fixtures must
+produce outputs; empty and insufficient cases must pin outputs or exact errors.
+Keep independent golden tests as the source of truth. The CLI executes the
+scorer, authoritative envelope validation, report projection and declared DOM
+suites. Those suites must cover the task's practice/formal transition, seeded
+stimuli and balance constraints, applicable all-wrong/timeout/invalid boundaries,
+and FINAL handoff. Do not substitute a placeholder or irrelevant passing suite.
+Real-browser behavior is separately required by the normal CI/browser lane.
+
+Review diagnostic `code`, `file`, `fieldPath` and remediation. Repair malformed
+configs, missing profiles/metrics/assets and generated drift before repeating the
+check. Content-only mode requires a pinned commit SHA; shared compiler, scoring
+infrastructure, registries, workflows and unknown paths cannot claim content-only
+status. Deletions and untracked files are included. This PR itself changes shared
+core and is deliberately not content-only.
+
+For Pilot, declare `PILOT` with no unsupported claim. To request Research Ready or
+Research Grade, a human author supplies applicability and evidence references in
+`scientific.ts`. Scope every claim/evidence item to the exact task/engine/scorer,
+profiles, protocol signature, stimulus version and population. The evaluator
+requires matching scope and uses the shared cross-family evidence tiers; it does
+not certify the scientific quality of a reference. Unscoped catalog citations are
+not eligibility. Evidence for one version/profile/population must not be copied as
+proof for another. Review the declaration explicitly, regenerate, run all gates,
+and use the existing config publication workflow only after human release review.
+
+Historical presentation is frozen with the assignment and used by both FINAL
+paths. To alter execution semantics or repair a historical metric type declaration,
+create a new execution identity; never regenerate the old baseline to conceal drift.

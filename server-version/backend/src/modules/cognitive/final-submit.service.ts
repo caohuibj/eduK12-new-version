@@ -241,11 +241,12 @@ const prepareFinalCognitiveData = async (
     engineVersion: session.engineVersion,
     scoringVersion: session.scoringVersion,
     profile: freeze.profile,
-    definition: definition.report,
+    participantPresentation: freeze.frozenReport?.participantPresentation,
+    definition: freeze.frozenReport?.v2ReportDefinition ?? definition.report,
     metrics: scored.metrics,
     score: scored,
-    metricDefinitions: definition.metrics,
-    qualityDefinitions: definition.quality,
+    metricDefinitions: freeze.frozenReport?.v2MetricDefinitions ?? definition.metrics,
+    qualityDefinitions: freeze.frozenReport?.v2QualityDefinitions ?? definition.quality,
   })
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,

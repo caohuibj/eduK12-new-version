@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "fake",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "fake.v1 contract",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "trialCount": 3,
+          "trialDurationMs": 1000,
+          "allowPractice": false,
+          "maxRtMs": 60000
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "correct": true,
+              "rtMs": 420
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "correct": true,
+              "rtMs": 420
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "correct": true,
+              "rtMs": 420
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "trialCount": 3,
+          "correctCount": 3,
+          "accuracy": 1,
+          "meanRtMs": 420
+        },
+        "qualityFlags": {}
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "trialCount": 3,
+          "trialDurationMs": 1000,
+          "allowPractice": false,
+          "maxRtMs": 60000
+        },
+        "trials": []
+      },
+      "expectedError": "fake v1 expects exactly 3 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "trialCount": 3,
+          "trialDurationMs": 1000,
+          "allowPractice": false,
+          "maxRtMs": 60000
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "correct": true,
+              "rtMs": 420
+            }
+          }
+        ]
+      },
+      "expectedError": "fake v1 expects exactly 3 trials, got 1"
+    }
+  ]
+}

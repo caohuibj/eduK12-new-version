@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "mentalrotation",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "stimulusMs": 5000,
+          "isiMs": 400,
+          "validRtFloorMs": 200,
+          "stimulusSetVersion": "rotation-objects-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-rotation",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "rotation-004",
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "rotation-058",
+              "response": "mirror",
+              "rtMs": 900,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "rotation-007",
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "rotation-050",
+              "response": "same",
+              "rtMs": 900,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "rotation-072",
+              "response": "same",
+              "rtMs": 900,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "rotation-026",
+              "response": "mirror",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "itemId": "rotation-077",
+              "response": "mirror",
+              "rtMs": 900,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "itemId": "rotation-045",
+              "response": "mirror",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "itemId": "rotation-014",
+              "response": "mirror",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "itemId": "rotation-019",
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "itemId": "rotation-011",
+              "response": "mirror",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "itemId": "rotation-038",
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianCorrectRtMs": 500,
+          "angleCost": 400,
+          "mirrorErrorRate": 0,
+          "omissionRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "constantResponse": false,
+          "insufficientAngleCoverage": false,
+          "excessiveOmissions": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "stimulusMs": 5000,
+          "isiMs": 400,
+          "validRtFloorMs": 200,
+          "stimulusSetVersion": "rotation-objects-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-rotation",
+        "trials": []
+      },
+      "expectedError": "mentalrotation v1 requires the configured trial count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "stimulusMs": 5000,
+          "isiMs": 400,
+          "validRtFloorMs": 200,
+          "stimulusSetVersion": "rotation-objects-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-rotation",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "rotation-004",
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "mentalrotation v1 requires the configured trial count"
+    }
+  ]
+}

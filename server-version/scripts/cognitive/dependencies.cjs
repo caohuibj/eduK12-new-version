@@ -17,7 +17,7 @@ function dependencies(file){
 }
 function guard(root=ROOT,packages=discover(root)){
  const done=new Set(),stack=[]
- const governanceFiles=new Set(packages.flatMap(p=>[p.catalogFile,p.presentationFile].filter(Boolean)).map(p=>path.resolve(root,p)))
+ const governanceFiles=new Set(packages.flatMap(p=>[p.catalogFile,p.presentationFile,p.scientificFile].filter(Boolean)).map(p=>path.resolve(root,p)))
  function walk(file,kind){
   const id=kind+':'+file
   if(stack.includes(id))fail('COG_DEPENDENCY_CYCLE',path.relative(root,file),stack.join(' -> '))
@@ -34,6 +34,11 @@ function guard(root=ROOT,packages=discover(root)){
    const stem=path.resolve(path.dirname(file),ref),target=[stem,stem+'.ts',stem+'.tsx',stem+'/index.ts',stem+'/index.tsx'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile())
    if(!target)fail('COG_DEPENDENCY_UNRESOLVED',rel,ref)
    if(/\.tsx?$/.test(target))walk(target,kind)
+   else if(/\.(png|webp|avif)$/.test(target)){
+    const bytes=fs.readFileSync(target),ext=path.extname(target)
+    const valid=ext==='.png'?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):ext==='.webp'?bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP':bytes.toString('ascii',4,8)==='ftyp'&&['avif','avis'].includes(bytes.toString('ascii',8,12))
+    if(!valid)fail('COG_ASSET_FORMAT_INVALID',path.relative(root,target),'asset bytes do not match their declared format')
+   }
   }
   stack.pop();done.add(id)
  }

@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "cpt",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "targetRatio": 0.25,
+          "blockCount": 1,
+          "stimulusMs": 400,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "perseverationRtMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-cpt",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "H",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": true,
+              "stimulus": "X",
+              "responded": true,
+              "rtMs": 280,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "S",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "U",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": true,
+              "stimulus": "X",
+              "responded": true,
+              "rtMs": 280,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "B",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "B",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "C",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "E",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": true,
+              "stimulus": "X",
+              "responded": true,
+              "rtMs": 280,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "H",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "D",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 91,
+        "metrics": {
+          "dPrime": 2.795,
+          "omissionRate": 0,
+          "commissionRate": 0,
+          "rtICV": 0,
+          "hitMedianRtMs": 280,
+          "hitRtSdMs": 0,
+          "blockSlopeRt": null,
+          "blockSlopeOmission": null,
+          "perseverationRate": 0,
+          "targetCount": 3,
+          "hitCount": 3
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientTargets": false,
+          "highOmissionRate": false,
+          "highPerseverationRate": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "targetRatio": 0.25,
+          "blockCount": 1,
+          "stimulusMs": 400,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "perseverationRtMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-cpt",
+        "trials": []
+      },
+      "expectedError": "cpt v1 expects exactly 12 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "targetRatio": 0.25,
+          "blockCount": 1,
+          "stimulusMs": 400,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "perseverationRtMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-cpt",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "blockIndex": 0,
+              "isTarget": false,
+              "stimulus": "H",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "cpt v1 expects exactly 12 trials, got 1"
+    }
+  ]
+}

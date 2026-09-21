@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "pairedassociate",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "pairCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyDurationMs": 12000,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "nonverbal-pairs-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-paired",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 1,
+              "responses": [
+                {
+                  "itemId": "pair-01",
+                  "selectedPosition": 5
+                },
+                {
+                  "itemId": "pair-02",
+                  "selectedPosition": 3
+                },
+                {
+                  "itemId": "pair-03",
+                  "selectedPosition": 6
+                },
+                {
+                  "itemId": "pair-04",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-05",
+                  "selectedPosition": 7
+                },
+                {
+                  "itemId": "pair-06",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-07",
+                  "selectedPosition": 8
+                },
+                {
+                  "itemId": "pair-08",
+                  "selectedPosition": 9
+                },
+                {
+                  "itemId": "pair-09",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-10",
+                  "selectedPosition": 10
+                },
+                {
+                  "itemId": "pair-11",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-12",
+                  "selectedPosition": 8
+                }
+              ],
+              "responseDurationMs": 3000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 2,
+              "responses": [
+                {
+                  "itemId": "pair-01",
+                  "selectedPosition": 4
+                },
+                {
+                  "itemId": "pair-02",
+                  "selectedPosition": 3
+                },
+                {
+                  "itemId": "pair-03",
+                  "selectedPosition": 5
+                },
+                {
+                  "itemId": "pair-04",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-05",
+                  "selectedPosition": 6
+                },
+                {
+                  "itemId": "pair-06",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-07",
+                  "selectedPosition": 7
+                },
+                {
+                  "itemId": "pair-08",
+                  "selectedPosition": 9
+                },
+                {
+                  "itemId": "pair-09",
+                  "selectedPosition": 1
+                },
+                {
+                  "itemId": "pair-10",
+                  "selectedPosition": 10
+                },
+                {
+                  "itemId": "pair-11",
+                  "selectedPosition": 11
+                },
+                {
+                  "itemId": "pair-12",
+                  "selectedPosition": 8
+                }
+              ],
+              "responseDurationMs": 3000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 3,
+              "responses": [
+                {
+                  "itemId": "pair-01",
+                  "selectedPosition": 4
+                },
+                {
+                  "itemId": "pair-02",
+                  "selectedPosition": 3
+                },
+                {
+                  "itemId": "pair-03",
+                  "selectedPosition": 5
+                },
+                {
+                  "itemId": "pair-04",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-05",
+                  "selectedPosition": 6
+                },
+                {
+                  "itemId": "pair-06",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-07",
+                  "selectedPosition": 7
+                },
+                {
+                  "itemId": "pair-08",
+                  "selectedPosition": 9
+                },
+                {
+                  "itemId": "pair-09",
+                  "selectedPosition": 1
+                },
+                {
+                  "itemId": "pair-10",
+                  "selectedPosition": 10
+                },
+                {
+                  "itemId": "pair-11",
+                  "selectedPosition": 11
+                },
+                {
+                  "itemId": "pair-12",
+                  "selectedPosition": 8
+                }
+              ],
+              "responseDurationMs": 3000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "correctByTrial": [
+            6,
+            12,
+            12
+          ],
+          "learningSlope": 0.25,
+          "trialsToCriterion": 2,
+          "immediateAccuracy": 1,
+          "delayedAccuracy": null
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "excessiveOmissions": false,
+          "constantPositionResponse": false,
+          "delayedStageIncomplete": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "pairCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyDurationMs": 12000,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "nonverbal-pairs-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-paired",
+        "trials": []
+      },
+      "expectedError": "pairedassociate v1 requires every learning round and at most one delayed round"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "pairCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0,
+          "studyDurationMs": 12000,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "nonverbal-pairs-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-paired",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "phase": "learning",
+              "roundIndex": 1,
+              "responses": [
+                {
+                  "itemId": "pair-01",
+                  "selectedPosition": 5
+                },
+                {
+                  "itemId": "pair-02",
+                  "selectedPosition": 3
+                },
+                {
+                  "itemId": "pair-03",
+                  "selectedPosition": 6
+                },
+                {
+                  "itemId": "pair-04",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-05",
+                  "selectedPosition": 7
+                },
+                {
+                  "itemId": "pair-06",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-07",
+                  "selectedPosition": 8
+                },
+                {
+                  "itemId": "pair-08",
+                  "selectedPosition": 9
+                },
+                {
+                  "itemId": "pair-09",
+                  "selectedPosition": 2
+                },
+                {
+                  "itemId": "pair-10",
+                  "selectedPosition": 10
+                },
+                {
+                  "itemId": "pair-11",
+                  "selectedPosition": 0
+                },
+                {
+                  "itemId": "pair-12",
+                  "selectedPosition": 8
+                }
+              ],
+              "responseDurationMs": 3000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "pairedassociate v1 requires every learning round and at most one delayed round"
+    }
+  ]
+}

@@ -217,11 +217,11 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   protocol: ProtocolDefinition
   scorer: AuthoritativeScorer<TConfig, TTrial>
   finalSubmission: FinalSubmissionDefinition<TConfig>
-  profiles: Record<CognitiveProfile, {
+  profiles: Partial<Record<CognitiveProfile, {
     estimatedMinutes: [number, number]
     configPatch: Record<string, unknown>
     reportCaveats: string[]
-  }>
+  }>>
   metrics: Record<string, MetricDefinition>
   quality: Record<string, QualityDefinition>
   references: ReferenceApplicability[]

@@ -43,5 +43,15 @@
   "presentation": {
     "file": "participant-presentation.ts",
     "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/stroop/__tests__/StroopTask.test.tsx",
+      "src/modules/cognitive/tasks/stroop/__tests__/prng.test.ts"
+    ]
   }
 }

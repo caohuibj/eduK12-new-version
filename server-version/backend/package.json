@@ -1,7 +1,7 @@
 {
   "name": "ptool-backend",
   "version": "1.0.0",
-  "description": "PTool 独立服务器版本后端",
+  "description": "PTool \u72ec\u7acb\u670d\u52a1\u5668\u7248\u672c\u540e\u7aef",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -34,7 +34,8 @@
     "deploy": "bash /opt/ptool/scripts/deploy.sh backend",
     "cognitive:manifest:generate": "node ../scripts/cognitive/manifests.cjs",
     "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check",
-    "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs"
+    "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs",
+    "cognitive:onboarding-check": "tsx src/scripts/cognitive-onboarding-check.ts"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",

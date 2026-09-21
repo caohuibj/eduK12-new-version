@@ -64,12 +64,12 @@ describe('scientific maturity inventory qualification', () => {
     }
   })
 
-  it('reuses Cognitive catalog literature and rights provenance for Research Ready qualification', () => {
+  it('does not inherit unscoped Cognitive catalog literature as exact-identity qualification', () => {
     const definition = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')
     if (!definition) throw new Error('reaction definition missing')
     const qualification = evaluateCognitiveScientificQualification(definition)
-    expect(qualification.researchReady.eligible).toBe(true)
-    expect(qualification.maxEligibleMaturity).toBe('RESEARCH_READY')
+    expect(qualification.researchReady.eligible).toBe(false)
+    expect(qualification.maxEligibleMaturity).toBe('PILOT')
     expect(qualification.researchGrade.eligible).toBe(false)
   })
 

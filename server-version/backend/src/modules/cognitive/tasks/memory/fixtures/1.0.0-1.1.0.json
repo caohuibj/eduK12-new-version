@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "memory",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "startLength": 2,
+          "maxLength": 5,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 1000,
+          "inactivityGuardMs": 30000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "length": 2,
+              "trialWithinLevel": 1,
+              "sequence": [
+                0,
+                1
+              ],
+              "response": [
+                0,
+                1
+              ],
+              "responseDurationMs": 100,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "length": 2,
+              "trialWithinLevel": 2,
+              "sequence": [
+                0,
+                1
+              ],
+              "response": [
+                0,
+                9
+              ],
+              "responseDurationMs": 200,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "length": 3,
+              "trialWithinLevel": 1,
+              "sequence": [
+                0,
+                1,
+                2
+              ],
+              "response": [
+                0,
+                1,
+                2
+              ],
+              "responseDurationMs": 100,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "length": 3,
+              "trialWithinLevel": 2,
+              "sequence": [
+                0,
+                1,
+                2
+              ],
+              "response": [
+                0,
+                1,
+                9
+              ],
+              "responseDurationMs": 200,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "length": 4,
+              "trialWithinLevel": 1,
+              "sequence": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "response": [
+                0,
+                1,
+                2,
+                9
+              ],
+              "responseDurationMs": 100,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "length": 4,
+              "trialWithinLevel": 2,
+              "sequence": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "response": [
+                0,
+                1,
+                2,
+                9
+              ],
+              "responseDurationMs": 200,
+              "interrupted": true
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 60,
+        "metrics": {
+          "maxSpan": 3,
+          "levelsPassed": 2,
+          "firstTryPassCount": 2,
+          "trialCount": 6,
+          "interruptedCount": 1,
+          "medianResponseDurationMs": 150,
+          "totalCorrectTrials": 2,
+          "perseverativeTrialCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": true,
+          "insufficientCompletedLevels": false,
+          "invalidSequencePattern": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "startLength": 2,
+          "maxLength": 5,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 1000,
+          "inactivityGuardMs": 30000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "memory v1 requires a complete two-trial level"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "startLength": 2,
+          "maxLength": 5,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 1000,
+          "inactivityGuardMs": 30000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "length": 2,
+              "trialWithinLevel": 1,
+              "sequence": [
+                0,
+                1
+              ],
+              "response": [
+                0,
+                1
+              ],
+              "responseDurationMs": 100,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "memory v1 requires a complete two-trial level"
+    }
+  ]
+}

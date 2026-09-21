@@ -32,6 +32,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
   if (definition.protocol.measurementCriticalConfigPaths.length === 0) issues.push(issue('protocol.measurementCriticalConfigPaths', 'at least one measurement-critical config path is required'))
   const phaseKeys = new Set<string>()
   for (const [index, phase] of definition.protocol.phases.entries()) {
+    if (!['test', 'learning', 'delayed'].includes(phase.key)) issues.push(issue(`protocol.phases.${index}.key`, 'unsupported phase'))
     if (phaseKeys.has(phase.key)) issues.push(issue(`protocol.phases.${index}.key`, 'protocol phase keys must be unique'))
     phaseKeys.add(phase.key)
     if (!phase.persists && phase.required) issues.push(issue(`protocol.phases.${index}`, 'a required phase must be persisted'))
@@ -39,8 +40,18 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
   if (definition.protocol.phases.length === 0 || !definition.protocol.phases.some((phase) => phase.persists && phase.required)) {
     issues.push(issue('protocol.phases', 'at least one required persisted phase is needed'))
   }
-  if (definition.profiles.standard === undefined || definition.profiles.research === undefined) {
-    issues.push(issue('profiles', 'standard and research profiles are required'))
+  if (definition.profiles.standard === undefined) {
+    issues.push(issue('profiles', 'standard profile is required'))
+  }
+
+  for (const [profile, value] of Object.entries(definition.profiles)) {
+    if (!validProfiles.has(profile) || !value || !Array.isArray(value.estimatedMinutes)
+      || value.estimatedMinutes.length !== 2 || !value.estimatedMinutes.every(n => Number.isFinite(n) && n > 0)
+      || value.estimatedMinutes[0] > value.estimatedMinutes[1]
+      || !value.configPatch || typeof value.configPatch !== 'object' || Array.isArray(value.configPatch)
+      || !Array.isArray(value.reportCaveats) || !value.reportCaveats.every(s => typeof s === 'string')) {
+      issues.push(issue(`profiles.${profile}`, 'declared profile is invalid'))
+    }
   }
 
   const metricKeys = new Set(Object.keys(definition.metrics))
@@ -57,6 +68,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
     if (metric.referenceEligible && (metric.role === 'quality' || metric.role === 'research_only')) {
       issues.push(issue(`metrics.${key}.role`, 'quality or research_only metric cannot be reference eligible'))
     }
+    if (metric.availableProfiles.some(profile => !validProfiles.has(profile) || !definition.profiles[profile])) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric references an absent profile'))
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
     for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
@@ -75,6 +87,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
   assertVisibility(definition.report.detailMetrics, 'detail', 'report.detailMetrics')
 
   for (const [key, quality] of Object.entries(definition.quality)) {
+    if (!['none', 'limited', 'invalid'].includes(quality.effect)) issues.push(issue(`quality.${key}.effect`, 'quality effect is invalid'))
     if (quality.key !== key) issues.push(issue(`quality.${key}.key`, 'quality key must match its registry key'))
     if (!quality.label || !quality.description) issues.push(issue(`quality.${key}`, 'quality label and description are required'))
   }

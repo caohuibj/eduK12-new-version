@@ -1,50 +1,57 @@
 # PR2 — deterministic onboarding and scientific qualification
 
-Base: `cffa9de2160b2b01312bfb66fd7fc7b4ab325c9b`.
-PR1: #147, merged 2026-09-21 after full CI, media acceptance and merge gate succeeded.
-Branch: `feat/cognitive-onboarding-gates`.
-Status: **Started / draft, not feature complete.**
+Base: `cffa9de2160b2b01312bfb66fd7fc7b4ab325c9b` (merged PR #147).
+PR: #148. Branch: `feat/cognitive-onboarding-gates`.
 
-## First implementation checkpoint
+## Delivered
 
-- Added strict, versioned `CognitiveBlockerV1` and `CognitiveOnboardingDecisionV1`
-  transport schemas for all planned domains and gates.
-- Added pure decision composition and stable JSON/text serialization. Object-key
-  and blocker ordering is independent of insertion order and locale. Only identical
-  diagnostics are deduplicated; distinct expected/actual values remain inspectable.
-- Technical failure blocks Pilot readiness; scientific eligibility and declaration
-  validity remain separate from product availability.
-- Added `declarationValid` and `declarationBlockers`: the v3 plan's
-  `blockersToNextTier` alone cannot represent a currently invalid declaration.
-- Reject contradictory readiness, misplaced gate blockers, unsupported schema
-  versions, extra fields and non-JSON evidence values.
-- Verified 11 contract tests and full backend TypeScript build.
+- Versioned, strict decision/blocker contracts with canonical JSON and text views.
+- Offline `cognitive:onboarding-check` producer: discovery and generated drift,
+  dependency boundaries and asset signatures, task/profile/protocol/FINAL contracts,
+  exact seed configs, versioned presentation, executable scorer fixtures, metric
+  presence/types/finite values, authoritative trial validation and report projection,
+  task-declared frontend acceptance, and exact-scope scientific qualification.
+- `--content-only --base <full SHA>` checks tracked and untracked changes and fails
+  closed on shared-core paths; generated files still require exact regeneration.
+- Standard is required. Experience/research are optional, but every declared profile
+  must validate, fit the FINAL budget, and match metric availability. The assignment
+  UI resets to standard when changing configs; backend rejects absent profiles.
+- All 28 historical execution identities have task-owned normal/empty/insufficient
+  fixtures. Existing independent golden tests and historical compatibility baselines
+  remain unchanged. Frontend acceptance declarations execute existing task-specific
+  practice/formal/timing/stimulus suites; they are not file-existence attestations.
+- Task-owned scientific records are projected at build time. Evidence must cover
+  identity, all claimed profiles, protocol signature, actual seed/profile stimulus
+  version, and population scope. Missing or mismatched evidence cannot raise a tier.
+  All existing declarations remain Pilot. No AI, network review, automatic promotion,
+  or scientific gate is introduced into scoring or product publication.
+- Test-only unknown package exercises actual release, assignment, session, legacy
+  and unified FINAL, idempotent replay and report services against PostgreSQL. Only
+  generated projections are extended inside its isolated test worker. It never
+  appears in the production registry. Its frontend fixture now has real practice
+  and formal steps.
+- Fixed a gap exposed by that lifecycle test: both FINAL paths now use the frozen
+  report/metric/quality/presentation metadata, matching completion.service. Editing
+  live presentation after publish does not change the frozen participant report.
+- Full frontend CI runs all-package onboarding decisions; full backend CI includes
+  the real PostgreSQL lifecycle test. Real-browser/media checks remain in their
+  existing CI lanes, outside synchronous publication.
 
-The composer is **not a validator**. Its callers must complete all checks before
-supplying facts. It does not discover packages, inspect evidence, authorize
-publication or call any AI/network service. No CLI is exposed until the producer
-can return complete diagnostics. Production publication and qualification behavior
-is unchanged in this initial checkpoint.
+## Compatibility finding
 
-## Remaining PR2 work before ready for review
+BART 1.0.0 has two historical average-pump metrics declared as integer despite
+returning fractional means. Its fixture records an explicit, baseline-pinned
+compatibility warning for those two keys. Changing that metadata in place changes
+historical execution hashes, so PR2 does not silently rewrite it. A future BART
+version must declare these averages as number. Other metric type mismatches block.
 
-1. Connect package discovery, task/profile/protocol/asset/scoring/report checks to
-   one producer and expose `npm run cognitive:onboarding-check -- <task> --json`.
-   Incomplete or failed validation must never yield a ready decision.
-2. Make standard required and experience/research optional consistently across
-   typings, adapters, validators, config resolution and UI. Reject requests for
-   absent profiles and validate every profile that is declared.
-3. Validate executable normal/boundary/stimulus/report/runner evidence. Keep
-   expensive browser validation outside the synchronous publication API.
-4. Generate exact-identity task-owned governance. Enforce evidence applicability
-   across profile/protocol/stimulus/population scope, reuse the cross-family
-   qualification evaluator, and check declared <= eligible without auto-promotion.
-5. Extend the unknown fixture to the real DRAFT → explicit PUBLISH → attempt →
-   FINAL → report chain and complete the domain blocker negative matrix. Expose
-   content-only path classification with a pinned base SHA and manifest drift gate.
-6. Finish human-operated authoring/promotion instructions, full regression and CI.
+## Local validation
 
-Existing PR1 execution and historical report baselines remain authoritative. Do
-not rewrite those baselines to hide unintended drift. Any intended PR2 readiness
-change needs a separate, explicit assertion. PR2 must remain draft until this list
-is complete; it is not authorized for merge by the PR1 merge instruction.
+- Backend TypeScript build and frontend application/Cognitive typechecks.
+- Existing historical execution/report baselines unchanged and passing.
+- Cognitive/governance regression, task-owned fixture negatives, scientific-scope
+  negatives, CLI deterministic JSON/text parity and content-only base validation.
+- Frontend cognitive runner regression, lint and production build.
+- Both unknown-task FINAL paths passed against an isolated PostgreSQL 15 database.
+- Full CI must be inspected on the final PR head; local unit runs skip DB suites
+  when their explicit integration URL is absent. PR2 is not authorized for merge.

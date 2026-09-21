@@ -341,6 +341,12 @@ jobs:
         run: npm run typecheck
       - name: full frontend tests
         run: npm test
+      - name: install offline Cognitive diagnostic dependencies
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts
+      - name: all Cognitive onboarding decisions
+        working-directory: server-version/backend
+        run: npm run cognitive:onboarding-check -- --all --json
       - name: build (vite)
         run: npm run build
 

@@ -5,10 +5,11 @@ import {
   type ProductReadinessDecisionV1,
   type ProductReadinessIssueV1,
 } from '../../assessment-governance/product-readiness'
+import { resolveCognitiveFinalMaxTrials } from '../v2/final-submission-budget'
 import { validateTaskDefinition } from '../v2/publication-gate'
 import type { CognitiveProfile, TaskDefinition } from '../v2/types'
 
-const releaseProfiles: CognitiveProfile[] = ['standard', 'research']
+const releaseProfiles: CognitiveProfile[] = ['experience', 'standard', 'research']
 
 const asRecord = (value: unknown): Record<string, unknown> | null => (
   value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -60,7 +61,7 @@ export const evaluateCognitiveProductReadiness = (
           message: 'Cognitive product config must resolve to an object before profile patches are applied',
         })
       } else {
-        for (const profile of releaseProfiles) {
+        for (const profile of releaseProfiles.filter(p => p === 'standard' || Object.prototype.hasOwnProperty.call(definition.profiles, p))) {
           const profileDefinition = definition.profiles[profile]
           if (!profileDefinition) {
             blockers.push({
@@ -73,6 +74,11 @@ export const evaluateCognitiveProductReadiness = (
           const resolvedConfig = {
             ...parsedRecord,
             ...profileDefinition.configPatch,
+          }
+          try {
+            resolveCognitiveFinalMaxTrials(definition, definition.configSchema.parse(resolvedConfig))
+          } catch {
+            blockers.push({ stage: 'FINAL', code: 'COGNITIVE_PROFILE_FINAL_INVALID', message: `${profile} profile must resolve to a valid FINAL trial budget` })
           }
           if (!definition.configSchema.safeParse(resolvedConfig).success) {
             blockers.push({

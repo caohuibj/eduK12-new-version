@@ -83,6 +83,7 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 }) => {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
   const profileDefinition = input.entry.profiles[input.profile]
+  if (!profileDefinition) throw BAD_REQUEST(`该任务未声明 Profile ${input.profile}`)
   const protocolPresentation = resolveCognitiveProtocolPresentation({
     testType: input.entry.testType,
     engineVersion: input.entry.engineVersion,

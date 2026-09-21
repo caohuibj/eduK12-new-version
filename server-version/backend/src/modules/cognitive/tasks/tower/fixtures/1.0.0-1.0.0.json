@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "tower",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "problemCount": 4,
+          "maxMovesFactor": 3,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "three-peg-tower-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-tower",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "problemId": "tower-05",
+              "moves": [
+                {
+                  "disk": 2,
+                  "from": 1,
+                  "to": 2,
+                  "atMs": 500
+                },
+                {
+                  "disk": 0,
+                  "from": 0,
+                  "to": 2,
+                  "atMs": 800
+                }
+              ],
+              "gaveUp": false,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "problemId": "tower-06",
+              "moves": [
+                {
+                  "disk": 0,
+                  "from": 0,
+                  "to": 2,
+                  "atMs": 500
+                },
+                {
+                  "disk": 1,
+                  "from": 0,
+                  "to": 1,
+                  "atMs": 800
+                }
+              ],
+              "gaveUp": false,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "problemId": "tower-10",
+              "moves": [
+                {
+                  "disk": 2,
+                  "from": 1,
+                  "to": 2,
+                  "atMs": 500
+                },
+                {
+                  "disk": 0,
+                  "from": 0,
+                  "to": 1,
+                  "atMs": 800
+                },
+                {
+                  "disk": 1,
+                  "from": 0,
+                  "to": 2,
+                  "atMs": 1100
+                },
+                {
+                  "disk": 0,
+                  "from": 1,
+                  "to": 0,
+                  "atMs": 1400
+                }
+              ],
+              "gaveUp": false,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "problemId": "tower-08",
+              "moves": [
+                {
+                  "disk": 0,
+                  "from": 0,
+                  "to": 1,
+                  "atMs": 500
+                },
+                {
+                  "disk": 1,
+                  "from": 0,
+                  "to": 2,
+                  "atMs": 800
+                },
+                {
+                  "disk": 0,
+                  "from": 1,
+                  "to": 2,
+                  "atMs": 1100
+                },
+                {
+                  "disk": 2,
+                  "from": 0,
+                  "to": 1,
+                  "atMs": 1400
+                }
+              ],
+              "gaveUp": false,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "minimumMoveSolveRate": 1,
+          "solveRate": 1,
+          "excessMoves": 0,
+          "firstMoveLatencyMs": 500,
+          "ruleViolations": 0,
+          "noAttemptRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "excessiveRuleViolations": false,
+          "insufficientAttemptedProblems": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "problemCount": 4,
+          "maxMovesFactor": 3,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "three-peg-tower-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-tower",
+        "trials": []
+      },
+      "expectedError": "tower v1 requires the configured problem count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "problemCount": 4,
+          "maxMovesFactor": 3,
+          "inactivityGuardMs": 90000,
+          "stimulusSetVersion": "three-peg-tower-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-tower",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "problemId": "tower-05",
+              "moves": [
+                {
+                  "disk": 2,
+                  "from": 1,
+                  "to": 2,
+                  "atMs": 500
+                },
+                {
+                  "disk": 0,
+                  "from": 0,
+                  "to": 2,
+                  "atMs": 800
+                }
+              ],
+              "gaveUp": false,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "tower v1 requires the configured problem count"
+    }
+  ]
+}

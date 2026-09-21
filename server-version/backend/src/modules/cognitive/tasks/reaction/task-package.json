@@ -43,5 +43,15 @@
   "presentation": {
     "file": "participant-presentation.ts",
     "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/__tests__/CognitiveSingleTaskReportCard.heading.test.tsx",
+      "src/modules/cognitive/tasks/reaction/__tests__/ReactionTask.test.tsx"
+    ]
   }
 }
