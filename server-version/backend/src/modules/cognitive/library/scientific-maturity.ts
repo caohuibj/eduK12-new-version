@@ -17,7 +17,7 @@ export const cognitiveScientificMaturityIdentityKey = (
  */
 export const COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY = new Map<string, CognitiveScientificStatus>()
 
-interface CognitiveMaturityIdentityView {
+export interface CognitiveMaturityIdentityView {
   add(identity: string): CognitiveMaturityIdentityView
   delete(identity: string): boolean
   has(identity: string): boolean
