@@ -3,13 +3,14 @@ import { describe, expect, it } from 'vitest'
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
 import { encryptField } from '../../utils/encryption'
-import { buildScaleUnitReport } from '../../modules/reporting/scale-unit-report'
+import { buildScaleUnitReport, projectScaleUnitReport } from '../../modules/reporting/scale-unit-report'
 import { buildQuestionnaireCollectionReport } from '../../modules/reporting/questionnaire-collection-report'
+import { createScaleProjectionContext } from '../../modules/scale/projection/context-factory'
 import type { ScaleResultV2 } from '../../modules/scale/scale-result'
 
 const makeResult = (overrides: Partial<ScaleResultV2> = {}): ScaleResultV2 => ({
   schemaVersion: 2,
-  instrument: { scaleId: 'scale-1', code: 'S-1', name: '学习投入', instrumentVersion: '2.0.0' },
+  instrument: { scaleId: 'scale-1', code: 'adexi_v1', name: '学习投入', instrumentVersion: '2.0.0' },
   method: {
     scaleId: 'scale-1',
     instrumentVersion: '2.0.0',
@@ -43,12 +44,12 @@ const makeResult = (overrides: Partial<ScaleResultV2> = {}): ScaleResultV2 => ({
 })
 
 describe('Scale unit report contract', () => {
-  it('projects one v2 scale result without collection interpretation and preserves zero/null', () => {
+  it('keeps the internal v2 report complete without inventing collection interpretation', () => {
     const result = makeResult()
     const report = buildScaleUnitReport({
       itemId: 'questionnaire-scale-1',
       scaleId: 'scale-1',
-      scaleCode: 'S-1',
+      scaleCode: 'adexi_v1',
       scaleName: '学习投入',
       result,
       completedAt: new Date('2026-08-20T01:00:00.000Z'),
@@ -74,6 +75,7 @@ describe('Scale unit report contract', () => {
     const result = makeResult()
     const report = buildScaleUnitReport({
       scaleId: 'scale-v2',
+      scaleCode: 'adexi_v1',
       scaleName: '历史量表',
       result: encryptField(result),
     })
@@ -88,7 +90,7 @@ describe('Scale unit report contract', () => {
     expect(degraded).toMatchObject({ decryptError: true, result: null, scores: [] })
   })
 
-  it('keeps caveats and disclaimer identical across authenticated/public collection projections', () => {
+  it('re-projects authenticated/public stored reports through the same respondent disclosure boundary', () => {
     const result = makeResult()
     const qa = {
       questionnaire: {
@@ -97,7 +99,7 @@ describe('Scale unit report contract', () => {
           id: 'questionnaire-scale-1',
           scaleId: 'scale-1',
           position: 0,
-          scale: { id: 'scale-1', code: 'S-1', name: '学习投入' },
+          scale: { id: 'scale-1', code: 'adexi_v1', name: '学习投入', instrumentVersion: '2.0.0' },
         }],
         formItems: [],
       },
@@ -107,24 +109,35 @@ describe('Scale unit report contract', () => {
         result,
         completedAt: new Date('2026-08-20T01:00:00.000Z'),
         totalTime: 0,
-        scale: { id: 'scale-1', code: 'S-1', name: '学习投入' },
+        scale: { id: 'scale-1', code: 'adexi_v1', name: '学习投入', instrumentVersion: '2.0.0' },
       }],
       formAnswers: [],
     }
     const authenticated = buildQuestionnaireCollectionReport(qa).unitReports[0]
     const publicProjection = buildQuestionnaireCollectionReport(structuredClone(qa)).unitReports[0]
-    const direct = buildScaleUnitReport({
+    const internal = buildScaleUnitReport({
       itemId: 'questionnaire-scale-1',
       scaleId: 'scale-1',
-      scaleCode: 'S-1',
+      scaleCode: 'adexi_v1',
       scaleName: '学习投入',
       result,
       completedAt: qa.scaleAssessments[0].completedAt,
       totalTime: 0,
     })
+    const expected = projectScaleUnitReport(internal, createScaleProjectionContext({
+      instrumentKey: 'adexi_v1',
+      instrumentVersion: '2.0.0',
+      audience: 'respondent',
+      purpose: 'report',
+    }))
 
     expect(authenticated).toEqual(publicProjection)
-    expect(authenticated).toEqual(direct)
-    expect(authenticated).toMatchObject({ caveats: ['同一项注意事项'], disclaimer: '同一项免责声明' })
+    expect(authenticated).toEqual(expected)
+    expect(authenticated).toMatchObject({
+      reportKind: 'full',
+      caveats: ['同一项注意事项'],
+      disclaimer: '同一项免责声明',
+      result: null,
+    })
   })
 })
