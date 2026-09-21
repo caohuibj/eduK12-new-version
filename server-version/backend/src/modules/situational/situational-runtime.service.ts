@@ -18,10 +18,11 @@ import {
   getSituationPackage,
   selectPublishedSituationPackage,
   validateSituationPackage,
-  type SituationPackageV1,
+  type SituationPackage,
 } from './situation-package.registry'
 import { resolveSituationalScientificMaturity } from './scientific-maturity'
-import { runnerSituationDefinition, situationalAssetReferences } from './situation-definition'
+import { situationalAssetReferences } from './situation-definition'
+import { runnerSituationRuntimeDefinition } from './situation-runtime-definition'
 import type { SituationalResultV1 } from './situation-scoring'
 import {
   decryptUnifiedRuntimePayload,
@@ -285,10 +286,10 @@ export const situationalAttemptForResponse = (
   }
 }
 
-const publishedPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackageV1 => {
+const publishedPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackage => {
   const situationPackage = selectPublishedSituationPackage(
     instrumentVersion
-      ? [getSituationPackage(instrumentKey, instrumentVersion)].filter((candidate): candidate is SituationPackageV1 => candidate !== undefined)
+      ? [getSituationPackage(instrumentKey, instrumentVersion)].filter((candidate): candidate is SituationPackage => candidate !== undefined)
       : listSituationPackages(),
     instrumentKey,
     instrumentVersion,
@@ -314,7 +315,7 @@ export const listSituationalInstruments = () => listSituationPackages()
       definition: situationPackage.definition,
       sourceDefinitionHash: validation.definitionHash,
     })
-    const runnerDefinition = runnerSituationDefinition(situationPackage.definition)
+    const runnerDefinition = runnerSituationRuntimeDefinition(situationPackage.definition)
     return {
       key: situationPackage.key,
       version: situationPackage.instrumentVersion,

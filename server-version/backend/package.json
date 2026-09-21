@@ -1,7 +1,7 @@
 {
   "name": "ptool-backend",
   "version": "1.0.0",
-  "description": "PTool \u72ec\u7acb\u670d\u52a1\u5668\u7248\u672c\u540e\u7aef",
+  "description": "PTool 独立服务器版本后端",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -39,6 +39,11 @@
     "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check",
     "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs",
     "cognitive:onboarding-check": "tsx src/scripts/cognitive-onboarding-check.ts",
+    "situational:manifest:generate": "node scripts/generate-situational-instruments.mjs",
+    "situational:manifest:check": "node scripts/generate-situational-instruments.mjs --check",
+    "situational:onboarding-check": "tsx src/scripts/situational-onboarding-check.ts",
+    "situational:contracts": "npm run situational:manifest:check && npm run situational:onboarding-check -- --all",
+    "situational:scaffold": "node scripts/scaffold-situational-instrument.mjs",
     "scale:onboarding:audit": "tsx src/scripts/scale-onboarding-backfill.ts --audit",
     "scale:onboarding:backfill": "tsx src/scripts/scale-onboarding-backfill.ts",
     "scale:instrument:publish": "tsx src/scripts/publish-scale-instrument.ts",

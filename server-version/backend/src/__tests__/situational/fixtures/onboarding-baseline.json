@@ -1,0 +1,1634 @@
+[
+  {
+    "key": "sjt-assertiveness-golden",
+    "instrumentVersion": "1.0.0",
+    "releaseStatus": "PUBLISHED",
+    "definition": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "情境化人格测评黄金模板：E-Assertiveness（行为倾向通道，文字版 V1）",
+        "citation": "eduK12 情境化测评设计组，基于 BFI-2 Assertiveness facet 的自编情境草案。",
+        "publicationYear": 2026
+      },
+      "license": {
+        "status": "self_authored",
+        "redistribution": "restricted",
+        "note": "自编情境草案；provisional key 仅用于开发期验证，不得作为常模解释依据。"
+      },
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AS-01",
+          "title": "大家都同意了，你要指出错误吗？",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "四人小组正在快速确定汇报方案。你刚看见屏幕上的数据明显支持方案 B，但组员把它误读成了 A。有人看了一眼时间说\"差不多了，就这样吧\"，其他人点头。组员甲看向你：\"你也觉得 A 可以吧？\"——画面定格。"
+          },
+          "primaryConstruct": "bfi2.assertiveness",
+          "secondaryConstructs": [
+            "bfi2.respectfulness"
+          ],
+          "situationFeatures": {
+            "duty": 0.8,
+            "sociality": 0.5,
+            "adversity": 0.5
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.assertiveness",
+              "prompt": "如果是你，下一步最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sceneKey": "AS-02",
+          "title": "会上资深同事用错了数字，你要开口吗？",
+          "sortOrder": 1,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "会议室里正在过月度数据。资深同事引用一组数字得出结论，而你手头的报表清楚显示正确数字是另一个。会议即将进入下一项，没有人提出疑问。主持人看向你：\"这里大家没有异议吧？\"——画面定格。"
+          },
+          "primaryConstruct": "bfi2.assertiveness",
+          "secondaryConstructs": [
+            "bfi2.respectfulness"
+          ],
+          "situationFeatures": {
+            "duty": 0.8,
+            "sociality": 0.6,
+            "adversity": 0.6
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.assertiveness",
+              "prompt": "如果是你，此刻最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "sjt-provisional-v1",
+        "choiceScores": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "A",
+            "contribution": 1.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "B",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "C",
+            "contribution": -0.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "D",
+            "contribution": -1.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "A",
+            "contribution": 1.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "B",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "C",
+            "contribution": -0.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "D",
+            "contribution": -1.5
+          }
+        ],
+        "publishedMetrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.assertiveness.behavior",
+            "headline": "果断性 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"群体共识 + 时间压力 + 是否公开表达异议\"的标准化情境中，公开表达异议的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在需要公开表达不同意见的情境中，通常选择哪种强度的表达方式。"
+              }
+            ],
+            "bands": []
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all-strongest",
+        "responses": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "responseValue": "A"
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "responseValue": "A"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.assertiveness.behavior": 1.5
+          },
+          "metricKeys": [
+            "bfi2.assertiveness.behavior"
+          ]
+        }
+      },
+      {
+        "name": "all-weakest",
+        "responses": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "responseValue": "D"
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "responseValue": "D"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.assertiveness.behavior": -1.5
+          },
+          "metricKeys": [
+            "bfi2.assertiveness.behavior"
+          ]
+        }
+      },
+      {
+        "name": "mixed-gradient",
+        "responses": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "responseValue": "A"
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "responseValue": "D"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.assertiveness.behavior": 0
+          },
+          "metricKeys": [
+            "bfi2.assertiveness.behavior"
+          ]
+        }
+      },
+      {
+        "name": "missing-second-scene",
+        "responses": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "responseValue": "A"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "metrics": {
+            "bfi2.assertiveness.behavior": null
+          },
+          "metricKeys": [
+            "bfi2.assertiveness.behavior"
+          ]
+        }
+      }
+    ],
+    "runtime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "SITUATIONAL",
+      "instrumentKey": "sjt-assertiveness-golden",
+      "instrumentVersion": "1.0.0",
+      "sourceDefinitionHash": "d60aa196c3a0f1a9d92bf17f06f3f67039541168bd9ba422f0bdf20759e03fab",
+      "scorerKey": "situational.default",
+      "scorerVersion": "sjt-provisional-v1",
+      "metricDefinitions": {
+        "bfi2.assertiveness.behavior": {
+          "key": "bfi2.assertiveness.behavior",
+          "label": "果断性 × 行为倾向（provisional）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_more",
+          "role": "primary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "结果满足情境化测评定义的解释条件。"
+        },
+        "limited": {
+          "key": "limited",
+          "label": "有限",
+          "description": "结果可计算但解释受到数据质量限制。"
+        },
+        "invalid": {
+          "key": "invalid",
+          "label": "无效",
+          "description": "结果不满足可解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.assertiveness.behavior",
+            "headline": "果断性 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"群体共识 + 时间压力 + 是否公开表达异议\"的标准化情境中，公开表达异议的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在需要公开表达不同意见的情境中，通常选择哪种强度的表达方式。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      },
+      "compiledRuntimeHash": "e995fee8bbd8e72369247ae789dda19cd44296e6beb47aa9b1638a60768e4f9b",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1"
+    },
+    "runner": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AS-01",
+          "title": "大家都同意了，你要指出错误吗？",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "四人小组正在快速确定汇报方案。你刚看见屏幕上的数据明显支持方案 B，但组员把它误读成了 A。有人看了一眼时间说\"差不多了，就这样吧\"，其他人点头。组员甲看向你：\"你也觉得 A 可以吧？\"——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "如果是你，下一步最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sceneKey": "AS-02",
+          "title": "会上资深同事用错了数字，你要开口吗？",
+          "sortOrder": 1,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "会议室里正在过月度数据。资深同事引用一组数字得出结论，而你手头的报表清楚显示正确数字是另一个。会议即将进入下一项，没有人提出疑问。主持人看向你：\"这里大家没有异议吧？\"——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "如果是你，此刻最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "results": [
+      {
+        "metrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 1.5,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "answeredResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": -1.5,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "answeredResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 0,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "answeredResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AS-01:behavior",
+              "AS-02:behavior"
+            ],
+            "answeredResponses": [
+              "AS-01:behavior"
+            ],
+            "status": "not_calculable"
+          }
+        ],
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_responses",
+            "metric_not_calculable"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "key": "sjt-responsibility-golden",
+    "instrumentVersion": "1.0.0",
+    "releaseStatus": "PUBLISHED",
+    "definition": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "情境化人格测评黄金模板：C-Responsibility（行为倾向通道，文字版 V1）",
+        "citation": "eduK12 情境化测评设计组，基于 BFI-2 Responsibility facet 的自编情境草案。",
+        "publicationYear": 2026
+      },
+      "license": {
+        "status": "self_authored",
+        "redistribution": "restricted",
+        "note": "自编情境草案；provisional key 仅用于开发期验证，不得作为常模解释依据。"
+      },
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "RS-01",
+          "title": "这个错误现在还没人发现",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "你刚在群里发出一份团队文件，随后发现漏掉了一行关键数据。群里已经有人回复\"收到，谢谢\"，另一人说\"我开始用了\"。目前没有人发现问题，而补发会让大家重新下载文件。光标停在输入框——画面定格。"
+          },
+          "primaryConstruct": "bfi2.responsibility",
+          "secondaryConstructs": [
+            "bfi2.productiveness"
+          ],
+          "situationFeatures": {
+            "duty": 0.9,
+            "deception": 0.4
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.responsibility",
+              "prompt": "你最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "立即说明是自己的疏漏，修正并重新发送文件。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "立即补发修正版，只简单说明\"更新了一处数据\"。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先判断这行数据是否真的会影响结果，必要时再说明。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "暂时不处理，等有人问到再修正。"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "sjt-provisional-v1",
+        "choiceScores": [
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "optionKey": "A",
+            "contribution": 1.5
+          },
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "optionKey": "B",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "optionKey": "C",
+            "contribution": -0.5
+          },
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "optionKey": "D",
+            "contribution": -1.5
+          }
+        ],
+        "publishedMetrics": [
+          {
+            "key": "bfi2.responsibility.behavior",
+            "label": "责任感 × 行为倾向（provisional）",
+            "construct": "bfi2.responsibility",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.responsibility.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.responsibility.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.responsibility.behavior",
+            "headline": "责任感 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"错误已发生但无人发现\"的标准化情境中，主动承担并纠正错误的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在无人监督时发现错误后的通常处理方式。"
+              }
+            ],
+            "bands": []
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "strongest-repair",
+        "responses": [
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "responseValue": "A"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.responsibility.behavior": 1.5
+          },
+          "metricKeys": [
+            "bfi2.responsibility.behavior"
+          ]
+        }
+      },
+      {
+        "name": "weakest-defer",
+        "responses": [
+          {
+            "sceneKey": "RS-01",
+            "channelKey": "behavior",
+            "responseValue": "D"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.responsibility.behavior": -1.5
+          },
+          "metricKeys": [
+            "bfi2.responsibility.behavior"
+          ]
+        }
+      },
+      {
+        "name": "missing-response",
+        "responses": [],
+        "expected": {
+          "quality": "invalid",
+          "metrics": {
+            "bfi2.responsibility.behavior": null
+          },
+          "metricKeys": [
+            "bfi2.responsibility.behavior"
+          ]
+        }
+      }
+    ],
+    "runtime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "SITUATIONAL",
+      "instrumentKey": "sjt-responsibility-golden",
+      "instrumentVersion": "1.0.0",
+      "sourceDefinitionHash": "e7baa3f362afd56f7456fa1abce03e1a528bc245b7be7d67bcc080a0b000fce6",
+      "scorerKey": "situational.default",
+      "scorerVersion": "sjt-provisional-v1",
+      "metricDefinitions": {
+        "bfi2.responsibility.behavior": {
+          "key": "bfi2.responsibility.behavior",
+          "label": "责任感 × 行为倾向（provisional）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_more",
+          "role": "primary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "结果满足情境化测评定义的解释条件。"
+        },
+        "limited": {
+          "key": "limited",
+          "label": "有限",
+          "description": "结果可计算但解释受到数据质量限制。"
+        },
+        "invalid": {
+          "key": "invalid",
+          "label": "无效",
+          "description": "结果不满足可解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.responsibility.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.responsibility.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.responsibility.behavior",
+            "headline": "责任感 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"错误已发生但无人发现\"的标准化情境中，主动承担并纠正错误的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在无人监督时发现错误后的通常处理方式。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "bfi2.responsibility.behavior"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      },
+      "compiledRuntimeHash": "acd5830d06f63a9e14be815378942132d091e931ddf5e9cf814b43afe63739cc",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1"
+    },
+    "runner": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "RS-01",
+          "title": "这个错误现在还没人发现",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "你刚在群里发出一份团队文件，随后发现漏掉了一行关键数据。群里已经有人回复\"收到，谢谢\"，另一人说\"我开始用了\"。目前没有人发现问题，而补发会让大家重新下载文件。光标停在输入框——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "你最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "立即说明是自己的疏漏，修正并重新发送文件。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "立即补发修正版，只简单说明\"更新了一处数据\"。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先判断这行数据是否真的会影响结果，必要时再说明。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "暂时不处理，等有人问到再修正。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "results": [
+      {
+        "metrics": [
+          {
+            "key": "bfi2.responsibility.behavior",
+            "label": "责任感 × 行为倾向（provisional）",
+            "construct": "bfi2.responsibility",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 1.5,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "RS-01:behavior"
+            ],
+            "answeredResponses": [
+              "RS-01:behavior"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.responsibility.behavior",
+            "label": "责任感 × 行为倾向（provisional）",
+            "construct": "bfi2.responsibility",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": -1.5,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "RS-01:behavior"
+            ],
+            "answeredResponses": [
+              "RS-01:behavior"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.responsibility.behavior",
+            "label": "责任感 × 行为倾向（provisional）",
+            "construct": "bfi2.responsibility",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": -1.5,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "RS-01:behavior"
+            ],
+            "answeredResponses": [],
+            "status": "not_calculable"
+          }
+        ],
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_responses",
+            "metric_not_calculable"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "key": "sjt-anxiety-golden",
+    "instrumentVersion": "1.0.0",
+    "releaseStatus": "PUBLISHED",
+    "definition": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "情境化人格测评黄金模板：N-Anxiety（情境解释 + 情绪通道，文字版 V1）",
+        "citation": "eduK12 情境化测评设计组，基于 BFI-2 Anxiety facet 的自编情境草案。",
+        "publicationYear": 2026
+      },
+      "license": {
+        "status": "self_authored",
+        "redistribution": "restricted",
+        "note": "自编情境草案；provisional key 仅用于开发期验证，不得作为常模解释依据。"
+      },
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AN-01",
+          "title": "上级只发来一句：\"明天来聊一下\"",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "一天的工作即将结束，负责人发来一条简短消息：\"明天上午有空来找我聊一下吗？\"没有说明原因。往前翻对话记录，最近一次沟通很平常，没有批评或表扬的线索。手指停在回复框——画面定格。"
+          },
+          "primaryConstruct": "bfi2.anxiety",
+          "secondaryConstructs": [
+            "bfi2.trust"
+          ],
+          "situationFeatures": {
+            "negativity": 0.5,
+            "duty": 0.5,
+            "uncertainty": 0.9
+          },
+          "channels": [
+            {
+              "channelKey": "appraisal",
+              "purpose": "APPRAISAL",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.anxiety",
+              "prompt": "你第一反应觉得这次谈话更可能是什么？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "可能有新的任务或安排。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "原因不清楚，现在无法判断。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "可能是我最近有哪里没做好。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "很可能是出了比较严重的问题。"
+                }
+              ]
+            },
+            {
+              "channelKey": "emotion",
+              "purpose": "EMOTION",
+              "responseType": "CONTINUOUS",
+              "range": {
+                "min": 0,
+                "max": 100
+              },
+              "scoringDirection": "POSITIVE",
+              "scoredConstruct": "bfi2.anxiety",
+              "prompt": "如果是你，此刻会有多紧张？（0 = 完全不紧张，100 = 非常紧张）"
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "sjt-provisional-v1",
+        "choiceScores": [
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "optionKey": "A",
+            "contribution": -1
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "optionKey": "B",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "optionKey": "C",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "optionKey": "D",
+            "contribution": 1.5
+          }
+        ],
+        "publishedMetrics": [
+          {
+            "key": "bfi2.anxiety.appraisal",
+            "label": "焦虑 × 情境解释（provisional）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "appraisal",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2
+          },
+          {
+            "key": "bfi2.anxiety.emotion",
+            "label": "焦虑 × 情绪反应（state，0–100）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "emotion",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 1
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.anxiety.appraisal",
+          "bfi2.anxiety.emotion"
+        ],
+        "metricOrder": [
+          "bfi2.anxiety.appraisal",
+          "bfi2.anxiety.emotion"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.anxiety.appraisal",
+            "headline": "焦虑 × 情境解释（威胁解释梯度，provisional）",
+            "summary": "反映面对信息模糊的标准化情境时，第一反应偏向威胁解释的程度。分数为开发期 provisional 编码。",
+            "bands": [],
+            "guidance": []
+          },
+          {
+            "metricKey": "bfi2.anxiety.emotion",
+            "headline": "焦虑 × 情绪反应（state，0–100）",
+            "summary": "反映该标准化情境诱发的紧张强度自评。这是情境化 state 反应，需由多个情境共同估计 trait 水平。",
+            "bands": [],
+            "guidance": []
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "情绪评分为单情境 state 反应，不等同于特质焦虑水平。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择与自评强度，不能替代专业评估。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "high-threat-high-arousal",
+        "responses": [
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "responseValue": "D"
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "emotion",
+            "responseValue": 80
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.anxiety.appraisal": 1.5,
+            "bfi2.anxiety.emotion": 80
+          },
+          "metricKeys": [
+            "bfi2.anxiety.appraisal",
+            "bfi2.anxiety.emotion"
+          ]
+        }
+      },
+      {
+        "name": "low-threat-low-arousal",
+        "responses": [
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "responseValue": "A"
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "emotion",
+            "responseValue": 20
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.anxiety.appraisal": -1,
+            "bfi2.anxiety.emotion": 20
+          },
+          "metricKeys": [
+            "bfi2.anxiety.appraisal",
+            "bfi2.anxiety.emotion"
+          ]
+        }
+      },
+      {
+        "name": "neutral-appraisal",
+        "responses": [
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "responseValue": "B"
+          },
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "emotion",
+            "responseValue": 50
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "metrics": {
+            "bfi2.anxiety.appraisal": 0,
+            "bfi2.anxiety.emotion": 50
+          },
+          "metricKeys": [
+            "bfi2.anxiety.appraisal",
+            "bfi2.anxiety.emotion"
+          ]
+        }
+      },
+      {
+        "name": "missing-emotion-rating",
+        "responses": [
+          {
+            "sceneKey": "AN-01",
+            "channelKey": "appraisal",
+            "responseValue": "C"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "metrics": {
+            "bfi2.anxiety.appraisal": 0.5,
+            "bfi2.anxiety.emotion": null
+          },
+          "metricKeys": [
+            "bfi2.anxiety.appraisal",
+            "bfi2.anxiety.emotion"
+          ]
+        }
+      }
+    ],
+    "runtime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "SITUATIONAL",
+      "instrumentKey": "sjt-anxiety-golden",
+      "instrumentVersion": "1.0.0",
+      "sourceDefinitionHash": "557c11ae130b3ce5b10d6b5a53f6d34626f7dedec7e0d5893542ff4a1fc98a4a",
+      "scorerKey": "situational.default",
+      "scorerVersion": "sjt-provisional-v1",
+      "metricDefinitions": {
+        "bfi2.anxiety.appraisal": {
+          "key": "bfi2.anxiety.appraisal",
+          "label": "焦虑 × 情境解释（provisional）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_more",
+          "role": "primary"
+        },
+        "bfi2.anxiety.emotion": {
+          "key": "bfi2.anxiety.emotion",
+          "label": "焦虑 × 情绪反应（state，0–100）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_more",
+          "role": "primary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "结果满足情境化测评定义的解释条件。"
+        },
+        "limited": {
+          "key": "limited",
+          "label": "有限",
+          "description": "结果可计算但解释受到数据质量限制。"
+        },
+        "invalid": {
+          "key": "invalid",
+          "label": "无效",
+          "description": "结果不满足可解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.anxiety.appraisal",
+          "bfi2.anxiety.emotion"
+        ],
+        "metricOrder": [
+          "bfi2.anxiety.appraisal",
+          "bfi2.anxiety.emotion"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.anxiety.appraisal",
+            "headline": "焦虑 × 情境解释（威胁解释梯度，provisional）",
+            "summary": "反映面对信息模糊的标准化情境时，第一反应偏向威胁解释的程度。分数为开发期 provisional 编码。",
+            "bands": [],
+            "guidance": []
+          },
+          {
+            "metricKey": "bfi2.anxiety.emotion",
+            "headline": "焦虑 × 情绪反应（state，0–100）",
+            "summary": "反映该标准化情境诱发的紧张强度自评。这是情境化 state 反应，需由多个情境共同估计 trait 水平。",
+            "bands": [],
+            "guidance": []
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "情绪评分为单情境 state 反应，不等同于特质焦虑水平。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择与自评强度，不能替代专业评估。"
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "bfi2.anxiety.appraisal",
+          "bfi2.anxiety.emotion"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      },
+      "compiledRuntimeHash": "026a9a32ccf30abbed54c65e32942a458644746a48a8f7131a41a8750c823825",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1"
+    },
+    "runner": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AN-01",
+          "title": "上级只发来一句：\"明天来聊一下\"",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "一天的工作即将结束，负责人发来一条简短消息：\"明天上午有空来找我聊一下吗？\"没有说明原因。往前翻对话记录，最近一次沟通很平常，没有批评或表扬的线索。手指停在回复框——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "appraisal",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "你第一反应觉得这次谈话更可能是什么？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "可能有新的任务或安排。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "原因不清楚，现在无法判断。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "可能是我最近有哪里没做好。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "很可能是出了比较严重的问题。"
+                }
+              ]
+            },
+            {
+              "channelKey": "emotion",
+              "responseType": "CONTINUOUS",
+              "prompt": "如果是你，此刻会有多紧张？（0 = 完全不紧张，100 = 非常紧张）",
+              "range": {
+                "min": 0,
+                "max": 100
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "results": [
+      {
+        "metrics": [
+          {
+            "key": "bfi2.anxiety.appraisal",
+            "label": "焦虑 × 情境解释（provisional）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "appraisal",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 1.5,
+            "range": {
+              "min": -1,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AN-01:appraisal"
+            ],
+            "answeredResponses": [
+              "AN-01:appraisal"
+            ],
+            "status": "calculated"
+          },
+          {
+            "key": "bfi2.anxiety.emotion",
+            "label": "焦虑 × 情绪反应（state，0–100）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "emotion",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 1,
+            "value": 80,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedResponses": [
+              "AN-01:emotion"
+            ],
+            "answeredResponses": [
+              "AN-01:emotion"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.anxiety.appraisal",
+            "label": "焦虑 × 情境解释（provisional）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "appraisal",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": -1,
+            "range": {
+              "min": -1,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AN-01:appraisal"
+            ],
+            "answeredResponses": [
+              "AN-01:appraisal"
+            ],
+            "status": "calculated"
+          },
+          {
+            "key": "bfi2.anxiety.emotion",
+            "label": "焦虑 × 情绪反应（state，0–100）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "emotion",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 1,
+            "value": 20,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedResponses": [
+              "AN-01:emotion"
+            ],
+            "answeredResponses": [
+              "AN-01:emotion"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.anxiety.appraisal",
+            "label": "焦虑 × 情境解释（provisional）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "appraisal",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 0,
+            "range": {
+              "min": -1,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AN-01:appraisal"
+            ],
+            "answeredResponses": [
+              "AN-01:appraisal"
+            ],
+            "status": "calculated"
+          },
+          {
+            "key": "bfi2.anxiety.emotion",
+            "label": "焦虑 × 情绪反应（state，0–100）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "emotion",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 1,
+            "value": 50,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedResponses": [
+              "AN-01:emotion"
+            ],
+            "answeredResponses": [
+              "AN-01:emotion"
+            ],
+            "status": "calculated"
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        }
+      },
+      {
+        "metrics": [
+          {
+            "key": "bfi2.anxiety.appraisal",
+            "label": "焦虑 × 情境解释（provisional）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "appraisal",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2,
+            "value": 0.5,
+            "range": {
+              "min": -1,
+              "max": 1.5
+            },
+            "expectedResponses": [
+              "AN-01:appraisal"
+            ],
+            "answeredResponses": [
+              "AN-01:appraisal"
+            ],
+            "status": "calculated"
+          },
+          {
+            "key": "bfi2.anxiety.emotion",
+            "label": "焦虑 × 情绪反应（state，0–100）",
+            "construct": "bfi2.anxiety",
+            "channelKey": "emotion",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 1,
+            "value": null,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedResponses": [
+              "AN-01:emotion"
+            ],
+            "answeredResponses": [],
+            "status": "not_calculable"
+          }
+        ],
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_responses",
+            "metric_not_calculable"
+          ]
+        }
+      }
+    ]
+  }
+]

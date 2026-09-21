@@ -61,6 +61,8 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -72,6 +74,16 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
+      - name: situational data-only manifests and publication gates
+        run: npm run situational:contracts
+      - name: verify SJT immutable releases and publication authority
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
+          npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
       - name: build (tsc)
@@ -202,6 +214,8 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -234,6 +248,16 @@ jobs:
         run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
         run: npm run db:release:preflight
+      - name: situational data-only manifests and publication gates
+        run: npm run situational:contracts
+      - name: verify SJT immutable releases and publication authority
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
+          npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
       - name: build (tsc)
