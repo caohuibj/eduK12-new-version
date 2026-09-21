@@ -2,6 +2,7 @@ import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskR
 import type { CognitiveReference } from './reference'
 import type { FrozenReportSnapshot } from './profile-freeze'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
+import { resolveCognitiveProtocolPresentation } from './protocol-presentation'
 
 export interface CognitiveReportMetricView {
   key: string
@@ -19,6 +20,7 @@ export interface CognitiveSingleTaskReport {
   interpretable: boolean
   qualityState: 'interpretable' | 'insufficient'
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
+  interpretationSummary: string | null
   headline: CognitiveReportMetricView | null
   productIndex: { label: '任务表现指数'; value: number } | null
   showProductIndex: boolean
@@ -147,6 +149,12 @@ export const buildCognitiveSingleTaskReport = (input: {
   const reportDefinition: SingleTaskReportDefinition | undefined = frozen.reportDefinition
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
+  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    testType: input.testType,
+    engineVersion: input.engineVersion,
+    scoringVersion: input.scoringVersion,
+    profile: input.profile,
+  })
   const interpretable = input.qualityFlags.interpretable !== false
   const metricVisible = (key: string) => {
     const definition = metricDefinitions[key]
@@ -163,7 +171,8 @@ export const buildCognitiveSingleTaskReport = (input: {
     primaryKeys,
     metricDefinitions,
   )
-  const showProductIndex = reportDefinition?.showProductIndex !== false
+  const showProductIndex = protocolPresentation?.showProductIndex
+    ?? (reportDefinition?.showProductIndex !== false)
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
     .map(([key, value]) => ({
@@ -178,17 +187,21 @@ export const buildCognitiveSingleTaskReport = (input: {
   return {
     testType: input.testType,
     profile: input.profile,
-    profileLabel: profileLabelOf(input.profile),
+    profileLabel: protocolPresentation?.profileLabel ?? profileLabelOf(input.profile),
     title: reportDefinition?.title ?? input.testType,
     interpretable,
     qualityState: interpretable ? 'interpretable' : 'insufficient',
     qualityFlags,
+    interpretationSummary: interpretable ? protocolPresentation?.participantConclusion ?? null : null,
     headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
     primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
     secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
-    caveats: input.frozenReport?.reportCaveats ?? frozen.reportCaveats ?? [],
+    caveats: protocolPresentation?.reportCaveats
+      ?? input.frozenReport?.reportCaveats
+      ?? frozen.reportCaveats
+      ?? [],
     practicalTips: participantPracticalTips(input.testType, reportDefinition?.practicalTips ?? []),
     method: {
       testType: input.testType,
