@@ -1,0 +1,70 @@
+import type {
+  CognitiveProfile,
+  MetricDefinition,
+  QualityDefinition,
+  SingleTaskReportDefinition,
+  CognitiveProfileDefinition,
+} from '../../cognitive.types'
+import { metric } from '../task-definition-helpers'
+
+export const cardsortRegistryMeta = {
+  name: '规则卡片分类',
+  category: 'cognitive_flexibility',
+  referenceEligibleMetricKeys: [] as const,
+  randomizationAlgorithmVersion: 'seq-v1.0.0',
+  profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [2, 3],
+      configPatch: { totalTrials: 24, blockCount: 2 },
+      reportCaveats: ['体验版转换试次较少，不进入综合分析。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [5, 7],
+      configPatch: { totalTrials: 72, blockCount: 3 },
+      reportCaveats: ['正式版区分转换代价、重复表现和持续性错误，不形成执行功能总分。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [9, 12],
+      configPatch: { totalTrials: 144, blockCount: 6 },
+      reportCaveats: ['科研档增加规则转换试次；仍不是临床卡片分类测验或年龄常模。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    switchCostRtMs: metric('switchCostRtMs', '规则转换 RT 代价', 'cognitive_flexibility', 'ms', 'lower_is_better', 'primary'),
+    switchCostAccuracy: metric('switchCostAccuracy', '规则转换准确率代价', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary'),
+    perseverativeErrorRate: metric('perseverativeErrorRate', '持续性错误率', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'primary'),
+    postSwitchRecovery: metric('postSwitchRecovery', '转换后恢复', 'cognitive_flexibility', 'ratio', 'signed', 'primary'),
+    accuracySwitch: metric('accuracySwitch', 'Switch 准确率', 'cognitive_flexibility', 'ratio', 'higher_is_better', 'secondary'),
+    accuracyRepeat: metric('accuracyRepeat', 'Repeat 准确率', 'cognitive_flexibility', 'ratio', 'higher_is_better', 'secondary'),
+    medianRtSwitch: metric('medianRtSwitch', 'Switch 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
+    medianRtRepeat: metric('medianRtRepeat', 'Repeat 中位RT', 'cognitive_flexibility', 'ms', 'descriptive', 'secondary'),
+    overallAccuracy: metric('overallAccuracy', '总体准确率', 'cognitive_flexibility', 'ratio', 'higher_is_better', 'secondary'),
+    omissionRate: metric('omissionRate', '未反应比例', 'cognitive_flexibility', 'ratio', 'lower_is_better', 'secondary'),
+    perseverativeErrorCount: metric('perseverativeErrorCount', '持续性错误次数', 'cognitive_flexibility', 'count', 'lower_is_better', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '转换/重复有效试次与总体准确率是否达到门槛。' },
+    insufficientSwitchTrials: { key: 'insufficientSwitchTrials', label: '转换有效试次不足', description: '规则转换正确有效试次过少。' },
+    insufficientRepeatTrials: { key: 'insufficientRepeatTrials', label: '重复有效试次不足', description: '规则重复正确有效试次过少。' },
+    lowAccuracy: { key: 'lowAccuracy', label: '准确率过低', description: '总体准确率低于 0.5。' },
+    excessiveOmissions: { key: 'excessiveOmissions', label: '未反应过多', description: '未反应比例达到 0.3。' },
+    constantResponse: { key: 'constantResponse', label: '恒定反应', description: '足够多试次始终选择同一侧。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '存在切屏或中断试次。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: {
+    title: '规则卡片分类',
+    headlineMetric: 'switchCostRtMs',
+    primaryMetrics: ['switchCostRtMs', 'switchCostAccuracy', 'perseverativeErrorRate', 'postSwitchRecovery'],
+    secondaryMetrics: ['accuracySwitch', 'accuracyRepeat', 'medianRtSwitch', 'medianRtRepeat', 'overallAccuracy'],
+    practicalTips: ['持续性错误由冻结规则和实际响应推导，不等同于临床执行功能判断。'],
+    disclaimer: '结果反映本次双规则分类任务表现，不是商业卡片分类测验、临床诊断或人口常模。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}
