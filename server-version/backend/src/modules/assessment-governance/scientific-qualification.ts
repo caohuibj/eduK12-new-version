@@ -2,14 +2,13 @@
  * Scientific maturity qualification is governance-only and intentionally
  * orthogonal to product release/runtime availability.
  *
- * The evaluator consumes already-resolved facts. It performs no I/O and must
- * never become part of save/scorer/FINAL request paths.
+ * The evaluator consumes evidence facts only. It performs no I/O, does not
+ * inspect product readiness or release status, and must never become part of
+ * save/scorer/FINAL request paths.
  */
 import { SCIENTIFIC_MATURITY_LEVELS, type ScientificMaturity } from './scientific-maturity'
-import type { ProductReadinessDecisionV1 } from './product-readiness'
 
 export interface ScientificQualificationFactsV1 {
-  productReadiness: ProductReadinessDecisionV1
   /** Literature, formal protocol, research design or preregistration. */
   hasResearchFoundation: boolean
   /** Provenance/ownership/license basis is explicitly traceable. */
@@ -29,7 +28,7 @@ export interface ScientificQualificationDecisionV1 {
   pilot: ScientificQualificationLevelDecisionV1
   researchReady: ScientificQualificationLevelDecisionV1
   researchGrade: ScientificQualificationLevelDecisionV1
-  maxEligibleMaturity: ScientificMaturity | null
+  maxEligibleMaturity: ScientificMaturity
 }
 
 const decision = (blockers: string[]): ScientificQualificationLevelDecisionV1 => ({
@@ -43,28 +42,24 @@ const scientificMaturityRank = (maturity: ScientificMaturity): number => (
 
 /**
  * Governance/admin/CI helper only. A declared scientific claim is valid only
- * when the evidence evaluator reaches at least the same level. DRAFT content
- * with the compatibility-default PILOT label is intentionally handled by the
- * inventory caller rather than being treated as an earned maturity claim here.
+ * when the evidence evaluator reaches at least the same level. PILOT is the
+ * default lowest evidence maturity and is always a valid scientific claim;
+ * it says nothing about whether the product can be released or executed.
  */
 export const qualificationAllowsScientificMaturity = (
   declared: ScientificMaturity,
   qualification: ScientificQualificationDecisionV1,
 ): boolean => (
-  qualification.maxEligibleMaturity !== null
-  && scientificMaturityRank(declared) <= scientificMaturityRank(qualification.maxEligibleMaturity)
+  scientificMaturityRank(declared) <= scientificMaturityRank(qualification.maxEligibleMaturity)
 )
 
 export const evaluateScientificQualification = (
   facts: ScientificQualificationFactsV1,
 ): ScientificQualificationDecisionV1 => {
-  const pilotBlockers = facts.productReadiness.ready
-    ? []
-    : ['PRODUCT_NOT_READY']
-  const pilot = decision(pilotBlockers)
+  // PILOT is the baseline scientific maturity, not a product-completeness gate.
+  const pilot = decision([])
 
   const researchReadyBlockers = [
-    ...(!pilot.eligible ? ['PILOT_NOT_ELIGIBLE'] : []),
     ...(!facts.hasResearchFoundation ? ['RESEARCH_FOUNDATION_MISSING'] : []),
     ...(!facts.hasTraceableProvenance ? ['TRACEABLE_PROVENANCE_MISSING'] : []),
   ]
@@ -77,13 +72,11 @@ export const evaluateScientificQualification = (
   ]
   const researchGrade = decision(researchGradeBlockers)
 
-  const maxEligibleMaturity: ScientificMaturity | null = researchGrade.eligible
+  const maxEligibleMaturity: ScientificMaturity = researchGrade.eligible
     ? 'RESEARCH_GRADE'
     : researchReady.eligible
       ? 'RESEARCH_READY'
-      : pilot.eligible
-        ? 'PILOT'
-        : null
+      : 'PILOT'
 
   return { pilot, researchReady, researchGrade, maxEligibleMaturity }
 }

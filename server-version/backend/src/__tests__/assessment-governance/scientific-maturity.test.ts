@@ -5,9 +5,11 @@ import {
 } from '../../modules/assessment-governance/scientific-maturity'
 import { scientificMaturitySchema } from '../../modules/scale/library/catalog-manifest'
 import {
+  COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY,
   RESEARCH_READY_IDENTITIES,
   resolveCognitiveScientificMaturity,
 } from '../../modules/cognitive/library/scientific-maturity'
+import { RESEARCH_GRADE_IDENTITIES as CATALOG_RESEARCH_GRADE_IDENTITIES } from '../../modules/cognitive/library/catalog'
 import {
   SITUATIONAL_SCIENTIFIC_MATURITY_BY_IDENTITY,
   resolveSituationalScientificMaturity,
@@ -22,7 +24,7 @@ const COGNITIVE_IDENTITY = 'reaction/1.0.0/1.1.0'
 const SITUATIONAL_IDENTITY = 'sjt-assertiveness-golden@1.0.0'
 
 afterEach(() => {
-  RESEARCH_READY_IDENTITIES.delete(COGNITIVE_IDENTITY)
+  COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.clear()
   SITUATIONAL_SCIENTIFIC_MATURITY_BY_IDENTITY.delete(SITUATIONAL_IDENTITY)
 })
 
@@ -37,6 +39,17 @@ describe('scientific maturity governance', () => {
     RESEARCH_READY_IDENTITIES.add(COGNITIVE_IDENTITY)
     expect(resolveCognitiveScientificMaturity('reaction', '1.0.0', '1.1.0')).toBe('RESEARCH_READY')
     expect(resolveCognitiveScientificMaturity('reaction', '1.0.0', '1.0.0')).toBe('PILOT')
+  })
+
+  it('routes legacy Cognitive maturity views through one authoritative identity map', () => {
+    RESEARCH_READY_IDENTITIES.add(COGNITIVE_IDENTITY)
+    expect(COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(COGNITIVE_IDENTITY)).toBe('RESEARCH_READY')
+    expect(CATALOG_RESEARCH_GRADE_IDENTITIES.has(COGNITIVE_IDENTITY)).toBe(false)
+
+    CATALOG_RESEARCH_GRADE_IDENTITIES.add(COGNITIVE_IDENTITY)
+    expect(COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(COGNITIVE_IDENTITY)).toBe('RESEARCH_GRADE')
+    expect(RESEARCH_READY_IDENTITIES.has(COGNITIVE_IDENTITY)).toBe(false)
+    expect(resolveCognitiveScientificMaturity('reaction', '1.0.0', '1.1.0')).toBe('RESEARCH_GRADE')
   })
 
   it('changes only situational governance metadata when an exact identity is promoted', () => {

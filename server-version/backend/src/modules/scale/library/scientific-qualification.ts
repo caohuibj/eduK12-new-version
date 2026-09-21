@@ -1,6 +1,5 @@
 import { evaluateScientificQualification, type ScientificQualificationDecisionV1 } from '../../assessment-governance/scientific-qualification'
 import type { ScalePackageV2 } from '../scale-package.registry'
-import { evaluateScaleProductReadiness } from './product-readiness'
 import { WAVE0_SCALE_CATALOG_MANIFESTS, getWave0LocalizationManifest } from './wave0-catalog'
 
 const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
@@ -9,7 +8,7 @@ const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
  * Scale already owns structured scientific/catalog provenance. Reuse that
  * source instead of copying Scale evidence pointers into the generic evidence
  * registry. This evaluator is read-only governance and never participates in
- * participant runtime or FINAL paths.
+ * participant runtime, product release, or FINAL paths.
  */
 export const evaluateScaleScientificQualification = (
   pkg: ScalePackageV2,
@@ -36,7 +35,6 @@ export const evaluateScaleScientificQualification = (
   )) ?? false
 
   return evaluateScientificQualification({
-    productReadiness: evaluateScaleProductReadiness(pkg),
     hasResearchFoundation,
     hasTraceableProvenance,
     hasEmpiricalReference,

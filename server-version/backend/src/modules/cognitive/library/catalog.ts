@@ -17,6 +17,10 @@ import {
   listCognitiveRegistryEntriesForType,
 } from '../cognitive.registry'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
+import {
+  RESEARCH_GRADE_IDENTITIES as COGNITIVE_RESEARCH_GRADE_IDENTITIES,
+  resolveCognitiveScientificMaturity,
+} from './scientific-maturity'
 import type {
   CognitiveLibraryCatalogEntry,
   CognitiveScientificStatus,
@@ -456,27 +460,22 @@ export const requireCatalogForIdentity = (
 }
 
 /**
- * Review Fix 1 — scientificStatus 是 **exact task identity scoped**：
- * 只有明确人工批准、进入 allowlist 的 exact identity 才是 RESEARCH_GRADE；
- * 其余一切注册身份（含未来新 engine/scoring 版本）默认 PILOT，绝不继承旧版本资格。
- * 未注册/非法身份在 requireCatalogForIdentity 处直接抛错。
+ * @deprecated Compatibility view for catalog-era callers. It owns no state;
+ * add/delete/has operate on COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.
  */
-const identityKeyOf = (testType: string, engineVersion: string, scoringVersion: string): string =>
-  `${testType}/${engineVersion}/${scoringVersion}`
+export const RESEARCH_GRADE_IDENTITIES = COGNITIVE_RESEARCH_GRADE_IDENTITIES
 
-export const RESEARCH_GRADE_IDENTITIES = new Set<string>([
-  // currently empty —— 升级须逐 exact identity 人工科研评审（Pilot-first 指令 §21）。
-])
-
+/**
+ * @deprecated Compatibility resolver. Scientific maturity is now owned by
+ * scientific-maturity.ts and remains exact-identity scoped.
+ */
 export const resolveScientificStatus = (
   testType: string,
   engineVersion: string,
   scoringVersion: string,
 ): CognitiveScientificStatus => {
   requireCatalogForIdentity(testType, engineVersion, scoringVersion)
-  return RESEARCH_GRADE_IDENTITIES.has(identityKeyOf(testType, engineVersion, scoringVersion))
-    ? 'RESEARCH_GRADE'
-    : 'PILOT'
+  return resolveCognitiveScientificMaturity(testType, engineVersion, scoringVersion)
 }
 
 export interface CognitiveCatalogDomainFacetSummary {
