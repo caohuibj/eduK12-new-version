@@ -1,3 +1,4 @@
+import cognitiveManifest from '../../modules/cognitive/generated/identities.json'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -15,12 +16,13 @@ const readinessMessage = (identity: string, blockers: Array<{ stage: string; cod
 )
 
 const cognitiveFrontendReady = (testType: string, engineVersion: string): boolean => {
-  const frontendRegistry = readFileSync(resolve(frontendRoot, 'registry.ts'), 'utf8')
+  const frontendRegistry = readFileSync(resolve(frontendRoot, 'generated/runners.ts'), 'utf8')
   const registryFile = resolve(frontendRoot, 'tasks', testType, `${testType}.registry.ts`)
   if (!existsSync(registryFile)) return false
   const taskRegistry = readFileSync(registryFile, 'utf8')
   return taskRegistry.includes(engineVersion)
-    && frontendRegistry.includes(`registerCognitiveRunner(${testType}RegistryEntry)`)
+    && frontendRegistry.includes(`${testType}RegistryEntry as `)
+    && cognitiveManifest.runners.some(r => r.testType === testType && r.engineVersion === engineVersion)
 }
 
 describe('assessment product readiness inventory', () => {

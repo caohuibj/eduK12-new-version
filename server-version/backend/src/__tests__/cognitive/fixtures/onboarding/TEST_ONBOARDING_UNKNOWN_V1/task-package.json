@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "task": "TEST_ONBOARDING_UNKNOWN_V1",
+  "identities": [
+    {
+      "testType": "TEST_ONBOARDING_UNKNOWN_V1",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "TEST_ONBOARDING_UNKNOWN_V1",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/__tests__/fixtures/unknown-runner.ts",
+      "export": "unknownRunner"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      0
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/__tests__/UnknownOnboardingTask.test.tsx"
+    ]
+  }
+}

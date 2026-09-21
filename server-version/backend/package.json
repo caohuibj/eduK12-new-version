@@ -1,7 +1,7 @@
 {
   "name": "ptool-backend",
   "version": "1.0.0",
-  "description": "PTool 独立服务器版本后端",
+  "description": "PTool \u72ec\u7acb\u670d\u52a1\u5668\u7248\u672c\u540e\u7aef",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -31,7 +31,11 @@
     "test:integration:pr26": "vitest run src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts src/__tests__/classroom/classroom-start.postgres.integration.test.ts",
     "test:integration:pr8": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "release:verify:local": "bash ../scripts/release-verify-local.sh",
-    "deploy": "bash /opt/ptool/scripts/deploy.sh backend"
+    "deploy": "bash /opt/ptool/scripts/deploy.sh backend",
+    "cognitive:manifest:generate": "node ../scripts/cognitive/manifests.cjs",
+    "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check",
+    "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs",
+    "cognitive:onboarding-check": "tsx src/scripts/cognitive-onboarding-check.ts"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",

@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "flanker",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "congruentRatio": 0.5,
+          "stimulusMs": 1800,
+          "isiMs": 400,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "arrows-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-flanker",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "left",
+              "response": "right",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "right",
+              "response": "left",
+              "rtMs": 600,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "targetDirection": "left",
+              "flankerDirection": "left",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "flankerEffectMs": 100,
+          "incongruentAccuracy": 1,
+          "congruentAccuracy": 1,
+          "errorCost": 0,
+          "accuracy": 1,
+          "medianRtCongruent": 500,
+          "medianRtIncongruent": 600,
+          "omissionRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCongruentTrials": false,
+          "insufficientIncongruentTrials": false,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "congruentRatio": 0.5,
+          "stimulusMs": 1800,
+          "isiMs": 400,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "arrows-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-flanker",
+        "trials": []
+      },
+      "expectedError": "flanker v1 expects exactly 24 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 24,
+          "congruentRatio": 0.5,
+          "stimulusMs": 1800,
+          "isiMs": 400,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "arrows-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-flanker",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetDirection": "right",
+              "flankerDirection": "right",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "flanker v1 expects exactly 24 trials, got 1"
+    }
+  ]
+}

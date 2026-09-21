@@ -14,7 +14,7 @@ import {
 import { isCompositeWrapper, rejectWrapperForStandaloneUse } from './assignment.access'
 import { canInstantiateConfig, grantedResourceIds } from '../../services/materialGrant'
 import { config as appConfig } from '../../config'
-import { assertTaskCanPublish } from './v2/publication-gate'
+import { assertTaskContractValid } from './v2/publication-gate'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 
 export { CognitiveServiceError }
@@ -64,10 +64,11 @@ type CognitiveConfigIdentity = {
 }
 
 /**
- * The v2 registry owns task publication status. Database config status remains
- * a required availability check, but it cannot promote a Draft definition.
+ * Verify that the exact v2 implementation remains structurally executable.
+ * Product availability is already authorized by CognitiveTestConfig.status;
+ * this helper must never maintain or consult a second lifecycle state.
  */
-const requirePublishedCognitiveV2Definition = (config: CognitiveConfigIdentity) => {
+const requireReadyCognitiveV2Definition = (config: CognitiveConfigIdentity) => {
   const definition = getCognitiveV2TaskDefinition(
     config.testType,
     config.engineVersion,
@@ -75,9 +76,9 @@ const requirePublishedCognitiveV2Definition = (config: CognitiveConfigIdentity) 
   )
   if (!definition) throw BAD_REQUEST('No Cognitive v2 definition for this task version')
   try {
-    assertTaskCanPublish(definition)
+    assertTaskContractValid(definition)
   } catch (err) {
-    throw BAD_REQUEST(err instanceof Error ? err.message : 'Cognitive task publication gate failed')
+    throw BAD_REQUEST(err instanceof Error ? err.message : 'Cognitive task contract validation failed')
   }
   return definition
 }
@@ -159,7 +160,7 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
 
   return configs.filter((config) => {
     try {
-      requirePublishedCognitiveV2Definition(config)
+      requireReadyCognitiveV2Definition(config)
       return true
     } catch {
       return false
@@ -439,9 +440,9 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
     userId
   )
 
-  // PR-B publication gate: the exact v2 registry definition owns publication
-  // status. A PUBLISHED database row cannot promote a registry-Draft task.
-  requirePublishedCognitiveV2Definition(config)
+  // DB CognitiveTestConfig.status already authorizes product release. The v2
+  // definition is checked only for executable contract completeness.
+  requireReadyCognitiveV2Definition(config)
 
   if (!existing.profile) {
     throw BAD_REQUEST('发布前必须选择 Profile')
@@ -559,12 +560,11 @@ export const ensureTeacherPublishedAssignment = async (
   const copiedHash = source?.resolvedConfigHash ?? generatedFreeze?.resolvedConfigHash ?? null
   const hasFreeze = hasCopiedFreeze || generatedFreeze !== null
 
-  // A generated freeze is a new materialization (used by report packages), so
-  // it must use a currently Published v2 definition. A complete source freeze
-  // is an explicit historical-copy path and remains structurally readable even
-  // if the live registry later becomes Draft or Retired.
+  // A generated freeze is a new materialization, so the exact v2 executable
+  // contract must still be valid. Historical copied freezes remain readable
+  // even if the live implementation later changes or is retired in DB.
   if (input.profile && !hasCopiedFreeze) {
-    requirePublishedCognitiveV2Definition(config)
+    requireReadyCognitiveV2Definition(config)
   }
 
   // copy / ensure 不调用 canInstantiateConfig：模板上已有的 configId 是一次性实例化许可。

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "task": "fake",
+  "order": 0,
+  "identities": [
+    {
+      "testType": "fake",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 0
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "fake",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/fake/fake.registry.ts",
+      "export": "fakeRegistryEntry"
+    }
+  ],
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      0
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/__tests__/FakeTask.test.tsx",
+      "src/modules/cognitive/__tests__/GonogoCptTask.test.tsx",
+      "src/modules/cognitive/__tests__/MemoryLearningPackTask.test.tsx",
+      "src/modules/cognitive/__tests__/NbackCorsiTask.test.tsx",
+      "src/modules/cognitive/__tests__/PatternFlankerCardsortTask.test.tsx",
+      "src/modules/cognitive/__tests__/Pr12Tasks.test.tsx",
+      "src/modules/cognitive/__tests__/Pr13Tasks.test.tsx",
+      "src/modules/cognitive/__tests__/ReasoningPlanningPackTask.test.tsx",
+      "src/modules/cognitive/tasks/memory/__tests__/MemoryTask.test.tsx",
+      "src/modules/cognitive/tasks/reaction/__tests__/ReactionTask.test.tsx",
+      "src/modules/cognitive/tasks/stroop/__tests__/StroopTask.test.tsx"
+    ]
+  }
+}

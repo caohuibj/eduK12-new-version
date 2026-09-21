@@ -1,6 +1,7 @@
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
 import { cognitiveController } from './cognitive.controller'
+import { cognitiveReleaseController } from './cognitive-release.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
 import { cognitiveVideoController } from './cognitive-video.controller'
 import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
@@ -35,6 +36,8 @@ router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests
 router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
 router.patch('/configs/:id/access-policy', authenticate, requireAdmin, cognitiveController.updateAccessPolicy)
+router.post('/configs/:id/publish', authenticate, requireAdmin, cognitiveReleaseController.publishConfig)
+router.post('/configs/:id/retire', authenticate, requireAdmin, cognitiveReleaseController.retireConfig)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)

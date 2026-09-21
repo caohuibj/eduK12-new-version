@@ -3,21 +3,22 @@
  *
  * 定位（Pilot-first v2 指令 §9）：
  *  - 只保存 Catalog 自有的轻量科学/产品元数据（教育用途、交互族、敏感度、
- *    scientificStatus、admin 备注、来源与 rights 指针、已知局限）。
+ *    admin 备注、来源与 rights 指针、已知局限）。
  *  - 不得复制既有真值，以下信息一律通过 authoritative join 在读取时获得：
  *      domain / facet   → cognitive-analysis/evidence-mapping.registry + domain.registry
  *      metric 定义      → cognitive.registry metricDefinitions
- *      publication      → v2 registry publication（DRAFT/PUBLISHED/RETIRED）
+ *      product release  → CognitiveTestConfig.status（DRAFT/PUBLISHED/RETIRED）
+ *      maturity         → scientific-maturity.ts exact-identity registry
  *      reference        → Reference Core（reference.ts / AssessmentReferenceSet）
  *      scoring          → registry config/trial schema + scorer
  *      estimated burden → registry profiles[*].estimatedMinutes
- *  - scientificStatus 与 engineering publication 完全独立（PUBLISHED + PILOT /
- *    PUBLISHED + RESEARCH_READY 都允许）。
+ *  - scientific maturity 与 product release 完全独立（PUBLISHED + PILOT /
+ *    DRAFT + RESEARCH_READY / PUBLISHED + RESEARCH_GRADE 均是合法状态组合）。
  *  - 本模块为 build-time 只读元数据：不得被 scorer / submit / runtime / hash 路径 import。
  */
 import type { ScientificMaturity } from '../../assessment-governance/scientific-maturity'
 
-/** 科学成熟度（与 DRAFT/PUBLISHED/RETIRED 工程发布状态完全独立）。 */
+/** 科学成熟度（与 DRAFT/PUBLISHED/RETIRED 产品发布状态完全独立）。 */
 export type CognitiveScientificStatus = ScientificMaturity
 
 /**
@@ -59,8 +60,8 @@ export interface CognitiveLibraryCatalogEntry {
 }
 
 /**
- * scientificStatus 是 **exact task identity scoped**：不绑定 task family。
+ * scientific maturity 是 **exact task identity scoped**：不绑定 task family。
  * protocol/scorer 发生实质变化的新 engine/scoring 版本天然回到 PILOT，
  * 不会继承旧版本的 RESEARCH_READY / RESEARCH_GRADE 资格。
- * 解析入口见 catalog.ts 的 resolveScientificStatus（无显式治理记录 → PILOT）。
+ * 权威解析入口为 scientific-maturity.ts 的 resolveCognitiveScientificMaturity。
  */

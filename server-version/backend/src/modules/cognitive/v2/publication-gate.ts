@@ -7,20 +7,13 @@ export interface PublicationIssue {
   severity: 'error' | 'warning'
 }
 
-const issue = (path: string, message: string, severity: PublicationIssue['severity'] = 'error'): PublicationIssue => ({
-  path,
-  message,
-  severity,
-})
-
+const issue = (path: string, message: string, severity: PublicationIssue['severity'] = 'error'): PublicationIssue => ({ path, message, severity })
 const validVisibility = new Set(['headline', 'user', 'detail', 'research_only', 'hidden'])
 const validDirections = new Set(['higher_is_better', 'lower_is_better', 'target_range', 'descriptive', 'signed'])
 const validReferenceValueTypes = new Set(['number', 'integer'])
 const validProfiles = new Set(['experience', 'standard', 'research'])
 
-export const validateTaskDefinition = <TConfig, TTrial>(
-  definition: TaskDefinition<TConfig, TTrial>,
-): PublicationIssue[] => {
+export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): PublicationIssue[] => {
   const issues: PublicationIssue[] = []
   if (definition.schemaVersion !== 1) issues.push(issue('schemaVersion', 'TaskDefinition schemaVersion must be 1'))
   for (const field of ['testType', 'name', 'category', 'engineVersion', 'scoringVersion']) {
@@ -39,6 +32,7 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   if (definition.protocol.measurementCriticalConfigPaths.length === 0) issues.push(issue('protocol.measurementCriticalConfigPaths', 'at least one measurement-critical config path is required'))
   const phaseKeys = new Set<string>()
   for (const [index, phase] of definition.protocol.phases.entries()) {
+    if (!['test', 'learning', 'delayed'].includes(phase.key)) issues.push(issue(`protocol.phases.${index}.key`, 'unsupported phase'))
     if (phaseKeys.has(phase.key)) issues.push(issue(`protocol.phases.${index}.key`, 'protocol phase keys must be unique'))
     phaseKeys.add(phase.key)
     if (!phase.persists && phase.required) issues.push(issue(`protocol.phases.${index}`, 'a required phase must be persisted'))
@@ -46,8 +40,18 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   if (definition.protocol.phases.length === 0 || !definition.protocol.phases.some((phase) => phase.persists && phase.required)) {
     issues.push(issue('protocol.phases', 'at least one required persisted phase is needed'))
   }
-  if (definition.profiles.standard === undefined || definition.profiles.research === undefined) {
-    issues.push(issue('profiles', 'standard and research profiles are required'))
+  if (definition.profiles.standard === undefined) {
+    issues.push(issue('profiles', 'standard profile is required'))
+  }
+
+  for (const [profile, value] of Object.entries(definition.profiles)) {
+    if (!validProfiles.has(profile) || !value || !Array.isArray(value.estimatedMinutes)
+      || value.estimatedMinutes.length !== 2 || !value.estimatedMinutes.every(n => Number.isFinite(n) && n > 0)
+      || value.estimatedMinutes[0] > value.estimatedMinutes[1]
+      || !value.configPatch || typeof value.configPatch !== 'object' || Array.isArray(value.configPatch)
+      || !Array.isArray(value.reportCaveats) || !value.reportCaveats.every(s => typeof s === 'string')) {
+      issues.push(issue(`profiles.${profile}`, 'declared profile is invalid'))
+    }
   }
 
   const metricKeys = new Set(Object.keys(definition.metrics))
@@ -64,21 +68,18 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     if (metric.referenceEligible && (metric.role === 'quality' || metric.role === 'research_only')) {
       issues.push(issue(`metrics.${key}.role`, 'quality or research_only metric cannot be reference eligible'))
     }
+    if (metric.availableProfiles.some(profile => !validProfiles.has(profile) || !definition.profiles[profile])) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric references an absent profile'))
     if (metric.availableProfiles.length === 0) issues.push(issue(`metrics.${key}.availableProfiles`, 'metric must declare at least one profile'))
     if (metric.visibility === 'headline' && metric.role === 'research_only') issues.push(issue(`metrics.${key}`, 'research_only metric cannot be headline-visible'))
     for (const [index, qualityKey] of (metric.requiresQualityFlags ?? []).entries()) {
-      if (!qualityKeys.has(qualityKey)) {
-        issues.push(issue(`metrics.${key}.requiresQualityFlags.${index}`, `${qualityKey} is not declared in quality definitions`))
-      }
+      if (!qualityKeys.has(qualityKey)) issues.push(issue(`metrics.${key}.requiresQualityFlags.${index}`, `${qualityKey} is not declared in quality definitions`))
     }
   }
 
   const assertVisibility = (keys: string[], visibility: MetricDefinition['visibility'], path: string) => {
     for (const [index, key] of keys.entries()) {
       const metric = definition.metrics[key]
-      if (metric && metric.visibility !== visibility) {
-        issues.push(issue(`${path}.${index}`, `${key} must be declared with ${visibility} visibility`))
-      }
+      if (metric && metric.visibility !== visibility) issues.push(issue(`${path}.${index}`, `${key} must be declared with ${visibility} visibility`))
     }
   }
   assertVisibility(definition.report.headlineMetrics, 'headline', 'report.headlineMetrics')
@@ -86,15 +87,12 @@ export const validateTaskDefinition = <TConfig, TTrial>(
   assertVisibility(definition.report.detailMetrics, 'detail', 'report.detailMetrics')
 
   for (const [key, quality] of Object.entries(definition.quality)) {
+    if (!['none', 'limited', 'invalid'].includes(quality.effect)) issues.push(issue(`quality.${key}.effect`, 'quality effect is invalid'))
     if (quality.key !== key) issues.push(issue(`quality.${key}.key`, 'quality key must match its registry key'))
     if (!quality.label || !quality.description) issues.push(issue(`quality.${key}`, 'quality label and description are required'))
   }
 
-  const reportKeys = [
-    ...definition.report.headlineMetrics,
-    ...definition.report.userMetrics,
-    ...definition.report.detailMetrics,
-  ]
+  const reportKeys = [...definition.report.headlineMetrics, ...definition.report.userMetrics, ...definition.report.detailMetrics]
   for (const key of reportKeys) {
     if (!metricKeys.has(key)) issues.push(issue(`report.${key}`, 'report references an unknown metric'))
   }
@@ -129,13 +127,12 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     }
   }
 
-  // Reference/norm availability is scientific/claim governance, not product
-  // publication. Existing mappings must still be internally valid, but a task
-  // may be PUBLISHED with zero mappings and remain descriptive/non-normative.
+  // Compatibility-only metadata may still request a reference warning for old
+  // audits, but reference absence is never a product publication blocker.
   if (definition.publication.referenceRequired && definition.references.length === 0) {
     issues.push(issue(
       'references',
-      'referenceRequired is not a product-publication blocker; scientific qualification/claim eligibility must resolve reference evidence separately',
+      'referenceRequired is compatibility metadata only; scientific qualification/claim eligibility must resolve reference evidence separately',
       'warning',
     ))
   }
@@ -145,12 +142,11 @@ export const validateTaskDefinition = <TConfig, TTrial>(
 
 export const assertTaskContractValid = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
   const errors = validateTaskDefinition(definition).filter((candidate) => candidate.severity === 'error')
-  if (errors.length > 0) throw new Error(`Cognitive task publication gate failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
+  if (errors.length > 0) throw new Error(`Cognitive task contract validation failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
 }
 
-export const assertTaskCanPublish = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
-  assertTaskContractValid(definition)
-  if (definition.publication.status !== 'PUBLISHED') {
-    throw new Error(`Cognitive task publication gate failed: publication.status must be PUBLISHED (received ${definition.publication.status})`)
-  }
-}
+/** Contract/readiness only. Product lifecycle authorization must use CognitiveTestConfig.status. */
+export const assertTaskReadyForRelease = assertTaskContractValid
+
+/** @deprecated Compatibility alias; it deliberately does NOT inspect publication.status. */
+export const assertTaskCanPublish = assertTaskReadyForRelease

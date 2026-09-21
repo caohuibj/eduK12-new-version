@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "digitbackward",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "startSpan": 2,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 800,
+          "inactivityGuardMs": 30000,
+          "stimulusSetVersion": "digits-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-digit",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "spanLength": 2,
+              "trialWithinLevel": 1,
+              "sequence": [
+                3,
+                2
+              ],
+              "response": [
+                2,
+                3
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "spanLength": 2,
+              "trialWithinLevel": 2,
+              "sequence": [
+                6,
+                5
+              ],
+              "response": [
+                5,
+                6
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "spanLength": 3,
+              "trialWithinLevel": 1,
+              "sequence": [
+                9,
+                3,
+                1
+              ],
+              "response": [
+                1,
+                3,
+                9
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "spanLength": 3,
+              "trialWithinLevel": 2,
+              "sequence": [
+                9,
+                1,
+                4
+              ],
+              "response": [
+                4,
+                1,
+                9
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "spanLength": 4,
+              "trialWithinLevel": 1,
+              "sequence": [
+                7,
+                2,
+                5,
+                8
+              ],
+              "response": [
+                8,
+                5,
+                2,
+                7
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "spanLength": 4,
+              "trialWithinLevel": 2,
+              "sequence": [
+                4,
+                7,
+                5,
+                0
+              ],
+              "response": [
+                0,
+                5,
+                7,
+                4
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "maxSpan": 4,
+          "totalCorrectTrials": 6,
+          "sequenceDistance": 0,
+          "medianResponseDurationMs": 800,
+          "completedLevelCount": 3
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientCompletedLevels": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "startSpan": 2,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 800,
+          "inactivityGuardMs": 30000,
+          "stimulusSetVersion": "digits-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-digit",
+        "trials": []
+      },
+      "expectedError": "digitbackward v1 requires complete two-trial levels"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "startSpan": 2,
+          "maxSpan": 4,
+          "trialsPerLevel": 2,
+          "digitDisplayMs": 800,
+          "digitIntervalMs": 200,
+          "readyDurationMs": 800,
+          "inactivityGuardMs": 30000,
+          "stimulusSetVersion": "digits-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-digit",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "spanLength": 2,
+              "trialWithinLevel": 1,
+              "sequence": [
+                3,
+                2
+              ],
+              "response": [
+                2,
+                3
+              ],
+              "responseDurationMs": 800,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "digitbackward v1 requires complete two-trial levels"
+    }
+  ]
+}

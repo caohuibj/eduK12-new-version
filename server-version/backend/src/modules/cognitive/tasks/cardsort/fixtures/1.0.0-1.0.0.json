@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "cardsort",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "switchRatio": 0.33,
+          "blockCount": 2,
+          "cueMs": 500,
+          "stimulusMs": 2000,
+          "isiMs": 350,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-cards-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "golden-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "ruleCue": "color",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "left",
+              "rtMs": 700,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 700,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "blue",
+              "stimulusShape": "circle",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "blue",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "circle",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "circle",
+              "response": "left",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "blue",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "ruleCue": "color",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "left",
+              "rtMs": 700,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "blue",
+              "stimulusShape": "circle",
+              "response": "left",
+              "rtMs": 700,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "blue",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "switchCostRtMs": 200,
+          "switchCostAccuracy": 0,
+          "perseverativeErrorRate": 0,
+          "postSwitchRecovery": 0,
+          "accuracySwitch": 1,
+          "accuracyRepeat": 1,
+          "medianRtSwitch": 700,
+          "medianRtRepeat": 500,
+          "overallAccuracy": 1,
+          "omissionRate": 0,
+          "perseverativeErrorCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "insufficientSwitchTrials": false,
+          "insufficientRepeatTrials": true,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "switchRatio": 0.33,
+          "blockCount": 2,
+          "cueMs": 500,
+          "stimulusMs": 2000,
+          "isiMs": 350,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-cards-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "golden-seed",
+        "trials": []
+      },
+      "expectedError": "cardsort v1 expects exactly 12 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 12,
+          "switchRatio": 0.33,
+          "blockCount": 2,
+          "cueMs": 500,
+          "stimulusMs": 2000,
+          "isiMs": 350,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "geometric-cards-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "golden-seed",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "ruleCue": "shape",
+              "stimulusColor": "red",
+              "stimulusShape": "star",
+              "response": "right",
+              "rtMs": 500,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "cardsort v1 expects exactly 12 trials, got 1"
+    }
+  ]
+}

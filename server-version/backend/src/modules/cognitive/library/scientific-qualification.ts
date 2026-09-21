@@ -1,32 +1,48 @@
-import { getScientificEvidenceRecord } from '../../assessment-governance/scientific-evidence'
-import { evaluateScientificQualification, type ScientificQualificationDecisionV1 } from '../../assessment-governance/scientific-qualification'
+import { cognitiveSeeds } from '../generated/seeds'
+import { cognitiveGovernance } from '../generated/scientific'
+import { evaluateScopedCognitiveQualification } from '../onboarding/governance'
 import type { TaskDefinition } from '../v2/types'
-import { requireCatalogForIdentity } from './catalog'
-import { evaluateCognitiveProductReadiness } from './product-readiness'
-
-const hasText = (value: string | undefined): boolean => Boolean(value?.trim())
-
+import { evaluateScientificQualification } from '../../assessment-governance/scientific-qualification'
 export const evaluateCognitiveScientificQualification = (
-  definition: TaskDefinition<unknown, unknown>,
-): ScientificQualificationDecisionV1 => {
-  const { catalog } = requireCatalogForIdentity(
-    definition.testType,
-    definition.engineVersion,
-    definition.scoringVersion,
+  definition: TaskDefinition,
+) => {
+  const governance = cognitiveGovernance.find(
+    (g) =>
+      g.testType === definition.testType &&
+      g.engineVersion === definition.engineVersion &&
+      g.scoringVersion === definition.scoringVersion,
   )
-  const evidence = getScientificEvidenceRecord({
-    family: 'COGNITIVE',
-    key: definition.testType,
-    version: definition.engineVersion,
-    scoringVersion: definition.scoringVersion,
-  })
-  return evaluateScientificQualification({
-    productReadiness: evaluateCognitiveProductReadiness(definition),
-    hasResearchFoundation: catalog.sourceNotes.some(hasText)
-      || (evidence?.researchFoundationRefs.length ?? 0) > 0,
-    hasTraceableProvenance: hasText(catalog.rightsProvenance)
-      || (evidence?.provenanceRefs.length ?? 0) > 0,
-    hasEmpiricalReference: (evidence?.empiricalReferenceRefs.length ?? 0) > 0,
-    hasFormalResearchOutput: (evidence?.researchOutputRefs.length ?? 0) > 0,
-  })
+  const seeds = cognitiveSeeds.filter(
+    (s) =>
+      s.testType === definition.testType &&
+      s.engineVersion === definition.engineVersion &&
+      s.scoringVersion === definition.scoringVersion,
+  )
+  const versions = new Set(
+    seeds.flatMap((seed) =>
+      (governance?.claimScope?.profiles ?? ['standard']).map((profile) => {
+        const config = {
+          ...(seed.config as Record<string, unknown>),
+          ...definition.profiles[profile as keyof typeof definition.profiles]
+            ?.configPatch,
+        }
+        return typeof config.stimulusSetVersion === 'string'
+          ? config.stimulusSetVersion
+          : 'none'
+      }),
+    ),
+  )
+  const stimulusVersion = versions.size === 1 ? [...versions][0] : undefined
+  return governance
+    ? evaluateScopedCognitiveQualification(
+        definition,
+        governance,
+        stimulusVersion,
+      )
+    : evaluateScientificQualification({
+        hasResearchFoundation: false,
+        hasTraceableProvenance: false,
+        hasEmpiricalReference: false,
+        hasFormalResearchOutput: false,
+      })
 }

@@ -1,29 +1,13 @@
+import { LEGACY_LABELS, LEGACY_EXPLANATIONS } from './legacy-single-presentation'
 import React from 'react'
 import type { CognitiveSingleTaskReport } from './types'
 
 const profileLabelOf = (profile: CognitiveSingleTaskReport['profile'], explicit?: string | null) =>
   explicit || (profile === 'experience' ? '体验版' : profile === 'research' ? '科研版' : profile === 'standard' ? '正式版' : '')
 
-const METRIC_EXPLANATIONS: Record<string, string> = {
-  medianRtMs: '典型反应速度：多数有效反应所需的时间。',
-  rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
-  missRate: '遗漏比例：该作答但没有在有效时间内作答的比例。',
-  stroopEffectMs: '冲突干扰时间：冲突条件相对一致条件增加的反应时间。',
-  incongruentAccuracy: '冲突条件正确率：在字义与字体颜色冲突时仍按目标规则正确作答的比例。',
-  commissionRate: '误按比例：本来不应该按时发生按键的比例。',
-  omissionRate: '遗漏比例：应该响应但没有响应的比例。',
-  dPrime: '目标辨别敏感度：区分目标和非目标表现的信号检测指标。',
-  maxSpan: '最长正确序列：本次任务中能够正确完成的最高序列长度。',
-  totalCorrectTrials: '正确试次数：本次正式测验中完整答对的试次数。',
-  dPrimeByN: '各 N 难度的目标辨别敏感度；不同 N 应分开阅读。',
-  maxReliableN: '本次配置内达到评分门槛的最高 N 难度，不是标准化能力等级。',
-  pRespondStop: '停止信号后仍作出反应的比例，用于检查停止任务是否处于可解释范围。',
-  ssrtMs: '停止反应估计时间：根据停止信号模型估计的动作停止时间。',
-  switchCostRtMs: '规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。',
-  switchCostAccuracy: '准确率转换代价：切换规则时相对重复规则时的正确率变化。',
-}
-
-const metricExplanation = (key: string) => METRIC_EXPLANATIONS[key]
+const metricExplanation = (metric: CognitiveSingleTaskReport['primaryMetrics'][number]) => metric.presentationVersion !== undefined ? metric.explanation : LEGACY_EXPLANATIONS[metric.key]
+const participantMetricLabel = (metric: CognitiveSingleTaskReport['primaryMetrics'][number]) =>
+  metric.presentationVersion !== undefined ? metric.participantLabel ?? metric.label : LEGACY_LABELS[metric.key] ?? metric.label
 
 const CognitiveSingleTaskReportCard: React.FC<{
   report: CognitiveSingleTaskReport
@@ -44,9 +28,9 @@ const CognitiveSingleTaskReportCard: React.FC<{
   const renderMetric = (metric: CognitiveSingleTaskReport['primaryMetrics'][number]) => (
     <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
       <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-      <div className="text-xs font-medium text-gray-500">{metric.label}</div>
-      {metricExplanation(metric.key) ? (
-        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric.key)}</p>
+      <div className="text-xs font-medium text-gray-500">{participantMetricLabel(metric)}</div>
+      {metricExplanation(metric) ? (
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric)}</p>
       ) : null}
     </div>
   )
@@ -84,12 +68,21 @@ const CognitiveSingleTaskReportCard: React.FC<{
         )}
       </section>
 
+      {interpretable && report.interpretationSummary ? (
+        <section className="mb-6 text-left">
+          <SectionHeading className="mb-2 text-sm font-semibold text-gray-600">结果概览</SectionHeading>
+          <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm leading-relaxed text-gray-700">
+            {report.interpretationSummary}
+          </div>
+        </section>
+      ) : null}
+
       {interpretable && report.headline && (
         <div className="mb-6 text-center">
           <div className="text-4xl sm:text-5xl font-bold text-primary">{report.headline.formatted}</div>
-          <div className="text-sm font-medium text-gray-500 mt-1">{report.headline.label}</div>
-          {metricExplanation(report.headline.key) ? (
-            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">{metricExplanation(report.headline.key)}</p>
+          <div className="text-sm font-medium text-gray-500 mt-1">{participantMetricLabel(report.headline)}</div>
+          {metricExplanation(report.headline) ? (
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">{metricExplanation(report.headline)}</p>
           ) : null}
         </div>
       )}

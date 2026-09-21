@@ -28,7 +28,7 @@ describe('Cognitive v2 registry adapter', () => {
     }
   })
 
-  it('binds FINAL admission to every exact registry identity', () => {
+  it('binds FINAL admission to every exact registry identity without a fixed inventory count', () => {
     const legacy = listCognitiveRegistryEntries()
     const definitions = listCognitiveV2TaskDefinitions()
     const legacyByKey = new Map(legacy.map((entry) => [
@@ -36,8 +36,7 @@ describe('Cognitive v2 registry adapter', () => {
       entry,
     ]))
 
-    expect(legacy).toHaveLength(28)
-    expect(definitions).toHaveLength(28)
+    expect(definitions).toHaveLength(legacy.length)
     for (const definition of definitions) {
       const entry = legacyByKey.get(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)
       expect(entry, `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).toBeDefined()
@@ -46,24 +45,25 @@ describe('Cognitive v2 registry adapter', () => {
     }
 
     const audit = auditCognitiveV2Registry(definitions)
-    expect(audit.registryCount).toBe(28)
+    expect(audit.registryCount).toBe(legacy.length)
+    expect(audit.entries).toHaveLength(legacy.length)
     expect(audit.entries.every((entry) => entry.issues.every((issue) => issue.severity !== 'error'))).toBe(true)
   })
 
-  it('separates product lifecycle from recommendation and reference eligibility', () => {
+  it('separates product lifecycle from compatibility publication metadata and reference eligibility', () => {
     const definitions = listCognitiveV2TaskDefinitions()
     const entries = listCognitiveRegistryEntries()
-    const published = definitions.filter((definition) => definition.publication.status === 'PUBLISHED')
-    const drafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
-    const retired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
+    const compatibilityPublished = definitions.filter((definition) => definition.publication.status === 'PUBLISHED')
+    const compatibilityDrafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
+    const compatibilityRetired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
 
-    expect(published).toHaveLength(24)
-    expect(drafts.map((definition) => definition.testType)).toEqual(['fake'])
-    expect(retired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
+    expect(compatibilityDrafts.map((definition) => definition.testType)).toEqual(['fake'])
+    expect(compatibilityRetired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
       'memory/1.0.0/1.0.0',
       'reaction/1.0.0/1.0.0',
       'stroop/1.0.0/1.0.0',
     ])
+    expect(compatibilityPublished.length + compatibilityDrafts.length + compatibilityRetired.length).toBe(definitions.length)
 
     const expectedEligible = entries.reduce((count, entry) => (
       count + (Array.isArray(entry.referenceEligibleMetricKeys) ? entry.referenceEligibleMetricKeys.length : 0)
@@ -77,13 +77,19 @@ describe('Cognitive v2 registry adapter', () => {
     expect(getCognitiveV2TaskDefinition('nback', '1.0.0', '1.0.0')?.metrics.maxReliableN.referenceEligible).toBe(false)
 
     const audit = auditCognitiveV2Registry(definitions)
-    expect(audit).toMatchObject({ status: 'PASS', registryCount: 28, publishedCount: 24, draftCount: 1, retiredCount: 3 })
-    expect(audit.entries).toHaveLength(28)
+    expect(audit.status).toBe('PASS')
+    expect(audit.registryCount).toBe(definitions.length)
+    expect(audit.compatibilityPublishedCount).toBe(compatibilityPublished.length)
+    expect(audit.compatibilityDraftCount).toBe(compatibilityDrafts.length)
+    expect(audit.compatibilityRetiredCount).toBe(compatibilityRetired.length)
+    expect(audit.publishedCount).toBe(audit.compatibilityPublishedCount)
+    expect(audit.draftCount).toBe(audit.compatibilityDraftCount)
+    expect(audit.retiredCount).toBe(audit.compatibilityRetiredCount)
   })
 
   it('keeps eligibility on exact RegistryEntry metadata and audits malformed allowlists', () => {
     const entries = listCognitiveRegistryEntries()
-    expect(entries).toHaveLength(28)
+    expect(entries.length).toBeGreaterThan(0)
     expect(entries.every((entry) => Array.isArray(entry.referenceEligibleMetricKeys))).toBe(true)
     expect(entries.every((entry) => Object.values(entry.metricDefinitions)
       .every((metric) => !Object.prototype.hasOwnProperty.call(metric, 'referenceEligible')))).toBe(true)
@@ -101,6 +107,16 @@ describe('Cognitive v2 registry adapter', () => {
       referenceEligibleMetricKeys: ['unknownMetric'],
     })).toEqual(expect.arrayContaining([
       expect.objectContaining({ message: 'unknown eligible metric key: unknownMetric' }),
+    ]))
+  })
+
+  it('fails audit on structural registry/definition drift rather than a hard-coded inventory size', () => {
+    const definitions = listCognitiveV2TaskDefinitions()
+    expect(definitions.length).toBeGreaterThan(1)
+    const audit = auditCognitiveV2Registry(definitions.slice(1))
+    expect(audit.status).toBe('FAIL')
+    expect(audit.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'registry', message: expect.stringContaining('cardinality mismatch') }),
     ]))
   })
 

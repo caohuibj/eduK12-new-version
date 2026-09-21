@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "gonogo",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 8,
+          "nogoRatio": 0.25,
+          "stimulusMs": 800,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-gonogo",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialType": "nogo",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialType": "nogo",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "trialType": "go",
+              "responded": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 80,
+        "metrics": {
+          "commissionRate": 0,
+          "dPrime": 2.433,
+          "goMedianRtMs": 300,
+          "hitRate": 1,
+          "omissionRate": 0,
+          "commissionErrors": 0,
+          "goTrialCount": 6,
+          "nogoTrialCount": 2
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientNoGoTrials": false,
+          "excessiveOmissions": false,
+          "extremeCommissionRate": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 8,
+          "nogoRatio": 0.25,
+          "stimulusMs": 800,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-gonogo",
+        "trials": []
+      },
+      "expectedError": "gonogo v1 expects exactly 8 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 8,
+          "nogoRatio": 0.25,
+          "stimulusMs": 800,
+          "isiMs": 400,
+          "validRtFloorMs": 100,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round1-golden-gonogo",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialType": "nogo",
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "gonogo v1 expects exactly 8 trials, got 1"
+    }
+  ]
+}

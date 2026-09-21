@@ -1,3 +1,4 @@
+import { LEGACY_LABELS, LEGACY_EXPLANATIONS } from './legacy-v2-presentation'
 import React from 'react'
 import type { CognitiveV2Report, CognitiveV2ReportMetricView } from './types'
 
@@ -8,34 +9,19 @@ const profileLabel = (profile: CognitiveV2Report['method']['profile']): string =
   return ''
 }
 
-const METRIC_EXPLANATIONS: Record<string, string> = {
-  medianRtMs: '典型反应速度：多数有效反应所需的时间。',
-  rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
-  missRate: '遗漏比例：应该响应但没有在有效时间内响应的比例。',
-  stroopEffectMs: '冲突干扰时间：冲突条件相对一致条件增加的反应时间。',
-  incongruentAccuracy: '冲突条件正确率：在字义与字体颜色冲突时仍按目标规则正确作答的比例。',
-  commissionRate: '误按比例：本来不应该按时发生按键的比例。',
-  omissionRate: '遗漏比例：应该响应但没有响应的比例。',
-  dPrime: '目标辨别敏感度：区分目标与非目标表现的信号检测指标。',
-  maxSpan: '最长正确序列：本次任务中能够正确完成的最高序列长度。',
-  totalCorrectTrials: '正确试次数：本次正式测验中完整答对的试次数。',
-  dPrimeByN: '各 N 难度的目标辨别敏感度；不同 N 应分开阅读。',
-  maxReliableN: '本次配置内达到评分门槛的最高 N 难度，不是标准化能力等级。',
-  pRespondStop: '停止信号后仍作出反应的比例，用于检查停止任务是否处于可解释范围。',
-  ssrtMs: '停止反应估计时间：根据停止信号模型估计的动作停止时间。',
-  switchCostRtMs: '规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。',
-  switchCostAccuracy: '准确率转换代价：切换规则时相对重复规则时的正确率变化。',
-}
+const participantMetricLabel = (metric: CognitiveV2ReportMetricView): string =>
+  metric.presentationVersion !== undefined ? metric.participantLabel ?? metric.label : LEGACY_LABELS[metric.key] ?? metric.label
+
+const metricExplanation = (metric: CognitiveV2ReportMetricView): string =>
+  (metric.presentationVersion !== undefined ? metric.explanation : LEGACY_EXPLANATIONS[metric.key]) ?? '该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。'
 
 const MetricGrid = ({ metrics }: { metrics: CognitiveV2ReportMetricView[] }) => (
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
     {metrics.map((metric) => (
       <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
         <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-        <div className="text-xs font-medium text-gray-500">{metric.label}</div>
-        <p className="mt-1 text-xs leading-relaxed text-gray-400">
-          {METRIC_EXPLANATIONS[metric.key] ?? metric.category}
-        </p>
+        <div className="text-xs font-medium text-gray-500">{participantMetricLabel(metric)}</div>
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric)}</p>
       </div>
     ))}
   </div>
@@ -49,7 +35,8 @@ const CognitiveV2ReportCard: React.FC<{
   anonymousCode?: string | null
 }> = ({ report, references = [], attemptNo, finishedAt, anonymousCode }) => {
   const activeQuality = report.quality.filter((item) => item.active)
-  const profileText = profileLabel(report.method.profile)
+  const reviewedProfileLabel = (report as CognitiveV2Report & { profileLabel?: string | null }).profileLabel
+  const profileText = reviewedProfileLabel || profileLabel(report.method.profile)
   const qualityStyle = report.qualityState === 'interpretable'
     ? 'bg-green-50 text-green-700'
     : report.qualityState === 'limited'
@@ -99,9 +86,9 @@ const CognitiveV2ReportCard: React.FC<{
           {report.headline.length === 1 ? (
             <div className="text-center py-2">
               <div className="text-4xl font-bold text-primary sm:text-5xl">{report.headline[0].formatted}</div>
-              <div className="mt-1 text-sm font-medium text-gray-500">{report.headline[0].label}</div>
+              <div className="mt-1 text-sm font-medium text-gray-500">{participantMetricLabel(report.headline[0])}</div>
               <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">
-                {METRIC_EXPLANATIONS[report.headline[0].key] ?? report.headline[0].category}
+                {metricExplanation(report.headline[0])}
               </p>
             </div>
           ) : <MetricGrid metrics={report.headline} />}
@@ -146,6 +133,7 @@ const CognitiveV2ReportCard: React.FC<{
             <h2 className="text-sm font-semibold text-gray-600 mb-2">方法说明（技术信息）</h2>
             <p className="text-xs text-gray-500">
               任务 {report.method.testType} · 引擎 {report.method.engineVersion} · 评分 {report.method.scoringVersion} · 配置 {report.method.configVersion}
+              {profileText ? ` · ${profileText}` : ''}
             </p>
           </section>
         </div>

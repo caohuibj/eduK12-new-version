@@ -1,0 +1,679 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "lexicaldecision",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "realWordRatio": 0.5,
+          "stimulusMs": 1200,
+          "trialTimeoutMs": 3000,
+          "isiMs": 300,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "zh-lexical-v1.0.0",
+          "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-lexicaldecision-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "stimulusId": "zh-real-2-high-016",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-high-002",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "stimulusId": "zh-real-2-medium-011",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-medium-022",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "stimulusId": "zh-real-2-low-013",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-low-023",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "stimulusId": "zh-real-3-high-020",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-high-016",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "stimulusId": "zh-real-3-medium-007",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-medium-029",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "stimulusId": "zh-real-3-low-009",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-low-011",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "stimulusId": "zh-real-2-high-030",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-high-010",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "stimulusId": "zh-real-2-medium-028",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-medium-027",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "stimulusId": "zh-real-2-low-011",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-low-022",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "stimulusId": "zh-real-3-high-008",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-high-013",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "stimulusId": "zh-real-3-medium-006",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-medium-004",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "stimulusId": "zh-real-3-low-025",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-low-018",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "stimulusId": "zh-real-2-high-026",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-high-028",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "stimulusId": "zh-real-2-medium-010",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-medium-010",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "stimulusId": "zh-real-2-low-026",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-low-029",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "stimulusId": "zh-real-3-high-004",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-high-008",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "stimulusId": "zh-real-3-medium-012",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-medium-010",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "stimulusId": "zh-real-3-low-030",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "stimulusId": "zh-pseudo-3-low-023",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 3,
+              "frequencyBand": "low",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 36,
+            "payload": {
+              "stimulusId": "zh-real-2-high-014",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 37,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-high-014",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 38,
+            "payload": {
+              "stimulusId": "zh-real-2-medium-025",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 39,
+            "payload": {
+              "stimulusId": "zh-pseudo-2-medium-012",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "pseudo",
+              "wordLength": 2,
+              "frequencyBand": "medium",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "nonword",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "dPrime": 3.9615,
+          "lexicalityEffectMs": 0,
+          "accuracyReal": 1,
+          "accuracyPseudo": 1,
+          "medianRtReal": 300,
+          "medianRtPseudo": 300,
+          "accuracyByFrequencyBand": {
+            "high": 1,
+            "medium": 1,
+            "low": 1
+          },
+          "omissionRate": 0,
+          "validResponseCount": 40
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientRealWords": false,
+          "insufficientPseudoWords": false,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantResponse": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "realWordRatio": 0.5,
+          "stimulusMs": 1200,
+          "trialTimeoutMs": 3000,
+          "isiMs": 300,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "zh-lexical-v1.0.0",
+          "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-lexicaldecision-golden",
+        "trials": []
+      },
+      "expectedError": "lexicaldecision v1 expects exactly 40 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 40,
+          "realWordRatio": 0.5,
+          "stimulusMs": 1200,
+          "trialTimeoutMs": 3000,
+          "isiMs": 300,
+          "validRtFloorMs": 150,
+          "stimulusSetVersion": "zh-lexical-v1.0.0",
+          "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "pr13-lexicaldecision-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "stimulusId": "zh-real-2-high-016",
+              "stimulusVersion": "zh-lexical-v1.0.0",
+              "lexicality": "real",
+              "wordLength": 2,
+              "frequencyBand": "high",
+              "pseudowordGeneratorVersion": "zh-pseudoword-generator-v1.0.0",
+              "response": "word",
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "lexicaldecision v1 expects exactly 40 trials, got 1"
+    }
+  ]
+}

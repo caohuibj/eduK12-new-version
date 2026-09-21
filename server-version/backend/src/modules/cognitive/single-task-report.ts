@@ -2,8 +2,14 @@ import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskR
 import type { CognitiveReference } from './reference'
 import type { FrozenReportSnapshot } from './profile-freeze'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
+import { resolveLegacyCognitiveProtocolPresentation } from './legacy-protocol-presentation'
+import { legacyExperienceHeadline, legacySuppressTips } from './legacy-report-policy'
+import type { CognitiveParticipantPresentationV1 } from './participant-presentation.types'
 
 export interface CognitiveReportMetricView {
+  presentationVersion?: string
+  participantLabel?: string
+  explanation?: string
   key: string
   label: string
   unit?: string
@@ -19,6 +25,7 @@ export interface CognitiveSingleTaskReport {
   interpretable: boolean
   qualityState: 'interpretable' | 'insufficient'
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
+  interpretationSummary: string | null
   headline: CognitiveReportMetricView | null
   productIndex: { label: '任务表现指数'; value: number } | null
   showProductIndex: boolean
@@ -72,10 +79,12 @@ const metricView = (
   key: string,
   metrics: Record<string, unknown>,
   definitions: Record<string, MetricDefinition>,
+  presentation?: CognitiveParticipantPresentationV1,
 ): CognitiveReportMetricView => {
   const definition = definitions[key]
   return {
     key,
+    ...(presentation ? { presentationVersion: presentation.presentationVersion, participantLabel: presentation.metrics[key]?.label ?? definition?.label ?? key, explanation: presentation.metrics[key]?.singleExplanation } : {}),
     label: definition?.label ?? key,
     unit: definition?.unit,
     value: metrics[key],
@@ -104,30 +113,17 @@ const registryCompatReport = (input: {
   }
 }
 
-const experienceHeadlineByTestType: Record<string, string> = {
-  stroop: 'incongruentAccuracy',
-  nback: 'dPrimeByN',
-  sst: 'pRespondStop',
-}
-
 const resolveHeadlineKey = (
   testType: string,
   profile: CognitiveProfile | null,
   reportDefinition: SingleTaskReportDefinition | undefined,
   primaryKeys: string[],
   metricDefinitions: Record<string, MetricDefinition>,
+  presentation?: CognitiveParticipantPresentationV1,
 ): string | undefined => {
-  const profileHeadline = profile === 'experience' ? experienceHeadlineByTestType[testType] : undefined
+  const profileHeadline = profile === 'experience' ? (presentation ? presentation.experienceHeadline : legacyExperienceHeadline(testType)) : undefined
   if (profileHeadline && metricDefinitions[profileHeadline]) return profileHeadline
   return reportDefinition?.headlineMetric || primaryKeys[0]
-}
-
-// Participant-facing reports must not teach task-specific strategies that can
-// contaminate a later repeated measurement. Environment/device guidance and
-// construct-interpretation notes remain allowed.
-const participantPracticalTips = (testType: string, tips: string[]): string[] => {
-  if (testType === 'memory' || testType === 'stroop') return []
-  return tips
 }
 
 export const buildCognitiveSingleTaskReport = (input: {
@@ -147,8 +143,21 @@ export const buildCognitiveSingleTaskReport = (input: {
   const reportDefinition: SingleTaskReportDefinition | undefined = frozen.reportDefinition
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
+  // For newly frozen assignments, participant-facing protocol wording is read
+  // from the immutable snapshot. Historical formats use a fixed legacy adapter.
+  const presentation = frozen.presentationVersion ? frozen.participantPresentation : undefined
+  if (frozen.presentationVersion && !presentation) throw new Error('COG_PRESENTATION_SNAPSHOT_INVALID')
+  const protocolPresentation = presentation
+    ? (input.profile ? presentation.protocols[input.profile] ?? null : null)
+    : resolveLegacyCognitiveProtocolPresentation({
+    testType: input.testType,
+    engineVersion: input.engineVersion,
+    scoringVersion: input.scoringVersion,
+    profile: input.profile,
+  })
   const interpretable = input.qualityFlags.interpretable !== false
   const metricVisible = (key: string) => {
+    if (presentation?.singleHiddenMetrics.includes(key)) return false
     const definition = metricDefinitions[key]
     if (!definition) return true
     if (!input.profile || !definition.availableProfiles) return true
@@ -162,8 +171,11 @@ export const buildCognitiveSingleTaskReport = (input: {
     reportDefinition,
     primaryKeys,
     metricDefinitions,
+    presentation,
   )
-  const showProductIndex = reportDefinition?.showProductIndex !== false
+  const showProductIndex = input.frozenReport?.protocolShowProductIndex
+    ?? protocolPresentation?.showProductIndex
+    ?? (reportDefinition?.showProductIndex !== false)
   const qualityFlags = Object.entries(input.qualityFlags)
     .filter(([key]) => key !== 'interpretable')
     .map(([key, value]) => ({
@@ -178,18 +190,26 @@ export const buildCognitiveSingleTaskReport = (input: {
   return {
     testType: input.testType,
     profile: input.profile,
-    profileLabel: profileLabelOf(input.profile),
-    title: reportDefinition?.title ?? input.testType,
+    profileLabel: input.frozenReport?.profileLabel
+      ?? protocolPresentation?.profileLabel
+      ?? profileLabelOf(input.profile),
+    title: presentation?.title ?? reportDefinition?.title ?? input.testType,
     interpretable,
     qualityState: interpretable ? 'interpretable' : 'insufficient',
     qualityFlags,
-    headline: interpretable && headlineKey ? metricView(headlineKey, input.metrics, metricDefinitions) : null,
+    interpretationSummary: interpretable
+      ? input.frozenReport?.participantConclusion ?? protocolPresentation?.participantConclusion ?? null
+      : null,
+    headline: interpretable && headlineKey && metricVisible(headlineKey) ? metricView(headlineKey, input.metrics, metricDefinitions, presentation) : null,
     productIndex: showProductIndex && interpretable ? { label: '任务表现指数', value: input.score } : null,
     showProductIndex,
-    primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
-    secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions)) : [],
-    caveats: input.frozenReport?.reportCaveats ?? frozen.reportCaveats ?? [],
-    practicalTips: participantPracticalTips(input.testType, reportDefinition?.practicalTips ?? []),
+    primaryMetrics: interpretable ? primaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
+    secondaryMetrics: interpretable ? secondaryKeys.map((key) => metricView(key, input.metrics, metricDefinitions, presentation)) : [],
+    caveats: input.frozenReport?.reportCaveats
+      ?? protocolPresentation?.reportCaveats
+      ?? frozen.reportCaveats
+      ?? [],
+    practicalTips: (presentation ? presentation.suppressTips : legacySuppressTips(input.testType)) ? [] : presentation?.practicalTips ?? reportDefinition?.practicalTips ?? [],
     method: {
       testType: input.testType,
       engineVersion: input.engineVersion,
@@ -197,7 +217,7 @@ export const buildCognitiveSingleTaskReport = (input: {
       configVersion: input.configVersion,
       profile: input.profile,
     },
-    disclaimer: reportDefinition?.disclaimer ?? '结果反映本次任务表现，不是医学诊断或人口常模。',
+    disclaimer: presentation?.disclaimer ?? reportDefinition?.disclaimer ?? '结果反映本次任务表现，不是医学诊断或人口常模。',
     reference: hiddenReference,
   }
 }

@@ -36,6 +36,9 @@ export interface CognitiveAssignmentSummary {
 export type CognitiveSessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED' | 'INVALID'
 
 export interface CognitiveReportMetricView {
+  presentationVersion?: string
+  participantLabel?: string
+  explanation?: string
   key: string
   label: string
   unit?: string
@@ -76,6 +79,7 @@ export interface CognitiveSingleTaskReport {
   interpretable: boolean
   qualityState: 'interpretable' | 'insufficient'
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
+  interpretationSummary?: string | null
   headline: CognitiveReportMetricView | null
   productIndex: { label: string; value: number } | null
   showProductIndex?: boolean

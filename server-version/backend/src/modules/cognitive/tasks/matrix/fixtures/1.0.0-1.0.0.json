@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "matrix",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Existing independent round1/round2/pr12/pr13 scoring golden tests; originals remain authoritative",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "itemCount": 6,
+          "optionCount": 4,
+          "itemTimeoutMs": 30000,
+          "validRtFloorMs": 300,
+          "stimulusSetVersion": "matrix-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-matrix",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "matrix-04",
+              "selectedOption": 0,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "matrix-08",
+              "selectedOption": 1,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "matrix-10",
+              "selectedOption": 1,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "matrix-12",
+              "selectedOption": 3,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "matrix-23",
+              "selectedOption": 0,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "matrix-21",
+              "selectedOption": 2,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "accuracyByRuleFamily": {
+            "progression": 1,
+            "alternation": 1,
+            "combination": 1
+          },
+          "reachedDifficulty": 3,
+          "medianRtMs": 1000,
+          "omissionRate": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "constantResponse": false,
+          "excessiveOmissions": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "itemCount": 6,
+          "optionCount": 4,
+          "itemTimeoutMs": 30000,
+          "validRtFloorMs": 300,
+          "stimulusSetVersion": "matrix-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-matrix",
+        "trials": []
+      },
+      "expectedError": "matrix v1 requires the configured item count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "itemCount": 6,
+          "optionCount": 4,
+          "itemTimeoutMs": 30000,
+          "validRtFloorMs": 300,
+          "stimulusSetVersion": "matrix-generator-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "round2-golden-matrix",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "matrix-04",
+              "selectedOption": 0,
+              "rtMs": 1000,
+              "interrupted": false,
+              "timedOut": false
+            }
+          }
+        ]
+      },
+      "expectedError": "matrix v1 requires the configured item count"
+    }
+  ]
+}
