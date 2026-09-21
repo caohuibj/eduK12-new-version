@@ -77,12 +77,10 @@ describe('Flanker publish-prep UX', () => {
     expect(screen.getByText('上一题：不正确，正确答案是「右」')).toBeInTheDocument()
   })
 
-  it('does not count duplicate practice responses before the practice item advances', () => {
+  it('advances exactly one practice item for one keyboard response', () => {
     render(<FlankerTask taskContext={baseContext} trialIndex={0} onTrialComplete={vi.fn()} />)
     fireEvent.click(screen.getByText('开始练习'))
-    const left = screen.getByRole('button', { name: '← 左' })
-    fireEvent.pointerDown(left, { pointerId: 1, button: 0, isPrimary: true })
-    fireEvent.pointerDown(left, { pointerId: 1, button: 0, isPrimary: true })
+    fireEvent.keyDown(window, { key: 'ArrowLeft' })
     expect(screen.getByText('练习 2 / 4')).toBeInTheDocument()
   })
 
