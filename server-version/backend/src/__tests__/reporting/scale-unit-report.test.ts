@@ -134,10 +134,12 @@ describe('Scale unit report contract', () => {
     expect(authenticated).toEqual(publicProjection)
     expect(authenticated).toEqual(expected)
     expect(authenticated).toMatchObject({
-      reportKind: 'full',
+      type: 'SCALE',
+      kind: 'scale',
+      scores: [{ key: 'engagement', value: 0 }],
       caveats: ['同一项注意事项'],
       disclaimer: '同一项免责声明',
-      result: null,
     })
+    expect(authenticated).not.toHaveProperty('result')
   })
 })
