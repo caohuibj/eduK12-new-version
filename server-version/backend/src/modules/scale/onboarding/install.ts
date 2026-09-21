@@ -141,7 +141,7 @@ const resolvePlan = async (
 }
 
 export const planScaleInstrumentInstall = async (
-  db: PrismaClient,
+  db: PrismaClient | Prisma.TransactionClient,
   input: InstallScaleInstrumentInput,
 ): Promise<InstallScaleInstrumentPlan> => resolvePlan(db, input)
 
