@@ -208,3 +208,17 @@ export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRu
   assertRuntimeAndReferenceIdentity(snapshot)
   return snapshot
 }
+
+export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1Like | FrozenScaleRuntimeSnapshotV2
+
+/** Compatibility export retained for PR-1/PR-2 callers. Lazy V1 require avoids a module-init cycle. */
+export const parseVersionedFrozenScaleRuntimeSnapshot = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid Frozen Scale runtime snapshot')
+  const schemaVersion = (value as { schemaVersion?: unknown }).schemaVersion
+  if (schemaVersion === 2) return parseFrozenScaleRuntimeSnapshotV2(value)
+  if (schemaVersion === 1) {
+    const { parseFrozenScaleRuntimeSnapshot } = require('./runtime-snapshot') as typeof import('./runtime-snapshot')
+    return parseFrozenScaleRuntimeSnapshot(value)
+  }
+  throw new Error(`Unsupported Frozen Scale runtime snapshot schemaVersion: ${String(schemaVersion)}`)
+}
