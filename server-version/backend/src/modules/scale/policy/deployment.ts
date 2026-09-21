@@ -39,6 +39,7 @@ export const scaleDeploymentPolicyV1Schema = z.object({
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   localizationVersion: z.string().min(1).optional(),
   inFlightCompletion: z.literal('FROZEN_DEADLINE'),
+  completionWindowMs: z.number().int().positive().max(30 * 24 * 60 * 60 * 1000).optional(),
 }).strict()
 
 export type ScaleDeploymentPolicyV1 = z.infer<typeof scaleDeploymentPolicyV1Schema>
@@ -73,7 +74,7 @@ const requiredActions = (
   const allowed = new Set(scaleDeploymentRightActionSchema.options)
   const sourceActions = usageRequirements?.requiredRightsActions
     .filter((action): action is ScaleDeploymentRightActionV1 => allowed.has(action as ScaleDeploymentRightActionV1)) ?? []
-  return [...new Set([...policy.requiredRightsActions, ...sourceActions])].sort()
+  return [...new Set<ScaleDeploymentRightActionV1>(['electronicAdministration', 'scoring', 'display', ...policy.requiredRightsActions, ...sourceActions])].sort()
 }
 
 export const evaluateScaleDeployment = (input: {
@@ -104,8 +105,21 @@ export const evaluateScaleDeployment = (input: {
     reasons.push('DEPLOYMENT_MODE_NOT_ALLOWED')
   }
 
+  // A revocation supersedes older grants in the same lineage; a newer DRAFT does not.
+  const eligibleLineages = input.authorizations.filter(row => {
+    const revocations = input.authorizations.filter(candidate => candidate.authorizationId === row.authorizationId
+      && candidate.instrumentKey === row.instrumentKey && candidate.instrumentVersion === row.instrumentVersion
+      && candidate.status === 'REVOKED')
+    return !revocations.some(revoked => revoked.version >= row.version && row.status !== 'REVOKED')
+  })
+  const boundAuthorizations = policy.authorizationRefs.length
+    ? eligibleLineages.filter(row => policy.authorizationRefs.includes(row.authorizationId)) : eligibleLineages
+  if (policy.authorizationRefs.length && !boundAuthorizations.length && input.authorizations.length) reasons.push('AUTHORIZATION_BINDING_STALE')
+  if (input.usageRequirements?.requiredRightsActions.some(action => !scaleDeploymentRightActionSchema.safeParse(action).success)) {
+    reasons.push('UNSUPPORTED_RIGHTS_ACTION')
+  }
   const effective = resolveEffectiveAuthorization({
-    authorizations: input.authorizations,
+    authorizations: boundAuthorizations,
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     nowIso,
@@ -132,6 +146,7 @@ export const evaluateScaleDeployment = (input: {
   })
   if (!scope.ok) reasons.push('AUTHORIZATION_SCOPE_MISMATCH')
 
+  if (effective.scope.commercialNature === 'UNSPECIFIED') reasons.push('AUTHORIZATION_COMMERCIAL_NATURE_UNKNOWN')
   if (
     effective.scope.commercialNature === 'NON_COMMERCIAL'
     && policy.commercialNature === 'COMMERCIAL'

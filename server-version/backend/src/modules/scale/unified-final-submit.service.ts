@@ -245,6 +245,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
   }
 
+  if (admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+    && Date.now() > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
+  }
+
   // The child row is already loaded by the final-submit admission path. Resolve
   // stored provenance and build the encrypted answer envelope before entering
   // the completion transaction; the transaction must only adjudicate and persist.

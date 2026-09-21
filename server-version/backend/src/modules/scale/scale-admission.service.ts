@@ -1,4 +1,5 @@
-import { Prisma, type PrismaClient } from '@prisma/client'
+import { withSerializableScaleTransaction } from './deployment/transactions'
+import { type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -21,7 +22,7 @@ import {
 import { getFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
 import { decryptFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
+import { ageMonthsAt, assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
 import { resolveScaleStartDeployment } from './deployment/service'
 import type { ScaleDeploymentModeV1 } from './policy/deployment'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
@@ -248,6 +249,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   contextSnapshotHash: string | null
   contextValues: AssessmentContextValues | null
   contextFrozenAt: string | null
+  contextSubjectUserId?: string | null
   respondentType?: string | null
   subjectUserId?: string | null
   respondentUserId?: string | null
@@ -293,12 +295,18 @@ export const createScaleAdmissionForRuntime = async (input: {
   const eligibility = evaluateInstrumentEligibility(input.runtime.compiledPolicy.applicability, {
     respondentType: resolvedRespondentType,
     subject: {
-      ageMonths: input.contextValues?.ageMonthsAtFreeze,
+      ageMonths: input.contextValues?.birthYearMonth && input.contextFrozenAt
+        ? ageMonthsAt(input.contextValues.birthYearMonth, new Date(input.contextFrozenAt)) : undefined,
       gradeLevel: input.contextValues?.gradeLevel,
     },
     assessmentContext: input.requestedMode,
     availableContextKeys: availableContextKeys(input.contextValues),
   })
+  if (resolvedRespondentType !== 'SELF' && policyRequiresContext(input.runtime)
+    && (!input.subjectUserId || input.contextSubjectUserId !== input.subjectUserId)) {
+    eligibility.outcome = 'INDETERMINATE'
+    eligibility.reasons.push({ code: 'SUBJECT_CONTEXT_UNBOUND', rule: 'Observer context must bind the frozen subject identity' })
+  }
   const evaluatedAt = new Date().toISOString()
   const identityBindingHash = canonicalHash({
     instrumentKey: input.scale.code,
@@ -358,6 +366,7 @@ export const createScaleAdmissionForRuntime = async (input: {
         authorizationId: deployment.decision.authorization.authorizationId,
         authorizationVersion: deployment.decision.authorization.version,
         evaluatedAt,
+        completionDeadline: new Date(Date.parse(evaluatedAt) + (deployment.deployment.policy.completionWindowMs ?? 7 * 24 * 60 * 60 * 1000)).toISOString(),
       },
     },
   })
@@ -453,11 +462,31 @@ const validateStoredAgainstRuntime = (
   stored: VersionedFrozenUnitAdmission,
 ): VersionedFrozenUnitAdmission => {
   assertAdmissionParentBinding(row, stored)
+  if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
+    || stored.scale?.code !== row.scale.code || stored.scale?.instrumentVersion !== row.scale.instrumentVersion
+    || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
+  }
   const runtime = readRuntime(row.runtimeSnapshotEncrypted)
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
   if (stored.schemaVersion === 2 && runtime.schemaVersion === 2) {
+    if (row.status !== 'COMPLETED' && stored.scalePolicy?.deployment?.completionDeadline
+      && Date.now() > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
+    }
+    const identityBindingHash = canonicalHash({
+      instrumentKey: row.scale.code, instrumentVersion: row.scale.instrumentVersion,
+      sourceDefinitionHash: runtime.sourceDefinitionHash, compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      runtimePolicyHash: runtime.runtimePolicyHash, deploymentPolicyHash: stored.scalePolicy?.deployment?.policyHash,
+      attemptEpoch: row.attemptEpoch, principal: stored.principal, parent: stored.parent,
+      subjectUserId: row.subjectUserId ?? null, respondentUserId: row.respondentUserId ?? null,
+      respondentType: resolveScalePolicyRespondentType(row),
+    })
+    if (stored.scalePolicy?.deployment && identityBindingHash !== stored.scalePolicy.eligibility.identityBindingHash) {
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结身份绑定不匹配', 409)
+    }
     if (stored.scalePolicy?.runtimePolicyHash !== runtime.runtimePolicyHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结策略绑定不匹配', 409)
     }
@@ -538,12 +567,13 @@ const activateUnstoredScaleAdmission = async (
       contextSnapshotHash: loadedParent.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
       contextFrozenAt: context.context?.frozenAt ?? null,
+      contextSubjectUserId: context.context?.subjectUserId ?? null,
       respondentType: row.respondentType,
       subjectUserId: row.subjectUserId,
       respondentUserId: row.respondentUserId,
       legacyRequiresContext,
     })
-    return assertReady(await persistAdmission(db, row.id, snapshot))
+    return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
   }
 
   if (row.compositeAttemptId) {
@@ -604,12 +634,13 @@ const activateUnstoredScaleAdmission = async (
       contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
       contextFrozenAt: context.context?.frozenAt ?? null,
+      contextSubjectUserId: context.context?.subjectUserId ?? null,
       respondentType: row.respondentType,
       subjectUserId: row.subjectUserId,
       respondentUserId: row.respondentUserId,
       legacyRequiresContext,
     })
-    return assertReady(await persistAdmission(db, row.id, snapshot))
+    return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
   }
 
   const snapshot = await createScaleAdmissionForRuntime({
@@ -628,7 +659,7 @@ const activateUnstoredScaleAdmission = async (
     respondentUserId: row.userId,
     legacyRequiresContext: false,
   })
-  return assertReady(await persistAdmission(db, row.id, snapshot))
+  return assertReady(await persistAdmission(db, row.id, assertReady(snapshot)))
 }
 
 export const activateScaleAdmission = async (
@@ -641,8 +672,15 @@ export const activateScaleAdmission = async (
   const runtime = readRuntime(row.runtimeSnapshotEncrypted)
   if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
 
-  return prisma.$transaction(
-    (tx) => activateUnstoredScaleAdmission(tx, row, runtime, parent),
-    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  return withSerializableScaleTransaction(prisma,
+    async (tx) => {
+      await tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`
+      const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
+      if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
+      const winner = readStoredScaleAdmission(current)
+      if (winner) return validateStoredAgainstRuntime(current, winner)
+      // Load the parent inside this transaction, never use a pre-transaction context.
+      return activateUnstoredScaleAdmission(tx, current, readRuntime(current.runtimeSnapshotEncrypted))
+    },
   )
 }

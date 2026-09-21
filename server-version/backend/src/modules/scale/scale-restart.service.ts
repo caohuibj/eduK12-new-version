@@ -1,4 +1,5 @@
-import { Prisma } from '@prisma/client'
+import { requiredScaleContextKeys } from './policy/context-preflight'
+import { withSerializableScaleTransaction } from './deployment/transactions'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
@@ -29,8 +30,8 @@ const refreezeStandaloneContext = (
   return { context, hash: hashAssessmentContext(context) }
 }
 
-export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: string, userId: string) => (
-  prisma.$transaction(async (tx) => {
+export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: string, userId: string, contextInput?: AssessmentContextValues) => (
+  withSerializableScaleTransaction(prisma, async (tx) => {
     const locked = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "assessments" WHERE "id" = ${assessmentId} FOR UPDATE
     `
@@ -79,7 +80,6 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
 
     const priorAdmission = readStoredScaleAdmission(current as any)
     const frozenAt = new Date()
-    const context = refreezeStandaloneContext(priorAdmission?.contextValues ?? null, frozenAt)
     const definition = scaleDefinitionFromRecord(current.scale)
     const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
       instrumentKey: current.scale.code,
@@ -87,6 +87,10 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
       definition,
       frozenAt,
     })
+    const supplied = contextInput ?? priorAdmission?.contextValues
+    const keys = runtimeSnapshot.schemaVersion === 2 ? requiredScaleContextKeys(runtimeSnapshot.compiledPolicy.applicability) : []
+    const values = supplied ? Object.fromEntries(keys.filter(key => supplied[key] !== undefined).map(key => [key, supplied[key]])) : null
+    const context = refreezeStandaloneContext(values, frozenAt)
     const nextEpoch = current.attemptEpoch + 1
     const admission = await standaloneAdmissionPersistenceForRuntime({
       db: tx,
@@ -136,5 +140,5 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
     })
     await retainFrozenScaleAssessmentImages({ assessmentId: next.id, snapshot: runtimeSnapshot, db: tx as never })
     return next
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
+  })
 )

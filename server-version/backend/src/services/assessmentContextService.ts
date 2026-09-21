@@ -183,6 +183,7 @@ export const freezeCompositeAttemptContext = async (
       options: item.formOptions,
     }))
   const context = buildOrThrow(formItems, attempt.formAnswers as unknown as Array<Record<string, unknown>>, frozenAt)
+  if (attempt.subjectUserId) context.subjectUserId = attempt.subjectUserId
   const hash = hashAssessmentContext(context)
   const updated = await db.compositeAssessmentAttempt.updateMany({
     where: { id: attemptId, contextSnapshotEncrypted: null, contextSnapshotHash: null },

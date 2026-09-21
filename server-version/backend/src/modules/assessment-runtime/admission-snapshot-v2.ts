@@ -16,6 +16,7 @@ export interface FrozenScaleDeploymentAdmissionBindingV1 {
   authorizationId: string
   authorizationVersion: number
   evaluatedAt: string
+  completionDeadline?: string
 }
 
 export interface FrozenScalePolicyAdmissionBindingV2 {
@@ -71,6 +72,7 @@ const deploymentBindingSchema = z.object({
   authorizationId: z.string().min(1),
   authorizationVersion: z.number().int().positive(),
   evaluatedAt: z.string().datetime({ offset: true }),
+  completionDeadline: z.string().datetime({ offset: true }).optional(),
 }).strict()
 
 const frozenUnitAdmissionV2Schema = z.object({

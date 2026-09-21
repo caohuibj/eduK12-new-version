@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { canonicalHash } from './canonical'
+import { parseFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
 import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import {
@@ -211,13 +212,12 @@ export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRu
 
 export type VersionedFrozenScaleRuntimeSnapshot = FrozenScaleRuntimeSnapshotV1Like | FrozenScaleRuntimeSnapshotV2
 
-/** Compatibility export retained for PR-1/PR-2 callers. Lazy V1 require avoids a module-init cycle. */
+/** Compatibility export retained for PR-1/PR-2 callers. The V1 parser is only called after module initialization. */
 export const parseVersionedFrozenScaleRuntimeSnapshot = (value: unknown): VersionedFrozenScaleRuntimeSnapshot => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid Frozen Scale runtime snapshot')
   const schemaVersion = (value as { schemaVersion?: unknown }).schemaVersion
   if (schemaVersion === 2) return parseFrozenScaleRuntimeSnapshotV2(value)
   if (schemaVersion === 1) {
-    const { parseFrozenScaleRuntimeSnapshot } = require('./runtime-snapshot') as typeof import('./runtime-snapshot')
     return parseFrozenScaleRuntimeSnapshot(value)
   }
   throw new Error(`Unsupported Frozen Scale runtime snapshot schemaVersion: ${String(schemaVersion)}`)

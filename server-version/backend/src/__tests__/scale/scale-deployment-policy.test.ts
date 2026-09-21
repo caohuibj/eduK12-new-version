@@ -103,4 +103,16 @@ describe('Scale deployment policy', () => {
     const newer = authorization({ version: 2, status: 'DRAFT' })
     expect(evaluate({ authorizations: [older, newer] })).toMatchObject({ allowNewStarts: true, reasons: [] })
   })
+  it('does not resurrect an older grant after a newer revocation', () => {
+    expect(evaluate({ authorizations: [authorization({ version: 1 }), authorization({ version: 2, status: 'REVOKED' })] }).allowNewStarts).toBe(false)
+  })
+
+  it('resolves the bound authorization rather than an unrelated higher version', () => {
+    expect(evaluate({ authorizations: [authorization(), authorization({ authorizationId: 'other', version: 20 })] }).allowNewStarts).toBe(true)
+  })
+
+  it('rejects unknown commercial scope', () => {
+    expect(evaluate({ authorizations: [authorization({ scope: { ...authorization().scope, commercialNature: 'UNSPECIFIED' } })] }).reasons).toContain('AUTHORIZATION_COMMERCIAL_NATURE_UNKNOWN')
+  })
+
 })

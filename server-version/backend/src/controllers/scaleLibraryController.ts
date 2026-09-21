@@ -20,7 +20,7 @@ import {
 } from '../modules/scale/library/wave1-p1-read-model'
 import { enrichExistingP1Evidence } from '../modules/scale/library/wave1-p1-existing-evidence'
 import { applyDass21ProductPolicy } from '../modules/scale/library/wave1-dass21-product-policy'
-import { WAVE0_SCALE_CATALOG_MANIFESTS } from '../modules/scale/library/wave0-catalog'
+import { listScaleInstrumentSources } from '../modules/scale/onboarding/instrument-registry'
 import { isValidContentLocaleTag } from '../modules/scale/content-locale'
 import { error, notFound, success, unauthorized } from '../utils/response'
 import { z } from 'zod'
@@ -72,7 +72,7 @@ const libraryQuerySchema = z.object({
  * Wave 1 P1 catalog-first entries deliberately have no deployment until their
  * exact-form package / rights / report contract is closed.
  */
-const deployedScalePairs = WAVE0_SCALE_CATALOG_MANIFESTS.map((manifest) => ({
+const deployedScalePairs = listScaleInstrumentSources().filter(source => source.executable).map((manifest) => ({
   code: manifest.identity.instrumentKey,
   instrumentVersion: manifest.identity.instrumentVersion,
 }))
@@ -80,6 +80,7 @@ const deployedScalePairs = WAVE0_SCALE_CATALOG_MANIFESTS.map((manifest) => ({
 type LibraryDeployment = NonNullable<ScaleLibraryReadModelContext['deployments']>[number] & {
   allowNewStarts: boolean
   startReasons: string[]
+  participantCheckRequired: boolean
 }
 
 const loadDeployments = async (req: Request): Promise<LibraryDeployment[]> => {
@@ -123,6 +124,7 @@ const loadDeployments = async (req: Request): Promise<LibraryDeployment[]> => {
       visibility: String(row.visibility),
       allowNewStarts: start.allowNewStarts,
       startReasons: [...start.reasons],
+      participantCheckRequired: start.kind === 'MANAGED_V2',
     })
   }
   return deployments
@@ -173,14 +175,18 @@ const buildLibraryModel = (context: ScaleLibraryReadModelContext) => {
     ...base,
     entries: base.entries.map((entry) => {
       const deployment = byIdentity.get(`${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`)
-      if (!deployment || deployment.allowNewStarts) return entry
+      if (!deployment) return entry
+      if (deployment.allowNewStarts) return deployment.participantCheckRequired ? {
+        ...entry, availability: { ...entry.availability, participantEligibility: 'NOT_EVALUATED' as const,
+          reasons: [...entry.availability.reasons, '个人适用资格将在开始前根据必需资料确认。'] },
+      } : entry
       const { launch: _launch, ...availability } = entry.availability
       return {
         ...entry,
         availability: {
           ...availability,
           status: availability.status === 'NOT_AVAILABLE' ? 'NOT_AVAILABLE' as const : 'RESTRICTED' as const,
-          reasons: [...new Set([...availability.reasons, '当前部署策略或授权不允许新启动。'])],
+          reasons: [...new Set([...availability.reasons, ...deployment.startReasons])],
         },
       }
     }),

@@ -29,6 +29,8 @@ import {
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
+import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
+import { getScaleInstrumentRuntimePolicy } from '../scale/onboarding/instrument-registry'
 import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -2157,6 +2159,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             instrumentKey: item.scale.code,
             instrumentVersion: item.scale.instrumentVersion,
             definition: scaleDefinitionFromRecord(item.scale),
+            requestedMode: 'COMPOSITE',
           })
         : null
       const child = await db.assessment.create({
@@ -2170,6 +2173,9 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           answers: encryptScaleAnswers([]),
           compositeAttemptId: attempt.id,
           compositeItemId: item.id,
+          subjectUserId: attempt.subjectUserId ?? userId,
+          respondentUserId: attempt.respondentUserId ?? userId,
+          respondentType: attempt.respondentType ?? 'SELF',
           ...(frozenScale ? {
             runtimeGeneration: 'UNIFIED_V1' as const,
             runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(frozenScale),
@@ -2254,6 +2260,11 @@ const createAttempt = async (
 ) => {
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
+  if (finalOnly) for (const item of composite.items) {
+    if (item.type !== 'SCALE' || !item.required) continue
+    const policy = getScaleInstrumentRuntimePolicy(item.scale.code, item.scale.instrumentVersion)
+    if (policy) assertScaleContextCollectable({ policy: policy.applicability, scalePosition: item.position, sections: formSections })
+  }
   const packageFields = finalOnly
     ? [composite.reportPackageKey, composite.reportPackageVersion, composite.reportPackageProfile, composite.reportPackageSnapshotEncrypted]
     : []

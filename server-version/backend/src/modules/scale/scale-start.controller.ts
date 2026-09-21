@@ -1,5 +1,6 @@
+import { standaloneContextSchema } from './scale-context-input'
+import { withSerializableScaleTransaction } from './deployment/transactions'
 import type { Request, Response } from 'express'
-import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, forbidden, instrumentError, notFound, success } from '../../utils/response'
@@ -7,36 +8,29 @@ import { logger } from '../../utils/logger'
 import { canStudentAccessScale } from './scale-access'
 import {
   ageMonthsAt,
-  gradeLevelSchema,
   hashAssessmentContext,
-  isValidYearMonth,
-  sexAtBirthSchema,
   type AssessmentContextV1,
   type AssessmentContextValues,
 } from '../assessment-context/context'
-import { hashScaleDefinition } from './scale-definition'
+import { resolveScaleStartDeployment } from './deployment/service'
+import { requiredScaleContextKeys } from './policy/context-preflight'
+import { hashScaleDefinition, runnerDefinition } from './scale-definition'
 import {
   readScaleAnswers,
   scaleAssessmentForResponse,
   scaleDefinitionFromRecord,
-  scaleRunnerFromRecord,
 } from './scale-workflow.service'
-import { freezeScaleRuntimeAtAttemptStart, encryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { freezeScaleRuntimeAtAttemptStart, encryptFrozenScaleRuntimeSnapshot, decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { encryptField } from '../../utils/encryption'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import {
+  activateScaleAdmission,
   readStoredScaleAdmission,
   standaloneAdmissionPersistenceForRuntime,
 } from './scale-admission.service'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 
-const standaloneContextSchema = z.object({
-  birthYearMonth: z.string().refine(isValidYearMonth, '出生年月必须是 YYYY-MM').optional(),
-  sexAtBirth: sexAtBirthSchema.optional(),
-  gradeLevel: gradeLevelSchema.optional(),
-  primaryLanguage: z.string().regex(/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/).optional(),
-  countryOrRegion: z.string().regex(/^[A-Z]{2}$/).optional(),
-}).strict().optional()
+
 
 const buildStandaloneContext = (
   input: z.infer<typeof standaloneContextSchema>,
@@ -57,8 +51,12 @@ const buildStandaloneContext = (
   return { context, hash: hashAssessmentContext(context) }
 }
 
-const responseEnvelope = (assessment: any, scale: any, definition: any, runner: any) => {
+const responseEnvelope = (assessment: any, scale: any) => {
   const admission = readStoredScaleAdmission(assessment)
+  const definition = assessment.runtimeSnapshotEncrypted
+    ? decryptFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted).definition
+    : scaleDefinitionFromRecord(scale)
+  const runner = runnerDefinition(definition)
   return {
     assessment: {
       ...scaleAssessmentForResponse(assessment),
@@ -105,8 +103,6 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     const scale = await prisma.scale.findUnique({ where: { id: scaleId }, select: scaleSelect })
     if (!scale) return notFound(res, '量表不存在')
 
-    const definition = scaleDefinitionFromRecord(scale)
-    const runner = scaleRunnerFromRecord(scale)
     const existing = await prisma.assessment.findFirst({
       where: {
         scaleId,
@@ -120,14 +116,15 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       // Resume is governed by the already-frozen admission. Current product
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
+      if (existing.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...existing, scale } as any)
       const stored = readScaleAnswers(existing.answers)
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
-      return success(res, responseEnvelope(existing, scale, definition, runner), '继续未完成的测评')
+      return success(res, responseEnvelope(existing, scale), '继续未完成的测评')
     }
 
     let assessment
     try {
-      assessment = await prisma.$transaction(async (tx) => {
+      assessment = await withSerializableScaleTransaction(prisma, async (tx) => {
         // Re-read every mutable new-start control inside the Serializable
         // transaction. Resource access, deployment/grant evaluation, runtime
         // freezing and admission persistence therefore share one DB snapshot.
@@ -135,8 +132,16 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         if (!currentScale || !(await canStudentAccessScale(currentScale, userId, tx))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表不存在', 404)
         }
+        const deployment = await resolveScaleStartDeployment({ db: tx, scale: currentScale, requestedMode: 'STANDALONE' })
+        if (!deployment.allowNewStarts) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', deployment.reasons.join(','), 409)
+        const requiredContextKeys = deployment.kind === 'MANAGED_V2'
+          ? requiredScaleContextKeys(deployment.runtimePolicy.applicability) : []
+        if (requiredContextKeys.some(key => !contextInput.data?.[key])) {
+          return { preflight: { kind: 'CONTEXT_REQUIRED' as const, requiredContextKeys } }
+        }
+        const selectedContext = Object.fromEntries(requiredContextKeys.map(key => [key, contextInput.data?.[key]]))
         const frozenAt = new Date()
-        const context = buildStandaloneContext(contextInput.data, frozenAt)
+        const context = buildStandaloneContext(standaloneContextSchema.parse(selectedContext), frozenAt)
         const currentDefinition = scaleDefinitionFromRecord(currentScale)
         const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
           instrumentKey: currentScale.code,
@@ -182,7 +187,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         })
         await retainFrozenScaleAssessmentImages({ assessmentId: created.id, snapshot: runtimeSnapshot, db: tx as never })
         return created
-      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
+      })
     } catch (err: any) {
       // The partial unique index remains the final concurrent-start boundary.
       // A concurrent winner is resumed by identity; every other serialization
@@ -199,9 +204,11 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       })
       if (!assessment) throw err
     }
+    if ('preflight' in assessment) return success(res, assessment, '请先补充测评所需资料')
+    if (assessment.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...assessment, scale } as any)
     const stored = readScaleAnswers(assessment.answers)
     if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
-    return success(res, responseEnvelope(assessment, scale, definition, runner), '测评已开始')
+    return success(res, responseEnvelope(assessment, scale), '测评已开始')
   } catch (err) {
     if (err instanceof InstrumentFinalSubmitError) return instrumentError(res, err.code, err.message, err.statusCode)
     logger.error('开始 v2 量表测评错误', err)

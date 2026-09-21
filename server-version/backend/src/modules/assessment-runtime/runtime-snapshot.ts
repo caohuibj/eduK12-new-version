@@ -120,6 +120,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     instrumentVersion: string
     definition: ScaleDefinitionV2
     frozenAt?: Date
+    requestedMode?: import('../scale/policy/deployment').ScaleDeploymentModeV1
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   // Manual operational pause is checked before any reference-binding DB read.
@@ -161,10 +162,11 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     where: { code: input.instrumentKey },
     select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true },
   })
-  if (!scale) return v1
+  if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
+  if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
 
   const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
-  const resolution = await resolveScaleStartDeployment({ db: db as any, scale })
+  const resolution = await resolveScaleStartDeployment({ db: db as any, scale, requestedMode: input.requestedMode })
   if (!resolution.allowNewStarts) {
     throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
   }

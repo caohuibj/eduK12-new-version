@@ -1,3 +1,4 @@
+import { standaloneContextSchema } from './scale-context-input'
 import type { Request, Response } from 'express'
 import { forbidden, instrumentError, success, error } from '../../utils/response'
 import { logger } from '../../utils/logger'
@@ -11,7 +12,9 @@ export const restartStandaloneScaleAssessmentWithPolicyController = async (req: 
   try {
     const userId = req.user?.userId
     if (!userId) return forbidden(res, '请先登录')
-    const created = await restartStandaloneScaleAssessmentWithPolicy(req.params.assessmentId, userId)
+    const context = standaloneContextSchema.safeParse(req.body?.context)
+    if (!context.success) return error(res, context.error.errors[0].message)
+    const created = await restartStandaloneScaleAssessmentWithPolicy(req.params.assessmentId, userId, context.data)
     const definition = scaleDefinitionFromRecord(created.scale)
     const admission = readStoredScaleAdmission(created as any)
     return success(res, {

@@ -1,3 +1,5 @@
+import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
+import { getScaleInstrumentRuntimePolicy } from '../modules/scale/onboarding/instrument-registry'
 /**
  * 公开访问控制器
  * 
@@ -597,11 +599,14 @@ export const publicQuestionnaireController = {
           const scaleRuntimeSnapshots = await Promise.all(startContent.questionnaireScales.map(async (qs: any) => {
             if (qs.scale.status !== 'PUBLISHED') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '问卷中的量表已不再可用', 409)
             const definition = scaleDefinitionFromRecord(qs.scale)
+            const policy = getScaleInstrumentRuntimePolicy(qs.scale.code, qs.scale.instrumentVersion)
+            if (policy) assertScaleContextCollectable({ policy: policy.applicability, scalePosition: qs.position, sections: frozenFormSections })
             return {
               qs,
               snapshot: await freezeScaleRuntimeAtAttemptStart(tx as any, {
                 instrumentKey: qs.scale.code,
                 instrumentVersion: qs.scale.instrumentVersion,
+                requestedMode: 'PUBLIC_QUESTIONNAIRE',
                 definition,
               }),
             }

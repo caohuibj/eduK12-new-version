@@ -113,5 +113,13 @@ export const persistVersionedAdmissionOnce = async <T extends VersionedFrozenUni
   if (stored.schemaVersion !== input.snapshot.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照版本冲突', 409)
   }
+  if (stored.attemptEpoch !== input.snapshot.attemptEpoch
+    || stored.contextSnapshotHash !== input.snapshot.contextSnapshotHash
+    || JSON.stringify(stored.principal) !== JSON.stringify(input.snapshot.principal)
+    || JSON.stringify(stored.parent) !== JSON.stringify(input.snapshot.parent)
+    || (stored.schemaVersion === 2 && input.snapshot.schemaVersion === 2
+      && stored.scalePolicy?.eligibility.identityBindingHash !== input.snapshot.scalePolicy?.eligibility.identityBindingHash)) {
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入并发冻结绑定冲突', 409)
+  }
   return stored as T
 }

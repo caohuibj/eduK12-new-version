@@ -1,3 +1,6 @@
+import { withSerializableScaleTransaction } from '../deployment/transactions'
+import { legacyDeploymentGateReasons } from '../deployment/legacy-gates'
+import { scaleLocalizationReasons } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -52,7 +55,7 @@ const resolvePlan = async (
   if (!source?.executable || !runtimePolicy) throw new Error('Scale instrument is not executable or has no compiled runtime policy')
 
   const deploymentPolicy = scaleDeploymentPolicyV1Schema.parse(input.deploymentPolicy)
-  const blockers: string[] = []
+  const blockers: string[] = scaleLocalizationReasons(source, deploymentPolicy)
   if (deploymentPolicy.runtimePolicyHash !== runtimePolicy.runtimePolicyHash) blockers.push('RUNTIME_POLICY_HASH_MISMATCH')
   if (deploymentPolicy.locale !== runtimePolicy.contentLocale) blockers.push('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
   const localizationVersion = source.localization?.localizationVersion
@@ -64,16 +67,18 @@ const resolvePlan = async (
 
   const scale = await db.scale.findUnique({
     where: { code: input.instrumentKey },
-    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, status: true },
+    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true },
   })
   if (scale) {
     if (scale.instrumentClass !== 'STANDARD') blockers.push('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
-    if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('SCALE_VERSION_CONFLICT')
+    if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('DEPLOYMENT_VERSION_CONFLICT')
+    if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== hashScaleDefinition(source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.status === 'DEPRECATED' || scale.status === 'ARCHIVED') blockers.push('SCALE_LIFECYCLE_BLOCKS_REACTIVATION')
   }
 
   const authorizations = await listScaleInstrumentAuthorizations(db, input.instrumentKey, input.instrumentVersion)
+  blockers.push(...legacyDeploymentGateReasons(input.instrumentKey, input.instrumentVersion, deploymentPolicy, authorizations))
   for (const requestedMode of deploymentPolicy.deploymentModes) {
     const decision = evaluateScaleDeployment({
       policy: deploymentPolicy,
@@ -150,7 +155,7 @@ export const installScaleInstrument = async (
     throw new Error(`Scale install blocked: ${preview.blockers.join(',')}`)
   }
 
-  return db.$transaction(async (tx) => {
+  return withSerializableScaleTransaction(db, async (tx) => {
     // Re-evaluate inside the serializable write transaction so a grant/revision
     // change between dry-run and apply cannot be promoted accidentally.
     const plan = await resolvePlan(tx, input)
@@ -166,7 +171,7 @@ export const installScaleInstrument = async (
         data: {
           code: input.instrumentKey,
           name: source.catalog.identity.canonicalName,
-          status: executable.releaseStatus === 'PUBLISHED' ? 'PUBLISHED' : 'DRAFT',
+          status: 'DRAFT',
           visibility: 'HIDDEN',
           instrumentClass: 'STANDARD',
           instrumentVersion: input.instrumentVersion,
@@ -225,5 +230,5 @@ export const installScaleInstrument = async (
       createdByUserId: input.actorUserId,
     })
     return resolvePlan(tx, input)
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
+  })
 }
