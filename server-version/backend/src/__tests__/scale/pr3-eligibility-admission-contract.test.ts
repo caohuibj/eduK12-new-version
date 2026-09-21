@@ -68,6 +68,44 @@ describe('PR3 frozen eligibility admission contract', () => {
     expect(evaluateInstrumentEligibility(applicability, facts({ respondentType: ambiguous })).outcome).toBe('INDETERMINATE')
   })
 
+  it('canonicalizes a database-shaped Scale object before freezing V2 identity', () => {
+    const snapshot = createFrozenUnitAdmissionV2({
+      attemptEpoch: 1,
+      scale: {
+        id: 'scale-1',
+        code: 'fixture_scale',
+        name: 'Fixture',
+        instrumentVersion: '1.0.0',
+        instrumentClass: 'STANDARD',
+        status: 'PUBLISHED',
+      } as any,
+      principal: { userId: 'student-1' },
+      frozenAt: new Date(frozenAt),
+      scalePolicy: {
+        runtimePolicyHash: policyHash,
+        eligibility: {
+          schemaVersion: 1,
+          evaluatorVersion: SCALE_ELIGIBILITY_EVALUATOR_VERSION,
+          policyVersion: applicability.policyVersion,
+          policyHash,
+          contextHash: null,
+          identityBindingHash: canonicalHash({ identity: 'scale-1' }),
+          contextFrozenAt: null,
+          evaluatedAt: frozenAt,
+          outcome: 'ELIGIBLE',
+          reasons: [],
+          factProvenance: { subject: 'FROZEN_SUBJECT_BINDING', respondent: 'FROZEN_RESPONDENT_BINDING' },
+        },
+      },
+    })
+    expect(parseFrozenUnitAdmissionV2(snapshot).scale).toEqual({
+      id: 'scale-1',
+      code: 'fixture_scale',
+      name: 'Fixture',
+      instrumentVersion: '1.0.0',
+    })
+  })
+
   it('persists a HOLD decision together with deployment and identity provenance', () => {
     const contextHash = canonicalHash({ context: 'frozen' })
     const identityBindingHash = canonicalHash({ subjectUserId: 'student-1', respondentUserId: 'student-1' })
