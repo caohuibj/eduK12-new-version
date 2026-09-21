@@ -31,7 +31,10 @@
     "test:integration:pr26": "vitest run src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts src/__tests__/classroom/classroom-start.postgres.integration.test.ts",
     "test:integration:pr8": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "release:verify:local": "bash ../scripts/release-verify-local.sh",
-    "deploy": "bash /opt/ptool/scripts/deploy.sh backend"
+    "deploy": "bash /opt/ptool/scripts/deploy.sh backend",
+    "cognitive:manifest:generate": "node ../scripts/cognitive/manifests.cjs",
+    "cognitive:manifest:check": "node ../scripts/cognitive/manifests.cjs --check",
+    "cognitive:contracts": "npm run cognitive:manifest:check && node ../scripts/cognitive/dependencies.cjs"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "task": "taskswitch",
+  "order": 9,
+  "identities": [
+    {
+      "testType": "taskswitch",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 12
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "taskswitch",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts",
+      "export": "taskswitchRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      11
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  }
+}

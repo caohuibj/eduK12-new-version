@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "task": "patterncompare",
+  "order": 10,
+  "identities": [
+    {
+      "testType": "patterncompare",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 13
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "patterncompare",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/patterncompare/patterncompare.registry.ts",
+      "export": "patterncompareRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      13
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  }
+}

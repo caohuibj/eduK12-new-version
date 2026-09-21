@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "task": "gonogo",
+  "order": 4,
+  "identities": [
+    {
+      "testType": "gonogo",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 7
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "gonogo",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gonogo/gonogo.registry.ts",
+      "export": "gonogoRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      7
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  }
+}

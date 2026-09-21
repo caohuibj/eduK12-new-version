@@ -41,6 +41,7 @@ on:
     branches:
       - main
       - 'refactor/unified-runtime-v32-unit'
+      - 'content/cognitive-expansion'
   workflow_dispatch:
 
 concurrency:
@@ -71,6 +72,8 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
+      - name: cognitive task manifests and dependency boundaries
+        run: npm run cognitive:contracts
       - name: build (tsc)
         run: npm run build
 
@@ -231,6 +234,8 @@ jobs:
         run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
         run: npm run db:release:preflight
+      - name: cognitive task manifests and dependency boundaries
+        run: npm run cognitive:contracts
       - name: build (tsc)
         run: npm run build
       - name: publish backend build to runner-local handoff

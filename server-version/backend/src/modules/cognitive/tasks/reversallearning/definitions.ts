@@ -1,0 +1,65 @@
+import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskReportDefinition, CognitiveProfileDefinition } from '../../cognitive.types'
+import { metric, allProfiles } from '../../task-primitives'
+
+export const reversallearningRegistryMeta = {
+  name: '概率反转学习',
+  category: 'decision_learning',
+  referenceEligibleMetricKeys: [] as const,
+  randomizationAlgorithmVersion: 'reversallearning-sequence-v1.0.0',
+  profileDefinitionVersion: '1.0.0',
+  profiles: {
+    experience: {
+      profile: 'experience' as const,
+      estimatedMinutes: [3, 4],
+      configPatch: { totalTrials: 40, acquisitionTrials: 20, reversalTrials: 20 },
+      reportCaveats: ['体验版阶段较短，结果仅描述本次概率学习任务表现。'],
+    },
+    standard: {
+      profile: 'standard' as const,
+      estimatedMinutes: [7, 9],
+      configPatch: { totalTrials: 120, acquisitionTrials: 60, reversalTrials: 60 },
+      reportCaveats: ['请同时阅读 acquisition、reversal、持续性错误和 criterion 指标，不作人格或风险判断。'],
+    },
+    research: {
+      profile: 'research' as const,
+      estimatedMinutes: [14, 18],
+      configPatch: { totalTrials: 240, acquisitionTrials: 120, reversalTrials: 120 },
+      reportCaveats: ['科研版增加固定阶段的试次，仍不等同于人格、决策能力或风险偏好测量。'],
+    },
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.0.0',
+  metricDefinitions: {
+    acquisitionAccuracy: metric('acquisitionAccuracy', 'Acquisition 正确率', 'decision_learning', 'ratio', 'descriptive', 'primary'),
+    reversalAccuracy: metric('reversalAccuracy', 'Reversal 正确率', 'decision_learning', 'ratio', 'descriptive', 'primary'),
+    reversalCost: metric('reversalCost', '反转准确率变化', 'decision_learning', 'ratio', 'signed', 'primary'),
+    perseverativeErrorCount: metric('perseverativeErrorCount', '持续性错误次数', 'decision_learning', 'count', 'descriptive', 'primary'),
+    trialsToAcquisitionCriterion: metric('trialsToAcquisitionCriterion', '达到 Acquisition criterion 的试次', 'decision_learning', 'count', 'descriptive', 'secondary'),
+    trialsToReversalCriterion: metric('trialsToReversalCriterion', '达到 Reversal criterion 的试次', 'decision_learning', 'count', 'descriptive', 'secondary'),
+    feedbackWinRate: metric('feedbackWinRate', '反馈获胜比例', 'decision_learning', 'ratio', 'descriptive', 'secondary'),
+    omissionRate: metric('omissionRate', '遗漏比例', 'decision_learning', 'ratio', 'descriptive', 'secondary'),
+    medianRtMs: metric('medianRtMs', '反应时中位数', 'decision_learning', 'ms', 'descriptive', 'secondary'),
+    validResponseCount: metric('validResponseCount', '有效响应次数', 'decision_learning', 'count', 'descriptive', 'secondary'),
+  } as Record<string, MetricDefinition>,
+  qualityDefinitionVersion: '1.0.0',
+  qualityDefinitions: {
+    interpretable: { key: 'interpretable', label: '可解释', description: '两个阶段的有效响应和总体作答模式是否达到门槛。' },
+    insufficientAcquisitionTrials: { key: 'insufficientAcquisitionTrials', label: 'Acquisition 有效试次不足', description: 'Acquisition 阶段有效响应过少。' },
+    insufficientReversalTrials: { key: 'insufficientReversalTrials', label: 'Reversal 有效试次不足', description: 'Reversal 阶段有效响应过少。' },
+    lowAccuracy: { key: 'lowAccuracy', label: '总体正确率较低', description: '总体正确率低于任务质量门槛。' },
+    excessiveOmissions: { key: 'excessiveOmissions', label: '遗漏过多', description: '遗漏比例达到 0.3。' },
+    constantChoice: { key: 'constantChoice', label: '恒定选择', description: '足够多有效响应始终选择同一侧。' },
+    noAcquisitionCriterion: { key: 'noAcquisitionCriterion', label: '未达到 Acquisition criterion', description: '固定连续正确门槛在 Acquisition 阶段未达到。' },
+    noReversalCriterion: { key: 'noReversalCriterion', label: '未达到 Reversal criterion', description: '固定连续正确门槛在 Reversal 阶段未达到。' },
+    interrupted: { key: 'interrupted', label: '作答中断', description: '至少一个正式试次被标记为中断。' },
+  } as Record<string, QualityDefinition>,
+  reportDefinitionVersion: '1.0.0',
+  reportDefinition: {
+    title: '概率反转学习',
+    headlineMetric: 'reversalAccuracy',
+    primaryMetrics: ['acquisitionAccuracy', 'reversalAccuracy', 'reversalCost', 'perseverativeErrorCount'],
+    secondaryMetrics: ['trialsToAcquisitionCriterion', 'trialsToReversalCriterion', 'feedbackWinRate', 'omissionRate', 'medianRtMs', 'validResponseCount'],
+    practicalTips: ['结果描述本次 acquisition/reversal 阶段的作答轨迹，不评价人格、风险偏好或因果机制。'],
+    disclaimer: '结果只描述本次概率学习和规则反转任务表现，不是人格、风险偏好或临床判断。',
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: false,
+}

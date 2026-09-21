@@ -1,4 +1,5 @@
 import { ZodType } from 'zod'
+import type { CognitiveExecutionSemanticsV1 } from './task-package.types'
 import type { CognitivePresentationDefinitionV1 } from './v2/presentation'
 
 /**
@@ -82,6 +83,7 @@ export interface FinalSubmissionDefinition<TConfig> {
 
 /** 一个注册的 Cognitive Test 实现：版本键 + 双 Zod schema + 纯函数 scorer。 */
 export interface RegistryEntry<TConfig, TTrial> {
+  executionSemantics?: CognitiveExecutionSemanticsV1
   testType: string
   name: string
   category: string

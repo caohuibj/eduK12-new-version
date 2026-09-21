@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "task": "digitbackward",
+  "order": 13,
+  "identities": [
+    {
+      "testType": "digitbackward",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 16
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "digitbackward",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts",
+      "export": "digitbackwardRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      16
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  }
+}
