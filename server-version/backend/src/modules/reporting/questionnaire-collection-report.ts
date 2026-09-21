@@ -1,9 +1,13 @@
-import { buildFormBackgroundReport, buildScaleUnitReport } from './scale-unit-report'
+import { buildFormBackgroundReport, buildScaleUnitReport, projectScaleUnitReport, type ScaleUnitReport } from './scale-unit-report'
 import { readContextFormAnswers } from '../assessment-context'
 import { safeDecrypt } from '../../utils/encryption'
 import { isFormAnswerComplete } from '../../services/questionnaireFormAnswerState'
 import type { CanonicalUnitResultCoreV1 } from '../assessment-runtime/unit-result'
 import type { FormSectionCollectionFactsV1 } from '../assessment-runtime/form-facts'
+import { createScaleProjectionContext } from '../scale/projection/context-factory'
+import type { ScaleProjectionContext } from '../scale/projection/types'
+
+const INTERNAL_SCALE_REPORTS = '__internalScaleReports'
 
 const readStoredAggregate = (qa: any): any => {
   if (qa?.aggregateReportEncrypted) {
@@ -13,29 +17,51 @@ const readStoredAggregate = (qa: any): any => {
   return qa?.aggregateReport ?? null
 }
 
-/** Collection-only questionnaire projection; it never creates a combined score. */
-export const buildQuestionnaireCollectionReport = (qa: any): any => {
+export interface QuestionnaireCollectionProjectionOptions {
+  contextForScale?: (report: ScaleUnitReport) => ScaleProjectionContext
+}
+
+const defaultContextForScale = (report: ScaleUnitReport): ScaleProjectionContext => createScaleProjectionContext({
+  instrumentKey: report.scaleCode,
+  instrumentVersion: report.method?.instrumentVersion ?? report.result?.instrument.instrumentVersion ?? null,
+  audience: 'respondent',
+  purpose: 'report',
+})
+
+const projectUnit = (report: ScaleUnitReport, options?: QuestionnaireCollectionProjectionOptions) => (
+  projectScaleUnitReport(report, options?.contextForScale?.(report) ?? defaultContextForScale(report))
+)
+
+const attachInternalScaleReports = <T extends object>(output: T, reports: ScaleUnitReport[]): T => {
+  Object.defineProperty(output, INTERNAL_SCALE_REPORTS, {
+    value: reports,
+    enumerable: false,
+    configurable: false,
+    writable: false,
+  })
+  return output
+}
+
+/** Collection-only external projection; stored aggregates are always re-projected. */
+export const buildQuestionnaireCollectionReport = (qa: any, options?: QuestionnaireCollectionProjectionOptions): any => {
   const storedAggregate = readStoredAggregate(qa)
-  // V32-2 persists the collection projection as the aggregate boundary. Once
-  // it exists, the report endpoint must not reconstruct it from participant
-  // answers or raw form-answer rows.
   if (
     storedAggregate?.reportDefinitionVersion === 'collection-only-v2'
     && Array.isArray(storedAggregate.scaleReports)
     && Array.isArray(storedAggregate.backgroundValues)
   ) {
-    const totalDimensions = Number.isFinite(storedAggregate.totalDimensions)
-      ? storedAggregate.totalDimensions
-      : storedAggregate.scaleReports.reduce(
-        (sum: number, report: any) => sum + (Array.isArray(report?.scores) ? report.scores.length : 0),
-        0,
-      )
-    return {
+    const internalUnitReports = storedAggregate.scaleReports as ScaleUnitReport[]
+    const unitReports = internalUnitReports.map((stored) => projectUnit(stored, options))
+    const totalDimensions = unitReports.reduce(
+      (sum: number, report: any) => sum + (Array.isArray(report?.scores) ? report.scores.length : 0),
+      0,
+    )
+    return attachInternalScaleReports({
       questionnaireName: qa.questionnaire?.name || '问卷',
       totalDimensions,
       backgroundValues: storedAggregate.backgroundValues,
-      unitReports: storedAggregate.scaleReports,
-    }
+      unitReports,
+    }, internalUnitReports)
   }
 
   const questionnaireScales = [...(qa.questionnaire?.questionnaireScales || [])]
@@ -51,12 +77,12 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
     scale?: any
     assessment?: any
     stored?: any
-  }) => {
+  }): ScaleUnitReport => {
     const { scale, assessment, stored } = input
-    return buildScaleUnitReport({
+    const internal = buildScaleUnitReport({
       itemId: input.itemId,
       scaleId: input.scaleId,
-      scaleCode: scale?.code,
+      scaleCode: scale?.code ?? stored?.scaleCode,
       scaleName: scale?.name || stored?.scaleName || '未知量表',
       result: assessment?.result ?? stored?.result,
       caveats: stored?.caveats,
@@ -64,9 +90,20 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
       completedAt: assessment?.completedAt ?? stored?.completedAt,
       totalTime: assessment?.totalTime ?? stored?.totalTime,
     })
+    // Stored unified aggregates can have result=null with materialized score
+    // fields. They remain internal facts until projectUnit below.
+    return stored && internal.result === null ? {
+      ...internal,
+      quality: stored.quality ?? internal.quality,
+      scores: Array.isArray(stored.scores) ? stored.scores : internal.scores,
+      references: Array.isArray(stored.references) ? stored.references : internal.references,
+      interpretations: Array.isArray(stored.interpretations) ? stored.interpretations : internal.interpretations,
+      method: stored.method ?? internal.method,
+      ...(stored.decryptError ? { decryptError: true } : {}),
+    } : internal
   }
 
-  const unitReports = [
+  const internalUnitReports = [
     ...questionnaireScales.map((questionnaireScale: any) => {
       const scaleId = questionnaireScale.scaleId
       seen.add(scaleId)
@@ -84,6 +121,7 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
       .filter((stored: any) => !seen.has(stored.scaleId) && !assessments.some((assessment: any) => assessment.scaleId === stored.scaleId))
       .map((stored: any) => reportFor({ itemId: stored.scaleId, scaleId: stored.scaleId, stored })),
   ]
+  const unitReports = internalUnitReports.map((report) => projectUnit(report, options))
 
   const formItems = [...(qa.questionnaire?.formItems || [])]
     .sort((left: any, right: any) => (left.position ?? 0) - (right.position ?? 0))
@@ -97,28 +135,26 @@ export const buildQuestionnaireCollectionReport = (qa: any): any => {
     label: item.label,
     value: formAnswers.has(item.id) ? String(formAnswers.get(item.id)) : null,
   }))
-  return {
+  return attachInternalScaleReports({
     questionnaireName: qa.questionnaire?.name || '问卷',
-    totalDimensions: unitReports.reduce((sum: number, report: any) => sum + report.scores.length, 0),
+    totalDimensions: unitReports.reduce((sum: number, report: any) => sum + (Array.isArray(report.scores) ? report.scores.length : 0), 0),
     backgroundValues,
     unitReports,
-  }
+  }, internalUnitReports)
 }
 
+/** Internal storage payload; the hidden full reports survive even when the returned DTO is restricted. */
 export const collectionReportForStorage = (report: any) => ({
   reportDefinitionVersion: 'collection-only-v2',
-  scaleReports: report.unitReports,
+  scaleReports: Array.isArray(report?.[INTERNAL_SCALE_REPORTS]) ? report[INTERNAL_SCALE_REPORTS] : report.unitReports,
   totalDimensions: report.totalDimensions,
-  // Unified finalization has no later raw form-answer read to reconstruct
-  // collection context. Keep the already-projected facts in the encrypted
-  // report while preserving the legacy fields above.
   ...(Array.isArray(report.backgroundValues) ? { backgroundValues: report.backgroundValues } : {}),
 })
 
 /**
- * V32-2 collection projection. It consumes the canonical unit result and
- * form-facts snapshots only; the participant's raw scale answers and form
- * answer rows are intentionally outside this aggregate boundary.
+ * Internal V32-2 collection materialization. It consumes canonical unit result
+ * and form facts only. The returned object is for encrypted aggregate storage,
+ * not direct HTTP serialization.
  */
 export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
   questionnaireName: string

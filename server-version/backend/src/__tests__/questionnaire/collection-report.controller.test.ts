@@ -28,13 +28,14 @@ import { publicQuestionnaireController } from '../../controllers/publicQuestionn
 
 const scale = {
   id: 'scale-1',
-  code: 'S-1',
+  code: 'adexi_v1',
   name: '学习投入',
+  instrumentVersion: '2.0.0',
 }
 
 const v2ScaleResult = {
   schemaVersion: 2 as const,
-  instrument: { scaleId: 'scale-1', code: 'S-1', name: '学习投入', instrumentVersion: '2.0.0' },
+  instrument: { scaleId: 'scale-1', code: 'adexi_v1', name: '学习投入', instrumentVersion: '2.0.0' },
   method: {
     scaleId: 'scale-1',
     instrumentVersion: '2.0.0',
@@ -93,7 +94,7 @@ const makeQa = (overrides: Record<string, unknown> = {}) => ({
     scale,
   }],
   formAnswers: [{ formItemId: 'form-1', value: '三年级' }],
-  // This shape represents pre-PR6A rows.  It must be read for individual
+  // This shape represents pre-PR6A rows. It must be read for individual
   // scale values but never exposed as a collection aggregate.
   aggregateReport: {
     averageScore: 99,
@@ -165,6 +166,7 @@ describe('collection-only questionnaire completion/report contract', () => {
     await publicQuestionnaireController.completeAssessment({ params: { sessionId: 'session-1' } } as any, res)
 
     expect(dataOf(res)).toMatchObject({ backgroundValues: [{ itemId: 'form-1', value: '三年级' }], unitReports: [{ scaleId: 'scale-1', scores: [{ key: 'engagement', value: 0 }], totalTime: 0 }] })
+    expect(dataOf(res).unitReports[0]).not.toHaveProperty('result')
     expect(dataOf(res)).not.toHaveProperty('averageScore')
     expect(dataOf(res)).not.toHaveProperty('overallSummary')
     expect(dataOf(res)).not.toHaveProperty('aggregateReport')
@@ -200,7 +202,8 @@ describe('collection-only questionnaire completion/report contract', () => {
     await questionnaireController.getReport({ params: { id: 'qa-1' }, user: { userId: 'student-1' } } as any, res)
 
     expect(dataOf(res).unitReports).toHaveLength(1)
-    expect(dataOf(res).unitReports[0]).toMatchObject({ scaleId: 'scale-1', caveats: [], disclaimer: expect.any(String) })
+    expect(dataOf(res).unitReports[0]).toMatchObject({ scaleId: 'scale-1', caveats: [], disclaimer: expect.any(String), scores: [{ key: 'engagement', value: 0 }] })
+    expect(dataOf(res).unitReports[0]).not.toHaveProperty('result')
     expect(dataOf(res)).not.toHaveProperty('averageScore')
     expect(dataOf(res)).not.toHaveProperty('overallSummary')
   })

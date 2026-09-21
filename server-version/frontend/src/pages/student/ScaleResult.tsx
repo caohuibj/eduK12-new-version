@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
-import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
+import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
 import Dass21StudentReport from '../../modules/reporting/Dass21StudentReport'
-import type { ScaleResultV2, ScaleUnitReport } from '../../modules/reporting/types'
+import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
 
 export interface Assessment {
   id: string
   status: string
   result?: ScaleResultV2 | null
+  report?: ExternalScaleReport | null
   decryptError?: boolean
   startedAt: string
   completedAt: string | null
@@ -22,7 +23,44 @@ export interface Assessment {
   }
 }
 
-export const toScaleUnitReport = (value: Assessment): ScaleUnitReport => {
+export const toScaleUnitReport = (value: Assessment): SafeScaleUnitReport => {
+  const external = value.report
+  if (external) {
+    const educationalFeedback = external.kind === 'educational'
+      ? {
+          contentVersion: external.contentVersion,
+          blocks: external.blocks,
+          ...(external.choices ? { choices: external.choices } : {}),
+          ...(external.disclaimer ? { disclaimer: external.disclaimer } : {}),
+        }
+      : undefined
+    return {
+      itemId: value.id,
+      type: 'SCALE',
+      kind: 'scale',
+      reportKind: external.kind,
+      scaleId: external.instrument.scaleId,
+      scaleCode: external.instrument.code,
+      label: external.instrument.name,
+      scaleName: external.instrument.name,
+      result: null,
+      quality: external.kind === 'full' ? external.quality ?? null : null,
+      scores: external.kind === 'full' || external.kind === 'scores' ? external.scores ?? [] : [],
+      references: external.kind === 'full' ? external.references ?? [] : [],
+      interpretations: external.kind === 'full' ? external.interpretations ?? [] : [],
+      caveats: external.kind === 'full' ? external.caveats ?? [] : [],
+      disclaimer: external.kind === 'full' || external.kind === 'scores' || external.kind === 'educational'
+        ? external.disclaimer ?? ''
+        : '',
+      completedAt: external.completedAt,
+      totalTime: external.totalTime,
+      method: external.kind === 'full' ? external.method ?? null : null,
+      ...(educationalFeedback ? { educationalFeedback } : {}),
+      ...(external.kind === 'unavailable' ? { reason: external.reason } : {}),
+      ...(value.decryptError ? { decryptError: true } : {}),
+    }
+  }
+
   const disclaimer = value.result?.disclaimer ?? '量表结果仅反映本次作答，不构成医学诊断或人口常模。'
   return {
     itemId: value.id,
@@ -106,28 +144,30 @@ const ScaleResult: React.FC = () => {
     ...(assessment.completedAt ? [{ label: '完成时间', value: new Date(assessment.completedAt).toLocaleString('zh-CN') }] : []),
     ...(assessment.totalTime != null ? [{ label: '用时', value: formatTime(assessment.totalTime) }] : []),
   ]
-  const isDass21 = assessment.scale.code === 'dass21_zh_cn'
+  const safeReport = toScaleUnitReport(assessment)
+  const isEducational = safeReport.reportKind === 'educational'
+  const useLegacyDassFallback = !assessment.report && assessment.scale.code === 'dass21_zh_cn'
 
   return (
     <ReportShell
       title={assessment.scale.name}
-      description={isDass21 ? '完成反馈' : '测评报告'}
+      description={isEducational || useLegacyDassFallback ? '完成反馈' : '测评报告'}
       facts={facts}
       status={{
         kind: 'success',
         title: '已提交',
-        description: isDass21
-          ? '下面是一份不提供分数或心理健康标签的描述性反馈。'
+        description: isEducational || useLegacyDassFallback
+          ? '下面是一份不提供受限个体分数或心理健康标签的教育性反馈。'
           : '以下内容来自当前已完成结果记录。',
       }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
     >
-      {isDass21 ? (
+      {useLegacyDassFallback ? (
         <Dass21StudentReport />
       ) : (
         <section className="card p-6" aria-labelledby="scale-report-detail-heading">
           <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
-          <ScaleUnitReportCard report={toScaleUnitReport(assessment)} />
+          <ScaleUnitReportCard report={safeReport} />
         </section>
       )}
     </ReportShell>

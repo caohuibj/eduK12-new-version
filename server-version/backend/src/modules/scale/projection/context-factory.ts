@@ -1,0 +1,46 @@
+import { getScalePackage } from '../scale-package.registry'
+import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
+import { compileScalePolicy } from '../policy/compile'
+import { DISCLOSURE_PRESETS } from '../policy/disclosure'
+import type { ScaleDisclosureAudience } from '../policy/types'
+import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from './policy-resolver'
+import type { EffectiveScaleDisclosureSnapshot, ScaleProjectionContext, ScaleProjectionPurpose, ScaleRelationalDisposition } from './types'
+
+export const createScaleProjectionContext = (input: {
+  instrumentKey?: string | null
+  instrumentVersion?: string | null
+  instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
+  audience: ScaleDisclosureAudience
+  purpose: ScaleProjectionPurpose
+  principalId?: string | null
+  relationalDisposition?: ScaleRelationalDisposition
+  frozenPolicy?: EffectiveScaleDisclosureSnapshot
+}): ScaleProjectionContext => {
+  const full = DISCLOSURE_PRESETS.FULL_REPORT()
+  let frozenPolicy = input.frozenPolicy
+  if (!frozenPolicy && input.instrumentKey && input.instrumentVersion) {
+    const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
+    if (source?.executable && source.applicability && source.disclosure) {
+      frozenPolicy = scaleProjectionPolicyFromCompiled(compileScalePolicy(source))
+    } else {
+      const executable = getScalePackage(input.instrumentKey, input.instrumentVersion)
+      // Never infer CUSTOM_DESCRIPTIVE merely because a package lookup missed.
+      // Unknown STANDARD identities must fail closed. Custom descriptive
+      // compatibility is available only when the authoritative caller says so.
+      const instrumentClass = input.instrumentClass ?? (executable ? 'STANDARD' : null)
+      frozenPolicy = instrumentClass
+        ? resolveLegacyScaleProjectionPolicy(input.instrumentKey, input.instrumentVersion, instrumentClass)
+        : resolveLegacyScaleProjectionPolicy('', '')
+    }
+  }
+  frozenPolicy ??= resolveLegacyScaleProjectionPolicy('', '')
+  return {
+    principalId: input.principalId ?? null,
+    audience: input.audience,
+    purpose: input.purpose,
+    accessDecision: { source: 'RESOURCE_AUTHORIZATION', allowed: true, capabilities: full },
+    frozenPolicy,
+    currentRestrictions: full,
+    relationalDisposition: input.relationalDisposition ?? 'NON_RELATIONAL',
+  }
+}
