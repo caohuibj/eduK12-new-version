@@ -26,10 +26,11 @@ const main = async () => {
   const territory = required('territory').toUpperCase()
   const revision = Number(required('revision'))
   if (!Number.isInteger(revision) || revision <= 0) throw new Error('--revision must be a positive integer')
-  const commercialNature = required('commercial')
-  if (commercialNature !== 'NON_COMMERCIAL' && commercialNature !== 'COMMERCIAL') {
+  const commercial = required('commercial')
+  if (commercial !== 'NON_COMMERCIAL' && commercial !== 'COMMERCIAL') {
     throw new Error('--commercial must be NON_COMMERCIAL or COMMERCIAL')
   }
+  const commercialNature: 'NON_COMMERCIAL' | 'COMMERCIAL' = commercial
   const deploymentModes = required('modes').split(',').filter(Boolean).map((mode) => scaleDeploymentModeSchema.parse(mode)) as ScaleDeploymentModeV1[]
   const authorizationRefs = repeated('authorization')
   if (authorizationRefs.length === 0) throw new Error('At least one --authorization is required')
