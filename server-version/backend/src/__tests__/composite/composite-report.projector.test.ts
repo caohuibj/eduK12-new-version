@@ -6,7 +6,7 @@ import {
 
 const scaleResult = {
   schemaVersion: 2 as const,
-  instrument: { scaleId: 'scale-definition-1', code: 'S1', name: '量表', instrumentVersion: '2.0.0' },
+  instrument: { scaleId: 'scale-definition-1', code: 'adexi_v1', name: '量表', instrumentVersion: '2.0.0' },
   method: {
     scaleId: 'scale-definition-1',
     instrumentVersion: '2.0.0',
@@ -46,21 +46,21 @@ const scaleResult = {
   disclaimer: '不作诊断',
 }
 
-  const evidence = {
-    id: 'evidence-1',
-    sourceType: 'cognitive_metric' as const,
-    sourceResultId: 'session-1',
+const evidence = {
+  id: 'evidence-1',
+  sourceType: 'cognitive_metric' as const,
+  sourceResultId: 'session-1',
   construct: 'sustained_attention' as const,
   facet: 'response_stability',
   metricKey: 'blockSlopeRt',
-    value: { observed: 12, payloadEncrypted: 'must-not-leak' },
-    payloadEncrypted: 'must-not-leak',
+  value: { observed: 12, payloadEncrypted: 'must-not-leak' },
+  payloadEncrypted: 'must-not-leak',
   role: 'primary' as const,
   interpretation: 'criterion' as const,
   directionClass: 'more_difficulty' as const,
   interpretable: true,
   qualityFlags: [],
-    provenance: { slotKey: 'attention', testType: 'cpt', internal: 'hidden', payloadEncrypted: 'must-not-leak' },
+  provenance: { slotKey: 'attention', testType: 'cpt', internal: 'hidden', payloadEncrypted: 'must-not-leak' },
 }
 
 const makeInput = () => {
@@ -112,9 +112,9 @@ const makeInput = () => {
         type: 'SCALE',
         kind: 'scale',
         scaleId: 'scale-definition-1',
-      scaleCode: 'S1',
-      label: '量表',
-      scaleName: '量表',
+        scaleCode: 'adexi_v1',
+        label: '量表',
+        scaleName: '量表',
         result: scaleResult,
         caveats: [],
         disclaimer: '不作诊断',
@@ -251,10 +251,10 @@ describe('PR9 composite report projector', () => {
     ].sort())
     expect(researcher.unitReports[0]).toMatchObject({ score: 88, metrics: { blockSlopeRt: 12 }, sessionId: 'session-1' })
     expect(researcher.unitReports[1]).toMatchObject({
-      result: scaleResult,
       scores: [{ key: 'D1', value: 88 }],
       method: scaleResult.method,
     })
+    expect(researcher.unitReports[1]).not.toHaveProperty('result')
     expect(Object.keys(researcher.unitReports[0]).sort()).toEqual([
       'finishedAt', 'itemId', 'kind', 'label', 'metrics', 'qualityFlags', 'reference',
       'score', 'sessionId', 'singleTaskReport', 'testType', 'type',
@@ -278,6 +278,7 @@ describe('PR9 composite report projector', () => {
         interpretations: [{ scoreKey: 'D1', interpretation: '解释文本' }],
         method: scaleResult.method,
       })
+      expect(collection.unitReports[1]).not.toHaveProperty('result')
       expect(JSON.stringify(collection.unitReports[1])).not.toContain('payloadEncrypted')
     }
   })
