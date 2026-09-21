@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { scientificSchema } from './scientific-schema'
 import { situationDefinitionSchema } from '../situation-definition'
 import { situationDefinitionV2Schema } from '../situation-branching'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -23,9 +24,7 @@ export const publicationSchema = z.object({
     z.object({ kind: z.literal('github-review'), reviewUrl: z.string().regex(/^https:\/\/github\.com\/caohuibj\/eduK12-new-version\/pull\/\d+#pullrequestreview-\d+$/), contentDigest: digest }).strict(),
   ]).optional(),
 }).strict()
-// PR1 reserves the governance boundary without activating a second maturity truth.
-// PR2 extends this schema and connects it to the existing qualification resolver.
-export const scientificSchema = z.object({ schemaVersion: z.literal(1), scientificMaturity: z.literal('PILOT'), governanceRevision: z.number().int().positive() }).strict()
+export { scientificSchema } from './scientific-schema'
 export const instrumentSourceSchema = z.object({ content: instrumentContentSchema, publication: publicationSchema, scientific: scientificSchema }).strict()
 export type SituationalInstrumentSourceV1 = z.infer<typeof instrumentSourceSchema>
 export type SituationalInstrumentContentV1 = z.infer<typeof instrumentContentSchema>

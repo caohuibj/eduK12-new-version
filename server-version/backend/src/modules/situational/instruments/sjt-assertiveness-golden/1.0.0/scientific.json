@@ -1,5 +1,10 @@
 {
   "schemaVersion": 1,
   "scientificMaturity": "PILOT",
-  "governanceRevision": 1
+  "governanceRevision": 2,
+  "claimScope": null,
+  "evidence": [],
+  "knownLimitations": [
+    "Pilot content; no scoped research evidence has been reviewed."
+  ]
 }
