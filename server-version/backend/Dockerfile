@@ -40,6 +40,7 @@ COPY vitest.config.ts ./
 COPY scripts/pr24-migration-preflight.mjs ./scripts/pr24-migration-preflight.mjs
 COPY scripts/release-data-preflight.mjs ./scripts/release-data-preflight.mjs
 COPY scripts/assert-release-test-report.mjs ./scripts/assert-release-test-report.mjs
+COPY scripts/generate-scale-instruments.ts ./scripts/generate-scale-instruments.ts
 COPY src ./src
 RUN npm run build
 

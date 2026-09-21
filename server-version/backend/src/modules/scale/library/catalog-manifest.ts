@@ -102,7 +102,8 @@ export type DevelopmentalEvidence = z.infer<typeof developmentalEvidenceSchema>
 
 /**
  * 工具适用人群与作答者（SL1-C2）。年龄用完整岁数（completed years）；
- * 年级用 1-12（1=小学一年级）。省略某一轴表示“该轴不限”。
+ * minAge/maxAge 独立可选，省略一侧表示该侧无界；年级用 1-12（1=小学一年级）。
+ * 整个年龄或年级轴均可省略，表示 catalog 不对该轴作描述性限制。
  */
 export const scaleCatalogPopulationSchema = z.object({
   minAge: z.number().int().min(0).max(100).optional(),
@@ -115,13 +116,6 @@ export const scaleCatalogPopulationSchema = z.object({
   respondentTypes: z.array(respondentTypeSchema).min(1, '至少需要一种作答者类型'),
   developmentalEvidence: developmentalEvidenceSchema,
 }).strict().superRefine((population, ctx) => {
-  if ((population.minAge === undefined) !== (population.maxAge === undefined)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['minAge'],
-      message: 'minAge 与 maxAge 必须同时给出或同时省略',
-    })
-  }
   if (population.minAge !== undefined && population.maxAge !== undefined && population.minAge > population.maxAge) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
