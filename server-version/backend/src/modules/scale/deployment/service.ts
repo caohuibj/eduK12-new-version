@@ -50,7 +50,13 @@ export const resolveScaleStartDeployment = async (input: {
     instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE'
     status: string
   }
-  requestedMode: ScaleDeploymentModeV1
+  /**
+   * Omit only while freezing the immutable runtime before a parent surface has
+   * activated the child admission. In that mode all declared deployment modes
+   * are validated for current rights, but the concrete surface is enforced at
+   * admission before item delivery.
+   */
+  requestedMode?: ScaleDeploymentModeV1
   now?: Date
 }): Promise<ScaleStartDeploymentResolution> => {
   if (input.scale.status !== 'PUBLISHED') {
@@ -129,9 +135,26 @@ export const resolveScaleStartDeployment = async (input: {
     input.scale.code,
     input.scale.instrumentVersion,
   )
-  const decision = evaluateScaleDeployment({
+  const modes = input.requestedMode ? [input.requestedMode] : deployment.policy.deploymentModes
+  let decision: ScaleDeploymentDecisionV1 | null = null
+  for (const requestedMode of modes) {
+    const current = evaluateScaleDeployment({
+      policy: deployment.policy,
+      requestedMode,
+      instrumentKey: input.scale.code,
+      instrumentVersion: input.scale.instrumentVersion,
+      compiledRuntimePolicyHash: runtimePolicy.runtimePolicyHash,
+      authorizations,
+      usageRequirements: runtimePolicy.usageRequirements,
+      nowIso: (input.now ?? new Date()).toISOString(),
+    })
+    decision ??= current
+    reasons.push(...current.reasons)
+  }
+
+  const effectiveDecision = decision ?? evaluateScaleDeployment({
     policy: deployment.policy,
-    requestedMode: input.requestedMode,
+    requestedMode: input.requestedMode ?? 'STANDALONE',
     instrumentKey: input.scale.code,
     instrumentVersion: input.scale.instrumentVersion,
     compiledRuntimePolicyHash: runtimePolicy.runtimePolicyHash,
@@ -139,15 +162,14 @@ export const resolveScaleStartDeployment = async (input: {
     usageRequirements: runtimePolicy.usageRequirements,
     nowIso: (input.now ?? new Date()).toISOString(),
   })
-  reasons.push(...decision.reasons)
 
   return {
     kind: 'MANAGED_V2',
-    allowNewStarts: reasons.length === 0 && decision.allowNewStarts,
+    allowNewStarts: reasons.length === 0 && effectiveDecision.allowNewStarts,
     reasons: [...new Set(reasons)],
     runtimePolicy,
     deployment,
-    decision,
+    decision: effectiveDecision,
   }
 }
 
