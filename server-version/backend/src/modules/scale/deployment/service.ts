@@ -177,7 +177,7 @@ export const assertScaleStartDeploymentAllowed = async (
   input: Parameters<typeof resolveScaleStartDeployment>[0],
 ): Promise<Exclude<ScaleStartDeploymentResolution, { kind: 'DENY' }>> => {
   const resolution = await resolveScaleStartDeployment(input)
-  if (!resolution.allowNewStarts || resolution.kind === 'DENY') {
+  if (!resolution.allowNewStarts) {
     throw new Error(`Scale new start denied: ${resolution.reasons.join(',') || 'UNKNOWN'}`)
   }
   return resolution
