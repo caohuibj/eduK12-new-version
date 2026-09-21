@@ -32,7 +32,7 @@ export const scaleDeploymentPolicyV1Schema = z.object({
   revision: z.number().int().positive(),
   locale: z.string().min(1),
   territory: z.string().regex(/^[A-Z]{2}$/),
-  deploymentMode: scaleDeploymentModeSchema,
+  deploymentModes: z.array(scaleDeploymentModeSchema).min(1),
   commercialNature: z.enum(['NON_COMMERCIAL', 'COMMERCIAL']),
   requiredRightsActions: z.array(scaleDeploymentRightActionSchema).min(1),
   authorizationRefs: z.array(z.string().min(1)),
@@ -78,6 +78,7 @@ const requiredActions = (
 
 export const evaluateScaleDeployment = (input: {
   policy: ScaleDeploymentPolicyV1
+  requestedMode: ScaleDeploymentModeV1
   instrumentKey: string
   instrumentVersion: string
   compiledRuntimePolicyHash: string
@@ -92,10 +93,13 @@ export const evaluateScaleDeployment = (input: {
   if (policy.runtimePolicyHash !== input.compiledRuntimePolicyHash) {
     reasons.push('RUNTIME_POLICY_HASH_MISMATCH')
   }
+  if (!policy.deploymentModes.includes(input.requestedMode)) {
+    reasons.push('DEPLOYMENT_MODE_NOT_BOUND')
+  }
   if (
     input.usageRequirements?.allowedDeploymentModes
     && input.usageRequirements.allowedDeploymentModes.length > 0
-    && !input.usageRequirements.allowedDeploymentModes.includes(policy.deploymentMode)
+    && !input.usageRequirements.allowedDeploymentModes.includes(input.requestedMode)
   ) {
     reasons.push('DEPLOYMENT_MODE_NOT_ALLOWED')
   }
