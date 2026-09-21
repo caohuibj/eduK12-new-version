@@ -13,7 +13,7 @@ import {
   prepareCanonicalSubmission,
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
-import { loadFrozenMeasurementContext } from './profile-freeze'
+import { loadFrozenMeasurementContext, resolveFrozenParticipantPresentation } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { lockSession } from './session-lock'
@@ -246,6 +246,13 @@ const prepareFinalCognitiveData = async (
     score: scored,
     metricDefinitions: definition.metrics,
     qualityDefinitions: definition.quality,
+    participantPresentation: resolveFrozenParticipantPresentation({
+      testType: session.testType,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      profile: freeze.profile,
+      frozenReport: freeze.frozenReport,
+    }),
   })
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,

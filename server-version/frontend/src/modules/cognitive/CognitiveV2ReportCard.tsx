@@ -1,5 +1,6 @@
 import React from 'react'
 import type { CognitiveV2Report, CognitiveV2ReportMetricView } from './types'
+import { resolveCognitiveFrontendParticipantPresentation } from './participant-presentation'
 
 const profileLabel = (profile: CognitiveV2Report['method']['profile']): string => {
   if (profile === 'experience') return '体验版'
@@ -8,63 +9,23 @@ const profileLabel = (profile: CognitiveV2Report['method']['profile']): string =
   return ''
 }
 
-const PARTICIPANT_METRIC_LABELS: Record<string, string> = {
-  correctPerMinute: '每分钟正确比较数',
-  medianCorrectRtMs: '典型正确反应时间',
-  lapseRate: '未作答比例',
-  correctCount: '正确比较次数',
-  completedTrialCount: '完成比较次数',
-  flankerEffectMs: '干扰反应时间差',
-  incongruentAccuracy: '不一致条件正确率',
-  congruentAccuracy: '一致条件正确率',
-  errorCost: '准确率干扰差',
-  medianRtCongruent: '一致条件典型反应时间',
-  medianRtIncongruent: '不一致条件典型反应时间',
-}
+const metricCopy = (testType: string, key: string) =>
+  resolveCognitiveFrontendParticipantPresentation(testType)?.metricCopy?.[key]
 
-const METRIC_EXPLANATIONS: Record<string, string> = {
-  medianRtMs: '典型反应速度：多数有效反应所需的时间。',
-  rtICV: '反应稳定性：不同试次之间反应速度的波动程度。',
-  missRate: '遗漏比例：应该响应但没有在有效时间内响应的比例。',
-  stroopEffectMs: '冲突干扰时间：冲突条件相对一致条件增加的反应时间。',
-  flankerEffectMs: '干扰反应时间差：不一致条件相对一致条件增加的典型正确反应时间；应与两种条件的正确率一起阅读。',
-  incongruentAccuracy: '不一致条件正确率：干扰信息与目标信息方向或含义不一致时，仍按目标规则正确作答的比例。',
-  congruentAccuracy: '一致条件正确率：干扰信息与目标信息一致时正确作答的比例。',
-  errorCost: '准确率干扰差：一致条件正确率与不一致条件正确率之间的差异，应结合反应时间一起阅读。',
-  medianRtCongruent: '一致条件典型反应时间：一致条件中正确有效反应的中位时间。',
-  medianRtIncongruent: '不一致条件典型反应时间：不一致条件中正确有效反应的中位时间。',
-  commissionRate: '误按比例：本来不应该按时发生按键的比例。',
-  omissionRate: '遗漏比例：应该响应但没有响应的比例。',
-  dPrime: '目标辨别敏感度：区分目标与非目标表现的信号检测指标。',
-  maxSpan: '最长正确序列：本次任务中能够正确完成的最高序列长度。',
-  totalCorrectTrials: '正确试次数：本次正式测验中完整答对的试次数。',
-  dPrimeByN: '各 N 难度的目标辨别敏感度；不同 N 应分开阅读。',
-  maxReliableN: '本次配置内达到评分门槛的最高 N 难度，不是标准化能力等级。',
-  pRespondStop: '停止信号后仍作出反应的比例，用于检查停止任务是否处于可解释范围。',
-  ssrtMs: '停止反应估计时间：根据停止信号模型估计的动作停止时间。',
-  switchCostRtMs: '规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。',
-  switchCostAccuracy: '准确率转换代价：切换规则时相对重复规则时的正确率变化。',
-  correctPerMinute: '单位时间内正确完成图形比较的数量，应与准确率一起阅读，避免把快速猜测理解为更快的加工速度。',
-  accuracy: '正确率：正式作答中判断正确的比例。',
-  medianCorrectRtMs: '典型正确反应时间：仅统计正确且达到有效反应时间门槛的试次，中位数越小表示本次正确判断通常更快。',
-  lapseRate: '未作答比例：正式试次中未在有效时间内作答的比例。',
-  correctCount: '正确比较次数：本次正式计时内完成并判断正确的试次数。',
-  completedTrialCount: '完成比较次数：本次正式计时内进入评分的试次数。',
-}
+const participantMetricLabel = (testType: string, metric: CognitiveV2ReportMetricView): string =>
+  metricCopy(testType, metric.key)?.label ?? metric.label
 
-const participantMetricLabel = (metric: CognitiveV2ReportMetricView): string =>
-  PARTICIPANT_METRIC_LABELS[metric.key] ?? metric.label
+const metricExplanation = (testType: string, metric: CognitiveV2ReportMetricView): string =>
+  metricCopy(testType, metric.key)?.explanation
+  ?? '该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。'
 
-const metricExplanation = (metric: CognitiveV2ReportMetricView): string =>
-  METRIC_EXPLANATIONS[metric.key] ?? '该指标用于描述本次任务中的一个具体表现维度，请结合任务说明与其他指标共同阅读。'
-
-const MetricGrid = ({ metrics }: { metrics: CognitiveV2ReportMetricView[] }) => (
+const MetricGrid = ({ metrics, testType }: { metrics: CognitiveV2ReportMetricView[]; testType: string }) => (
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
     {metrics.map((metric) => (
       <div key={metric.key} className="rounded-lg bg-gray-50 px-4 py-3">
         <div className="text-lg font-semibold text-gray-800">{metric.formatted}</div>
-        <div className="text-xs font-medium text-gray-500">{participantMetricLabel(metric)}</div>
-        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(metric)}</p>
+        <div className="text-xs font-medium text-gray-500">{participantMetricLabel(testType, metric)}</div>
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">{metricExplanation(testType, metric)}</p>
       </div>
     ))}
   </div>
@@ -129,19 +90,19 @@ const CognitiveV2ReportCard: React.FC<{
           {report.headline.length === 1 ? (
             <div className="text-center py-2">
               <div className="text-4xl font-bold text-primary sm:text-5xl">{report.headline[0].formatted}</div>
-              <div className="mt-1 text-sm font-medium text-gray-500">{participantMetricLabel(report.headline[0])}</div>
+              <div className="mt-1 text-sm font-medium text-gray-500">{participantMetricLabel(report.method.testType, report.headline[0])}</div>
               <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-gray-400">
-                {metricExplanation(report.headline[0])}
+                {metricExplanation(report.method.testType, report.headline[0])}
               </p>
             </div>
-          ) : <MetricGrid metrics={report.headline} />}
+          ) : <MetricGrid metrics={report.headline} testType={report.method.testType} />}
         </section>
       )}
 
       {report.user.length > 0 && (
         <section className="mb-6">
           <h2 className="text-sm font-semibold text-gray-600 mb-2 text-left">任务表现</h2>
-          <MetricGrid metrics={report.user} />
+          <MetricGrid metrics={report.user} testType={report.method.testType} />
         </section>
       )}
 
@@ -151,7 +112,7 @@ const CognitiveV2ReportCard: React.FC<{
           {report.detail.length > 0 && (
             <section className="mb-5">
               <h2 className="text-sm font-semibold text-gray-600 mb-2">详细指标</h2>
-              <MetricGrid metrics={report.detail} />
+              <MetricGrid metrics={report.detail} testType={report.method.testType} />
             </section>
           )}
           {referenceRows.length > 0 && (

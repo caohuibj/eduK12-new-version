@@ -6,7 +6,7 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { CognitiveScoringInputError } from './cognitive.types'
 import { resolveCognitiveReferenceForResult } from './reference'
-import { loadFrozenMeasurementContext } from './profile-freeze'
+import { loadFrozenMeasurementContext, resolveFrozenParticipantPresentation } from './profile-freeze'
 import { buildCognitiveSingleTaskReport } from './single-task-report'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
@@ -183,6 +183,13 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     score: scored,
     metricDefinitions: definition.metrics,
     qualityDefinitions: definition.quality,
+    participantPresentation: resolveFrozenParticipantPresentation({
+      testType: session.testType,
+      engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion,
+      profile: freeze.profile,
+      frozenReport: freeze.frozenReport,
+    }),
   })
   const resultSnapshot: CognitiveResultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,

@@ -1,8 +1,10 @@
 import type { CognitiveProfile, MetricDefinition, QualityDefinition, SingleTaskReportDefinition } from './cognitive.types'
 import type { CognitiveReference } from './reference'
-import type { FrozenReportSnapshot } from './profile-freeze'
+import {
+  resolveFrozenParticipantPresentation,
+  type FrozenReportSnapshot,
+} from './profile-freeze'
 import { getCognitiveRegistryEntry } from './cognitive.registry'
-import { resolveCognitiveProtocolPresentation } from './protocol-presentation'
 
 export interface CognitiveReportMetricView {
   key: string
@@ -106,30 +108,16 @@ const registryCompatReport = (input: {
   }
 }
 
-const experienceHeadlineByTestType: Record<string, string> = {
-  stroop: 'incongruentAccuracy',
-  nback: 'dPrimeByN',
-  sst: 'pRespondStop',
-}
-
 const resolveHeadlineKey = (
-  testType: string,
   profile: CognitiveProfile | null,
   reportDefinition: SingleTaskReportDefinition | undefined,
   primaryKeys: string[],
   metricDefinitions: Record<string, MetricDefinition>,
+  experienceHeadlineMetric?: string,
 ): string | undefined => {
-  const profileHeadline = profile === 'experience' ? experienceHeadlineByTestType[testType] : undefined
+  const profileHeadline = profile === 'experience' ? experienceHeadlineMetric : undefined
   if (profileHeadline && metricDefinitions[profileHeadline]) return profileHeadline
   return reportDefinition?.headlineMetric || primaryKeys[0]
-}
-
-// Participant-facing reports must not teach task-specific strategies that can
-// contaminate a later repeated measurement. Environment/device guidance and
-// construct-interpretation notes remain allowed.
-const participantPracticalTips = (testType: string, tips: string[]): string[] => {
-  if (testType === 'memory' || testType === 'stroop') return []
-  return tips
 }
 
 export const buildCognitiveSingleTaskReport = (input: {
@@ -149,15 +137,14 @@ export const buildCognitiveSingleTaskReport = (input: {
   const reportDefinition: SingleTaskReportDefinition | undefined = frozen.reportDefinition
   const metricDefinitions: Record<string, MetricDefinition> = frozen.metricDefinitions ?? {}
   const qualityDefinitions: Record<string, QualityDefinition> = frozen.qualityDefinitions ?? {}
-  // For newly frozen assignments, participant-facing protocol wording is read
-  // from the immutable snapshot. The live exact-identity registry remains a
-  // compatibility fallback for assignments frozen before these optional fields.
-  const protocolPresentation = resolveCognitiveProtocolPresentation({
+  const participantPresentation = resolveFrozenParticipantPresentation({
     testType: input.testType,
     engineVersion: input.engineVersion,
     scoringVersion: input.scoringVersion,
     profile: input.profile,
+    frozenReport: input.frozenReport,
   })
+  const protocolPresentation = participantPresentation?.protocol
   const interpretable = input.qualityFlags.interpretable !== false
   const metricVisible = (key: string) => {
     const definition = metricDefinitions[key]
@@ -168,11 +155,11 @@ export const buildCognitiveSingleTaskReport = (input: {
   const primaryKeys = (reportDefinition?.primaryMetrics ?? []).filter(metricVisible)
   const secondaryKeys = (reportDefinition?.secondaryMetrics ?? []).filter(metricVisible)
   const headlineKey = resolveHeadlineKey(
-    input.testType,
     input.profile,
     reportDefinition,
     primaryKeys,
     metricDefinitions,
+    participantPresentation?.experienceHeadlineMetric,
   )
   const showProductIndex = input.frozenReport?.protocolShowProductIndex
     ?? protocolPresentation?.showProductIndex
@@ -210,7 +197,9 @@ export const buildCognitiveSingleTaskReport = (input: {
       ?? protocolPresentation?.reportCaveats
       ?? frozen.reportCaveats
       ?? [],
-    practicalTips: participantPracticalTips(input.testType, reportDefinition?.practicalTips ?? []),
+    practicalTips: participantPresentation?.suppressPracticalTips
+      ? []
+      : (reportDefinition?.practicalTips ?? []),
     method: {
       testType: input.testType,
       engineVersion: input.engineVersion,

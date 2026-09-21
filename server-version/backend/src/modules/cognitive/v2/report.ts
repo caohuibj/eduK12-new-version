@@ -7,7 +7,7 @@ import type {
   QualityState,
 } from './types'
 import { metricIsQualityGated } from './quality'
-import { resolveCognitiveProtocolPresentation } from '../protocol-presentation'
+import type { ResolvedCognitiveParticipantPresentationV1 } from '../tasks/participant-presentation.types'
 
 export interface ReportMetricView {
   key: string
@@ -118,16 +118,10 @@ const projectKeys = (
   )
 })
 
-const participantMetricAllowed = (testType: string, key: string): boolean => {
-  if (testType === 'matrix' && key === 'reachedDifficulty') return false
-  return true
-}
-
-const experienceHeadlineByTestType: Record<string, string> = {
-  stroop: 'incongruentAccuracy',
-  nback: 'dPrimeByN',
-  sst: 'pRespondStop',
-}
+const participantMetricAllowed = (
+  key: string,
+  presentation: ResolvedCognitiveParticipantPresentationV1 | null | undefined,
+): boolean => !presentation?.v2HiddenMetricKeys.includes(key)
 
 const resolveHeadlineKeys = (input: {
   testType: string
@@ -135,14 +129,15 @@ const resolveHeadlineKeys = (input: {
   definition: ReportDefinition
   metricDefinitions: Record<string, MetricDefinition>
   quality: Pick<CognitiveScoreResult['quality'], 'flags'>
+  participantPresentation?: ResolvedCognitiveParticipantPresentationV1 | null
 }): string[] => {
   const experienceHeadline = input.profile === 'experience'
-    ? experienceHeadlineByTestType[input.testType]
+    ? input.participantPresentation?.experienceHeadlineMetric
     : undefined
   if (
     experienceHeadline
     && eligibleMetric(experienceHeadline, input.metricDefinitions, input.profile, input.quality)
-    && participantMetricAllowed(input.testType, experienceHeadline)
+    && participantMetricAllowed(experienceHeadline, input.participantPresentation)
   ) {
     return [experienceHeadline]
   }
@@ -152,7 +147,7 @@ const resolveHeadlineKeys = (input: {
     input.metricDefinitions,
     input.profile,
     input.quality,
-  ).filter((key) => participantMetricAllowed(input.testType, key))
+  ).filter((key) => participantMetricAllowed(key, input.participantPresentation))
 }
 
 const conclusionFor = (
@@ -167,11 +162,6 @@ const conclusionFor = (
     return '体验版使用短程协议；以下指标由正式评分器计算，适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。'
   }
   return '以下结果描述本次任务中的表现，不等同于诊断或正式人口常模。'
-}
-
-const participantPracticalTips = (testType: string, tips: string[]): string[] => {
-  if (testType === 'memory' || testType === 'stroop') return []
-  return tips
 }
 
 const legacyProfileLabel = (profile: CognitiveProfile | null): string | null => {
@@ -193,6 +183,7 @@ export const projectThreeLayerReport = (input: {
   score: CognitiveScoreResult
   metricDefinitions: Record<string, MetricDefinition>
   qualityDefinitions: Record<string, QualityDefinition>
+  participantPresentation?: ResolvedCognitiveParticipantPresentationV1 | null
 }): ThreeLayerReport => {
   const qualityEntries = Object.entries(input.score.quality.flags).map(([key, active]) => ({
     key,
@@ -206,19 +197,15 @@ export const projectThreeLayerReport = (input: {
     definition: input.definition,
     metricDefinitions: input.metricDefinitions,
     quality: input.score.quality,
+    participantPresentation: input.participantPresentation,
   })
   const headlineSet = new Set(headlineKeys)
   const userKeys = projectKeys(input.definition.userMetrics, 'user', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => !headlineSet.has(key))
-    .filter((key) => participantMetricAllowed(input.testType, key))
+    .filter((key) => participantMetricAllowed(key, input.participantPresentation))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
-    .filter((key) => participantMetricAllowed(input.testType, key))
-  const protocolPresentation = resolveCognitiveProtocolPresentation({
-    testType: input.testType,
-    engineVersion: input.engineVersion,
-    scoringVersion: input.scoringVersion,
-    profile: input.profile,
-  })
+    .filter((key) => participantMetricAllowed(key, input.participantPresentation))
+  const protocolPresentation = input.participantPresentation?.protocol
   return {
     title: input.definition.title,
     profileLabel: protocolPresentation?.profileLabel ?? legacyProfileLabel(input.profile),
@@ -247,6 +234,8 @@ export const projectThreeLayerReport = (input: {
       profile: input.profile,
     },
     disclaimer: input.definition.disclaimer,
-    practicalTips: participantPracticalTips(input.testType, input.definition.practicalTips),
+    practicalTips: input.participantPresentation?.suppressPracticalTips
+      ? []
+      : input.definition.practicalTips,
   }
 }

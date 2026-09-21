@@ -14,7 +14,7 @@ import {
 } from '../../services/instrumentFinalSubmit'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
-import { loadFrozenMeasurementContext } from './profile-freeze'
+import { loadFrozenMeasurementContext, resolveFrozenParticipantPresentation } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
 import { readCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
@@ -377,6 +377,13 @@ export const submitUnifiedCognitiveSessionFinal = async (
       score: scored,
       metricDefinitions: prepared.definition.metrics,
       qualityDefinitions: prepared.definition.quality,
+    participantPresentation: resolveFrozenParticipantPresentation({
+      testType: prepared.snapshot.testType,
+      engineVersion: prepared.snapshot.engineVersion,
+      scoringVersion: prepared.snapshot.scoringVersion,
+      profile: freeze.profile,
+      frozenReport: freeze.frozenReport,
+    }),
     }) as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,
   })

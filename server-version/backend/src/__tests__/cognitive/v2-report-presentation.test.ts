@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
 import { projectThreeLayerReport } from '../../modules/cognitive/v2/report'
+import { resolveCognitiveTaskParticipantPresentation } from '../../modules/cognitive/tasks/participant-presentation'
 import type { CognitiveProfile, CognitiveScoreResult } from '../../modules/cognitive/v2/types'
 
 const project = (
@@ -28,6 +29,12 @@ const project = (
     },
     metricDefinitions: task.metrics,
     qualityDefinitions: task.quality,
+    participantPresentation: resolveCognitiveTaskParticipantPresentation({
+      testType,
+      engineVersion: '1.0.0',
+      scoringVersion,
+      profile,
+    }),
   })
 }
 

@@ -8,10 +8,12 @@ import type {
   RegistryEntry,
   SingleTaskReportDefinition,
 } from './cognitive.types'
-import {
-  resolveCognitiveProtocolPresentation,
-  type CognitiveProtocolTier,
-} from './protocol-presentation'
+import { resolveCognitiveTaskParticipantPresentation } from './tasks/participant-presentation'
+import { resolveLegacyCognitiveParticipantPresentation } from './tasks/legacy-participant-presentation'
+import type {
+  CognitiveProtocolTier,
+  ResolvedCognitiveParticipantPresentationV1,
+} from './tasks/participant-presentation.types'
 
 export interface FrozenReportSnapshot {
   profile: CognitiveProfile
@@ -30,6 +32,8 @@ export interface FrozenReportSnapshot {
   profileLabel?: string
   participantConclusion?: string
   protocolShowProductIndex?: boolean
+  /** New assignments freeze the complete task-owned participant presentation. */
+  participantPresentation?: ResolvedCognitiveParticipantPresentationV1
 }
 
 const sortValue = (value: unknown): unknown => {
@@ -75,12 +79,13 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 }) => {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
   const profileDefinition = input.entry.profiles[input.profile]
-  const protocolPresentation = resolveCognitiveProtocolPresentation({
+  const participantPresentation = resolveCognitiveTaskParticipantPresentation({
     testType: input.entry.testType,
     engineVersion: input.entry.engineVersion,
     scoringVersion: input.entry.scoringVersion,
     profile: input.profile,
   })
+  const protocolPresentation = participantPresentation?.protocol
   const resolvedReport: FrozenReportSnapshot = {
     profile: input.profile,
     randomizationAlgorithmVersion: input.entry.randomizationAlgorithmVersion,
@@ -92,6 +97,7 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     metricDefinitions: input.entry.metricDefinitions,
     qualityDefinitions: input.entry.qualityDefinitions,
     reportDefinition: input.entry.reportDefinition,
+    ...(participantPresentation ? { participantPresentation } : {}),
     ...(protocolPresentation ? {
       protocolTier: protocolPresentation.tier,
       profileLabel: protocolPresentation.profileLabel,
@@ -112,6 +118,23 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapshot | null => {
   if (!encrypted) return null
   return decryptCognitivePayload<FrozenReportSnapshot>(encrypted)
+}
+
+export const resolveFrozenParticipantPresentation = (input: {
+  testType: string
+  engineVersion: string
+  scoringVersion: string
+  profile: CognitiveProfile | null
+  frozenReport: FrozenReportSnapshot | null
+}): ResolvedCognitiveParticipantPresentationV1 | null => {
+  if (input.frozenReport?.participantPresentation) return input.frozenReport.participantPresentation
+  return resolveLegacyCognitiveParticipantPresentation({
+    testType: input.testType,
+    engineVersion: input.engineVersion,
+    scoringVersion: input.scoringVersion,
+    profile: input.profile,
+    frozenProtocol: input.frozenReport,
+  })
 }
 
 export interface FrozenMeasurementContext {
