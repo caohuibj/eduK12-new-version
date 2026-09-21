@@ -10,6 +10,8 @@ import type { TaskDefinition } from './types'
 export interface CognitiveAuditEntry {
   key: string
   /** Deprecated compatibility projection; never use as product availability truth. */
+  compatibilityStatus: TaskDefinition['publication']['status']
+  /** @deprecated Use compatibilityStatus. */
   status: TaskDefinition['publication']['status']
   protocolSignature: string
   scorerCovered: boolean
@@ -22,9 +24,15 @@ export interface CognitiveAuditReport {
   status: 'PASS' | 'FAIL'
   generatedAt: string
   registryCount: number
-  /** Compatibility-only counts retained for historical audit consumers. */
+  /** Compatibility-only counts; these are not DB product lifecycle counts. */
+  compatibilityPublishedCount: number
+  compatibilityDraftCount: number
+  compatibilityRetiredCount: number
+  /** @deprecated Compatibility aliases retained for historical audit consumers. */
   publishedCount: number
+  /** @deprecated Compatibility aliases retained for historical audit consumers. */
   draftCount: number
+  /** @deprecated Compatibility aliases retained for historical audit consumers. */
   retiredCount: number
   entries: CognitiveAuditEntry[]
   issues: PublicationIssue[]
@@ -71,6 +79,7 @@ export const auditCognitiveV2Registry = (
     }
     return {
       key,
+      compatibilityStatus: definition.publication.status,
       status: definition.publication.status,
       protocolSignature: signature,
       scorerCovered: typeof definition.scorer === 'function',
@@ -83,25 +92,34 @@ export const auditCognitiveV2Registry = (
       issues: entryIssues,
     }
   })
+
   const definitionKeys = new Set(definitions.map(taskKey))
-  if (registryEntries.length !== 28) {
-    issues.push({ path: 'registry', message: `expected 28 exact RegistryEntry identities (found ${registryEntries.length})`, severity: 'error' })
+  if (definitions.length !== registryEntries.length) {
+    issues.push({
+      path: 'registry',
+      message: `registry/definition cardinality mismatch: ${registryEntries.length} RegistryEntry identities vs ${definitions.length} task definitions`,
+      severity: 'error',
+    })
   }
   for (const registryEntry of registryEntries) {
     const key = registryKey(registryEntry)
     if (!definitionKeys.has(key)) issues.push({ path: `registry.${key}`, message: 'exact RegistryEntry is missing from the v2 audit', severity: 'error' })
   }
-  const publishedCount = entries.filter((entry) => entry.status === 'PUBLISHED').length
-  const draftCount = entries.filter((entry) => entry.status === 'DRAFT').length
-  const retiredCount = entries.filter((entry) => entry.status === 'RETIRED').length
+
+  const compatibilityPublishedCount = entries.filter((entry) => entry.compatibilityStatus === 'PUBLISHED').length
+  const compatibilityDraftCount = entries.filter((entry) => entry.compatibilityStatus === 'DRAFT').length
+  const compatibilityRetiredCount = entries.filter((entry) => entry.compatibilityStatus === 'RETIRED').length
   const hasErrors = [...issues, ...entries.flatMap((entry) => entry.issues)].some((entry) => entry.severity === 'error')
   return {
     status: hasErrors ? 'FAIL' : 'PASS',
     generatedAt: new Date().toISOString(),
     registryCount: entries.length,
-    publishedCount,
-    draftCount,
-    retiredCount,
+    compatibilityPublishedCount,
+    compatibilityDraftCount,
+    compatibilityRetiredCount,
+    publishedCount: compatibilityPublishedCount,
+    draftCount: compatibilityDraftCount,
+    retiredCount: compatibilityRetiredCount,
     entries,
     issues,
   }
