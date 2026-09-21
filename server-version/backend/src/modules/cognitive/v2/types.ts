@@ -215,14 +215,11 @@ export interface ReportDefinition {
   practicalTips: string[]
 }
 
-export interface TaskPublicationDefinition {
-  status: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
-  publishedAt?: string
-  /** Published tasks may legitimately have no eligible reference. */
-  referenceRequired: boolean
-  evidenceNote: string
-}
-
+/**
+ * Pure executable/scoring/report contract for one exact Cognitive identity.
+ * Product lifecycle is intentionally absent: CognitiveTestConfig.status is the
+ * only authoritative DRAFT/PUBLISHED/RETIRED release state.
+ */
 export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   schemaVersion: typeof COGNITIVE_V2_SCHEMA_VERSION
   testType: string
@@ -246,7 +243,6 @@ export interface TaskDefinition<TConfig = unknown, TTrial = unknown> {
   quality: Record<string, QualityDefinition>
   references: ReferenceApplicability[]
   report: ReportDefinition
-  publication: TaskPublicationDefinition
 }
 
 /** Used by the reference adapter without copying shared reference definitions. */

@@ -129,28 +129,23 @@ export const validateTaskDefinition = <TConfig, TTrial>(
     }
   }
 
-  // Reference/norm availability is scientific/claim governance, not product
-  // publication. Existing mappings must still be internally valid, but a task
-  // may be PUBLISHED with zero mappings and remain descriptive/non-normative.
-  if (definition.publication.referenceRequired && definition.references.length === 0) {
-    issues.push(issue(
-      'references',
-      'referenceRequired is not a product-publication blocker; scientific qualification/claim eligibility must resolve reference evidence separately',
-      'warning',
-    ))
-  }
+  // Reference/norm availability is scientific/claim governance rather than a
+  // product-release switch. Existing mappings must be internally valid, while
+  // zero mappings remains a valid descriptive/non-normative task contract.
   if (!definition.report.disclaimer) issues.push(issue('report.disclaimer', 'report disclaimer is required'))
   return issues
 }
 
 export const assertTaskContractValid = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
   const errors = validateTaskDefinition(definition).filter((candidate) => candidate.severity === 'error')
-  if (errors.length > 0) throw new Error(`Cognitive task publication gate failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
+  if (errors.length > 0) throw new Error(`Cognitive task contract validation failed: ${errors.map((candidate) => `${candidate.path}: ${candidate.message}`).join('; ')}`)
 }
 
-export const assertTaskCanPublish = <TConfig, TTrial>(definition: TaskDefinition<TConfig, TTrial>): void => {
-  assertTaskContractValid(definition)
-  if (definition.publication.status !== 'PUBLISHED') {
-    throw new Error(`Cognitive task publication gate failed: publication.status must be PUBLISHED (received ${definition.publication.status})`)
-  }
-}
+/**
+ * Release-readiness contract assertion. Lifecycle authorization is deliberately
+ * not represented here; callers must use CognitiveTestConfig.status for that.
+ */
+export const assertTaskReadyForRelease = assertTaskContractValid
+
+/** @deprecated Use assertTaskReadyForRelease or assertTaskContractValid. */
+export const assertTaskCanPublish = assertTaskReadyForRelease

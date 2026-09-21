@@ -21,7 +21,7 @@ export interface RegistryReferenceEligibilityIssue {
   message: string
 }
 
-/** Validate the exact RegistryEntry-owned reference allowlist before publication. */
+/** Validate the exact RegistryEntry-owned reference allowlist independently of release state. */
 export const validateRegistryReferenceEligibility = (entry: {
   metricDefinitions: Record<string, { valueType: string; role: string }>
   referenceEligibleMetricKeys?: unknown
@@ -166,9 +166,16 @@ const adaptProtocol = (entry: AnyRegistryEntry) => ({
   measurementCriticalConfigPaths: ['*'],
 })
 
+/**
+ * Adapt a RegistryEntry into the pure executable Cognitive V2 contract.
+ *
+ * The optional legacy lifecycle argument is intentionally ignored so older
+ * fixtures can be migrated without reintroducing a second release truth.
+ * Product release state belongs exclusively to CognitiveTestConfig.status.
+ */
 export const buildCognitiveV2TaskDefinition = (
   entry: AnyRegistryEntry,
-  publicationStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED' = 'DRAFT',
+  _legacyPublicationStatus?: 'DRAFT' | 'PUBLISHED' | 'RETIRED',
 ): TaskDefinition<unknown, unknown> => {
   const metrics = adaptMetricDefinitions(entry)
   const quality = adaptQualityDefinitions(entry)
@@ -213,36 +220,11 @@ export const buildCognitiveV2TaskDefinition = (
     quality,
     references: [],
     report: adaptReportDefinition(entry, metrics),
-    publication: {
-      status: publicationStatus,
-      referenceRequired: false,
-      evidenceNote: 'Scientific evidence/reference maturity is governed separately from Product Release.',
-    },
   }
 }
 
-const SUPERSEDED_IDENTITIES = new Set([
-  'reaction/1.0.0/1.0.0',
-  'memory/1.0.0/1.0.0',
-  'stroop/1.0.0/1.0.0',
-])
-
-/**
- * Product lifecycle is executable-state only. `recommendedForCreate` remains a
- * catalog/recommendation signal and does not demote a complete task to DRAFT.
- * Legacy scorer identities stay readable for frozen attempts but are RETIRED
- * for new product use. `fake` is test infrastructure and never a real product.
- */
-const defaultStatus = (entry: AnyRegistryEntry): 'DRAFT' | 'PUBLISHED' | 'RETIRED' => {
-  if (entry.testType === 'fake') return 'DRAFT'
-  const identity = `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
-  if (SUPERSEDED_IDENTITIES.has(identity)) return 'RETIRED'
-  return 'PUBLISHED'
-}
-
 export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
-  listCognitiveRegistryEntries()
-    .map((entry) => buildCognitiveV2TaskDefinition(entry, defaultStatus(entry)))
+  listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry))
 
 export const getCognitiveV2TaskDefinition = (
   testType: string,
@@ -250,5 +232,5 @@ export const getCognitiveV2TaskDefinition = (
   scoringVersion: string,
 ): TaskDefinition<unknown, unknown> | undefined => {
   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
-  return entry ? buildCognitiveV2TaskDefinition(entry, defaultStatus(entry)) : undefined
+  return entry ? buildCognitiveV2TaskDefinition(entry) : undefined
 }
