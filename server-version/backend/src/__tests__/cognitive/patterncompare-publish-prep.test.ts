@@ -66,9 +66,9 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
     })).toMatchObject({ tier: 'RESEARCH_READY', profileLabel: 'Research Ready 版', showProductIndex: false })
 
     expect(resolveCognitiveProtocolPresentation({
-      testType: 'flanker',
+      testType: 'patterncompare',
       engineVersion: '1.0.0',
-      scoringVersion: '1.0.0',
+      scoringVersion: '9.9.9',
       profile: 'standard',
     })).toBeNull()
   })
