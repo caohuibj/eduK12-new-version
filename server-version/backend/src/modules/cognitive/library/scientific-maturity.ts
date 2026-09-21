@@ -17,6 +17,40 @@ export const cognitiveScientificMaturityIdentityKey = (
  */
 export const COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY = new Map<string, CognitiveScientificStatus>()
 
+interface CognitiveMaturityIdentityView {
+  add(identity: string): CognitiveMaturityIdentityView
+  delete(identity: string): boolean
+  has(identity: string): boolean
+}
+
+const maturityIdentityView = (
+  maturity: Exclude<CognitiveScientificStatus, 'PILOT'>,
+): CognitiveMaturityIdentityView => ({
+  add(identity: string) {
+    COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.set(identity, maturity)
+    return this
+  },
+  delete(identity: string) {
+    if (COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(identity) !== maturity) return false
+    return COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.delete(identity)
+  },
+  has(identity: string) {
+    return COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(identity) === maturity
+  },
+})
+
+/**
+ * @deprecated Compatibility mutation view for older governance tests/callers.
+ * It owns no state; every operation reads/writes the authoritative Map above.
+ */
+export const RESEARCH_READY_IDENTITIES = maturityIdentityView('RESEARCH_READY')
+
+/**
+ * @deprecated Compatibility mutation view for catalog-era callers.
+ * It owns no state; every operation reads/writes the authoritative Map above.
+ */
+export const RESEARCH_GRADE_IDENTITIES = maturityIdentityView('RESEARCH_GRADE')
+
 /**
  * Governance-only resolver. New/unreviewed exact identities default to PILOT;
  * a substantive engine/scoring identity change therefore cannot inherit an
