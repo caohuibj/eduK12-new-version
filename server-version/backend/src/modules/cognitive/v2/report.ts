@@ -7,6 +7,7 @@ import type {
   QualityState,
 } from './types'
 import { metricIsQualityGated } from './quality'
+import { resolveCognitiveProtocolPresentation } from '../protocol-presentation'
 
 export interface ReportMetricView {
   key: string
@@ -157,9 +158,14 @@ const resolveHeadlineKeys = (input: {
   ).filter((key) => participantMetricAllowed(input.testType, key))
 }
 
-const conclusionFor = (state: QualityState, profile: CognitiveProfile | null): string => {
+const conclusionFor = (
+  state: QualityState,
+  profile: CognitiveProfile | null,
+  reviewedConclusion?: string,
+): string => {
   if (state === 'invalid') return '本次数据未达到可解释条件，暂不提供表现结论。'
   if (state === 'limited') return '本次结果存在质量限制，请结合展开详情谨慎阅读。'
+  if (reviewedConclusion) return reviewedConclusion
   if (profile === 'experience') {
     return '体验版使用短程协议；以下指标由正式评分器计算，适合描述本次体验，不用于人口百分位、年龄等级或稳定能力等级。'
   }
@@ -203,10 +209,20 @@ export const projectThreeLayerReport = (input: {
     .filter((key) => participantMetricAllowed(input.testType, key))
   const detailKeys = projectKeys(input.definition.detailMetrics, 'detail', input.metricDefinitions, input.profile, input.score.quality)
     .filter((key) => participantMetricAllowed(input.testType, key))
+  const protocolPresentation = resolveCognitiveProtocolPresentation({
+    testType: input.testType,
+    engineVersion: input.engineVersion,
+    scoringVersion: input.scoringVersion,
+    profile: input.profile,
+  })
   return {
     title: input.definition.title,
     qualityState: input.score.quality.state,
-    conclusion: conclusionFor(input.score.quality.state, input.profile),
+    conclusion: conclusionFor(
+      input.score.quality.state,
+      input.profile,
+      protocolPresentation?.participantConclusion,
+    ),
     headline: input.score.quality.state === 'invalid'
       ? []
       : headlineKeys.map((key) => metricView(key, input.metrics, input.metricDefinitions)),
