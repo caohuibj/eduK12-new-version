@@ -20,6 +20,10 @@ jobs:
   boundary:
     timeout-minutes: 20
     runs-on: [self-hosted, linux, eduk12-mac-ci]
+    env:
+      # Test-only deterministic keys required by Scale provenance/encryption unit tests.
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
     steps:
       - uses: actions/checkout@v4
         with:
