@@ -14,7 +14,24 @@ import {
 } from '../../modules/scale/library/catalog-only-read-model'
 import { listScaleInstrumentSources } from '../../modules/scale/onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../../modules/scale/onboarding/validate-instrument'
-const WAVE1_P1_SCALE_CATALOG_MANIFESTS = listScaleInstrumentSources().filter(source => !source.executable).map(materializeCatalogManifest)
+const WAVE1_P1_CATALOG_KEYS = new Set([
+  'dass21_zh_cn',
+  'gse_zh_cn',
+  'mpfi24_zh_cn',
+  'pss10_zh_cn',
+])
+const WAVE1_P1_SCALE_CATALOG_MANIFESTS = listScaleInstrumentSources()
+  .filter(source => !source.executable && WAVE1_P1_CATALOG_KEYS.has(source.identity.instrumentKey))
+  .map(materializeCatalogManifest)
+
+const LEGACY_EXECUTABLE_KEYS = [
+  'adexi_v1',
+  'who5',
+  'sdq_parent_zh_cn',
+  'sdq_teacher_zh_cn',
+  'texi_parent_zh_cn',
+  'texi_teacher_zh_cn',
+]
 
 const NOW = '2026-09-20T00:00:00.000Z'
 
@@ -59,23 +76,14 @@ describe('Wave 1 P1 scale-library integration', () => {
     expect(missingDiagnostics.every((diagnostic) => diagnostic.severity === 'warning')).toBe(true)
   })
 
-  it('keeps the six Wave 0 executable entries and adds four catalog-first P1 entries', () => {
+  it('keeps the six Wave 0 executable entries as the compatibility prefix and retains the four catalog-first P1 entries', () => {
     const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
-    expect(model.entries).toHaveLength(10)
-    expect(keys(model.entries)).toEqual([
-      'adexi_v1',
-      'who5',
-      'sdq_parent_zh_cn',
-      'sdq_teacher_zh_cn',
-      'texi_parent_zh_cn',
-      'texi_teacher_zh_cn',
-      'dass21_zh_cn',
-      'gse_zh_cn',
-      'mpfi24_zh_cn',
-      'pss10_zh_cn',
-    ])
+    const modelKeys = keys(model.entries)
+    expect(modelKeys.slice(0, LEGACY_EXECUTABLE_KEYS.length)).toEqual(LEGACY_EXECUTABLE_KEYS)
+    WAVE1_P1_CATALOG_KEYS.forEach((key) => expect(modelKeys).toContain(key))
 
-    const wave1 = model.entries.slice(6)
+    const wave1 = model.entries.filter((entry) => WAVE1_P1_CATALOG_KEYS.has(entry.identity.instrumentKey))
+    expect(wave1).toHaveLength(4)
     expect(wave1.every((entry) => entry.availability.status === 'NOT_AVAILABLE')).toBe(true)
     expect(wave1.every((entry) => entry.availability.launch === undefined)).toBe(true)
     expect(wave1.every((entry) => isScaleLibraryPublicPayloadSafe(entry as unknown as ScaleLibraryEntry))).toBe(true)
