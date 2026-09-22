@@ -85,12 +85,19 @@ classifier, shared tests/docs and all mixed core changes retain the platform rou
 PR #163 head `7641595f2fb1e4f17aaab2135f9724837bd02dd8`:
 [CI run 35794071947](https://github.com/caohuibj/eduK12-new-version/actions/runs/35794071947).
 Three workflows ran: CI, Situational publication integrity, MEDIA-2.
-CI had eight successful jobs and four intentionally skipped jobs. Five heavy
+CI had seven successful jobs and four intentionally skipped jobs. Five heavy
 platform jobs were backend, frontend, browser, CodeQL and Docker. Timing below
 is observed job execution (not queue time, and not an estimate of future savings).
 
 | Successful CI job | Duration |
 | --- | --- |
+| classify changed content | 13 s |
+| backend (ci + migrate + build + full regression) | 296 s |
+| frontend (lint + typecheck + full tests + build) | 244 s |
+| codeql (javascript/typescript SAST) | 354 s |
+| browser (seeded Situational Bundle + static visual acceptance) | 332 s |
+| docker (compose config + production builds) | 188 s |
+| merge gate / ready PR | 11 s |
 
 
 No after/canary result exists yet. Do not claim reduced CI costs until measured.

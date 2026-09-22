@@ -4,7 +4,9 @@ export function requiredChecks(needs, draft) {
     ? ['pr-light-backend', 'pr-light-frontend'] : ['backend', 'frontend', 'browser', 'docker', 'codeql'])];
 }
 export function failedChecks(needs, draft) {
-  return requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (!['true', 'false'].includes(needs.scope?.outputs?.content) && !failed.includes('scope')) failed.unshift('scope');
+  return failed;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const needs = JSON.parse(process.env.NEEDS_JSON);

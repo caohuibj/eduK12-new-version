@@ -65,3 +65,58 @@ test('real git diff retains both rename sides and all files beyond API path limi
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+import { chmodSync, symlinkSync, unlinkSync } from 'node:fs';
+import { classifyChanges, changedEntries, parseChangedEntries } from './content-scope.mjs';
+test('malformed classification output never authorizes a passing aggregate', () => {
+  for (const content of [undefined, '', 'TRUE', ' true', true, 'bundle']) {
+    const needs = { scope: { result: 'success', outputs: { content } } };
+    for (const name of requiredChecks(needs, false)) needs[name] = { ...needs[name], result: 'success' };
+    assert.ok(failedChecks(needs, false).includes('scope'));
+  }
+});
+test('Git record parser rejects incomplete, renamed or unsupported records', () => {
+  const hash = 'a'.repeat(40);
+  for (const raw of ['\0', ':garbage\0file\0', `:100644 100644 ${hash} ${hash} M\0file`,
+    `:100644 100644 ${hash} ${hash} R100\0old\0new\0`]) {
+    assert.throws(() => parseChangedEntries(raw));
+  }
+  assert.deepEqual(parseChangedEntries(''), []);
+});
+test('noncanonical paths and Bundle packages stay full until Bundle validators are wired', () => {
+  for (const file of [scale.replace('/instruments/', '//instruments/'), scale + '\n',
+    scale.replace('new_scale', '.'), scale.replace('new_scale', '..'), scale.replace('/', '\\'),
+    `${root}assessment-bundle/packages/example/1.0.0/manifest.json`,
+    `${root}assessment-bundle/generated/packages.json`]) assert.equal(classify([file]).content, false, file);
+});
+test('actual Git metadata forces deletion, symlink, executable and move changes to platform route', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'content-modes-'));
+  const cwd = process.cwd();
+  const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
+  const commit = () => { git('add', '.'); git('-c', 'user.name=CI Test', '-c', 'user.email=ci@example.invalid', 'commit', '-qm', 'fixture'); };
+  try {
+    git('init', '-q'); git('config', 'core.filemode', 'true');
+    mkdirSync(dirname(join(dir, sjt)), { recursive: true });
+    writeFileSync(join(dir, sjt), '{}'); commit();
+    const base = git('rev-parse', 'HEAD');
+    process.chdir(dir);
+    const reset = () => git('reset', '--hard', base);
+    writeFileSync(join(dir, sjt), '{"updated":true}'); commit();
+    assert.equal(classifyChanges(changedEntries(base)).content, true);
+    reset(); unlinkSync(join(dir, sjt)); commit();
+    assert.equal(classifyChanges(changedEntries(base)).content, false);
+    reset(); unlinkSync(join(dir, sjt)); symlinkSync('publication.json', join(dir, sjt)); commit();
+    assert.equal(classifyChanges(changedEntries(base)).content, false);
+    reset(); chmodSync(join(dir, sjt), 0o755); commit();
+    assert.equal(classifyChanges(changedEntries(base)).content, false);
+    reset(); renameSync(join(dir, sjt), join(dirname(join(dir, sjt)), 'publication.json')); commit();
+    const moved = changedEntries(base);
+    assert.equal(moved.length, 2);
+    assert.equal(classifyChanges(moved).content, false);
+    reset(); writeFileSync(join(dirname(join(dir, sjt)), 'scientific.json'), '{}'); commit();
+    assert.equal(classifyChanges(changedEntries(base)).content, true);
+    assert.throws(() => changedEntries('bad-base'));
+    assert.throws(() => changedEntries('f'.repeat(40)));
+    assert.throws(() => changedEntries(base, '--stat'));
+  } finally { process.chdir(cwd); rmSync(dir, { recursive: true, force: true }); }
+});
