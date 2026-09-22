@@ -14,6 +14,7 @@ const sessionGuardedGates = [
 ]
 const syntaxOnlyGates = [
   'app-shell-browser-e2e.cjs',
+  'browser-preflight.cjs',
 ]
 
 const legacyPatterns = [
@@ -44,3 +45,5 @@ assert.doesNotMatch(helper, /localStorage\.getItem\(['"]token['"]\)/u, 'session 
 execFileSync(process.execPath, ['--check', helperPath], { stdio: 'pipe' })
 
 console.log(`FE-11 browser gate contract: PASS (${sessionGuardedGates.length} session gates, ${syntaxOnlyGates.length} syntax-only gates)`)
+
+execFileSync(process.execPath, ['--test', path.join(e2eDir, 'helpers/session-auth.test.cjs')], { stdio: 'inherit' })

@@ -153,7 +153,7 @@ export interface ScaleResponseProjectionOptions {
   includeResumeAnswers?: boolean
 }
 
-const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null) => {
+export const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null) => {
   const storedSnapshot = assessment?.runtimeSnapshotEncrypted
   if (storedSnapshot !== null && storedSnapshot !== undefined) {
     try {

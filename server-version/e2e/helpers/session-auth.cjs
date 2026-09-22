@@ -48,8 +48,8 @@ const loginWithSession = async (page, {
   assert.ok(password, 'loginWithSession requires password')
 
   await page.goto(`${String(baseUrl).replace(/\/$/, '')}${route}`, { waitUntil: 'domcontentloaded', timeout })
-  await page.getByPlaceholder(usernamePlaceholder).fill(username)
-  await page.getByPlaceholder(passwordPlaceholder).fill(password)
+  await page.getByPlaceholder(usernamePlaceholder).fill(username, { timeout })
+  await page.getByPlaceholder(passwordPlaceholder).fill(password, { timeout })
 
   const loginResponsePromise = page.waitForResponse((response) => (
     response.request().method() === 'POST'

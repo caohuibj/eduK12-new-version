@@ -36,6 +36,7 @@ const questionnaireDestination = (questionnaire: Questionnaire) => (
 
 const StudentQuestionnaires: React.FC = () => {
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
+  const [collections, setCollections] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,6 +50,10 @@ const StudentQuestionnaires: React.FC = () => {
       const response = await apiClient.get<{ list: Questionnaire[] }>('/questionnaires/available')
       if (response.code !== 0) throw new Error(response.message || '获取问卷列表失败')
       setQuestionnaires(response.data.list)
+      const mixed = await apiClient.get<any>('/questionnaire-products/available')
+      if (mixed.code !== 0) throw new Error(mixed.message)
+      setCollections(mixed.data)
+
     } catch (reason) {
       console.error('获取问卷列表失败', reason)
       setError(reason instanceof Error ? reason.message : '获取问卷列表失败')
@@ -59,16 +64,17 @@ const StudentQuestionnaires: React.FC = () => {
 
   return (
     <ProductPage width="assessment">
-      <PageHeader title="聚合问卷" description="一次完成问卷中配置的多个量表；进行中的尝试优先继续，已完成记录打开对应结果。" />
+      <PageHeader title="聚合问卷" description="按顺序完成量表、认知测验、情境判断与表单，各项结果独立展示。" />
 
       {loading ? (
         <ProductStatus kind="pending" title="正在加载问卷" announce="polite" />
       ) : error ? (
         <ProductStatus kind="error" title="问卷列表加载失败" announce="assertive">{error}</ProductStatus>
-      ) : questionnaires.length === 0 ? (
+      ) : questionnaires.length === 0 && collections.length === 0 ? (
         <ProductStatus kind="info" title="暂无可用的问卷">当有适用于你的已发布问卷后，会显示在这里。</ProductStatus>
       ) : (
         <div className="grid gap-4">
+          {collections.map(row => <DiscoveryCard key={row.id} to={row.href} title={row.name} description={row.description} notice={row.canContinue ? '继续当前问卷作答' : row.availability !== 'OPEN' ? '当前问卷尚未开放或已结束' : '各项测评独立反馈'} meta={<span>{row.estimatedModules} 个内容单元</span>} />)}
           {questionnaires.map((questionnaire) => (
             <DiscoveryCard
               key={questionnaire.id}

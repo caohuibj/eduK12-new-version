@@ -70,6 +70,7 @@ const replaceScaleUnits = (
   context: 'collection' | 'package',
 ): Record<string, any> => ({
   ...projected,
+  ...(source.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY' } : {}),
   unitReports: projectCompositeUnitReports(Array.isArray(source.unitReports) ? source.unitReports : [], audience, context),
 })
 

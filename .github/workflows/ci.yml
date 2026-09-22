@@ -345,6 +345,7 @@ jobs:
           src/__tests__/scale/pr3-managed.postgres.integration.test.ts
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
+          src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
@@ -498,6 +499,9 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: clear previous browser evidence
+        run: |
+          rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -580,11 +584,14 @@ jobs:
           nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-bundle-frontend.pid
           for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            if ! kill -0 $(cat /tmp/eduk12-situational-bundle-frontend.pid) 2>/dev/null; then break; fi
+            if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/eduk12-situational-bundle-frontend.log
           exit 1
+      - name: verify built frontend in Chromium
+        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
       - name: run seeded browser acceptance
         run: node e2e/situational-bundle-browser-e2e.cjs
       - name: run FE-11 storage fault acceptance

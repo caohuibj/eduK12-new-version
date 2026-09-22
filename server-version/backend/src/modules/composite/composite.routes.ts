@@ -14,6 +14,19 @@ import { relationalProductReportService } from '../assessment-relational/product
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 
 const router = Router()
+// New questionnaire writes must use the revisioned product service. Runtime,
+// credential and export routes retain their original authorization.
+router.use('/:id', async (req, res, next) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || /^(attempts|available|library|report-packages)$/.test(req.params.id)
+      || /^\/(attempts|public-tokens|export)(\/|$)/.test(req.path)) return next()
+  try {
+    const { prisma } = await import('../../config/database')
+    const row = await prisma.compositeAssessment.findUnique({ where: { id: req.params.id }, select: { productKind: true } })
+    if (row?.productKind === 'QUESTIONNAIRE') return instrumentError(res, 'QUESTIONNAIRE_REVISION_REQUIRED', '请从问卷编制页面修改此问卷', 409)
+    return next()
+  } catch (e) { return next(e) }
+})
+
 const respondentAttemptAccess = runOrLegacyRespondentAccess('COMPOSITE')
 
 const relationalGuardError = (res: Response, error: RelationalAssessmentError) => {
