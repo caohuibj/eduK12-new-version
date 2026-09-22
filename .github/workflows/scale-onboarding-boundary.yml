@@ -12,6 +12,9 @@ on:
       situational:
         type: boolean
         required: true
+      bundle:
+        type: boolean
+        required: true
       base:
         type: string
         required: true
@@ -20,9 +23,36 @@ permissions:
   pull-requests: read
 jobs:
   boundary:
-    timeout-minutes: 20
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     runs-on: ubuntu-latest
     env:
+      CI: 'true'
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-content-jwt-secret-12345678901234567890
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BUNDLE_PRODUCTS_ENABLED: 'true'
+      BUNDLE_CONTENT_BASE_SHA: ${{ inputs.base }}
+      BUNDLE_CONTENT_EVIDENCE: /tmp/bundle-content-evidence.json
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
     defaults:
@@ -89,5 +119,31 @@ jobs:
           npx vitest run src/__tests__/situational
           --exclude 'src/__tests__/situational/**/*.integration.test.ts'
           --no-file-parallelism
+      # Conservatively include every Bundle for changes in any content domain.
+      # This closes reverse dependencies without trusting a stale generated index.
+      - name: Bundle manifests, fixtures, exact dependencies and immutable history
+        run: npx tsx scripts/bundle-content-check.ts
+      - name: Isolated content database migration
+        run: npm run db:migrate:guarded
+      - name: Bundle canonical reports, release governance and actual-package FINAL smoke
+        run: >-
+          npx vitest run src/__tests__/assessment-bundle src/__tests__/assessment-reanalysis
+          src/__tests__/bundle-onboarding src/__tests__/bundle-product
+          --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/bundle-content-tests.json
+      - name: Actual-package and release lifecycle suites must execute
+        run: >-
+          node scripts/assert-release-test-report.mjs /tmp/bundle-content-tests.json
+          src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
+          src/__tests__/bundle-product/product.postgres.integration.test.ts
+      - name: Save Bundle hashes and smoke results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-content-evidence
+          path: |
+            /tmp/bundle-content-evidence.json
+            /tmp/bundle-content-tests.json
+          if-no-files-found: error
       - name: Compile backend TypeScript
         run: npx tsc --noEmit

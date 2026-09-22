@@ -83,11 +83,9 @@ test('Git record parser rejects incomplete, renamed or unsupported records', () 
   }
   assert.deepEqual(parseChangedEntries(''), []);
 });
-test('noncanonical paths and Bundle packages stay full until Bundle validators are wired', () => {
+test('noncanonical paths stay full', () => {
   for (const file of [scale.replace('/instruments/', '//instruments/'), scale + '\n',
-    scale.replace('new_scale', '.'), scale.replace('new_scale', '..'), scale.replace('/', '\\'),
-    `${root}assessment-bundle/packages/example/1.0.0/manifest.json`,
-    `${root}assessment-bundle/generated/packages.json`]) assert.equal(classify([file]).content, false, file);
+    scale.replace('new_scale', '.'), scale.replace('new_scale', '..'), scale.replace('/', '\\')]) assert.equal(classify([file]).content, false, file);
 });
 test('actual Git metadata forces deletion, symlink, executable and move changes to platform route', () => {
   const dir = mkdtempSync(join(tmpdir(), 'content-modes-'));
@@ -119,4 +117,32 @@ test('actual Git metadata forces deletion, symlink, executable and move changes 
     assert.throws(() => changedEntries('f'.repeat(40)));
     assert.throws(() => changedEntries(base, '--stat'));
   } finally { process.chdir(cwd); rmSync(dir, { recursive: true, force: true }); }
+});
+
+const bundle = `${root}assessment-bundle/packages/example/1.0.0/manifest.json`;
+test('Bundle exact files and cross-domain union qualify; arbitrary package files do not', () => {
+  assert.equal(classify([bundle]).content, true);
+  assert.deepEqual(classify([bundle, scale, cognitive, sjt]).domains, ['bundle', 'cognitive', 'scale', 'situational']);
+  for (const file of ['rules.json', 'report.json', 'context.json', 'fixtures/valid.json', 'fixtures/not-applicable.json'])
+    assert.equal(classify([bundle.replace('manifest.json', file)]).content, true);
+  for (const file of ['engine.ts', 'rules.js', 'README.md', 'fixtures/extra.json', 'nested/report.json'])
+    assert.equal(classify([bundle.replace('manifest.json', file)]).content, false);
+  for (const file of ['.github/workflows/ci.yml', 'server-version/backend/package-lock.json', `${root}assessment-bundle/onboarding/contract.ts`])
+    assert.equal(classify([bundle, file]).content, false);
+  assert.equal(classify([`${root}assessment-bundle/generated/packages.json`]).content, true);
+  assert.equal(classify([`${root}assessment-bundle/ci-fixtures/example/1.0.0.json`]).content, true);
+});
+
+test('force full can only strengthen the selected route', () => {
+  const entry = {file: bundle, status: 'A', oldMode: '000000', newMode: '100644'};
+  assert.equal(classifyChanges([entry]).content, true);
+  assert.equal(classifyChanges([entry], true).content, false);
+  assert.equal(classifyChanges([{...entry, file: 'core.ts'}], true).content, false);
+});
+
+test('manual dispatch forces platform checks even with no base SHA', () => {
+  const output = execFileSync(process.execPath, [new URL('./content-scope.mjs', import.meta.url).pathname], {
+    encoding: 'utf8', env: {...process.env, CI_EVENT:'workflow_dispatch', CI_BASE_SHA:'', GITHUB_OUTPUT:''},
+  });
+  assert.equal(JSON.parse(output).content, false);
 });

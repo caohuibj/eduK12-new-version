@@ -8,6 +8,10 @@ const modules = 'server-version/backend/src/modules/';
 export function domainFor(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return null;
+  if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|scientific|publication|context)\\.json$`).test(file)
+      || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
+      || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
+      || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
   if (new RegExp(`^${modules}scale/instruments/[^/]+/[^/]+/`).test(file)
       || file === `${modules}scale/onboarding/instruments.generated.ts`
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
@@ -39,12 +43,12 @@ export function parseChangedEntries(raw) {
   return entries;
 }
 
-export function classifyChanges(entries) {
+export function classifyChanges(entries, forceFull = false) {
   const result = classify(entries.map(entry => entry.file));
   const regularChanges = entries.every(({ status, oldMode, newMode }) =>
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
-  return { ...result, content: result.content && regularChanges };
+  return { ...result, content: !forceFull && result.content && regularChanges };
 }
 
 export function changedEntries(base, head = 'HEAD') {
@@ -63,9 +67,10 @@ export function changedFiles(base, head = 'HEAD') {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  const result = event === 'workflow_dispatch' ? { content: false, domains: [] } : classifyChanges(changedEntries(base));
-  const output = { content: result.content, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'), situational: result.domains.includes('situational') };
-  console.log(JSON.stringify({ ...output, base }));
+  const result = event === 'workflow_dispatch' ? { content: false, domains: [] } : classifyChanges(changedEntries(base), process.env.CI_FORCE_FULL === 'true');
+  const output = { content: result.content, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'), situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle') };
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles',
+    reason: result.content ? 'allowlisted regular content files' : 'platform, manual override, empty or non-regular changes' }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }
