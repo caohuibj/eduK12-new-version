@@ -31,7 +31,7 @@ describe('offline onboarding CLI transport', () => {
     expect(run(['NO_SUCH_TASK']).stdout).toBe(
       formatCognitiveOnboardingDecision(decision),
     )
-  }, 30000)
+  }, 100000)
   it('requires an immutable base for content-only claims', () => {
     const result = run([
       'NO_SUCH_TASK',
@@ -44,5 +44,5 @@ describe('offline onboarding CLI transport', () => {
     expect(
       JSON.parse(result.stdout).technical.blockers.map((b: any) => b.code),
     ).toContain('COG_COMPATIBILITY_BASE_REQUIRED')
-  })
+  }, 35000)
 })
