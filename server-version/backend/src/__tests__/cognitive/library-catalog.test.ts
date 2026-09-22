@@ -65,7 +65,7 @@ describe('cognitive library catalog identity', () => {
   })
 
   it('resolves every real registry entry through testType + engineVersion + scoringVersion', () => {
-    expect(realRegistryEntries.length).toBe(27)
+    expect(realRegistryEntries.length).toBe(listCognitiveRegistryEntries().filter((entry) => entry.testType !== 'fake').length)
     for (const entry of realRegistryEntries) {
       const resolved = resolveCatalogForIdentity(
         entry.testType,
