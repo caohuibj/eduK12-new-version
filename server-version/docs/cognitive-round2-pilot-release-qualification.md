@@ -40,4 +40,4 @@ BART 1.0.0 has a baseline-pinned compatibility warning: `adjustedPumps` and `mea
 
 - Qualification changes do not publish database rows.
 - Product publication remains an explicit `DRAFT -> PUBLISHED` operation through the Cognitive release workflow.
-- After explicit publication, the reviewed source seed baseline must be synchronized to the published lifecycle state so subsequent deterministic seeding remains consistent.
+- Seed status is an initial bootstrap state only. After explicit publication or retirement, deterministic seeding preserves the existing DB lifecycle state as long as immutable core content still matches; it never republishes, retires, or downgrades a row.
