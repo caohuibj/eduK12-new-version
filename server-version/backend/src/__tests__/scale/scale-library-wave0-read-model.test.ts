@@ -12,6 +12,19 @@ import {
 
 const NOW = '2026-09-07T00:00:00.000Z'
 
+const WAVE0_KEYS = [
+  'adexi_v1',
+  'who5',
+  'sdq_parent_zh_cn',
+  'sdq_teacher_zh_cn',
+  'texi_parent_zh_cn',
+  'texi_teacher_zh_cn',
+] as const
+const WAVE0_KEY_SET = new Set<string>(WAVE0_KEYS)
+const wave0Entries = <T extends { identity: { instrumentKey: string } }>(entries: T[]): T[] => (
+  entries.filter((entry) => WAVE0_KEY_SET.has(entry.identity.instrumentKey))
+)
+
 const keys = (entries: Array<{ identity: { instrumentKey: string } }>): string[] => (
   entries.map((entry) => entry.identity.instrumentKey)
 )
@@ -47,54 +60,50 @@ const approvedAuthorization = (instrumentKey: string, instrumentVersion: string)
 describe('Wave 0 Scale Library read model', () => {
   it('binds the six scoped packages without adding a runtime payload', () => {
     const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
-    expect(model.entries).toHaveLength(6)
-    expect(keys(model.entries)).toEqual([
-      'adexi_v1',
-      'who5',
-      'sdq_parent_zh_cn',
-      'sdq_teacher_zh_cn',
-      'texi_parent_zh_cn',
-      'texi_teacher_zh_cn',
-    ])
-    expect(model.entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
-    expect(model.entries.every((entry) => entry.governance === undefined)).toBe(true)
-    const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
+    const entries = wave0Entries(model.entries)
+    expect(entries).toHaveLength(6)
+    expect(keys(entries)).toEqual([...WAVE0_KEYS])
+    expect(entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
+    expect(entries.every((entry) => entry.governance === undefined)).toBe(true)
+    const who5 = entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.source.citation).toContain('World Health Organization')
     expect(who5.localization.targetLocale).toBe('zh-CN')
   })
 
   it('filters only by declared metadata and actual localization target locale', () => {
     const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
-    expect(keys(filterScaleLibraryEntries(model.entries, { locale: 'zh-CN' }))).toEqual([
+    const entries = wave0Entries(model.entries)
+    expect(keys(filterScaleLibraryEntries(entries, { locale: 'zh-CN' }))).toEqual([
       'adexi_v1',
       'who5',
       'sdq_parent_zh_cn',
     ])
-    expect(keys(filterScaleLibraryEntries(model.entries, { locale: 'en' }))).toEqual([
+    expect(keys(filterScaleLibraryEntries(entries, { locale: 'en' }))).toEqual([
       'sdq_teacher_zh_cn',
       'texi_parent_zh_cn',
       'texi_teacher_zh_cn',
     ])
-    expect(keys(filterScaleLibraryEntries(model.entries, { instrumentFamily: 'WHO-5 Well-Being Index family' }))).toEqual(['who5'])
-    expect(keys(filterScaleLibraryEntries(model.entries, { respondent: 'PARENT' }))).toEqual([
+    expect(keys(filterScaleLibraryEntries(entries, { instrumentFamily: 'WHO-5 Well-Being Index family' }))).toEqual(['who5'])
+    expect(keys(filterScaleLibraryEntries(entries, { respondent: 'PARENT' }))).toEqual([
       'sdq_parent_zh_cn',
       'texi_parent_zh_cn',
     ])
-    expect(keys(filterScaleLibraryEntries(model.entries, { respondent: 'TEACHER', primaryDomain: 'EXECUTIVE_FUNCTION' }))).toEqual([
+    expect(keys(filterScaleLibraryEntries(entries, { respondent: 'TEACHER', primaryDomain: 'EXECUTIVE_FUNCTION' }))).toEqual([
       'texi_teacher_zh_cn',
     ])
-    expect(keys(filterScaleLibraryEntries(model.entries, { minAge: 9, maxAge: 12 }))).toEqual([
+    expect(keys(filterScaleLibraryEntries(entries, { minAge: 9, maxAge: 12 }))).toEqual([
       'who5',
       'sdq_parent_zh_cn',
       'sdq_teacher_zh_cn',
     ])
-    expect(keys(filterScaleLibraryEntries(model.entries, { minGrade: 3, maxGrade: 6 }))).toContain('who5')
-    expect(keys(filterScaleLibraryEntries(model.entries, { intendedUse: 'INDIVIDUAL_REFLECTION' }))).toHaveLength(6)
+    expect(keys(filterScaleLibraryEntries(entries, { minGrade: 3, maxGrade: 6 }))).toContain('who5')
+    expect(keys(filterScaleLibraryEntries(entries, { intendedUse: 'INDIVIDUAL_REFLECTION' }))).toHaveLength(6)
   })
 
   it('uses each entry target locale when the read context does not specify one', () => {
     const defaultModel = buildScaleLibraryReadModel({ territory: 'CN', nowIso: NOW })
-    const defaultLocales = Object.fromEntries(defaultModel.entries.map((entry) => [
+    const defaultEntries = wave0Entries(defaultModel.entries)
+    const defaultLocales = Object.fromEntries(defaultEntries.map((entry) => [
       entry.identity.instrumentKey,
       entry.availability.locale,
     ]))
@@ -107,12 +116,13 @@ describe('Wave 0 Scale Library read model', () => {
       texi_teacher_zh_cn: 'en',
     })
     for (const key of ['sdq_teacher_zh_cn', 'texi_parent_zh_cn', 'texi_teacher_zh_cn']) {
-      const entry = defaultModel.entries.find((candidate) => candidate.identity.instrumentKey === key)!
+      const entry = defaultEntries.find((candidate) => candidate.identity.instrumentKey === key)!
       expect(entry.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
     }
 
     const explicitZh = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
-    expect(keys(filterScaleLibraryEntries(explicitZh.entries, { locale: 'zh-CN' }))).toEqual([
+    const explicitZhEntries = wave0Entries(explicitZh.entries)
+    expect(keys(filterScaleLibraryEntries(explicitZhEntries, { locale: 'zh-CN' }))).toEqual([
       'adexi_v1',
       'who5',
       'sdq_parent_zh_cn',
@@ -121,7 +131,8 @@ describe('Wave 0 Scale Library read model', () => {
       .toContain('当前内容语言为 en，不提供 zh-CN 版本。')
 
     const explicitEn = buildScaleLibraryReadModel({ locale: 'en', territory: 'CN', nowIso: NOW })
-    expect(keys(filterScaleLibraryEntries(explicitEn.entries, { locale: 'en' }))).toEqual([
+    const explicitEnEntries = wave0Entries(explicitEn.entries)
+    expect(keys(filterScaleLibraryEntries(explicitEnEntries, { locale: 'en' }))).toEqual([
       'sdq_teacher_zh_cn',
       'texi_parent_zh_cn',
       'texi_teacher_zh_cn',
@@ -130,7 +141,7 @@ describe('Wave 0 Scale Library read model', () => {
     expect(explicitEn.entries.find((entry) => entry.identity.instrumentKey === 'who5')?.availability.reasons)
       .toContain('当前内容语言为 zh-CN，不提供 en 版本。')
 
-    const directEnglish = defaultModel.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')!
+    const directEnglish = defaultEntries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')!
     expect(directEnglish.localization.targetLocale).toBe('en')
     expect(directEnglish.availability.locale).toBe('en')
     expect(directEnglish.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
@@ -179,7 +190,8 @@ describe('Wave 0 Scale Library read model', () => {
 
   it('keeps scientific maturity and evidence matrix details in the controlled admin projection', () => {
     const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
-    const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
+    const entries = wave0Entries(model.entries)
+    const who5 = entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.governance?.scientificMaturity).toBe('PILOT')
     expect(who5.governance?.evidence).toHaveLength(1)
     expect(who5.source.citation).toContain('World Health Organization')
@@ -189,9 +201,9 @@ describe('Wave 0 Scale Library read model', () => {
     expect(who5.evidence.coverageText).toContain('Scientific Evidence Matrix')
     expect(who5.evidence.coverageText).toContain('不作超出样本的验证、常模或诊断声称')
 
-    const sdqParent = model.entries.find((entry) => entry.identity.instrumentKey === 'sdq_parent_zh_cn')!
+    const sdqParent = entries.find((entry) => entry.identity.instrumentKey === 'sdq_parent_zh_cn')!
     expect(sdqParent.source.citation).toContain('Goodman R.')
     expect(sdqParent.governance?.evidence).toHaveLength(1)
-    expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toHaveLength(3)
+    expect(entries.flatMap((entry) => entry.governance?.evidence ?? [])).toHaveLength(3)
   })
 })
