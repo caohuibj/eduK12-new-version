@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "items": [
+    {
+      "ruleId": "observed",
+      "when": {
+        "op": "present",
+        "evidenceKey": "sjt.observation"
+      },
+      "kind": "independent_summary",
+      "text": "本次情境任务提供了可读取的描述性结果。",
+      "evidenceKeys": [
+        "sjt.observation"
+      ],
+      "supportRefs": []
+    }
+  ]
+}

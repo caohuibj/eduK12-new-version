@@ -1,0 +1,9 @@
+{
+  "values": {
+    "sjt.observation": {
+      "state": "missing"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

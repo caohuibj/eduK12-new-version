@@ -7,7 +7,7 @@ const entry=()=>catalog.exact('integrated_gonogo_adexi_adult_zh_cn_v1','1.0.0')!
 const freeze=()=>freezeBundleProductionDefinition(entry(),{frozenAt:'2026-09-22T00:00:00.000Z',sourceReference:'code:test'})
 describe('Bundle production definition provider and full freeze',()=>{
   it('keeps all existing draft products blocked and observer products separate',()=>{
-    expect(catalog.list()).toHaveLength(7)
+    expect(catalog.list().filter(entry => !entry.declarativePackage)).toHaveLength(7)
     for(const item of catalog.list()) {
       expect(item.definition.status).toBe('DRAFT')
       expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('BUNDLE_NOT_PUBLISHED')

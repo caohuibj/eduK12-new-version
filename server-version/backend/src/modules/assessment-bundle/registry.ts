@@ -31,6 +31,7 @@ export interface BundleEngineInputV1 {
   /** Frozen Situational metrics projected from CanonicalUnitResult only. */
   situationalSources?: BundleFrozenSituationalSourceV1[]
   /** Frozen mental-health rule set (required by mental-health-rule-v1). */
+  declarativePackage?: import('./onboarding/contract').DeclarativePackage
   ruleSet?: MentalHealthRuleSetV1 | null
 }
 

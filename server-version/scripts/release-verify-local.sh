@@ -247,6 +247,7 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
   run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
   run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-release-test-report.mjs" "$BACKEND_TEST_REPORT" \
     src/__tests__/bundle-product/product.postgres.integration.test.ts \
+    src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts \
     src/__tests__/cognitive/concurrency.integration.test.ts \
     src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
     src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \

@@ -1,0 +1,9 @@
+{
+  "values": {
+    "sjt.observation": {
+      "state": "not_applicable"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

@@ -66,6 +66,10 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
       <h3 className="text-lg font-semibold">{report.reportDefinition.sections.evidence}</h3>
       <ul>{view.evidence?.filter((v:any)=>v.sourceKind!=='CONTEXT_FACT').map((v:any)=><li key={v.evidenceKey}>{v.constructKey}：{v.value?.state==='present'?String(v.value.value):'暂无可展示结果'}（{{interpretable:'可解释',limited:'有限解释',invalid:'无效',unavailable:'不可用'}[v.quality as string] || v.quality}）</li>)}</ul>
       <h3 className="text-lg font-semibold">{report.reportDefinition.sections.limitations}</h3><ul>{view.limitations?.map((v:string)=><li key={v}>{v}</li>)}</ul>
+      {view.declarativeState && <p>{view.declarativeState}</p>}
+      {view.blocks?.map((block:any) => ['evidence','conclusions','limitations'].includes(block.kind)
+        ? <section key={block.blockId}><h3>{block.title}</h3><ul>{block.conclusions?.map((c:any)=><li key={c.ruleId}>{c.text}</li>)}</ul><ul>{block.evidence?.map((e:any)=><li key={e.evidenceKey}>{e.constructKey}：{e.value?.state==='present'?String(e.value.value):'暂无可展示结果'}</li>)}</ul><ul>{block.limitations?.map((text:string)=><li key={text}>{text}</li>)}</ul></section>
+        : <p role="alert" key={block.blockId}>报告结构不受支持，请联系管理员。</p>)}
       <button onClick={()=>void download()}>导出综合报告 JSON</button>
     </>}
     {staff && <details><summary>分析历史与显式重分析</summary>

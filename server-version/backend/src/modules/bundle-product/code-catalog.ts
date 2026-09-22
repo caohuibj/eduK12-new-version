@@ -1,3 +1,4 @@
+import { generatedPackageEntries } from '../assessment-bundle/onboarding/catalog'
 import {
   COGNITIVE_RESPONSE_INHIBITION_V1, INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
   INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1, WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1,
@@ -20,7 +21,7 @@ const reports: BundleReportDefinition[] = [
  * Current DRAFT statuses are deliberately preserved; catalog registration is not publication.
  */
 export function createCodeBundleDefinitionProvider(): BundleDefinitionProvider {
-  return new BundleDefinitionProvider([
+  return new BundleDefinitionProvider([...[
     COGNITIVE_RESPONSE_INHIBITION_V1, INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
     WELLBEING_WHO5_YOUTH_SELF_ZH_CN_V1, SDQ_PARENT_OBSERVER_ZH_CN_V1,
     SDQ_TEACHER_OBSERVER_ZH_CN_V1, TEXI_PARENT_OBSERVER_ZH_CN_V1, TEXI_TEACHER_OBSERVER_ZH_CN_V1,
@@ -33,5 +34,5 @@ export function createCodeBundleDefinitionProvider(): BundleDefinitionProvider {
         context.contextDefinitionVersion === definition.contextDefinitionVersion)
     if (contextDefinition === undefined) throw new Error('BUNDLE_CONTEXT_DEFINITION_MISSING')
     return {definition,contextDefinition,reportDefinition,ruleSet:null}
-  }))
+  }), ...generatedPackageEntries()])
 }

@@ -2319,6 +2319,12 @@ const createAttempt = async (
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
+  if (composite.productKind === 'ASSESSMENT_BUNDLE') {
+    const instance = await db.bundleInstance.findUniqueOrThrow({ where: { compositeId: composite.id } })
+    const { readInstance } = await import('../bundle-product/service')
+    const frozen = readInstance(instance).frozen
+    if (frozen.declarativePackage) await (await import('../bundle-product/package-release')).assertPackageAdmission(db, frozen.declarativePackage)
+  }
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
   const packageFields = finalOnly

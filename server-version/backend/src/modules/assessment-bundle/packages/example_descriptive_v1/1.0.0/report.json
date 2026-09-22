@@ -1,0 +1,25 @@
+{
+  "key": "example_descriptive_v1_report",
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "summary",
+      "kind": "conclusions",
+      "title": "描述性结果",
+      "audience": [
+        "student",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "observed"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "缺少结果",
+    "limited": "结果质量有限",
+    "unavailable": "不能生成有依据的结论"
+  }
+}

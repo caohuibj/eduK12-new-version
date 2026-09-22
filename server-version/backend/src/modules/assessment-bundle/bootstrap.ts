@@ -1,3 +1,4 @@
+import { runDeclarativeEvidence } from './onboarding/engine'
 import {
   BundleAnalysisEngineRegistry,
   createBundleAnalysisEngineRegistry,
@@ -50,6 +51,7 @@ export const registerProductBundleEngines = (
     INTEGRATED_EVIDENCE_ENGINE_VERSION,
     runIntegratedEvidenceV1,
   )
+  registry.register('declarative-evidence-v1', '1.0.0', runDeclarativeEvidence)
   return registry
 }
 
