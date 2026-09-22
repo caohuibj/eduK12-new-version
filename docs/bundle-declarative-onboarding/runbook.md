@@ -79,3 +79,12 @@ npm run bundle:onboarding:check
 ```
 
 The full backend gate requires the new lifecycle suite to run, not skip. Two random names exercise Scale+SJT and Cognitive+Scale installation, signed publication, real FINALs, persisted reports, reanalysis and retirement. The test temporarily publishes a seeded WHO-5 row only in the isolated database and restores its status. It does not approve a real WHO-5 release. Core-diff tests compare handwritten module bytes before/after unknown-package generation. Generic renderer tests exercise unfamiliar blocks and HTML-as-text; the existing browser gate still checks the shared product workflow.
+
+## Content-only CI (C4)
+
+New package versions also need a synthetic JSON runtime sample in
+`assessment-bundle/ci-fixtures/<key>/<version>.json`. See the
+[C4 runbook](../bundle-content-ci/runbook.md) for its schema and checks. Keep merged
+package and CI sample bytes immutable, regenerate the registry, and use new exact
+versions for revisions. Passing CI never replaces the independent signed release
+approval or database publication operation.

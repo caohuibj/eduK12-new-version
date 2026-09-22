@@ -1,6 +1,7 @@
 # PR4 — Bundle content CI implementation baseline
 
-Status: implementation started; Bundle fast path is NOT enabled by this baseline.
+Historical baseline recorded before implementation. The current implementation and
+remaining remote acceptance are described in runbook.md and evidence.md.
 
 ## Verified prerequisites
 

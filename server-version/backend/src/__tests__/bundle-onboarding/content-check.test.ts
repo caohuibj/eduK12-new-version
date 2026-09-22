@@ -4,8 +4,9 @@ import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/temp
 import { dependencyBlockers } from '../../modules/assessment-bundle/onboarding/dependencies'
 import { verifyPackageFixtures } from '../../modules/assessment-bundle/onboarding/fixtures'
 import { generatePackages, writePackage } from '../../modules/assessment-bundle/onboarding/loader'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
+import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 
 describe('content gate negative canaries', () => {
@@ -37,6 +38,23 @@ describe('content gate negative canaries', () => {
       expect(() => generatePackages(root, output, true)).toThrow('MANIFEST_DRIFT')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
+  it('manual branch dispatch cannot hide an old-version overwrite by comparing HEAD to itself', () => {
+    const dir = mkdtempSync(path.join(os.tmpdir(), 'c4-manual-'))
+    const git = (...args: string[]) => execFileSync('git', args, {cwd:dir,stdio:'pipe'})
+    try {
+      git('init','-q')
+      const file = path.join(dir,'server-version/backend/src/modules/assessment-bundle/packages/example/1.0.0/rules.json')
+      mkdirSync(path.dirname(file),{recursive:true}); writeFileSync(file,'original')
+      git('add','.'); git('-c','user.name=CI Test','-c','user.email=ci@example.invalid','commit','-qm','base')
+      git('update-ref','refs/remotes/origin/main','HEAD')
+      writeFileSync(file,'changed')
+      git('add','.'); git('-c','user.name=CI Test','-c','user.email=ci@example.invalid','commit','-qm','overwrite')
+      expect(() => execFileSync(process.execPath,[
+        path.resolve(__dirname,'../../../node_modules/tsx/dist/cli.mjs'),
+        path.resolve(__dirname,'../../../scripts/bundle-content-check.ts'),
+      ],{cwd:dir,stdio:'pipe',env:{...process.env,GITHUB_EVENT_NAME:'workflow_dispatch',BUNDLE_CONTENT_BASE_SHA:'',BUNDLE_CONTENT_EVIDENCE:''}})).toThrow('BUNDLE_VERSION_IMMUTABLE')
+    } finally { rmSync(dir,{recursive:true,force:true}) }
+  },15000)
   it('requires explicit synthetic runtime samples, strict keys, exact identities and bounded trials', () => {
     const fixture = readSmoke('example_descriptive_v1', '1.0.0')
     expect(smokeSchema.safeParse(fixture).success).toBe(true)

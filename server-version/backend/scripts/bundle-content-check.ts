@@ -74,7 +74,11 @@ export function checkContent(base: string) {
 }
 if (require.main === module) {
   try {
-    const result = checkContent(process.env.BUNDLE_CONTENT_BASE_SHA ?? '')
+    // Manual branch runs must still compare historical packages against main,
+    // never against their own head (which would hide an old-version overwrite).
+    const base = process.env.BUNDLE_CONTENT_BASE_SHA || (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch'
+      ? execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { encoding: 'utf8' }).trim() : '')
+    const result = checkContent(base)
     const bytes = JSON.stringify(result, null, 2) + '\n'
     if (process.env.BUNDLE_CONTENT_EVIDENCE) fs.writeFileSync(process.env.BUNDLE_CONTENT_EVIDENCE, bytes)
     console.log(bytes)
