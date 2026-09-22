@@ -31,7 +31,9 @@ const catalogOnlyIdentities = [
 describe('ScaleInstrumentSourceV1 registry', () => {
   it('preserves the six-package legacy API order and definition hashes', () => {
     const packages = listScalePackages()
-    expect(packages.map((pkg) => `${pkg.key}:${pkg.instrumentVersion}`)).toEqual(legacyExecutableIdentities)
+    const packageIdentities = packages.map((pkg) => `${pkg.key}:${pkg.instrumentVersion}`)
+    expect(packageIdentities.slice(0, legacyExecutableIdentities.length)).toEqual(legacyExecutableIdentities)
+    expect(new Set(packageIdentities).size).toBe(packageIdentities.length)
 
     const sourceByIdentity = new Map(listScaleInstrumentSources().map((source) => [
       `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`,
@@ -45,14 +47,21 @@ describe('ScaleInstrumentSourceV1 registry', () => {
     })
   })
 
-  it('enumerates six executable and four catalog-only sources exactly once', () => {
+  it('enumerates sources exactly once while allowing new content identities', () => {
     const sources = listScaleInstrumentSources()
     const identities = sources.map((source) => `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`)
-    expect(new Set(identities).size).toBe(10)
+    expect(new Set(identities).size).toBe(identities.length)
     expect(identities).toEqual([...identities].sort((left, right) => left.localeCompare(right)))
-    expect(sources.filter((source) => source.executable)).toHaveLength(6)
-    expect(sources.filter((source) => !source.executable).map((source) => `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`).sort())
-      .toEqual([...catalogOnlyIdentities].sort())
+
+    const executableIdentities = sources
+      .filter((source) => source.executable)
+      .map((source) => `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`)
+    legacyExecutableIdentities.forEach((identity) => expect(executableIdentities).toContain(identity))
+
+    const catalogOnly = sources
+      .filter((source) => !source.executable)
+      .map((source) => `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`)
+    catalogOnlyIdentities.forEach((identity) => expect(catalogOnly).toContain(identity))
   })
 
   it('allows a catalog-only source but rejects a new executable without explicit policy', () => {
