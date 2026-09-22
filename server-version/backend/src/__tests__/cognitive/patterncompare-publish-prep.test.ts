@@ -50,20 +50,20 @@ const build = (profile: 'standard' | 'research') => buildCognitiveSingleTaskRepo
 })
 
 describe('Pattern Comparison publish-prep protocol presentation', () => {
-  it('maps only the reviewed exact identity to Pilot and Research Ready tiers', () => {
+  it('maps only the reviewed exact identity to standard and research tiers', () => {
     expect(resolveCognitiveProtocolPresentation({
       testType: 'patterncompare',
       engineVersion: '1.0.0',
       scoringVersion: '1.0.0',
       profile: 'standard',
-    })).toMatchObject({ tier: 'PILOT', profileLabel: 'Pilot 版', showProductIndex: false })
+    })).toMatchObject({ tier: 'PILOT', profileLabel: '正式版', showProductIndex: false })
 
     expect(resolveCognitiveProtocolPresentation({
       testType: 'patterncompare',
       engineVersion: '1.0.0',
       scoringVersion: '1.0.0',
       profile: 'research',
-    })).toMatchObject({ tier: 'RESEARCH_READY', profileLabel: 'Research Ready 版', showProductIndex: false })
+    })).toMatchObject({ tier: 'PILOT', profileLabel: '研究版', showProductIndex: false })
 
     expect(resolveCognitiveProtocolPresentation({
       testType: 'patterncompare',
@@ -77,7 +77,7 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
     const pilot = frozenFor('standard')
     expect(pilot).toMatchObject({
       protocolTier: 'PILOT',
-      profileLabel: 'Pilot 版',
+      profileLabel: '正式版',
       protocolShowProductIndex: false,
     })
     expect(pilot.participantConclusion).toContain('提示')
@@ -85,8 +85,8 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
 
     const ready = frozenFor('research')
     expect(ready).toMatchObject({
-      protocolTier: 'RESEARCH_READY',
-      profileLabel: 'Research Ready 版',
+      protocolTier: 'PILOT',
+      profileLabel: '研究版',
       protocolShowProductIndex: false,
     })
     expect(ready.participantConclusion).toContain('显示')
@@ -96,7 +96,7 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
   it('uses tentative task-level language for Pilot without exposing a misleading product index', () => {
     const report = build('standard')
     expect(report).not.toBeNull()
-    expect(report?.profileLabel).toBe('Pilot 版')
+    expect(report?.profileLabel).toBe('正式版')
     expect(report?.interpretationSummary).toContain('提示')
     expect(report?.interpretationSummary).toContain('初步任务表现参考')
     expect(report?.caveats.join(' ')).toContain('60 秒')
@@ -104,12 +104,12 @@ describe('Pattern Comparison publish-prep protocol presentation', () => {
     expect(report?.productIndex).toBeNull()
   })
 
-  it('uses stronger but task-bounded language for the Research Ready protocol', () => {
+  it('uses task-bounded language for the research profile', () => {
     const report = build('research')
     expect(report).not.toBeNull()
-    expect(report?.profileLabel).toBe('Research Ready 版')
+    expect(report?.profileLabel).toBe('研究版')
     expect(report?.interpretationSummary).toContain('显示')
-    expect(report?.interpretationSummary).toContain('较稳定的单次任务证据')
+    expect(report?.interpretationSummary).toContain('检验单次指标稳定性')
     expect(report?.caveats.join(' ')).toContain('90 秒')
     expect(report?.caveats.join(' ')).toContain('不代表人口常模')
     expect(report?.showProductIndex).toBe(false)

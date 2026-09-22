@@ -23,16 +23,20 @@ const Board: React.FC<{
   onAttempt?: (item: TrailmakingItemSpec, pointerType: PointerType) => void
   disabled?: boolean
 }> = ({ items, onAttempt, disabled = false }) => (
-  <div className="relative mx-auto h-[25rem] max-w-xl rounded-2xl border border-slate-200 bg-slate-50 p-3">
+  <div className="relative mx-auto h-[25rem] w-[28rem] rounded-2xl border border-slate-200 bg-slate-50 p-3">
     {items.map((item) => (
       <button
         key={item.targetId}
         type="button"
         aria-label={`目标 ${item.label}`}
         disabled={disabled || !onAttempt}
-        onPointerDown={(event) => onAttempt?.(item, pointerTypeOf(event.pointerType))}
+        onPointerDown={(event) => {
+          if (event.isPrimary === false || event.button > 0) return
+          event.preventDefault()
+          onAttempt?.(item, pointerTypeOf(event.pointerType))
+        }}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
+          if (!event.repeat && (event.key === 'Enter' || event.key === ' ')) {
             event.preventDefault()
             onAttempt?.(item, 'keyboard')
           }
@@ -78,7 +82,7 @@ export const TrailmakingTask: React.FC<CognitiveTaskProps> = ({
   const completionRequestedRef = useRef(false)
   const currentFormalItem = sequence[trialIndex] ?? sequence[sequence.length - 1]
   const currentPracticeItem = PRACTICE[practiceIndex]
-  const items = phase === 'practice' ? PRACTICE : sequence
+  const items = phase === 'practice' ? PRACTICE : sequence.filter((item) => item.part === currentFormalItem.part)
   const deviceClass = useMemo(deviceClassOf, [])
 
   useEffect(() => {
@@ -189,7 +193,8 @@ export const TrailmakingTask: React.FC<CognitiveTaskProps> = ({
     return (
       <div className="card p-8 text-center">
         <h1 className="mb-4 text-2xl font-bold text-gray-800">Trail Making 视觉搜索与切换</h1>
-        <p className="mb-3 text-gray-600">请按顺序点击或键盘选择目标。正式任务可能要求在数字和字母之间交替。</p>
+        <p className="mb-3 text-gray-600">A 部分按 1 → 2 → 3 的顺序选择数字；B 部分按 1 → A → 2 → B 的顺序交替选择数字和字母。可点击目标，或用 Tab 定位后按 Enter / 空格选择。</p>
+        <p className="mb-3 text-sm text-gray-600">本次包含 A 部分 {partAItemCount} 个目标{form === 'AB' ? `、B 部分 ${partBItemCount} 个目标` : '，不包含 B 部分'}。每一步有 {stepTimeoutMs / 1000} 秒作答时间。小屏幕可横向滚动查看完整目标区域。</p>
         <p className="mb-6 text-xs text-gray-400">练习至少完成 3 / 4；练习不计入正式结果。动作速度、设备和指针方式可能影响完成时间。</p>
         <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
       </div>
@@ -223,9 +228,10 @@ export const TrailmakingTask: React.FC<CognitiveTaskProps> = ({
     <div className="card p-5 text-center">
       <p className="mb-4 text-sm text-gray-500">
         {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE.length}` : `正式步骤 ${trialIndex + 1} / ${sequence.length}`}
-        {' · '}不保存练习数据
+        {phase === 'practice' ? ' · 练习不计分' : ` · ${currentFormalItem.part} 部分`}
       </p>
-      <Board items={items} onAttempt={phase === 'practice' ? (item) => handlePracticeAttempt(item) : handleFormalAttempt} disabled={submitting} />
+      {phase === 'formal' && <p className="mb-3 text-sm text-gray-600">下一目标：{currentFormalItem.label}</p>}
+      <div className="overflow-x-auto pb-3" role="region" aria-label="目标区域，可横向滚动" tabIndex={0}><Board items={items} onAttempt={phase === 'practice' ? (item) => handlePracticeAttempt(item) : handleFormalAttempt} disabled={submitting} /></div>
       {feedback && <p className="mt-3 text-sm text-amber-700">{feedback}</p>}
       {phase === 'practice' && <button type="button" onClick={() => { setFeedback('本题未完成'); setPhase('practice-feedback') }} className="btn-secondary mt-5">本题无法完成</button>}
       {phase === 'formal' && interrupted && <p className="mt-3 text-xs text-amber-700">检测到页面切换，中断状态会随正式试次提交。</p>}

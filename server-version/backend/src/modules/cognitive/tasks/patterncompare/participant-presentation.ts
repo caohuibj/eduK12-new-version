@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "patterncompare",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -43,21 +43,33 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": false,
     "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "本次体验版结果提示你在图形模式比较中的任务表现。短程结果仅作初步任务表现参考。",
+        "reportCaveats": [
+          "体验版采用30 秒。短程结果用于了解本次任务表现，条件内观察较少，不进入综合分析；数据质量不足时不作能力解释。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
+        ],
+        "showProductIndex": false
+      },
       "standard": {
         "tier": "PILOT",
-        "profileLabel": "Pilot 版",
-        "participantConclusion": "本次 Pilot 短版结果提示你在本次图形比较任务中的速度与准确性表现；由于协议较短，应把结果作为初步任务表现参考。",
+        "profileLabel": "正式版",
+        "participantConclusion": "本次正式版结果提示你在图形模式比较中的任务表现。结果仅作初步任务表现参考。",
         "reportCaveats": [
-          "Pilot 短版采用 60 秒正式协议，提供最低限度但可解释的单次表现信息；速度、正确率与反应时间应结合阅读，短程结果可能存在较大波动。"
+          "正式版采用60 秒。结果应结合完成量、正确率和质量提示阅读，仅作为初步任务表现参考。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
         ],
         "showProductIndex": false
       },
       "research": {
-        "tier": "RESEARCH_READY",
-        "profileLabel": "Research Ready 版",
-        "participantConclusion": "本次 Research Ready 完整协议显示你在本次图形比较任务中的速度与准确性表现；在数据质量达标时，这些指标可作为较稳定的单次任务证据。",
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "本次研究版结果显示你在图形模式比较中的任务表现。更多轮次可用于检验单次指标稳定性，不能据此认定稳定能力。",
         "reportCaveats": [
-          "Research Ready 版采用 90 秒完整协议，以更多正式试次提高单次指标稳定性；结果仍只解释本次任务表现，不代表人口常模、年龄等级或诊断结论。"
+          "研究版采用90 秒。增加观察量用于检验指标稳定性；研究版是轮次配置名称，不代表已通过研究级科学验证。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
         ],
         "showProductIndex": false
       }
