@@ -44,6 +44,13 @@ installing dependencies if no publication-related paths changed.
 No production scoring, admission, publication or transaction code was changed.
 Runtime retry/admission experimentation was discarded after it failed validation.
 
+- Follow-up run 35703437883: backend, frontend, CodeQL and publication checks
+  passed. Browser login navigation exceeded 30 seconds on the Vite development
+  server. Browser CI now downloads the exact frontend build from the same run
+  and serves it with Vite preview (which inherits the existing API proxy),
+  avoiding cold development transforms and another build. The session login
+  helper also forwards its supplied timeout to navigation.
+
 ## Local verification
 
 - Full backend regression with isolated PostgreSQL/Redis and `CI=true`: 357 files / 2,203 tests passed (177.84 seconds locally).

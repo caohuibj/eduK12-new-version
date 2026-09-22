@@ -47,7 +47,7 @@ const loginWithSession = async (page, {
   assert.ok(username, 'loginWithSession requires username')
   assert.ok(password, 'loginWithSession requires password')
 
-  await page.goto(`${String(baseUrl).replace(/\/$/, '')}${route}`, { waitUntil: 'domcontentloaded' })
+  await page.goto(`${String(baseUrl).replace(/\/$/, '')}${route}`, { waitUntil: 'domcontentloaded', timeout })
   await page.getByPlaceholder(usernamePlaceholder).fill(username)
   await page.getByPlaceholder(passwordPlaceholder).fill(password)
 

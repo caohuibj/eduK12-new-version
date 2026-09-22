@@ -30,7 +30,7 @@
 #   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
 #   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
-#   - browser 使用 Vite dev server 做验收，因此不重复 production frontend build；production build 已由 frontend gate 覆盖。
+#   - browser 下载同一运行的 production frontend build，用 preview 验收，避免重复构建和 Vite 首次转换超时。
 #   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
 name: CI
@@ -429,6 +429,13 @@ jobs:
         run: npm run cognitive:onboarding-check -- --all --json
       - name: build (vite)
         run: npm run build
+      - name: publish tested frontend for browser acceptance
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 1
+          if-no-files-found: error
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
@@ -520,6 +527,11 @@ jobs:
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
+      - name: restore tested frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
       - name: prisma generate and guarded migration
         working-directory: server-version/backend
         run: |
@@ -567,7 +579,7 @@ jobs:
           exit 1
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-bundle-frontend.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
