@@ -12,7 +12,7 @@ describe('TSWQ English instrument package', () => {
     expect(validateScaleInstrumentSource(SCALE_INSTRUMENT_SOURCE).valid).toBe(true)
     expect(validateScalePackage(pkg).valid).toBe(true)
     expect(SCALE_INSTRUMENT_SOURCE.catalog.scientificMaturity).toBe('PILOT')
-    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('DRAFT')
+    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('PUBLISHED')
     expect(SCALE_INSTRUMENT_SOURCE.scientificReview).toBeUndefined()
   })
 
