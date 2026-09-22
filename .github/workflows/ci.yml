@@ -1,11 +1,14 @@
 # CI / merge gate
 #
 # 触发模型：
-#   Draft PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
-#   Ready PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
+#   Pure Scale content PR: excluded from this monolithic workflow by pull_request.paths-ignore.
+#     It is certified by scale-onboarding-boundary.yml instead, regardless of Draft/Ready state.
+#   Draft non-Scale PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
+#   Ready non-Scale PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
 #   workflow_dispatch: manual Full Gate for explicit debugging/verification.
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
+#   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
 #   Mac lane:     backend → seeded browser → docker
@@ -42,8 +45,14 @@ on:
       - main
       - 'refactor/unified-runtime-v32-unit'
       - 'content/cognitive-expansion'
-  pull_request_review:
-    types: [submitted, dismissed]
+    # A PR is excluded only when *every* changed file is instrument-owned Scale
+    # content. Any shared/core/test-maintenance/dependency/workflow change falls
+    # back to this normal CI automatically.
+    paths-ignore:
+      - 'server-version/backend/src/modules/scale/instruments/**'
+      - 'server-version/backend/src/__tests__/scale/instruments/**'
+      - 'server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'
+      - 'docs/scale-instruments/**'
   workflow_dispatch:
 
 concurrency:
@@ -79,7 +88,7 @@ jobs:
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -158,7 +167,7 @@ jobs:
 
   backend:
     name: backend (ci + migrate + build + full regression)
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -253,7 +262,7 @@ jobs:
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -344,7 +353,7 @@ jobs:
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -388,7 +397,7 @@ jobs:
     # production lanes have passed. It uses its own service containers and
     # runs before Docker on the dedicated Mac lane.
     needs: [backend, frontend]
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -592,7 +601,7 @@ jobs:
     # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
     # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
     needs: [backend, browser]
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -686,7 +695,7 @@ jobs:
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
     needs: frontend
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -723,7 +732,7 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [backend, frontend, browser, docker, codeql]
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'pull_request_review') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on:
       - self-hosted
       - linux
