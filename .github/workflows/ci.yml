@@ -67,7 +67,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node --test .github/scripts/content-scope.test.mjs
+      - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}

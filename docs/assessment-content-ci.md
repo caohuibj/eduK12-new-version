@@ -54,6 +54,11 @@ Runtime retry/admission experimentation was discarded after it failed validation
   avoiding cold development transforms and another build. The session login
   helper also forwards its supplied timeout to navigation.
 
+- Production-preview follow-up: branching business flows passed, but the final
+  missing-token assertion counted `/assets/*.js` bundles as protected media.
+  Both branching and Bundle browser checks now count only GET requests to
+  `/api/.../assets/...`, retaining the zero-protected-request assertion.
+
 ## Local verification
 
 - Full backend regression with isolated PostgreSQL/Redis and `CI=true`: 357 files / 2,203 tests passed (177.84 seconds locally).
