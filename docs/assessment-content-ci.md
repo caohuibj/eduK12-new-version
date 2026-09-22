@@ -9,14 +9,17 @@ complete local Git diff (including both sides of renames), rather than workflow
 | Scale instrument version directories, generated instrument registry, owned tests/docs | Scale boundary, registry, scientific qualification, non-Postgres Scale regression, backend types |
 | Existing Cognitive task seeds, participant presentation, governance/scientific declarations | Declaration-only AST check, manifests/dependency graph, onboarding decisions, Cognitive backend/frontend tests and types |
 | SJT instrument/publication/scientific JSON, generated instrument registry | SJT manifests, scientific contracts, immutable publication/review check, non-Postgres SJT regression, backend types |
+| Bundle exact package JSON, four goldens, CI sidecars and generated packages registry | B3 schema/fixture/dependency checks, immutable history, actual-package PostgreSQL FINAL/report smoke, Bundle regressions and backend types |
 | Several of the above content domains together | Union of their targeted checks, one backend dependency install |
 | Any other file, including new Cognitive engines/task descriptors/runners, shared tests, workflows, schema or dependencies | Existing draft light checks / ready full checks |
 
-The reusable content workflow runs on an isolated hosted runner and does not
-start PostgreSQL, browser acceptance, Docker image builds or CodeQL. Production
+The reusable content workflow runs on an isolated hosted runner with disposable
+PostgreSQL and Redis for Bundle smoke. It does not run full browser acceptance,
+Docker image builds or CodeQL. Every content domain includes all dependent Bundles
+(conservatively all Bundles) in this same job. Production
 code changes retain these checks. Main pushes with content changes use the same
 targeted checks; other main pushes retain compile smoke. Manual dispatch always
-runs full CI. Dedicated Cognitive video and SJT video/branching workflows
+runs full CI. `CI_FORCE_FULL=true` also forces the full route for PR/main events. Dedicated Cognitive video and SJT video/branching workflows
 exclude the same owned declarations so they cannot silently reintroduce heavy
 checks for pure content. Their platform and workflow changes still trigger them.
 Review events only rerun the publication workflow, which avoids
@@ -102,3 +105,6 @@ Runtime retry/admission experimentation was discarded after it failed validation
   not a production performance guarantee.
 
 PR 158 changes CI itself, so its next push intentionally takes the full route.
+
+Bundle content contracts, sidecar authoring, immutable version rules, recovery and
+pending remote canary acceptance are documented in [the C4 runbook](bundle-content-ci/runbook.md).

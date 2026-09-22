@@ -1,7 +1,7 @@
 # CI / merge gate
 #
 # 触发模型：
-#   Pure Scale / existing Cognitive / SJT content: one targeted content gate.
+#   Pure Scale / existing Cognitive / SJT / Bundle content: one targeted content gate.
 #   Routing always runs; the stable aggregate check also completes for content PRs.
 #   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
 #   Ready platform PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
@@ -61,6 +61,7 @@ jobs:
       scale: ${{ steps.scope.outputs.scale }}
       cognitive: ${{ steps.scope.outputs.cognitive }}
       situational: ${{ steps.scope.outputs.situational }}
+      bundle: ${{ steps.scope.outputs.bundle }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,6 +73,7 @@ jobs:
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/content-scope.mjs
 
@@ -87,12 +89,13 @@ jobs:
       scale: ${{ needs.scope.outputs.scale == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
+      bundle: ${{ needs.scope.outputs.bundle == 'true' }}
       base: ${{ github.event.pull_request.base.sha || github.event.before }}
 
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -129,13 +132,17 @@ jobs:
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
+      - name: Bundle content and immutable history
+        env:
+          BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npx tsx scripts/bundle-content-check.ts
       - name: build (tsc)
         run: npm run build
 
   pr-light-frontend:
     needs: scope
     name: PR light / frontend lint + typecheck
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -164,7 +171,7 @@ jobs:
   post-merge-smoke:
     needs: scope
     name: main / post-merge compile smoke
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'push'
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -173,6 +180,8 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -186,6 +195,11 @@ jobs:
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
+      - name: Bundle content and immutable history
+        working-directory: server-version/backend
+        env:
+          BUNDLE_CONTENT_BASE_SHA: ${{ github.event.before }}
+        run: npx tsx scripts/bundle-content-check.ts
       - name: backend compile smoke
         working-directory: server-version/backend
         run: npm run build
@@ -202,7 +216,7 @@ jobs:
   backend:
     needs: scope
     name: backend (ci + migrate + build + full regression)
-    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -309,6 +323,10 @@ jobs:
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
+      - name: Bundle content and immutable history
+        env:
+          BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npx tsx scripts/bundle-content-check.ts
       - name: build (tsc)
         run: npm run build
       - name: publish tested backend build
@@ -362,6 +380,7 @@ jobs:
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/bundle-product/product.postgres.integration.test.ts
           src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
@@ -409,7 +428,7 @@ jobs:
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -460,7 +479,7 @@ jobs:
     # production lanes have passed. It uses its own service containers and
     # uses an isolated hosted runner so browser work cannot stall the Mac lane.
     needs: [scope, backend, frontend]
-    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on: ${{ fromJSON(vars.CI_BROWSER_HOSTED != 'false' && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
     timeout-minutes: 35
     env:
@@ -700,7 +719,7 @@ jobs:
     # Windows has one heavy lane: frontend -> CodeQL -> Docker.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
     needs: [scope, codeql]
-    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -795,7 +814,7 @@ jobs:
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
     needs: [scope, frontend]
-    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -832,11 +851,11 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [scope, content, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
+    if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-latest
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
-      IS_DRAFT: ${{ github.event.pull_request.draft == true }}
+      IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

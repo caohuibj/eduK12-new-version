@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {},
+  "slots": {
+    "situational": {
+      "type": "SITUATIONAL",
+      "responses": [
+        { "sceneKey": "AS-01", "channelKey": "behavior", "responseValue": "A" },
+        { "sceneKey": "AS-02", "channelKey": "behavior", "responseValue": "B" }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": ["observed"]
+}
