@@ -100,3 +100,13 @@ PR #160，远程 HEAD b1ba439297c78304fe47461080ba37d5eabbcfac。
 三场景及恢复演练继续按 ci.yml 中同名步骤执行，先生成 fixture，
 将后端切换到显式 PR5_SCENARIOS_ENABLED=true 的专用测试入口。
 这些步骤不会自动开启 GitHub Actions。
+
+## 推送时与最新 main 的整合
+
+首次推送 d77d457 后，发现 main 已合入 #158（82dfb4d），相同 CI 文件产生冲突，
+GitHub 未启动该 SHA 的 PR 检查。本次合入最新 main 后保留双方修复：
+主 CI 使用同一运行、精确 SHA 的前端/后端 artifact，避免重复构建；
+独立视频工作流只保留一次前端构建；保留内容变更快速通道和完整平台门禁；
+媒体 URL 判断统一复用 main 的 asset-request.cjs，保留登录控件 timeout、
+浏览器 preflight、严格端口及旧证据清理。整合后重新运行工作流合同、
+助手测试、前端类型检查及工作流 YAML/shell 语法检查。

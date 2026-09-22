@@ -1,6 +1,7 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { loginWithSession, isAssessmentAssetGet } = require('./session-auth.cjs')
+const { loginWithSession } = require('./session-auth.cjs')
+const { isAssetApiGet: isAssessmentAssetGet } = require('./asset-request.cjs')
 
 test('the caller timeout reaches initial navigation and controls as well as login response', async () => {
   const calls = []

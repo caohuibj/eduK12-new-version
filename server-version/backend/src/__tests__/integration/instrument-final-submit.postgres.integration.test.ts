@@ -483,7 +483,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
     const fakeConfig = await prisma.cognitiveTestConfig.findUnique({ where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } } })
     if (!fakeConfig) throw new Error('seeded fake cognitive config is required')
     fakeConfigId = fakeConfig.id
-  })
+  }, 90_000) // Cold imports span all instrument runtimes; keep this outside operation budgets.
 
   afterAll(async () => {
     try {
@@ -496,7 +496,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
       if (createdScaleIds.length) await prisma.scale.deleteMany({ where: { id: { in: createdScaleIds } } })
       if (userId) await prisma.user.delete({ where: { id: userId } })
     } finally {
-      await prisma.$disconnect()
+      await prisma?.$disconnect()
     }
   })
 

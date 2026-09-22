@@ -1,15 +1,19 @@
 # CI / merge gate
 #
 # 触发模型：
-#   Draft PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
-#   Ready PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
+#   Pure Scale / existing Cognitive / SJT content: one targeted content gate.
+#   Routing always runs; the stable aggregate check also completes for content PRs.
+#   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
+#   Ready platform PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
 #   workflow_dispatch: manual Full Gate for explicit debugging/verification.
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
+#   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
-#   Mac lane:     backend → seeded browser → docker
-#   Windows lane: frontend → codeql
+#   Mac lane:     backend
+#   Hosted:       main browser plus three independent browser gates, each isolated
+#   Windows lane: frontend → codeql → docker
 #   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
 #   这是 CI 调度稳定性优化，不代表 production performance improvement。
 #
@@ -26,8 +30,8 @@
 #     不扩大本里程碑范围。
 #   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
-#   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
-#   - browser 验收预先构建的前端，避免把开发服务器冷编译混入首屏导航；独立 browser preflight 验证真实页面与 API 代理。
+#   - backend/frontend builds use exact GITHUB_SHA artifacts from this run; missing artifacts fail closed.
+#   - browser 下载同一运行的 production frontend build，用 preview 验收，避免重复构建和 Vite 首次转换超时。
 #   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
 name: CI
@@ -42,8 +46,6 @@ on:
       - main
       - 'refactor/unified-runtime-v32-unit'
       - 'content/cognitive-expansion'
-  pull_request_review:
-    types: [submitted, dismissed]
   workflow_dispatch:
 
 concurrency:
@@ -51,9 +53,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  scope:
+    name: classify changed content
+    runs-on: ubuntu-latest
+    outputs:
+      content: ${{ steps.scope.outputs.content }}
+      scale: ${{ steps.scope.outputs.scale }}
+      cognitive: ${{ steps.scope.outputs.cognitive }}
+      situational: ${{ steps.scope.outputs.situational }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
+      - id: scope
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node .github/scripts/content-scope.mjs
+
+  content:
+    name: assessment content
+    needs: scope
+    if: needs.scope.outputs.content == 'true'
+    uses: ./.github/workflows/scale-onboarding-boundary.yml
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      scale: ${{ needs.scope.outputs.scale == 'true' }}
+      cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
+      situational: ${{ needs.scope.outputs.situational == 'true' }}
+      base: ${{ github.event.pull_request.base.sha || github.event.before }}
+
   pr-light-backend:
+    needs: scope
     name: PR light / backend compile
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true
     runs-on:
       - self-hosted
       - linux
@@ -74,12 +113,14 @@ jobs:
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
       - name: npm ci
         run: npm ci
+      - name: content routing boundary tests
+        run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -92,8 +133,9 @@ jobs:
         run: npm run build
 
   pr-light-frontend:
+    needs: scope
     name: PR light / frontend lint + typecheck
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == true
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true
     runs-on:
       - self-hosted
       - linux
@@ -120,8 +162,9 @@ jobs:
         run: npm run typecheck
 
   post-merge-smoke:
+    needs: scope
     name: main / post-merge compile smoke
-    if: github.event_name == 'push'
+    if: needs.scope.outputs.content == 'false' && github.event_name == 'push'
     runs-on:
       - self-hosted
       - linux
@@ -157,8 +200,9 @@ jobs:
         run: npm run build
 
   backend:
+    needs: scope
     name: backend (ci + migrate + build + full regression)
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -231,6 +275,8 @@ jobs:
         run: npm ci
       - name: dependency audit (high and critical)
         run: npm audit --audit-level=high
+      - name: content routing boundary tests
+        run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
       - name: prisma migrate deploy
@@ -253,7 +299,7 @@ jobs:
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
+        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -264,15 +310,13 @@ jobs:
         run: npm run cognitive:contracts
       - name: build (tsc)
         run: npm run build
-      - name: publish backend build to runner-local handoff
-        run: |
-          handoff_dir="$HOME/.cache/eduk12-ci/backend-builds"
-          artifact="$handoff_dir/${GITHUB_SHA}.tar"
-          temp_artifact="${artifact}.tmp"
-          mkdir -p "$handoff_dir"
-          tar -C dist -cf "$temp_artifact" .
-          mv "$temp_artifact" "$artifact"
-          find "$handoff_dir" -type f -name '*.tar' -mtime +7 -delete
+      - name: publish tested backend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
       # The unknown-package contract imports the generated frontend runner.
       # This job has its own checkout; dependencies installed by the frontend
       # job are not available here. Preserve the real import instead of mocking it.
@@ -298,6 +342,8 @@ jobs:
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
           src/__tests__/cognitive/concurrency.integration.test.ts
+          src/__tests__/scale/pr3-managed.postgres.integration.test.ts
+          src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
@@ -342,10 +388,11 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
 
   frontend:
+    needs: scope
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -382,18 +429,23 @@ jobs:
         run: npm run cognitive:onboarding-check -- --all --json
       - name: build (vite)
         run: npm run build
+      - name: publish tested frontend for browser acceptance
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 1
+          if-no-files-found: error
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance must execute against the same commit after both
     # production lanes have passed. It uses its own service containers and
-    # runs before Docker on the dedicated Mac lane.
-    needs: [backend, frontend]
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    # uses an isolated hosted runner so browser work cannot stall the Mac lane.
+    needs: [scope, backend, frontend]
+    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(vars.CI_BROWSER_HOSTED != 'false' && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
@@ -460,6 +512,19 @@ jobs:
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: restore hosted dependency downloads
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
+          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
+      - name: restore hosted Chromium binaries
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
@@ -476,9 +541,11 @@ jobs:
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
-      - name: build frontend for browser acceptance
-        working-directory: server-version/frontend
-        run: npm run build
+      - name: restore tested frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
       - name: prisma generate and guarded migration
         working-directory: server-version/backend
         run: |
@@ -490,23 +557,11 @@ jobs:
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
-      - name: restore backend build from runner-local handoff
-        id: backend-build
-        working-directory: server-version/backend
-        run: |
-          artifact="$HOME/.cache/eduk12-ci/backend-builds/${GITHUB_SHA}.tar"
-          if [ -f "$artifact" ]; then
-            rm -rf dist
-            mkdir -p dist
-            tar -C dist -xf "$artifact"
-            echo "restored=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "restored=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: build backend (fallback)
-        if: steps.backend-build.outputs.restored != 'true'
-        working-directory: server-version/backend
-        run: npm run build
+      - name: restore tested backend build
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
@@ -599,14 +654,15 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
-    # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
-    needs: [backend, browser]
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    # Windows has one heavy lane: frontend -> CodeQL -> Docker.
+    # No backend/browser artifacts are consumed here; the merge gate requires all.
+    needs: [scope, codeql]
+    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
-      - eduk12-mac-ci
+      - eduk12-win-ci
+    timeout-minutes: 45
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -695,8 +751,8 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
-    needs: frontend
-    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
+    needs: [scope, frontend]
+    if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -732,64 +788,16 @@ jobs:
 
   merge-gate:
     name: merge gate / ready PR
-    needs: [backend, frontend, browser, docker, codeql]
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'pull_request_review') }}
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    needs: [scope, content, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
+    runs-on: ubuntu-latest
     env:
-      BACKEND_RESULT: ${{ needs.backend.result }}
-      FRONTEND_RESULT: ${{ needs.frontend.result }}
-      BROWSER_RESULT: ${{ needs.browser.result }}
-      DOCKER_RESULT: ${{ needs.docker.result }}
-      CODEQL_RESULT: ${{ needs.codeql.result }}
+      NEEDS_JSON: ${{ toJSON(needs) }}
+      IS_DRAFT: ${{ github.event.pull_request.draft == true }}
     steps:
-      - name: verify fail-closed decision table
-        shell: bash
-        run: |
-          set -euo pipefail
-          assert_gate() {
-            local expected="$1"
-            shift
-            local actual=success
-            local result
-            for result in "$@"; do
-              if [ "$result" != success ]; then
-                actual=failure
-                break
-              fi
-            done
-            if [ "$actual" != "$expected" ]; then
-              echo "merge-gate self-test failed: expected=$expected actual=$actual inputs=$*" >&2
-              exit 1
-            fi
-          }
-          assert_gate success success success success success success
-          assert_gate failure failure success success success success
-          assert_gate failure success success success success failure
-          assert_gate failure success success skipped success success
-          assert_gate failure success cancelled success success success
-          assert_gate failure success success success missing success
-      - name: require exact success from every Full Gate dependency
-        shell: bash
-        run: |
-          set -euo pipefail
-          failed=0
-          check_result() {
-            local job="$1"
-            local result="$2"
-            echo "$job=$result"
-            if [ "$result" != success ]; then
-              failed=1
-            fi
-          }
-          check_result backend "$BACKEND_RESULT"
-          check_result frontend "$FRONTEND_RESULT"
-          check_result browser "$BROWSER_RESULT"
-          check_result docker "$DOCKER_RESULT"
-          check_result codeql "$CODEQL_RESULT"
-          if [ "$failed" -ne 0 ]; then
-            echo "Ready-PR merge gate is fail-closed: every required dependency must conclude success." >&2
-            exit 1
-          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: require exact success for the selected route
+        run: node .github/scripts/merge-gate.mjs
