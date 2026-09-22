@@ -54,5 +54,5 @@ export const patterncompareRegistryMeta = {
     practicalTips: ['速度指标必须与准确率同屏阅读，避免把快速猜测当作加工速度。'],
     disclaimer: '结果来自内部自制几何刺激，只反映本次任务表现，不是 NIH Toolbox 分数、临床诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

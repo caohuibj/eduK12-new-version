@@ -42,8 +42,12 @@ async function main() {
   let packages: any[] = []
   try {
     packages = manifests.discover()
-    manifests.generate({ check: true })
-    dependencies.guard(manifests.ROOT, packages)
+    // An unknown task is already fail-closed; do not load or scan every runtime
+    // just to report a misspelled directory. Valid targets retain all gates.
+    if (task === '--all' || packages.some((p) => p.task === task)) {
+      manifests.generate({ check: true })
+      dependencies.guard(manifests.ROOT, packages)
+    }
   } catch (e) {
     technical.push(
       add(
@@ -151,7 +155,7 @@ async function main() {
       }
   }
   const decisions = []
-  try {
+  if (selectedPackages.length) try {
     const { getCognitiveRegistryEntry } = await import(
       '../modules/cognitive/cognitive.registry'
     )

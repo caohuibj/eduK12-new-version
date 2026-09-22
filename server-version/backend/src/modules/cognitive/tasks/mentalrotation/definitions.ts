@@ -27,5 +27,5 @@ export const mentalrotationRegistryMeta = {
   } as Record<string, QualityDefinition>,
   reportDefinitionVersion: '1.0.0',
   reportDefinition: { title: '心理旋转', headlineMetric: 'accuracy', primaryMetrics: ['accuracy', 'angleCost', 'medianCorrectRtMs'], secondaryMetrics: ['mirrorErrorRate', 'omissionRate'], practicalTips: ['角度代价只在大小角度都有足够正确反应时解释，并与正确率同屏阅读。'], disclaimer: '结果只反映本次内部几何旋转任务表现，不是完整空间智力、诊断或人口常模。' } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

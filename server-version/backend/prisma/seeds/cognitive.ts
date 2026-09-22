@@ -39,18 +39,19 @@ async function seedOneCognitiveConfig(prisma: PrismaClient, expected: CognitiveS
     return
   }
 
-  const same =
+  const sameCore =
     existing.name === expected.name &&
-    existing.status === expected.status &&
     existing.engineVersion === expected.engineVersion &&
     existing.scoringVersion === expected.scoringVersion &&
     deepEqual(existing.config, expected.config)
-  if (same) {
-    console.log(`${expected.testType} Cognitive 配置已存在且一致，跳过（幂等）: configVersion=${expected.configVersion}`)
+  if (sameCore) {
+    console.log(
+      `${expected.testType} Cognitive 配置核心内容一致，保留现有 lifecycle=${existing.status}（seed initial=${expected.status}）: configVersion=${expected.configVersion}`,
+    )
     return
   }
 
-  throw new Error(`cognitiveTestConfig ${expected.testType}/${expected.configVersion} already exists with divergent content; create a new configVersion instead of mutating it`)
+  throw new Error(`cognitiveTestConfig ${expected.testType}/${expected.configVersion} already exists with divergent core content; create a new configVersion instead of mutating it`)
 }
 
 export async function seedCognitiveConfigs(prisma: PrismaClient): Promise<void> {

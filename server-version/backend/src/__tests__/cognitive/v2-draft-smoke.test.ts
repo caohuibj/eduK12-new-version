@@ -53,7 +53,7 @@ describe('Cognitive v2 exact-identity contract smoke fixtures', () => {
   const definitions = listCognitiveV2TaskDefinitions()
 
   it('covers every registered exact identity with a seeded config and valid envelope payload', () => {
-    expect(definitions).toHaveLength(28)
+    expect(definitions).toHaveLength(COGNITIVE_SEEDS.length)
     for (const definition of definitions) {
       const seed = seedFor(definition)
       expect(seed, `${definition.testType}/${definition.scoringVersion} is missing a seed fixture`).toBeTruthy()

@@ -15,7 +15,7 @@ const Board: React.FC<{ state: TowerState; selectedPeg?: number | null; onPeg?: 
   <div><p className="mb-2 text-sm font-medium text-slate-600">{label}</p><div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-100 p-3">{[0, 1, 2].map((peg) => (
     <button key={peg} type="button" aria-label={`${label} 柱 ${peg + 1}`} disabled={!onPeg} onClick={() => onPeg?.(peg)} className={`relative flex h-36 flex-col-reverse items-center rounded-lg border-b-4 bg-white pb-2 ${selectedPeg === peg ? 'border-sky-500 ring-2 ring-sky-300' : 'border-slate-400'}`}>
       <span className="absolute bottom-2 top-4 w-1 bg-slate-300" />
-      {[2, 1, 0].filter((disk) => state[disk] === peg).map((disk) => <span key={disk} className="relative z-10 mb-1 h-5 rounded bg-teal-600" style={{ width: `${38 + disk * 20}px` }} aria-label={`圆盘 ${disk + 1}`} />)}
+      {[2, 1, 0].filter((disk) => state[disk] === peg).map((disk) => <span key={disk} className="relative z-10 mb-1 h-5 rounded bg-teal-600" style={{ width: `${45 + disk * 20}%` }} aria-label={`圆盘 ${disk + 1}`} />)}
     </button>
   ))}</div></div>
 )
@@ -89,7 +89,7 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => window.clearTimeout(timer)
   }, [phase, trialIndex, moves, inactivityGuardMs, submitFormal])
 
-  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">塔式规划</h2><p className="mb-2 text-gray-600">把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，小盘不能放在大盘下方。</p><p className="mb-6 text-xs text-gray-400">尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">塔式规划</h2><p className="mb-2 text-gray-600">把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p><p className="mb-6 text-xs text-gray-400">尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 

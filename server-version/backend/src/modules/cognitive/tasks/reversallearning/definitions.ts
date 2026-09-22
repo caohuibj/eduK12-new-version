@@ -61,5 +61,5 @@ export const reversallearningRegistryMeta = {
     practicalTips: ['结果描述本次 acquisition/reversal 阶段的作答轨迹，不评价人格、风险偏好或因果机制。'],
     disclaimer: '结果只描述本次概率学习和规则反转任务表现，不是人格、风险偏好或临床判断。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

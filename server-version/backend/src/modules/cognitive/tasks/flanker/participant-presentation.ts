@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "flanker",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -53,21 +53,33 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "hiddenMetrics": [],
     "suppressTips": false,
     "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "本次体验版结果提示你在Flanker 箭头干扰中的任务表现。短程结果仅作初步任务表现参考。",
+        "reportCaveats": [
+          "体验版采用24 个平衡试次。短程结果用于了解本次任务表现，条件内观察较少，不进入综合分析；数据质量不足时不作能力解释。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
+        ],
+        "showProductIndex": false
+      },
       "standard": {
         "tier": "PILOT",
-        "profileLabel": "Pilot 版",
-        "participantConclusion": "本次 Pilot 短版结果提示你在本次箭头干扰任务中，中央目标方向受到两侧干扰时的反应差异；由于试次数较少，应把干扰效应与两种条件的正确率一起作为初步任务表现参考。",
+        "profileLabel": "正式版",
+        "participantConclusion": "本次正式版结果提示你在Flanker 箭头干扰中的任务表现。结果仅作初步任务表现参考。",
         "reportCaveats": [
-          "Pilot 版采用 80 个严格平衡的正式试次，提供最低限度但可解释的单次干扰信息；干扰反应时间差可能仍有较大波动，不能单独解释为稳定的抑制控制能力。"
+          "正式版采用80 个平衡试次。结果应结合完成量、正确率和质量提示阅读，仅作为初步任务表现参考。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
         ],
         "showProductIndex": false
       },
       "research": {
-        "tier": "RESEARCH_READY",
-        "profileLabel": "Research Ready 版",
-        "participantConclusion": "本次 Research Ready 完整协议显示你在本次箭头干扰任务中的干扰反应时间差和条件正确率；在数据质量达标时，160 个平衡试次可提供较稳定的单次任务证据。",
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "本次研究版结果显示你在Flanker 箭头干扰中的任务表现。更多轮次可用于检验单次指标稳定性，不能据此认定稳定能力。",
         "reportCaveats": [
-          "Research Ready 版采用 160 个严格平衡的正式试次，以更多一致与不一致条件观察提高单次指标稳定性；结果仍只解释本次任务表现，不代表人口常模、年龄等级、诊断或稳定人格/能力结论。"
+          "研究版采用160 个平衡试次。增加观察量用于检验指标稳定性；研究版是轮次配置名称，不代表已通过研究级科学验证。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
         ],
         "showProductIndex": false
       }
