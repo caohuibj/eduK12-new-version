@@ -22,3 +22,15 @@ CI optimization is PR4. PR3 remains a full-platform change. No source package or
 ## Verification ledger
 
 Commands and outcomes are recorded as executed. No complete-PR acceptance is claimed before the unknown-package production lifecycle and all required gates pass.
+
+### Initial contract implementation
+
+Added an isolated authoring schema; it is not yet connected to runtime or publication. It validates pure JSON, exact identities, fixed file references, bounded conditions, typed comparisons, evidence provenance, report rule references and context identity. A publication request is separate from immutable content identity and does not grant publication authority.
+
+Executed in `server-version/backend`:
+
+- `npx vitest run src/__tests__/bundle-onboarding/contract.test.ts`: 18 tests passed.
+- `npx tsc --noEmit`: passed.
+- `git diff --check`: passed.
+
+Remaining before B3-01 closes: cross-file loader diagnostics, complete dependency catalog/selector/unit compatibility and full capability enforcement. Remaining PR3 stages include deterministic discovery/generation, runtime engine and frozen-definition integration, governed database installation/publication, real lifecycle/renderer validation and authoring runbook. No claim of full PR3 completion or production readiness is made by this initial commit.
