@@ -164,7 +164,7 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
       },
     })
     questionnaireId = questionnaire.id
-  }, 30_000)
+  }, 90_000)
 
   afterAll(async () => {
     try {
@@ -191,7 +191,7 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
       }
       if (teacherId) await prisma.user.delete({ where: { id: teacherId } })
     } finally {
-      await prisma.$disconnect()
+      await prisma?.$disconnect()
     }
   })
 

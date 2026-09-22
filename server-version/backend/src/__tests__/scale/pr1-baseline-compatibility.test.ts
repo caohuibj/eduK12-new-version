@@ -42,7 +42,7 @@ const BASELINE_ADMISSION_FIXTURE: FrozenUnitAdmissionV1 = {
 
 describe(`PR-1 fixed compatibility baseline ${BASE_SHA}`, () => {
   it('pins all six legacy definition hashes and golden output digests', () => {
-    const rows = listScalePackages().map((pkg) => ({
+    const rows = listScalePackages().filter(pkg => BASELINE_PACKAGE_ROWS.some(row => row.identity === `${pkg.key}@${pkg.instrumentVersion}`)).map((pkg) => ({
       identity: `${pkg.key}@${pkg.instrumentVersion}`,
       definitionHash: hashScaleDefinition(pkg.definition),
       goldenDigest: canonicalHash(pkg.goldenCases.map((fixture) => scoreScale(pkg.definition, fixture.answers))),

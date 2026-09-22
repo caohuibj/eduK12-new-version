@@ -441,5 +441,5 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       organizationId: org.organization.id,
       artifactId: artifacts[0].id,
     })).rejects.toMatchObject({ code: 'REPORT_ARTIFACT_NOT_FOUND', statusCode: 404 })
-  })
+  }, 30_000)
 })

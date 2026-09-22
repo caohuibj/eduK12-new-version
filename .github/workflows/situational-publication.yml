@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
   pull-requests: read
+concurrency:
+  group: situational-publication-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   publication:
     runs-on: ubuntu-latest
@@ -16,12 +19,30 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Detect publication-relevant changes
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          const files = execFileSync('git', ['diff', '--no-renames', '--name-only', '-z', process.env.BASE_SHA, 'HEAD'], { encoding: 'utf8' }).split('\0').filter(Boolean);
+          const relevant = files.some(file => file.startsWith('server-version/backend/src/modules/situational/')
+            || file.startsWith('server-version/backend/src/scripts/situational-')
+            || file.startsWith('server-version/backend/scripts/')
+            || file.startsWith('.github/') || /^server-version\/backend\/package(-lock)?\.json$/.test(file));
+          appendFileSync(process.env.GITHUB_OUTPUT, `relevant=${relevant}\n`);
+          JS
       - uses: actions/setup-node@v4
+        if: steps.scope.outputs.relevant == 'true'
         with:
           node-version: 20
       - run: npm ci --ignore-scripts
+        if: steps.scope.outputs.relevant == 'true'
         working-directory: server-version/backend
       - name: Verify publication, scoped scientific declarations and human reviews
+        if: steps.scope.outputs.relevant == 'true'
         working-directory: server-version/backend
         env:
           GITHUB_TOKEN: ${{ github.token }}

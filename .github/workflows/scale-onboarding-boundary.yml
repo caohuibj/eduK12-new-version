@@ -1,29 +1,33 @@
-# Authoritative fast path for Scale onboarding.
-# Pure instrument-owned Scale content PRs are intentionally excluded from the
-# monolithic CI workflow and must pass this deterministic/targeted gate instead.
-name: Scale onboarding boundary
+# Reused by CI for content-only changes; no second PR-triggered installation.
+name: Assessment content gate
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
-    paths:
-      - 'server-version/backend/src/modules/scale/**'
-      - 'server-version/backend/scripts/*scale*'
-      - 'server-version/backend/src/__tests__/scale/**'
-      - 'docs/scale-instruments/**'
-      - '.github/workflows/scale-onboarding-boundary.yml'
-
-concurrency:
-  group: scale-onboarding-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
+  workflow_call:
+    inputs:
+      scale:
+        type: boolean
+        required: true
+      cognitive:
+        type: boolean
+        required: true
+      situational:
+        type: boolean
+        required: true
+      base:
+        type: string
+        required: true
+permissions:
+  contents: read
+  pull-requests: read
 jobs:
   boundary:
     timeout-minutes: 20
-    runs-on: [self-hosted, linux, eduk12-mac-ci]
+    runs-on: ubuntu-latest
     env:
-      # Test-only deterministic keys required by Scale provenance/encryption unit tests.
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+    defaults:
+      run:
+        working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,28 +35,59 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-        working-directory: server-version/backend
-      - name: Generate Prisma client for TypeScript compile
-        run: npx prisma generate
-        working-directory: server-version/backend
-      - name: Verify declared change class and content dependencies
-        working-directory: server-version/backend
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          CHANGE_CLASS: ${{ contains(github.event.pull_request.labels.*.name, 'scale-platform-capability') && 'platform' || 'content' }}
-        run: npm run scale:onboarding:check -- --base="$BASE_SHA" --mode="$CHANGE_CLASS"
-      - name: Verify generated registry and scientific qualification
-        run: npm run scale:instruments:check && npm run scale:qualification:check
-        working-directory: server-version/backend
-      - name: Run targeted Scale regression
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npx prisma generate
+      - name: Scale content boundaries, registry and scientific qualification
+        if: inputs.scale
+        # Scope is already checked for all domains by the caller. Do not reject
+        # mixed Scale + Cognitive + SJT content as a Scale platform change.
+        run: npm run scale:onboarding:check && npm run scale:instruments:check && npm run scale:qualification:check
+      - name: Scale regression
+        if: inputs.scale
         run: >-
-          npx vitest run
-          src/__tests__/scale
+          npx vitest run src/__tests__/scale
           src/__tests__/assessment-governance/product-readiness-inventory.test.ts
           --exclude 'src/__tests__/scale/**/*.postgres.integration.test.ts'
           --no-file-parallelism
-        working-directory: server-version/backend
+      - name: Cognitive cross-tree test dependencies
+        if: inputs.cognitive
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
+      - name: Cognitive declaration-only content boundary
+        if: inputs.cognitive
+        working-directory: .
+        env:
+          CI_BASE_SHA: ${{ inputs.base }}
+        run: node --test .github/scripts/cognitive-content.test.mjs && node .github/scripts/cognitive-content.mjs
+      - name: Cognitive contracts and onboarding decisions
+        if: inputs.cognitive
+        run: npm run cognitive:contracts && npm run cognitive:onboarding-check -- --all --json
+      - name: Cognitive regression
+        if: inputs.cognitive
+        run: >-
+          npx vitest run src/__tests__/cognitive
+          --exclude 'src/__tests__/cognitive/**/*.integration.test.ts'
+          --no-file-parallelism
+      - name: Cognitive presentation regression and frontend types
+        if: inputs.cognitive
+        working-directory: server-version/frontend
+        run: npx vitest run src/modules/cognitive --maxWorkers=2 && npm run typecheck
+      - name: SJT manifests and scientific contracts
+        if: inputs.situational
+        run: npm run situational:contracts
+      - name: SJT immutable releases and publication authority
+        if: inputs.situational && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICATION_BASE_SHA: ${{ inputs.base }}
+        run: npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
+      - name: SJT regression
+        if: inputs.situational
+        run: >-
+          npx vitest run src/__tests__/situational
+          --exclude 'src/__tests__/situational/**/*.integration.test.ts'
+          --no-file-parallelism
       - name: Compile backend TypeScript
         run: npx tsc --noEmit
-        working-directory: server-version/backend
