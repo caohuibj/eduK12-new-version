@@ -86,14 +86,14 @@ export const SCALE_INSTRUMENT_SOURCE = {
         "evidenceType": "STRUCTURAL_VALIDITY",
         "population": "Employees from Canada, Spain, France, Germany, Sweden and Turkey",
         "locale": "en",
-        "territory": "GB",
+        "territory": "DE",
         "sampleSize": 23361,
         "studyDesign": "International COPSOQ III middle-version reliability and psychometric evaluation across six countries.",
         "rating": "SUFFICIENT",
         "citation": "Burr H, Berthelsen H, Moncada S, et al. (2019). The Third Version of the Copenhagen Psychosocial Questionnaire. Safety and Health at Work, 10(4), 482–503.",
         "doi": "10.1016/j.shaw.2019.10.002",
         "url": "https://doi.org/10.1016/j.shaw.2019.10.002",
-        "notes": "Supports the international middle version and its multidimensional occupational psychosocial measurement framework."
+        "notes": "Supports the international middle version and its multidimensional occupational psychosocial measurement framework. The study sample spans Canada, Spain, France, Germany, Sweden and Turkey; the single-territory schema field uses DE only as one included study territory and must not be interpreted as Germany-only evidence."
       },
       {
         "evidenceId": "copsoq3-china-huang-2025",
