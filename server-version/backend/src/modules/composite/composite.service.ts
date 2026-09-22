@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto'
 import { nanoid } from 'nanoid'
 import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+const defaultPrisma = prisma
 import { config } from '../../config'
 import { MAX_TOKEN_USES } from '../../constants'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
@@ -193,6 +194,7 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
   const composite = await db.compositeAssessment.findUnique({
     where: { id },
     include: {
+      questionnaireCourses: { include: { course: { select: { id: true, title: true } } } },
       creator: { select: { id: true, role: true } },
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
       ...(includeItems
@@ -472,19 +474,21 @@ const validateCognitiveConfig = (config: any, requirePublication = false) => {
 
 const assertCognitiveAssignmentOnCompositeCourse = (
   assignment: { courseId: string | null },
-  composite: { courseId: string | null },
+  composite: { courseId: string | null; productKind?: string },
 ) => {
+  if (composite.productKind === 'QUESTIONNAIRE') return
   if (!composite.courseId) throw compositeBadRequest('含认知模块的综合测评必须绑定课程')
   if (assignment.courseId !== composite.courseId) {
     throw compositeBadRequest('认知任务必须与综合测评属于同一课程')
   }
 }
 
-const assertValidItem = async (
+export const assertValidItem = async (
   input: AddCompositeItemInput,
   userId: string,
   role: UserRole,
-  composite: { courseId: string | null },
+  composite: { courseId: string | null; productKind?: string },
+  prisma: Db = defaultPrisma,
 ) => {
   if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
     throw compositeBadRequest('只有 context 表单可以设置为非必填')
@@ -907,6 +911,10 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
   ])
   return {
     id: composite.id,
+    productKind: composite.productKind,
+    questionnaireType: composite.questionnaireType,
+    revision: composite.revision,
+    questionnaireCourses: composite.questionnaireCourses,
     code: composite.code,
     name: composite.name,
     description: composite.description,
@@ -1334,6 +1342,7 @@ export const setCompositeAnalysisProtocol = async (
   assertTeacher(role)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  if (composite.productKind === 'QUESTIONNAIRE') throw compositeBadRequest('问卷只提供独立结果，不能绑定综合报告')
   assertDraft(composite)
   if (composite.reportPackageKey) {
     throw compositeConflict('报告包实例不能通过旧版分析协议接口修改')
@@ -1398,6 +1407,7 @@ export const setCompositeReportPackage = async (
   assertTeacher(role)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  if (composite.productKind === 'QUESTIONNAIRE') throw compositeBadRequest('问卷只提供独立结果，不能绑定综合报告')
   assertDraft(composite)
 
   const selection = input.reportPackage
@@ -1702,14 +1712,14 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string) => {
+export const publishComposite = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma) => {
   assertTeacher(role)
   // Publish validates, it never repairs. The write-time invariant guarantees
   // every FORM module is sectioned on create/copy/import, so a published
   // composite must never carry an orphan that the participant read path would
   // otherwise have to lazily materialize. loadComposite already includes
   // formSections + items, so the orphan gate below is a pure in-memory assert.
-  const composite = await loadComposite(id, true)
+  const composite = await loadComposite(id, true, prisma)
   assertOwner(composite, userId, role)
   assertDraft(composite)
   if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
@@ -1764,7 +1774,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     }
     if (item.type === 'COGNITIVE') {
       assertCognitiveAssignmentOnCompositeCourse(item.cognitiveAssignment, composite)
-      if (!composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
+      if (composite.productKind !== 'QUESTIONNAIRE' && !composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
         throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
       }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
@@ -1964,7 +1974,10 @@ export const listAvailableForStudent = async (userId: string) => {
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
-    where: { status: 'PUBLISHED', courseId: { in: courseIds }, course: { isLibrary: false } },
+    where: { status: 'PUBLISHED', OR: [
+      { productKind: 'LEGACY_COMPOSITE', courseId: { in: courseIds }, course: { isLibrary: false } },
+      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds } } } },
+    ] },
     orderBy: { publishedAt: 'desc' },
     include: {
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
@@ -2038,6 +2051,7 @@ export const listAvailableForStudent = async (userId: string) => {
     ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
     return {
       id: item.id,
+      productKind: item.productKind,
       code: item.code,
       name: item.name,
       description: item.description,
@@ -2063,6 +2077,19 @@ export const listAvailableForStudent = async (userId: string) => {
 
 const assertStudentEligibility = async (composite: any, userId: string) => {
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('综合测评尚未发布')
+  if (composite.productKind === 'QUESTIONNAIRE') {
+    if (composite.questionnaireType !== 'COURSE') throw compositeForbidden('此问卷请通过公开链接访问')
+    const eligible = await prisma.courseStudent.findFirst({
+      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] },
+        courseId: { in: (composite.questionnaireCourses ?? []).map((row: any) => row.courseId) } },
+      orderBy: { courseId: 'asc' },
+    })
+    if (!eligible) throw compositeForbidden('不是问卷投放课程的有效学生')
+    if (composite.opensAt && composite.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
+    if (composite.expiresAt && composite.expiresAt.getTime() < Date.now()) throw compositeBadRequest('问卷已过期')
+    composite.deliveryCourseId = eligible.courseId
+    return
+  }
   if (!composite.courseId) throw compositeForbidden('该综合测评仅允许通过公开链接访问')
   if (composite.course?.isLibrary) throw compositeBadRequest('库课程上的综合测评不能作答')
   const membership = await prisma.courseStudent.findUnique({ where: { courseId_studentId: { courseId: composite.courseId, studentId: userId } } })
@@ -2073,7 +2100,24 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
 
 const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null) => {
   assertCognitiveModuleEnabled()
-  const assignment = item.cognitiveAssignment
+  let assignment = item.cognitiveAssignment
+  if (attempt.deliveryCourseId && assignment) {
+    const copied = await ensureTeacherPublishedAssignment(db, {
+      userId: assignment.createdBy,
+      courseId: attempt.deliveryCourseId,
+      configId: assignment.configId,
+      title: assignment.title,
+      instruction: assignment.instruction ?? null,
+      sourceFreeze: {
+        profile: assignment.profile,
+        profileDefinitionVersion: assignment.profileDefinitionVersion,
+        resolvedConfigSnapshotEncrypted: assignment.resolvedConfigSnapshotEncrypted,
+        resolvedConfigHash: assignment.resolvedConfigHash,
+        resolvedReportSnapshotEncrypted: assignment.resolvedReportSnapshotEncrypted,
+      },
+    })
+    assignment = { ...copied, config: assignment.config }
+  }
   const config = assignment?.config
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const parsedConfig = validateCognitiveConfig(config)
@@ -2289,6 +2333,7 @@ const createAttempt = async (
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
+      ...(composite.productKind === 'QUESTIONNAIRE' ? { deliveryCourseId: composite.deliveryCourseId ?? null } : {}),
       userId,
       accessTokenId,
       recoveryTokenHash: credential?.hash ?? null,
