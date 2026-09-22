@@ -22,6 +22,8 @@ const BASELINE_PACKAGE_ROWS = [
   { identity: 'texi_teacher_zh_cn@1.0.0', definitionHash: 'dfb5ac0982b6d39eb7daaf84bf8fbcac0e1cbb43de3622fb4ef69b5ff789a7d6', goldenDigest: 'c8f5bc070f9b470f9f00f4f3198fcdad84fe869d1a89736ba3ba4a213a83596a' },
 ] as const
 
+const BASELINE_PACKAGE_IDENTITIES = new Set(BASELINE_PACKAGE_ROWS.map((row) => row.identity))
+
 const BASELINE_RUNTIME_SNAPSHOT_HASH = '5744a7a717dc628a1f8a96216c01342522cbcc10075e31ade6591ec745b8edfc'
 const BASELINE_ADMISSION_SNAPSHOT_HASH = '3a3fa92226c6f17b4e6f208afc55812e354c9ec3e48f77a7d8441f570583dc5d'
 
@@ -42,11 +44,13 @@ const BASELINE_ADMISSION_FIXTURE: FrozenUnitAdmissionV1 = {
 
 describe(`PR-1 fixed compatibility baseline ${BASE_SHA}`, () => {
   it('pins all six legacy definition hashes and golden output digests', () => {
-    const rows = listScalePackages().map((pkg) => ({
-      identity: `${pkg.key}@${pkg.instrumentVersion}`,
-      definitionHash: hashScaleDefinition(pkg.definition),
-      goldenDigest: canonicalHash(pkg.goldenCases.map((fixture) => scoreScale(pkg.definition, fixture.answers))),
-    }))
+    const rows = listScalePackages()
+      .filter((pkg) => BASELINE_PACKAGE_IDENTITIES.has(`${pkg.key}@${pkg.instrumentVersion}` as typeof BASELINE_PACKAGE_ROWS[number]['identity']))
+      .map((pkg) => ({
+        identity: `${pkg.key}@${pkg.instrumentVersion}`,
+        definitionHash: hashScaleDefinition(pkg.definition),
+        goldenDigest: canonicalHash(pkg.goldenCases.map((fixture) => scoreScale(pkg.definition, fixture.answers))),
+      }))
     expect(rows).toEqual(BASELINE_PACKAGE_ROWS)
   })
 
