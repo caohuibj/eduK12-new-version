@@ -89,7 +89,7 @@ const CORE_PACKAGES = [
 ] as const
 const MULTISOURCE_PACKAGE = 'inhibitory_control_multisource_v1' as const
 const PR14_PACKAGE_KEYS = [...CORE_PACKAGES, MULTISOURCE_PACKAGE] as const
-const DRAFT_ONLY_TASKS = [
+const STANDALONE_RELEASE_TASKS = [
   'trailmaking',
   'reversallearning',
   'bart',
@@ -97,6 +97,10 @@ const DRAFT_ONLY_TASKS = [
   'lexicaldecision',
   'emotionrecognition',
 ] as const
+
+const releaseScoringVersion = (testType: typeof ROUND2_TASKS[number]) => (
+  testType === 'bart' ? '1.1.0' : '1.0.0'
+)
 
 const isPr14Package = (key: string): key is typeof PR14_PACKAGE_KEYS[number] =>
   (PR14_PACKAGE_KEYS as readonly string[]).includes(key)
@@ -247,10 +251,10 @@ describe('PR14 Round 2 release gate contracts', () => {
   it('covers every Round 2 task with an exact Registry key, strict schema, Profile merge and frozen provenance', () => {
     const registry = listCognitiveRegistryEntries()
     for (const testType of ROUND2_TASKS) {
-      const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')
+      const entry = getCognitiveRegistryEntry(testType, '1.0.0', releaseScoringVersion(testType))
       expect(entry, testType).toBeDefined()
       expect(entry?.testType, testType).toBe(testType)
-      expect(entry?.recommendedForCreate, testType).toBe(false)
+      expect(entry?.recommendedForCreate, testType).toBe(true)
       expect(entry?.randomizationAlgorithmVersion, testType).toBeTruthy()
       expect(entry?.configSchema.safeParse({ ...BASE_CONFIGS[testType], __pr14Unknown: true }).success, testType)
         .toBe(false)
@@ -263,7 +267,11 @@ describe('PR14 Round 2 release gate contracts', () => {
       }
     }
 
-    const registeredRound2 = registry.filter((entry) => ROUND2_TASKS.includes(entry.testType))
+    const registeredRound2 = registry.filter((entry) =>
+      ROUND2_TASKS.includes(entry.testType as typeof ROUND2_TASKS[number])
+      && entry.engineVersion === '1.0.0'
+      && entry.scoringVersion === releaseScoringVersion(entry.testType as typeof ROUND2_TASKS[number]),
+    )
     expect(registeredRound2.map((entry) => entry.testType).sort()).toEqual([...ROUND2_TASKS].sort())
   })
 
@@ -444,11 +452,12 @@ describe('PR14 Round 2 release gate contracts', () => {
     expect(JSON.stringify(report)).not.toMatch(/overallScore|averageScore|percentile|\bIQ\b|诊断建议/i)
   })
 
-  it('keeps PR12/PR13 tasks and limits package publication to the selected candidate', () => {
-    for (const testType of DRAFT_ONLY_TASKS) {
-      const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')!
-      expect(entry.recommendedForCreate, testType).toBe(false)
+  it('keeps standalone Round 2 tasks create-ready without silently publishing report packages', () => {
+    for (const testType of STANDALONE_RELEASE_TASKS) {
+      const entry = getCognitiveRegistryEntry(testType, '1.0.0', releaseScoringVersion(testType))!
+      expect(entry.recommendedForCreate, testType).toBe(true)
     }
+    expect(getCognitiveRegistryEntry('bart', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
     for (const packageKey of PR14_PACKAGE_KEYS) {
       const definition = listReportPackageDefinitions().find((candidate) => candidate.key === packageKey)
       expect(definition?.status, packageKey).toBe(expectedPackageStatus(packageKey))

@@ -158,12 +158,12 @@ describe('PR13 cognitive task contracts', () => {
     expect(() => scoreEmotionrecognitionV1({ config: emotionConfig, trials: trials.map((trial, index) => index === 0 ? { ...trial, payload: emotionrecognitionTrialSchema.parse({ ...trial.payload, stimulusId: trials[1].payload.stimulusId }) } : trial), randomSeed: seed })).toThrow()
   })
 
-  it('keeps new tasks descriptive, reference-free, standalone, and fully dictionary-backed', () => {
+  it('keeps new tasks descriptive, reference-free, standalone, create-ready, and fully dictionary-backed', () => {
     for (const testType of ['wordlist', 'lexicaldecision', 'emotionrecognition']) {
       const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')
-      expect(entry?.recommendedForCreate).toBe(false)
+      expect(entry?.recommendedForCreate).toBe(true)
       expect(entry?.reportDefinition.showProductIndex).not.toBe(false)
-      expect(listCognitiveTestsCatalog(testType).list[0].recommendedForCreate).toBe(false)
+      expect(listCognitiveTestsCatalog(testType).list[0].recommendedForCreate).toBe(true)
       const report = buildCognitiveSingleTaskReport({ testType, engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', profile: 'standard', frozenReport: null, score: 100, metrics: {}, qualityFlags: { interpretable: true }, reference: null })
       expect(report?.reference).toBeNull()
       expect(report?.productIndex?.value).toBe(100)
