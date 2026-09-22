@@ -37,5 +37,5 @@ export const pairedassociateRegistryMeta = {
     practicalTips: ['学习斜率、达到标准轮次与最终正确率应一起阅读；延迟缺失不按 0 计。'],
     disclaimer: '结果来自内部非语言配对刺激，不等同 CANTAB PAL、临床记忆判断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

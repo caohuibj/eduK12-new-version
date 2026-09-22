@@ -58,5 +58,5 @@ export const trailmakingRegistryMeta = {
     practicalTips: ['累计正确步骤时长应与错误尝试、A/B 部分和设备/指针信息一起阅读；它不是从任务开始到结束的端到端用时。'],
     disclaimer: '结果只描述本次视觉搜索、动作速度和规则切换任务表现，不是 motor 能力诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

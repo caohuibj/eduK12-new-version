@@ -57,5 +57,5 @@ export const flankerRegistryMeta = {
     practicalTips: ['干扰效应必须与两种条件的准确率一起解释，避免速度—准确权衡误读。'],
     disclaimer: '结果反映本次箭头干扰任务表现，不是临床诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }
