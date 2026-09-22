@@ -209,7 +209,7 @@ const CompositeReportPage: React.FC = () => {
   return (
     <ReportShell
       title={report.name}
-      description={report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
+      description={report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
       facts={facts}
       status={{ kind: 'success', title: '已提交', description: '报告读取失败不会改变已经完成的提交状态。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}

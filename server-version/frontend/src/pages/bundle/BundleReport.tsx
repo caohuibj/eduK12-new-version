@@ -51,6 +51,8 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
     }catch(e:any){setError(e.message)}
   }
   const view=report.view
+  const qualityLabels:Record<string,string>={interpretable:'可解释',limited:'仅支持有限解释',invalid:'结果无效',unavailable:'证据不足或未获披露授权'}
+  const summaryLabels:Record<string,string>={complementary_descriptive:'不同方法提供互补的描述性证据；不能据此判断一致、分歧、异常或诊断。',insufficient_quality:'部分证据质量不足，只能在限制范围内阅读结果。',age_rejected:'不符合本测评包的适用年龄。',missing_sources:'缺少形成综合结果所需的来源。'}
   return <section className="card p-6 space-y-3 break-words" aria-label="Bundle 综合报告">
     <h2 className="text-xl font-semibold">{report.reportDefinition.title}</h2>
     {error && <p role="alert">{error}</p>}
@@ -59,9 +61,10 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
     {report.status==='UNAVAILABLE' && <p>现有证据不足以形成可支持的综合结论，请阅读限制说明。</p>}
     {['PENDING','FAILED'].includes(report.status) && <button disabled={busy||report.retryCount>=5} onClick={()=>void retry()}>重试生成报告</button>}
     {view && <><p>{view.identity?.bundleKey} · {view.identity?.bundleVersion}</p>
-      <h3 className="text-lg font-semibold">{report.reportDefinition.sections.summary}</h3><p>{view.engineSummary?.reportingMode || view.engineSummary?.reason || '请结合各项证据和解释范围阅读。'}</p>
+      <h3 className="text-lg font-semibold">{report.reportDefinition.sections.summary}</h3><p>{summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || '请结合各项证据和解释范围阅读。'}</p>
+      <h3 className="text-lg font-semibold">{report.reportDefinition.sections.quality}</h3><p>{qualityLabels[view.quality?.overall] || '暂无质量信息'}</p>
       <h3 className="text-lg font-semibold">{report.reportDefinition.sections.evidence}</h3>
-      <ul>{view.evidence?.map((v:any)=><li key={v.evidenceKey}>{v.constructKey}：{v.value?.state==='present'?String(v.value.value):'暂无可展示结果'}（{{interpretable:'可解释',limited:'有限解释',invalid:'无效',unavailable:'不可用'}[v.quality as string] || v.quality}）</li>)}</ul>
+      <ul>{view.evidence?.filter((v:any)=>v.sourceKind!=='CONTEXT_FACT').map((v:any)=><li key={v.evidenceKey}>{v.constructKey}：{v.value?.state==='present'?String(v.value.value):'暂无可展示结果'}（{{interpretable:'可解释',limited:'有限解释',invalid:'无效',unavailable:'不可用'}[v.quality as string] || v.quality}）</li>)}</ul>
       <h3 className="text-lg font-semibold">{report.reportDefinition.sections.limitations}</h3><ul>{view.limitations?.map((v:string)=><li key={v}>{v}</li>)}</ul>
       <button onClick={()=>void download()}>导出综合报告 JSON</button>
     </>}

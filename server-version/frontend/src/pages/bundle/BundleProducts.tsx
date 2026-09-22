@@ -76,8 +76,7 @@ export function BundleProducts() {
 export function BundleProductDetail() {
   const { id } = useParams(), [row, setRow] = useState<any>(null), [error, setError] = useState('')
   const [publicUrl,setPublicUrl] = useState('')
-  const load = () => request('/bundle-products/'+id).then(setRow).catch(e=>setError(e.message))
-  useEffect(()=>{void load()},[id])
+  useEffect(()=>{void request('/bundle-products/'+id).then(setRow).catch(e=>setError(e.message))},[id])
   const publish = async()=> {try {setRow(await request('/bundle-products/'+id+'/publish',{revision:row.revision}))}catch(e:any){setError(e.message)}}
   const token = async()=> {try {
     const value=await request('/composite-assessments/'+id+'/public-tokens',{expiresAt:new Date(Date.now()+86400000).toISOString(),maxUses:100})
