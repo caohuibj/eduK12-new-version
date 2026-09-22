@@ -34,3 +34,7 @@ Executed in `server-version/backend`:
 - `git diff --check`: passed.
 
 Remaining before B3-01 closes: cross-file loader diagnostics, complete dependency catalog/selector/unit compatibility and full capability enforcement. Remaining PR3 stages include deterministic discovery/generation, runtime engine and frozen-definition integration, governed database installation/publication, real lifecycle/renderer validation and authoring runbook. No claim of full PR3 completion or production readiness is made by this initial commit.
+
+## Implementation closeout
+
+The remaining implementation milestones described above have now been implemented. See [runbook](runbook.md) for executable commands, governance and supported capabilities, and [evidence](evidence.md) for actual validation results and remote-CI boundaries. Initial-commit limitations above describe the historical first checkpoint, not the final implementation.
