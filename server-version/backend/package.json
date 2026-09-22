@@ -1,7 +1,7 @@
 {
   "name": "ptool-backend",
   "version": "1.0.0",
-  "description": "PTool \u72ec\u7acb\u670d\u52a1\u5668\u7248\u672c\u540e\u7aef",
+  "description": "PTool 独立服务器版本后端",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -48,7 +48,8 @@
     "scale:onboarding:backfill": "tsx src/scripts/scale-onboarding-backfill.ts",
     "scale:instrument:publish": "tsx src/scripts/publish-scale-instrument.ts",
     "scale:onboarding:check": "node scripts/scale-onboarding-check.mjs",
-    "scale:qualification:check": "tsx scripts/check-scale-source-qualification.ts"
+    "scale:qualification:check": "tsx scripts/check-scale-source-qualification.ts",
+    "cognitive:configs:publish": "tsx src/scripts/publish-cognitive-configs.ts"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",
