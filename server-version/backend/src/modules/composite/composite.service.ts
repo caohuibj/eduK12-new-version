@@ -477,7 +477,7 @@ const assertCognitiveAssignmentOnCompositeCourse = (
   assignment: { courseId: string | null },
   composite: { courseId: string | null; productKind?: string },
 ) => {
-  if (composite.productKind === 'QUESTIONNAIRE') return
+  if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind ?? '')) return
   if (!composite.courseId) throw compositeBadRequest('含认知模块的综合测评必须绑定课程')
   if (assignment.courseId !== composite.courseId) {
     throw compositeBadRequest('认知任务必须与综合测评属于同一课程')
@@ -1776,7 +1776,7 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     }
     if (item.type === 'COGNITIVE') {
       assertCognitiveAssignmentOnCompositeCourse(item.cognitiveAssignment, composite)
-      if (composite.productKind !== 'QUESTIONNAIRE' && !composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
+      if (!['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind) && !composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
         throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
       }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
@@ -1977,7 +1977,7 @@ export const listAvailableForStudent = async (userId: string) => {
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
     where: { status: 'PUBLISHED', OR: [
-      { productKind: 'LEGACY_COMPOSITE', courseId: { in: courseIds }, course: { isLibrary: false } },
+      { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
     orderBy: { publishedAt: 'desc' },
@@ -2307,7 +2307,7 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
-  if (composite.productKind === 'QUESTIONNAIRE') {
+  if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
@@ -2316,7 +2316,7 @@ const createAttempt = async (
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     if (userId && !await db.courseStudent.findFirst({ where: {
-      studentId: userId, courseId: composite.deliveryCourseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
+      studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
   const finalOnly = composite.deliveryMode !== 'LEGACY'
@@ -2335,6 +2335,9 @@ const createAttempt = async (
     || packageSnapshot.packageVersion !== composite.reportPackageVersion
     || packageSnapshot.profile !== composite.reportPackageProfile
   )) throw compositeBadRequest('综合测评报告包实例与冻结快照不匹配')
+  const bundleRuntimeHash = composite.productKind === 'ASSESSMENT_BUNDLE'
+    ? await (await import('../bundle-product/runtime')).compiledHashForInstance(db, composite.id)
+    : null
   const totalUnits = finalOnly
     ? composite.items.filter((item: any) => item.type !== 'FORM' && item.required).length + formSections.length
     : composite.items.length
@@ -2356,7 +2359,7 @@ const createAttempt = async (
       attemptNo,
       deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
       runtimeGeneration: finalOnly ? 'UNIFIED_V1' : null,
-      compiledBundleRuntimeHash: packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null,
+      compiledBundleRuntimeHash: bundleRuntimeHash ?? (packageSnapshot ? compiledBundleRuntimeHashForSnapshot(packageSnapshot) : null),
       attemptEpoch,
       ...(relationalIdentity ? {
         subjectUserId: relationalIdentity.subjectUserId,
@@ -2842,7 +2845,7 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
-  assertSupportedComposite(attempt.compositeAssessment, frozenRead && attempt.compositeAssessment.productKind === 'QUESTIONNAIRE')
+  assertSupportedComposite(attempt.compositeAssessment, frozenRead && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
   return attempt
 }
 
@@ -3763,7 +3766,7 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
 export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
   const route = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { deliveryMode: true, runtimeGeneration: true, assignmentRef: true },
+    select: { status: true, deliveryMode: true, runtimeGeneration: true, assignmentRef: true, compositeAssessment: { select: { productKind: true } } },
   })
   let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
@@ -3773,6 +3776,9 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
     result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
   } else {
     result = await finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
+  }
+  if (result?.status === 'COMPLETED' && route?.status !== 'COMPLETED' && route?.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE') {
+    await (await import('../bundle-product/analysis')).processInitial(attemptId)
   }
   // The canonical runtime commits first. Reconcile outside its transaction to
   // preserve the Run -> runtime lock order. Repeated FINAL/GET repairs any lag.
@@ -4293,7 +4299,7 @@ export const buildCompositeReport = (attempt: any) => {
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
         })
-        if (attempt.compositeAssessment.productKind === 'QUESTIONNAIRE') {
+        if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
           const policy = resolveProjectionPolicyForAssessment(result, report.result)
           Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
         }
@@ -4550,6 +4556,11 @@ const projectHttpReport = async (
   snapshotId?: string,
 ) => {
   const report = buildCompositeReport(attempt)
+  if (attempt.compositeAssessment.productKind === 'ASSESSMENT_BUNDLE') {
+    const projected = projectCompositeCollectionReport({ ...report, backgroundValues: [] }, audience)
+    return { ...projected, productKind: 'ASSESSMENT_BUNDLE', bundleReport: await (await import('../bundle-product/analysis')).readReport(
+      attempt.id, audience === 'researcher' ? 'admin' : audience === 'teacher' ? 'teacher' : 'student', snapshotId) }
+  }
   const packageContext = await readPackageSnapshotForReport(attempt, snapshotId)
   if (!packageContext) return projectCompositeCollectionReport(report, audience)
   return projectCompositeReport({
@@ -4803,7 +4814,7 @@ export const getReportForTeacher = async (
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-  assertSupportedComposite(attempt.compositeAssessment, attempt.compositeAssessment.productKind === 'QUESTIONNAIRE')
+  assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 
@@ -4829,7 +4840,17 @@ export const getExportContext = async (userId: string, role: UserRole, id: strin
   assertTeacher(role)
   const composite = await loadComposite(id)
   assertOwner(composite, userId, role)
+  if (composite.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('请使用 Bundle 报告导出，通用明细导出不适用于测评包')
   return composite
 }
 
 export const isCompositeError = (err: unknown): err is CompositeServiceError => err instanceof CompositeServiceError
+
+export async function retryBundleForParticipant(attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) {
+  const attempt = await findAttempt(attemptId, context, true)
+  if (attempt.compositeAssessment.productKind !== 'ASSESSMENT_BUNDLE' || attempt.assignmentRef || attempt.status !== 'COMPLETED') throw compositeNotFound()
+  const analysis = await import('../bundle-product/analysis')
+  const row = await analysis.readReport(attemptId, 'student')
+  await analysis.processAnalysis(row.analysisId)
+  return analysis.readReport(attemptId, 'student')
+}

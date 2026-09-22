@@ -1,3 +1,4 @@
+import { compiledHashFromInstance as bundleRuntimeHash } from '../bundle-product/runtime'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -140,6 +141,8 @@ const compositeParentGraphSelect = {
   compositeAssessment: {
     select: {
       id: true,
+      productKind: true,
+      bundleInstance: true,
       reportPackageKey: true,
       reportPackageVersion: true,
       reportPackageProfile: true,
@@ -910,7 +913,9 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
         || packageSnapshot.profile !== assessment.reportPackageProfile
       ) throw aggregateInputError('报告包实例与冻结快照不匹配')
     }
-    const nextCompiledBundleRuntimeHash = packageSnapshot
+    const nextCompiledBundleRuntimeHash = assessment.productKind === 'ASSESSMENT_BUNDLE'
+      ? (assessment.bundleInstance ? bundleRuntimeHash(assessment.bundleInstance) : (() => { throw aggregateInputError('Bundle 实例缺失') })())
+      : packageSnapshot
       ? compileBundleRuntimeFromSnapshot(packageSnapshot).compiledRuntimeHash
       : null
     if (parent.compiledBundleRuntimeHash !== nextCompiledBundleRuntimeHash) throw aggregateInputError('compiled bundle runtime hash 不匹配')
@@ -978,6 +983,16 @@ const persistCompositeCompletion = async (input: {
       })
       if (updated.count !== 1) throw new AggregateCasLost()
 
+      const instance = input.parent.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE'
+        ? input.parent.compositeAssessment.bundleInstance : null
+      if (instance) {
+        await tx.bundleAnalysis.upsert({
+          where: { attemptId_attemptEpoch_requestKey: { attemptId: input.parent.id, attemptEpoch: input.parent.attemptEpoch, requestKey: 'INITIAL' } },
+          create: { attemptId: input.parent.id, attemptEpoch: input.parent.attemptEpoch, requestKey: 'INITIAL', purpose: 'INITIAL',
+            parentInputHash: input.aggregateInputHash, targetDefinitionHash: instance.definitionHash, targetDefinitionEncrypted: instance.definitionEncrypted },
+          update: {},
+        })
+      }
       if (input.parent.assignmentRef) {
         const relationalUpdated = await tx.relationalAssessmentAssignment.updateMany({
           where: { id: input.parent.assignmentRef, status: 'STARTED' },
@@ -1251,3 +1266,22 @@ export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: s
     }
   })
 )
+
+
+// The same frozen-source validator used by FINAL is reused by explicit recovery.
+// Reads only canonical snapshots / declared Form facts; never raw child answers.
+export async function readCompletedCompositeBundleInputs(attemptId: string) {
+  const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: compositeParentGraphSelect as any }) as any
+  if (!parent || parent.status !== 'COMPLETED' || parent.compositeAssessment.productKind !== 'ASSESSMENT_BUNDLE') throw aggregateInputError('Bundle 尚未完成')
+  const frozenSlots = readFrozenSlotSet(parent)
+  const headers = await loadSnapshotHeaders({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true })
+  const completeness = evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })
+  if (!completeness.ready || completeness.invalidSlotKeys.length) throw aggregateInputError('Bundle canonical 来源不完整')
+  const context = readAggregateContext(parent, true)
+  const completed = await decryptCompletedPayloads({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true,
+    slots: frozenSlots.slots, headers, contextHash: context.hash })
+  const hash = buildAggregateInputHash({ attemptEpoch: parent.attemptEpoch, contextHash: context.hash,
+    compiledBundleRuntimeHash: parent.compiledBundleRuntimeHash, entries: completed.entries })
+  if (hash !== parent.aggregateInputHash || bundleRuntimeHash(parent.compositeAssessment.bundleInstance) !== parent.compiledBundleRuntimeHash) throw aggregateInputError('Bundle 已完成来源发生变化')
+  return { parent, frozenSlots, payloads: completed.payloads }
+}

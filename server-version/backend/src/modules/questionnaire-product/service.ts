@@ -238,9 +238,9 @@ export async function resources(actor: Actor) {
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true } }),
   ])
   const usable = []
-  for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, version: row.instrumentVersion })
+  for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, code: row.code, version: row.instrumentVersion })
   return {
-    scales: usable, cognitive: cognitive.map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
+    scales: usable, cognitive: cognitive.map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.definition.source.title || v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),
     courses: courseRows,
   }
@@ -267,7 +267,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     if ((!legacy && !composite) || (legacy && composite)) throw compositeNotFound('无法唯一识别来源问卷')
     const source = legacy ?? composite!
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
-    if (composite && (composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
+    if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.questionnaireCourses.map(v => v.courseId)
     await courses(tx, actor, sourceCourses, questionnaireType)

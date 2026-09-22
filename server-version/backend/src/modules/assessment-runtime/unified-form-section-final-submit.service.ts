@@ -322,6 +322,10 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     'final_submit_payload_validation',
     () => normalizeCompositeSectionAnswers(mappedSection, input.answers),
   )
+  if (_parent) {
+    const { validateContextSubmission } = await import('../bundle-product/context-submission')
+    validateContextSubmission(_parent, normalized.normalized.map(entry => ({ key: entry.item.id, value: entry.normalizedValue })))
+  }
   const canonical = canonicalSubmission({ answers: normalized.payloadAnswers })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.formSection, '综合测评区段提交数据')
   const payloadHash = canonical.hash

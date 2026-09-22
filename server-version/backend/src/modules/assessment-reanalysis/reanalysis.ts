@@ -1,3 +1,4 @@
+import { hashMentalHealthRuleSet, type MentalHealthRuleSetV1 } from '../assessment-bundle/engines/mental-health-rule-v1'
 import { randomUUID } from 'node:crypto'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
@@ -154,6 +155,7 @@ export const runExplicitBundleReanalysis = (input: {
     contextDefinitionKey: string,
     contextDefinitionVersion: string,
   ) => BundleContextDefinitionV1 | null
+  ruleSet?: MentalHealthRuleSetV1 | null
   priorSnapshot?: FrozenAssessmentBundleSnapshotV3 | null
   /** Optional registry override (tests); defaults to product registry. */
   registry?: BundleAnalysisEngineRegistry
@@ -309,7 +311,7 @@ export const runExplicitBundleReanalysis = (input: {
 
   const newSnapshot = buildFrozenAssessmentBundleSnapshot(
     validated,
-    contextDefinition ? { contextDefinition } : undefined,
+    { contextDefinition, ruleSetRef: input.ruleSet ? { key: input.ruleSet.ruleSetKey, version: input.ruleSet.ruleSetVersion, hash: hashMentalHealthRuleSet(input.ruleSet) } : null },
   )
 
   const compiledRuntime = compileBundleRuntimeFromFrozenRead({
@@ -345,6 +347,7 @@ export const runExplicitBundleReanalysis = (input: {
     cognitiveSources: matchedCognitive,
     scaleSources: matchedScale,
     situationalSources: matchedSituational,
+    ruleSet: input.ruleSet,
   }
   const reportFacts = projectBundleReportFacts({
     registry,

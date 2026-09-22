@@ -776,6 +776,12 @@ export const compositeController = {
     }
   },
 
+  async retryBundle(req: Request, res: Response) {
+    try { return success(res, await service.retryBundleForParticipant(req.params.attemptId, { userId: req.user!.userId })) } catch (err) { return handleError(res, err) }
+  },
+  async publicRetryBundle(req: Request, res: Response) {
+    try { return success(res, await service.retryBundleForParticipant(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+  },
   async publicReport(req: Request, res: Response) {
     try { return success(res, await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
   },

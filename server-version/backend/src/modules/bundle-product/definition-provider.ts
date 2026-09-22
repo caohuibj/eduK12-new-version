@@ -74,6 +74,16 @@ export class BundleDefinitionProvider {
     if (entry.definition.category === 'observer' || entry.definition.respondentTypes.some(value => value !== 'SELF')) {
       blockers.push('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
     }
+    const population = entry.definition.population
+    if ((population.subjectMinAgeYears !== undefined || population.subjectMaxAgeYears !== undefined) &&
+        !entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_age_years' && field.required && field.valueType === 'number')) {
+      blockers.push('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
+    }
+    const forms = entry.definition.slots.filter(slot => slot.unitType === 'FORM')
+    if (forms.length > 1 || forms.some(slot => slot.instrumentKey !== entry.contextDefinition?.contextDefinitionKey || slot.instrumentVersion !== entry.contextDefinition?.contextDefinitionVersion)) {
+      blockers.push('FORM_SLOT_CONTEXT_IDENTITY_MISMATCH')
+    }
+    if (entry.definition.slots.some(slot => slot.unitType !== 'FORM' && !slot.required)) blockers.push('OPTIONAL_MEASUREMENT_DELIVERY_NOT_SUPPORTED')
     if (entry.definition.safetyCapability.productionTriggerEnabled) blockers.push('PRODUCTION_SAFETY_TRIGGER_NOT_ENABLED')
     return blockers
   }

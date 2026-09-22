@@ -622,6 +622,7 @@ enum AssessmentReferenceStatus {
 }
 
 enum MaterialResourceType {
+  ASSESSMENT_BUNDLE
   SCALE
   COGNITIVE_CONFIG
   REPORT_PACKAGE
@@ -1075,6 +1076,7 @@ model CompositeAssessment {
   revision            Int @default(0)
   creationKey         String? @unique @map("creation_key")
   creationHash        String? @map("creation_hash")
+  bundleInstance       BundleInstance?
   questionnaireCourses QuestionnaireCourseDelivery[]
   id                                String                    @id @default(uuid())
   code                              String                    @unique
@@ -1223,6 +1225,7 @@ model CompositeAssessmentAttempt {
   situationalAttempts SituationalAttempt[]            @relation("CompositeAttemptSituationalAttempts")
   formAnswers         CompositeFormAnswer[]
   formSectionAttempts CompositeFormSectionAttempt[]
+  bundleAnalyses      BundleAnalysis[]
   analysisSnapshots   CompositeAnalysisSnapshot[]
   unitSnapshots       AssessmentUnitSnapshot[]        @relation("CompositeAssessmentUnitSnapshots")
 
@@ -2265,4 +2268,47 @@ model QuestionnaireCourseDelivery {
   @@id([compositeId, courseId])
   @@index([courseId])
   @@map("questionnaire_course_deliveries")
+}
+
+
+// Explicit V3 family. Legacy package snapshots cannot represent pending/failed
+// executions or request-scoped append-only reanalysis; keep their storage contract.
+model BundleInstance {
+  compositeId String @id @map("composite_id")
+  schemaVersion Int @default(1) @map("schema_version")
+  bundleKey String @map("bundle_key")
+  bundleVersion String @map("bundle_version")
+  definitionHash String @map("definition_hash")
+  definitionEncrypted String @map("definition_encrypted")
+  bindingsEncrypted String @map("bindings_encrypted")
+  bindingsHash String @map("bindings_hash")
+  createdAt DateTime @default(now()) @map("created_at")
+  composite CompositeAssessment @relation(fields: [compositeId], references: [id], onDelete: Cascade)
+  @@map("bundle_instances")
+}
+
+model BundleAnalysis {
+  id String @id @default(uuid())
+  attemptId String @map("attempt_id")
+  attemptEpoch Int @map("attempt_epoch")
+  requestKey String @map("request_key")
+  purpose String
+  status String @default("PENDING")
+  parentInputHash String @map("parent_input_hash")
+  targetDefinitionHash String @map("target_definition_hash")
+  targetDefinitionEncrypted String @map("target_definition_encrypted")
+  aggregateInputHash String? @map("aggregate_input_hash")
+  payloadEncrypted String? @map("payload_encrypted")
+  factsHash String? @map("facts_hash")
+  errorCode String? @map("error_code")
+  generatedBy String? @map("generated_by")
+  reason String?
+  previousAnalysisId String? @map("previous_analysis_id")
+  retryCount Int @default(0) @map("retry_count")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  attempt CompositeAssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  @@unique([attemptId, attemptEpoch, requestKey])
+  @@index([attemptId, createdAt])
+  @@map("bundle_analyses")
 }
