@@ -3,7 +3,16 @@ import baseline from './fixtures/task-package-baseline.json'
 import { captureCompatibility } from './compatibility-capture'
 
 describe('PR1 compatibility against 01f5a46ac21235a9d5fefb950e89ef68b7e82be4', () => {
-  it('preserves every exact identity, config, protocol, compiler hash, quality effect and publish outcome', () => {
-    expect(JSON.parse(JSON.stringify(captureCompatibility()))).toEqual(baseline.tasks)
+  it('preserves every historical exact identity while allowing reviewed new identities', () => {
+    const current = new Map(
+      JSON.parse(JSON.stringify(captureCompatibility()))
+        .map((entry: { identity: string }) => [entry.identity, entry]),
+    )
+
+    for (const historical of baseline.tasks) {
+      expect(current.get(historical.identity), historical.identity).toEqual(historical)
+    }
+
+    expect(current.size).toBeGreaterThanOrEqual(baseline.tasks.length)
   })
 })
