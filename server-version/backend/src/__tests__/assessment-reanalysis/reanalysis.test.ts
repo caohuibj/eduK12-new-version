@@ -368,3 +368,52 @@ describe('explicit Bundle reanalysis by target version (Prep 15.1)', () => {
 const HEX_OK = (value: string): boolean => /^[0-9a-f]{64}$/.test(value)
 
 void computeReanalysisAggregateInputHash
+
+
+describe('Bundle reanalysis includes Situational canonical sources', () => {
+  const definition = {
+    ...INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1,
+    bundleKey: 'integrated_sjt_test_v1',
+    slots: [...INTEGRATED_GONOGO_ADEXI_ADULT_ZH_CN_V1.slots, {
+      slotKey:'sjt',unitType:'SITUATIONAL' as const,position:2,required:true,
+      instrumentKey:'sjt-assertiveness-golden',instrumentVersion:'1.0.0',
+      respondentType:'SELF' as const,valueSelectors:['bfi2.assertiveness.behavior'],
+    }],
+  }
+  const source = {
+    slotKey:'sjt',instrumentKey:'sjt-assertiveness-golden',instrumentVersion:'1.0.0',
+    sourceResultHash:HASH_A,envelopeResultHash:HASH_B,qualityState:'interpretable' as const,
+    metrics:{'bfi2.assertiveness.behavior':1.5},
+  }
+  const run = (sources: typeof source[] = [source]) => {
+    const units=frozenSources()
+    return runExplicitBundleReanalysis({
+      request:{schemaVersion:1,targetBundleKey:definition.bundleKey,targetBundleVersion:'1.0.0',
+        frozenCognitiveSources:units.cognitive,frozenScaleSources:units.scale,
+        frozenSituationalSources:sources,frozenContextFacts:contextFacts(),
+        aggregateInputHash:null,actorUserId:'admin-1'},
+      resolveTargetDefinition:()=>definition,resolveContextDefinition:resolveContext,
+    })
+  }
+  it('includes SJT evidence and binds its result identity into reanalysis provenance', () => {
+    const a=run(), b=run([{...source,sourceResultHash:'c'.repeat(64)}])
+    expect(a.ok&&b.ok).toBe(true)
+    if(!a.ok||!b.ok)return
+    expect(a.aggregateInputHash).not.toBe(b.aggregateInputHash)
+    expect(a.reportFacts.evidence.some(v=>v.source.kind==='SITUATIONAL_METRIC')).toBe(true)
+    expect(a.reportFacts.provenance.evidenceSourceHashes).toContain(HASH_A)
+    expect(JSON.stringify(a.reportFacts)).not.toMatch(/sceneKey|rawAnswers|rawTrials/)
+  })
+  it.each([
+    [[], 'MISSING_REQUIRED_SOURCE'],
+    [[source,source], 'DUPLICATE_SOURCE_SLOT'],
+    [[{...source,slotKey:'other'}], 'UNKNOWN_SOURCE_SLOT'],
+    [[{...source,instrumentVersion:'2.0.0'}], 'INCOMPATIBLE_SOURCE_VERSION'],
+  ] as const)('rejects invalid SJT source bindings %#', (sources,reason) => {
+    expect(run([...sources])).toMatchObject({ok:false,reason})
+  })
+  it('keeps legacy provenance unchanged when no SJT source is supplied', () => {
+    const input={snapshotHash:HASH_A,compiledBundleRuntimeHash:HASH_B,cognitiveSources:[],scaleSources:[],contextSnapshotHash:null}
+    expect(computeReanalysisAggregateInputHash(input)).toBe(computeReanalysisAggregateInputHash({...input,situationalSources:[]}))
+  })
+})
