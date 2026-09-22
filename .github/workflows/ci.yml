@@ -11,9 +11,9 @@
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
-#   Mac lane:     backend → docker
+#   Mac lane:     backend
 #   Hosted:       main browser plus three independent browser gates, each isolated
-#   Windows lane: frontend → codeql
+#   Windows lane: frontend → codeql → docker
 #   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
 #   这是 CI 调度稳定性优化，不代表 production performance improvement。
 #
@@ -647,14 +647,15 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Docker has no browser artifact dependency. Run after backend while the
-    # isolated browser validates; merge-gate still requires both to succeed.
-    needs: [scope, backend]
+    # Windows has one heavy lane: frontend -> CodeQL -> Docker.
+    # No backend/browser artifacts are consumed here; the merge gate requires all.
+    needs: [scope, codeql]
     if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
-      - eduk12-mac-ci
+      - eduk12-win-ci
+    timeout-minutes: 45
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
