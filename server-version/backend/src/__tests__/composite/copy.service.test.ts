@@ -699,7 +699,10 @@ describe('library composites are not takeable', () => {
     await listAvailableForStudent('student-1')
     expect(mockPrisma.compositeAssessment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ course: { isLibrary: false } }),
+        where: expect.objectContaining({ OR: [
+          expect.objectContaining({ productKind: 'LEGACY_COMPOSITE', course: { isLibrary: false } }),
+          expect.objectContaining({ productKind: 'QUESTIONNAIRE', questionnaireCourses: { some: { courseId: { in: ['library-1'] }, course: { isLibrary: false } } } }),
+        ] }),
       }),
     )
   })

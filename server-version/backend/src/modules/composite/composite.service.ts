@@ -28,6 +28,7 @@ import {
   encryptScaleAnswers,
   encryptScaleResult,
   readScaleAnswers,
+  resolveProjectionPolicyForAssessment,
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
@@ -1977,7 +1978,7 @@ export const listAvailableForStudent = async (userId: string) => {
   const list = await prisma.compositeAssessment.findMany({
     where: { status: 'PUBLISHED', OR: [
       { productKind: 'LEGACY_COMPOSITE', courseId: { in: courseIds }, course: { isLibrary: false } },
-      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds } } } },
+      { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
     orderBy: { publishedAt: 'desc' },
     include: {
@@ -2081,7 +2082,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
   if (composite.productKind === 'QUESTIONNAIRE') {
     if (composite.questionnaireType !== 'COURSE') throw compositeForbidden('此问卷请通过公开链接访问')
     const eligible = await prisma.courseStudent.findFirst({
-      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] },
+      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
         courseId: { in: (composite.questionnaireCourses ?? []).map((row: any) => row.courseId) } },
       orderBy: { courseId: 'asc' },
     })
@@ -2306,6 +2307,18 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
+  if (composite.productKind === 'QUESTIONNAIRE') {
+    // Serialize new admission against archive; never trust the pre-lock read.
+    await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
+    const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
+      select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true } })
+    if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
+    if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
+    if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
+    if (userId && !await db.courseStudent.findFirst({ where: {
+      studentId: userId, courseId: composite.deliveryCourseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
+    } })) throw compositeForbidden('不是问卷投放课程的有效学生')
+  }
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   const formSections = finalOnly ? (composite.formSections ?? []) : []
   const packageFields = finalOnly
@@ -2823,13 +2836,13 @@ const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
   return attempt as any
 }
 
-const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, frozenRead = false) => {
   const attempt = await loadAttemptWithChildren(attemptId)
   const authorized = context.userId
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
-  assertSupportedComposite(attempt.compositeAssessment)
+  assertSupportedComposite(attempt.compositeAssessment, frozenRead && attempt.compositeAssessment.productKind === 'QUESTIONNAIRE')
   return attempt
 }
 
@@ -4280,6 +4293,10 @@ export const buildCompositeReport = (attempt: any) => {
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
         })
+        if (attempt.compositeAssessment.productKind === 'QUESTIONNAIRE') {
+          const policy = resolveProjectionPolicyForAssessment(result, report.result)
+          Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
+        }
         if (report.decryptError) {
           logger.warn('composite report module decrypt failed', { attemptId: attempt.id, itemId: item.id, type: item.type })
           unitReports.push(report)
@@ -4574,7 +4591,7 @@ const packageAnalysisExportContextFor = async (
 }
 
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
-  const attempt = await findAttempt(attemptId, context)
+  const attempt = await findAttempt(attemptId, context, true)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   return projectHttpReport(attempt, 'participant')
 }

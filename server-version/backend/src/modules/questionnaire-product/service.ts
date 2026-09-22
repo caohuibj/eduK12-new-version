@@ -167,7 +167,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
         && item.cognitiveAssignment?.createdBy === row.createdBy && item.cognitiveAssignment?.courseId === null
         && item.cognitiveAssignment?.resolvedConfigSnapshotEncrypted && item.cognitiveAssignment?.resolvedReportSnapshotEncrypted
       if (!copiedBinding) await assertValidItem(input as any, actor.userId, actor.role, row, tx)
-      if (item.type === 'COGNITIVE') {
+      if (item.type === 'COGNITIVE' && !copiedBinding) {
         const source = item.cognitiveAssignment
         const entry = requireCognitiveRegistryEntry(source.config.testType, source.config.engineVersion, source.config.scoringVersion)
         const freeze = source.resolvedConfigSnapshotEncrypted ? {
@@ -200,11 +200,16 @@ export async function remove(actor: Actor, id: string, raw: unknown) {
   author(actor)
   await prisma.$transaction(async tx => {
     await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', id)
-    const row = await tx.compositeAssessment.findUnique({ where: { id }, include: { _count: { select: { attempts: true } } } })
+    const row = await tx.compositeAssessment.findUnique({ where: { id }, include: { _count: { select: { attempts: true } }, items: { select: { cognitiveAssignmentId: true } } } })
     if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound()
     owner(actor, row)
     if (row.revision !== revisionSchema.parse(raw).revision || row.status !== 'DRAFT' || row._count.attempts) throw compositeConflict('只能删除没有作答记录的当前草稿')
     await tx.compositeAssessment.delete({ where: { id } })
+    await tx.cognitiveAssignment.deleteMany({ where: {
+      id: { in: row.items.map(v => v.cognitiveAssignmentId).filter((v): v is string => Boolean(v)) },
+      createdBy: row.createdBy, listedStandalone: false, courseId: null,
+      compositeItems: { none: {} }, sessions: { none: {} },
+    } })
   })
 }
 export async function list(actor: Actor, page = 1, pageSize = 25) {
@@ -236,7 +241,7 @@ export async function resources(actor: Actor) {
   for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, version: row.instrumentVersion })
   return {
     scales: usable, cognitive: cognitive.map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
-    situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),
+    situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.definition.source.title || v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),
     courses: courseRows,
   }
 }
@@ -258,7 +263,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const legacy = await tx.questionnaire.findUnique({ where: { id }, include: {
       questionnaireScales: true, formItems: true, formSections: true, courseQuestionnaires: true,
     } })
-    const composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: true, formSections: true, questionnaireCourses: true } })
+    const composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
     if ((!legacy && !composite) || (legacy && composite)) throw compositeNotFound('无法唯一识别来源问卷')
     const source = legacy ?? composite!
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
@@ -291,7 +296,19 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
       } })
     } else {
       for (const item of composite!.items) {
-        const { id: _id, compositeAssessmentId: _parent, ...data } = item
+        const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
+        if (cognitiveAssignment?.listedStandalone === false) {
+          const binding = await tx.cognitiveAssignment.create({ data: {
+            configId: cognitiveAssignment.configId, createdBy: actor.userId, title: cognitiveAssignment.title,
+            instruction: cognitiveAssignment.instruction, status: cognitiveAssignment.status,
+            listedStandalone: false, required: false, profile: cognitiveAssignment.profile,
+            profileDefinitionVersion: cognitiveAssignment.profileDefinitionVersion,
+            resolvedConfigSnapshotEncrypted: cognitiveAssignment.resolvedConfigSnapshotEncrypted,
+            resolvedConfigHash: cognitiveAssignment.resolvedConfigHash,
+            resolvedReportSnapshotEncrypted: cognitiveAssignment.resolvedReportSnapshotEncrypted,
+          } })
+          data.cognitiveAssignmentId = binding.id
+        }
         await tx.compositeAssessmentItem.create({ data: { ...data, compositeAssessmentId: target.id,
           formOptions: item.formOptions ?? Prisma.JsonNull,
           formSectionId: item.formSectionId ? sectionIds.get(item.formSectionId) : null,

@@ -68,7 +68,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
   afterAll(async () => {
     if (!db) return
     // Delete only this suite's owned graph; the database may host other suites.
-    const ids=(await db.compositeAssessment.findMany({where:{createdBy:actor.userId},select:{id:true}})).map(v=>v.id)
+    const ids=(await db.compositeAssessment.findMany({where:{createdBy:{in:[actor.userId,other.userId]}},select:{id:true}})).map(v=>v.id)
     const attempts=(await db.compositeAssessmentAttempt.findMany({where:{compositeAssessmentId:{in:ids}},select:{id:true}})).map(v=>v.id)
     await db.assessmentUnitSnapshot.deleteMany({where:{compositeAttemptId:{in:attempts}}})
     await db.situationalRawSubmission.deleteMany({where:{attempt:{compositeAttemptId:{in:attempts}}}})
@@ -78,7 +78,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     await db.assessment.deleteMany({where:{compositeAttemptId:{in:attempts}}})
     await db.compositeAssessment.deleteMany({where:{id:{in:ids}}})
     await db.questionnaire.deleteMany({where:{creatorId:actor.userId}})
-    await db.cognitiveAssignment.deleteMany({where:{createdBy:actor.userId}})
+    await db.cognitiveAssignment.deleteMany({where:{createdBy:{in:[actor.userId,other.userId]}}})
     await db.scale.deleteMany({where:{creatorId:actor.userId}})
     await db.course.deleteMany({where:{creatorId:actor.userId}})
     await db.user.deleteMany({where:{id:{in:[actor.userId,other.userId,student,student2]}}})
@@ -154,13 +154,24 @@ suite('Four-type Questionnaire production lifecycle', () => {
     })
     expect(await runtime.getAttemptState(attemptId,{userId:student})).toMatchObject({status:'COMPLETED',progress:100,completedItems:4})
     const report=await runtime.getReport(attemptId,{userId:student})
+    expect(report).toMatchObject({productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY'})
+    expect(report.unitReports.find((v:any)=>v.type==='SCALE').reportKind).not.toBe('unavailable')
     expect(report.unitReports.map((v:any)=>v.type).sort()).toEqual(['COGNITIVE','SCALE','SITUATIONAL'])
     expect(await db.compositeAnalysisSnapshot.count({where:{attemptId}})).toBe(0)
     expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:attemptId}})).toBe(4)
     await expect(runtime.getAnalysisExportForParticipant(attemptId,{userId:student})).rejects.toBeDefined()
+    const exported=await product.exportReports(actor,row.id,{})
+    expect(exported.reports).toHaveLength(1)
+    expect(exported.reports[0].unitReports.map((v:any)=>v.type).sort()).toEqual(['COGNITIVE','SCALE','SITUATIONAL'])
+    expect(exported.next).toBeNull()
+    await expect(product.exportReports(other,row.id,{})).rejects.toMatchObject({statusCode:403})
     const original=JSON.stringify(report)
     await product.archive(actor,row.id,{revision:row.revision})
-    expect(JSON.stringify(await runtime.getReport(attemptId,{userId:student}))).toBe(original)
+    await db.scale.update({where:{id:scaleId},data:{status:'DRAFT'}})
+    try {
+      expect(JSON.stringify(await runtime.getReport(attemptId,{userId:student}))).toBe(original)
+      expect((await runtime.getReportForTeacher(actor.userId,actor.role,row.id,attemptId)).unitReports).toHaveLength(3)
+    } finally { await db.scale.update({where:{id:scaleId},data:{status:'PUBLISHED'}}) }
   },60000)
   it('supports anonymous start/resume and rejects another recovery credential', async () => {
     let row=await fresh({questionnaireType:'GENERAL',courseIds:[],publicEnabled:true,expiresAt:new Date(Date.now()+86400000).toISOString()})
@@ -170,6 +181,36 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const result=await runtime.startPublicAttempt(token.token!)
     expect((await runtime.startPublicAttempt(token.token!,result.recoveryToken!)).attempt.id).toBe(result.attempt.id)
     await expect(runtime.getAttemptState(result.attempt.id,{recoveryTokenHash:hashRecoveryToken('x'.repeat(40))})).rejects.toBeDefined()
+  },30000)
+  it('restarts with a new epoch, rejects the old FINAL and keeps existing reads when creation closes', async () => {
+    let row=await fresh()
+    row=await add(row,{type:'FORM',formType:'text_input',formLabel:'Restart field'})
+    row=await product.publish(actor,row.id,{revision:row.revision})
+    const original=await runtime.startUserAttempt(student,row.id)
+    const originalItem=original.attempt.currentItem as any
+    const restarted=await runtime.restartUserAttempt(student,original.attempt.id)
+    expect(restarted.attempt.id).not.toBe(original.attempt.id)
+    expect(restarted.attempt.attemptEpoch).toBe(2)
+    await expect(forms.submitCompositeFormSectionFinal({attemptId:original.attempt.id,sectionId:row.formSections[0].id,userId:student,
+      submissionId:randomUUID(),attemptEpoch:1,definitionHash:originalItem.definitionHash,
+      answers:row.formSections[0].items.map((i:any)=>({formItemId:i.id,value:'stale'}))})).rejects.toBeDefined()
+    process.env.QUESTIONNAIRE_PRODUCTS_ENABLED='false'
+    try {
+      await expect(fresh()).rejects.toMatchObject({statusCode:409})
+      expect((await runtime.getAttemptState(restarted.attempt.id,{userId:student})).status).toBe('IN_PROGRESS')
+      expect((await product.detail(actor,row.id)).id).toBe(row.id)
+    } finally { delete process.env.QUESTIONNAIRE_PRODUCTS_ENABLED }
+  },30000)
+  it('allows administrator authoring and rejects a retired resource at publication', async () => {
+    const admin={userId:actor.userId,role:UserRole.ADMIN}
+    let row=await product.create(admin,{requestId:randomUUID(),name:'Admin authored',questionnaireType:'COURSE',courseIds:[course1]})
+    row=await product.addItem(admin,row.id,{revision:row.revision,item:{type:'SCALE',scaleId}})
+    await db.scale.update({where:{id:scaleId},data:{status:'DRAFT'}})
+    try {
+      await expect(product.publish(admin,row.id,{revision:row.revision})).rejects.toBeDefined()
+      expect((await product.detail(admin,row.id)).revision).toBe(row.revision)
+    } finally { await db.scale.update({where:{id:scaleId},data:{status:'PUBLISHED'}}) }
+    expect((await product.publish(admin,row.id,{revision:row.revision})).status).toBe('PUBLISHED')
   },30000)
   it('copies legacy definitions without changing legacy history or identity', async () => {
     const old=await db.questionnaire.create({data:{code:'Q1-old-'+suffix,name:'Legacy',creatorId:actor.userId,formItems:{create:{type:'text_input',label:'Old form',position:0}}}})
@@ -189,12 +230,25 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const children=await db.assessment.findMany({where:{compositeAttemptId:started.attempt.id}})
     expect(children).toHaveLength(2)
     expect(new Set(children.map(v=>v.compositeItemId)).size).toBe(2)
+    await Promise.all(children.map((child,index)=>scaleSubmit.submitScaleAssessmentFinal({
+      assessmentId:child.id,submissionId:randomUUID(),attemptEpoch:1,
+      definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),contextSnapshotHash:null,
+      answers:[{itemCode:'mixed-scale-item-1',responseValue:index?'no':'yes'}],userId:student,
+    })))
+    // FINAL persists each canonical unit; authorized state reads reconcile the parent.
+    const states=await Promise.all([runtime.getAttemptState(started.attempt.id,{userId:student}),runtime.getAttemptState(started.attempt.id,{userId:student})])
+    expect(states.every(v=>v.status==='COMPLETED'&&v.progress===100)).toBe(true)
+    const report=await runtime.getReport(started.attempt.id,{userId:student})
+    expect(report.unitReports).toHaveLength(2)
+    expect(new Set(report.unitReports.map((v:any)=>v.itemId)).size).toBe(2)
+    expect((await runtime.getAttemptState(started.attempt.id,{userId:student})).progress).toBe(100)
+    expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:started.attempt.id}})).toBe(2)
   },30000)
   it('copies a published four-type product and can publish the new draft', async () => {
     let row=await mixed()
     row=await product.publish(actor,row.id,{revision:row.revision})
-    const copy=await product.copy(actor,row.id,{requestId:randomUUID()})
+    const copy=await product.copy({userId:other.userId,role:UserRole.ADMIN},row.id,{requestId:randomUUID()})
     expect(copy.status).toBe('DRAFT')
-    expect((await product.publish(actor,copy.id,{revision:copy.revision})).status).toBe('PUBLISHED')
+    expect((await product.publish({userId:other.userId,role:UserRole.ADMIN},copy.id,{revision:copy.revision})).status).toBe('PUBLISHED')
   },30000)
 })
