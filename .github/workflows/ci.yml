@@ -312,12 +312,26 @@ jobs:
       - name: build (tsc)
         run: npm run build
       - name: publish tested backend build
+        id: backend-build-upload
+        # Artifact finalization can fail transiently (ECONNRESET). Allow one
+        # retry below; a second failure still fails the job and merge gate.
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: backend-dist-${{ github.sha }}
           path: server-version/backend/dist
           retention-days: 1
           if-no-files-found: error
+      - name: retry backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
       # The unknown-package contract imports the generated frontend runner.
       # This job has its own checkout; dependencies installed by the frontend
       # job are not available here. Preserve the real import instead of mocking it.
