@@ -197,7 +197,7 @@ export const SCALE_INSTRUMENT_SOURCE = {
     ]
   },
   "executable": {
-    "releaseStatus": "DRAFT",
+    "releaseStatus": "PUBLISHED",
     "contentLocale": "en-GB",
     "references": [],
     "definition": {
