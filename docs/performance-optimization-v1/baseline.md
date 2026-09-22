@@ -1,0 +1,57 @@
+# PERF v1 runtime baseline
+
+## Recovery point
+
+- Repository: `caohuibj/eduK12-new-version`
+- Execution specification: `docs/performance-optimization-v1/implementation-plan.md`
+- Analysis base: `f89354d32c7ac3dc4a9abd3a6abdca851667b8b5`
+- Working base: `199662df3304f29b0fee74e316a2f10a1a8faa9a` (GitHub `main`, checked 2026-09-23)
+- Worktree: `/Users/Qiang/projects/perf-measurement-baseline-v1`; branch: `perf/measurement-baseline-v1`
+- Next planned commit: P1-C02 after P1-C01 is recorded in `state.json`.
+
+The original checkout was on `fix/ci-runner-stability-v2`; it was not modified. No PERF-01/02/03 PR or progress file existed at the start. Open PRs #164, #157, #155, #146, #145, #125, #112, and #48 concern other work. PR #164 changes content CI and is not treated as a performance baseline.
+
+## Main since analysis base
+
+The relevant main delta includes questionnaire four-type and bundle runtime work (#160, #162, #163), a new questionnaire-product and bundle-product mount in `src/index.ts`, composite route guard and recovery additions, bundle-specific aggregate reads/writes, and CI content fast paths (#158). These additions do not remove the 14 FINAL route templates in section 7.2 of the plan. The new composite `/:id` write guard explicitly bypasses `/attempts/*`; the three composite FINAL handlers retain respondent access and relational consent guards. The new bundle aggregate path must be included in parent-finalization measurements, not assumed equivalent to the prior generic path.
+
+The CI workflow classifies content-only changes and has separate PR-light and ready-PR full gates. The active main ruleset (ID `23665026`, read 2026-09-23) requires `merge gate / ready PR` with strict head freshness. Runtime, parser, and gateway changes in this plan require the full merge gate. Required branch rules and final head checks must be re-read when a PR is ready; a local test or an older SHA is not a substitute.
+
+## Fixed comparison configuration
+
+| Resource | Default at working base | Qualification |
+| --- | --- | --- |
+| API processes | 1 | Target topology still to be measured |
+| UNIT admission | 7 active / 16 queued / 500 ms wait | `unitSubmitAdmission.ts`; env overrides are recorded per run |
+| Aggregate admission | 3 active / 4 queued / 250 ms wait | `aggregateFinalizationAdmission.ts` |
+| Prisma pool | 10 | `databasePool.ts`; explicit `DATABASE_URL` parameters take precedence |
+| JSON body parser | 2 MB, before CSRF, route auth and UNIT admission | `src/index.ts` |
+| Public limiters | process-local, mounted before public routers | `src/index.ts` |
+| Capacity target | whole 4C4G host | Developer machines and shared load generators are only for correctness/comparable A/B |
+
+No current-main throughput, SQL count, or 4C4G capacity has been measured. Historical Gate-E figures are background only.
+
+## Current path and planned owner
+
+| Hotspot or guard | Current location | Planned item |
+| --- | --- | --- |
+| SJT validation index | `src/modules/situational/situation-scoring.ts` | P2-C02 |
+| SJT commit/replay and parent recovery | `src/modules/situational/situational-final-submit.service.ts` | P2-C03, P2-C05 |
+| SJT response/runtime projection | `src/modules/situational/situational-runtime.service.ts` | P2-C05 |
+| SJT and embedded controller response | `src/controllers/situationalController.ts`; `src/modules/composite/composite.controller.ts` | P2-C04, P2-C05 |
+| Scale child binding and reference | `src/modules/scale/scale-final-submit.service.ts`; `src/controllers/scaleController.ts` | P2-C04, P2-C07 |
+| Cognitive verified input, scorer, frozen report | `src/modules/cognitive/final-submit.service.ts`; `unified-final-submit.service.ts`; `v2/authoritative-scorer.ts`; `profile-freeze.ts` | P2-C04, P2-C06 |
+| Reference freeze/load | `src/modules/assessment-runtime/reference-binding.ts` | P2-C07 |
+| Parent snapshot/aggregate | `src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts` | P2-C08 |
+| Auth, organization, consent, privacy | `src/middleware/auth.ts`; `src/modules/organization/principal.ts`; `src/modules/assessment-relational/result-authority.ts`; `runtime-consent.ts` | P1-C04 budget, P2-C01/P2-C04 invariants |
+| Gate, transaction, pool | `src/services/unitSubmitAdmission.ts`; `aggregateFinalizationAdmission.ts`; `questionnaireProgressService.ts`; `src/config/databasePool.ts` | P1-C02/P1-C04, P2-C01, P3-C01/P3-C02 |
+| Entry parser and public limiter | `src/index.ts`; `src/middleware/publicAssessmentRateLimit.ts` | P3-C01/P3-C02 |
+| Media | `src/modules/assessment-media/assessment-image-delivery.ts`; `src/modules/situational/situational-video.service.ts` | P3-C04 |
+| Client retry and proxy | `frontend/src/services/persistence/finalDraftCapacityRetry.ts`; `frontend/nginx.conf` | P3-C03 |
+| Existing observation and query test | `src/services/runtimeObservability.ts`; `src/__tests__/hotpath/query-budget.postgres.integration.test.ts` | P1-C02/P1-C04/P1-C05 |
+
+`src/` paths in this table are under `server-version/backend/`. Route-level access, reconciliation and response privacy are counted in the full HTTP budget, even when a service microbenchmark omits them. The 14 current FINAL templates and their guard/handler mapping are in `route-inventory.csv`. Run `node server-version/perf/current-main-v1/check-final-routes.mjs` from the repository root after route edits.
+
+## Environment and evidence status
+
+Docker is available on the development host, but its existing PostgreSQL/Redis containers belong to other work and are not this plan's test database. No isolated PostgreSQL/Redis URL, load generator, image digest, or 4C4G target has been qualified for this worktree yet. P1-C02 through P1-C04 can continue with deterministic local tooling; P1-C05 requires real isolated PG evidence. This host also runs unrelated containers, so it cannot qualify whole-host capacity. `query-budgets.csv` and `performance-results.md` intentionally contain no fabricated measurements.
