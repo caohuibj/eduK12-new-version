@@ -320,20 +320,15 @@ npm test -- src/__tests__/scale/instruments
 
 No install or publication command belongs in this content PR.
 
-## Known pre-existing regression-test prerequisite
+## Regression-test prerequisite resolved
 
-The runtime registry already documents that the historical six executable packages
-retain their API order and **new identities sort after them**. However two older
-regression tests still hard-code the Wave-0 inventory size/order:
+PR #156 (`test(scale): keep onboarding regression checks extensible`) was merged to
+`main` before this content branch was refreshed. It replaced the two stale Wave-0
+exact-count assertions with the intended compatibility contract:
 
-- `src/__tests__/scale/instrument-source.test.ts`
-- `src/__tests__/scale/scale-library-wave1-p1.test.ts`
+- the historical six executable identities remain the ordered compatibility prefix;
+- the four Wave-1 catalog fixtures remain explicitly testable;
+- later executable identities may be added without rewriting shared runtime code.
 
-A real new DRAFT executable necessarily invalidates those exact-count assertions.
-Content policy correctly prevents this content branch from editing shared regression
-tests. Therefore the fix must be a separate small platform/test-maintenance change
-that makes the tests assert the historical-prefix compatibility contract rather than
-"no future executable may exist".
-
-This is **not** an instrument runtime capability gap and requires no shared scorer,
-runtime, registry, FINAL, report or admission change.
+Teacher Scale Batch 1 has now merged that `main` prerequisite. No shared scorer,
+runtime, registry, FINAL, report or admission change is required by these instruments.
