@@ -66,7 +66,7 @@ export async function processAnalysis(id: string) {
         request: { schemaVersion: 1, targetBundleKey: target.bundleSnapshot.bundleKey, targetBundleVersion: target.bundleSnapshot.bundleVersion,
           frozenCognitiveSources: source.cognitive, frozenScaleSources: source.scale, frozenSituationalSources: source.situational,
           frozenContextFacts: source.contextFacts, aggregateInputHash: null, actorUserId: row.generatedBy! },
-        resolveTargetDefinition: () => target.bundleSnapshot.bundleDefinition, resolveContextDefinition: () => target.contextDefinition, ruleSet: target.ruleSet,
+        resolveTargetDefinition: () => target.bundleSnapshot.bundleDefinition, resolveContextDefinition: () => target.contextDefinition, ruleSet: target.ruleSet, declarativePackage: target.declarativePackage,
       })
       if (!result.ok) throw new Error('BUNDLE_REANALYSIS_' + result.reason)
       facts = result.reportFacts
@@ -78,7 +78,7 @@ export async function processAnalysis(id: string) {
         situationalSources: source.situational, contextSnapshotHash: source.contextFacts?.contextSnapshotHash ?? null })
       facts = projectBundleReportFacts({ registry: createProductBundleAnalysisEngineRegistry(), engineInput: {
         snapshot, compiledRuntime, aggregateInputHash, cognitiveSources: source.cognitive, scaleSources: source.scale,
-        situationalSources: source.situational, contextFacts: source.contextFacts, evidence: [], ruleSet: target.ruleSet ?? undefined,
+        situationalSources: source.situational, contextFacts: source.contextFacts, evidence: [], ruleSet: target.ruleSet ?? undefined, declarativePackage: target.declarativePackage,
       } })
     }
     phase = 'PERSIST'
@@ -123,7 +123,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
   if (!row) throw compositeNotFound('分析记录不存在')
   const target = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.targetDefinitionEncrypted))
   if (target.contentHash !== row.targetDefinitionHash) throw compositeConflict('报告定义校验失败')
-  let view = null
+  let view: ReturnType<typeof projectBundleAudienceView> | null = null
   if (terminal(row.status)) {
     const facts = validateBundleReportFacts(decryptCognitivePayload(row.payloadEncrypted!))
     if (canonicalHash(facts) !== row.factsHash || facts.identity.snapshotHash !== target.bundleSnapshot.snapshotHash) throw compositeConflict('报告快照校验失败')
@@ -158,6 +158,23 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
       view.recommendations = []
       view.quality = {overall:'unavailable',notes:[]}
     }
+  if (view && target.declarativePackage && facts?.enginePayload.kind === 'COMPUTED') {
+    const payload = facts.enginePayload.payload as { conclusions?: Array<{ ruleId: string; text: string; evidenceKeys: string[] }> }
+    const audienceView = view
+    const allowed = (payload.conclusions ?? []).filter(c => c.evidenceKeys.every(key => {
+      const item = audienceView.evidence.find(e => e.evidenceKey === key)
+      return item && item.sourceKind !== 'CONTEXT_FACT' && item.value.state !== 'redacted'
+    }))
+    ;(view as any).declarativeState = audienceView.quality.overall === 'limited' ? target.declarativePackage.report.states.limited
+      : audienceView.quality.overall === 'invalid' || audienceView.quality.overall === 'unavailable' ? target.declarativePackage.report.states.unavailable
+      : audienceView.evidence.some(e => e.value.state === 'missing') ? target.declarativePackage.report.states.missing : null
+    ;(view as any).blocks = target.declarativePackage.report.blocks.filter(b => b.audience.includes(audience)).map(block => ({
+      blockId: block.blockId, kind: block.kind, title: block.title,
+      evidence: block.kind === 'evidence' ? audienceView.evidence.filter(e => e.sourceKind !== 'CONTEXT_FACT') : [],
+      limitations: block.kind === 'limitations' ? audienceView.limitations : [],
+      conclusions: audienceView.quality.overall === 'unavailable' ? [] : allowed.filter(c => block.ruleIds.includes(c.ruleId)),
+    }))
+  }
   }
   return { schemaVersion: 1, snapshotFamily: 'ASSESSMENT_BUNDLE', analysisId: row.id, status: row.status, purpose: row.purpose,
     factsHash: row.factsHash, definitionHash: row.targetDefinitionHash, retryCount: row.retryCount,
@@ -179,7 +196,7 @@ export async function history(actor: BundleActor, attemptId: string) {
 const reanalysisSchema = z.object({ requestId: z.string().uuid(), targetBundleKey: z.string().min(1),
   targetBundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/), reason: z.string().trim().min(1).max(1000), previousAnalysisId: z.string().uuid() }).strict()
 export async function reanalyze(actor: BundleActor, attemptId: string, raw: unknown, provider: BundleDefinitionProvider,
-  assertEligible: (actor: BundleActor, key: string, version: string) => Promise<unknown>) {
+  assertEligible: (actor: BundleActor, key: string, version: string, db?: Prisma.TransactionClient) => Promise<unknown>) {
   const parent = await authorizeStaff(actor, attemptId), input = reanalysisSchema.parse(raw)
   const requestKey = input.requestId
   const existing = await prisma.bundleAnalysis.findUnique({ where: { attemptId_attemptEpoch_requestKey: { attemptId, attemptEpoch: parent.attemptEpoch, requestKey } } })
@@ -189,8 +206,7 @@ export async function reanalyze(actor: BundleActor, attemptId: string, raw: unkn
         target.bundleSnapshot.bundleKey !== input.targetBundleKey || target.bundleSnapshot.bundleVersion !== input.targetBundleVersion) throw compositeConflict('相同 requestId 不能改变重分析请求')
     return readReport(attemptId, actor.role === 'ADMIN' ? 'admin' : 'teacher', existing.id)
   }
-  await assertEligible(actor, input.targetBundleKey, input.targetBundleVersion)
-  const entry = provider.exact(input.targetBundleKey, input.targetBundleVersion)!
+  const entry = await assertEligible(actor, input.targetBundleKey, input.targetBundleVersion) as import('./definition-provider').BundleDefinitionEntry
   const target = freezeBundleProductionDefinition(entry, { frozenAt: new Date().toISOString(), sourceReference: 'code-catalog' })
   const source = await inputs(attemptId)
   const previous = await prisma.bundleAnalysis.findFirst({ where: { id: input.previousAnalysisId, attemptId, attemptEpoch: parent.attemptEpoch } })
@@ -199,13 +215,17 @@ export async function reanalyze(actor: BundleActor, attemptId: string, raw: unkn
   const probe = runExplicitBundleReanalysis({ request: { schemaVersion: 1, targetBundleKey: input.targetBundleKey, targetBundleVersion: input.targetBundleVersion,
     frozenCognitiveSources: source.cognitive, frozenScaleSources: source.scale, frozenSituationalSources: source.situational,
     frozenContextFacts: source.contextFacts, aggregateInputHash: null, actorUserId: actor.userId },
-    resolveTargetDefinition: () => entry.definition, resolveContextDefinition: () => entry.contextDefinition, ruleSet: entry.ruleSet })
+    resolveTargetDefinition: () => entry.definition, resolveContextDefinition: () => entry.contextDefinition, ruleSet: entry.ruleSet, declarativePackage: entry.declarativePackage })
   if (!probe.ok) throw compositeConflict(probe.reason)
   let row
   try {
-    row = await prisma.bundleAnalysis.create({ data: { attemptId, attemptEpoch: parent.attemptEpoch, requestKey, purpose: 'REANALYSIS',
+    row = await prisma.$transaction(async tx => {
+      // Serialize new history admission with package HOLD/RETIRED transitions.
+      await assertEligible(actor, input.targetBundleKey, input.targetBundleVersion, tx)
+      return tx.bundleAnalysis.create({ data: { attemptId, attemptEpoch: parent.attemptEpoch, requestKey, purpose: 'REANALYSIS',
       parentInputHash: parent.aggregateInputHash!, targetDefinitionHash: target.contentHash, targetDefinitionEncrypted: encryptCognitivePayload(target),
       generatedBy: actor.userId, reason: input.reason, previousAnalysisId: previous.id } })
+    })
   } catch (error: any) {
     if (error.code !== 'P2002') throw error
     return reanalyze(actor, attemptId, raw, provider, assertEligible)

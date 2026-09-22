@@ -1,3 +1,4 @@
+import { mapDeclarativeEvidence } from './onboarding/engine'
 /**
  * BundleReportFacts projector, audience projections, and non-authoritative exports.
  * HTML/Markdown are presentation only — BundleReportFactsV1 remains authoritative.
@@ -229,7 +230,7 @@ export const projectBundleReportFacts = (input: {
 
   // Same parsed contextFacts object for Evidence + engine + ReportFacts.
   const normalizedInput = { ...engineInput, contextFacts }
-  const evidence = collectEvidenceFromSources(normalizedInput)
+  const evidence = snapshot.engine.key === 'declarative-evidence-v1' ? mapDeclarativeEvidence(normalizedInput) : collectEvidenceFromSources(normalizedInput)
   const engineResult = input.registry.dispatch({ ...normalizedInput, evidence })
   const enginePayload = toEnginePayload(snapshot, engineResult)
 

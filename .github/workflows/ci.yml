@@ -361,6 +361,7 @@ jobs:
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/bundle-product/product.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts

@@ -1,0 +1,12 @@
+{
+  "values": {
+    "sjt.observation": {
+      "state": "present",
+      "value": 1
+    }
+  },
+  "expectedRuleIds": [
+    "observed"
+  ],
+  "expectedKind": "COMPUTED"
+}

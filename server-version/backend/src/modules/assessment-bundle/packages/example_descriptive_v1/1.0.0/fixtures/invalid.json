@@ -1,0 +1,9 @@
+{
+  "values": {
+    "sjt.observation": {
+      "state": "invalid"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

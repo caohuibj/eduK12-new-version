@@ -23,6 +23,7 @@ const condition: z.ZodType<Condition> = z.lazy(() => z.union([
 ]))
 const declaration = assessmentBundleDefinitionSchema.innerType().extend({
   bundleKey: z.string().regex(BUNDLE_KEY).max(100),
+  slots: assessmentBundleDefinitionSchema.innerType().shape.slots.max(64),
   status: z.literal('DRAFT'),
   engine: z.object({ key: z.literal('declarative-evidence-v1'), version: z.literal('1.0.0') }).strict(),
   respondentTypes: z.tuple([z.literal('SELF')]),
@@ -36,7 +37,7 @@ export const packageSchema = z.object({
     cognitiveDependencies: z.array(z.object({ slotKey: key, configVersion: version, engineVersion: version, scoringVersion: version, profile: z.enum(['standard', 'experience', 'research']) }).strict()).max(64),
   }).strict(),
   evidence: z.array(z.object({
-    evidenceKey: key, slotKey: key, selector: key,
+    evidenceKey: key, slotKey: key, selector: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_.]*$/).max(100),
     valueType: z.enum(['number', 'string', 'boolean']), unit: z.string().min(1).max(100),
     construct: key, role: z.enum(['PRIMARY', 'SUPPORTING', 'CONTEXT']),
     direction: z.enum(['higher', 'lower', 'neutral']), qualityPolicy: z.enum(['interpretable_only', 'allow_limited']),
@@ -58,6 +59,12 @@ export const packageSchema = z.object({
     maturity: z.enum(['EXPERIMENTAL', 'PILOT', 'VALIDATED']), scope: text,
     references: z.array(z.object({ id: key, citation: text, allowedClaims: z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).min(1) }).strict()).max(64),
   }).strict(),
+  fixtures: z.object(Object.fromEntries(['valid','missing','invalid','not-applicable'].map(name => [name, z.object({
+    values: z.record(key, z.discriminatedUnion('state', [
+      z.object({state:z.literal('present'),value:scalar}).strict(),
+      z.object({state:z.literal('missing')}).strict(),z.object({state:z.literal('invalid')}).strict(),z.object({state:z.literal('not_applicable')}).strict(),
+    ])), expectedRuleIds: z.array(key), expectedKind: z.enum(['COMPUTED','UNAVAILABLE']),
+  }).strict()]))).strict(),
   publication: z.object({ requestedStatus: z.enum(['DRAFT', 'PUBLISHED', 'HOLD', 'RETIRED']) }).strict(),
   context: z.unknown().optional(),
 }).strict()
@@ -130,6 +137,7 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
     unique(rule.evidenceKeys, `rules.${rule.ruleId}.evidenceKeys`)
     if (rule.evidenceKeys.some(k => !evidence.has(k)) || used.some(k => !rule.evidenceKeys.includes(k))) fail(`rules.${rule.ruleId}`, 'incomplete evidence provenance')
     if (rule.supportRefs.some(k => !references.has(k))) fail(`rules.${rule.ruleId}.supportRefs`, 'unknown support reference')
+    if (['cross_source_condition','joint_conclusion'].includes(rule.kind) && new Set(rule.evidenceKeys.map(k=>evidence.get(k)?.slotKey)).size < 2) fail(`rules.${rule.ruleId}`, 'cross-source claims require at least two sources')
     if (rule.kind === 'joint_conclusion' && !rule.supportRefs.some(k => references.get(k)?.allowedClaims.includes('joint_conclusion'))) fail(`rules.${rule.ruleId}`, 'joint conclusion requires declared supporting evidence; publication review still required')
   }
   const rules = new Set(value.rules.items.map(r => r.ruleId))

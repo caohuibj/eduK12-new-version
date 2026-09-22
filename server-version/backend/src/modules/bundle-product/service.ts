@@ -1,3 +1,4 @@
+import { assertPackageAdmission } from '../bundle-product/package-release'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import type { EffectiveScaleDisclosureSnapshot } from '../scale/projection/types'
 import { Prisma, UserRole } from '@prisma/client'
@@ -48,12 +49,15 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
     author(actor)
     const entry = provider.exact(key, version)
     if (!entry) throw compositeNotFound('Bundle 精确版本不存在')
-    const blockers = provider.publicationBlockers(key, version)
+    if (entry.declarativePackage) {
+      try { await assertPackageAdmission(db, entry.declarativePackage) } catch { throw compositeConflict('Bundle 内容尚未发布、已停用或审批失效') }
+    }
+    const blockers = provider.publicationBlockers(key, version).filter(v => !(entry.declarativePackage && v === 'BUNDLE_NOT_PUBLISHED'))
     if (blockers.length) throw compositeConflict(blockers.join(', '))
     if (actor.role !== 'ADMIN' && !await db.materialGrant.findUnique({ where: {
       teacherId_resourceType_resourceId: { teacherId: actor.userId, resourceType: 'ASSESSMENT_BUNDLE', resourceId: key + '@' + version },
     } })) throw compositeForbidden('缺少此精确版本 Bundle 的使用授权')
-    return entry
+    return entry.declarativePackage ? { ...entry, definition: { ...entry.definition, status: 'PUBLISHED' as const } } : entry
   }
   async function detail(actor: BundleActor, id: string) {
     const row = await prisma.compositeAssessment.findUnique({ where: { id }, include: { bundleInstance: true,
@@ -125,6 +129,8 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
             { courseId: input.courseId, productKind: 'QUESTIONNAIRE' }, tx)
           if (!await canInstantiateConfig(actor.userId, actor.role, source.config)) throw compositeForbidden('缺少认知配置使用授权')
           const engine = requireCognitiveRegistryEntry(source.config.testType, source.config.engineVersion, source.config.scoringVersion)
+          const dependency = entry.declarativePackage?.manifest.cognitiveDependencies.find(d => d.slotKey === slot.slotKey)
+          if (dependency && (source.config.engineVersion !== dependency.engineVersion || source.config.scoringVersion !== dependency.scoringVersion || source.profile !== dependency.profile)) throw compositeBadRequest('认知任务精确引擎/评分/profile 不匹配')
           const freeze = source.resolvedConfigSnapshotEncrypted && source.resolvedReportSnapshotEncrypted ? {
             profile: source.profile, profileDefinitionVersion: source.profileDefinitionVersion, resolvedConfigSnapshotEncrypted: source.resolvedConfigSnapshotEncrypted,
             resolvedConfigHash: source.resolvedConfigHash, resolvedReportSnapshotEncrypted: source.resolvedReportSnapshotEncrypted,
@@ -189,9 +195,10 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
     return Promise.all(provider.list().map(async entry => {
       const definition = entry.definition
       let allowed = true
-      try { await eligible(actor, definition.bundleKey, definition.bundleVersion) } catch { allowed = false }
-      return { ...definition, canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
-        publicationBlockers: provider.publicationBlockers(definition.bundleKey, definition.bundleVersion) }
+      let publicationBlockers: string[] = []
+      try { await eligible(actor, definition.bundleKey, definition.bundleVersion) } catch (error: any) { allowed = false; publicationBlockers = [error.message] }
+      return { ...definition, ...(allowed && entry.declarativePackage ? { status: 'PUBLISHED' } : {}), canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
+        publicationBlockers }
     }))
   }
   async function list(actor: BundleActor) {

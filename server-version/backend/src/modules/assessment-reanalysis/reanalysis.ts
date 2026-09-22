@@ -155,6 +155,7 @@ export const runExplicitBundleReanalysis = (input: {
     contextDefinitionKey: string,
     contextDefinitionVersion: string,
   ) => BundleContextDefinitionV1 | null
+  declarativePackage?: import('../assessment-bundle/onboarding/contract').DeclarativePackage
   ruleSet?: MentalHealthRuleSetV1 | null
   priorSnapshot?: FrozenAssessmentBundleSnapshotV3 | null
   /** Optional registry override (tests); defaults to product registry. */
@@ -348,6 +349,7 @@ export const runExplicitBundleReanalysis = (input: {
     scaleSources: matchedScale,
     situationalSources: matchedSituational,
     ruleSet: input.ruleSet,
+    declarativePackage: input.declarativePackage,
   }
   const reportFacts = projectBundleReportFacts({
     registry,

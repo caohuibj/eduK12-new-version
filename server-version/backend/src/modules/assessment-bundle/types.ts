@@ -12,6 +12,7 @@ export const BUNDLE_ENGINE_KEYS = [
   'scale-evidence-v1',
   'mental-health-rule-v1',
   'integrated-evidence-v1',
+  'declarative-evidence-v1',
 ] as const
 
 export type BundleEngineKeyV1 = (typeof BUNDLE_ENGINE_KEYS)[number]

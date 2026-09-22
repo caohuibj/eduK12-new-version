@@ -1,0 +1,13 @@
+[
+  {
+    "evidenceKey": "sjt.observation",
+    "slotKey": "situational",
+    "selector": "bfi2.assertiveness.behavior",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "assertiveness",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

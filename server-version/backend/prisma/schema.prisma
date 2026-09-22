@@ -2312,3 +2312,20 @@ model BundleAnalysis {
   @@index([attemptId, createdAt])
   @@map("bundle_analyses")
 }
+
+// Source content is immutable; admission uses this governed lifecycle record.
+model BundlePackageRelease {
+  id              String   @id @default(uuid())
+  bundleKey       String
+  bundleVersion   String
+  contentHash     String
+  content         Json
+  status          String   @default("DRAFT")
+  review          Json?
+  installedBy     String
+  publishedBy     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@unique([bundleKey, bundleVersion])
+  @@map("bundle_package_releases")
+}

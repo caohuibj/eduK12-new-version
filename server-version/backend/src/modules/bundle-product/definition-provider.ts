@@ -1,3 +1,4 @@
+import { parseDeclarativePackage, type DeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { createProductBundleAnalysisEngineRegistry } from '../assessment-bundle/bootstrap'
@@ -19,6 +20,7 @@ export const bundleReportDefinitionSchema = z.object({
 export type BundleReportDefinition = z.infer<typeof bundleReportDefinitionSchema>
 
 export interface BundleDefinitionEntry {
+  declarativePackage?: DeclarativePackage
   definition: AssessmentBundleDefinitionV1
   contextDefinition: BundleContextDefinitionV1 | null
   ruleSet: MentalHealthRuleSetV1 | null
@@ -45,7 +47,10 @@ function validateEntry(input: BundleDefinitionEntry): BundleDefinitionEntry {
     contextDefinition,
     ruleSetRef: ruleSet ? { key: ruleSet.ruleSetKey, version: ruleSet.ruleSetVersion, hash: hashMentalHealthRuleSet(ruleSet) } : null,
   })
-  return clone({ definition, contextDefinition, ruleSet, reportDefinition })
+  const declarativePackage = input.declarativePackage ? parseDeclarativePackage(input.declarativePackage) : undefined
+  if ((definition.engine.key === 'declarative-evidence-v1') !== Boolean(declarativePackage)) throw new Error('BUNDLE_DECLARATIVE_CONTENT_REQUIRED')
+  if (declarativePackage && canonicalHash({ ...definition, status: 'DRAFT' }) !== canonicalHash(declarativePackage.manifest.definition)) throw new Error('BUNDLE_DECLARATIVE_DEFINITION_MISMATCH')
+  return clone({ definition, contextDefinition, ruleSet, reportDefinition, ...(declarativePackage ? { declarativePackage } : {}) })
 }
 
 /** Definition provider only. A successful lookup is never resource authorization. */
@@ -90,7 +95,8 @@ export class BundleDefinitionProvider {
 }
 
 export interface FrozenBundleProductionDefinitionV1 {
-  schemaVersion: 1
+  declarativePackage?: DeclarativePackage
+  schemaVersion: 1 | 2
   snapshotFamily: 'ASSESSMENT_BUNDLE'
   bundleSnapshot: FrozenAssessmentBundleSnapshotV3
   contextDefinition: BundleContextDefinitionV1 | null
@@ -98,13 +104,14 @@ export interface FrozenBundleProductionDefinitionV1 {
   reportDefinition: BundleReportDefinition
   contentHash: string
   frozenAt: string
-  source: { kind: 'CODE_CATALOG'; reference: string }
+  source: { kind: 'CODE_CATALOG' | 'DECLARATIVE_PACKAGE'; reference: string }
   freezeHash: string
 }
 const contentFor = (value: Omit<FrozenBundleProductionDefinitionV1, 'freezeHash' | 'contentHash'>) => ({
   schemaVersion: value.schemaVersion, snapshotFamily: value.snapshotFamily,
   bundleSnapshot: value.bundleSnapshot, contextDefinition: value.contextDefinition,
   ruleSet: value.ruleSet, reportDefinition: value.reportDefinition,
+  ...(value.declarativePackage ? { declarativePackage: value.declarativePackage } : {}),
 })
 
 /** Full definition freeze; the caller must authorize publication before persisting an instance. */
@@ -118,22 +125,24 @@ export function freezeBundleProductionDefinition(
     ruleSetRef: entry.ruleSet ? { key: entry.ruleSet.ruleSetKey, version: entry.ruleSet.ruleSetVersion, hash: hashMentalHealthRuleSet(entry.ruleSet) } : null,
   })
   const material = {
-    schemaVersion: 1 as const, snapshotFamily: 'ASSESSMENT_BUNDLE' as const,
+    schemaVersion: entry.declarativePackage ? 2 as const : 1 as const, snapshotFamily: 'ASSESSMENT_BUNDLE' as const,
     bundleSnapshot, contextDefinition: entry.contextDefinition, ruleSet: entry.ruleSet, reportDefinition: entry.reportDefinition,
+    ...(entry.declarativePackage ? { declarativePackage: entry.declarativePackage } : {}),
     frozenAt: z.string().datetime().parse(metadata.frozenAt),
-    source: { kind: 'CODE_CATALOG' as const, reference: z.string().min(1).parse(metadata.sourceReference) },
+    source: { kind: entry.declarativePackage ? 'DECLARATIVE_PACKAGE' as const : 'CODE_CATALOG' as const, reference: z.string().min(1).parse(metadata.sourceReference) },
   }
   const frozen = { ...material, contentHash: canonicalHash(contentFor(material)) }
   return { ...frozen, freezeHash: canonicalHash(frozen) }
 }
 
 const frozenSchema = z.object({
-  schemaVersion: z.literal(1), snapshotFamily: z.literal('ASSESSMENT_BUNDLE'),
+  declarativePackage: z.unknown().optional(),
+  schemaVersion: z.union([z.literal(1), z.literal(2)]), snapshotFamily: z.literal('ASSESSMENT_BUNDLE'),
   bundleSnapshot: z.unknown().refine(value => value !== undefined),
   contextDefinition: z.unknown().refine(value => value !== undefined),
   ruleSet: z.unknown().refine(value => value !== undefined),
   reportDefinition: bundleReportDefinitionSchema, contentHash: hash,
-  frozenAt: z.string().datetime(), source: z.object({ kind: z.literal('CODE_CATALOG'), reference: z.string().min(1) }).strict(),
+  frozenAt: z.string().datetime(), source: z.object({ kind: z.enum(['CODE_CATALOG', 'DECLARATIVE_PACKAGE']), reference: z.string().min(1) }).strict(),
   freezeHash: hash,
 }).strict()
 
@@ -153,7 +162,12 @@ export function readFrozenBundleProductionDefinition(raw: unknown): FrozenBundle
       contextDefinition.contextDefinitionVersion !== bundleSnapshot.bundleDefinition.contextDefinitionVersion)) throw new Error('BUNDLE_CONTEXT_IDENTITY_MISMATCH')
   if ((ruleSet ? hashMentalHealthRuleSet(ruleSet) : null) !== (bundleSnapshot.ruleSetRef?.hash ?? null)) throw new Error('BUNDLE_RULE_HASH_MISMATCH')
   if (ruleSet && (ruleSet.ruleSetKey !== bundleSnapshot.ruleSetRef?.key || ruleSet.ruleSetVersion !== bundleSnapshot.ruleSetRef?.version)) throw new Error('BUNDLE_RULE_IDENTITY_MISMATCH')
-  const { freezeHash, ...material } = { ...value, bundleSnapshot, contextDefinition, ruleSet }
+  const declarativePackage = value.declarativePackage ? parseDeclarativePackage(value.declarativePackage) : undefined
+  if ((bundleSnapshot.engine.key === 'declarative-evidence-v1') !== Boolean(declarativePackage)) throw new Error('BUNDLE_DECLARATIVE_CONTENT_REQUIRED')
+  if (declarativePackage && canonicalHash({...bundleSnapshot.bundleDefinition,status:'DRAFT'}) !== canonicalHash(declarativePackage.manifest.definition)) throw new Error('BUNDLE_DECLARATIVE_DEFINITION_MISMATCH')
+  if ((value.schemaVersion === 2) !== Boolean(declarativePackage) || (value.source.kind === 'DECLARATIVE_PACKAGE') !== Boolean(declarativePackage)) throw new Error('BUNDLE_FREEZE_VERSION_MISMATCH')
+  const { declarativePackage: _rawPackage, ...baseValue } = value
+  const { freezeHash, ...material } = { ...baseValue, bundleSnapshot, contextDefinition, ruleSet, ...(declarativePackage ? { declarativePackage } : {}) }
   if (canonicalHash(contentFor(material)) !== material.contentHash || canonicalHash(material) !== freezeHash) {
     throw new Error('BUNDLE_FREEZE_HASH_MISMATCH')
   }
