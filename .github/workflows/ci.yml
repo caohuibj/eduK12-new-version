@@ -11,7 +11,8 @@
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
-#   Mac lane:     backend → seeded browser → docker
+#   Mac lane:     backend → docker
+#   Hosted:       main browser plus three independent browser gates, each isolated
 #   Windows lane: frontend → codeql
 #   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
 #   这是 CI 调度稳定性优化，不代表 production performance improvement。
@@ -29,7 +30,7 @@
 #     不扩大本里程碑范围。
 #   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
-#   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
+#   - backend/frontend builds use exact GITHUB_SHA artifacts from this run; missing artifacts fail closed.
 #   - browser 下载同一运行的 production frontend build，用 preview 验收，避免重复构建和 Vite 首次转换超时。
 #   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
@@ -67,7 +68,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs
+      - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -309,15 +310,13 @@ jobs:
         run: npm run cognitive:contracts
       - name: build (tsc)
         run: npm run build
-      - name: publish backend build to runner-local handoff
-        run: |
-          handoff_dir="$HOME/.cache/eduk12-ci/backend-builds"
-          artifact="$handoff_dir/${GITHUB_SHA}.tar"
-          temp_artifact="${artifact}.tmp"
-          mkdir -p "$handoff_dir"
-          tar -C dist -cf "$temp_artifact" .
-          mv "$temp_artifact" "$artifact"
-          find "$handoff_dir" -type f -name '*.tar' -mtime +7 -delete
+      - name: publish tested backend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
       # The unknown-package contract imports the generated frontend runner.
       # This job has its own checkout; dependencies installed by the frontend
       # job are not available here. Preserve the real import instead of mocking it.
@@ -441,13 +440,11 @@ jobs:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance must execute against the same commit after both
     # production lanes have passed. It uses its own service containers and
-    # runs before Docker on the dedicated Mac lane.
+    # uses an isolated hosted runner so browser work cannot stall the Mac lane.
     needs: [scope, backend, frontend]
     if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ${{ fromJSON(vars.CI_BROWSER_HOSTED != 'false' && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
@@ -511,6 +508,19 @@ jobs:
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: restore hosted dependency downloads
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
+          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
+      - name: restore hosted Chromium binaries
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
@@ -543,23 +553,11 @@ jobs:
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
-      - name: restore backend build from runner-local handoff
-        id: backend-build
-        working-directory: server-version/backend
-        run: |
-          artifact="$HOME/.cache/eduk12-ci/backend-builds/${GITHUB_SHA}.tar"
-          if [ -f "$artifact" ]; then
-            rm -rf dist
-            mkdir -p dist
-            tar -C dist -xf "$artifact"
-            echo "restored=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "restored=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: build backend (fallback)
-        if: steps.backend-build.outputs.restored != 'true'
-        working-directory: server-version/backend
-        run: npm run build
+      - name: restore tested backend build
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
@@ -649,9 +647,9 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
-    # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
-    needs: [scope, backend, browser]
+    # Docker has no browser artifact dependency. Run after backend while the
+    # isolated browser validates; merge-gate still requires both to succeed.
+    needs: [scope, backend]
     if: needs.scope.outputs.content == 'false' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
