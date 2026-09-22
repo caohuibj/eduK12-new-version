@@ -1,3 +1,6 @@
+# Authoritative fast path for Scale onboarding.
+# Pure instrument-owned Scale content PRs are intentionally excluded from the
+# monolithic CI workflow and must pass this deterministic/targeted gate instead.
 name: Scale onboarding boundary
 on:
   pull_request:
@@ -8,8 +11,14 @@ on:
       - 'server-version/backend/src/__tests__/scale/**'
       - 'docs/scale-instruments/**'
       - '.github/workflows/scale-onboarding-boundary.yml'
+
+concurrency:
+  group: scale-onboarding-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   boundary:
+    timeout-minutes: 20
     runs-on: [self-hosted, linux, eduk12-mac-ci]
     steps:
       - uses: actions/checkout@v4
@@ -20,11 +29,26 @@ jobs:
           node-version: 20
       - run: npm ci
         working-directory: server-version/backend
+      - name: Generate Prisma client for TypeScript compile
+        run: npx prisma generate
+        working-directory: server-version/backend
       - name: Verify declared change class and content dependencies
         working-directory: server-version/backend
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           CHANGE_CLASS: ${{ contains(github.event.pull_request.labels.*.name, 'scale-platform-capability') && 'platform' || 'content' }}
         run: npm run scale:onboarding:check -- --base="$BASE_SHA" --mode="$CHANGE_CLASS"
-      - run: npm run scale:instruments:check && npm run scale:qualification:check
+      - name: Verify generated registry and scientific qualification
+        run: npm run scale:instruments:check && npm run scale:qualification:check
+        working-directory: server-version/backend
+      - name: Run targeted Scale regression
+        run: >-
+          npx vitest run
+          src/__tests__/scale
+          src/__tests__/assessment-governance/product-readiness-inventory.test.ts
+          --exclude 'src/__tests__/scale/**/*.postgres.integration.test.ts'
+          --no-file-parallelism
+        working-directory: server-version/backend
+      - name: Compile backend TypeScript
+        run: npx tsc --noEmit
         working-directory: server-version/backend
