@@ -1,3 +1,4 @@
+import type { SituationalScientificContext } from '../situational/types'
 import React from 'react'
 
 export interface SituationalReportMetric {
@@ -20,6 +21,7 @@ export interface SituationalReportInterpretationView {
 }
 
 export interface SituationalReportView extends Record<string, unknown> {
+  scientificContext?: SituationalScientificContext
   itemId: string
   type: 'SITUATIONAL'
   kind: 'situational'
@@ -65,6 +67,7 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
   return (
     <div data-testid={`situational-report-${report.itemId}`} className="space-y-5">
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+        <span>测评时科研等级：{report.scientificContext?.scientificMaturity ?? 'PILOT'}{!report.scientificContext || report.scientificContext.provenance === 'LEGACY_MISSING' ? '（历史科研快照缺失）' : ` · 治理修订 ${report.scientificContext.governanceRevision}`}</span>
         {report.instrumentKey && <span>工具：{report.instrumentKey}</span>}
         {report.instrumentVersion && <span>版本：{report.instrumentVersion}</span>}
         {report.scoringVersion && <span>评分：{report.scoringVersion}</span>}
@@ -72,6 +75,7 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
         {report.completedAt && <span>完成时间：{new Date(report.completedAt).toLocaleString('zh-CN')}</span>}
       </div>
 
+      {report.scientificContext?.scope && <p className="text-sm text-gray-600">证据适用范围：{[report.scientificContext.scope.language, report.scientificContext.scope.population, report.scientificContext.scope.use, report.scientificContext.scope.claim].join(' · ')}</p>}
       {report.disclaimer && (
         <p className="rounded-lg bg-indigo-50 p-4 text-sm leading-6 text-indigo-900/80" data-testid="situational-report-disclaimer">
           {report.disclaimer}

@@ -26,7 +26,7 @@ interface SituationPackageBase {
    * resolveSituationalScientificMaturity(exact identity), so promotion does
    * not alter the executable package or become a runtime capability switch.
    */
-  scienceMaturity: 'PILOT'
+  scienceMaturity?: 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
   goldenCases: SituationalGoldenCase[]
 }
 
@@ -80,7 +80,6 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   if (!situationPackage.key.trim()) identityIssues.push({ path: 'key', message: 'package key 不能为空', severity: 'error' })
   if (!situationPackage.instrumentVersion.trim()) identityIssues.push({ path: 'instrumentVersion', message: 'package instrumentVersion 不能为空', severity: 'error' })
   if (!['DRAFT', 'PUBLISHED', 'RETIRED'].includes(situationPackage.releaseStatus)) identityIssues.push({ path: 'releaseStatus', message: 'package releaseStatus 不合法', severity: 'error' })
-  if (situationPackage.scienceMaturity !== 'PILOT') identityIssues.push({ path: 'scienceMaturity', message: 'legacy package scienceMaturity 必须保持 PILOT；真实成熟度属于 governance metadata', severity: 'error' })
   const validation = validateSituationRuntimeDefinition(situationPackage.definition, {
     forPublish: false,
   })

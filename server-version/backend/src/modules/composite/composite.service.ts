@@ -1,3 +1,6 @@
+import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
+import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
+import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
 import { randomBytes } from 'crypto'
 import { nanoid } from 'nanoid'
 import { Prisma, UserRole } from '@prisma/client'
@@ -292,8 +295,8 @@ const assertSituationalCompositeItem = (item: {
     throw compositeBadRequest('情境化模块必须绑定精确 instrumentKey 和 instrumentVersion')
   }
   const situationPackage = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)
-  if (!situationPackage || situationPackage.releaseStatus !== 'PUBLISHED' || situationPackage.scienceMaturity !== 'PILOT') {
-    throw compositeBadRequest('情境化题包不存在、未发布或不满足 PILOT 准入')
+  if (!situationPackage || situationPackage.releaseStatus !== 'PUBLISHED') {
+    throw compositeBadRequest('情境化题包不存在或未发布')
   }
   const validation = validateSituationPackage(situationPackage)
   if (!validation.valid) throw compositeBadRequest('情境化题包未通过运行时校验')
@@ -586,7 +589,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
         key: item.situationalInstrumentKey,
         version: item.situationalInstrumentVersion,
         status: 'PUBLISHED',
-        scienceMaturity: 'PILOT',
+        scienceMaturity: resolveSituationalScientificMaturity(item.situationalInstrumentKey, item.situationalInstrumentVersion),
       }
     : null,
   form: item.type === 'FORM'
@@ -4273,12 +4276,15 @@ export const buildCompositeReport = (attempt: any) => {
         const canonical = child?.canonicalResultEncrypted
           ? parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload<unknown>(child.canonicalResultEncrypted))
           : null
+        const scientificContext = frozenSituationalScientificProjection(child?.runtimeSnapshotEncrypted ? decryptFrozenSituationalRuntimeSnapshot(child.runtimeSnapshotEncrypted).scientificContext : undefined)
         if (canonical && canonical.core.unitType !== 'SITUATIONAL') throw new Error('wrong situational canonical unit type')
         unitReports.push({
           itemId: item.id,
           type: 'SITUATIONAL' as const,
           kind: 'situational' as const,
           label: resolveCompositeItemLabel(item, packageSlotLabels),
+          scienceMaturity: scientificContext.scientificMaturity,
+          scientificContext,
           instrumentKey: canonical?.core.instrumentKey ?? child?.instrumentKey ?? item.situationalInstrumentKey ?? null,
           instrumentVersion: canonical?.core.instrumentVersion ?? child?.instrumentVersion ?? item.situationalInstrumentVersion ?? null,
           metrics: canonical?.core.metrics?.map((metric) => ({

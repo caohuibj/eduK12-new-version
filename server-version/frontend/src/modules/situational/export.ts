@@ -1,6 +1,7 @@
-import type { SituationalAttemptResponse } from './types'
+import type { SituationalAttemptResponse, SituationalScientificContext } from './types'
 
 export interface SituationalExportPayload {
+  scientificContext: SituationalScientificContext
   instrumentKey: string
   instrumentVersion: string
   scoringVersion: string
@@ -18,6 +19,7 @@ export interface SituationalExportPayload {
 }
 
 export const buildSituationalExportPayload = (data: SituationalAttemptResponse): SituationalExportPayload => ({
+  scientificContext: data.instrument.scientificContext ?? { scientificMaturity: 'PILOT', governanceRevision: null, scope: null, evidenceDigest: null, provenance: 'LEGACY_MISSING' },
   instrumentKey: data.attempt.instrumentKey,
   instrumentVersion: data.attempt.instrumentVersion,
   scoringVersion: data.attempt.scoringVersion,
@@ -45,6 +47,11 @@ export const buildSituationalCsv = (data: SituationalAttemptResponse): string =>
     ['instrumentKey', payload.instrumentKey],
     ['instrumentVersion', payload.instrumentVersion],
     ['scoringVersion', payload.scoringVersion],
+    ['scientificMaturity', payload.scientificContext.scientificMaturity],
+    ['governanceRevision', payload.scientificContext.governanceRevision],
+    ['scientificProvenance', payload.scientificContext.provenance],
+    ['scientificScope', JSON.stringify(payload.scientificContext.scope)],
+    ['evidenceDigest', payload.scientificContext.evidenceDigest],
     ['completedAt', payload.completedAt ?? ''],
     ['quality.status', payload.quality.status],
     ['quality.flags', payload.quality.flags.join('|')],

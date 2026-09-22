@@ -32,5 +32,5 @@ export const publicationContentDigest = (content: SituationalInstrumentContentV1
 export const projectSituationPackage = (source: SituationalInstrumentSourceV1): SituationPackage => ({
   key: source.content.identity.instrumentKey, instrumentVersion: source.content.identity.instrumentVersion,
   definition: source.content.definition, goldenCases: source.content.goldenCases,
-  releaseStatus: source.publication.releaseStatus, scienceMaturity: 'PILOT',
+  releaseStatus: source.publication.releaseStatus,
 } as SituationPackage)

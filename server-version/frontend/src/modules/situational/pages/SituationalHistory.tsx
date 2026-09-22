@@ -84,6 +84,7 @@ const SituationalHistory: React.FC = () => {
                   meta={(
                     <>
                       <span>版本 {row.attempt.instrumentVersion}</span>
+                      <span>测评时科研等级：{row.instrument.scientificContext?.scientificMaturity ?? 'PILOT'}</span>
                       <span>{new Date(row.attempt.startedAt).toLocaleString('zh-CN')}</span>
                     </>
                   )}

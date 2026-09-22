@@ -24,3 +24,13 @@ describe('Situational export', () => {
 })
 
 
+
+it('exports frozen governance and uses a marked legacy baseline without borrowing a current grade', () => {
+  const historical = structuredClone(result)
+  historical.instrument.scienceMaturity = 'RESEARCH_GRADE'
+  expect(buildSituationalExportPayload(historical).scientificContext).toMatchObject({ scientificMaturity: 'PILOT', governanceRevision: null, provenance: 'LEGACY_MISSING' })
+  historical.instrument.scientificContext = { scientificMaturity: 'RESEARCH_READY', governanceRevision: 3, evidenceDigest: 'd'.repeat(64), scope: { language: 'zh-CN', population: 'adults', use: 'research', claim: 'association' }, provenance: 'FROZEN' }
+  expect(buildSituationalExportPayload(historical).scientificContext.scientificMaturity).toBe('RESEARCH_READY')
+  expect(buildSituationalCsv(historical)).toContain('RESEARCH_READY')
+  expect(buildSituationalCsv(historical)).not.toContain('RESEARCH_GRADE')
+})

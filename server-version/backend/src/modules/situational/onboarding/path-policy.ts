@@ -7,3 +7,12 @@ export const classifySituationalPath = (path: string): SituationalPathClass => {
   if (path === root + 'onboarding/instruments.generated.ts') return 'GENERATED'
   return 'SHARED_CORE'
 }
+
+/** Review routing only; it never grants publication or scientific approval. */
+export const classifySituationalChange = (path: string) => {
+  const category = classifySituationalPath(path)
+  if (category !== 'INSTRUMENT_OWNED') return category
+  if (path.endsWith('/scientific.json')) return 'SCIENTIFIC_GOVERNANCE' as const
+  if (path.endsWith('/publication.json')) return 'PUBLICATION' as const
+  return 'EXECUTABLE_CONTENT' as const
+}

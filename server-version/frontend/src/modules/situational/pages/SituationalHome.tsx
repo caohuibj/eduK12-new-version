@@ -52,7 +52,7 @@ const SituationalHome: React.FC = () => {
         <ProductStatus kind="error" title="情境化测评列表加载失败" announce="assertive">{error}</ProductStatus>
       ) : instruments.length === 0 ? (
         <ProductStatus kind="info" title="暂无可用的情境化测评">
-          当前没有可用的已发布试点题包。
+          当前没有可用的已发布题包。
         </ProductStatus>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -62,13 +62,13 @@ const SituationalHome: React.FC = () => {
               to={`/student/situational/${encodeURIComponent(instrument.key)}`}
               title={instrumentTitle(instrument)}
               ariaLabel={`${instrumentTitle(instrument)}，开始或继续情境化测评`}
-              eyebrow="Situational Text Pilot"
+              eyebrow="Situational"
               leading={(
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
                   <Sparkles className="h-6 w-6" />
                 </span>
               )}
-              status={<span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">PILOT · reference NONE</span>}
+              status={<span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">{instrument.scienceMaturity} · reference NONE</span>}
               description={instrument.report.limitations[0] || '试点阶段结果仅用于描述当前情境任务中的反应模式。'}
               meta={(
                 <>

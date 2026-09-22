@@ -1,5 +1,6 @@
 import { GENERATED_SITUATIONAL_INSTRUMENT_SOURCES } from './instruments.generated'
 import { instrumentSourceSchema } from './schema'
+import { evaluateSituationalScientificGovernance } from './scientific-governance'
 import type { SituationalScientificDeclarationV1 } from './scientific-schema'
 
 const identityKey = (key: string, version: string) => JSON.stringify([key, version])
@@ -9,6 +10,8 @@ export function createSituationalScientificRegistry(sources: readonly unknown[])
   const declarations = new Map<string, SituationalScientificDeclarationV1>()
   for (const value of sources) {
     const source = instrumentSourceSchema.parse(value)
+    const decision = evaluateSituationalScientificGovernance(source)
+    if (!decision.valid) throw new Error(`Invalid scientific governance: ${decision.errors.join(',')}`)
     const identity = source.content.identity
     const key = identityKey(identity.instrumentKey, identity.instrumentVersion)
     if (declarations.has(key)) throw new Error(`Duplicate situational scientific identity: ${key}`)

@@ -6,5 +6,6 @@
   "evidence": [],
   "knownLimitations": [
     "Pilot content; no scoped research evidence has been reviewed."
-  ]
+  ],
+  "changeReason": "Migrate to instrument-owned scoped evidence and explicit limitations."
 }

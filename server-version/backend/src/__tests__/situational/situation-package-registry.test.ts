@@ -54,8 +54,8 @@ describe('situation package registry', () => {
       scienceMaturity: 'EXPERIMENTAL',
     } as unknown as SituationPackageV1
     const maturityValidation = validateSituationPackage(brokenMaturity)
-    expect(maturityValidation.valid).toBe(false)
-    expect(maturityValidation.issues.some((issue) => issue.path === 'scienceMaturity')).toBe(true)
+    expect(maturityValidation.valid).toBe(true)
+    expect(maturityValidation.issues.some((issue) => issue.path === 'scienceMaturity')).toBe(false)
   })
 })
 

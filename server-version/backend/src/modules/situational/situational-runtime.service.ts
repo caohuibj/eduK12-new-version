@@ -1,3 +1,4 @@
+import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -20,7 +21,7 @@ import {
   validateSituationPackage,
   type SituationPackage,
 } from './situation-package.registry'
-import { resolveSituationalScientificMaturity } from './scientific-maturity'
+import { resolveSituationalScientificMaturity, resolveSituationalScientificContext, currentSituationalScientificProjection } from './scientific-maturity'
 import { situationalAssetReferences } from './situation-definition'
 import { runnerSituationRuntimeDefinition } from './situation-runtime-definition'
 import type { SituationalResultV1 } from './situation-scoring'
@@ -121,9 +122,8 @@ const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
     definition: snapshot.runnerDefinition,
     report: snapshot.definition.report,
     referencePolicy: snapshot.definition.referencePolicy,
-    scienceMaturity: governance
-      ? resolveSituationalScientificMaturity(snapshot.instrumentKey, snapshot.instrumentVersion)
-      : 'PILOT' as const,
+    scienceMaturity: frozenSituationalScientificProjection(snapshot.scientificContext).scientificMaturity,
+    scientificContext: frozenSituationalScientificProjection(snapshot.scientificContext),
     runtimeCapabilities: snapshot.compiledRuntime.runtimeCapabilities,
   }
 }
@@ -332,6 +332,7 @@ export const listSituationalInstruments = () => listSituationPackages()
         situationPackage.key,
         situationPackage.instrumentVersion,
       ),
+      scientificContext: currentSituationalScientificProjection(situationPackage),
       runtimeCapabilities: runtime.runtimeCapabilities,
     }
   })
@@ -343,10 +344,12 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
     definition: situationPackage.definition,
+    scientificContext: resolveSituationalScientificContext(situationPackage),
     frozenAt: new Date(0),
   })
   return {
     ...instrumentResponse(snapshot),
+    scientificContext: currentSituationalScientificProjection(situationPackage),
   }
 }
 
@@ -385,6 +388,7 @@ export const startSituationalAttempt = async (userId: string, input: {
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
     definition: situationPackage.definition,
+    scientificContext: resolveSituationalScientificContext(situationPackage),
     frozenAt,
   })
   const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
@@ -472,6 +476,7 @@ export const createEmbeddedSituationalAttempt = async (
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
     definition: situationPackage.definition,
+    scientificContext: resolveSituationalScientificContext(situationPackage),
     frozenAt,
   })
   const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)

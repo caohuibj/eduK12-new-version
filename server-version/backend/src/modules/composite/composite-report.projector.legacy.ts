@@ -275,6 +275,8 @@ const projectSituationalUnit = (unit: any) => ({
   itemId: unit.itemId,
   type: 'SITUATIONAL' as const,
   kind: 'situational' as const,
+  scienceMaturity: unit.scientificContext?.scientificMaturity ?? 'PILOT',
+  scientificContext: unit.scientificContext ?? { scientificMaturity: 'PILOT', governanceRevision: null, scope: null, evidenceDigest: null, provenance: 'LEGACY_MISSING' },
   label: unit.label ?? null,
   instrumentKey: unit.instrumentKey ?? null,
   instrumentVersion: unit.instrumentVersion ?? null,
