@@ -13,7 +13,7 @@ All three new exact identities remain:
 
 - `catalogStatus=CANDIDATE`
 - `scientificMaturity=PILOT`
-- `executable.releaseStatus=DRAFT`
+- `executable.releaseStatus=PUBLISHED`
 - no `scientificReview`
 - no production authorization record
 - no install/apply or publication action
@@ -242,7 +242,7 @@ No overall total score has been invented.
 ### Missing responses
 
 The reviewed public source material did not establish an exact digital partial-score
-rule suitable for deterministic implementation. The DRAFT package therefore uses
+rule suitable for deterministic implementation. The released executable package therefore uses
 `complete_required` within each dimension.
 
 This is deliberately conservative. It can be relaxed only after a traceable source
