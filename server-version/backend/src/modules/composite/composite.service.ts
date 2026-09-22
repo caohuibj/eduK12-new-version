@@ -829,7 +829,7 @@ export const createComposite = async (userId: string, role: UserRole, input: Cre
 
 export const listComposites = async (userId: string, role: UserRole) => {
   assertTeacher(role)
-  const where = role === UserRole.ADMIN ? {} : { createdBy: userId }
+  const where = { productKind: 'LEGACY_COMPOSITE', ...(role === UserRole.ADMIN ? {} : { createdBy: userId }) }
   const list = await prisma.compositeAssessment.findMany({
     where,
     orderBy: { createdAt: 'desc' },
@@ -1265,6 +1265,7 @@ export const listAttemptsForTeacher = async (
     assessment: {
       id: composite.id,
       name: composite.name,
+      productKind: composite.productKind,
       code: composite.code,
       status: composite.status,
       courseId: composite.courseId,
@@ -2972,6 +2973,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
     select: {
       id: true,
       name: true,
+      productKind: true,
       instruction: true,
       reportPackageSnapshotEncrypted: true,
       reportPackageKey: true,
@@ -3336,6 +3338,7 @@ const getUnifiedCompositeAttemptState = async (
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
+    ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
     deliveryMode: attempt.deliveryMode,
@@ -3934,6 +3937,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
+    ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
     deliveryMode: attempt.deliveryMode,
@@ -4450,6 +4454,7 @@ export const buildCompositeReport = (attempt: any) => {
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
+    ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     anonymousCode: attempt.anonymousCode,
     completedAt: attempt.completedAt,
     totalTime: attempt.totalTime,
@@ -4781,7 +4786,7 @@ export const getReportForTeacher = async (
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-  assertSupportedComposite(attempt.compositeAssessment)
+  assertSupportedComposite(attempt.compositeAssessment, attempt.compositeAssessment.productKind === 'QUESTIONNAIRE')
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 

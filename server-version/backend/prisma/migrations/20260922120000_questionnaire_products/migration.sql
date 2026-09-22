@@ -8,8 +8,8 @@ CREATE UNIQUE INDEX "composite_assessments_creation_key_key" ON "composite_asses
 ALTER TABLE "composite_assessments" ADD CONSTRAINT "questionnaire_collection_only" CHECK (
  ("product_kind" = 'LEGACY_COMPOSITE' AND "questionnaire_type" IS NULL)
  OR ("product_kind" = 'QUESTIONNAIRE' AND "questionnaire_type" IS NOT NULL
- AND "reportPackageKey" IS NULL AND "reportPackageVersion" IS NULL AND "reportPackageSnapshotEncrypted" IS NULL
- AND "analysisProtocolKey" IS NULL AND "analysisProtocolVersion" IS NULL AND "analysisProtocolSnapshotEncrypted" IS NULL));
+ AND "report_package_profile" IS NULL AND "report_package_key" IS NULL AND "report_package_version" IS NULL AND "report_package_snapshot_encrypted" IS NULL
+ AND "analysis_protocol_key" IS NULL AND "analysis_protocol_version" IS NULL AND "analysis_protocol_snapshot_encrypted" IS NULL));
 ALTER TABLE "composite_assessment_attempts" ADD COLUMN "delivery_course_id" TEXT;
 CREATE TABLE "questionnaire_course_deliveries" (
  "composite_id" TEXT NOT NULL REFERENCES "composite_assessments"("id") ON DELETE CASCADE,

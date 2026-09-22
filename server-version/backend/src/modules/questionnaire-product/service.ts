@@ -210,7 +210,7 @@ export async function remove(actor: Actor, id: string, raw: unknown) {
 export async function list(actor: Actor, page = 1, pageSize = 25) {
   author(actor)
   // SQL is static; values remain positional parameters, never interpolated.
-  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT id, name, status::text, \"createdAt\" AS created, \"createdBy\" AS owner_id, 'COLLECTION' AS kind, questionnaire_type::text FROM composite_assessments WHERE product_kind = 'QUESTIONNAIRE'"
+  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT id, name, status::text, created_at AS created, created_by AS owner_id, 'COLLECTION' AS kind, questionnaire_type::text FROM composite_assessments WHERE product_kind = 'QUESTIONNAIRE'"
   const filter = '($1::boolean OR owner_id = $2)'
   const [rows, counts] = await prisma.$transaction([
     prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $3 OFFSET $4', actor.role === 'ADMIN', actor.userId, pageSize, (page - 1) * pageSize),
@@ -304,4 +304,19 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
   let target: string
   try { target = await run() } catch (e: any) { if (e.code !== 'P2002') throw e; target = await run() }
   return detail(actor, target)
+}
+
+/** Paged audience-projected reports, never raw response tables. */
+export async function exportReports(actor: Actor, id: string, raw: unknown) {
+  await detail(actor, id)
+  const { after } = z.object({ after: z.string().uuid().optional() }).strict().parse(raw)
+  const rows = await prisma.compositeAssessmentAttempt.findMany({
+    where: { compositeAssessmentId: id, status: 'COMPLETED', ...(after ? { id: { gt: after } } : {}) },
+    orderBy: { id: 'asc' }, take: 101, select: { id: true },
+  })
+  const { getReportForTeacher } = await import('../composite/composite.service')
+  const reports = []
+  for (const row of rows.slice(0,100)) reports.push(await getReportForTeacher(actor.userId, actor.role, id, row.id))
+  return { schemaVersion: 'questionnaire-independent-reports-v1', reportMode: 'COLLECTION_ONLY', questionnaireId: id,
+    reports, next: rows.length > 100 ? rows[99].id : null }
 }
