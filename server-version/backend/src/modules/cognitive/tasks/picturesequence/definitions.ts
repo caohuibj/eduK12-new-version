@@ -39,5 +39,5 @@ export const picturesequenceRegistryMeta = {
     practicalTips: ['延迟保持只有在科研档延迟阶段实际完成时展示；缺失不等于低分。'],
     disclaimer: '使用内部自制场景刺激，只反映本次序列学习表现，不等同 NIH PSM、临床诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

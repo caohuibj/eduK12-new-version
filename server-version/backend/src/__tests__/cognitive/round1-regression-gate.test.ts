@@ -107,8 +107,20 @@ const baseConfigs: Record<string, Record<string, unknown>> = {
   },
 }
 
+const ROUND1_TASKS = new Set([
+  'corsi',
+  'cpt',
+  'gonogo',
+  'memory',
+  'nback',
+  'reaction',
+  'sst',
+  'stroop',
+  'taskswitch',
+])
+
 const round1Entries = () => listCognitiveRegistryEntries()
-  .filter((entry) => entry.recommendedForCreate && entry.testType !== 'fake')
+  .filter((entry) => ROUND1_TASKS.has(entry.testType) && entry.recommendedForCreate)
   .sort((left, right) => left.testType.localeCompare(right.testType))
 
 beforeAll(() => {

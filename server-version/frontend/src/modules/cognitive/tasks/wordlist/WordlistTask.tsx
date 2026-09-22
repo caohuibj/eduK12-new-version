@@ -264,7 +264,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
     return (
       <div className="card p-8 text-center">
         <p className="mb-3 text-sm text-gray-500">正式延迟阶段</p>
-        <p className="text-gray-700">请稍候，延迟回忆会按冻结配置开始。</p>
+        <p className="text-gray-700">请保持当前页面，等待结束后将再次回忆刚才学习的词语。</p>
       </div>
     )
   }
@@ -305,7 +305,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
       {feedback && <p className="mt-4 text-sm text-amber-700">{feedback}</p>}
       {!isPractice && interrupted && <p className="mt-3 text-xs text-amber-700">检测到页面切换，中断状态会随正式阶段提交。</p>}
       {!isPractice && completionPending && onTaskComplete && <button type="button" onClick={() => void onTaskComplete()} className="btn-secondary mt-4 w-full">重试完成测评</button>}
-      {!isPractice && stage?.phase === 'delayed' && config.delayedDelayMs && config.delayedDelayMs > 0 && <p className="mt-3 text-xs text-gray-400">延迟阶段按冻结配置进入；本页面不把等待时间写入响应。</p>}
+      {!isPractice && stage?.phase === 'delayed' && config.delayedDelayMs && config.delayedDelayMs > 0 && <p className="mt-3 text-xs text-gray-400">本阶段不再呈现词表，请凭记忆输入；想不起来的词可以留空。</p>}
       {activeRecallWords.length > 0 && <span className="sr-only">本阶段包含 {activeRecallWords.length} 个目标词</span>}
     </div>
   )

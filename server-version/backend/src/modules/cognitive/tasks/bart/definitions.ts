@@ -59,3 +59,19 @@ export const bartRegistryMeta = {
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: false,
 }
+
+export const bartRegistryMetaV11 = {
+  ...bartRegistryMeta,
+  metricDefinitionVersion: '1.1.0',
+  metricDefinitions: {
+    ...bartRegistryMeta.metricDefinitions,
+    adjustedPumps: metric('adjustedPumps', '现金化气球平均泵压', 'risk_taking', 'count', 'descriptive', 'primary', { valueType: 'number', precision: 4 }),
+    meanPumpsAllCompleted: metric('meanPumpsAllCompleted', '已完成气球平均泵压', 'risk_taking', 'count', 'descriptive', 'secondary', { valueType: 'number', precision: 4 }),
+  } as Record<string, MetricDefinition>,
+  reportDefinitionVersion: '1.1.0',
+  reportDefinition: {
+    ...bartRegistryMeta.reportDefinition,
+    practicalTips: ['平均泵压、爆破次数和现金化次数应作为本次任务内的描述性指标阅读，不形成风险高低或好坏等级。'],
+  } satisfies SingleTaskReportDefinition,
+  recommendedForCreate: true,
+}

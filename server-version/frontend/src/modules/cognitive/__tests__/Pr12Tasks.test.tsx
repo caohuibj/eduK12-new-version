@@ -47,6 +47,21 @@ describe('PR12 cognitive task runners', () => {
     expect(JSON.stringify(payload)).not.toMatch(/userAgent|screen|coordinate|deviceId/i)
   })
 
+  it('separates A/B boards so duplicate numeric labels never compete for a response', () => {
+    const taskContext = { ...context, config: { ...context.config, form: 'AB' as const, partAItemCount: 12, partBItemCount: 12 } }
+    const onTrialComplete = vi.fn().mockResolvedValue(true)
+    const { rerender } = render(<TrailmakingTask taskContext={taskContext} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    finishTrailPractice()
+    expect(screen.getAllByRole('button', { name: '目标 1' })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: '目标 A' })).toBeNull()
+    expect(screen.getByText(/A 部分/)).toBeTruthy()
+    rerender(<TrailmakingTask taskContext={taskContext} trialIndex={12} onTrialComplete={onTrialComplete} />)
+    expect(screen.getAllByRole('button', { name: '目标 1' })).toHaveLength(1)
+    expect(screen.getByRole('button', { name: '目标 A' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '目标 12' })).toBeNull()
+    expect(screen.getByText(/B 部分/)).toBeTruthy()
+  })
+
   it('runs Reversal Learning practice feedback without submitting a formal trial', () => {
     const onTrialComplete = vi.fn()
     render(

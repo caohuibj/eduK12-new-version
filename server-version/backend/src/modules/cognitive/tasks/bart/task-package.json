@@ -8,6 +8,11 @@
       "engineVersion": "1.0.0",
       "scoringVersion": "1.0.0",
       "order": 24
+    },
+    {
+      "testType": "bart",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0"
     }
   ],
   "backend": {
@@ -30,7 +35,8 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      24
+      24,
+      null
     ]
   },
   "presentation": {

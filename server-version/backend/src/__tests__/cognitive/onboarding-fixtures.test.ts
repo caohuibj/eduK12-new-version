@@ -16,7 +16,7 @@ describe('task-owned executable onboarding evidence', () => {
       expect(
         diagnostics.filter((b) => b.severity === 'WARNING').map((b) => b.code),
       ).toEqual(
-        e.testType === 'bart'
+        e.testType === 'bart' && e.scoringVersion === '1.0.0'
           ? ['COG_LEGACY_FRACTIONAL_COUNT', 'COG_LEGACY_FRACTIONAL_COUNT']
           : [],
       )

@@ -25,5 +25,5 @@ export const matrixRegistryMeta = {
   } as Record<string, QualityDefinition>,
   reportDefinitionVersion: '1.0.0',
   reportDefinition: { title: '矩阵规则推理', headlineMetric: 'accuracy', primaryMetrics: ['accuracy', 'accuracyByRuleFamily'], secondaryMetrics: ['reachedDifficulty', 'medianRtMs', 'omissionRate'], practicalTips: ['正确率按规则族和难度覆盖一起阅读，不换算 IQ 或智力等级。'], disclaimer: '结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。' } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }

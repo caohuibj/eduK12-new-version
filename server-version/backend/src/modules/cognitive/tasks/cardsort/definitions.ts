@@ -60,5 +60,5 @@ export const cardsortRegistryMeta = {
     practicalTips: ['持续性错误由冻结规则和实际响应推导，不等同于临床执行功能判断。'],
     disclaimer: '结果反映本次双规则分类任务表现，不是商业卡片分类测验、临床诊断或人口常模。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: false,
+  recommendedForCreate: true,
 }
