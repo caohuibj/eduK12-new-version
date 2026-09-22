@@ -54,4 +54,13 @@ describe('Bundle production definition provider and full freeze',()=>{
     expect(retired.publicationBlockers(changed.definition.bundleKey,changed.definition.bundleVersion)).toContain('BUNDLE_NOT_PUBLISHED')
     expect(readFrozenBundleProductionDefinition(a).reportDefinition.title).toBe(a.reportDefinition.title)
   })
+  it('blocks publication when age eligibility cannot be collected or Form identity differs',()=>{
+    const withoutAge=entry();withoutAge.contextDefinition!.fields[0].required=false
+    const ageProvider=new BundleDefinitionProvider([withoutAge])
+    expect(ageProvider.publicationBlockers(withoutAge.definition.bundleKey,'1.0.0')).toContain('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
+    const wrongForm=entry();wrongForm.definition.slots.push({slotKey:'context',unitType:'FORM',position:2,required:true,instrumentKey:'wrong-context',instrumentVersion:'1.0.0',respondentType:'SELF'})
+    const formProvider=new BundleDefinitionProvider([wrongForm])
+    expect(formProvider.publicationBlockers(wrongForm.definition.bundleKey,'1.0.0')).toContain('FORM_SLOT_CONTEXT_IDENTITY_MISMATCH')
+  })
+
 })

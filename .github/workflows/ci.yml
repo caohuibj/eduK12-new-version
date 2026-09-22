@@ -218,6 +218,7 @@ jobs:
       V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -345,6 +346,7 @@ jobs:
           src/__tests__/scale/pr3-managed.postgres.integration.test.ts
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
+          src/__tests__/bundle-product/product.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
@@ -625,6 +627,30 @@ jobs:
         env:
           PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: node e2e/pr5-release-rehearsal.mjs
+      - name: verify Bundle V3 browser lifecycle in isolated catalog
+        env:
+          BUNDLE_PRODUCTS_ENABLED: 'true'
+          BUNDLE_PRODUCT_ISOLATED_DB: '1'
+          BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          BUNDLE_PRODUCT_BASE_URL: http://127.0.0.1:5173
+          BUNDLE_PRODUCT_EVIDENCE: /tmp/eduk12-bundle-products-e2e
+        run: |
+          rm -rf /tmp/eduk12-bundle-products-e2e
+          backend/node_modules/.bin/tsx e2e/bundle-products-fixture.ts
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          nohup setsid backend/node_modules/.bin/tsx e2e/bundle-products-server.ts > /tmp/eduk12-bundle-products-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
+          node e2e/bundle-products-browser-e2e.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
@@ -638,6 +664,8 @@ jobs:
             /tmp/eduk12-pr5-scenarios-evidence
             /tmp/eduk12-pr5-release-rehearsal
             /tmp/eduk12-pr5-scenario-backend.log
+            /tmp/eduk12-bundle-products-e2e
+            /tmp/eduk12-bundle-products-backend.log
           if-no-files-found: ignore
       - name: stop seeded services
         if: always()

@@ -194,6 +194,7 @@ export PR26_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export PR34_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export PR38_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+export BUNDLE_PRODUCT_TEST_DATABASE_URL="$DATABASE_URL"
 export RELEASE_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_1_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_2_INTEGRATION_DATABASE_URL="$DATABASE_URL"
@@ -245,6 +246,7 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
   BACKEND_TEST_REPORT="$REPORT_DIR/backend-vitest.json"
   run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
   run_logged backend-test-report-check.log node "$BACKEND_DIR/scripts/assert-release-test-report.mjs" "$BACKEND_TEST_REPORT" \
+    src/__tests__/bundle-product/product.postgres.integration.test.ts \
     src/__tests__/cognitive/concurrency.integration.test.ts \
     src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
     src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
