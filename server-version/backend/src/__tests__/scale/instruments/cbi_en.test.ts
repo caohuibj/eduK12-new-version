@@ -17,7 +17,7 @@ describe('CBI English instrument package', () => {
       'client_related_burnout',
     ])
     expect(pkg.definition.scoring.scores.every(row => row.type === 'dimension')).toBe(true)
-    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('DRAFT')
+    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('PUBLISHED')
   })
 
   it('reverses the work-energy item exactly and preserves the source mean rule', () => {
