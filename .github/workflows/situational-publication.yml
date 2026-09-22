@@ -21,7 +21,7 @@ jobs:
           node-version: 20
       - run: npm ci --ignore-scripts
         working-directory: server-version/backend
-      - name: Verify exact content, immutable identities and human publication reviews
+      - name: Verify publication, scoped scientific declarations and human reviews
         working-directory: server-version/backend
         env:
           GITHUB_TOKEN: ${{ github.token }}

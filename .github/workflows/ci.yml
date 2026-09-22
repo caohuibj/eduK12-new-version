@@ -42,6 +42,8 @@ on:
       - main
       - 'refactor/unified-runtime-v32-unit'
       - 'content/cognitive-expansion'
+  pull_request_review:
+    types: [submitted, dismissed]
   workflow_dispatch:
 
 concurrency:
@@ -77,7 +79,7 @@ jobs:
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -156,7 +158,7 @@ jobs:
 
   backend:
     name: backend (ci + migrate + build + full regression)
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -251,7 +253,7 @@ jobs:
       - name: situational data-only manifests and publication gates
         run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -342,7 +344,7 @@ jobs:
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -386,7 +388,7 @@ jobs:
     # production lanes have passed. It uses its own service containers and
     # runs before Docker on the dedicated Mac lane.
     needs: [backend, frontend]
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -590,7 +592,7 @@ jobs:
     # Mac lane 的第三个 job：browser 通过后才启动；同一 dedicated runner
     # 也保证 Docker 不会与 seeded browser 在同一物理主机重叠运行。
     needs: [backend, browser]
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -684,7 +686,7 @@ jobs:
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
     needs: frontend
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    if: github.event_name == 'workflow_dispatch' || ((github.event_name == 'pull_request' || github.event_name == 'pull_request_review') && github.event.pull_request.draft == false)
     runs-on:
       - self-hosted
       - linux
@@ -721,7 +723,7 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [backend, frontend, browser, docker, codeql]
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'pull_request_review') }}
     runs-on:
       - self-hosted
       - linux

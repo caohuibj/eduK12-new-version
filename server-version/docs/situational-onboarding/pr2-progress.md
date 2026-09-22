@@ -1,55 +1,65 @@
-# SJT PR2: scientific governance and runtime decoupling
+# SJT PR2 execution and acceptance record
 
-Status: **Draft, C01 implemented; C02–C05 pending. Not ready to merge.**
+Status: implementation complete; local validation passed; full remote CI required before merge. PR: #153.
 
-## Baseline and compatibility
+## Baseline and commits
 
-PR1 #151 supplies data-only sources, explicit publication, immutable released content and frozen execution compatibility. This branch starts from its integration with main `5cf5d8e` (Scale onboarding #152); the PR1 integration commit is `05a96e7`. PR1 merged into main at `8b916eba6d76bfad1911e10189e7258be122a15c`; this branch incorporates that merged base. Full Gate run `35663856001`, attempt 3, passed all required checks before merging.
+Base: PR1 #151 merged at `8b916eba6d76bfad1911e10189e7258be122a15c`, including Scale onboarding #152 and previously merged Cognitive onboarding. No shared scientific qualification policy or scoring algorithm was changed.
 
-Scale and Cognitive now both use scoped evidence adapters. SJT reuses the shared `evaluateScientificQualification` policy without changing either family. The definition's source/license remains a valid provenance fact, but it cannot establish research foundation, empirical support or formal output.
-
-## C01 — instrument-owned scientific authority
-
-- `scientific.json` owns revision, declared PILOT maturity, claim scope, limitations and evidence pointers.
-- Each evidence item binds key/version, scorer/scoring version, definition hash, language, population, use and claim. Only exact matches contribute to eligibility.
-- The resolver reads generated sources. It no longer uses the SJT mutable maturity override map or shared mutable evidence map. Returned declarations are defensive copies; duplicate identities and evidence IDs fail validation.
-- Existing production declarations advance to governance revision 2 and explicitly remain PILOT with empty evidence and a stated limitation. Existing publication receipts and executable definitions are unchanged.
-- Technical eligibility and scientific eligibility remain independent. Scoped evidence can qualify a DRAFT as Research Ready/Grade; it never changes the declared tier or release status.
-- Advanced declarations remain rejected by schema in this first stage. `reviewReference` is a pointer, **not yet verified approval**. It cannot authorize promotion. This restriction stays until C02 and C04 are complete.
-- Existing explicit E2E fixtures fall back to PILOT and do not become production scientific sources.
-
-## Remaining commits and acceptance
-
-| Commit | Deliverable | Acceptance |
+| Planned stage | Implementation | Acceptance |
 |---|---|---|
-| C02 | Review identity/authority, evidence digest, target maturity and revision monotonicity; safe withdrawal/downgrade | A13–A15, A19; stale or forged reviews fail, evidence alone never promotes |
-| C03 | Remove legacy PILOT-only Composite admission and hardcoded current projections | A16–A17; use publication/technical capability; retired content still cannot start |
-| C04 | Freeze separate governance context at the existing start/freeze boundary; legacy missing snapshot semantics | A18; history/report/export/Bundle retain original maturity and revision without live upgrades |
-| C05 | Three-tier and withdrawal lifecycle, DB/browser regression, runbook and review workflow | A16–A20; equivalent execution hashes, scoring and canonical FINAL behavior |
+| C01 | `fea1eff` instrument-owned declarations, scoped evidence, immutable lookup copies | Exact identity/scope isolation; no central mutable SJT maturity/evidence authority |
+| C02–C04 | `31869eb` bound human review, revision rules, maturity-independent Composite admission, authenticated frozen governance and UI/export projections | Advanced claims and historical readers land atomically; no intermediate rollout with live historical grades |
+| C05 | CI/build enforcement, review-triggered required Full Gate, author/reviewer workflow and this evidence record | Final candidate must pass full CI; no skipped required gate counts as success |
 
-Do not remove the PILOT declaration restriction merely to make a promotion fixture pass. First implement verifiable scientific review bindings and frozen historical projections together. No production content is promoted by this PR's platform work.
+C02–C04 were intentionally one atomic implementation commit because accepting an advanced declaration before historical projections are frozen would violate the compatibility contract. Intermediate C01 progress is preserved in Git history.
 
-## C01 validation
+## Delivered behavior
 
-Commands run from the repository root:
+Each instrument's scientific.json declares maturity, revision, limitations, scoped evidence and, for advanced claims, a bound GitHub approval. Offline evaluation rejects overclaim, mismatched evidence, stale reviews, and revision/reason violations against a base. Online verification checks the human reviewer, repository permission, approval state and exact content at the approved commit. Evidence eligibility never promotes or publishes content automatically.
+
+Production packages remain PILOT at governance revision 2 with no invented scientific approvals. Existing content digests and definition/compiled-runtime hashes remain unchanged. Legacy package scienceMaturity is optional and ignored by executable validation/admission. Composite admission uses publication and runtime capabilities.
+
+New standalone and Bundle attempts freeze scientific context inside the authenticated encrypted snapshot envelope. Scientific changes affect that governance context/envelope hash, not execution hashes or canonical FINAL core. Current directory/teacher metadata reads current governance; old attempts, history, results, Bundle reports and exports read frozen metadata. Legacy snapshots retain their original hash and use PILOT/LEGACY_MISSING/null revision when context is absent.
+
+No DB migration, historic rewrite, new scorer, runtime capability, or production promotion is introduced. Existing organization-run provenance remains independently frozen from its resource policy.
+
+## Acceptance evidence
+
+| ID | Local evidence | Result |
+|---|---|---|
+| A13 | `scientific-governance.test.ts`: overclaim, missing foundation/provenance/empirical/output and missing human review | PASS |
+| A14 | Explicit three-tier declarations; DRAFT evidence eligibility with PILOT declaration and no publication mutation | PASS |
+| A15 | Five execution binding mismatches, four scope mismatches, changed evidence, reviewer identity/time/permission, dismissed/superseded reviews, changed approved content | PASS |
+| A16 | Same definition/compiled runtime/runner/report and complete canonical FINAL core across PILOT → READY → GRADE → PILOT | PASS |
+| A17 | `scientific-promotion.postgres.integration.test.ts`: V1/V2 real standalone and authenticated Bundle start/resume/FINAL/replay/report under each tier | PASS |
+| A18 | Completed and active attempts across promotion retain prior maturity/revision; old Bundle reports stay frozen; legacy snapshot parsing/hash/tamper tests; UI and JSON/CSV tests | PASS |
+| A19 | Withdrawal with revision/reason; unchanged publication; mismatched versions never borrow evidence; retirement still blocks new admission and preserves frozen completion | PASS |
+| A20 | Shared governance, original production baseline, mixed Scale/Cognitive/SJT Bundle, Cognitive manifest/dependency guard, Scale build checks, frontend reporting regression | PASS |
+
+Backend full targeted run: **192 tests / 33 files passed**, including real PostgreSQL lifecycle/concurrency tests. Subsequent targeted reruns passed after strengthening full canonical-core and active-attempt/old-Bundle assertions; scientific unit suite now has 24 tests. No assertion, transaction/concurrency threshold or timeout was weakened.
+
+Frontend: **46 tests / 12 files passed**, typecheck passed, lint passed with 91 existing warnings and zero errors. Backend build (including Scale checks) and SJT source/publication/scientific contracts passed. Cognitive dependency guard passed for 228 modules. Offline contracts also passed with invalid GIT_DIR, verifying builds do not require Git metadata.
+
+Real Chrome: standalone text flow (directory, draft recovery, FINAL, result refresh, JSON export, history, mobile) **ALL PASS**; seeded authenticated/public Bundle flow, frozen identity and one authoritative terminal write **ALL PASS**. Initial attempts hit local database connectivity / incomplete fixture setup; fresh isolated fixtures passed after connectivity recovered. No browser assertion was removed.
+
+Commands from repository root:
 
 ```sh
 npm --prefix server-version/backend run build
-npm --prefix server-version/backend run situational:contracts
-npm --prefix server-version/backend test -- --run --no-file-parallelism src/__tests__/assessment-governance src/__tests__/situational/onboarding.test.ts src/__tests__/situational/onboarding-baseline.test.ts src/__tests__/situational/onboarding-cli.test.ts src/__tests__/situational/scientific-governance.test.ts
+npm --prefix server-version/backend run situational:onboarding-check -- --all --base 8b916eba6d76bfad1911e10189e7258be122a15c
+npm --prefix server-version/backend run cognitive:contracts
+# Use an isolated migrated database; never a developer or production database.
+COGNITIVE_MODULE_ENABLED=true V32_3_INTEGRATION_DATABASE_URL=<isolated-db> DATABASE_URL=<isolated-db> npm --prefix server-version/backend test -- --no-file-parallelism src/__tests__/situational src/__tests__/assessment-bundle/situational-bundle.test.ts src/__tests__/assessment-governance src/__tests__/composite/situational-bundle.postgres.integration.test.ts
+npm --prefix server-version/frontend run typecheck
+npm --prefix server-version/frontend run lint
+npm --prefix server-version/frontend test -- src/modules/situational src/modules/composite/__tests__/CompositeSituationalReport.test.tsx
 ```
 
-The new scientific-governance tests cover exact identity isolation, caller mutation isolation, duplicate rejection, draft eligibility without promotion, all five execution-binding mismatch cases, four scope mismatch cases, and unchanged compiled runtime/publication digests when evidence/revision changes. Existing production baseline and CLI onboarding tests remain the compatibility evidence.
+Browser fixtures/scripts: `e2e/situational-bundle-browser-fixture.ts`, `e2e/situational-text-pilot-browser-e2e.cjs`, `e2e/situational-bundle-browser-e2e.cjs`. Disposable test users and database only; test reviews never enter production sources. Browser screenshots were generated under `/tmp/sjt-pr2-browser-text-final` on the validation host.
 
-Full A13–A20 certification is **NOT RUN** because C02–C05 are pending. No runtime/DB schema/frontend modifications are part of C01.
+## Merge and rollout
 
-C01 local result: backend build PASS; SJT contracts PASS; 57 tests / 11 files PASS. An initial parallel run hit the existing CLI five-second timeout; the complete serial rerun passed without changing any timeout or assertion.
+Full remote backend/frontend/browser/CodeQL/Docker and aggregate checks remain the final merge authority. Review submission/dismissal retriggers the existing required Full Gate, including online scientific verification. No ruleset or required status was weakened. Future evidence changes remain ordinary reviewed source PRs; the platform's acceptance does not confer scientific grade on any production content.
 
-## C03/C04 inspected integration points
-
-- `situational-runtime.service.ts`: `startSituationalAttempt` and `createCompositeSituationalAttemptInTransaction` both freeze immediately before storing the encrypted runtime snapshot. Reuse these existing boundaries; concurrent reuse must retain the winning row's governance context.
-- The same service's `instrumentResponse` currently resolves scientific maturity live. C04 must split current catalog projection from historical attempt projection.
-- `assessment-runtime/situational-runtime-snapshot.ts`: the envelope is strict and hashes an explicit `unsignedSnapshot` projection. Add optional, separately authenticated governance context with legacy parsing; preserve old snapshots and definition/compiled hashes. Do not silently discard or exclude governance fields from all integrity protection.
-- That snapshot module still has `assertPilotCapabilities`; C03 should rename it to reflect technical capabilities without changing its checks.
-- `composite.service.ts`: remove the admission `scienceMaturity !== 'PILOT'` condition and replace the current response's literal PILOT in C03. Keep PR1's frozen-attempt publication bypass narrowly scoped.
-- `assessment-run/scientificProvenance.ts` already freezes organization-run provenance from the resource policy. C04 must keep that separate contract consistent rather than overwrite it from current SJT metadata.
+See [scientific review workflow](scientific-review-runbook.md) for authoring, approval, downgrade and rollback. Once new snapshots exist, retain the new reader in any rollback/forward fix; an older strict parser cannot read the additive governance field.

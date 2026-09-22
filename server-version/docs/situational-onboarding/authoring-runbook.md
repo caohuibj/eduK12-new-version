@@ -12,10 +12,8 @@ Run commands from `server-version/backend`.
 
 Once published, changing instrument.json requires a new instrumentVersion (including changed golden expectations/catalog presentation). A changed scoring contract also needs an appropriate scoringVersion. Exact old identities are retained. DRAFT -> PUBLISHED -> RETIRED affects admission, not definition/runtime hashes. Retirement preserves frozen completion/history and does not require reapproving the original author’s scientific claims.
 
-`scientific.json` deliberately accepts PILOT only in PR1. Its revision is separate from execution identity; source-owned advanced qualification and historical governance projection are PR2, not an unimplemented advanced label in PR1.
+`scientific.json` owns scientific declarations independently of execution/publication. Follow [scientific review workflow](scientific-review-runbook.md) for scoped evidence, verified human approval, revisions and withdrawal.
 
 ## CI activation / human decision boundary
 
-At the baseline, main has an active ruleset requiring `merge gate / ready PR`, with zero required approving reviews. The new authority/immutability check is inside backend CI and therefore participates in that required aggregate. The independent `Situational publication integrity` workflow also rechecks on review submission/dismissal. Before enabling future new production content publications, configure its `publication` check as a required ruleset status as well: otherwise a dismissal after an earlier green aggregate is visible but may not independently block merge. This PR does not silently modify repository-wide rules or claim that this rollout prerequisite is already enabled.
-
-Historical migration receipts are limited to the three content digests captured from main a3098d8; they do not fabricate retrospective review timestamps or authorize other identities. The runtime trusts a CI-verified static build, not mutable filesystem discovery or a runtime call to GitHub.
+The main ruleset requires `merge gate / ready PR`. PR2 retriggers that required full workflow on review submission/dismissal, so the authority check participates in the enforced gate after review changes. The independent `publication` check remains an additional signal. No repository-wide ruleset change is required by this implementation.

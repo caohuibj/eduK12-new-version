@@ -44,6 +44,7 @@ COPY scripts/generate-scale-instruments.ts ./scripts/generate-scale-instruments.
 COPY scripts/scale-onboarding-check.mjs ./scripts/scale-onboarding-check.mjs
 COPY scripts/scale-onboarding-boundaries.json ./scripts/scale-onboarding-boundaries.json
 COPY scripts/check-scale-source-qualification.ts ./scripts/check-scale-source-qualification.ts
+COPY scripts/generate-situational-instruments.mjs ./scripts/generate-situational-instruments.mjs
 COPY src ./src
 RUN npm run build
 
