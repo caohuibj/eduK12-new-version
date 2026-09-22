@@ -132,7 +132,7 @@ jobs:
       - name: focused backend media + FINAL/Bundle boundary tests
         working-directory: server-version/backend
         run: >-
-          npx vitest run
+          npx vitest run --no-file-parallelism
           src/__tests__/cognitive/cognitive-video-adapter.test.ts
           src/__tests__/assessment-media/media-6-boundaries.test.ts
           src/__tests__/assessment-media/media-6-scale-definition.test.ts

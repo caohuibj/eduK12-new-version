@@ -81,7 +81,6 @@ let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/co
 let teacherId = ''
 let questionnaireId = ''
 let copiedQuestionnaireId = ''
-let compositeId = ''
 let observedPrismaCalls: ObservedPrismaCall[] = []
 const extraQuestionnaireIds: string[] = []
 
@@ -121,7 +120,8 @@ const anyCall = (calls: ObservedPrismaCall[], model: string, action: string): bo
   callCount(calls, model, action) > 0
 )
 
-suite('Work C Query Budget (real PostgreSQL)', () => {
+// This suite measures query counts; fixture creation and cold imports are not latency assertions.
+suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = DB_URL!
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
@@ -168,6 +168,15 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
 
   afterAll(async () => {
     try {
+      // Own fixtures by the unique suite user, including rows left behind when
+      // an assertion fails before a test reaches its inline cleanup.
+      if (teacherId) {
+        await prisma.compositeAssessmentAttempt.deleteMany({
+          where: { compositeAssessment: { createdBy: teacherId } },
+        })
+        // Cascades to access tokens, items and sections before deleting their creator.
+        await prisma.compositeAssessment.deleteMany({ where: { createdBy: teacherId } })
+      }
       if (copiedQuestionnaireId) {
         await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: copiedQuestionnaireId } })
         await prisma.questionnaireFormSection.deleteMany({ where: { questionnaireId: copiedQuestionnaireId } })
@@ -177,11 +186,6 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
         await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: questionnaireId } })
         await prisma.questionnaireFormSection.deleteMany({ where: { questionnaireId: questionnaireId } })
         await prisma.questionnaire.delete({ where: { id: questionnaireId } })
-      }
-      if (compositeId) {
-        await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: compositeId } })
-        await prisma.compositeFormSection.deleteMany({ where: { compositeAssessmentId: compositeId } })
-        await prisma.compositeAssessment.delete({ where: { id: compositeId } })
       }
       for (const id of extraQuestionnaireIds) {
         await prisma.questionnaireFormItem.deleteMany({ where: { questionnaireId: id } })
@@ -193,7 +197,7 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     } finally {
       await prisma?.$disconnect()
     }
-  })
+  }, 30_000)
 
   it('sections a newly-created form item at write time (no orphan)', async () => {
     resetRuntimeObservabilityForTests()
@@ -279,8 +283,8 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
         status: 'DRAFT',
       },
     })
-    compositeId = composite.id
 
+    const compositeId = composite.id
     const item = await compositeService.addItem(teacherId, 'TEACHER' as any, compositeId, {
       type: 'FORM',
       formType: 'text_input',
@@ -1092,10 +1096,8 @@ suite('Work C Query Budget (real PostgreSQL)', () => {
     expect(callCount(calls, 'CompositeFormSection', 'create')).toBe(0)
     expect(callCount(calls, 'CompositeFormSection', 'update')).toBe(0)
 
-    await prisma.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: composite.id } })
-    await prisma.compositeAssessmentAccessToken.deleteMany({ where: { compositeAssessmentId: composite.id } })
-    await prisma.compositeFormSection.deleteMany({ where: { compositeAssessmentId: composite.id } })
-    await prisma.compositeAssessment.delete({ where: { id: composite.id } })
+    // Leave the attempt and token for suite teardown to exercise cleanup of
+    // the same graph that remains after an interrupted assertion.
   })
 
   it('composite publish fails closed on an orphan FORM item (no repair)', async () => {

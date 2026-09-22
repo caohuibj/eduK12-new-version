@@ -59,6 +59,35 @@ Runtime retry/admission experimentation was discarded after it failed validation
   Both branching and Bundle browser checks now count only GET requests to
   `/api/.../assets/...`, retaining the zero-protected-request assertion.
 
+## Latest backend failure analysis (head 0107cdd)
+
+- CI run 35707705599 passed 2,202 of 2,203 tests. The public-composite-start
+  query-budget case hit Vitest's default five-second test timeout. Its inline
+  cleanup was bypassed, leaving an access token whose creator foreign key then
+  failed the suite's user deletion. This is a second teardown error from the
+  same interrupted test, not a separate application migration failure.
+- Query-budget cases now have an explicit 30-second fixture/operation envelope;
+  all logical query-count assertions are unchanged. Suite teardown removes all
+  composites owned by its unique fixture user (including attempts and cascading
+  tokens) before deleting that user. The public-start case leaves its graph for
+  teardown so the normal database regression exercises this path.
+- MEDIA-7 run 35707705257 failed during the instrument-FINAL suite's cold module
+  imports at the default ten-second hook timeout, skipping its 12 cases. This
+  setup loads Scale, Cognitive, Questionnaire and Composite runtimes. It now has
+  a separate 90-second initialization budget and the focused backend command
+  runs files serially to avoid redundant concurrent transforms on the runner.
+  Business assertions and transaction/performance limits remain unchanged.
+- Targeted verification: six files / 40 tests passed against isolated PostgreSQL;
+  public composite start took 308ms. A temporary fault-injection copy throws
+  after the public attempt and token exist: only that intentional assertion
+  fails, teardown succeeds, and zero suite fixture users remain. The temporary
+  test was removed after this check. Backend typechecking passes.
+- A subsequent full local run hit transient PostgreSQL reachability failures
+  through the VM's forwarded port while the same machine was running remote
+  video CI. The container remained running without OOM/restart. This run was
+  interrupted to remove competing load; it is not counted as a passing full run.
+  The updated head still needs the remote full backend gate.
+
 ## Local verification
 
 - Full backend regression with isolated PostgreSQL/Redis and `CI=true`: 357 files / 2,203 tests passed (177.84 seconds locally).
