@@ -37,7 +37,7 @@
 | 教师浏览器 | 双课程选择、四类编制、发布、学生发现、刷新恢复、四类实际作答及报告通过 |
 | 管理员/匿名浏览器 | GENERAL 四类编制、公开 token、匿名实际作答、刷新恢复及报告通过 |
 | 最终报告复验 | 最新后端与最终前端构建上，两个问卷的报告 API、JSON 导出和页面通过；量表正常显示单项结果 |
-| 远程 CI | 按用户要求暂不启动；草稿 PR + HEAD 的跳过 CI 标记 |
+| 远程 CI | 后续已按授权启用；浏览器失败的修订和最新验收见 [CI 修订记录](ci-remediation.md)。本轮修订尚未推送 |
 
 浏览器认知任务使用真实计时和输入；合成操作被既有质量规则标记为不可稳定解释时，页面保留完成状态并隐藏不适合解释的指数。未为取得漂亮结果修改质量门槛。SJT 使用现有 golden fixture，缺少的冻结解释文案按既有规则明确提示，不动态补写。
 
@@ -59,6 +59,8 @@
 | Q-12 | 同量表两个 slot 分别完成、独立 itemId 与 snapshot，报告不串用 |
 
 Q-08 的旧路径以真实数据库及既有回归为证据，没有宣称逐一手工重走所有历史浏览器链接。前端新编制器提供添加/移除和单元排序；本 PR 沿用既有 Form section/背景字段规则，不增加可选认知或可选情境判断语义。
+
+以上为首次实现验收记录。后续 CI 修订以 [CI 修订记录](ci-remediation.md) 为准。
 
 ## 复现命令
 
@@ -98,7 +100,7 @@ backend 环境至少需要 DATABASE_URL、QUESTIONNAIRE_PRODUCT_TEST_DATABASE_UR
 3. 先以内部课程验证；新版问卷创建开关 QUESTIONNAIRE_PRODUCTS_ENABLED=false 可关闭 create/copy，保留现存记录读取、作答和结果。
 4. 如需停止单份问卷新增作答，使用“停止新作答”；已有凭据下的历史读取及完成链路保留。
 5. 应用回退不逆向删除新表、新列或历史报告。旧二进制不认识新产品时应保持新入口关闭；不要回滚成允许旧编辑器修改新容器的部署组合。
-6. 开启 CI 需用户后续授权；届时推送不含跳过标记的新提交并转为 ready，或按仓库约定手动触发。当前跳过检查不代表合并门禁通过。
+6. PR #160 后续已按授权转为 ready 并运行过 CI。当前修订按最新要求仅保存在本地；后续推送前需遵循用户当时的 CI 指令。
 
 GitHub 跳过机制依据：[Skipping workflow runs](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs)。当前工作流的自动创建事件为 pull_request；没有 pull_request_target。pull_request_review 仍可能触发工作流，本次不提交 review。
 

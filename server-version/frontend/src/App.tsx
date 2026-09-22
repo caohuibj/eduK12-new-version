@@ -1,4 +1,3 @@
-import { QuestionnaireProductList, QuestionnaireProductEdit } from './pages/questionnaire/QuestionnaireProducts'
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -35,6 +34,8 @@ const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile')
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
 const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
 const ScaleLibrary = React.lazy(() => import('./pages/ScaleLibrary'))
+const QuestionnaireProductList = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductList })))
+const QuestionnaireProductEdit = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductEdit })))
 const QuestionnaireList = React.lazy(() => import('./pages/QuestionnaireList'))
 const QuestionnaireEdit = React.lazy(() => import('./pages/QuestionnaireEdit'))
 const TeacherCourseDetail = React.lazy(() => import('./pages/teacher/TeacherCourseDetail'))

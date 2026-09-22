@@ -9,7 +9,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
-const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const { loginWithSession, sessionJsonFetch, isAssessmentAssetGet } = require('./helpers/session-auth.cjs')
 
 const BASE_URL = (process.env.SITUATIONAL_BUNDLE_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const FIXTURE_FILE = process.env.SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE || '/tmp/eduk12-situational-bundle-fixture.json'
@@ -365,7 +365,7 @@ const runPublicFlow = async (browser) => {
     let assetGetRequests = 0
     missingPage.on('request', (request) => {
       if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGetRequests += 1
-      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGetRequests += 1
+      if (isAssessmentAssetGet(request)) assetGetRequests += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)

@@ -2,6 +2,12 @@ const assert = require('node:assert/strict')
 
 const isUnsafeMethod = (method) => !['GET', 'HEAD', 'OPTIONS'].includes(String(method || 'GET').toUpperCase())
 
+// Built JS/CSS also live under /assets/. Only API paths are assessment media.
+const isAssessmentAssetGet = request => {
+  const pathname = new URL(request.url()).pathname
+  return request.method() === 'GET' && pathname.startsWith('/api/') && pathname.includes('/assets/')
+}
+
 const sessionJsonFetch = async (page, endpoint, init = {}) => page.evaluate(async ({ endpoint: pathName, requestInit }) => {
   const method = String(requestInit.method || 'GET').toUpperCase()
   const headers = new Headers(requestInit.headers || {})
@@ -47,9 +53,9 @@ const loginWithSession = async (page, {
   assert.ok(username, 'loginWithSession requires username')
   assert.ok(password, 'loginWithSession requires password')
 
-  await page.goto(`${String(baseUrl).replace(/\/$/, '')}${route}`, { waitUntil: 'domcontentloaded' })
-  await page.getByPlaceholder(usernamePlaceholder).fill(username)
-  await page.getByPlaceholder(passwordPlaceholder).fill(password)
+  await page.goto(`${String(baseUrl).replace(/\/$/, '')}${route}`, { waitUntil: 'domcontentloaded', timeout })
+  await page.getByPlaceholder(usernamePlaceholder).fill(username, { timeout })
+  await page.getByPlaceholder(passwordPlaceholder).fill(password, { timeout })
 
   const loginResponsePromise = page.waitForResponse((response) => (
     response.request().method() === 'POST'
@@ -69,6 +75,7 @@ const loginWithSession = async (page, {
 
 module.exports = {
   isUnsafeMethod,
+  isAssessmentAssetGet,
   loginWithSession,
   readSessionUser,
   sessionJsonFetch,

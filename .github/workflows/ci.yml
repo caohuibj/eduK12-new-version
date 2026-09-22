@@ -27,7 +27,7 @@
 #   - backend 使用 CI Postgres service；COGNITIVE_INTEGRATION_DB_URL 与 DATABASE_URL 指向同一临时库，
 #     full regression 会包含真实 DB 并发集成测试，不以跳过代替通过。
 #   - backend build 以精确 GITHUB_SHA 发布到 Mac runner-local handoff；browser 命中则复用，未命中回退本地 build。
-#   - browser 使用 Vite dev server 做验收，因此不重复 production frontend build；production build 已由 frontend gate 覆盖。
+#   - browser 验收预先构建的前端，避免把开发服务器冷编译混入首屏导航；独立 browser preflight 验证真实页面与 API 代理。
 #   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
 name: CI
@@ -447,6 +447,9 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: clear previous browser evidence
+        run: |
+          rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -473,6 +476,9 @@ jobs:
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
+      - name: build frontend for browser acceptance
+        working-directory: server-version/frontend
+        run: npm run build
       - name: prisma generate and guarded migration
         working-directory: server-version/backend
         run: |
@@ -520,14 +526,17 @@ jobs:
           exit 1
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-bundle-frontend.pid
           for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            if ! kill -0 $(cat /tmp/eduk12-situational-bundle-frontend.pid) 2>/dev/null; then break; fi
+            if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/eduk12-situational-bundle-frontend.log
           exit 1
+      - name: verify built frontend in Chromium
+        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
       - name: run seeded browser acceptance
         run: node e2e/situational-bundle-browser-e2e.cjs
       - name: run FE-11 storage fault acceptance

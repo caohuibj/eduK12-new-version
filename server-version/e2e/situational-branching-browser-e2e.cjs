@@ -5,7 +5,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
-const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const { loginWithSession, sessionJsonFetch, isAssessmentAssetGet } = require('./helpers/session-auth.cjs')
 
 const BASE_URL = (process.env.SITUATIONAL_BRANCHING_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const FIXTURE_FILE = process.env.SITUATIONAL_BRANCHING_E2E_FIXTURE_FILE || '/tmp/eduk12-situational-branching-fixture.json'
@@ -492,7 +492,7 @@ const runPublicBundle = async (browser) => {
     let assetGets = 0
     missingPage.on('request', (request) => {
       if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGets += 1
-      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGets += 1
+      if (isAssessmentAssetGet(request)) assetGets += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)
