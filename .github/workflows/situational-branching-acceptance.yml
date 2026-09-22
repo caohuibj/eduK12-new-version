@@ -11,6 +11,11 @@ on:
       - 'server-version/frontend/src/modules/situational/**'
       - 'server-version/frontend/src/services/persistence/finalDraftStore.ts'
       - 'server-version/e2e/situational-branching-browser-*'
+      # Declaration-only content is covered by the assessment content gate.
+      - '!server-version/backend/src/modules/situational/instruments/*/*/instrument.json'
+      - '!server-version/backend/src/modules/situational/instruments/*/*/publication.json'
+      - '!server-version/backend/src/modules/situational/instruments/*/*/scientific.json'
+      - '!server-version/backend/src/modules/situational/onboarding/instruments.generated.ts'
   workflow_dispatch:
 
 concurrency:
@@ -135,9 +140,12 @@ jobs:
           done
           cat /tmp/eduk12-situational-branching-backend.log
           exit 1
+      - name: build frontend for deterministic browser startup
+        working-directory: server-version/frontend
+        run: npm run build
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-branching-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-branching-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-branching-frontend.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi

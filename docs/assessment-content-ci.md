@@ -16,7 +16,10 @@ The reusable content workflow runs on an isolated hosted runner and does not
 start PostgreSQL, browser acceptance, Docker image builds or CodeQL. Production
 code changes retain these checks. Main pushes with content changes use the same
 targeted checks; other main pushes retain compile smoke. Manual dispatch always
-runs full CI. Review events only rerun the publication workflow, which avoids
+runs full CI. Dedicated Cognitive video and SJT video/branching workflows
+exclude the same owned declarations so they cannot silently reintroduce heavy
+checks for pure content. Their platform and workflow changes still trigger them.
+Review events only rerun the publication workflow, which avoids
 installing dependencies if no publication-related paths changed.
 
 ## Failures investigated on 2026-09-22
