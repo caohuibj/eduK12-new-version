@@ -299,6 +299,7 @@ jobs:
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
+          src/__tests__/questionnaire/product.postgres.integration.test.ts
           src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts

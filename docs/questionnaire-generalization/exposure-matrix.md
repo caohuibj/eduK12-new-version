@@ -9,7 +9,7 @@
 | Start/resume/restart/FINAL | legacy handlers | Composite/Unified Runtime |
 | Public/token/recovery | legacy tokens | Composite tokens, no credential interchange |
 | Results | legacy frozen report | collection projector, no synthesis |
-| Export/results | legacy routes | authorized Composite export/results |
+| Export/results | legacy routes | authorized Composite results + paged independent JSON reports |
 | Miniprogram | unchanged | Web-only; not advertised in native legacy API |
 | Relational | unchanged guards | no synthesis or relational conversion |
 

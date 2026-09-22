@@ -181,6 +181,8 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const result=await runtime.startPublicAttempt(token.token!)
     expect((await runtime.startPublicAttempt(token.token!,result.recoveryToken!)).attempt.id).toBe(result.attempt.id)
     await expect(runtime.getAttemptState(result.attempt.id,{recoveryTokenHash:hashRecoveryToken('x'.repeat(40))})).rejects.toBeDefined()
+    await db.compositeAssessmentAccessToken.update({where:{id:token.id},data:{expiresAt:new Date(Date.now()-1000)}})
+    await expect(runtime.startPublicAttempt(token.token!)).rejects.toBeDefined()
   },30000)
   it('restarts with a new epoch, rejects the old FINAL and keeps existing reads when creation closes', async () => {
     let row=await fresh()
