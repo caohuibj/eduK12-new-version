@@ -11,7 +11,6 @@ import {
 } from '../../modules/cognitive/library/scientific-maturity'
 import { RESEARCH_GRADE_IDENTITIES as CATALOG_RESEARCH_GRADE_IDENTITIES } from '../../modules/cognitive/library/catalog'
 import {
-  SITUATIONAL_SCIENTIFIC_MATURITY_BY_IDENTITY,
   resolveSituationalScientificMaturity,
 } from '../../modules/situational/scientific-maturity'
 import { getSituationalInstrument } from '../../modules/situational/situational-runtime.service'
@@ -21,11 +20,9 @@ import {
 } from '../../modules/assessment-bundle/scientific-maturity'
 
 const COGNITIVE_IDENTITY = 'reaction/1.0.0/1.1.0'
-const SITUATIONAL_IDENTITY = 'sjt-assertiveness-golden@1.0.0'
 
 afterEach(() => {
   COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.clear()
-  SITUATIONAL_SCIENTIFIC_MATURITY_BY_IDENTITY.delete(SITUATIONAL_IDENTITY)
 })
 
 describe('scientific maturity governance', () => {
@@ -52,21 +49,11 @@ describe('scientific maturity governance', () => {
     expect(resolveCognitiveScientificMaturity('reaction', '1.0.0', '1.1.0')).toBe('RESEARCH_GRADE')
   })
 
-  it('changes only situational governance metadata when an exact identity is promoted', () => {
-    const pilot = getSituationalInstrument('sjt-assertiveness-golden', '1.0.0')
-    expect(pilot.scienceMaturity).toBe('PILOT')
-
-    SITUATIONAL_SCIENTIFIC_MATURITY_BY_IDENTITY.set(SITUATIONAL_IDENTITY, 'RESEARCH_READY')
-    const researchReady = getSituationalInstrument('sjt-assertiveness-golden', '1.0.0')
-
-    expect(resolveSituationalScientificMaturity('sjt-assertiveness-golden', '1.0.0')).toBe('RESEARCH_READY')
-    expect(researchReady.scienceMaturity).toBe('RESEARCH_READY')
-    expect(researchReady.definitionHash).toBe(pilot.definitionHash)
-    expect(researchReady.compiledRuntimeHash).toBe(pilot.compiledRuntimeHash)
-    expect(researchReady.scorerKey).toBe(pilot.scorerKey)
-    expect(researchReady.scoringVersion).toBe(pilot.scoringVersion)
-    expect(researchReady.definition).toEqual(pilot.definition)
-    expect(researchReady.report).toEqual(pilot.report)
+  it('resolves current SJT maturity from its owned declaration and rejects unknown versions', () => {
+    const instrument = getSituationalInstrument('sjt-assertiveness-golden', '1.0.0')
+    expect(instrument.scienceMaturity).toBe('PILOT')
+    expect(resolveSituationalScientificMaturity('sjt-assertiveness-golden', '1.0.0')).toBe('PILOT')
+    expect(() => resolveSituationalScientificMaturity('sjt-assertiveness-golden', '9.0.0')).toThrow('Unknown situational scientific identity')
   })
 
   it('keeps Bundle maturity in governance metadata and defaults missing reviews to Pilot', () => {

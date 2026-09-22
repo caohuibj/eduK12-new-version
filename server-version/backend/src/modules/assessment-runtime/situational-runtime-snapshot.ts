@@ -1,3 +1,4 @@
+import { situationalScientificContextSchema, type SituationalScientificContextV1 } from '../situational/onboarding/scientific-schema'
 import {
   situationalOpaqueKeySchema,
   situationalStimulusSchema,
@@ -34,6 +35,7 @@ export interface FrozenSituationalRuntimeSnapshotV1 {
   definition: SituationRuntimeDefinition
   runnerDefinition: ReturnType<typeof runnerSituationRuntimeDefinition>
   compiledRuntime: CompiledInstrumentRuntimeV1
+  scientificContext?: SituationalScientificContextV1
   snapshotHash: string
 }
 
@@ -93,6 +95,7 @@ const frozenSituationalRuntimeSnapshotSchema = z.object({
   definition: z.union([situationDefinitionSchema, situationDefinitionV2Schema]),
   runnerDefinition: z.union([runnerDefinitionV1Schema, runnerDefinitionV2Schema]),
   compiledRuntime: z.record(z.unknown()),
+  scientificContext: situationalScientificContextSchema.optional(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
@@ -109,9 +112,10 @@ const unsignedSnapshot = (input: Omit<FrozenSituationalRuntimeSnapshotV1, 'snaps
   definition: input.definition,
   runnerDefinition: input.runnerDefinition,
   compiledRuntime: input.compiledRuntime,
+  ...(input.scientificContext ? { scientificContext: input.scientificContext } : {}),
 })
 
-const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => {
+const assertSituationalCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => {
   const expected = {
     standalone: true,
     embedded: true,
@@ -124,7 +128,7 @@ const assertPilotCapabilities = (runtime: CompiledInstrumentRuntimeV1): void => 
   const hasExpectedKeys = Object.keys(actual).length === keys.length
   const hasExpectedValues = keys.every((key) => actual[key] === expected[key])
   if (!hasExpectedKeys || !hasExpectedValues) {
-    throw new Error('Situational runtime capabilities are not the embedded pilot contract')
+    throw new Error('Situational runtime capabilities are not the embedded runtime contract')
   }
 }
 
@@ -132,6 +136,7 @@ const buildFrozenSnapshot = (input: {
   instrumentKey: string
   instrumentVersion: string
   definition: SituationRuntimeDefinition
+  scientificContext?: SituationalScientificContextV1
   frozenAt?: Date
 }): FrozenSituationalRuntimeSnapshotV1 => {
   const validation = validateSituationRuntimeDefinition(input.definition)
@@ -147,7 +152,9 @@ const buildFrozenSnapshot = (input: {
     definition,
     sourceDefinitionHash: definitionHash,
   })
-  assertPilotCapabilities(compiledRuntime)
+  assertSituationalCapabilities(compiledRuntime)
+  const scientificContext = input.scientificContext ? situationalScientificContextSchema.parse(input.scientificContext) : undefined
+  if (scientificContext && canonicalHash(scientificContext.executionRef) !== canonicalHash({ instrumentKey: input.instrumentKey, instrumentVersion: input.instrumentVersion, scorerKey: compiledRuntime.scorerKey, scoringVersion: definition.scoring.scoringVersion, definitionHash })) throw new Error('Scientific context execution identity mismatch')
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid frozen Situational runtime snapshot frozenAt')
   const runnerDefinition = runnerSituationRuntimeDefinition(definition)
@@ -164,6 +171,7 @@ const buildFrozenSnapshot = (input: {
     definition,
     runnerDefinition,
     compiledRuntime,
+    scientificContext,
   })
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
 }
@@ -173,6 +181,7 @@ export const freezeSituationalRuntimeAtAttemptStart = (input: {
   instrumentKey: string
   instrumentVersion: string
   definition: SituationRuntimeDefinition
+  scientificContext?: SituationalScientificContextV1
   frozenAt?: Date
 }): FrozenSituationalRuntimeSnapshotV1 => buildFrozenSnapshot(input)
 
@@ -203,7 +212,8 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
   ) {
     throw new Error('Frozen Situational compiled runtime identity mismatch')
   }
-  assertPilotCapabilities(compiledRuntime)
+  assertSituationalCapabilities(compiledRuntime)
+  if (parsed.scientificContext && canonicalHash(parsed.scientificContext.executionRef) !== canonicalHash({ instrumentKey: parsed.instrumentKey, instrumentVersion: parsed.instrumentVersion, scorerKey: parsed.scorerKey, scoringVersion: parsed.scoringVersion, definitionHash })) throw new Error('Frozen scientific context execution identity mismatch')
   const unsigned = unsignedSnapshot({
     schemaVersion: parsed.schemaVersion,
     runtimeGeneration: parsed.runtimeGeneration,
@@ -217,6 +227,7 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
     definition,
     runnerDefinition: parsed.runnerDefinition,
     compiledRuntime,
+    scientificContext: parsed.scientificContext,
   })
   if (canonicalHash(unsigned) !== parsed.snapshotHash) throw new Error('Frozen Situational runtime snapshot hash mismatch')
   return { ...unsigned, snapshotHash: parsed.snapshotHash }

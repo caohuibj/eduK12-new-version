@@ -120,7 +120,16 @@ export interface SituationalReportDefinition {
   disclaimer: string
 }
 
+export interface SituationalScientificContext {
+  scientificMaturity: 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
+  governanceRevision: number | null
+  scope: { language: string; population: string; use: string; claim: string } | null
+  evidenceDigest: string | null
+  provenance: 'CURRENT' | 'FROZEN' | 'LEGACY_MISSING'
+}
+
 export interface SituationalInstrument {
+  scientificContext?: SituationalScientificContext
   key: string
   version: string
   releaseStatus: 'PUBLISHED' | 'DRAFT' | 'RETIRED'

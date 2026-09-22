@@ -67,6 +67,7 @@ const SituationalResult: React.FC = () => {
     type: 'SITUATIONAL',
     kind: 'situational',
     label: '情境化测评结果',
+    scientificContext: data.instrument.scientificContext,
     instrumentKey: data.attempt.instrumentKey,
     instrumentVersion: data.attempt.instrumentVersion,
     scoringVersion: data.attempt.scoringVersion,
