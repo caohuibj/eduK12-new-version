@@ -1,7 +1,7 @@
 import apiClient from './client'
 import type { User } from '../types'
 
-export type MaterialResourceType = 'SCALE' | 'COGNITIVE_CONFIG' | 'REPORT_PACKAGE'
+export type MaterialResourceType = 'SCALE' | 'COGNITIVE_CONFIG' | 'REPORT_PACKAGE' | 'ASSESSMENT_BUNDLE'
 
 export interface MaterialGrantRow {
   id: string

@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/product-ui/PageHeader'
 import { ProductPage } from '../../components/product-ui/ProductPage'
 
 const typeLabel: Record<MaterialResourceType, string> = {
+  ASSESSMENT_BUNDLE: 'Bundle 综合测评包',
   SCALE: '量表',
   COGNITIVE_CONFIG: '认知任务类型',
   REPORT_PACKAGE: '报告包',
@@ -72,6 +73,7 @@ const MaterialGrants: React.FC = () => {
           <option value="SCALE">量表</option>
           <option value="COGNITIVE_CONFIG">认知任务类型</option>
           <option value="REPORT_PACKAGE">报告包</option>
+          <option value="ASSESSMENT_BUNDLE">Bundle 综合测评包</option>
         </select>
       </label>
 

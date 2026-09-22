@@ -1,3 +1,4 @@
+import BundleReport from '../../pages/bundle/BundleReport'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { compositeApi, publicCompositeApi } from './api'
@@ -49,7 +50,7 @@ const CompositeReportPage: React.FC = () => {
   const legacyModules = (report as (CompositeReport & { modules?: LegacyCompositeModule[] }) | null)?.modules || []
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')
-  const shouldLoadSnapshots = staffMode && Boolean(report?.packageReport || selectedSnapshotId)
+  const shouldLoadSnapshots = staffMode && !report?.bundleReport && Boolean(report?.packageReport || selectedSnapshotId)
 
   const load = useCallback(async (credential = recoveryToken, snapshotId = selectedSnapshotId) => {
     if (!attemptId) return
@@ -214,6 +215,7 @@ const CompositeReportPage: React.FC = () => {
       backAction={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
     >
       {snapshotControls}
+      {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
       {backgroundValues.length > 0 && <div className="card p-6" data-testid="composite-background-values">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">背景信息</h2>
