@@ -90,6 +90,12 @@ suite('aggregate report completion storage (real PostgreSQL)', () => {
       })),
       select: { id: true },
     })
+    // Fresh CI tables retain empty-table planner statistics after bulk fixture
+    // insertion. A sequential scan for an id/status update takes relation-wide
+    // SSI predicate locks, creating conflicts between independent assessments.
+    // Refresh statistics outside the timed burst; keep production isolation,
+    // admission, concurrency and the 10-second assertion unchanged.
+    await prisma.$executeRawUnsafe('ANALYZE "questionnaire_assessments"')
     const { runtimeMetricLines, resetRuntimeObservabilityForTests } = await import('../../services/runtimeObservability')
     resetRuntimeObservabilityForTests()
     const startedAt = performance.now()

@@ -10,7 +10,8 @@ const { discover, generate } = require('../../../../scripts/cognitive/manifests.
 const { guard } = require('../../../../scripts/cognitive/dependencies.cjs')
 const key = (v: { testType: string; engineVersion: string; scoringVersion: string }) => `${v.testType}/${v.engineVersion}/${v.scoringVersion}`
 
-describe('task package projections', () => {
+// These tests parse the entire cross-tree package graph, not a single unit.
+describe('task package projections', { timeout: 30_000 }, () => {
   it('has no drift and preserves declared exact identities and engine parity', () => {
     generate({ check: true })
     expect(listCognitiveRegistryEntries().map(key)).toEqual(identities.identities.map(key))

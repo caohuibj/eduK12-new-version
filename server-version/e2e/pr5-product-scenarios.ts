@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process'
 import { prisma } from '../backend/src/config/database'
 import { parseStoredCanonicalUnitResult } from '../backend/src/modules/assessment-runtime/persistence'
 const { chromium } = require('../backend/node_modules/playwright-core')
+const { assertApiSuccess } = require('./helpers/api-response.cjs')
 const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
 const fixture = JSON.parse(readFileSync(process.env.PR5_SCENARIOS_FIXTURE || '/tmp/eduk12-pr5-scenarios.json', 'utf8'))
 const base = process.env.PR5_SCENARIOS_BASE_URL || 'http://127.0.0.1:5173'
@@ -20,9 +21,7 @@ const api = async (page, path, body?) => sessionJsonFetch(page, path, body === u
 })
 const ok = async (page, path, body?) => {
   const response = await api(page, path, body)
-  assert.equal(response.status, 200, `${path}: ${JSON.stringify(response.body)}`)
-  assert.equal(response.body.code, 0, `${path}: ${JSON.stringify(response.body)}`)
-  return response.body.data
+  return assertApiSuccess(response.status, response.body, path)
 }
 const denied = async (page, path, body?) => {
   const result = await api(page, path, body)
@@ -109,9 +108,11 @@ async function complete(name, r) {
     await prisma.$executeRaw`UPDATE assessment_run_executions SET status='STARTED', completed_at=NULL WHERE id=${task.executionId}`
     const rereadBody = page.waitForResponse(
       response => response.request().method() === 'GET' && response.url().endsWith(`/composite-assessments/attempts/${attemptId}`),
-    ).then(response => response.json())
+    )
     await page.goto(`${base}/relational/attempts/${attemptId}`)
-    assert.equal((await rereadBody).data.status, 'COMPLETED')
+    const response = await rereadBody
+    const state = assertApiSuccess(response.status(), await response.json(), 'authorized projection recovery GET')
+    assert.equal(state.status, 'COMPLETED')
     const repaired = await prisma.$queryRaw`SELECT status FROM assessment_run_executions WHERE id=${task.executionId}`
     assert.equal(repaired[0].status, 'COMPLETED')
     assert.equal(await prisma.assessmentUnitSnapshot.count({ where: { compositeAttemptId: attemptId } }), 1)

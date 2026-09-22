@@ -50,7 +50,9 @@ const request = async (body: unknown = {}) => {
   return { status: response.status, body: await response.json() as any }
 }
 
-suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', () => {
+// Installation/publication spans multiple transactions and HTTP round trips.
+// Keep the measured performance gates separate from this lifecycle test.
+suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { timeout: 30_000 }, () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = DB_URL!
     process.env.DATA_ENCRYPTION_KEY = 'b'.repeat(64)

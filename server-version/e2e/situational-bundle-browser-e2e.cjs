@@ -1,3 +1,4 @@
+const { isAssetApiGet } = require('./helpers/asset-request.cjs')
 // PR-D/PR-E seeded browser acceptance gate.
 //
 // The workflow creates a disposable PostgreSQL/Redis environment, seeds one
@@ -365,7 +366,7 @@ const runPublicFlow = async (browser) => {
     let assetGetRequests = 0
     missingPage.on('request', (request) => {
       if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGetRequests += 1
-      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGetRequests += 1
+      if (isAssetApiGet(request)) assetGetRequests += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)
