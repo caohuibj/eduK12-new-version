@@ -35,8 +35,6 @@ describe('CBI English instrument package', () => {
   })
 
   it('implements the source minimum-answered rules without guessing missing values', () => {
-    const maximum = pkg.executable?.goldenCases?.find?.(() => false)
-    void maximum
     const maxCase = SCALE_INSTRUMENT_SOURCE.executable!.goldenCases.find(row => row.name === 'all-maximum-burnout')!
     const oneMissing = scoreScale(pkg.definition, maxCase.answers.filter(row => row.itemCode !== 'CBI-P6'))
     expect(oneMissing.quality.status).toBe('limited')
