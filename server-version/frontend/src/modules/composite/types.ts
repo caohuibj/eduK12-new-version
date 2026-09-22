@@ -120,6 +120,8 @@ export interface CompositeCurrentItem {
 }
 
 export interface CompositeAttemptState {
+  productKind?: string
+  reportMode?: string
   id: string
   assessmentId: string
   name: string
@@ -256,6 +258,8 @@ export interface CompositePackageReport {
 }
 
 export interface CompositeReport {
+  productKind?: 'QUESTIONNAIRE'
+  reportMode?: 'COLLECTION_ONLY'
   id: string
   assessmentId: string
   name: string

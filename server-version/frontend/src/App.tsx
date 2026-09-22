@@ -1,3 +1,4 @@
+import { QuestionnaireProductList, QuestionnaireProductEdit } from './pages/questionnaire/QuestionnaireProducts'
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -307,10 +308,12 @@ function AppRoutes() {
             path="/questionnaires"
             element={
               <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                <QuestionnaireList />
+                <QuestionnaireProductList />
               </ProtectedRoute>
             }
           />
+          <Route path="/questionnaires/legacy" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><QuestionnaireList /></ProtectedRoute>} />
+          <Route path="/questionnaire-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><QuestionnaireProductEdit /></ProtectedRoute>} />
           <Route
             path="/questionnaires/:id"
             element={

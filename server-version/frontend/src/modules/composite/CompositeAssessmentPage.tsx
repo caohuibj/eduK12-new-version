@@ -317,7 +317,7 @@ const CompositeAssessmentPage: React.FC = () => {
   if (!state) return <div className="text-center py-12 text-gray-500">{error || '综合测评不存在或不可访问'}</div>
 
   if (state.status === 'COMPLETED') {
-    return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">综合测评已完成</h1><button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>
+    return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">{state.productKind === 'QUESTIONNAIRE' ? '问卷已完成' : '综合测评已完成'}</h1><button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>
   }
 
   if (state.deliveryMode === 'LEGACY') {
