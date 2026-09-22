@@ -21,7 +21,7 @@ describe('HSE Management Standards Indicator Tool English package', () => {
       'change',
     ])
     expect(pkg.definition.scoring.scores.every(row => row.type === 'dimension')).toBe(true)
-    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('DRAFT')
+    expect(SCALE_INSTRUMENT_SOURCE.executable?.releaseStatus).toBe('PUBLISHED')
   })
 
   it('applies the official direction reversal before dimension means', () => {
