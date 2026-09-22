@@ -48,6 +48,8 @@ const ClassroomCreate = React.lazy(() => import('./pages/teacher/ClassroomCreate
 const ClassroomEdit = React.lazy(() => import('./pages/teacher/ClassroomEdit'))
 const ClassroomQRCode = React.lazy(() => import('./pages/teacher/ClassroomQRCode'))
 const ClassroomQuestionEdit = React.lazy(() => import('./pages/teacher/ClassroomQuestionEdit'))
+const BundleProducts = React.lazy(() => import('./pages/bundle/BundleProducts').then(m => ({ default: m.BundleProducts })))
+const BundleProductDetail = React.lazy(() => import('./pages/bundle/BundleProducts').then(m => ({ default: m.BundleProductDetail })))
 const CompositeAssessmentList = React.lazy(() => import('./pages/teacher/CompositeAssessmentList'))
 const CompositeAssessmentEdit = React.lazy(() => import('./pages/teacher/CompositeAssessmentEdit'))
 const CompositeAssessmentResults = React.lazy(() => import('./pages/teacher/CompositeAssessmentResults'))
@@ -347,6 +349,8 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
+          <Route path="/bundle-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProductDetail /></ProtectedRoute>} />
           <Route
             path="/composite-assessments"
             element={

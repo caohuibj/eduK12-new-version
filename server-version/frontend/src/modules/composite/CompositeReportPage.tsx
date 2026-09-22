@@ -1,3 +1,4 @@
+import BundleReport from '../../pages/bundle/BundleReport'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { compositeApi, publicCompositeApi } from './api'
@@ -49,7 +50,7 @@ const CompositeReportPage: React.FC = () => {
   const legacyModules = (report as (CompositeReport & { modules?: LegacyCompositeModule[] }) | null)?.modules || []
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')
-  const shouldLoadSnapshots = staffMode && Boolean(report?.packageReport || selectedSnapshotId)
+  const shouldLoadSnapshots = staffMode && !report?.bundleReport && Boolean(report?.packageReport || selectedSnapshotId)
 
   const load = useCallback(async (credential = recoveryToken, snapshotId = selectedSnapshotId) => {
     if (!attemptId) return
@@ -208,12 +209,13 @@ const CompositeReportPage: React.FC = () => {
   return (
     <ReportShell
       title={report.name}
-      description={report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
+      description={report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
       facts={facts}
       status={{ kind: 'success', title: '已提交', description: '报告读取失败不会改变已经完成的提交状态。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
     >
       {snapshotControls}
+      {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
       {backgroundValues.length > 0 && <div className="card p-6" data-testid="composite-background-values">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">背景信息</h2>

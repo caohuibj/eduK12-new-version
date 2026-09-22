@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 95 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 97 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -34,6 +34,8 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 95 expl
 | /general-questionnaires | GeneralQuestionnaireList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /general-questionnaires/create | GeneralQuestionnaireCreate | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /general-questionnaires/:id/edit | GeneralQuestionnaireEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /bundle-products | BundleProducts | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /bundle-products/:id | BundleProductDetail | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /composite-assessments | CompositeAssessmentList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /composite-assessments/:id/results | CompositeAssessmentResults | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /composite-assessments/:id/attempts/:attemptId/report | CompositeReportPage | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |

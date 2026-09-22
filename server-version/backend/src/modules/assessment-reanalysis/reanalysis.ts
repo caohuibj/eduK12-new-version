@@ -1,3 +1,4 @@
+import { hashMentalHealthRuleSet, type MentalHealthRuleSetV1 } from '../assessment-bundle/engines/mental-health-rule-v1'
 import { randomUUID } from 'node:crypto'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
@@ -36,6 +37,10 @@ export const validateReanalysisRequest = (
   if (!Array.isArray(req.frozenCognitiveSources) || !Array.isArray(req.frozenScaleSources)) {
     reanalysisFail('REANALYSIS_SOURCE', 'frozen unit sources required')
   }
+  if (req.frozenSituationalSources !== undefined && !Array.isArray(req.frozenSituationalSources)) {
+    reanalysisFail('REANALYSIS_SOURCE', 'frozen Situational sources must be an array')
+  }
+  assertNoRawReanalysisInput(req as BundleReanalysisRequestV1 & { rawAnswers?: unknown; rawTrials?: unknown })
   if (!req.actorUserId?.trim()) reanalysisFail('REANALYSIS_INPUT', 'actorUserId required')
   if (req.aggregateInputHash != null && !HEX.test(req.aggregateInputHash)) {
     reanalysisFail('REANALYSIS_INPUT', 'aggregateInputHash must be 64 hex or null')
@@ -52,6 +57,7 @@ export const computeReanalysisAggregateInputHash = (input: {
   compiledBundleRuntimeHash: string
   cognitiveSources: Array<{ slotKey: string; sourceResultHash: string }>
   scaleSources: Array<{ slotKey: string; sourceResultHash: string }>
+  situationalSources?: Array<{ slotKey: string; sourceResultHash: string }>
   contextSnapshotHash: string | null
 }): string => canonicalHash({
   hashScheme: 'bundle-reanalysis-aggregate-v1',
@@ -69,6 +75,11 @@ export const computeReanalysisAggregateInputHash = (input: {
       slotKey: row.slotKey,
       sourceResultHash: row.sourceResultHash,
     })),
+    ...(input.situationalSources ?? []).map((row) => ({
+      unitType: 'SITUATIONAL' as const,
+      slotKey: row.slotKey,
+      sourceResultHash: row.sourceResultHash,
+    })),
   ].sort((a, b) => (
     a.slotKey < b.slotKey ? -1 : a.slotKey > b.slotKey ? 1 : a.unitType < b.unitType ? -1 : a.unitType > b.unitType ? 1 : 0
   )),
@@ -82,7 +93,7 @@ const matchUniqueSlotSource = <T extends {
   slotKey: string
   instrumentKey: string
   instrumentVersion: string
-  unitType: 'COGNITIVE' | 'SCALE'
+  unitType: 'COGNITIVE' | 'SCALE' | 'SITUATIONAL'
   sources: T[]
 }): { ok: true; source: T } | { ok: false; reason: BundleReanalysisResultV1 & { ok: false } } => {
   const matches = input.sources.filter((row) => row.slotKey === input.slotKey)
@@ -125,7 +136,7 @@ const matchUniqueSlotSource = <T extends {
 
 /**
  * Explicit Bundle reanalysis by { targetBundleKey, targetBundleVersion }.
- * - Require ALL COGNITIVE/SCALE slots have unique matching frozen sources
+ * - Require ALL COGNITIVE/SCALE/SITUATIONAL slots have unique matching frozen sources
  * - Context key/version/hash must match via hashBundleContextDefinition
  * - Build engine input from frozen sources + context → dispatch registry
  * - Regenerate BundleReportFacts; always emit a new history entry (never overwrite)
@@ -144,6 +155,7 @@ export const runExplicitBundleReanalysis = (input: {
     contextDefinitionKey: string,
     contextDefinitionVersion: string,
   ) => BundleContextDefinitionV1 | null
+  ruleSet?: MentalHealthRuleSetV1 | null
   priorSnapshot?: FrozenAssessmentBundleSnapshotV3 | null
   /** Optional registry override (tests); defaults to product registry. */
   registry?: BundleAnalysisEngineRegistry
@@ -177,10 +189,15 @@ export const runExplicitBundleReanalysis = (input: {
   const validated = validateAssessmentBundleDefinition(definition)
   const cognitiveSlots = validated.slots.filter((slot) => slot.unitType === 'COGNITIVE')
   const scaleSlots = validated.slots.filter((slot) => slot.unitType === 'SCALE')
+  const situationalSlots = validated.slots.filter((slot) => slot.unitType === 'SITUATIONAL')
 
   // Reject unknown / extra source slots not declared by the target Bundle.
   const declaredCognitive = new Set(cognitiveSlots.map((slot) => slot.slotKey))
   const declaredScale = new Set(scaleSlots.map((slot) => slot.slotKey))
+  const declaredSituational = new Set(situationalSlots.map((slot) => slot.slotKey))
+  for (const source of request.frozenSituationalSources ?? []) {
+    if (!declaredSituational.has(source.slotKey)) return { ok: false, reason: 'UNKNOWN_SOURCE_SLOT', message: 'unknown Situational source slot ' + source.slotKey }
+  }
   for (const source of request.frozenCognitiveSources) {
     if (!declaredCognitive.has(source.slotKey)) {
       return {
@@ -224,6 +241,16 @@ export const runExplicitBundleReanalysis = (input: {
     })
     if (!matched.ok) return matched.reason
     matchedScale.push(matched.source)
+  }
+
+  const matchedSituational = []
+  for (const slot of situationalSlots) {
+    const matched = matchUniqueSlotSource({
+      slotKey: slot.slotKey, instrumentKey: slot.instrumentKey, instrumentVersion: slot.instrumentVersion,
+      unitType: 'SITUATIONAL', sources: request.frozenSituationalSources ?? [],
+    })
+    if (!matched.ok) return matched.reason
+    matchedSituational.push(matched.source)
   }
 
   let contextDefinition: BundleContextDefinitionV1 | null = null
@@ -284,7 +311,7 @@ export const runExplicitBundleReanalysis = (input: {
 
   const newSnapshot = buildFrozenAssessmentBundleSnapshot(
     validated,
-    contextDefinition ? { contextDefinition } : undefined,
+    { contextDefinition, ruleSetRef: input.ruleSet ? { key: input.ruleSet.ruleSetKey, version: input.ruleSet.ruleSetVersion, hash: hashMentalHealthRuleSet(input.ruleSet) } : null },
   )
 
   const compiledRuntime = compileBundleRuntimeFromFrozenRead({
@@ -298,6 +325,7 @@ export const runExplicitBundleReanalysis = (input: {
     compiledBundleRuntimeHash: compiledRuntime.compiledRuntimeHash,
     cognitiveSources: matchedCognitive,
     scaleSources: matchedScale,
+    situationalSources: matchedSituational,
     contextSnapshotHash: contextFacts?.contextSnapshotHash ?? null,
   })
 
@@ -318,6 +346,8 @@ export const runExplicitBundleReanalysis = (input: {
     aggregateInputHash: recomputedAggregateHash,
     cognitiveSources: matchedCognitive,
     scaleSources: matchedScale,
+    situationalSources: matchedSituational,
+    ruleSet: input.ruleSet,
   }
   const reportFacts = projectBundleReportFacts({
     registry,

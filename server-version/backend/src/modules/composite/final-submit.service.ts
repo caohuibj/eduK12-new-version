@@ -395,12 +395,12 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
-    select: { id: true, runtimeGeneration: true },
+    select: { id: true, runtimeGeneration: true, compositeAssessment: { select: { bundleInstance: true } } },
   }))
   if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
   if (route.runtimeGeneration === 'UNIFIED_V1') {
     const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedCompositeFormSectionFinal(input)
+    return submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance)
   }
   const attempt = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },

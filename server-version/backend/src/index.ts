@@ -1,3 +1,4 @@
+import bundleProductRoutes from './modules/bundle-product/routes'
 import express from 'express'
 import { publicAssessmentRateLimiters } from './middleware/publicAssessmentRateLimit'
 import cors from 'cors'
@@ -217,6 +218,7 @@ app.use('/api/scale-library', scaleLibraryRoutes)
 app.use('/api/situational', situationalRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/questionnaire-products', questionnaireProductRoutes)
+app.use('/api/bundle-products', bundleProductRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/assets', assetRoutes)
 app.use('/api/public/assets', publicAssetRouter)

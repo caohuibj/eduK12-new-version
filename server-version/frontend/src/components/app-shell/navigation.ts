@@ -16,7 +16,7 @@ const staff: NavigationItem[] = [
   { path: '/students', label: '学生管理' }, { path: '/assignments', label: '作业管理' },
   { path: '/checkins', label: '打卡管理' }, { path: '/teacher/classrooms', label: '课堂互动' },
   { path: '/scales', label: '心理量表' }, { path: '/scale-library', label: '量表库' },
-  { path: '/questionnaires', label: '聚合问卷' }, { path: '/composite-assessments', label: '综合测评' },
+  { path: '/questionnaires', label: '聚合问卷' }, { path: '/composite-assessments', label: '综合测评' }, { path: '/bundle-products', label: 'Bundle 综合测评包' },
   { path: '/general-questionnaires', label: '泛化问卷' }, { path: '/videos', label: '视频库' },
   { path: '/images', label: '图片库' }, { path: '/documents', label: '文档库' },
 ]

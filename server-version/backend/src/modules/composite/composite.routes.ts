@@ -22,7 +22,7 @@ router.use('/:id', async (req, res, next) => {
   try {
     const { prisma } = await import('../../config/database')
     const row = await prisma.compositeAssessment.findUnique({ where: { id: req.params.id }, select: { productKind: true } })
-    if (row?.productKind === 'QUESTIONNAIRE') return instrumentError(res, 'QUESTIONNAIRE_REVISION_REQUIRED', '请从问卷编制页面修改此问卷', 409)
+    if (row && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(row.productKind)) return instrumentError(res, 'QUESTIONNAIRE_REVISION_REQUIRED', '请从问卷编制页面修改此问卷', 409)
     return next()
   } catch (e) { return next(e) }
 })
@@ -73,6 +73,7 @@ router.post('/attempts/:attemptId/save', authenticate, requireRole(UserRole.STUD
 router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
+router.post('/attempts/:attemptId/bundle-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryBundle)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalGenericReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)

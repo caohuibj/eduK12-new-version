@@ -693,15 +693,15 @@ describe('library composites are not takeable', () => {
     ]))
   })
 
-  it('omits library-course composites from the student list', async () => {
+  it('excludes library courses for legacy composites, Bundles and questionnaires', async () => {
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'library-1' }])
     mockPrisma.compositeAssessment.findMany.mockResolvedValue([])
     await listAvailableForStudent('student-1')
     expect(mockPrisma.compositeAssessment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ OR: [
-          expect.objectContaining({ productKind: 'LEGACY_COMPOSITE', course: { isLibrary: false } }),
-          expect.objectContaining({ productKind: 'QUESTIONNAIRE', questionnaireCourses: { some: { courseId: { in: ['library-1'] }, course: { isLibrary: false } } } }),
+        where: expect.objectContaining({ status: 'PUBLISHED', OR: [
+          expect.objectContaining({ productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: ['library-1'] }, course: { isLibrary: false } }),
+          expect.objectContaining({ productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: ['library-1'] }, course: { isLibrary: false } } } }),
         ] }),
       }),
     )

@@ -164,6 +164,12 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
     if (definition.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布报告包')
     return
   }
+  if (resourceType === MaterialResourceType.ASSESSMENT_BUNDLE) {
+    const { bundleDefinitionProvider } = await import('../modules/bundle-product/service')
+    const entry = bundleDefinitionProvider.list().find(v => v.definition.bundleKey + '@' + v.definition.bundleVersion === resourceId)
+    if (!entry || bundleDefinitionProvider.publicationBlockers(entry.definition.bundleKey, entry.definition.bundleVersion).length) throw grantBadRequest('只能授权已具备发布条件的 Bundle 精确版本')
+    return
+  }
   throw grantBadRequest('不支持的材料类型')
 }
 
@@ -190,6 +196,11 @@ const attachResource = async (grant: {
     })
     resource = testConfig
     resourceMissing = !testConfig
+  } else if (grant.resourceType === MaterialResourceType.ASSESSMENT_BUNDLE) {
+    const { bundleDefinitionProvider } = await import('../modules/bundle-product/service')
+    const entry = bundleDefinitionProvider.list().find(v => v.definition.bundleKey + '@' + v.definition.bundleVersion === grant.resourceId)
+    resource = entry ? { id: grant.resourceId, name: entry.definition.name, status: entry.definition.status } : null
+    resourceMissing = !entry
   } else {
     const definition = getReportPackageByResourceId(grant.resourceId)
     resource = definition

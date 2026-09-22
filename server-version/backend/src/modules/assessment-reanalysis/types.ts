@@ -4,7 +4,7 @@ import type {
   FrozenAssessmentBundleSnapshotV3,
 } from '../assessment-bundle/types'
 import type { BundleEngineResultV1 } from '../assessment-bundle/registry'
-import type { BundleFrozenCognitiveSourceV1, BundleFrozenScaleSourceV1 } from '../assessment-bundle/sources'
+import type { BundleFrozenCognitiveSourceV1, BundleFrozenScaleSourceV1, BundleFrozenSituationalSourceV1 } from '../assessment-bundle/sources'
 
 /**
  * Explicit versioned Bundle reanalysis — Commit 15 / Prep 15.1.
@@ -21,6 +21,8 @@ export interface BundleReanalysisRequestV1 {
   frozenCognitiveSources: BundleFrozenCognitiveSourceV1[]
   /** Frozen Scale unit projections from the original attempt. */
   frozenScaleSources: BundleFrozenScaleSourceV1[]
+  /** Canonical Situational projections; omitted only for older callers without SJT slots. */
+  frozenSituationalSources?: BundleFrozenSituationalSourceV1[]
   /** Original frozen Context facts (required when target declares Context). */
   frozenContextFacts: BundleContextFactsV1 | null
   /**

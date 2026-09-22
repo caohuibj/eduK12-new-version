@@ -258,7 +258,8 @@ export interface CompositePackageReport {
 }
 
 export interface CompositeReport {
-  productKind?: 'QUESTIONNAIRE'
+  productKind?: 'QUESTIONNAIRE' | 'ASSESSMENT_BUNDLE'
+  bundleReport?: import('../../pages/bundle/BundleReport').BundleReportData
   reportMode?: 'COLLECTION_ONLY'
   id: string
   assessmentId: string
