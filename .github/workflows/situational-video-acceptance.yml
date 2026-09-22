@@ -12,7 +12,21 @@ on:
       - 'server-version/frontend/src/modules/situational/**'
       - 'server-version/e2e/situational-video-*'
       - 'server-version/e2e/fe-11-video-fault-*'
+      - 'server-version/e2e/browser-preflight.cjs'
+      - 'server-version/e2e/helpers/session-auth*'
+      - 'server-version/frontend/vite.config.ts'
+      # Declaration-only content is covered by the assessment content gate.
+      - '!server-version/backend/src/modules/situational/instruments/*/*/instrument.json'
+      - '!server-version/backend/src/modules/situational/instruments/*/*/publication.json'
+      - '!server-version/backend/src/modules/situational/instruments/*/*/scientific.json'
+      - '!server-version/backend/src/modules/situational/onboarding/instruments.generated.ts'
   workflow_dispatch:
+    inputs:
+      hosted_runner:
+        description: 'Pilot on an isolated GitHub-hosted runner (consumes hosted minutes)'
+        type: boolean
+        default: false
+
 
 concurrency:
   group: situational-video-acceptance-${{ github.event.pull_request.number || github.ref }}
@@ -22,10 +36,9 @@ jobs:
   situational-video-browser:
     name: Situational VIDEO auth/public/branch browser acceptance
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    # Isolate required browser gates by default; set CI_BROWSER_HOSTED=false to roll back.
+    runs-on: ${{ fromJSON((inputs.hosted_runner || vars.CI_BROWSER_HOSTED != 'false') && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
@@ -74,6 +87,9 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: clear previous browser evidence
+        run: |
+          rm -rf /tmp/eduk12-situational-video-e2e /tmp/eduk12-situational-video-backend.log /tmp/eduk12-situational-video-frontend.log /tmp/eduk12-situational-video-backend.pid /tmp/eduk12-situational-video-frontend.pid
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -91,6 +107,19 @@ jobs:
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: restore hosted dependency downloads
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
+          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
+      - name: restore hosted Chromium binaries
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
@@ -138,16 +167,22 @@ jobs:
           done
           cat /tmp/eduk12-situational-video-backend.log
           exit 1
+      - name: build frontend for deterministic browser startup
+        working-directory: server-version/frontend
+        run: npm run build
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-situational-video-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-video-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-video-frontend.pid
           for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            if ! kill -0 $(cat /tmp/eduk12-situational-video-frontend.pid) 2>/dev/null; then break; fi
+            if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/eduk12-situational-video-frontend.log
           exit 1
+      - name: verify built frontend in Chromium
+        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-video-e2e/preflight
       - name: run FE-11 video capability fault acceptance
         run: node e2e/fe-11-video-fault-browser-e2e.cjs
       - name: run Situational VIDEO browser acceptance

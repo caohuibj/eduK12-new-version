@@ -10,6 +10,14 @@ import {
   isScaleLibraryPublicPayloadSafe,
 } from '../../modules/scale/library/scale-library-read-model'
 
+// Historical Wave 0 assertions deliberately exclude later content onboarding.
+const wave0 = new Set(['adexi_v1', 'who5', 'sdq_parent_zh_cn', 'sdq_teacher_zh_cn', 'texi_parent_zh_cn', 'texi_teacher_zh_cn'])
+const buildWave0ReadModel: typeof buildScaleLibraryReadModel = (...args) => {
+  const model = buildScaleLibraryReadModel(...args)
+  expect(model.entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
+  return { ...model, entries: model.entries.filter(entry => wave0.has(entry.identity.instrumentKey)) }
+}
+
 const NOW = '2026-09-07T00:00:00.000Z'
 
 const keys = (entries: Array<{ identity: { instrumentKey: string } }>): string[] => (
@@ -46,7 +54,7 @@ const approvedAuthorization = (instrumentKey: string, instrumentVersion: string)
 
 describe('Wave 0 Scale Library read model', () => {
   it('binds the six scoped packages without adding a runtime payload', () => {
-    const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    const model = buildWave0ReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
     expect(model.entries).toHaveLength(6)
     expect(keys(model.entries)).toEqual([
       'adexi_v1',
@@ -64,7 +72,7 @@ describe('Wave 0 Scale Library read model', () => {
   })
 
   it('filters only by declared metadata and actual localization target locale', () => {
-    const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    const model = buildWave0ReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
     expect(keys(filterScaleLibraryEntries(model.entries, { locale: 'zh-CN' }))).toEqual([
       'adexi_v1',
       'who5',
@@ -93,7 +101,7 @@ describe('Wave 0 Scale Library read model', () => {
   })
 
   it('uses each entry target locale when the read context does not specify one', () => {
-    const defaultModel = buildScaleLibraryReadModel({ territory: 'CN', nowIso: NOW })
+    const defaultModel = buildWave0ReadModel({ territory: 'CN', nowIso: NOW })
     const defaultLocales = Object.fromEntries(defaultModel.entries.map((entry) => [
       entry.identity.instrumentKey,
       entry.availability.locale,
@@ -111,7 +119,7 @@ describe('Wave 0 Scale Library read model', () => {
       expect(entry.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
     }
 
-    const explicitZh = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
+    const explicitZh = buildWave0ReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
     expect(keys(filterScaleLibraryEntries(explicitZh.entries, { locale: 'zh-CN' }))).toEqual([
       'adexi_v1',
       'who5',
@@ -120,7 +128,7 @@ describe('Wave 0 Scale Library read model', () => {
     expect(explicitZh.entries.find((entry) => entry.identity.instrumentKey === 'sdq_teacher_zh_cn')?.availability.reasons)
       .toContain('当前内容语言为 en，不提供 zh-CN 版本。')
 
-    const explicitEn = buildScaleLibraryReadModel({ locale: 'en', territory: 'CN', nowIso: NOW })
+    const explicitEn = buildWave0ReadModel({ locale: 'en', territory: 'CN', nowIso: NOW })
     expect(keys(filterScaleLibraryEntries(explicitEn.entries, { locale: 'en' }))).toEqual([
       'sdq_teacher_zh_cn',
       'texi_parent_zh_cn',
@@ -137,7 +145,7 @@ describe('Wave 0 Scale Library read model', () => {
   })
 
   it('keeps deployment and authorization gates fail-closed for PUBLISHED packages', () => {
-    const model = buildScaleLibraryReadModel({
+    const model = buildWave0ReadModel({
       locale: 'zh-CN',
       territory: 'CN',
       nowIso: NOW,
@@ -160,7 +168,7 @@ describe('Wave 0 Scale Library read model', () => {
     const originalReleaseStatus = pkg.releaseStatus
     pkg.releaseStatus = 'PUBLISHED'
     try {
-      const model = buildScaleLibraryReadModel({
+      const model = buildWave0ReadModel({
         locale: 'zh-CN',
         territory: 'CN',
         respondent: 'SELF',
@@ -178,7 +186,7 @@ describe('Wave 0 Scale Library read model', () => {
   })
 
   it('keeps scientific maturity and evidence matrix details in the controlled admin projection', () => {
-    const model = buildScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
+    const model = buildWave0ReadModel({ locale: 'zh-CN', territory: 'CN', viewerRole: 'ADMIN', nowIso: NOW })
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
     expect(who5.governance?.scientificMaturity).toBe('PILOT')
     expect(who5.governance?.evidence).toHaveLength(1)

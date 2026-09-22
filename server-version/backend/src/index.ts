@@ -35,6 +35,7 @@ import scaleRoutes from './routes/scales'
 import scaleLibraryRoutes from './routes/scaleLibrary'
 import situationalRoutes from './routes/situational'
 import questionnaireRoutes from './routes/questionnaires'
+import questionnaireProductRoutes from './modules/questionnaire-product/routes'
 import documentRoutes from './routes/documents'
 import publicRoutes from './routes/public'
 import generalQuestionnaireRoutes from './routes/generalQuestionnaires'
@@ -215,6 +216,7 @@ app.use('/api/scales', scaleRoutes)
 app.use('/api/scale-library', scaleLibraryRoutes)
 app.use('/api/situational', situationalRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
+app.use('/api/questionnaire-products', questionnaireProductRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/assets', assetRoutes)
 app.use('/api/public/assets', publicAssetRouter)

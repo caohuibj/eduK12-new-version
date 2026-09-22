@@ -1,0 +1,32 @@
+Baseline: f89354d32c7ac3dc4a9abd3a6abdca851667b8b5
+Local verification: 2026-09-22; Node 25.2.1; PostgreSQL 14; Redis 7
+Remote CI: intentionally not triggered.
+
+huisurvey-q1-final-regression.log
+ ✓ src/__tests__/scale/composite-scale-disclosure.test.ts (2 tests) 47ms
+ ✓ src/__tests__/composite/anonymousAccess.test.ts (2 tests) 20ms
+
+ Test Files  25 passed (25)
+      Tests  216 passed (216)
+   Start at  20:07:01
+   Duration  136.54s (transform 8.91s, setup 0ms, collect 56.09s, tests 47.43s, environment 12ms, prepare 7.15s)
+
+
+huisurvey-q1-frontend-tests.log
+ ✓ src/components/questionnaire/__tests__/ScalePlayer.test.tsx (3 tests) 266ms
+ ✓ src/modules/composite/__tests__/CompositeSituationalReport.test.tsx (1 test) 102ms
+
+ Test Files  11 passed (11)
+      Tests  40 passed (40)
+   Start at  20:01:46
+   Duration  5.37s (transform 2.04s, setup 4.90s, collect 5.57s, tests 2.23s, environment 11.56s, prepare 1.66s)
+
+
+huisurvey-q1-report-check.log
+Final independent report API, disclosure and browser projection: PASS
+Final independent report API, disclosure and browser projection: PASS
+
+Frontend production build: PASS (5664 modules).
+Backend build and final TypeScript: PASS.
+Empty migration and populated baseline upgrade: PASS.
+Teacher and administrator/public browser complete-four flows: PASS.

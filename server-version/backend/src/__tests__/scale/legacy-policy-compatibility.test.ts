@@ -11,7 +11,8 @@ describe('legacy scale compatibility profiles', () => {
     const profileIds = listLegacyScaleCompatibilityProfiles()
       .map((profile) => `${profile.identity.instrumentKey}:${profile.identity.instrumentVersion}`)
       .sort()
-    expect(profileIds).toEqual(packageIds)
+    expect(profileIds).toEqual(['adexi_v1:2.0.0', 'who5:1.0.0', 'sdq_parent_zh_cn:1.0.0', 'sdq_teacher_zh_cn:1.0.0', 'texi_parent_zh_cn:1.0.0', 'texi_teacher_zh_cn:1.0.0'].sort())
+    expect(packageIds).toEqual(expect.arrayContaining(profileIds))
   })
 
   it('does not synthesize an unrestricted profile for unknown identities', () => {

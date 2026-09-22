@@ -1,3 +1,4 @@
+const { isAssetApiGet } = require('./helpers/asset-request.cjs')
 // FE-06 final branching acceptance gate.
 // Real Chromium + IndexedDB + backend + PostgreSQL; fixture is CI-only.
 
@@ -492,7 +493,7 @@ const runPublicBundle = async (browser) => {
     let assetGets = 0
     missingPage.on('request', (request) => {
       if (request.method() === 'GET' && request.url().includes(`/api/public/composite-assessments/attempts/${parentId}/items/${fixture.item.id}/situational/${childId}`)) embeddedGets += 1
-      if (request.method() === 'GET' && request.url().includes('/assets/')) assetGets += 1
+      if (isAssetApiGet(request)) assetGets += 1
     })
     try {
       const returnTo = encodeURIComponent(`/public/composite/attempts/${parentId}`)

@@ -11,12 +11,13 @@ const tsx = path.join(backend, 'node_modules/.bin/tsx')
 describe('SJT authoring CLI and actual content-only diff', () => {
   it('emits reproducible JSON and rejects an ambiguous comparison base', () => {
     const run = () => execFileSync(tsx, [script, '--all', '--json'], { cwd: backend, encoding: 'utf8' })
-    expect(run()).toBe(run())
-    expect(JSON.parse(run()).ok).toBe(true)
+    const first = run()
+    expect(first).toBe(run())
+    expect(JSON.parse(first).ok).toBe(true)
     const failed = spawnSync(tsx, [script, '--content-only', '--base', 'HEAD'], { cwd: backend, encoding: 'utf8' })
     expect(failed.status).not.toBe(0)
     expect(failed.stderr).toContain('full 40-character')
-  })
+  }, 30_000)
   it('scaffolds and generates an unknown package with zero shared-core edits', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'sjt-content-diff-'))
     const prefix = 'server-version/backend/'

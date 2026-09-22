@@ -248,6 +248,7 @@ model TeacherCode {
 }
 
 model Course {
+  questionnaireDeliveries QuestionnaireCourseDelivery[]
   id                   String                @id @default(uuid())
   title                String
   description          String?
@@ -1069,6 +1070,12 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  productKind         String @default("LEGACY_COMPOSITE") @map("product_kind")
+  questionnaireType   QuestionnaireType? @map("questionnaire_type")
+  revision            Int @default(0)
+  creationKey         String? @unique @map("creation_key")
+  creationHash        String? @map("creation_hash")
+  questionnaireCourses QuestionnaireCourseDelivery[]
   id                                String                    @id @default(uuid())
   code                              String                    @unique
   name                              String
@@ -1171,6 +1178,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  deliveryCourseId String? @map("delivery_course_id")
   id                           String                           @id @default(uuid())
   compositeAssessmentId        String                           @map("composite_assessment_id")
   userId                       String?                          @map("user_id")
@@ -2246,4 +2254,15 @@ model ScalePublicationAudit {
   actor User @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
   @@index([scaleId, createdAt])
   @@map("scale_publication_audits")
+}
+
+
+model QuestionnaireCourseDelivery {
+  compositeId String @map("composite_id")
+  courseId String @map("course_id")
+  composite CompositeAssessment @relation(fields: [compositeId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  @@id([compositeId, courseId])
+  @@index([courseId])
+  @@map("questionnaire_course_deliveries")
 }

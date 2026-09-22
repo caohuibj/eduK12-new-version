@@ -418,7 +418,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   return (
     <AssessmentShell
       title={state.name}
-      eyebrow="综合测评"
+      eyebrow={state.productKind === 'QUESTIONNAIRE' ? '问卷' : '综合测评'}
       instructions={(
         <div className="space-y-2">
           {state.instruction ? <p>{state.instruction}</p> : null}
