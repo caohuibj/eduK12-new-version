@@ -28,10 +28,13 @@ for (const name of readdirSync(root)) {
     variant: match[2],
     group: match[3],
     testedSha: JSON.parse(readFileSync(resolve(root, name, 'manifest.json'), 'utf8')).testedSha,
+    configuredArrivals: report.counts?.configuredArrivals ?? null,
+    offered: report.counts?.offered ?? 0,
     fresh: report.counts?.fresh ?? 0,
     recovered: report.counts?.recovered ?? 0,
     retries: report.counts?.retry ?? 0,
     dropped: report.counts?.dropped ?? 0,
+    eventualFailure: report.counts?.eventualFailure ?? 0,
     drainCompleted: report.counts?.drainCompleted ?? 0,
     p50Ms: report.counts?.p50Ms ?? null,
     p95Ms: report.counts?.p95Ms ?? null,
@@ -51,34 +54,48 @@ for (const group of groups) {
   const headP95 = median(head.map((row) => row.p95Ms))
   const delta = headP95 - baseP95
   const allowed = Math.max(baseP95 * 0.10, 10)
-  const baseDurable = median(base.map((row) => row.drainCompleted))
-  const headDurable = median(head.map((row) => row.drainCompleted))
-  const regression = delta > allowed || headDurable < baseDurable
-  if (regression) failures.push(`${group}: p95 ${baseP95.toFixed(2)} -> ${headP95.toFixed(2)} ms, durable ${baseDurable} -> ${headDurable}`)
+  const completionRate = (row) => row.offered > 0 ? row.drainCompleted / row.offered : 0
+  const dropRate = (row) => row.offered > 0 ? row.dropped / row.offered : 0
+  const failureRate = (row) => row.offered > 0 ? row.eventualFailure / row.offered : 0
+  const baseCompletionRate = median(base.map(completionRate))
+  const headCompletionRate = median(head.map(completionRate))
+  const baseDropRate = median(base.map(dropRate))
+  const headDropRate = median(head.map(dropRate))
+  const baseFailureRate = median(base.map(failureRate))
+  const headFailureRate = median(head.map(failureRate))
+  const regression = delta > allowed
+    || headCompletionRate + 1e-9 < baseCompletionRate
+    || headDropRate > baseDropRate + 1e-9
+    || headFailureRate > baseFailureRate + 1e-9
+  if (regression) failures.push(
+    `${group}: p95 ${baseP95.toFixed(2)} -> ${headP95.toFixed(2)} ms, completion ${(baseCompletionRate * 100).toFixed(2)}% -> ${(headCompletionRate * 100).toFixed(2)}%, drop ${(baseDropRate * 100).toFixed(2)}% -> ${(headDropRate * 100).toFixed(2)}%, failure ${(baseFailureRate * 100).toFixed(2)}% -> ${(headFailureRate * 100).toFixed(2)}%`,
+  )
   comparisons.push({
     group,
     baseP95Ms: baseP95,
     headP95Ms: headP95,
     p95DeltaMs: delta,
-    baseDurable,
-    headDurable,
+    baseCompletionRate,
+    headCompletionRate,
+    baseDropRate,
+    headDropRate,
+    baseFailureRate,
+    headFailureRate,
     baseRetries: median(base.map((row) => row.retries)),
     headRetries: median(head.map((row) => row.retries)),
-    baseDropped: median(base.map((row) => row.dropped)),
-    headDropped: median(head.map((row) => row.dropped)),
     baseSjtValidationMeanMs: median(base.map((row) => row.sjtValidationMeanMs).filter((v) => v !== null)),
     headSjtValidationMeanMs: median(head.map((row) => row.sjtValidationMeanMs).filter((v) => v !== null)),
     regression,
   })
 }
 
-writeFileSync(resolve(root, 'ab-summary.json'), JSON.stringify({ schemaVersion: 1, rows, comparisons, failures }, null, 2) + '\n')
+writeFileSync(resolve(root, 'ab-summary.json'), JSON.stringify({ schemaVersion: 2, rows, comparisons, failures }, null, 2) + '\n')
 const md = [
   '# Phase 0 same-host A/B',
   '',
-  '| workload | base p95 ms | head p95 ms | p95 delta | base/head durable | base/head retry | base/head drop | verdict |',
+  '| workload | base p95 ms | head p95 ms | p95 delta | base/head completion | base/head retry | base/head drop rate | verdict |',
   '|---|---:|---:|---:|---:|---:|---:|---|',
-  ...comparisons.map((row) => `| ${row.group} | ${row.baseP95Ms.toFixed(2)} | ${row.headP95Ms.toFixed(2)} | ${row.p95DeltaMs.toFixed(2)} | ${row.baseDurable}/${row.headDurable} | ${row.baseRetries}/${row.headRetries} | ${row.baseDropped}/${row.headDropped} | ${row.regression ? 'REGRESSION' : 'NON-DEGRADED'} |`),
+  ...comparisons.map((row) => `| ${row.group} | ${row.baseP95Ms.toFixed(2)} | ${row.headP95Ms.toFixed(2)} | ${row.p95DeltaMs.toFixed(2)} | ${(row.baseCompletionRate * 100).toFixed(2)}%/${(row.headCompletionRate * 100).toFixed(2)}% | ${row.baseRetries}/${row.headRetries} | ${(row.baseDropRate * 100).toFixed(2)}%/${(row.headDropRate * 100).toFixed(2)}% | ${row.regression ? 'REGRESSION' : 'NON-DEGRADED'} |`),
   '',
   failures.length ? `Failures: ${failures.join('; ')}` : 'No A/B non-degradation failure.',
   '',

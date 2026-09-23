@@ -174,3 +174,10 @@ Decision: **KEEP**.
 The closed Aggregate finalizer now constructs one `headersBySlot` index inside the existing decrypt/parse phase and uses O(1) slot lookups for each required unit instead of repeating `headers.find`. Duplicate header slot keys still fail closed before any payload is accepted, and the existing completeness/identity/hash/report ordering contracts are unchanged.
 
 Evidence: commit `a95154cd9c79f2995e94a5c2008ede35d4361808`; extended Phase 0 invariant run `35833019854` and Draft backend compile in CI run `35833020182` succeeded. P2-C09 adds explicit 5/20/50/100 ready-parent finalization measurements on the frozen candidate.
+
+
+### P2-C09 A/B accounting correction
+
+The first complete A/B execution reached all six workloads in all three interleaved rounds. All six p95 medians were non-degraded; SJT-60 was incorrectly labelled regression only because the constant-arrival scheduler produced a median of 51 durable completions on BASE and 50 on HEAD for a configured 50-arrival window. Inspection of the per-run manifests shows both variants durably completed 100% of their observed offered work with zero drop and zero eventual failure.
+
+The A/B gate therefore compares durable completion **rate** (`drainCompleted / observed offered`) plus drop/failure rates, not absolute row count. This preserves fail-closed behavior for real lost work while allowing the already-documented +1 scheduler-boundary arrival. The p95 rule remains unchanged: median HEAD p95 may not degrade by more than `max(10%, 10ms)`.
