@@ -21,6 +21,19 @@ export const eventualSuccessRate = new Rate('gate_e_eventual_success_rate');
 export const eventualLatency = new Trend('gate_e_eventual_latency_ms', true);
 /** Number of capacity (503) retries issued for a logical submit (v3.0 §31). */
 export const capacityRetries = new Counter('gate_e_capacity_retries');
+/** Every HTTP attempt, classified without path/payload/identity labels. */
+export const http2xx = new Counter('gate_e_http_2xx');
+export const http4xx = new Counter('gate_e_http_4xx');
+export const http5xx = new Counter('gate_e_http_5xx');
+export const networkErrors = new Counter('gate_e_network_errors');
+
+export function recordHttpAttemptStatus(status, tags = {}) {
+  const value = Number(status);
+  if (value === 0) networkErrors.add(1, tags);
+  else if (value >= 200 && value < 300) http2xx.add(1, tags);
+  else if (value >= 400 && value < 500) http4xx.add(1, tags);
+  else if (value >= 500 && value < 600) http5xx.add(1, tags);
+}
 
 /**
  * Classify a 503 response body code into one of the three capacity buckets.
@@ -53,6 +66,9 @@ export function record503(body, tags = {}) {
 export const fixturesUsed = new Counter('gate_e_fixtures_used');
 export const freshCompletions = new Counter('gate_e_fresh_completions');
 export const idempotentReplays = new Counter('gate_e_idempotent_replays');
+/** Same logical submit recovered by a retry after the first response was not durable-confirmed. */
+export const retryRecoveredReplays = new Counter('gate_e_retry_recovered_replays');
+export const firstAttemptReplays = new Counter('gate_e_first_attempt_replays');
 export const missingFixtures = new Counter('gate_e_missing_fixtures');
 /** Steady-scenario splits of the fresh/replay counters (no tag dedup needed). */
 export const steadyFreshCompletions = new Counter('gate_e_steady_fresh_completions');

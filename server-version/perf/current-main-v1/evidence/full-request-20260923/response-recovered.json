@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "group": "sjtLinear30Steady",
+  "validationErrors": [],
+  "capacityDisqualifiers": [
+    "UNQUALIFIED_FOR_CAPACITY: shared or unverified load generator/target"
+  ],
+  "capacityEligible": false,
+  "counts": {
+    "offered": 4,
+    "started": 4,
+    "interrupted": 0,
+    "dropped": 0,
+    "fixtureUsed": 4,
+    "fresh": 3,
+    "replay": 1,
+    "recovered": 1,
+    "firstAttemptReplay": 0,
+    "retry": 1,
+    "eventualSuccess": 4,
+    "eventualFailure": 0,
+    "missingFixture": 0,
+    "http2xx": 4,
+    "http4xx": 0,
+    "http5xx": 0,
+    "networkErrors": 1,
+    "status429": 0,
+    "status503": 0,
+    "checksFailed": 0,
+    "windowCompleted": 4,
+    "drainCompleted": 4,
+    "windowCompletedPerSecond": 1,
+    "p50Ms": 62.074,
+    "p95Ms": 86.39219999999999,
+    "responseBytes": 149498
+  },
+  "cost": {
+    "sqlEvents": null,
+    "prismaCalls": [
+      {
+        "labels": "{model=\"raw\",action=\"queryRaw\"}",
+        "delta": 10
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+        "delta": 14
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"updateMany\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{model=\"SituationalRawSubmission\",action=\"create\"}",
+        "delta": 4
+      }
+    ],
+    "requestPhases": [
+      {
+        "labels": "{phase=\"response\",route=\"/metrics\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"request_body_receive_parse\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"auth_account_lookup\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"sjt.validation_index\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"transaction\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"final_submit_commit\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"response.build\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 5
+      }
+    ],
+    "httpRoutes": [
+      {
+        "labels": "{method=\"GET\",route=\"/metrics\",status=\"200\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{method=\"POST\",route=\"/api/situational/attempts/:attemptId/submit\",status=\"200\"}",
+        "delta": 5
+      }
+    ]
+  }
+}
