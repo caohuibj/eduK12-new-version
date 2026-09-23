@@ -1,0 +1,22 @@
+{
+  "baseUrl": "http://127.0.0.1:53002",
+  "overLimitStatus": 400,
+  "outcomes": [
+    {
+      "fixtureClass": "scaleTypical",
+      "itemCount": 25,
+      "status": 200,
+      "fresh": true,
+      "scoreMatch": true,
+      "references": 0
+    },
+    {
+      "fixtureClass": "scaleMaxLegal",
+      "itemCount": 1000,
+      "status": 200,
+      "fresh": true,
+      "scoreMatch": true,
+      "references": 0
+    }
+  ]
+}

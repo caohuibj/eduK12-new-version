@@ -1,0 +1,53 @@
+{
+  "baseUrl": "http://127.0.0.1:53002",
+  "outcomes": [
+    {
+      "fixtureClass": "cpt-experience",
+      "trialCount": 60,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    },
+    {
+      "fixtureClass": "cpt-research",
+      "trialCount": 360,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    },
+    {
+      "fixtureClass": "cpt-standard",
+      "trialCount": 180,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    },
+    {
+      "fixtureClass": "nback-experience",
+      "trialCount": 30,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    },
+    {
+      "fixtureClass": "nback-research",
+      "trialCount": 180,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    },
+    {
+      "fixtureClass": "nback-standard",
+      "trialCount": 100,
+      "status": 200,
+      "replayed": false,
+      "metricsMatch": true,
+      "frozenProfileReport": true
+    }
+  ]
+}

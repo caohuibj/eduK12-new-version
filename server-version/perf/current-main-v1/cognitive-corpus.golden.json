@@ -1,0 +1,1633 @@
+{
+  "schemaVersion": 1,
+  "historicalClasses": {
+    "nback100": "c5af9e15444df9b801b018175ba079d9f85dd2c6387d351234d53247c4b8ec40",
+    "cpt180": "1f7719b54912cf2da5e8a5880999aecf90aa2e5bef838aef60d745c47e399dd7"
+  },
+  "entries": [
+    {
+      "identity": "bart/1.0.0/1.0.0",
+      "definitionHash": "591e3e8e81b7b894c8f020aaac48cfc65fd7258f070296de7032cb4a103f928c",
+      "compiledRuntimeHash": "0772121d66952c943226fe456f485cf927b65978b538bee8b937f2100f52ebee",
+      "protocolSignature": "d3c4b44f77e59abd2cdc21f05946394c3d0524541f09033d6e679e498572c804",
+      "reportDefinitionHash": "b3ac912ea41cf2e545e4894311f8cc5bc78385f5c7457e9960ddd9994ee84613",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "b4313ad38f62591564bed505d237e4202f80f47b57a9992211961d754af24d72",
+          "maxTrials": 10,
+          "reportDefinitionHash": "41d4493269611d435fa689b2a56b7067ca35b2d116805dca3ed8bc41b4a554c5",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "b8e0c44a83789ef18c6adfc972cc464f441ef6ee3e15d08b481b416ea83deb07",
+          "maxTrials": 30,
+          "reportDefinitionHash": "41d4493269611d435fa689b2a56b7067ca35b2d116805dca3ed8bc41b4a554c5",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "0c69d065dded188b7f304bf6eec8fd0f6cda21e9442f1cdd981ab2bf162c2b62",
+          "maxTrials": 50,
+          "reportDefinitionHash": "41d4493269611d435fa689b2a56b7067ca35b2d116805dca3ed8bc41b4a554c5",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "2447f054a1f763994e39af8fdb741d18fc689ae1bd8f166080690ce73646c32b",
+          "expectedScoreHash": "68b11f17ac19ea69271ac6a438175bd8e50299356d1b4df4d8bf39944d82c928",
+          "expectedError": null,
+          "trialCount": 10
+        },
+        {
+          "name": "empty",
+          "inputHash": "539f1700dcbacc9278552f731f6c258f8b79b6366d63bbc27597b81f5c562d6d",
+          "expectedScoreHash": null,
+          "expectedError": "bart v1 requires the configured balloon count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "5fbbf3e82d60b6f6b8c058ae7498a9aa8cfcd330e0c62c4f96341c4a28f3ab99",
+          "expectedScoreHash": null,
+          "expectedError": "bart v1 requires the configured balloon count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "bart/1.0.0/1.1.0",
+      "definitionHash": "ea6e941dee539d8276a7a2bee5d95e4ba96160aa95b6225a4d9d69483a48e867",
+      "compiledRuntimeHash": "b03f9a5e9d8c4f2659229fa985b478a681fc617e1c65a3d26cb35b6bf44b5c01",
+      "protocolSignature": "cac5f8c337279212dd39e0fa38b6237670f0f31c160fea7932726f89432dc8fa",
+      "reportDefinitionHash": "e62a2d0b92275525e0fa479a77c2756e3692fa697ba6c5434857d7f798158fd4",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "b4313ad38f62591564bed505d237e4202f80f47b57a9992211961d754af24d72",
+          "maxTrials": 10,
+          "reportDefinitionHash": "990b5ec50c9be9b6dfbecf7d3fb0a63f66338c3dec7c09e00a4d1268fa60861c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "b8e0c44a83789ef18c6adfc972cc464f441ef6ee3e15d08b481b416ea83deb07",
+          "maxTrials": 30,
+          "reportDefinitionHash": "990b5ec50c9be9b6dfbecf7d3fb0a63f66338c3dec7c09e00a4d1268fa60861c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "0c69d065dded188b7f304bf6eec8fd0f6cda21e9442f1cdd981ab2bf162c2b62",
+          "maxTrials": 50,
+          "reportDefinitionHash": "990b5ec50c9be9b6dfbecf7d3fb0a63f66338c3dec7c09e00a4d1268fa60861c",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "2447f054a1f763994e39af8fdb741d18fc689ae1bd8f166080690ce73646c32b",
+          "expectedScoreHash": "68b11f17ac19ea69271ac6a438175bd8e50299356d1b4df4d8bf39944d82c928",
+          "expectedError": null,
+          "trialCount": 10
+        },
+        {
+          "name": "empty",
+          "inputHash": "539f1700dcbacc9278552f731f6c258f8b79b6366d63bbc27597b81f5c562d6d",
+          "expectedScoreHash": null,
+          "expectedError": "bart v1 requires the configured balloon count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "5fbbf3e82d60b6f6b8c058ae7498a9aa8cfcd330e0c62c4f96341c4a28f3ab99",
+          "expectedScoreHash": null,
+          "expectedError": "bart v1 requires the configured balloon count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "cardsort/1.0.0/1.0.0",
+      "definitionHash": "df036d251c601b371a0a01399b26576f650afa8f96d76004e6d73c6778d2d9c1",
+      "compiledRuntimeHash": "3657e08e49c3ae6262fec9d5fcd0c43d0f4eb5f34f4750aa943ef8726c7e6efd",
+      "protocolSignature": "fa72febf6fb793f856ea57a85f475768ce341cae510711acfb71e4d21c9bf4dc",
+      "reportDefinitionHash": "e39f35f18bbbb1b4bac762d618f9e1407a3ef74252ba72b7df5e845b57c6974c",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "b9d84ef19ca48c44cfdff2ee70b2f95aafa6db3a32789324d3a31a4e08e9e26f",
+          "maxTrials": 24,
+          "reportDefinitionHash": "550cc38493f9d7b340961eb2cd521dcd843a77bb9f2385c31e02ef06b449a391",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "887f96a51c066bf7cbcd8c76d36788e30d736e2f64cde38e0801083eaa542b17",
+          "maxTrials": 72,
+          "reportDefinitionHash": "550cc38493f9d7b340961eb2cd521dcd843a77bb9f2385c31e02ef06b449a391",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "193bc09a5ee1fb18bf240a567a53f6e027db67e5080caafe786dc7b68459862c",
+          "maxTrials": 144,
+          "reportDefinitionHash": "550cc38493f9d7b340961eb2cd521dcd843a77bb9f2385c31e02ef06b449a391",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "86c89194b72e9415b7691bb3c8c0d0feab5d37867555307dd32fa5ad2095bd01",
+          "expectedScoreHash": "caf14bf2cf57c58d66de92a0a175864f524949cd8ae50878e28883e6f8e2c3a1",
+          "expectedError": null,
+          "trialCount": 12
+        },
+        {
+          "name": "empty",
+          "inputHash": "3e5eb4744e3ed5720653470e2b396429ae72ca1dadeb7306438812423c4268c3",
+          "expectedScoreHash": null,
+          "expectedError": "cardsort v1 expects exactly 12 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "825ce221996f5ef61b39321c82b1163d3be32876fad9932b14b23f2860f97e49",
+          "expectedScoreHash": null,
+          "expectedError": "cardsort v1 expects exactly 12 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "corsi/1.0.0/1.0.0",
+      "definitionHash": "91f24c282edfc3ffa0d489ce7b74872c65665a4b712781c1f6799ff94f611e51",
+      "compiledRuntimeHash": "1e5825697e2afaada98222441d2d97afd1f1490d46e251528bb1cc62a3088304",
+      "protocolSignature": "fa712f62160004d22a1b9caab13c0acc5a22e319eaffd63c2d8a0fd502032aef",
+      "reportDefinitionHash": "b87fed2046faf00f7e5da6ab52ac65de4f40dc3d935da1125186d45aed553866",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "460da757e930f47055dfbda39b1244e2898956a99a67ee9f487e410a7a26ceab",
+          "maxTrials": 8,
+          "reportDefinitionHash": "fba8c8029c97a292d2c102cc2f76c7df0f6bbf5e50589863ce235d270ca3c0f9",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "ebc4f3b71a2382d8a0d7d3e43d837eb669d68d3c9938a9925d1daefd64ff0017",
+          "maxTrials": 12,
+          "reportDefinitionHash": "fba8c8029c97a292d2c102cc2f76c7df0f6bbf5e50589863ce235d270ca3c0f9",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "196bf9dc5a0acbebf5a5ad8337bd8f50f7460ae3364e7e0450cd9e939471e3c9",
+          "maxTrials": 14,
+          "reportDefinitionHash": "fba8c8029c97a292d2c102cc2f76c7df0f6bbf5e50589863ce235d270ca3c0f9",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "b52d72dcdeacbcccd6e4711c1d93764df4adc26c3e130cfb0618314bf47db605",
+          "expectedScoreHash": "3533244ee34213359de66b92905b27867661c5e5e670ecb2d091bfeaa98c31d1",
+          "expectedError": null,
+          "trialCount": 4
+        },
+        {
+          "name": "empty",
+          "inputHash": "568f56cdd7402801bd319b45c9e06882eee6a7689bd99b8717caccd2646328f1",
+          "expectedScoreHash": null,
+          "expectedError": "corsi v1 requires a complete two-trial level",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "e19029e84a3f7b134fd319553a4b56cdbd4b620c6e5270625dcc32e0ff38011a",
+          "expectedScoreHash": null,
+          "expectedError": "corsi v1 requires a complete two-trial level",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "cpt/1.0.0/1.0.0",
+      "definitionHash": "acd6ba811b64280e74f6d9e3cda143e81d6e79c3d5eec91ed1394b31806779b1",
+      "compiledRuntimeHash": "7ff5b21a28e3c241f18024438f3dba15dde3e369e6aba16dc1c3259c22a80665",
+      "protocolSignature": "93767f07a614c6e50386ae03e044fa9ff73cf39fedd10f583174a41eee6e0cb9",
+      "reportDefinitionHash": "327395371d0c451ef921bafe2655bfb8ee86ae2084c3dd594f2a7c75fcaee2bc",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "2a883217d28d57897288ec5f921f0da33e58b259a1501ca132e59d874f9c4cf9",
+          "maxTrials": 60,
+          "reportDefinitionHash": "b80a7774b6d662bad26fca178f6c59f8f3b387e5fa75697bbbefea6ed92530a8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "1f7719b54912cf2da5e8a5880999aecf90aa2e5bef838aef60d745c47e399dd7",
+          "maxTrials": 180,
+          "reportDefinitionHash": "b80a7774b6d662bad26fca178f6c59f8f3b387e5fa75697bbbefea6ed92530a8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "dbf2591a82ef9aeee854361de9043760122f266f3d4abc81f2c4b61f3edda1a6",
+          "maxTrials": 360,
+          "reportDefinitionHash": "b80a7774b6d662bad26fca178f6c59f8f3b387e5fa75697bbbefea6ed92530a8",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "697d62d94101c8419e1575a620896c6509eaff527f2e9d8b08da211839699489",
+          "expectedScoreHash": "c36069dbd3abdb77bb986ac40cca613e98e39841573054b3e4deb08270c91afb",
+          "expectedError": null,
+          "trialCount": 12
+        },
+        {
+          "name": "empty",
+          "inputHash": "e755c89af26074d2ca65461246c66197ed8923fed1c049ff1c74b53f4477fbb4",
+          "expectedScoreHash": null,
+          "expectedError": "cpt v1 expects exactly 12 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "0cf2785a83bbcb5f4f0598a3c784032b50beb9684d0c5e95d1ad66e1290fdc1d",
+          "expectedScoreHash": null,
+          "expectedError": "cpt v1 expects exactly 12 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "digitbackward/1.0.0/1.0.0",
+      "definitionHash": "74fdd458c44d612b6a1092643ff7d79bf23eae49261ca0aba0fee916bc20f525",
+      "compiledRuntimeHash": "5a9d651e813bff1c9c505203e4be215a126e95a8b297f363413d83c4204d10d7",
+      "protocolSignature": "155df3b2cbded2dad86b7b9908db1d4180e908ef6b605c65d698ccb897ada001",
+      "reportDefinitionHash": "cd946f5e4ddbe7390bb68bd389dc1dbac87b0ce2137fc0a39ad5333027ed0bee",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "6a5169217e6e8730244a5a0d67c39abf45d66133cd4f5886b5bc3f7c6d7be417",
+          "maxTrials": 6,
+          "reportDefinitionHash": "4487c1d14727e851f349fc93b66ff824ebc46e0b646e01fea342847d9c5b46f6",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "2d5f9ac91a26793ac937785878eb62ce70b77e4851962bbb374ccac9a8baa660",
+          "maxTrials": 12,
+          "reportDefinitionHash": "4487c1d14727e851f349fc93b66ff824ebc46e0b646e01fea342847d9c5b46f6",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "c7a406dfd5f41de7ecb4f33c3aec11ea6a1a8e2077cd1c68f2db2cee5c37a78b",
+          "maxTrials": 14,
+          "reportDefinitionHash": "4487c1d14727e851f349fc93b66ff824ebc46e0b646e01fea342847d9c5b46f6",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "f3bd6f222376bdfaa14e3dde4a482b0a6d2a3ed012a80ee7da27029e705c9361",
+          "expectedScoreHash": "da4fd06604ad1d1d1b96efa040552f08fbec5f82b53fd2ad5cfba20386ba417d",
+          "expectedError": null,
+          "trialCount": 6
+        },
+        {
+          "name": "empty",
+          "inputHash": "7996b89f087cfce31995763268e6ed774b961086429a8c1f7f28863bdcfca990",
+          "expectedScoreHash": null,
+          "expectedError": "digitbackward v1 requires complete two-trial levels",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "3b681f9977121a5e1d3124eb8a6746f5a313ad90ea7d882f2b4bc7e00e23c22e",
+          "expectedScoreHash": null,
+          "expectedError": "digitbackward v1 requires complete two-trial levels",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "emotionrecognition/1.0.0/1.0.0",
+      "definitionHash": "082643991377043babc3ae53b44c7c4d8b2cfec62d6f6f99b149760b2b73d926",
+      "compiledRuntimeHash": "97827a5b28048e6255a037628a7657d2cf9a9dd550eda9f7aca165d21645c813",
+      "protocolSignature": "85c8dd4fc34439faed53f4a3931bdd0824dc1d60bac0be0eecd935675560038d",
+      "reportDefinitionHash": "d53104ae99cffb91c67b5704596a5e75f97eb429b06bc7e53fc484bb1364c465",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "7c2cddf14d527e27a5e30bff6540895dfb8b9328fb1478524155e4d2b911f6c3",
+          "maxTrials": 24,
+          "reportDefinitionHash": "152bd8ba520dfe2eef63ca4a90956869f9884e4bc69872c8440df10719aedfe9",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "ee789fae97c538c3e49e4490a9f7552a21d9d3e15a3437dad61f8d611617abb6",
+          "maxTrials": 60,
+          "reportDefinitionHash": "152bd8ba520dfe2eef63ca4a90956869f9884e4bc69872c8440df10719aedfe9",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "b494cd46e1b3c8172016a64cfc33d9a0c9d991f5ac53196da154a2894d16545f",
+          "maxTrials": 120,
+          "reportDefinitionHash": "152bd8ba520dfe2eef63ca4a90956869f9884e4bc69872c8440df10719aedfe9",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "08e761a7ac899b3e378bd758441de86b549d4a16521587fc3f47cc675fa30ae7",
+          "expectedScoreHash": "0c8e23b011c1825d02c18787a0549dc6bcfb0e92eeee494175c6fe87ea3f5888",
+          "expectedError": null,
+          "trialCount": 24
+        },
+        {
+          "name": "empty",
+          "inputHash": "f287211d81cd78043cde5445e30aac4be0f38223bd902289ad6956ffff1b2d48",
+          "expectedScoreHash": null,
+          "expectedError": "emotionrecognition v1 expects exactly 24 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "46d6a3a103a92d48e633128cd7fdf9003ee927e0da18b1b9c2b75276ad865071",
+          "expectedScoreHash": null,
+          "expectedError": "emotionrecognition v1 expects exactly 24 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "fake/1.0.0/1.0.0",
+      "definitionHash": "a370b8357b4d9fc6a0e2b6994e41cb360fff89ca359ccfb10c0cae7f0140cf67",
+      "compiledRuntimeHash": "d1036a7f72d91a3843ce14efe198fd245c74ac9d2c3d1f5d255c8203767a4818",
+      "protocolSignature": "fdc2a757d43a8e7976e7adb11f490f856c0a462584f151bd14474ed957e50d3f",
+      "reportDefinitionHash": "1c9ad2075fea2b334822f9e3e21f69e06ece672f891f765fa4f36d165d1ca627",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "8f18da2db47abd31ec9d5b7e47a1f3952f319e9faa7ffe6a3224582fe0ae3706",
+          "maxTrials": 3,
+          "reportDefinitionHash": "e6d874f1c3834062f59e7987a25dd7800a5b0009050a935be00c5a6340bc5553",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "8f18da2db47abd31ec9d5b7e47a1f3952f319e9faa7ffe6a3224582fe0ae3706",
+          "maxTrials": 3,
+          "reportDefinitionHash": "e6d874f1c3834062f59e7987a25dd7800a5b0009050a935be00c5a6340bc5553",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "8f18da2db47abd31ec9d5b7e47a1f3952f319e9faa7ffe6a3224582fe0ae3706",
+          "maxTrials": 3,
+          "reportDefinitionHash": "e6d874f1c3834062f59e7987a25dd7800a5b0009050a935be00c5a6340bc5553",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "8bc7b43a9de81e2b12a3a81e8d6cd7ef698184cd60006d7385e4a242eed97155",
+          "expectedScoreHash": "12a314335fd30642a878b8ab6e933de91bb6a4effd60ac3e3643c573f9c54732",
+          "expectedError": null,
+          "trialCount": 3
+        },
+        {
+          "name": "empty",
+          "inputHash": "f99ad2b3e9100475523e20e79be7257a2a4b0b7ac11d8e232ec1e671829b1389",
+          "expectedScoreHash": null,
+          "expectedError": "fake v1 expects exactly 3 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "d0f5bdbe694061727ab69c94cef85b8ad89bdb5236118bdc5ed0c8e29d0352d8",
+          "expectedScoreHash": null,
+          "expectedError": "fake v1 expects exactly 3 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "flanker/1.0.0/1.0.0",
+      "definitionHash": "15c1c0772420d6d6f9e9f2c1ddd327d149fe908146be59778d4544d409517070",
+      "compiledRuntimeHash": "43bd5f5448724b4f73b33ca1e9b38e011e0a55f7034f02e7e1a2eba54b6045bb",
+      "protocolSignature": "9e666c6cfe92533ee39146935458375e0c261787a4e5e9c67ea58649674cf7a4",
+      "reportDefinitionHash": "eb42dd4026e4445fda7b59393a4e5c48c61f193d77e964b15f7bb8be8f6eb75e",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "44b50a07aec0e508017ae9cc4b54e7a5d87cf38b296af1446127293378e537ab",
+          "maxTrials": 24,
+          "reportDefinitionHash": "b74d0da6e2e3cb6a9261ebaa0f2e018b8499b5fbae36f1f552ca2835da1c3407",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "4e9fa2bd477364daa2e59f63c15d189eae41e8a1b92670f3b0f2d2044bd756b3",
+          "maxTrials": 80,
+          "reportDefinitionHash": "b74d0da6e2e3cb6a9261ebaa0f2e018b8499b5fbae36f1f552ca2835da1c3407",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "3886bbf78065d4132ccb0aaca11f7c168ad838f492ee1ec2ba05f35410bdbe12",
+          "maxTrials": 160,
+          "reportDefinitionHash": "b74d0da6e2e3cb6a9261ebaa0f2e018b8499b5fbae36f1f552ca2835da1c3407",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "b9068a1c7f544fd462f9831bce05b2e008eb8b7f296263379de82ccd0bb9ab46",
+          "expectedScoreHash": "2ed6ad421abe340f596e9198c67460c08c6de2ac8690bf94037980e41fdc34d6",
+          "expectedError": null,
+          "trialCount": 24
+        },
+        {
+          "name": "empty",
+          "inputHash": "6369553bd76366421828619d0364d45f7d7c419490d141101b3e1265a693263d",
+          "expectedScoreHash": null,
+          "expectedError": "flanker v1 expects exactly 24 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "801faca791e16084069b406c9e43edc0f6bcac2a42eb154dd54502dcc4920637",
+          "expectedScoreHash": null,
+          "expectedError": "flanker v1 expects exactly 24 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "gonogo/1.0.0/1.0.0",
+      "definitionHash": "31486c1d1dc3f7b5bba4cef95af473df0ca70991d070f0468d4f58d8f5f69a56",
+      "compiledRuntimeHash": "79a0a837eb08228846e2df6d0104ad61fd6b4dcaab9809d19f164362e4252f7c",
+      "protocolSignature": "90a93745d458f4d6e5a44f784a34cd1f645b9bb832683c253c463e21030a7b68",
+      "reportDefinitionHash": "09715c76b552f3ccaf55259bfc256724120a3f3db63a5f58ada405e57295ac50",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "716d73efa0d56f68a92b5a4d7653ff8c06fdb556e404b726e04e4d736111a294",
+          "maxTrials": 40,
+          "reportDefinitionHash": "0f302a59f0e1b953716a89928ff4aa2ccc44b29045202bbd57ff9b40098622a2",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "1181c5ccd277e02122681aa2ad427f52bc9593c5c1bd4b4bbab9ed0e6be195ef",
+          "maxTrials": 120,
+          "reportDefinitionHash": "0f302a59f0e1b953716a89928ff4aa2ccc44b29045202bbd57ff9b40098622a2",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "17d2282b24d0c87f7ae639e41b266eb01e94a618d4d52113c73573dd873e1599",
+          "maxTrials": 240,
+          "reportDefinitionHash": "0f302a59f0e1b953716a89928ff4aa2ccc44b29045202bbd57ff9b40098622a2",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "3c27f8998461cc133932e793007077e858132f1e1c0189a0fc19e589694d9e6f",
+          "expectedScoreHash": "7f735044fc78826e69840b2c7c2a39f48872e6f8e9503982ae82b9848d60263e",
+          "expectedError": null,
+          "trialCount": 8
+        },
+        {
+          "name": "empty",
+          "inputHash": "8683aa3ccc5e1e51f994038b316e4a62513a664690dad2eaa75a0662d16ca6d5",
+          "expectedScoreHash": null,
+          "expectedError": "gonogo v1 expects exactly 8 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "5ae1c991e08d45684fc2f30a342735cf85acd2d2ff7166ee53dd8c302df044dd",
+          "expectedScoreHash": null,
+          "expectedError": "gonogo v1 expects exactly 8 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "lexicaldecision/1.0.0/1.0.0",
+      "definitionHash": "4a03ed868c1f8235ffa0b2111dec53e9ae4a2c46b6aa738ebf2d7fdf575ddd21",
+      "compiledRuntimeHash": "0994cd66f0b893eb75c182f20a7809c4b7482e3bd4de8ddcd08a161e22c4bcdf",
+      "protocolSignature": "4c4daf9702fa8e4b37e23013b4d18a20a5ce6cbee2e04a2b53d20f1398209ac9",
+      "reportDefinitionHash": "250c51ee4ad0605d70d2f4e1a98cf6b7b1fe5b6ba23999a05b521781f97949eb",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "972fcc31c543ad87b01040875c4912651d1b139d74943bb738ea97a893050c9a",
+          "maxTrials": 40,
+          "reportDefinitionHash": "190f90fad57bcbfdcb8a470465d5fa7403f6ff9879cdc191e1d13cabaf9fb6e8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "0894112747a7570bd782aa60462fa7beb619d27d1cae25b945a1c94166dfabbd",
+          "maxTrials": 100,
+          "reportDefinitionHash": "190f90fad57bcbfdcb8a470465d5fa7403f6ff9879cdc191e1d13cabaf9fb6e8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "43db4d31699105896bed4f6f58d6bf897c49fc006d09e33a5ae64f368512035c",
+          "maxTrials": 200,
+          "reportDefinitionHash": "190f90fad57bcbfdcb8a470465d5fa7403f6ff9879cdc191e1d13cabaf9fb6e8",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "70e7f5041de47e469f6b9d752616fb2b88518a4facb478a863e5913438058bdd",
+          "expectedScoreHash": "c5814086c976ebd579bb8d1c7798d51d8c0eb76d669795b9c568a1f219b3f638",
+          "expectedError": null,
+          "trialCount": 40
+        },
+        {
+          "name": "empty",
+          "inputHash": "bb56dc683774237a51d3e6780aeac8bee31fa945db9c8f72738460224c352d5b",
+          "expectedScoreHash": null,
+          "expectedError": "lexicaldecision v1 expects exactly 40 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "aa7a83b110b63a3436757fd67dff54c44b798c91a2c585fa5813c42288fb63e7",
+          "expectedScoreHash": null,
+          "expectedError": "lexicaldecision v1 expects exactly 40 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "matrix/1.0.0/1.0.0",
+      "definitionHash": "dc432a4e15a5c1a076f62d849023b2540d8202f8f59715d65dcdfc3d55504892",
+      "compiledRuntimeHash": "66d65490d17ba336a711f8d694b7378d64bfddd78cc0a252ca9ec7c300db59d7",
+      "protocolSignature": "8b3b6dbdb0811c18020cb5d1459e66ea3b29419412832dad83e185a748a50948",
+      "reportDefinitionHash": "a97afd32c425d6fb4f7dce5c3a283b3c379ff7c3537d8e37a9947165aa2c1b31",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "cb9c7eac0467cb0b78843443809e3a46f80b529c958a23ed5fb1943f6e130e8f",
+          "maxTrials": 6,
+          "reportDefinitionHash": "05a1378a5ea1949888286eed252d1c51d3728094b7413b09b8e0a3c2aa8d7575",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "8e55e83be2048ce29c523ce2263c8ad42e727affa68e5d5724275320cedfa08c",
+          "maxTrials": 16,
+          "reportDefinitionHash": "05a1378a5ea1949888286eed252d1c51d3728094b7413b09b8e0a3c2aa8d7575",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "2907a582ba0d7b0cb601e3be3139e409ac49a29e41a6e4229dbec866751c8502",
+          "maxTrials": 24,
+          "reportDefinitionHash": "05a1378a5ea1949888286eed252d1c51d3728094b7413b09b8e0a3c2aa8d7575",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "0ce31fa0a2221073130f175867f84cefccb36e53abb21c99c74866bb25a5b12d",
+          "expectedScoreHash": "28a14d751b1f2a460c908019bae4874a1993b7141da8ea9c1b37953b99669c60",
+          "expectedError": null,
+          "trialCount": 6
+        },
+        {
+          "name": "empty",
+          "inputHash": "43bd524515058cda899247c59eea75e7b5622e4f41a9e7b5ebcfe0c1ce5a7ea4",
+          "expectedScoreHash": null,
+          "expectedError": "matrix v1 requires the configured item count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "d8e62eb74addbbb85e9328e9a26af7a12b959e7835ed999038abddfa8d160db4",
+          "expectedScoreHash": null,
+          "expectedError": "matrix v1 requires the configured item count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "memory/1.0.0/1.0.0",
+      "definitionHash": "f8a65685807d6b03ddb08dbb902d801fe026db46283abc8fa1ca87c404f2d0c5",
+      "compiledRuntimeHash": "5cd9dead28e1717d7d5d9d00bf71d167e34fe9dc7761d9b6e409701bf9b74002",
+      "protocolSignature": "84c66966e3626eba97c77f749916f1ca53250dd8632f694369abb2fbb611506d",
+      "reportDefinitionHash": "32f2dd84fff1aeacea23b62bda70d9f13e57d2b46ea20a5af06a06eb85ed61b8",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "efb331626b4349d94a0745f093cf92aa5845875adcf4a3d61ab640af72e8e890",
+          "maxTrials": 10,
+          "reportDefinitionHash": "f24be5e25fd448a4bee70f164737cd7e969c60ef3ecf5ba76d8c70b9a52f69d1",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "a49a6dbb0deab31ab3f3c2de7b9acfbccb247c1631a205f6228eb1f1a7032816",
+          "maxTrials": 14,
+          "reportDefinitionHash": "f24be5e25fd448a4bee70f164737cd7e969c60ef3ecf5ba76d8c70b9a52f69d1",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "739de87d9e95f8f864ed3b0591de23e12b133ed058627009d923f41074cf7932",
+          "maxTrials": 16,
+          "reportDefinitionHash": "f24be5e25fd448a4bee70f164737cd7e969c60ef3ecf5ba76d8c70b9a52f69d1",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "dd12c641a38d2b2f9441271ca14f4fb2360c915500cd3fbec2b10dd4ee54fe06",
+          "expectedScoreHash": "d6d50b3dcfb4846e63f80bdee6819832d0f7eaeb5178d423bd067d24782a717b",
+          "expectedError": null,
+          "trialCount": 6
+        },
+        {
+          "name": "empty",
+          "inputHash": "1516be7d02061e9604b3ec2ab8739f7de9552f9903b2a59fa3019596fd26601c",
+          "expectedScoreHash": null,
+          "expectedError": "memory v1 requires a complete two-trial level",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "60a24ff613cf509eae84aa34e59aa69642c24e6880234315e98c647983a87daf",
+          "expectedScoreHash": null,
+          "expectedError": "memory v1 requires a complete two-trial level",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "memory/1.0.0/1.1.0",
+      "definitionHash": "8aa03357b35c900188f91dd0aeb99e26811dc71c1674c173d9ba900e7b2b61e1",
+      "compiledRuntimeHash": "c26c0619ee25e4d54884bdd7bc4a8e53749f1a7ed43c5f6dd106034dfe506fa2",
+      "protocolSignature": "1fc1e23de3953527c5d6cdeee8a6a3b07090581f8af1b279153a74ca3b898d05",
+      "reportDefinitionHash": "f77ab96fd053fe3d98034b7253ae1812d5ca5f092b05775656cb3b2e9cc19a56",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "9a92dcf3d0d44fcb65626c29766be715ecd73adc86de553cdc16fe9108a606e8",
+          "maxTrials": 8,
+          "reportDefinitionHash": "4636bfebc0af87f2476c21bf51658ae8680b9e577a36153a43e1b8b035b37a19",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "701b888901e24187e556cff2808c7de01c1626358f0ad5f8e6481bedcf066d6e",
+          "maxTrials": 12,
+          "reportDefinitionHash": "4636bfebc0af87f2476c21bf51658ae8680b9e577a36153a43e1b8b035b37a19",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "d10a1c82d96f4b15ca5a35e86a45f8f5fe531449323071a74e551877c4bdb654",
+          "maxTrials": 14,
+          "reportDefinitionHash": "4636bfebc0af87f2476c21bf51658ae8680b9e577a36153a43e1b8b035b37a19",
+          "profileDefinitionVersion": "1.1.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "dd12c641a38d2b2f9441271ca14f4fb2360c915500cd3fbec2b10dd4ee54fe06",
+          "expectedScoreHash": "1e0677d4f89ca4d56c58f2bd403c22459c934e97d7903f3b1405b12731d935f4",
+          "expectedError": null,
+          "trialCount": 6
+        },
+        {
+          "name": "empty",
+          "inputHash": "1516be7d02061e9604b3ec2ab8739f7de9552f9903b2a59fa3019596fd26601c",
+          "expectedScoreHash": null,
+          "expectedError": "memory v1 requires a complete two-trial level",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "60a24ff613cf509eae84aa34e59aa69642c24e6880234315e98c647983a87daf",
+          "expectedScoreHash": null,
+          "expectedError": "memory v1 requires a complete two-trial level",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "mentalrotation/1.0.0/1.0.0",
+      "definitionHash": "70ce7d9271f7c0724ca755bb645193871dd3f6b7cb4c36a5428db823b410fea1",
+      "compiledRuntimeHash": "f98144ac4e6f119271330f5afc06a3b161420bb94de055a86c07715f12e936f4",
+      "protocolSignature": "273f3b826ac7cb3ec15df37e2cb0200fbb872b1174dfbb3cbd9c8a1c497a87a5",
+      "reportDefinitionHash": "103b3c912df966f742355fcd59cf3be08a637c14b9eee6ef7358e74ec0af32db",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "858e9d0632c1a2fab157386fef5c6358646d109e4df257486b743a5b239b7e1e",
+          "maxTrials": 12,
+          "reportDefinitionHash": "d2392be1e91989897aeb42d94169dbf130e2f003e1840ac28fd2233e59628ae1",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "e5f30591a4ff686bf2e572ce3e263cf546d6a2929f4476803cfd5dd9e611c444",
+          "maxTrials": 40,
+          "reportDefinitionHash": "d2392be1e91989897aeb42d94169dbf130e2f003e1840ac28fd2233e59628ae1",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "db3d524448b3588d90cb30bd3b4766599166d6a2e71bc277372ce2d5ce465753",
+          "maxTrials": 80,
+          "reportDefinitionHash": "d2392be1e91989897aeb42d94169dbf130e2f003e1840ac28fd2233e59628ae1",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "c80a045444aab109284a0161f0fbc37f2a64cddf53d73a9a1c277b3d29368edb",
+          "expectedScoreHash": "389efb320c58a4631d43f62e567a4e79d98306891808e16c7a3c9a0ff43cbfdd",
+          "expectedError": null,
+          "trialCount": 12
+        },
+        {
+          "name": "empty",
+          "inputHash": "66e6ce60c45b2bc3cee2faa349981e97f8d2b37fa8ebc78d7d6dce8c421bc65d",
+          "expectedScoreHash": null,
+          "expectedError": "mentalrotation v1 requires the configured trial count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "25ecc5b213b2ac0947afe3379d3a086548c22d0da86546873dfde1a9ab242016",
+          "expectedScoreHash": null,
+          "expectedError": "mentalrotation v1 requires the configured trial count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "nback/1.0.0/1.0.0",
+      "definitionHash": "4b697b3da8d88779c1272610775acfa9de00f45f0cb99df318e965de765dc922",
+      "compiledRuntimeHash": "9664c821e7b4ec92261e576c8496b3e312aceab22e1277d6c72dd580360025ba",
+      "protocolSignature": "06e6266d85efe1bf0b4adc22df1a2d414b1653ba789773dc6fcb03789cf40a78",
+      "reportDefinitionHash": "4dd14c5eddb9b80540b1ff5ec28aa8c6b6172370564b2724a6793edcb39d8e98",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "0a70df0fb4779a9d515f8bc9f87bcdaec552db1641759776bd395b3c45d9d0fa",
+          "maxTrials": 30,
+          "reportDefinitionHash": "a82054062934d34d2dd52b54fff0b61edaaca73842428bc2eb5c318e760e4f1d",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "c5af9e15444df9b801b018175ba079d9f85dd2c6387d351234d53247c4b8ec40",
+          "maxTrials": 100,
+          "reportDefinitionHash": "a82054062934d34d2dd52b54fff0b61edaaca73842428bc2eb5c318e760e4f1d",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "390b8df0141bfc932f6b20002e61dd85741615c1206f59de26ab7c6777177a89",
+          "maxTrials": 360,
+          "reportDefinitionHash": "a82054062934d34d2dd52b54fff0b61edaaca73842428bc2eb5c318e760e4f1d",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "fab2f384f8e0bdaaf903d99ea9305911033e8d7db9f070e00fad0588f1ba0476",
+          "expectedScoreHash": "eba94e6aa22df8cb9a839cb577f8b467a4388b91a3d9354fc88d7990cba8a4f2",
+          "expectedError": null,
+          "trialCount": 16
+        },
+        {
+          "name": "empty",
+          "inputHash": "697e7a53ebd2d839cc78e6253344d94a2aea3fc0a096688b3fb6841f0e5d4139",
+          "expectedScoreHash": null,
+          "expectedError": "nback v1 expects exactly 16 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "f362f8f8e5f429add5ee42e80c7216bcf48a2b1a694ed9e2eb031a3ccf29859a",
+          "expectedScoreHash": null,
+          "expectedError": "nback v1 expects exactly 16 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "pairedassociate/1.0.0/1.0.0",
+      "definitionHash": "2194a037f6d3b6eabc269f52ecac09f04f9a229cd2e054cdc1b3427c902ba41d",
+      "compiledRuntimeHash": "8c0711070d857ddae9866549370a0441a799f4d28112c1de6f56ff5e5d382306",
+      "protocolSignature": "c132c62b059682ca38b0c7b1ce1d362e91766c79427cbfc7ff7882ce338e98ee",
+      "reportDefinitionHash": "5e5a08171da55b35686d6f62aa0e3f70e387b12f4ba3940c434b7eedad166f47",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "a2c7bcc7bbb6684459318d9bbe87d62634f6376aef1bb49d889dec2cc741da11",
+          "maxTrials": 2,
+          "reportDefinitionHash": "452ff336183930be527f7fa4cbb909dfb50a6e03974ecec78cce336bace7b048",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "7653530ed3e316027c2c2d13d93f8fb3e8cfc6f37b79266d7b1e98d2212b6723",
+          "maxTrials": 3,
+          "reportDefinitionHash": "452ff336183930be527f7fa4cbb909dfb50a6e03974ecec78cce336bace7b048",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "1cca9c29891584e749bb8fc9d2b21a1e1138c19505f6d6424e8b4d418acb8ba5",
+          "maxTrials": 5,
+          "reportDefinitionHash": "452ff336183930be527f7fa4cbb909dfb50a6e03974ecec78cce336bace7b048",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "64b7f851e76e90bb02f6970d090a218ec1dccddd3831289926171a4adef7c908",
+          "expectedScoreHash": "550ea98e723af76e4f2027f85a8dd4fa91cb4f53a4a2cb05dada3f1be5fb21e7",
+          "expectedError": null,
+          "trialCount": 3
+        },
+        {
+          "name": "empty",
+          "inputHash": "29e502ca63907000a7ea6a4cffb92d9e0a322676a6a4a5a0074b5c1b64426151",
+          "expectedScoreHash": null,
+          "expectedError": "pairedassociate v1 requires every learning round and at most one delayed round",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "482dbeba3348c3cfc512bab09ce4bf629584cf88022792599a2f28cfc03ff438",
+          "expectedScoreHash": null,
+          "expectedError": "pairedassociate v1 requires every learning round and at most one delayed round",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "patterncompare/1.0.0/1.0.0",
+      "definitionHash": "505242fa769d19c7a77fd90f9057700b84c3c749704a1d52ecf54db0637cf5d2",
+      "compiledRuntimeHash": "681aecfe5918b00225b5ff6c670e057e70823f52081dabc99afc7034c6696ccb",
+      "protocolSignature": "9c8705d93fec8fcbc71335d43b2c4e99fd9f11dcd09603da0a6bbcb47f3cdc3c",
+      "reportDefinitionHash": "b600b4b1fa10495483fbc3540337567723cace241255055deb3e48edbe7dd57d",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "809cff2b084e707b82c6034ed55f4726366ae921f6c7f1ad12864092b44fca84",
+          "maxTrials": 1000,
+          "reportDefinitionHash": "be602dbce6c92eb8b4d01242d73b7e83999f2eba663a267de5f69a0d19ef7d24",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "06b13f59782833cd0a11e5d1ab44400d1706c4cbad9a8a07277dee59bad7307b",
+          "maxTrials": 1000,
+          "reportDefinitionHash": "be602dbce6c92eb8b4d01242d73b7e83999f2eba663a267de5f69a0d19ef7d24",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "0ba647895d0f5ac8e9dfab7b81c4e7983d50fba23495412270be76c23cf06ce4",
+          "maxTrials": 1000,
+          "reportDefinitionHash": "be602dbce6c92eb8b4d01242d73b7e83999f2eba663a267de5f69a0d19ef7d24",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "69aa25127f4a211a5071985275473a3a3a81f804a080742c05169b75b2916355",
+          "expectedScoreHash": "dbc24daacc85e2b73fd5a0f7264d6d780fb4604374c4a5579a737235d7f7fc81",
+          "expectedError": null,
+          "trialCount": 12
+        },
+        {
+          "name": "empty",
+          "inputHash": "525d732b8c499272a45c0d61362ac8544cd96a79c03d43f61c78414a42b19839",
+          "expectedScoreHash": "a3af9052cdcea9c568d13b714a6139528227af432786319de121931fdec73e7e",
+          "expectedError": null,
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "e0dee14f80de881b496c7d28627154336c6e677183dbccfa7333e230507eaef9",
+          "expectedScoreHash": "31e7c770e68852798936771398b9d8d548a3770bdc5929cbb6f8832787bcb17b",
+          "expectedError": null,
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "picturesequence/1.0.0/1.0.0",
+      "definitionHash": "fb830f5b596cd7b53fc730fd87347e9335aa85772a321f51b874c593d3aec346",
+      "compiledRuntimeHash": "079e4ec557994f84dcef23590636f4f6a6dca79cd63637a451d4b8281be28755",
+      "protocolSignature": "555d3622b1abf7500d652e105e42edc190f6a8a8bf50a49181272c503ac6ff3b",
+      "reportDefinitionHash": "d556559ad68edf553759936175aca75d293d5d38067f509976958f524d8e52f6",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "2e2b8cfad3865f509446b6672e99ea3e29688405b317c2bfba1623b51344021d",
+          "maxTrials": 2,
+          "reportDefinitionHash": "ce82cfa46fa4adb13d0df47a9c1429f80a7c3a24309aae7dfcbcbf430b34da73",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "33d3474c0512fe34596fd18b8471559a05a5867ff66ecbdc4efb4b9d84ef904e",
+          "maxTrials": 3,
+          "reportDefinitionHash": "ce82cfa46fa4adb13d0df47a9c1429f80a7c3a24309aae7dfcbcbf430b34da73",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "cdeaba989860c7be39330b16d6f73ca138d5d5f416cda7caa94adb24ea102bc7",
+          "maxTrials": 4,
+          "reportDefinitionHash": "ce82cfa46fa4adb13d0df47a9c1429f80a7c3a24309aae7dfcbcbf430b34da73",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "f6834bccc9d20f6b85439a2bb97f6ed90c5e087e68477074e35e4f7b4251b301",
+          "expectedScoreHash": "fafdb7dc5738a703e1ff7155bf6f5e0d00ec2486271ed188fdb5f2ec178b6af9",
+          "expectedError": null,
+          "trialCount": 3
+        },
+        {
+          "name": "empty",
+          "inputHash": "bf64e77b912a058da96ce99f81541fcdb047fb82d156608a398b7537ef5d763b",
+          "expectedScoreHash": null,
+          "expectedError": "picturesequence v1 requires every learning round and at most one delayed round",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "77cd26937f79221c2de7104d7a43eb76b8c79a7c895d5b63d76ec36f4d5dd17d",
+          "expectedScoreHash": null,
+          "expectedError": "picturesequence v1 requires every learning round and at most one delayed round",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "reaction/1.0.0/1.0.0",
+      "definitionHash": "94bf28ac4c7fb649bf756afb886f00f645b24f2be8e69a1cdd6a1825083eda5d",
+      "compiledRuntimeHash": "779a92c1dd805d7316cd90e54d7dff8e20bbb05c7f4728fcf12be809b54f11c2",
+      "protocolSignature": "bbfe55fa9aef6b55bcc63f726882f21e6d508f3c77e46eb296d1b2fdf81256a5",
+      "reportDefinitionHash": "c6514a565d6da8547cd205ec626d2a950fbbeaebf53fb21864ce21b532a116c0",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "612bd25a7de1afc3b2e4138a32fa4d32874a141addca069d842ddd531cfc932a",
+          "maxTrials": 8,
+          "reportDefinitionHash": "bc1d78e2ecd3b6efb35b48a7885f713217f917485429553fd16a7e0684aa036d",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "a37ba3d5aecab5ee64f3c3ba7b94c0f692a46b759e1a14f60df0e03eb81e662a",
+          "maxTrials": 20,
+          "reportDefinitionHash": "bc1d78e2ecd3b6efb35b48a7885f713217f917485429553fd16a7e0684aa036d",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "6f706a9a459206f7f62d107e487a26b0ff9e819bb0c805692cbea7e555979e81",
+          "maxTrials": 60,
+          "reportDefinitionHash": "bc1d78e2ecd3b6efb35b48a7885f713217f917485429553fd16a7e0684aa036d",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "dec9d63640fd351f6f0e636f364cde686f2413660310c8bcd0589bcece0d8f93",
+          "expectedScoreHash": "c4c68b5057a2115fb6cf32adb30ec79f1dcdf8587264f7a3e8c8237b1af2510e",
+          "expectedError": null,
+          "trialCount": 5
+        },
+        {
+          "name": "empty",
+          "inputHash": "6a9acd7736b66b6b68b59f2bb87b414b32934a8a206e9b104fa3e9483f95197e",
+          "expectedScoreHash": null,
+          "expectedError": "reaction v1 expects exactly 5 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "1216d7b032acc0fcf40f4e8456076f2d60c3815fe349b4f56d09d9a5605b9eaf",
+          "expectedScoreHash": null,
+          "expectedError": "reaction v1 expects exactly 5 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "reaction/1.0.0/1.1.0",
+      "definitionHash": "84833e8b9893616814fa8ad073d6d5009b3966a2fc2bf8c5573feb79dafe88f6",
+      "compiledRuntimeHash": "940f9da1c15fe663e4836a1f46f5e8f69915a9ef0a188fc602fe28f7cb20bb73",
+      "protocolSignature": "f31e756f3f91b46da4c22b51d419af99c0abb231d2048d4f28d1b08b27f1aaed",
+      "reportDefinitionHash": "69d2dff3b82af0c11fa71b351be076a7ddc005547833f09d2922f4de47a0c742",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "1e794593810e051521095e9bb8760a295452db90cdb986219c78b3fb62e96c2d",
+          "maxTrials": 8,
+          "reportDefinitionHash": "e8c99d66b5d00e0c932b51cded6b77fd13b269e7414e4c2104b8bc820e8afe51",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "98533b736cade673f2ff35f8b2d75e48032b80f2602fa5ab88c896895f77b77d",
+          "maxTrials": 20,
+          "reportDefinitionHash": "e8c99d66b5d00e0c932b51cded6b77fd13b269e7414e4c2104b8bc820e8afe51",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "9402f8907753c52d1b7286669f9fb7f09ab8b1a687765c2574c95cc23bfa9456",
+          "maxTrials": 60,
+          "reportDefinitionHash": "e8c99d66b5d00e0c932b51cded6b77fd13b269e7414e4c2104b8bc820e8afe51",
+          "profileDefinitionVersion": "1.1.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "dec9d63640fd351f6f0e636f364cde686f2413660310c8bcd0589bcece0d8f93",
+          "expectedScoreHash": "de5d7a64478107324f5b0263b306a8b49b9fe4a26ea2f5377c9359294a4a7e1b",
+          "expectedError": null,
+          "trialCount": 5
+        },
+        {
+          "name": "empty",
+          "inputHash": "6a9acd7736b66b6b68b59f2bb87b414b32934a8a206e9b104fa3e9483f95197e",
+          "expectedScoreHash": null,
+          "expectedError": "reaction v1 expects exactly 5 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "1216d7b032acc0fcf40f4e8456076f2d60c3815fe349b4f56d09d9a5605b9eaf",
+          "expectedScoreHash": null,
+          "expectedError": "reaction v1 expects exactly 5 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "reversallearning/1.0.0/1.0.0",
+      "definitionHash": "18e3802c6622d12c4960ad0aaf40c5e2528a83b88bffd88a64379ea2b5567244",
+      "compiledRuntimeHash": "06f01330ca2c52855cc4be4fcfef47d004b50942ad12e894ef24fbd4d8314a3b",
+      "protocolSignature": "2405fd1ecc47d54515dccdd5d7a3a9bbbc3c00946dc8068c4efe63cd623f3371",
+      "reportDefinitionHash": "6aab32bb1b58eac4b4b61524158fca45fa6112c080e196e33fffa261d0a769dd",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "61c0c43a5b62223c62d9128166bcfba636fcf1e085d2a1b100c13f5ccc08f2bb",
+          "maxTrials": 40,
+          "reportDefinitionHash": "91b01d023e85e11e691433611f42ce624a0649ee8fe55a406b7e490d8f40447a",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "c0ccfc01345d808ffddb2618403d9f8b9a5fc4039762f3ba7eceabb9ebec2bf7",
+          "maxTrials": 120,
+          "reportDefinitionHash": "91b01d023e85e11e691433611f42ce624a0649ee8fe55a406b7e490d8f40447a",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "195e5556e5eb82d91442aae28957a108f505b884c114bb4d4599a39fe0b4e161",
+          "maxTrials": 240,
+          "reportDefinitionHash": "91b01d023e85e11e691433611f42ce624a0649ee8fe55a406b7e490d8f40447a",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "2f05bc0e4eb7f8a3f0169a805953397a99109128ec2b4488cc36ab6c64898137",
+          "expectedScoreHash": "74f604fb80c5a1e64fcddfb9ff71c58d7dc55ca0637869523d39795f9af72ec4",
+          "expectedError": null,
+          "trialCount": 40
+        },
+        {
+          "name": "empty",
+          "inputHash": "f376560ffe7c7d16969d243da0ee82f5e0084debb1e126b6e9687c5d98eafbab",
+          "expectedScoreHash": null,
+          "expectedError": "reversallearning v1 requires the configured trial count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "aebadd0e2e91036ebb6419f6cf9aad8485ac9ce9d8b9fc4c41dd83bb089dbac5",
+          "expectedScoreHash": null,
+          "expectedError": "reversallearning v1 requires the configured trial count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "sst/1.0.0/1.0.0",
+      "definitionHash": "e1d81674ea4dc33b67541ec6faacbf7bfc883c2db2ec5b5a03e2918447444bd0",
+      "compiledRuntimeHash": "c786d6184555e95fa5cf00552f1242c283f0a6d9f2d97830a4e56fe6be8ab8b0",
+      "protocolSignature": "3121fe6651f110c1dff4ab33f58155b6fa5d8135b095937c81060bc4506948be",
+      "reportDefinitionHash": "cf10c477a806ce421e7384143bab837e331bb0a7726828fbe7e1161b2b78f7e5",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "a390a98b0488c3b30a5953a964c2026b8c22c3eaee87c3fbb5fc43e862e331cb",
+          "maxTrials": 40,
+          "reportDefinitionHash": "1143bd2270bc24500847c33ddd9d7d90293ec843dfadf10333914ee206f654b8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "edb8f75985f7b09b878c389efac4edc8ca5f98cc5bca59ea19a22734fb1e5b6f",
+          "maxTrials": 96,
+          "reportDefinitionHash": "1143bd2270bc24500847c33ddd9d7d90293ec843dfadf10333914ee206f654b8",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "568ff4818a05566bf24db35ddb73b446b156518fc4f2298d04ee95ccf77192c2",
+          "maxTrials": 200,
+          "reportDefinitionHash": "1143bd2270bc24500847c33ddd9d7d90293ec843dfadf10333914ee206f654b8",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "8008d9da0f2c2836af3932c4ba0cb8346d7df4d289c060f9475e789f5070d70b",
+          "expectedScoreHash": "f1d998f3133c3839e9f8d3723295e64dd9225b800fa8aa288f373dfc64ebeb6d",
+          "expectedError": null,
+          "trialCount": 40
+        },
+        {
+          "name": "empty",
+          "inputHash": "6fc3f31e6b02ceb6fada8e23ee6e69aef8a518f66c71586327f1f89869ffe438",
+          "expectedScoreHash": null,
+          "expectedError": "sst v1 expects exactly 40 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "b24763798ef329f13d5f82edc66d22f16a030a8a1084b52e75f76a46227b93df",
+          "expectedScoreHash": null,
+          "expectedError": "sst v1 expects exactly 40 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "stroop/1.0.0/1.0.0",
+      "definitionHash": "68dcbdd1fc753149158e3c343c333cb3f14e4525f988edce40c5e93d061941fb",
+      "compiledRuntimeHash": "13ab018793d6dc02109db466573de5225c311d14f17685cc977f55c71c1d55ed",
+      "protocolSignature": "cbe8b9f2c55f33a40d9e9f061a3c4fff45be6ab8bf16250b2bd460bf2479d8d9",
+      "reportDefinitionHash": "d685cacdd94c552ef962eb8fbcf5b579ab7bfa5866dda6782c48847d702f06f5",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "6feceaa534d0c7c476c7c34b38c9d17c2d9354b3216ea27c9e9205f288d49b6f",
+          "maxTrials": 16,
+          "reportDefinitionHash": "c2cc54b3e4585b48c598127d0dd8e8315bb21fbc6f400e27dc4276839e8bba0c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "e5c166d3a0d509db5fc8f9a592bd0b97537e9882697adc0a1773781f7a815b3a",
+          "maxTrials": 24,
+          "reportDefinitionHash": "c2cc54b3e4585b48c598127d0dd8e8315bb21fbc6f400e27dc4276839e8bba0c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "8bf9913320f58546adc668b42331aeaef2f8f6cae3b7ea86dea4467dd717e450",
+          "maxTrials": 48,
+          "reportDefinitionHash": "c2cc54b3e4585b48c598127d0dd8e8315bb21fbc6f400e27dc4276839e8bba0c",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "9a8728cac0e5b9b9d82e625551853fbfd06ebadedd2b823881354b07a6779390",
+          "expectedScoreHash": "a39030803c4f65d991af1da569c627f7f3aa2b9f3329630a2ccb3df464dfa1e4",
+          "expectedError": null,
+          "trialCount": 4
+        },
+        {
+          "name": "empty",
+          "inputHash": "aa326057e5d5beb0bff914495d81dda48b7f30e8d7c86f0e438244c659061681",
+          "expectedScoreHash": null,
+          "expectedError": "stroop v1 expects exactly 4 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "8bc59f3b8fd859431ba13c3913b40b75a35c2ea7e1dbce1b51ddd7fcc0e8ccbc",
+          "expectedScoreHash": null,
+          "expectedError": "stroop v1 expects exactly 4 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "stroop/1.0.0/1.1.0",
+      "definitionHash": "816c9b84fb766121c6d3304952b1331ddfcfa67da0326a92406795d8599bae18",
+      "compiledRuntimeHash": "1aba2bd210763b003b110925187e793f2ea184388473ab0e7d6ef7134aaef8fb",
+      "protocolSignature": "90890c08b67d544717b23f5d4109e13109bcd941c3cddf07f06bd16622795cd5",
+      "reportDefinitionHash": "63d56cd3713a98324dd5caa9c0fff4555c6a8c17a9c04b5355da720da06bb53e",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "026197d901fd0ca36c1ef40911afc0ae6906747d337e11618c1e71e1e138fbfa",
+          "maxTrials": 16,
+          "reportDefinitionHash": "147972ea05d5aafb6ffdd9afb9faf99198a1f30694692dd04fe3027f13cc40e8",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "3608759829609d0833e6535144fa2cb6e663e8510e5a47f670dc9dd1f874a1be",
+          "maxTrials": 40,
+          "reportDefinitionHash": "147972ea05d5aafb6ffdd9afb9faf99198a1f30694692dd04fe3027f13cc40e8",
+          "profileDefinitionVersion": "1.1.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "947374fb249da3614708687518f318727c3b2101c446201909c336e080f11c2d",
+          "maxTrials": 96,
+          "reportDefinitionHash": "147972ea05d5aafb6ffdd9afb9faf99198a1f30694692dd04fe3027f13cc40e8",
+          "profileDefinitionVersion": "1.1.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "9a8728cac0e5b9b9d82e625551853fbfd06ebadedd2b823881354b07a6779390",
+          "expectedScoreHash": "a56b9a3fee546ba1105198baed65094abfba60be0b7af01af9ad9e6c5579ff49",
+          "expectedError": null,
+          "trialCount": 4
+        },
+        {
+          "name": "empty",
+          "inputHash": "aa326057e5d5beb0bff914495d81dda48b7f30e8d7c86f0e438244c659061681",
+          "expectedScoreHash": null,
+          "expectedError": "stroop v1 expects exactly 4 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "8bc59f3b8fd859431ba13c3913b40b75a35c2ea7e1dbce1b51ddd7fcc0e8ccbc",
+          "expectedScoreHash": null,
+          "expectedError": "stroop v1 expects exactly 4 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "taskswitch/1.0.0/1.0.0",
+      "definitionHash": "4abab89e275aa476e0eb3beffda03c46c8c9173bacee33f318cb2f926c78b30c",
+      "compiledRuntimeHash": "35eb8d8248047b55f761421ba18c595ea2cf87410b64cce480c94a73c52d1943",
+      "protocolSignature": "65ceb34f5dbfb5169933e834903b85eaf2a0bf71027604d07c3f6e396e745591",
+      "reportDefinitionHash": "95f3fb91e721e35c6785b585336749ff6532995f95285bc27e26e58e0f1c0eef",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "69b70d1dddc13874f27f468390dd99043594e0cf1e71190d3076c8725fddd2da",
+          "maxTrials": 48,
+          "reportDefinitionHash": "67a6d3d57a69059d522cf1e29b26fa066f11c7860efaf263515629ea5d208769",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "d1a100ded07bd83d9c7b1d083b2184652a469166cd85b4e502183b5320621862",
+          "maxTrials": 128,
+          "reportDefinitionHash": "67a6d3d57a69059d522cf1e29b26fa066f11c7860efaf263515629ea5d208769",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "c4bb43c3b8570412af4ca75fcb08cd07317e881db332fa4c186e4d7898d79ae5",
+          "maxTrials": 256,
+          "reportDefinitionHash": "67a6d3d57a69059d522cf1e29b26fa066f11c7860efaf263515629ea5d208769",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "e87a3abe7d2ada9669610bfa99a6e591aa1dbd44553cbec1008a14988e071643",
+          "expectedScoreHash": "47493cd63e23eceb47d0bf2be90e7a8c43d64364eb9b2b4c0e3760267431b8e1",
+          "expectedError": null,
+          "trialCount": 48
+        },
+        {
+          "name": "empty",
+          "inputHash": "056624ae18691ec73a1e6ef5410314b80526813f7126dac0e8dca512384016c5",
+          "expectedScoreHash": null,
+          "expectedError": "taskswitch v1 expects exactly 48 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "eeed3a660e62320cce7418fd84c38be4131e2f4da1c5c2f35b07097c9f75935e",
+          "expectedScoreHash": null,
+          "expectedError": "taskswitch v1 expects exactly 48 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "tower/1.0.0/1.0.0",
+      "definitionHash": "8404f19a069acf4adbdfee4f03d5ac60400499ecec36cad274a2041e5f1638f3",
+      "compiledRuntimeHash": "039812d8f2fc32873beb8883e8d9ebfe2f15dbba205d91665106b72b0e222c5f",
+      "protocolSignature": "3d7c6cc7370a598f58f9c34f228892ff021418541532d6ad988ab17bf47a7abd",
+      "reportDefinitionHash": "35f3344df8985f709fd3461f2fccfc5e66b09b0791b993d73b8463991625529e",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "a59d4ca7d64d23857c9d789e2ddabb32eb35bfd3439b369e829744da110fa8d6",
+          "maxTrials": 4,
+          "reportDefinitionHash": "9614a8c0119866285f7bf7875df8b901854c7a40d9e2db79b2d5fbc5ad30dc2b",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "f55b61ca7b69a5ebaac7c1e2f67971685246d713a21477f5e3c07102a1902af6",
+          "maxTrials": 10,
+          "reportDefinitionHash": "9614a8c0119866285f7bf7875df8b901854c7a40d9e2db79b2d5fbc5ad30dc2b",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "7bac45c867bc81c636d4201a4adacdbca039a152be02daf6802354b1ba4682f1",
+          "maxTrials": 18,
+          "reportDefinitionHash": "9614a8c0119866285f7bf7875df8b901854c7a40d9e2db79b2d5fbc5ad30dc2b",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "1dfca16d936a5e013ad1ba7a14d4e2bc1c2ec661ab4b42f93e46bb1781a2b890",
+          "expectedScoreHash": "e5414edc1457299135326ba432930649a15b69700aaa0c6b01a004d0cb5ecba9",
+          "expectedError": null,
+          "trialCount": 4
+        },
+        {
+          "name": "empty",
+          "inputHash": "c0b133ef3c2d20732d50fe4d97d99db5ee443544af40c89cb6b0eadf529ff940",
+          "expectedScoreHash": null,
+          "expectedError": "tower v1 requires the configured problem count",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "75be7da3cb4ae664d4b2dec7f2ec5bd5df3f7222cd54ff720df96903963ff12d",
+          "expectedScoreHash": null,
+          "expectedError": "tower v1 requires the configured problem count",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "trailmaking/1.0.0/1.0.0",
+      "definitionHash": "c0b691df6aa1f92b1b0dc17e1263d5244aa90697f8ada337b6a3afea4c30bafc",
+      "compiledRuntimeHash": "a00085d6c92be5c940c2684174064182cd0f26b17442790bbb15d56ce7f384cd",
+      "protocolSignature": "33c5213123c11c9fab829d15275512d839f4fbbbd4b7cc1be77e8b4e03028b0a",
+      "reportDefinitionHash": "2687d549591d424900e2796a39af3158853eb82cdd3d14f0e6277946a58609e1",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "22f1c5bbd28504060e86f2814c463127952888ce839a353b695036bade4592fe",
+          "maxTrials": 12,
+          "reportDefinitionHash": "0e841f4580684e32548b560499e213c7b6fc780a50e7b438cea64f48b7383d6c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "10a3d8e1ddcd7cd1cd57838f73a176cb0a5143fdff8313758752dca021cf2310",
+          "maxTrials": 24,
+          "reportDefinitionHash": "0e841f4580684e32548b560499e213c7b6fc780a50e7b438cea64f48b7383d6c",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "409277b22d925a1b3360b1553f5297746d2de48578cacca0a6104834be296ede",
+          "maxTrials": 48,
+          "reportDefinitionHash": "0e841f4580684e32548b560499e213c7b6fc780a50e7b438cea64f48b7383d6c",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "4d4839fdcd1c0d06a38079571321cb92a011fe89d35cb908af182849a19614e8",
+          "expectedScoreHash": "550396be21ec92e5af0e96236ac65005119fa972d20052ed96dd4ced57ad373f",
+          "expectedError": null,
+          "trialCount": 16
+        },
+        {
+          "name": "empty",
+          "inputHash": "e8321bef8733572421f69340a84a9fc4fafd05bdaa23587c6aada6c07e3a8d4d",
+          "expectedScoreHash": null,
+          "expectedError": "trailmaking v1 expects exactly 16 trials, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "341facc8e00228e199fc591a170ee26cafbc18451cba0f383a072a6c3261e99a",
+          "expectedScoreHash": null,
+          "expectedError": "trailmaking v1 expects exactly 16 trials, got 1",
+          "trialCount": 1
+        }
+      ]
+    },
+    {
+      "identity": "wordlist/1.0.0/1.0.0",
+      "definitionHash": "aad782723bf4848ba9306975c88806204cec523c80b60dd2277c9a8e2a6c723d",
+      "compiledRuntimeHash": "264eb7dfb074d5733702b12d93d3de4a28f7a1438a9be88e8fb9aebf8c5e6a74",
+      "protocolSignature": "e12b40d4d0b8cfe134fa48f1f82f567152e52a26a69055332eb5fecc3123f53d",
+      "reportDefinitionHash": "2357c51f444178b8dea716e81f9dc64f43d9f65a31807aa610678c68933f07b9",
+      "profiles": [
+        {
+          "profile": "experience",
+          "support": "SUPPORTED",
+          "configHash": "7a7020bd99517a3374d73433bb0790358969bcd0206ff70cdd0d8b1184713ffe",
+          "maxTrials": 2,
+          "reportDefinitionHash": "8c3013c2b11854efc3b6eaa5169eee8c0529c7cffcade21dd0b951d737e52791",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "standard",
+          "support": "SUPPORTED",
+          "configHash": "74221484cf011b1ccb05d43dbe0a4cde0544ea84fa849d511083521c8d197235",
+          "maxTrials": 3,
+          "reportDefinitionHash": "8c3013c2b11854efc3b6eaa5169eee8c0529c7cffcade21dd0b951d737e52791",
+          "profileDefinitionVersion": "1.0.0"
+        },
+        {
+          "profile": "research",
+          "support": "SUPPORTED",
+          "configHash": "d1ac774b06a912493b92e28f5870300e235ea8bce8362055b245a2ee58efd341",
+          "maxTrials": 6,
+          "reportDefinitionHash": "8c3013c2b11854efc3b6eaa5169eee8c0529c7cffcade21dd0b951d737e52791",
+          "profileDefinitionVersion": "1.0.0"
+        }
+      ],
+      "cases": [
+        {
+          "name": "golden",
+          "inputHash": "29f0e7bb7a7e85bdfb2d2cbcd0e2d8fa7a420f08b9c0c9aa15d7fb59efeb4feb",
+          "expectedScoreHash": "3243609032f1908f7a414d51321fd9e4ace6be67539fe179585da2a6a4e700fe",
+          "expectedError": null,
+          "trialCount": 2
+        },
+        {
+          "name": "empty",
+          "inputHash": "2a6613cbe92f327da514727b920592f7ab71298d49c48e13a3e7f3ae8f60d8bd",
+          "expectedScoreHash": null,
+          "expectedError": "wordlist v1 expects exactly 2 stages, got 0",
+          "trialCount": 0
+        },
+        {
+          "name": "insufficient",
+          "inputHash": "28287523bbf2f995daa5fed5841b99420e377cde63b799092f1c5b615837e4f0",
+          "expectedScoreHash": null,
+          "expectedError": "wordlist v1 expects exactly 2 stages, got 1",
+          "trialCount": 1
+        }
+      ]
+    }
+  ]
+}

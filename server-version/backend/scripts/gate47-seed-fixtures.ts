@@ -32,6 +32,7 @@ import {
   freezeQuestionnaireActiveSlotSet,
 } from '../src/modules/assessment-runtime/attempt-runtime'
 import { encryptFrozenActiveSlotSet, questionnaireScaleSlotKey } from '../src/modules/assessment-runtime/slot-set'
+import { assertFreshFixturePool, partitionFreshFixturePool } from '../../perf/current-main-v1/fresh-fixture-pool.mjs'
 
 const OUT_DIR = process.env.FIXTURE_OUT_DIR || '/tmp/eduk12-gate47-fixtures'
 const SCALE_N = Number(process.env.SCALE_FIXTURE_COUNT || 1200)
@@ -138,6 +139,10 @@ async function upsertUser(username: string, password: string, role: 'ADMIN' | 'S
 }
 
 async function main() {
+  if (process.env.PERF_CURRENT_MAIN_V1 === '1') {
+    await import('./current-main-seed-fixtures').then(({ seedCurrentMainFixtures }) => seedCurrentMainFixtures(prisma))
+    return
+  }
   mkdirSync(OUT_DIR, { recursive: true })
   const admin = await upsertUser(ADMIN_USERNAME, ADMIN_PASSWORD, 'ADMIN')
   const student = await upsertUser(STUDENT_USERNAME, STUDENT_PASSWORD, 'STUDENT')
@@ -632,6 +637,11 @@ async function main() {
     sameParent: sameParentRequests,
     mixed,
   }
+
+  // Legacy grouped fixtures remain available to Gate-E. The current-main mode
+  // below uses a strict partition: a fresh request can never appear in both
+  // warmup and steady windows, or in two independent scenarios.
+  assertFreshFixturePool(fixtures, { allowCrossGroupAliases: true })
 
   const fixturesPath = `${OUT_DIR}/final-submit-fixtures.json`
   writeFileSync(fixturesPath, JSON.stringify(fixtures))

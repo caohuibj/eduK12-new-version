@@ -4,15 +4,23 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "199662df3304f29b0fee74e316a2f10a1a8faa9a",
   "currentPr": "PERF-01",
-  "currentCommitId": "P1-C02",
+  "currentCommitId": "P1-C03",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": "/Users/Qiang/projects/perf-measurement-baseline-v1",
     "branch": "perf/measurement-baseline-v1",
     "baseSha": "199662df3304f29b0fee74e316a2f10a1a8faa9a",
-    "headSha": "b5159c0591c0709fb6fbce92d0df1eddecf48c43"
+    "headSha": "527d6258ac4a05a28c9c5f3b1469a486572c08ca"
   },
-  "pullRequests": [],
+  "pullRequests": [
+    {
+      "planId": "PERF-01",
+      "number": 165,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/165",
+      "status": "DRAFT",
+      "baseSha": "199662df3304f29b0fee74e316a2f10a1a8faa9a"
+    }
+  ],
   "completedCommits": [
     {
       "id": "P1-C01",
@@ -25,6 +33,19 @@
       ],
       "measurement": "Not a measurement commit",
       "evidence": ["docs/performance-optimization-v1/baseline.md", "docs/performance-optimization-v1/route-inventory.csv"]
+    },
+    {
+      "id": "P1-C02",
+      "sha": "527d6258ac4a05a28c9c5f3b1469a486572c08ca",
+      "contracts": ["bounded phase labels", "count-only opt-in SQL events", "unavailable database activity is not zero", "no business response change"],
+      "tests": [
+        "npm run build: passed",
+        "relevant Vitest: 49/49 passed",
+        "isolated PostgreSQL SJT standalone/branching: 12/12 passed",
+        "local /ready 3x no-scrape vs 3x 5-second scrape: median RPS -2.63%, p95 +3.51%, checks 100%"
+      ],
+      "measurement": "Local observer diagnostic only; k6 and API share host, so not a FINAL cost or capacity result",
+      "evidence": ["docs/performance-optimization-v1/observability.md", "server-version/perf/current-main-v1/evidence/observer-effect-20260923/README.md"]
     }
   ],
   "evidence": [
@@ -36,7 +57,7 @@
   "blockedItems": [
     {
       "item": "CAPACITY_VERIFIED",
-      "reason": "No exclusive whole-host 4C4G target or independent load generator identified; current Docker host runs unrelated containers",
+      "reason": "User confirmed no exclusive whole-host 4C4G target or independent load generator is currently available; current Docker host runs unrelated containers",
       "nextAction": "Obtain qualified host and load generator before PERF-03 formal capacity acceptance"
     }
   ],
@@ -47,6 +68,6 @@
       "reason": "Requires measured post-PERF-03 bottleneck evidence"
     }
   ],
-  "nextAction": "Commit P1-C02 after evidence review, then extend the isolated fresh fixture and compatibility corpus in P1-C03",
+  "nextAction": "Extend existing isolated seeders with unique fresh fixture pools and compatibility corpus for P1-C03; then implement complete HTTP accounting in P1-C04. Keep PR #165 Draft until PERF-01 exit evidence is complete.",
   "updatedAt": "2026-09-23"
 }
