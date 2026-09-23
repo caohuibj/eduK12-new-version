@@ -5,9 +5,9 @@
 - Repository: `caohuibj/eduK12-new-version`
 - Execution specification: `docs/performance-optimization-v1/implementation-plan.md`
 - Analysis base: `f89354d32c7ac3dc4a9abd3a6abdca851667b8b5`
-- Working base: `199662df3304f29b0fee74e316a2f10a1a8faa9a` (GitHub `main`, checked 2026-09-23)
+- Working base: `68afbe63672b42c9a2086f834d5ae46794c3c013` (GitHub `main`, checked 2026-09-23)
 - Worktree: `/Users/Qiang/projects/perf-measurement-baseline-v1`; branch: `perf/measurement-baseline-v1`
-- Next planned commit: P1-C02 after P1-C01 is recorded in `state.json`.
+- Current planned commit: P1-C05; the P1-C01–C04 commits have been rebased onto the working base above.
 
 The original checkout was on `fix/ci-runner-stability-v2`; it was not modified. No PERF-01/02/03 PR or progress file existed at the start. Open PRs #164, #157, #155, #146, #145, #125, #112, and #48 concern other work. PR #164 changes content CI and is not treated as a performance baseline.
 
@@ -29,7 +29,7 @@ The CI workflow classifies content-only changes and has separate PR-light and re
 | Public limiters | process-local, mounted before public routers | `src/index.ts` |
 | Capacity target | whole 4C4G host | Developer machines and shared load generators are only for correctness/comparable A/B |
 
-No current-main throughput, SQL count, or 4C4G capacity has been measured. Historical Gate-E figures are background only.
+The isolated PostgreSQL first-attempt HTTP baseline now covers all 14 FINAL route templates and two distinct policy-domain samples. It records SQL events, model calls, phase means, response bytes and durable completion; see `query-budgets.csv` and `server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json`. One request per route is not a latency distribution or a throughput/capacity measurement. No 4C4G capacity has been measured. Historical Gate-E figures are background only.
 
 ## Current path and planned owner
 
@@ -54,4 +54,4 @@ No current-main throughput, SQL count, or 4C4G capacity has been measured. Histo
 
 ## Environment and evidence status
 
-Docker is available on the development host. Existing PostgreSQL/Redis containers belong to other work and are not used. P1-C02 created task-owned `huisurvey-perf01-postgres` (PostgreSQL 14, localhost port 55439) and `huisurvey-perf01-redis` (Redis 7, localhost port 56379). The independent database has all 81 current migrations; no shared data or credentials are used. k6 is available locally. The database is suitable for correctness and development SQL probes, but this host also runs unrelated containers and k6 shares resources with the API, so it cannot qualify whole-host capacity or a clean same-host A/B. No 4C4G target or independent load generator has been identified. `query-budgets.csv` and `performance-results.md` intentionally contain no fabricated FINAL measurements.
+Docker is available on the development host. Existing PostgreSQL/Redis containers belong to other work and are not used. P1-C02 created task-owned `huisurvey-perf01-postgres` (PostgreSQL 14, localhost port 55439) and `huisurvey-perf01-redis` (Redis 7, localhost port 56379). The independent database has all 81 current migrations; no shared data or credentials are used. k6 is available locally. The database is suitable for correctness and development SQL probes. This host also runs unrelated containers and k6 shares resources with the API, so it cannot qualify whole-host capacity or a clean same-host A/B. The user confirmed there is no exclusive 4C4G target or independent load generator. `performance-results.md` separates the measured low-speed cost baseline from unverified capacity.

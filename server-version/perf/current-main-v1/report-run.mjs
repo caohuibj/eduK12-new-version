@@ -39,13 +39,26 @@ export function metricDelta(before, after, name, { required = false } = {}) {
   return out
 }
 
+function subtractScrapeControl(observed, control, name) {
+  const baseline = new Map(control.map((sample) => [sample.labels, sample.delta]))
+  const result = []
+  for (const sample of observed) {
+    const corrected = sample.delta - (baseline.get(sample.labels) || 0)
+    if (!finiteNonnegative(corrected) && corrected < -1e-12) throw new Error(`negative scrape-corrected metric ${name}${sample.labels}`)
+    if (corrected > 1e-12) result.push({ labels: sample.labels, delta: corrected })
+    baseline.delete(sample.labels)
+  }
+  if ([...baseline.values()].some((value) => value > 0)) throw new Error(`scrape-control labels missing from request window for ${name}`)
+  return result
+}
+
 function assertDurableProbe(probe, group) {
   if (!probe || probe.group !== group || !integerNonnegative(probe.fixtureCount)
     || !integerNonnegative(probe.completed) || !integerNonnegative(probe.wrongIdentity)
     || probe.completed > probe.fixtureCount) throw new Error(`invalid durable probe for ${group}`)
 }
 
-export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metricsBefore, metricsAfter }) {
+export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metricsControl, metricsBefore, metricsAfter }) {
   const errors = []
   const reject = (message) => errors.push(message)
   let counts = null
@@ -102,6 +115,10 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     if (drainCompleted !== fresh + recovered) reject('durable completed delta differs from client fresh plus recovered completion count')
     if (before.wrongIdentity || afterWindow.wrongIdentity || afterDrain.wrongIdentity) reject('durable submission identity mismatch')
     if (drainCompleted > manifest.offered) reject('durable completion exceeds offered work')
+    if (manifest.requireAllFresh === true && (fresh !== started || replay || recovered || retry
+      || eventualFailure || dropped || interrupted || missingFixture || checks.fails)) {
+      reject('all-fresh baseline requires every completed iteration to be a first-attempt fresh success')
+    }
     counts = {
       offered: manifest.offered, started, interrupted, dropped, fixtureUsed,
       fresh, replay, recovered, firstAttemptReplay, retry, eventualSuccess, eventualFailure, missingFixture,
@@ -113,12 +130,37 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
       responseBytes: metricCount(metrics, 'data_received', { required: true }),
     }
     if (counts.responseBytes !== null && !integerNonnegative(counts.responseBytes)) reject('invalid received byte count')
-    const sql = metricDelta(metricsBefore, metricsAfter, 'ptool_prisma_sql_events_total', { required: manifest.sqlEventMode === true })
+    if (manifest.scrapeCorrection === true && typeof metricsControl !== 'string') throw new Error('missing scrape-control metric snapshot')
+    const correctedDelta = (name, options) => {
+      const observed = metricDelta(metricsBefore, metricsAfter, name, options)
+      return manifest.scrapeCorrection === true
+        ? subtractScrapeControl(observed, metricDelta(metricsControl, metricsBefore, name, options), name)
+        : observed
+    }
+    const rawSql = metricDelta(metricsBefore, metricsAfter, 'ptool_prisma_sql_events_total', { required: manifest.sqlEventMode === true })
+    const sql = correctedDelta('ptool_prisma_sql_events_total', { required: manifest.sqlEventMode === true })
+    const rawPrismaCalls = metricDelta(metricsBefore, metricsAfter, 'ptool_prisma_call_duration_seconds_count')
+    // Scrape latency varies, so subtracting its duration would create a false
+    // negative. Phase and HTTP route labels identify /metrics directly.
+    const isBusinessRoute = (sample) => !sample.labels.includes('route="/metrics"')
+    const phaseCounts = metricDelta(metricsBefore, metricsAfter, 'ptool_assessment_phase_duration_seconds_count').filter(isBusinessRoute)
+    const phaseSums = new Map(metricDelta(metricsBefore, metricsAfter, 'ptool_assessment_phase_duration_seconds_sum').filter(isBusinessRoute)
+      .map((sample) => [sample.labels, sample.delta]))
+    const phaseLatencyMs = phaseCounts.map((sample) => {
+      const sumMs = (phaseSums.get(sample.labels) || 0) * 1000
+      phaseSums.delete(sample.labels)
+      return { labels: sample.labels, count: sample.delta, sumMs, meanMs: sumMs / sample.delta }
+    })
+    if (phaseSums.size) throw new Error('phase duration sum has no matching count')
     cost = {
+      scrapeCorrected: manifest.scrapeCorrection === true,
+      rawSqlEvents: rawSql.length ? rawSql.reduce((sum, sample) => sum + sample.delta, 0) : manifest.sqlEventMode === true ? 0 : null,
       sqlEvents: sql.length ? sql.reduce((sum, sample) => sum + sample.delta, 0) : manifest.sqlEventMode === true ? 0 : null,
-      prismaCalls: metricDelta(metricsBefore, metricsAfter, 'ptool_prisma_call_duration_seconds_count'),
-      requestPhases: metricDelta(metricsBefore, metricsAfter, 'ptool_assessment_phase_duration_seconds_count'),
-      httpRoutes: metricDelta(metricsBefore, metricsAfter, 'ptool_http_request_duration_seconds_count'),
+      rawPrismaCalls,
+      prismaCalls: correctedDelta('ptool_prisma_call_duration_seconds_count'),
+      requestPhases: phaseCounts,
+      phaseLatencyMs,
+      httpRoutes: metricDelta(metricsBefore, metricsAfter, 'ptool_http_request_duration_seconds_count').filter(isBusinessRoute),
     }
     if (manifest.requirePrismaCalls !== false && cost.prismaCalls.length === 0) reject('no Prisma model-call samples in request window')
   } catch (error) {
@@ -169,6 +211,7 @@ if (process.argv[1] && resolve(process.argv[1]) === import.meta.filename) {
     manifest: parse('manifest.json'), k6: parse('k6-summary.json'),
     before: parse('durable-before.json'), afterWindow: parse('durable-window.json'),
     afterDrain: parse('durable-drain.json'),
+    metricsControl: parse('manifest.json').scrapeCorrection === true ? read('metrics-control.txt') : undefined,
     metricsBefore: read('metrics-before.txt'), metricsAfter: read('metrics-after.txt'),
   })
   writeArtifacts(runDir, report)

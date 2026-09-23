@@ -5,7 +5,9 @@ import { integrationDatabaseUrl } from '../integration/integration-env'
 import { freezeExactReferenceBindings, loadFrozenReferenceSets } from '../../modules/assessment-runtime/reference-binding'
 import { validateReferenceSetDefinition } from '../../modules/assessment-reference/reference'
 
-const databaseUrl = integrationDatabaseUrl('PERF_INTEGRATION_DATABASE_URL')
+// CI's PR38 URL is the same explicitly provisioned disposable PostgreSQL
+// service; the dedicated PERF URL remains the local override.
+const databaseUrl = integrationDatabaseUrl('PERF_INTEGRATION_DATABASE_URL', 'PR38_INTEGRATION_DATABASE_URL')
 const suite = databaseUrl ? describe : describe.skip
 
 suite('PERF-01 shared Scale reference version with multiple score selections', () => {

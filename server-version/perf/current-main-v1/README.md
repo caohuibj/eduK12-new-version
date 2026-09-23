@@ -61,3 +61,32 @@ only 503, dropped iterations, interrupted scheduler work, lost responses, and
 recovered replay. A low-speed smoke run on a shared host validates accounting,
 not rated capacity. `CAPACITY_VERIFIED` requires the plan's isolated 4C4G
 target and independent load generator.
+
+## Route-by-route isolated PostgreSQL baseline
+
+Use a fresh, task-owned fixture file with all 14 FINAL groups and explicit
+`LEGACY_COURSE` and `ORGANIZATION_RUN` samples. Set `PERF_SQL_EVENT_COUNT=1`
+on the isolated API and runner, and `PERF_REQUIRE_ALL_FRESH=1` on each runner
+invocation. The runner captures PostgreSQL version, table counts, indexes and
+ANALYZE timestamps before every run, and a no-work `/metrics` control scrape
+so its SQL/model calls can be subtracted. A group with HTTP error, replay,
+retry, drop, missing metrics or an incorrect durable identity fails the
+baseline gate.
+
+After one successful run per group, from `server-version` execute:
+
+```sh
+PERF_RUN_PREFIX=/tmp/<run-prefix> \
+PERF_EVIDENCE_DIR=perf/current-main-v1/evidence/<date> \
+PERF_ROUTE_INVENTORY=../docs/performance-optimization-v1/route-inventory.csv \
+PERF_BUDGET_CSV=../docs/performance-optimization-v1/query-budgets.csv \
+node perf/current-main-v1/summarize-route-baseline.mjs
+```
+
+The rollup refuses missing/failing route or policy-domain runs. It emits a
+sanitized JSON/CSV/Markdown rollup and fills before costs in the comparison
+CSV; private raw manifests, headers, fixture records and credentials remain
+outside the repository. The committed
+`evidence/query-baseline-20260923/route-baseline.json` contains the completed
+PERF-01 baseline and SQL/model/phase distributions. A single request per
+route has no meaningful p95 and this shared host is unqualified for capacity.

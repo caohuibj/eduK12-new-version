@@ -118,3 +118,28 @@ test('missing mandatory metrics and negative counters fail validation', () => {
   const negative = baseline(); negative.k6.metrics.iterations.count = -1
   assert.ok(analyzeRun(negative).validationErrors.some((message) => message.includes('invalid count')))
 })
+
+test('a no-work scrape control is deducted from request SQL and model calls', () => {
+  const run = baseline()
+  run.manifest.scrapeCorrection = true
+  run.metricsControl = 'ptool_prisma_sql_events_total 0\nptool_prisma_call_duration_seconds_count{model="raw",action="queryRaw"} 0\n'
+  run.metricsBefore = 'ptool_prisma_sql_events_total 1\nptool_prisma_call_duration_seconds_count{model="raw",action="queryRaw"} 1\n'
+  run.metricsAfter = 'ptool_prisma_sql_events_total 32\nptool_prisma_call_duration_seconds_count{model="raw",action="queryRaw"} 2\nptool_prisma_call_duration_seconds_count{model="Test",action="findUnique"} 10\n'
+  const report = analyzeRun(run)
+  assert.deepEqual(report.validationErrors, [])
+  assert.equal(report.cost.rawSqlEvents, 31)
+  assert.equal(report.cost.sqlEvents, 30)
+  assert.deepEqual(report.cost.prismaCalls, [{ labels: '{model="Test",action="findUnique"}', delta: 10 }])
+})
+
+test('strict baseline mode exits validation on an HTTP failure even when counters reconcile', () => {
+  const run = baseline()
+  run.manifest.requireAllFresh = true
+  run.k6.metrics.gate_e_fresh_completions.count = 9
+  run.k6.metrics.gate_e_eventual_success.count = 9
+  run.k6.metrics.gate_e_eventual_failure = { count: 1 }
+  run.k6.metrics.gate_e_http_2xx.count = 9
+  run.k6.metrics.gate_e_http_4xx = { count: 1 }
+  run.afterWindow = probe(9); run.afterDrain = probe(9)
+  assert.ok(analyzeRun(run).validationErrors.some((message) => message.includes('all-fresh baseline')))
+})

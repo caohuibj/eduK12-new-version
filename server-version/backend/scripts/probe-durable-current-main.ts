@@ -13,16 +13,32 @@ if (!fixtureFile || !group) throw new Error('PERF_FIXTURE_FILE and PERF_FIXTURE_
 const groups = JSON.parse(readFileSync(fixtureFile, 'utf8')) as Record<string, Array<{
   path: string
   body: { submissionId: string; attemptEpoch: number }
+  durableType?: 'situational' | 'scale' | 'cognitive' | 'form' | 'compositeForm'
+  durableChildId?: string
+  durableParentId?: string
+  durableSectionId?: string
 }>>
 const fixtures = groups[group]
 if (!fixtures?.length) throw new Error(`empty or absent fixture group ${group}`)
 
 const expected = new Map<string, string>()
-const IDs: Record<'situational' | 'scale' | 'cognitive' | 'form', string[]> = {
-  situational: [], scale: [], cognitive: [], form: [],
+const IDs: Record<'situational' | 'scale' | 'cognitive' | 'form' | 'compositeForm', string[]> = {
+  situational: [], scale: [], cognitive: [], form: [], compositeForm: [],
 }
 const formPairs: Array<{ parentId: string; sectionId: string }> = []
+const compositeFormPairs: Array<{ parentId: string; sectionId: string }> = []
 for (const fixture of fixtures) {
+  if (fixture.durableType) {
+    const type = fixture.durableType
+    const id = type === 'form' || type === 'compositeForm'
+      ? `${fixture.durableParentId}:${fixture.durableSectionId}` : fixture.durableChildId
+    if (!id || id.includes('undefined') || expected.has(`${type}:${id}`)) throw new Error('invalid or duplicate explicit durable fixture identity')
+    expected.set(`${type}:${id}`, fixture.body.submissionId)
+    if (type === 'form') formPairs.push({ parentId: fixture.durableParentId!, sectionId: fixture.durableSectionId! })
+    else if (type === 'compositeForm') compositeFormPairs.push({ parentId: fixture.durableParentId!, sectionId: fixture.durableSectionId! })
+    else IDs[type].push(id)
+    continue
+  }
   const matches = [
     ['situational', /^\/api\/situational\/attempts\/([^/]+)\/submit$/],
     ['scale', /^\/api\/scales\/assessments\/([^/]+)\/submit$/],
@@ -44,13 +60,17 @@ for (const fixture of fixtures) {
 async function main() {
 const db = new PrismaClient()
 try {
-  const [situational, scale, cognitive, form, sjtRaw, cognitiveRaw, snapshots] = await Promise.all([
+  const [situational, scale, cognitive, form, compositeForm, sjtRaw, cognitiveRaw, snapshots] = await Promise.all([
     IDs.situational.length ? db.situationalAttempt.findMany({ where: { id: { in: IDs.situational } }, select: { id: true, status: true, submissionId: true } }) : [],
     IDs.scale.length ? db.assessment.findMany({ where: { id: { in: IDs.scale } }, select: { id: true, status: true, submissionId: true, answers: true } }) : [],
     IDs.cognitive.length ? db.cognitiveSession.findMany({ where: { id: { in: IDs.cognitive } }, select: { id: true, status: true, submissionId: true } }) : [],
     formPairs.length ? db.questionnaireFormSectionAttempt.findMany({
       where: { OR: formPairs.map(({ parentId, sectionId }) => ({ questionnaireAssessmentId: parentId, sectionId })) },
       select: { questionnaireAssessmentId: true, sectionId: true, status: true, submissionId: true },
+    }) : [],
+    compositeFormPairs.length ? db.compositeFormSectionAttempt.findMany({
+      where: { OR: compositeFormPairs.map(({ parentId, sectionId }) => ({ attemptId: parentId, sectionId })) },
+      select: { attemptId: true, sectionId: true, status: true, submissionId: true },
     }) : [],
     IDs.situational.length ? db.situationalRawSubmission.count({ where: { attemptId: { in: IDs.situational } } }) : 0,
     IDs.cognitive.length ? db.cognitiveRawSubmission.count({ where: { sessionId: { in: IDs.cognitive } } }) : 0,
@@ -65,6 +85,7 @@ try {
     scale: { fixtureCount: IDs.scale.length, completed: 0 },
     cognitive: { fixtureCount: IDs.cognitive.length, completed: 0 },
     form: { fixtureCount: formPairs.length, completed: 0 },
+    compositeForm: { fixtureCount: compositeFormPairs.length, completed: 0 },
   }
   const inspect = (type: keyof typeof byType, id: string, status: string, submissionId: string | null) => {
     if (status !== 'COMPLETED') return
@@ -79,6 +100,7 @@ try {
   scale.forEach((row) => inspect('scale', row.id, row.status, row.submissionId))
   cognitive.forEach((row) => inspect('cognitive', row.id, row.status, row.submissionId))
   form.forEach((row) => inspect('form', `${row.questionnaireAssessmentId}:${row.sectionId}`, row.status, row.submissionId))
+  compositeForm.forEach((row) => inspect('compositeForm', `${row.attemptId}:${row.sectionId}`, row.status, row.submissionId))
   console.log(JSON.stringify({
     group, fixtureCount: fixtures.length, completed, wrongIdentity, byType,
     rawRecords: { situational: sjtRaw, cognitive: cognitiveRaw, scaleAnswers: scale.filter((row) => row.answers != null).length },

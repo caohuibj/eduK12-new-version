@@ -29,9 +29,13 @@ import { FINAL_SUBMISSION_MAX_BYTES } from '../src/services/instrumentFinalSubmi
 import { finalScaleSubmitSchema } from '../src/services/scale-final-submit.schema'
 import { mapQuestionnaireSection } from '../src/modules/assessment-runtime/form-section-definition'
 import { ensureQuestionnaireFormSections, listQuestionnaireFormSections } from '../src/services/questionnaire-form-section.service'
-import { freezeQuestionnaireActiveSlotSet } from '../src/modules/assessment-runtime/attempt-runtime'
-import { encryptFrozenActiveSlotSet } from '../src/modules/assessment-runtime/slot-set'
+import { formSectionIdentityHash, freezeCompositeActiveSlotSet, freezeQuestionnaireActiveSlotSet } from '../src/modules/assessment-runtime/attempt-runtime'
+import { compositeItemSlotKey, encryptFrozenActiveSlotSet } from '../src/modules/assessment-runtime/slot-set'
+import { listCompositeFormSections } from '../src/modules/composite/final-submit.service'
 import { getLocalAssetPath } from '../src/services/assetStorage'
+import { hashQuestionnaireResumeToken } from '../src/services/questionnaireResumeTokenService'
+import { hashRecoveryToken } from '../src/services/anonymousAccess'
+import { createSqlRelationalAssignmentRepository } from '../src/modules/assessment-relational/repository'
 import {
   deriveAuthoritativeSituationalTrajectory,
   projectReachableSituationDefinitionForScoring,
@@ -223,6 +227,8 @@ export async function seedCurrentMainFixtures(db: PrismaClient) {
     scaleIds: [] as string[], scaleAssessmentIds: [] as string[],
     questionnaireIds: [] as string[], questionnaireAssessmentIds: [] as string[], formSectionIds: [] as string[],
     storedAssetIds: [] as string[], localAssetPaths: [] as string[],
+    compositeIds: [] as string[], compositeAttemptIds: [] as string[],
+    episodeIds: [] as string[], relationalAssignmentIds: [] as string[],
     createdAt: new Date().toISOString(),
   }
   const classes = [
@@ -476,6 +482,73 @@ export async function seedCurrentMainFixtures(db: PrismaClient) {
       groups.scaleTypicalWarmup = partition.warmup
       groups.scaleTypicalSteady = partition.steady
       mixedRequests.push(...fixturePool.slice(warmupCount + steadyCount))
+      const questionnaire = await db.questionnaire.create({ data: {
+        code: `P01-Q-SCALE-${runId}`, name: `Disposable Scale questionnaire ${runId}`,
+        creatorId: ledger.userIds[0]!, type: 'GENERAL', status: 'PUBLISHED', visibility: 'PUBLIC',
+      } })
+      ledger.questionnaireIds.push(questionnaire.id)
+      const binding = await db.questionnaireScale.create({ data: {
+        questionnaireId: questionnaire.id, scaleId: scale.id, position: 0,
+      } })
+      const slotSet = freezeQuestionnaireActiveSlotSet({ attemptEpoch: 1, scales: [{
+        questionnaireScaleId: binding.id, code: scale.code, instrumentVersion: scale.instrumentVersion,
+        sourceDefinitionHash: definitionHash, compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+      }], formSections: [] })
+      for (const publicMode of [false, true]) {
+        const groupName = publicMode ? 'publicQuestionnaireScaleSteady' : 'authQuestionnaireScaleSteady'
+        groups[groupName] = []
+        for (let index = 0; index < 2; index += 1) {
+          const username = `perf01-${runId}-questionnaire-scale-${publicMode ? 'public' : 'auth'}-${index + 1}`
+          const user = publicMode ? null : await db.user.create({ data: {
+            username, passwordHash, role: 'STUDENT', nickname: username,
+            isActive: true, mustChangePassword: false, teacherApproved: true,
+          } })
+          if (user) ledger.userIds.push(user.id)
+          const sessionId = publicMode ? randomUUID() : null
+          const resumeToken = publicMode ? randomBytes(32).toString('base64url') : null
+          const parent = await db.questionnaireAssessment.create({ data: {
+            questionnaireId: questionnaire.id, userId: user?.id ?? null,
+            sessionId, resumeTokenHash: resumeToken ? hashQuestionnaireResumeToken(resumeToken) : null,
+            resumeTokenExpiresAt: publicMode ? new Date(Date.now() + 60 * 60 * 1000) : null,
+            status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+            frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet), frozenActiveSlotSetHash: slotSet.snapshotHash,
+          } })
+          ledger.questionnaireAssessmentIds.push(parent.id)
+          const admission = createFrozenUnitAdmission({
+            attemptEpoch: 1,
+            scale: { id: scale.id, code: scale.code, name: scale.name, instrumentVersion: scale.instrumentVersion },
+            principal: { userId: user?.id ?? null, questionnaireSessionId: sessionId,
+              recoveryTokenHash: resumeToken ? hashQuestionnaireResumeToken(resumeToken) : null },
+            parent: { kind: 'questionnaire', parentId: parent.id, slotKey: `scale:${binding.id}`,
+              sourceDefinitionHash: definitionHash, compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash },
+          })
+          const child = await db.assessment.create({ data: {
+            scaleId: scale.id, userId: user?.id ?? null, questionnaireAssessmentId: parent.id,
+            status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+            runtimeSnapshotEncrypted: encrypted, compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+            ...frozenAdmissionPersistence(admission), progress: 0,
+          } })
+          ledger.scaleAssessmentIds.push(child.id)
+          const body = {
+            submissionId: `perf01-q-scale-${runId}-${publicMode ? 'public' : 'auth'}-${index + 1}`,
+            attemptEpoch: 1, definitionHash, contextSnapshotHash: null, answers,
+          }
+          const csrf = randomBytes(32).toString('base64url')
+          const token = user ? jwt.sign({ userId: user.id, username: user.username, role: user.role,
+            tokenVersion: user.tokenVersion, mustChangePassword: false }, process.env.JWT_SECRET!, { expiresIn: '7d' }) : null
+          groups[groupName].push({
+            fixtureId: `${groupName}-${index + 1}`, instrument: 'scale', fixtureClass: groupName,
+            method: 'POST', path: publicMode
+              ? `/api/public/assessments/${sessionId}/scale/${child.id}/submit`
+              : `/api/questionnaires/assessments/${parent.id}/scales/${child.id}/submit`,
+            body, headers: publicMode
+              ? { Authorization: `Bearer ${resumeToken}`, 'Content-Type': 'application/json' }
+              : { Cookie: `ptool_session=${encodeURIComponent(token!)}; ptool_csrf=${encodeURIComponent(csrf)}`,
+                'x-csrf-token': csrf, 'Content-Type': 'application/json' },
+            durableType: 'scale', durableChildId: child.id,
+          })
+        }
+      }
     } else {
       groups.scaleMaxLegalSteady = fixturePool
     }
@@ -549,6 +622,31 @@ export async function seedCurrentMainFixtures(db: PrismaClient) {
         itemCount: section.items.length, bodyBytes: Buffer.byteLength(JSON.stringify(body)),
       }
     })
+    groups.publicQuestionnaireFormSteady = []
+    const publicSection = sections[0]!
+    for (let index = 0; index < 2; index += 1) {
+      const sessionId = randomUUID()
+      const resumeToken = randomBytes(32).toString('base64url')
+      const publicParent = await db.questionnaireAssessment.create({ data: {
+        questionnaireId: questionnaire.id, userId: null, sessionId,
+        resumeTokenHash: hashQuestionnaireResumeToken(resumeToken),
+        resumeTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet), frozenActiveSlotSetHash: slotSet.snapshotHash,
+      } })
+      ledger.questionnaireAssessmentIds.push(publicParent.id)
+      const body = {
+        submissionId: `perf01-public-form-${runId}-${index + 1}`, attemptEpoch: 1,
+        definitionHash: sectionHashes[0]!.definitionHash, contextSnapshotHash: null,
+        answers: publicSection.items.map((item) => ({ formItemId: item.id, value: `anonymous-answer-${index + 1}` })),
+      }
+      groups.publicQuestionnaireFormSteady.push({
+        fixtureId: `public-form-${index + 1}`, fixtureClass: 'publicQuestionnaireForm', instrument: 'form',
+        method: 'POST', path: `/api/public/assessments/${sessionId}/form-sections/${publicSection.id}/submit`,
+        body, headers: { Authorization: `Bearer ${resumeToken}`, 'Content-Type': 'application/json' },
+        durableType: 'form', durableParentId: publicParent.id, durableSectionId: publicSection.id,
+      })
+    }
   }
 
   for (const testType of ['nback', 'cpt'] as const) {
@@ -645,6 +743,269 @@ export async function seedCurrentMainFixtures(db: PrismaClient) {
       groups[`${key}Warmup`] = partition.warmup
       groups[`${key}Steady`] = partition.steady
       mixedRequests.push(...fixturePool.slice(warmupCount + steadyCount))
+      if (testType === 'nback' && profile === 'standard') {
+        groups.publicCognitiveSteady = []
+        for (let index = 0; index < 2; index += 1) {
+          const recoveryToken = randomBytes(24).toString('base64url')
+          const recoveryTokenHash = hashRecoveryToken(recoveryToken)
+          const randomSeed = `perf01-${runId}-public-nback-${index + 1}`
+          const admission = createFrozenUnitAdmission({
+            attemptEpoch: 1,
+            cognitive: { testType, engineVersion: cfg.engineVersion, scoringVersion: cfg.scoringVersion,
+              configHash: parsed.configHash },
+            principal: { userId: null, recoveryTokenHash }, parent: null, requiresContext: false,
+          })
+          const session = await db.cognitiveSession.create({ data: {
+            userId: null, participantKey: `anonymous:perf01-${runId}-${index + 1}`,
+            recoveryTokenHash, assignmentId: assignment.id, configId: cfg.id, testType, attemptNo: 1,
+            status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1',
+            configVersion: cfg.configVersion, configSnapshotEncrypted: snapshot.encrypted,
+            engineVersion: cfg.engineVersion, scoringVersion: cfg.scoringVersion, randomSeed,
+            compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+            ...frozenAdmissionPersistence(admission),
+          } })
+          ledger.cognitiveSessionIds.push(session.id)
+          const body = {
+            submissionId: `perf01-public-cognitive-${runId}-${index + 1}`, attemptEpoch: 1,
+            definitionHash: parsed.configHash, contextSnapshotHash: null,
+            trials: cognitiveTrials(testType, randomSeed, freeze.resolvedConfig as Record<string, unknown>),
+            recoveryToken,
+          }
+          groups.publicCognitiveSteady.push({
+            fixtureId: `public-cognitive-${index + 1}`, instrument: 'cognitive', fixtureClass: 'publicCognitive',
+            method: 'POST', path: `/api/public/cognitive/sessions/${session.id}/submit`, body,
+            headers: { 'Content-Type': 'application/json' },
+            durableType: 'cognitive', durableChildId: session.id,
+          })
+        }
+      }
+    }
+  }
+  // Route-cost fixtures cover every Composite FINAL template using the same
+  // frozen runtime as the standalone source, with a distinct parent/child for
+  // each logical request. The unused siblings keep this a non-last-unit case.
+  {
+    const sourceScaleFixture = groups.scaleTypicalSteady![0]!
+    const sourceSjtFixture = groups.sjtLinear10Steady![0]!
+    const sourceScaleId = sourceScaleFixture.path.split('/').at(-2)!
+    const sourceSjtId = sourceSjtFixture.path.split('/').at(-2)!
+    const [scaleSource, sjtSource] = await Promise.all([
+      db.assessment.findUniqueOrThrow({ where: { id: sourceScaleId }, include: { scale: true } }),
+      db.situationalAttempt.findUniqueOrThrow({ where: { id: sourceSjtId } }),
+    ])
+    const composite = await db.compositeAssessment.create({ data: {
+      code: `P01-COMPOSITE-${runId}`, name: `Disposable composite cost ${runId}`,
+      status: 'PUBLISHED', createdBy: ledger.userIds[0]!, publicEnabled: true, maxAttempts: 3,
+    } })
+    ledger.compositeIds.push(composite.id)
+    const scaleItem = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'SCALE', position: 0, required: true,
+      scaleId: scaleSource.scaleId,
+    } })
+    const sjtItem = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'SITUATIONAL', position: 1, required: true,
+      situationalInstrumentKey: sjtSource.instrumentKey,
+      situationalInstrumentVersion: sjtSource.instrumentVersion,
+    } })
+    const section = await db.compositeFormSection.create({ data: {
+      compositeAssessmentId: composite.id, title: 'Disposable form', position: 0, contextSection: false,
+    } })
+    const formItem = await db.compositeAssessmentItem.create({ data: {
+      compositeAssessmentId: composite.id, type: 'FORM', position: 2, required: true,
+      formType: 'text_input', formLabel: 'Disposable answer',
+      formSectionId: section.id, formSectionPosition: 0,
+    } })
+    const formDefinition = (await listCompositeFormSections(composite.id)).find((value) => value.id === section.id)
+    if (!formDefinition) throw new Error('composite fixture form section is missing')
+    const { definitionHash: _computedDefinitionHash, ...formIdentityDefinition } = formDefinition
+    const formHash = formSectionIdentityHash(formIdentityDefinition)
+    const slotSet = freezeCompositeActiveSlotSet({
+      attemptEpoch: 1,
+      scales: [{ compositeItemId: scaleItem.id, code: scaleSource.scale.code,
+        instrumentVersion: scaleSource.scale.instrumentVersion,
+        sourceDefinitionHash: sourceScaleFixture.body.definitionHash as string,
+        compiledRuntimeHash: scaleSource.compiledRuntimeHash! }],
+      cognitive: [], formSections: [{ sectionId: section.id, definitionHash: formSectionIdentityHash(formIdentityDefinition) }],
+      situational: [{ compositeItemId: sjtItem.id,
+        instrumentKey: sjtSource.instrumentKey, instrumentVersion: sjtSource.instrumentVersion,
+        definitionHash: sjtSource.definitionHash, compiledRuntimeHash: sjtSource.compiledRuntimeHash,
+        scorerKey: sjtSource.scorerKey, scoringVersion: sjtSource.scoringVersion,
+        runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', frozenAt: sjtSource.frozenAt.toISOString() }],
+    })
+    for (const publicMode of [false, true]) {
+      for (const kind of ['scale', 'situational', 'form'] as const) {
+        const groupName = `${publicMode ? 'public' : 'auth'}Composite${kind[0]!.toUpperCase()}${kind.slice(1)}Steady`
+        groups[groupName] = []
+        for (let index = 0; index < 2; index += 1) {
+          const username = `perf01-${runId}-composite-${publicMode ? 'public' : 'auth'}-${kind}-${index + 1}`
+          const user = publicMode ? null : await db.user.create({ data: {
+            username, passwordHash, role: 'STUDENT', nickname: username,
+            isActive: true, mustChangePassword: false, teacherApproved: true,
+          } })
+          if (user) ledger.userIds.push(user.id)
+          const recoveryToken = publicMode ? randomBytes(24).toString('base64url') : null
+          const recoveryTokenHash = recoveryToken ? hashRecoveryToken(recoveryToken) : null
+          const parent = await db.compositeAssessmentAttempt.create({ data: {
+            compositeAssessmentId: composite.id, userId: user?.id ?? null,
+            recoveryTokenHash, participantKey: user ? getParticipantKey(user.id) : `anonymous:perf01-${runId}-${kind}-${index + 1}`,
+            attemptNo: 1, status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1',
+            attemptEpoch: 1, frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slotSet),
+            frozenActiveSlotSetHash: slotSet.snapshotHash,
+          } })
+          ledger.compositeAttemptIds.push(parent.id)
+          const scaleAdmission = createFrozenUnitAdmission({
+            attemptEpoch: 1,
+            scale: { id: scaleSource.scale.id, code: scaleSource.scale.code, name: scaleSource.scale.name,
+              instrumentVersion: scaleSource.scale.instrumentVersion },
+            principal: { userId: user?.id ?? null, recoveryTokenHash },
+            parent: { kind: 'composite', parentId: parent.id, slotKey: compositeItemSlotKey(scaleItem.id, 'SCALE'),
+              sourceDefinitionHash: sourceScaleFixture.body.definitionHash as string,
+              compiledRuntimeHash: scaleSource.compiledRuntimeHash! },
+          })
+          const scaleChild = await db.assessment.create({ data: {
+            scaleId: scaleSource.scaleId, userId: user?.id ?? null,
+            compositeAttemptId: parent.id, compositeItemId: scaleItem.id,
+            status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+            runtimeSnapshotEncrypted: scaleSource.runtimeSnapshotEncrypted,
+            compiledRuntimeHash: scaleSource.compiledRuntimeHash,
+            ...frozenAdmissionPersistence(scaleAdmission),
+          } })
+          ledger.scaleAssessmentIds.push(scaleChild.id)
+          const sjtChild = await db.situationalAttempt.create({ data: {
+            userId: user?.id ?? null, compositeAttemptId: parent.id, compositeItemId: sjtItem.id,
+            compositeSlotKey: compositeItemSlotKey(sjtItem.id, 'SITUATIONAL'),
+            participantKey: parent.participantKey, instrumentKey: sjtSource.instrumentKey,
+            instrumentVersion: sjtSource.instrumentVersion, attemptNo: 1, status: 'IN_PROGRESS',
+            deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+            definitionHash: sjtSource.definitionHash, compiledRuntimeHash: sjtSource.compiledRuntimeHash,
+            scorerKey: sjtSource.scorerKey, scoringVersion: sjtSource.scoringVersion,
+            frozenAt: sjtSource.frozenAt, runtimeSnapshotEncrypted: sjtSource.runtimeSnapshotEncrypted,
+          } })
+          ledger.situationalAttemptIds.push(sjtChild.id)
+          const csrf = randomBytes(32).toString('base64url')
+          const token = user ? jwt.sign({ userId: user.id, username: user.username, role: user.role,
+            tokenVersion: user.tokenVersion, mustChangePassword: false }, process.env.JWT_SECRET!, { expiresIn: '7d' }) : null
+          const headers = publicMode
+            ? { 'x-recovery-token': recoveryToken!, 'Content-Type': 'application/json' }
+            : { Cookie: `ptool_session=${encodeURIComponent(token!)}; ptool_csrf=${encodeURIComponent(csrf)}`,
+              'x-csrf-token': csrf, 'Content-Type': 'application/json' }
+          const body = kind === 'scale'
+            ? { ...sourceScaleFixture.body, submissionId: `perf01-composite-scale-${runId}-${publicMode}-${index + 1}` }
+            : kind === 'situational'
+              ? { ...sourceSjtFixture.body, submissionId: `perf01-composite-sjt-${runId}-${publicMode}-${index + 1}` }
+              : { submissionId: `perf01-composite-form-${runId}-${publicMode}-${index + 1}`,
+                attemptEpoch: 1, definitionHash: formHash, contextSnapshotHash: null,
+                answers: [{ formItemId: formItem.id, value: `answer-${index + 1}` }] }
+          const prefix = publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'
+          const path = kind === 'scale'
+            ? `${prefix}/attempts/${parent.id}/items/${scaleItem.id}/scale/submit`
+            : kind === 'situational'
+              ? `${prefix}/attempts/${parent.id}/items/${sjtItem.id}/situational/${sjtChild.id}/submit`
+              : `${prefix}/attempts/${parent.id}/form-sections/${section.id}/submit`
+          groups[groupName].push({
+            fixtureId: `${groupName}-${index + 1}`, instrument: kind, fixtureClass: groupName,
+            method: 'POST', path, body, headers,
+            durableType: kind === 'form' ? 'compositeForm' : kind,
+            ...(kind === 'form'
+              ? { durableParentId: parent.id, durableSectionId: section.id }
+              : { durableChildId: kind === 'scale' ? scaleChild.id : sjtChild.id }),
+          })
+        }
+      }
+    }
+  }
+  // Separate cost domains. An explicit STARTED SELF assignment exercises the
+  // real relational FINAL consent authority for both legacy and Organization
+  // policy domains; the generic Composite pool above remains independent.
+  {
+    const generic = groups.authCompositeScaleSteady![0]!
+    const genericChild = await db.assessment.findUniqueOrThrow({
+      where: { id: generic.durableChildId as string }, include: { scale: true },
+    })
+    const genericParent = await db.compositeAssessmentAttempt.findUniqueOrThrow({
+      where: { id: generic.path.split('/')[4]! }, include: { compositeAssessment: true },
+    })
+    const itemId = generic.path.split('/')[6]!
+    const assignments = createSqlRelationalAssignmentRepository(db)
+    for (const policyDomain of ['LEGACY_COURSE', 'ORGANIZATION_RUN'] as const) {
+      const groupName = policyDomain === 'LEGACY_COURSE'
+        ? 'relationalCompositeScaleSteady' : 'organizationCompositeScaleSteady'
+      groups[groupName] = []
+      for (let index = 0; index < 2; index += 1) {
+        const username = `perf01-${runId}-${policyDomain}-${index + 1}`
+        const user = await db.user.create({ data: {
+          username, passwordHash, role: 'STUDENT', nickname: username,
+          isActive: true, mustChangePassword: false, teacherApproved: true,
+        } })
+        ledger.userIds.push(user.id)
+        const episode = await db.assessmentEpisode.create({ data: {
+          subjectUserId: user.id, initiatedByUserId: user.id, initiationMode: 'STUDENT_SELF',
+        } })
+        ledger.episodeIds.push(episode.id)
+        const assignmentId = randomUUID()
+        const now = new Date().toISOString()
+        const relationshipSnapshot = {
+          schemaVersion: 1 as const, relationshipKind: 'SELF' as const, relationshipRef: null,
+          subjectUserId: user.id, subjectRole: 'STUDENT' as const,
+          respondentUserId: user.id, respondentRole: 'STUDENT' as const,
+          courseId: null, verifiedAt: now, facts: {},
+        }
+        await assignments.create({
+          assignmentId, episodeId: episode.id,
+          subjectUserId: user.id, subjectRole: 'STUDENT',
+          respondentUserId: user.id, respondentRole: 'STUDENT', createdByUserId: user.id,
+          relationshipKind: 'SELF', relationshipRef: null, relationshipSnapshot,
+          relationshipSnapshotHash: canonicalHash(relationshipSnapshot),
+          perspective: 'SELF_REPORT', resourceKind: 'BUNDLE',
+          resourceKey: genericParent.compositeAssessment.code, resourceVersion: '1.0.0',
+          applicabilityHash: canonicalHash({ policyDomain, resourceKey: genericParent.compositeAssessment.code }),
+          analysisMode: 'INDIVIDUAL_ONLY', minimumRespondents: null,
+          consentId: null, visibilityPolicyKey: 'self_private_v1', policyDomain,
+          status: 'STARTED', createdAt: now, startedAt: now, completedAt: null, revokedAt: null,
+        })
+        ledger.relationalAssignmentIds.push(assignmentId)
+        const parent = await db.compositeAssessmentAttempt.create({ data: {
+          compositeAssessmentId: genericParent.compositeAssessmentId,
+          userId: user.id, participantKey: getParticipantKey(user.id), attemptNo: 1,
+          status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+          frozenActiveSlotSetEncrypted: genericParent.frozenActiveSlotSetEncrypted,
+          frozenActiveSlotSetHash: genericParent.frozenActiveSlotSetHash,
+          subjectUserId: user.id, respondentUserId: user.id, respondentType: 'SELF',
+          episodeId: episode.id, assignmentRef: assignmentId,
+        } })
+        ledger.compositeAttemptIds.push(parent.id)
+        const admission = createFrozenUnitAdmission({
+          attemptEpoch: 1,
+          scale: { id: genericChild.scale.id, code: genericChild.scale.code,
+            name: genericChild.scale.name, instrumentVersion: genericChild.scale.instrumentVersion },
+          principal: { userId: user.id },
+          parent: { kind: 'composite', parentId: parent.id, slotKey: compositeItemSlotKey(itemId, 'SCALE'),
+            sourceDefinitionHash: generic.body.definitionHash as string,
+            compiledRuntimeHash: genericChild.compiledRuntimeHash! },
+        })
+        const child = await db.assessment.create({ data: {
+          scaleId: genericChild.scaleId, userId: user.id,
+          compositeAttemptId: parent.id, compositeItemId: itemId,
+          status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+          runtimeSnapshotEncrypted: genericChild.runtimeSnapshotEncrypted,
+          compiledRuntimeHash: genericChild.compiledRuntimeHash,
+          ...frozenAdmissionPersistence(admission),
+          subjectUserId: user.id, respondentUserId: user.id, respondentType: 'SELF',
+          episodeId: episode.id, assignmentRef: assignmentId,
+        } })
+        ledger.scaleAssessmentIds.push(child.id)
+        const csrf = randomBytes(32).toString('base64url')
+        const token = jwt.sign({ userId: user.id, username: user.username, role: user.role,
+          tokenVersion: user.tokenVersion, mustChangePassword: false }, process.env.JWT_SECRET!, { expiresIn: '7d' })
+        groups[groupName].push({
+          fixtureId: `${groupName}-${index + 1}`, instrument: 'scale', fixtureClass: groupName,
+          method: 'POST', path: `/api/composite-assessments/attempts/${parent.id}/items/${itemId}/scale/submit`,
+          body: { ...generic.body, submissionId: `perf01-${groupName}-${runId}-${index + 1}` },
+          headers: { Cookie: `ptool_session=${encodeURIComponent(token)}; ptool_csrf=${encodeURIComponent(csrf)}`,
+            'x-csrf-token': csrf, 'Content-Type': 'application/json' },
+          durableType: 'scale', durableChildId: child.id,
+        })
+      }
     }
   }
   const mixKey = (fixtureId: string) => createHash('sha256').update(`${runId}:${fixtureId}`).digest('hex')

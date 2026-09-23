@@ -73,10 +73,15 @@ async function metrics(name) {
 
 const ready = await fetch(new URL('/ready', target))
 if (!ready.ok) throw new Error(`target not ready: HTTP ${ready.status}`)
+const databaseShape = JSON.parse(execFileSync(tsx, [resolve(backend, 'scripts/probe-db-shape-current-main.ts')], {
+  cwd: backend, env: probeEnv, encoding: 'utf8', maxBuffer: 10_000_000,
+}).trim())
+writeFileSync(resolve(runDir, 'db-shape-before.json'), `${JSON.stringify(databaseShape, null, 2)}\n`)
 const before = durable('before')
 if (before.completed !== 0 || before.wrongIdentity !== 0) {
   throw new Error(`fresh run refused: fixture group ${group} already has completed or mismatched rows`)
 }
+const controlScrapeRetries = await metrics('control')
 const beforeScrapeRetries = await metrics('before')
 
 const fixtureChecksum = createHash('sha256').update(readFileSync(fixtureFile)).digest('hex')
@@ -90,6 +95,7 @@ const manifest = {
   targetImageDigest: process.env.PERF_TARGET_IMAGE_DIGEST || null,
   targetBaseUrl: target.origin,
   targetHost: process.env.PERF_TARGET_HOST_MANIFEST || null,
+  database: databaseShape,
   loadGenerator: { platform: os.platform(), architecture: os.arch(), cpuLogicalCount: os.cpus().length, memoryBytes: os.totalmem(), cgroup: 'unavailable-on-this-host' },
   qualifiedLoadGenerator: process.env.PERF_CAPACITY_QUALIFIED === '1' && Boolean(process.env.PERF_TARGET_HOST_MANIFEST),
   fixtureChecksum, fixtureCount,
@@ -98,9 +104,11 @@ const manifest = {
   maxVUs: Number(process.env.PERF_MAX_VUS || 16),
   retryMode: 'finaldraft', retryAttempts: 4,
   sqlEventMode: process.env.PERF_SQL_EVENT_COUNT === '1',
-  metricScrapeRetries: { before: beforeScrapeRetries, after: null },
+  requireAllFresh: process.env.PERF_REQUIRE_ALL_FRESH === '1',
+  scrapeCorrection: true,
+  metricScrapeRetries: { control: controlScrapeRetries, before: beforeScrapeRetries, after: null },
   startedAt: new Date().toISOString(),
-  rawEvidence: { k6Summary: 'k6-summary.json', k6Console: 'k6-console.log', durable: ['durable-before.json', 'durable-window.json', 'durable-drain.json'], metrics: ['metrics-before.txt', 'metrics-after.txt'] },
+  rawEvidence: { k6Summary: 'k6-summary.json', k6Console: 'k6-console.log', database: 'db-shape-before.json', durable: ['durable-before.json', 'durable-window.json', 'durable-drain.json'], metrics: ['metrics-control.txt', 'metrics-before.txt', 'metrics-after.txt'] },
 }
 writeFileSync(resolve(runDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
 
