@@ -5,14 +5,14 @@
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
   "currentCommitId": "P2-C09",
-  "status": "IN_PROGRESS",
+  "status": "MEASURED",
   "workspace": {
     "path": null,
     "branch": "perf/runtime-hotpath-v1",
     "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
-    "headSha": "HEAD",
-    "headShaNote": "P2-C01 branch is GitHub-managed from merged PERF-01 main.",
-    "measuredRuntimeSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
+    "headSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+    "headShaNote": "Phase 0 production/runtime candidate and final measured head. A later docs-only closure commit may differ without changing runtime.",
+    "measuredRuntimeSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
     "uncommittedChanges": false
   },
   "pullRequests": [
@@ -29,10 +29,11 @@
       "planId": "PERF-02",
       "number": 166,
       "url": "https://github.com/caohuibj/eduK12-new-version/pull/166",
-      "status": "DRAFT_IN_PROGRESS",
+      "status": "READY_TO_MERGE",
       "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
-      "headSha": "HEAD",
-      "ciStatus": "P2-C02 head ordinary CI green; exploratory 25-rate job produced valid evidence but workflow failed only because strict requireAllFresh rejected legal capacity retries. Next head separates exploratory overload from baseline accounting."
+      "headSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+      "ciStatus": "Final measured head: CI 35847450756 success; Phase 0 closure 35847450233 success; smoke/exploratory/media/SJT acceptance all success.",
+      "measuredHeadSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667"
     }
   ],
   "completedCommits": [
@@ -309,6 +310,41 @@
         "CI run 35833020182"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C09",
+      "sha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+      "contracts": [
+        "same-host P1 merged baseline vs final runtime candidate A-B/B-A/A-B across six representative HTTP workloads",
+        "A/B uses p95 non-degradation plus durable/offered completion, drop and eventual-failure rates",
+        "mixed 100/300/500 one-shot burst retains overload evidence without converting it into a capacity claim",
+        "lost-response retry/replay recovery reconciles durable winner without duplicate persistence",
+        "Aggregate ready-parent 5/20/50/100 verifies terminal completion and aggregate input hash",
+        "final Full Gate and affected browser/media/SJT acceptance checks are green"
+      ],
+      "tests": [
+        "Phase 0 closure run 35847450233 passed all six jobs",
+        "six-workload same-host A/B: all NON-DEGRADED, 100% completion rate, 0% drop/failure on both sides",
+        "mixed burst 100: 100/100 durable; 72 retries; 0 eventual failure",
+        "mixed burst 300: 300/300 durable; 518 retries; 0 eventual failure",
+        "mixed burst 500: 490/500 durable; 1099 retries; 10 eventual failures; retained as PRE-CAPACITY overload",
+        "lost-response scenario: 4 fresh + 1 replay/retry recovery = 5/5 durable",
+        "Aggregate parentN5/N20/N50/N100 all COMPLETED with p95 22/25/55/51 ms on shared hosted runner",
+        "CI run 35847450756 passed backend/frontend/full regression/CodeQL/browser/Docker/merge gate",
+        "Phase 0 smoke 35847450408 and exploratory 35847450244 passed",
+        "Situational branching/video/publication and cross-runtime/Scale media acceptance passed"
+      ],
+      "evidence": [
+        "workflow run 35847450233",
+        "A/B artifact 10744780859 sha256:629e253f89b8647c41d7d35d7e159ecec24e9f662f55562b1a4f7ccaa070fb3b",
+        "burst100 artifact 10744033375 sha256:6a72113da8886364cc86ce516823a71e8f104c725e56476394a2cf774b525395",
+        "burst300 artifact 10744295933 sha256:bd8056a316fe62dc512ef5adcadec580408ad7a165432b2d85d1ef2533952acb",
+        "burst500 artifact 10743379228 sha256:0f0e2cd4f0bb8e37f12a878866cae51d20ca2814e2404599d27f4c4d66fed3a4",
+        "lost-response artifact 10743309517 sha256:e2d89f214c178a16091e70e2ffab39a21ba20d7a0855c0f5d5651e788230ae22",
+        "aggregate artifact 10743882727 sha256:8a1871e227e08f5f630bef8579e89679b1280f8773c43700550efac6e3e38189",
+        "CI run 35847450756"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -349,10 +385,10 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Re-run P2-C09 same-host A/B with normalized completion-rate accounting. A steady scheduler may start 50 or 51 iterations at the duration boundary; fail only on p95 regression, lower durable/offered completion rate, higher drop rate, or higher eventual-failure rate. Then rerun the transient npm audit failure and close Phase 0 if all final-head evidence is green.",
+  "nextAction": "Merge PERF-02 PR #166 after the docs-only closure commit remains clean. Phase 0 is CODE_READY + MEASURED. Formal capacity is intentionally deferred: provision an isolated whole-host CAP-2C4G target with an external load generator for Phase 1; CAP-4C4G remains later. Do not claim production capacity from Phase 0 shared-runner data.",
   "updatedAt": "2026-09-23",
   "phase0": {
-    "status": "IN_PROGRESS",
+    "status": "MEASURED",
     "strategy": "existing-resources-first",
     "resources": {
       "githubHosted": "ENABLED_FOR_SMOKE_AND_ACCOUNTING",
@@ -387,20 +423,15 @@
       "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP",
       "P2-C06 Cognitive request-local prepared scorer context KEEP",
       "P2-C07 reference freeze batching KEEP",
-      "P2-C08 Aggregate snapshot-header indexing KEEP"
+      "P2-C08 Aggregate snapshot-header indexing KEEP",
+      "P2-C09 same-host six-workload A/B NON-DEGRADED on final measured head",
+      "P2-C09 mixed 100/300 burst fully durable; 500 burst retained as shared-runner overload at 490/500",
+      "P2-C09 lost-response retry/replay recovery 5/5 durable",
+      "P2-C09 Aggregate ready-parent 5/20/50/100 all COMPLETED",
+      "Final measured head Full Gate + CodeQL + browser + Docker + media/SJT acceptance green",
+      "Phase 0 CODE_READY + MEASURED complete"
     ],
-    "pending": [
-      "P2-C09 Aggregate 5/20/50/100 ready-parent curve — closure workflow pending",
-      "P2-C09 lost-response retry/replay recovery — closure workflow pending",
-      "P2-C09 mixed 100/300/500 one-shot burst — closure workflow pending",
-      "P2-C09 same-host BASE vs HEAD A/B — closure workflow pending",
-      "mixed workload",
-      "burst/fault/recovery under concurrency",
-      "BASE vs HEAD A/B for retained optimizations",
-      "Continue curve above 25 only for workloads that remain below overload",
-      "burst/fault/recovery under concurrency after P2-C03",
-      "P2-C09 final A/B and evidence close"
-    ]
+    "pending": []
   },
   "capacityProfiles": {
     "2c4g": {

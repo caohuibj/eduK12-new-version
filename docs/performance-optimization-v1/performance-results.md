@@ -1,6 +1,6 @@
 # Current-main performance results
 
-Status: **ISOLATED_PG_BASELINE; CAPACITY_VERIFIED=false**. PERF-01 measured one first-attempt fresh HTTP FINAL per 14 registered templates and two additional policy-domain branches. All 16 completed durably in the one-second steady window and after drain, without replay, dropped iteration, HTTP failure or retry. This is a low-speed cost and accounting baseline, not a rated throughput or percentile latency result.
+Status: **PHASE0_MEASURED; CODE_READY=true; CAPACITY_VERIFIED=false**. PERF-01 measured one first-attempt fresh HTTP FINAL per 14 registered templates and two additional policy-domain branches. All 16 completed durably in the one-second steady window and after drain, without replay, dropped iteration, HTTP failure or retry. This is a low-speed cost and accounting baseline, not a rated throughput or percentile latency result.
 
 The runtime candidate was `c91456d7f3c9c1b7e0a27b8351731acf2bdd7774`, based on `main@68afbe63672b42c9a2086f834d5ae46794c3c013`. P1-C05 changes only tooling, fixtures and evidence; it does not alter the measured service path. One Node API process used task-owned PostgreSQL 14.24 and Redis 7, with `NODE_ENV=test`, opt-in SQL event counting, default admission/pool parameters, one offered request/s for one second per group, and one no-work `/metrics` control scrape subtracted from SQL and Prisma totals. API and k6 shared a Mac with unrelated workloads. The fixture checksum, 13-table PostgreSQL cardinality/index/ANALYZE snapshots, per-route model/action distribution, phase means, raw/corrected SQL and network bytes are in [route-baseline.json](../../server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json). The concise route table is in [route-baseline.md](../../server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.md); the comparison template is [query-budgets.csv](query-budgets.csv). K6 `data_received` includes protocol overhead and is labelled network bytes.
 
@@ -181,3 +181,81 @@ Evidence: commit `a95154cd9c79f2995e94a5c2008ede35d4361808`; extended Phase 0 in
 The first complete A/B execution reached all six workloads in all three interleaved rounds. All six p95 medians were non-degraded; SJT-60 was incorrectly labelled regression only because the constant-arrival scheduler produced a median of 51 durable completions on BASE and 50 on HEAD for a configured 50-arrival window. Inspection of the per-run manifests shows both variants durably completed 100% of their observed offered work with zero drop and zero eventual failure.
 
 The A/B gate therefore compares durable completion **rate** (`drainCompleted / observed offered`) plus drop/failure rates, not absolute row count. This preserves fail-closed behavior for real lost work while allowing the already-documented +1 scheduler-boundary arrival. The p95 rule remains unchanged: median HEAD p95 may not degrade by more than `max(10%, 10ms)`.
+
+
+## Phase 0 final closure — P2-C09
+
+Phase 0 is **CODE_READY + MEASURED** on measured head `76934c7bc6e48d9b3d12dc0dbf620ea206264667`. Formal `CAP-2C4G` and `CAP-4C4G` remain **NOT_STARTED**. The environment below is GitHub-hosted/shared and all results remain **PRE-CAPACITY**.
+
+### Same-host BASE vs HEAD A/B
+
+BASE is merged PERF-01 main `a945ea0d3e6750d2a395ae1869647c547febe482`. HEAD is the final measured Phase 0 candidate. Three interleaved rounds were executed A→B / B→A / A→B on the same runner. Both variants completed 100% of observed offered work with zero drop and zero eventual failure in all six representative workloads.
+
+| Workload | BASE p95 | HEAD p95 | Delta | Completion BASE/HEAD | Verdict |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Scale typical | 25.67 ms | 23.59 ms | -2.07 ms | 100% / 100% | NON-DEGRADED |
+| Cognitive N-back standard | 27.15 ms | 24.68 ms | -2.48 ms | 100% / 100% | NON-DEGRADED |
+| Cognitive CPT standard | 34.63 ms | 24.01 ms | -10.63 ms | 100% / 100% | NON-DEGRADED |
+| SJT linear 30 | 46.08 ms | 43.81 ms | -2.27 ms | 100% / 100% | NON-DEGRADED |
+| SJT linear 60 | 54.13 ms | 40.84 ms | -13.30 ms | 100% / 100% | NON-DEGRADED |
+| mixedSteady | 41.31 ms | 37.53 ms | -3.78 ms | 100% / 100% | NON-DEGRADED |
+
+A/B artifact: `10744780859`, digest `sha256:629e253f89b8647c41d7d35d7e159ecec24e9f662f55562b1a4f7ccaa070fb3b`.
+
+### Mixed one-shot burst
+
+These are shared-runner burst characterization points, not rated capacity.
+
+| Burst | Fresh durable | Retry attempts | Eventual failure | Interpretation |
+| --- | ---: | ---: | ---: | --- |
+| 100 simultaneous | 100 / 100 | 72 | 0 | fully recovered |
+| 300 simultaneous | 300 / 300 | 518 | 0 | fully recovered with substantial admission retry |
+| 500 simultaneous | 490 / 500 | 1099 | 10 | overload point on this shared runner |
+
+The 500 result is intentionally retained as an overload signal and carries `HTTP_OR_LOGICAL_FAILURES`; it is not converted into a green capacity claim.
+
+### Fault / recovery
+
+The committed-response-loss scenario produced 5 observed logical completions: 4 fresh winners plus 1 replay/retry recovery, with **5/5 durable**, zero drop and zero eventual failure. This confirms retry/replay recovery without duplicate terminal persistence in the exercised path.
+
+### Aggregate ready-parent size curve
+
+All four parents ended `COMPLETED`, progress 100, with an `aggregateInputHash` persisted.
+
+| Required units | Finalize p95 |
+| ---: | ---: |
+| 5 | 22 ms |
+| 20 | 25 ms |
+| 50 | 55 ms |
+| 100 | 51 ms |
+
+This is a single shared-host characterization, not a production percentile claim. It verifies that P2-C08's header indexing does not introduce correctness loss and that the 5/20/50/100 paths complete on the final candidate.
+
+### Final gates
+
+Final measured head checks:
+
+- `PERF Phase 0 closure` run `35847450233`: success;
+- CI run `35847450756`: backend full regression, frontend, CodeQL, browser, Docker and merge gate all success;
+- Phase 0 smoke run `35847450408`: success;
+- Phase 0 exploratory run `35847450244`: success;
+- Situational branching/video/publication integrity: success;
+- Cross-runtime media and Scale form-image acceptance: success.
+
+The only late CI repair was a source-layout architecture assertion that expected `finalizeParentAfterUnitSubmit(await withUnitSubmitAdmission(...))` without whitespace. Production Scale already preserved the required UNIT-release-before-parent-finalize call structure; the test was changed to tolerate the actual multiline layout. No production runtime behavior changed in that repair.
+
+### Phase 0 decision
+
+P2-C02 through P2-C08 are **KEEP**. P2-C09 evidence closure is **KEEP**. The optional SJT lock+reread SQL merge remains **NOT_TRIGGERED**; no evidence justified changing lock order. No worker farm, multi-process production topology, PgBouncer, Redis distributed lock, global runtime cache, asynchronous FINAL, or CDN redesign was introduced.
+
+Phase 0 therefore exits at:
+
+```text
+CODE_READY = YES
+MEASURED = YES
+CAP-2C4G = NOT_STARTED
+CAP-4C4G = NOT_STARTED
+CAPACITY_VERIFIED = NO
+```
+
+The next capacity step is Phase 1 on an isolated whole-host 2C4G target with an external load generator.
