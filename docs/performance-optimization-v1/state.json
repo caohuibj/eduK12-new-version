@@ -1,5 +1,5 @@
 {
-  "planVersion": "1.0",
+  "planVersion": "1.1",
   "repository": "caohuibj/eduK12-new-version",
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
@@ -30,37 +30,100 @@
     {
       "id": "P1-C01",
       "sha": "b0b3e42",
-      "contracts": ["FINAL route inventory", "baseline configuration", "sequential PR scope"],
-      "tests": ["14 FINAL route templates matched", "route inventory Vitest passed", "backend build passed"],
-      "evidence": ["docs/performance-optimization-v1/baseline.md", "docs/performance-optimization-v1/route-inventory.csv"]
+      "contracts": [
+        "FINAL route inventory",
+        "baseline configuration",
+        "sequential PR scope"
+      ],
+      "tests": [
+        "14 FINAL route templates matched",
+        "route inventory Vitest passed",
+        "backend build passed"
+      ],
+      "evidence": [
+        "docs/performance-optimization-v1/baseline.md",
+        "docs/performance-optimization-v1/route-inventory.csv"
+      ]
     },
     {
       "id": "P1-C02",
       "sha": "b0f0faa",
-      "contracts": ["bounded phase labels", "opt-in SQL events", "unavailable database activity is not zero", "unchanged business responses"],
-      "tests": ["backend build passed", "49 focused Vitest passed", "12 isolated PostgreSQL SJT tests passed", "local observer diagnostic passed"],
-      "evidence": ["docs/performance-optimization-v1/observability.md", "server-version/perf/current-main-v1/evidence/observer-effect-20260923/README.md"]
+      "contracts": [
+        "bounded phase labels",
+        "opt-in SQL events",
+        "unavailable database activity is not zero",
+        "unchanged business responses"
+      ],
+      "tests": [
+        "backend build passed",
+        "49 focused Vitest passed",
+        "12 isolated PostgreSQL SJT tests passed",
+        "local observer diagnostic passed"
+      ],
+      "evidence": [
+        "docs/performance-optimization-v1/observability.md",
+        "server-version/perf/current-main-v1/evidence/observer-effect-20260923/README.md"
+      ]
     },
     {
       "id": "P1-C03",
       "sha": "41e23d2",
-      "contracts": ["unique first-attempt fixture pools", "29 current Cognitive entries and 87 golden cases", "SJT branch and legal Scale boundary", "isolated PostgreSQL reference multi-selection"],
-      "tests": ["Cognitive corpus 87/87 passed", "fresh fixture pool 5/5 passed", "isolated PostgreSQL reference multi-selection 1/1 passed"],
-      "evidence": ["docs/performance-optimization-v1/compatibility.md", "server-version/perf/current-main-v1/evidence/fixture-corpus-20260923/README.md"]
+      "contracts": [
+        "unique first-attempt fixture pools",
+        "29 current Cognitive entries and 87 golden cases",
+        "SJT branch and legal Scale boundary",
+        "isolated PostgreSQL reference multi-selection"
+      ],
+      "tests": [
+        "Cognitive corpus 87/87 passed",
+        "fresh fixture pool 5/5 passed",
+        "isolated PostgreSQL reference multi-selection 1/1 passed"
+      ],
+      "evidence": [
+        "docs/performance-optimization-v1/compatibility.md",
+        "server-version/perf/current-main-v1/evidence/fixture-corpus-20260923/README.md"
+      ]
     },
     {
       "id": "P1-C04",
       "sha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
-      "contracts": ["offered/fresh/replay/retry/drop/durable accounting", "START/RESUME/media and lost-response recovery", "shared-host capacity disqualification"],
-      "tests": ["13 fixture/reporter checks passed", "low-speed real HTTP and PostgreSQL reconciliation passed", "backend build passed"],
-      "evidence": ["server-version/perf/current-main-v1/evidence/full-request-20260923/README.md"]
+      "contracts": [
+        "offered/fresh/replay/retry/drop/durable accounting",
+        "START/RESUME/media and lost-response recovery",
+        "shared-host capacity disqualification"
+      ],
+      "tests": [
+        "13 fixture/reporter checks passed",
+        "low-speed real HTTP and PostgreSQL reconciliation passed",
+        "backend build passed"
+      ],
+      "evidence": [
+        "server-version/perf/current-main-v1/evidence/full-request-20260923/README.md"
+      ]
     },
     {
       "id": "P1-C05",
       "sha": "HEAD",
-      "contracts": ["all 14 FINAL HTTP routes and two explicit policy domains", "SQL/model/phase/bytes baseline", "PostgreSQL cardinality/index/ANALYZE manifest", "no capacity claim"],
-      "tests": ["backend build passed", "route inventory 14/14 passed", "Cognitive corpus 87/87 passed", "reporter 10/10 and fixture pool 5/5 passed", "isolated PostgreSQL query budget 16/16 and reference 1/1 passed", "CI=true with existing PR38 isolated database variable: reference 1/1 passed", "16/16 first-attempt fresh route samples durably reconciled"],
-      "evidence": ["docs/performance-optimization-v1/performance-results.md", "docs/performance-optimization-v1/query-budgets.csv", "server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json"]
+      "contracts": [
+        "all 14 FINAL HTTP routes and two explicit policy domains",
+        "SQL/model/phase/bytes baseline",
+        "PostgreSQL cardinality/index/ANALYZE manifest",
+        "no capacity claim"
+      ],
+      "tests": [
+        "backend build passed",
+        "route inventory 14/14 passed",
+        "Cognitive corpus 87/87 passed",
+        "reporter 10/10 and fixture pool 5/5 passed",
+        "isolated PostgreSQL query budget 16/16 and reference 1/1 passed",
+        "CI=true with existing PR38 isolated database variable: reference 1/1 passed",
+        "16/16 first-attempt fresh route samples durably reconciled"
+      ],
+      "evidence": [
+        "docs/performance-optimization-v1/performance-results.md",
+        "docs/performance-optimization-v1/query-budgets.csv",
+        "server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json"
+      ]
     }
   ],
   "evidence": [
@@ -78,8 +141,8 @@
   "blockedItems": [
     {
       "item": "CAPACITY_VERIFIED",
-      "reason": "User confirmed no exclusive whole-host 4C4G target or independent load generator; API and k6 share a Mac with unrelated loads.",
-      "nextAction": "Use a qualified host and independent load generator for the PERF-03 formal capacity acceptance; preserve unverified status until then."
+      "reason": "Phase 0 intentionally uses GitHub-hosted/Codespaces/current self-hosted resources. No exclusive whole-host 2C4G or 4C4G target is currently provisioned; these resources are qualified for correctness/comparable A/B only.",
+      "nextAction": "Complete Phase 0 CODE_READY+MEASURED first; later provision CAP-2C4G, then CAP-4C4G, each with an external load generator."
     }
   ],
   "conditionalDecisions": [
@@ -101,6 +164,51 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Review PR #165 full-head CI and merge only after human review; then fetch the merged latest main and begin PERF-02/P2-C01 in a new branch and PR. Do not start PERF-02 from unmerged PERF-01. Continue isolated PostgreSQL correctness work while capacity remains unverified.",
-  "updatedAt": "2026-09-23"
+  "nextAction": "Review the new Phase 0 smoke run on PR #165. After #165 is merged, branch PERF-02 from latest main, execute Scale/Cognitive/SJT exploratory curves with existing resources, and implement only evidence-backed hot-path changes. Do not claim CAP-2C4G or CAP-4C4G from Phase 0.",
+  "updatedAt": "2026-09-23",
+  "phase0": {
+    "status": "IN_PROGRESS",
+    "strategy": "existing-resources-first",
+    "resources": {
+      "githubHosted": "ENABLED_FOR_SMOKE_AND_ACCOUNTING",
+      "macSelfHosted": "AVAILABLE_FOR_RESERVED_BACKEND_PG_AB",
+      "windowsSelfHosted": "AVAILABLE_FOR_CLIENT_DOCKER_OR_LOADGEN",
+      "codespaces": "CONFIGURED_BY_CURRENT_HEAD"
+    },
+    "completed": [
+      "PERF-01 P1-C01..P1-C05 measurement baseline on PR #165",
+      "Phase 0 execution plan added",
+      "Codespaces devcontainer configuration added",
+      "GitHub-hosted Scale/Cognitive/SJT smoke workflow added"
+    ],
+    "pending": [
+      "Scale exploratory stress curve",
+      "Cognitive exploratory stress curve",
+      "SJT exploratory stress curve",
+      "mixed workload",
+      "burst/fault/recovery under concurrency",
+      "first evidence-driven optimization round",
+      "BASE vs HEAD A/B for retained optimizations"
+    ]
+  },
+  "capacityProfiles": {
+    "2c4g": {
+      "status": "NOT_STARTED",
+      "verifiedSha": null,
+      "safeRate": null,
+      "artifact": null
+    },
+    "4c4g": {
+      "status": "NOT_STARTED",
+      "verifiedSha": null,
+      "safeRate": null,
+      "artifact": null
+    }
+  },
+  "capacityComparison": {
+    "status": "NOT_STARTED",
+    "scalingFactor": null,
+    "scalingEfficiency": null,
+    "artifact": null
+  }
 }

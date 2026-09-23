@@ -62,6 +62,12 @@ recovered replay. A low-speed smoke run on a shared host validates accounting,
 not rated capacity. `CAPACITY_VERIFIED` requires the plan's isolated 4C4G
 target and independent load generator.
 
+## Phase 0 representative smoke
+
+The existing fresh-fixture harness is also the Phase 0 load primitive. A representative automated smoke uses `scaleTypicalSteady`, `cognitiveNbackStandardSteady`, and `sjtLinear30Steady` at a deliberately low concurrent arrival rate. It gates only fresh/durable accounting and unexpected HTTP errors; it does not enforce latency or throughput thresholds.
+
+For exploratory work, regenerate fixtures before each logical fresh run and increase `PERF_RATE` in controlled steps. The selected steady group must contain at least `PERF_RATE × PERF_SECONDS + 1` unused fixtures. Keep fixture seeding outside the measured steady window. Record the actual host and leave `PERF_CAPACITY_QUALIFIED=0` on GitHub-hosted, Codespaces, Mac, and Windows runs.
+
 ## Route-by-route isolated PostgreSQL baseline
 
 Use a fresh, task-owned fixture file with all 14 FINAL groups and explicit

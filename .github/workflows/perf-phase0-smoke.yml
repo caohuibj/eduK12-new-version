@@ -1,0 +1,170 @@
+name: PERF Phase 0 smoke
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - 'server-version/perf/**'
+      - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
+      - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
+      - 'server-version/backend/src/modules/scale/**'
+      - 'server-version/backend/src/modules/cognitive/**'
+      - 'server-version/backend/src/modules/situational/**'
+      - 'server-version/backend/src/modules/assessment-runtime/**'
+      - 'server-version/backend/src/services/unitSubmitAdmission.ts'
+      - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
+      - 'docs/performance-optimization-v1/**'
+      - '.devcontainer/**'
+      - '.github/workflows/perf-phase0-smoke.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: perf-phase0-smoke-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Scale + Cognitive + SJT fresh accounting
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      COOKIE_SECURE: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/huisurvey-phase0-uploads
+      PERF_ISOLATED_TEST_MODE: '1'
+      PERF_FIXTURE_DB_NAME: ptool
+      PERF_CAPACITY_QUALIFIED: '0'
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: grafana/setup-k6-action@v1
+      - name: install backend dependencies
+        working-directory: server-version/backend
+        run: npm ci
+      - name: generate Prisma client and migrate disposable database
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: seed reference/configuration data
+        working-directory: server-version/backend
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+        run: npm run db:seed
+      - name: build backend
+        working-directory: server-version/backend
+        run: npm run build
+      - name: validate current FINAL route inventory
+        run: node server-version/perf/current-main-v1/check-final-routes.mjs
+      - name: seed fresh Phase 0 fixtures
+        working-directory: server-version/backend
+        env:
+          PERF_CURRENT_MAIN_V1: '1'
+          FIXTURE_OUT_DIR: /tmp/huisurvey-phase0-fixtures
+          PERF_WARMUP_FIXTURES: '2'
+          PERF_STEADY_FIXTURES: '30'
+          PERF_MIXED_PER_CLASS: '2'
+          PERF_SAME_PARENT_SIBLINGS: '2'
+        run: npm run perf:fixtures:seed
+      - name: start tested backend
+        working-directory: server-version/backend
+        run: |
+          mkdir -p "$UPLOAD_DIR"
+          nohup npm start > /tmp/huisurvey-phase0-backend.log 2>&1 &
+          echo $! > /tmp/huisurvey-phase0-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/huisurvey-phase0-backend.log
+          exit 1
+      - name: run representative fresh accounting smoke
+        working-directory: server-version
+        env:
+          PERF_FIXTURE_FILE: /tmp/huisurvey-phase0-fixtures/final-submit-fixtures.json
+          BASE_URL: http://127.0.0.1:3000
+          PERF_RATE: '5'
+          PERF_SECONDS: '5'
+          PERF_RATE_CEILING: '10'
+          PERF_PRE_VUS: '8'
+          PERF_MAX_VUS: '32'
+          PERF_REQUIRE_ALL_FRESH: '1'
+        run: |
+          set -euo pipefail
+          for group in scaleTypicalSteady cognitiveNbackStandardSteady sjtLinear30Steady; do
+            export PERF_FIXTURE_GROUP="$group"
+            export PERF_RUN_DIR="/tmp/huisurvey-phase0-${group}"
+            node perf/current-main-v1/run-full-request.mjs
+          done
+      - name: capture environment
+        if: always()
+        run: |
+          {
+            echo "sha=${GITHUB_SHA}"
+            echo "runner=${RUNNER_NAME}"
+            echo "os=${RUNNER_OS}"
+            echo "arch=${RUNNER_ARCH}"
+            echo "cpus=$(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo || true
+            node --version
+            k6 version
+          } > /tmp/huisurvey-phase0-environment.txt
+      - name: upload Phase 0 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-smoke-${{ github.sha }}
+          path: |
+            /tmp/huisurvey-phase0-scaleTypicalSteady
+            /tmp/huisurvey-phase0-cognitiveNbackStandardSteady
+            /tmp/huisurvey-phase0-sjtLinear30Steady
+            /tmp/huisurvey-phase0-backend.log
+            /tmp/huisurvey-phase0-environment.txt
+          retention-days: 7
+          if-no-files-found: warn
+      - name: stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/huisurvey-phase0-backend.pid ]; then
+            kill "$(cat /tmp/huisurvey-phase0-backend.pid)" 2>/dev/null || true
+          fi

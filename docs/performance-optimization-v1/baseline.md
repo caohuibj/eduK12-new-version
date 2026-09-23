@@ -11,6 +11,13 @@
 
 The original checkout was on `fix/ci-runner-stability-v2`; it was not modified. No PERF-01/02/03 PR or progress file existed at the start. Open PRs #164, #157, #155, #146, #145, #125, #112, and #48 concern other work. PR #164 changes content CI and is not treated as a performance baseline.
 
+## Phase 0 / dual-capacity amendment
+
+- Phase 0 now deliberately uses GitHub-hosted Actions, the existing Mac/Windows self-hosted runners, and Codespaces for correctness, profiling, exploratory stress and comparable A/B.
+- These environments remain unqualified for production capacity; manifests must not set `PERF_CAPACITY_QUALIFIED=1` merely because a run reaches a high rate.
+- Formal capacity is staged later as two independent profiles: `CAP-2C4G` first, then `CAP-4C4G`. Both require whole-host topology and an external load generator.
+- PR #165 remains PERF-01; this amendment extends its measurement infrastructure rather than creating a duplicate baseline PR.
+
 ## Main since analysis base
 
 The relevant main delta includes questionnaire four-type and bundle runtime work (#160, #162, #163), a new questionnaire-product and bundle-product mount in `src/index.ts`, composite route guard and recovery additions, bundle-specific aggregate reads/writes, and CI content fast paths (#158). These additions do not remove the 14 FINAL route templates in section 7.2 of the plan. The new composite `/:id` write guard explicitly bypasses `/attempts/*`; the three composite FINAL handlers retain respondent access and relational consent guards. The new bundle aggregate path must be included in parent-finalization measurements, not assumed equivalent to the prior generic path.
@@ -27,7 +34,7 @@ The CI workflow classifies content-only changes and has separate PR-light and re
 | Prisma pool | 10 | `databasePool.ts`; explicit `DATABASE_URL` parameters take precedence |
 | JSON body parser | 2 MB, before CSRF, route auth and UNIT admission | `src/index.ts` |
 | Public limiters | process-local, mounted before public routers | `src/index.ts` |
-| Capacity target | whole 4C4G host | Developer machines and shared load generators are only for correctness/comparable A/B |
+| Phase 0 target | existing GitHub/Codespaces/self-hosted resources | Correctness, profiling, exploratory stress and comparable A/B only; `PERF_CAPACITY_QUALIFIED=0` |\n| Formal capacity targets | CAP-2C4G, then CAP-4C4G | Whole-host target for each profile; external load generator required |
 
 The isolated PostgreSQL first-attempt HTTP baseline now covers all 14 FINAL route templates and two distinct policy-domain samples. It records SQL events, model calls, phase means, response bytes and durable completion; see `query-budgets.csv` and `server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json`. One request per route is not a latency distribution or a throughput/capacity measurement. No 4C4G capacity has been measured. Historical Gate-E figures are background only.
 
@@ -54,4 +61,4 @@ The isolated PostgreSQL first-attempt HTTP baseline now covers all 14 FINAL rout
 
 ## Environment and evidence status
 
-Docker is available on the development host. Existing PostgreSQL/Redis containers belong to other work and are not used. P1-C02 created task-owned `huisurvey-perf01-postgres` (PostgreSQL 14, localhost port 55439) and `huisurvey-perf01-redis` (Redis 7, localhost port 56379). The independent database has all 81 current migrations; no shared data or credentials are used. k6 is available locally. The database is suitable for correctness and development SQL probes. This host also runs unrelated containers and k6 shares resources with the API, so it cannot qualify whole-host capacity or a clean same-host A/B. The user confirmed there is no exclusive 4C4G target or independent load generator. `performance-results.md` separates the measured low-speed cost baseline from unverified capacity.
+Docker is available on the development host. Existing PostgreSQL/Redis containers belong to other work and are not used. P1-C02 created task-owned `huisurvey-perf01-postgres` (PostgreSQL 14, localhost port 55439) and `huisurvey-perf01-redis` (Redis 7, localhost port 56379). The independent database has all 81 current migrations; no shared data or credentials are used. k6 is available locally. The database is suitable for correctness and development SQL probes. This host also runs unrelated containers and k6 shares resources with the API, so it cannot qualify whole-host capacity or a clean same-host A/B. There is no exclusive formal CAP-2C4G or CAP-4C4G target provisioned for this phase. Phase 0 instead uses existing GitHub/Codespaces/self-hosted resources for correctness and comparable measurement. `performance-results.md` separates measured evidence from unverified formal capacity.

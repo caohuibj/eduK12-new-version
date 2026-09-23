@@ -1,4 +1,4 @@
-# Huisurvey 并发与访问成本优化开发执行文档 v1.0
+# Huisurvey 并发与访问成本优化开发执行文档 v1.1
 
 **文档日期：2026-09-22**
 **仓库：caohuibj/eduK12-new-version**
@@ -6,6 +6,21 @@
 **性质：实施规格与交接手册；未实施、未压测、未创建 PR。**
 
 本文可单独交给一个没有前文上下文的新对话。它规定要做什么、不能改变什么、按什么 commit 推进、怎样证明完成。前一份调查报告仅作背景，实施不依赖它的本地路径，也不依赖任何 /tmp 快照或旧对话记忆。
+
+## v1.1 扩展：Phase 0 + 双容量档位
+
+**修订日期：2026-09-23**
+
+v1.1 完整保留 v1.0 的产品契约、PR/commit 划分、正确性要求、A/B 判据、故障恢复、媒体、入口保护与 PERF-04 条件触发规则。以下扩展优先解释下文尚未逐字改写的旧版容量表述：
+
+1. 在专用服务器之前增加 **Phase 0：现有资源并发测试与第一轮优化**。使用 GitHub-hosted Actions、现有 Mac/Windows self-hosted runner 和 GitHub Codespaces，完成所有不依赖精确整机资源边界的 correctness、fresh accounting、query budget、A/B、exploratory stress、mixed、fault/recovery 和可证实的低风险优化。
+2. Phase 0 可以达到 `CODE_READY + MEASURED`，但所有现有资源环境默认 `PERF_CAPACITY_QUALIFIED=0`，不得据此宣称生产容量。
+3. 原正式单一 4C4G 目标扩展为两个完全对等的正式 Capacity Profile：`CAP-2C4G` 与 `CAP-4C4G`。二者都要求 API + PostgreSQL + Redis + Nginx + 必要系统开销处于对应整机资源边界，load generator 外置。
+4. 正式容量允许分阶段执行：先完成 `CAP-2C4G`，之后可间隔一段时间再完成 `CAP-4C4G`。历史结果只对记录的 SHA/配置有效；后续进入另一档前先做 delta review，并只重跑受影响的 correctness/A-B。
+5. 顶层 `CAPACITY_VERIFIED` 只有在 `CAP-2C4G=VERIFIED` 且 `CAP-4C4G=VERIFIED` 时成立。单档完成时明确写对应 profile 已验证，不把双档项目整体标完成。
+6. Codespaces 的 `CS-2C`/`CS-4C` 只用于开发性能实验、profiling、A/B 和 PRE-CAPACITY；即使通过 cgroup/container 限制，也不得重命名为 `CAP-2C4G`/`CAP-4C4G`。
+
+Phase 0 的详细执行矩阵、资源分工和退出条件见 `docs/performance-optimization-v1/phase-0-plan.md`。下文所有未限定的旧版“4C4G 正式容量”表述，在 v1.1 中应理解为后续正式容量层的一部分，而不是 Phase 0 的完成条件；原始文字保留用于追溯 v1.0 设计。
 
 ## 0. 快速执行约定
 
