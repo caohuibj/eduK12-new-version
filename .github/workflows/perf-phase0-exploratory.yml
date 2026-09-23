@@ -82,6 +82,11 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npm run db:migrate:guarded
+      - name: seed reference and configuration data
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+        run: npm run db:seed
       - name: run P2-C01 invariant matrix
         run: >-
           npx vitest run

@@ -65,17 +65,41 @@ test('dropped iterations cannot inflate served throughput', () => {
   assert.ok(report.capacityDisqualifiers.includes('DROPPED_ITERATIONS'))
 })
 
-test('an iteration interrupted at the scheduler boundary is recorded and disqualified', () => {
+test('one extra scheduler-boundary fixture does not invalidate completed configured arrivals', () => {
   const run = baseline()
   run.manifest.offered = 11
   run.manifest.configuredArrivals = 10
+  run.manifest.requireAllFresh = true
   run.k6.metrics.gate_e_fixtures_used.count = 11
   run.before = probe(0, 11); run.afterWindow = probe(10, 11); run.afterDrain = probe(10, 11)
   const report = analyzeRun(run)
   assert.deepEqual(report.validationErrors, [])
   assert.equal(report.counts.interrupted, 1)
+  assert.equal(report.counts.schedulerBoundaryInterrupted, 1)
+  assert.equal(report.counts.workloadInterrupted, 0)
+  assert.equal(report.capacityEligible, true)
+  assert.ok(!report.capacityDisqualifiers.includes('INTERRUPTED_ITERATIONS'))
+})
+
+test('an interrupted configured arrival remains disqualified', () => {
+  const run = baseline()
+  run.manifest.offered = 10
+  run.manifest.configuredArrivals = 10
+  run.manifest.requireAllFresh = true
+  run.k6.metrics.iterations.count = 9
+  run.k6.metrics.gate_e_fixtures_used.count = 10
+  run.k6.metrics.gate_e_fresh_completions.count = 9
+  run.k6.metrics.gate_e_eventual_success.count = 9
+  run.k6.metrics.gate_e_http_2xx.count = 9
+  run.k6.metrics.checks.passes = 9
+  run.before = probe(0); run.afterWindow = probe(9); run.afterDrain = probe(9)
+  const report = analyzeRun(run)
+  assert.equal(report.counts.interrupted, 1)
+  assert.equal(report.counts.schedulerBoundaryInterrupted, 0)
+  assert.equal(report.counts.workloadInterrupted, 1)
   assert.equal(report.capacityEligible, false)
   assert.ok(report.capacityDisqualifiers.includes('INTERRUPTED_ITERATIONS'))
+  assert.ok(report.validationErrors.some((message) => message.includes('all-fresh baseline')))
 })
 
 test('committed write with lost response fails durable/client reconciliation', () => {

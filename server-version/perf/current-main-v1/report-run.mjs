@@ -92,6 +92,19 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     const status429 = metricCount(metrics, 'gate_e_rate_limited_429')
     const status503 = metricCount(metrics, 'gate_e_capacity_busy_503')
     const interrupted = Math.max(0, fixtureUsed + missingFixture - started)
+    // k6 constant-arrival-rate may acquire exactly one extra fixture at the
+    // duration boundary even after every configured arrival has completed.
+    // Preserve the raw interruption count, but distinguish this scheduler-only
+    // headroom from an interrupted configured arrival. Any other interruption
+    // remains a strict accounting failure/disqualifier.
+    const schedulerBoundaryInterrupted = Number.isSafeInteger(manifest.configuredArrivals)
+      && started === manifest.configuredArrivals
+      && dropped === 0
+      && interrupted === 1
+      && fixtureUsed === manifest.configuredArrivals + 1
+      && missingFixture === 0
+      ? 1 : 0
+    const workloadInterrupted = interrupted - schedulerBoundaryInterrupted
     const checks = metrics?.checks
     const duration = metrics?.http_req_duration
     if (!checks || !integerNonnegative(checks.passes) || !integerNonnegative(checks.fails)
@@ -116,11 +129,11 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     if (before.wrongIdentity || afterWindow.wrongIdentity || afterDrain.wrongIdentity) reject('durable submission identity mismatch')
     if (drainCompleted > manifest.offered) reject('durable completion exceeds offered work')
     if (manifest.requireAllFresh === true && (fresh !== started || replay || recovered || retry
-      || eventualFailure || dropped || interrupted || missingFixture || checks.fails)) {
+      || eventualFailure || dropped || workloadInterrupted || missingFixture || checks.fails)) {
       reject('all-fresh baseline requires every completed iteration to be a first-attempt fresh success')
     }
     counts = {
-      offered: manifest.offered, started, interrupted, dropped, fixtureUsed,
+      offered: manifest.offered, started, interrupted, schedulerBoundaryInterrupted, workloadInterrupted, dropped, fixtureUsed,
       fresh, replay, recovered, firstAttemptReplay, retry, eventualSuccess, eventualFailure, missingFixture,
       http2xx, http4xx, http5xx, networkErrors, status429, status503,
       checksFailed: checks.fails, windowCompleted, drainCompleted,
@@ -171,7 +184,7 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
   if (counts) {
     if (counts.fresh + counts.recovered === 0) disqualifiers.push('NO_FRESH_COMPLETIONS')
     if (counts.firstAttemptReplay > 0) disqualifiers.push('FIRST_ATTEMPT_REPLAYS')
-    if (counts.interrupted > 0) disqualifiers.push('INTERRUPTED_ITERATIONS')
+    if (counts.workloadInterrupted > 0) disqualifiers.push('INTERRUPTED_ITERATIONS')
     if (counts.dropped > 0) disqualifiers.push('DROPPED_ITERATIONS')
     if (counts.eventualFailure > 0 || counts.checksFailed > 0) disqualifiers.push('HTTP_OR_LOGICAL_FAILURES')
     if (counts.missingFixture > 0) disqualifiers.push('FIXTURE_EXHAUSTION')
