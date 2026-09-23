@@ -26,6 +26,7 @@ env:
   PERF_ISOLATED_TEST_MODE: '1'
   PERF_FIXTURE_DB_NAME: ptool
   PERF_CAPACITY_QUALIFIED: '0'
+  UPLOAD_DIR: /tmp/huisurvey-phase0-closure-uploads
 
 jobs:
   ab:

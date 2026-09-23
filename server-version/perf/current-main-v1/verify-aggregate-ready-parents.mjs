@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs'
-import { PrismaClient } from '@prisma/client'
+import { createRequire } from 'node:module'
+
+const backendRequire = createRequire(new URL('../../backend/package.json', import.meta.url))
+const { PrismaClient } = backendRequire('@prisma/client')
 
 if (process.env.NODE_ENV !== 'test' || process.env.PERF_ISOLATED_TEST_MODE !== '1') {
   throw new Error('aggregate verifier requires isolated test mode')
