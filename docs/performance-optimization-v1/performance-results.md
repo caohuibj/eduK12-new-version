@@ -59,3 +59,30 @@ After fixing k6 duration-boundary accounting (allow an already-started +1 schedu
 | SJT linear 60 | **overload: 121 fresh/durable, 5 dropped** | 876.50 ms | 1086.83 ms |
 
 The SJT-60 overload is retained as a failure point, not converted into a green capacity result. Artifact evidence: workflow run `35824011273`, 10-rate artifact `10734172166`, 25-rate artifact `10735135174`.
+
+
+## Phase 0 / P2-C02 SJT validation-index A/B
+
+Decision: **KEEP**. The comparison is GitHub-hosted PRE-CAPACITY evidence, not CAP-2C4G/CAP-4C4G.
+
+P2-C02 replaces per-response reconstruction of the full scene/channel/options validation lookup with one request-local immutable index. Public validation codes, duplicate-answer rejection, authoritative branching trajectory, scorer output and persistence semantics remain unchanged; ordinary CI and the P2-C01 PostgreSQL/privacy invariant gate are green.
+
+### 25 fresh FINAL/s × 5 s
+
+| Workload / metric | Before P2-C02 | After P2-C02 |
+| --- | ---: | ---: |
+| SJT-30 `sjt.validation_index` mean | 1.709 ms | 0.128 ms |
+| SJT-30 fresh durable | 126/126 | 125/125 |
+| SJT-30 retries / drops | 0 / 0 | 0 / 0 |
+| SJT-30 p50 / p95 | 30.66 / 129.88 ms | 29.14 / 113.39 ms |
+| SJT-60 `sjt.validation_index` mean | 6.052 ms | 0.137 ms |
+| SJT-60 fresh durable | 121 | 125/125 |
+| SJT-60 retries | 24 | 7 |
+| SJT-60 dropped iterations | 5 | 0 |
+| SJT-60 p50 / p95 | 876.50 / 1086.83 ms | 714.12 / 1041.48 ms |
+
+The deterministic validation-phase reduction is about 92.5% for the 30-scene sample and 97.7% for the 60-scene sample. End-to-end latency is noisier across separate hosted runners and is not used as the sole KEEP criterion.
+
+The after-run SJT-60 job was marked failed by the exploratory workflow because `PERF_REQUIRE_ALL_FRESH=1` also forbids legal capacity retries. Artifact inspection shows the accounting itself is valid: 125 configured/started, 125 fresh, 125 durable, 0 replay, 0 drop, 0 eventual failure, with 7 UNIT-busy 503 attempts followed by successful retry. The strict all-fresh rule remains intact for baseline gates; the exploratory workflow now runs with that strict option disabled so retry/drop can be retained as overload evidence instead of being mislabeled as invalid accounting.
+
+Before evidence: artifact `10735135174` (P2-C01 / `8e1885e2`). After evidence: artifact `10734177804` (P2-C02 / `f72c142`), plus 10-rate artifact `10735135753`.

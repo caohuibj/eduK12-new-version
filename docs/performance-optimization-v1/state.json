@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C02",
+  "currentCommitId": "P2-C03",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -24,6 +24,15 @@
       "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
       "headSha": "HEAD",
       "ciStatus": "Read live checks on PR #165; do not rely on this static snapshot."
+    },
+    {
+      "planId": "PERF-02",
+      "number": 166,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/166",
+      "status": "DRAFT_IN_PROGRESS",
+      "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
+      "headSha": "HEAD",
+      "ciStatus": "P2-C02 head ordinary CI green; exploratory 25-rate job produced valid evidence but workflow failed only because strict requireAllFresh rejected legal capacity retries. Next head separates exploratory overload from baseline accounting."
     }
   ],
   "completedCommits": [
@@ -148,6 +157,27 @@
         "artifact phase0-curve-10-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10734172166)",
         "artifact phase0-curve-25-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10735135174)"
       ]
+    },
+    {
+      "id": "P2-C02",
+      "sha": "f72c14288455db411b0f5b07b55695862c1f8299",
+      "contracts": [
+        "one request-local SJT scene/channel/options validation index",
+        "unchanged response validation errors and duplicate detection",
+        "unchanged trajectory/scoring/quality semantics"
+      ],
+      "tests": [
+        "ordinary CI run 35824480278 passed",
+        "P2-C01 PostgreSQL + privacy invariant gate passed on head",
+        "25 req/s SJT-30 remained 125/125 fresh durable with no retry/drop",
+        "25 req/s SJT-60 improved from 121 fresh + 5 dropped + 24 retries to 125/125 fresh durable + 0 dropped + 7 retries"
+      ],
+      "evidence": [
+        "before artifact 10735135174 (P2-C01 / 8e1885e2)",
+        "after artifact 10734177804 (P2-C02 / f72c142)",
+        "after 10-rate artifact 10735135753"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -188,7 +218,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C02 SJT request-local response-validation index reuse. Compare 10/25 req/s SJT-30/SJT-60 phase latency and durable/drop behavior against P2-C01 artifacts; keep only if semantics are identical and validation work decreases.",
+  "nextAction": "Run the extended Phase 0 curve on the next head (10/25 repeat, 50 req/s Scale/N-back/CPT/SJT-30, 35 req/s SJT-60, mixedSteady 25 req/s). Treat retry/drop as exploratory overload evidence while keeping accounting fail-closed. Then implement P2-C03 UNIT release before aggregate recovery.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -208,15 +238,21 @@
       "P2-C01 invariant gate and 10/25 req/s exploratory workflow prepared",
       "P2-C01 invariant gate green",
       "10 req/s representative curve green for Scale/N-back/CPT/SJT-30/SJT-60",
-      "25 req/s measured overload isolated to SJT-60 on GitHub-hosted 2C/8G"
+      "25 req/s measured overload isolated to SJT-60 on GitHub-hosted 2C/8G",
+      "P2-C02 SJT response-validation index reuse KEEP",
+      "SJT-30 validation phase at 25 req/s: ~1.709 ms -> ~0.128 ms mean",
+      "SJT-60 validation phase at 25 req/s: ~6.052 ms -> ~0.137 ms mean",
+      "SJT-60 at 25 req/s: dropped 5 -> 0; retries 24 -> 7; fresh durable 121 -> 125"
     ],
     "pending": [
       "mixed workload",
       "burst/fault/recovery under concurrency",
-      "first evidence-driven optimization round",
       "BASE vs HEAD A/B for retained optimizations",
-      "P2-C02 SJT validation-index reuse A/B",
-      "Continue curve above 25 only for workloads that remain below overload"
+      "Continue curve above 25 only for workloads that remain below overload",
+      "extended curve: 50 req/s for Scale/N-back/CPT/SJT-30",
+      "extended curve: 35 req/s for SJT-60",
+      "mixedSteady at 25 req/s",
+      "P2-C03 SJT UNIT/aggregate recovery"
     ]
   },
   "capacityProfiles": {

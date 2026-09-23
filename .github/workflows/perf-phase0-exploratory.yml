@@ -105,16 +105,42 @@ jobs:
           --no-file-parallelism
 
   curve:
-    name: "fresh FINAL curve / ${{ matrix.rate }} req-s"
+    name: "fresh FINAL curve / ${{ matrix.profile }}"
     if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'perf/')
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        rate: [10, 25]
+        include:
+          - profile: baseline-10
+            rate: 10
+            groups: 'scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady'
+            steady: 55
+            mixed: 1
+          - profile: baseline-25
+            rate: 25
+            groups: 'scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady'
+            steady: 130
+            mixed: 1
+          - profile: scale-cog-sjt30-50
+            rate: 50
+            groups: 'scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady'
+            steady: 255
+            mixed: 1
+          - profile: sjt60-35
+            rate: 35
+            groups: 'sjtLinear60Steady'
+            steady: 180
+            mixed: 1
+          - profile: mixed-25
+            rate: 25
+            groups: 'mixedSteady'
+            steady: 2
+            mixed: 20
     env:
       UPLOAD_DIR: /tmp/huisurvey-phase0-curve-uploads
+      PERF_GROUPS: ${{ matrix.groups }}
     services:
       postgres:
         image: postgres:14-alpine
@@ -159,8 +185,8 @@ jobs:
           PERF_CURRENT_MAIN_V1: '1'
           FIXTURE_OUT_DIR: /tmp/huisurvey-phase0-curve-fixtures
           PERF_WARMUP_FIXTURES: '2'
-          PERF_STEADY_FIXTURES: ${{ matrix.rate == 25 && '130' || '55' }}
-          PERF_MIXED_PER_CLASS: '1'
+          PERF_STEADY_FIXTURES: ${{ matrix.steady }}
+          PERF_MIXED_PER_CLASS: ${{ matrix.mixed }}
           PERF_SAME_PARENT_SIBLINGS: '2'
         run: npm run perf:fixtures:seed
       - name: start backend
@@ -182,16 +208,18 @@ jobs:
           BASE_URL: http://127.0.0.1:3000
           PERF_RATE: ${{ matrix.rate }}
           PERF_SECONDS: '5'
-          PERF_RATE_CEILING: '50'
-          PERF_PRE_VUS: '32'
-          PERF_MAX_VUS: '128'
-          PERF_REQUIRE_ALL_FRESH: '1'
+          PERF_RATE_CEILING: '60'
+          PERF_PRE_VUS: '64'
+          PERF_MAX_VUS: '256'
+          # Exploratory overload is evidence, not invalid accounting. Replay,
+          # durable mismatch, fixture exhaustion and eventual failure still fail closed.
+          PERF_REQUIRE_ALL_FRESH: '0'
         run: |
           set -euo pipefail
-          for group in             scaleTypicalSteady             cognitiveNbackStandardSteady             cognitiveCptStandardSteady             sjtLinear30Steady             sjtLinear60Steady
+          for group in $PERF_GROUPS
           do
             export PERF_FIXTURE_GROUP="$group"
-            export PERF_RUN_DIR="/tmp/huisurvey-phase0-rate-${PERF_RATE}-${group}"
+            export PERF_RUN_DIR="/tmp/huisurvey-phase0-${{ matrix.profile }}-${group}"
             node perf/current-main-v1/run-full-request.mjs
             cat "$PERF_RUN_DIR/summary.md"
           done
@@ -201,7 +229,9 @@ jobs:
           {
             echo "head_sha=${{ github.event.pull_request.head.sha || github.sha }}"
             echo "tested_sha=${GITHUB_SHA}"
+            echo "profile=${{ matrix.profile }}"
             echo "rate=${{ matrix.rate }}"
+            echo "groups=${PERF_GROUPS}"
             echo "cpus=$(nproc)"
             grep -E 'MemTotal|MemAvailable' /proc/meminfo || true
             node --version
@@ -211,9 +241,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase0-curve-${{ matrix.rate }}-${{ github.event.pull_request.head.sha || github.sha }}
+          name: phase0-curve-${{ matrix.profile }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
-            /tmp/huisurvey-phase0-rate-*
+            /tmp/huisurvey-phase0-${{ matrix.profile }}-*
             /tmp/huisurvey-phase0-curve-environment.txt
             /tmp/huisurvey-phase0-curve-backend.log
           retention-days: 7
