@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "group": "sjtStartWarmup",
+  "kind": "sjtStart",
+  "validationErrors": [],
+  "capacityDisqualifiers": [
+    "UNQUALIFIED_FOR_CAPACITY: shared or unverified host"
+  ],
+  "capacityEligible": false,
+  "counts": {
+    "offered": 1,
+    "completedIterations": 1,
+    "interrupted": 0,
+    "dropped": 0,
+    "used": 1,
+    "success": 1,
+    "failure": 0,
+    "missing": 0,
+    "http2xx": 1,
+    "http4xx": 0,
+    "http5xx": 0,
+    "networkErrors": 0,
+    "durableBefore": 0,
+    "durableAfter": 1,
+    "p50Ms": 52.665,
+    "p95Ms": 52.665,
+    "responseBytes": 5816
+  },
+  "cost": {
+    "prismaCalls": [
+      {
+        "labels": "{model=\"raw\",action=\"queryRaw\"}",
+        "delta": 2
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"findFirst\"}",
+        "delta": 2
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"create\"}",
+        "delta": 1
+      }
+    ],
+    "requestPhases": [
+      {
+        "labels": "{phase=\"response\",route=\"/metrics\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"request_body_receive_parse\",route=\"/api/situational/attempts\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"auth_account_lookup\",route=\"/api/situational/attempts\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"response.build\",route=\"/api/situational/attempts\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/api/situational/attempts\"}",
+        "delta": 1
+      }
+    ],
+    "httpRoutes": [
+      {
+        "labels": "{method=\"GET\",route=\"/metrics\",status=\"200\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{method=\"POST\",route=\"/api/situational/attempts\",status=\"200\"}",
+        "delta": 1
+      }
+    ]
+  }
+}

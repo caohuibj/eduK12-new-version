@@ -1,6 +1,7 @@
 import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
   compileSituationRuntime,
 } from '../assessment-runtime/compiler'
@@ -250,7 +251,7 @@ export const situationalAttemptForResponse = (
   row: SituationalAttemptRow,
   snapshot: FrozenSituationalRuntimeSnapshotV1,
   options: { replayed?: boolean; suppressResult?: boolean } = {},
-) => {
+) => measureRequestPhaseSync('response.build', () => {
   const stored = row.status === 'COMPLETED' && !options.suppressResult ? decodeStoredResult(row) : null
   if (row.status === 'COMPLETED' && !options.suppressResult && !stored) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
@@ -284,7 +285,7 @@ export const situationalAttemptForResponse = (
     ...(stored ? { result: stored.result, canonicalResult: stored.canonicalResult } : {}),
     ...(options.replayed === undefined ? {} : { replayed: options.replayed }),
   }
-}
+})
 
 const publishedPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackage => {
   const situationPackage = selectPublishedSituationPackage(

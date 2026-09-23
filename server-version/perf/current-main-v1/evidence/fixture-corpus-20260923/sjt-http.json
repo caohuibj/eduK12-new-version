@@ -1,0 +1,45 @@
+{
+  "baseUrl": "http://127.0.0.1:53002",
+  "outcomes": [
+    {
+      "fixtureClass": "sjtLinear10",
+      "status": 200,
+      "replayed": false,
+      "semanticMatch": true
+    },
+    {
+      "fixtureClass": "sjtLinear30",
+      "status": 200,
+      "replayed": false,
+      "semanticMatch": true
+    },
+    {
+      "fixtureClass": "sjtLinear60",
+      "status": 200,
+      "replayed": false,
+      "semanticMatch": true
+    },
+    {
+      "fixtureClass": "sjtBranchFull",
+      "status": 200,
+      "replayed": false,
+      "semanticMatch": true
+    },
+    {
+      "fixtureClass": "sjtBranchEarly",
+      "status": 200,
+      "replayed": false,
+      "semanticMatch": true
+    },
+    {
+      "fixtureClass": "negative",
+      "expectedStatuses": [
+        400,
+        403,
+        409
+      ],
+      "freshAfterNegatives": true,
+      "replayAfterSuccess": true
+    }
+  ]
+}

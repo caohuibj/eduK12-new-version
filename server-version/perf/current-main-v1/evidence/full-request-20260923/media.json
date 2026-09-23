@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "group": "sjtMediaWarmup",
+  "kind": "media",
+  "validationErrors": [],
+  "capacityDisqualifiers": [
+    "UNQUALIFIED_FOR_CAPACITY: shared or unverified host"
+  ],
+  "capacityEligible": false,
+  "counts": {
+    "offered": 1,
+    "completedIterations": 1,
+    "interrupted": 0,
+    "dropped": 0,
+    "used": 1,
+    "success": 1,
+    "failure": 0,
+    "missing": 0,
+    "http2xx": 1,
+    "http4xx": 0,
+    "http5xx": 0,
+    "networkErrors": 0,
+    "durableBefore": 2,
+    "durableAfter": 2,
+    "p50Ms": 24.644,
+    "p95Ms": 24.644,
+    "responseBytes": 1216
+  },
+  "cost": {
+    "prismaCalls": [
+      {
+        "labels": "{model=\"raw\",action=\"queryRaw\"}",
+        "delta": 2
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{model=\"StoredAsset\",action=\"findUnique\"}",
+        "delta": 1
+      }
+    ],
+    "requestPhases": [
+      {
+        "labels": "{phase=\"auth_account_lookup\",route=\"/api/situational/attempts/:attemptId/assets/:assetId/content\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/situational/attempts/:attemptId/assets/:assetId/content\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/api/situational/attempts/:attemptId/assets/:assetId/content\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/metrics\"}",
+        "delta": 1
+      }
+    ],
+    "httpRoutes": [
+      {
+        "labels": "{method=\"GET\",route=\"/api/situational/attempts/:attemptId/assets/:assetId/content\",status=\"200\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{method=\"GET\",route=\"/metrics\",status=\"200\"}",
+        "delta": 1
+      }
+    ]
+  }
+}

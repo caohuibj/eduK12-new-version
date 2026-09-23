@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "group": "mixedSteady",
+  "validationErrors": [],
+  "capacityDisqualifiers": [
+    "UNQUALIFIED_FOR_CAPACITY: shared or unverified load generator/target"
+  ],
+  "capacityEligible": false,
+  "counts": {
+    "offered": 9,
+    "started": 9,
+    "interrupted": 0,
+    "dropped": 0,
+    "fixtureUsed": 9,
+    "fresh": 9,
+    "replay": 0,
+    "retry": 0,
+    "eventualSuccess": 9,
+    "eventualFailure": 0,
+    "missingFixture": 0,
+    "http2xx": 9,
+    "http4xx": 0,
+    "http5xx": 0,
+    "networkErrors": 0,
+    "status429": 0,
+    "status503": 0,
+    "checksFailed": 0,
+    "windowCompleted": 9,
+    "drainCompleted": 9,
+    "windowCompletedPerSecond": 3,
+    "p50Ms": 69.162,
+    "p95Ms": 107.64419999999998,
+    "responseBytes": 143226
+  },
+  "cost": {
+    "sqlEvents": null,
+    "prismaCalls": [
+      {
+        "labels": "{model=\"raw\",action=\"queryRaw\"}",
+        "delta": 14
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+        "delta": 12
+      },
+      {
+        "labels": "{model=\"SituationalAttempt\",action=\"updateMany\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{model=\"SituationalRawSubmission\",action=\"create\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{model=\"CognitiveSession\",action=\"findUnique\"}",
+        "delta": 20
+      },
+      {
+        "labels": "{model=\"CognitiveAssignment\",action=\"findUnique\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{model=\"CognitiveRawSubmission\",action=\"create\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{model=\"CognitiveSession\",action=\"updateMany\"}",
+        "delta": 5
+      }
+    ],
+    "requestPhases": [
+      {
+        "labels": "{phase=\"response\",route=\"/metrics\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{phase=\"request_body_receive_parse\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"auth_account_lookup\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"sjt.validation_index\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"transaction\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"final_submit_commit\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"response.build\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{phase=\"request_body_receive_parse\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"auth_account_lookup\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_admission\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 10
+      },
+      {
+        "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 10
+      },
+      {
+        "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_serialization\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_scoring\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"cognitive.frozen_report_db\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"cognitive.frozen_report_decrypt\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_db_query\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_encryption\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"transaction\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"final_submit_commit\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      },
+      {
+        "labels": "{phase=\"response\",route=\"/api/cognitive/sessions/:id/submit\"}",
+        "delta": 5
+      }
+    ],
+    "httpRoutes": [
+      {
+        "labels": "{method=\"GET\",route=\"/metrics\",status=\"200\"}",
+        "delta": 1
+      },
+      {
+        "labels": "{method=\"POST\",route=\"/api/situational/attempts/:attemptId/submit\",status=\"200\"}",
+        "delta": 4
+      },
+      {
+        "labels": "{method=\"POST\",route=\"/api/cognitive/sessions/:id/submit\",status=\"200\"}",
+        "delta": 5
+      }
+    ]
+  }
+}

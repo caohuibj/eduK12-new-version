@@ -8,9 +8,12 @@ import {
   fixturesUsed,
   freshCompletions,
   idempotentReplays,
+  retryRecoveredReplays,
+  firstAttemptReplays,
   steadyIdempotentReplays,
   steadyFreshCompletions,
   missingFixtures,
+  recordHttpAttemptStatus,
 } from './eventual-success.js';
 
 const baseUrl = String(__ENV.BASE_URL || 'http://127.0.0.1:3300').replace(/\/$/, '');
@@ -98,7 +101,6 @@ export function runLogicalSubmit(request, tags = {}) {
   fixturesUsed.add(1, tags);
   const started = Date.now();
   let lastStatus = 0;
-  let sawFreshCompletion = false;
   let last503Body = null;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -107,9 +109,9 @@ export function runLogicalSubmit(request, tags = {}) {
     const headers = merge(request.headers);
     const authToken = String(__ENV.AUTH_TOKEN || __ENV.PERF_AUTH_TOKEN || '').trim();
     const csrfToken = String(__ENV.CSRF_TOKEN || __ENV.PERF_CSRF_TOKEN || '').trim();
-    if (authToken) {
+    if (authToken && !headers.Cookie) {
       headers.Cookie = `ptool_session=${encodeURIComponent(authToken)}${csrfToken ? `; ptool_csrf=${encodeURIComponent(csrfToken)}` : ''}`;
-      if (csrfToken) headers['x-csrf-token'] = csrfToken;
+      if (csrfToken && !headers['x-csrf-token']) headers['x-csrf-token'] = csrfToken;
     }
     if (request.body !== undefined && request.body !== null && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
@@ -124,6 +126,7 @@ export function runLogicalSubmit(request, tags = {}) {
       tags: merge(tags, { attempt: String(attempt) }),
     });
     lastStatus = response.status;
+    recordHttpAttemptStatus(response.status, tags);
     if (response.status === 503) last503Body = response.body;
 
     if (isDurableSuccessStatus(response.status)) {
@@ -131,12 +134,12 @@ export function runLogicalSubmit(request, tags = {}) {
       if (replayed) {
         idempotentReplays.add(1, tags);
         if (tags.phase === 'steady') steadyIdempotentReplays.add(1);
-        // F7 (Gate-E): a replay on the first attempt means non-fresh /
-        // pre-seeded reuse and is fail-closed for an authoritative run. Only a
-        // replay that arrives on a later capacity (503) retry of this same
-        // logical submit, after we already observed a fresh completion in this
-        // attempt chain, is a legal eventual success.
-        if (!sawFreshCompletion) {
+        // A replay on the first HTTP attempt is stale fixture reuse. On a
+        // retry, the same fixture carries the same child/epoch/submissionId:
+        // a previous response may have been lost after its database commit.
+        // The durable probe independently reconciles the recovered write.
+        if (attempt === 1) {
+          firstAttemptReplays.add(1, tags);
           recordEventualOutcome({
             ok: false,
             latencyMs: Date.now() - started,
@@ -146,9 +149,7 @@ export function runLogicalSubmit(request, tags = {}) {
           check(false, { 'no first-attempt replay (fail-closed)': () => true });
           return false;
         }
-        // Documented retry-after-lost-response: earlier attempt in this logical
-        // submit may have persisted server-side; replayed:true on capacity retry
-        // is durable success for the same submissionId.
+        retryRecoveredReplays.add(1, tags);
         recordEventualOutcome({
           ok: true,
           latencyMs: Date.now() - started,
@@ -160,7 +161,6 @@ export function runLogicalSubmit(request, tags = {}) {
       }
       freshCompletions.add(1, tags);
       if (tags.phase === 'steady') steadyFreshCompletions.add(1);
-      sawFreshCompletion = true;
       recordEventualOutcome({
         ok: true,
         latencyMs: Date.now() - started,

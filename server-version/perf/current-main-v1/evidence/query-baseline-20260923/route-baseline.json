@@ -1,0 +1,2010 @@
+{
+  "schemaVersion": 1,
+  "planId": "PERF-01",
+  "candidateRuntimeSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+  "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+  "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+  "ordinaryRouteCount": 14,
+  "policyDomainSamples": 2,
+  "sharedHostCapacityQualified": false,
+  "postgresVersion": "14.24",
+  "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+  "tableRanges": [
+    {
+      "table": "users",
+      "minRows": 1895,
+      "maxRows": 1895,
+      "indexes": [
+        "users_pkey",
+        "users_username_key"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.791Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:55:28.294Z"
+    },
+    {
+      "table": "scales",
+      "minRows": 47,
+      "maxRows": 47,
+      "indexes": [
+        "scales_code_key",
+        "scales_pkey"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.799Z",
+      "initialLastAutoAnalyze": null
+    },
+    {
+      "table": "assessments",
+      "minRows": 279,
+      "maxRows": 279,
+      "indexes": [
+        "assessments_composite_attempt_id_idx",
+        "assessments_composite_item_id_idx",
+        "assessments_episode_id_idx",
+        "assessments_pkey",
+        "assessments_questionnaire_assessment_id_idx",
+        "assessments_respondent_user_id_status_idx",
+        "assessments_scale_id_status_idx",
+        "assessments_standalone_active_scale_user_key",
+        "assessments_started_at_idx",
+        "assessments_status_started_at_idx",
+        "assessments_subject_user_id_status_idx",
+        "assessments_submission_id_key",
+        "assessments_user_id_status_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.815Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:55:28.329Z"
+    },
+    {
+      "table": "situational_attempts",
+      "minRows": 875,
+      "maxRows": 875,
+      "indexes": [
+        "situational_attempts_active_composite_slot_key",
+        "situational_attempts_active_participant_key",
+        "situational_attempts_composite_attempt_id_status_idx",
+        "situational_attempts_composite_item_key",
+        "situational_attempts_instrument_key_instrument_version_status_i",
+        "situational_attempts_participant_key_status_idx",
+        "situational_attempts_pkey",
+        "situational_attempts_standalone_identity_key",
+        "situational_attempts_submission_id_key",
+        "situational_attempts_user_id_status_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.833Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:55:28.376Z"
+    },
+    {
+      "table": "situational_raw_submissions",
+      "minRows": 49,
+      "maxRows": 52,
+      "indexes": [
+        "situational_raw_submissions_attempt_id_key",
+        "situational_raw_submissions_pkey"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.836Z",
+      "initialLastAutoAnalyze": "2026-09-23T00:06:26.166Z"
+    },
+    {
+      "table": "cognitive_sessions",
+      "minRows": 802,
+      "maxRows": 802,
+      "indexes": [
+        "cognitive_sessions_access_token_id_idx",
+        "cognitive_sessions_assignment_id_idx",
+        "cognitive_sessions_assignment_id_participant_key_attempt_no_key",
+        "cognitive_sessions_composite_attempt_id_idx",
+        "cognitive_sessions_composite_item_id_idx",
+        "cognitive_sessions_config_id_idx",
+        "cognitive_sessions_participant_key_idx",
+        "cognitive_sessions_pkey",
+        "cognitive_sessions_recovery_token_hash_idx",
+        "cognitive_sessions_recovery_token_hash_key",
+        "cognitive_sessions_submission_id_key",
+        "cognitive_sessions_user_id_status_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.851Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:49:28.151Z"
+    },
+    {
+      "table": "cognitive_raw_submissions",
+      "minRows": 43,
+      "maxRows": 45,
+      "indexes": [
+        "cognitive_raw_submissions_pkey",
+        "cognitive_raw_submissions_session_epoch_key",
+        "cognitive_raw_submissions_session_id_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.853Z",
+      "initialLastAutoAnalyze": null
+    },
+    {
+      "table": "questionnaire_assessments",
+      "minRows": 76,
+      "maxRows": 76,
+      "indexes": [
+        "questionnaire_assessments_logged_in_active_key",
+        "questionnaire_assessments_pkey",
+        "questionnaire_assessments_questionnaire_id_status_idx",
+        "questionnaire_assessments_resume_token_expires_at_idx",
+        "questionnaire_assessments_resume_token_hash_key",
+        "questionnaire_assessments_session_id_idx",
+        "questionnaire_assessments_session_id_key",
+        "questionnaire_assessments_started_at_idx",
+        "questionnaire_assessments_token_id_idx",
+        "questionnaire_assessments_user_id_status_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.856Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:45:28.060Z"
+    },
+    {
+      "table": "questionnaire_form_section_attempts",
+      "minRows": 12,
+      "maxRows": 14,
+      "indexes": [
+        "questionnaire_form_section_attempts_assessment_section_key",
+        "questionnaire_form_section_attempts_assessment_status_idx",
+        "questionnaire_form_section_attempts_pkey",
+        "questionnaire_form_section_attempts_submission_id_key"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.857Z",
+      "initialLastAutoAnalyze": null
+    },
+    {
+      "table": "composite_assessment_attempts",
+      "minRows": 92,
+      "maxRows": 92,
+      "indexes": [
+        "composite_assessment_attempts_access_token_id_idx",
+        "composite_assessment_attempts_composite_assessment_id_status_id",
+        "composite_assessment_attempts_episode_id_idx",
+        "composite_assessment_attempts_participant_key_idx",
+        "composite_assessment_attempts_pkey",
+        "composite_assessment_attempts_recovery_token_hash_key",
+        "composite_assessment_attempts_respondent_user_id_status_idx",
+        "composite_assessment_attempts_subject_user_id_status_idx",
+        "composite_assessment_attempts_user_id_status_idx",
+        "composite_attempts_assessment_participant_no_key"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.861Z",
+      "initialLastAutoAnalyze": "2026-09-23T01:45:28.086Z"
+    },
+    {
+      "table": "composite_form_section_attempts",
+      "minRows": 16,
+      "maxRows": 18,
+      "indexes": [
+        "composite_form_section_attempts_attempt_section_key",
+        "composite_form_section_attempts_attempt_status_idx",
+        "composite_form_section_attempts_pkey",
+        "composite_form_section_attempts_submission_id_key"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.864Z",
+      "initialLastAutoAnalyze": null
+    },
+    {
+      "table": "assessment_unit_snapshots",
+      "minRows": 30,
+      "maxRows": 41,
+      "indexes": [
+        "assessment_unit_snapshots_composite_slot_key",
+        "assessment_unit_snapshots_composite_source_key",
+        "assessment_unit_snapshots_composite_terminal_idx",
+        "assessment_unit_snapshots_pkey",
+        "assessment_unit_snapshots_questionnaire_slot_key",
+        "assessment_unit_snapshots_questionnaire_source_key",
+        "assessment_unit_snapshots_questionnaire_terminal_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.867Z",
+      "initialLastAutoAnalyze": null
+    },
+    {
+      "table": "relational_assessment_assignments",
+      "minRows": 8,
+      "maxRows": 8,
+      "indexes": [
+        "relational_assessment_assignments_pkey",
+        "relational_assignment_cohort_scope_idx",
+        "relational_assignment_episode_idx",
+        "relational_assignment_episode_respondent_resource_key",
+        "relational_assignment_policy_domain_status_idx",
+        "relational_assignment_relationship_ref_idx",
+        "relational_assignment_respondent_status_idx",
+        "relational_assignment_subject_status_idx"
+      ],
+      "initialLastAnalyze": "2026-09-23T01:57:40.870Z",
+      "initialLastAutoAnalyze": null
+    }
+  ],
+  "rows": [
+    {
+      "caseId": "SCALE_STANDALONE",
+      "group": "scaleTypicalSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/scales/assessments/:assessmentId/submit",
+      "sqlEvents": 9,
+      "rawSqlEvents": 10,
+      "logicalPrismaCalls": 5,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.32058300000000006
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 2.621749999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 2,
+          "meanMs": 7.059583500000001
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 1.1813339999999997
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.12154199999999987
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.03516700000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.041083
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.7745829999999997
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.06487500000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 3.3806249999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 18.785833000000007
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 18.788749999999993
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 2.4065840000000005
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/scales/assessments/:assessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 8.197790999999995
+        }
+      ],
+      "networkResponseBytes": 6065,
+      "oneRequestDurationMs": 46.589,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:23.535Z",
+        "endedAt": "2026-09-23T01:58:25.621Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COGNITIVE_AUTH",
+      "group": "cognitiveNbackStandardSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/cognitive/sessions/:id/submit",
+      "sqlEvents": 11,
+      "rawSqlEvents": 12,
+      "logicalPrismaCalls": 8,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CognitiveSession\",action=\"findUnique\"}",
+          "count": 4
+        },
+        {
+          "labels": "{model=\"CognitiveAssignment\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CognitiveRawSubmission\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CognitiveSession\",action=\"updateMany\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.2606660000000001
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.5768749999999994
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 2,
+          "meanMs": 2.7166670000000006
+        },
+        {
+          "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 2,
+          "meanMs": 0.22749999999999995
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 1.6446670000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.020209000000000008
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.558542
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.884208000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 1.57025
+        },
+        {
+          "labels": "{phase=\"cognitive.frozen_report_db\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 7.546957999999999
+        },
+        {
+          "labels": "{phase=\"cognitive.frozen_report_decrypt\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.19108300000000009
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 7.7541249999999975
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.2556669999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 1.7767090000000005
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 30.836792000000003
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 30.84049999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 5.779416
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 10.146750000000003
+        }
+      ],
+      "networkResponseBytes": 8432,
+      "oneRequestDurationMs": 62.223,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:32.202Z",
+        "endedAt": "2026-09-23T01:58:33.745Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COGNITIVE_PUBLIC",
+      "group": "publicCognitiveSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/cognitive/sessions/:id/submit",
+      "sqlEvents": 8,
+      "rawSqlEvents": 9,
+      "logicalPrismaCalls": 5,
+      "modelCalls": [
+        {
+          "labels": "{model=\"CognitiveSession\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"CognitiveAssignment\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CognitiveRawSubmission\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CognitiveSession\",action=\"updateMany\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.5240000000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 2,
+          "meanMs": 2.1405830000000012
+        },
+        {
+          "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 2,
+          "meanMs": 0.3602499999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.498583999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.026540999999999988
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.4338749999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 4.353583000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.5603340000000002
+        },
+        {
+          "labels": "{phase=\"cognitive.frozen_report_db\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.3465410000000007
+        },
+        {
+          "labels": "{phase=\"cognitive.frozen_report_decrypt\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.2871250000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.657416999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 0.31029200000000023
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 1.3292080000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 16.572457999999997
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 16.577416999999997
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 2.9663749999999984
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/cognitive/sessions/:id/submit\"}",
+          "count": 1,
+          "meanMs": 1.9139580000000012
+        }
+      ],
+      "networkResponseBytes": 8518,
+      "oneRequestDurationMs": 31.57,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:59:15.460Z",
+        "endedAt": "2026-09-23T01:59:17.004Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "SJT_STANDALONE",
+      "group": "sjtLinear10Steady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/situational/attempts/:attemptId/submit",
+      "sqlEvents": 10,
+      "rawSqlEvents": 11,
+      "logicalPrismaCalls": 7,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"SituationalRawSubmission\",action=\"create\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.464665999999999
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 3.8242910000000006
+        },
+        {
+          "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 5.697459000000002
+        },
+        {
+          "labels": "{phase=\"sjt.validation_index\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.1963749999999995
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 3.134167
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 41.31483299999999
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 41.327458000000014
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.179540999999998
+        },
+        {
+          "labels": "{phase=\"response.build\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.7033750000000004
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/situational/attempts/:attemptId/submit\"}",
+          "count": 1,
+          "meanMs": 15.474667999999998
+        }
+      ],
+      "networkResponseBytes": 16534,
+      "oneRequestDurationMs": 68.434,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:14.426Z",
+        "endedAt": "2026-09-23T01:58:16.915Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "QUESTIONNAIRE_SCALE_AUTH",
+      "group": "authQuestionnaireScaleSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit",
+      "sqlEvents": 11,
+      "rawSqlEvents": 12,
+      "logicalPrismaCalls": 6,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.33508300000000013
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 2.9209999999999967
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 2,
+          "meanMs": 4.450874999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 1.0930409999999995
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.12625
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.078625
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.08916599999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.7610829999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.5693330000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 4.346624999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 24.19783300000001
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 24.207000000000008
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 1.800958
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/questionnaires/assessments/:assessmentId/scales/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 18.092335999999992
+        }
+      ],
+      "networkResponseBytes": 6120,
+      "oneRequestDurationMs": 57.772,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:49.719Z",
+        "endedAt": "2026-09-23T01:58:51.261Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "QUESTIONNAIRE_FORM_AUTH",
+      "group": "sameParentSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit",
+      "sqlEvents": 20,
+      "rawSqlEvents": 21,
+      "logicalPrismaCalls": 11,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireAssessment\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSection\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"updateMany\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"raw\",action=\"executeRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.250958
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 2.1417500000000005
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 2,
+          "meanMs": 22.162666499999997
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.061832999999999964
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.019499999999999993
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 21.336584000000006
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/questionnaires/assessments/:assessmentId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 21.575041999999996
+        }
+      ],
+      "networkResponseBytes": 1447,
+      "oneRequestDurationMs": 90.048,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:41.172Z",
+        "endedAt": "2026-09-23T01:58:43.177Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "QUESTIONNAIRE_SCALE_PUBLIC",
+      "group": "publicQuestionnaireScaleSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit",
+      "sqlEvents": 11,
+      "rawSqlEvents": 12,
+      "logicalPrismaCalls": 6,
+      "modelCalls": [
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireAssessment\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.310417
+        },
+        {
+          "labels": "{phase=\"resume_auth\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 4.302249999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 2,
+          "meanMs": 4.27725
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 1.1145420000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.11512499999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.037250000000000005
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.05075
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.703875
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 0.5408749999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 2.5994159999999993
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 20.816707999999995
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 20.825624999999995
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 5.829791
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/assessments/:sessionId/scale/:scaleAssessmentId/submit\"}",
+          "count": 1,
+          "meanMs": 8.988499999999993
+        }
+      ],
+      "networkResponseBytes": 6213,
+      "oneRequestDurationMs": 45.838,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:58:57.736Z",
+        "endedAt": "2026-09-23T01:58:59.732Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "QUESTIONNAIRE_FORM_PUBLIC",
+      "group": "publicQuestionnaireFormSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/assessments/:sessionId/form-sections/:sectionId/submit",
+      "sqlEvents": 21,
+      "rawSqlEvents": 22,
+      "logicalPrismaCalls": 12,
+      "modelCalls": [
+        {
+          "labels": "{model=\"QuestionnaireAssessment\",action=\"findUnique\"}",
+          "count": 4
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSection\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"QuestionnaireFormSectionAttempt\",action=\"updateMany\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"raw\",action=\"executeRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.20154099999999997
+        },
+        {
+          "labels": "{phase=\"resume_auth\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 2.7499580000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 2,
+          "meanMs": 11.139958499999999
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.059125000000000004
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.011708000000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 12.491041999999993
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/assessments/:sessionId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 10.259291999999997
+        }
+      ],
+      "networkResponseBytes": 1533,
+      "oneRequestDurationMs": 48.388,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:59:06.843Z",
+        "endedAt": "2026-09-23T01:59:08.913Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SCALE_AUTH",
+      "group": "authCompositeScaleSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit",
+      "sqlEvents": 12,
+      "rawSqlEvents": 13,
+      "logicalPrismaCalls": 8,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findFirst\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.4109999999999995
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 5.120125000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 2,
+          "meanMs": 4.337478999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.1528750000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.5837910000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.041958999999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.056541000000000015
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.7879999999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.8476249999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 2.8105000000000024
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 24.81750000000002
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 24.82562499999999
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 3.098291999999999
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 21.907417999999996
+        }
+      ],
+      "networkResponseBytes": 6131,
+      "oneRequestDurationMs": 64.903,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:59:36.284Z",
+        "endedAt": "2026-09-23T01:59:40.102Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SJT_AUTH",
+      "group": "authCompositeSituationalSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit",
+      "sqlEvents": 24,
+      "rawSqlEvents": 25,
+      "logicalPrismaCalls": 14,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"SituationalRawSubmission\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 4
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"findMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"updateMany\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.3006249999999999
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.2557499999999973
+        },
+        {
+          "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 4.118791999999999
+        },
+        {
+          "labels": "{phase=\"sjt.validation_index\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.17425000000000004
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.8790000000000004
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 36.635708
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 36.63891699999999
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 5.924583000000001
+        },
+        {
+          "labels": "{phase=\"aggregate.parent_probe_db\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 4.091833000000001
+        },
+        {
+          "labels": "{phase=\"aggregate.decrypt_parse\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.8010000000000003
+        },
+        {
+          "labels": "{phase=\"aggregate.header_db\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 4.326041999999999
+        },
+        {
+          "labels": "{phase=\"aggregate.validate\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.03237499999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_parent_finalization\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 26.072666
+        },
+        {
+          "labels": "{phase=\"response.build\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.5432920000000001
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 25.525250999999997
+        }
+      ],
+      "networkResponseBytes": 16562,
+      "oneRequestDurationMs": 96.244,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T01:59:49.652Z",
+        "endedAt": "2026-09-23T01:59:52.133Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_FORM_AUTH",
+      "group": "authCompositeFormSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit",
+      "sqlEvents": 23,
+      "rawSqlEvents": 24,
+      "logicalPrismaCalls": 12,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"raw\",action=\"executeRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 3
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeFormSection\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"updateMany\"}",
+          "count": 2
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.11345799999999945
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 2.154749999999983
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 2,
+          "meanMs": 16.991478999999977
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 16.201416999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.07058299999999992
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.008459000000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 17.858875000000005
+        }
+      ],
+      "networkResponseBytes": 1453,
+      "oneRequestDurationMs": 70.699,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:00.421Z",
+        "endedAt": "2026-09-23T02:00:02.604Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SCALE_PUBLIC",
+      "group": "publicCompositeScaleSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit",
+      "sqlEvents": 9,
+      "rawSqlEvents": 10,
+      "logicalPrismaCalls": 5,
+      "modelCalls": [
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findFirst\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.33325
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 2,
+          "meanMs": 4.3408124999999975
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.0475419999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.169375
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.040374999999999994
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.04983400000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.4801660000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.1323329999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 2.867666
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 21.036417
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 21.046041999999993
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 2.174207999999999
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 7.745167000000004
+        }
+      ],
+      "networkResponseBytes": 6220,
+      "oneRequestDurationMs": 42.24,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:10.929Z",
+        "endedAt": "2026-09-23T02:00:15.052Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SJT_PUBLIC",
+      "group": "publicCompositeSituationalSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit",
+      "sqlEvents": 21,
+      "rawSqlEvents": 22,
+      "logicalPrismaCalls": 11,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"SituationalAttempt\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"SituationalRawSubmission\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"findMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"updateMany\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.18808299999999992
+        },
+        {
+          "labels": "{phase=\"snapshot.parse_hash\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 4.8881250000000005
+        },
+        {
+          "labels": "{phase=\"sjt.validation_index\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.16295900000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.161999999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 37.09204199999999
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 37.095833000000006
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 4.431124999999999
+        },
+        {
+          "labels": "{phase=\"aggregate.parent_probe_db\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.8979169999999965
+        },
+        {
+          "labels": "{phase=\"aggregate.decrypt_parse\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.7954579999999998
+        },
+        {
+          "labels": "{phase=\"aggregate.header_db\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 2.4014169999999995
+        },
+        {
+          "labels": "{phase=\"aggregate.validate\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.052083
+        },
+        {
+          "labels": "{phase=\"final_submit_parent_finalization\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 14.346833000000004
+        },
+        {
+          "labels": "{phase=\"response.build\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 0.5498339999999999
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/composite-assessments/attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/submit\"}",
+          "count": 1,
+          "meanMs": 19.939208
+        }
+      ],
+      "networkResponseBytes": 16649,
+      "oneRequestDurationMs": 77.687,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:21.679Z",
+        "endedAt": "2026-09-23T02:00:23.287Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_FORM_PUBLIC",
+      "group": "publicCompositeFormSteady",
+      "policyDomain": "GENERIC",
+      "routeTemplate": "/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit",
+      "sqlEvents": 21,
+      "rawSqlEvents": 22,
+      "logicalPrismaCalls": 10,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"executeRaw\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeFormSection\",action=\"findUnique\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeFormSectionAttempt\",action=\"updateMany\"}",
+          "count": 2
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.2752499999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 2,
+          "meanMs": 13.202917000000008
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 9.477581999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.10116700000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 0.09254200000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_db_query\",route=\"/api/public/composite-assessments/attempts/:attemptId/form-sections/:sectionId/submit\"}",
+          "count": 1,
+          "meanMs": 18.137375000000002
+        }
+      ],
+      "networkResponseBytes": 1541,
+      "oneRequestDurationMs": 54.855,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:29.970Z",
+        "endedAt": "2026-09-23T02:00:31.506Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SCALE_AUTH_RELATIONAL",
+      "group": "relationalCompositeScaleSteady",
+      "policyDomain": "LEGACY_COURSE",
+      "routeTemplate": "/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit",
+      "sqlEvents": 13,
+      "rawSqlEvents": 14,
+      "logicalPrismaCalls": 9,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findFirst\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.22541599999999998
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 11.840749999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 2,
+          "meanMs": 7.6086665
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.1149159999999996
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.12195799999999991
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.03929199999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.05829199999999999
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.7442919999999997
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.586666
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 7.712624999999997
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 46.671834
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 46.71766700000002
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 5.343833000000003
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 26.764086000000006
+        }
+      ],
+      "networkResponseBytes": 1324,
+      "oneRequestDurationMs": 103.752,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:37.855Z",
+        "endedAt": "2026-09-23T02:00:39.373Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    },
+    {
+      "caseId": "COMPOSITE_SCALE_AUTH_ORGANIZATION",
+      "group": "organizationCompositeScaleSteady",
+      "policyDomain": "ORGANIZATION_RUN",
+      "routeTemplate": "/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit",
+      "sqlEvents": 13,
+      "rawSqlEvents": 14,
+      "logicalPrismaCalls": 9,
+      "modelCalls": [
+        {
+          "labels": "{model=\"raw\",action=\"queryRaw\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"updateMany\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"AssessmentUnitSnapshot\",action=\"create\"}",
+          "count": 1
+        },
+        {
+          "labels": "{model=\"CompositeAssessmentAttempt\",action=\"findUnique\"}",
+          "count": 2
+        },
+        {
+          "labels": "{model=\"Assessment\",action=\"findFirst\"}",
+          "count": 1
+        }
+      ],
+      "phases": [
+        {
+          "labels": "{phase=\"request_body_receive_parse\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.29004099999999955
+        },
+        {
+          "labels": "{phase=\"auth_account_lookup\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 2.243042000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_admission\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 2,
+          "meanMs": 3.6108750000000063
+        },
+        {
+          "labels": "{phase=\"final_submit_definition_prepare\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 1.2393330000000005
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_validation\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.18408300000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_payload_hash\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.03933300000000004
+        },
+        {
+          "labels": "{phase=\"final_submit_serialization\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.04883300000000002
+        },
+        {
+          "labels": "{phase=\"final_submit_scoring\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.682292000000001
+        },
+        {
+          "labels": "{phase=\"final_submit_encryption\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 0.4477499999999998
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wait\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 2.747125000000003
+        },
+        {
+          "labels": "{phase=\"final_submit_transaction_wall_time\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 21.28733400000002
+        },
+        {
+          "labels": "{phase=\"transaction\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 21.294582999999978
+        },
+        {
+          "labels": "{phase=\"final_submit_commit\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 5.097166999999996
+        },
+        {
+          "labels": "{phase=\"response\",route=\"/api/composite-assessments/attempts/:attemptId/items/:itemId/scale/submit\"}",
+          "count": 1,
+          "meanMs": 12.017209000000001
+        }
+      ],
+      "networkResponseBytes": 1326,
+      "oneRequestDurationMs": 46.107,
+      "durableWindow": 1,
+      "durableDrain": 1,
+      "manifest": {
+        "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "observedMainSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+        "runtimeHeadSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+        "fixtureChecksum": "827e346a9d449651175f42cdd86096e529a6b18cd8adbbf4a62c4404d22e79ee",
+        "startedAt": "2026-09-23T02:00:46.267Z",
+        "endedAt": "2026-09-23T02:00:48.255Z",
+        "postgresVersion": "14.24",
+        "qualifiedLoadGenerator": false
+      }
+    }
+  ]
+}

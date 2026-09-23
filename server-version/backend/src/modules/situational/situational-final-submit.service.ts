@@ -13,6 +13,7 @@ import {
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
+import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import {
   createCanonicalUnitResultEnvelope,
   buildSituationalBundleBridge,
@@ -75,30 +76,33 @@ const normalizeSituationalSubmission = (
   input: SituationalResponse[],
 ): { responses: SituationalResponse[]; trajectory: AuthoritativeSituationalTrajectory } => {
   const scientificDefinition = asLinearSituationDefinition(definition)
-  const byPair = new Map<string, SituationalResponse>()
-  input.forEach((candidate, index) => {
-    const pairKey = `${candidate.sceneKey}:${candidate.channelKey}`
-    if (byPair.has(pairKey)) {
-      throw new InstrumentFinalSubmitError(
-        'SUBMISSION_PAYLOAD_CONFLICT',
-        `同一场景通道重复回答：${pairKey}`,
-        400,
-      )
-    }
-    try {
-      validateSituationalResponse(scientificDefinition, candidate)
-    } catch (error) {
-      if (error instanceof SituationalResponseValidationError) {
-        const issue = error.issues[0]
+  const byPair = measureRequestPhaseSync('sjt.validation_index', () => {
+    const index = new Map<string, SituationalResponse>()
+    input.forEach((candidate, position) => {
+      const pairKey = `${candidate.sceneKey}:${candidate.channelKey}`
+      if (index.has(pairKey)) {
         throw new InstrumentFinalSubmitError(
           'SUBMISSION_PAYLOAD_CONFLICT',
-          issue ? `${issue.path}: ${issue.message}` : `第 ${index + 1} 个回答不合法`,
+          `同一场景通道重复回答：${pairKey}`,
           400,
         )
       }
-      throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '回答数据不合法', 400)
-    }
-    byPair.set(pairKey, normalizedResponse(candidate))
+      try {
+        validateSituationalResponse(scientificDefinition, candidate)
+      } catch (error) {
+        if (error instanceof SituationalResponseValidationError) {
+          const issue = error.issues[0]
+          throw new InstrumentFinalSubmitError(
+            'SUBMISSION_PAYLOAD_CONFLICT',
+            issue ? `${issue.path}: ${issue.message}` : `第 ${position + 1} 个回答不合法`,
+            400,
+          )
+        }
+        throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '回答数据不合法', 400)
+      }
+      index.set(pairKey, normalizedResponse(candidate))
+    })
+    return index
   })
 
   const trajectory = deriveAuthoritativeSituationalTrajectory(definition, [...byPair.values()])
@@ -353,7 +357,7 @@ export const submitSituationalAttemptFinal = async (
 
   if (embedded && committed.kind === 'committed') {
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await finalizeCompositeAttemptIfReady(embedded.compositeAttemptId)
+    await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(embedded.compositeAttemptId))
   }
   return situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' })
 }

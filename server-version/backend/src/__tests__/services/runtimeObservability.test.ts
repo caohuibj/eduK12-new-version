@@ -5,6 +5,7 @@ import {
   measureRequestPhaseSync,
   recordPrismaCall,
   recordPrismaError,
+  recordPrismaSqlEvent,
   recordBoundedAdmissionRejection,
   recordCompletionAdmissionRejection,
   recordSerializableAttempt,
@@ -125,6 +126,34 @@ describe('runtime observability', () => {
     expect(metrics).toContain('ptool_prisma_errors_total{code="P2034"} 1')
     expect(metrics).toContain('ptool_prisma_errors_total{code="40001"} 1')
     expect(metrics).not.toContain('SELECT')
+  })
+
+  it('keeps SQL event collection opt-in and process-wide without SQL or identity labels', () => {
+    const prior = process.env.PERF_SQL_EVENT_COUNT
+    const priorIsolated = process.env.PERF_ISOLATED_TEST_MODE
+    try {
+      delete process.env.PERF_SQL_EVENT_COUNT
+      delete process.env.PERF_ISOLATED_TEST_MODE
+      recordPrismaSqlEvent(12)
+      expect(metricText()).not.toContain('ptool_prisma_sql_events_total')
+
+      process.env.PERF_SQL_EVENT_COUNT = '1'
+      recordPrismaSqlEvent(12)
+      expect(metricText()).not.toContain('ptool_prisma_sql_events_total')
+      process.env.PERF_ISOLATED_TEST_MODE = '1'
+      recordPrismaSqlEvent(7)
+      const metrics = metricText()
+      expect(metrics).toContain('ptool_prisma_sql_events_total 1')
+      expect(metrics).toContain('ptool_prisma_sql_event_duration_seconds_total 0.007')
+      expect(metrics).not.toContain('SELECT')
+      expect(metrics).not.toContain('token=')
+      expect(metrics).toContain('process_cpu_seconds_total')
+    } finally {
+      if (prior === undefined) delete process.env.PERF_SQL_EVENT_COUNT
+      else process.env.PERF_SQL_EVENT_COUNT = prior
+      if (priorIsolated === undefined) delete process.env.PERF_ISOLATED_TEST_MODE
+      else process.env.PERF_ISOLATED_TEST_MODE = priorIsolated
+    }
   })
 
   it('records completion admission and Serializable retry signals', () => {

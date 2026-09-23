@@ -34,6 +34,11 @@ export type RequestObservationPhase =
   | 'final_submit_commit'
   | 'final_submit_parent_finalization'
   | 'final_submit_retry_backoff'
+  | 'sjt.validation_index'
+  | 'snapshot.parse_hash'
+  | 'cognitive.frozen_report_db'
+  | 'cognitive.frozen_report_decrypt'
+  | 'response.build'
   | 'aggregate.parent_probe_db'
   | 'aggregate.header_db'
   | 'aggregate.definition_db'
@@ -46,6 +51,11 @@ export type RequestObservationPhase =
   | 'aggregate.persist'
   | 'aggregate.cas_loser'
   | 'response'
+
+/** Explicitly opt into count-only SQL events on an isolated test instance. */
+export const sqlEventCollectionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => (
+  env.PERF_ISOLATED_TEST_MODE === '1' && env.PERF_SQL_EVENT_COUNT === '1'
+)
 
 type Histogram = {
   count: number
@@ -79,20 +89,12 @@ const MAX_METRIC_KEYS = 10_000
 const OTHER_ROUTE = '__other__'
 const finiteMilliseconds = (value: number): number => Number.isFinite(value) && value >= 0 ? value : 0
 
-const safeMemoryUsage = (): NodeJS.MemoryUsage => {
+const safeMemoryUsage = (): NodeJS.MemoryUsage | null => {
   try {
     return process.memoryUsage()
   } catch {
-    // Some restricted test sandboxes do not expose the libuv RSS probe. Keep
-    // the metric contract stable without turning an observability failure into
-    // a request failure; production nodes should expose the real values.
-    return {
-      rss: 0,
-      heapTotal: 0,
-      heapUsed: 0,
-      external: 0,
-      arrayBuffers: 0,
-    }
+    // Omit unavailable values; zero would falsely claim no memory usage.
+    return null
   }
 }
 
@@ -104,6 +106,8 @@ const serializableAttemptCounts = new Map<string, LabeledCounter>()
 const serializationConflictCounts = new Map<string, LabeledCounter>()
 const completionAdmissionRejectionCounts = new Map<string, LabeledCounter>()
 const prismaErrorCounts = new Map<string, number>()
+let prismaSqlEventCount = 0
+let prismaSqlEventDurationMs = 0
 
 const SLOW_REQUEST_THRESHOLDS = [
   { milliseconds: 500, label: '500ms' },
@@ -502,6 +506,14 @@ export const recordPrismaCall = (
   }, durationMs)
 }
 
+/** Process-wide SQL event count for opt-in test collection; not per-request. */
+export const recordPrismaSqlEvent = (durationMs: number): void => {
+  if (!sqlEventCollectionEnabled()) return
+  if (!Number.isFinite(durationMs) || durationMs < 0) return
+  prismaSqlEventCount += 1
+  prismaSqlEventDurationMs += durationMs
+}
+
 /** Record only a bounded Prisma error code, never the error or query text. */
 export const recordPrismaError = (code: unknown): void => {
   if (typeof code !== 'string' || code.length === 0 || code.length > 32) return
@@ -533,6 +545,7 @@ const requestCounterLines = (): string[] => (
 /** Return Prometheus-compatible process, request, phase and Prisma metrics. */
 export const runtimeMetricLines = (): string[] => {
   const memory = safeMemoryUsage()
+  const cpu = process.cpuUsage()
   const eventLoopUtilization = performance.eventLoopUtilization()
   const delayP50Ms = finiteMilliseconds(eventLoopDelay.percentile(50) / 1_000_000)
   const delayP95Ms = finiteMilliseconds(eventLoopDelay.percentile(95) / 1_000_000)
@@ -544,15 +557,9 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP process_uptime_seconds Process uptime in seconds.',
     '# TYPE process_uptime_seconds gauge',
     `process_uptime_seconds ${process.uptime()}`,
-    '# HELP process_resident_memory_bytes Resident memory size in bytes.',
-    '# TYPE process_resident_memory_bytes gauge',
-    `process_resident_memory_bytes ${memory.rss}`,
-    '# HELP process_heap_used_bytes V8 heap used in bytes.',
-    '# TYPE process_heap_used_bytes gauge',
-    `process_heap_used_bytes ${memory.heapUsed}`,
-    '# HELP process_heap_total_bytes V8 heap total in bytes.',
-    '# TYPE process_heap_total_bytes gauge',
-    `process_heap_total_bytes ${memory.heapTotal}`,
+    '# HELP process_cpu_seconds_total Cumulative process CPU time across all requests.',
+    '# TYPE process_cpu_seconds_total counter',
+    `process_cpu_seconds_total ${(cpu.user + cpu.system) / 1_000_000}`,
     '# HELP ptool_nodejs_active_requests Current in-flight HTTP requests.',
     '# TYPE ptool_nodejs_active_requests gauge',
     `ptool_nodejs_active_requests ${activeRequests}`,
@@ -622,6 +629,29 @@ export const runtimeMetricLines = (): string[] => {
     '# TYPE ptool_prisma_errors_total counter',
     ...[...prismaErrorCounts.entries()].map(([code, count]) => `ptool_prisma_errors_total{code="${escapeLabel(code)}"} ${count}`),
   ]
+  if (memory) {
+    lines.push(
+      '# HELP process_resident_memory_bytes Resident memory size in bytes.',
+      '# TYPE process_resident_memory_bytes gauge',
+      `process_resident_memory_bytes ${memory.rss}`,
+      '# HELP process_heap_used_bytes V8 heap used in bytes.',
+      '# TYPE process_heap_used_bytes gauge',
+      `process_heap_used_bytes ${memory.heapUsed}`,
+      '# HELP process_heap_total_bytes V8 heap total in bytes.',
+      '# TYPE process_heap_total_bytes gauge',
+      `process_heap_total_bytes ${memory.heapTotal}`,
+    )
+  }
+  if (sqlEventCollectionEnabled()) {
+    lines.push(
+      '# HELP ptool_prisma_sql_events_total Process-wide Prisma SQL events; not HTTP requests or network round trips.',
+      '# TYPE ptool_prisma_sql_events_total counter',
+      `ptool_prisma_sql_events_total ${prismaSqlEventCount}`,
+      '# HELP ptool_prisma_sql_event_duration_seconds_total Process-wide SQL event durations.',
+      '# TYPE ptool_prisma_sql_event_duration_seconds_total counter',
+      `ptool_prisma_sql_event_duration_seconds_total ${prismaSqlEventDurationMs / 1_000}`,
+    )
+  }
   return lines
 }
 
@@ -637,6 +667,8 @@ export const resetRuntimeObservabilityForTests = (): void => {
   boundedAdmissionRejectionCounts.clear()
   boundedAdmissionGateStates.clear()
   prismaErrorCounts.clear()
+  prismaSqlEventCount = 0
+  prismaSqlEventDurationMs = 0
   activeRequests = 0
   gcEvents = 0
   gcDurationMs = 0
