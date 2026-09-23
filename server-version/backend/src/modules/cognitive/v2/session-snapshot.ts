@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { measureRequestPhaseSync } from '../../../services/runtimeObservability'
 import { computeConfigSnapshotHash, computeProtocolSignature, assertProtocolSignature } from './canonical'
 import type { ProtocolDefinition, SessionConfigSnapshot, TaskDefinition } from './types'
 import { canonicalHash, CANONICAL_JSON_SHA256_V1 } from '../../assessment-runtime/canonical'
@@ -137,7 +138,7 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   return parseSessionConfigSnapshot(snapshot)
 }
 
-export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> => {
+export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> => measureRequestPhaseSync('snapshot.parse_hash', () => {
   const parsed = sessionConfigSnapshotSchema.parse(value) as SessionConfigSnapshot<TConfig>
   const expectedConfigHash = parsed.hashScheme === CANONICAL_JSON_SHA256_V1
     ? canonicalHash(parsed.config)
@@ -180,7 +181,7 @@ export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): S
   }
   assertProtocolSignature(parsed)
   return parsed
-}
+})
 
 export const tryParseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> | null => {
   const parsed = sessionConfigSnapshotSchema.safeParse(value)

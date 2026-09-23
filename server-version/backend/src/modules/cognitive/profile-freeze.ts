@@ -3,6 +3,7 @@ import { buildCognitiveV2TaskDefinition } from './v2/registry'
 import type { TaskDefinition } from './v2/types'
 import { createHash } from 'crypto'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
+import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { BAD_REQUEST } from './cognitive.errors'
 import type {
   CognitiveProfile,
@@ -128,7 +129,9 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
 
 export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapshot | null => {
   if (!encrypted) return null
-  const snapshot = decryptCognitivePayload<FrozenReportSnapshot>(encrypted)
+  const snapshot = measureRequestPhaseSync('cognitive.frozen_report_decrypt', () => (
+    decryptCognitivePayload<FrozenReportSnapshot>(encrypted)
+  ))
   if (snapshot.presentationVersion !== undefined && (
     !snapshot.participantPresentation
     || snapshot.participantPresentation.presentationVersion !== snapshot.presentationVersion
@@ -151,14 +154,14 @@ export const loadFrozenMeasurementContext = async (
   if (!assignmentId) {
     return { profile: null, frozenReport: null, resolvedConfigHash: null }
   }
-  const assignment = await db.cognitiveAssignment.findUnique({
+  const assignment = await measureRequestPhase('cognitive.frozen_report_db', () => db.cognitiveAssignment.findUnique({
     where: { id: assignmentId },
     select: {
       profile: true,
       resolvedConfigHash: true,
       resolvedReportSnapshotEncrypted: true,
     },
-  } as never) as {
+  } as never)) as {
     profile: string | null
     resolvedConfigHash: string | null
     resolvedReportSnapshotEncrypted: string | null

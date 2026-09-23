@@ -22,6 +22,7 @@ import { closeQueues } from './config/queue'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
+import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -176,6 +177,7 @@ app.get('/ready', async (_req, res) => {
 app.get('/metrics', async (_req, res) => {
   const lines = [
     ...runtimeMetricLines(),
+    ...await postgresActivityMetricLines(prisma),
     '# HELP ptool_socket_redis_state Socket Redis adapter state (1 for current state).',
     '# TYPE ptool_socket_redis_state gauge',
     `ptool_socket_redis_state{state="ready"} ${socketService.getRedisState() === 'ready' ? 1 : 0}`,

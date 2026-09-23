@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { logger } from '../utils/logger'
 import { buildDatabaseUrl } from './databasePool'
-import { recordPrismaCall, recordPrismaError } from '../services/runtimeObservability'
+import { recordPrismaCall, recordPrismaError, recordPrismaSqlEvent, sqlEventCollectionEnabled } from '../services/runtimeObservability'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -13,8 +13,13 @@ const globalForPrisma = globalThis as unknown as {
 export { buildDatabaseUrl } from './databasePool'
 
 const databaseUrl = buildDatabaseUrl(process.env.DATABASE_URL)
+// Test collection is explicit and records counts/durations only. Never emit
+// SQL text or parameters in production metrics.
+const collectSqlEvents = sqlEventCollectionEnabled()
 const prismaConfig = {
-  log: process.env.NODE_ENV === 'development' 
+  log: collectSqlEvents
+    ? ([{ level: 'query', emit: 'event' }, { level: 'error', emit: 'stdout' }, { level: 'warn', emit: 'stdout' }] as const)
+    : process.env.NODE_ENV === 'development'
     ? ([{ level: 'query', emit: 'stdout' }, { level: 'error', emit: 'stdout' }, { level: 'warn', emit: 'stdout' }] as const)
     : ([{ level: 'error', emit: 'stdout' }] as const),
   ...(databaseUrl ? { datasources: { db: { url: databaseUrl } } } : {}),
@@ -23,6 +28,12 @@ const prismaConfig = {
 export const prisma = globalForPrisma.prisma ?? new PrismaClient(prismaConfig as any)
 
 if (globalForPrisma.prismaObservabilityClient !== prisma) {
+  if (collectSqlEvents) {
+    ;(prisma as unknown as { $on: (event: 'query', callback: (event: { duration: number }) => void) => void })
+      .$on('query', (event) => {
+        try { recordPrismaSqlEvent(event.duration) } catch { /* metrics cannot affect queries */ }
+      })
+  }
   prisma.$use(async (params, next) => {
     const startedAt = process.hrtime.bigint()
     try {

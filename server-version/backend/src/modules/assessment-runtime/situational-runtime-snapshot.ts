@@ -20,6 +20,7 @@ import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
 import type { CompiledInstrumentRuntimeV1 } from './types'
 import { z } from 'zod'
+import { measureRequestPhaseSync } from '../../services/runtimeObservability'
 
 export interface FrozenSituationalRuntimeSnapshotV1 {
   /** Snapshot envelope version. Definition schema may be Situational V1 or V2. */
@@ -189,7 +190,7 @@ export const hashFrozenSituationalRuntimeSnapshot = (snapshot: FrozenSituational
   canonicalHash(unsignedSnapshot(snapshot))
 )
 
-export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSituationalRuntimeSnapshotV1 => {
+export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSituationalRuntimeSnapshotV1 => measureRequestPhaseSync('snapshot.parse_hash', () => {
   const parsed = frozenSituationalRuntimeSnapshotSchema.parse(value) as unknown as FrozenSituationalRuntimeSnapshotV1
   const validation = validateSituationRuntimeDefinition(parsed.definition)
   const definitionErrors = validation.issues.filter((issue) => issue.severity === 'error')
@@ -231,7 +232,7 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
   })
   if (canonicalHash(unsigned) !== parsed.snapshotHash) throw new Error('Frozen Situational runtime snapshot hash mismatch')
   return { ...unsigned, snapshotHash: parsed.snapshotHash }
-}
+})
 
 export const encryptFrozenSituationalRuntimeSnapshot = (snapshot: FrozenSituationalRuntimeSnapshotV1): string => (
   encryptUnifiedRuntimePayload(snapshot)

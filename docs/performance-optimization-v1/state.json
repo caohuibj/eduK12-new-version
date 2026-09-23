@@ -4,21 +4,42 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "199662df3304f29b0fee74e316a2f10a1a8faa9a",
   "currentPr": "PERF-01",
-  "currentCommitId": "P1-C01",
+  "currentCommitId": "P1-C02",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": "/Users/Qiang/projects/perf-measurement-baseline-v1",
     "branch": "perf/measurement-baseline-v1",
     "baseSha": "199662df3304f29b0fee74e316a2f10a1a8faa9a",
-    "headSha": null
+    "headSha": "b5159c0591c0709fb6fbce92d0df1eddecf48c43"
   },
   "pullRequests": [],
-  "completedCommits": [],
+  "completedCommits": [
+    {
+      "id": "P1-C01",
+      "sha": "b5159c0591c0709fb6fbce92d0df1eddecf48c43",
+      "contracts": ["FINAL route inventory", "baseline configuration", "sequential PR scope"],
+      "tests": [
+        "node server-version/perf/current-main-v1/check-final-routes.mjs: 14 routes matched",
+        "npx vitest run src/__tests__/hotpath/final-route-inventory.test.ts: 1/1 passed",
+        "npm run build: passed"
+      ],
+      "measurement": "Not a measurement commit",
+      "evidence": ["docs/performance-optimization-v1/baseline.md", "docs/performance-optimization-v1/route-inventory.csv"]
+    }
+  ],
   "evidence": [
     "docs/performance-optimization-v1/baseline.md",
-    "docs/performance-optimization-v1/route-inventory.csv"
+    "docs/performance-optimization-v1/route-inventory.csv",
+    "docs/performance-optimization-v1/observability.md",
+    "server-version/perf/current-main-v1/evidence/observer-effect-20260923/README.md"
   ],
-  "blockedItems": [],
+  "blockedItems": [
+    {
+      "item": "CAPACITY_VERIFIED",
+      "reason": "No exclusive whole-host 4C4G target or independent load generator identified; current Docker host runs unrelated containers",
+      "nextAction": "Obtain qualified host and load generator before PERF-03 formal capacity acceptance"
+    }
+  ],
   "conditionalDecisions": [
     {
       "item": "PERF-04",
@@ -26,6 +47,6 @@
       "reason": "Requires measured post-PERF-03 bottleneck evidence"
     }
   ],
-  "nextAction": "Run route inventory checker, commit P1-C01, then start bounded observability P1-C02",
+  "nextAction": "Commit P1-C02 after evidence review, then extend the isolated fresh fixture and compatibility corpus in P1-C03",
   "updatedAt": "2026-09-23"
 }
