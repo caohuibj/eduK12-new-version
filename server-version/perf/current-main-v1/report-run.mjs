@@ -115,9 +115,6 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     if (!started || !fixtureUsed) reject('empty started or fixture sample')
     if (started > fixtureUsed + missingFixture || started !== eventualSuccess + eventualFailure) reject('client logical accounting differs from completed iterations')
     if (manifest.offered !== started + interrupted + dropped) reject('offered does not reconcile with completed, interrupted and dropped iterations')
-    if (manifest.configuredArrivals !== undefined && Math.abs(manifest.configuredArrivals - manifest.offered) > 1) {
-      reject('observed k6 arrivals exceed configured schedule boundary')
-    }
     if (fresh + recovered !== eventualSuccess || recovered + firstAttemptReplay !== replay
       || replay > started + retry || missingFixture > started) reject('invalid fresh/replay/recovery/missing counters')
     if (http2xx + http4xx + http5xx + networkErrors < fixtureUsed - interrupted) reject('HTTP attempt categories do not cover completed fixture requests')
@@ -134,6 +131,7 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     }
     counts = {
       configuredArrivals: Number.isSafeInteger(manifest.configuredArrivals) ? manifest.configuredArrivals : null,
+      scheduleDelta: Number.isSafeInteger(manifest.configuredArrivals) ? manifest.offered - manifest.configuredArrivals : null,
       offered: manifest.offered, started, interrupted, schedulerBoundaryInterrupted, workloadInterrupted, dropped, fixtureUsed,
       fresh, replay, recovered, firstAttemptReplay, retry, eventualSuccess, eventualFailure, missingFixture,
       http2xx, http4xx, http5xx, networkErrors, status429, status503,
@@ -187,6 +185,7 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
     if (counts.firstAttemptReplay > 0) disqualifiers.push('FIRST_ATTEMPT_REPLAYS')
     if (counts.workloadInterrupted > 0) disqualifiers.push('INTERRUPTED_ITERATIONS')
     if (counts.dropped > 0) disqualifiers.push('DROPPED_ITERATIONS')
+    if (counts.scheduleDelta !== null && Math.abs(counts.scheduleDelta) > 1) disqualifiers.push('SCHEDULER_ARRIVAL_DRIFT')
     if (counts.eventualFailure > 0 || counts.checksFailed > 0) disqualifiers.push('HTTP_OR_LOGICAL_FAILURES')
     if (counts.missingFixture > 0) disqualifiers.push('FIXTURE_EXHAUSTION')
   }
@@ -202,13 +201,13 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
 function writeArtifacts(runDir, report) {
   writeFileSync(resolve(runDir, 'summary.json'), `${JSON.stringify(report, null, 2)}\n`)
   const c = report.counts || {}
-  const columns = ['group', 'capacityEligible', 'offered', 'started', 'interrupted', 'dropped', 'fresh', 'replay', 'recovered', 'firstAttemptReplay', 'retry', 'windowCompleted', 'drainCompleted', 'windowCompletedPerSecond', 'p50Ms', 'p95Ms']
+  const columns = ['group', 'capacityEligible', 'configuredArrivals', 'scheduleDelta', 'offered', 'started', 'interrupted', 'dropped', 'fresh', 'replay', 'recovered', 'firstAttemptReplay', 'retry', 'windowCompleted', 'drainCompleted', 'windowCompletedPerSecond', 'p50Ms', 'p95Ms']
   const values = columns.map((key) => key === 'group' ? report.group : key === 'capacityEligible' ? report.capacityEligible : c[key])
   writeFileSync(resolve(runDir, 'summary.csv'), `${columns.join(',')}\n${values.map((value) => value ?? '').join(',')}\n`)
   const markdown = [
     `# ${report.group} full-request accounting`, '',
     `Capacity eligible: **${report.capacityEligible ? 'YES' : 'NO'}**`, '',
-    `Offered ${c.offered ?? 'unknown'}, completed iterations ${c.started ?? 'unknown'}, interrupted ${c.interrupted ?? 'unknown'}, dropped ${c.dropped ?? 'unknown'}, fresh confirmed ${c.fresh ?? 'unknown'}, retry recovered ${c.recovered ?? 'unknown'}, first-attempt replay ${c.firstAttemptReplay ?? 'unknown'}, retries ${c.retry ?? 'unknown'}.`, '',
+    `Configured schedule ${c.configuredArrivals ?? 'unknown'}; observed offered ${c.offered ?? 'unknown'} (delta ${c.scheduleDelta ?? 'unknown'}), completed iterations ${c.started ?? 'unknown'}, interrupted ${c.interrupted ?? 'unknown'}, dropped ${c.dropped ?? 'unknown'}, fresh confirmed ${c.fresh ?? 'unknown'}, retry recovered ${c.recovered ?? 'unknown'}, first-attempt replay ${c.firstAttemptReplay ?? 'unknown'}, retries ${c.retry ?? 'unknown'}.`, '',
     `Durable completed by steady window: ${c.windowCompleted ?? 'unknown'}; after drain: ${c.drainCompleted ?? 'unknown'}. Window completion rate: ${c.windowCompletedPerSecond ?? 'unknown'} per second. Drain completions are not included in this rate.`, '',
     `SQL events: ${report.cost?.sqlEvents ?? 'unavailable'}; p50 ${c.p50Ms ?? 'unknown'} ms; p95 ${c.p95Ms ?? 'unknown'} ms.`, '',
     `Validation errors: ${report.validationErrors.length ? report.validationErrors.join('; ') : 'none'}.`, '',

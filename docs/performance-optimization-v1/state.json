@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C03",
+  "currentCommitId": "P2-C04",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -178,6 +178,27 @@
         "after 10-rate artifact 10735135753"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C03",
+      "sha": "5828859d5e7ff141b2479c7659394b887e063bee",
+      "contracts": [
+        "submitSituationalAttemptFinal is the sole production UNIT admission owner",
+        "embedded parent aggregate/recovery runs after UNIT release",
+        "legal replay re-runs parent finalization recovery",
+        "aggregate busy preserves committed child and retryable HTTP mapping"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck succeeded on P2-C03 head",
+        "Phase 0 invariant run 35829055624: 10 test files / 66 tests passed",
+        "situational-bundle PostgreSQL suite: 10/10 passed including UNIT-release and queue-full replay-recovery tests",
+        "raw submission and UnitSnapshot remain unique after recovery replay"
+      ],
+      "evidence": [
+        "workflow run 35829055624 / invariant job 107077196085",
+        "server-version/backend/src/__tests__/composite/situational-bundle.postgres.integration.test.ts"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -218,7 +239,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C03 on real PostgreSQL: UNIT must be inactive while parent aggregate is queued; aggregate queue-full must leave exactly one committed child and replay must repair parent completion. Then continue P2-C04 binding reuse.",
+  "nextAction": "Implement P2-C04: return trusted request-local child binding as internal context for Scale/Cognitive/SJT generic authenticated FINAL controllers, remove post-submit binding rereads, and prove no internal field leaks into HTTP data.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -249,16 +270,22 @@
       "N-back standard 50 req/s: 251/251 fresh durable, 46 retries, 0 drop",
       "CPT standard 50 req/s: 223 fresh durable, 28 drops, 103 retries",
       "SJT-30 50 req/s: 220 fresh durable, 31 drops, 130 retries",
-      "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries"
+      "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries",
+      "P2-C03 UNIT release before parent aggregate KEEP",
+      "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence"
     ],
     "pending": [
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",
       "Continue curve above 25 only for workloads that remain below overload",
-      "P2-C03 SJT UNIT/aggregate recovery",
-      "P2-C03 UNIT release / aggregate replay-recovery verification",
-      "burst/fault/recovery under concurrency after P2-C03"
+      "burst/fault/recovery under concurrency after P2-C03",
+      "P2-C04 authoritative child binding reuse",
+      "P2-C05 SJT narrow reads / fresh response reuse",
+      "P2-C06 Cognitive prepared context",
+      "P2-C07 reference batch freeze",
+      "P2-C08 aggregate header index",
+      "P2-C09 final A/B and evidence close"
     ]
   },
   "capacityProfiles": {

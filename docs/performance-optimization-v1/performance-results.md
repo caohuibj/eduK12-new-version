@@ -104,3 +104,22 @@ Environment remains GitHub-hosted Ubuntu with 2 logical CPUs / ~8 GiB, API + Pos
 The repeated 10/s and 25/s profiles remained accounting-valid after exploratory runs stopped requiring zero capacity retries. The strict all-fresh reporter option itself was not weakened. Artifacts: run `35828241966`; mixed `10736111899`, SJT-60@35 `10736141711`, 50-rate `10736790313`, repeat-10 `10736626522`, repeat-25 `10736556638`.
 
 These results establish enough hosted-environment knee points for Phase 0; increasing offered load further on the same shared 2C/8G runner would add little engineering information. The next optimization target is P2-C03: release UNIT admission before embedded parent aggregate/recovery.
+
+
+## Phase 0 / P2-C03 UNIT release and aggregate recovery
+
+Decision: **KEEP**.
+
+The production SJT service is now the single UNIT admission owner. Child FINAL/replay work completes under UNIT admission; embedded parent aggregate/recovery executes only after the UNIT permit is released. A legal replay re-runs parent finalization, covering the crash/response-loss window after child commit without inserting a second raw submission or UnitSnapshot.
+
+Evidence on head `5828859d`:
+
+- PR-light backend compile and frontend typecheck: success.
+- Phase 0 PostgreSQL/privacy invariant job `107077196085` in workflow run `35829055624`: **10 test files / 66 tests passed**.
+- Situational Bundle PostgreSQL suite: **10/10**. New tests explicitly hold Aggregate admission at capacity and assert UNIT admission is already `active=0, queued=0` while parent aggregation waits.
+- A second test fills the Aggregate queue, verifies the child is already COMPLETED with exactly one raw submission and one UnitSnapshot while the parent remains IN_PROGRESS, then replays the same submission after the gate drains and verifies the parent becomes COMPLETED with evidence counts still exactly one.
+- Standalone high-fanout transaction characterization uses a named test-only persistence entry so production service callers cannot bypass UNIT admission.
+
+### k6 schedule-drift harness correction
+
+A post-P2-C03 hosted CPT@50 run produced 249 started + 5 dropped = 254 observed offered attempts against a configured schedule of 250. All 249 started iterations were fresh/durable. The previous reporter incorrectly treated `abs(configured-offered)>1` as invalid durable accounting. The reporter now keeps actual `started + interrupted + dropped` reconciliation authoritative, records `scheduleDelta`, and emits `SCHEDULER_ARRIVAL_DRIFT` as a capacity disqualifier rather than an accounting error. Fixture exhaustion, wrong identity, replay, durable mismatch and eventual failure remain strict validation failures.

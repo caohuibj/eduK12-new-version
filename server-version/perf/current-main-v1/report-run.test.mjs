@@ -121,6 +121,34 @@ test('an interrupted configured arrival remains disqualified', () => {
   assert.ok(report.validationErrors.some((message) => message.includes('all-fresh baseline')))
 })
 
+test('scheduler arrival drift is recorded as load-generator evidence instead of invalid durable accounting', () => {
+  const run = baseline()
+  run.manifest.configuredArrivals = 250
+  run.manifest.offered = 254
+  run.manifest.steadySeconds = 5
+  run.k6.metrics.iterations.count = 249
+  run.k6.metrics.gate_e_fixtures_used.count = 249
+  run.k6.metrics.gate_e_fresh_completions.count = 249
+  run.k6.metrics.gate_e_eventual_success.count = 249
+  run.k6.metrics.gate_e_http_2xx.count = 249
+  run.k6.metrics.dropped_iterations = { count: 5 }
+  run.k6.metrics.gate_e_capacity_retries = { count: 39 }
+  run.k6.metrics.checks.passes = 249
+  run.before = probe(0, 255); run.afterWindow = probe(249, 255); run.afterDrain = probe(249, 255)
+  const report = analyzeRun(run)
+  assert.deepEqual(report.validationErrors, [])
+  assert.equal(report.counts.configuredArrivals, 250)
+  assert.equal(report.counts.scheduleDelta, 4)
+  assert.equal(report.counts.offered, 254)
+  assert.equal(report.counts.started, 249)
+  assert.equal(report.counts.dropped, 5)
+  assert.equal(report.counts.drainCompleted, 249)
+  assert.equal(report.capacityEligible, false)
+  assert.ok(report.capacityDisqualifiers.includes('DROPPED_ITERATIONS'))
+  assert.ok(report.capacityDisqualifiers.includes('SCHEDULER_ARRIVAL_DRIFT'))
+  assert.ok(!report.capacityDisqualifiers.includes('INVALID_ACCOUNTING'))
+})
+
 test('committed write with lost response fails durable/client reconciliation', () => {
   const run = baseline()
   run.manifest.offered = 1
