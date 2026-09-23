@@ -64,6 +64,11 @@ export type SituationalFinalSubmitServiceInput = SituationalFinalSubmitInput & {
   embedded?: SituationalEmbeddedAccess
 }
 
+export type SituationalFinalSubmitInternalContext = {
+  compositeAttemptId: string | null
+  attemptEpoch: number
+}
+
 const normalizedResponse = (response: SituationalResponse): SituationalResponse => ({
   sceneKey: response.sceneKey,
   channelKey: response.channelKey,
@@ -372,7 +377,7 @@ const persistSituationalAttemptFinal = async (
  * A legal replay also re-runs parent finalization so a response lost after child
  * commit can deterministically repair the parent without duplicating child data.
  */
-export const submitSituationalAttemptFinal = async (
+export const submitSituationalAttemptFinalWithContext = async (
   input: SituationalFinalSubmitServiceInput,
 ) => {
   const persisted = await withUnitSubmitAdmission(() => persistSituationalAttemptFinal(input))
@@ -383,8 +388,18 @@ export const submitSituationalAttemptFinal = async (
       () => finalizeCompositeAttemptIfReady(persisted.parentAttemptId as string),
     )
   }
-  return persisted.data
+  return {
+    data: persisted.data,
+    internalContext: {
+      compositeAttemptId: persisted.parentAttemptId,
+      attemptEpoch: input.attemptEpoch,
+    } satisfies SituationalFinalSubmitInternalContext,
+  }
 }
+
+export const submitSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => (await submitSituationalAttemptFinalWithContext(input)).data
 
 /**
  * Test-only persistence entry for high-fanout transaction correctness tests.

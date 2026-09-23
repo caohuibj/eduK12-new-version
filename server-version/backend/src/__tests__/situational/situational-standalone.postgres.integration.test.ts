@@ -19,6 +19,7 @@ let db: PrismaClient | null = null
 let startSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['startSituationalAttempt']
 let resumeSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['resumeSituationalAttempt']
 let submitSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinal']
+let submitSituationalAttemptFinalWithContext: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinalWithContext']
 let testOnlyPersistSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['__testOnlyPersistSituationalAttemptFinal']
 let listSituationalHistory: typeof import('../../modules/situational/situational-runtime.service')['listSituationalHistory']
 
@@ -103,6 +104,7 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     resumeSituationalAttempt = runtime.resumeSituationalAttempt
     listSituationalHistory = runtime.listSituationalHistory
     submitSituationalAttemptFinal = submit.submitSituationalAttemptFinal
+    submitSituationalAttemptFinalWithContext = submit.submitSituationalAttemptFinalWithContext
     testOnlyPersistSituationalAttemptFinal = submit.__testOnlyPersistSituationalAttemptFinal
   }, 30_000)
 
@@ -145,10 +147,13 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     const resumed = await resumeSituationalAttempt(started.attemptId, userId)
     expect(resumed.attempt.status).toBe('IN_PROGRESS')
     const submissionId = `situational-prb-submit-${randomUUID()}`
-    const submitted = await submitSituationalAttemptFinal({
+    const contextual = await submitSituationalAttemptFinalWithContext({
       ...finalInput({ ...started, userId }, assertivenessResponses, submissionId),
       userId,
     })
+    expect(contextual.internalContext).toEqual({ compositeAttemptId: null, attemptEpoch: 1 })
+    expect(contextual.data).not.toHaveProperty('internalContext')
+    const submitted = contextual.data
     expect(submitted.replayed).toBe(false)
     expect(submitted.attempt.status).toBe('COMPLETED')
     expect(submitted.result?.quality.status).toBe('interpretable')

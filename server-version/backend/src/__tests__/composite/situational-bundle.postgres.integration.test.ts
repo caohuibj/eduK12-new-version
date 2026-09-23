@@ -68,6 +68,7 @@ for (const sceneCount of [10, 30, 60]) {
 let db: PrismaClient | null = null
 let compositeService: typeof import('../../modules/composite/composite.service')
 let submitSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinal']
+let submitSituationalAttemptFinalWithContext: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinalWithContext']
 let loadEmbeddedSituationalAttemptRuntime: typeof import('../../modules/situational/situational-runtime.service')['loadEmbeddedSituationalAttemptRuntime']
 let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
 let submitCognitiveSessionFinal: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinal']
@@ -472,7 +473,11 @@ suite('Situational Bundle PostgreSQL integration', () => {
     db = new PrismaClient({ datasources: { db: { url: databaseUrl! } } })
     await db.$connect()
     compositeService = await import('../../modules/composite/composite.service')
-    submitSituationalAttemptFinal = (await import('../../modules/situational/situational-final-submit.service')).submitSituationalAttemptFinal
+    {
+      const finalSubmit = await import('../../modules/situational/situational-final-submit.service')
+      submitSituationalAttemptFinal = finalSubmit.submitSituationalAttemptFinal
+      submitSituationalAttemptFinalWithContext = finalSubmit.submitSituationalAttemptFinalWithContext
+    }
     loadEmbeddedSituationalAttemptRuntime = (await import('../../modules/situational/situational-runtime.service')).loadEmbeddedSituationalAttemptRuntime
     submitScaleAssessmentFinal = (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal
     submitCognitiveSessionFinal = (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal
@@ -537,7 +542,10 @@ suite('Situational Bundle PostgreSQL integration', () => {
 
     const input = finalInput(fixture, parentId, child, assertivenessResponses)
     await expect(loadEmbeddedSituationalAttemptRuntime(child.id, input.embedded)).resolves.toMatchObject({ row: { id: child.id } })
-    const submitted = await submitSituationalAttemptFinal(input)
+    const contextual = await submitSituationalAttemptFinalWithContext(input)
+    expect(contextual.internalContext).toEqual({ compositeAttemptId: parentId, attemptEpoch: 1 })
+    expect(contextual.data).not.toHaveProperty('internalContext')
+    const submitted = contextual.data
     expect(submitted).toMatchObject({ replayed: false, attempt: { status: 'COMPLETED' } })
 
     const parentAfter = await db!.compositeAssessmentAttempt.findUnique({ where: { id: parentId }, select: { status: true, progress: true, completedItems: true } })

@@ -50,6 +50,11 @@ export type FinalScaleSubmitInput = {
   recoveryTokenHash?: string
 }
 
+export type ScaleFinalSubmitInternalContext = {
+  compositeAttemptId: string | null
+  attemptEpoch: number
+}
+
 type ScaleRecord = {
   id: string
   code: string
@@ -234,7 +239,14 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
   }))
   if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
   if (child.runtimeGeneration === 'UNIFIED_V1') {
-    return submitUnifiedScaleAssessmentFinal(input, child)
+    const data = await submitUnifiedScaleAssessmentFinal(input, child)
+    return {
+      ...data,
+      internalContext: {
+        compositeAttemptId: child.compositeAttemptId ?? null,
+        attemptEpoch: child.attemptEpoch,
+      } satisfies ScaleFinalSubmitInternalContext,
+    }
   }
   const assessment = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
@@ -333,6 +345,10 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
         parent: null,
         shouldFinalize: true,
         finalizeAssessment: assessment,
+        internalContext: {
+          compositeAttemptId: assessment.compositeAttemptId ?? null,
+          attemptEpoch: assessment.attemptEpoch,
+        } satisfies ScaleFinalSubmitInternalContext,
       }
     }
   }
@@ -458,6 +474,10 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     parent: committed.parent,
     shouldFinalize: committed.shouldFinalize,
     finalizeAssessment: assessment,
+    internalContext: {
+      compositeAttemptId: assessment.compositeAttemptId ?? null,
+      attemptEpoch: assessment.attemptEpoch,
+    } satisfies ScaleFinalSubmitInternalContext,
   }
 }
 
@@ -474,8 +494,29 @@ const finalizeParentAfterUnitSubmit = async <T>(result: T): Promise<Omit<T, 'sho
   return result as Omit<T, 'shouldFinalize' | 'finalizeAssessment'>
 }
 
+const splitScaleFinalContext = (result: any): {
+  data: Record<string, any>
+  internalContext: ScaleFinalSubmitInternalContext
+} => {
+  if (!result?.internalContext || !Number.isInteger(result.internalContext.attemptEpoch)) {
+    throw new Error('Scale FINAL internal context is missing')
+  }
+  const { internalContext, ...data } = result
+  return { data, internalContext }
+}
+
+const stripScaleFinalContext = (result: any) => splitScaleFinalContext(result).data
+
+export const submitScaleAssessmentFinalWithContext = async (input: FinalScaleSubmitInput) => (
+  splitScaleFinalContext(
+    await finalizeParentAfterUnitSubmit(
+      await withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(input)),
+    ),
+  )
+)
+
 export const submitScaleAssessmentFinal = async (input: FinalScaleSubmitInput) => (
-  finalizeParentAfterUnitSubmit(await withUnitSubmitAdmission(() => submitScaleAssessmentFinalImpl(input)))
+  (await submitScaleAssessmentFinalWithContext(input)).data
 )
 
 const questionnaireChild = async (scaleAssessmentId: string) => prisma.assessment.findUnique({
@@ -505,7 +546,7 @@ export const submitQuestionnaireScaleFinal = async (
       questionnaireSessionId: child.questionnaireAssessment.sessionId ?? undefined,
     })
   })
-  return finalizeParentAfterUnitSubmit(result)
+  return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }
 
 export const submitQuestionnaireScaleFinalForPublic = async (
@@ -527,7 +568,7 @@ export const submitQuestionnaireScaleFinalForPublic = async (
       recoveryTokenHash: resumeTokenHash,
     })
   })
-  return finalizeParentAfterUnitSubmit(result)
+  return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }
 
 export const submitCompositeScaleFinal = async (
@@ -550,7 +591,7 @@ export const submitCompositeScaleFinal = async (
       recoveryTokenHash: context.recoveryTokenHash,
     })
   })
-  return finalizeParentAfterUnitSubmit(result)
+  return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }
 
 /**

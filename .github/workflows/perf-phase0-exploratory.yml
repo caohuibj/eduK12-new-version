@@ -106,7 +106,7 @@ jobs:
 
   curve:
     name: "fresh FINAL curve / ${{ matrix.profile }}"
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'perf/')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && startsWith(github.head_ref, 'perf/'))
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
