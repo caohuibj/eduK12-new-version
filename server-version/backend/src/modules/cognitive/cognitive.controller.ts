@@ -42,7 +42,6 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
-import { prisma } from '../../config/database'
 import { projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
 
 /**
@@ -450,15 +449,11 @@ export const cognitiveController = {
     try {
       if (!req.user) return unauthorized(res)
       const input = finalCognitiveSubmitSchema.parse(req.body)
-      const data = await finalSubmitService.submitCognitiveSessionFinal(req.user.userId, {
+      const { data, internalContext } = await finalSubmitService.submitCognitiveSessionFinalWithContext(req.user.userId, {
         sessionId: req.params.id,
         ...input,
       })
-      const binding = await prisma.cognitiveSession.findUnique({
-        where: { id: req.params.id },
-        select: { compositeAttemptId: true },
-      })
-      const responseData = await projectRelationalUnitFinalResponse(binding?.compositeAttemptId, data)
+      const responseData = await projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
       return success(res, responseData, data.replayed ? '认知测评提交已确认' : '认知测评已完成')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)

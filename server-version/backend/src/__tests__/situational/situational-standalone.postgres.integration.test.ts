@@ -19,7 +19,11 @@ let db: PrismaClient | null = null
 let startSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['startSituationalAttempt']
 let resumeSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['resumeSituationalAttempt']
 let submitSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinal']
+let submitSituationalAttemptFinalWithContext: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinalWithContext']
+let testOnlyPersistSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['__testOnlyPersistSituationalAttemptFinal']
 let listSituationalHistory: typeof import('../../modules/situational/situational-runtime.service')['listSituationalHistory']
+let loadSituationalAttemptRuntime: typeof import('../../modules/situational/situational-runtime.service')['loadSituationalAttemptRuntime']
+let situationalAttemptForResponse: typeof import('../../modules/situational/situational-runtime.service')['situationalAttemptForResponse']
 
 const createdUserIds: string[] = []
 const createdAttemptIds: string[] = []
@@ -101,7 +105,11 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     startSituationalAttempt = runtime.startSituationalAttempt
     resumeSituationalAttempt = runtime.resumeSituationalAttempt
     listSituationalHistory = runtime.listSituationalHistory
+    loadSituationalAttemptRuntime = runtime.loadSituationalAttemptRuntime
+    situationalAttemptForResponse = runtime.situationalAttemptForResponse
     submitSituationalAttemptFinal = submit.submitSituationalAttemptFinal
+    submitSituationalAttemptFinalWithContext = submit.submitSituationalAttemptFinalWithContext
+    testOnlyPersistSituationalAttemptFinal = submit.__testOnlyPersistSituationalAttemptFinal
   }, 30_000)
 
   afterAll(async () => {
@@ -143,15 +151,46 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     const resumed = await resumeSituationalAttempt(started.attemptId, userId)
     expect(resumed.attempt.status).toBe('IN_PROGRESS')
     const submissionId = `situational-prb-submit-${randomUUID()}`
-    const submitted = await submitSituationalAttemptFinal({
+    const contextual = await submitSituationalAttemptFinalWithContext({
       ...finalInput({ ...started, userId }, assertivenessResponses, submissionId),
       userId,
     })
+    expect(contextual.internalContext).toEqual({ compositeAttemptId: null, attemptEpoch: 1 })
+    expect(contextual.data).not.toHaveProperty('internalContext')
+    const submitted = contextual.data
     expect(submitted.replayed).toBe(false)
     expect(submitted.attempt.status).toBe('COMPLETED')
     expect(submitted.result?.quality.status).toBe('interpretable')
     expect(submitted.canonicalResult?.core.unitType).toBe('SITUATIONAL')
     expect(submitted.canonicalResult?.core.metrics.map((metric) => metric.key)).toEqual(['bfi2.assertiveness.behavior'])
+    if (!submitted.result || !submitted.canonicalResult) throw new Error('fresh FINAL must expose committed result')
+    const committedRuntime = await loadSituationalAttemptRuntime(started.attemptId, userId)
+    const responseWithoutDecrypt = situationalAttemptForResponse(
+      {
+        ...committedRuntime.row,
+        resultEncrypted: 'intentionally-invalid-for-fresh-response',
+        canonicalResultEncrypted: 'intentionally-invalid-for-fresh-response',
+      },
+      committedRuntime.snapshot,
+      {
+        replayed: false,
+        committedResult: {
+          result: submitted.result,
+          canonicalResult: submitted.canonicalResult,
+        },
+      },
+    )
+    expect(responseWithoutDecrypt.result).toEqual(submitted.result)
+    expect(responseWithoutDecrypt.canonicalResult).toEqual(submitted.canonicalResult)
+    expect(() => situationalAttemptForResponse(
+      {
+        ...committedRuntime.row,
+        resultEncrypted: 'intentionally-invalid-for-replay',
+        canonicalResultEncrypted: 'intentionally-invalid-for-replay',
+      },
+      committedRuntime.snapshot,
+      { replayed: true },
+    )).toThrow(/结果无法读取/)
 
     const stored = await db!.situationalAttempt.findUnique({
       where: { id: started.attemptId },
@@ -247,7 +286,9 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
       createdAttemptIds.push(started.attemptId)
       return { userId, started }
     }))
-    const outcomes = await Promise.all(fixtures.map(({ userId, started }, index) => submitSituationalAttemptFinal({
+    // This stress case characterizes transaction uniqueness independent of the
+    // production UNIT gate. Production callers use submitSituationalAttemptFinal.
+    const outcomes = await Promise.all(fixtures.map(({ userId, started }, index) => testOnlyPersistSituationalAttemptFinal({
       ...finalInput({ ...started, userId }, assertivenessResponses, `situational-prb-load-${count}-${index}-${randomUUID()}`),
       userId,
     })))

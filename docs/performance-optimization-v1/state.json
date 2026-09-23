@@ -3,16 +3,16 @@
   "repository": "caohuibj/eduK12-new-version",
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
-  "currentPr": "PERF-01",
-  "currentCommitId": "P1-C05",
-  "status": "CODE_READY_REVIEW",
+  "currentPr": "PERF-02",
+  "currentCommitId": "P2-C09",
+  "status": "MEASURED",
   "workspace": {
-    "path": "/Users/Qiang/projects/perf-measurement-baseline-v1",
-    "branch": "perf/measurement-baseline-v1",
-    "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
-    "headSha": "HEAD",
-    "headShaNote": "Resolve HEAD on this branch; P1-C05 contains this state file and cannot embed its own SHA.",
-    "measuredRuntimeSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+    "path": null,
+    "branch": "perf/runtime-hotpath-v1",
+    "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
+    "headSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+    "headShaNote": "Phase 0 production/runtime candidate and final measured head. A later docs-only closure commit may differ without changing runtime.",
+    "measuredRuntimeSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
     "uncommittedChanges": false
   },
   "pullRequests": [
@@ -20,10 +20,20 @@
       "planId": "PERF-01",
       "number": 165,
       "url": "https://github.com/caohuibj/eduK12-new-version/pull/165",
-      "status": "READY_FOR_REVIEW",
+      "status": "MERGED",
       "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
       "headSha": "HEAD",
       "ciStatus": "Read live checks on PR #165; do not rely on this static snapshot."
+    },
+    {
+      "planId": "PERF-02",
+      "number": 166,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/166",
+      "status": "READY_TO_MERGE",
+      "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
+      "headSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+      "ciStatus": "Final measured head: CI 35847450756 success; Phase 0 closure 35847450233 success; smoke/exploratory/media/SJT acceptance all success.",
+      "measuredHeadSha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667"
     }
   ],
   "completedCommits": [
@@ -124,6 +134,217 @@
         "docs/performance-optimization-v1/query-budgets.csv",
         "server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json"
       ]
+    },
+    {
+      "id": "P2-C01",
+      "sha": "7f73a844b72fe0db8718c4025364db3b64359391",
+      "fixShas": [
+        "0d3945f13cc7db1f154b154d449e0721410c30d4",
+        "8e1885e2af1f3bae5fbe3164bbb5403cf7018aac"
+      ],
+      "contracts": [
+        "PostgreSQL concurrency/finalization invariants",
+        "relational privacy/consent invariants",
+        "strict fresh/durable accounting",
+        "k6 scheduler-boundary accounting"
+      ],
+      "tests": [
+        "P2-C01 PostgreSQL + privacy invariant gate passed",
+        "10 fresh FINAL/s x 5s passed for Scale, N-back, CPT, SJT-30 and SJT-60",
+        "25 fresh FINAL/s x 5s passed for Scale, N-back, CPT and SJT-30; SJT-60 retained as measured overload with 5 dropped iterations"
+      ],
+      "evidence": [
+        "GitHub Actions run 35824011273",
+        "artifact phase0-curve-10-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10734172166)",
+        "artifact phase0-curve-25-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10735135174)"
+      ]
+    },
+    {
+      "id": "P2-C02",
+      "sha": "f72c14288455db411b0f5b07b55695862c1f8299",
+      "contracts": [
+        "one request-local SJT scene/channel/options validation index",
+        "unchanged response validation errors and duplicate detection",
+        "unchanged trajectory/scoring/quality semantics"
+      ],
+      "tests": [
+        "ordinary CI run 35824480278 passed",
+        "P2-C01 PostgreSQL + privacy invariant gate passed on head",
+        "25 req/s SJT-30 remained 125/125 fresh durable with no retry/drop",
+        "25 req/s SJT-60 improved from 121 fresh + 5 dropped + 24 retries to 125/125 fresh durable + 0 dropped + 7 retries"
+      ],
+      "evidence": [
+        "before artifact 10735135174 (P2-C01 / 8e1885e2)",
+        "after artifact 10734177804 (P2-C02 / f72c142)",
+        "after 10-rate artifact 10735135753"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C03",
+      "sha": "5828859d5e7ff141b2479c7659394b887e063bee",
+      "contracts": [
+        "submitSituationalAttemptFinal is the sole production UNIT admission owner",
+        "embedded parent aggregate/recovery runs after UNIT release",
+        "legal replay re-runs parent finalization recovery",
+        "aggregate busy preserves committed child and retryable HTTP mapping"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck succeeded on P2-C03 head",
+        "Phase 0 invariant run 35829055624: 10 test files / 66 tests passed",
+        "situational-bundle PostgreSQL suite: 10/10 passed including UNIT-release and queue-full replay-recovery tests",
+        "raw submission and UnitSnapshot remain unique after recovery replay"
+      ],
+      "evidence": [
+        "workflow run 35829055624 / invariant job 107077196085",
+        "server-version/backend/src/__tests__/composite/situational-bundle.postgres.integration.test.ts"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C04",
+      "sha": "08905687b0b1b1097f355bc4c2e276a456e485b0",
+      "contracts": [
+        "trusted request-local child binding is returned only as internal context",
+        "Scale/Cognitive/SJT generic controllers remove post-FINAL child binding rereads",
+        "result-authority policy checks remain live",
+        "internal context is not serialized into public service data"
+      ],
+      "tests": [
+        "ordinary CI run 35830664723 passed",
+        "Phase 0 exploratory workflow 35830664418 passed",
+        "real PostgreSQL tests verify context identity and no internalContext leakage"
+      ],
+      "evidence": [
+        "commit 08905687b0b1b1097f355bc4c2e276a456e485b0",
+        "workflow run 35830664723",
+        "workflow run 35830664418"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C05",
+      "sha": "9112045518e1a16706a8976fefedb4877ab42d00",
+      "contracts": [
+        "transaction reread excludes already-verified frozen runtime blob and unused composite item relation",
+        "fresh committed SJT response reuses in-memory result/canonical after successful persistence",
+        "replay still reads and validates persisted encrypted winner",
+        "lock order, CAS and authorization reread remain unchanged"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck passed",
+        "Phase 0 PostgreSQL/privacy invariant workflow 35831651833 passed",
+        "fresh response override test proves invalid stored cipher is not read when committedResult is supplied",
+        "replay response without committedResult still fails closed on invalid stored cipher"
+      ],
+      "evidence": [
+        "commit 9112045518e1a16706a8976fefedb4877ab42d00",
+        "workflow run 35831651833",
+        "workflow run 35831652053"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C06",
+      "sha": "9699f2436b66017a957d032ca7e77e3667e0e61f",
+      "contracts": [
+        "Unified Cognitive FINAL reuses one validated snapshot/config/runtime/trial preparation",
+        "generic runAuthoritativeScorer retains full defensive snapshot/config/trial validation",
+        "prepared scorer context requires a WeakSet brand created by the trusted server preparation boundary",
+        "no cross-request cache or client-constructible validation flag"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck passed",
+        "Phase 0 PostgreSQL/privacy invariant workflow passed",
+        "Cognitive contract test covers generic rejection, prepared equivalence and forged-context rejection"
+      ],
+      "evidence": [
+        "commit 9699f2436b66017a957d032ca7e77e3667e0e61f",
+        "workflow run 35832330901",
+        "workflow run 35832331353"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C07",
+      "sha": "3a30c7782eed1734cce9f94072dbc6fe73faeabc",
+      "fixShas": [
+        "434aca1005e85d83e7e220483b08d1a26d20a1e5"
+      ],
+      "contracts": [
+        "reference freeze selections are deduplicated by referenceVersion and loaded with one findMany",
+        "0 selections perform 0 DB calls; 1/10/50 selections use one batch lookup",
+        "each unique version is parsed/hashed once while binding output preserves selection order",
+        "START still requires ACTIVE and exact reference key; FINAL frozen hash verification remains unchanged"
+      ],
+      "tests": [
+        "extended Phase 0 invariant matrix passed",
+        "V32-3 contract covers 0/1/10/50 batch-call budget and ACTIVE/key failures",
+        "real PostgreSQL scale multi-reference test passed",
+        "PR light backend compile passed"
+      ],
+      "evidence": [
+        "commit 3a30c7782eed1734cce9f94072dbc6fe73faeabc",
+        "test gate fix 434aca1005e85d83e7e220483b08d1a26d20a1e5",
+        "workflow run 35832765188",
+        "CI run 35832765431"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C08",
+      "sha": "a95154cd9c79f2995e94a5c2008ede35d4361808",
+      "contracts": [
+        "aggregate snapshot headers are indexed once by slotKey before required-slot matching",
+        "duplicate header slot keys fail closed instead of being overwritten by Map semantics",
+        "aggregate input hash/report ordering and authoritative payload validation are unchanged"
+      ],
+      "tests": [
+        "extended Phase 0 invariant matrix passed",
+        "unified aggregate duplicate/foreign/stale/mismatched contract passed",
+        "PR light backend compile passed"
+      ],
+      "evidence": [
+        "commit a95154cd9c79f2995e94a5c2008ede35d4361808",
+        "workflow run 35833019854",
+        "CI run 35833020182"
+      ],
+      "decision": "KEEP"
+    },
+    {
+      "id": "P2-C09",
+      "sha": "76934c7bc6e48d9b3d12dc0dbf620ea206264667",
+      "contracts": [
+        "same-host P1 merged baseline vs final runtime candidate A-B/B-A/A-B across six representative HTTP workloads",
+        "A/B uses p95 non-degradation plus durable/offered completion, drop and eventual-failure rates",
+        "mixed 100/300/500 one-shot burst retains overload evidence without converting it into a capacity claim",
+        "lost-response retry/replay recovery reconciles durable winner without duplicate persistence",
+        "Aggregate ready-parent 5/20/50/100 verifies terminal completion and aggregate input hash",
+        "final Full Gate and affected browser/media/SJT acceptance checks are green"
+      ],
+      "tests": [
+        "Phase 0 closure run 35847450233 passed all six jobs",
+        "six-workload same-host A/B: all NON-DEGRADED, 100% completion rate, 0% drop/failure on both sides",
+        "mixed burst 100: 100/100 durable; 72 retries; 0 eventual failure",
+        "mixed burst 300: 300/300 durable; 518 retries; 0 eventual failure",
+        "mixed burst 500: 490/500 durable; 1099 retries; 10 eventual failures; retained as PRE-CAPACITY overload",
+        "lost-response scenario: 4 fresh + 1 replay/retry recovery = 5/5 durable",
+        "Aggregate parentN5/N20/N50/N100 all COMPLETED with p95 22/25/55/51 ms on shared hosted runner",
+        "CI run 35847450756 passed backend/frontend/full regression/CodeQL/browser/Docker/merge gate",
+        "Phase 0 smoke 35847450408 and exploratory 35847450244 passed",
+        "Situational branching/video/publication and cross-runtime/Scale media acceptance passed"
+      ],
+      "evidence": [
+        "workflow run 35847450233",
+        "A/B artifact 10744780859 sha256:629e253f89b8647c41d7d35d7e159ecec24e9f662f55562b1a4f7ccaa070fb3b",
+        "burst100 artifact 10744033375 sha256:6a72113da8886364cc86ce516823a71e8f104c725e56476394a2cf774b525395",
+        "burst300 artifact 10744295933 sha256:bd8056a316fe62dc512ef5adcadec580408ad7a165432b2d85d1ef2533952acb",
+        "burst500 artifact 10743379228 sha256:0f0e2cd4f0bb8e37f12a878866cae51d20ca2814e2404599d27f4c4d66fed3a4",
+        "lost-response artifact 10743309517 sha256:e2d89f214c178a16091e70e2ffab39a21ba20d7a0855c0f5d5651e788230ae22",
+        "aggregate artifact 10743882727 sha256:8a1871e227e08f5f630bef8579e89679b1280f8773c43700550efac6e3e38189",
+        "CI run 35847450756"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -164,10 +385,10 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Review the new Phase 0 smoke run on PR #165. After #165 is merged, branch PERF-02 from latest main, execute Scale/Cognitive/SJT exploratory curves with existing resources, and implement only evidence-backed hot-path changes. Do not claim CAP-2C4G or CAP-4C4G from Phase 0.",
+  "nextAction": "Merge PERF-02 PR #166 after the docs-only closure commit remains clean. Phase 0 is CODE_READY + MEASURED. Formal capacity is intentionally deferred: provision an isolated whole-host CAP-2C4G target with an external load generator for Phase 1; CAP-4C4G remains later. Do not claim production capacity from Phase 0 shared-runner data.",
   "updatedAt": "2026-09-23",
   "phase0": {
-    "status": "IN_PROGRESS",
+    "status": "MEASURED",
     "strategy": "existing-resources-first",
     "resources": {
       "githubHosted": "ENABLED_FOR_SMOKE_AND_ACCOUNTING",
@@ -179,17 +400,38 @@
       "PERF-01 P1-C01..P1-C05 measurement baseline on PR #165",
       "Phase 0 execution plan added",
       "Codespaces devcontainer configuration added",
-      "GitHub-hosted Scale/Cognitive/SJT smoke workflow added"
+      "GitHub-hosted Scale/Cognitive/SJT smoke workflow added",
+      "PERF-01 merged as main@a945ea0d3e6750d2a395ae1869647c547febe482",
+      "P2-C01 invariant gate and 10/25 req/s exploratory workflow prepared",
+      "P2-C01 invariant gate green",
+      "10 req/s representative curve green for Scale/N-back/CPT/SJT-30/SJT-60",
+      "25 req/s measured overload isolated to SJT-60 on GitHub-hosted 2C/8G",
+      "P2-C02 SJT response-validation index reuse KEEP",
+      "SJT-30 validation phase at 25 req/s: ~1.709 ms -> ~0.128 ms mean",
+      "SJT-60 validation phase at 25 req/s: ~6.052 ms -> ~0.137 ms mean",
+      "SJT-60 at 25 req/s: dropped 5 -> 0; retries 24 -> 7; fresh durable 121 -> 125",
+      "extended hosted curve run 35828241966 completed green",
+      "mixedSteady 25 req/s: 126/126 fresh durable, 0 retry/drop, p95 ~105 ms",
+      "Scale typical 50 req/s: 251/251 fresh durable, 0 retry/drop",
+      "N-back standard 50 req/s: 251/251 fresh durable, 46 retries, 0 drop",
+      "CPT standard 50 req/s: 223 fresh durable, 28 drops, 103 retries",
+      "SJT-30 50 req/s: 220 fresh durable, 31 drops, 130 retries",
+      "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries",
+      "P2-C03 UNIT release before parent aggregate KEEP",
+      "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence",
+      "P2-C04 authoritative child-binding context reuse KEEP",
+      "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP",
+      "P2-C06 Cognitive request-local prepared scorer context KEEP",
+      "P2-C07 reference freeze batching KEEP",
+      "P2-C08 Aggregate snapshot-header indexing KEEP",
+      "P2-C09 same-host six-workload A/B NON-DEGRADED on final measured head",
+      "P2-C09 mixed 100/300 burst fully durable; 500 burst retained as shared-runner overload at 490/500",
+      "P2-C09 lost-response retry/replay recovery 5/5 durable",
+      "P2-C09 Aggregate ready-parent 5/20/50/100 all COMPLETED",
+      "Final measured head Full Gate + CodeQL + browser + Docker + media/SJT acceptance green",
+      "Phase 0 CODE_READY + MEASURED complete"
     ],
-    "pending": [
-      "Scale exploratory stress curve",
-      "Cognitive exploratory stress curve",
-      "SJT exploratory stress curve",
-      "mixed workload",
-      "burst/fault/recovery under concurrency",
-      "first evidence-driven optimization round",
-      "BASE vs HEAD A/B for retained optimizations"
-    ]
+    "pending": []
   },
   "capacityProfiles": {
     "2c4g": {

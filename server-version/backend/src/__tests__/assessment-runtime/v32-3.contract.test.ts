@@ -6,7 +6,11 @@ import {
   hashFrozenUnitAdmission,
   parseFrozenUnitAdmission,
 } from '../../modules/assessment-runtime/admission-snapshot'
-import { loadFrozenReferenceSets, referenceSetHash } from '../../modules/assessment-runtime/reference-binding'
+import {
+  freezeExactReferenceBindings,
+  loadFrozenReferenceSets,
+  referenceSetHash,
+} from '../../modules/assessment-runtime/reference-binding'
 import { validateReferenceSetDefinition } from '../../modules/assessment-reference/reference'
 import { assertAdmissionParentBinding } from '../../modules/scale/scale-admission.service'
 
@@ -216,6 +220,65 @@ describe('V32-3 frozen reference batch load', () => {
     if (!validation.definition) throw new Error('V32-3 reference fixture is invalid')
     return validation.definition
   }
+
+  it.each([0, 1, 10, 50])('freezes %s selections with at most one batch lookup', async (count) => {
+    const shared = definitionFor('freeze-shared')
+    const findMany = vi.fn().mockResolvedValue(count === 0 ? [] : [{
+      instrumentType: 'SCALE',
+      instrumentKey: 'v32-3.demo',
+      referenceVersion: 'freeze-shared',
+      status: 'ACTIVE',
+      definition: shared,
+    }])
+    const selections = Array.from({ length: count }, (_, index) => ({
+      referenceVersion: 'freeze-shared',
+      scoreKey: `score-${index}`,
+      referenceKind: 'normative_distribution',
+    }))
+
+    const bindings = await freezeExactReferenceBindings({ assessmentReferenceSet: { findMany } }, {
+      instrumentType: 'SCALE',
+      instrumentKey: 'v32-3.demo',
+      selections,
+    })
+
+    expect(findMany).toHaveBeenCalledTimes(count === 0 ? 0 : 1)
+    if (count > 0) {
+      expect(findMany.mock.calls[0][0]).toMatchObject({
+        where: {
+          instrumentType: 'SCALE',
+          instrumentKey: 'v32-3.demo',
+          referenceVersion: { in: ['freeze-shared'] },
+        },
+      })
+    }
+    expect(bindings.map((binding) => binding.scoreKey)).toEqual(selections.map((selection) => selection.scoreKey))
+    expect(new Set(bindings.map((binding) => binding.referenceHash)).size).toBe(count === 0 ? 0 : 1)
+  })
+
+  it('keeps ACTIVE and key validation while batching freeze reads', async () => {
+    const retired = definitionFor('retired-ref')
+    const findMany = vi.fn().mockResolvedValue([{
+      instrumentType: 'SCALE',
+      instrumentKey: 'v32-3.demo',
+      referenceVersion: 'retired-ref',
+      status: 'RETIRED',
+      definition: retired,
+    }])
+    await expect(freezeExactReferenceBindings({ assessmentReferenceSet: { findMany } }, {
+      instrumentType: 'SCALE',
+      instrumentKey: 'v32-3.demo',
+      selections: [{ referenceVersion: 'retired-ref' }],
+    })).rejects.toThrow(/not active/)
+
+    const untouched = vi.fn()
+    await expect(freezeExactReferenceBindings({ assessmentReferenceSet: { findMany: untouched } }, {
+      instrumentType: 'SCALE',
+      instrumentKey: 'v32-3.demo',
+      selections: [{ referenceKey: 'other', referenceVersion: 'retired-ref' }],
+    })).rejects.toThrow(/does not match/)
+    expect(untouched).not.toHaveBeenCalled()
+  })
 
   it('loads distinct frozen versions in one findMany', async () => {
     const first = definitionFor('ref-1')

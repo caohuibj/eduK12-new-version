@@ -38,7 +38,6 @@ import {
   isTransientCompletionDatabaseError,
 } from '../../services/questionnaireCompletionAdmission'
 import { isUnitSubmitAdmissionBusyError } from '../../services/unitSubmitAdmission'
-import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import {
   loadEmbeddedSituationalAttemptRuntime,
   situationalAttemptForResponse,
@@ -405,16 +404,18 @@ export const compositeController = {
       if (!req.user) return unauthorized(res)
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstSituationalValidationMessage(parsed.error))
-      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+      const data = await submitSituationalAttemptFinal({
         attemptId: req.params.situationalAttemptId,
         userId: req.user!.userId,
         embedded: embeddedSituationalAccess(req, { userId: req.user!.userId }),
         ...parsed.data,
-      }))
+      })
       const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
       return success(res, responseData, data.replayed ? '综合测评情境化模块提交已确认' : '综合测评情境化模块提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
     }
@@ -686,15 +687,17 @@ export const compositeController = {
     try {
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstSituationalValidationMessage(parsed.error))
-      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+      const data = await submitSituationalAttemptFinal({
         attemptId: req.params.situationalAttemptId,
         userId: undefined,
         embedded: embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
         ...parsed.data,
-      }))
+      })
       return success(res, data, data.replayed ? '匿名综合测评情境化模块提交已确认' : '匿名综合测评情境化模块提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+      if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+      if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
     }

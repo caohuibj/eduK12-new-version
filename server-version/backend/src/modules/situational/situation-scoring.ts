@@ -117,12 +117,18 @@ const normalizeResponses = (
     })
 )
 
-const validateResponses = (
+type SituationalResponseValidationPair = {
+  responseType: string
+  optionKeys: Set<string>
+  range: { min: number; max: number } | null
+}
+
+type SituationalResponseValidationIndex = ReadonlyMap<string, SituationalResponseValidationPair>
+
+const buildSituationalResponseValidationIndex = (
   definition: SituationDefinitionV1,
-  responses: SituationalResponse[],
-): Map<string, SituationalResponse> => {
-  const issues: SituationalResponseIssue[] = []
-  const pairByKey = new Map<string, { responseType: string; optionKeys: Set<string>; range: { min: number; max: number } | null }>()
+): Map<string, SituationalResponseValidationPair> => {
+  const pairByKey = new Map<string, SituationalResponseValidationPair>()
   definition.scenes.forEach((scene) => {
     scene.channels.forEach((channel) => {
       pairByKey.set(responseKey(scene.sceneKey, channel.channelKey), {
@@ -132,7 +138,14 @@ const validateResponses = (
       })
     })
   })
+  return pairByKey
+}
 
+const validateResponsesWithIndex = (
+  pairByKey: SituationalResponseValidationIndex,
+  responses: SituationalResponse[],
+): Map<string, SituationalResponse> => {
+  const issues: SituationalResponseIssue[] = []
   const answered = new Map<string, SituationalResponse>()
   responses.forEach((response, index) => {
     const path = `responses.${index}`
@@ -172,6 +185,26 @@ const validateResponses = (
 
   if (issues.length > 0) throw new SituationalResponseValidationError(issues)
   return answered
+}
+
+const validateResponses = (
+  definition: SituationDefinitionV1,
+  responses: SituationalResponse[],
+): Map<string, SituationalResponse> => (
+  validateResponsesWithIndex(buildSituationalResponseValidationIndex(definition), responses)
+)
+
+/**
+ * Prepare the immutable scene/channel/options lookup once for one FINAL request.
+ * The returned validator preserves the existing single-response error paths.
+ */
+export const createSituationalResponseValidator = (
+  definition: SituationDefinitionV1,
+): ((response: SituationalResponse) => void) => {
+  const pairByKey = buildSituationalResponseValidationIndex(definition)
+  return (response: SituationalResponse): void => {
+    validateResponsesWithIndex(pairByKey, [response])
+  }
 }
 
 const contributionByKey = (definition: SituationDefinitionV1): Map<string, number> => {

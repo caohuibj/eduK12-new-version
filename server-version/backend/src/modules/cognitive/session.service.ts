@@ -151,6 +151,7 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
 export const readCognitiveSessionConfig = <TConfig = Record<string, unknown>>(encrypted: string): {
   config: TConfig
   snapshot: ReturnType<typeof sessionConfigFromStoredValue<TConfig>>['snapshot']
+  compiledRuntime: ReturnType<typeof sessionConfigFromStoredValue<TConfig>>['compiledRuntime']
 } => sessionConfigFromStoredValue<TConfig>(decryptCognitivePayload<unknown>(encrypted))
 
 const v2ResultFromSnapshot = (encrypted: string) => {

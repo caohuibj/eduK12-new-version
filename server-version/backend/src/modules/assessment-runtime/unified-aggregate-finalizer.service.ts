@@ -532,9 +532,16 @@ const decryptCompletedPayloads = async (input: {
   }
 
   const parsed = measureRequestPhaseSync('aggregate.decrypt_parse', () => {
+    const headersBySlot = new Map<string, AggregateSnapshotHeader>()
+    for (const header of input.headers) {
+      if (headersBySlot.has(header.slotKey)) {
+        throw aggregateSourceError(`槽位 ${header.slotKey} 存在重复快照 header`)
+      }
+      headersBySlot.set(header.slotKey, header)
+    }
     const out: ParsedSlot[] = []
     for (const slot of requiredSlots) {
-      const rawHeader = input.headers.find((header) => header.slotKey === slot.slotKey)
+      const rawHeader = headersBySlot.get(slot.slotKey)
       const row = rowsBySlot.get(slot.slotKey)
       if (!rawHeader || !row) throw aggregateSourceError(`槽位 ${slot.slotKey} 的快照在 payload 查询中消失`)
       if (slot.unitType === 'FORM_SECTION') {

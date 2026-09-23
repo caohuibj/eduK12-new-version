@@ -36,8 +36,10 @@ type ObservedPrismaCall = {
 
 let prisma: PrismaClient
 let submitScaleAssessmentFinal: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
+let submitScaleAssessmentFinalWithContext: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinalWithContext']
 let restartStandaloneScaleAssessment: typeof import('../../modules/scale/scale-final-submit.service')['restartStandaloneScaleAssessment']
 let submitCognitiveSessionFinal: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinal']
+let submitCognitiveSessionFinalWithContext: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinalWithContext']
 let submitCognitiveSessionFinalForPublic: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinalForPublic']
 let createCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createCognitiveSessionConfigSnapshot']
 let createUnifiedCognitiveSessionConfigSnapshot: typeof import('../../modules/cognitive/session.service')['createUnifiedCognitiveSessionConfigSnapshot']
@@ -445,9 +447,11 @@ suite('instrument final submit (real PostgreSQL)', () => {
     prisma = database.prisma
     const scaleModule = await import('../../modules/scale/scale-final-submit.service')
     submitScaleAssessmentFinal = scaleModule.submitScaleAssessmentFinal
+    submitScaleAssessmentFinalWithContext = scaleModule.submitScaleAssessmentFinalWithContext
     restartStandaloneScaleAssessment = scaleModule.restartStandaloneScaleAssessment
     const cognitiveModule = await import('../../modules/cognitive/final-submit.service')
     submitCognitiveSessionFinal = cognitiveModule.submitCognitiveSessionFinal
+    submitCognitiveSessionFinalWithContext = cognitiveModule.submitCognitiveSessionFinalWithContext
     submitCognitiveSessionFinalForPublic = cognitiveModule.submitCognitiveSessionFinalForPublic
     const cognitiveSessionModule = await import('../../modules/cognitive/session.service')
     createCognitiveSessionConfigSnapshot = cognitiveSessionModule.createCognitiveSessionConfigSnapshot
@@ -507,6 +511,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
     for (const fixture of fixtures) {
       const observed = await withObserved(() => submitScaleAssessmentFinal(fixture.input))
       expect(observed.value.replayed).toBe(false)
+      expect(observed.value).not.toHaveProperty('internalContext')
       expect(observed.elapsedMs).toBeGreaterThanOrEqual(0)
       expect(observed.calls.filter((call) => call.model === 'Assessment' && call.action === 'updateMany')).toHaveLength(1)
       expect(observed.calls.filter((call) => call.model === 'Assessment' && call.action === 'upsert')).toHaveLength(0)
@@ -514,6 +519,11 @@ suite('instrument final submit (real PostgreSQL)', () => {
       const row = await prisma.assessment.findUnique({ where: { id: fixture.assessment.id } })
       expect(row).toMatchObject({ status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', submissionId: fixture.input.submissionId, progress: 100 })
     }
+
+    const contextFixture = await createScaleFixture(1)
+    const contextualScale = await submitScaleAssessmentFinalWithContext(contextFixture.input)
+    expect(contextualScale.internalContext).toEqual({ compositeAttemptId: null, attemptEpoch: 1 })
+    expect(contextualScale.data).not.toHaveProperty('internalContext')
 
     const replayed = await submitScaleAssessmentFinal(fixtures[0].input)
     expect(replayed.replayed).toBe(true)
@@ -542,6 +552,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
       const fixture = await createCognitiveFixture(size)
       const observed = await withObserved(() => submitCognitiveSessionFinal(userId, fixture.input))
       expect(observed.value.replayed).toBe(false)
+      expect(observed.value).not.toHaveProperty('internalContext')
       expect(observed.calls.filter((call) => call.model === 'CognitiveTrial' && call.action === 'createMany')).toHaveLength(1)
       expect(observed.calls.filter((call) => call.model === 'CognitiveTrial' && call.action === 'create')).toHaveLength(0)
       expect(observed.calls.filter((call) => call.model === 'CognitiveSession' && call.action === 'updateMany')).toHaveLength(1)
@@ -554,6 +565,11 @@ suite('instrument final submit (real PostgreSQL)', () => {
       expect(row).toMatchObject({ status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', submissionId: fixture.input.submissionId, attemptNo: 1 })
       expect(trials).toHaveLength(size)
     }
+
+    const contextFixture = await createCognitiveFixture(1)
+    const contextualCognitive = await submitCognitiveSessionFinalWithContext(userId, contextFixture.input)
+    expect(contextualCognitive.internalContext).toEqual({ compositeAttemptId: null, attemptEpoch: 1 })
+    expect(contextualCognitive.data).not.toHaveProperty('internalContext')
 
     const replayFixture = await createCognitiveFixture(5)
     await submitCognitiveSessionFinal(userId, replayFixture.input)

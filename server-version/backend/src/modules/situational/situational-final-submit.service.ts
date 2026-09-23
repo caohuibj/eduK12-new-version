@@ -14,6 +14,7 @@ import {
 } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import {
   createCanonicalUnitResultEnvelope,
   buildSituationalBundleBridge,
@@ -27,9 +28,9 @@ import {
   SITUATIONAL_RAW_PAYLOAD_SCHEMA_VERSION,
 } from './situational-raw-submission'
 import {
+  createSituationalResponseValidator,
   scoreSituational,
   SituationalResponseValidationError,
-  validateSituationalResponse,
   type SituationalResponse,
 } from './situation-scoring'
 import {
@@ -52,7 +53,8 @@ import {
   loadEmbeddedSituationalAttemptRuntime,
   assertEmbeddedSituationalAttemptBinding,
   type SituationalEmbeddedAccess,
-  SITUATIONAL_ATTEMPT_SELECT,
+  SITUATIONAL_ATTEMPT_COMMIT_SELECT,
+  type SituationalAttemptCommitRow,
   type SituationalAttemptRow,
 } from './situational-runtime.service'
 import type { SituationalFinalSubmitInput } from './situational-final-submit.schema'
@@ -61,6 +63,11 @@ export type SituationalFinalSubmitServiceInput = SituationalFinalSubmitInput & {
   attemptId: string
   userId?: string
   embedded?: SituationalEmbeddedAccess
+}
+
+export type SituationalFinalSubmitInternalContext = {
+  compositeAttemptId: string | null
+  attemptEpoch: number
 }
 
 const normalizedResponse = (response: SituationalResponse): SituationalResponse => ({
@@ -77,6 +84,7 @@ const normalizeSituationalSubmission = (
 ): { responses: SituationalResponse[]; trajectory: AuthoritativeSituationalTrajectory } => {
   const scientificDefinition = asLinearSituationDefinition(definition)
   const byPair = measureRequestPhaseSync('sjt.validation_index', () => {
+    const validateResponse = createSituationalResponseValidator(scientificDefinition)
     const index = new Map<string, SituationalResponse>()
     input.forEach((candidate, position) => {
       const pairKey = `${candidate.sceneKey}:${candidate.channelKey}`
@@ -88,7 +96,7 @@ const normalizeSituationalSubmission = (
         )
       }
       try {
-        validateSituationalResponse(scientificDefinition, candidate)
+        validateResponse(candidate)
       } catch (error) {
         if (error instanceof SituationalResponseValidationError) {
           const issue = error.issues[0]
@@ -183,14 +191,17 @@ const lockEmbeddedCompositeAttempt = async (tx: Prisma.TransactionClient, attemp
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
 }
 
-const transactionRow = async (tx: Prisma.TransactionClient, attemptId: string) => (
+const transactionRow = async (
+  tx: Prisma.TransactionClient,
+  attemptId: string,
+): Promise<SituationalAttemptCommitRow | null> => (
   tx.situationalAttempt.findUnique({
     where: { id: attemptId },
-    select: SITUATIONAL_ATTEMPT_SELECT,
+    select: SITUATIONAL_ATTEMPT_COMMIT_SELECT,
   })
 )
 
-export const submitSituationalAttemptFinal = async (
+const persistSituationalAttemptFinal = async (
   input: SituationalFinalSubmitServiceInput,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
@@ -226,7 +237,10 @@ export const submitSituationalAttemptFinal = async (
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
-      return situationalAttemptForResponse(row, snapshot, { replayed: true })
+      return {
+        data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
+        parentAttemptId: embedded?.compositeAttemptId ?? null,
+      }
     }
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评已完成，请重启后重新作答', 409)
   }
@@ -351,13 +365,59 @@ export const submitSituationalAttemptFinal = async (
         totalTime,
         resultEncrypted: encryptedResult,
         canonicalResultEncrypted: encryptedCanonicalResult,
-      } as SituationalAttemptRow,
+      } as SituationalAttemptCommitRow,
     }
   })
 
-  if (embedded && committed.kind === 'committed') {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(embedded.compositeAttemptId))
+  return {
+    data: situationalAttemptForResponse(
+      committed.row,
+      snapshot,
+      committed.kind === 'committed'
+        ? { replayed: false, committedResult: { result, canonicalResult } }
+        : { replayed: true },
+    ),
+    parentAttemptId: embedded?.compositeAttemptId ?? null,
   }
-  return situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' })
+}
+
+/**
+ * Production orchestration boundary: child FINAL/replay is admitted as UNIT work,
+ * then the UNIT permit is released before any embedded parent aggregate/recovery.
+ * A legal replay also re-runs parent finalization so a response lost after child
+ * commit can deterministically repair the parent without duplicating child data.
+ */
+export const submitSituationalAttemptFinalWithContext = async (
+  input: SituationalFinalSubmitServiceInput,
+) => {
+  const persisted = await withUnitSubmitAdmission(() => persistSituationalAttemptFinal(input))
+  if (persisted.parentAttemptId) {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await measureRequestPhase(
+      'final_submit_parent_finalization',
+      () => finalizeCompositeAttemptIfReady(persisted.parentAttemptId as string),
+    )
+  }
+  return {
+    data: persisted.data,
+    internalContext: {
+      compositeAttemptId: persisted.parentAttemptId,
+      attemptEpoch: input.attemptEpoch,
+    } satisfies SituationalFinalSubmitInternalContext,
+  }
+}
+
+export const submitSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => (await submitSituationalAttemptFinalWithContext(input)).data
+
+/**
+ * Test-only persistence entry for high-fanout transaction correctness tests.
+ * Production routes and ordinary service callers must use submitSituationalAttemptFinal.
+ */
+export const __testOnlyPersistSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => {
+  if (process.env.NODE_ENV !== 'test') throw new Error('test-only Situational persistence entry requires NODE_ENV=test')
+  return (await persistSituationalAttemptFinal(input)).data
 }

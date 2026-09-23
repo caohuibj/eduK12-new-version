@@ -48,6 +48,7 @@ const CNT: Record<number, number> = {
   2: Number(process.env.E5_N2 || 60),
   5: Number(process.env.E5_N5 || 150),
   10: Number(process.env.E5_N10 || 50),
+  20: Number(process.env.E5_N20 || 0),
   25: Number(process.env.E5_N25 || 40),
   50: Number(process.env.E5_N50 || 30),
   100: Number(process.env.E5_N100 || 20),
@@ -221,9 +222,40 @@ async function createReadyParent(studentId: string, n: number, idx: number): Pro
 }
 
 async function main() {
+  if (process.env.PERF_ISOLATED_TEST_MODE === '1') {
+    if (process.env.NODE_ENV !== 'test') throw new Error('E5 isolated mode requires NODE_ENV=test')
+    const databaseUrl = new URL(process.env.DATABASE_URL || '')
+    const databaseName = databaseUrl.pathname.replace(/^\//, '')
+    if (!databaseName || databaseName !== process.env.PERF_FIXTURE_DB_NAME) {
+      throw new Error('E5 isolated mode requires PERF_FIXTURE_DB_NAME to match DATABASE_URL')
+    }
+    if (!OUT.startsWith('/tmp/')) throw new Error('E5 isolated output must stay under /tmp')
+    if (process.env.E5_AUTH_OUT && !process.env.E5_AUTH_OUT.startsWith('/tmp/')) {
+      throw new Error('E5 isolated auth output must stay under /tmp')
+    }
+  }
+
+  const passwordHash = await bcrypt.hash(STUDENT_PASSWORD, 10)
+  const student = await prisma.user.upsert({
+    where: { username: STUDENT_USERNAME },
+    create: {
+      username: STUDENT_USERNAME, passwordHash, role: 'STUDENT', nickname: STUDENT_USERNAME,
+      isActive: true, mustChangePassword: false, teacherApproved: true,
+    },
+    update: {
+      passwordHash, role: 'STUDENT', isActive: true, mustChangePassword: false,
+      isFrozen: false, tokenVersion: 0,
+    },
+  })
   await login()
-  const student = await prisma.user.findUnique({ where: { username: STUDENT_USERNAME } })
-  if (!student) throw new Error(`student ${STUDENT_USERNAME} missing`)
+  if (process.env.E5_AUTH_OUT) {
+    mkdirSync(dirname(process.env.E5_AUTH_OUT), { recursive: true })
+    writeFileSync(process.env.E5_AUTH_OUT, [
+      `PERF_AUTH_TOKEN=${SESSION_COOKIE}`,
+      `PERF_CSRF_TOKEN=${CSRF_COOKIE}`,
+      '',
+    ].join('\n'), { mode: 0o600 })
+  }
   const out: Record<string, any[]> = {}
   console.log(`Stage5 ready-parent seeder: N_counts=${JSON.stringify(CNT)} sib_items=${SIB_COUNT} base=${BASE_URL}`)
   for (const nStr of Object.keys(CNT).map(Number).sort((a, b) => a - b)) {

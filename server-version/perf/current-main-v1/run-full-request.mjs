@@ -20,22 +20,31 @@ if (process.env.PERF_ISOLATED_TEST_MODE !== '1' || !process.env.PERF_FIXTURE_DB_
 if (['AUTH_TOKEN', 'PERF_AUTH_TOKEN', 'CSRF_TOKEN', 'PERF_CSRF_TOKEN'].some((key) => process.env[key])) {
   throw new Error('global auth tokens would override per-fixture student identities')
 }
+const loadMode = process.env.PERF_LOAD_MODE || 'steady'
 const rate = Number(process.env.PERF_RATE || 1)
 const steadySeconds = Number(process.env.PERF_SECONDS || 5)
 const maxRate = Number(process.env.PERF_RATE_CEILING || 100)
 const drainSeconds = Number(process.env.PERF_DRAIN_SECONDS || 5)
+const burstCount = Number(process.env.PERF_BURST_COUNT || 0)
+const burstVUs = Number(process.env.PERF_BURST_VUS || burstCount || 0)
 if (![rate, steadySeconds, maxRate, drainSeconds].every((value) => Number.isSafeInteger(value) && value >= 0)
-  || rate < 1 || rate > maxRate || steadySeconds < 1 || steadySeconds > 3600 || drainSeconds > 120) {
-  throw new Error('invalid rate, rate ceiling, duration, or drain limit')
+  || rate < 1 || rate > maxRate || steadySeconds < 1 || steadySeconds > 3600 || drainSeconds > 120
+  || !['steady', 'burst'].includes(loadMode)) {
+  throw new Error('invalid load mode, rate, rate ceiling, duration, or drain limit')
+}
+if (loadMode === 'burst' && (!Number.isSafeInteger(burstCount) || burstCount < 1 || burstCount > 500
+  || burstVUs !== burstCount)) {
+  throw new Error('burst mode requires 1..500 one-shot VUs')
 }
 const groups = JSON.parse(readFileSync(fixtureFile, 'utf8'))
 assertFreshFixturePool(groups)
 const fixtureCount = groups[group]?.length || 0
-const configuredArrivals = rate * steadySeconds
-// k6's constant-arrival scheduler can start one extra iteration at the end
-// boundary. Reserve that child rather than replaying or hiding the request.
-if (fixtureCount < configuredArrivals + 1) {
-  throw new Error(`fixture pool exhausted before load: ${group} has ${fixtureCount}, requires ${configuredArrivals + 1} including scheduler boundary headroom`)
+const configuredArrivals = loadMode === 'burst' ? burstCount : rate * steadySeconds
+// k6's constant-arrival scheduler can start one extra iteration at the steady
+// duration boundary. Burst mode has an exact one-shot VU count and needs no +1.
+const fixtureHeadroom = loadMode === 'steady' ? 1 : 0
+if (fixtureCount < configuredArrivals + fixtureHeadroom) {
+  throw new Error(`fixture pool exhausted before load: ${group} has ${fixtureCount}, requires ${configuredArrivals + fixtureHeadroom}`)
 }
 const runDir = resolve(process.env.PERF_RUN_DIR || `/tmp/huisurvey-perf01-run-${Date.now()}`)
 if (!runDir.startsWith('/tmp/')) throw new Error('run artifacts must stay under /tmp')
@@ -88,10 +97,11 @@ const fixtureChecksum = createHash('sha256').update(readFileSync(fixtureFile)).d
 const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 const manifest = {
   schemaVersion: 1,
-  planId: 'PERF-01', group, phase: 'steady',
+  planId: 'PERF-01', group, phase: 'steady', loadMode,
   baseSha: git('merge-base', 'HEAD', 'origin/main'),
   mainObservedSha: git('rev-parse', 'origin/main'),
   headSha: git('rev-parse', 'HEAD'),
+  testedSha: process.env.PERF_TESTED_SHA || git('rev-parse', 'HEAD'),
   targetImageDigest: process.env.PERF_TARGET_IMAGE_DIGEST || null,
   targetBaseUrl: target.origin,
   targetHost: process.env.PERF_TARGET_HOST_MANIFEST || null,
@@ -99,7 +109,11 @@ const manifest = {
   loadGenerator: { platform: os.platform(), architecture: os.arch(), cpuLogicalCount: os.cpus().length, memoryBytes: os.totalmem(), cgroup: 'unavailable-on-this-host' },
   qualifiedLoadGenerator: process.env.PERF_CAPACITY_QUALIFIED === '1' && Boolean(process.env.PERF_TARGET_HOST_MANIFEST),
   fixtureChecksum, fixtureCount,
-  configuredArrivals, offered: configuredArrivals, rate, steadySeconds, drainSeconds,
+  configuredArrivals, offered: configuredArrivals,
+  rate: loadMode === 'steady' ? rate : null,
+  steadySeconds, drainSeconds,
+  burstCount: loadMode === 'burst' ? burstCount : null,
+  burstVUs: loadMode === 'burst' ? burstVUs : null,
   preAllocatedVUs: Number(process.env.PERF_PRE_VUS || 4),
   maxVUs: Number(process.env.PERF_MAX_VUS || 16),
   retryMode: 'finaldraft', retryAttempts: 4,
@@ -117,8 +131,10 @@ const k6 = spawnSync('k6', ['run', '--summary-export', resolve(runDir, 'k6-summa
   cwd: root, env: {
     ...process.env,
     FIXTURE_FILE: resolve(fixtureFile), GROUP: group, BASE_URL: target.origin,
+    LOAD_MODE: loadMode,
     RATE: String(rate), DURATION: `${steadySeconds}s`, PHASE: 'steady',
     PRE_VUS: String(manifest.preAllocatedVUs), MAX_VUS: String(manifest.maxVUs),
+    BURST_COUNT: String(burstCount), BURST_VUS: String(burstVUs), BURST_DEADLINE: String(steadySeconds),
     RETRY_MODE: 'finaldraft', CAPACITY_RETRY_ATTEMPTS: '4',
   }, stdio: ['ignore', logFile, logFile],
 })
@@ -131,7 +147,7 @@ try {
   const dropped = k6Summary.metrics?.dropped_iterations?.count || 0
   const fixturesUsed = k6Summary.metrics?.gate_e_fixtures_used?.count || 0
   const missingFixtures = k6Summary.metrics?.gate_e_missing_fixtures?.count || 0
-  if ([started, dropped, fixturesUsed, missingFixtures].every(Number.isSafeInteger)) {
+  if (loadMode === 'steady' && [started, dropped, fixturesUsed, missingFixtures].every(Number.isSafeInteger)) {
     manifest.offered = Math.max(started, fixturesUsed + missingFixtures) + dropped
   }
 } catch {

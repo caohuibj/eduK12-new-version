@@ -1,0 +1,405 @@
+name: PERF Phase 0 closure
+
+on:
+  pull_request:
+    types: [ready_for_review, synchronize, reopened]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: perf-phase0-closure-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: test
+  DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  REDIS_URL: redis://localhost:6379
+  JWT_SECRET: ci-jwt-secret-123456789012345678901234
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+  ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+  COGNITIVE_MODULE_ENABLED: 'true'
+  BACKGROUND_WORKERS_ENABLED: 'false'
+  COOKIE_SECURE: 'false'
+  TRUST_PROXY_HOPS: '0'
+  LOG_LEVEL: warn
+  PERF_ISOLATED_TEST_MODE: '1'
+  PERF_FIXTURE_DB_NAME: ptool
+  PERF_CAPACITY_QUALIFIED: '0'
+  PERF_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  UPLOAD_DIR: /tmp/huisurvey-phase0-closure-uploads
+
+jobs:
+  ab:
+    name: same-host BASE vs HEAD A-B / B-A / A-B
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env: { POSTGRES_USER: ptool, POSTGRES_PASSWORD: ptool123, POSTGRES_DB: ptool }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: grafana/setup-k6-action@v1
+      - name: prepare BASE worktree and build both variants
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          BASE_SHA="$(git merge-base HEAD origin/main)"
+          echo "BASE_SHA=$BASE_SHA" >> "$GITHUB_ENV"
+          git worktree add /tmp/huisurvey-phase0-base "$BASE_SHA"
+          for root in "$GITHUB_WORKSPACE" /tmp/huisurvey-phase0-base
+          do
+            (
+              cd "$root/server-version/backend"
+              npm ci
+              npx prisma generate
+              npm run build
+            )
+          done
+      - name: run three interleaved A/B rounds
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+        run: |
+          set -euo pipefail
+          OUT=/tmp/huisurvey-phase0-ab
+          mkdir -p "$OUT"
+          PERF_GROUP_LIST="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
+
+          reset_and_seed() {
+            local round="$1" variant="$2"
+            cd "$GITHUB_WORKSPACE/server-version/backend"
+            npx prisma migrate reset --force --skip-seed >/tmp/ab-reset.log
+            npm run db:seed >/tmp/ab-seed.log
+            local fixture_dir="/tmp/ab-fixtures-r${round}-${variant}"
+            rm -rf "$fixture_dir"
+            PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR="$fixture_dir"               PERF_WARMUP_FIXTURES=2 PERF_STEADY_FIXTURES=55 PERF_MIXED_PER_CLASS=18               PERF_SAME_PARENT_SIBLINGS=2 npm run perf:fixtures:seed >/tmp/ab-fixtures.log
+            echo "$fixture_dir"
+          }
+
+          start_api() {
+            local variant="$1"
+            local root="$GITHUB_WORKSPACE"
+            [ "$variant" = base ] && root=/tmp/huisurvey-phase0-base
+            nohup node "$root/server-version/backend/dist/index.js" >"$OUT/api-${variant}.log" 2>&1 &
+            API_PID=$!
+            export API_PID
+            for attempt in $(seq 1 60); do
+              if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then return 0; fi
+              sleep 1
+            done
+            cat "$OUT/api-${variant}.log"
+            return 1
+          }
+
+          stop_api() {
+            if [ -n "${API_PID:-}" ]; then
+              kill "$API_PID" 2>/dev/null || true
+              wait "$API_PID" 2>/dev/null || true
+              unset API_PID
+              sleep 1
+            fi
+          }
+
+          run_variant() {
+            local round="$1" variant="$2" tested_sha="$3"
+            local fixture_dir
+            fixture_dir="$(reset_and_seed "$round" "$variant")"
+            start_api "$variant"
+            for group in $PERF_GROUP_LIST; do
+              PERF_FIXTURE_FILE="$fixture_dir/final-submit-fixtures.json"               PERF_FIXTURE_GROUP="$group" BASE_URL=http://127.0.0.1:3000               PERF_RUN_DIR="$OUT/r${round}-${variant}-${group}"               PERF_RATE=10 PERF_SECONDS=5 PERF_RATE_CEILING=20               PERF_PRE_VUS=32 PERF_MAX_VUS=128 PERF_REQUIRE_ALL_FRESH=0               PERF_TESTED_SHA="$tested_sha"               node "$GITHUB_WORKSPACE/server-version/perf/current-main-v1/run-full-request.mjs"
+            done
+            stop_api
+          }
+
+          trap stop_api EXIT
+          HEAD_SHA="$PERF_CANDIDATE_SHA"
+          run_variant 1 base "$BASE_SHA"
+          run_variant 1 head "$HEAD_SHA"
+          run_variant 2 head "$HEAD_SHA"
+          run_variant 2 base "$BASE_SHA"
+          run_variant 3 base "$BASE_SHA"
+          run_variant 3 head "$HEAD_SHA"
+          node "$GITHUB_WORKSPACE/server-version/perf/current-main-v1/summarize-ab.mjs" "$OUT"
+      - name: upload A/B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-ab-${{ github.event.pull_request.head.sha || github.sha }}
+          path: /tmp/huisurvey-phase0-ab
+          retention-days: 7
+          if-no-files-found: error
+
+  burst:
+    name: mixed one-shot burst / ${{ matrix.count }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { count: 100, mixed: 34, experimental: false }
+          - { count: 300, mixed: 100, experimental: true }
+          - { count: 500, mixed: 167, experimental: true }
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env: { POSTGRES_USER: ptool, POSTGRES_PASSWORD: ptool123, POSTGRES_DB: ptool }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: grafana/setup-k6-action@v1
+      - name: build and seed
+        working-directory: server-version/backend
+        env: { ADMIN_USERNAME: ci-admin, ADMIN_PASSWORD: ci-admin-password-2026 }
+        run: |
+          npm ci
+          npx prisma generate
+          npm run db:migrate:guarded
+          npm run db:seed
+          npm run build
+          PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR=/tmp/phase0-burst-fixtures             PERF_WARMUP_FIXTURES=1 PERF_STEADY_FIXTURES=2             PERF_MIXED_PER_CLASS=${{ matrix.mixed }} PERF_SAME_PARENT_SIBLINGS=2             npm run perf:fixtures:seed
+      - name: start backend
+        working-directory: server-version/backend
+        run: |
+          nohup npm start >/tmp/phase0-burst-backend.log 2>&1 &
+          echo $! >/tmp/phase0-burst-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/phase0-burst-backend.log
+          exit 1
+      - name: run exact one-shot mixed burst
+        working-directory: server-version
+        env:
+          PERF_FIXTURE_FILE: /tmp/phase0-burst-fixtures/final-submit-fixtures.json
+          PERF_FIXTURE_GROUP: mixedSteady
+          BASE_URL: http://127.0.0.1:3000
+          PERF_RUN_DIR: /tmp/phase0-burst-${{ matrix.count }}
+          PERF_LOAD_MODE: burst
+          PERF_BURST_COUNT: ${{ matrix.count }}
+          PERF_BURST_VUS: ${{ matrix.count }}
+          PERF_RATE: '1'
+          PERF_SECONDS: '30'
+          PERF_RATE_CEILING: '500'
+          PERF_REQUIRE_ALL_FRESH: '0'
+          PERF_TESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node perf/current-main-v1/run-full-request.mjs
+      - name: upload burst evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-burst-${{ matrix.count }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            /tmp/phase0-burst-${{ matrix.count }}
+            /tmp/phase0-burst-backend.log
+          retention-days: 7
+          if-no-files-found: warn
+      - name: stop backend
+        if: always()
+        run: |
+          [ ! -f /tmp/phase0-burst-backend.pid ] || kill "$(cat /tmp/phase0-burst-backend.pid)" 2>/dev/null || true
+
+  lost-response:
+    name: committed response loss + retry/replay recovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env: { POSTGRES_USER: ptool, POSTGRES_PASSWORD: ptool123, POSTGRES_DB: ptool }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: grafana/setup-k6-action@v1
+      - name: build and seed
+        working-directory: server-version/backend
+        env: { ADMIN_USERNAME: ci-admin, ADMIN_PASSWORD: ci-admin-password-2026 }
+        run: |
+          npm ci
+          npx prisma generate
+          npm run db:migrate:guarded
+          npm run db:seed
+          npm run build
+          PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR=/tmp/phase0-fault-fixtures             PERF_WARMUP_FIXTURES=1 PERF_STEADY_FIXTURES=8 PERF_MIXED_PER_CLASS=1             PERF_SAME_PARENT_SIBLINGS=2 npm run perf:fixtures:seed
+      - name: start backend and fault proxy
+        run: |
+          nohup node server-version/backend/dist/index.js >/tmp/phase0-fault-backend.log 2>&1 &
+          echo $! >/tmp/phase0-fault-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then break; fi
+            sleep 1
+          done
+          PERF_UPSTREAM_URL=http://127.0.0.1:3000 PERF_PROXY_PORT=53003             nohup node server-version/perf/current-main-v1/lost-response-proxy.mjs >/tmp/phase0-fault-proxy.log 2>&1 &
+          echo $! >/tmp/phase0-fault-proxy.pid
+          sleep 1
+      - name: verify retry/replay durable recovery
+        working-directory: server-version
+        env:
+          PERF_FIXTURE_FILE: /tmp/phase0-fault-fixtures/final-submit-fixtures.json
+          PERF_FIXTURE_GROUP: sjtLinear30Steady
+          BASE_URL: http://127.0.0.1:53003
+          PERF_RUN_DIR: /tmp/phase0-lost-response
+          PERF_RATE: '1'
+          PERF_SECONDS: '4'
+          PERF_RATE_CEILING: '5'
+          PERF_REQUIRE_ALL_FRESH: '0'
+          PERF_TESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node perf/current-main-v1/run-full-request.mjs
+      - name: upload fault evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-lost-response-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            /tmp/phase0-lost-response
+            /tmp/phase0-fault-backend.log
+            /tmp/phase0-fault-proxy.log
+          retention-days: 7
+          if-no-files-found: error
+      - name: stop services
+        if: always()
+        run: |
+          [ ! -f /tmp/phase0-fault-proxy.pid ] || kill "$(cat /tmp/phase0-fault-proxy.pid)" 2>/dev/null || true
+          [ ! -f /tmp/phase0-fault-backend.pid ] || kill "$(cat /tmp/phase0-fault-backend.pid)" 2>/dev/null || true
+
+  aggregate-size:
+    name: Aggregate ready-parent 5 / 20 / 50 / 100
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env: { POSTGRES_USER: ptool, POSTGRES_PASSWORD: ptool123, POSTGRES_DB: ptool }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: grafana/setup-k6-action@v1
+      - name: build backend
+        working-directory: server-version/backend
+        env: { ADMIN_USERNAME: ci-admin, ADMIN_PASSWORD: ci-admin-password-2026 }
+        run: |
+          npm ci
+          npx prisma generate
+          npm run db:migrate:guarded
+          npm run db:seed
+          npm run build
+      - name: start backend
+        run: |
+          nohup node server-version/backend/dist/index.js >/tmp/phase0-aggregate-backend.log 2>&1 &
+          echo $! >/tmp/phase0-aggregate-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/phase0-aggregate-backend.log
+          exit 1
+      - name: seed ready parents
+        working-directory: server-version/backend
+        env:
+          E5_OUT: /tmp/phase0-aggregate/ready-parent-fixtures.json
+          E5_AUTH_OUT: /tmp/phase0-aggregate/auth.env
+          E5_BASE_URL: http://127.0.0.1:3000
+          E5_N2: '0'
+          E5_N5: '1'
+          E5_N10: '0'
+          E5_N20: '1'
+          E5_N25: '0'
+          E5_N50: '1'
+          E5_N100: '1'
+        run: npx tsx scripts/e5-seed-ready-parents.ts
+      - name: run aggregate size points
+        run: |
+          set -euo pipefail
+          source /tmp/phase0-aggregate/auth.env
+          export AUTH_TOKEN="$PERF_AUTH_TOKEN" CSRF_TOKEN="$PERF_CSRF_TOKEN"
+          for n in 5 20 50 100; do
+            k6 run               -e BASE_URL=http://127.0.0.1:3000               -e FIXTURE_FILE=/tmp/phase0-aggregate/ready-parent-fixtures.json               -e MODE=distinct -e GROUP="parentN${n}" -e PEAK=1 -e FIXTURE_OFFSET=0               -e AUTH_TOKEN="$AUTH_TOKEN" -e CSRF_TOKEN="$CSRF_TOKEN"               -e GATE_E_SUMMARY_PATH="/tmp/phase0-aggregate/n${n}.json"               server-version/perf/gate-e/k6-e5-finalize.js
+          done
+          FIXTURE_FILE=/tmp/phase0-aggregate/ready-parent-fixtures.json             GROUPS="parentN5 parentN20 parentN50 parentN100"             npx --prefix server-version/backend tsx server-version/perf/current-main-v1/verify-aggregate-ready-parents.mjs
+          rm -f /tmp/phase0-aggregate/auth.env
+      - name: upload aggregate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-aggregate-size-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            /tmp/phase0-aggregate/*.json
+            /tmp/phase0-aggregate-backend.log
+          retention-days: 7
+          if-no-files-found: error
+      - name: stop backend
+        if: always()
+        run: |
+          [ ! -f /tmp/phase0-aggregate-backend.pid ] || kill "$(cat /tmp/phase0-aggregate-backend.pid)" 2>/dev/null || true

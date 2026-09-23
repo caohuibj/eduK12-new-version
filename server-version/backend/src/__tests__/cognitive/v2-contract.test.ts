@@ -15,6 +15,10 @@ import {
   type TaskDefinition,
 } from '../../modules/cognitive/v2'
 import { getCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
+import {
+  prepareAuthoritativeScorerContext,
+  runPreparedAuthoritativeScorer,
+} from '../../modules/cognitive/v2/authoritative-scorer'
 
 const protocol = {
   schemaVersion: 1 as const,
@@ -147,6 +151,33 @@ describe('Cognitive Assessment v2 contracts', () => {
       trials: [createTrialEnvelope({ trialIndex: 0, phase: 'test', payload: { correct: true, score: 100 } as never, startedAtPerfMs: 0, endedAtPerfMs: 10 })],
       randomSeed: 'fixture-seed',
     })).toThrow()
+
+    const preparedDefinition = definition()
+    const preparedSnapshot = snapshot()
+    const preparedTrials = [
+      createTrialEnvelope({
+        trialIndex: 0,
+        phase: 'test',
+        payload: preparedDefinition.trialSchema.parse({ correct: true }),
+        startedAtPerfMs: 0,
+        endedAtPerfMs: 10,
+      }),
+    ]
+    const prepared = prepareAuthoritativeScorerContext({
+      definition: preparedDefinition,
+      session: preparedSnapshot,
+      config: preparedDefinition.configSchema.parse(preparedSnapshot.config),
+      trials: preparedTrials,
+      randomSeed: 'fixture-seed',
+    })
+    expect(runPreparedAuthoritativeScorer(prepared)).toEqual(result)
+    expect(() => runPreparedAuthoritativeScorer({
+      definition: preparedDefinition,
+      session: preparedSnapshot,
+      config: preparedSnapshot.config,
+      trials: preparedTrials,
+      randomSeed: 'fixture-seed',
+    } as never)).toThrow(/trusted preparation boundary/)
   })
 
   it('projects headline, user, and detail layers without exposing invalid quantitative results', () => {

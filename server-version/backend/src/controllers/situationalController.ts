@@ -1,8 +1,12 @@
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
-import { assessmentSubmitBusy, error, instrumentError, success } from '../utils/response'
-import { isUnitSubmitAdmissionBusyError, withUnitSubmitAdmission } from '../services/unitSubmitAdmission'
+import { assessmentSubmitBusy, completionBusy, error, instrumentError, success } from '../utils/response'
+import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  isTransientCompletionDatabaseError,
+} from '../services/questionnaireCompletionAdmission'
 import {
   getSituationalAttemptResult,
   getSituationalInstrument,
@@ -12,11 +16,10 @@ import {
   resumeSituationalAttempt,
   startSituationalAttempt,
 } from '../modules/situational/situational-runtime.service'
-import { submitSituationalAttemptFinal } from '../modules/situational/situational-final-submit.service'
+import { submitSituationalAttemptFinalWithContext } from '../modules/situational/situational-final-submit.service'
 import { situationalFinalSubmitSchema, situationalStartSchema } from '../modules/situational/situational-final-submit.schema'
 import { serveFrozenSituationalAsset } from '../modules/situational/situational-asset.service'
 import { projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
-import { prisma } from '../config/database'
 
 const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): string => (
   errorValue.errors?.[0]?.message ?? '请求参数不合法'
@@ -24,6 +27,8 @@ const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): s
 
 const handleSituationalError = (res: Response, errorValue: unknown, operation: string) => {
   if (isUnitSubmitAdmissionBusyError(errorValue)) return assessmentSubmitBusy(res, errorValue.retryAfterSeconds)
+  if (isQuestionnaireCompletionAdmissionBusyError(errorValue)) return completionBusy(res, errorValue.retryAfterSeconds)
+  if (isTransientCompletionDatabaseError(errorValue)) return completionBusy(res, 1)
   if (isInstrumentFinalSubmitError(errorValue)) return instrumentError(res, errorValue.code, errorValue.message, errorValue.statusCode)
   logger.error(operation, errorValue)
   return error(res, errorValue instanceof Error ? errorValue.message : '情境化测评请求失败')
@@ -112,16 +117,12 @@ export const situationalController = {
     try {
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstZodMessage(parsed.error))
-      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+      const { data, internalContext } = await submitSituationalAttemptFinalWithContext({
         attemptId: req.params.attemptId,
         userId: req.user!.userId,
         ...parsed.data,
-      }))
-      const binding = await prisma.situationalAttempt.findUnique({
-        where: { id: req.params.attemptId },
-        select: { compositeAttemptId: true },
       })
-      const responseData = await projectRelationalUnitFinalResponse(binding?.compositeAttemptId, data)
+      const responseData = await projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
       return success(res, responseData, data.replayed ? '情境化测评提交已确认' : '情境化测评提交成功')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '最终提交情境化测评失败')

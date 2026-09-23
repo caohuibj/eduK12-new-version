@@ -98,6 +98,27 @@ export type SituationalAttemptRow = Prisma.SituationalAttemptGetPayload<{
   select: typeof SITUATIONAL_ATTEMPT_SELECT
 }>
 
+/**
+ * Transaction rereads need authoritative identity/replay/result fields, but do
+ * not need to retransmit the already verified frozen runtime blob or the
+ * composite item relation. Keep compositeAttempt because embedded authorization
+ * is intentionally rechecked inside the transaction.
+ */
+export const SITUATIONAL_ATTEMPT_COMMIT_SELECT = {
+  ...SITUATIONAL_ATTEMPT_SELECT,
+  runtimeSnapshotEncrypted: false,
+  compositeItem: false,
+} as const
+
+export type SituationalAttemptCommitRow = Prisma.SituationalAttemptGetPayload<{
+  select: typeof SITUATIONAL_ATTEMPT_COMMIT_SELECT
+}>
+
+export type SituationalAttemptResponseRow = Omit<
+  SituationalAttemptRow,
+  'runtimeSnapshotEncrypted' | 'compositeAttempt' | 'compositeItem'
+>
+
 export type SituationalAttemptRuntime = {
   row: SituationalAttemptRow
   snapshot: FrozenSituationalRuntimeSnapshotV1
@@ -248,11 +269,20 @@ const decodeStoredResult = (row: Pick<SituationalAttemptRow, 'resultEncrypted' |
 }
 
 export const situationalAttemptForResponse = (
-  row: SituationalAttemptRow,
+  row: SituationalAttemptResponseRow,
   snapshot: FrozenSituationalRuntimeSnapshotV1,
-  options: { replayed?: boolean; suppressResult?: boolean } = {},
+  options: {
+    replayed?: boolean
+    suppressResult?: boolean
+    committedResult?: {
+      result: SituationalResultV1
+      canonicalResult: CanonicalUnitResultEnvelopeV1
+    }
+  } = {},
 ) => measureRequestPhaseSync('response.build', () => {
-  const stored = row.status === 'COMPLETED' && !options.suppressResult ? decodeStoredResult(row) : null
+  const stored = row.status === 'COMPLETED' && !options.suppressResult
+    ? options.committedResult ?? decodeStoredResult(row)
+    : null
   if (row.status === 'COMPLETED' && !options.suppressResult && !stored) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
   }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  createSituationalResponseValidator,
   missingRequiredSituationalResponseKeys,
   scoreSituational,
   SituationalResponseValidationError,
@@ -215,6 +216,38 @@ describe('situational response helpers', () => {
       channelKey: 'appraisal',
       responseValue: 'E',
     })).toThrow(SituationalResponseValidationError)
+  })
+
+  it('reuses one prepared definition index while preserving single-response validation semantics', () => {
+    const validateResponse = createSituationalResponseValidator(SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION)
+    expect(() => validateResponse({
+      sceneKey: 'AN-01',
+      channelKey: 'appraisal',
+      responseValue: 'C',
+    })).not.toThrow()
+    expect(() => validateResponse({
+      sceneKey: 'AN-01',
+      channelKey: 'emotion',
+      responseValue: 55,
+    })).not.toThrow()
+
+    const invalid = {
+      sceneKey: 'AN-01',
+      channelKey: 'appraisal',
+      responseValue: 'E',
+    } satisfies SituationalResponse
+    expect(captureIssues(() => validateResponse(invalid))).toEqual(
+      captureIssues(() => validateSituationalResponse(SJT_ANXIETY_GOLDEN_ZH_CN_V1_DEFINITION, invalid)),
+    )
+
+    try {
+      validateResponse(invalid)
+    } catch (error) {
+      expect(error).toBeInstanceOf(SituationalResponseValidationError)
+      if (error instanceof SituationalResponseValidationError) {
+        expect(error.issues[0]?.path).toBe('responses.0.responseValue')
+      }
+    }
   })
 
   it('lists missing required scene-channel pairs', () => {

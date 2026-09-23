@@ -13,17 +13,19 @@ type ExactReferenceRow = {
   definition: unknown
 }
 
-export type ExactReferenceDb = {
+type SingleExactReferenceDb = {
   assessmentReferenceSet: {
     findUnique: (args: unknown) => Promise<ExactReferenceRow | null>
   }
 }
 
-export type FrozenReferenceDb = {
+export type ExactReferenceDb = {
   assessmentReferenceSet: {
     findMany: (args: unknown) => Promise<ExactReferenceRow[]>
   }
 }
+
+export type FrozenReferenceDb = ExactReferenceDb
 
 const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition => {
   const validation = validateReferenceSetDefinition({
@@ -43,7 +45,7 @@ const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition 
 export const referenceSetHash = (definition: AssessmentReferenceSetDefinition): string => canonicalHash(definition)
 
 export const loadExactReferenceSet = async (
-  db: ExactReferenceDb,
+  db: SingleExactReferenceDb,
   input: { instrumentType: 'SCALE' | 'COGNITIVE'; instrumentKey: string; referenceVersion: string },
 ): Promise<{ definition: AssessmentReferenceSetDefinition; hash: string; status: ExactReferenceRow['status'] }> => {
   const row = await db.assessmentReferenceSet.findUnique({
@@ -75,20 +77,37 @@ export const freezeExactReferenceBindings = async (
     }>
   },
 ): Promise<ReferenceBindingSnapshot[]> => {
-  const bindings: ReferenceBindingSnapshot[] = []
+  if (input.selections.length === 0) return []
   for (const selection of input.selections) {
     if (selection.referenceKey !== undefined && selection.referenceKey !== input.instrumentKey) {
       throw new Error(`Reference selection key ${selection.referenceKey} does not match ${input.instrumentKey}`)
     }
-    const loaded = await loadExactReferenceSet(db, {
+  }
+
+  const versions = [...new Set(input.selections.map((selection) => selection.referenceVersion))]
+  const rows = await db.assessmentReferenceSet.findMany({
+    where: {
       instrumentType: input.instrumentType,
       instrumentKey: input.instrumentKey,
-      referenceVersion: selection.referenceVersion,
-    })
+      referenceVersion: { in: versions },
+    },
+  })
+  const rowsByVersion = new Map(rows.map((row) => [row.referenceVersion, row]))
+  const loadedByVersion = new Map<string, { hash: string; status: ExactReferenceRow['status'] }>()
+  for (const version of versions) {
+    const row = rowsByVersion.get(version)
+    if (!row) throw new Error(`Reference set ${input.instrumentKey}/${version} was not found`)
+    const definition = toDefinition(row)
+    loadedByVersion.set(version, { hash: referenceSetHash(definition), status: row.status })
+  }
+
+  return input.selections.map((selection) => {
+    const loaded = loadedByVersion.get(selection.referenceVersion)
+    if (!loaded) throw new Error(`Reference set ${input.instrumentKey}/${selection.referenceVersion} was not found`)
     if (loaded.status !== 'ACTIVE') {
       throw new Error(`Reference set ${input.instrumentKey}/${selection.referenceVersion} is not active`)
     }
-    const row = {
+    return {
       referenceKey: selection.referenceKey ?? input.instrumentKey,
       referenceVersion: selection.referenceVersion,
       referenceHash: loaded.hash,
@@ -96,9 +115,7 @@ export const freezeExactReferenceBindings = async (
       ...(selection.referenceKind ? { referenceKind: selection.referenceKind } : {}),
       ...(selection.profileKey ? { profileKey: selection.profileKey } : {}),
     }
-    bindings.push(row)
-  }
-  return bindings
+  })
 }
 
 export const loadFrozenReferenceSets = async (

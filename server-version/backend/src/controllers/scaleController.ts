@@ -39,7 +39,7 @@ import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError }
 import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
 import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
-import { restartStandaloneScaleAssessment, submitScaleAssessmentFinal, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
+import { restartStandaloneScaleAssessment, submitScaleAssessmentFinalWithContext, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
 import { standaloneAdmissionPersistence } from '../modules/scale/scale-admission.service'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
@@ -743,16 +743,12 @@ export const scaleController = {
     try {
       const input = finalScaleSubmitSchema.safeParse(req.body)
       if (!input.success) return error(res, input.error.errors[0].message)
-      const data = await submitScaleAssessmentFinal({
+      const { data, internalContext } = await submitScaleAssessmentFinalWithContext({
         assessmentId: req.params.assessmentId,
         userId: req.user?.userId ?? null,
         ...input.data,
       })
-      const binding = await prisma.assessment.findUnique({
-        where: { id: req.params.assessmentId },
-        select: { compositeAttemptId: true },
-      })
-      const responseData = await projectRelationalUnitFinalResponse(binding?.compositeAttemptId, data)
+      const responseData = await projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
       return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)

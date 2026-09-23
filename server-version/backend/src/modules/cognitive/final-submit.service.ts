@@ -47,6 +47,11 @@ export type FinalCognitiveSubmitInput = {
   recoveryTokenHash?: string
 }
 
+export type CognitiveFinalSubmitInternalContext = {
+  compositeAttemptId: string | null
+  attemptEpoch: number
+}
+
 type FinalizedCognitiveData = {
   payloadHash: string
   trials: TrialEnvelope[]
@@ -284,8 +289,15 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
     select: UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT,
   }))
   if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
+  const internalContext = {
+    compositeAttemptId: child.compositeAttemptId ?? null,
+    attemptEpoch: child.attemptNo,
+  } satisfies CognitiveFinalSubmitInternalContext
   if (child.runtimeGeneration === 'UNIFIED_V1') {
-    return submitUnifiedCognitiveSessionFinal(input, child)
+    return {
+      ...(await submitUnifiedCognitiveSessionFinal(input, child)),
+      internalContext,
+    }
   }
   const session = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
@@ -347,6 +359,7 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
         response: responseFromSnapshot(session.id, snapshot),
         shouldFinalize: Boolean(session.compositeAttemptId),
         finalizeCompositeAttemptId: session.compositeAttemptId,
+        internalContext,
       }
     }
   }
@@ -470,6 +483,7 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
     ...response,
     shouldFinalize: Boolean(shouldFinalize),
     finalizeCompositeAttemptId: shouldFinalize ? session.compositeAttemptId : null,
+    internalContext,
   }
 }
 
@@ -487,10 +501,30 @@ const submitWithPrincipal = async (input: FinalCognitiveSubmitInput): Promise<an
   return result
 }
 
-export const submitCognitiveSessionFinal = (userId: string, input: Omit<FinalCognitiveSubmitInput, 'userId'>) =>
-  submitWithPrincipal({ ...input, userId })
+const splitCognitiveFinalContext = (result: any): {
+  data: Record<string, any>
+  internalContext: CognitiveFinalSubmitInternalContext
+} => {
+  if (!result?.internalContext || !Number.isInteger(result.internalContext.attemptEpoch)) {
+    throw new Error('Cognitive FINAL internal context is missing')
+  }
+  const { internalContext, ...data } = result
+  return { data, internalContext }
+}
 
-export const submitCognitiveSessionFinalForPublic = (
+export const submitCognitiveSessionFinalWithContext = async (
+  userId: string,
+  input: Omit<FinalCognitiveSubmitInput, 'userId'>,
+) => splitCognitiveFinalContext(await submitWithPrincipal({ ...input, userId }))
+
+export const submitCognitiveSessionFinal = async (
+  userId: string,
+  input: Omit<FinalCognitiveSubmitInput, 'userId'>,
+) => (await submitCognitiveSessionFinalWithContext(userId, input)).data
+
+export const submitCognitiveSessionFinalForPublic = async (
   input: Omit<FinalCognitiveSubmitInput, 'userId'>,
   recoveryTokenHash: string,
-) => submitWithPrincipal({ ...input, userId: null, recoveryTokenHash })
+) => splitCognitiveFinalContext(
+  await submitWithPrincipal({ ...input, userId: null, recoveryTokenHash }),
+).data
