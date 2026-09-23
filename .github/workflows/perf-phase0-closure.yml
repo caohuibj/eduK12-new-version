@@ -93,7 +93,7 @@ jobs:
             npm run db:seed >/tmp/ab-seed.log
             local fixture_dir="/tmp/ab-fixtures-r${round}-${variant}"
             rm -rf "$fixture_dir"
-            PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR="$fixture_dir"               PERF_WARMUP_FIXTURES=2 PERF_STEADY_FIXTURES=55 PERF_MIXED_PER_CLASS=10               PERF_SAME_PARENT_SIBLINGS=2 npm run perf:fixtures:seed >/tmp/ab-fixtures.log
+            PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR="$fixture_dir"               PERF_WARMUP_FIXTURES=2 PERF_STEADY_FIXTURES=55 PERF_MIXED_PER_CLASS=18               PERF_SAME_PARENT_SIBLINGS=2 npm run perf:fixtures:seed >/tmp/ab-fixtures.log
             echo "$fixture_dir"
           }
 
