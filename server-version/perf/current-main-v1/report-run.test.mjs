@@ -81,6 +81,25 @@ test('one extra scheduler-boundary fixture does not invalidate completed configu
   assert.ok(!report.capacityDisqualifiers.includes('INTERRUPTED_ITERATIONS'))
 })
 
+test('one completed scheduler-boundary arrival is explicitly recorded without hiding it', () => {
+  const run = baseline()
+  run.manifest.offered = 11
+  run.manifest.configuredArrivals = 10
+  run.manifest.requireAllFresh = true
+  for (const name of ['iterations', 'gate_e_fixtures_used', 'gate_e_fresh_completions', 'gate_e_eventual_success', 'gate_e_http_2xx']) {
+    run.k6.metrics[name].count = 11
+  }
+  run.k6.metrics.checks.passes = 11
+  run.before = probe(0, 11); run.afterWindow = probe(11, 11); run.afterDrain = probe(11, 11)
+  const report = analyzeRun(run)
+  assert.deepEqual(report.validationErrors, [])
+  assert.equal(report.counts.configuredArrivals, 10)
+  assert.equal(report.counts.offered, 11)
+  assert.equal(report.counts.started, 11)
+  assert.equal(report.counts.schedulerBoundaryInterrupted, 0)
+  assert.equal(report.capacityEligible, true)
+})
+
 test('an interrupted configured arrival remains disqualified', () => {
   const run = baseline()
   run.manifest.offered = 10

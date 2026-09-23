@@ -133,6 +133,7 @@ export function analyzeRun({ manifest, k6, before, afterWindow, afterDrain, metr
       reject('all-fresh baseline requires every completed iteration to be a first-attempt fresh success')
     }
     counts = {
+      configuredArrivals: Number.isSafeInteger(manifest.configuredArrivals) ? manifest.configuredArrivals : null,
       offered: manifest.offered, started, interrupted, schedulerBoundaryInterrupted, workloadInterrupted, dropped, fixtureUsed,
       fresh, replay, recovered, firstAttemptReplay, retry, eventualSuccess, eventualFailure, missingFixture,
       http2xx, http4xx, http5xx, networkErrors, status429, status503,

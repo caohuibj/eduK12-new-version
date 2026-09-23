@@ -31,7 +31,7 @@ export const options = {
       duration,
       preAllocatedVUs,
       maxVUs,
-      gracefulStop: '0s',
+      // Let an iteration already started at the duration boundary finish.\n      // The runner still records a possible +1 scheduler-boundary arrival.\n      gracefulStop: '5s',
     },
   },
 };
