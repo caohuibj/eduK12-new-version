@@ -165,3 +165,12 @@ Reference freezing now validates selection keys first, deduplicates reference ve
 The Phase 0 invariant gate was expanded so this work does not wait for Full Gate: Cognitive v2 contracts/goldens, V32-3 Reference contracts, the real-PostgreSQL Scale multi-reference suite, and Aggregate contracts now run on Draft performance commits.
 
 Evidence: commit `3a30c7782eed1734cce9f94072dbc6fe73faeabc`; invariant-gate extension `434aca1005e85d83e7e220483b08d1a26d20a1e5`; workflow run `35832765188` succeeded, including the 0/1/10/50 batch-call assertions and real PostgreSQL multi-reference behavior.
+
+
+## Phase 0 / P2-C08 Aggregate header indexing
+
+Decision: **KEEP**.
+
+The closed Aggregate finalizer now constructs one `headersBySlot` index inside the existing decrypt/parse phase and uses O(1) slot lookups for each required unit instead of repeating `headers.find`. Duplicate header slot keys still fail closed before any payload is accepted, and the existing completeness/identity/hash/report ordering contracts are unchanged.
+
+Evidence: commit `a95154cd9c79f2995e94a5c2008ede35d4361808`; extended Phase 0 invariant run `35833019854` and Draft backend compile in CI run `35833020182` succeeded. P2-C09 adds explicit 5/20/50/100 ready-parent finalization measurements on the frozen candidate.

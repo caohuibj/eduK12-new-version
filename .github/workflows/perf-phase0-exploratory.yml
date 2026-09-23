@@ -89,6 +89,11 @@ jobs:
         run: npm run db:seed
       - name: run performance reporter self-tests
         run: node --test ../perf/current-main-v1/report-run.test.mjs
+      - name: check Phase 0 closure script syntax
+        run: |
+          node --check ../perf/current-main-v1/summarize-ab.mjs
+          node --check ../perf/current-main-v1/verify-aggregate-ready-parents.mjs
+          node --check ../perf/current-main-v1/k6-full-request.js
       - name: run P2-C01 invariant matrix
         run: >-
           npx vitest run
