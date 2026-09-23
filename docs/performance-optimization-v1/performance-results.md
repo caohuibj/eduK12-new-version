@@ -143,3 +143,14 @@ The transaction reread retains authoritative owner/binding/status/epoch/runtime-
 For a fresh winner, the response builder now receives the exact in-memory result and canonical envelope that were successfully persisted, so it does not immediately decrypt the ciphertext it just generated. Replay and history continue to read and validate the persisted encrypted winner. Focused tests deliberately replace stored result ciphertext with invalid strings: the fresh committed-result path still returns the committed values, while the replay path fails closed.
 
 Evidence: commit `9112045518e1a16706a8976fefedb4877ab42d00`; Phase 0 PostgreSQL/privacy invariant run `35831651833` succeeded; Draft backend compile/frontend typecheck in CI run `35831652053` succeeded.
+
+
+## Phase 0 / P2-C06 Cognitive prepared request context
+
+Decision: **KEEP**.
+
+Unified Cognitive FINAL now reuses the frozen session snapshot's already-validated compiled runtime instead of parsing it again, carries the once-validated config forward, and enters scoring through a request-local prepared context after trial envelopes/payloads have already been normalized. The prepared scorer context is branded in a private WeakSet, so arbitrary JSON or a client-supplied boolean cannot enter that path.
+
+The generic `runAuthoritativeScorer` remains the defensive boundary: it still validates the complete snapshot, config schema and untrusted trials before creating the same prepared context. No global snapshot/runtime cache was introduced.
+
+Evidence: commit `9699f2436b66017a957d032ca7e77e3667e0e61f`; Phase 0 PostgreSQL/privacy invariant workflow and Draft backend/frontend compile/typecheck succeeded. Cognitive contract coverage keeps the untrusted generic rejection path and verifies prepared/generic result equivalence plus forged-context rejection.

@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C06",
+  "currentCommitId": "P2-C07",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -242,6 +242,27 @@
         "workflow run 35831652053"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C06",
+      "sha": "9699f2436b66017a957d032ca7e77e3667e0e61f",
+      "contracts": [
+        "Unified Cognitive FINAL reuses one validated snapshot/config/runtime/trial preparation",
+        "generic runAuthoritativeScorer retains full defensive snapshot/config/trial validation",
+        "prepared scorer context requires a WeakSet brand created by the trusted server preparation boundary",
+        "no cross-request cache or client-constructible validation flag"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck passed",
+        "Phase 0 PostgreSQL/privacy invariant workflow passed",
+        "Cognitive contract test covers generic rejection, prepared equivalence and forged-context rejection"
+      ],
+      "evidence": [
+        "commit 9699f2436b66017a957d032ca7e77e3667e0e61f",
+        "workflow run 35832330901",
+        "workflow run 35832331353"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -282,7 +303,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C06: generic scorer still performs full snapshot/config/trial validation; Unified FINAL reuses the already parsed compiled runtime, validated config and normalized trials through a WeakSet-branded prepared scorer context. Run Cognitive contracts/golden + P2 invariant matrix before P2-C07.",
+  "nextAction": "Validate P2-C07 reference batching: 0 selections -> 0 DB, 1/10/50 selections -> one findMany; shared versions parse/hash once; ACTIVE/key/order/hash semantics unchanged. Then proceed to P2-C08 aggregate header indexing.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -317,16 +338,16 @@
       "P2-C03 UNIT release before parent aggregate KEEP",
       "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence",
       "P2-C04 authoritative child-binding context reuse KEEP",
-      "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP"
+      "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP",
+      "P2-C06 Cognitive request-local prepared scorer context KEEP"
     ],
     "pending": [
-      "P2-C06 Cognitive prepared context — validation pending",
+      "P2-C07 reference batch freeze — validation pending",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",
       "Continue curve above 25 only for workloads that remain below overload",
       "burst/fault/recovery under concurrency after P2-C03",
-      "P2-C06 Cognitive prepared context",
       "P2-C07 reference batch freeze",
       "P2-C08 aggregate header index",
       "P2-C09 final A/B and evidence close"
