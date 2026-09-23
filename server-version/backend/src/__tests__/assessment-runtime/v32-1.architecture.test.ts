@@ -111,7 +111,7 @@ describe('Unified runtime architecture boundaries', () => {
       scaleFinal.indexOf('const finalizeParentAfterUnitSubmit'),
     )
     expect(scaleImpl).not.toMatch(/finalizeLinkedParent|finalizeQuestionnaireAttemptIfReady|finalizeCompositeAttemptIfReady/)
-    expect(scaleFinal).toMatch(/finalizeParentAfterUnitSubmit\(await withUnitSubmitAdmission/)
+    expect(scaleFinal).toMatch(/finalizeParentAfterUnitSubmit\(\s*await withUnitSubmitAdmission/)
 
     const cognitiveImpl = cognitiveFinal.slice(
       cognitiveFinal.indexOf('const submitWithPrincipalImpl'),
