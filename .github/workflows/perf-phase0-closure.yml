@@ -26,6 +26,7 @@ env:
   PERF_ISOLATED_TEST_MODE: '1'
   PERF_FIXTURE_DB_NAME: ptool
   PERF_CAPACITY_QUALIFIED: '0'
+  PERF_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
   UPLOAD_DIR: /tmp/huisurvey-phase0-closure-uploads
 
 jobs:
@@ -53,7 +54,9 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - uses: grafana/setup-k6-action@v1
@@ -81,7 +84,7 @@ jobs:
           set -euo pipefail
           OUT=/tmp/huisurvey-phase0-ab
           mkdir -p "$OUT"
-          GROUPS="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
+          PERF_GROUP_LIST="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
 
           reset_and_seed() {
             local round="$1" variant="$2"
@@ -123,14 +126,14 @@ jobs:
             local fixture_dir
             fixture_dir="$(reset_and_seed "$round" "$variant")"
             start_api "$variant"
-            for group in $GROUPS; do
+            for group in $PERF_GROUP_LIST; do
               PERF_FIXTURE_FILE="$fixture_dir/final-submit-fixtures.json"               PERF_FIXTURE_GROUP="$group" BASE_URL=http://127.0.0.1:3000               PERF_RUN_DIR="$OUT/r${round}-${variant}-${group}"               PERF_RATE=10 PERF_SECONDS=5 PERF_RATE_CEILING=20               PERF_PRE_VUS=32 PERF_MAX_VUS=128 PERF_REQUIRE_ALL_FRESH=0               PERF_TESTED_SHA="$tested_sha"               node "$GITHUB_WORKSPACE/server-version/perf/current-main-v1/run-full-request.mjs"
             done
             stop_api
           }
 
           trap stop_api EXIT
-          HEAD_SHA="$GITHUB_SHA"
+          HEAD_SHA="$PERF_CANDIDATE_SHA"
           run_variant 1 base "$BASE_SHA"
           run_variant 1 head "$HEAD_SHA"
           run_variant 2 head "$HEAD_SHA"
@@ -142,7 +145,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase0-ab-${{ github.sha }}
+          name: phase0-ab-${{ github.event.pull_request.head.sha || github.sha }}
           path: /tmp/huisurvey-phase0-ab
           retention-days: 7
           if-no-files-found: error
@@ -218,13 +221,13 @@ jobs:
           PERF_SECONDS: '30'
           PERF_RATE_CEILING: '500'
           PERF_REQUIRE_ALL_FRESH: '0'
-          PERF_TESTED_SHA: ${{ github.sha }}
+          PERF_TESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node perf/current-main-v1/run-full-request.mjs
       - name: upload burst evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase0-burst-${{ matrix.count }}-${{ github.sha }}
+          name: phase0-burst-${{ matrix.count }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             /tmp/phase0-burst-${{ matrix.count }}
             /tmp/phase0-burst-backend.log
@@ -295,13 +298,13 @@ jobs:
           PERF_SECONDS: '4'
           PERF_RATE_CEILING: '5'
           PERF_REQUIRE_ALL_FRESH: '0'
-          PERF_TESTED_SHA: ${{ github.sha }}
+          PERF_TESTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node perf/current-main-v1/run-full-request.mjs
       - name: upload fault evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase0-lost-response-${{ github.sha }}
+          name: phase0-lost-response-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             /tmp/phase0-lost-response
             /tmp/phase0-fault-backend.log
@@ -338,6 +341,8 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - uses: grafana/setup-k6-action@v1
@@ -388,7 +393,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase0-aggregate-size-${{ github.sha }}
+          name: phase0-aggregate-size-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             /tmp/phase0-aggregate/*.json
             /tmp/phase0-aggregate-backend.log
