@@ -154,3 +154,14 @@ Unified Cognitive FINAL now reuses the frozen session snapshot's already-validat
 The generic `runAuthoritativeScorer` remains the defensive boundary: it still validates the complete snapshot, config schema and untrusted trials before creating the same prepared context. No global snapshot/runtime cache was introduced.
 
 Evidence: commit `9699f2436b66017a957d032ca7e77e3667e0e61f`; Phase 0 PostgreSQL/privacy invariant workflow and Draft backend/frontend compile/typecheck succeeded. Cognitive contract coverage keeps the untrusted generic rejection path and verifies prepared/generic result equivalence plus forged-context rejection.
+
+
+## Phase 0 / P2-C07 reference freeze batching
+
+Decision: **KEEP**.
+
+Reference freezing now validates selection keys first, deduplicates reference versions, performs one `findMany` for the request, and parses/hashes each unique version once before projecting bindings back in the original selection order. The empty-selection path performs no database call. ACTIVE status remains a START requirement; frozen FINAL loading still performs its own batch read and validates every persisted expected hash.
+
+The Phase 0 invariant gate was expanded so this work does not wait for Full Gate: Cognitive v2 contracts/goldens, V32-3 Reference contracts, the real-PostgreSQL Scale multi-reference suite, and Aggregate contracts now run on Draft performance commits.
+
+Evidence: commit `3a30c7782eed1734cce9f94072dbc6fe73faeabc`; invariant-gate extension `434aca1005e85d83e7e220483b08d1a26d20a1e5`; workflow run `35832765188` succeeded, including the 0/1/10/50 batch-call assertions and real PostgreSQL multi-reference behavior.

@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C07",
+  "currentCommitId": "P2-C08",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -263,6 +263,32 @@
         "workflow run 35832331353"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C07",
+      "sha": "3a30c7782eed1734cce9f94072dbc6fe73faeabc",
+      "fixShas": [
+        "434aca1005e85d83e7e220483b08d1a26d20a1e5"
+      ],
+      "contracts": [
+        "reference freeze selections are deduplicated by referenceVersion and loaded with one findMany",
+        "0 selections perform 0 DB calls; 1/10/50 selections use one batch lookup",
+        "each unique version is parsed/hashed once while binding output preserves selection order",
+        "START still requires ACTIVE and exact reference key; FINAL frozen hash verification remains unchanged"
+      ],
+      "tests": [
+        "extended Phase 0 invariant matrix passed",
+        "V32-3 contract covers 0/1/10/50 batch-call budget and ACTIVE/key failures",
+        "real PostgreSQL scale multi-reference test passed",
+        "PR light backend compile passed"
+      ],
+      "evidence": [
+        "commit 3a30c7782eed1734cce9f94072dbc6fe73faeabc",
+        "test gate fix 434aca1005e85d83e7e220483b08d1a26d20a1e5",
+        "workflow run 35832765188",
+        "CI run 35832765431"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -303,7 +329,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C07 reference batching: 0 selections -> 0 DB, 1/10/50 selections -> one findMany; shared versions parse/hash once; ACTIVE/key/order/hash semantics unchanged. Then proceed to P2-C08 aggregate header indexing.",
+  "nextAction": "Validate P2-C08 aggregate header index: required-slot/header matching is O(S+H), duplicate header keys still fail closed, aggregate hash/report/order remain unchanged. Then execute P2-C09 full Phase 0 evidence closure with final hosted curves, mixed, burst/fault and ready-parent aggregate sizes.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -339,16 +365,16 @@
       "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence",
       "P2-C04 authoritative child-binding context reuse KEEP",
       "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP",
-      "P2-C06 Cognitive request-local prepared scorer context KEEP"
+      "P2-C06 Cognitive request-local prepared scorer context KEEP",
+      "P2-C07 reference freeze batching KEEP"
     ],
     "pending": [
-      "P2-C07 reference batch freeze — validation pending",
+      "P2-C08 aggregate header indexing — validation pending",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",
       "Continue curve above 25 only for workloads that remain below overload",
       "burst/fault/recovery under concurrency after P2-C03",
-      "P2-C07 reference batch freeze",
       "P2-C08 aggregate header index",
       "P2-C09 final A/B and evidence close"
     ]
