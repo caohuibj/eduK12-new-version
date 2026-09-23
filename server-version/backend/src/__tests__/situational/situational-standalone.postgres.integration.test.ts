@@ -19,6 +19,7 @@ let db: PrismaClient | null = null
 let startSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['startSituationalAttempt']
 let resumeSituationalAttempt: typeof import('../../modules/situational/situational-runtime.service')['resumeSituationalAttempt']
 let submitSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinal']
+let testOnlyPersistSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['__testOnlyPersistSituationalAttemptFinal']
 let listSituationalHistory: typeof import('../../modules/situational/situational-runtime.service')['listSituationalHistory']
 
 const createdUserIds: string[] = []
@@ -102,6 +103,7 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     resumeSituationalAttempt = runtime.resumeSituationalAttempt
     listSituationalHistory = runtime.listSituationalHistory
     submitSituationalAttemptFinal = submit.submitSituationalAttemptFinal
+    testOnlyPersistSituationalAttemptFinal = submit.__testOnlyPersistSituationalAttemptFinal
   }, 30_000)
 
   afterAll(async () => {
@@ -247,7 +249,9 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
       createdAttemptIds.push(started.attemptId)
       return { userId, started }
     }))
-    const outcomes = await Promise.all(fixtures.map(({ userId, started }, index) => submitSituationalAttemptFinal({
+    // This stress case characterizes transaction uniqueness independent of the
+    // production UNIT gate. Production callers use submitSituationalAttemptFinal.
+    const outcomes = await Promise.all(fixtures.map(({ userId, started }, index) => testOnlyPersistSituationalAttemptFinal({
       ...finalInput({ ...started, userId }, assertivenessResponses, `situational-prb-load-${count}-${index}-${randomUUID()}`),
       userId,
     })))

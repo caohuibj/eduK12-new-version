@@ -86,3 +86,21 @@ The deterministic validation-phase reduction is about 92.5% for the 30-scene sam
 The after-run SJT-60 job was marked failed by the exploratory workflow because `PERF_REQUIRE_ALL_FRESH=1` also forbids legal capacity retries. Artifact inspection shows the accounting itself is valid: 125 configured/started, 125 fresh, 125 durable, 0 replay, 0 drop, 0 eventual failure, with 7 UNIT-busy 503 attempts followed by successful retry. The strict all-fresh rule remains intact for baseline gates; the exploratory workflow now runs with that strict option disabled so retry/drop can be retained as overload evidence instead of being mislabeled as invalid accounting.
 
 Before evidence: artifact `10735135174` (P2-C01 / `8e1885e2`). After evidence: artifact `10734177804` (P2-C02 / `f72c142`), plus 10-rate artifact `10735135753`.
+
+
+## Phase 0 extended hosted curve before P2-C03
+
+Environment remains GitHub-hosted Ubuntu with 2 logical CPUs / ~8 GiB, API + PostgreSQL + Redis + k6 on the same runner. These are **PRE-CAPACITY** characterization points only.
+
+| Workload | Offered | Fresh durable | Retries | Drops | p50 | p95 | Interpretation |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| mixedSteady @25/s | 126 | 126 | 0 | 0 | 22.92 ms | 105.25 ms | clean hosted mixed point |
+| Scale typical @50/s | 251 | 251 | 0 | 0 | 276.68 ms | 392.18 ms | no retry/drop on hosted runner |
+| N-back standard @50/s | 251 | 251 | 46 | 0 | 543.76 ms | 683.46 ms | retry amplification begins |
+| CPT standard @50/s | 251 | 223 | 103 | 28 | 460.32 ms | hosted overload |
+| SJT-30 @50/s | 251 | 220 | 130 | 31 | 611.24 ms | hosted overload |
+| SJT-60 @35/s | 175 | 158 | 101 | 17 | 792.08 ms | 1587.92 ms | hosted overload; knee lies below 35/s |
+
+The repeated 10/s and 25/s profiles remained accounting-valid after exploratory runs stopped requiring zero capacity retries. The strict all-fresh reporter option itself was not weakened. Artifacts: run `35828241966`; mixed `10736111899`, SJT-60@35 `10736141711`, 50-rate `10736790313`, repeat-10 `10736626522`, repeat-25 `10736556638`.
+
+These results establish enough hosted-environment knee points for Phase 0; increasing offered load further on the same shared 2C/8G runner would add little engineering information. The next optimization target is P2-C03: release UNIT admission before embedded parent aggregate/recovery.

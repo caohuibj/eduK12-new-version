@@ -13,6 +13,8 @@ import { freezeAssignmentProfile } from '../../modules/cognitive/profile-freeze'
 import { compositeItemSlotKey, decryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { parseCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
+import { aggregateFinalizationAdmission } from '../../services/aggregateFinalizationAdmission'
+import { unitSubmitAdmission } from '../../services/unitSubmitAdmission'
 
 const databaseUrl = integrationDatabaseUrl(
   'SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL',
@@ -163,6 +165,27 @@ const assertivenessResponses = [
   { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' },
   { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'B' },
 ]
+
+const waitForGateState = async (predicate: () => boolean, label: string): Promise<void> => {
+  const deadline = Date.now() + 5_000
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error(`timed out waiting for ${label}`)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+  }
+}
+
+const holdAggregateCapacity = async () => {
+  const { maxConcurrent } = aggregateFinalizationAdmission.getStats().options
+  const releases: Array<() => void> = []
+  const holders = Array.from({ length: maxConcurrent }, () => (
+    aggregateFinalizationAdmission.run(() => new Promise<void>((resolve) => { releases.push(resolve) }))
+  ))
+  await waitForGateState(
+    () => aggregateFinalizationAdmission.getStats().active === maxConcurrent && releases.length === maxConcurrent,
+    'aggregate active capacity',
+  )
+  return { holders, releases }
+}
 
 const conflictingAssertivenessResponses = [
   { sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'B' },
@@ -564,6 +587,76 @@ suite('Situational Bundle PostgreSQL integration', () => {
     expect(await db!.situationalRawSubmission.count({ where: { attemptId: child.id } })).toBe(1)
     expect(await db!.assessmentUnitSnapshot.count({ where: { compositeAttemptId: parentId, slotKey } })).toBe(1)
   }, 30_000)
+
+  it('releases UNIT admission before waiting for embedded parent aggregate', async () => {
+    const fixture = await createCompositeFixture({})
+    const started = await compositeService.startUserAttempt(fixture.userId, fixture.compositeId)
+    const parentId = started.attempt.id
+    createdAttemptIds.push(parentId)
+    const child = await readEmbeddedChild(parentId, fixture.itemId)
+    const input = finalInput(fixture, parentId, child, assertivenessResponses, `situational-bundle-unit-release-${randomUUID()}`)
+    const held = await holdAggregateCapacity()
+    let submitted: Promise<Awaited<ReturnType<typeof submitSituationalAttemptFinal>>> | null = null
+    try {
+      submitted = submitSituationalAttemptFinal(input)
+      await waitForGateState(() => aggregateFinalizationAdmission.getStats().queued === 1, 'queued parent aggregate')
+      expect(unitSubmitAdmission.getStats()).toMatchObject({ active: 0, queued: 0 })
+      expect(await db!.situationalAttempt.findUnique({ where: { id: child.id }, select: { status: true } }))
+        .toEqual({ status: 'COMPLETED' })
+      held.releases.forEach((release) => release())
+      await Promise.all(held.holders)
+      await expect(submitted).resolves.toMatchObject({ replayed: false, attempt: { status: 'COMPLETED' } })
+      expect(await db!.compositeAssessmentAttempt.findUnique({ where: { id: parentId }, select: { status: true } }))
+        .toEqual({ status: 'COMPLETED' })
+    } finally {
+      held.releases.forEach((release) => release())
+      await Promise.allSettled(held.holders)
+      if (submitted) await Promise.allSettled([submitted])
+      await waitForGateState(
+        () => aggregateFinalizationAdmission.getStats().active === 0 && aggregateFinalizationAdmission.getStats().queued === 0,
+        'aggregate gate drain',
+      )
+    }
+  }, 60_000)
+
+  it('repairs the parent on legal replay after aggregate queue-full without duplicating child evidence', async () => {
+    const fixture = await createCompositeFixture({})
+    const started = await compositeService.startUserAttempt(fixture.userId, fixture.compositeId)
+    const parentId = started.attempt.id
+    createdAttemptIds.push(parentId)
+    const child = await readEmbeddedChild(parentId, fixture.itemId)
+    const slotKey = compositeItemSlotKey(fixture.itemId, 'SITUATIONAL')
+    const input = finalInput(fixture, parentId, child, assertivenessResponses, `situational-bundle-recovery-${randomUUID()}`)
+    const held = await holdAggregateCapacity()
+    const maxQueue = aggregateFinalizationAdmission.getStats().options.maxQueue
+    const fillers = Array.from({ length: maxQueue }, () => aggregateFinalizationAdmission.run(async () => undefined))
+    try {
+      await waitForGateState(() => aggregateFinalizationAdmission.getStats().queued === maxQueue, 'full aggregate queue')
+      const rejected = await submitSituationalAttemptFinal(input).catch((error) => error)
+      expect(rejected).toMatchObject({ code: 'COMPLETION_BUSY' })
+      expect(unitSubmitAdmission.getStats()).toMatchObject({ active: 0, queued: 0 })
+      expect(await db!.situationalAttempt.findUnique({ where: { id: child.id }, select: { status: true, submissionId: true } }))
+        .toEqual({ status: 'COMPLETED', submissionId: input.submissionId })
+      expect(await db!.situationalRawSubmission.count({ where: { attemptId: child.id } })).toBe(1)
+      expect(await db!.assessmentUnitSnapshot.count({ where: { compositeAttemptId: parentId, slotKey } })).toBe(1)
+      expect(await db!.compositeAssessmentAttempt.findUnique({ where: { id: parentId }, select: { status: true } }))
+        .toEqual({ status: 'IN_PROGRESS' })
+    } finally {
+      held.releases.forEach((release) => release())
+      await Promise.allSettled([...held.holders, ...fillers])
+      await waitForGateState(
+        () => aggregateFinalizationAdmission.getStats().active === 0 && aggregateFinalizationAdmission.getStats().queued === 0,
+        'aggregate gate recovery drain',
+      )
+    }
+
+    const replayed = await submitSituationalAttemptFinal(input)
+    expect(replayed).toMatchObject({ replayed: true, attempt: { status: 'COMPLETED' } })
+    expect(await db!.compositeAssessmentAttempt.findUnique({ where: { id: parentId }, select: { status: true, progress: true, completedItems: true } }))
+      .toEqual({ status: 'COMPLETED', progress: 100, completedItems: 1 })
+    expect(await db!.situationalRawSubmission.count({ where: { attemptId: child.id } })).toBe(1)
+    expect(await db!.assessmentUnitSnapshot.count({ where: { compositeAttemptId: parentId, slotKey } })).toBe(1)
+  }, 60_000)
 
   it('admits exact PUBLISHED Situational packages and rejects missing or RETIRED identities before creating a Bundle attempt', async () => {
     const retiredPackage = JSON.parse(JSON.stringify(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE)) as SituationPackageV1

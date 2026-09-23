@@ -218,7 +218,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Run the extended Phase 0 curve on the next head (10/25 repeat, 50 req/s Scale/N-back/CPT/SJT-30, 35 req/s SJT-60, mixedSteady 25 req/s). Treat retry/drop as exploratory overload evidence while keeping accounting fail-closed. Then implement P2-C03 UNIT release before aggregate recovery.",
+  "nextAction": "Validate P2-C03 on real PostgreSQL: UNIT must be inactive while parent aggregate is queued; aggregate queue-full must leave exactly one committed child and replay must repair parent completion. Then continue P2-C04 binding reuse.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -242,17 +242,23 @@
       "P2-C02 SJT response-validation index reuse KEEP",
       "SJT-30 validation phase at 25 req/s: ~1.709 ms -> ~0.128 ms mean",
       "SJT-60 validation phase at 25 req/s: ~6.052 ms -> ~0.137 ms mean",
-      "SJT-60 at 25 req/s: dropped 5 -> 0; retries 24 -> 7; fresh durable 121 -> 125"
+      "SJT-60 at 25 req/s: dropped 5 -> 0; retries 24 -> 7; fresh durable 121 -> 125",
+      "extended hosted curve run 35828241966 completed green",
+      "mixedSteady 25 req/s: 126/126 fresh durable, 0 retry/drop, p95 ~105 ms",
+      "Scale typical 50 req/s: 251/251 fresh durable, 0 retry/drop",
+      "N-back standard 50 req/s: 251/251 fresh durable, 46 retries, 0 drop",
+      "CPT standard 50 req/s: 223 fresh durable, 28 drops, 103 retries",
+      "SJT-30 50 req/s: 220 fresh durable, 31 drops, 130 retries",
+      "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries"
     ],
     "pending": [
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",
       "Continue curve above 25 only for workloads that remain below overload",
-      "extended curve: 50 req/s for Scale/N-back/CPT/SJT-30",
-      "extended curve: 35 req/s for SJT-60",
-      "mixedSteady at 25 req/s",
-      "P2-C03 SJT UNIT/aggregate recovery"
+      "P2-C03 SJT UNIT/aggregate recovery",
+      "P2-C03 UNIT release / aggregate replay-recovery verification",
+      "burst/fault/recovery under concurrency after P2-C03"
     ]
   },
   "capacityProfiles": {

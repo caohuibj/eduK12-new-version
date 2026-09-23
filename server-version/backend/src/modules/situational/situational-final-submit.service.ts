@@ -14,6 +14,7 @@ import {
 } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
+import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import {
   createCanonicalUnitResultEnvelope,
   buildSituationalBundleBridge,
@@ -191,7 +192,7 @@ const transactionRow = async (tx: Prisma.TransactionClient, attemptId: string) =
   })
 )
 
-export const submitSituationalAttemptFinal = async (
+const persistSituationalAttemptFinal = async (
   input: SituationalFinalSubmitServiceInput,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
@@ -227,7 +228,10 @@ export const submitSituationalAttemptFinal = async (
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
-      return situationalAttemptForResponse(row, snapshot, { replayed: true })
+      return {
+        data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
+        parentAttemptId: embedded?.compositeAttemptId ?? null,
+      }
     }
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评已完成，请重启后重新作答', 409)
   }
@@ -356,9 +360,39 @@ export const submitSituationalAttemptFinal = async (
     }
   })
 
-  if (embedded && committed.kind === 'committed') {
-    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
-    await measureRequestPhase('final_submit_parent_finalization', () => finalizeCompositeAttemptIfReady(embedded.compositeAttemptId))
+  return {
+    data: situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' }),
+    parentAttemptId: embedded?.compositeAttemptId ?? null,
   }
-  return situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' })
+}
+
+/**
+ * Production orchestration boundary: child FINAL/replay is admitted as UNIT work,
+ * then the UNIT permit is released before any embedded parent aggregate/recovery.
+ * A legal replay also re-runs parent finalization so a response lost after child
+ * commit can deterministically repair the parent without duplicating child data.
+ */
+export const submitSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => {
+  const persisted = await withUnitSubmitAdmission(() => persistSituationalAttemptFinal(input))
+  if (persisted.parentAttemptId) {
+    const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
+    await measureRequestPhase(
+      'final_submit_parent_finalization',
+      () => finalizeCompositeAttemptIfReady(persisted.parentAttemptId as string),
+    )
+  }
+  return persisted.data
+}
+
+/**
+ * Test-only persistence entry for high-fanout transaction correctness tests.
+ * Production routes and ordinary service callers must use submitSituationalAttemptFinal.
+ */
+export const __testOnlyPersistSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => {
+  if (process.env.NODE_ENV !== 'test') throw new Error('test-only Situational persistence entry requires NODE_ENV=test')
+  return (await persistSituationalAttemptFinal(input)).data
 }

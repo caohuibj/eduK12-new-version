@@ -1,8 +1,12 @@
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
-import { assessmentSubmitBusy, error, instrumentError, success } from '../utils/response'
-import { isUnitSubmitAdmissionBusyError, withUnitSubmitAdmission } from '../services/unitSubmitAdmission'
+import { assessmentSubmitBusy, completionBusy, error, instrumentError, success } from '../utils/response'
+import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
+import {
+  isQuestionnaireCompletionAdmissionBusyError,
+  isTransientCompletionDatabaseError,
+} from '../services/questionnaireCompletionAdmission'
 import {
   getSituationalAttemptResult,
   getSituationalInstrument,
@@ -24,6 +28,8 @@ const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): s
 
 const handleSituationalError = (res: Response, errorValue: unknown, operation: string) => {
   if (isUnitSubmitAdmissionBusyError(errorValue)) return assessmentSubmitBusy(res, errorValue.retryAfterSeconds)
+  if (isQuestionnaireCompletionAdmissionBusyError(errorValue)) return completionBusy(res, errorValue.retryAfterSeconds)
+  if (isTransientCompletionDatabaseError(errorValue)) return completionBusy(res, 1)
   if (isInstrumentFinalSubmitError(errorValue)) return instrumentError(res, errorValue.code, errorValue.message, errorValue.statusCode)
   logger.error(operation, errorValue)
   return error(res, errorValue instanceof Error ? errorValue.message : '情境化测评请求失败')
@@ -112,11 +118,11 @@ export const situationalController = {
     try {
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstZodMessage(parsed.error))
-      const data = await withUnitSubmitAdmission(() => submitSituationalAttemptFinal({
+      const data = await submitSituationalAttemptFinal({
         attemptId: req.params.attemptId,
         userId: req.user!.userId,
         ...parsed.data,
-      }))
+      })
       const binding = await prisma.situationalAttempt.findUnique({
         where: { id: req.params.attemptId },
         select: { compositeAttemptId: true },
