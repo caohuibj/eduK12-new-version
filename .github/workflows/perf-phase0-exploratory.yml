@@ -96,6 +96,11 @@ jobs:
           src/__tests__/situational/situational-final-submit.contract.test.ts
           src/__tests__/situational/situational-authoritative-trajectory.test.ts
           src/__tests__/cognitive/concurrency.integration.test.ts
+          src/__tests__/cognitive/v2-contract.test.ts
+          src/__tests__/cognitive/v2-published-golden.test.ts
+          src/__tests__/assessment-runtime/v32-3.contract.test.ts
+          src/__tests__/assessment-runtime/unified-aggregate.test.ts
+          src/__tests__/hotpath/scale-multi-reference.postgres.integration.test.ts
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/situational-bundle.postgres.integration.test.ts
           src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
