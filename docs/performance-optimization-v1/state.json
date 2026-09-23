@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C01",
+  "currentCommitId": "P2-C02",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -124,6 +124,30 @@
         "docs/performance-optimization-v1/query-budgets.csv",
         "server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json"
       ]
+    },
+    {
+      "id": "P2-C01",
+      "sha": "7f73a844b72fe0db8718c4025364db3b64359391",
+      "fixShas": [
+        "0d3945f13cc7db1f154b154d449e0721410c30d4",
+        "8e1885e2af1f3bae5fbe3164bbb5403cf7018aac"
+      ],
+      "contracts": [
+        "PostgreSQL concurrency/finalization invariants",
+        "relational privacy/consent invariants",
+        "strict fresh/durable accounting",
+        "k6 scheduler-boundary accounting"
+      ],
+      "tests": [
+        "P2-C01 PostgreSQL + privacy invariant gate passed",
+        "10 fresh FINAL/s x 5s passed for Scale, N-back, CPT, SJT-30 and SJT-60",
+        "25 fresh FINAL/s x 5s passed for Scale, N-back, CPT and SJT-30; SJT-60 retained as measured overload with 5 dropped iterations"
+      ],
+      "evidence": [
+        "GitHub Actions run 35824011273",
+        "artifact phase0-curve-10-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10734172166)",
+        "artifact phase0-curve-25-8e1885e2af1f3bae5fbe3164bbb5403cf7018aac (10735135174)"
+      ]
     }
   ],
   "evidence": [
@@ -164,7 +188,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Open PERF-02 draft PR, run P2-C01 invariant gate plus 10/25 req/s Phase 0 curve, then choose the first evidence-backed hot-path optimization. SJT validation-index reuse is the leading structural candidate but must be compared against the curve.",
+  "nextAction": "Validate P2-C02 SJT request-local response-validation index reuse. Compare 10/25 req/s SJT-30/SJT-60 phase latency and durable/drop behavior against P2-C01 artifacts; keep only if semantics are identical and validation work decreases.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -181,14 +205,18 @@
       "Codespaces devcontainer configuration added",
       "GitHub-hosted Scale/Cognitive/SJT smoke workflow added",
       "PERF-01 merged as main@a945ea0d3e6750d2a395ae1869647c547febe482",
-      "P2-C01 invariant gate and 10/25 req/s exploratory workflow prepared"
+      "P2-C01 invariant gate and 10/25 req/s exploratory workflow prepared",
+      "P2-C01 invariant gate green",
+      "10 req/s representative curve green for Scale/N-back/CPT/SJT-30/SJT-60",
+      "25 req/s measured overload isolated to SJT-60 on GitHub-hosted 2C/8G"
     ],
     "pending": [
-      "Review 10/25 req/s exploratory results for Scale/Cognitive/SJT",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "first evidence-driven optimization round",
-      "BASE vs HEAD A/B for retained optimizations"
+      "BASE vs HEAD A/B for retained optimizations",
+      "P2-C02 SJT validation-index reuse A/B",
+      "Continue curve above 25 only for workloads that remain below overload"
     ]
   },
   "capacityProfiles": {

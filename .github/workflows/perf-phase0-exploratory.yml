@@ -92,6 +92,9 @@ jobs:
       - name: run P2-C01 invariant matrix
         run: >-
           npx vitest run
+          src/__tests__/situational/situation-scoring.test.ts
+          src/__tests__/situational/situational-final-submit.contract.test.ts
+          src/__tests__/situational/situational-authoritative-trajectory.test.ts
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/situational-bundle.postgres.integration.test.ts

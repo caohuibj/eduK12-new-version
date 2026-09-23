@@ -29,3 +29,33 @@ The remaining route cases and their exact counts appear in the linked table. A s
 | PERF-04 worker/cache/CDN/multi-API | No qualified post-PERF-03 bottleneck evidence exists. | Deferred; conditional PR not triggered. |
 
 The full-request reporter's failure fixtures include all replay, only 503, scheduler drops, response lost after commit, retry recovery and missing metrics. A one-second lost-response run failed closed because the scheduler ended before its retry; a separate four-second run reconciled four durable writes, including one retry-recovered replay. These are retained in [full-request evidence](../../server-version/perf/current-main-v1/evidence/full-request-20260923/README.md), rather than discarded as inconvenient runs. Historical Gate-E rates are background only and are not reproduced as current results.
+
+## Phase 0 / P2-C01 exploratory baseline
+
+Environment: GitHub-hosted Ubuntu, 2 logical CPUs / ~8 GiB, disposable PostgreSQL 14 + Redis 7, API and k6 on the same runner. **PRE-CAPACITY only; not CAP-2C4G/CAP-4C4G.**
+
+### 10 fresh FINAL/s × 5 s
+
+| Workload | Durable | p50 | p95 |
+| --- | ---: | ---: | ---: |
+| Scale typical | 50/50 | 17.23 ms | 30.67 ms |
+| Cognitive N-back standard | 50/50 | 20.95 ms | 33.62 ms |
+| Cognitive CPT standard | 50/50 | 27.67 ms | 42.80 ms |
+| SJT linear 30 | 50/50 | 34.22 ms | 55.09 ms |
+| SJT linear 60 | 50/50 | 51.50 ms | 77.78 ms |
+
+At this point the SJT `sjt.validation_index` phase mean was ~2.06 ms for 30 scenes and ~6.52 ms for 60 scenes, which is consistent with the existing per-response full-index rebuild.
+
+### 25 fresh FINAL/s × 5 s
+
+After fixing k6 duration-boundary accounting (allow an already-started +1 scheduler-boundary iteration to finish), the representative result was:
+
+| Workload | Result | p50 | p95 |
+| --- | --- | ---: | ---: |
+| Scale typical | 126 fresh/durable (125 configured + 1 recorded boundary arrival) | 18.93 ms | 32.20 ms |
+| Cognitive N-back standard | 126 fresh/durable | 18.95 ms | 28.52 ms |
+| Cognitive CPT standard | 125/125 fresh/durable | 23.28 ms | 64.05 ms |
+| SJT linear 30 | 126 fresh/durable | 30.66 ms | 129.88 ms |
+| SJT linear 60 | **overload: 121 fresh/durable, 5 dropped** | 876.50 ms | 1086.83 ms |
+
+The SJT-60 overload is retained as a failure point, not converted into a green capacity result. Artifact evidence: workflow run `35824011273`, 10-rate artifact `10734172166`, 25-rate artifact `10735135174`.

@@ -27,9 +27,9 @@ import {
   SITUATIONAL_RAW_PAYLOAD_SCHEMA_VERSION,
 } from './situational-raw-submission'
 import {
+  createSituationalResponseValidator,
   scoreSituational,
   SituationalResponseValidationError,
-  validateSituationalResponse,
   type SituationalResponse,
 } from './situation-scoring'
 import {
@@ -77,6 +77,7 @@ const normalizeSituationalSubmission = (
 ): { responses: SituationalResponse[]; trajectory: AuthoritativeSituationalTrajectory } => {
   const scientificDefinition = asLinearSituationDefinition(definition)
   const byPair = measureRequestPhaseSync('sjt.validation_index', () => {
+    const validateResponse = createSituationalResponseValidator(scientificDefinition)
     const index = new Map<string, SituationalResponse>()
     input.forEach((candidate, position) => {
       const pairKey = `${candidate.sceneKey}:${candidate.channelKey}`
@@ -88,7 +89,7 @@ const normalizeSituationalSubmission = (
         )
       }
       try {
-        validateSituationalResponse(scientificDefinition, candidate)
+        validateResponse(candidate)
       } catch (error) {
         if (error instanceof SituationalResponseValidationError) {
           const issue = error.issues[0]
