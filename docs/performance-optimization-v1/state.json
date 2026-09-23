@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C04",
+  "currentCommitId": "P2-C05",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -20,7 +20,7 @@
       "planId": "PERF-01",
       "number": 165,
       "url": "https://github.com/caohuibj/eduK12-new-version/pull/165",
-      "status": "READY_FOR_REVIEW",
+      "status": "MERGED",
       "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
       "headSha": "HEAD",
       "ciStatus": "Read live checks on PR #165; do not rely on this static snapshot."
@@ -199,6 +199,27 @@
         "server-version/backend/src/__tests__/composite/situational-bundle.postgres.integration.test.ts"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C04",
+      "sha": "08905687b0b1b1097f355bc4c2e276a456e485b0",
+      "contracts": [
+        "trusted request-local child binding is returned only as internal context",
+        "Scale/Cognitive/SJT generic controllers remove post-FINAL child binding rereads",
+        "result-authority policy checks remain live",
+        "internal context is not serialized into public service data"
+      ],
+      "tests": [
+        "ordinary CI run 35830664723 passed",
+        "Phase 0 exploratory workflow 35830664418 passed",
+        "real PostgreSQL tests verify context identity and no internalContext leakage"
+      ],
+      "evidence": [
+        "commit 08905687b0b1b1097f355bc4c2e276a456e485b0",
+        "workflow run 35830664723",
+        "workflow run 35830664418"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -239,7 +260,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C04 on Draft invariant + compile: public service results remain data-only; internal context carries authoritative compositeAttemptId/attemptEpoch; Scale/Cognitive/SJT generic controllers remove post-FINAL binding rereads while result-authority policy reads remain live. Then measure query-budget delta and proceed to P2-C05.",
+  "nextAction": "Validate P2-C05: transaction reread excludes runtimeSnapshotEncrypted/compositeItem; fresh winner response reuses committed in-memory result/canonical without decrypt, while replay still requires persisted encrypted winner. Keep lock+reread merge NOT_TRIGGERED unless separate evidence appears.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -272,10 +293,11 @@
       "SJT-30 50 req/s: 220 fresh durable, 31 drops, 130 retries",
       "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries",
       "P2-C03 UNIT release before parent aggregate KEEP",
-      "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence"
+      "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence",
+      "P2-C04 authoritative child-binding context reuse KEEP"
     ],
     "pending": [
-      "P2-C04 authoritative child binding reuse — implementation pending invariant/query evidence",
+      "P2-C05 SJT narrow reads / fresh response reuse — validation pending",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",

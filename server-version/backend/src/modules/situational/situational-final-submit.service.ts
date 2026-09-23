@@ -53,7 +53,8 @@ import {
   loadEmbeddedSituationalAttemptRuntime,
   assertEmbeddedSituationalAttemptBinding,
   type SituationalEmbeddedAccess,
-  SITUATIONAL_ATTEMPT_SELECT,
+  SITUATIONAL_ATTEMPT_COMMIT_SELECT,
+  type SituationalAttemptCommitRow,
   type SituationalAttemptRow,
 } from './situational-runtime.service'
 import type { SituationalFinalSubmitInput } from './situational-final-submit.schema'
@@ -190,10 +191,13 @@ const lockEmbeddedCompositeAttempt = async (tx: Prisma.TransactionClient, attemp
   if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
 }
 
-const transactionRow = async (tx: Prisma.TransactionClient, attemptId: string) => (
+const transactionRow = async (
+  tx: Prisma.TransactionClient,
+  attemptId: string,
+): Promise<SituationalAttemptCommitRow | null> => (
   tx.situationalAttempt.findUnique({
     where: { id: attemptId },
-    select: SITUATIONAL_ATTEMPT_SELECT,
+    select: SITUATIONAL_ATTEMPT_COMMIT_SELECT,
   })
 )
 
@@ -361,12 +365,18 @@ const persistSituationalAttemptFinal = async (
         totalTime,
         resultEncrypted: encryptedResult,
         canonicalResultEncrypted: encryptedCanonicalResult,
-      } as SituationalAttemptRow,
+      } as SituationalAttemptCommitRow,
     }
   })
 
   return {
-    data: situationalAttemptForResponse(committed.row, snapshot, { replayed: committed.kind === 'replay' }),
+    data: situationalAttemptForResponse(
+      committed.row,
+      snapshot,
+      committed.kind === 'committed'
+        ? { replayed: false, committedResult: { result, canonicalResult } }
+        : { replayed: true },
+    ),
     parentAttemptId: embedded?.compositeAttemptId ?? null,
   }
 }

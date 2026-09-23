@@ -123,3 +123,12 @@ Evidence on head `5828859d`:
 ### k6 schedule-drift harness correction
 
 A post-P2-C03 hosted CPT@50 run produced 249 started + 5 dropped = 254 observed offered attempts against a configured schedule of 250. All 249 started iterations were fresh/durable. The previous reporter incorrectly treated `abs(configured-offered)>1` as invalid durable accounting. The reporter now keeps actual `started + interrupted + dropped` reconciliation authoritative, records `scheduleDelta`, and emits `SCHEDULER_ARRIVAL_DRIFT` as a capacity disqualifier rather than an accounting error. Fixture exhaustion, wrong identity, replay, durable mismatch and eventual failure remain strict validation failures.
+
+
+## Phase 0 / P2-C04 authoritative child binding reuse
+
+Decision: **KEEP**.
+
+Generic authenticated Scale, Cognitive and Situational FINAL controllers now consume an internal request-local `compositeAttemptId/attemptEpoch` returned by the authoritative submit service instead of issuing a second child binding lookup after FINAL. The public `data` object remains unchanged; tests explicitly reject leakage of `internalContext`. Relational/cohort/organization result-authority policy checks remain live and are not cached.
+
+Evidence: commit `08905687b0b1b1097f355bc4c2e276a456e485b0`; ordinary CI run `35830664723` and Phase 0 exploratory run `35830664418` succeeded. This is deterministic query elimination on applicable generic authenticated controller paths; public and other paths are reported as N/A rather than forcing a synthetic reduction.
