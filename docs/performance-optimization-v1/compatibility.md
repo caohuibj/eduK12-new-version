@@ -13,3 +13,9 @@ Status: BASELINE_CAPTURED. The present runtime is the comparison oracle for PERF
 | Current principal, consent, visibility, CSRF and recovery controls | Route inventory, isolated HTTP samples, existing backend suite | PERF-01 pins current behavior; adversarial concurrency/privacy matrix is required in P2-C01 before changing runtime paths |
 
 The isolated PostgreSQL setup and local HTTP samples do not prove high concurrency, campaign-wide organization behavior, or rated capacity. P2-C01 must add the full concurrent/privacy invariant matrix before P2 runtime changes.
+
+## PERF-02 P2-C01 gate
+
+P2-C01 no longer relies on an informal statement that the full suite covers concurrency/privacy. The dedicated `PERF Phase 0 exploratory` workflow now executes the current PostgreSQL/concurrency/privacy subset before runtime hot-path changes. Detailed mapping: [p2-invariants.md](p2-invariants.md).
+
+The first exploratory curve is 10 and 25 fresh FINAL/s on GitHub-hosted runners for Scale typical, N-back standard, CPT standard, SJT-30 and SJT-60. Results are MEASURED/PRE-CAPACITY evidence only.

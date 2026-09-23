@@ -3,16 +3,16 @@
   "repository": "caohuibj/eduK12-new-version",
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
-  "currentPr": "PERF-01",
-  "currentCommitId": "P1-C05",
-  "status": "CODE_READY_REVIEW",
+  "currentPr": "PERF-02",
+  "currentCommitId": "P2-C01",
+  "status": "IN_PROGRESS",
   "workspace": {
-    "path": "/Users/Qiang/projects/perf-measurement-baseline-v1",
-    "branch": "perf/measurement-baseline-v1",
-    "baseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
+    "path": null,
+    "branch": "perf/runtime-hotpath-v1",
+    "baseSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
     "headSha": "HEAD",
-    "headShaNote": "Resolve HEAD on this branch; P1-C05 contains this state file and cannot embed its own SHA.",
-    "measuredRuntimeSha": "c91456d7f3c9c1b7e0a27b8351731acf2bdd7774",
+    "headShaNote": "P2-C01 branch is GitHub-managed from merged PERF-01 main.",
+    "measuredRuntimeSha": "a945ea0d3e6750d2a395ae1869647c547febe482",
     "uncommittedChanges": false
   },
   "pullRequests": [
@@ -164,7 +164,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Review the new Phase 0 smoke run on PR #165. After #165 is merged, branch PERF-02 from latest main, execute Scale/Cognitive/SJT exploratory curves with existing resources, and implement only evidence-backed hot-path changes. Do not claim CAP-2C4G or CAP-4C4G from Phase 0.",
+  "nextAction": "Open PERF-02 draft PR, run P2-C01 invariant gate plus 10/25 req/s Phase 0 curve, then choose the first evidence-backed hot-path optimization. SJT validation-index reuse is the leading structural candidate but must be compared against the curve.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -179,12 +179,12 @@
       "PERF-01 P1-C01..P1-C05 measurement baseline on PR #165",
       "Phase 0 execution plan added",
       "Codespaces devcontainer configuration added",
-      "GitHub-hosted Scale/Cognitive/SJT smoke workflow added"
+      "GitHub-hosted Scale/Cognitive/SJT smoke workflow added",
+      "PERF-01 merged as main@a945ea0d3e6750d2a395ae1869647c547febe482",
+      "P2-C01 invariant gate and 10/25 req/s exploratory workflow prepared"
     ],
     "pending": [
-      "Scale exploratory stress curve",
-      "Cognitive exploratory stress curve",
-      "SJT exploratory stress curve",
+      "Review 10/25 req/s exploratory results for Scale/Cognitive/SJT",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "first evidence-driven optimization round",

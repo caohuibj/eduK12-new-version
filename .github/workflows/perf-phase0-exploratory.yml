@@ -1,0 +1,216 @@
+name: PERF Phase 0 exploratory
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths:
+      - 'server-version/backend/src/**'
+      - 'server-version/backend/scripts/**'
+      - 'server-version/perf/**'
+      - 'docs/performance-optimization-v1/**'
+      - '.github/workflows/perf-phase0-exploratory.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: perf-phase0-exploratory-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: test
+  DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+  JWT_SECRET: ci-jwt-secret-123456789012345678901234
+  DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+  ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+  REDIS_URL: redis://localhost:6379
+  COGNITIVE_MODULE_ENABLED: 'true'
+  BACKGROUND_WORKERS_ENABLED: 'false'
+  COOKIE_SECURE: 'false'
+  TRUST_PROXY_HOPS: '0'
+  LOG_LEVEL: warn
+  PERF_ISOLATED_TEST_MODE: '1'
+  PERF_FIXTURE_DB_NAME: ptool
+  PERF_CAPACITY_QUALIFIED: '0'
+
+jobs:
+  invariants:
+    name: P2-C01 PostgreSQL + privacy invariants
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'perf/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run db:migrate:guarded
+      - name: run P2-C01 invariant matrix
+        run: >-
+          npx vitest run
+          src/__tests__/cognitive/concurrency.integration.test.ts
+          src/__tests__/situational/situational-standalone.postgres.integration.test.ts
+          src/__tests__/composite/situational-bundle.postgres.integration.test.ts
+          src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+          src/__tests__/assessment-relational/result-authority.test.ts
+          src/__tests__/assessment-relational/runtime-consent.test.ts
+          src/__tests__/integration/assessmentRunConsentRecovery.postgres.integration.test.ts
+          --no-file-parallelism
+
+  curve:
+    name: "fresh FINAL curve / ${{ matrix.rate }} req-s"
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'perf/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        rate: [10, 25]
+    env:
+      UPLOAD_DIR: /tmp/huisurvey-phase0-curve-uploads
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: grafana/setup-k6-action@v1
+      - name: install and build backend
+        working-directory: server-version/backend
+        run: |
+          npm ci
+          npx prisma generate
+          npm run db:migrate:guarded
+          npm run db:seed
+          npm run build
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: seed isolated fresh pools
+        working-directory: server-version/backend
+        env:
+          PERF_CURRENT_MAIN_V1: '1'
+          FIXTURE_OUT_DIR: /tmp/huisurvey-phase0-curve-fixtures
+          PERF_WARMUP_FIXTURES: '2'
+          PERF_STEADY_FIXTURES: ${{ matrix.rate == 25 && '130' || '55' }}
+          PERF_MIXED_PER_CLASS: '1'
+          PERF_SAME_PARENT_SIBLINGS: '2'
+        run: npm run perf:fixtures:seed
+      - name: start backend
+        working-directory: server-version/backend
+        run: |
+          mkdir -p "$UPLOAD_DIR"
+          nohup npm start > /tmp/huisurvey-phase0-curve-backend.log 2>&1 &
+          echo $! > /tmp/huisurvey-phase0-curve-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/huisurvey-phase0-curve-backend.log
+          exit 1
+      - name: run representative curve
+        working-directory: server-version
+        env:
+          PERF_FIXTURE_FILE: /tmp/huisurvey-phase0-curve-fixtures/final-submit-fixtures.json
+          BASE_URL: http://127.0.0.1:3000
+          PERF_RATE: ${{ matrix.rate }}
+          PERF_SECONDS: '5'
+          PERF_RATE_CEILING: '50'
+          PERF_PRE_VUS: '32'
+          PERF_MAX_VUS: '128'
+          PERF_REQUIRE_ALL_FRESH: '1'
+        run: |
+          set -euo pipefail
+          for group in             scaleTypicalSteady             cognitiveNbackStandardSteady             cognitiveCptStandardSteady             sjtLinear30Steady             sjtLinear60Steady
+          do
+            export PERF_FIXTURE_GROUP="$group"
+            export PERF_RUN_DIR="/tmp/huisurvey-phase0-rate-${PERF_RATE}-${group}"
+            node perf/current-main-v1/run-full-request.mjs
+            cat "$PERF_RUN_DIR/summary.md"
+          done
+      - name: capture environment
+        if: always()
+        run: |
+          {
+            echo "head_sha=${{ github.event.pull_request.head.sha || github.sha }}"
+            echo "tested_sha=${GITHUB_SHA}"
+            echo "rate=${{ matrix.rate }}"
+            echo "cpus=$(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo || true
+            node --version
+            k6 version
+          } > /tmp/huisurvey-phase0-curve-environment.txt
+      - name: upload curve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase0-curve-${{ matrix.rate }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            /tmp/huisurvey-phase0-rate-*
+            /tmp/huisurvey-phase0-curve-environment.txt
+            /tmp/huisurvey-phase0-curve-backend.log
+          retention-days: 7
+          if-no-files-found: warn
+      - name: stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/huisurvey-phase0-curve-backend.pid ]; then
+            kill "$(cat /tmp/huisurvey-phase0-curve-backend.pid)" 2>/dev/null || true
+          fi
