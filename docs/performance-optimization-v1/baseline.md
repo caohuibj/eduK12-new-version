@@ -34,7 +34,8 @@ The CI workflow classifies content-only changes and has separate PR-light and re
 | Prisma pool | 10 | `databasePool.ts`; explicit `DATABASE_URL` parameters take precedence |
 | JSON body parser | 2 MB, before CSRF, route auth and UNIT admission | `src/index.ts` |
 | Public limiters | process-local, mounted before public routers | `src/index.ts` |
-| Phase 0 target | existing GitHub/Codespaces/self-hosted resources | Correctness, profiling, exploratory stress and comparable A/B only; `PERF_CAPACITY_QUALIFIED=0` |\n| Formal capacity targets | CAP-2C4G, then CAP-4C4G | Whole-host target for each profile; external load generator required |
+| Phase 0 target | existing GitHub/Codespaces/self-hosted resources | Correctness, profiling, exploratory stress and comparable A/B only; `PERF_CAPACITY_QUALIFIED=0` |
+| Formal capacity targets | CAP-2C4G, then CAP-4C4G | Whole-host target for each profile; external load generator required |
 
 The isolated PostgreSQL first-attempt HTTP baseline now covers all 14 FINAL route templates and two distinct policy-domain samples. It records SQL events, model calls, phase means, response bytes and durable completion; see `query-budgets.csv` and `server-version/perf/current-main-v1/evidence/query-baseline-20260923/route-baseline.json`. One request per route is not a latency distribution or a throughput/capacity measurement. No 4C4G capacity has been measured. Historical Gate-E figures are background only.
 
