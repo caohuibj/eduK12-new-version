@@ -138,7 +138,14 @@ export const createSessionConfigSnapshot = <TConfig, TTrial>(input: {
   return parseSessionConfigSnapshot(snapshot)
 }
 
-export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> => measureRequestPhaseSync('snapshot.parse_hash', () => {
+type ParsedSessionConfigSnapshot<TConfig> = {
+  snapshot: SessionConfigSnapshot<TConfig>
+  compiledRuntime: CompiledInstrumentRuntimeV1 | null
+}
+
+const parseSessionConfigSnapshotInternal = <TConfig = unknown>(
+  value: unknown,
+): ParsedSessionConfigSnapshot<TConfig> => measureRequestPhaseSync('snapshot.parse_hash', () => {
   const parsed = sessionConfigSnapshotSchema.parse(value) as SessionConfigSnapshot<TConfig>
   const expectedConfigHash = parsed.hashScheme === CANONICAL_JSON_SHA256_V1
     ? canonicalHash(parsed.config)
@@ -147,11 +154,12 @@ export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): S
     throw new Error('config snapshot hash mismatch')
   }
   const hasUnifiedMetadata = Boolean(parsed.hashScheme || parsed.runtimeGeneration || parsed.compiledRuntime || parsed.referenceBindings)
+  let compiledRuntime: CompiledInstrumentRuntimeV1 | null = null
   if (hasUnifiedMetadata) {
     if (parsed.hashScheme !== CANONICAL_JSON_SHA256_V1 || parsed.runtimeGeneration !== 'UNIFIED_V1' || !parsed.compiledRuntime) {
       throw new Error('unified cognitive session snapshot metadata is incomplete')
     }
-    const compiledRuntime = parseCompiledInstrumentRuntime(parsed.compiledRuntime)
+    compiledRuntime = parseCompiledInstrumentRuntime(parsed.compiledRuntime)
     if (compiledRuntime.instrumentType !== 'COGNITIVE'
       || compiledRuntime.instrumentKey !== parsed.testType
       || compiledRuntime.instrumentVersion !== parsed.engineVersion
@@ -180,8 +188,12 @@ export const parseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): S
     }
   }
   assertProtocolSignature(parsed)
-  return parsed
+  return { snapshot: parsed, compiledRuntime }
 })
+
+export const parseSessionConfigSnapshot = <TConfig = unknown>(
+  value: unknown,
+): SessionConfigSnapshot<TConfig> => parseSessionConfigSnapshotInternal<TConfig>(value).snapshot
 
 export const tryParseSessionConfigSnapshot = <TConfig = unknown>(value: unknown): SessionConfigSnapshot<TConfig> | null => {
   const parsed = sessionConfigSnapshotSchema.safeParse(value)
@@ -210,14 +222,17 @@ const looksLikeSessionConfigSnapshot = (value: unknown): boolean => (
 export const sessionConfigFromStoredValue = <TConfig = unknown>(value: unknown): {
   config: TConfig
   snapshot: SessionConfigSnapshot<TConfig> | null
+  compiledRuntime: CompiledInstrumentRuntimeV1 | null
 } => {
   // A legacy session stores the parsed task config directly. Once a stored
   // value advertises the v2 snapshot fields, malformed metadata must fail
   // closed instead of silently being treated as a legacy config.
-  const snapshot = looksLikeSessionConfigSnapshot(value)
-    ? parseSessionConfigSnapshot<TConfig>(value)
+  const parsed = looksLikeSessionConfigSnapshot(value)
+    ? parseSessionConfigSnapshotInternal<TConfig>(value)
     : null
-  return snapshot ? { config: snapshot.config, snapshot } : { config: value as TConfig, snapshot: null }
+  return parsed
+    ? { config: parsed.snapshot.config, snapshot: parsed.snapshot, compiledRuntime: parsed.compiledRuntime }
+    : { config: value as TConfig, snapshot: null, compiledRuntime: null }
 }
 
 export const protocolForSnapshot = (snapshot: SessionConfigSnapshot): ProtocolDefinition => snapshot.protocol

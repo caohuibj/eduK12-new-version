@@ -26,12 +26,14 @@ import { withFrozenCognitiveReferenceApplicability } from './v2/frozen-reference
 import type { AdministrationProvenanceV1 } from './administration-provenance'
 
 import { validateAndNormalizeTrials } from './v2/trial-normalizer'
-import { runAuthoritativeScorer } from './v2/authoritative-scorer'
+import {
+  prepareAuthoritativeScorerContext,
+  runPreparedAuthoritativeScorer,
+} from './v2/authoritative-scorer'
 import { resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport } from './v2/report'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot, TrialEnvelope } from './v2/types'
-import { parseCompiledInstrumentRuntime } from '../assessment-runtime/compiler'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { loadFrozenReferenceSets } from '../assessment-runtime/reference-binding'
@@ -202,11 +204,11 @@ const prepareRuntime = (
   input: UnifiedCognitiveFinalSubmitInput,
 ) => {
   const stored = readCognitiveSessionConfig(session.configSnapshotEncrypted)
-  if (!stored.snapshot || stored.snapshot.runtimeGeneration !== 'UNIFIED_V1') {
+  if (!stored.snapshot || stored.snapshot.runtimeGeneration !== 'UNIFIED_V1' || !stored.compiledRuntime) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时快照不可用，请重启后重新作答', 409)
   }
   const snapshot = stored.snapshot
-  const runtime = parseCompiledInstrumentRuntime(snapshot.compiledRuntime)
+  const runtime = stored.compiledRuntime
   if (
     runtime.instrumentType !== 'COGNITIVE'
     || runtime.instrumentKey !== snapshot.testType
@@ -281,7 +283,14 @@ const prepareRuntime = (
     FINAL_SUBMISSION_MAX_BYTES.cognitive,
     '认知提交数据',
   )
-  return { snapshot, runtime, definition, trials, payloadHash: canonical.payloadHash }
+  return {
+    snapshot,
+    runtime,
+    definition,
+    validatedConfig,
+    trials,
+    payloadHash: canonical.payloadHash,
+  }
 }
 
 export const submitUnifiedCognitiveSessionFinal = async (
@@ -316,13 +325,17 @@ export const submitUnifiedCognitiveSessionFinal = async (
 
   let scored
   try {
-    scored = await measureRequestPhase('final_submit_scoring', async () => runAuthoritativeScorer({
+    const scorerContext = prepareAuthoritativeScorerContext({
       definition: prepared.definition,
       session: prepared.snapshot,
+      config: prepared.validatedConfig,
       trials: prepared.trials,
-      preparedTrials: prepared.trials,
       randomSeed: child.randomSeed,
-    }))
+    })
+    scored = await measureRequestPhase(
+      'final_submit_scoring',
+      async () => runPreparedAuthoritativeScorer(scorerContext),
+    )
   } catch (error) {
     if (error instanceof InstrumentFinalSubmitError) throw error
     throw new InstrumentFinalSubmitError(

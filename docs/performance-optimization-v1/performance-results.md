@@ -132,3 +132,14 @@ Decision: **KEEP**.
 Generic authenticated Scale, Cognitive and Situational FINAL controllers now consume an internal request-local `compositeAttemptId/attemptEpoch` returned by the authoritative submit service instead of issuing a second child binding lookup after FINAL. The public `data` object remains unchanged; tests explicitly reject leakage of `internalContext`. Relational/cohort/organization result-authority policy checks remain live and are not cached.
 
 Evidence: commit `08905687b0b1b1097f355bc4c2e276a456e485b0`; ordinary CI run `35830664723` and Phase 0 exploratory run `35830664418` succeeded. This is deterministic query elimination on applicable generic authenticated controller paths; public and other paths are reported as N/A rather than forcing a synthetic reduction.
+
+
+## Phase 0 / P2-C05 SJT narrow reads and fresh response reuse
+
+Decision: **KEEP** for the deterministic request-local changes; the conditional lock+reread SQL merge remains **NOT_TRIGGERED**.
+
+The transaction reread retains authoritative owner/binding/status/epoch/runtime-identity/replay fields and the embedded parent relation required for authorization, but no longer retransmits the already-verified encrypted frozen runtime blob or unused composite item relation. Lock order and CAS are unchanged.
+
+For a fresh winner, the response builder now receives the exact in-memory result and canonical envelope that were successfully persisted, so it does not immediately decrypt the ciphertext it just generated. Replay and history continue to read and validate the persisted encrypted winner. Focused tests deliberately replace stored result ciphertext with invalid strings: the fresh committed-result path still returns the committed values, while the replay path fails closed.
+
+Evidence: commit `9112045518e1a16706a8976fefedb4877ab42d00`; Phase 0 PostgreSQL/privacy invariant run `35831651833` succeeded; Draft backend compile/frontend typecheck in CI run `35831652053` succeeded.

@@ -4,7 +4,7 @@
   "analysisBaseSha": "f89354d32c7ac3dc4a9abd3a6abdca851667b8b5",
   "workingBaseSha": "68afbe63672b42c9a2086f834d5ae46794c3c013",
   "currentPr": "PERF-02",
-  "currentCommitId": "P2-C05",
+  "currentCommitId": "P2-C06",
   "status": "IN_PROGRESS",
   "workspace": {
     "path": null,
@@ -220,6 +220,28 @@
         "workflow run 35830664418"
       ],
       "decision": "KEEP"
+    },
+    {
+      "id": "P2-C05",
+      "sha": "9112045518e1a16706a8976fefedb4877ab42d00",
+      "contracts": [
+        "transaction reread excludes already-verified frozen runtime blob and unused composite item relation",
+        "fresh committed SJT response reuses in-memory result/canonical after successful persistence",
+        "replay still reads and validates persisted encrypted winner",
+        "lock order, CAS and authorization reread remain unchanged"
+      ],
+      "tests": [
+        "PR light backend compile + frontend typecheck passed",
+        "Phase 0 PostgreSQL/privacy invariant workflow 35831651833 passed",
+        "fresh response override test proves invalid stored cipher is not read when committedResult is supplied",
+        "replay response without committedResult still fails closed on invalid stored cipher"
+      ],
+      "evidence": [
+        "commit 9112045518e1a16706a8976fefedb4877ab42d00",
+        "workflow run 35831651833",
+        "workflow run 35831652053"
+      ],
+      "decision": "KEEP"
     }
   ],
   "evidence": [
@@ -260,7 +282,7 @@
       "resolution": "The suite now accepts CI's explicitly provisioned PR38_INTEGRATION_DATABASE_URL as an alternative; the same CI=true configuration passed locally against task-owned PostgreSQL. Full final-head CI must rerun."
     }
   ],
-  "nextAction": "Validate P2-C05: transaction reread excludes runtimeSnapshotEncrypted/compositeItem; fresh winner response reuses committed in-memory result/canonical without decrypt, while replay still requires persisted encrypted winner. Keep lock+reread merge NOT_TRIGGERED unless separate evidence appears.",
+  "nextAction": "Validate P2-C06: generic scorer still performs full snapshot/config/trial validation; Unified FINAL reuses the already parsed compiled runtime, validated config and normalized trials through a WeakSet-branded prepared scorer context. Run Cognitive contracts/golden + P2 invariant matrix before P2-C07.",
   "updatedAt": "2026-09-23",
   "phase0": {
     "status": "IN_PROGRESS",
@@ -294,16 +316,16 @@
       "SJT-60 35 req/s: 158 fresh durable, 17 drops, 101 retries",
       "P2-C03 UNIT release before parent aggregate KEEP",
       "P2-C03 replay repairs parent after aggregate queue-full without duplicate raw/snapshot evidence",
-      "P2-C04 authoritative child-binding context reuse KEEP"
+      "P2-C04 authoritative child-binding context reuse KEEP",
+      "P2-C05 SJT narrow transaction reads + fresh result reuse KEEP"
     ],
     "pending": [
-      "P2-C05 SJT narrow reads / fresh response reuse — validation pending",
+      "P2-C06 Cognitive prepared context — validation pending",
       "mixed workload",
       "burst/fault/recovery under concurrency",
       "BASE vs HEAD A/B for retained optimizations",
       "Continue curve above 25 only for workloads that remain below overload",
       "burst/fault/recovery under concurrency after P2-C03",
-      "P2-C05 SJT narrow reads / fresh response reuse",
       "P2-C06 Cognitive prepared context",
       "P2-C07 reference batch freeze",
       "P2-C08 aggregate header index",
