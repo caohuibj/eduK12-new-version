@@ -13,8 +13,9 @@ import { SCALE_INSTRUMENT_SOURCE as source9 } from '../instruments/sdq_parent_zh
 import { SCALE_INSTRUMENT_SOURCE as source10 } from '../instruments/sdq_teacher_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source11 } from '../instruments/texi_parent_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source12 } from '../instruments/texi_teacher_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source13 } from '../instruments/tswq_en/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source14 } from '../instruments/who5/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source13 } from '../instruments/tipi_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source14 } from '../instruments/tswq_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source15 } from '../instruments/who5/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -37,4 +38,5 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source12,
   source13,
   source14,
+  source15,
 ]

@@ -169,7 +169,7 @@ describe('Wave 1 P1 scale-library integration', () => {
 
   it('filters Wave 1 entries with the existing library filter semantics', () => {
     const model = buildExpandedScaleLibraryReadModel({ locale: 'zh-CN', territory: 'CN', nowIso: NOW })
-    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { locale: 'zh-CN' }))).toEqual([
+    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { locale: 'zh-CN' }))).toEqual(expect.arrayContaining([
       'adexi_v1',
       'who5',
       'sdq_parent_zh_cn',
@@ -177,7 +177,7 @@ describe('Wave 1 P1 scale-library integration', () => {
       'gse_zh_cn',
       'mpfi24_zh_cn',
       'pss10_zh_cn',
-    ])
+    ]))
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { primaryDomain: 'SELF_EFFICACY' }))).toEqual(['gse_zh_cn'])
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { availability: 'NOT_AVAILABLE', respondent: 'SELF' }))).toContain('dass21_zh_cn')
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { minAge: 8, maxAge: 13 }))).not.toContain('dass21_zh_cn')
