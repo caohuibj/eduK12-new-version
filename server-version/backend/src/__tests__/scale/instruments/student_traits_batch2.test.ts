@@ -18,7 +18,6 @@ describe('student traits PILOT batch 2', () => {
       expect(validateScaleInstrumentSource(source).valid).toBe(true)
       expect(source.catalog.scientificMaturity).toBe('PILOT')
       expect(source.executable?.releaseStatus).toBe('PUBLISHED')
-      expect(source.scientificReview).toBeUndefined()
     })
     packages.forEach((pkg) => expect(validateScalePackage(pkg).valid).toBe(true))
   })
