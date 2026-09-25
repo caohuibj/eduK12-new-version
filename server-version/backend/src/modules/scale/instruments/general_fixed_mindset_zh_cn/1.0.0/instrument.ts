@@ -1,0 +1,348 @@
+import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'
+
+export const SCALE_INSTRUMENT_SOURCE = {
+  schemaVersion: 1,
+  identity: {
+    instrumentKey: 'general_fixed_mindset_zh_cn',
+    instrumentVersion: '1.0.0',
+  },
+  catalog: {
+    schemaVersion: 1,
+    catalogManifestVersion: 1,
+    catalogStatus: 'REVIEWED',
+    scientificMaturity: 'PILOT',
+    identity: {
+      canonicalName: 'General Fixed Mindset — Project Chinese 3-item',
+      abbreviation: 'GFM-3',
+      instrumentFamily: 'Implicit Theories / Mindset',
+    },
+    construct: {
+      primaryDomain: 'MOTIVATION',
+      secondaryDomains: [],
+      constructDefinition: '描述个体认为一般聪明程度是固定且难以改变的信念强度。',
+      constructLevel: 'SPECIFIC_CONSTRUCT',
+      constructOverlapTags: [
+        'fixed_mindset',
+        'entity_theory',
+        'implicit_theories',
+        'intelligence_beliefs',
+        'self_report',
+      ],
+    },
+    population: {
+      populationNotes: '本工具为学习动机研究基于 Dweck 隐含理论框架改编的 3 题中文项目版本，原研究用于中学生样本。PILOT 状态不宣称其与任何原版固定心态量表完全等价。',
+      respondentTypes: ['SELF'],
+      developmentalEvidence: 'PARTIAL',
+    },
+    administration: {
+      itemCount: 3,
+      estimatedMinutes: 2,
+      administrationModes: ['DIGITAL_SELF_ADMINISTERED', 'DIGITAL_SUPERVISED', 'PAPER'],
+      timeFrame: '一般信念；无特定回忆时段',
+      requiredTraining: false,
+      itemOrderLocked: true,
+      responseFormatLocked: true,
+      layoutConstraints: [
+        '保持项目实际使用的 3 个中文题目和 1–6 六点同意度作答格式。',
+        '三题均按固定心态方向正向计分；不在 runtime 中反向生成成长心态分数。',
+      ],
+    },
+    intendedUse: {
+      intendedUses: [
+        {
+          use: 'RESEARCH',
+          evidenceStatus: 'SUPPORTED',
+        },
+        {
+          use: 'INDIVIDUAL_REFLECTION',
+          evidenceStatus: 'EVIDENCE_UNKNOWN',
+          notes: '仅提供一般能力可变性信念的描述性反馈。',
+        },
+      ],
+      forbiddenUses: [
+        'DIAGNOSIS',
+        'HIGH_STAKES_SELECTION',
+        'SCHOOL_RANKING',
+        'TEACHER_ACCOUNTABILITY',
+        'UNSUPPORTED_GROUP_COMPARISON',
+      ],
+    },
+    evidence: [
+      {
+        evidenceId: 'general-fixed-mindset-dweck-1995',
+        evidenceType: 'CONTENT_VALIDITY',
+        population: 'General implicit-theory research samples',
+        locale: 'en',
+        territory: 'US',
+        studyDesign: 'Foundational implicit-theories framework used as the conceptual basis for the project adaptation.',
+        rating: 'UNKNOWN',
+        citation: 'Dweck CS, Chiu C-y, Hong Y-y. (1995). Implicit theories and their role in judgments and reactions. Psychological Inquiry, 6(4), 267–285.',
+        doi: '10.1207/s15327965pli0604_1',
+        url: 'https://doi.org/10.1207/s15327965pli0604_1',
+        notes: 'Conceptual background only; this citation does not establish exact-form validation of the three project items.',
+      },
+      {
+        evidenceId: 'general-fixed-mindset-project-t1-alpha',
+        evidenceType: 'INTERNAL_CONSISTENCY',
+        population: 'T1 middle-school learning-motivation study sample',
+        locale: 'zh-CN',
+        territory: 'CN',
+        studyDesign: 'Internal consistency recomputed from the project Final canonical item data.',
+        rating: 'SUFFICIENT',
+        citation: 'Learning Motivation Project Canonical Data Package — Final scoring audit (internal project evidence).',
+        notes: 'Three-item General Fixed Mindset alpha = 0.866 in the Final T1 general sample.',
+      },
+    ],
+    referenceApplicability: [],
+  },
+  localization: {
+    schemaVersion: 1,
+    sourceLocale: 'zh-CN',
+    targetLocale: 'zh-CN',
+    localizationVersion: '1.0.0',
+    translationSource: 'Project-authored/adapted Chinese wording used in the T1 learning-motivation questionnaire.',
+    adaptationMethod: 'ORIGINAL_SOURCE',
+    expertReviewStatus: 'COMPLETED',
+    cognitiveDebriefStatus: 'NOT_ESTABLISHED',
+    localEvidenceRefs: ['general-fixed-mindset-project-t1-alpha'],
+    reviewStatus: 'PENDING',
+    notes: '该 executable 冻结研究实际使用的中文题干与六点作答格式。',
+  },
+  applicability: {
+    schemaVersion: 1,
+    policyVersion: 'general-fixed-mindset-zh-cn-v1',
+    respondentTypes: ['SELF'],
+    requiredContextKeys: [],
+  },
+  disclosure: {
+    schemaVersion: 1,
+    policyVersion: 'general-fixed-mindset-zh-cn-v1',
+    audiences: {
+      respondent: {
+        numericScores: true,
+        references: false,
+        individualInterpretations: true,
+        scoreDerivedLabels: false,
+        resultQualityDetails: true,
+        rawAnswers: false,
+        itemScores: false,
+        methods: true,
+        educationalContent: false,
+      },
+      subject: {
+        numericScores: true,
+        references: false,
+        individualInterpretations: true,
+        scoreDerivedLabels: false,
+        resultQualityDetails: true,
+        rawAnswers: false,
+        itemScores: false,
+        methods: true,
+        educationalContent: false,
+      },
+      teacher: {
+        numericScores: true,
+        references: false,
+        individualInterpretations: true,
+        scoreDerivedLabels: false,
+        resultQualityDetails: true,
+        rawAnswers: false,
+        itemScores: false,
+        methods: true,
+        educationalContent: false,
+      },
+      researcher: {
+        numericScores: true,
+        references: false,
+        individualInterpretations: true,
+        scoreDerivedLabels: false,
+        resultQualityDetails: true,
+        rawAnswers: false,
+        itemScores: true,
+        methods: true,
+        educationalContent: false,
+      },
+    },
+    unknownAudience: 'DENY',
+  },
+  usageRequirements: {
+    schemaVersion: 1,
+    policyVersion: 'general-fixed-mindset-zh-cn-v1',
+    requiredRightsActions: ['electronicAdministration', 'scoring', 'display'],
+    allowedCommercialNatures: ['NON_COMMERCIAL', 'COMMERCIAL'],
+    notes: [
+      '项目方确认该项目改编版本的使用与部署权利已完成授权确认。',
+    ],
+  },
+  executable: {
+    releaseStatus: 'PUBLISHED',
+    contentLocale: 'zh-CN',
+    references: [],
+    definition: {
+      schemaVersion: 2,
+      respondentType: 'participant_self_report',
+      source: {
+        title: 'General Fixed Mindset — project adaptation',
+        citation: 'Project adaptation informed by Dweck CS, Chiu C-y, Hong Y-y. (1995).',
+        url: 'https://doi.org/10.1207/s15327965pli0604_1',
+        publicationYear: 1995,
+      },
+      license: {
+        status: 'authorized',
+        redistribution: 'allowed',
+        note: '项目方确认该项目改编中文版本可用于 Huisurvey 电子施测、计分与展示。',
+      },
+      display: {
+        randomizeItems: false,
+      },
+      responseSets: [
+        {
+          key: 'agreement_1_6_t1_zh_cn',
+          options: [
+            { value: '1', label: '完全不同意', score: 1 },
+            { value: '2', label: '比较不同意', score: 2 },
+            { value: '3', label: '有点不同意', score: 3 },
+            { value: '4', label: '有点同意', score: 4 },
+            { value: '5', label: '比较同意', score: 5 },
+            { value: '6', label: '完全同意', score: 6 },
+          ],
+        },
+      ],
+      items: [
+        {
+          itemCode: 'GFM-01',
+          content: '每个人的聪明程度是大致确定的，很难改变。',
+          type: 'single',
+          required: true,
+          sortOrder: 0,
+          responseSetKey: 'agreement_1_6_t1_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'GFM-02',
+          content: '每个人的聪明程度不可能改变很多。',
+          type: 'single',
+          required: true,
+          sortOrder: 1,
+          responseSetKey: 'agreement_1_6_t1_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'GFM-03',
+          content: '每个人都能学会新知识，但是不能改变本来的聪明程度。',
+          type: 'single',
+          required: true,
+          sortOrder: 2,
+          responseSetKey: 'agreement_1_6_t1_zh_cn',
+          randomizeOptions: false,
+        },
+      ],
+      scoring: {
+        scoringVersion: '1.0.0',
+        itemRules: [
+          { itemCode: 'GFM-01', transform: { type: 'identity' } },
+          { itemCode: 'GFM-02', transform: { type: 'identity' } },
+          { itemCode: 'GFM-03', transform: { type: 'identity' } },
+        ],
+        defaultMissingPolicy: {
+          type: 'complete_required',
+        },
+        scores: [
+          {
+            key: 'general_fixed_mindset',
+            type: 'total',
+            label: '一般固定心态',
+            description: '三题平均分；分数越高表示越倾向认为一般聪明程度固定且难以改变。',
+            direction: 'higher_is_more',
+            canonical: true,
+            displayPrecision: 2,
+            missingPolicy: {
+              type: 'prorate_if_min_answered',
+              minimumAnswered: 2,
+            },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'GFM-01', weight: 1 },
+                { itemCode: 'GFM-02', weight: 1 },
+                { itemCode: 'GFM-03', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
+          },
+        ],
+      },
+      report: {
+        reportVersion: '1.0.0',
+        primaryScoreKeys: ['general_fixed_mindset'],
+        scoreOrder: ['general_fixed_mindset'],
+        interpretations: [
+          {
+            scoreKey: 'general_fixed_mindset',
+            headline: '一般能力固定观',
+            source: { type: 'score_only' },
+            summary: '该分数描述你在多大程度上认为一般“聪明程度”是相对固定、难以改变的。分数较高表示更认同能力具有固定属性；分数较低表示较少认同这种固定观。它测量的是关于能力可变性的信念，而不是实际智力、学习能力或发展潜力。',
+            bands: [],
+            guidance: [],
+          },
+        ],
+        limitations: [
+          '这是项目改编的 3 题 PILOT 指标，不应宣称与某一原版标准量表完全等价。',
+          '本 package 不提供常模、百分位、cut-off 或“固定型/成长型人格”分类。',
+          '固定心态分数描述的是信念倾向，不是智力、成绩、能力上限或未来发展潜力的测量。',
+          '单次自评可能受到当前学习经历、语言理解和具体情境影响。',
+        ],
+        disclaimer: '本报告仅用于研究和描述性自我了解，不用于智力判断、能力鉴定、教育分流、诊断或高风险决策。',
+      },
+      referencePolicy: {
+        type: 'none',
+      },
+    },
+    goldenCases: [
+      {
+        name: 'all-lowest',
+        answers: [
+          { itemCode: 'GFM-01', responseValue: '1' },
+          { itemCode: 'GFM-02', responseValue: '1' },
+          { itemCode: 'GFM-03', responseValue: '1' },
+        ],
+        expected: {
+          quality: 'interpretable',
+          scores: {
+            general_fixed_mindset: 1,
+          },
+          totalScoreKeys: ['general_fixed_mindset'],
+        },
+      },
+      {
+        name: 'all-highest',
+        answers: [
+          { itemCode: 'GFM-01', responseValue: '6' },
+          { itemCode: 'GFM-02', responseValue: '6' },
+          { itemCode: 'GFM-03', responseValue: '6' },
+        ],
+        expected: {
+          quality: 'interpretable',
+          scores: {
+            general_fixed_mindset: 6,
+          },
+          totalScoreKeys: ['general_fixed_mindset'],
+        },
+      },
+      {
+        name: 'two-of-three',
+        answers: [
+          { itemCode: 'GFM-01', responseValue: '4' },
+          { itemCode: 'GFM-02', responseValue: '6' },
+        ],
+        expected: {
+          quality: 'limited',
+          scores: {
+            general_fixed_mindset: 5,
+          },
+          totalScoreKeys: ['general_fixed_mindset'],
+        },
+      },
+    ],
+  },
+} satisfies ScaleInstrumentSourceV1
