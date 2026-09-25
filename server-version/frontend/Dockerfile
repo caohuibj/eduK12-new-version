@@ -20,7 +20,8 @@ RUN npm run build
 FROM nginx:alpine AS runtime
 # Apply the latest Alpine security updates to the runtime image before it is
 # scanned and before the static assets are copied in.
-RUN apk upgrade --no-cache
+RUN apk upgrade --no-cache \
+    && apk add --no-cache --upgrade 'libexpat>=2.8.5-r0'
 # 覆盖默认站点：SPA + /api /uploads /socket.io 反向代理到 backend:3000
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
