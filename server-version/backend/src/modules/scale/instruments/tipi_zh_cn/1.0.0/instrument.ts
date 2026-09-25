@@ -1,49 +1,5 @@
 import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'
 
-const SCORE_KEYS = [
-  'extraversion',
-  'agreeableness',
-  'conscientiousness',
-  'emotional_stability',
-  'openness_to_experience',
-] as const
-
-const ITEM_CODES = Array.from({ length: 10 }, (_, index) => `TIPI-${String(index + 1).padStart(2, '0')}`)
-
-const responseOptions = [
-  { value: '1', label: '非常不同意', score: 1 },
-  { value: '2', label: '比较不同意', score: 2 },
-  { value: '3', label: '有点不同意', score: 3 },
-  { value: '4', label: '既不同意也不反对', score: 4 },
-  { value: '5', label: '有点同意', score: 5 },
-  { value: '6', label: '比较同意', score: 6 },
-  { value: '7', label: '非常同意', score: 7 },
-] as const
-
-const itemContents = [
-  '我是外向的、热情的。',
-  '我是挑剔的、爱争论的。',
-  '我是可靠的、自律的。',
-  '我是焦虑的、易心烦的。',
-  '我是愿意接触新事物的、思维复杂的。',
-  '我是内敛的、安静的。',
-  '我是有同情心的、温暖的。',
-  '我是缺乏条理的、粗心的。',
-  '我是冷静的、情绪稳定的。',
-  '我是循规蹈矩的、缺乏创造性的。',
-] as const
-
-const reversedItems = new Set(['TIPI-02', 'TIPI-04', 'TIPI-06', 'TIPI-08', 'TIPI-10'])
-
-const pair = (first: number, second: number) => [
-  { itemCode: ITEM_CODES[first - 1], weight: 1 },
-  { itemCode: ITEM_CODES[second - 1], weight: 1 },
-]
-
-const scoreKeys = [...SCORE_KEYS]
-
-const allAnswers = (value: string) => ITEM_CODES.map((itemCode) => ({ itemCode, responseValue: value }))
-
 export const SCALE_INSTRUMENT_SOURCE = {
   schemaVersion: 1,
   identity: {
@@ -95,7 +51,10 @@ export const SCALE_INSTRUMENT_SOURCE = {
     },
     intendedUse: {
       intendedUses: [
-        { use: 'RESEARCH', evidenceStatus: 'SUPPORTED' },
+        {
+          use: 'RESEARCH',
+          evidenceStatus: 'SUPPORTED',
+        },
         {
           use: 'INDIVIDUAL_REFLECTION',
           evidenceStatus: 'EVIDENCE_UNKNOWN',
@@ -244,24 +203,123 @@ export const SCALE_INSTRUMENT_SOURCE = {
       responseSets: [
         {
           key: 'tipi_agreement_1_7_zh_cn',
-          options: [...responseOptions],
+          options: [
+            { value: '1', label: '非常不同意', score: 1 },
+            { value: '2', label: '比较不同意', score: 2 },
+            { value: '3', label: '有点不同意', score: 3 },
+            { value: '4', label: '既不同意也不反对', score: 4 },
+            { value: '5', label: '有点同意', score: 5 },
+            { value: '6', label: '比较同意', score: 6 },
+            { value: '7', label: '非常同意', score: 7 },
+          ],
         },
       ],
-      items: itemContents.map((content, index) => ({
-        itemCode: ITEM_CODES[index],
-        content,
-        type: 'single',
-        required: true,
-        sortOrder: index,
-        responseSetKey: 'tipi_agreement_1_7_zh_cn',
-        randomizeOptions: false,
-      })),
+      items: [
+        {
+          itemCode: 'TIPI-01',
+          content: '我是外向的、热情的。',
+          type: 'single',
+          required: true,
+          sortOrder: 0,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-02',
+          content: '我是挑剔的、爱争论的。',
+          type: 'single',
+          required: true,
+          sortOrder: 1,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-03',
+          content: '我是可靠的、自律的。',
+          type: 'single',
+          required: true,
+          sortOrder: 2,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-04',
+          content: '我是焦虑的、易心烦的。',
+          type: 'single',
+          required: true,
+          sortOrder: 3,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-05',
+          content: '我是愿意接触新事物的、思维复杂的。',
+          type: 'single',
+          required: true,
+          sortOrder: 4,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-06',
+          content: '我是内敛的、安静的。',
+          type: 'single',
+          required: true,
+          sortOrder: 5,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-07',
+          content: '我是有同情心的、温暖的。',
+          type: 'single',
+          required: true,
+          sortOrder: 6,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-08',
+          content: '我是缺乏条理的、粗心的。',
+          type: 'single',
+          required: true,
+          sortOrder: 7,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-09',
+          content: '我是冷静的、情绪稳定的。',
+          type: 'single',
+          required: true,
+          sortOrder: 8,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+        {
+          itemCode: 'TIPI-10',
+          content: '我是循规蹈矩的、缺乏创造性的。',
+          type: 'single',
+          required: true,
+          sortOrder: 9,
+          responseSetKey: 'tipi_agreement_1_7_zh_cn',
+          randomizeOptions: false,
+        },
+      ],
       scoring: {
         scoringVersion: '1.0.0',
-        itemRules: ITEM_CODES.map((itemCode) => ({
-          itemCode,
-          transform: { type: reversedItems.has(itemCode) ? 'reverse' as const : 'identity' as const },
-        })),
+        itemRules: [
+          { itemCode: 'TIPI-01', transform: { type: 'identity' } },
+          { itemCode: 'TIPI-02', transform: { type: 'reverse' } },
+          { itemCode: 'TIPI-03', transform: { type: 'identity' } },
+          { itemCode: 'TIPI-04', transform: { type: 'reverse' } },
+          { itemCode: 'TIPI-05', transform: { type: 'identity' } },
+          { itemCode: 'TIPI-06', transform: { type: 'reverse' } },
+          { itemCode: 'TIPI-07', transform: { type: 'identity' } },
+          { itemCode: 'TIPI-08', transform: { type: 'reverse' } },
+          { itemCode: 'TIPI-09', transform: { type: 'identity' } },
+          { itemCode: 'TIPI-10', transform: { type: 'reverse' } },
+        ],
         defaultMissingPolicy: {
           type: 'complete_required',
         },
@@ -275,7 +333,14 @@ export const SCALE_INSTRUMENT_SOURCE = {
             canonical: true,
             displayPrecision: 1,
             missingPolicy: { type: 'complete_required' },
-            source: { type: 'items', items: pair(1, 6), aggregation: 'mean' },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'TIPI-01', weight: 1 },
+                { itemCode: 'TIPI-06', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
           },
           {
             key: 'agreeableness',
@@ -286,7 +351,14 @@ export const SCALE_INSTRUMENT_SOURCE = {
             canonical: true,
             displayPrecision: 1,
             missingPolicy: { type: 'complete_required' },
-            source: { type: 'items', items: pair(2, 7), aggregation: 'mean' },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'TIPI-02', weight: 1 },
+                { itemCode: 'TIPI-07', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
           },
           {
             key: 'conscientiousness',
@@ -297,7 +369,14 @@ export const SCALE_INSTRUMENT_SOURCE = {
             canonical: true,
             displayPrecision: 1,
             missingPolicy: { type: 'complete_required' },
-            source: { type: 'items', items: pair(3, 8), aggregation: 'mean' },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'TIPI-03', weight: 1 },
+                { itemCode: 'TIPI-08', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
           },
           {
             key: 'emotional_stability',
@@ -308,7 +387,14 @@ export const SCALE_INSTRUMENT_SOURCE = {
             canonical: true,
             displayPrecision: 1,
             missingPolicy: { type: 'complete_required' },
-            source: { type: 'items', items: pair(4, 9), aggregation: 'mean' },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'TIPI-04', weight: 1 },
+                { itemCode: 'TIPI-09', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
           },
           {
             key: 'openness_to_experience',
@@ -319,14 +405,33 @@ export const SCALE_INSTRUMENT_SOURCE = {
             canonical: true,
             displayPrecision: 1,
             missingPolicy: { type: 'complete_required' },
-            source: { type: 'items', items: pair(5, 10), aggregation: 'mean' },
+            source: {
+              type: 'items',
+              items: [
+                { itemCode: 'TIPI-05', weight: 1 },
+                { itemCode: 'TIPI-10', weight: 1 },
+              ],
+              aggregation: 'mean',
+            },
           },
         ],
       },
       report: {
         reportVersion: '1.0.0',
-        primaryScoreKeys: [...scoreKeys],
-        scoreOrder: [...scoreKeys],
+        primaryScoreKeys: [
+          'extraversion',
+          'agreeableness',
+          'conscientiousness',
+          'emotional_stability',
+          'openness_to_experience',
+        ],
+        scoreOrder: [
+          'extraversion',
+          'agreeableness',
+          'conscientiousness',
+          'emotional_stability',
+          'openness_to_experience',
+        ],
         interpretations: [
           {
             scoreKey: 'extraversion',
@@ -385,7 +490,18 @@ export const SCALE_INSTRUMENT_SOURCE = {
     goldenCases: [
       {
         name: 'all-midpoint',
-        answers: allAnswers('4'),
+        answers: [
+          { itemCode: 'TIPI-01', responseValue: '4' },
+          { itemCode: 'TIPI-02', responseValue: '4' },
+          { itemCode: 'TIPI-03', responseValue: '4' },
+          { itemCode: 'TIPI-04', responseValue: '4' },
+          { itemCode: 'TIPI-05', responseValue: '4' },
+          { itemCode: 'TIPI-06', responseValue: '4' },
+          { itemCode: 'TIPI-07', responseValue: '4' },
+          { itemCode: 'TIPI-08', responseValue: '4' },
+          { itemCode: 'TIPI-09', responseValue: '4' },
+          { itemCode: 'TIPI-10', responseValue: '4' },
+        ],
         expected: {
           quality: 'interpretable',
           scores: {
@@ -395,15 +511,29 @@ export const SCALE_INSTRUMENT_SOURCE = {
             emotional_stability: 4,
             openness_to_experience: 4,
           },
-          totalScoreKeys: [...scoreKeys],
+          totalScoreKeys: [
+            'extraversion',
+            'agreeableness',
+            'conscientiousness',
+            'emotional_stability',
+            'openness_to_experience',
+          ],
         },
       },
       {
         name: 'all-positive-poles-high',
-        answers: ITEM_CODES.map((itemCode, index) => ({
-          itemCode,
-          responseValue: reversedItems.has(itemCode) ? '1' : '7',
-        })),
+        answers: [
+          { itemCode: 'TIPI-01', responseValue: '7' },
+          { itemCode: 'TIPI-02', responseValue: '1' },
+          { itemCode: 'TIPI-03', responseValue: '7' },
+          { itemCode: 'TIPI-04', responseValue: '1' },
+          { itemCode: 'TIPI-05', responseValue: '7' },
+          { itemCode: 'TIPI-06', responseValue: '1' },
+          { itemCode: 'TIPI-07', responseValue: '7' },
+          { itemCode: 'TIPI-08', responseValue: '1' },
+          { itemCode: 'TIPI-09', responseValue: '7' },
+          { itemCode: 'TIPI-10', responseValue: '1' },
+        ],
         expected: {
           quality: 'interpretable',
           scores: {
@@ -413,15 +543,29 @@ export const SCALE_INSTRUMENT_SOURCE = {
             emotional_stability: 7,
             openness_to_experience: 7,
           },
-          totalScoreKeys: [...scoreKeys],
+          totalScoreKeys: [
+            'extraversion',
+            'agreeableness',
+            'conscientiousness',
+            'emotional_stability',
+            'openness_to_experience',
+          ],
         },
       },
       {
         name: 'all-positive-poles-low',
-        answers: ITEM_CODES.map((itemCode) => ({
-          itemCode,
-          responseValue: reversedItems.has(itemCode) ? '7' : '1',
-        })),
+        answers: [
+          { itemCode: 'TIPI-01', responseValue: '1' },
+          { itemCode: 'TIPI-02', responseValue: '7' },
+          { itemCode: 'TIPI-03', responseValue: '1' },
+          { itemCode: 'TIPI-04', responseValue: '7' },
+          { itemCode: 'TIPI-05', responseValue: '1' },
+          { itemCode: 'TIPI-06', responseValue: '7' },
+          { itemCode: 'TIPI-07', responseValue: '1' },
+          { itemCode: 'TIPI-08', responseValue: '7' },
+          { itemCode: 'TIPI-09', responseValue: '1' },
+          { itemCode: 'TIPI-10', responseValue: '7' },
+        ],
         expected: {
           quality: 'interpretable',
           scores: {
@@ -431,7 +575,13 @@ export const SCALE_INSTRUMENT_SOURCE = {
             emotional_stability: 1,
             openness_to_experience: 1,
           },
-          totalScoreKeys: [...scoreKeys],
+          totalScoreKeys: [
+            'extraversion',
+            'agreeableness',
+            'conscientiousness',
+            'emotional_stability',
+            'openness_to_experience',
+          ],
         },
       },
     ],
