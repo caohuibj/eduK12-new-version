@@ -170,8 +170,11 @@ async function group(owner, r, specId) {
 }
 async function showArtifact(page, org, artifactId) {
   await page.goto(`${base}/organizations/${org}/reporting`)
+  await page.getByText('高级：受保护反馈与历史报告读取', { exact: true }).click()
   await page.getByPlaceholder('artifact UUID').fill(artifactId)
   await page.getByRole('button', { name: /读取.*artifact|读取 Artifact|读取 artifact/i }).click()
+  await page.getByRole('heading', { name: '报告结果', exact: true }).waitFor()
+  await page.getByText('报告记录编号', { exact: true }).click()
   await page.getByText(`Artifact ${artifactId}`, { exact: false }).first().waitFor()
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'Reporting workspace must fit the viewport')
 }
