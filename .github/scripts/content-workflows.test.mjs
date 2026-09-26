@@ -73,3 +73,52 @@ test('force-full override schedules full jobs and uses a full aggregate even for
     assert.match(job(ci, name), /vars.CI_FORCE_FULL != 'true'/, name);
   assert.match(job(ci, 'merge-gate'), /IS_DRAFT:.*vars.CI_FORCE_FULL != 'true'/);
 });
+
+
+test('performance gates only follow runtime hot paths', () => {
+  const cold = [
+    'server-version/backend/src/modules/cognitive/public.service.ts',
+    'server-version/backend/src/modules/reporting/service.ts',
+    'server-version/backend/src/modules/scale/instruments/example/1.0.0/instrument.json',
+  ];
+  const hot = [
+    'server-version/backend/src/modules/cognitive/final-submit.service.ts',
+    'server-version/backend/src/modules/scale/scale-final-submit.service.ts',
+    'server-version/backend/src/modules/situational/situational-final-submit.service.ts',
+    'server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts',
+    'server-version/backend/src/services/unitSubmitAdmission.ts',
+  ];
+  for (const workflow of ['perf-phase0-smoke', 'perf-phase0-closure']) {
+    assert.equal(triggered(workflow, cold), false, workflow);
+    for (const file of hot) assert.equal(triggered(workflow, [file]), true, `${workflow}: ${file}`);
+    assert.equal(triggered(workflow, [`.github/workflows/${workflow}.yml`]), true, workflow);
+  }
+});
+
+test('Cognitive management changes do not trigger the video gate', () => {
+  const workflow = 'media-7-cross-runtime-acceptance';
+  assert.equal(triggered(workflow, ['server-version/backend/src/modules/cognitive/public.service.ts']), false);
+  assert.equal(triggered(workflow, ['server-version/backend/src/modules/cognitive/cognitive.controller.ts']), false);
+  assert.equal(triggered(workflow, ['server-version/backend/src/modules/cognitive/cognitive-video.service.ts']), true);
+  assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
+});
+
+test('full CI preserves two physical self-hosted lanes', () => {
+  const ci = source('ci');
+  const backend = job(ci, 'backend');
+  const frontend = job(ci, 'frontend');
+  const browser = job(ci, 'browser');
+  const codeql = job(ci, 'codeql');
+  const docker = job(ci, 'docker');
+  const scope = job(ci, 'scope');
+  const merge = job(ci, 'merge-gate');
+  assert.match(backend, /eduk12-mac-ci/);
+  assert.match(browser, /eduk12-mac-ci/);
+  for (const text of [frontend, codeql, docker]) assert.match(text, /eduk12-win-ci/);
+  for (const text of [scope, merge]) {
+    assert.match(text, /self-hosted/);
+    assert.match(text, /- linux/);
+    assert.doesNotMatch(text, /eduk12-(mac|win)-ci|ubuntu-/);
+  }
+  assert.match(source('scale-onboarding-boundary'), /eduk12-win-ci/);
+});
