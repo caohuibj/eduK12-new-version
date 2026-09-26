@@ -50,12 +50,12 @@ async function completeFour(page, label) {
   const reportButton=page.getByRole('button',{name:'查看个人报告',exact:true})
   if(await reportButton.isVisible()) await reportButton.click()
   await page.waitForURL(url=>url.pathname.endsWith('/report'),{timeout:30000})
+  await page.getByText('本次学习目标',{exact:false}).waitFor({timeout:30000})
   await page.screenshot({path:output+'/'+label+'-report.png',fullPage:true})
-  assert.equal(await page.getByText('本次学习目标',{exact:false}).count()>0,true)
 }
 async function main() {
   assert.equal(process.env.QUESTIONNAIRE_PRODUCT_ISOLATED_DB,'1','Use an isolated test service')
-  const browser = await chromium.launch({headless:true, executablePath:process.env.BROWSER_EXECUTABLE || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'})
+  const browser = await chromium.launch({headless:true, ...(process.env.BROWSER_EXECUTABLE ? {executablePath:process.env.BROWSER_EXECUTABLE} : {})})
   const context = await browser.newContext({viewport:{width:1440,height:1000}})
   const page = await context.newPage()
   const errors=[]

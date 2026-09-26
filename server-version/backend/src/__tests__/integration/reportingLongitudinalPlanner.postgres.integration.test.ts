@@ -184,4 +184,32 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
     expect(waveSpecific.projection.state).toBe('suppressed')
   }, 60000)
 
+  it('bounds queries for three completed waves of 1000 subjects', async () => {
+    const { prisma }=await import('../../config/database')
+    let queries=0
+    prisma.$use(async (params,next)=>{queries++;return next(params)})
+    const counts:number[]=[]
+    for(const population of [100,1000]) {
+      const first=await buildReportingFixture(db,population)
+      await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+      const resource=(await db.$queryRaw<Array<{key:string}>>`SELECT resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0].key
+      const waves=[first]
+      for(const at of [new Date('2026-10-01'),new Date('2026-11-01')]) waves.push(await buildReportingFixture(db,population,false,{ownerId:first.ownerId,organizationId:first.organizationId,members:first.members,resourceKey:resource,at}))
+      const actor={userId:first.ownerId,platformRole:'SYSTEM_ADMIN' as const}
+      const spec=await createPlatformReportingSpec({actor,specKey:key('performance'),version:1,definition:{
+        schemaVersion:1,analysisKind:'MATCHED_LONGITUDINAL',engineKey:'ORG_MATCHED_LONGITUDINAL_V1',engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',minimumCohortN:3,minimumContributorN:3,reportEvidenceCeiling:'PILOT',
+        metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:resource,valueType:'NUMBER',longitudinalMetricKey:'score',acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',minimumMetricN:3,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[]}})
+      await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+      queries=0
+      const result=await generateAutomaticLongitudinal({principal:{userId:first.ownerId,platformRole:'STANDARD'},organizationId:first.organizationId,specId:spec.id,analysisKind:'MATCHED_LONGITUDINAL',sources:waves.map(({runId,trackId})=>({runId,trackId})),cohortStrategy:'BASELINE_FIXED',mode:'FULL_CASE'})
+      counts.push(queries)
+      expect(result.projection.state).toBe('present')
+      expect((result.projection as any).matchedEligibleN).toBe(population)
+    }
+    expect(counts[0]).toBeGreaterThan(0)
+    console.info('Three-wave query budget', { populations: [100,1000], counts })
+    expect(counts[1]).toBeLessThanOrEqual(counts[0]+30)
+    expect(counts[1]).toBeLessThan(600)
+  },180000)
+
 })

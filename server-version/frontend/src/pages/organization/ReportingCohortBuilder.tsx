@@ -1,6 +1,8 @@
+import { ReportingMemberPicker } from './ReportingMemberPicker'
 import type { CohortOptions, CohortSelector } from '../../api/reporting'
 
-export function ReportingCohortBuilder({ options, value, onChange }: {
+export function ReportingCohortBuilder({ organizationId, options, value, onChange }: {
+  organizationId: string;
   options: CohortOptions; value: CohortSelector; onChange: (value: CohortSelector) => void
 }) {
   const classes = value.clauses.find(c => c.kind === 'CLASS_UNITS')
@@ -26,6 +28,7 @@ export function ReportingCohortBuilder({ options, value, onChange }: {
       ] })
       return <fieldset key={d.id}><legend>{d.name}</legend><select aria-label={`${d.name}匹配方式`} value={match} onChange={e => update(selected, e.target.value as 'ANY' | 'ALL')}><option value="ANY">符合任一标签</option><option value="ALL">符合所有标签</option></select><div className="mt-2 flex flex-wrap gap-4">{labels.map(l => <label key={l.id}><input type="checkbox" checked={selected.includes(l.id)} onChange={e => update(toggle(selected, l.id, e.target.checked), match)} /> {l.name}</label>)}</div></fieldset>
     })}
+    <ReportingMemberPicker organizationId={organizationId} value={value} onChange={onChange} />
     <p className="text-sm text-slate-600">{value.clauses.length ? '已选择部分人群。历史班级与标签按测量发布时的记录解析。' : '当前选择：全部受测者'}</p>
   </section>
 }

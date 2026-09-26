@@ -33,7 +33,7 @@ type PopulationFixture = {
 }
 
 export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false, repeated?: {
-  ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date
+  ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date; resourceVersion?: string
 }): Promise<PopulationFixture> => {
   const prefix = `reporting-qb-${population}-${randomUUID().slice(0, 8)}`
   const ownerId = repeated?.ownerId ?? randomUUID()
@@ -44,6 +44,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
   const subjectActorId = randomUUID()
   const now = repeated?.at ?? new Date('2026-09-19T00:00:00.000Z')
   const resourceKey = repeated?.resourceKey ?? `${prefix}-resource`
+  const resourceVersion = repeated?.resourceVersion ?? '1.0.0'
   const members: FixtureMember[] = Array.from({ length: population }, (_, i) => ({
     userId: repeated?.members[i].userId ?? randomUUID(),
     membershipId: repeated?.members[i].membershipId ?? randomUUID(),
@@ -103,7 +104,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     `INSERT INTO assessment_run_tracks
       (id, organization_id, run_id, resource_family, resource_key, resource_version,
        subject_selector, respondent_selector, requested_policy, frozen_resource_policy, resource_policy_hash)
-     VALUES ($1,$2,$3,'BUNDLE',$4,'1.0.0','{}'::jsonb,'{}'::jsonb,$5::jsonb,$6::jsonb,$7)`,
+     VALUES ($1,$2,$3,'BUNDLE',$4,$8,'{}'::jsonb,'{}'::jsonb,$5::jsonb,$6::jsonb,$7)`,
     trackId,
     organizationId,
     runId,
@@ -111,6 +112,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     JSON.stringify({ analysisMode: protectedSubject ? 'COHORT_AGGREGATE' : 'INDIVIDUAL_ONLY', perspectives: [protectedSubject ? 'RELATIONAL_EXPERIENCE' : 'SELF_REPORT'] }),
     JSON.stringify({ minimumRespondents: 3 }),
     resourcePolicyHash,
+    resourceVersion,
   )
 
   const graphRows = members.map((member) => ({
@@ -165,7 +167,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     schemaVersion: 1,
     resourceFamily: 'BUNDLE',
     resourceKey,
-    resourceVersion: '1.0.0',
+    resourceVersion,
     resourcePolicyHash,
     scientificMaturity: 'PILOT',
   }

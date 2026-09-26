@@ -1,4 +1,4 @@
-import { listIndividualSubjects, listIndividualSources } from './individualService'
+import { listCohortMembers, listIndividualSubjects, listIndividualSources } from './individualService'
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { instrumentError, unauthorized } from '../../utils/response'
@@ -31,6 +31,13 @@ const noStore = (res: Response, data: unknown) => {
 }
 
 export const reportingDiscoveryController = {
+  async cohortMembers(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = z.object({ ...pagination, search: z.string().trim().max(100).optional() }).strict().safeParse(req.query)
+    if (!parsed.success) return badRequest(res, 'invalid member search')
+    try { return noStore(res, await listCohortMembers({ ...parsed.data, principal: principal(req), organizationId: req.params.organizationId })) }
+    catch (error) { return fail(res, error) }
+  },
   async individualSubjects(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = z.object({ ...pagination, search: z.string().trim().max(100).optional() }).strict().safeParse(req.query)

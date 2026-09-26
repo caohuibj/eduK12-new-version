@@ -331,8 +331,8 @@ jobs:
         run: npm run build
       - name: publish tested backend build
         id: backend-build-upload
-        # Artifact finalization can fail transiently (ECONNRESET). Allow one
-        # retry below; a second failure still fails the job and merge gate.
+        # GitHub artifact creation/finalization can reset connections. Retry
+        # with bounded backoff; the final attempt must succeed or fail the job.
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
@@ -340,7 +340,12 @@ jobs:
           path: server-version/backend/dist
           retention-days: 1
           if-no-files-found: error
+      - name: wait before retrying backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        run: sleep 15
       - name: retry backend build upload
+        id: backend-build-upload-retry
+        continue-on-error: true
         if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
@@ -349,6 +354,19 @@ jobs:
           retention-days: 1
           if-no-files-found: error
           # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
+      - name: wait before final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        # Do not ignore this failure: browser must consume this run's exact build.
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
           overwrite: true
       # The unknown-package contract imports the generated frontend runner.
       # This job has its own checkout; dependencies installed by the frontend
@@ -688,6 +706,24 @@ jobs:
           done
           if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
           node e2e/bundle-products-browser-e2e.cjs
+      - name: Reporting V2.2 final product scenarios
+        env:
+          REPORTING_BROWSER_ISOLATED_DB: '1'
+          REPORTING_BROWSER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          REPORTING_BROWSER_BASE_URL: http://127.0.0.1:5173
+        run: |
+          backend/node_modules/.bin/tsx e2e/reporting-v22-fixture.ts
+          node e2e/reporting-v22-browser-e2e.cjs
+      - name: anonymous questionnaire completion and exhausted-link recovery
+        env:
+          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
+          QUESTIONNAIRE_PRODUCT_PUBLIC: '1'
+          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          QUESTIONNAIRE_PRODUCT_BASE_URL: http://127.0.0.1:5173
+          QUESTIONNAIRE_PRODUCT_EVIDENCE: /tmp/eduk12-questionnaire-public-e2e
+        run: |
+          backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
+          node e2e/questionnaire-products-browser-e2e.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
@@ -702,6 +738,8 @@ jobs:
             /tmp/eduk12-pr5-release-rehearsal
             /tmp/eduk12-pr5-scenario-backend.log
             /tmp/eduk12-bundle-products-e2e
+            /tmp/eduk12-questionnaire-public-e2e
+            /tmp/reporting-v22-evidence
             /tmp/eduk12-bundle-products-backend.log
           if-no-files-found: ignore
       - name: stop seeded services

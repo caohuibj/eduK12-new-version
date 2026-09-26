@@ -1,3 +1,4 @@
+import { resourceLabel } from './reportingLabels'
 import { useEffect, useRef, useState } from 'react'
 import { reportingApi, type ReportingArtifactProjection, type ReportingSourceSummary, type PublishedReportingSpecSummary } from '../../api/reporting'
 import { deliveryApi } from '../../api/delivery'
@@ -62,12 +63,12 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
     {open && <>
       <label className="grid gap-1">查找学生<input disabled={busy} value={search} onChange={e=>setSearch(e.target.value)} /></label>
       <ProductButton disabled={busy} onClick={()=>{reset();setSubject('');void findSubjects()}}>查找</ProductButton>
-      <label className="grid gap-1">选择学生<select disabled={busy} value={subject} onChange={e=>{reset();setSubject(e.target.value);if(e.target.value) void findSources(e.target.value)}}><option value="">请选择</option>{subjects.map(s=><option key={s.userId} value={s.userId}>{s.name}</option>)}</select></label>
+      <label className="grid gap-1">选择学生<select aria-label="选择学生" disabled={busy} value={subject} onChange={e=>{reset();setSubject(e.target.value);if(e.target.value) void findSources(e.target.value)}}><option value="">请选择</option>{subjects.map(s=><option key={s.userId} value={s.userId}>{s.name}</option>)}</select></label>
       {subjectPage && <ProductButton disabled={busy} onClick={()=>void findSubjects(subjectPage)}>更多学生</ProductButton>}
-      <label className="grid gap-1">个人测量项目<select disabled={busy} value={resource} onChange={e=>{setResource(e.target.value);setSelected([]);setArtifact(null)}}><option value="">请选择</option>{[...new Set(sources.map(s=>`${s.resource.family}/${s.resource.key}`))].map(k=><option key={k}>{k}</option>)}</select></label>
+      <label className="grid gap-1">个人测量项目<select aria-label="个人测量项目" disabled={busy} value={resource} onChange={e=>{setResource(e.target.value);setSelected([]);setArtifact(null)}}><option value="">请选择</option>{[...new Set(sources.map(s=>`${s.resource.family}/${s.resource.key}`))].map(k=><option key={k} value={k}>{resourceLabel(sources,k)}</option>)}</select></label>
       <fieldset disabled={busy}><legend>个人测量时间</legend>{sources.filter(s=>`${s.resource.family}/${s.resource.key}`===resource).map(s=><label key={key(s)} className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={selected.includes(key(s))} onChange={e=>{setArtifact(null);setSelected(old=>e.target.checked?[...old,key(s)]:old.filter(k=>k!==key(s)))}} />{s.runName} · {s.publishedAt ? new Date(s.publishedAt).toLocaleDateString() : '日期未知'} · {s.resource.version}</label>)}</fieldset>
       {sourcePage && <ProductButton disabled={busy} onClick={()=>void findSources(subject,sourcePage)}>更早的个人测量</ProductButton>}
-      <label className="grid gap-1">个人报告方案<select disabled={busy} value={specId} onChange={e=>{setSpecId(e.target.value);setArtifact(null)}}><option value="">请选择</option>{specs.map(s=><option key={s.specId} value={s.specId}>{s.specKey} v{s.version}</option>)}</select></label>
+      <label className="grid gap-1">个人报告方案<select aria-label="个人报告方案" disabled={busy} value={specId} onChange={e=>{setSpecId(e.target.value);setArtifact(null)}}><option value="">请选择</option>{specs.map(s=><option key={s.specId} value={s.specId}>{s.specKey} v{s.version}</option>)}</select></label>
       {specs.length===0 && <p>尚无已发布的个人纵向报告方案，请由平台管理员审核并发布。</p>}
       <ProductButton disabled={busy || !subject || !specId || selected.length<2} onClick={()=>void generate()}>生成个人纵向报告</ProductButton>
     </>}
