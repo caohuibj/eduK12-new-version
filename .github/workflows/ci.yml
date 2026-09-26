@@ -55,7 +55,10 @@ concurrency:
 jobs:
   scope:
     name: classify changed content
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     outputs:
       content: ${{ steps.scope.outputs.content }}
       scale: ${{ steps.scope.outputs.scale }}
@@ -501,7 +504,10 @@ jobs:
     # uses an isolated hosted runner so browser work cannot stall the Mac lane.
     needs: [scope, backend, frontend]
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(vars.CI_BROWSER_HOSTED != 'false' && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -893,7 +899,10 @@ jobs:
     name: merge gate / ready PR
     needs: [scope, content, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
