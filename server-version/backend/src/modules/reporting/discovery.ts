@@ -8,7 +8,6 @@ import { getPublishedReportingSpec } from './spec'
 import { ReportingError, type ReportingAnalysisKindV1, type ReportingAnalysisSpecDefinitionV1 } from './types'
 
 const MAX_SERIES_WAVES = 100
-const MAX_SOURCE_CANDIDATES = 200
 const MAX_PROTECTED_SOURCE_CANDIDATES = 500
 const MAX_PROTECTED_SOURCES = 100
 
@@ -120,6 +119,8 @@ export async function listPublishedReportingSpecs(input: {
 export async function listOrganizationReportingSources(input: {
   principal: ReportingPrincipal
   organizationId: string
+  page?: number
+  pageSize?: number
 }) {
   await assertOrganizationReportingWorkspaceAccess(input)
   const rows = await prisma.$queryRaw<Array<{
@@ -158,8 +159,8 @@ export async function listOrganizationReportingSources(input: {
         AND subject."user_id"=respondent."user_id"
         AND subject."membership_id" IS NOT NULL
       )
-    ORDER BY r."created_at" DESC, r."id", t."created_at", t."id"
-    LIMIT ${MAX_SOURCE_CANDIDATES}
+    ORDER BY r."published_at" DESC, r."id", t."id"
+    LIMIT ${input.pageSize ?? 100} OFFSET ${((input.page ?? 1) - 1) * (input.pageSize ?? 100)}
   `
   const allowedRuns = new Map<string, boolean>()
   for (const runId of [...new Set(rows.map((row) => row.runId))]) {
@@ -181,7 +182,8 @@ export async function listOrganizationReportingSources(input: {
       trackId: row.trackId,
       resource: { family: row.resourceFamily, key: row.resourceKey, version: row.resourceVersion },
     })),
-    truncated: rows.length === MAX_SOURCE_CANDIDATES,
+    truncated: rows.length === (input.pageSize ?? 100),
+    nextPage: rows.length === (input.pageSize ?? 100) ? (input.page ?? 1) + 1 : null,
   }
 }
 
@@ -335,4 +337,14 @@ export async function listOrganizationReportingSeries(input: {
   }))
   await assertOrganizationReportingWorkspaceAccess(input)
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize, maxWavesPerSeries: MAX_SERIES_WAVES }
+}
+
+/** Reporting metadata only; no assignments, member identities, or counts. */
+export async function listReportingCohortOptions(input: { principal: ReportingPrincipal; organizationId: string }) {
+  await assertOrganizationReportingWorkspaceAccess(input)
+  const classes = await prisma.$queryRaw<Array<{ id: string; name: string }>>`SELECT id, name FROM organization_units WHERE organization_id=${input.organizationId} AND unit_kind='CLASS' ORDER BY name, id`
+  const dimensions = await prisma.$queryRaw<Array<{ id: string; key: string; name: string }>>`SELECT id, key, name FROM organization_classification_dimensions WHERE organization_id=${input.organizationId} ORDER BY name, id`
+  const labels = await prisma.$queryRaw<Array<{ id: string; dimensionId: string; name: string }>>`SELECT id, dimension_id AS "dimensionId", name FROM organization_labels WHERE organization_id=${input.organizationId} ORDER BY name, id`
+  await assertOrganizationReportingWorkspaceAccess(input)
+  return { classes, dimensions, labels }
 }

@@ -169,6 +169,7 @@ export const createReportingSeries = async (input: {
   seriesKey: string
   scope: ReportingSeriesScopeV1
   createdByUserId: string
+  reuse?: boolean
 }): Promise<ReportingSeriesRecordV1> => {
   const seriesKey = input.seriesKey.trim()
   if (!seriesKey) reportingFail('REPORT_SERIES_KEY_INVALID', 'seriesKey is required', 400)
@@ -195,11 +196,19 @@ export const createReportingSeries = async (input: {
       INSERT INTO "reporting_series"
         ("id","organization_id","series_key","scope","series_identity_hash","snapshot_hash","created_by_user_id","created_at")
       VALUES (${row.id},${row.organizationId},${row.seriesKey},${JSON.stringify(row.scope)}::jsonb,${row.seriesIdentityHash},${row.snapshotHash},${row.createdByUserId},${row.createdAt})
+      ${input.reuse ? Prisma.sql`ON CONFLICT ("organization_id", "series_key") DO NOTHING` : Prisma.empty}
       RETURNING "id", "organization_id" AS "organizationId", "series_key" AS "seriesKey", "scope",
         "series_identity_hash" AS "seriesIdentityHash", "snapshot_hash" AS "snapshotHash",
         "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt"
     `
-    return assertSeriesIntegrity(rows[0])
+    if (rows[0]) return assertSeriesIntegrity(rows[0])
+    if (input.reuse) {
+      const rows = await prisma.$queryRaw<Array<{ id: string }>>`SELECT id FROM reporting_series WHERE organization_id=${input.organizationId} AND series_key=${seriesKey}`
+      const existing = await readReportingSeries(rows[0]?.id ?? '')
+      if (canonicalHash(existing.scope) !== canonicalHash(scope)) reportingFail('REPORT_SERIES_RESOURCE_MISMATCH', 'existing series scope differs', 409)
+      return existing
+    }
+    return reportingFail('REPORT_SERIES_KEY_CONFLICT', 'reporting series could not be created', 409)
   } catch (error) {
     if (isUniqueViolation(error)) reportingFail('REPORT_SERIES_KEY_CONFLICT', 'reporting series key already exists in this Organization', 409)
     throw error
@@ -223,6 +232,7 @@ export const bindReportingSeriesWave = async (input: {
   ordinal: number
   cohortSnapshotId: string
   createdByUserId: string
+  preparedBatch?: ReportingResultBatchV1
 }): Promise<ReportingSeriesWaveRecordV1> => {
   const waveKey = input.waveKey.trim()
   if (!waveKey || !Number.isInteger(input.ordinal) || input.ordinal < 1) {
@@ -235,7 +245,14 @@ export const bindReportingSeriesWave = async (input: {
   if (series.organizationId !== input.organizationId || cohort.organizationId !== input.organizationId) {
     reportingFail('REPORT_SERIES_SCOPE_MISMATCH', 'Series and Wave cohort must belong to the same Organization', 404)
   }
-  const batch = await resolveAuthoritativeRunResults(cohort)
+  const batch = input.preparedBatch ?? await resolveAuthoritativeRunResults(cohort)
+  const members = new Map(cohort.members.map(member => [member.executionId, member]))
+  const observations = [...batch.resolved, ...batch.unresolved]
+  if (observations.length !== members.size || new Set(observations.map(row => row.executionId)).size !== members.size
+    || observations.some(row => {
+      const member = members.get(row.executionId)
+      return !member || member.userId !== row.subjectUserId || member.membershipId !== row.membershipId
+    })) reportingFail('REPORT_RESULT_INTEGRITY', 'Wave results must exactly cover the frozen cohort', 500)
   if (batch.resourceFamily !== series.scope.resourceFamily || batch.resourceKey !== series.scope.resourceKey) {
     reportingFail('REPORT_SERIES_RESOURCE_MISMATCH', 'Wave resource is outside the Series resource scope', 409)
   }

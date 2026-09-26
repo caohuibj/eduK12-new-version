@@ -305,10 +305,16 @@ export const resolveAuthoritativeRunResults = (cohort: ReportingCohortSnapshotRe
       runId: cohort.sourceRunId,
       trackId: cohort.sourceTrackId,
     })
-    if (batch.resolved.length + batch.unresolved.length !== cohort.members.length) {
+    if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && batch.resolved.length + batch.unresolved.length !== cohort.members.length) {
       reportingFail('REPORT_RESULT_INTEGRITY', 'Run execution population no longer matches frozen cohort', 500)
     }
     const memberByExecution = new Map(cohort.members.map((member) => [member.executionId, member]))
+    const selectedResolved = batch.resolved.filter(o => memberByExecution.has(o.executionId))
+    const selectedUnresolved = batch.unresolved.filter(o => memberByExecution.has(o.executionId))
+    const executionIds = [...selectedResolved, ...selectedUnresolved].map(o => o.executionId)
+    if (memberByExecution.size !== cohort.members.length || executionIds.length !== cohort.members.length || new Set(executionIds).size !== cohort.members.length) {
+      reportingFail('REPORT_RESULT_INTEGRITY', 'frozen cohort executions must resolve exactly once', 500)
+    }
     const assertSelf = (observation: ReportingResolvedObservationV1 | ReportingUnresolvedObservationV1) => {
       const member = memberByExecution.get(observation.executionId)
       if (
@@ -321,9 +327,9 @@ export const resolveAuthoritativeRunResults = (cohort: ReportingCohortSnapshotRe
         || observation.respondent.membershipId !== member.membershipId
       ) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group result source accepts frozen SELF observations only', 409)
     }
-    batch.resolved.forEach(assertSelf)
-    batch.unresolved.forEach(assertSelf)
-    const resolved: ReportingResolvedExecutionV1[] = batch.resolved.map((observation) => ({
+    selectedResolved.forEach(assertSelf)
+    selectedUnresolved.forEach(assertSelf)
+    const resolved: ReportingResolvedExecutionV1[] = selectedResolved.map((observation) => ({
       executionId: observation.executionId,
       subjectUserId: observation.subject.userId,
       membershipId: observation.subject.membershipId!,
@@ -334,7 +340,7 @@ export const resolveAuthoritativeRunResults = (cohort: ReportingCohortSnapshotRe
       provenanceState: observation.provenanceState,
       scientificProvenanceHash: observation.scientificProvenanceHash,
     }))
-    const unresolved: ReportingUnresolvedExecutionV1[] = batch.unresolved.map((observation) => ({
+    const unresolved: ReportingUnresolvedExecutionV1[] = selectedUnresolved.map((observation) => ({
       executionId: observation.executionId,
       subjectUserId: observation.subject.userId,
       membershipId: observation.subject.membershipId!,

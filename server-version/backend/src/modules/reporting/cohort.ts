@@ -1,3 +1,4 @@
+import { normalizeCohortSelector, selectHistoricalMembers } from './cohort-selector'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -5,6 +6,8 @@ import {
   reportingFail,
   type ReportingCohortMemberV1,
   type ReportingCohortSnapshotPayloadV1,
+  type ReportingCohortSnapshotPayloadV2,
+  type ReportingCohortSelectorInputV2,
   type ReportingCohortSnapshotRecord,
 } from './types'
 
@@ -24,7 +27,7 @@ type CohortRow = {
   organizationId: string
   sourceRunId: string
   sourceTrackId: string
-  selector: ReportingCohortSnapshotPayloadV1['selector']
+  selector: ReportingCohortSnapshotRecord['selector']
   members: ReportingCohortMemberV1[]
   eligibleN: number
   cohortIdentityHash: string
@@ -39,8 +42,8 @@ const memberSort = (left: ReportingCohortMemberV1, right: ReportingCohortMemberV
   return a < b ? -1 : a > b ? 1 : 0
 }
 
-const payloadFor = (row: CohortRow): ReportingCohortSnapshotPayloadV1 => ({
-  schemaVersion: 1,
+const payloadFor = (row: CohortRow) => ({
+  schemaVersion: row.selector.kind === 'RUN_TRACK_SUBJECTS' ? 1 : 2,
   organizationId: row.organizationId,
   source: { kind: 'RUN_TRACK', runId: row.sourceRunId, trackId: row.sourceTrackId },
   selector: row.selector,
@@ -54,11 +57,11 @@ const assertRecordIntegrity = (row: CohortRow): ReportingCohortSnapshotRecord =>
   const memberKeys = row.members.map((member) => ({ userId: member.userId, membershipId: member.membershipId }))
     .sort((left, right) => `${left.userId}\u0000${left.membershipId}`.localeCompare(`${right.userId}\u0000${right.membershipId}`))
   const identity = canonicalHash({
-    schema: 'ReportingCohortIdentityV1',
+    schema: row.selector.kind === 'RUN_TRACK_SUBJECTS' ? 'ReportingCohortIdentityV1' : 'ReportingCohortIdentityV2',
     organizationId: row.organizationId,
     source: { kind: 'RUN_TRACK', runId: row.sourceRunId, trackId: row.sourceTrackId },
     selector: row.selector,
-    members: memberKeys,
+    members: row.selector.kind === 'RUN_TRACK_SUBJECTS' ? memberKeys : [...row.members].sort(memberSort),
   })
   if (identity !== row.cohortIdentityHash || canonicalHash(payloadFor(row)) !== row.snapshotHash) {
     reportingFail('REPORT_COHORT_INTEGRITY', 'stored cohort snapshot failed integrity verification', 500)
@@ -72,6 +75,8 @@ export const freezeRunTrackCohort = async (input: {
   runId: string
   trackId: string
   generatedByUserId: string
+  cohortSelector?: ReportingCohortSelectorInputV2
+  baselineCohort?: ReportingCohortSnapshotRecord
 }): Promise<ReportingCohortSnapshotRecord> => {
   const rows = await prisma.$queryRaw<PopulationRow[]>`
     SELECT r."status" AS "runStatus", t."resource_family" AS "resourceFamily",
@@ -96,7 +101,7 @@ export const freezeRunTrackCohort = async (input: {
   if (rows.some((row) => !row.membershipId)) {
     reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
   }
-  const members = rows.map<ReportingCohortMemberV1>((row) => ({
+  let members = rows.map<ReportingCohortMemberV1>((row) => ({
     userId: row.subjectUserId,
     membershipId: row.membershipId!,
     actorSnapshotId: row.actorSnapshotId,
@@ -106,18 +111,34 @@ export const freezeRunTrackCohort = async (input: {
   if (memberIdentity.size !== members.length) {
     reportingFail('AMBIGUOUS_OBSERVATION', 'Run Track contains more than one SELF execution for a subject Membership', 409)
   }
-  const selector = { kind: 'RUN_TRACK_SUBJECTS' as const, runId: input.runId, trackId: input.trackId }
+  let selector: ReportingCohortSnapshotRecord['selector'] = { kind: 'RUN_TRACK_SUBJECTS', runId: input.runId, trackId: input.trackId }
+  if (input.cohortSelector || input.baselineCohort) {
+    const normalized = normalizeCohortSelector(input.cohortSelector ?? { schemaVersion: 2, clauses: [], combine: 'ALL' })
+    const anchors = await prisma.$queryRaw<Array<{ at: Date | null }>>`SELECT published_at AS at FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${input.runId}`
+    const at = anchors[0]?.at
+    if (!at) return reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
+    selector = { ...normalized, kind: 'FILTERED_RUN_TRACK_SUBJECTS', anchor: { kind: 'RUN_PUBLISHED_AT', at: at.toISOString() } }
+    if (input.baselineCohort) {
+      if (input.baselineCohort.organizationId !== input.organizationId) reportingFail('REPORT_SELECTOR_INVALID', 'baseline must belong to organization', 404)
+      const subjects = new Set(input.baselineCohort.members.map(m => m.userId))
+      members = members.filter(m => subjects.has(m.userId))
+      selector.baseline = { cohortSnapshotId: input.baselineCohort.id, cohortIdentityHash: input.baselineCohort.cohortIdentityHash }
+    } else {
+      members = await selectHistoricalMembers({ organizationId: input.organizationId, at, selector: normalized, members })
+    }
+    if (!members.length) reportingFail('REPORT_COHORT_EMPTY', 'selected population has no executions at this measurement', 409)
+  }
   const cohortIdentityHash = canonicalHash({
-    schema: 'ReportingCohortIdentityV1',
+    schema: selector.kind === 'RUN_TRACK_SUBJECTS' ? 'ReportingCohortIdentityV1' : 'ReportingCohortIdentityV2',
     organizationId: input.organizationId,
     source: { kind: 'RUN_TRACK', runId: input.runId, trackId: input.trackId },
     selector,
-    members: members.map(({ userId, membershipId }) => ({ userId, membershipId })),
+    members: selector.kind === 'RUN_TRACK_SUBJECTS' ? members.map(({ userId, membershipId }) => ({ userId, membershipId })) : members,
   })
   const generatedAt = new Date()
   const id = randomUUID()
-  const payload: ReportingCohortSnapshotPayloadV1 = {
-    schemaVersion: 1,
+  const payload = {
+    schemaVersion: selector.kind === 'RUN_TRACK_SUBJECTS' ? 1 : 2,
     organizationId: input.organizationId,
     source: { kind: 'RUN_TRACK', runId: input.runId, trackId: input.trackId },
     selector,
@@ -126,7 +147,7 @@ export const freezeRunTrackCohort = async (input: {
     generatedByUserId: input.generatedByUserId,
     generatedAt: generatedAt.toISOString(),
   }
-  const snapshotHash = canonicalHash(payload)
+  const snapshotHash = canonicalHash(payload as ReportingCohortSnapshotPayloadV1 | ReportingCohortSnapshotPayloadV2)
   const inserted = await prisma.$queryRaw<CohortRow[]>`
     INSERT INTO "reporting_cohort_snapshots"
       ("id","organization_id","source_run_id","source_track_id","selector","members","eligible_n","cohort_identity_hash","snapshot_hash","generated_by_user_id","generated_at")

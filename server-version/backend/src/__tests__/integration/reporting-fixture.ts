@@ -32,24 +32,28 @@ type PopulationFixture = {
   cohort: ReportingCohortSnapshotRecord
 }
 
-export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false): Promise<PopulationFixture> => {
+export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false, repeated?: {
+  ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date
+}): Promise<PopulationFixture> => {
   const prefix = `reporting-qb-${population}-${randomUUID().slice(0, 8)}`
-  const ownerId = randomUUID()
-  const organizationId = randomUUID()
+  const ownerId = repeated?.ownerId ?? randomUUID()
+  const organizationId = repeated?.organizationId ?? randomUUID()
   const runId = randomUUID()
   const trackId = randomUUID()
   const compositeId = randomUUID()
   const subjectActorId = randomUUID()
-  const now = new Date('2026-09-19T00:00:00.000Z')
-  const members: FixtureMember[] = Array.from({ length: population }, () => ({
-    userId: randomUUID(),
-    membershipId: randomUUID(),
+  const now = repeated?.at ?? new Date('2026-09-19T00:00:00.000Z')
+  const resourceKey = repeated?.resourceKey ?? `${prefix}-resource`
+  const members: FixtureMember[] = Array.from({ length: population }, (_, i) => ({
+    userId: repeated?.members[i].userId ?? randomUUID(),
+    membershipId: repeated?.members[i].membershipId ?? randomUUID(),
     actorSnapshotId: randomUUID(),
     relationshipSnapshotId: randomUUID(),
     executionId: randomUUID(),
     attemptId: randomUUID(),
   }))
 
+  if (!repeated) {
   await prisma.user.create({
     data: {
       id: ownerId,
@@ -82,6 +86,8 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     })),
   })
 
+  }
+
   const resourcePolicyHash = canonicalHash({ prefix, policy: 'reporting-query-budget' })
   await prisma.$executeRawUnsafe(
     `INSERT INTO assessment_runs
@@ -101,7 +107,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     trackId,
     organizationId,
     runId,
-    `${prefix}-resource`,
+    resourceKey,
     JSON.stringify({ analysisMode: protectedSubject ? 'COHORT_AGGREGATE' : 'INDIVIDUAL_ONLY', perspectives: [protectedSubject ? 'RELATIONAL_EXPERIENCE' : 'SELF_REPORT'] }),
     JSON.stringify({ minimumRespondents: 3 }),
     resourcePolicyHash,
@@ -158,7 +164,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
   const scientificProvenance = {
     schemaVersion: 1,
     resourceFamily: 'BUNDLE',
-    resourceKey: `${prefix}-resource`,
+    resourceKey,
     resourceVersion: '1.0.0',
     resourcePolicyHash,
     scientificMaturity: 'PILOT',

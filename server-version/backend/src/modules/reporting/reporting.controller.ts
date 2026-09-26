@@ -1,3 +1,5 @@
+import { generateAutomaticLongitudinal } from './longitudinal-planner'
+import { cohortSelectorSchema } from './cohort-selector'
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { instrumentError, unauthorized } from '../../utils/response'
@@ -42,6 +44,7 @@ const bindWaveSchema = z.object({
 }).strict()
 
 const legacyGroupAnalysisSchema = z.object({
+  cohortSelector: cohortSelectorSchema.optional(),
   runId: z.string().uuid(),
   trackId: z.string().uuid(),
   specId: z.string().uuid(),
@@ -69,7 +72,16 @@ const protectedAnalysisSchema = z.object({
   perspective: z.enum(['SELF_REPORT', 'OBSERVER_REPORT', 'RELATIONAL_EXPERIENCE']),
   specId: z.string().uuid(),
 }).strict()
+const automaticAnalysisSchema = z.object({
+  analysisKind: z.enum(['REPEATED_COHORT', 'MATCHED_LONGITUDINAL']),
+  sources: z.array(z.object({ runId: z.string().uuid(), trackId: z.string().uuid() }).strict()).min(2).max(50),
+  cohortSelector: cohortSelectorSchema.optional(),
+  cohortStrategy: z.enum(['WAVE_SPECIFIC', 'BASELINE_FIXED']),
+  specId: z.string().uuid(),
+  mode: z.enum(['PAIRWISE', 'FULL_CASE']).optional(),
+}).strict()
 const analysisSchema = z.union([
+  automaticAnalysisSchema,
   legacyGroupAnalysisSchema,
   repeatedAnalysisSchema,
   matchedAnalysisSchema,
@@ -206,6 +218,11 @@ export const reportingController = {
     if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid analysis request')
     try {
       const data = parsed.data
+      if ('sources' in data) {
+        const artifact = await generateAutomaticLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
+        res.setHeader('Cache-Control', 'no-store')
+        return res.json({ code: 0, message: '操作成功', data: artifact })
+      }
       if (!('analysisKind' in data)) {
         const artifact = await generateOrganizationGroupAnalysis({
           principal: principal(req),
@@ -213,6 +230,7 @@ export const reportingController = {
           runId: data.runId,
           trackId: data.trackId,
           specId: data.specId,
+          cohortSelector: data.cohortSelector,
         })
         res.setHeader('Cache-Control', 'no-store')
         return res.json({ code: 0, message: '操作成功', data: artifact })
