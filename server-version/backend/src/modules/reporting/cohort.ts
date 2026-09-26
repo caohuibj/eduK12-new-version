@@ -231,7 +231,7 @@ export const freezeRunTrackCohort = async (input: {
   return assertRecordIntegrity(existing[0] ?? reportingFail('REPORT_COHORT_REUSE', 'cohort create-or-reuse failed', 500))
 }
 
-export const readReportingCohort =export const readReportingCohort = async (cohortId: string): Promise<ReportingCohortSnapshotRecord> => {
+export const readReportingCohort = async (cohortId: string): Promise<ReportingCohortSnapshotRecord> => {
   const rows = await prisma.$queryRaw<CohortRow[]>`
     SELECT "id", "organization_id" AS "organizationId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
       "selector", "members", "eligible_n" AS "eligibleN", "cohort_identity_hash" AS "cohortIdentityHash", "snapshot_hash" AS "snapshotHash",

@@ -122,6 +122,8 @@ function ReportingWorkspace() {
   const [sources, setSources] = useState<ReportingSourceSummary[]>([])
   const [protectedSources, setProtectedSources] = useState<ProtectedReportingSourceSummary[]>([])
   const [series, setSeries] = useState<ReportingSeriesDiscoveryItem[]>([])
+  const [protectedLoaded, setProtectedLoaded] = useState(false)
+  const [seriesLoaded, setSeriesLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -171,38 +173,65 @@ function ReportingWorkspace() {
     setArtifact(null)
     setLoadError(null)
     try {
-      const [specPage, sourcePage, protectedPage, seriesPage, options] = await Promise.all([
+      const [specPage, sourcePage, options] = await Promise.all([
         reportingApi.listSpecs(organizationId),
         reportingApi.listSources(organizationId),
-        reportingApi.listProtectedSources(organizationId),
-        reportingApi.listSeries(organizationId),
         reportingApi.cohortOptions(organizationId),
       ])
       setSpecs(specPage.list)
       setSources(sourcePage.list)
       setNextSourcePage(sourcePage.nextPage ?? null)
       setCohortOptions(options)
-      setProtectedSources(protectedPage.list)
-      setSeries(seriesPage.list)
       setGroupSpecId((current) => current || specPage.list.find((item) => item.analysisKind === 'GROUP')?.specId || '')
       setGroupSourceKey((current) => current || (sourcePage.list[0] ? sourceKey(sourcePage.list[0]) : ''))
-      setWaveSeriesId((current) => current || seriesPage.list[0]?.seriesId || '')
       setWaveSourceKey((current) => current || (sourcePage.list[0] ? sourceKey(sourcePage.list[0]) : ''))
-      setLongitudinalSeriesId((current) => current || seriesPage.list[0]?.seriesId || '')
       setLongitudinalSpecId((current) => current || specPage.list.find((item) => item.analysisKind === 'REPEATED_COHORT')?.specId || '')
       setProtectedSpecId((current) => current || specPage.list.find((item) => item.analysisKind === 'PROTECTED_FEEDBACK')?.specId || '')
-      setProtectedSourceKey((current) => current || (protectedPage.list[0] ? `${sourceKey(protectedPage.list[0])}::${protectedPage.list[0].subject.userId}::${protectedPage.list[0].relationshipKind}::${protectedPage.list[0].perspective}` : ''))
     } catch (error) {
       setArtifact(null)
       setSpecs([])
       setSources([])
       setProtectedSources([])
       setSeries([])
+      setProtectedLoaded(false)
+      setSeriesLoaded(false)
       setLoadError(errorText(error, '当前账户无法进入 报告工作区'))
     } finally {
       setLoading(false)
     }
   }, [organizationId, context])
+
+  const loadSeriesDiscovery = useCallback(async (force = false) => {
+    if (!organizationId || !context || (seriesLoaded && !force)) return
+    try {
+      const page = await reportingApi.listSeries(organizationId)
+      setSeries(page.list)
+      setSeriesLoaded(true)
+      setWaveSeriesId((current) => page.list.some((item) => item.seriesId === current) ? current : (page.list[0]?.seriesId ?? ''))
+      setLongitudinalSeriesId((current) => page.list.some((item) => item.seriesId === current) ? current : (page.list[0]?.seriesId ?? ''))
+    } catch (error) {
+      setSeries([])
+      setSeriesLoaded(false)
+      setLoadError(errorText(error, '历史报告系列读取失败'))
+    }
+  }, [organizationId, context, seriesLoaded])
+
+  const loadProtectedDiscovery = useCallback(async (force = false) => {
+    if (!organizationId || !context || (protectedLoaded && !force)) return
+    try {
+      const page = await reportingApi.listProtectedSources(organizationId)
+      setProtectedSources(page.list)
+      setProtectedLoaded(true)
+      setProtectedSourceKey((current) => {
+        const available = page.list.map((item) => `${sourceKey(item)}::${item.subject.userId}::${item.relationshipKind}::${item.perspective}`)
+        return available.includes(current) ? current : (available[0] ?? '')
+      })
+    } catch (error) {
+      setProtectedSources([])
+      setProtectedLoaded(false)
+      setLoadError(errorText(error, '受保护反馈来源读取失败'))
+    }
+  }, [organizationId, context, protectedLoaded])
 
   useEffect(() => { void load() }, [load])
 
@@ -243,7 +272,7 @@ function ReportingWorkspace() {
     await act('Series 已创建。', async () => {
       await reportingApi.createSeries(organizationId, { seriesKey: seriesKey.trim(), scope: { resourceFamily: seriesFamily, resourceKey: seriesResourceKey.trim() } })
       setSeriesKey('')
-      await load()
+      await loadSeriesDiscovery(true)
     })
   }
 
@@ -255,7 +284,7 @@ function ReportingWorkspace() {
     await act('Wave 已绑定到 immutable cohort input。', async () => {
       await reportingApi.bindWave(organizationId, waveSeriesId, { waveKey: waveKey.trim(), ordinal, runId: source.runId, trackId: source.trackId })
       setWaveKey('')
-      await load()
+      await loadSeriesDiscovery(true)
     })
   }
 
@@ -342,7 +371,7 @@ function ReportingWorkspace() {
         </div>
       </section>
 
-      <details className="mt-8"><summary>高级：手动管理历史报告系列</summary>
+      <details className="mt-8" onToggle={(event) => { if (event.currentTarget.open) void loadSeriesDiscovery() }}><summary>高级：手动管理历史报告系列</summary>
       <section className="mt-8 space-y-4" aria-labelledby="series-heading">
         <div><h2 id="series-heading" className="text-xl font-semibold">Longitudinal Series / Waves</h2><p className="mt-1 text-sm text-slate-600">Series scope 固定 resource family/key；Wave 绑定会冻结 cohort 与 authoritative input identity。</p></div>
         <div className="grid min-w-0 gap-4 lg:grid-cols-2">
@@ -354,7 +383,7 @@ function ReportingWorkspace() {
       </section>
 
       </details>
-      <details className="mt-8"><summary>高级：受保护反馈与历史报告读取</summary>
+      <details className="mt-8" onToggle={(event) => { if (event.currentTarget.open) void loadProtectedDiscovery() }}><summary>高级：受保护反馈与历史报告读取</summary>
       <section className="mt-8 space-y-4" aria-labelledby="protected-heading">
         <div><h2 id="protected-heading" className="text-xl font-semibold">Protected feedback</h2><p className="mt-1 text-sm text-slate-600">Source discovery 已按 subject-scoped manager authority 过滤，只暴露 frozen subject/source identity，不暴露 respondent identities/counts。</p></div>
         <div className="grid min-w-0 gap-4 rounded-xl border border-slate-200 bg-white p-4 md:grid-cols-2"><label className="grid min-w-0 gap-1 text-sm font-medium">Protected source<select aria-label="Protected source" className="min-h-11 min-w-0 w-full rounded-lg border border-slate-300 px-3" value={protectedSourceKey} onChange={(event) => setProtectedSourceKey(event.target.value)}><option value="">请选择</option>{protectedSources.map((source) => { const key = `${sourceKey(source)}::${source.subject.userId}::${source.relationshipKind}::${source.perspective}`; return <option key={key} value={key}>{source.runName} · subject {source.subject.userId} · {source.relationshipKind}/{source.perspective}</option> })}</select></label><label className="grid min-w-0 gap-1 text-sm font-medium">Published protected spec<select aria-label="Published protected spec" className="min-h-11 min-w-0 w-full rounded-lg border border-slate-300 px-3" value={protectedSpecId} onChange={(event) => setProtectedSpecId(event.target.value)}><option value="">请选择</option>{protectedSpecs.map((spec) => <option key={spec.specId} value={spec.specId}>{spec.specKey} v{spec.version}</option>)}</select></label><div className="flex items-end md:col-span-2"><ProductButton variant="primary" disabled={busy || !protectedSourceKey || !protectedSpecId} onClick={() => void generateProtected()}>生成 Protected</ProductButton></div></div>

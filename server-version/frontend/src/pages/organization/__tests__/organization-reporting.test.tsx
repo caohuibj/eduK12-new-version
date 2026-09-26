@@ -8,6 +8,20 @@ const org = vi.hoisted(() => ({ active: { organization: { id: 'o1' }, access: { 
 vi.mock('../../../api/reporting', () => ({ reportingApi: api }))
 vi.mock('../../../contexts/OrganizationContext', () => ({ useOrganization: () => org }))
 beforeEach(() => { vi.clearAllMocks(); api.cohortOptions.mockResolvedValue({ classes: [], dimensions: [], labels: [] }); for (const method of [api.listSpecs, api.listSources, api.listProtectedSources, api.listSeries]) method.mockResolvedValue({ list: [] }) })
+it('lazy loads advanced discovery only after the advanced section opens', async () => {
+  render(<MemoryRouter initialEntries={['/organizations/o1/reporting']}><Routes><Route path="/organizations/:organizationId/reporting" element={<OrganizationReportingPage />} /></Routes></MemoryRouter>)
+  await waitFor(() => expect(api.cohortOptions).toHaveBeenCalledWith('o1'))
+  expect(api.listSeries).not.toHaveBeenCalled()
+  expect(api.listProtectedSources).not.toHaveBeenCalled()
+
+  await userEvent.click(screen.getByText('高级：手动管理历史报告系列'))
+  await waitFor(() => expect(api.listSeries).toHaveBeenCalledTimes(1))
+  expect(api.listProtectedSources).not.toHaveBeenCalled()
+
+  await userEvent.click(screen.getByText('高级：受保护反馈与历史报告读取'))
+  await waitFor(() => expect(api.listProtectedSources).toHaveBeenCalledTimes(1))
+})
+
 it('removes an existing artifact when exact read permission is revoked', async () => {
   api.readArtifact.mockResolvedValueOnce({ artifactId: 'private-artifact', generatedAt: '2026-09-19T00:00:00Z', projection: { kind: 'GROUP', state: 'present', eligibleN: 12, resultContributorN: 12, metrics: {} } })
   render(<MemoryRouter initialEntries={['/organizations/o1/reporting']}><Routes><Route path="/organizations/:organizationId/reporting" element={<OrganizationReportingPage />} /></Routes></MemoryRouter>)
