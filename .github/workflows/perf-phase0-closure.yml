@@ -4,6 +4,23 @@ on:
   pull_request:
     types: [ready_for_review, synchronize, reopened]
     branches: [main]
+    paths:
+      - '.github/workflows/perf-phase0-closure.yml'
+      - 'server-version/perf/**'
+      - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
+      - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
+      - 'server-version/backend/src/config/database.ts'
+      - 'server-version/backend/src/modules/assessment-runtime/**'
+      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
+      - 'server-version/backend/src/modules/scale/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/situational/situational-final-submit.service.ts'
+      - 'server-version/backend/src/services/unitSubmitAdmission.ts'
+      - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
+      - 'server-version/backend/src/services/boundedAdmissionGate.ts'
+      - 'server-version/backend/src/services/instrumentFinalSubmit.ts'
+      - 'server-version/backend/src/services/runtimeObservability.ts'
   workflow_dispatch:
 
 concurrency:
