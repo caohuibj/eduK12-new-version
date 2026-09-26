@@ -33,7 +33,7 @@ export const serializeQuestionnaireAccessToken = (row: any, reveal = false) => {
   } = row || {}
   return reveal
     ? { ...safe, token: legacyToken || (tokenEncrypted ? tokenService.decryptToken(tokenEncrypted) : null) }
-    : safe
+    : { ...safe, token: null }
 }
 
 export interface TokenValidation {

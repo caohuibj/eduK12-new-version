@@ -54,6 +54,7 @@ router.post('/:id/form-sections/:sectionId/items/:itemId', generalQuestionnaireC
 // 访问令牌管理
 router.get('/:id/tokens', generalQuestionnaireController.listTokens)
 router.post('/:id/tokens', generalQuestionnaireController.createToken)
+router.post('/:id/tokens/:tokenId/reveal', generalQuestionnaireController.revealToken)
 router.delete('/:id/tokens/:tokenId', generalQuestionnaireController.disableToken)
 
 // 数据管理
