@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/auth'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
 import { reportingDiscoveryController } from '../reporting/discovery.controller'
+import { reportingAnalysisGuard, reportingExportBudget } from '../reporting/runtimeLimit'
 import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
 import { organizationAdminController } from './organization.admin.controller'
 import { organizationController } from './organization.controller'
@@ -94,7 +95,7 @@ router.get('/:organizationId/reporting/protected-sources', authenticate, reporti
 router.get('/:organizationId/reporting/series', authenticate, reportingDiscoveryController.listSeries)
 router.post('/:organizationId/reporting/series', authenticate, reportingController.createSeries)
 router.post('/:organizationId/reporting/series/:seriesId/waves', authenticate, reportingController.bindWave)
-router.post('/:organizationId/reporting/exports', authenticate, reportingController.createExport)
+router.post('/:organizationId/reporting/exports', authenticate, reportingExportBudget, reportingController.createExport)
 router.get('/:organizationId/reporting/exports/:exportId', authenticate, reportingController.downloadExport)
 
 // Safety remains server-authoritative. The inbox is an already-filtered product
@@ -102,7 +103,7 @@ router.get('/:organizationId/reporting/exports/:exportId', authenticate, reporti
 // decide FULL/ACTION/SUMMARY on every request.
 router.get('/:organizationId/safety/cases', authenticate, reportingController.listSafetyCases)
 router.get('/:organizationId/safety/cases/:caseId', authenticate, reportingController.readSafetyCase)
-router.post('/:organizationId/reporting/analyses', authenticate, reportingController.analyze)
+router.post('/:organizationId/reporting/analyses', authenticate, reportingAnalysisGuard, reportingController.analyze)
 router.get('/:organizationId/reporting/artifacts/:artifactId', authenticate, reportingController.readArtifact)
 
 export default router
