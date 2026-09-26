@@ -342,6 +342,92 @@ export const readReportingSeriesWave = async (input: {
   return row
 }
 
+const verifyReportingWaveCohorts = async (waves: ReportingSeriesWaveRecordV1[]): Promise<ReportingSeriesWaveRecordV1[]> => {
+  if (!waves.length) return waves
+  const cohorts = await readReportingCohorts(waves.map((wave) => wave.cohortSnapshotId))
+  const cohortsById = new Map(cohorts.map((cohort) => [cohort.id, cohort]))
+  for (const wave of waves) {
+    const cohort = cohortsById.get(wave.cohortSnapshotId)
+      ?? reportingFail('REPORT_WAVE_INTEGRITY', 'Wave cohort is missing', 500)
+    if (
+      cohort.organizationId !== wave.organizationId
+      || cohort.sourceRunId !== wave.sourceRunId
+      || cohort.sourceTrackId !== wave.sourceTrackId
+    ) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave source binding no longer matches its frozen cohort', 500)
+    const expectedInput = reportingWaveInputIdentity({ cohortIdentityHash: cohort.cohortIdentityHash, manifest: wave.inputManifest })
+    if (expectedInput !== wave.inputIdentityHash) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave input identity failed integrity verification', 500)
+  }
+  return waves
+}
+
+export const readReportingSeriesWavesByKeysBatch = async (input: {
+  organizationId: string
+  seriesId: string
+  waveKeys: string[]
+}): Promise<ReportingSeriesWaveRecordV1[]> => {
+  const keys = [...new Set(input.waveKeys)]
+  if (keys.length !== input.waveKeys.length || !keys.length) {
+    reportingFail('REPORT_WAVE_INVALID', 'Wave keys must be non-empty and distinct', 400)
+  }
+  const rows = await prisma.$queryRaw<WaveRow[]>(Prisma.sql`
+    SELECT "id", "organization_id" AS "organizationId", "series_id" AS "seriesId", "wave_key" AS "waveKey", "ordinal",
+      "cohort_snapshot_id" AS "cohortSnapshotId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
+      "input_manifest" AS "inputManifest", "input_identity_hash" AS "inputIdentityHash", "snapshot_hash" AS "snapshotHash",
+      "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt"
+    FROM "reporting_series_waves"
+    WHERE "organization_id"=${input.organizationId}
+      AND "series_id"=${input.seriesId}
+      AND "wave_key" IN (${Prisma.join(keys)})
+    ORDER BY "ordinal", "created_at", "id"
+  `)
+  if (rows.length !== keys.length) reportingFail('REPORT_WAVE_NOT_FOUND', 'reporting Wave not found', 404)
+  return verifyReportingWaveCohorts(rows.map(assertWaveIntegrity))
+}
+
+export const readExactReportingSeriesWavesBatch = async (input: {
+  organizationId: string
+  seriesId: string
+  bindings: Array<{
+    waveId: string
+    waveKey: string
+    ordinal: number
+    cohortSnapshotId: string
+    inputIdentityHash: string
+    snapshotHash: string
+  }>
+}): Promise<ReportingSeriesWaveRecordV1[]> => {
+  const ids = [...new Set(input.bindings.map((binding) => binding.waveId))]
+  if (!ids.length || ids.length !== input.bindings.length) {
+    reportingFail('REPORT_WAVE_INTEGRITY', 'artifact Wave bindings must be non-empty and distinct', 500)
+  }
+  const rows = await prisma.$queryRaw<WaveRow[]>(Prisma.sql`
+    SELECT "id", "organization_id" AS "organizationId", "series_id" AS "seriesId", "wave_key" AS "waveKey", "ordinal",
+      "cohort_snapshot_id" AS "cohortSnapshotId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
+      "input_manifest" AS "inputManifest", "input_identity_hash" AS "inputIdentityHash", "snapshot_hash" AS "snapshotHash",
+      "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt"
+    FROM "reporting_series_waves"
+    WHERE "organization_id"=${input.organizationId}
+      AND "series_id"=${input.seriesId}
+      AND "id" IN (${Prisma.join(ids)})
+  `)
+  if (rows.length !== ids.length) reportingFail('REPORT_WAVE_INTEGRITY', 'artifact Wave binding is missing', 500)
+  const verified = await verifyReportingWaveCohorts(rows.map(assertWaveIntegrity))
+  const byId = new Map(verified.map((wave) => [wave.id, wave]))
+  return input.bindings.map((binding) => {
+    const wave = byId.get(binding.waveId)
+      ?? reportingFail('REPORT_WAVE_INTEGRITY', 'artifact Wave binding is missing', 500)
+    if (
+      wave.seriesId !== input.seriesId
+      || wave.waveKey !== binding.waveKey
+      || wave.ordinal !== binding.ordinal
+      || wave.cohortSnapshotId !== binding.cohortSnapshotId
+      || wave.inputIdentityHash !== binding.inputIdentityHash
+      || wave.snapshotHash !== binding.snapshotHash
+    ) reportingFail('REPORT_WAVE_INTEGRITY', 'artifact Wave binding failed integrity verification', 500)
+    return wave
+  })
+}
+
 export const readReportingSeriesWavesBatch = async (input: {
   organizationId: string
   seriesIds: string[]
@@ -367,18 +453,5 @@ export const readReportingSeriesWavesBatch = async (input: {
     ORDER BY "seriesId", "ordinal", "createdAt", "id"
   `)
   const waves = rows.map(({ rn: _rn, ...row }) => assertWaveIntegrity(row))
-  const cohorts = await readReportingCohorts(waves.map((wave) => wave.cohortSnapshotId))
-  const cohortsById = new Map(cohorts.map((cohort) => [cohort.id, cohort]))
-  for (const wave of waves) {
-    const cohort = cohortsById.get(wave.cohortSnapshotId)
-      ?? reportingFail('REPORT_WAVE_INTEGRITY', 'Wave cohort is missing', 500)
-    if (
-      cohort.organizationId !== wave.organizationId
-      || cohort.sourceRunId !== wave.sourceRunId
-      || cohort.sourceTrackId !== wave.sourceTrackId
-    ) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave source binding no longer matches its frozen cohort', 500)
-    const expectedInput = reportingWaveInputIdentity({ cohortIdentityHash: cohort.cohortIdentityHash, manifest: wave.inputManifest })
-    if (expectedInput !== wave.inputIdentityHash) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave input identity failed integrity verification', 500)
-  }
-  return waves
+  return verifyReportingWaveCohorts(waves)
 }
