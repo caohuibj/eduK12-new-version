@@ -43,6 +43,26 @@ export async function listIndividualSubjects(input: IndividualScopeInput & { pag
   }
   return { list: rows, nextPage: rows.length === input.pageSize ? input.page+1 : null }
 }
+/** Names require individual scope; only frozen organization membership identities are exposed. */
+export async function listCohortMembers(input: IndividualScopeInput & { page: number; pageSize: number; search?: string }) {
+  const subjects = await listIndividualSubjects(input)
+  if (!subjects.list.length) return { ...subjects, list: [] }
+  const rows = await prisma.$queryRaw<Array<{ userId: string; membershipIds: string[] }>>(Prisma.sql`
+    SELECT a.user_id AS "userId", array_agg(DISTINCT a.membership_id ORDER BY a.membership_id) AS "membershipIds"
+    FROM assessment_run_actor_snapshots a
+    JOIN organization_memberships m ON m.id=a.membership_id AND m.organization_id=a.organization_id AND m.user_id=a.user_id
+    WHERE a.organization_id=${input.organizationId} AND a.user_id IN (${Prisma.join(subjects.list.map(s=>s.userId))})
+    GROUP BY a.user_id
+  `)
+  // Recheck authority after reading historical identities, without an N+1 subject lookup.
+  const scope = await individualSubjectScope(input)
+  const allowed = await prisma.$queryRaw<Array<{ userId: string }>>(Prisma.sql`
+    SELECT DISTINCT m.user_id AS "userId" FROM organization_memberships m
+    WHERE m.organization_id=${input.organizationId} AND m.user_id IN (${Prisma.join(subjects.list.map(s=>s.userId))}) AND (${scope})
+  `)
+  if (allowed.length !== subjects.list.length) reportingFail('REPORT_NOT_FOUND', 'subject authority changed', 404)
+  return { ...subjects, list: subjects.list.map(subject=>({ ...subject, membershipIds: rows.find(r=>r.userId===subject.userId)?.membershipIds ?? [] })) }
+}
 export async function listIndividualSources(input: IndividualScopeInput & { subjectUserId: string; page: number; pageSize: number }) {
   await assertIndividualLongitudinalAccess(input)
   const rows = await prisma.$queryRaw<SourceRow[]>(Prisma.sql`${sourceQuery(input.organizationId,input.subjectUserId)}

@@ -84,7 +84,7 @@ describe('historical filtered cohorts (real PostgreSQL)', () => {
     let count = 0
     prisma.$use(async (params, next) => { count++; return next(params) })
     const counts: number[] = []
-    for (const n of [50, 500, 2000]) {
+    for (const n of [100, 1000, 5000]) {
       const f = await buildReportingFixture(prisma, n)
       count = 0
       await freezeRunTrackCohort({ ...f, generatedByUserId: f.ownerId, cohortSelector: selector(f.members.slice(0, 5).map(m => m.membershipId)) })
@@ -92,5 +92,5 @@ describe('historical filtered cohorts (real PostgreSQL)', () => {
     }
     expect(new Set(counts).size).toBe(1)
     expect(counts[0]).toBeLessThanOrEqual(6)
-  }, 60000)
+  }, 180000)
 })

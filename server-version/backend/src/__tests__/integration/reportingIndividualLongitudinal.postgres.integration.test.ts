@@ -9,7 +9,7 @@ import { integrationDatabaseUrl } from './integration-env'
 import { buildReportingFixture } from './reporting-fixture'
 import { createMembership, endMembership, grantCapability, grantPersona, denyOrganizationAccess } from '../../modules/organization/service'
 import { createPlatformReportingSpec, reviewPlatformReportingSpec, publishPlatformReportingSpec, validateReportingSpecDefinition } from '../../modules/reporting/spec'
-import { generateIndividualLongitudinal, listIndividualSources, listIndividualSubjects } from '../../modules/reporting/individualService'
+import { generateIndividualLongitudinal, listIndividualSources, listIndividualSubjects, listCohortMembers } from '../../modules/reporting/individualService'
 import { readOrganizationReportingArtifact } from '../../modules/reporting/pr4Service'
 import { readReportingArtifactRecord } from '../../modules/reporting/artifact'
 import { createReportingExport, downloadReportingExport } from '../../modules/reporting/export'
@@ -44,6 +44,9 @@ describe('individual longitudinal PostgreSQL',()=>{
     const discovery=await listIndividualSubjects({...scope,page:1,pageSize:2})
     expect(discovery.list).toHaveLength(2);expect(discovery.nextPage).toBe(2)
     expect((await listIndividualSources({...scope,subjectUserId:subject.userId,page:1,pageSize:1})).nextPage).toBe(2)
+    const named=await listCohortMembers({...scope,page:1,pageSize:100})
+    expect(named.list.find(m=>m.userId===subject.userId)?.membershipIds.sort()).toEqual([subject.membershipId,episode.id].sort())
+    expect((await listCohortMembers({...scope,search:'no-such-member',page:1,pageSize:1})).list).toEqual([])
     const input={...scope,subjectUserId:subject.userId,specId:spec.id,sources:[second,first].map(({runId,trackId})=>({runId,trackId}))}
     const result=await generateIndividualLongitudinal(input)
     expect(result.projection.waves.map(w=>w.metrics.score)).toEqual([{state:'present',value:1},{state:'present',value:1}])
@@ -94,7 +97,9 @@ describe('individual longitudinal PostgreSQL',()=>{
     await expect(assertIndividualLongitudinalAccess(input)).resolves.toBeUndefined()
     expect((await listIndividualSubjects({...input,page:1,pageSize:50})).list.map(s=>s.userId)).toEqual([f.members[0].userId])
     await expect(assertIndividualLongitudinalAccess({...input,subjectUserId:f.members[1].userId})).rejects.toMatchObject({statusCode:404})
+    expect((await listCohortMembers({...input,page:1,pageSize:50})).list.map(s=>s.userId)).toEqual([f.members[0].userId])
     await endStaffClassAssignment({organizationId,assignmentId:staff.id})
+    expect((await listCohortMembers({...input,page:1,pageSize:50})).list).toEqual([])
     await expect(assertIndividualLongitudinalAccess(input)).rejects.toMatchObject({statusCode:404})
     await grantPersona({organizationId,membershipId:manager.id,persona:'COUNSELOR',meta:meta()})
     await grantPersona({organizationId,membershipId:f.members[0].membershipId,persona:'CLIENT',meta:meta()})

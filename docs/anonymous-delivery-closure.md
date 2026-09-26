@@ -29,3 +29,5 @@ Recovery retains each runtime's existing lifetime: legacy questionnaire capabili
 The expanded PostgreSQL suite already belongs to CI's mandatory non-skipping integration list. Full CI must pass on this PR before merge.
 
 Local results (2026-09-26): backend production build passed; 13 PostgreSQL lifecycle tests passed; 9 controller tests passed; capability/rate-limit/credential/wrapper suites passed (13 tests); frontend typecheck and all 141 suites / 534 tests passed. Changed-file lint has no errors; existing page warnings remain. Browser script syntax check passed; the real-browser scenario has not been executed locally.
+
+The follow-up [Reporting V2.2 closure](reporting-v2.2-closure.md) wires the real questionnaire browser scenario into the mandatory CI browser job and records final product acceptance.

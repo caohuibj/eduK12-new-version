@@ -182,7 +182,11 @@ export interface CohortOptions {
   labels: Array<{ id: string; dimensionId: string; name: string }>
 }
 
+export interface CohortMemberOption { userId: string; name: string; membershipIds: string[] }
 export const reportingApi = {
+  async cohortMembers(organizationId: string, search = '', page = 1) {
+    return requireData(await apiClient.get<{ list: CohortMemberOption[]; nextPage: number | null }>(`${base(organizationId)}/cohort-members`, { params: { search, page, pageSize: 50 } }))
+  },
   async individualSubjects(organizationId: string, search = '', page = 1) {
     return requireData(await apiClient.get<{ list: Array<{ userId: string; name: string }>; nextPage: number | null }>(`${base(organizationId)}/individual-subjects`, { params: { search, page, pageSize: 50 } }))
   },

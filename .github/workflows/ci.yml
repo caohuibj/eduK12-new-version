@@ -688,6 +688,24 @@ jobs:
           done
           if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
           node e2e/bundle-products-browser-e2e.cjs
+      - name: Reporting V2.2 final product scenarios
+        env:
+          REPORTING_BROWSER_ISOLATED_DB: '1'
+          REPORTING_BROWSER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          REPORTING_BROWSER_BASE_URL: http://127.0.0.1:5173
+        run: |
+          backend/node_modules/.bin/tsx e2e/reporting-v22-fixture.ts
+          node e2e/reporting-v22-browser-e2e.cjs
+      - name: anonymous questionnaire completion and exhausted-link recovery
+        env:
+          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
+          QUESTIONNAIRE_PRODUCT_PUBLIC: '1'
+          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          QUESTIONNAIRE_PRODUCT_BASE_URL: http://127.0.0.1:5173
+          QUESTIONNAIRE_PRODUCT_EVIDENCE: /tmp/eduk12-questionnaire-public-e2e
+        run: |
+          backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
+          node e2e/questionnaire-products-browser-e2e.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
@@ -702,6 +720,8 @@ jobs:
             /tmp/eduk12-pr5-release-rehearsal
             /tmp/eduk12-pr5-scenario-backend.log
             /tmp/eduk12-bundle-products-e2e
+            /tmp/eduk12-questionnaire-public-e2e
+            /tmp/reporting-v22-evidence
             /tmp/eduk12-bundle-products-backend.log
           if-no-files-found: ignore
       - name: stop seeded services

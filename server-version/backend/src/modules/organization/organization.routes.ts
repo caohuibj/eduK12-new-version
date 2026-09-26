@@ -87,6 +87,7 @@ router.post('/:organizationId/runs/:runId/executions/:executionId/start', authen
 router.get('/:organizationId/reporting/specs', authenticate, reportingDiscoveryController.listSpecs)
 router.get('/:organizationId/reporting/individual-subjects', authenticate, reportingDiscoveryController.individualSubjects)
 router.get('/:organizationId/reporting/individual-sources', authenticate, reportingDiscoveryController.individualSources)
+router.get('/:organizationId/reporting/cohort-members', authenticate, reportingDiscoveryController.cohortMembers)
 router.get('/:organizationId/reporting/cohort-options', authenticate, reportingDiscoveryController.cohortOptions)
 router.get('/:organizationId/reporting/sources', authenticate, reportingDiscoveryController.listSources)
 router.get('/:organizationId/reporting/protected-sources', authenticate, reportingDiscoveryController.listProtectedSources)

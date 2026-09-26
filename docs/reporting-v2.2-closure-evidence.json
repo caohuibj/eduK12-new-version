@@ -1,0 +1,48 @@
+{
+  "date": "2026-09-26",
+  "base": "527be744",
+  "environment": "isolated local PostgreSQL + Redis + Chromium; synthetic data",
+  "reportingBrowser": {
+    "group": true,
+    "repeated": true,
+    "matched": true,
+    "historicalClass": true,
+    "individual": true,
+    "noUnsupportedDelta": true,
+    "memberSuppression": true,
+    "errors": []
+  },
+  "anonymousBrowser": {
+    "teacherAuthoring": true,
+    "fourTypes": true,
+    "studentEntry": true,
+    "studentCompleted": true,
+    "publicMode": true,
+    "errors": []
+  },
+  "queryBudget": {
+    "threeWavePopulations": [
+      100,
+      1000
+    ],
+    "queries": [
+      147,
+      147
+    ],
+    "cohortPopulations": [
+      100,
+      1000,
+      5000
+    ],
+    "cohortQueriesMax": 6
+  },
+  "reportingTests": {
+    "files": 21,
+    "tests": 71
+  },
+  "frontendFullRegression": {
+    "files": 142,
+    "tests": 536
+  },
+  "finalMemberComponentTests": 3
+}
