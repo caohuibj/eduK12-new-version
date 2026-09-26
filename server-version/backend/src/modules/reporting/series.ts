@@ -371,8 +371,9 @@ export const readReportingSeriesWavesBatch = async (input: {
   const cohortsById = new Map(cohorts.map((cohort) => [cohort.id, cohort]))
   for (const wave of waves) {
     const cohort = cohortsById.get(wave.cohortSnapshotId)
-    if (!cohort
-      || cohort.organizationId !== wave.organizationId
+      ?? reportingFail('REPORT_WAVE_INTEGRITY', 'Wave cohort is missing', 500)
+    if (
+      cohort.organizationId !== wave.organizationId
       || cohort.sourceRunId !== wave.sourceRunId
       || cohort.sourceTrackId !== wave.sourceTrackId
     ) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave source binding no longer matches its frozen cohort', 500)
