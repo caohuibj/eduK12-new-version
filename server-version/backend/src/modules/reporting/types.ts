@@ -146,12 +146,32 @@ export interface ReportingCohortSnapshotPayloadV1 {
   generatedAt: string
 }
 
+export type ReportingCohortClauseV2 =
+  | { kind: 'CLASS_UNITS'; classUnitIds: string[] }
+  | { kind: 'LABELS'; labelIds: string[]; match: 'ANY' | 'ALL' }
+  | { kind: 'MEMBERSHIP_IDS'; membershipIds: string[] }
+
+export interface ReportingCohortSelectorInputV2 {
+  schemaVersion: 2
+  clauses: ReportingCohortClauseV2[]
+  combine: 'ALL'
+}
+export interface ReportingCohortSelectorV2 extends ReportingCohortSelectorInputV2 {
+  kind: 'FILTERED_RUN_TRACK_SUBJECTS'
+  anchor: { kind: 'RUN_PUBLISHED_AT'; at: string }
+  baseline?: { cohortSnapshotId: string; cohortIdentityHash: string }
+}
+export interface ReportingCohortSnapshotPayloadV2 extends Omit<ReportingCohortSnapshotPayloadV1, 'schemaVersion' | 'selector'> {
+  schemaVersion: 2
+  selector: ReportingCohortSelectorV2
+}
+
 export interface ReportingCohortSnapshotRecord {
   id: string
   organizationId: string
   sourceRunId: string
   sourceTrackId: string
-  selector: ReportingCohortSnapshotPayloadV1['selector']
+  selector: ReportingCohortSnapshotPayloadV1['selector'] | ReportingCohortSelectorV2
   members: ReportingCohortMemberV1[]
   eligibleN: number
   cohortIdentityHash: string

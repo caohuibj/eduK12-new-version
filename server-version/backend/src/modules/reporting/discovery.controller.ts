@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { instrumentError, unauthorized } from '../../utils/response'
 import {
+  listReportingCohortOptions,
   listOrganizationReportingSeries,
   listOrganizationReportingSources,
   listProtectedReportingSources,
@@ -29,6 +30,11 @@ const noStore = (res: Response, data: unknown) => {
 }
 
 export const reportingDiscoveryController = {
+  async cohortOptions(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    try { return noStore(res, await listReportingCohortOptions({ principal: principal(req), organizationId: req.params.organizationId })) }
+    catch (error) { return fail(res, error) }
+  },
   async listSpecs(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = specQuery.safeParse(req.query)
@@ -44,8 +50,11 @@ export const reportingDiscoveryController = {
 
   async listSources(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
+    const parsed = seriesQuery.safeParse(req.query)
+    if (!parsed.success) return badRequest(res, 'invalid source pagination')
     try {
       return noStore(res, await listOrganizationReportingSources({
+        ...parsed.data,
         principal: principal(req),
         organizationId: req.params.organizationId,
       }))

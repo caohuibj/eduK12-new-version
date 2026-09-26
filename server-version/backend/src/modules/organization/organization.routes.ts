@@ -85,6 +85,7 @@ router.post('/:organizationId/runs/:runId/executions/:executionId/start', authen
 // Run/Track sources, protected subject-scoped sources, and Organization
 // Series/Waves; it never exposes raw observations or expands report authority.
 router.get('/:organizationId/reporting/specs', authenticate, reportingDiscoveryController.listSpecs)
+router.get('/:organizationId/reporting/cohort-options', authenticate, reportingDiscoveryController.cohortOptions)
 router.get('/:organizationId/reporting/sources', authenticate, reportingDiscoveryController.listSources)
 router.get('/:organizationId/reporting/protected-sources', authenticate, reportingDiscoveryController.listProtectedSources)
 router.get('/:organizationId/reporting/series', authenticate, reportingDiscoveryController.listSeries)

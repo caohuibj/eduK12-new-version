@@ -10,7 +10,7 @@ import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
-import { reportingFail, type ReportingArtifactRecord, type ReportingGroupArtifactRecord } from './types'
+import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord } from './types'
 
 const publicArtifact = (artifact: ReportingArtifactRecord) => ({
   artifactId: artifact.id,
@@ -24,6 +24,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
   runId: string
   trackId: string
   specId: string
+  cohortSelector?: ReportingCohortSelectorInputV2
 }): Promise<ReturnType<typeof publicArtifact>> => {
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
@@ -36,6 +37,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     runId: input.runId,
     trackId: input.trackId,
     generatedByUserId: input.principal.userId,
+    cohortSelector: input.cohortSelector,
   })
   const batch = await resolveAuthoritativeRunResults(cohort)
   const generatedAt = new Date()

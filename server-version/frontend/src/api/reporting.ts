@@ -160,15 +160,36 @@ const requireData = <T>(response: { code: number | string; message: string; data
 
 const base = (organizationId: string) => `/organizations/${encodeURIComponent(organizationId)}/reporting`
 
+export type CohortSelector = { schemaVersion: 2; combine: 'ALL'; clauses: Array<
+  { kind: 'CLASS_UNITS'; classUnitIds: string[] } |
+  { kind: 'LABELS'; labelIds: string[]; match: 'ANY' | 'ALL' } |
+  { kind: 'MEMBERSHIP_IDS'; membershipIds: string[] }
+> }
+export interface CohortOptions {
+  classes: Array<{ id: string; name: string }>
+  dimensions: Array<{ id: string; key: string; name: string }>
+  labels: Array<{ id: string; dimensionId: string; name: string }>
+}
+
 export const reportingApi = {
+  async cohortOptions(organizationId: string) {
+    return requireData(await apiClient.get<CohortOptions>(`${base(organizationId)}/cohort-options`))
+  },
+  async analyzeAutomatic(organizationId: string, input: {
+    analysisKind: 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'; specId: string
+    sources: Array<{ runId: string; trackId: string }>; cohortSelector?: CohortSelector
+    cohortStrategy: 'WAVE_SPECIFIC' | 'BASELINE_FIXED'; mode?: 'PAIRWISE' | 'FULL_CASE'
+  }): Promise<ReportingArtifactProjection> {
+    return requireData(await apiClient.post<ReportingArtifactProjection>(`${base(organizationId)}/analyses`, input))
+  },
   async listSpecs(organizationId: string, analysisKind?: ReportingAnalysisKind) {
     return requireData(await apiClient.get<{ list: PublishedReportingSpecSummary[]; total: number; page: number; pageSize: number }>(`${base(organizationId)}/specs`, {
       params: { page: 1, pageSize: 100, ...(analysisKind ? { analysisKind } : {}) },
     }))
   },
 
-  async listSources(organizationId: string) {
-    return requireData(await apiClient.get<{ list: ReportingSourceSummary[]; truncated: boolean }>(`${base(organizationId)}/sources`))
+  async listSources(organizationId: string, page = 1) {
+    return requireData(await apiClient.get<{ list: ReportingSourceSummary[]; truncated: boolean; nextPage?: number | null }>(`${base(organizationId)}/sources`, { params: { page, pageSize: 100 } }))
   },
 
   async listProtectedSources(organizationId: string) {
@@ -189,7 +210,7 @@ export const reportingApi = {
     return requireData(await apiClient.post<{ waveId: string; waveKey: string; ordinal: number; source: { runId: string; trackId: string }; createdAt: string }>(`${base(organizationId)}/series/${encodeURIComponent(seriesId)}/waves`, input))
   },
 
-  async analyzeGroup(organizationId: string, input: { runId: string; trackId: string; specId: string }): Promise<ReportingArtifactProjection> {
+  async analyzeGroup(organizationId: string, input: { runId: string; trackId: string; specId: string; cohortSelector?: CohortSelector }): Promise<ReportingArtifactProjection> {
     return requireData(await apiClient.post<ReportingArtifactProjection>(`${base(organizationId)}/analyses`, input))
   },
 
