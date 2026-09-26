@@ -54,6 +54,7 @@ router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveC
 // 单个认知任务公开链接（参与者不要求登录，恢复凭证只存哈希）
 router.get('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.listPublicTokens)
 router.post('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.createPublicToken)
+router.post('/assignments/:id/public-tokens/:tokenId/reveal', authenticate, requireTeacher, cognitiveController.revealPublicToken)
 router.delete('/assignments/:id/public-tokens/:tokenId', authenticate, requireTeacher, cognitiveController.disablePublicToken)
 
 // 教师端数据导出（下载路径携带 assignmentId，控制器会再次校验归属）
