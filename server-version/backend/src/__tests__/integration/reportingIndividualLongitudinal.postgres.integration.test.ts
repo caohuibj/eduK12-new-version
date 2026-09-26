@@ -14,7 +14,8 @@ import { readOrganizationReportingArtifact } from '../../modules/reporting/pr4Se
 import { readReportingArtifactRecord } from '../../modules/reporting/artifact'
 import { createReportingExport, downloadReportingExport } from '../../modules/reporting/export'
 import { buildIndividualLongitudinalProjection } from '../../modules/reporting/individual'
-import { readReportingSeriesWave } from '../../modules/reporting/series'
+import { listOrganizationReportingSeries, listOrganizationReportingSources, listReportingCohortOptions } from '../../modules/reporting/discovery'
+import { createReportingSeries, readReportingSeriesWave } from '../../modules/reporting/series'
 import type { ReportingIndividualLongitudinalSpecV1 } from '../../modules/reporting/types'
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL')
 if (!url) throw new Error('Individual longitudinal requires an isolated PostgreSQL database')
@@ -90,11 +91,48 @@ describe('individual longitudinal PostgreSQL',()=>{
     const input={principal,organizationId,subjectUserId:f.members[0].userId}
     await expect(assertIndividualLongitudinalAccess(input)).rejects.toMatchObject({statusCode:404})
     await grantPersona({organizationId,membershipId:f.members[0].membershipId,persona:'STUDENT',meta:meta()})
+    await grantPersona({organizationId,membershipId:f.members[1].membershipId,persona:'STUDENT',meta:meta()})
     const grade=await createOrganizationUnit({organizationId,unitKind:'GRADE',name:'grade'})
     const cls=await createOrganizationUnit({organizationId,unitKind:'CLASS',name:'class',parentUnitId:grade.id})
+    const otherCls=await createOrganizationUnit({organizationId,unitKind:'CLASS',name:'other-class',parentUnitId:grade.id})
     await assignStudentToClass({organizationId,membershipId:f.members[0].membershipId,classUnitId:cls.id})
+    await assignStudentToClass({organizationId,membershipId:f.members[1].membershipId,classUnitId:otherCls.id})
     const staff=await assignStaffToClass({organizationId,membershipId:manager.id,classUnitId:cls.id,staffRole:'TEACHING'})
+
+    const dimension=randomUUID(), inScopeLabel=randomUUID(), outOfScopeLabel=randomUUID()
+    await db.$executeRaw`INSERT INTO organization_classification_dimensions
+      (id,organization_id,key,name,cardinality)
+      VALUES (${dimension},${organizationId},${'scope-'+randomUUID()},'Scope labels','SINGLE')`
+    await db.$executeRaw`INSERT INTO organization_labels (id,organization_id,dimension_id,name)
+      VALUES (${inScopeLabel},${organizationId},${dimension},'Visible label'),
+             (${outOfScopeLabel},${organizationId},${dimension},'Hidden label')`
+    await db.$executeRaw`INSERT INTO organization_label_assignments
+      (id,organization_id,membership_id,dimension_id,dimension_cardinality,label_id,valid_from)
+      VALUES
+        (${randomUUID()},${organizationId},${f.members[0].membershipId},${dimension},'SINGLE',${inScopeLabel},'2026-09-01'::timestamptz),
+        (${randomUUID()},${organizationId},${f.members[1].membershipId},${dimension},'SINGLE',${outOfScopeLabel},'2026-09-01'::timestamptz)`
+
     await expect(assertIndividualLongitudinalAccess(input)).resolves.toBeUndefined()
+    const options=await listReportingCohortOptions({principal,organizationId})
+    expect(options.classes.map(row=>row.id)).toEqual([cls.id])
+    expect(options.labels.map(row=>row.id)).toEqual([inScopeLabel])
+    expect(options.dimensions.map(row=>row.id)).toEqual([dimension])
+
+    const resource=(await db.$queryRaw<Array<{family:string;key:string}>>`
+      SELECT resource_family AS family, resource_key AS key FROM assessment_run_tracks WHERE id=${f.trackId}`)[0]
+    const ownSeries=await createReportingSeries({organizationId,seriesKey:`teacher-${randomUUID()}`,
+      scope:{schemaVersion:1,resourceFamily:resource.family as any,resourceKey:resource.key},createdByUserId:f.ownerId})
+    const otherSeries=await createReportingSeries({organizationId,seriesKey:`other-${randomUUID()}`,
+      scope:{schemaVersion:1,resourceFamily:resource.family as any,resourceKey:resource.key},createdByUserId:f.members[1].userId})
+    const visibleSeries=await listOrganizationReportingSeries({principal,organizationId,page:1,pageSize:50})
+    expect(visibleSeries.list.map(row=>row.seriesId)).toContain(ownSeries.id)
+    expect(visibleSeries.list.map(row=>row.seriesId)).not.toContain(otherSeries.id)
+
+    const otherRun=await buildReportingFixture(db,3,false,{organizationId,ownerId:f.members[1].userId,members:f.members,
+      resourceKey:resource.key,at:new Date('2026-10-02T00:00:00Z')})
+    const visibleSources=await listOrganizationReportingSources({principal,organizationId,page:1,pageSize:100})
+    expect(visibleSources.list.map(row=>row.runId)).toContain(f.runId)
+    expect(visibleSources.list.map(row=>row.runId)).not.toContain(otherRun.runId)
     expect((await listIndividualSubjects({...input,page:1,pageSize:50})).list.map(s=>s.userId)).toEqual([f.members[0].userId])
     await expect(assertIndividualLongitudinalAccess({...input,subjectUserId:f.members[1].userId})).rejects.toMatchObject({statusCode:404})
     expect((await listCohortMembers({...input,page:1,pageSize:50})).list.map(s=>s.userId)).toEqual([f.members[0].userId])

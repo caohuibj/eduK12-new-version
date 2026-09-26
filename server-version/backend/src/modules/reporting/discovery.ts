@@ -186,6 +186,7 @@ export async function listProtectedReportingSources(input: {
   principal: ReportingPrincipal
   organizationId: string
 }) {
+  await assertOrganizationReportingWorkspaceAccess(input)
   const context = await resolveProtectedFeedbackManagerContext(input)
   const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
   const teacher = context.personas.includes('TEACHER')
@@ -274,6 +275,7 @@ export async function listProtectedReportingSources(input: {
     LIMIT ${MAX_PROTECTED_SOURCE_CANDIDATES}
   `
   await resolveProtectedFeedbackManagerContext(input)
+  await assertOrganizationReportingWorkspaceAccess(input)
   const list = rows.slice(0, MAX_PROTECTED_SOURCES).map<ProtectedReportingSourceSummary>((row) => ({
     runId: row.runId,
     runName: row.runName,
