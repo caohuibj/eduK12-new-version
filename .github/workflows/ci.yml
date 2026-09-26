@@ -331,8 +331,8 @@ jobs:
         run: npm run build
       - name: publish tested backend build
         id: backend-build-upload
-        # Artifact finalization can fail transiently (ECONNRESET). Allow one
-        # retry below; a second failure still fails the job and merge gate.
+        # GitHub artifact creation/finalization can reset connections. Retry
+        # with bounded backoff; the final attempt must succeed or fail the job.
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
@@ -340,7 +340,12 @@ jobs:
           path: server-version/backend/dist
           retention-days: 1
           if-no-files-found: error
+      - name: wait before retrying backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        run: sleep 15
       - name: retry backend build upload
+        id: backend-build-upload-retry
+        continue-on-error: true
         if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
@@ -349,6 +354,19 @@ jobs:
           retention-days: 1
           if-no-files-found: error
           # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
+      - name: wait before final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        # Do not ignore this failure: browser must consume this run's exact build.
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
           overwrite: true
       # The unknown-package contract imports the generated frontend runner.
       # This job has its own checkout; dependencies installed by the frontend
