@@ -18,6 +18,7 @@ export const readOrganizationMemberProjection = async (input: {
 }) => {
   await readOrganizationReportingArtifact(input)
   const artifact = await readReportingArtifactRecord(input.artifactId)
+  if (artifact.analysisKind === 'INDIVIDUAL_LONGITUDINAL') return readOrganizationReportingArtifact(input)
   if (artifact.analysisKind !== 'GROUP') return reportingFail('EXPORT_NOT_ALLOWED', 'member projection is not enabled for this report kind', 403)
   const context = await resolveOrganizationAccessContext(input)
   if (!context?.membershipId || context.organizationStatus !== 'ACTIVE'

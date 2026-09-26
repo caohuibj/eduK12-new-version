@@ -1,3 +1,4 @@
+import { generateIndividualLongitudinal } from './individualService'
 import { generateAutomaticLongitudinal } from './longitudinal-planner'
 import { cohortSelectorSchema } from './cohort-selector'
 import type { Request, Response } from 'express'
@@ -80,7 +81,12 @@ const automaticAnalysisSchema = z.object({
   specId: z.string().uuid(),
   mode: z.enum(['PAIRWISE', 'FULL_CASE']).optional(),
 }).strict()
+const individualAnalysisSchema = z.object({
+  analysisKind: z.literal('INDIVIDUAL_LONGITUDINAL'), subjectUserId: z.string().uuid(), specId: z.string().uuid(),
+  sources: z.array(z.object({ runId: z.string().uuid(), trackId: z.string().uuid() }).strict()).min(2).max(50),
+}).strict()
 const analysisSchema = z.union([
+  individualAnalysisSchema,
   automaticAnalysisSchema,
   legacyGroupAnalysisSchema,
   repeatedAnalysisSchema,
@@ -218,6 +224,11 @@ export const reportingController = {
     if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid analysis request')
     try {
       const data = parsed.data
+      if ('analysisKind' in data && data.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+        const artifact = await generateIndividualLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
+        res.setHeader('Cache-Control', 'no-store')
+        return res.json({ code: 0, message: '操作成功', data: artifact })
+      }
       if ('sources' in data) {
         const artifact = await generateAutomaticLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
         res.setHeader('Cache-Control', 'no-store')
