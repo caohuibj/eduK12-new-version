@@ -8,6 +8,7 @@ import { prisma } from '../../config/database'
 const defaultPrisma = prisma
 import { config } from '../../config'
 import { MAX_TOKEN_USES } from '../../constants'
+import { publicAccessExpiryWithinPolicy } from '../../services/publicAccessPolicy'
 import { encryptField, safeDecrypt } from '../../utils/encryption'
 import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
 import {
@@ -1916,9 +1917,8 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
   assertNotLibraryComposite(composite, '库课程上的综合测评不能公开作答')
   const expiry = new Date(expiresAt)
-  if (!Number.isFinite(expiry.getTime()) || expiry.getTime() <= Date.now()) throw compositeBadRequest('有效期必须晚于当前时间')
-  if (composite.expiresAt && expiry.getTime() > composite.expiresAt.getTime()) {
-    throw compositeBadRequest('公开链接有效期不能晚于综合测评有效期')
+  if (!publicAccessExpiryWithinPolicy(expiry, { upperBound: composite.expiresAt })) {
+    throw compositeBadRequest('公开链接有效期必须在未来一年内，且不能晚于综合测评有效期')
   }
   const rawToken = createAccessToken()
   const record = await prisma.compositeAssessmentAccessToken.create({
@@ -1942,24 +1942,25 @@ export const listAccessTokens = async (userId: string, role: UserRole, composite
   const records = await prisma.compositeAssessmentAccessToken.findMany({
     where: { compositeAssessmentId: compositeId },
     orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      token: true,
-      tokenEncrypted: true,
-      expiresAt: true,
-      maxUses: true,
-      usedCount: true,
-      isActive: true,
-      createdAt: true,
-    },
+    select: { id: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true },
   })
-  return records.map(({ token, tokenEncrypted, ...record }) => ({
-    ...record,
-    // Management callers may still need to copy an existing link. Decrypt
-    // only in this already-authorized owner/admin path; it is never stored in
-    // the database or emitted by public resolvers.
-    token: token || (tokenEncrypted ? decryptPublicAccessToken(tokenEncrypted) : null),
-  }))
+  return records.map((record) => ({ ...record, token: null }))
+}
+
+export const revealAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {
+  assertTeacher(role)
+  const composite = await loadComposite(compositeId)
+  assertOwner(composite, userId, role)
+  const record = await prisma.compositeAssessmentAccessToken.findFirst({
+    where: { id: tokenId, compositeAssessmentId: compositeId },
+    select: { id: true, token: true, tokenEncrypted: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true },
+  })
+  if (!record) throw compositeNotFound('公开链接不存在')
+  const token = record.token || (record.tokenEncrypted ? decryptPublicAccessToken(record.tokenEncrypted) : null)
+  if (!token) throw compositeNotFound('公开链接凭证不可恢复')
+  logger.info('Public composite link bearer revealed', { compositeId, tokenId, actorUserId: userId })
+  const { token: _legacy, tokenEncrypted: _encrypted, ...safe } = record
+  return { ...safe, token }
 }
 
 export const disableAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {
