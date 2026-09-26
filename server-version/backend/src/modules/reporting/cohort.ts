@@ -120,8 +120,8 @@ export const freezeRunTrackCohort = async (input: {
     if (source.resourceFamily === 'FORM') reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
     if (!source.selfShape) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'PR3 generic group reporting accepts SELF observations only', 409)
     if (!source.membershipShape) reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
-    const sourceAt = source.at
-    if (!sourceAt) reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
+    if (!source.at) reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
+    const sourceAt = source.at as Date
     at = sourceAt
 
     if (input.baselineCohort) {
