@@ -98,6 +98,7 @@ export const compositeApi = {
   publish: (id: string) => apiClient.post<any>(`/composite-assessments/${id}/publish`, {}),
   listTokens: (id: string) => apiClient.get<{ list: CompositePublicAccessToken[] }>(`/composite-assessments/${id}/public-tokens`),
   createToken: (id: string, input: { expiresAt: string; maxUses: number }) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
+  revealToken: (id: string, tokenId: string) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' }) => apiClient.post<any>(`/composite-assessments/${id}/export`, input),
   listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available'),

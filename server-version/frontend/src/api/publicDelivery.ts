@@ -15,6 +15,7 @@ export interface PublicDeliveryLink {
 export interface PublicDeliveryAdapter {
   listLinks(): Promise<PublicDeliveryLink[]>
   createLink(input: { expiresAt: string; maxUses: number }): Promise<PublicDeliveryLink>
+  revealLink(id: string): Promise<PublicDeliveryLink>
   disableLink(id: string): Promise<void>
   getPublicEntry(link: PublicDeliveryLink): string | null
 }
@@ -40,6 +41,12 @@ export function publicDeliveryAdapter(family: PublicDeliveryFamily, resourceId: 
       if (!Number.isSafeInteger(input.maxUses) || input.maxUses < 0 || input.maxUses > 2147483647) throw new Error('最大参与次数必须为有效的非负整数')
       const response = family === 'QUESTIONNAIRE' ? await apiClient.post<PublicDeliveryLink>(questionnaireRoot,input)
         : family === 'COGNITIVE' ? await cognitiveApi.createPublicToken(resourceId,input) : await compositeApi.createToken(resourceId,input)
+      return normalize(data(response) as PublicDeliveryLink)
+    },
+    async revealLink(id) {
+      const encoded = encodeURIComponent(id)
+      const response = family === 'QUESTIONNAIRE' ? await apiClient.post<PublicDeliveryLink>(`${questionnaireRoot}/${encoded}/reveal`, {})
+        : family === 'COGNITIVE' ? await cognitiveApi.revealPublicToken(resourceId,id) : await compositeApi.revealToken(resourceId,id)
       return normalize(data(response) as PublicDeliveryLink)
     },
     async disableLink(id) {
