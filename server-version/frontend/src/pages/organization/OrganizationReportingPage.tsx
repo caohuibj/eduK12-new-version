@@ -1,4 +1,4 @@
-import { measurementLabel, resourceLabel } from './reportingLabels'
+import { limitationLabel, comparabilityLabel, operationLabel, waveLabel, measurementLabel, resourceLabel } from './reportingLabels'
 import { IndividualLongitudinalBuilder } from './IndividualLongitudinalBuilder'
 import { ReportingCohortBuilder } from './ReportingCohortBuilder'
 import type { CohortOptions, CohortSelector } from '../../api/reporting'
@@ -36,19 +36,31 @@ function MetricCard({ metricId, metric }: { metricId: string; metric: ReportingM
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-3">
       <div className="flex flex-wrap items-center justify-between gap-2"><strong>{metricId}</strong><span className="text-xs font-semibold text-emerald-700">可查看</span></div>
-      {'validN' in rich && (rich.validN !== undefined || rich.missingN !== undefined) && <p className="mt-1 text-sm text-slate-600">valid N {rich.validN ?? '—'} · missing N {rich.missingN ?? '—'}</p>}
+      {'validN' in rich && (rich.validN !== undefined || rich.missingN !== undefined) && <p className="mt-1 text-sm text-slate-600">有效人数 {rich.validN ?? '—'} · 缺失人数 {rich.missingN ?? '—'}</p>}
       {metric.aggregations && <dl className="mt-2 grid gap-1 text-sm">{Object.entries(metric.aggregations).map(([key, value]) => <div key={key} className="grid min-w-0 grid-cols-[minmax(7rem,auto)_1fr] gap-2"><dt className="font-medium text-slate-600">{key}</dt><dd className="break-words text-slate-900">{formatValue(value)}</dd></div>)}</dl>}
     </div>
   )
 }
 
 function Evidence({ level, limitations }: { level: string; limitations: string[] }) {
-  return <div className="rounded-lg border border-slate-200 bg-slate-50 p-3"><strong>证据等级 · {level}</strong>{limitations.length > 0 ? <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">{limitations.map((item) => <li key={item}>{item}</li>)}</ul> : <p className="mt-1 text-sm text-slate-600">无额外解释限制。</p>}</div>
+  return <div className="rounded-lg border border-slate-200 bg-slate-50 p-3"><strong>证据等级 · {level}</strong>{limitations.length > 0 ? <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">{limitations.map((item) => <li key={item}>{limitationLabel(item)}</li>)}</ul> : <p className="mt-1 text-sm text-slate-600">无额外解释限制。</p>}</div>
 }
 
 export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProjection }) {
   const projection: ReportingProjection = artifact.projection
   const suppressed = projection.state === 'suppressed'
+  const waveName = (id: string) => {
+    if (projection.kind === 'REPEATED_COHORT') {
+      const wave = projection.waves.find(w => w.waveId === id)
+      return wave ? waveLabel(wave.ordinal, wave.waveKey) : '测量时间点'
+    }
+    if (projection.kind === 'MATCHED_LONGITUDINAL') {
+      const index = projection.waveIds.indexOf(id)
+      const wave = Object.values(projection.metrics ?? {}).flatMap(m => m.waveMeans ?? []).find(w => w.waveId === id)
+      return index >= 0 ? waveLabel(index + 1, wave?.waveKey) : '测量时间点'
+    }
+    return '测量时间点'
+  }
   return (
     <section className="mt-8 min-w-0 break-words space-y-4" aria-labelledby="report-artifact-heading">
       <div><h2 id="report-artifact-heading" className="text-xl font-semibold text-slate-900">报告结果</h2><p className="mt-1 text-sm text-slate-600">生成时间：{formatTime(artifact.generatedAt)}</p><details><summary>报告记录编号</summary>Artifact {artifact.artifactId}</details></div>
@@ -65,30 +77,30 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
 
       {projection.kind === 'REPEATED_COHORT' && (
         <div className="space-y-4">
-          <ProductStatus kind="info" title="群体趋势（不代表个人变化）">{projection.limitations.join(' · ')}</ProductStatus>
-          <div className="grid min-w-0 gap-4 lg:grid-cols-2">{projection.waves.map((wave) => <article key={wave.waveId} className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap justify-between gap-2"><strong>{wave.waveKey} · wave {wave.ordinal}</strong><span className={wave.state === 'present' ? 'text-sm font-semibold text-emerald-700' : 'text-sm font-semibold text-amber-700'}>{wave.state === 'present' ? 'AVAILABLE' : 'SUPPRESSED'}</span></div>{wave.state === 'present' && <p className="mt-2 text-sm text-slate-600">eligible N {wave.eligibleN ?? '—'} · contributors {wave.resultContributorN ?? '—'}</p>}<div className="mt-3"><Evidence level={wave.evidence.level} limitations={wave.evidence.limitations} /></div><div className="mt-3 grid min-w-0 gap-2">{Object.entries(wave.metrics ?? {}).map(([metricId, metric]) => <MetricCard key={metricId} metricId={metricId} metric={metric} />)}</div></article>)}</div>
-          <div className="space-y-3"><h3 className="font-semibold">Comparability decisions</h3>{projection.comparisons.map((pair) => <div key={`${pair.fromWaveId}-${pair.toWaveId}`} className="rounded-lg border border-slate-200 bg-white p-3"><p className="text-sm font-medium">{pair.fromWaveId} → {pair.toWaveId}</p><ul className="mt-2 space-y-1 text-sm text-slate-600">{Object.entries(pair.metrics).map(([metricId, decision]) => <li key={metricId}>{metricId}: {decision.level} · ops {decision.allowedOperations.join(', ') || 'none'}{decision.limitations.length ? ` · ${decision.limitations.join('; ')}` : ''}</li>)}</ul></div>)}</div>
+          <ProductStatus kind="info" title="群体趋势（不代表个人变化）">{projection.limitations.map(limitationLabel).join(' · ')}</ProductStatus>
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">{projection.waves.map((wave) => <article key={wave.waveId} className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap justify-between gap-2"><strong>{waveLabel(wave.ordinal, wave.waveKey)}</strong><span className={wave.state === 'present' ? 'text-sm font-semibold text-emerald-700' : 'text-sm font-semibold text-amber-700'}>{wave.state === 'present' ? '可查看' : '隐私保护'}</span></div>{wave.state === 'present' && <p className="mt-2 text-sm text-slate-600">所选人数 {wave.eligibleN ?? '—'} · 有效结果人数 {wave.resultContributorN ?? '—'}</p>}<div className="mt-3"><Evidence level={wave.evidence.level} limitations={wave.evidence.limitations} /></div><div className="mt-3 grid min-w-0 gap-2">{Object.entries(wave.metrics ?? {}).map(([metricId, metric]) => <MetricCard key={metricId} metricId={metricId} metric={metric} />)}</div></article>)}</div>
+          <div className="space-y-3"><h3 className="font-semibold">时间点可比性</h3>{projection.comparisons.map((pair) => <div key={`${pair.fromWaveId}-${pair.toWaveId}`} className="rounded-lg border border-slate-200 bg-white p-3"><p className="text-sm font-medium">{waveName(pair.fromWaveId)} → {waveName(pair.toWaveId)}</p><ul className="mt-2 space-y-1 text-sm text-slate-600">{Object.entries(pair.metrics).map(([metricId, decision]) => <li key={metricId}>{metricId}: {comparabilityLabel(decision.level)} · {decision.allowedOperations.map(operationLabel).join('、') || '不允许比较计算'}{decision.limitations.length ? ` · ${decision.limitations.map(limitationLabel).join('；')}` : ''}</li>)}</ul></div>)}</div>
         </div>
       )}
 
       {projection.kind === 'MATCHED_LONGITUDINAL' && (
         <div className="space-y-4">
           <Evidence level={projection.evidence.level} limitations={projection.evidence.limitations} />
-          <div className="rounded-lg border border-slate-200 bg-white p-3"><strong>Matched mode · {projection.mode}</strong>{projection.state === 'present' && <p className="mt-1 text-sm text-slate-600">matched eligible N {projection.matchedEligibleN ?? '—'} · waves {projection.waveIds.join(', ')}</p>}</div>
-          <div className="grid min-w-0 gap-3 lg:grid-cols-2">{Object.entries(projection.metrics ?? {}).map(([metricId, metric]) => <div key={metricId} className="rounded-lg border border-slate-200 bg-white p-3"><div className="flex flex-wrap justify-between gap-2"><strong>{metricId}</strong><span className={metric.state === 'present' ? 'text-xs font-semibold text-emerald-700' : 'text-xs font-semibold text-amber-700'}>{metric.state === 'present' ? 'AVAILABLE' : 'SUPPRESSED'}</span></div>{metric.state === 'present' && <><p className="mt-1 text-sm text-slate-600">{metric.countKind ?? 'case count'} · valid cases {metric.validCaseN ?? '—'}</p>{metric.waveMeans && <ul className="mt-2 text-sm text-slate-600">{metric.waveMeans.map((wave) => <li key={wave.waveId}>{wave.waveKey}: mean {wave.mean}</li>)}</ul>}{metric.comparisons && <ul className="mt-2 text-sm text-slate-600">{metric.comparisons.map((comparison) => <li key={`${comparison.fromWaveId}-${comparison.toWaveId}`}>{comparison.fromWaveId} → {comparison.toWaveId}: {comparison.comparability.level}{comparison.delta !== undefined ? ` · delta ${comparison.delta}` : ''}</li>)}</ul>}</>}</div>)}</div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3"><strong>匹配方式 · {projection.mode === 'PAIRWISE' ? '两个时间点配对' : '全部时间点均有测量'}</strong>{projection.state === 'present' && <p className="mt-1 text-sm text-slate-600">匹配人数 {projection.matchedEligibleN ?? '—'} · {projection.waveIds.length} 次测量</p>}</div>
+          <div className="grid min-w-0 gap-3 lg:grid-cols-2">{Object.entries(projection.metrics ?? {}).map(([metricId, metric]) => <div key={metricId} className="rounded-lg border border-slate-200 bg-white p-3"><div className="flex flex-wrap justify-between gap-2"><strong>{metricId}</strong><span className={metric.state === 'present' ? 'text-xs font-semibold text-emerald-700' : 'text-xs font-semibold text-amber-700'}>{metric.state === 'present' ? '可查看' : '隐私保护'}</span></div>{metric.state === 'present' && <><p className="mt-1 text-sm text-slate-600">{metric.countKind === 'PAIRED_VALID' ? '有效配对' : '完整测量'} · 有效人数 {metric.validCaseN ?? '—'}</p>{metric.waveMeans && <ul className="mt-2 text-sm text-slate-600">{metric.waveMeans.map((wave) => <li key={wave.waveId}>{waveName(wave.waveId)}：均值 {wave.mean}</li>)}</ul>}{metric.comparisons && <ul className="mt-2 text-sm text-slate-600">{metric.comparisons.map((comparison) => <li key={`${comparison.fromWaveId}-${comparison.toWaveId}`}>{waveName(comparison.fromWaveId)} → {waveName(comparison.toWaveId)}：{comparabilityLabel(comparison.comparability.level)}{comparison.delta !== undefined ? ` · 变化量 ${comparison.delta}` : ''}</li>)}</ul>}</>}</div>)}</div>
         </div>
       )}
 
       {projection.kind === 'INDIVIDUAL_LONGITUDINAL' && <div className="space-y-3">
         {projection.waves.map(wave => <article key={wave.waveId} className="rounded border p-3"><h3>第 {wave.ordinal} 次 · {wave.waveKey}</h3>{Object.entries(wave.metrics).map(([id, metric]) => <p key={id}>{id}：{metric.state === 'present' ? metric.value : '未完成、缺失或质量不足'}</p>)}<Evidence level={wave.evidence.level} limitations={wave.evidence.limitations} /></article>)}
-        {projection.comparisons.map((pair, index) => <div key={pair.fromWaveId + pair.toWaveId}><h3>第 {index + 1} 次 → 第 {index + 2} 次</h3>{Object.entries(pair.metrics).map(([id, metric]) => <p key={id}>{id}：{metric.comparability.level} · {metric.delta === undefined ? '未计算变化量' : `变化量 ${metric.delta}`}</p>)}</div>)}
+        {projection.comparisons.map((pair, index) => <div key={pair.fromWaveId + pair.toWaveId}><h3>第 {index + 1} 次 → 第 {index + 2} 次</h3>{Object.entries(pair.metrics).map(([id, metric]) => <p key={id}>{id}：{comparabilityLabel(metric.comparability.level)} · {metric.delta === undefined ? '未计算变化量' : `变化量 ${metric.delta}`}</p>)}</div>)}
         <p>用于描述测量变化，不用于诊断或推断因果。</p>
       </div>}
 
       {projection.kind === 'PROTECTED_FEEDBACK' && (
         <div className="space-y-4">
           {artifact.evidence && <Evidence level={artifact.evidence.level} limitations={artifact.evidence.limitations} />}
-          <ProductStatus kind="info" title="Protected feedback">{projection.limitations.join(' · ')}。该投影不包含 respondent identity 或 respondent count。</ProductStatus>
+          <ProductStatus kind="info" title="Protected feedback">{projection.limitations.map(limitationLabel).join(' · ')}。该投影不包含 respondent identity 或 respondent count。</ProductStatus>
           <div className="grid min-w-0 gap-3 lg:grid-cols-2">{Object.entries(projection.metrics ?? {}).map(([metricId, metric]) => <MetricCard key={metricId} metricId={metricId} metric={metric} />)}</div>
         </div>
       )}
@@ -97,6 +109,12 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
 }
 
 export default function OrganizationReportingPage() {
+  const { organizationId = '' } = useParams<{ organizationId: string }>()
+  const { active } = useOrganization()
+  return <ReportingWorkspace key={organizationId + JSON.stringify(active?.access)} />
+}
+
+function ReportingWorkspace() {
   const { organizationId = '' } = useParams<{ organizationId: string }>()
   const { active, activeLoading, activeError, selectOrganization } = useOrganization()
   const context = active?.organization.id === organizationId ? active : null
@@ -134,6 +152,13 @@ export default function OrganizationReportingPage() {
   const [resource, setResource] = useState('')
   const [nextSourcePage, setNextSourcePage] = useState<number | null>(null)
   const [artifactId, setArtifactId] = useState('')
+
+  useEffect(() => {
+    setArtifact(null)
+    setNotice(null)
+  }, [cohortSelector, cohortStrategy, selectedSources, resource, groupSourceKey, groupSpecId,
+    longitudinalKind, longitudinalSpecId, matchedMode, longitudinalSeriesId, selectedWaveKeys,
+    protectedSourceKey, protectedSpecId])
 
   useEffect(() => {
     if (!organizationId || context || activeLoading) return
@@ -294,6 +319,7 @@ export default function OrganizationReportingPage() {
       {notice && <ProductStatus kind="success" title="Reporting 已更新" announce="polite">{notice}</ProductStatus>}
 
       <IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} />
+      <fieldset disabled={busy} className="min-w-0">
       <ReportingCohortBuilder organizationId={organizationId} options={cohortOptions} value={cohortSelector} onChange={setCohortSelector} />
       {nextSourcePage && <ProductButton disabled={busy} onClick={() => void loadMoreSources()}>加载更早的测量</ProductButton>}
       <section className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-4" aria-label="自动纵向报告">
@@ -337,6 +363,7 @@ export default function OrganizationReportingPage() {
       <section className="mt-8 space-y-3" aria-labelledby="artifact-read-heading"><div><h2 id="artifact-read-heading" className="text-xl font-semibold">读取 immutable artifact</h2><p className="mt-1 text-sm text-slate-600">每次读取都会重新执行当前 authorization；历史 artifact ID 本身不授予访问权。</p></div><div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row"><input className="min-h-11 min-w-0 w-full flex-1 rounded-lg border border-slate-300 px-3" value={artifactId} onChange={(event) => setArtifactId(event.target.value)} placeholder="artifact UUID" /><ProductButton disabled={busy || !artifactId.trim()} onClick={() => void readArtifact()}>读取 artifact</ProductButton></div></section>
 
       </details>
+      </fieldset>
       {artifact && <ProjectionPanel artifact={artifact} />}
     </ProductPage>
   )

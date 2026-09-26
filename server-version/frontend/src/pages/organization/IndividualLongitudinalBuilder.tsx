@@ -1,4 +1,4 @@
-import { resourceLabel } from './reportingLabels'
+import { limitationLabel, comparabilityLabel, resourceLabel } from './reportingLabels'
 import { useEffect, useRef, useState } from 'react'
 import { reportingApi, type ReportingArtifactProjection, type ReportingSourceSummary, type PublishedReportingSpecSummary } from '../../api/reporting'
 import { deliveryApi } from '../../api/delivery'
@@ -74,8 +74,8 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
     </>}
     {error && <p role="alert">{error}</p>}
     {projection && <div className="space-y-4" aria-label="个人报告结果">
-      {projection.waves.map(w=><article className="rounded border p-3" key={w.waveId}><h3>第 {w.ordinal} 次 · {w.waveKey.split(' / ')[0]}</h3><dl>{Object.entries(w.metrics).map(([id,m])=><div key={id}><dt>{id}</dt><dd>{m.state==='present'?m.value:(m.reason==='NOT_COMPLETED'?'本次未完成':'指标缺失或质量不足')}</dd></div>)}</dl><p>证据等级：{w.evidence.level}</p><p>{w.evidence.limitations.join(' · ')}</p></article>)}
-      {projection.comparisons.map((c,i)=><div key={`${c.fromWaveId}/${c.toWaveId}`}><h3>第 {i+1} 次 → 第 {i+2} 次</h3>{Object.entries(c.metrics).map(([id,m])=><p key={id}>{id}：{m.comparability.level} · {m.delta===undefined?'未计算变化量':`变化量 ${m.delta}`} {m.comparability.limitations.join(' · ')}</p>)}</div>)}
+      {projection.waves.map(w=><article className="rounded border p-3" key={w.waveId}><h3>第 {w.ordinal} 次 · {w.waveKey.split(' / ')[0]}</h3><dl>{Object.entries(w.metrics).map(([id,m])=><div key={id}><dt>{id}</dt><dd>{m.state==='present'?m.value:(m.reason==='NOT_COMPLETED'?'本次未完成':'指标缺失或质量不足')}</dd></div>)}</dl><p>证据等级：{w.evidence.level}</p><p>{w.evidence.limitations.map(limitationLabel).join(' · ')}</p></article>)}
+      {projection.comparisons.map((c,i)=><div key={`${c.fromWaveId}/${c.toWaveId}`}><h3>第 {i+1} 次 → 第 {i+2} 次</h3>{Object.entries(c.metrics).map(([id,m])=><p key={id}>{id}：{comparabilityLabel(m.comparability.level)} · {m.delta===undefined?'未计算变化量':`变化量 ${m.delta}`} {m.comparability.limitations.map(limitationLabel).join(' · ')}</p>)}</div>)}
       <p>用于描述测量变化，不用于诊断或推断因果。</p>
       <ProductButton disabled={busy} onClick={()=>void exportReport()}>导出个人报告</ProductButton>
     </div>}

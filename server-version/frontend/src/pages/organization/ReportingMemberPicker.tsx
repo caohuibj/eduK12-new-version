@@ -28,12 +28,14 @@ export function ReportingMemberPicker({ organizationId, value, onChange }: {
   const toggle=(member:CohortMemberOption,checked:boolean)=>{
     const updated=checked?[...selected.filter(s=>s.userId!==member.userId),member]:selected.filter(s=>s.userId!==member.userId)
     setSelected(updated)
-    const membershipIds=[...new Set(updated.flatMap(s=>s.membershipIds))]
+    // The selector is authoritative even when a failed read cleared cached names.
+    const membershipIds=checked?[...new Set([...ids,...member.membershipIds])]:ids.filter(id=>!member.membershipIds.includes(id))
     onChange({...value,clauses:[...value.clauses.filter(c=>c.kind!=='MEMBERSHIP_IDS'),...(membershipIds.length?[{kind:'MEMBERSHIP_IDS' as const,membershipIds}]:[])]})
   }
   return <fieldset className="space-y-2"><legend>指定成员（可选）</legend>
     <p className="text-sm">仅显示当前有权查看的成员；选择后与上方班级、标签条件同时生效。</p>
     <button type="button" disabled={busy} onClick={()=>{setOpen(!open);if(!open)void find()}}>{open?'收起成员选择':'选择指定成员'}</button>
+    {ids.length>0 && <p>成员筛选已生效；重新搜索可查看或调整选择，清空全部条件请使用上方重置按钮。</p>}
     {selected.length>0 && <ul aria-label="已选成员">{selected.map(s=><li key={s.userId}>{s.name} <button type="button" onClick={()=>toggle(s,false)}>移除 {s.name}</button></li>)}</ul>}
     {open && <div className="space-y-2">
       <label>搜索成员<input value={search} disabled={busy} onChange={e=>{setSearch(e.target.value);setNext(null)}} /></label>
