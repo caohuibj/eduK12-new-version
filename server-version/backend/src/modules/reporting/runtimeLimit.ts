@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import type { Request, RequestHandler } from 'express'
+import type { RequestHandler, Response } from 'express'
 import { cacheService } from '../../services/cacheService'
 
 const positiveInt = (value: string | undefined, fallback: number): number => {
@@ -22,7 +22,7 @@ export const reportingAnalysisCost = (body: unknown): number => {
   return 1
 }
 
-const failUnavailable = (res: Parameters<RequestHandler>[1]) =>
+const failUnavailable = (res: Response) =>
   res.status(503).json({ code: -1, message: '报告服务繁忙，请稍后再试' })
 
 export const reportingAnalysisGuard: RequestHandler = async (req, res, next) => {

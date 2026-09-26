@@ -1959,8 +1959,15 @@ export const revealAccessToken = async (userId: string, role: UserRole, composit
   const token = record.token || (record.tokenEncrypted ? decryptPublicAccessToken(record.tokenEncrypted) : null)
   if (!token) throw compositeNotFound('公开链接凭证不可恢复')
   logger.info('Public composite link bearer revealed', { compositeId, tokenId, actorUserId: userId })
-  const { token: _legacy, tokenEncrypted: _encrypted, ...safe } = record
-  return { ...safe, token }
+  return {
+    id: record.id,
+    token,
+    expiresAt: record.expiresAt,
+    maxUses: record.maxUses,
+    usedCount: record.usedCount,
+    isActive: record.isActive,
+    createdAt: record.createdAt,
+  }
 }
 
 export const disableAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {

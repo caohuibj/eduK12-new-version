@@ -315,8 +315,15 @@ export const revealAccessToken = async (userId: string, role: UserRole, assignme
   const token = record.token || (record.tokenEncrypted ? decryptPublicAccessToken(record.tokenEncrypted) : null)
   if (!token) throw NOT_FOUND('Public link bearer is unavailable')
   logger.info('Public cognitive link bearer revealed', { assignmentId, tokenId, actorUserId: userId })
-  const { token: _legacy, tokenEncrypted: _encrypted, ...safe } = record
-  return { ...safe, token }
+  return {
+    id: record.id,
+    token,
+    expiresAt: record.expiresAt,
+    maxUses: record.maxUses,
+    usedCount: record.usedCount,
+    isActive: record.isActive,
+    createdAt: record.createdAt,
+  }
 }
 
 export const disableAccessToken = async (userId: string, role: UserRole, assignmentId: string, tokenId: string) => {

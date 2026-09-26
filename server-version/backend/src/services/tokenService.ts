@@ -5,7 +5,6 @@
  * - 生成唯一访问令牌
  * - 验证令牌有效性
  * - 检查过期和访问限制
- * - 记录访问次数
  */
 
 import { prisma } from '../config/database'
@@ -250,30 +249,6 @@ export const tokenService = {
         ${questionnaireId ? Prisma.sql`AND "questionnaire_id" = ${questionnaireId}` : Prisma.empty}
     `
     return Number(claimed) > 0
-  },
-
-  /**
-   * 记录访问（增加 usedCount）
-   */
-  async recordAccess(tokenId: string, questionnaireId?: string): Promise<void> {
-    const token = await prisma.questionnaireAccessToken.findUnique({
-      where: { id: tokenId },
-      select: { token: true, maxUses: true, usedCount: true, questionnaireId: true },
-    })
-
-    if (!token || (questionnaireId && token.questionnaireId !== questionnaireId)) return
-
-    // 更新访问计数
-    const newUsedCount = token.usedCount + 1
-    
-    await prisma.questionnaireAccessToken.update({
-      where: { id: tokenId },
-      data: {
-        usedCount: {
-          increment: 1,
-        },
-      },
-    })
   },
 
   /**
