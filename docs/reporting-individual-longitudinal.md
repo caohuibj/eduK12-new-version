@@ -37,4 +37,4 @@ The additive migration adds nullable `subject_user_id`, expands artifact constra
 
 Local validation: all 21 Reporting unit/PostgreSQL suites pass (70 tests); four frontend reporting tests pass; backend production build, frontend TypeScript and changed-file lint pass. Tests cover stable identity across membership episodes, subject isolation, concurrency, missing data, evidence-required comparisons, immutable rows, current teacher/counselor scope, explicit denies, and export revocation. The new PostgreSQL suite is mandatory in CI's critical integration list. Remote Full Gate remains required before merge.
 
-The separate Anonymous/Public Delivery Closure from the original plan remains the next independent PR.
+The separate Anonymous/Public Delivery Closure from the original plan is tracked in [anonymous-delivery-closure.md](anonymous-delivery-closure.md).

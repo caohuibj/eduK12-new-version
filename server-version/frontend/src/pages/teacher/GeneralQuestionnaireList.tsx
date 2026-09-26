@@ -1,6 +1,7 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useState, useEffect } from 'react'
-import { Alert, Button, Card, Empty, Form, InputNumber, message, Modal, Space, Table, Tag } from 'antd'
-import { PlusOutlined, LinkOutlined, DeleteOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Empty, message, Modal, Space, Table, Tag } from 'antd'
+import { PlusOutlined, LinkOutlined, CheckCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { sessionFetch } from '../../api/client'
 import { PageHeader, ProductPage } from '../../components/product-ui'
@@ -12,8 +13,6 @@ const GeneralQuestionnaireList: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [tokenModalVisible, setTokenModalVisible] = useState(false)
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState<any>(null)
-  const [tokens, setTokens] = useState<any[]>([])
-  const [tokenForm] = Form.useForm()
 
   useEffect(() => {
     fetchQuestionnaires()
@@ -45,73 +44,6 @@ const GeneralQuestionnaireList: React.FC = () => {
   const handleManageTokens = async (questionnaire: any) => {
     setCurrentQuestionnaire(questionnaire)
     setTokenModalVisible(true)
-    await fetchTokens(questionnaire.id)
-  }
-
-  const fetchTokens = async (questionnaireId: string) => {
-    try {
-      const response = await sessionFetch(`/api/general-questionnaires/${questionnaireId}/tokens`)
-
-      if (!response.ok) {
-        throw new Error('获取令牌列表失败')
-      }
-
-      const data = await response.json()
-      setTokens(data.data?.list || [])
-    } catch (err: any) {
-      message.error(err.message || '获取令牌失败')
-    }
-  }
-
-  const handleGenerateToken = async (values: any) => {
-    try {
-      const response = await sessionFetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          expiresDays: values.expiresIn,
-          maxUses: values.maxUses || 0
-        })
-      })
-
-      if (!response.ok) {
-        const errData = await response.json()
-        throw new Error(errData.message || '生成令牌失败')
-      }
-
-      const data = await response.json()
-
-      message.success('令牌生成成功')
-      tokenForm.resetFields()
-      await fetchTokens(currentQuestionnaire.id)
-
-      if (data.data?.token) {
-        const link = `${window.location.origin}/public/questionnaire/${data.data.token}`
-        await navigator.clipboard.writeText(link)
-        message.success('链接已复制到剪贴板')
-      }
-    } catch (err: any) {
-      message.error(err.message || '生成令牌失败')
-    }
-  }
-
-  const handleDisableToken = async (tokenId: string) => {
-    try {
-      const response = await sessionFetch(`/api/general-questionnaires/${currentQuestionnaire.id}/tokens/${tokenId}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        throw new Error('禁用令牌失败')
-      }
-
-      message.success('令牌已禁用')
-      await fetchTokens(currentQuestionnaire.id)
-    } catch (err: any) {
-      message.error(err.message || '操作失败')
-    }
   }
 
   const handleExportData = async (questionnaireId: string) => {
@@ -255,69 +187,6 @@ const GeneralQuestionnaireList: React.FC = () => {
     }
   ]
 
-  const tokenColumns = [
-    {
-      title: '令牌',
-      dataIndex: 'token',
-      key: 'token',
-      render: (token: string) => (
-        <Space wrap>
-          <code className="bg-gray-100 px-2 py-1 rounded text-sm">
-            {token.substring(0, 16)}...
-          </code>
-          <Button
-            type="link"
-            size="small"
-            icon={<LinkOutlined />}
-            onClick={() => {
-              const link = `${window.location.origin}/public/questionnaire/${token}`
-              navigator.clipboard.writeText(link)
-              message.success('链接已复制')
-            }}
-          >
-            复制链接
-          </Button>
-        </Space>
-      )
-    },
-    {
-      title: '状态',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'red'}>
-          {isActive ? '有效' : '已禁用'}
-        </Tag>
-      )
-    },
-    {
-      title: '使用次数',
-      key: 'usage',
-      render: (_: any, record: any) => `${record.usedCount} / ${record.maxUses || '∞'}`
-    },
-    {
-      title: '过期时间',
-      dataIndex: 'expiresAt',
-      key: 'expiresAt',
-      render: (date: string) => new Date(date).toLocaleString()
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_: any, record: any) => (
-        <Button
-          type="link"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => handleDisableToken(record.id)}
-          disabled={!record.isActive}
-        >
-          禁用
-        </Button>
-      )
-    }
-  ]
-
   return (
     <ProductPage width="management" className="space-y-6">
       <PageHeader
@@ -366,47 +235,7 @@ const GeneralQuestionnaireList: React.FC = () => {
         footer={null}
         width={900}
       >
-        <div className="mb-6">
-          <h4 className="font-semibold mb-3">生成新令牌</h4>
-          <Form
-            form={tokenForm}
-            layout="inline"
-            onFinish={handleGenerateToken}
-          >
-            <Form.Item
-              name="expiresIn"
-              label="有效期（天）"
-              rules={[{ required: true, message: '请输入有效期' }]}
-            >
-              <InputNumber min={1} max={365} defaultValue={30} />
-            </Form.Item>
-            <Form.Item
-              name="maxUses"
-              label="最大使用次数"
-              extra="0表示无限制"
-            >
-              <InputNumber min={0} defaultValue={0} />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                生成令牌
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-
-        <div>
-          <h4 className="font-semibold mb-3">已生成令牌</h4>
-          <Table
-            columns={tokenColumns}
-            dataSource={tokens}
-            rowKey="id"
-            pagination={false}
-            size="small"
-            scroll={{ x: 680 }}
-            locale={{ emptyText: '暂无令牌' }}
-          />
-        </div>
+        {tokenModalVisible && currentQuestionnaire && <PublicDeliveryManager key={currentQuestionnaire.id} family="QUESTIONNAIRE" resourceId={currentQuestionnaire.id} canCreate={currentQuestionnaire.status === 'PUBLISHED'} />}
       </Modal>
     </ProductPage>
   )

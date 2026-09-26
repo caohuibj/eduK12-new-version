@@ -1,3 +1,4 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import api from '../../api/client'
@@ -75,21 +76,16 @@ export function BundleProducts() {
 }
 export function BundleProductDetail() {
   const { id } = useParams(), [row, setRow] = useState<any>(null), [error, setError] = useState('')
-  const [publicUrl,setPublicUrl] = useState('')
   useEffect(()=>{void request('/bundle-products/'+id).then(setRow).catch(e=>setError(e.message))},[id])
   const publish = async()=> {try {setRow(await request('/bundle-products/'+id+'/publish',{revision:row.revision}))}catch(e:any){setError(e.message)}}
-  const token = async()=> {try {
-    const value=await request('/composite-assessments/'+id+'/public-tokens',{expiresAt:new Date(Date.now()+86400000).toISOString(),maxUses:100})
-    setPublicUrl(window.location.origin+'/public/composite/'+value.token)
-  }catch(e:any){setError(e.message)}}
   return <ProductPage width="management"><PageHeader title={row?.name || 'Bundle'} description="固定内容的综合测评包" />
     {error && <p role="alert">{error}</p>}
     {row && <><p>{row.bundle.name} · {row.bundle.bundleVersion} · {row.status}</p>
       <ul>{row.bundle.slots.map((v:any)=><li key={v.slotKey}>{v.slotKey} · {v.unitType} · {v.instrumentKey} {v.instrumentVersion}</li>)}</ul>
       {row.status!=='ARCHIVED' && <button className="btn-secondary" onClick={()=>void request('/bundle-products/'+id+'/archive',{revision:row.revision}).then(setRow).catch(e=>setError(e.message))}>归档，停止新作答</button>}
       {row.status==='DRAFT' && <button className="btn-primary" onClick={()=>void publish()}>发布 Bundle</button>}
-      {row.status==='PUBLISHED' && row.publicEnabled && <button onClick={()=>void token()}>生成公开链接</button>}
-      {publicUrl && <a href={publicUrl}>{publicUrl}</a>}
+      {row.status==='PUBLISHED' && row.publicEnabled && id && <PublicDeliveryManager key={id} family="COMPOSITE" resourceId={id} maximumExpiry={row.expiresAt} />}
+
       <h2 className="mt-6">作答记录</h2>{row.attempts.map((v:any)=><p key={v.id}>{v.status} {v.completedAt}
         {v.status==='COMPLETED' && <Link to={'/composite-assessments/'+id+'/attempts/'+v.id+'/report'}>查看报告</Link>}</p>)}
     </>}

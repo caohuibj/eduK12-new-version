@@ -1,6 +1,7 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Download, Link as LinkIcon, Send, Archive } from 'lucide-react'
+import { ArrowLeft, Download, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import { sessionFetch } from '../../api/client'
 
@@ -16,9 +17,6 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [detail, setDetail] = useState<any>(null)
-  const [token, setToken] = useState<any>(null)
-  const [tokenExpiresAt, setTokenExpiresAt] = useState('')
-  const [tokenMaxUses, setTokenMaxUses] = useState(0)
   const [title, setTitle] = useState('')
   const [instruction, setInstruction] = useState('')
   const [saving, setSaving] = useState(false)
@@ -35,13 +33,6 @@ const CognitiveAssignmentEdit: React.FC = () => {
       setDetail(detailResponse.data)
       setTitle(detailResponse.data.title)
       setInstruction(detailResponse.data.instruction || '')
-      if (detailResponse.data.listedStandalone !== false) {
-        const tokenResponse = await cognitiveApi.listPublicTokens(id)
-        const tokens = tokenResponse.code === 0 ? (tokenResponse.data?.list || []) : []
-        setToken(tokens.find((item: any) => item.isActive) || tokens[0] || null)
-      } else {
-        setToken(null)
-      }
     } catch (err) {
       setError((err as { message?: string }).message || '加载失败')
     }
@@ -78,32 +69,6 @@ const CognitiveAssignmentEdit: React.FC = () => {
     } finally {
       setSaving(false)
     }
-  }
-
-  const createToken = async () => {
-    if (!tokenExpiresAt) {
-      setError('请先选择公开链接的有效期')
-      return
-    }
-    try {
-      setError(null)
-      const response = await cognitiveApi.createPublicToken(id, {
-        expiresAt: new Date(tokenExpiresAt).toISOString(),
-        maxUses: Number(tokenMaxUses) || 0,
-      })
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
-      setToken({ ...response.data, isActive: true, usedCount: response.data.usedCount ?? 0 })
-    } catch (err) {
-      const message = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : '生成公开链接失败'
-      setError(message)
-    }
-  }
-
-  const disableToken = async () => {
-    if (!token || !confirm('确定停用当前公开链接吗？')) return
-    const response = await cognitiveApi.disablePublicToken(id, token.id)
-    if (response.code === 0) setToken({ ...token, isActive: false })
-    else setError(response.message || '停用公开链接失败')
   }
 
   const exportData = async (
@@ -227,34 +192,8 @@ const CognitiveAssignmentEdit: React.FC = () => {
           </div>
         )
       )}
-      {detail.status === 'PUBLISHED' && !isWrapper && (
-        <div className="card p-6">
-          <h2 className="font-semibold mb-3">
-            <LinkIcon className="w-4 h-4 inline mr-1" />公开匿名链接
-          </h2>
-          {token ? (
-            <div className="text-sm">
-              <p className="break-all text-primary mb-2">{window.location.origin}/public/cognitive/assignments/{token.token}</p>
-              <p className="text-gray-500">
-                有效期：{new Date(token.expiresAt).toLocaleString('zh-CN')} · 已使用 {token.usedCount} 次 · {token.isActive ? '使用中' : '已停用'}
-              </p>
-              {token.isActive && (
-                <button onClick={() => void disableToken()} className="text-red-500 text-sm mt-2">停用当前链接</button>
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-500 mb-3">尚未生成链接</p>
-          )}
-          <div className="flex flex-wrap gap-3 mt-4 items-center">
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input type="datetime-local" value={tokenExpiresAt} onChange={(e) => setTokenExpiresAt(e.target.value)} className="border rounded px-3 py-2 text-base text-gray-800" />
-              <span>有效期</span>
-            </label>
-            <input type="number" min={0} value={tokenMaxUses} onChange={(e) => setTokenMaxUses(Number(e.target.value))} className="border rounded px-3 py-2 w-28" placeholder="最大次数" />
-            <button onClick={() => void createToken()} className="btn-secondary">生成新链接</button>
-          </div>
-        </div>
-      )}
+      {detail.status === 'PUBLISHED' && !isWrapper && <PublicDeliveryManager key={id} family="COGNITIVE" resourceId={id} />}
+
     </div>
   )
 }

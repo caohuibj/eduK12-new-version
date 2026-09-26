@@ -46,9 +46,10 @@ const createQuestionnaireSchema = z.object({
 })
 
 const createTokenSchema = z.object({
-  expiresDays: z.number().int().min(1).max(365).default(30),
+  expiresDays: z.number().int().min(1).max(365).optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional(),
   maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0), // 0表示无限制
-})
+}).strict().refine(value => !(value.expiresAt && value.expiresDays !== undefined), { message: 'Choose expiresAt or expiresDays, not both' })
 
 // ==================== Controller ====================
 
@@ -243,7 +244,7 @@ export const generalQuestionnaireController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { expiresDays, maxUses } = result.data
+      const { expiresDays, expiresAt: requestedExpiry, maxUses } = result.data
 
       // 验证问卷是否存在
       const questionnaire = await generalQuestionnaire(id)
@@ -263,8 +264,10 @@ export const generalQuestionnaireController = {
       }
 
       // 计算过期时间
-      const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + expiresDays)
+      const expiresAt = requestedExpiry ? new Date(requestedExpiry) : new Date(Date.now() + (expiresDays ?? 30) * 86400000)
+      if (expiresAt.getTime() <= Date.now() || expiresAt.getTime() > Date.now() + 365 * 86400000) {
+        return error(res, 'Expiry must be in the future and within one year', -1, 400)
+      }
 
       // 创建令牌
       const token = await tokenService.createToken({

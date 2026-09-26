@@ -116,11 +116,15 @@ async function main() {
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),'mobile overflow')
     const studentContext=await browser.newContext({viewport:{width:1280,height:900}})
     const student=await studentContext.newPage()
+    let publicEntry
     if(publicMode) {
-      await page.getByRole('button',{name:'生成公开链接',exact:true}).click()
-      const link=page.locator('a[href^="/public/composite/"]').first()
+      await page.getByLabel('有效期',{exact:true}).fill(new Date(Date.now()+3600000-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16))
+      await page.getByLabel('最大参与次数（0 表示不限）',{exact:true}).fill('1')
+      await page.getByRole('button',{name:'生成新链接',exact:true}).click()
+      const link=page.locator('a[href*="/public/composite/"]').first()
       await link.waitFor()
-      await student.goto(baseUrl+await link.getAttribute('href'))
+      publicEntry=await link.getAttribute('href')
+      await student.goto(publicEntry)
       await student.getByRole('button',{name:'开始匿名测评',exact:true}).click()
     } else {
       await loginWithSession(student,{baseUrl,route:'/student/login',...fixture.student,timeout:60000})
@@ -130,6 +134,12 @@ async function main() {
     await student.getByText('本次学习目标',{exact:false}).waitFor()
     await student.screenshot({path:output+'/student-form.png',fullPage:true})
     await completeFour(student, 'student').catch(async e=>{await student.screenshot({path:output+'/student-failure.png',fullPage:true});throw e})
+    if(publicMode) {
+      const reportUrl=student.url()
+      await student.goto(publicEntry)
+      await student.waitForURL(reportUrl,{timeout:30000})
+      await student.getByText('本次学习目标',{exact:false}).waitFor()
+    }
     fs.writeFileSync(output+'/result.json',JSON.stringify({id,name,teacherAuthoring:true,multiCourse:true,fourTypes:true,legacyBypassBlocked:true,studentEntry:true,studentCompleted:true,publicMode,errors},null,2))
     assert.deepEqual(errors,[])
     console.log('Questionnaire browser authoring, publish, four-type completion and report: PASS')

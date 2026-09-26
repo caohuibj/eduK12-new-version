@@ -1,3 +1,4 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
@@ -63,7 +64,6 @@ export function QuestionnaireProductEdit() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [requestId] = useState(() => crypto.randomUUID())
-  const [tokens, setTokens] = useState<any[]>([])
   const hydrate = (row: any) => {
     setDetail(row); setName(row.name); setInstruction(row.instruction || ''); setDescription(row.description || '')
     setKind(row.questionnaireType); setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
@@ -72,8 +72,7 @@ export function QuestionnaireProductEdit() {
   const reload = async () => {
     if (id === 'new') return
     hydrate(await request('/' + id))
-    const response = await apiClient.get<any>('/composite-assessments/' + id + '/public-tokens')
-    if (response.code === 0) setTokens(response.data.list)
+
   }
   useEffect(() => { setDetail(null); setError(''); request('/resources').then(setCatalog).catch(e => setError(message(e))); void reload().catch(e => setError(message(e))) }, [id])
   const action = async (fn: () => Promise<void>) => {
@@ -115,11 +114,6 @@ export function QuestionnaireProductEdit() {
     hydrate(await request('/' + id + '/reorder', { revision: detail.revision, units: reordered }))
   })
   const publish = () => action(async () => { hydrate(await request('/' + id + '/publish', { revision: detail.revision })) })
-  const newToken = () => action(async () => {
-    const response = await apiClient.post<any>('/composite-assessments/' + id + '/public-tokens', { expiresAt: detail.expiresAt, maxUses: 0 })
-    if (response.code !== 0) throw new Error(response.message)
-    await reload()
-  })
   const exportAll = () => action(async () => {
     let after: string | null = null
     let part = 1
@@ -188,10 +182,7 @@ export function QuestionnaireProductEdit() {
           {detail.status === 'PUBLISHED' && <button disabled={busy || dirty} onClick={() => void action(async () => hydrate(await request('/' + id + '/archive', { revision: detail.revision })))}>停止新作答</button>}
           {draft && <button disabled={busy} onClick={() => { if (confirm('删除当前草稿？')) void action(async () => { await request('/' + id + '/remove', { revision: detail.revision }); navigate('/questionnaires') }) }}>删除草稿</button>}
         </div>
-        {detail.publicEnabled && detail.status === 'PUBLISHED' && <section className="border rounded p-4"><h2>公开作答链接</h2><button disabled={busy} onClick={() => void newToken()}>生成公开链接</button>
-          {tokens.map(t => <div key={t.id} className="mt-2">{t.token && <a href={'/public/composite/' + t.token}>{window.location.origin + '/public/composite/' + t.token}</a>}
-            <span> {t.isActive ? '有效' : '已停用'}</span>{t.isActive && <button className="ml-3" onClick={() => void action(async () => { const r = await apiClient.delete('/composite-assessments/' + id + '/public-tokens/' + t.id); if (r.code !== 0) throw new Error(r.message); await reload() })}>停用链接</button>}</div>)}
-        </section>}
+        {detail.publicEnabled && detail.status === 'PUBLISHED' && id && <PublicDeliveryManager key={id} family="COMPOSITE" resourceId={id} maximumExpiry={detail.expiresAt} />}
       </>}
     </>}
   </ProductPage>
