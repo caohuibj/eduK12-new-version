@@ -47,6 +47,8 @@ export const assertOrganizationGroupSubgroupSubjectsAccess = async (input: {
   organizationId: string
   subjectUserIds: string[]
 }): Promise<{ organizationManager: boolean }> => {
+  const subjectUserIds = [...new Set(input.subjectUserIds)]
+  if (!subjectUserIds.length) hidden()
   const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
     ?? hidden()
   assertNoReportDeny(context)
@@ -64,6 +66,7 @@ export const assertOrganizationGroupSubgroupSubjectsAccess = async (input: {
     SELECT DISTINCT membership."user_id" AS "userId"
     FROM "organization_memberships" membership
     WHERE membership."organization_id"=${input.organizationId}
+      AND membership."user_id" = ANY(${subjectUserIds}::text[])
       AND membership."valid_from" <= statement_timestamp()
       AND (membership."valid_until" IS NULL OR membership."valid_until" > statement_timestamp())
       AND (
@@ -113,6 +116,7 @@ const resolveScopedContextBatch = async (input: {
   runIds: string[]
 }): Promise<{ context: OrganizationAccessContext; runs: RunAuthorityRow[] }> => {
   const ids = [...new Set(input.runIds)]
+  if (!ids.length) hidden()
   const [resolved, runs] = await Promise.all([
     resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId }),
     readScopedRuns(input.organizationId, ids),

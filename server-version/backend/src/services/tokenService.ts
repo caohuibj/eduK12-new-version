@@ -268,7 +268,7 @@ export const tokenService = {
   /**
    * 获取问卷的所有令牌
    */
-  async getTokensByQuestionnaire(questionnaireId: string, options: { reveal?: boolean } = {}) {
+  async getTokensByQuestionnaire(questionnaireId: string) {
     const rows = await prisma.questionnaireAccessToken.findMany({
       where: { questionnaireId },
       orderBy: { createdAt: 'desc' },
@@ -282,7 +282,7 @@ export const tokenService = {
         },
       },
     })
-    return rows.map((row) => serializeQuestionnaireAccessToken(row, options.reveal === true))
+    return rows.map((row) => serializeQuestionnaireAccessToken(row))
   },
 
   /**
