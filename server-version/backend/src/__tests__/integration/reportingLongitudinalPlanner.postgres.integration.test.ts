@@ -17,6 +17,7 @@ import {
   readReportingSeriesWave,
 } from '../../modules/reporting/series'
 import { createLongitudinalAnalysisArtifact } from '../../modules/reporting/pr4Artifact'
+import { listOrganizationReportingSeries } from '../../modules/reporting/discovery'
 import {
   createPlatformReportingSpec,
   publishPlatformReportingSpec,
@@ -183,6 +184,41 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
     const waveSpecific = await generateAutomaticLongitudinal({ ...input, cohortStrategy: 'WAVE_SPECIFIC' })
     expect(waveSpecific.projection.state).toBe('suppressed')
   }, 60000)
+
+  it('keeps Series discovery query count constant as Waves accumulate', async () => {
+    const first=await buildReportingFixture(db,3)
+    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+    const resource=(await db.$queryRaw<Array<{family:string;key:string}>>`
+      SELECT resource_family AS family, resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0]
+    const series=await createReportingSeries({organizationId:first.organizationId,seriesKey:key('discovery-budget'),
+      scope:{schemaVersion:1,resourceFamily:resource.family as any,resourceKey:resource.key},createdByUserId:first.ownerId})
+    const bind=async(fixture:typeof first,ordinal:number)=>{
+      const cohort=await freezeRunTrackCohort({...fixture,generatedByUserId:first.ownerId})
+      await bindReportingSeriesWave({organizationId:first.organizationId,seriesId:series.id,waveKey:`T${ordinal}`,ordinal,
+        cohortSnapshotId:cohort.id,createdByUserId:first.ownerId})
+    }
+    await bind(first,1)
+
+    const { prisma }=await import('../../config/database')
+    let queries=0
+    prisma.$use(async (params,next)=>{queries++;return next(params)})
+    const principal={userId:first.ownerId,platformRole:'STANDARD' as const}
+    queries=0
+    await listOrganizationReportingSeries({principal,organizationId:first.organizationId,page:1,pageSize:50})
+    const oneWave=queries
+
+    for(let ordinal=2;ordinal<=10;ordinal++){
+      const fixture=await buildReportingFixture(db,3,false,{ownerId:first.ownerId,organizationId:first.organizationId,
+        members:first.members,resourceKey:resource.key,at:new Date(`2026-${String(ordinal).padStart(2,'0')}-01T00:00:00Z`)})
+      await bind(fixture,ordinal)
+    }
+    queries=0
+    const page=await listOrganizationReportingSeries({principal,organizationId:first.organizationId,page:1,pageSize:50})
+    const tenWaves=queries
+    expect(page.list.find(row=>row.seriesId===series.id)?.waveCount).toBe(10)
+    expect(tenWaves).toBe(oneWave)
+    expect(tenWaves).toBeLessThan(30)
+  },120000)
 
   it('bounds queries for three completed waves of 1000 subjects', async () => {
     const { prisma }=await import('../../config/database')

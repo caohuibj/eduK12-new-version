@@ -1,5 +1,6 @@
-import { normalizeCohortSelector, selectHistoricalMembers } from './cohort-selector'
+import { historicalCohortMembershipPredicate, normalizeCohortSelector } from './cohort-selector'
 import { randomUUID } from 'node:crypto'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
@@ -20,6 +21,15 @@ type PopulationRow = {
   membershipId: string | null
   respondentUserId: string
   relationshipKind: string
+}
+
+type SourceMetaRow = {
+  runStatus: string
+  resourceFamily: string
+  at: Date | null
+  populationN: number
+  selfShape: boolean
+  membershipShape: boolean
 }
 
 type CohortRow = {
@@ -78,7 +88,59 @@ export const freezeRunTrackCohort = async (input: {
   cohortSelector?: ReportingCohortSelectorInputV2
   baselineCohort?: ReportingCohortSnapshotRecord
 }): Promise<ReportingCohortSnapshotRecord> => {
-  const rows = await prisma.$queryRaw<PopulationRow[]>`
+  const filtered = Boolean(input.cohortSelector || input.baselineCohort)
+  let normalized: ReportingCohortSelectorInputV2 | undefined
+  let at: Date | undefined
+  let rowFilter = Prisma.empty
+
+  if (filtered) {
+    normalized = normalizeCohortSelector(input.cohortSelector ?? { schemaVersion: 2, clauses: [], combine: 'ALL' })
+    const sourceRows = await prisma.$queryRaw<SourceMetaRow[]>(Prisma.sql`
+      SELECT r."status" AS "runStatus", t."resource_family" AS "resourceFamily", r."published_at" AS at,
+        COUNT(e."id")::int AS "populationN",
+        BOOL_AND(relationship."relationship_kind"='SELF' AND subject."user_id"=respondent."user_id") AS "selfShape",
+        BOOL_AND(subject."membership_id" IS NOT NULL) AS "membershipShape"
+      FROM "assessment_runs" r
+      JOIN "assessment_run_tracks" t
+        ON t."organization_id"=r."organization_id" AND t."run_id"=r."id"
+      JOIN "assessment_run_executions" e
+        ON e."organization_id"=r."organization_id" AND e."run_id"=r."id" AND e."track_id"=t."id"
+      JOIN "assessment_run_actor_snapshots" subject
+        ON subject."organization_id"=e."organization_id" AND subject."run_id"=e."run_id" AND subject."id"=e."subject_actor_snapshot_id"
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."organization_id"=e."organization_id" AND respondent."run_id"=e."run_id" AND respondent."id"=e."respondent_actor_snapshot_id"
+      JOIN "assessment_run_relationship_snapshots" relationship
+        ON relationship."organization_id"=e."organization_id" AND relationship."run_id"=e."run_id" AND relationship."id"=e."relationship_snapshot_id"
+      WHERE r."organization_id"=${input.organizationId} AND r."id"=${input.runId} AND t."id"=${input.trackId}
+      GROUP BY r."status", t."resource_family", r."published_at"
+    `)
+    const source = sourceRows[0]
+    if (!source || source.populationN < 1) reportingFail('REPORT_COHORT_EMPTY', 'Run Track has no frozen reporting population', 409)
+    if (source.runStatus === 'DRAFT') reportingFail('REPORT_COHORT_SOURCE_STATE', 'draft Run cannot produce a reporting cohort', 409)
+    if (source.resourceFamily === 'FORM') reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
+    if (!source.selfShape) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'PR3 generic group reporting accepts SELF observations only', 409)
+    if (!source.membershipShape) reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
+    if (!source.at) reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
+    const sourceAt = source.at as Date
+    at = sourceAt
+
+    if (input.baselineCohort) {
+      if (input.baselineCohort.organizationId !== input.organizationId) reportingFail('REPORT_SELECTOR_INVALID', 'baseline must belong to organization', 404)
+      const subjectIds = [...new Set(input.baselineCohort.members.map((member) => member.userId))]
+      if (!subjectIds.length) reportingFail('REPORT_COHORT_EMPTY', 'baseline population is empty', 409)
+      rowFilter = Prisma.sql`AND subject."user_id" = ANY(${subjectIds}::text[])`
+    } else {
+      const predicate = await historicalCohortMembershipPredicate({
+        organizationId: input.organizationId,
+        at: sourceAt,
+        selector: normalized,
+        membershipIdSql: Prisma.sql`subject."membership_id"`,
+      })
+      rowFilter = Prisma.sql`AND ${predicate}`
+    }
+  }
+
+  const rows = await prisma.$queryRaw<PopulationRow[]>(Prisma.sql`
     SELECT r."status" AS "runStatus", t."resource_family" AS "resourceFamily",
       e."id" AS "executionId", subject."id" AS "actorSnapshotId", subject."user_id" AS "subjectUserId",
       subject."membership_id" AS "membershipId", respondent."user_id" AS "respondentUserId",
@@ -90,9 +152,12 @@ export const freezeRunTrackCohort = async (input: {
     JOIN "assessment_run_actor_snapshots" respondent ON respondent."organization_id"=e."organization_id" AND respondent."run_id"=e."run_id" AND respondent."id"=e."respondent_actor_snapshot_id"
     JOIN "assessment_run_relationship_snapshots" relationship ON relationship."organization_id"=e."organization_id" AND relationship."run_id"=e."run_id" AND relationship."id"=e."relationship_snapshot_id"
     WHERE e."organization_id"=${input.organizationId} AND e."run_id"=${input.runId} AND e."track_id"=${input.trackId}
+      ${rowFilter}
     ORDER BY subject."user_id", subject."membership_id", e."id"
-  `
-  if (rows.length === 0) reportingFail('REPORT_COHORT_EMPTY', 'Run Track has no frozen reporting population', 409)
+  `)
+  if (rows.length === 0) {
+    reportingFail('REPORT_COHORT_EMPTY', filtered ? 'selected population has no executions at this measurement' : 'Run Track has no frozen reporting population', 409)
+  }
   if (rows.some((row) => row.runStatus === 'DRAFT')) reportingFail('REPORT_COHORT_SOURCE_STATE', 'draft Run cannot produce a reporting cohort', 409)
   if (rows.some((row) => row.resourceFamily === 'FORM')) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
   if (rows.some((row) => row.relationshipKind !== 'SELF' || row.subjectUserId !== row.respondentUserId)) {
@@ -101,7 +166,8 @@ export const freezeRunTrackCohort = async (input: {
   if (rows.some((row) => !row.membershipId)) {
     reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
   }
-  let members = rows.map<ReportingCohortMemberV1>((row) => ({
+
+  const members = rows.map<ReportingCohortMemberV1>((row) => ({
     userId: row.subjectUserId,
     membershipId: row.membershipId!,
     actorSnapshotId: row.actorSnapshotId,
@@ -111,23 +177,22 @@ export const freezeRunTrackCohort = async (input: {
   if (memberIdentity.size !== members.length) {
     reportingFail('AMBIGUOUS_OBSERVATION', 'Run Track contains more than one SELF execution for a subject Membership', 409)
   }
+
   let selector: ReportingCohortSnapshotRecord['selector'] = { kind: 'RUN_TRACK_SUBJECTS', runId: input.runId, trackId: input.trackId }
-  if (input.cohortSelector || input.baselineCohort) {
-    const normalized = normalizeCohortSelector(input.cohortSelector ?? { schemaVersion: 2, clauses: [], combine: 'ALL' })
-    const anchors = await prisma.$queryRaw<Array<{ at: Date | null }>>`SELECT published_at AS at FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${input.runId}`
-    const at = anchors[0]?.at
-    if (!at) return reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
-    selector = { ...normalized, kind: 'FILTERED_RUN_TRACK_SUBJECTS', anchor: { kind: 'RUN_PUBLISHED_AT', at: at.toISOString() } }
-    if (input.baselineCohort) {
-      if (input.baselineCohort.organizationId !== input.organizationId) reportingFail('REPORT_SELECTOR_INVALID', 'baseline must belong to organization', 404)
-      const subjects = new Set(input.baselineCohort.members.map(m => m.userId))
-      members = members.filter(m => subjects.has(m.userId))
-      selector.baseline = { cohortSnapshotId: input.baselineCohort.id, cohortIdentityHash: input.baselineCohort.cohortIdentityHash }
-    } else {
-      members = await selectHistoricalMembers({ organizationId: input.organizationId, at, selector: normalized, members })
+  if (filtered) {
+    selector = {
+      ...normalized!,
+      kind: 'FILTERED_RUN_TRACK_SUBJECTS',
+      anchor: { kind: 'RUN_PUBLISHED_AT', at: at!.toISOString() },
     }
-    if (!members.length) reportingFail('REPORT_COHORT_EMPTY', 'selected population has no executions at this measurement', 409)
+    if (input.baselineCohort) {
+      selector.baseline = {
+        cohortSnapshotId: input.baselineCohort.id,
+        cohortIdentityHash: input.baselineCohort.cohortIdentityHash,
+      }
+    }
   }
+
   const cohortIdentityHash = canonicalHash({
     schema: selector.kind === 'RUN_TRACK_SUBJECTS' ? 'ReportingCohortIdentityV1' : 'ReportingCohortIdentityV2',
     organizationId: input.organizationId,
@@ -175,4 +240,18 @@ export const readReportingCohort = async (cohortId: string): Promise<ReportingCo
     FROM "reporting_cohort_snapshots" WHERE "id"=${cohortId} LIMIT 1
   `
   return assertRecordIntegrity(rows[0] ?? reportingFail('REPORT_COHORT_NOT_FOUND', 'reporting cohort not found', 404))
+}
+
+export const readReportingCohorts = async (cohortIds: string[]): Promise<ReportingCohortSnapshotRecord[]> => {
+  const ids = [...new Set(cohortIds)]
+  if (!ids.length) return []
+  const rows = await prisma.$queryRaw<CohortRow[]>(Prisma.sql`
+    SELECT "id", "organization_id" AS "organizationId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
+      "selector", "members", "eligible_n" AS "eligibleN", "cohort_identity_hash" AS "cohortIdentityHash", "snapshot_hash" AS "snapshotHash",
+      "generated_by_user_id" AS "generatedByUserId", "generated_at" AS "generatedAt"
+    FROM "reporting_cohort_snapshots"
+    WHERE "id" IN (${Prisma.join(ids)})
+  `)
+  if (rows.length !== ids.length) reportingFail('REPORT_COHORT_NOT_FOUND', 'reporting cohort not found', 404)
+  return rows.map(assertRecordIntegrity)
 }

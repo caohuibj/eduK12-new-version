@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { readReportingCohort } from './cohort'
+import { readReportingCohort, readReportingCohorts } from './cohort'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import {
   reportingFail,
@@ -225,6 +225,23 @@ export const readReportingSeries = async (seriesId: string): Promise<ReportingSe
   return assertSeriesIntegrity(rows[0] ?? reportingFail('REPORT_SERIES_NOT_FOUND', 'reporting series not found', 404))
 }
 
+export const readReportingSeriesBatch = async (input: {
+  organizationId: string
+  seriesIds: string[]
+}): Promise<ReportingSeriesRecordV1[]> => {
+  const ids = [...new Set(input.seriesIds)]
+  if (!ids.length) return []
+  const rows = await prisma.$queryRaw<SeriesRow[]>(Prisma.sql`
+    SELECT "id", "organization_id" AS "organizationId", "series_key" AS "seriesKey", "scope",
+      "series_identity_hash" AS "seriesIdentityHash", "snapshot_hash" AS "snapshotHash",
+      "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt"
+    FROM "reporting_series"
+    WHERE "organization_id"=${input.organizationId} AND "id" IN (${Prisma.join(ids)})
+  `)
+  if (rows.length !== ids.length) reportingFail('REPORT_SERIES_NOT_FOUND', 'reporting series not found', 404)
+  return rows.map(assertSeriesIntegrity)
+}
+
 export const bindReportingSeriesWave = async (input: {
   organizationId: string
   seriesId: string
@@ -323,4 +340,45 @@ export const readReportingSeriesWave = async (input: {
   const expectedInput = reportingWaveInputIdentity({ cohortIdentityHash: cohort.cohortIdentityHash, manifest: row.inputManifest })
   if (expectedInput !== row.inputIdentityHash) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave input identity failed integrity verification', 500)
   return row
+}
+
+export const readReportingSeriesWavesBatch = async (input: {
+  organizationId: string
+  seriesIds: string[]
+  maxPerSeries: number
+}): Promise<ReportingSeriesWaveRecordV1[]> => {
+  const seriesIds = [...new Set(input.seriesIds)]
+  if (!seriesIds.length) return []
+  if (!Number.isInteger(input.maxPerSeries) || input.maxPerSeries < 1 || input.maxPerSeries > 1000) {
+    reportingFail('REPORT_WAVE_INVALID', 'batch Wave limit is invalid', 400)
+  }
+  const rows = await prisma.$queryRaw<Array<WaveRow & { rn: number }>>(Prisma.sql`
+    SELECT * FROM (
+      SELECT
+        "id", "organization_id" AS "organizationId", "series_id" AS "seriesId", "wave_key" AS "waveKey", "ordinal",
+        "cohort_snapshot_id" AS "cohortSnapshotId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
+        "input_manifest" AS "inputManifest", "input_identity_hash" AS "inputIdentityHash", "snapshot_hash" AS "snapshotHash",
+        "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt",
+        ROW_NUMBER() OVER (PARTITION BY "series_id" ORDER BY "ordinal", "created_at", "id") AS rn
+      FROM "reporting_series_waves"
+      WHERE "organization_id"=${input.organizationId} AND "series_id" IN (${Prisma.join(seriesIds)})
+    ) ranked
+    WHERE rn <= ${input.maxPerSeries}
+    ORDER BY "seriesId", "ordinal", "createdAt", "id"
+  `)
+  const waves = rows.map(({ rn: _rn, ...row }) => assertWaveIntegrity(row))
+  const cohorts = await readReportingCohorts(waves.map((wave) => wave.cohortSnapshotId))
+  const cohortsById = new Map(cohorts.map((cohort) => [cohort.id, cohort]))
+  for (const wave of waves) {
+    const cohort = cohortsById.get(wave.cohortSnapshotId)
+      ?? reportingFail('REPORT_WAVE_INTEGRITY', 'Wave cohort is missing', 500)
+    if (
+      cohort.organizationId !== wave.organizationId
+      || cohort.sourceRunId !== wave.sourceRunId
+      || cohort.sourceTrackId !== wave.sourceTrackId
+    ) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave source binding no longer matches its frozen cohort', 500)
+    const expectedInput = reportingWaveInputIdentity({ cohortIdentityHash: cohort.cohortIdentityHash, manifest: wave.inputManifest })
+    if (expectedInput !== wave.inputIdentityHash) reportingFail('REPORT_WAVE_INTEGRITY', 'Wave input identity failed integrity verification', 500)
+  }
+  return waves
 }
