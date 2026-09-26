@@ -137,7 +137,7 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
   hidden()
 }
 
-const uniqueFixedSourceObservations =const uniqueFixedSourceObservations = (input: {
+const uniqueFixedSourceObservations = (input: {
   separated: ReportingSeparatedMultiRaterV1
   subjectUserId: string
   trackId: string

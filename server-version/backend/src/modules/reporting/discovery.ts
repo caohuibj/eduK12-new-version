@@ -177,7 +177,6 @@ export async function listOrganizationReportingSources(input: {
 }
 
 /**
- * Protected source discovery/**
  * Protected source discovery returns only frozen subject/source identity. It
  * never returns respondent identities or respondent counts; each candidate is
  * filtered through the same current subject-scoped manager authorization used
@@ -356,7 +355,7 @@ export async function listOrganizationReportingSeries(input: {
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize, maxWavesPerSeries: MAX_SERIES_WAVES }
 }
 
-/** Reporting metadata only; no assignments, member identities, or counts. *//** Reporting metadata only; no assignments, member identities, or counts. */
+/** Reporting metadata only; no assignments, member identities, or counts. */
 export async function listReportingCohortOptions(input: { principal: ReportingPrincipal; organizationId: string }) {
   const context = await resolveOrganizationReportingWorkspaceContext(input)
   const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')

@@ -60,6 +60,15 @@ describe('historical filtered cohorts (real PostgreSQL)', () => {
     await expect(freezeRunTrackCohort({ ...base, cohortSelector: filter })).rejects.toMatchObject({ code: 'REPORT_COHORT_EMPTY' })
     expect((await readReportingCohort(all.id)).members).toEqual(all.members)
     expect(() => normalizeCohortSelector({ ...filter, outcome: { score: 60 } })).toThrow()
+    const tooMany = Array.from({ length: 2501 }, () => randomUUID())
+    expect(() => normalizeCohortSelector({
+      schemaVersion: 2,
+      combine: 'ALL',
+      clauses: [
+        { kind: 'MEMBERSHIP_IDS', membershipIds: tooMany },
+        { kind: 'CLASS_UNITS', classUnitIds: Array.from({ length: 2500 }, () => randomUUID()) },
+      ],
+    })).toThrow()
   })
 
   it('keeps the historical class after a transfer and combines class with labels', async () => {
