@@ -5,16 +5,23 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/media-7-cross-runtime-acceptance.yml'
-      - 'server-version/backend/src/modules/cognitive/**'
-      - 'server-version/frontend/src/modules/cognitive/**'
+      - 'server-version/backend/src/modules/assessment-media/**'
+      - 'server-version/backend/src/modules/cognitive/cognitive-video.controller.ts'
+      - 'server-version/backend/src/modules/cognitive/cognitive-video.service.ts'
+      - 'server-version/backend/src/modules/cognitive/cognitive.routes.ts'
+      - 'server-version/backend/src/modules/cognitive/cognitive.public.routes.ts'
+      - 'server-version/backend/src/modules/cognitive/v2/presentation.ts'
+      - 'server-version/backend/src/modules/cognitive/v2/session-snapshot.ts'
+      - 'server-version/backend/src/modules/cognitive/tasks/*/package.ts'
+      - 'server-version/frontend/src/modules/assessment-media/**'
+      - 'server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx'
+      - 'server-version/frontend/src/modules/cognitive/video-presentation.ts'
+      - 'server-version/frontend/src/modules/cognitive/useCognitiveVideoSources.ts'
+      - 'server-version/frontend/src/modules/cognitive/useCognitiveInstructionVideoCompletion.ts'
+      - 'server-version/frontend/src/modules/cognitive/types.ts'
+      - 'server-version/frontend/src/modules/cognitive/__tests__/*Video*'
       - 'server-version/e2e/cognitive-video-*'
       - 'server-version/e2e/helpers/session-auth.cjs'
-      - 'server-version/docs/frontend-convergence/fe-11-unified-journey-gate.md'
-      # Declaration-only content is covered by the assessment content gate.
-      - '!server-version/backend/src/modules/cognitive/tasks/*/seeds.ts'
-      - '!server-version/backend/src/modules/cognitive/tasks/*/participant-presentation.ts'
-      - '!server-version/backend/src/modules/cognitive/tasks/*/governance.ts'
-      - '!server-version/backend/src/modules/cognitive/tasks/*/scientific.ts'
   workflow_dispatch:
     inputs:
       hosted_runner:
@@ -31,11 +38,11 @@ jobs:
   cognitive-video-and-cross-runtime:
     name: Cognitive VIDEO auth/public + media boundary acceptance
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    # Isolate required browser gates by default; set CI_BROWSER_HOSTED=false to roll back.
+    # Windows has the larger memory budget and is the dedicated frontend/media lane.
     runs-on:
       - self-hosted
       - linux
-      - eduk12-mac-ci
+      - eduk12-win-ci
     timeout-minutes: 35
     env:
       NODE_ENV: test
