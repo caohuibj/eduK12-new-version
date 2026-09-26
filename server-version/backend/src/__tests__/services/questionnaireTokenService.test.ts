@@ -10,7 +10,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
-import { tokenService } from '../../services/tokenService'
+import { serializeQuestionnaireAccessToken, tokenService } from '../../services/tokenService'
 
 describe('questionnaire access token quota handling', () => {
   beforeEach(() => vi.clearAllMocks())
@@ -52,4 +52,23 @@ describe('questionnaire access token quota handling', () => {
     expect(validation.valid).toBe(false)
     expect(validation.overLimit).toBe(true)
   })
+})
+
+
+it('hides questionnaire bearers in list projections and reveals only on explicit request', () => {
+  const row = {
+    id: 'token-1',
+    token: 'qn_secret',
+    tokenHash: 'lookup-hash',
+    tokenEncrypted: null,
+    expiresAt: new Date(Date.now() + 60_000),
+    maxUses: 1,
+    usedCount: 0,
+    isActive: true,
+  }
+  const hidden = serializeQuestionnaireAccessToken(row)
+  expect(hidden.token).toBeNull()
+  expect(hidden).not.toHaveProperty('tokenHash')
+  expect(hidden).not.toHaveProperty('tokenEncrypted')
+  expect(serializeQuestionnaireAccessToken(row, true).token).toBe('qn_secret')
 })
