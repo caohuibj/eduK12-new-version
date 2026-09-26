@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assertOrganizationGroupReportGenerateAccess, type ReportingPrincipal } from './authorization'
+import { assertOrganizationGroupReportsGenerateAccess, type ReportingPrincipal } from './authorization'
 import { freezeRunTrackCohort } from './cohort'
 import { normalizeCohortSelector } from './cohort-selector'
 import { resolveAuthoritativeRunResults } from './resultSource'
@@ -26,8 +26,12 @@ export async function generateAutomaticLongitudinal(input: {
   }
   if (input.analysisKind === 'MATCHED_LONGITUDINAL' && !input.mode) reportingFail('REPORT_LONGITUDINAL_MODE_REQUIRED', 'select a matching mode', 400)
   if (input.analysisKind === 'REPEATED_COHORT' && input.mode) reportingFail('REPORT_LONGITUDINAL_MODE_INVALID', 'group trends do not accept a matching mode', 400)
-  // Authorize every source before persisting any planning evidence.
-  for (const source of input.sources) await assertOrganizationGroupReportGenerateAccess({ ...input, runId: source.runId })
+  // Authorize the full source set before persisting any planning evidence.
+  await assertOrganizationGroupReportsGenerateAccess({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    runIds: input.sources.map((source) => source.runId),
+  })
   const spec = await getPublishedReportingSpec(input.specId)
   if (spec.definition.analysisKind !== input.analysisKind) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'published spec must match the requested report', 409)
   const sources = await prisma.$queryRaw<Array<{ runId: string; trackId: string; at: Date; family: ReportingResourceFamily; key: string }>>(Prisma.sql`
@@ -56,11 +60,15 @@ export async function generateAutomaticLongitudinal(input: {
   const identity = canonicalHash({ schema: 'AutoLongitudinalV2', organizationId: input.organizationId,
     selector, strategy: input.cohortStrategy,
     waves: prepared.map(p => ({ source: { ...p.source, at: p.source.at.toISOString() }, cohort: p.cohort.cohortIdentityHash, manifest: p.manifest })) })
+  await assertOrganizationGroupReportsGenerateAccess({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    runIds: prepared.map((item) => item.source.runId),
+  })
   const series = await createReportingSeries({ organizationId: input.organizationId, seriesKey: `AUTO-LONG-V2:${identity}`, reuse: true,
     scope: { schemaVersion: 1, resourceFamily: sources[0].family, resourceKey: sources[0].key }, createdByUserId: input.principal.userId })
   const waveKeys: string[] = []
   for (const [i, p] of prepared.entries()) {
-    await assertOrganizationGroupReportGenerateAccess({ ...input, runId: p.source.runId })
     const waveKey = `${p.source.at.toISOString()} / T${i + 1}`
     await bindReportingSeriesWave({ organizationId: input.organizationId, seriesId: series.id, waveKey, ordinal: i + 1,
       cohortSnapshotId: p.cohort.id, createdByUserId: input.principal.userId, preparedBatch: p.batch })
