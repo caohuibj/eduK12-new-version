@@ -1,5 +1,6 @@
 import { normalizeCohortSelector, selectHistoricalMembers } from './cohort-selector'
 import { randomUUID } from 'node:crypto'
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
@@ -175,4 +176,18 @@ export const readReportingCohort = async (cohortId: string): Promise<ReportingCo
     FROM "reporting_cohort_snapshots" WHERE "id"=${cohortId} LIMIT 1
   `
   return assertRecordIntegrity(rows[0] ?? reportingFail('REPORT_COHORT_NOT_FOUND', 'reporting cohort not found', 404))
+}
+
+export const readReportingCohorts = async (cohortIds: string[]): Promise<ReportingCohortSnapshotRecord[]> => {
+  const ids = [...new Set(cohortIds)]
+  if (!ids.length) return []
+  const rows = await prisma.$queryRaw<CohortRow[]>(Prisma.sql`
+    SELECT "id", "organization_id" AS "organizationId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
+      "selector", "members", "eligible_n" AS "eligibleN", "cohort_identity_hash" AS "cohortIdentityHash", "snapshot_hash" AS "snapshotHash",
+      "generated_by_user_id" AS "generatedByUserId", "generated_at" AS "generatedAt"
+    FROM "reporting_cohort_snapshots"
+    WHERE "id" IN (${Prisma.join(ids)})
+  `)
+  if (rows.length !== ids.length) reportingFail('REPORT_COHORT_NOT_FOUND', 'reporting cohort not found', 404)
+  return rows.map(assertRecordIntegrity)
 }

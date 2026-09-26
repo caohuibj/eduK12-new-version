@@ -1,4 +1,4 @@
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import { reportingFail } from './types'
 import type { ReportingPrincipal } from './authorization'
 
@@ -8,10 +8,12 @@ const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resourc
  * Series is a reporting workspace resource, not content authority by itself.
  * Platform role alone never grants access; current Organization evidence is required.
  */
-export const assertOrganizationReportingWorkspaceAccess = async (input: {
+export type CurrentReportingWorkspaceContext = OrganizationAccessContext & { membershipId: string }
+
+export const resolveOrganizationReportingWorkspaceContext = async (input: {
   principal: ReportingPrincipal
   organizationId: string
-}): Promise<void> => {
+}): Promise<CurrentReportingWorkspaceContext> => {
   const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
   if (!context || context.membershipId === null) return hidden()
   if (
@@ -20,7 +22,18 @@ export const assertOrganizationReportingWorkspaceAccess = async (input: {
     || context.explicitDenies.includes('ORG_GROUP_REPORT_V1')
   ) return hidden()
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
-  if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
-  if (context.personas.includes('TEACHER') || context.personas.includes('COUNSELOR')) return
-  hidden()
+  if (
+    context.orgRole !== 'ORG_ADMIN'
+    && !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    && !context.personas.includes('TEACHER')
+    && !context.personas.includes('COUNSELOR')
+  ) return hidden()
+  return context as CurrentReportingWorkspaceContext
+}
+
+export const assertOrganizationReportingWorkspaceAccess = async (input: {
+  principal: ReportingPrincipal
+  organizationId: string
+}): Promise<void> => {
+  await resolveOrganizationReportingWorkspaceContext(input)
 }

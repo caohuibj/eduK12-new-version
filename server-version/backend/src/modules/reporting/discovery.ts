@@ -1,12 +1,12 @@
 import { individualSubjectScope } from './individualAuthorization'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { assertOrganizationGroupReportGenerateAccess, type ReportingPrincipal } from './authorization'
-import { assertOrganizationReportingWorkspaceAccess } from './pr4Authorization'
-import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
-import { readReportingSeries, readReportingSeriesWave } from './series'
+import { type ReportingPrincipal } from './authorization'
+import { assertOrganizationReportingWorkspaceAccess, resolveOrganizationReportingWorkspaceContext } from './pr4Authorization'
+import { resolveProtectedFeedbackManagerContext } from './protectedFeedback'
+import { readReportingSeriesBatch, readReportingSeriesWavesBatch } from './series'
 import { getPublishedReportingSpec } from './spec'
-import { ReportingError, type ReportingAnalysisKindV1, type ReportingAnalysisSpecDefinitionV1 } from './types'
+import { type ReportingAnalysisKindV1, type ReportingAnalysisSpecDefinitionV1 } from './types'
 
 const MAX_SERIES_WAVES = 100
 const MAX_PROTECTED_SOURCE_CANDIDATES = 500
@@ -77,10 +77,6 @@ const specSummary = (input: Awaited<ReturnType<typeof getPublishedReportingSpec>
   }
 }
 
-const hiddenReportingDenial = (error: unknown): boolean => (
-  error instanceof ReportingError && error.statusCode === 404
-)
-
 export async function listPublishedReportingSpecs(input: {
   principal: ReportingPrincipal
   organizationId: string
@@ -123,7 +119,8 @@ export async function listOrganizationReportingSources(input: {
   page?: number
   pageSize?: number
 }) {
-  await assertOrganizationReportingWorkspaceAccess(input)
+  const context = await resolveOrganizationReportingWorkspaceContext(input)
+  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
   const rows = await prisma.$queryRaw<Array<{
     runId: string
     runName: string
@@ -152,6 +149,7 @@ export async function listOrganizationReportingSources(input: {
     WHERE r."organization_id"=${input.organizationId}
       AND r."status" <> 'DRAFT'
       AND t."resource_family" <> 'FORM'
+      AND (${organizationManager} OR r."created_by_user_id"=${input.principal.userId})
     GROUP BY r."id", r."name", r."status", r."published_at", r."created_at",
              t."id", t."resource_family", t."resource_key", t."resource_version"
     HAVING COUNT(e."id") > 0
@@ -163,19 +161,9 @@ export async function listOrganizationReportingSources(input: {
     ORDER BY r."published_at" DESC, r."id", t."id"
     LIMIT ${input.pageSize ?? 100} OFFSET ${((input.page ?? 1) - 1) * (input.pageSize ?? 100)}
   `
-  const allowedRuns = new Map<string, boolean>()
-  for (const runId of [...new Set(rows.map((row) => row.runId))]) {
-    try {
-      await assertOrganizationGroupReportGenerateAccess({ ...input, runId })
-      allowedRuns.set(runId, true)
-    } catch (error) {
-      if (!hiddenReportingDenial(error)) throw error
-      allowedRuns.set(runId, false)
-    }
-  }
   await assertOrganizationReportingWorkspaceAccess(input)
   return {
-    list: rows.filter((row) => allowedRuns.get(row.runId)).map<ReportingSourceSummary>((row) => ({
+    list: rows.map<ReportingSourceSummary>((row) => ({
       runId: row.runId,
       runName: row.runName,
       runStatus: row.runStatus,
@@ -189,6 +177,7 @@ export async function listOrganizationReportingSources(input: {
 }
 
 /**
+ * Protected source discovery/**
  * Protected source discovery returns only frozen subject/source identity. It
  * never returns respondent identities or respondent counts; each candidate is
  * filtered through the same current subject-scoped manager authorization used
@@ -198,7 +187,10 @@ export async function listProtectedReportingSources(input: {
   principal: ReportingPrincipal
   organizationId: string
 }) {
-  await assertOrganizationReportingWorkspaceAccess(input)
+  const context = await resolveProtectedFeedbackManagerContext(input)
+  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const teacher = context.personas.includes('TEACHER')
+  const counselor = context.personas.includes('COUNSELOR')
   const rows = await prisma.$queryRaw<Array<{
     runId: string
     runName: string
@@ -231,39 +223,72 @@ export async function listProtectedReportingSources(input: {
     WHERE r."organization_id"=${input.organizationId}
       AND r."status" <> 'DRAFT'
       AND relationship."relationship_kind" <> 'SELF'
+      AND subject."user_id" <> ${input.principal.userId}
       AND (t."requested_policy"->'perspectives'->>0) IN ('SELF_REPORT','OBSERVER_REPORT','RELATIONAL_EXPERIENCE')
+      AND (
+        ${organizationManager}
+        OR (${teacher} AND EXISTS (
+          SELECT 1
+          FROM "organization_memberships" current_subject
+          JOIN "organization_persona_grants" subject_persona
+            ON subject_persona."organization_id"=current_subject."organization_id"
+           AND subject_persona."membership_id"=current_subject."id"
+           AND subject_persona."persona"='STUDENT'
+           AND subject_persona."revoked_at" IS NULL
+          JOIN "organization_student_class_assignments" student
+            ON student."organization_id"=current_subject."organization_id"
+           AND student."membership_id"=current_subject."id"
+           AND student."valid_from" <= statement_timestamp()
+           AND (student."valid_until" IS NULL OR student."valid_until" > statement_timestamp())
+          JOIN "organization_staff_class_assignments" staff
+            ON staff."organization_id"=student."organization_id"
+           AND staff."class_unit_id"=student."class_unit_id"
+           AND staff."membership_id"=${context.membershipId}
+           AND staff."valid_from" <= statement_timestamp()
+           AND (staff."valid_until" IS NULL OR staff."valid_until" > statement_timestamp())
+          WHERE current_subject."organization_id"=${input.organizationId}
+            AND current_subject."user_id"=subject."user_id"
+            AND current_subject."valid_from" <= statement_timestamp()
+            AND (current_subject."valid_until" IS NULL OR current_subject."valid_until" > statement_timestamp())
+        ))
+        OR (${counselor} AND EXISTS (
+          SELECT 1
+          FROM "organization_memberships" current_subject
+          JOIN "organization_persona_grants" subject_persona
+            ON subject_persona."organization_id"=current_subject."organization_id"
+           AND subject_persona."membership_id"=current_subject."id"
+           AND subject_persona."persona"='CLIENT'
+           AND subject_persona."revoked_at" IS NULL
+          JOIN "organization_counselor_client_relationships" relation
+            ON relation."organization_id"=current_subject."organization_id"
+           AND relation."client_membership_id"=current_subject."id"
+           AND relation."counselor_membership_id"=${context.membershipId}
+           AND relation."valid_from" <= statement_timestamp()
+           AND (relation."valid_until" IS NULL OR relation."valid_until" > statement_timestamp())
+          WHERE current_subject."organization_id"=${input.organizationId}
+            AND current_subject."user_id"=subject."user_id"
+            AND current_subject."valid_from" <= statement_timestamp()
+            AND (current_subject."valid_until" IS NULL OR current_subject."valid_until" > statement_timestamp())
+        ))
+      )
     ORDER BY r."published_at" DESC NULLS LAST, r."id", t."id", subject."user_id", relationship."relationship_kind"
     LIMIT ${MAX_PROTECTED_SOURCE_CANDIDATES}
   `
-  const accessible: ProtectedReportingSourceSummary[] = []
-  for (const row of rows) {
-    try {
-      await assertProtectedFeedbackManagerAccess({
-        principal: input.principal,
-        organizationId: input.organizationId,
-        subjectUserId: row.subjectUserId,
-      })
-    } catch (error) {
-      if (hiddenReportingDenial(error) || (error instanceof ReportingError && error.code === 'SUBJECT_EXCLUDED')) continue
-      throw error
-    }
-    accessible.push({
-      runId: row.runId,
-      runName: row.runName,
-      runStatus: row.runStatus,
-      publishedAt: row.publishedAt?.toISOString() ?? null,
-      trackId: row.trackId,
-      resource: { family: row.resourceFamily, key: row.resourceKey, version: row.resourceVersion },
-      subject: { userId: row.subjectUserId, membershipId: row.subjectMembershipId },
-      relationshipKind: row.relationshipKind,
-      perspective: row.perspective,
-    })
-    if (accessible.length >= MAX_PROTECTED_SOURCES) break
-  }
-  await assertOrganizationReportingWorkspaceAccess(input)
+  await resolveProtectedFeedbackManagerContext(input)
+  const list = rows.slice(0, MAX_PROTECTED_SOURCES).map<ProtectedReportingSourceSummary>((row) => ({
+    runId: row.runId,
+    runName: row.runName,
+    runStatus: row.runStatus,
+    publishedAt: row.publishedAt?.toISOString() ?? null,
+    trackId: row.trackId,
+    resource: { family: row.resourceFamily, key: row.resourceKey, version: row.resourceVersion },
+    subject: { userId: row.subjectUserId, membershipId: row.subjectMembershipId },
+    relationshipKind: row.relationshipKind,
+    perspective: row.perspective,
+  }))
   return {
-    list: accessible,
-    truncated: rows.length === MAX_PROTECTED_SOURCE_CANDIDATES || accessible.length >= MAX_PROTECTED_SOURCES,
+    list,
+    truncated: rows.length === MAX_PROTECTED_SOURCE_CANDIDATES || rows.length > MAX_PROTECTED_SOURCES,
   }
 }
 
@@ -273,61 +298,52 @@ export async function listOrganizationReportingSeries(input: {
   page: number
   pageSize: number
 }) {
-  await assertOrganizationReportingWorkspaceAccess(input)
+  const context = await resolveOrganizationReportingWorkspaceContext(input)
+  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const seriesScope = organizationManager ? Prisma.empty : Prisma.sql`AND s."created_by_user_id"=${input.principal.userId}`
+  const countScope = organizationManager ? Prisma.empty : Prisma.sql`AND "created_by_user_id"=${input.principal.userId}`
   const offset = (input.page - 1) * input.pageSize
   const [rows, totals] = await Promise.all([
-    prisma.$queryRaw<Array<{ id: string; waveCount: number }>>`
+    prisma.$queryRaw<Array<{ id: string; waveCount: number }>>(Prisma.sql`
       SELECT s."id", COUNT(w."id")::int AS "waveCount"
       FROM "reporting_series" s
       LEFT JOIN "reporting_series_waves" w
         ON w."organization_id" = s."organization_id" AND w."series_id" = s."id"
-      WHERE s."organization_id" = ${input.organizationId} AND s."series_key" NOT LIKE 'AUTO-IND-V1:%'
+      WHERE s."organization_id" = ${input.organizationId} AND s."series_key" NOT LIKE 'AUTO-IND-V1:%' ${seriesScope}
       GROUP BY s."id", s."created_at"
       ORDER BY s."created_at" DESC, s."id"
       LIMIT ${input.pageSize} OFFSET ${offset}
-    `,
-    prisma.$queryRaw<Array<{ count: number }>>`
+    `),
+    prisma.$queryRaw<Array<{ count: number }>>(Prisma.sql`
       SELECT COUNT(*)::int AS "count"
       FROM "reporting_series"
-      WHERE "organization_id" = ${input.organizationId} AND "series_key" NOT LIKE 'AUTO-IND-V1:%'
-    `,
+      WHERE "organization_id" = ${input.organizationId} AND "series_key" NOT LIKE 'AUTO-IND-V1:%' ${countScope}
+    `),
   ])
   const seriesIds = rows.map((row) => row.id)
-  const waveKeys = seriesIds.length === 0 ? [] : await prisma.$queryRaw<Array<{ seriesId: string; waveKey: string }>>(Prisma.sql`
-    SELECT "seriesId", "waveKey"
-    FROM (
-      SELECT
-        "series_id" AS "seriesId",
-        "wave_key" AS "waveKey",
-        ROW_NUMBER() OVER (PARTITION BY "series_id" ORDER BY "ordinal", "created_at", "id") AS rn
-      FROM "reporting_series_waves"
-      WHERE "organization_id" = ${input.organizationId}
-        AND "series_id" IN (${Prisma.join(seriesIds)})
-    ) ranked
-    WHERE rn <= ${MAX_SERIES_WAVES}
-    ORDER BY "seriesId", rn
-  `)
-  const keysBySeries = new Map<string, string[]>()
-  for (const row of waveKeys) {
-    const current = keysBySeries.get(row.seriesId) ?? []
-    current.push(row.waveKey)
-    keysBySeries.set(row.seriesId, current)
+  const [seriesRecords, waves] = await Promise.all([
+    readReportingSeriesBatch({ organizationId: input.organizationId, seriesIds }),
+    readReportingSeriesWavesBatch({ organizationId: input.organizationId, seriesIds, maxPerSeries: MAX_SERIES_WAVES }),
+  ])
+  const seriesById = new Map(seriesRecords.map((series) => [series.id, series]))
+  const wavesBySeries = new Map<string, typeof waves>()
+  for (const wave of waves) {
+    const current = wavesBySeries.get(wave.seriesId) ?? []
+    current.push(wave)
+    wavesBySeries.set(wave.seriesId, current)
   }
-  const list: ReportingSeriesDiscoveryItem[] = await Promise.all(rows.map(async (row) => {
-    const series = await readReportingSeries(row.id)
-    const waves = await Promise.all((keysBySeries.get(row.id) ?? []).map((waveKey) => readReportingSeriesWave({
-      organizationId: input.organizationId,
-      seriesId: row.id,
-      waveKey,
-    })))
+  const list: ReportingSeriesDiscoveryItem[] = rows.map((row) => {
+    const series = seriesById.get(row.id)
+    if (!series) throw new Error('verified reporting series missing from batch')
+    const seriesWaves = wavesBySeries.get(row.id) ?? []
     return {
       seriesId: series.id,
       seriesKey: series.seriesKey,
       scope: series.scope,
       createdAt: series.createdAt.toISOString(),
       waveCount: row.waveCount,
-      wavesTruncated: row.waveCount > waves.length,
-      waves: waves.map((wave) => ({
+      wavesTruncated: row.waveCount > seriesWaves.length,
+      waves: seriesWaves.map((wave) => ({
         waveId: wave.id,
         waveKey: wave.waveKey,
         ordinal: wave.ordinal,
@@ -335,17 +351,104 @@ export async function listOrganizationReportingSeries(input: {
         createdAt: wave.createdAt.toISOString(),
       })),
     }
-  }))
+  })
   await assertOrganizationReportingWorkspaceAccess(input)
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize, maxWavesPerSeries: MAX_SERIES_WAVES }
 }
 
-/** Reporting metadata only; no assignments, member identities, or counts. */
+/** Reporting metadata only; no assignments, member identities, or counts. *//** Reporting metadata only; no assignments, member identities, or counts. */
 export async function listReportingCohortOptions(input: { principal: ReportingPrincipal; organizationId: string }) {
-  await assertOrganizationReportingWorkspaceAccess(input)
-  const classes = await prisma.$queryRaw<Array<{ id: string; name: string }>>`SELECT id, name FROM organization_units WHERE organization_id=${input.organizationId} AND unit_kind='CLASS' ORDER BY name, id`
-  const dimensions = await prisma.$queryRaw<Array<{ id: string; key: string; name: string }>>`SELECT id, key, name FROM organization_classification_dimensions WHERE organization_id=${input.organizationId} ORDER BY name, id`
-  const labels = await prisma.$queryRaw<Array<{ id: string; dimensionId: string; name: string }>>`SELECT id, dimension_id AS "dimensionId", name FROM organization_labels WHERE organization_id=${input.organizationId} ORDER BY name, id`
+  const context = await resolveOrganizationReportingWorkspaceContext(input)
+  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  if (organizationManager) {
+    const [classes, dimensions, labels] = await Promise.all([
+      prisma.$queryRaw<Array<{ id: string; name: string }>>`SELECT id, name FROM organization_units WHERE organization_id=${input.organizationId} AND unit_kind='CLASS' ORDER BY name, id`,
+      prisma.$queryRaw<Array<{ id: string; key: string; name: string }>>`SELECT id, key, name FROM organization_classification_dimensions WHERE organization_id=${input.organizationId} ORDER BY name, id`,
+      prisma.$queryRaw<Array<{ id: string; dimensionId: string; name: string }>>`SELECT id, dimension_id AS "dimensionId", name FROM organization_labels WHERE organization_id=${input.organizationId} ORDER BY name, id`,
+    ])
+    await assertOrganizationReportingWorkspaceAccess(input)
+    return { classes, dimensions, labels }
+  }
+
+  const teacher = context.personas.includes('TEACHER')
+  const counselor = context.personas.includes('COUNSELOR')
+  const [classes, labelRows] = await Promise.all([
+    prisma.$queryRaw<Array<{ id: string; name: string }>>(Prisma.sql`
+      SELECT DISTINCT unit.id, unit.name
+      FROM organization_units unit
+      WHERE unit.organization_id=${input.organizationId} AND unit.unit_kind='CLASS' AND (
+        (${teacher} AND EXISTS (
+          SELECT 1 FROM organization_staff_class_assignments staff
+          WHERE staff.organization_id=unit.organization_id AND staff.class_unit_id=unit.id
+            AND staff.membership_id=${context.membershipId}
+            AND staff.valid_from <= statement_timestamp()
+            AND (staff.valid_until IS NULL OR staff.valid_until > statement_timestamp())
+        ))
+        OR (${counselor} AND EXISTS (
+          SELECT 1
+          FROM organization_counselor_client_relationships relation
+          JOIN organization_memberships client
+            ON client.organization_id=relation.organization_id AND client.id=relation.client_membership_id
+            AND client.valid_from <= statement_timestamp() AND (client.valid_until IS NULL OR client.valid_until > statement_timestamp())
+          JOIN organization_persona_grants persona
+            ON persona.organization_id=client.organization_id AND persona.membership_id=client.id
+            AND persona.persona='CLIENT' AND persona.revoked_at IS NULL
+          JOIN organization_student_class_assignments student
+            ON student.organization_id=client.organization_id AND student.membership_id=client.id AND student.class_unit_id=unit.id
+            AND student.valid_from <= statement_timestamp() AND (student.valid_until IS NULL OR student.valid_until > statement_timestamp())
+          WHERE relation.organization_id=unit.organization_id AND relation.counselor_membership_id=${context.membershipId}
+            AND relation.valid_from <= statement_timestamp() AND (relation.valid_until IS NULL OR relation.valid_until > statement_timestamp())
+        ))
+      )
+      ORDER BY unit.name, unit.id
+    `),
+    prisma.$queryRaw<Array<{ id: string; dimensionId: string; name: string; dimensionKey: string; dimensionName: string }>>(Prisma.sql`
+      SELECT DISTINCT label.id, label.dimension_id AS "dimensionId", label.name,
+        dimension.key AS "dimensionKey", dimension.name AS "dimensionName"
+      FROM organization_labels label
+      JOIN organization_classification_dimensions dimension
+        ON dimension.organization_id=label.organization_id AND dimension.id=label.dimension_id
+      JOIN organization_label_assignments assignment
+        ON assignment.organization_id=label.organization_id AND assignment.label_id=label.id
+      JOIN organization_memberships member
+        ON member.organization_id=assignment.organization_id AND member.id=assignment.membership_id
+        AND member.user_id <> ${input.principal.userId}
+        AND member.valid_from <= statement_timestamp() AND (member.valid_until IS NULL OR member.valid_until > statement_timestamp())
+      WHERE label.organization_id=${input.organizationId} AND (
+        (${teacher} AND EXISTS (
+          SELECT 1
+          FROM organization_student_class_assignments student
+          JOIN organization_staff_class_assignments staff
+            ON staff.organization_id=student.organization_id AND staff.class_unit_id=student.class_unit_id
+            AND staff.membership_id=${context.membershipId}
+            AND staff.valid_from <= statement_timestamp() AND (staff.valid_until IS NULL OR staff.valid_until > statement_timestamp())
+          JOIN organization_persona_grants persona
+            ON persona.organization_id=member.organization_id AND persona.membership_id=member.id
+            AND persona.persona='STUDENT' AND persona.revoked_at IS NULL
+          WHERE student.organization_id=member.organization_id AND student.membership_id=member.id
+            AND student.valid_from <= statement_timestamp() AND (student.valid_until IS NULL OR student.valid_until > statement_timestamp())
+        ))
+        OR (${counselor} AND EXISTS (
+          SELECT 1
+          FROM organization_counselor_client_relationships relation
+          JOIN organization_persona_grants persona
+            ON persona.organization_id=member.organization_id AND persona.membership_id=member.id
+            AND persona.persona='CLIENT' AND persona.revoked_at IS NULL
+          WHERE relation.organization_id=member.organization_id
+            AND relation.counselor_membership_id=${context.membershipId}
+            AND relation.client_membership_id=member.id
+            AND relation.valid_from <= statement_timestamp() AND (relation.valid_until IS NULL OR relation.valid_until > statement_timestamp())
+        ))
+      )
+      ORDER BY dimension.name, label.name, label.id
+    `),
+  ])
+  const dimensions = [...new Map(labelRows.map((row) => [row.dimensionId, {
+    id: row.dimensionId,
+    key: row.dimensionKey,
+    name: row.dimensionName,
+  }])).values()]
+  const labels = labelRows.map(({ id, dimensionId, name }) => ({ id, dimensionId, name }))
   await assertOrganizationReportingWorkspaceAccess(input)
   return { classes, dimensions, labels }
 }

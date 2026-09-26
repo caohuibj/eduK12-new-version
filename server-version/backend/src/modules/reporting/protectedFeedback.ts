@@ -89,12 +89,10 @@ const hasCounselorSubjectScope = async (input: {
   return rows[0]?.allowed === true
 }
 
-export const assertProtectedFeedbackManagerAccess = async (input: {
+export const resolveProtectedFeedbackManagerContext = async (input: {
   principal: ReportingPrincipal
   organizationId: string
-  subjectUserId: string
-}): Promise<void> => {
-  assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
+}): Promise<CurrentProtectedContext> => {
   const context = requireCurrentProtectedContext(await resolveOrganizationAccessContext({
     principal: input.principal,
     organizationId: input.organizationId,
@@ -105,6 +103,22 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
     || context.explicitDenies.includes('REPORT_READ')
     || context.explicitDenies.includes(ORG_PROTECTED_FEEDBACK_POLICY)
   ) hidden()
+  if (
+    context.orgRole !== 'ORG_ADMIN'
+    && !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    && !context.personas.includes('TEACHER')
+    && !context.personas.includes('COUNSELOR')
+  ) hidden()
+  return context
+}
+
+export const assertProtectedFeedbackManagerAccess = async (input: {
+  principal: ReportingPrincipal
+  organizationId: string
+  subjectUserId: string
+}): Promise<void> => {
+  assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
+  const context = await resolveProtectedFeedbackManagerContext(input)
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (context.personas.includes('TEACHER')) {
     if (await hasTeacherSubjectScope({
@@ -123,7 +137,7 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
   hidden()
 }
 
-const uniqueFixedSourceObservations = (input: {
+const uniqueFixedSourceObservations =const uniqueFixedSourceObservations = (input: {
   separated: ReportingSeparatedMultiRaterV1
   subjectUserId: string
   trackId: string
