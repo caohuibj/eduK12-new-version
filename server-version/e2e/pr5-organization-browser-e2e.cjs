@@ -35,7 +35,7 @@ const assertPublishedGroupSpec = async (page) => {
   // when they are present in a rendered <select>. Exercise the actual control
   // instead: selectOption waits for the discovered option to exist and proves
   // that the published spec is usable by the product surface.
-  const specSelect = page.getByLabel('Published GROUP spec')
+  const specSelect = page.getByLabel('报告方案（单次）')
   await specSelect.selectOption(fixture.publishedSpec.id)
   assert.equal(
     await specSelect.inputValue(),
@@ -96,7 +96,7 @@ const ownerJourney = async (browser) => {
     await screenshot(page, '02-run-durable-direct-link')
 
     await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '群体与纵向报告', exact: true }).waitFor()
     await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
@@ -144,7 +144,7 @@ const teacherJourney = async (browser) => {
     assert.equal(await page.getByRole('link', { name: /Safety \/ CSV|Safety\/CSV/ }).count() > 0, true, 'TEACHER persona must get Safety responsibility surface')
 
     await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Organization Reporting', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '群体与纵向报告', exact: true }).waitFor()
     await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
