@@ -48,7 +48,8 @@ export const reportingAnalysisGuard: RequestHandler = async (req, res, next) => 
   }
 
   const semaphoreKey = `semaphore:reporting-analysis:${subject}`
-  const acquired = await cacheService.acquireSemaphore(semaphoreKey, maxConcurrent(), semaphoreTtlSeconds())
+  const holderId = crypto.randomUUID()
+  const acquired = await cacheService.acquireSemaphore(semaphoreKey, holderId, maxConcurrent(), semaphoreTtlSeconds())
   if (acquired === null) return void failUnavailable(res)
   if (!acquired) {
     res.status(429).json({ code: -1, message: '已有多个报告分析正在处理，请稍后再试' })
@@ -59,7 +60,7 @@ export const reportingAnalysisGuard: RequestHandler = async (req, res, next) => 
   const release = () => {
     if (released) return
     released = true
-    void cacheService.releaseSemaphore(semaphoreKey)
+    void cacheService.releaseSemaphore(semaphoreKey, holderId)
   }
   res.once('finish', release)
   res.once('close', release)

@@ -260,8 +260,8 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
         acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',
         minimumMetricN:3,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[],
     }})
-    await reviewPlatformReportingSpec({actor,specId:rawSpec.id});await publishPlatformReportingSpec({actor,specId:rawSpec.id})
-    const spec=rawSpec as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1>
+    await reviewPlatformReportingSpec({actor,specId:rawSpec.id})
+    const spec=await publishPlatformReportingSpec({actor,specId:rawSpec.id}) as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1>
     const sizes=[2,10,50]
     const artifacts=[]
     for(const size of sizes) artifacts.push(await createLongitudinalAnalysisArtifact({

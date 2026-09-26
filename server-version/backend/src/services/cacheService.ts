@@ -89,23 +89,28 @@ return { count, ttl }
 `
 
 const SEMAPHORE_ACQUIRE_SCRIPT = `
-local current = tonumber(redis.call('GET', KEYS[1]) or '0')
+local clock = redis.call('TIME')
+local now_ms = tonumber(clock[1]) * 1000 + math.floor(tonumber(clock[2]) / 1000)
 local limit = tonumber(ARGV[1])
+local holder = ARGV[2]
+local ttl_seconds = tonumber(ARGV[3])
+redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now_ms)
+local current = tonumber(redis.call('ZCARD', KEYS[1]))
 if current >= limit then
   return { 0, current }
 end
-local next = redis.call('INCR', KEYS[1])
-redis.call('EXPIRE', KEYS[1], ARGV[2])
-return { 1, next }
+redis.call('ZADD', KEYS[1], now_ms + ttl_seconds * 1000, holder)
+redis.call('EXPIRE', KEYS[1], ttl_seconds)
+return { 1, current + 1 }
 `
 
 const SEMAPHORE_RELEASE_SCRIPT = `
-local current = tonumber(redis.call('GET', KEYS[1]) or '0')
-if current <= 1 then
+redis.call('ZREM', KEYS[1], ARGV[1])
+local current = tonumber(redis.call('ZCARD', KEYS[1]))
+if current == 0 then
   redis.call('DEL', KEYS[1])
-  return 0
 end
-return redis.call('DECR', KEYS[1])
+return current
 `
 
 /**
@@ -343,13 +348,13 @@ class CacheService {
   }
 
   /** Acquire a small Redis-backed semaphore with a fail-safe TTL. */
-  async acquireSemaphore(key: string, limit: number, ttlSeconds: number): Promise<boolean | null> {
+  async acquireSemaphore(key: string, holderId: string, limit: number, ttlSeconds: number): Promise<boolean | null> {
     if (!this.isConnected || !this.client) return null
-    if (!Number.isSafeInteger(limit) || limit < 1 || !Number.isSafeInteger(ttlSeconds) || ttlSeconds < 1) return null
+    if (!holderId || !Number.isSafeInteger(limit) || limit < 1 || !Number.isSafeInteger(ttlSeconds) || ttlSeconds < 1) return null
     try {
       const rawResult = await this.client.eval(SEMAPHORE_ACQUIRE_SCRIPT, {
         keys: [key],
-        arguments: [String(limit), String(ttlSeconds)],
+        arguments: [String(limit), holderId, String(ttlSeconds)],
       }) as unknown
       if (!Array.isArray(rawResult) || rawResult.length < 1) return null
       return Number(rawResult[0]) === 1
@@ -358,10 +363,10 @@ class CacheService {
     }
   }
 
-  async releaseSemaphore(key: string): Promise<void> {
-    if (!this.isConnected || !this.client) return
+  async releaseSemaphore(key: string, holderId: string): Promise<void> {
+    if (!this.isConnected || !this.client || !holderId) return
     try {
-      await this.client.eval(SEMAPHORE_RELEASE_SCRIPT, { keys: [key], arguments: [] })
+      await this.client.eval(SEMAPHORE_RELEASE_SCRIPT, { keys: [key], arguments: [holderId] })
     } catch {
       logger.warn('[CacheService] Redis semaphore release failed')
     }
