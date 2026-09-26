@@ -5,18 +5,22 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
     paths:
+      - '.github/workflows/perf-phase0-smoke.yml'
       - 'server-version/perf/**'
       - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
       - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
-      - 'server-version/backend/src/modules/scale/**'
-      - 'server-version/backend/src/modules/cognitive/**'
-      - 'server-version/backend/src/modules/situational/**'
+      - 'server-version/backend/src/config/database.ts'
       - 'server-version/backend/src/modules/assessment-runtime/**'
+      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
+      - 'server-version/backend/src/modules/scale/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/situational/situational-final-submit.service.ts'
       - 'server-version/backend/src/services/unitSubmitAdmission.ts'
       - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
-      - 'docs/performance-optimization-v1/**'
-      - '.devcontainer/**'
-      - '.github/workflows/perf-phase0-smoke.yml'
+      - 'server-version/backend/src/services/boundedAdmissionGate.ts'
+      - 'server-version/backend/src/services/instrumentFinalSubmit.ts'
+      - 'server-version/backend/src/services/runtimeObservability.ts'
   workflow_dispatch:
 
 concurrency:
