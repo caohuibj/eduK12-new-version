@@ -26,16 +26,21 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          node --input-type=module <<'JS'
-          import { execFileSync } from 'node:child_process';
-          import { appendFileSync } from 'node:fs';
-          const files = execFileSync('git', ['diff', '--no-renames', '--name-only', '-z', process.env.BASE_SHA, 'HEAD'], { encoding: 'utf8' }).split('\0').filter(Boolean);
-          const relevant = files.some(file => file.startsWith('server-version/backend/src/modules/situational/')
-            || file.startsWith('server-version/backend/src/scripts/situational-')
-            || file.startsWith('server-version/backend/scripts/')
-            || file.startsWith('.github/') || /^server-version\/backend\/package(-lock)?\.json$/.test(file));
-          appendFileSync(process.env.GITHUB_OUTPUT, `relevant=${relevant}\n`);
-          JS
+          relevant=false
+          while IFS= read -r file; do
+            case "$file" in
+              server-version/backend/src/modules/situational/*|\
+              server-version/backend/src/scripts/situational-*|\
+              server-version/backend/scripts/situational-*|\
+              server-version/backend/package.json|\
+              server-version/backend/package-lock.json|\
+              .github/workflows/situational-publication.yml)
+                relevant=true
+                break
+                ;;
+            esac
+          done < <(git diff --no-renames --name-only "$BASE_SHA" HEAD)
+          echo "relevant=$relevant" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         if: steps.scope.outputs.relevant == 'true'
         with:
