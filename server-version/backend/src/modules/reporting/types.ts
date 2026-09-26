@@ -6,8 +6,8 @@ export type ReportingResultQuality = 'interpretable' | 'limited' | 'invalid'
 export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
 export type ReportingComparabilityLevel = 'EXACT' | 'COMPATIBLE' | 'LINKED' | 'LIMITED' | 'NOT_COMPARABLE'
 export type ReportingComparabilityOperation = 'SIDE_BY_SIDE' | 'DESCRIPTIVE_TREND' | 'NUMERIC_DELTA'
-export type ReportingAnalysisKindV1 = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK'
-export type ReportingArtifactPolicyDomainV1 = 'ORG_GROUP_REPORT_V1' | 'ORG_PROTECTED_FEEDBACK_V1'
+export type ReportingAnalysisKindV1 = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK' | 'INDIVIDUAL_LONGITUDINAL'
+export type ReportingArtifactPolicyDomainV1 = 'ORG_GROUP_REPORT_V1' | 'ORG_PROTECTED_FEEDBACK_V1' | 'ORG_INDIVIDUAL_REPORT_V1'
 
 export interface ReportingComparabilityRuleV1 {
   schemaVersion: 1
@@ -114,6 +114,7 @@ export type ReportingAnalysisSpecDefinitionV1 =
   | ReportingRepeatedCohortSpecV1
   | ReportingMatchedLongitudinalSpecV1
   | ReportingProtectedFeedbackSpecV1
+  | ReportingIndividualLongitudinalSpecV1
 
 export interface ReportingAnalysisSpecRecord<TDefinition extends ReportingAnalysisSpecDefinitionV1 = ReportingAnalysisSpecDefinitionV1> {
   id: string
@@ -459,6 +460,7 @@ export type ReportingArtifactPayloadV1 =
   | ReportingGroupArtifactPayloadV1
   | ReportingLongitudinalArtifactPayloadV1
   | ReportingProtectedArtifactPayloadV1
+  | ReportingIndividualArtifactPayloadV1
 
 interface ReportingArtifactRecordBase {
   id: string
@@ -505,7 +507,7 @@ export interface ReportingProtectedArtifactRecord extends ReportingArtifactRecor
   perspective: 'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'
   artifactPayload: ReportingProtectedArtifactPayloadV1
 }
-export type ReportingArtifactRecord = ReportingGroupArtifactRecord | ReportingLongitudinalArtifactRecord | ReportingProtectedArtifactRecord
+export type ReportingArtifactRecord = ReportingGroupArtifactRecord | ReportingLongitudinalArtifactRecord | ReportingProtectedArtifactRecord | ReportingIndividualArtifactRecord
 
 export class ReportingError extends Error {
   constructor(public readonly code: string, message: string, public readonly statusCode = 409) {
@@ -516,4 +518,47 @@ export class ReportingError extends Error {
 
 export const reportingFail = (code: string, message: string, statusCode = 409): never => {
   throw new ReportingError(code, message, statusCode)
+}
+
+export type ReportingIndividualMetricRuleV1 = Omit<ReportingLongitudinalMetricRuleV1, 'aggregations' | 'minimumMetricN'>
+export interface ReportingIndividualLongitudinalSpecV1 {
+  schemaVersion: 1
+  analysisKind: 'INDIVIDUAL_LONGITUDINAL'
+  engineKey: 'ORG_INDIVIDUAL_LONGITUDINAL_V1'
+  engineVersion: '1.0.0'
+  privacyUnit: 'SUBJECT'
+  selectionPolicy: 'UNIQUE_OR_REJECT'
+  reportEvidenceCeiling: ReportingMaturity
+  metricRules: ReportingIndividualMetricRuleV1[]
+  comparabilityRules: ReportingComparabilityRuleV1[]
+}
+export interface ReportingIndividualProjectionV1 {
+  schemaVersion: 1
+  kind: 'INDIVIDUAL_LONGITUDINAL'
+  state: 'present'
+  waves: Array<{
+    waveId: string
+    waveKey: string
+    ordinal: number
+    metrics: Record<string, { state: 'present'; value: number } | { state: 'missing'; reason: 'NOT_COMPLETED' | 'METRIC_UNAVAILABLE' }>
+    evidence: ReportingEvidenceProjectionV1
+  }>
+  comparisons: Array<{
+    fromWaveId: string
+    toWaveId: string
+    metrics: Record<string, { comparability: ReportingComparabilityDecisionV1; delta?: number }>
+  }>
+  limitations: string[]
+}
+export interface ReportingIndividualArtifactPayloadV1 extends Omit<ReportingLongitudinalArtifactPayloadV1, 'analysisKind' | 'policyDomain' | 'projection'> {
+  analysisKind: 'INDIVIDUAL_LONGITUDINAL'
+  policyDomain: 'ORG_INDIVIDUAL_REPORT_V1'
+  subjectUserId: string
+  projection: ReportingIndividualProjectionV1
+}
+export interface ReportingIndividualArtifactRecord extends Omit<ReportingLongitudinalArtifactRecord, 'analysisKind' | 'policyDomain' | 'artifactPayload'> {
+  analysisKind: 'INDIVIDUAL_LONGITUDINAL'
+  policyDomain: 'ORG_INDIVIDUAL_REPORT_V1'
+  subjectUserId: string
+  artifactPayload: ReportingIndividualArtifactPayloadV1
 }

@@ -1,3 +1,4 @@
+import { IndividualLongitudinalBuilder } from './IndividualLongitudinalBuilder'
 import { ReportingCohortBuilder } from './ReportingCohortBuilder'
 import type { CohortOptions, CohortSelector } from '../../api/reporting'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
@@ -76,6 +77,12 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
           <div className="grid min-w-0 gap-3 lg:grid-cols-2">{Object.entries(projection.metrics ?? {}).map(([metricId, metric]) => <div key={metricId} className="rounded-lg border border-slate-200 bg-white p-3"><div className="flex flex-wrap justify-between gap-2"><strong>{metricId}</strong><span className={metric.state === 'present' ? 'text-xs font-semibold text-emerald-700' : 'text-xs font-semibold text-amber-700'}>{metric.state === 'present' ? 'AVAILABLE' : 'SUPPRESSED'}</span></div>{metric.state === 'present' && <><p className="mt-1 text-sm text-slate-600">{metric.countKind ?? 'case count'} · valid cases {metric.validCaseN ?? '—'}</p>{metric.waveMeans && <ul className="mt-2 text-sm text-slate-600">{metric.waveMeans.map((wave) => <li key={wave.waveId}>{wave.waveKey}: mean {wave.mean}</li>)}</ul>}{metric.comparisons && <ul className="mt-2 text-sm text-slate-600">{metric.comparisons.map((comparison) => <li key={`${comparison.fromWaveId}-${comparison.toWaveId}`}>{comparison.fromWaveId} → {comparison.toWaveId}: {comparison.comparability.level}{comparison.delta !== undefined ? ` · delta ${comparison.delta}` : ''}</li>)}</ul>}</>}</div>)}</div>
         </div>
       )}
+
+      {projection.kind === 'INDIVIDUAL_LONGITUDINAL' && <div className="space-y-3">
+        {projection.waves.map(wave => <article key={wave.waveId} className="rounded border p-3"><h3>第 {wave.ordinal} 次 · {wave.waveKey}</h3>{Object.entries(wave.metrics).map(([id, metric]) => <p key={id}>{id}：{metric.state === 'present' ? metric.value : '未完成、缺失或质量不足'}</p>)}<Evidence level={wave.evidence.level} limitations={wave.evidence.limitations} /></article>)}
+        {projection.comparisons.map((pair, index) => <div key={pair.fromWaveId + pair.toWaveId}><h3>第 {index + 1} 次 → 第 {index + 2} 次</h3>{Object.entries(pair.metrics).map(([id, metric]) => <p key={id}>{id}：{metric.comparability.level} · {metric.delta === undefined ? '未计算变化量' : `变化量 ${metric.delta}`}</p>)}</div>)}
+        <p>用于描述测量变化，不用于诊断或推断因果。</p>
+      </div>}
 
       {projection.kind === 'PROTECTED_FEEDBACK' && (
         <div className="space-y-4">
@@ -276,7 +283,7 @@ export default function OrganizationReportingPage() {
   if (activeLoading && !context) return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
   if (!context) return <ProductPage><ProductStatus kind="error" title="无法进入 Reporting" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
   if (loading && specs.length === 0 && !loadError) return <ProductPage><ProductStatus kind="pending" title="正在加载 Reporting workspace">正在读取已发布 spec、授权 source 与 Series/Wave 摘要。</ProductStatus></ProductPage>
-  if (loadError && specs.length === 0) return <ProductPage><ProductStatus kind="warning" title="Reporting workspace 不可用" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>{loadError}</ProductStatus></ProductPage>
+  if (loadError && specs.length === 0) return <ProductPage><ProductStatus kind="warning" title="Reporting workspace 不可用" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>{loadError}</ProductStatus><IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} /></ProductPage>
 
   return (
     <ProductPage>
@@ -285,6 +292,7 @@ export default function OrganizationReportingPage() {
       {actionError && <ProductStatus kind="error" title="Reporting 操作失败" announce="assertive">{actionError}</ProductStatus>}
       {notice && <ProductStatus kind="success" title="Reporting 已更新" announce="polite">{notice}</ProductStatus>}
 
+      <IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} />
       <ReportingCohortBuilder options={cohortOptions} value={cohortSelector} onChange={setCohortSelector} />
       {nextSourcePage && <ProductButton disabled={busy} onClick={() => void loadMoreSources()}>加载更早的测量</ProductButton>}
       <section className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-4" aria-label="自动纵向报告">

@@ -402,6 +402,7 @@ jobs:
           src/__tests__/integration/reportingSeries.postgres.integration.test.ts
           src/__tests__/integration/reportingCohortSelector.postgres.integration.test.ts
           src/__tests__/integration/reportingLongitudinalPlanner.postgres.integration.test.ts
+          src/__tests__/integration/reportingIndividualLongitudinal.postgres.integration.test.ts
           src/__tests__/integration/organizationProductContext.postgres.integration.test.ts
           src/__tests__/integration/organizationProductAdmin.postgres.integration.test.ts
           src/__tests__/integration/assessmentRunProductRead.postgres.integration.test.ts

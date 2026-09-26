@@ -1,3 +1,4 @@
+import { listIndividualSubjects, listIndividualSources } from './individualService'
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { instrumentError, unauthorized } from '../../utils/response'
@@ -10,7 +11,7 @@ import {
 } from './discovery'
 import { ReportingError } from './types'
 
-const analysisKind = z.enum(['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL', 'PROTECTED_FEEDBACK'])
+const analysisKind = z.enum(['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL', 'PROTECTED_FEEDBACK', 'INDIVIDUAL_LONGITUDINAL'])
 const pagination = {
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -30,6 +31,20 @@ const noStore = (res: Response, data: unknown) => {
 }
 
 export const reportingDiscoveryController = {
+  async individualSubjects(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = z.object({ ...pagination, search: z.string().trim().max(100).optional() }).strict().safeParse(req.query)
+    if (!parsed.success) return badRequest(res, 'invalid subject search')
+    try { return noStore(res, await listIndividualSubjects({ ...parsed.data, principal: principal(req), organizationId: req.params.organizationId })) }
+    catch (error) { return fail(res, error) }
+  },
+  async individualSources(req: Request, res: Response) {
+    if (!req.user) return unauthorized(res)
+    const parsed = z.object({ ...pagination, subjectUserId: z.string().uuid() }).strict().safeParse(req.query)
+    if (!parsed.success) return badRequest(res, 'invalid individual source query')
+    try { return noStore(res, await listIndividualSources({ ...parsed.data, principal: principal(req), organizationId: req.params.organizationId })) }
+    catch (error) { return fail(res, error) }
+  },
   async cohortOptions(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try { return noStore(res, await listReportingCohortOptions({ principal: principal(req), organizationId: req.params.organizationId })) }

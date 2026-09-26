@@ -112,11 +112,22 @@ const protectedDefinition = z.object({
   metricRules: z.array(protectedMetricRule).min(1),
 }).strict()
 
+const individualDefinition = z.object({
+  schemaVersion: z.literal(1), engineVersion: z.literal('1.0.0'),
+  analysisKind: z.literal('INDIVIDUAL_LONGITUDINAL'),
+  engineKey: z.literal('ORG_INDIVIDUAL_LONGITUDINAL_V1'),
+  privacyUnit: z.literal('SUBJECT'), selectionPolicy: z.literal('UNIQUE_OR_REJECT'),
+  reportEvidenceCeiling: maturity,
+  metricRules: z.array(longitudinalMetricRule.omit({ aggregations: true, minimumMetricN: true })).min(1),
+  comparabilityRules: z.array(comparabilityRule),
+}).strict()
+
 const definitionSchema = z.discriminatedUnion('analysisKind', [
   groupDefinition,
   repeatedDefinition,
   matchedDefinition,
   protectedDefinition,
+  individualDefinition,
 ])
 
 type SpecRow = {
@@ -147,7 +158,7 @@ const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void =
     if (Array.isArray(rule.acceptedMetricQuality) && new Set(rule.acceptedMetricQuality).size !== rule.acceptedMetricQuality.length) {
       reportingFail('REPORT_SPEC_INVALID', `duplicate accepted metric quality for ${rule.metricId}`, 400)
     }
-    if (new Set(rule.aggregations).size !== rule.aggregations.length) {
+    if ('aggregations' in rule && new Set(rule.aggregations).size !== rule.aggregations.length) {
       reportingFail('REPORT_SPEC_INVALID', `duplicate aggregation for ${rule.metricId}`, 400)
     }
     metricIds.add(rule.metricId)
@@ -163,7 +174,7 @@ const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void =
     }
   }
 
-  if (definition.analysisKind === 'REPEATED_COHORT' || definition.analysisKind === 'MATCHED_LONGITUDINAL') {
+  if (definition.analysisKind === 'REPEATED_COHORT' || definition.analysisKind === 'MATCHED_LONGITUDINAL' || definition.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
     const metricById = new Map(definition.metricRules.map((rule) => [rule.metricId, rule]))
     const comparisonKeys = new Set<string>()
     for (const rule of definition.comparabilityRules) {

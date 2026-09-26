@@ -1,6 +1,6 @@
 import apiClient from './client'
 
-export type ReportingAnalysisKind = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK'
+export type ReportingAnalysisKind = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK' | 'INDIVIDUAL_LONGITUDINAL'
 export type ReportingMaturity = 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
 export type ReportingResourceFamily = 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'
 
@@ -15,7 +15,7 @@ export interface PublishedReportingSpecSummary {
   privacy: {
     minimumCohortN?: number
     minimumRespondentN?: number
-    minimumContributorN: number
+    minimumContributorN?: number
   }
   publishedAt: string | null
 }
@@ -142,7 +142,18 @@ export interface ProtectedProjection {
   limitations: string[]
 }
 
-export type ReportingProjection = GroupProjection | RepeatedProjection | MatchedProjection | ProtectedProjection
+export interface IndividualProjection {
+  schemaVersion: 1
+  kind: 'INDIVIDUAL_LONGITUDINAL'
+  state: 'present'
+  waves: Array<{ waveId: string; waveKey: string; ordinal: number; evidence: ReportingEvidenceProjection;
+    metrics: Record<string, { state: 'present'; value: number } | { state: 'missing'; reason: string }> }>
+  comparisons: Array<{ fromWaveId: string; toWaveId: string; metrics: Record<string, {
+    comparability: { level: string; limitations: string[]; allowedOperations: string[] }; delta?: number
+  }> }>
+  limitations: string[]
+}
+export type ReportingProjection = IndividualProjection | GroupProjection | RepeatedProjection | MatchedProjection | ProtectedProjection
 
 export interface ReportingArtifactProjection {
   artifactId: string
@@ -172,6 +183,15 @@ export interface CohortOptions {
 }
 
 export const reportingApi = {
+  async individualSubjects(organizationId: string, search = '', page = 1) {
+    return requireData(await apiClient.get<{ list: Array<{ userId: string; name: string }>; nextPage: number | null }>(`${base(organizationId)}/individual-subjects`, { params: { search, page, pageSize: 50 } }))
+  },
+  async individualSources(organizationId: string, subjectUserId: string, page = 1) {
+    return requireData(await apiClient.get<{ list: ReportingSourceSummary[]; nextPage: number | null }>(`${base(organizationId)}/individual-sources`, { params: { subjectUserId, page, pageSize: 100 } }))
+  },
+  async analyzeIndividual(organizationId: string, input: { subjectUserId: string; specId: string; sources: Array<{runId: string; trackId: string}> }) {
+    return requireData(await apiClient.post<ReportingArtifactProjection>(`${base(organizationId)}/analyses`, { analysisKind: 'INDIVIDUAL_LONGITUDINAL', ...input }))
+  },
   async cohortOptions(organizationId: string) {
     return requireData(await apiClient.get<CohortOptions>(`${base(organizationId)}/cohort-options`))
   },

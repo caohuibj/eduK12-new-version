@@ -1,3 +1,4 @@
+import { readReportingArtifactRecord } from './artifact'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
@@ -50,6 +51,9 @@ const authorizedProjection = async (input: ExportInput): Promise<unknown> => {
     : input.target.kind === 'MEMBER'
       ? await readOrganizationMemberProjection({ ...input, artifactId: input.target.artifactId })
       : await readOrganizationReportingArtifact({ ...input, artifactId: input.target.artifactId })
+  if (input.target.kind === 'AGGREGATE' && (await readReportingArtifactRecord(input.target.artifactId)).analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+    reportingFail('EXPORT_NOT_ALLOWED', 'individual reports require member export capability', 403)
+  }
   await assertExportGrant(input)
   return projection
 }

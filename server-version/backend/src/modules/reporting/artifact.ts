@@ -4,6 +4,8 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   reportingFail,
+  type ReportingIndividualArtifactPayloadV1,
+  type ReportingIndividualArtifactRecord,
   type ReportingArtifactPayloadV1,
   type ReportingArtifactRecord,
   type ReportingGroupArtifactPayloadV1,
@@ -21,6 +23,7 @@ type ArtifactRow = {
   id: string
   organizationId: string
   analysisKind: string
+  subjectUserId: string | null
   policyDomain: string
   cohortSnapshotId: string | null
   seriesId: string | null
@@ -129,6 +132,32 @@ const verifyStored = async (tx: Tx, row: ArtifactRow): Promise<ReportingArtifact
     return { ...row, analysisKind: row.analysisKind, policyDomain: 'ORG_GROUP_REPORT_V1', artifactPayload: longitudinal } as ReportingLongitudinalArtifactRecord
   }
 
+  if (row.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+    if (row.policyDomain !== 'ORG_INDIVIDUAL_REPORT_V1' || !row.subjectUserId || !row.seriesId
+      || row.cohortSnapshotId !== null || row.sourceRunId !== null || row.sourceTrackId !== null
+      || row.subjectActorSnapshotId !== null || row.relationshipKind !== null || row.perspective !== null
+      || !('analysisKind' in payload) || payload.analysisKind !== 'INDIVIDUAL_LONGITUDINAL'
+      || payload.policyDomain !== row.policyDomain || payload.subjectUserId !== row.subjectUserId
+      || payload.source.seriesId !== row.seriesId || payload.projection.kind !== row.analysisKind) {
+      reportingFail('REPORT_ARTIFACT_INTEGRITY', 'individual artifact source shape is invalid', 500)
+    }
+    const individual = payload as ReportingIndividualArtifactPayloadV1
+    const bindings = await readWaveBindings(tx, row.id)
+    if (bindings.length < 2 || canonicalHash(bindings) !== canonicalHash(individual.waveBindings)) {
+      reportingFail('REPORT_ARTIFACT_INTEGRITY', 'individual artifact Wave bindings are invalid', 500)
+    }
+    const waves = await tx.$queryRaw<Array<{ manifest: { resolved: Array<{ subjectUserId: string }>; unresolved: Array<{ subjectUserId: string }> } }>>`
+      SELECT w.input_manifest AS manifest FROM reporting_series_waves w
+      JOIN reporting_analysis_artifact_waves aw ON aw.wave_id=w.id AND aw.organization_id=w.organization_id AND aw.series_id=w.series_id
+      WHERE aw.artifact_id=${row.id}
+    `
+    if (waves.length !== bindings.length || waves.some(w => {
+      const observations = [...w.manifest.resolved, ...w.manifest.unresolved]
+      return observations.length !== 1 || observations[0].subjectUserId !== row.subjectUserId
+    })) reportingFail('REPORT_ARTIFACT_INTEGRITY', 'individual artifact contains a different or ambiguous subject', 500)
+    return { ...row, artifactPayload: individual } as ReportingIndividualArtifactRecord
+  }
+
   if (row.analysisKind === 'PROTECTED_FEEDBACK') {
     if (
       row.policyDomain !== 'ORG_PROTECTED_FEEDBACK_V1'
@@ -157,7 +186,7 @@ const verifyStored = async (tx: Tx, row: ArtifactRow): Promise<ReportingArtifact
 
 const readByIdentity = async (tx: Tx, analysisIdentityHash: string): Promise<ArtifactRow> => {
   const rows = await tx.$queryRaw<ArtifactRow[]>`
-    SELECT "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain",
+    SELECT "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
       "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId",
       "relationship_kind" AS "relationshipKind", "perspective", "spec_id" AS "specId",
@@ -184,7 +213,7 @@ export const createOrReuseReportingArtifact = async (input: {
     VALUES (${input.artifactPayload.artifactId},${input.organizationId},'GROUP','ORG_GROUP_REPORT_V1',${input.cohortSnapshotId},${input.specId},${input.analysisIdentityHash},
       ${JSON.stringify(input.artifactPayload)}::jsonb,${input.snapshotHash},${input.generatedByUserId},${input.generatedAt})
     ON CONFLICT ("analysis_identity_hash") DO NOTHING
-    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain",
+    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
       "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId", "relationship_kind" AS "relationshipKind", "perspective",
       "spec_id" AS "specId", "analysis_identity_hash" AS "analysisIdentityHash", "artifact_payload" AS "artifactPayload", "snapshot_hash" AS "snapshotHash",
@@ -222,7 +251,7 @@ export const createOrReuseLongitudinalReportingArtifact = async (input: {
     VALUES (${input.artifactPayload.artifactId},${input.organizationId},${input.artifactPayload.analysisKind},'ORG_GROUP_REPORT_V1',NULL,${input.seriesId},${input.specId},${input.analysisIdentityHash},
       ${JSON.stringify(input.artifactPayload)}::jsonb,${input.snapshotHash},${input.generatedByUserId},${input.generatedAt})
     ON CONFLICT ("analysis_identity_hash") DO NOTHING
-    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain",
+    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
       "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId", "relationship_kind" AS "relationshipKind", "perspective",
       "spec_id" AS "specId", "analysis_identity_hash" AS "analysisIdentityHash", "artifact_payload" AS "artifactPayload", "snapshot_hash" AS "snapshotHash",
@@ -268,7 +297,7 @@ export const createOrReuseProtectedReportingArtifact = async (input: {
     VALUES (${input.artifactPayload.artifactId},${input.organizationId},'PROTECTED_FEEDBACK','ORG_PROTECTED_FEEDBACK_V1',NULL,NULL,${source.runId},${source.trackId},${source.subjectActorSnapshotId},
       ${source.relationshipKind},${source.perspective},${input.specId},${input.analysisIdentityHash},${JSON.stringify(input.artifactPayload)}::jsonb,${input.snapshotHash},${input.generatedByUserId},${input.generatedAt})
     ON CONFLICT ("analysis_identity_hash") DO NOTHING
-    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain",
+    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
       "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId", "relationship_kind" AS "relationshipKind", "perspective",
       "spec_id" AS "specId", "analysis_identity_hash" AS "analysisIdentityHash", "artifact_payload" AS "artifactPayload", "snapshot_hash" AS "snapshotHash",
@@ -291,7 +320,7 @@ export const createOrReuseProtectedReportingArtifact = async (input: {
 
 export const readReportingArtifactRecord = async (artifactId: string): Promise<ReportingArtifactRecord> => prisma.$transaction(async (tx) => {
   const rows = await tx.$queryRaw<ArtifactRow[]>`
-    SELECT "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain",
+    SELECT "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
       "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId",
       "relationship_kind" AS "relationshipKind", "perspective", "spec_id" AS "specId",
@@ -301,3 +330,50 @@ export const readReportingArtifactRecord = async (artifactId: string): Promise<R
   `
   return verifyStored(tx, rows[0] ?? reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404))
 })
+
+export const createOrReuseIndividualReportingArtifact = async (input: {
+  organizationId: string
+  seriesId: string
+  specId: string
+  analysisIdentityHash: string
+  artifactPayload: ReportingIndividualArtifactPayloadV1
+  snapshotHash: string
+  waveBindings: ReportingLongitudinalWaveBindingV1[]
+  generatedByUserId: string
+  generatedAt: Date
+}): Promise<ReportingIndividualArtifactRecord> => prisma.$transaction(async (tx) => {
+  if (input.waveBindings.length < 2) reportingFail('REPORT_LONGITUDINAL_WAVES_REQUIRED', 'longitudinal artifact requires at least two Waves', 400)
+  const rows = await tx.$queryRaw<ArtifactRow[]>`
+    INSERT INTO "reporting_analysis_artifacts"
+      ("id","organization_id","analysis_kind","policy_domain","subject_user_id","cohort_snapshot_id","series_id","spec_id","analysis_identity_hash","artifact_payload","snapshot_hash","generated_by_user_id","generated_at")
+    VALUES (${input.artifactPayload.artifactId},${input.organizationId},${input.artifactPayload.analysisKind},'ORG_INDIVIDUAL_REPORT_V1',${input.artifactPayload.subjectUserId},NULL,${input.seriesId},${input.specId},${input.analysisIdentityHash},
+      ${JSON.stringify(input.artifactPayload)}::jsonb,${input.snapshotHash},${input.generatedByUserId},${input.generatedAt})
+    ON CONFLICT ("analysis_identity_hash") DO NOTHING
+    RETURNING "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
+      "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
+      "source_track_id" AS "sourceTrackId", "subject_actor_snapshot_id" AS "subjectActorSnapshotId", "relationship_kind" AS "relationshipKind", "perspective",
+      "spec_id" AS "specId", "analysis_identity_hash" AS "analysisIdentityHash", "artifact_payload" AS "artifactPayload", "snapshot_hash" AS "snapshotHash",
+      "generated_by_user_id" AS "generatedByUserId", "generated_at" AS "generatedAt"
+  `
+  if (rows[0]) {
+    for (const binding of input.waveBindings) {
+      await tx.$executeRaw`
+        INSERT INTO "reporting_analysis_artifact_waves"
+          ("organization_id","artifact_id","series_id","wave_id","ordinal","input_identity_hash","wave_snapshot_hash")
+        VALUES (${input.organizationId},${rows[0].id},${input.seriesId},${binding.waveId},${binding.ordinal},${binding.inputIdentityHash},${binding.snapshotHash})
+      `
+    }
+    await tx.$executeRaw`
+      INSERT INTO "organization_governance_audits"
+        ("id","organization_id","actor_user_id","action","target_type","target_id","domain_event_id","payload")
+      VALUES (${randomUUID()},${input.organizationId},${input.generatedByUserId},'REPORTING_ANALYSIS_CREATED','ReportingAnalysisArtifact',
+        ${rows[0].id},${rows[0].id},${JSON.stringify({ analysisKind: input.artifactPayload.analysisKind, specId: input.specId, seriesId: input.seriesId, waveIds: input.waveBindings.map((binding) => binding.waveId) })}::jsonb)
+    `
+    return await verifyStored(tx, rows[0]) as ReportingIndividualArtifactRecord
+  }
+  const existing = await verifyStored(tx, await readByIdentity(tx, input.analysisIdentityHash))
+  if (existing.analysisKind !== input.artifactPayload.analysisKind || existing.seriesId !== input.seriesId) {
+    reportingFail('REPORT_ANALYSIS_REUSE', 'analysis identity collides with different longitudinal inputs', 500)
+  }
+  return existing as ReportingIndividualArtifactRecord
+}, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })

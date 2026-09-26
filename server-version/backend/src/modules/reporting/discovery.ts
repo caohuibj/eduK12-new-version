@@ -1,3 +1,4 @@
+import { individualSubjectScope } from './individualAuthorization'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertOrganizationGroupReportGenerateAccess, type ReportingPrincipal } from './authorization'
@@ -22,7 +23,7 @@ export interface PublishedReportingSpecSummary {
   privacy: {
     minimumCohortN?: number
     minimumRespondentN?: number
-    minimumContributorN: number
+    minimumContributorN?: number
   }
   publishedAt: string | null
 }
@@ -60,7 +61,7 @@ export interface ProtectedReportingSourceSummary extends ReportingSourceSummary 
 
 const specSummary = (input: Awaited<ReturnType<typeof getPublishedReportingSpec>>): PublishedReportingSpecSummary => {
   const definition: ReportingAnalysisSpecDefinitionV1 = input.definition
-  const privacy = definition.analysisKind === 'PROTECTED_FEEDBACK'
+  const privacy = definition.analysisKind === 'INDIVIDUAL_LONGITUDINAL' ? {} : definition.analysisKind === 'PROTECTED_FEEDBACK'
     ? { minimumRespondentN: definition.minimumRespondentN, minimumContributorN: definition.minimumContributorN }
     : { minimumCohortN: definition.minimumCohortN, minimumContributorN: definition.minimumContributorN }
   return {
@@ -87,7 +88,7 @@ export async function listPublishedReportingSpecs(input: {
   page: number
   pageSize: number
 }) {
-  await assertOrganizationReportingWorkspaceAccess(input)
+  await (input.analysisKind === 'INDIVIDUAL_LONGITUDINAL' ? individualSubjectScope(input) : assertOrganizationReportingWorkspaceAccess(input))
   const offset = (input.page - 1) * input.pageSize
   const filter = input.analysisKind
     ? Prisma.sql`AND "definition"->>'analysisKind' = ${input.analysisKind}`
@@ -107,7 +108,7 @@ export async function listPublishedReportingSpecs(input: {
     `),
   ])
   const list = await Promise.all(rows.map(async (row) => specSummary(await getPublishedReportingSpec(row.id))))
-  await assertOrganizationReportingWorkspaceAccess(input)
+  await (input.analysisKind === 'INDIVIDUAL_LONGITUDINAL' ? individualSubjectScope(input) : assertOrganizationReportingWorkspaceAccess(input))
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize }
 }
 
@@ -280,7 +281,7 @@ export async function listOrganizationReportingSeries(input: {
       FROM "reporting_series" s
       LEFT JOIN "reporting_series_waves" w
         ON w."organization_id" = s."organization_id" AND w."series_id" = s."id"
-      WHERE s."organization_id" = ${input.organizationId}
+      WHERE s."organization_id" = ${input.organizationId} AND s."series_key" NOT LIKE 'AUTO-IND-V1:%'
       GROUP BY s."id", s."created_at"
       ORDER BY s."created_at" DESC, s."id"
       LIMIT ${input.pageSize} OFFSET ${offset}
@@ -288,7 +289,7 @@ export async function listOrganizationReportingSeries(input: {
     prisma.$queryRaw<Array<{ count: number }>>`
       SELECT COUNT(*)::int AS "count"
       FROM "reporting_series"
-      WHERE "organization_id" = ${input.organizationId}
+      WHERE "organization_id" = ${input.organizationId} AND "series_key" NOT LIKE 'AUTO-IND-V1:%'
     `,
   ])
   const seriesIds = rows.map((row) => row.id)

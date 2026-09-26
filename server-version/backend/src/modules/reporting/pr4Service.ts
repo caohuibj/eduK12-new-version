@@ -1,3 +1,4 @@
+import { assertIndividualLongitudinalAccess } from './individualAuthorization'
 import { prisma } from '../../config/database'
 import {
   assertOrganizationGroupArtifactReadAccess,
@@ -239,6 +240,18 @@ export const readOrganizationReportingArtifact = async (input: {
 }) => {
   const artifact = await readReportingArtifactRecord(input.artifactId)
   if (artifact.organizationId !== input.organizationId) reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+
+  if (artifact.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+    await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
+    for (const binding of artifact.artifactPayload.waveBindings) {
+      const wave = await readReportingSeriesWave({ organizationId: input.organizationId, seriesId: artifact.seriesId, waveKey: binding.waveKey })
+      if (wave.id !== binding.waveId || wave.snapshotHash !== binding.snapshotHash || wave.inputIdentityHash !== binding.inputIdentityHash) {
+        reportingFail('REPORT_ARTIFACT_INTEGRITY', 'individual Wave integrity mismatch', 500)
+      }
+    }
+    await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
+    return publicArtifact(artifact)
+  }
 
   if (artifact.analysisKind === 'GROUP') {
     await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactReadAccess({
