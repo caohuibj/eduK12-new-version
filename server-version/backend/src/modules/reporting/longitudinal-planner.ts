@@ -8,6 +8,7 @@ import { resolveAuthoritativeRunResults } from './resultSource'
 import { buildReportingWaveInputManifest, createReportingSeries, bindReportingSeriesWave } from './series'
 import { getPublishedReportingSpec } from './spec'
 import { generateOrganizationLongitudinalAnalysis } from './pr4Service'
+import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
 import { reportingFail, type ReportingCohortSelectorInputV2, type ReportingResourceFamily, type ReportingCohortSnapshotRecord } from './types'
 
 export async function generateAutomaticLongitudinal(input: {
@@ -54,6 +55,23 @@ export async function generateAutomaticLongitudinal(input: {
     baseline ??= cohort
     const batch = await resolveAuthoritativeRunResults(cohort)
     prepared.push({ source, cohort, batch, manifest: buildReportingWaveInputManifest(batch) })
+  }
+  if (selector.clauses.length > 0) {
+    const definition = spec.definition
+    await assertReportingSubgroupsPrivacy({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      specId: spec.id,
+      entries: prepared.map((item) => ({
+        cohort: item.cohort,
+        minimumN: Math.max(
+          3,
+          'minimumCohortN' in definition ? definition.minimumCohortN : 3,
+          'minimumContributorN' in definition ? definition.minimumContributorN : 3,
+          item.batch.resourceMinimumN ?? 0,
+        ),
+      })),
+    })
   }
   // Include actual frozen inputs: newly completed results produce a new series,
   // rather than conflicting with or silently reusing an earlier partial Wave.

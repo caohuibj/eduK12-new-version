@@ -42,6 +42,71 @@ const assertCurrentGroupAudience = (input: {
   if (input.run.createdByUserId !== input.principal.userId) hidden()
 }
 
+export const assertOrganizationGroupSubgroupSubjectsAccess = async (input: {
+  principal: ReportingPrincipal
+  organizationId: string
+  subjectUserIds: string[]
+}): Promise<{ organizationManager: boolean }> => {
+  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
+    ?? hidden()
+  assertNoReportDeny(context)
+  if (context.membershipId === null) hidden()
+  if (context.organizationStatus !== 'ACTIVE') {
+    reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
+  }
+  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  if (organizationManager) return { organizationManager: true }
+  const teacher = context.personas.includes('TEACHER')
+  const counselor = context.personas.includes('COUNSELOR')
+  if (!teacher && !counselor) hidden()
+
+  const allowed = await prisma.$queryRaw<Array<{ userId: string }>>`
+    SELECT DISTINCT membership."user_id" AS "userId"
+    FROM "organization_memberships" membership
+    WHERE membership."organization_id"=${input.organizationId}
+      AND membership."valid_from" <= statement_timestamp()
+      AND (membership."valid_until" IS NULL OR membership."valid_until" > statement_timestamp())
+      AND (
+        (${teacher} AND EXISTS (
+          SELECT 1
+          FROM "organization_student_class_assignments" student
+          JOIN "organization_staff_class_assignments" staff
+            ON staff."organization_id"=student."organization_id"
+           AND staff."class_unit_id"=student."class_unit_id"
+           AND staff."membership_id"=${context.membershipId}
+           AND staff."valid_from" <= statement_timestamp()
+           AND (staff."valid_until" IS NULL OR staff."valid_until" > statement_timestamp())
+          JOIN "organization_persona_grants" persona
+            ON persona."organization_id"=membership."organization_id"
+           AND persona."membership_id"=membership."id"
+           AND persona."persona"='STUDENT'
+           AND persona."revoked_at" IS NULL
+          WHERE student."organization_id"=membership."organization_id"
+            AND student."membership_id"=membership."id"
+            AND student."valid_from" <= statement_timestamp()
+            AND (student."valid_until" IS NULL OR student."valid_until" > statement_timestamp())
+        ))
+        OR (${counselor} AND EXISTS (
+          SELECT 1
+          FROM "organization_counselor_client_relationships" relation
+          JOIN "organization_persona_grants" persona
+            ON persona."organization_id"=membership."organization_id"
+           AND persona."membership_id"=membership."id"
+           AND persona."persona"='CLIENT'
+           AND persona."revoked_at" IS NULL
+          WHERE relation."organization_id"=membership."organization_id"
+            AND relation."counselor_membership_id"=${context.membershipId}
+            AND relation."client_membership_id"=membership."id"
+            AND relation."valid_from" <= statement_timestamp()
+            AND (relation."valid_until" IS NULL OR relation."valid_until" > statement_timestamp())
+        ))
+      )
+  `
+  const allowedUsers = new Set(allowed.map((row) => row.userId))
+  if ([...new Set(input.subjectUserIds)].some((userId) => !allowedUsers.has(userId))) hidden()
+  return { organizationManager: false }
+}
+
 const resolveScopedContextBatch = async (input: {
   principal: ReportingPrincipal
   organizationId: string
