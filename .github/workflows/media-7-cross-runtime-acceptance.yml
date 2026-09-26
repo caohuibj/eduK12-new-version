@@ -32,7 +32,10 @@ jobs:
     name: Cognitive VIDEO auth/public + media boundary acceptance
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     # Isolate required browser gates by default; set CI_BROWSER_HOSTED=false to roll back.
-    runs-on: ${{ fromJSON((inputs.hosted_runner || vars.CI_BROWSER_HOSTED != 'false') && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 35
     env:
       NODE_ENV: test
