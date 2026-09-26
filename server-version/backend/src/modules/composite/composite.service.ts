@@ -1916,7 +1916,7 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
   assertNotLibraryComposite(composite, '库课程上的综合测评不能公开作答')
   const expiry = new Date(expiresAt)
-  if (expiry.getTime() <= Date.now()) throw compositeBadRequest('有效期必须晚于当前时间')
+  if (!Number.isFinite(expiry.getTime()) || expiry.getTime() <= Date.now()) throw compositeBadRequest('有效期必须晚于当前时间')
   if (composite.expiresAt && expiry.getTime() > composite.expiresAt.getTime()) {
     throw compositeBadRequest('公开链接有效期不能晚于综合测评有效期')
   }

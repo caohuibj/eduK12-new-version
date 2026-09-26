@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Spin, message, Card, Button, Result } from 'antd'
 import { SafetyOutlined } from '@ant-design/icons'
 import { completePOW } from '../../utils/powService'
@@ -12,37 +12,39 @@ import {
 
 const PublicQuestionnaire: React.FC = () => {
   const { token } = useParams<{ token: string }>()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [powLoading, setPowLoading] = useState(false)
   const [questionnaire, setQuestionnaire] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (token) {
-      validateAndFetchQuestionnaire()
+    let cancelled = false
+    const load = async () => {
+      setLoading(true); setError(null); setQuestionnaire(null)
+      if (!token) { setLoading(false); return }
+      try {
+        const sessionId = readQuestionnaireSessionId(token)
+        const credential = readQuestionnaireResumeToken(token, sessionId)
+        const client = createPublicCapabilityClient(credential)
+        // An existing attempt is authorized by its own capability, independently
+        // of the entry link's remaining quota. Never start a new attempt here.
+        if (sessionId && credential) {
+          const response = await client.get<{ questionnaireAssessment: { status: string } }>(`/assessments/${encodeURIComponent(sessionId)}`)
+          if (cancelled) return
+          const page = response.data.questionnaireAssessment.status === 'COMPLETED' ? 'result' : 'assessment'
+          navigate(`/public/questionnaire/${encodeURIComponent(token)}/${page}?sessionId=${encodeURIComponent(sessionId)}`, { replace: true })
+          return
+        }
+        const response = await client.get<{ questionnaire: unknown }>(`/questionnaires/${encodeURIComponent(token)}`)
+        if (!cancelled) setQuestionnaire(response.data.questionnaire)
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to open assessment')
+      } finally { if (!cancelled) setLoading(false) }
     }
-  }, [token])
-
-  /**
-   * 验证令牌并获取问卷信息
-   */
-  const validateAndFetchQuestionnaire = async () => {
-    try {
-      setLoading(true)
-      
-      // 获取问卷信息（GET 请求，无需 POW）
-      const sessionId = readQuestionnaireSessionId(token)
-      const client = createPublicCapabilityClient(readQuestionnaireResumeToken(token, sessionId))
-      const data = await client.get<{ questionnaire: any }>(`/questionnaires/${token}`)
-      setQuestionnaire(data.data.questionnaire)
-      
-    } catch (err: any) {
-      setError(err.message || '问卷访问失败')
-      message.error(err.message || '问卷访问失败')
-    } finally {
-      setLoading(false)
-    }
-  }
+    void load()
+    return () => { cancelled = true }
+  }, [token, navigate])
 
   /**
    * 开始测评

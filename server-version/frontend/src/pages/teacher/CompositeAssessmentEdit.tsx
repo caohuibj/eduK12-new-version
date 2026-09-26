@@ -1,6 +1,7 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Download, Link as LinkIcon, Plus, Send, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Plus, Send, Trash2 } from 'lucide-react'
 import apiClient from '../../api/client'
 import { sessionFetch } from '../../api/client'
 import { compositeApi } from '../../modules/composite/api'
@@ -8,26 +9,12 @@ import type {
   AnalysisProtocolCatalogItem,
   AnalysisProtocolProfile,
   CompositeAnalysisProtocol,
-  CompositePublicAccessToken,
   ReportPackageCatalogItem,
   ReportPackageProfile,
 } from '../../modules/composite/types'
 import { contextOptionsForKey, contextValueHint, parseDelimitedOptions, serializeDelimitedOptions } from '../../modules/assessment-context/options'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import FormSectionManager from '../../components/FormSectionManager'
-
-const pad = (value: number) => String(value).padStart(2, '0')
-
-const toDatetimeLocal = (date: Date) =>
-  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-
-const suggestedTokenExpiry = (compositeExpiresAt?: string | null) => {
-  const inOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000)
-  if (!compositeExpiresAt) return toDatetimeLocal(inOneDay)
-  const cap = new Date(compositeExpiresAt)
-  if (Number.isNaN(cap.getTime()) || cap.getTime() <= Date.now()) return toDatetimeLocal(inOneDay)
-  return toDatetimeLocal(inOneDay.getTime() < cap.getTime() ? inOneDay : cap)
-}
 
 const errorMessage = (err: unknown, fallback: string) => {
   if (typeof err === 'string' && err.trim()) return err
@@ -62,20 +49,15 @@ const CompositeAssessmentEdit: React.FC = () => {
   const [formOptions, setFormOptions] = useState('')
   const [formContextKey, setFormContextKey] = useState('')
   const [formRequired, setFormRequired] = useState(true)
-  const [tokens, setTokens] = useState<CompositePublicAccessToken[]>([])
-  const [tokenExpiresAt, setTokenExpiresAt] = useState('')
-  const [tokenMaxUses, setTokenMaxUses] = useState(0)
-  const [savingToken, setSavingToken] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savingCopyable, setSavingCopyable] = useState(false)
   const cognitiveModuleEnabled = useCognitiveEnabled()
 
   const load = async () => {
     try {
-      const [detailResponse, scaleResponse, tokenResponse, protocolResponse, packageResponse, situationalResponse] = await Promise.all([
+      const [detailResponse, scaleResponse, protocolResponse, packageResponse, situationalResponse] = await Promise.all([
         compositeApi.detail(id),
         apiClient.get<any>('/scales?status=PUBLISHED&page=1&pageSize=100'),
-        compositeApi.listTokens(id),
         packageCatalogAvailable
           ? Promise.resolve({ code: 0, data: { list: [] as AnalysisProtocolCatalogItem[] }, message: '' })
           : compositeApi.listAnalysisProtocols(),
@@ -95,7 +77,6 @@ const CompositeAssessmentEdit: React.FC = () => {
       if (protocolResponse.code === 0 && protocolResponse.data) setProtocols(protocolResponse.data.list)
       else setError(protocolResponse.message || '无法加载综合分析协议')
       if (packageResponse.code === 0 && packageResponse.data) setReportPackages(packageResponse.data.list)
-      setTokenExpiresAt((current) => current || suggestedTokenExpiry(detailResponse.data.expiresAt))
       const scaleData = Array.isArray(scaleResponse.data) ? scaleResponse.data : scaleResponse.data?.list || scaleResponse.data?.data?.list || []
       setScales(scaleData)
       const situationalData = Array.isArray(situationalResponse.data) ? situationalResponse.data : situationalResponse.data?.list || []
@@ -111,7 +92,6 @@ const CompositeAssessmentEdit: React.FC = () => {
         setCognitiveAssignments([])
         setError(errorMessage(err, '无法加载已发布的认知任务'))
       }
-      if (tokenResponse.code === 0 && tokenResponse.data) setTokens(tokenResponse.data.list)
     } catch (err) {
       setError(errorMessage(err, '加载配置失败'))
     }
@@ -232,56 +212,6 @@ const CompositeAssessmentEdit: React.FC = () => {
       else await load()
     } catch (err) {
       setError(errorMessage(err, '发布失败'))
-    }
-  }
-
-  const createToken = async () => {
-    if (!tokenExpiresAt) {
-      setError('请先选择公开链接的有效期')
-      return
-    }
-    try {
-      setSavingToken(true)
-      setError(null)
-      const expiry = new Date(tokenExpiresAt)
-      if (Number.isNaN(expiry.getTime())) throw new Error('有效期格式无效')
-      const compositeExpiry = detail?.expiresAt ? new Date(detail.expiresAt) : null
-      if (compositeExpiry && expiry.getTime() > compositeExpiry.getTime()) {
-        const updated = await compositeApi.update(id, { expiresAt: expiry.toISOString() })
-        if (updated.code !== 0) throw new Error(updated.message || '无法延长测评有效期')
-        setDetail((current: any) => current ? { ...current, expiresAt: expiry.toISOString() } : current)
-      }
-      const response = await compositeApi.createToken(id, {
-        expiresAt: expiry.toISOString(),
-        maxUses: Number(tokenMaxUses) || 0,
-      })
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '生成公开链接失败')
-      await load()
-    } catch (err) {
-      setError(errorMessage(err, '生成公开链接失败'))
-    } finally {
-      setSavingToken(false)
-    }
-  }
-
-  const disableToken = async (token: CompositePublicAccessToken) => {
-    if (!confirm('确定停用这个公开链接吗？')) return
-    try {
-      const response = await compositeApi.disableToken(id, token.id)
-      if (response.code === 0) setTokens((current) => current.map((item) => item.id === token.id ? { ...item, isActive: false } : item))
-      else setError(response.message || '停用公开链接失败')
-    } catch (err) {
-      setError(errorMessage(err, '停用公开链接失败'))
-    }
-  }
-
-  const copyTokenLink = async (token: CompositePublicAccessToken) => {
-    const link = `${window.location.origin}/public/composite/${token.token}`
-    try {
-      await navigator.clipboard.writeText(link)
-      setError(null)
-    } catch {
-      setError('复制链接失败，请手动复制')
     }
   }
 
@@ -634,73 +564,8 @@ const CompositeAssessmentEdit: React.FC = () => {
       {detail.status === 'PUBLISHED' && isLibraryCourse && (
         <p className="text-sm text-gray-500 mb-5">库课程上的综合测评不能生成公开链接，也不能发给学生作答。</p>
       )}
-      {detail.status === 'PUBLISHED' && !isLibraryCourse && (
-        <div className="card p-6">
-          <h2 className="font-semibold mb-3">
-            <LinkIcon className="w-4 h-4 inline mr-1" />公开匿名链接
-          </h2>
-          {!detail.publicEnabled && (
-            <p className="text-amber-600 text-sm mb-3">创建时未勾选「允许公开匿名参与」。仍可生成链接，登录学生课内入口不受影响。</p>
-          )}
-          {tokens.length ? (
-            <div className="space-y-3 text-sm">
-              {tokens.map((token) => {
-                const expired = new Date(token.expiresAt).getTime() <= Date.now()
-                const exhausted = token.maxUses > 0 && token.usedCount >= token.maxUses
-                const status = !token.isActive ? '已停用' : expired ? '已过期' : exhausted ? '已用尽' : '使用中'
-                return (
-                  <div key={token.id} className="border rounded p-3">
-                    <p className="break-all text-primary mb-2">{window.location.origin}/public/composite/{token.token}</p>
-                    <p className="text-gray-500">
-                      创建于：{new Date(token.createdAt).toLocaleString('zh-CN')} · 有效期至：{new Date(token.expiresAt).toLocaleString('zh-CN')}
-                    </p>
-                    <p className="text-gray-500">
-                      最大次数：{token.maxUses || '不限制'} · 已使用 {token.usedCount} 次 · {status}
-                    </p>
-                    <div className="flex gap-3 mt-2">
-                      <button onClick={() => void copyTokenLink(token)} className="text-primary text-sm">复制链接</button>
-                      {token.isActive && (
-                        <button onClick={() => void disableToken(token)} className="text-red-500 text-sm">停用此链接</button>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="text-gray-500 mb-3">尚未生成链接</p>
-          )}
-          <div className="flex flex-wrap gap-3 mt-4 items-end">
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="datetime-local"
-                value={tokenExpiresAt}
-                onChange={(e) => setTokenExpiresAt(e.target.value)}
-                className="border rounded px-3 py-2 text-base text-gray-800"
-              />
-              <span>有效期</span>
-            </label>
-            <label className="text-sm text-gray-600">
-              最大次数（0 不限制）
-              <input
-                type="number"
-                min={0}
-                value={tokenMaxUses}
-                onChange={(e) => setTokenMaxUses(Number(e.target.value))}
-                className="mt-1 block border rounded px-3 py-2 w-36 text-base text-gray-800"
-              />
-            </label>
-            <button onClick={() => void createToken()} disabled={savingToken} className="btn-secondary">
-              {savingToken ? '生成中...' : '生成新链接'}
-            </button>
-          </div>
-          {detail.expiresAt && (
-            <p className="text-xs text-gray-400 mt-2">
-              不能晚于本测评有效期 {new Date(detail.expiresAt).toLocaleString('zh-CN')}
-            </p>
-          )}
-        </div>
-      )}
+      {detail.status === 'PUBLISHED' && !isLibraryCourse && <PublicDeliveryManager key={id} family="COMPOSITE" resourceId={id} maximumExpiry={detail.expiresAt} />}
+
     </div>
   )
 }

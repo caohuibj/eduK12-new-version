@@ -1,7 +1,8 @@
+import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3, Link as LinkIcon } from 'lucide-react'
+import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3 } from 'lucide-react'
 import { ScaleSelector } from '../../components/ScaleSelector'
 import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
@@ -85,10 +86,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   // 选中的量表ID列表（用于穿梭框）
   const [selectedScaleIds, setSelectedScaleIds] = useState<string[]>([])
 
-  // 访问令牌列表
-  const [tokens, setTokens] = useState<any[]>([])
-  const [showTokenModal, setShowTokenModal] = useState(false)
-  const [tokenForm, setTokenForm] = useState({ expiresDays: 30, maxUses: 0 })
 
   // 表单题目编辑弹窗状态
   const [showFormItemModal, setShowFormItemModal] = useState(false)
@@ -113,7 +110,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     if (id) {
       fetchQuestionnaire()
       fetchContent()
-      fetchTokens()
     }
     fetchAvailableScales()
   }, [id])
@@ -159,17 +155,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       }
     } catch (err) {
       console.error('获取量表列表失败', err)
-    }
-  }
-
-  const fetchTokens = async () => {
-    try {
-      const response = await apiClient.get<{ list: any[] }>(`/general-questionnaires/${id}/tokens`)
-      if (response.code === 0) {
-        setTokens(response.data.list)
-      }
-    } catch (err) {
-      console.error('获取令牌列表失败', err)
     }
   }
 
@@ -337,35 +322,6 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     }
   }
 
-  // 创建访问令牌
-  const handleCreateToken = async () => {
-    try {
-      const response = await apiClient.post(`/general-questionnaires/${id}/tokens`, tokenForm)
-      if (response.code === 0) {
-        fetchTokens()
-        setShowTokenModal(false)
-        setTokenForm({ expiresDays: 30, maxUses: 0 })
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '创建失败')
-    }
-  }
-
-  // 禁用令牌
-  const handleDisableToken = async (tokenId: string) => {
-    if (!confirm('确定要禁用此令牌吗？')) return
-
-    try {
-      await apiClient.delete(`/general-questionnaires/${id}/tokens/${tokenId}`)
-      fetchTokens()
-    } catch (err: any) {
-      alert(err.message || '禁用失败')
-    }
-  }
-
-  // 获取类型标签
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'fill_blank':
@@ -642,91 +598,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
         </div>
       )}
 
-      {/* Tokens Tab */}
-      {activeTab === 'tokens' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">访问令牌</h3>
-              {questionnaire.status === 'PUBLISHED' && (
-                <button
-                  onClick={() => setShowTokenModal(true)}
-                  className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  生成令牌
-                </button>
-              )}
-            </div>
-
-            {questionnaire.status !== 'PUBLISHED' && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                <p className="text-yellow-800 text-sm">
-                  问卷发布后才能生成访问令牌
-                </p>
-              </div>
-            )}
-
-            {tokens.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>暂无访问令牌</p>
-                <p className="text-sm mt-2">发布问卷后可生成访问令牌</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {tokens.map((token) => (
-                  <div
-                    key={token.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <LinkIcon className="w-5 h-5 text-gray-400" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <code className="text-sm bg-gray-200 px-2 py-1 rounded">
-                            {token.token}
-                          </code>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(`${window.location.origin}/public/questionnaire/${token.token}`)
-                              alert('链接已复制')
-                            }}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            复制链接
-                          </button>
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          过期时间: {new Date(token.expiresAt).toLocaleDateString()} |
-                          已使用: {token.useCount || 0} 次
-                          {token.maxUses > 0 && ` / ${token.maxUses} 次`}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded ${
-                        token.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {token.status === 'ACTIVE' ? '有效' : '已禁用'}
-                      </span>
-                      {token.status === 'ACTIVE' && (
-                        <button
-                          onClick={() => handleDisableToken(token.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          禁用
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {activeTab === 'tokens' && id && <PublicDeliveryManager key={id} family="QUESTIONNAIRE" resourceId={id} canCreate={questionnaire.status === 'PUBLISHED'} />}
 
       {/* 表单题目编辑弹窗 */}
       {showFormItemModal && (
@@ -913,54 +785,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       )}
 
       {/* 令牌创建弹窗 */}
-      {showTokenModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4">生成访问令牌</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  有效期（天）
-                </label>
-                <input
-                  type="number"
-                  value={tokenForm.expiresDays}
-                  onChange={(e) => setTokenForm({ ...tokenForm, expiresDays: parseInt(e.target.value) || 30 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  min={1}
-                  max={365}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  最大使用次数（0表示无限制）
-                </label>
-                <input
-                  type="number"
-                  value={tokenForm.maxUses}
-                  onChange={(e) => setTokenForm({ ...tokenForm, maxUses: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  min={0}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowTokenModal(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleCreateToken}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-              >
-                生成
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }
