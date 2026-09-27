@@ -39,7 +39,7 @@ async function start(container) {
       '-e', `POSTGRES_PASSWORD=${pass}`,
       '-e', 'POSTGRES_DB=restore',
       '-p', '127.0.0.1::5432',
-      'postgres:14-alpine',
+      'postgres:16.15-bookworm',
     ], { encoding: 'utf8' });
     if (!started.error && started.status === 0) {
       for (let i = 0; i < 60; i++) {
