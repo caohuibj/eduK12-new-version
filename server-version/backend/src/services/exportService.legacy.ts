@@ -348,9 +348,7 @@ export async function exportToCSV(scaleId: string, options: ExportOptions = {}):
  * 导出为 SPSS .sav 格式
  * 由于 npm 上的 sav-writer 库可能不可用，这里提供 CSV + SPS 语法方案
  */
-export function exportDataToSPSS(fields: ExportField[], rows: Record<string, any>[]): { csvContent: string; spsContent: string } {
-  const csvContent = serializeCsv(fields, rows)
-
+export function serializeSpsSyntax(fields: ExportField[]): string {
   // 生成 SPSS 语法文件 (.sps)
   const spsLines: string[] = [
     '* SPSS 导入语法文件',
@@ -393,9 +391,13 @@ export function exportDataToSPSS(fields: ExportField[], rows: Record<string, any
 
   spsLines.push('EXECUTE.')
 
+  return spsLines.join('\n')
+}
+
+export function exportDataToSPSS(fields: ExportField[], rows: Record<string, any>[]): { csvContent: string; spsContent: string } {
   return {
-    csvContent,
-    spsContent: spsLines.join('\n')
+    csvContent: serializeCsv(fields, rows),
+    spsContent: serializeSpsSyntax(fields),
   }
 }
 
@@ -505,19 +507,67 @@ const writeSavFile = async (savPath: string, exportData: ExportData): Promise<st
   return savPath
 }
 
-/** Write one already-built dataset to an explicit artifact path. */
+const writeChunk = async (
+  stream: fs.WriteStream,
+  chunk: string,
+  state: { bytes: number },
+  maxBytes: number,
+): Promise<void> => {
+  const bytes = Buffer.byteLength(chunk)
+  if (state.bytes + bytes > maxBytes) {
+    throw new Error('EXPORT_MAX_BYTES exceeded while writing export artifact')
+  }
+  state.bytes += bytes
+  if (!stream.write(chunk, 'utf8')) {
+    await new Promise<void>((resolve, reject) => {
+      stream.once('drain', resolve)
+      stream.once('error', reject)
+    })
+  }
+}
+
+const writeCsvIncrementally = async (
+  filePath: string,
+  exportData: ExportData,
+  maxBytes: number,
+): Promise<void> => {
+  const stream = fs.createWriteStream(filePath, { encoding: 'utf8', flags: 'wx' })
+  const state = { bytes: 0 }
+  try {
+    await writeChunk(stream, '\uFEFF' + exportData.fields.map((field) => field.name).join(',') + '\n', state, maxBytes)
+    for (let index = 0; index < exportData.rows.length; index += 1) {
+      const row = exportData.rows[index]
+      const line = exportData.fields.map((field) => spreadsheetSafeCell(row[field.name])).join(',')
+      await writeChunk(stream, line + (index + 1 < exportData.rows.length ? '\n' : ''), state, maxBytes)
+    }
+    await new Promise<void>((resolve, reject) => {
+      stream.end(resolve)
+      stream.once('error', reject)
+    })
+  } catch (error) {
+    stream.destroy()
+    try { fs.unlinkSync(filePath) } catch {}
+    throw error
+  }
+}
+
+/** Write one already-built dataset to an explicit artifact path without
+ * materializing a second full CSV string in memory. */
 export const writeExportDataFile = async (
   filePath: string,
   exportData: ExportData,
   format: 'csv' | 'sav' | 'sps',
+  maxBytes = Number.POSITIVE_INFINITY,
 ): Promise<void> => {
   fs.mkdirSync(path.dirname(filePath), { recursive: true })
   if (format === 'csv') {
-    fs.writeFileSync(filePath, '\uFEFF' + serializeCsv(exportData.fields, exportData.rows), 'utf8')
+    await writeCsvIncrementally(filePath, exportData, maxBytes)
     return
   }
   if (format === 'sps') {
-    fs.writeFileSync(filePath, exportDataToSPSS(exportData.fields, exportData.rows).spsContent, 'utf8')
+    const content = serializeSpsSyntax(exportData.fields)
+    if (Buffer.byteLength(content) > maxBytes) throw new Error('EXPORT_MAX_BYTES exceeded while writing export artifact')
+    fs.writeFileSync(filePath, content, { encoding: 'utf8', flag: 'wx' })
     return
   }
   await writeSavFile(filePath, exportData)
