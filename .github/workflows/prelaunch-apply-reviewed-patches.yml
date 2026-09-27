@@ -22,36 +22,63 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 2
-      - name: Apply exact reviewed patch without executing repository code
+      - name: Apply exact reviewed changes without executing repository code
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, pathlib, subprocess
+          import hashlib, json, pathlib, subprocess
           run = lambda *args, **kw: subprocess.run(args, check=True, **kw)
           head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
           parent = subprocess.check_output(['git','rev-parse','HEAD^'], text=True).strip()
           spec = json.loads(pathlib.Path('.prelaunch/reviewed-change-set.json').read_text())
           if spec['parent_sha'] != parent:
-              raise SystemExit('Change set parent does not match checkout; refusing a stale patch')
-          patch = spec['patch']
-          for line in patch.splitlines():
-              if line.startswith('+++ b/') or line.startswith('--- a/'):
-                  path = line[6:].split('\t')[0]
-                  if not path.startswith(('server-version/', 'docs/', '.github/')) or '..' in pathlib.PurePosixPath(path).parts:
-                      raise SystemExit('Patch path is outside the reviewed repository scope')
-                  if 'prelaunch-apply-reviewed-patches' in path:
-                      raise SystemExit('The write bridge cannot modify itself')
+              raise SystemExit('Change set parent does not match checkout; refusing stale changes')
+          def blob(data):
+              return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          seen = set()
+          for edit in spec['edits']:
+              name = edit['path']
+              path = pathlib.Path(name)
+              if name in seen or not name.startswith(('server-version/', 'docs/', '.github/')) or '..' in path.parts or path.is_symlink():
+                  raise SystemExit('Duplicate or unsupported patch path')
+              if not path.resolve().is_relative_to(pathlib.Path.cwd().resolve()) or 'prelaunch-apply-reviewed-patches' in name:
+                  raise SystemExit('The write bridge cannot change itself or leave this checkout')
+              seen.add(name)
+              original = path.read_bytes() if path.exists() else None
+              if (blob(original) if original is not None else None) != edit['before_blob']:
+                  raise SystemExit('Reviewed input blob mismatch: '+name)
+              if edit.get('delete'):
+                  if original is None or edit['after_blob'] is not None:
+                      raise SystemExit('Invalid deletion')
+                  path.unlink()
+              else:
+                  lines = (original or b'').decode('utf-8').splitlines(keepends=True)
+                  hunks = edit['hunks']
+                  end = 0
+                  for hunk in hunks:
+                      at, remove = hunk['at'], hunk['remove']
+                      if not isinstance(at,int) or not isinstance(remove,int) or at < end or remove < 0 or at+remove > len(lines):
+                          raise SystemExit('Invalid or overlapping reviewed hunk')
+                      if not isinstance(hunk['text'], str):
+                          raise SystemExit('Non-text hunk')
+                      end = at+remove
+                  for hunk in reversed(hunks):
+                      lines[hunk['at']:hunk['at']+hunk['remove']] = [hunk['text']]
+                  updated = ''.join(lines).encode('utf-8')
+                  if blob(updated) != edit['after_blob']:
+                      raise SystemExit('Reviewed output blob mismatch: '+name)
+                  path.parent.mkdir(parents=True, exist_ok=True)
+                  path.write_bytes(updated)
+              run('git','add','--',name)
           message = spec['message']
           if not isinstance(message,str) or not message.strip() or len(message)>1000:
               raise SystemExit('Invalid commit message')
-          run('git','apply','--check','--whitespace=error-all','-',input=patch,text=True)
-          run('git','apply','--index','--whitespace=error-all','-',input=patch,text=True)
           run('git','diff','--cached','--check')
           run('git','diff','--cached','--stat')
           run('git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m',message)
-          # A concurrent push makes this fast-forward-only push fail. There is
-          # no force update, no main write, no merge, and no repository code run.
+          # A concurrent push makes this fast-forward-only push fail. No force
+          # update, main write, merge, dependency installation or code execution.
           run('git','push','origin','HEAD:refs/heads/perf/runtime-prelaunch-serialization-reporting')
           print('APPLIED_PARENT='+head)
           print('APPLIED_HEAD='+subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip())
