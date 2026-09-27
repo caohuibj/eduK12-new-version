@@ -48,8 +48,11 @@ env:
 jobs:
   invariants:
     name: P2-C01 PostgreSQL + privacy invariants
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'perf/')
-    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch'
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 30
     services:
       postgres:
@@ -116,8 +119,13 @@ jobs:
 
   curve:
     name: "fresh FINAL curve / ${{ matrix.profile }}"
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && startsWith(github.head_ref, 'perf/'))
-    runs-on: ubuntu-24.04
+    # Capacity/curve work is evidence collection, not a per-PR correctness gate.
+    # Keep it manual until the qualified 4C4G host is available.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 40
     strategy:
       fail-fast: false

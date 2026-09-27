@@ -19,10 +19,12 @@ const formatTime = () => {
   return new Date().toISOString()
 }
 
-const SENSITIVE_KEY = /(authorization|password|secret|token|credential|cookie|set-cookie|answer|score|feedback|content|rawbody|body|message|query|sql|error|err)/i
+const SENSITIVE_KEY = /(authorization|password|secret|token|credential|start[_-]?intent|cookie|set-cookie|answer|score|feedback|content|rawbody|body|message|query|sql|error|err)/i
 const SENSITIVE_TEXT = /(Bearer\s+)[^\s,}]+|((?:token|password|secret|code|sessionId|resumeToken|authorization)=)[^&\s,}]+/gi
 
-const redactText = (value: string): string => value.replace(SENSITIVE_TEXT, (_match, bearerPrefix, keyPrefix) => `${bearerPrefix || keyPrefix}[REDACTED]`)
+const redactText = (value: string): string => value
+  .replace(SENSITIVE_TEXT, (_match, bearerPrefix, keyPrefix) => `${bearerPrefix || keyPrefix}[REDACTED]`)
+  .replace(/((?:["']?start[_-]?intent["']?)\s*[:=]\s*["']?)[A-Za-z0-9_-]+/gi, '$1[REDACTED]')
 
 const redactStack = (stack: string): string => {
   const lines = stack.split('\n')

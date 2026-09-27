@@ -1,27 +1,22 @@
 name: PERF Phase 0 closure
 
 on:
-  pull_request:
-    types: [ready_for_review, synchronize, reopened]
-    branches: [main]
-    paths:
-      - '.github/workflows/perf-phase0-closure.yml'
-      - 'server-version/perf/**'
-      - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
-      - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
-      - 'server-version/backend/src/config/database.ts'
-      - 'server-version/backend/src/modules/assessment-runtime/**'
-      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
-      - 'server-version/backend/src/modules/scale/unified-final-submit.service.ts'
-      - 'server-version/backend/src/modules/cognitive/final-submit.service.ts'
-      - 'server-version/backend/src/modules/cognitive/unified-final-submit.service.ts'
-      - 'server-version/backend/src/modules/situational/situational-final-submit.service.ts'
-      - 'server-version/backend/src/services/unitSubmitAdmission.ts'
-      - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
-      - 'server-version/backend/src/services/boundedAdmissionGate.ts'
-      - 'server-version/backend/src/services/instrumentFinalSubmit.ts'
-      - 'server-version/backend/src/services/runtimeObservability.ts'
+  # Manual evidence only: do not compete with required backend/browser CI.
   workflow_dispatch:
+    inputs:
+      ab_groups:
+        description: Space-separated steady groups for same-host A/B
+        required: true
+        default: 'scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady'
+        type: string
+      scope:
+        description: Evidence scope
+        required: true
+        default: ab-only
+        type: choice
+        options:
+          - ab-only
+          - full
 
 concurrency:
   group: perf-phase0-closure-${{ github.event.pull_request.number || github.ref }}
@@ -108,8 +103,19 @@ jobs:
           set -euo pipefail
           OUT="$AB_OUT"
           mkdir -p "$OUT"
-          PERF_GROUP_LIST="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
-          PERF_WARMUP_GROUP_LIST="scaleTypicalWarmup cognitiveNbackStandardWarmup cognitiveCptStandardWarmup sjtLinear30Warmup sjtLinear60Warmup"
+          PERF_GROUP_LIST="${{ inputs.ab_groups }}"
+          PERF_WARMUP_GROUP_LIST=""
+          for group in $PERF_GROUP_LIST; do
+            case "$group" in
+              scaleTypicalSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST scaleTypicalWarmup" ;;
+              cognitiveNbackStandardSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST cognitiveNbackStandardWarmup" ;;
+              cognitiveCptStandardSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST cognitiveCptStandardWarmup" ;;
+              sjtLinear30Steady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST sjtLinear30Warmup" ;;
+              sjtLinear60Steady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST sjtLinear60Warmup" ;;
+              mixedSteady) ;;
+              *) echo "Unsupported A/B group: $group" >&2; exit 2 ;;
+            esac
+          done
 
           reset_and_seed() {
             local round="$1" variant="$2"
@@ -184,6 +190,7 @@ jobs:
 
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux
@@ -275,6 +282,7 @@ jobs:
 
   lost-response:
     name: committed response loss + retry/replay recovery
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux
@@ -357,6 +365,7 @@ jobs:
 
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux

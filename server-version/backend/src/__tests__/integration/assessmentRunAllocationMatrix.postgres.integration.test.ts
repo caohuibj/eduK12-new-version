@@ -73,8 +73,22 @@ suite('Assessment Run Episode allocation matrix (real PostgreSQL)', () => {
     const start = () => acquireClaim({ executionId: task.id, actorUserId: parent.id, resourceRegistry: parentRegistry })
     await expect(start()).rejects.toMatchObject({ code: 'RUN_CONSENT_REQUIRED' })
     await acceptRunExecutionConsent({ executionId: task.id, actorUserId: parent.id })
-    await db.parentStudentRelationship.update({ where: { id: relationship.id }, data: { status: 'REVOKED', revokedAt: new Date() } })
-    await expect(start()).rejects.toMatchObject({ code: 'RUN_RELATIONSHIP_REVOKED' })
+    let releaseRevoke!: () => void
+    const revokeStarted = new Promise<void>((resolve) => {
+      void db.$transaction(async (tx) => {
+        await tx.parentStudentRelationship.update({
+          where: { id: relationship.id },
+          data: { status: 'REVOKED', revokedAt: new Date() },
+        })
+        resolve()
+        await new Promise<void>((release) => { releaseRevoke = release })
+      }, { timeout: 10_000 })
+    })
+    await revokeStarted
+    const racedStart = start()
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    releaseRevoke()
+    await expect(racedStart).rejects.toMatchObject({ code: 'RUN_RELATIONSHIP_REVOKED' })
   })
 
   it('creates one Episode per Track+subject while allowing multiple respondents and separating different subjects', async () => {

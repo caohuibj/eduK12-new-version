@@ -34,4 +34,17 @@ describe('logger redaction', () => {
     for(const raw of ['raw-entry-credential','raw-recovery-credential','raw-auth-credential']) expect(output).not.toContain(raw)
   })
 
+  it('redacts the new start-intent capability from nested data and textual diagnostics', () => {
+    const secret = 'A'.repeat(43)
+    const spy = vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    logger.info(`startIntent=${secret}`, {
+      requestId: 'keep-this-id', nested: [{ startIntent: secret }, { start_intent: secret }],
+      diagnostic: `{"start-intent":"${secret}"}`,
+    })
+    const output = JSON.stringify(spy.mock.calls)
+    expect(output).toContain('keep-this-id')
+    expect(output).toContain('[REDACTED]')
+    expect(output).not.toContain(secret)
+  })
+
 })

@@ -8,16 +8,20 @@ import {
 import { createOrReuseReportingArtifact, readReportingArtifactRecord } from './artifact'
 import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
+import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
 import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord } from './types'
 
-const publicArtifact = (artifact: ReportingArtifactRecord) => ({
-  artifactId: artifact.id,
-  generatedAt: artifact.generatedAt.toISOString(),
-  projection: artifact.artifactPayload.projection,
-})
+const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
+  await assertFixedPopulationArtifactDisclosure({ principal, artifact })
+  return {
+    artifactId: artifact.id,
+    generatedAt: artifact.generatedAt.toISOString(),
+    projection: artifact.artifactPayload.projection,
+  }
+}
 
 export const generateOrganizationGroupAnalysis = async (input: {
   principal: ReportingPrincipal
@@ -26,7 +30,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
   trackId: string
   specId: string
   cohortSelector?: ReportingCohortSelectorInputV2
-}): Promise<ReturnType<typeof publicArtifact>> => {
+}): Promise<Awaited<ReturnType<typeof publicArtifact>>> => {
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
@@ -40,22 +44,14 @@ export const generateOrganizationGroupAnalysis = async (input: {
     generatedByUserId: input.principal.userId,
     cohortSelector: input.cohortSelector,
   })
+  // Reject untrusted arbitrary subgroup requests before canonical payload work.
+  await assertReportingSubgroupsPrivacy({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    specId: spec.id,
+    entries: [{ cohort, minimumN: 3 }],
+  })
   const batch = await resolveAuthoritativeRunResults(cohort)
-  if (cohort.selector.kind === 'FILTERED_RUN_TRACK_SUBJECTS' && cohort.selector.clauses.length > 0) {
-    const definition = spec.definition
-    const minimumN = Math.max(
-      3,
-      'minimumCohortN' in definition ? definition.minimumCohortN : 3,
-      'minimumContributorN' in definition ? definition.minimumContributorN : 3,
-      batch.resourceMinimumN ?? 0,
-    )
-    await assertReportingSubgroupsPrivacy({
-      principal: input.principal,
-      organizationId: input.organizationId,
-      specId: spec.id,
-      entries: [{ cohort, minimumN }],
-    })
-  }
   const generatedAt = new Date()
   const built = buildReportingArtifact({
     artifactId: randomUUID(),
@@ -66,7 +62,15 @@ export const generateOrganizationGroupAnalysis = async (input: {
     batch,
     options: {},
   })
-
+  await assertFixedPopulationArtifactDisclosure({
+    principal: input.principal,
+    artifact: {
+      organizationId: input.organizationId,
+      analysisKind: 'GROUP',
+      cohortSnapshotId: cohort.id,
+      artifactPayload: built.payload,
+    },
+  })
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
@@ -87,7 +91,9 @@ export const generateOrganizationGroupAnalysis = async (input: {
     organizationId: input.organizationId,
     runId: input.runId,
   })
-  return publicArtifact(artifact)
+  // A former manager cannot receive an unrestricted projection after losing
+  // trusted authority during generation. Reuse follows this same boundary.
+  return publicArtifact(artifact, input.principal)
 }
 
 const requireGroupArtifact = (artifact: ReportingArtifactRecord): ReportingGroupArtifactRecord => {
@@ -101,7 +107,7 @@ export const readOrganizationGroupArtifact = async (input: {
   principal: ReportingPrincipal
   organizationId: string
   artifactId: string
-}): Promise<ReturnType<typeof publicArtifact>> => {
+}): Promise<Awaited<ReturnType<typeof publicArtifact>>> => {
   const artifact = requireGroupArtifact(await readReportingArtifactRecord(input.artifactId))
   if (artifact.organizationId !== input.organizationId) {
     reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
@@ -111,5 +117,5 @@ export const readOrganizationGroupArtifact = async (input: {
     organizationId: artifact.organizationId,
     runId: artifact.artifactPayload.source.runId,
   }))
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }

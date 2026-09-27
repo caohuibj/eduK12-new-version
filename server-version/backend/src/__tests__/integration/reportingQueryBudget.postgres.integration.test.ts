@@ -48,6 +48,7 @@ type PopulationFixture = {
 
 let prisma: PrismaClient
 let resolveAuthoritativeRunResults: (cohort: ReportingCohortSnapshotRecord) => Promise<ReportingResultBatchV1>
+let setPayloadObserver: (observer: (() => void) | null) => void
 let observedPrismaCalls: ObservedPrismaCall[] = []
 const fixtures: PopulationFixture[] = []
 
@@ -89,7 +90,9 @@ suite('PR3 reporting result-source query budget (real PostgreSQL)', () => {
     process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY || 'a'.repeat(64)
     const database = await import('../../config/database')
     prisma = database.prisma
-    resolveAuthoritativeRunResults = (await import('../../modules/reporting/resultSource')).resolveAuthoritativeRunResults
+    const resultSource = await import('../../modules/reporting/resultSource')
+    resolveAuthoritativeRunResults = resultSource.resolveAuthoritativeRunResults
+    setPayloadObserver = resultSource.setReportingPayloadMaterializationObserverForTests
     prisma.$use(async (params, next) => {
       const result = await next(params)
       observedPrismaCalls.push({
@@ -128,6 +131,42 @@ suite('PR3 reporting result-source query budget (real PostgreSQL)', () => {
     }
     expect(measured500.calls.map(({ model, action }) => ({ model, action })))
       .toEqual(measured100.calls.map(({ model, action }) => ({ model, action })))
+  }, 120_000)
+
+  it('pushes canonical payload work down to selected cohort members while keeping Track metadata validation full-width', async () => {
+    const fixture = await buildFixture(300)
+    const members = fixture.cohort.members.slice(0, 30)
+    const filtered: ReportingCohortSnapshotRecord = {
+      ...fixture.cohort,
+      id: randomUUID(),
+      selector: {
+        kind: 'FILTERED_RUN_TRACK_SUBJECTS',
+        schemaVersion: 2,
+        clauses: [{ kind: 'MEMBERSHIP_IDS', membershipIds: members.map((member) => member.membershipId) }],
+        combine: 'ALL',
+        anchor: { kind: 'RUN_PUBLISHED_AT', at: fixture.cohort.generatedAt.toISOString() },
+      },
+      members,
+      eligibleN: members.length,
+      cohortIdentityHash: canonicalHash({ source: fixture.cohort.cohortIdentityHash, selected: members.map((member) => member.executionId) }),
+      snapshotHash: canonicalHash({ source: fixture.cohort.snapshotHash, selected: members.map((member) => member.executionId) }),
+    }
+    let materialized = 0
+    setPayloadObserver(() => { materialized += 1 })
+    try {
+      const measured = await observe(() => resolveAuthoritativeRunResults(filtered))
+      expect(measured.value.resolved).toHaveLength(30)
+      expect(measured.value.unresolved).toHaveLength(0)
+      expect(countCall(measured.calls, undefined, 'queryRaw')).toBe(1)
+      expect(countCall(measured.calls, 'CompositeAssessmentAttempt', 'findMany')).toBe(1)
+      expect(countCall(measured.calls, 'AssessmentUnitSnapshot', 'findMany')).toBe(1)
+      expect(measured.calls.map((call) => call.rows)).toEqual([300, 300, 30])
+      // parseStoredCanonicalUnitResult performs one decrypt + parse per selected
+      // canonical snapshot, so this count locks both CPU-heavy operations.
+      expect(materialized).toBe(30)
+    } finally {
+      setPayloadObserver(null)
+    }
   }, 120_000)
 
   it('keeps non-completed executions diagnostic and out of the resolved contribution set', async () => {

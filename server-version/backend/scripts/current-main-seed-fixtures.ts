@@ -1008,7 +1008,9 @@ export async function seedCurrentMainFixtures(db: PrismaClient) {
       }
     }
   }
-  const mixKey = (fixtureId: string) => createHash('sha256').update(`${runId}:${fixtureId}`).digest('hex')
+  // A/B variants reseed with different run IDs. Mixed ordering must depend only
+  // on stable fixture identity or BASE/HEAD receive different workload mixes.
+  const mixKey = (fixtureId: string) => createHash('sha256').update(fixtureId).digest('hex')
   groups.mixedSteady = mixedRequests.sort((left, right) => mixKey(left.fixtureId).localeCompare(mixKey(right.fixtureId)))
   const validation = assertFreshFixturePool(groups)
   mkdirSync(outDir, { recursive: true, mode: 0o700 })

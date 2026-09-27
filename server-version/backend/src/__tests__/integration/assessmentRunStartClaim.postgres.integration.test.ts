@@ -116,6 +116,81 @@ async function createExecution(label: string) {
   return { executionId: executions[0].id, trackId: executions[0].trackId, actorUserId: student.id }
 }
 
+
+const waitGate = () => {
+  let release!: () => void
+  const promise = new Promise<void>((resolve) => { release = resolve })
+  return { promise, release }
+}
+
+async function createExecutionPair(label: string, sameRun: boolean) {
+  const owner = await db.user.create({
+    data: { username: `claim-pair-owner-${label}-${suffix}-${randomUUID().slice(0, 8)}`, passwordHash: 'test-only', role: UserRole.TEACHER },
+    select: { id: true },
+  })
+  const students = await Promise.all([0, 1].map((index) => db.user.create({
+    data: { username: `claim-pair-student-${label}-${index}-${suffix}-${randomUUID().slice(0, 8)}`, passwordHash: 'test-only', role: UserRole.STUDENT },
+    select: { id: true },
+  })))
+  const organization = await createOrganization({
+    name: `claim pair ${label} ${suffix}`,
+    meta: { actorUserId: owner.id, commandKey: key(`${label}-pair-org`) },
+  })
+  const memberships = []
+  for (const [index, student] of students.entries()) {
+    const membership = await createMembership({
+      organizationId: organization.organization.id,
+      userId: student.id,
+      meta: { actorUserId: owner.id, commandKey: key(`${label}-pair-member-${index}`) },
+    })
+    await grantPersona({
+      organizationId: organization.organization.id,
+      membershipId: membership.id,
+      persona: 'STUDENT',
+      meta: { actorUserId: owner.id, commandKey: key(`${label}-pair-persona-${index}`) },
+    })
+    memberships.push(membership)
+  }
+
+  const publish = async (runLabel: string, selected: typeof memberships) => {
+    const run = await createAssessmentRunDraft({
+      organizationId: organization.organization.id,
+      name: `claim pair ${runLabel}`,
+      createdByUserId: owner.id,
+    })
+    await addAssessmentRunTrackDraft({
+      organizationId: organization.organization.id,
+      runId: run.id,
+      resource: { family: 'BUNDLE', key: `bundle-pair-${runLabel}-${randomUUID()}`, version: '1.0.0' },
+      subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: selected.map((membership) => membership.id) },
+      respondentSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: selected.map((membership) => membership.id) },
+      requestedPolicy,
+    })
+    await publishAssessmentRun({
+      organizationId: organization.organization.id,
+      runId: run.id,
+      actorUserId: owner.id,
+      expectedVersion: 2,
+      resourceRegistry: registry,
+    })
+    return db.$queryRawUnsafe<Array<{ executionId: string; actorUserId: string; runId: string }>>(
+      `SELECT e.id AS "executionId", actor.user_id AS "actorUserId", e.run_id AS "runId"
+       FROM assessment_run_executions e
+       JOIN assessment_run_actor_snapshots actor ON actor.id=e.respondent_actor_snapshot_id
+       WHERE e.run_id=$1 ORDER BY e.id`,
+      run.id,
+    )
+  }
+
+  const executions = sameRun
+    ? await publish(`${label}-same`, memberships)
+    : [
+        ...(await publish(`${label}-a`, [memberships[0]])),
+        ...(await publish(`${label}-b`, [memberships[1]])),
+      ]
+  return { organizationId: organization.organization.id, executions }
+}
+
 suite('Assessment Run durable START claims (real PostgreSQL)', () => {
   beforeAll(async () => {
     db = new PrismaClient({ datasources: { db: { url: DB_URL! } } })
@@ -159,6 +234,76 @@ suite('Assessment Run durable START claims (real PostgreSQL)', () => {
     expect(rows[0].frozen).toBeTruthy()
     expect(rows[0].audits).toBe(1)
   })
+
+
+  it.each([
+    ['the same Run', true],
+    ['different Runs', false],
+  ])('allows unrelated executions in %s across shared Organization/Run authority fences', async (_label, sameRun) => {
+    const fixture = await createExecutionPair(`parallel-${sameRun ? 'same' : 'different'}`, sameRun)
+    expect(fixture.executions).toHaveLength(2)
+    const locked = waitGate()
+    const release = waitGate()
+    const blocker = db.$transaction(async (tx) => {
+      await tx.$queryRawUnsafe('SELECT id FROM organizations WHERE id=$1 FOR SHARE', fixture.organizationId)
+      if (sameRun) await tx.$queryRawUnsafe('SELECT id FROM assessment_runs WHERE id=$1 FOR SHARE', fixture.executions[0].runId)
+      locked.release()
+      await release.promise
+    }, { timeout: 10_000 })
+    await locked.promise
+    try {
+      const starts = Promise.all(fixture.executions.map((execution) => acquireRunExecutionStartClaim({
+        executionId: execution.executionId,
+        actorUserId: execution.actorUserId,
+        leaseMs: 30_000,
+      })))
+      const timeout = new Promise<never>((_, reject) => setTimeout(
+        () => reject(new Error('unrelated START was serialized behind a shared authority fence')),
+        2_000,
+      ))
+      const results = await Promise.race([starts, timeout])
+      expect(results.every((result) => result.kind === 'ACQUIRED')).toBe(true)
+    } finally {
+      release.release()
+      await blocker
+    }
+  }, 30_000)
+
+  it.each([
+    ['organization suspension', false, `UPDATE organizations SET status='SUSPENDED' WHERE id=(SELECT organization_id FROM assessment_run_executions WHERE id=$1)`, 'ORGANIZATION_SUSPENDED'],
+    ['Run close', false, `UPDATE assessment_runs SET status='CLOSED', closed_at=clock_timestamp() WHERE id=(SELECT run_id FROM assessment_run_executions WHERE id=$1)`, 'RUN_NOT_STARTABLE'],
+    ['intake close', false, `UPDATE assessment_runs SET intake_deadline=clock_timestamp()-INTERVAL '1 second' WHERE id=(SELECT run_id FROM assessment_run_executions WHERE id=$1)`, 'RUN_INTAKE_CLOSED'],
+    ['account freeze', false, `UPDATE users SET is_frozen=true WHERE id=(SELECT a.user_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACCOUNT_INACTIVE'],
+    ['account deactivate', false, `UPDATE users SET is_active=false WHERE id=(SELECT a.user_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACCOUNT_INACTIVE'],
+    ['membership end', true, `UPDATE organization_memberships SET valid_until=clock_timestamp() WHERE id=(SELECT a.membership_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACTOR_AUTHORITY_REVOKED'],
+    ['persona revoke', true, `UPDATE organization_persona_grants SET revoked_at=clock_timestamp() WHERE membership_id=(SELECT a.membership_id FROM assessment_run_actor_snapshots a JOIN assessment_run_executions e ON e.respondent_actor_snapshot_id=a.id WHERE e.id=$1)`, 'RUN_ACTOR_AUTHORITY_REVOKED'],
+  ])('serializes START against a concurrently committing %s', async (_label, lockOrganization, mutation, code) => {
+    const fixture = await createExecution(`race-${String(_label).replaceAll(' ', '-')}`)
+    const locked = waitGate()
+    const release = waitGate()
+    const mutator = db.$transaction(async (tx) => {
+      if (lockOrganization) {
+        await tx.$queryRawUnsafe(
+          'SELECT o.id FROM organizations o JOIN assessment_run_executions e ON e.organization_id=o.id WHERE e.id=$1 FOR UPDATE OF o',
+          fixture.executionId,
+        )
+      }
+      await tx.$executeRawUnsafe(mutation, fixture.executionId)
+      locked.release()
+      await release.promise
+    }, { timeout: 10_000 })
+    await locked.promise
+    const start = acquireRunExecutionStartClaim(fixture)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    release.release()
+    await mutator
+    await expect(start).rejects.toMatchObject({ code })
+    const rows = await db.$queryRawUnsafe<Array<{ count: number }>>(
+      'SELECT COUNT(*)::int AS count FROM assessment_run_execution_start_claims WHERE execution_id=$1',
+      fixture.executionId,
+    )
+    expect(rows[0].count).toBe(0)
+  }, 30_000)
 
   it('admits exactly one active claim under concurrent START and never accepts a client operation key', async () => {
     const execution = await createExecution('concurrent')

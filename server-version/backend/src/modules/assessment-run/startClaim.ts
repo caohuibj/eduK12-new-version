@@ -65,13 +65,16 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     LIMIT 1
   `
   if (!identity[0]) throw new RunStartClaimError('RUN_EXECUTION_NOT_FOUND', 'Run execution not found', 404)
+  // Read-only authority fences: SHARE still conflicts with lifecycle and
+  // governance updates, while unrelated executions can START concurrently.
+  // The execution row remains the exclusive admission/idempotency boundary.
   await tx.$queryRaw`
-    SELECT "id" FROM "organizations" WHERE "id" = ${identity[0].organizationId} FOR UPDATE
+    SELECT "id" FROM "organizations" WHERE "id" = ${identity[0].organizationId} FOR SHARE
   `
   await tx.$queryRaw`
     SELECT "id" FROM "assessment_runs"
     WHERE "organization_id" = ${identity[0].organizationId} AND "id" = ${identity[0].runId}
-    FOR UPDATE
+    FOR SHARE
   `
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",

@@ -227,8 +227,29 @@ suite('Four-type Questionnaire production lifecycle', () => {
     expect((await publicRuntime.revealAccessToken(actor.userId,actor.role,assignmentId,token.id)).token).toBe(token.token)
     await expect(publicRuntime.revealAccessToken(other.userId,other.role,assignmentId,token.id)).rejects.toBeDefined()
     await expect(publicRuntime.createAccessTokenForAssignment(actor.userId,actor.role,assignmentId,new Date(Date.now()+366*86400000).toISOString(),1)).rejects.toBeDefined()
-    const started=await publicRuntime.startPublicSession(token.token!)
+    const intent='B'.repeat(43)
+    const started=await publicRuntime.startPublicSession(token.token!,undefined,intent)
+    // Simulate a committed START whose HTTP response was lost: replaying the
+    // persisted client intent must return the same admission and credential.
+    const replayedStart=await publicRuntime.startPublicSession(token.token!,undefined,intent)
+    expect(replayedStart.session.sessionId).toBe(started.session.sessionId)
+    expect(replayedStart.recoveryToken).toBe(started.recoveryToken)
+    expect((await db.cognitiveAccessToken.findUniqueOrThrow({where:{id:token.id}})).usedCount).toBe(1)
+    expect(await db.cognitiveSession.count({where:{accessTokenId:token.id}})).toBe(1)
+    // The public link by itself remains insufficient to recover the admission.
     await expect(publicRuntime.startPublicSession(token.token!)).rejects.toBeDefined()
+
+    const concurrentToken=await publicRuntime.createAccessTokenForAssignment(actor.userId,actor.role,assignmentId,new Date(Date.now()+3600000).toISOString(),1)
+    const concurrentIntent='C'.repeat(43)
+    const [tabA,tabB]=await Promise.all([
+      publicRuntime.startPublicSession(concurrentToken.token!,undefined,concurrentIntent),
+      publicRuntime.startPublicSession(concurrentToken.token!,undefined,concurrentIntent),
+    ])
+    expect(tabA.session.sessionId).toBe(tabB.session.sessionId)
+    expect(tabA.recoveryToken).toBe(tabB.recoveryToken)
+    expect((await db.cognitiveAccessToken.findUniqueOrThrow({where:{id:concurrentToken.id}})).usedCount).toBe(1)
+    expect(await db.cognitiveSession.count({where:{accessTokenId:concurrentToken.id}})).toBe(1)
+
     const session=await db.cognitiveSession.findUniqueOrThrow({where:{id:started.session.sessionId},include:{assignment:true}})
     const input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:session.assignment!.resolvedConfigHash!,contextSnapshotHash:null,
       trials:gonogoSequence(session.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1000,endedAtPerfMs:trialIndex*1000+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))}

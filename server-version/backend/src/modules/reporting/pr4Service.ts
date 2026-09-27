@@ -12,6 +12,7 @@ import { readReportingArtifactRecord } from './artifact'
 import { freezeRunTrackCohort } from './cohort'
 import { assertOrganizationReportingWorkspaceAccess } from './pr4Authorization'
 import { createLongitudinalAnalysisArtifact, createProtectedFeedbackArtifact } from './pr4Artifact'
+import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
 import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
 import { resolveAuthoritativeTrackObservations, type ReportingObservationPerspectiveV1 } from './resultSource'
 import {
@@ -49,7 +50,11 @@ const publicWave = (wave: Awaited<ReturnType<typeof bindReportingSeriesWave>>) =
   createdAt: wave.createdAt.toISOString(),
 })
 
-const publicArtifact = (artifact: ReportingArtifactRecord) => {
+const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
+  // Every aggregate response, including an old artifact and export projection,
+  // is checked with current authority. A trusted creator does not confer trusted
+  // disclosure rights on an ordinary reader of the same Run.
+  await assertFixedPopulationArtifactDisclosure({ principal, artifact })
   if (artifact.analysisKind === 'PROTECTED_FEEDBACK') {
     return {
       artifactId: artifact.id,
@@ -166,13 +171,14 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
     spec: governed,
     mode: input.mode,
     generatedByUserId: input.principal.userId,
+    principal: input.principal,
   })
   await assertOrganizationGroupReportsGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,
     runIds: waves.map((wave) => wave.sourceRunId),
   })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }
 
 type FrozenSubjectRow = { actorSnapshotId: string; userId: string }
@@ -218,15 +224,20 @@ export const generateOrganizationProtectedFeedback = async (input: {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'published reporting spec is not protected feedback', 409)
   }
   const [batch, subject] = await Promise.all([
-    resolveAuthoritativeTrackObservations({ organizationId: input.organizationId, runId: input.runId, trackId: input.trackId }),
+    resolveAuthoritativeTrackObservations({
+      organizationId: input.organizationId,
+      runId: input.runId,
+      trackId: input.trackId,
+      selection: {
+        subjectUserId: input.subjectUserId,
+        relationshipKind: input.relationshipKind,
+        perspective: input.perspective,
+      },
+    }),
     resolveFrozenProtectedSubject(input),
   ])
   const all = [...batch.resolved, ...batch.unresolved]
-  const allowedExecutionIds = new Set(all.filter((row) => (
-    row.subject.userId === input.subjectUserId
-    && row.relationshipKind === input.relationshipKind
-    && row.perspective === input.perspective
-  )).map((row) => row.executionId))
+  const allowedExecutionIds = new Set(all.map((row) => row.executionId))
   if (allowedExecutionIds.size === 0) reportingFail('REPORT_PROTECTED_SOURCE_INVALID', 'protected fixed source contains no matching executions', 409)
 
   await assertProtectedFeedbackManagerAccess({ principal: input.principal, organizationId: input.organizationId, subjectUserId: input.subjectUserId })
@@ -242,9 +253,10 @@ export const generateOrganizationProtectedFeedback = async (input: {
     allowedExecutionIds,
     spec: spec as ReportingAnalysisSpecRecord<ReportingProtectedFeedbackSpecV1>,
     generatedByUserId: input.principal.userId,
+    principal: input.principal,
   })
   await assertProtectedFeedbackManagerAccess({ principal: input.principal, organizationId: input.organizationId, subjectUserId: input.subjectUserId })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }
 
 export const readOrganizationReportingArtifact = async (input: {
@@ -263,7 +275,7 @@ export const readOrganizationReportingArtifact = async (input: {
       bindings: artifact.artifactPayload.waveBindings,
     })
     await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind === 'GROUP') {
@@ -272,7 +284,7 @@ export const readOrganizationReportingArtifact = async (input: {
       organizationId: input.organizationId,
       runId: artifact.artifactPayload.source.runId,
     }))
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind === 'REPEATED_COHORT' || artifact.analysisKind === 'MATCHED_LONGITUDINAL') {
@@ -286,7 +298,7 @@ export const readOrganizationReportingArtifact = async (input: {
       organizationId: input.organizationId,
       runIds: waves.map((wave) => wave.sourceRunId),
     }))
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind !== 'PROTECTED_FEEDBACK') {
@@ -297,5 +309,5 @@ export const readOrganizationReportingArtifact = async (input: {
     organizationId: input.organizationId,
     subjectUserId: artifact.artifactPayload.source.subjectUserId,
   })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }

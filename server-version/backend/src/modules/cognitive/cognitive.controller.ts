@@ -240,9 +240,10 @@ export const cognitiveController = {
   },
 
   async startPublicSession(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = cognitivePublicStartSchema.parse(req.body || {})
-      const data = await publicCognitiveService.startPublicSession(req.params.token, input.recoveryToken)
+      const data = await publicCognitiveService.startPublicSession(req.params.token, input.recoveryToken, input.startIntent)
       return success(res, data, data.recoveryToken ? '匿名测评已开始，请保存恢复凭证' : '已恢复匿名测评')
     } catch (err) {
       return handleError(res, err)

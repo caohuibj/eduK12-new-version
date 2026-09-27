@@ -250,7 +250,11 @@ const main = async () => {
   }
 }
 
-main().catch((error) => {
+main().then(() => {
+  execFileSync(path.resolve(__dirname, '../backend/node_modules/.bin/tsx'), [
+    path.resolve(__dirname, 'prelaunch-start-intent-browser-e2e.cjs'),
+  ], { cwd: path.resolve(__dirname, '..'), env: process.env, stdio: 'inherit', timeout: 180000 })
+}).catch((error) => {
   console.error('FE-11 focused storage/duplicate-tab fault gates: FAIL')
   console.error(error?.stack || error)
   process.exitCode = 1

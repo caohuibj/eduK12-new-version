@@ -454,6 +454,8 @@ export interface ReportingProtectedArtifactPayloadV1 {
   maturityProfile: Record<string, number>
   evidence: ReportingEvidenceProjectionV1
   projection: ReportingProtectedFeedbackProjectionV1
+  /** Private publication proof; absent on immutable legacy artifacts. */
+  fixedPopulationDisclosure?: { schemaVersion: 1; complete: boolean }
 }
 
 export type ReportingArtifactPayloadV1 =

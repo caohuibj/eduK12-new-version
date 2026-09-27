@@ -4,6 +4,8 @@ import {
   createOrReuseLongitudinalReportingArtifact,
   createOrReuseProtectedReportingArtifact,
 } from './artifact'
+import type { ReportingPrincipal } from './authorization'
+import { assertFixedPopulationArtifactDisclosure, protectedPopulationIsComplete } from './fixedPopulationPrivacy'
 import { reportingEvidenceFor } from './engine'
 import { buildMatchedLongitudinalProjection } from './matched'
 import { buildSeparatedMultiRaterObservations } from './multiRater'
@@ -59,6 +61,7 @@ export const createLongitudinalAnalysisArtifact = async (input: {
   mode?: ReportingMatchedModeV1
   generatedByUserId: string
   generatedAt?: Date
+  principal?: ReportingPrincipal
 }): Promise<ReportingLongitudinalArtifactRecord> => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'longitudinal analysis requires a published spec', 409)
   const definition = input.spec.definition
@@ -111,6 +114,17 @@ export const createLongitudinalAnalysisArtifact = async (input: {
     options,
     projection,
   }
+  // Evaluate the actual immutable projection, including matched valid-case N,
+  // at this shared automatic/manual boundary, before any artifact publication.
+  await assertFixedPopulationArtifactDisclosure({
+    principal: input.principal ?? { userId: input.generatedByUserId, platformRole: 'STANDARD' },
+    artifact: {
+      organizationId: input.series.organizationId,
+      analysisKind: definition.analysisKind,
+      cohortSnapshotId: null,
+      artifactPayload: payload,
+    },
+  })
   return createOrReuseLongitudinalReportingArtifact({
     organizationId: input.series.organizationId,
     seriesId: input.series.id,
@@ -185,6 +199,7 @@ export const createProtectedFeedbackArtifact = async (input: {
   spec: ReportingAnalysisSpecRecord<ReportingProtectedFeedbackSpecV1>
   generatedByUserId: string
   generatedAt?: Date
+  principal?: ReportingPrincipal
 }): Promise<ReportingProtectedArtifactRecord> => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'protected feedback requires a published spec', 409)
   if (
@@ -234,6 +249,7 @@ export const createProtectedFeedbackArtifact = async (input: {
   })
   const analysisIdentityHash = canonicalHash({
     schema: 'ReportingPr4AnalysisIdentityV1',
+    disclosurePolicy: 'FIXED_POPULATION_V1',
     analysisKind: 'PROTECTED_FEEDBACK',
     policyDomain: 'ORG_PROTECTED_FEEDBACK_V1',
     organizationId: input.organizationId,
@@ -261,7 +277,12 @@ export const createProtectedFeedbackArtifact = async (input: {
     maturityProfile: evidence.profile,
     evidence: { level: evidence.level, limitations: evidence.limitations },
     projection: built.projection,
+    fixedPopulationDisclosure: { schemaVersion: 1, complete: protectedPopulationIsComplete(built) },
   }
+  await assertFixedPopulationArtifactDisclosure({
+    principal: input.principal ?? { userId: input.generatedByUserId, platformRole: 'STANDARD' },
+    artifact: { organizationId: input.organizationId, analysisKind: 'PROTECTED_FEEDBACK', artifactPayload: payload },
+  })
   return createOrReuseProtectedReportingArtifact({
     organizationId: input.organizationId,
     specId: input.spec.id,

@@ -1,32 +1,29 @@
 import { Prisma } from '@prisma/client'
 import { RunStartAdmissionError } from './startAdmission'
 
-/** Called with Organization -> Run -> Execution locked by START admission. */
+/** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
 export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string): Promise<void> => {
   const fail = (code: string) => { throw new RunStartAdmissionError(code, 'current Run START authority is no longer valid', 403) }
-  // Account changes also lock these rows. Check after acquiring the lock, using
-  // statement time so a wait cannot extend an expired account or intake window.
+  // Account mutation conflicts with these shared fences. Do not evaluate expiry
+  // against this statement's start time: acquiring a row lock can wait past it.
   const users = await tx.$queryRaw<Array<{ valid: boolean }>>`
     SELECT (u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password"
-      AND (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp())
       AND (u."role" <> 'TEACHER' OR u."teacher_approved")) AS "valid"
     FROM "users" u
     WHERE u."id" IN (
       SELECT a."user_id" FROM "assessment_run_actor_snapshots" a
       JOIN "assessment_run_executions" e ON a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
       WHERE e."id" = ${executionId}
-    ) ORDER BY u."id" FOR UPDATE OF u
+    ) ORDER BY u."id" FOR SHARE OF u
   `
   if (!users.length || users.some((u) => !u.valid)) fail('RUN_ACCOUNT_INACTIVE')
-  const envelopes = await tx.$queryRaw<Array<{ organizationId: string; active: boolean; intakeOpen: boolean }>>`
-    SELECT e."organization_id" AS "organizationId", o."status" = 'ACTIVE' AS "active",
-      (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen"
+  const envelopes = await tx.$queryRaw<Array<{ organizationId: string; active: boolean }>>`
+    SELECT e."organization_id" AS "organizationId", o."status" = 'ACTIVE' AS "active"
     FROM "assessment_run_executions" e JOIN "assessment_runs" r ON r."id" = e."run_id"
     JOIN "organizations" o ON o."id" = e."organization_id" WHERE e."id" = ${executionId}
   `
   const envelope = envelopes[0]
   if (!envelope?.active) fail('ORGANIZATION_SUSPENDED')
-  if (!envelope.intakeOpen) fail('RUN_INTAKE_CLOSED')
   const actors = await tx.$queryRaw<Array<{ valid: boolean; denied: boolean }>>`
     SELECT (a."provenance_kind" = 'EXTERNAL_PARENT' OR EXISTS (
       SELECT 1 FROM "organization_memberships" m
@@ -50,18 +47,18 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   `
   const relationship = relationships[0]
   if (!relationship) fail('RUN_RELATIONSHIP_REVOKED')
-  if (relationship.kind === 'SELF') return
-  let valid = false
+  let valid = relationship.kind === 'SELF'
   if (relationship.kind === 'PARENT_CHILD') {
     const rows = await tx.$queryRaw<Array<{ valid: boolean }>>`
       SELECT ("status" = 'ACTIVE' AND "approved_at" IS NOT NULL) AS "valid"
-      FROM "parent_student_relationships" WHERE "id" = ${relationship.ref} FOR UPDATE
+      FROM "parent_student_relationships" WHERE "id" = ${relationship.ref} FOR SHARE
     `
     valid = rows[0]?.valid ?? false
   } else if (relationship.kind === 'COUNSELOR_CLIENT') {
     const rows = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_counselor_client_relationships"
       WHERE "id" = ${relationship.ref} AND "organization_id" = ${envelope.organizationId} AND "valid_until" IS NULL
+      FOR SHARE
     `
     valid = Boolean(rows[0])
   } else if (relationship.kind === 'CLASS_TEACHER_STUDENT') {
@@ -70,8 +67,25 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       JOIN "organization_staff_class_assignments" sa ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id"
       WHERE sc."id" = ${relationship.facts.studentClassAssignmentId} AND sa."id" = ${relationship.facts.staffClassAssignmentId}
         AND sc."organization_id" = ${envelope.organizationId} AND sc."valid_until" IS NULL AND sa."valid_until" IS NULL
+      FOR SHARE OF sc, sa
     `
     valid = Boolean(rows[0])
   }
   if (!valid) fail('RUN_RELATIONSHIP_REVOKED')
+
+  // A separate statement is essential here: statement_timestamp() is fixed at
+  // the beginning of its statement, not the end of a lock wait. All authority
+  // fences are now held; this is the time-window admission decision.
+  const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean }>>`
+    SELECT (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
+      NOT EXISTS (
+        SELECT 1 FROM "assessment_run_actor_snapshots" a JOIN "users" u ON u."id"=a."user_id"
+        WHERE a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
+          AND u."expires_at" IS NOT NULL AND u."expires_at" <= statement_timestamp()
+      ) AS "accountsCurrent"
+    FROM "assessment_run_executions" e JOIN "assessment_runs" r ON r."id"=e."run_id"
+    WHERE e."id"=${executionId}
+  `
+  if (!windows[0]?.accountsCurrent) fail('RUN_ACCOUNT_INACTIVE')
+  if (!windows[0].intakeOpen) fail('RUN_INTAKE_CLOSED')
 }

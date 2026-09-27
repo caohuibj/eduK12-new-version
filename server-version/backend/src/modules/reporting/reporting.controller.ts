@@ -22,6 +22,8 @@ import { ReportingError } from './types'
 import { createReportingExport, downloadReportingExport } from './export'
 import { readOrganizationSafetyCase } from '../assessment-safety/organization-view'
 import { listOrganizationSafetyCases } from '../assessment-safety/organization-discovery'
+import { releaseReportingAnalysisLease, withReportingAnalysisExecution } from './runtimeLimit'
+import { isBoundedAdmissionBusyError } from '../../services/boundedAdmissionGate'
 
 const createSpecSchema = z.object({
   specKey: z.string().trim().min(1).max(160),
@@ -101,6 +103,10 @@ const exportSchema = z.union([
 
 const badRequest = (res: Response, message: string) => instrumentError(res, 'REPORT_REQUEST_INVALID', message, 400)
 const fail = (res: Response, error: unknown) => {
+  if (isBoundedAdmissionBusyError(error) && error.code === 'REPORTING_BUSY') {
+    res.setHeader('Retry-After', String(error.retryAfterSeconds))
+    return res.status(503).json({ code: -1, message: '报告服务繁忙，请稍后再试' })
+  }
   if (error instanceof ReportingError) return instrumentError(res, error.code, error.message, error.statusCode)
   throw error
 }
@@ -112,18 +118,22 @@ export const reportingController = {
     const parsed = exportSchema.safeParse(req.body)
     if (!parsed.success) return badRequest(res, 'invalid export request')
     try {
-      const data = await createReportingExport({ principal: principal(req), organizationId: req.params.organizationId, target: parsed.data })
-      res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data })
+      return await withReportingAnalysisExecution(async () => {
+        const data = await createReportingExport({ principal: principal(req), organizationId: req.params.organizationId, target: parsed.data })
+        res.setHeader('Cache-Control', 'no-store')
+        return res.json({ code: 0, message: '操作成功', data })
+      })
     } catch (error) { return fail(res, error) }
   },
   async downloadExport(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      const result = await downloadReportingExport({ principal: principal(req), organizationId: req.params.organizationId, exportId: req.params.exportId })
-      res.setHeader('Cache-Control', 'no-store')
-      res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`)
-      return res.type('text/csv').send(result.csv)
+      return await withReportingAnalysisExecution(async () => {
+        const result = await downloadReportingExport({ principal: principal(req), organizationId: req.params.organizationId, exportId: req.params.exportId })
+        res.setHeader('Cache-Control', 'no-store')
+        res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`)
+        return res.type('text/csv').send(result.csv)
+      })
     } catch (error) { return fail(res, error) }
   },
   async listSafetyCases(req: Request, res: Response) {
@@ -207,83 +217,97 @@ export const reportingController = {
     const parsed = bindWaveSchema.safeParse(req.body)
     if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting Wave')
     try {
-      const wave = await bindOrganizationReportingWave({
-        principal: principal(req),
-        organizationId: req.params.organizationId,
-        seriesId: req.params.seriesId,
-        ...parsed.data,
+      return await withReportingAnalysisExecution(async () => {
+        const wave = await bindOrganizationReportingWave({
+          principal: principal(req),
+          organizationId: req.params.organizationId,
+          seriesId: req.params.seriesId,
+          ...parsed.data,
+        })
+        res.setHeader('Cache-Control', 'no-store')
+        return res.json({ code: 0, message: '操作成功', data: wave })
       })
-      res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: wave })
     } catch (error) { return fail(res, error) }
   },
 
   async analyze(req: Request, res: Response) {
-    if (!req.user) return unauthorized(res)
-    const parsed = analysisSchema.safeParse(req.body)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid analysis request')
     try {
-      const data = parsed.data
-      if ('analysisKind' in data && data.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
-        const artifact = await generateIndividualLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
-        res.setHeader('Cache-Control', 'no-store')
-        return res.json({ code: 0, message: '操作成功', data: artifact })
-      }
-      if ('sources' in data) {
-        const artifact = await generateAutomaticLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
-        res.setHeader('Cache-Control', 'no-store')
-        return res.json({ code: 0, message: '操作成功', data: artifact })
-      }
-      if (!('analysisKind' in data)) {
-        const artifact = await generateOrganizationGroupAnalysis({
-          principal: principal(req),
-          organizationId: req.params.organizationId,
-          runId: data.runId,
-          trackId: data.trackId,
-          specId: data.specId,
-          cohortSelector: data.cohortSelector,
-        })
-        res.setHeader('Cache-Control', 'no-store')
-        return res.json({ code: 0, message: '操作成功', data: artifact })
-      }
-      if (data.analysisKind === 'REPEATED_COHORT') {
-        const artifact = await generateOrganizationLongitudinalAnalysis({
+      if (!req.user) return unauthorized(res)
+      const parsed = analysisSchema.safeParse(req.body)
+      if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid analysis request')
+      return await withReportingAnalysisExecution(async () => {
+        const data = parsed.data
+        if ('analysisKind' in data && data.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+          const artifact = await generateIndividualLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
+          res.setHeader('Cache-Control', 'no-store')
+          return res.json({ code: 0, message: '操作成功', data: artifact })
+        }
+        if ('sources' in data) {
+          const artifact = await generateAutomaticLongitudinal({ ...data, principal: principal(req), organizationId: req.params.organizationId })
+          res.setHeader('Cache-Control', 'no-store')
+          return res.json({ code: 0, message: '操作成功', data: artifact })
+        }
+        if (!('analysisKind' in data)) {
+          const artifact = await generateOrganizationGroupAnalysis({
+            principal: principal(req),
+            organizationId: req.params.organizationId,
+            runId: data.runId,
+            trackId: data.trackId,
+            specId: data.specId,
+            cohortSelector: data.cohortSelector,
+          })
+          res.setHeader('Cache-Control', 'no-store')
+          return res.json({ code: 0, message: '操作成功', data: artifact })
+        }
+        if (data.analysisKind === 'REPEATED_COHORT') {
+          const artifact = await generateOrganizationLongitudinalAnalysis({
+            principal: principal(req), organizationId: req.params.organizationId,
+            seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
+            analysisKind: data.analysisKind,
+          })
+          res.setHeader('Cache-Control', 'no-store')
+          return res.json({ code: 0, message: '操作成功', data: artifact })
+        }
+        if (data.analysisKind === 'MATCHED_LONGITUDINAL') {
+          const artifact = await generateOrganizationLongitudinalAnalysis({
+            principal: principal(req), organizationId: req.params.organizationId,
+            seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
+            analysisKind: data.analysisKind, mode: data.options.mode,
+          })
+          res.setHeader('Cache-Control', 'no-store')
+          return res.json({ code: 0, message: '操作成功', data: artifact })
+        }
+        const artifact = await generateOrganizationProtectedFeedback({
           principal: principal(req), organizationId: req.params.organizationId,
-          seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
-          analysisKind: data.analysisKind,
+          runId: data.runId, trackId: data.trackId, subjectUserId: data.subjectUserId,
+          relationshipKind: data.relationshipKind, perspective: data.perspective, specId: data.specId,
         })
         res.setHeader('Cache-Control', 'no-store')
         return res.json({ code: 0, message: '操作成功', data: artifact })
-      }
-      if (data.analysisKind === 'MATCHED_LONGITUDINAL') {
-        const artifact = await generateOrganizationLongitudinalAnalysis({
-          principal: principal(req), organizationId: req.params.organizationId,
-          seriesId: data.seriesId, waveKeys: data.waveKeys, specId: data.specId,
-          analysisKind: data.analysisKind, mode: data.options.mode,
-        })
-        res.setHeader('Cache-Control', 'no-store')
-        return res.json({ code: 0, message: '操作成功', data: artifact })
-      }
-      const artifact = await generateOrganizationProtectedFeedback({
-        principal: principal(req), organizationId: req.params.organizationId,
-        runId: data.runId, trackId: data.trackId, subjectUserId: data.subjectUserId,
-        relationshipKind: data.relationshipKind, perspective: data.perspective, specId: data.specId,
       })
-      res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: artifact })
-    } catch (error) { return fail(res, error) }
+    } catch (error) {
+      if (isBoundedAdmissionBusyError(error) && error.code === 'REPORTING_BUSY') {
+        res.setHeader('Retry-After', String(error.retryAfterSeconds))
+        return res.status(503).json({ code: -1, message: '报告服务繁忙，请稍后再试' })
+      }
+      return fail(res, error)
+    } finally {
+      await releaseReportingAnalysisLease(req)
+    }
   },
 
   async readArtifact(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
-      const artifact = await readOrganizationReportingArtifact({
-        principal: principal(req),
-        organizationId: req.params.organizationId,
-        artifactId: req.params.artifactId,
+      return await withReportingAnalysisExecution(async () => {
+        const artifact = await readOrganizationReportingArtifact({
+          principal: principal(req),
+          organizationId: req.params.organizationId,
+          artifactId: req.params.artifactId,
+        })
+        res.setHeader('Cache-Control', 'no-store')
+        return res.json({ code: 0, message: '操作成功', data: artifact })
       })
-      res.setHeader('Cache-Control', 'no-store')
-      return res.json({ code: 0, message: '操作成功', data: artifact })
     } catch (error) { return fail(res, error) }
   },
 }

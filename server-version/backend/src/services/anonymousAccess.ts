@@ -1,4 +1,5 @@
-import { createHash, randomBytes } from 'crypto'
+import { createHash, createHmac, randomBytes } from 'crypto'
+import { HEX_32_BYTE_KEY } from '../utils/encryption'
 
 /**
  * 公开测评的两个凭证分开处理：
@@ -24,3 +25,47 @@ export const hashRecoveryToken = (token: string): string =>
 
 export const isValidRecoveryToken = (token: unknown): token is string =>
   typeof token === 'string' && token.length >= 20 && token.length <= 200
+
+const PUBLIC_START_INTENT_RE = /^[A-Za-z0-9_-]{43}$/
+const PUBLIC_START_DOMAIN = 'anonymous-public-start-v1'
+
+const publicStartKey = (): Buffer => {
+  const source = process.env.DATA_PSEUDONYM_KEY
+  if (!source || !HEX_32_BYTE_KEY.test(source)) {
+    throw new Error('DATA_PSEUDONYM_KEY must be exactly 64 hex characters (32 bytes)')
+  }
+  return Buffer.from(source, 'hex')
+}
+
+export const isValidPublicStartIntent = (value: unknown): value is string =>
+  typeof value === 'string' && PUBLIC_START_INTENT_RE.test(value)
+
+/**
+ * Derive a stable admission identity from a client-generated 256-bit start
+ * intent. The raw intent is never persisted. Domain-separated HMAC outputs
+ * ensure the participant key cannot be used as the recovery credential.
+ *
+ * accessTokenId is included so reusing the same browser intent with a different
+ * public link cannot recover or collide with an admission created by that link.
+ */
+export const derivePublicStartCredential = (accessTokenId: string, startIntent: string) => {
+  if (!accessTokenId || !isValidPublicStartIntent(startIntent)) {
+    throw new Error('invalid public START intent')
+  }
+  const derive = (domain: string): Buffer => createHmac('sha256', publicStartKey())
+    .update(PUBLIC_START_DOMAIN)
+    .update('\0')
+    .update(domain)
+    .update('\0')
+    .update(accessTokenId)
+    .update('\0')
+    .update(startIntent)
+    .digest()
+  const token = derive('recovery').toString('base64url')
+  return {
+    token,
+    hash: hashRecoveryToken(token),
+    participantKey: `anonymous-intent:${derive('participant').toString('hex')}`,
+    anonymousCode: `ANON-${derive('code').subarray(0, 4).toString('hex').toUpperCase()}`,
+  }
+}
