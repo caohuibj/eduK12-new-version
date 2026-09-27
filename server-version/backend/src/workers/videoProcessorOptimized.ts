@@ -98,7 +98,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   logger.info(`🎬 开始处理视频: ${videoId} (${isUrlMode ? 'URL下载' : '本地上传'})`)
 
-  const tempDir = path.join('/tmp', `video-${videoId}`)
+  let tempDir = ''
   const derivativeAssets: Array<{ id: string; objectKey: string; provider: string }> = []
 
   try {
@@ -109,16 +109,24 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     }
 
     // 更新状态为处理中
-    const claimed = await markVideoProcessing(videoId, String(job.id))
-    if (!claimed) {
+    const processingGeneration = await markVideoProcessing(videoId, String(job.id))
+    if (processingGeneration === null) {
       logger.warn('视频处理任务未能取得视频行所有权，跳过过期任务', { videoId, jobId: job.id })
       return { videoId, skipped: true }
     }
+    const safeJobId = String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')
+    tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${processingGeneration}`)
     if (isUrlMode) {
-      await prisma.video.update({
-        where: { id: videoId },
+      const updated = await prisma.video.updateMany({
+        where: {
+          id: videoId,
+          status: 'PROCESSING',
+          processingJobId: String(job.id),
+          processingGeneration,
+        },
         data: { originalUrl: videoUrl },
       })
+      if (updated.count !== 1) throw new Error('视频处理任务已失效')
     }
 
     await job.progress(5)
@@ -172,7 +180,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       derivativeAssets.push(originalAsset)
       await prisma.$transaction(async (tx) => {
         const updated = await tx.video.updateMany({
-          where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
+          where: {
+            id: videoId,
+            status: 'PROCESSING',
+            processingJobId: String(job.id),
+            processingGeneration,
+          },
           data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
         })
         if (updated.count !== 1) throw new Error('视频处理任务已失效')
@@ -268,7 +281,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     // Update the video and attach both derivatives atomically.
     await prisma.$transaction(async (tx) => {
       const updated = await tx.video.updateMany({
-        where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
+        where: {
+          id: videoId,
+          status: 'PROCESSING',
+          processingJobId: String(job.id),
+          processingGeneration,
+        },
         data: {
           status: 'COMPLETED',
           processedUrl: null,
@@ -292,7 +310,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     await job.progress(100)
 
     // 清理临时文件
-    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+    if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
 
     logger.info(`✅ 视频处理完成: ${videoId} (分辨率: ${PROCESSING_CONFIG.resolution})`)
 
@@ -305,7 +323,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       if (result.status === 'rejected') logger.warn('视频失败清理资源失败', { videoId })
     }
     if (isWorkerShutdownCancellationError(error)) {
-      await releaseVideoProcessingForRetry(videoId, String(job.id)).catch(() => false)
+      await releaseVideoProcessingForRetry(videoId, String(job.id), processingGeneration).catch(() => false)
       if (isFinalVideoAttempt(job)) {
         try {
           const retry = await videoQueue.add('transcode', job.data, {
@@ -324,7 +342,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           logger.error('worker shutdown video recovery enqueue failed', { videoId, priorJobId: job.id })
         }
       }
-      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+      if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
       throw error
     }
 
@@ -333,13 +351,13 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     // above and must not become a business failure.
     if (isFinalVideoAttempt(job)) {
       try {
-        const recorded = await markVideoFailed(videoId, String(job.id))
+        const recorded = await markVideoFailed(videoId, String(job.id), processingGeneration)
         if (!recorded) logger.warn('视频最终失败状态未更新（任务可能已被其他流程处理）', { videoId, jobId: job.id })
       } catch {
         logger.error('视频最终失败状态写入异常', { videoId, jobId: job.id })
       }
     }
-    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+    if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
     throw error
   }
 })
