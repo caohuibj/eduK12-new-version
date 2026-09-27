@@ -20,6 +20,7 @@ const suite = databaseUrl ? describe : describe.skip
 let db: PrismaClient | null = null
 let finalizeQuestionnaireAttemptUnifiedIfReady: typeof import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')['finalizeQuestionnaireAttemptUnifiedIfReady']
 let finalizeCompositeAttemptUnifiedIfReady: typeof import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')['finalizeCompositeAttemptUnifiedIfReady']
+let persistObservedAggregateProgressForTests: typeof import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')['persistObservedAggregateProgressForTests']
 let mapCompositeSection: typeof import('../../modules/composite/final-submit.service')['mapCompositeSection']
 let compositeService: typeof import('../../modules/composite/composite.service')
 let submitCognitiveSessionFinal: typeof import('../../modules/cognitive/final-submit.service')['submitCognitiveSessionFinal']
@@ -740,6 +741,7 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
     await db.$connect()
     finalizeQuestionnaireAttemptUnifiedIfReady = (await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')).finalizeQuestionnaireAttemptUnifiedIfReady
     finalizeCompositeAttemptUnifiedIfReady = (await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')).finalizeCompositeAttemptUnifiedIfReady
+    persistObservedAggregateProgressForTests = (await import('../../modules/assessment-runtime/unified-aggregate-finalizer.service')).persistObservedAggregateProgressForTests
     mapCompositeSection = (await import('../../modules/composite/final-submit.service')).mapCompositeSection
     compositeService = await import('../../modules/composite/composite.service')
     submitCognitiveSessionFinal = (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal
@@ -767,6 +769,55 @@ suite('V32-2 closed aggregate PostgreSQL integration', () => {
       const result = await finalizeQuestionnaireAttemptUnifiedIfReady(fixture.parentId)
       expect(result).toMatchObject({ status: 'IN_PROGRESS', progress: 50, completedAt: null })
       expect(await db!.questionnaireAssessment.findUnique({ where: { id: fixture.parentId }, select: { status: true, progress: true } })).toEqual({ status: 'IN_PROGRESS', progress: 50 })
+    } finally {
+      await destroyFixture(fixture)
+    }
+  }, 30_000)
+
+  it('keeps non-terminal parent progress monotonic when a stale observer writes after a newer observer', async () => {
+    const fixture = await createFixture()
+    try {
+      const observed = await db!.questionnaireAssessment.findUniqueOrThrow({
+        where: { id: fixture.parentId },
+        select: {
+          id: true, status: true, deliveryMode: true, runtimeGeneration: true, attemptEpoch: true,
+          startedAt: true, completedAt: true, progress: true, aggregateInputHash: true,
+          contextSnapshotEncrypted: true, contextSnapshotHash: true,
+          frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
+          completedScales: true, completedForms: true,
+        },
+      })
+      const staleA = { ...observed }
+      const staleB = { ...observed }
+      let releaseA!: () => void
+      const waitA = new Promise<void>((resolve) => { releaseA = resolve })
+      const late = (async () => {
+        await waitA
+        return persistObservedAggregateProgressForTests({
+          parent: staleA,
+          composite: false,
+          progress: 50,
+          completedScales: 1,
+          completedForms: 0,
+        })
+      })()
+
+      const newer = await persistObservedAggregateProgressForTests({
+        parent: staleB,
+        composite: false,
+        progress: 75,
+        completedScales: 1,
+        completedForms: 1,
+      })
+      expect(newer).toMatchObject({ status: 'IN_PROGRESS', progress: 75 })
+      releaseA()
+      const staleResult = await late
+      expect(staleResult).toMatchObject({ status: 'IN_PROGRESS', progress: 75 })
+
+      expect(await db!.questionnaireAssessment.findUnique({
+        where: { id: fixture.parentId },
+        select: { status: true, progress: true, completedScales: true, completedForms: true },
+      })).toEqual({ status: 'IN_PROGRESS', progress: 75, completedScales: 1, completedForms: 1 })
     } finally {
       await destroyFixture(fixture)
     }
