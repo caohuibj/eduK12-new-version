@@ -12,7 +12,6 @@ import { readReportingArtifactRecord } from './artifact'
 import { freezeRunTrackCohort } from './cohort'
 import { assertOrganizationReportingWorkspaceAccess } from './pr4Authorization'
 import { createLongitudinalAnalysisArtifact, createProtectedFeedbackArtifact } from './pr4Artifact'
-import type { ReportingPrivacyExposureV1 } from './artifact'
 import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
 import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
 import { resolveAuthoritativeTrackObservations, type ReportingObservationPerspectiveV1 } from './resultSource'
@@ -154,7 +153,6 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
   specId: string
   analysisKind: 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
   mode?: ReportingMatchedModeV1
-  privacyExposures?: ReportingPrivacyExposureV1[]
 }) => {
   const { series, waves } = await readAuthorizedWavesForGenerate(input)
   const spec = await getPublishedReportingSpec(input.specId)
@@ -174,7 +172,6 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
     mode: input.mode,
     generatedByUserId: input.principal.userId,
     principal: input.principal,
-    privacyExposures: input.privacyExposures,
   })
   await assertOrganizationGroupReportsGenerateAccess({
     principal: input.principal,

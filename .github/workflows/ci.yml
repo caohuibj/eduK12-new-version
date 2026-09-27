@@ -416,6 +416,10 @@ jobs:
           src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
           src/__tests__/hotpath/query-budget.postgres.integration.test.ts
           src/__tests__/integration/assessmentRunConsentRecovery.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunStartClaim.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunAllocationMatrix.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunStartFences.postgres.integration.test.ts
+          src/__tests__/integration/reportingSubgroupPrivacy.postgres.integration.test.ts
           src/__tests__/integration/reportingCore.postgres.integration.test.ts
           src/__tests__/integration/reportingHttp.postgres.integration.test.ts
           src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts

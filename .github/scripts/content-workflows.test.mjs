@@ -122,3 +122,12 @@ test('full CI preserves two physical self-hosted lanes', () => {
   }
   assert.match(source('scale-onboarding-boundary'), /eduk12-win-ci/);
 });
+
+
+test('expensive performance work stays off draft PRs unless full CI is explicitly forced', () => {
+  for (const workflow of ['perf-phase0-closure', 'perf-phase0-exploratory']) {
+    const text = source(workflow);
+    assert.match(text, /github\.event\.pull_request\.draft == false/);
+    assert.match(text, /vars\.CI_FORCE_FULL == 'true'/);
+  }
+});

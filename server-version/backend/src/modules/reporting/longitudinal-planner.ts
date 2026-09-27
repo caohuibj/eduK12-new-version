@@ -9,7 +9,6 @@ import { buildReportingWaveInputManifest, createReportingSeries, bindReportingSe
 import { getPublishedReportingSpec } from './spec'
 import { generateOrganizationLongitudinalAnalysis } from './pr4Service'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
-import type { ReportingPrivacyExposureV1 } from './artifact'
 import { reportingFail, type ReportingCohortSelectorInputV2, type ReportingResourceFamily, type ReportingCohortSnapshotRecord } from './types'
 
 export async function generateAutomaticLongitudinal(input: {
@@ -54,37 +53,12 @@ export async function generateAutomaticLongitudinal(input: {
       generatedByUserId: input.principal.userId, cohortSelector: selector,
       baselineCohort: input.cohortStrategy === 'BASELINE_FIXED' ? baseline : undefined })
     baseline ??= cohort
+    await assertReportingSubgroupsPrivacy({
+      principal: input.principal, organizationId: input.organizationId, specId: spec.id,
+      entries: [{ cohort, minimumN: 3 }],
+    })
     const batch = await resolveAuthoritativeRunResults(cohort)
     prepared.push({ source, cohort, batch, manifest: buildReportingWaveInputManifest(batch) })
-  }
-  let privacyExposures: ReportingPrivacyExposureV1[] | undefined
-  if (selector.clauses.length > 0) {
-    const definition = spec.definition
-    const privacy = await assertReportingSubgroupsPrivacy({
-      principal: input.principal,
-      organizationId: input.organizationId,
-      specId: spec.id,
-      entries: prepared.map((item) => ({
-        cohort: item.cohort,
-        minimumN: Math.max(
-          3,
-          'minimumCohortN' in definition ? definition.minimumCohortN : 3,
-          'minimumContributorN' in definition ? definition.minimumContributorN : 3,
-          item.batch.resourceMinimumN ?? 0,
-        ),
-      })),
-    })
-    if (!privacy.organizationManager) {
-      privacyExposures = prepared.map((item) => ({
-        sourceRunId: item.cohort.sourceRunId,
-        sourceTrackId: item.cohort.sourceTrackId,
-        analysisKind: input.analysisKind,
-        specHash: spec.specHash,
-        eligibleSubjectUserIds: item.cohort.members.map((member) => member.userId),
-        resolvedSubjectUserIds: item.batch.resolved.map((row) => row.subjectUserId),
-        unresolvedSubjectUserIds: item.batch.unresolved.map((row) => row.subjectUserId),
-      }))
-    }
   }
   // Include actual frozen inputs: newly completed results produce a new series,
   // rather than conflicting with or silently reusing an earlier partial Wave.
@@ -105,5 +79,5 @@ export async function generateAutomaticLongitudinal(input: {
       cohortSnapshotId: p.cohort.id, createdByUserId: input.principal.userId, preparedBatch: p.batch })
     waveKeys.push(waveKey)
   }
-  return generateOrganizationLongitudinalAnalysis({ ...input, seriesId: series.id, waveKeys, privacyExposures })
+  return generateOrganizationLongitudinalAnalysis({ ...input, seriesId: series.id, waveKeys })
 }

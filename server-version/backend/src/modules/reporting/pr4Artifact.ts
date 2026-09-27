@@ -3,7 +3,6 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import {
   createOrReuseLongitudinalReportingArtifact,
   createOrReuseProtectedReportingArtifact,
-  type ReportingPrivacyExposureV1,
 } from './artifact'
 import type { ReportingPrincipal } from './authorization'
 import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
@@ -63,7 +62,6 @@ export const createLongitudinalAnalysisArtifact = async (input: {
   generatedByUserId: string
   generatedAt?: Date
   principal?: ReportingPrincipal
-  privacyExposures?: ReportingPrivacyExposureV1[]
 }): Promise<ReportingLongitudinalArtifactRecord> => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'longitudinal analysis requires a published spec', 409)
   const definition = input.spec.definition
@@ -137,7 +135,6 @@ export const createLongitudinalAnalysisArtifact = async (input: {
     waveBindings,
     generatedByUserId: input.generatedByUserId,
     generatedAt,
-    privacyExposures: input.privacyExposures,
   })
 }
 

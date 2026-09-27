@@ -49,6 +49,7 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
     runs-on:
       - self-hosted
       - linux
