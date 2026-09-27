@@ -70,7 +70,8 @@ describe('PublicCognitiveAssignment recovery flow', () => {
     renderAt()
     const button = await screen.findByRole('button', { name: '开始匿名测评' })
     expect(button).toBeEnabled()
-    expect(screen.getByText(/已有恢复凭证仍可继续|继续匿名认知测评/)).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: '继续匿名认知测评' })).toBeVisible()
+    expect(screen.getByText(/已有恢复凭证仍可继续/)).toBeVisible()
 
     await userEvent.click(button)
     await waitFor(() => expect(mockPublicAssignmentApi.start).toHaveBeenCalledWith(
