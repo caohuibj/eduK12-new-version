@@ -23,7 +23,7 @@ export const fixedPopulationPrivacyFailure = (): never => reportingFail(
 export type FixedPopulationArtifact = {
   organizationId: string
   analysisKind: string
-  cohortSnapshotId: string | null
+  cohortSnapshotId?: string | null
   artifactPayload: {
     projection: unknown
     waveBindings?: Array<{ waveId: string; cohortSnapshotId: string }>
@@ -106,11 +106,21 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
 }): Promise<void> => {
   const { artifact } = input
   if (!['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL'].includes(artifact.analysisKind)) return
-  // This supplements (never substitutes for) the existing Run/read/export
-  // authorization. Platform ADMIN alone is not a trusted tenant aggregate role.
+  // This supplements (never substitutes for) existing Run/read/export authority.
   const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: artifact.organizationId })
-  if (!context?.membershipId) reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  if (!context?.membershipId || context.explicitDenies.some((deny) => ['*', 'REPORT_READ', 'ORG_GROUP_REPORT_V1'].includes(deny))) {
+    reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  }
+  if (context.organizationStatus !== 'ACTIVE') {
+    // Preserve the existing narrow current-member platform historical read.
+    // Generation still refuses suspension before reaching this disclosure gate.
+    if (input.principal.platformRole === 'SYSTEM_ADMIN') return
+    reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
+  }
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
+  if (!context.personas.some((persona) => persona === 'TEACHER' || persona === 'COUNSELOR')) {
+    reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  }
   const bindings = artifact.artifactPayload.waveBindings
   const ids = artifact.analysisKind === 'GROUP'
     ? [artifact.cohortSnapshotId ?? fixedPopulationPrivacyFailure()]
@@ -121,8 +131,8 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
     `${cohort.sourceRunId}:${cohort.sourceTrackId}`, cohort,
   ])).values()]
   if (!sources.length) fixedPopulationPrivacyFailure()
-  // Header-only source coverage; never load/decrypt canonical payloads here.
-  // Compare actual execution IDs, not selector syntax or only population N.
+  // Header-only coverage; never load/decrypt canonical payloads here. Compare
+  // actual execution IDs, not selector spelling or only the population count.
   const rows = await prisma.$queryRaw<Array<{ runId: string; trackId: string; executionId: string; userId: string }>>(Prisma.sql`
     SELECT e.run_id AS "runId", e.track_id AS "trackId", e.id AS "executionId", a.user_id AS "userId"
     FROM assessment_run_executions e
@@ -143,6 +153,7 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
     if (!population || population.size < 3 || cohort.eligibleN !== population.size
       || cohort.members.length !== population.size
       || new Set(cohort.members.map((member) => member.executionId)).size !== population.size
+      || new Set(cohort.members.map((member) => member.userId)).size !== population.size
       || cohort.members.some((member) => population.get(member.executionId) !== member.userId)) {
       fixedPopulationPrivacyFailure()
     }
