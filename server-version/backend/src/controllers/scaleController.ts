@@ -1466,7 +1466,8 @@ export const scaleController = {
       // 获取字段预览
       const previewData = await exportService.getScaleExportData(scaleId, {
         anonymize: true,
-        minProgress: 100
+        minProgress: 100,
+        recordLimit: 5,
       })
 
       // 只返回前5行数据
@@ -1474,7 +1475,7 @@ export const scaleController = {
 
       return success(res, {
         scaleName: scale.name,
-        totalRecords: previewData.rows.length,
+        totalRecords: scale._count.assessments,
         completedCount: scale._count.assessments,
         itemCount: Array.isArray((scale.definition as any)?.items) ? (scale.definition as any).items.length : 0,
         dimensionCount: Array.isArray((scale.definition as any)?.scoring?.scores)
