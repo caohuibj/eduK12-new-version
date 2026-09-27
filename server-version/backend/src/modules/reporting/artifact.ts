@@ -49,6 +49,151 @@ type ArtifactWaveRow = {
   cohortSnapshotId: string
 }
 
+export type ReportingPrivacyExposureV1 = {
+  sourceRunId: string
+  sourceTrackId: string
+  analysisKind: 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
+  specHash: string
+  eligibleSubjectUserIds: string[]
+  resolvedSubjectUserIds: string[]
+  unresolvedSubjectUserIds: string[]
+}
+
+type PriorPrivacyExposureRow = {
+  sourceRunId: string
+  sourceTrackId: string
+  analysisKind: 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'
+  specHash: string
+  members: unknown
+  manifest: unknown
+}
+
+const normalizedIds = (values: unknown[]): string[] => [...new Set(
+  values.filter((value): value is string => typeof value === 'string' && value.length > 0),
+)].sort()
+
+const exposureFingerprint = (exposure: ReportingPrivacyExposureV1): string => canonicalHash({
+  schema: 'ReportingSubgroupDisclosureExposureV1',
+  sourceRunId: exposure.sourceRunId,
+  sourceTrackId: exposure.sourceTrackId,
+  analysisKind: exposure.analysisKind,
+  specHash: exposure.specHash,
+  eligibleSubjectUserIds: normalizedIds(exposure.eligibleSubjectUserIds),
+  resolvedSubjectUserIds: normalizedIds(exposure.resolvedSubjectUserIds),
+  unresolvedSubjectUserIds: normalizedIds(exposure.unresolvedSubjectUserIds),
+})
+
+const priorExposureFromRow = (row: PriorPrivacyExposureRow): ReportingPrivacyExposureV1 => {
+  const members = Array.isArray(row.members) ? row.members : []
+  const eligible = normalizedIds(members.map((member) => (
+    member && typeof member === 'object' ? (member as Record<string, unknown>).userId : null
+  )))
+  const manifest = row.manifest
+  const resolvedRows = Array.isArray(manifest)
+    ? manifest
+    : manifest && typeof manifest === 'object' && Array.isArray((manifest as Record<string, unknown>).resolved)
+      ? (manifest as { resolved: unknown[] }).resolved
+      : []
+  const unresolvedRows = manifest && !Array.isArray(manifest) && typeof manifest === 'object'
+    && Array.isArray((manifest as Record<string, unknown>).unresolved)
+    ? (manifest as { unresolved: unknown[] }).unresolved
+    : []
+  const resolved = normalizedIds(resolvedRows.map((entry) => (
+    entry && typeof entry === 'object' ? (entry as Record<string, unknown>).subjectUserId : null
+  )))
+  const unresolved = unresolvedRows.length
+    ? normalizedIds(unresolvedRows.map((entry) => (
+        entry && typeof entry === 'object' ? (entry as Record<string, unknown>).subjectUserId : null
+      )))
+    : eligible.filter((userId) => !resolved.includes(userId))
+  return {
+    sourceRunId: row.sourceRunId,
+    sourceTrackId: row.sourceTrackId,
+    analysisKind: row.analysisKind,
+    specHash: row.specHash,
+    eligibleSubjectUserIds: eligible,
+    resolvedSubjectUserIds: resolved,
+    unresolvedSubjectUserIds: unresolved,
+  }
+}
+
+const privacyFail = (): never => reportingFail(
+  'REPORT_PRIVACY_GUARD',
+  'selected subgroup is too identifying for a new aggregate report',
+  409,
+)
+
+const assertAtomicPrivacyExposures = async (
+  tx: Tx,
+  organizationId: string,
+  exposures: ReportingPrivacyExposureV1[],
+): Promise<void> => {
+  if (!exposures.length) return
+  const bySource = new Map<string, ReportingPrivacyExposureV1>()
+  for (const exposure of exposures) {
+    const key = `${exposure.sourceRunId}\u0000${exposure.sourceTrackId}`
+    const existing = bySource.get(key)
+    if (existing && exposureFingerprint(existing) !== exposureFingerprint(exposure)) privacyFail()
+    bySource.set(key, exposure)
+  }
+  const unique = [...bySource.values()].sort((left, right) => (
+    left.sourceRunId.localeCompare(right.sourceRunId) || left.sourceTrackId.localeCompare(right.sourceTrackId)
+  ))
+  const locked = await tx.$queryRaw<Array<{ runId: string; trackId: string }>>(Prisma.sql`
+    SELECT "run_id" AS "runId", "id" AS "trackId"
+    FROM "assessment_run_tracks"
+    WHERE "organization_id"=${organizationId}
+      AND (${Prisma.join(unique.map((exposure) => Prisma.sql`(
+        "run_id"=${exposure.sourceRunId} AND "id"=${exposure.sourceTrackId}
+      )`), ' OR ')})
+    ORDER BY "run_id", "id"
+    FOR UPDATE
+  `)
+  if (locked.length !== unique.length) reportingFail('REPORT_RESULT_INTEGRITY', 'privacy source Track disappeared before publication', 500)
+
+  const prior = await tx.$queryRaw<PriorPrivacyExposureRow[]>(Prisma.sql`
+    SELECT artifact."analysis_kind" AS "analysisKind",
+      artifact."artifact_payload"->>'specHash' AS "specHash",
+      cohort."source_run_id" AS "sourceRunId", cohort."source_track_id" AS "sourceTrackId",
+      cohort.members, artifact."artifact_payload"->'inputManifest' AS manifest
+    FROM "reporting_analysis_artifacts" artifact
+    JOIN "reporting_cohort_snapshots" cohort
+      ON cohort."organization_id"=artifact."organization_id" AND cohort."id"=artifact."cohort_snapshot_id"
+    WHERE artifact."organization_id"=${organizationId}
+      AND artifact."analysis_kind"='GROUP'
+      AND cohort.selector->>'kind'='FILTERED_RUN_TRACK_SUBJECTS'
+      AND (${Prisma.join(unique.map((exposure) => Prisma.sql`(
+        cohort."source_run_id"=${exposure.sourceRunId} AND cohort."source_track_id"=${exposure.sourceTrackId}
+      )`), ' OR ')})
+    UNION ALL
+    SELECT artifact."analysis_kind" AS "analysisKind",
+      artifact."artifact_payload"->>'specHash' AS "specHash",
+      wave."source_run_id" AS "sourceRunId", wave."source_track_id" AS "sourceTrackId",
+      cohort.members, wave."input_manifest" AS manifest
+    FROM "reporting_analysis_artifacts" artifact
+    JOIN "reporting_analysis_artifact_waves" binding
+      ON binding."organization_id"=artifact."organization_id" AND binding."artifact_id"=artifact."id"
+    JOIN "reporting_series_waves" wave
+      ON wave."organization_id"=binding."organization_id" AND wave."series_id"=binding."series_id" AND wave."id"=binding."wave_id"
+    JOIN "reporting_cohort_snapshots" cohort
+      ON cohort."organization_id"=wave."organization_id" AND cohort."id"=wave."cohort_snapshot_id"
+    WHERE artifact."organization_id"=${organizationId}
+      AND artifact."analysis_kind" IN ('REPEATED_COHORT','MATCHED_LONGITUDINAL')
+      AND cohort.selector->>'kind'='FILTERED_RUN_TRACK_SUBJECTS'
+      AND (${Prisma.join(unique.map((exposure) => Prisma.sql`(
+        wave."source_run_id"=${exposure.sourceRunId} AND wave."source_track_id"=${exposure.sourceTrackId}
+      )`), ' OR ')})
+  `)
+  const currentBySource = new Map(unique.map((exposure) => [
+    `${exposure.sourceRunId}\u0000${exposure.sourceTrackId}`,
+    exposureFingerprint(exposure),
+  ]))
+  for (const row of prior) {
+    const expected = currentBySource.get(`${row.sourceRunId}\u0000${row.sourceTrackId}`)
+    if (expected && exposureFingerprint(priorExposureFromRow(row)) !== expected) privacyFail()
+  }
+}
+
 const readWaveBindings = async (tx: Tx, artifactId: string): Promise<ReportingLongitudinalWaveBindingV1[]> => {
   const rows = await tx.$queryRaw<ArtifactWaveRow[]>`
     SELECT aw."wave_id" AS "waveId", aw."ordinal", aw."input_identity_hash" AS "inputIdentityHash",
@@ -206,7 +351,9 @@ export const createOrReuseReportingArtifact = async (input: {
   snapshotHash: string
   generatedByUserId: string
   generatedAt: Date
+  privacyExposure?: ReportingPrivacyExposureV1
 }): Promise<ReportingGroupArtifactRecord> => prisma.$transaction(async (tx) => {
+  if (input.privacyExposure) await assertAtomicPrivacyExposures(tx, input.organizationId, [input.privacyExposure])
   const rows = await tx.$queryRaw<ArtifactRow[]>`
     INSERT INTO "reporting_analysis_artifacts"
       ("id","organization_id","analysis_kind","policy_domain","cohort_snapshot_id","spec_id","analysis_identity_hash","artifact_payload","snapshot_hash","generated_by_user_id","generated_at")
@@ -243,8 +390,10 @@ export const createOrReuseLongitudinalReportingArtifact = async (input: {
   waveBindings: ReportingLongitudinalWaveBindingV1[]
   generatedByUserId: string
   generatedAt: Date
+  privacyExposures?: ReportingPrivacyExposureV1[]
 }): Promise<ReportingLongitudinalArtifactRecord> => prisma.$transaction(async (tx) => {
   if (input.waveBindings.length < 2) reportingFail('REPORT_LONGITUDINAL_WAVES_REQUIRED', 'longitudinal artifact requires at least two Waves', 400)
+  if (input.privacyExposures?.length) await assertAtomicPrivacyExposures(tx, input.organizationId, input.privacyExposures)
   const rows = await tx.$queryRaw<ArtifactRow[]>`
     INSERT INTO "reporting_analysis_artifacts"
       ("id","organization_id","analysis_kind","policy_domain","cohort_snapshot_id","series_id","spec_id","analysis_identity_hash","artifact_payload","snapshot_hash","generated_by_user_id","generated_at")
