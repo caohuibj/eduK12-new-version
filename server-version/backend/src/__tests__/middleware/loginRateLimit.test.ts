@@ -65,25 +65,28 @@ describe('login Redis rate limits', () => {
     expect(first.ipKey).not.toBe(second.ipKey)
   })
 
-  it('blocks distributed failures after the account-wide budget', async () => {
-    mockCacheService.getRateLimitState
-      .mockResolvedValueOnce({ count: 0, retryAfterSeconds: 900 })
-      .mockResolvedValueOnce({ count: 50, retryAfterSeconds: 900 })
+  it('does not pre-lock an account from somebody else\'s failure budget', async () => {
+    mockCacheService.getRateLimitState.mockResolvedValue({ count: 500, retryAfterSeconds: 900 })
     const res = makeRes()
     const next = vi.fn()
 
     await loginRateLimit(makeReq(), res, next)
 
-    expect(res.statusCode).toBe(429)
-    expect(res.body.message).toContain('登录尝试次数过多')
-    expect(next).not.toHaveBeenCalled()
+    expect(next).toHaveBeenCalledOnce()
+    expect(mockCacheService.getRateLimitState).not.toHaveBeenCalled()
+    expect(mockCacheService.consumeRateLimit).toHaveBeenCalledWith(
+      expect.stringContaining('auth:login:ip:'),
+      3000,
+      900,
+    )
   })
 
   it('records and clears both account failure dimensions', async () => {
     const req = makeReq()
     const context = getLoginRateLimitContext(req, req.body.username)
 
-    await recordLoginFailure(req)
+    const result = await recordLoginFailure(req)
+    expect(result).toEqual({ accountIpAllowed: true, accountGlobalAllowed: true, retryAfterSeconds: 900 })
     expect(mockCacheService.consumeRateLimit).toHaveBeenCalledTimes(2)
     expect(mockCacheService.consumeRateLimit).toHaveBeenCalledWith(context.failureKey, 10, 900)
     expect(mockCacheService.consumeRateLimit).toHaveBeenCalledWith(context.globalFailureKey, 50, 900)
@@ -93,4 +96,17 @@ describe('login Redis rate limits', () => {
     expect(mockCacheService.del).toHaveBeenCalledWith(context.failureKey)
     expect(mockCacheService.del).toHaveBeenCalledWith(context.globalFailureKey)
   })
+
+  it('reports post-failure throttling without turning it into a pre-auth account lock', async () => {
+    mockCacheService.consumeRateLimit
+      .mockResolvedValueOnce({ allowed: false, remaining: 0, retryAfterSeconds: 300 })
+      .mockResolvedValueOnce({ allowed: true, remaining: 49, retryAfterSeconds: 900 })
+    const result = await recordLoginFailure(makeReq())
+    expect(result).toEqual({
+      accountIpAllowed: false,
+      accountGlobalAllowed: true,
+      retryAfterSeconds: 900,
+    })
+  })
+
 })
