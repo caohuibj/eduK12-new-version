@@ -15,9 +15,13 @@ export class ExportJobFailedError extends Error {
 }
 
 export const createExportRequestKey = (): string => {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  const webCrypto = globalThis.crypto
+  if (typeof webCrypto?.randomUUID === 'function') return webCrypto.randomUUID()
+  if (typeof webCrypto?.getRandomValues !== 'function') {
+    throw new Error('当前浏览器无法生成安全的导出请求标识')
+  }
   const bytes = new Uint8Array(24)
-  crypto.getRandomValues(bytes)
+  webCrypto.getRandomValues(bytes)
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
