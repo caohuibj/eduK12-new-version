@@ -99,12 +99,33 @@ async function main() {
   record('PG14 logical dump restores into a distinct PG16 data directory')
 
   run(process.execPath, [prisma, 'migrate', 'deploy', '--schema', schema], { cwd: backend, env: { ...baseEnv, DATABASE_URL: targetUrl } })
+
+  // Match the supported release sequence exactly. Public-token protection is
+  // an operational data backfill, not a Prisma schema migration, so a restored
+  // populated database must complete it before the read-only release preflight.
+  run('npm', ['run', 'db:backfill:checkin-tokens'], {
+    cwd: backend,
+    env: { ...baseEnv, DATABASE_URL: targetUrl },
+  })
+  record('PG16 restored data completes public-token protection backfill')
+
   const uploadDir = path.join(scratch, 'uploads')
   fs.mkdirSync(uploadDir)
-  run(process.execPath, ['scripts/release-data-preflight.mjs'], {
+  const preflight = spawnSync(process.execPath, ['scripts/release-data-preflight.mjs'], {
     cwd: backend,
     env: { ...baseEnv, DATABASE_URL: targetUrl, UPLOAD_DIR: uploadDir },
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
   })
+  if (preflight.error || preflight.status !== 0) {
+    // release-data-preflight emits only aggregate counts to stdout and
+    // deliberately suppresses sensitive Prisma errors. Preserve those safe
+    // diagnostics in CI/evidence when the gate blocks.
+    const safeOutput = String(preflight.stdout || '').trim()
+    if (safeOutput) console.error(safeOutput)
+    throw new Error(`release data preflight failed: ${String(preflight.stderr || preflight.error || '').slice(-1000)}`)
+  }
+  record('PG16 restored data passes release preflight')
   const after = {
     users: query(target, 'SELECT count(*) FROM users'),
     scales: query(target, 'SELECT count(*) FROM scales'),
@@ -112,7 +133,7 @@ async function main() {
   }
   assert.deepEqual(after, before)
   assert.ok(query(target, 'SHOW server_version').startsWith('16.15'))
-  record('PG16 restored data accepts current migrations and release preflight')
+  record('PG16 restored data accepts current migrations and release sequence')
   record('key populated row counts and finished migration history are preserved')
   manifest.status = 'PASSED'
   manifest.before = before
