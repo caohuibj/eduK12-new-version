@@ -218,15 +218,20 @@ export const generateOrganizationProtectedFeedback = async (input: {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'published reporting spec is not protected feedback', 409)
   }
   const [batch, subject] = await Promise.all([
-    resolveAuthoritativeTrackObservations({ organizationId: input.organizationId, runId: input.runId, trackId: input.trackId }),
+    resolveAuthoritativeTrackObservations({
+      organizationId: input.organizationId,
+      runId: input.runId,
+      trackId: input.trackId,
+      selection: {
+        subjectUserId: input.subjectUserId,
+        relationshipKind: input.relationshipKind,
+        perspective: input.perspective,
+      },
+    }),
     resolveFrozenProtectedSubject(input),
   ])
   const all = [...batch.resolved, ...batch.unresolved]
-  const allowedExecutionIds = new Set(all.filter((row) => (
-    row.subject.userId === input.subjectUserId
-    && row.relationshipKind === input.relationshipKind
-    && row.perspective === input.perspective
-  )).map((row) => row.executionId))
+  const allowedExecutionIds = new Set(all.map((row) => row.executionId))
   if (allowedExecutionIds.size === 0) reportingFail('REPORT_PROTECTED_SOURCE_INVALID', 'protected fixed source contains no matching executions', 409)
 
   await assertProtectedFeedbackManagerAccess({ principal: input.principal, organizationId: input.organizationId, subjectUserId: input.subjectUserId })
