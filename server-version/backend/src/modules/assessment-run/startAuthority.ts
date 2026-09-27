@@ -15,7 +15,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       SELECT a."user_id" FROM "assessment_run_actor_snapshots" a
       JOIN "assessment_run_executions" e ON a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
       WHERE e."id" = ${executionId}
-    ) ORDER BY u."id" FOR UPDATE OF u
+    ) ORDER BY u."id" FOR SHARE OF u
   `
   if (!users.length || users.some((u) => !u.valid)) fail('RUN_ACCOUNT_INACTIVE')
   const envelopes = await tx.$queryRaw<Array<{ organizationId: string; active: boolean; intakeOpen: boolean }>>`
@@ -55,7 +55,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   if (relationship.kind === 'PARENT_CHILD') {
     const rows = await tx.$queryRaw<Array<{ valid: boolean }>>`
       SELECT ("status" = 'ACTIVE' AND "approved_at" IS NOT NULL) AS "valid"
-      FROM "parent_student_relationships" WHERE "id" = ${relationship.ref} FOR UPDATE
+      FROM "parent_student_relationships" WHERE "id" = ${relationship.ref} FOR SHARE
     `
     valid = rows[0]?.valid ?? false
   } else if (relationship.kind === 'COUNSELOR_CLIENT') {
