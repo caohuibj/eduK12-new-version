@@ -5,6 +5,8 @@ import {
   createOrReuseProtectedReportingArtifact,
   type ReportingPrivacyExposureV1,
 } from './artifact'
+import type { ReportingPrincipal } from './authorization'
+import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
 import { reportingEvidenceFor } from './engine'
 import { buildMatchedLongitudinalProjection } from './matched'
 import { buildSeparatedMultiRaterObservations } from './multiRater'
@@ -60,6 +62,7 @@ export const createLongitudinalAnalysisArtifact = async (input: {
   mode?: ReportingMatchedModeV1
   generatedByUserId: string
   generatedAt?: Date
+  principal?: ReportingPrincipal
   privacyExposures?: ReportingPrivacyExposureV1[]
 }): Promise<ReportingLongitudinalArtifactRecord> => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'longitudinal analysis requires a published spec', 409)
@@ -113,6 +116,17 @@ export const createLongitudinalAnalysisArtifact = async (input: {
     options,
     projection,
   }
+  // Evaluate the actual immutable projection, including matched valid-case N,
+  // at this shared automatic/manual boundary, before any artifact publication.
+  await assertFixedPopulationArtifactDisclosure({
+    principal: input.principal ?? { userId: input.generatedByUserId, platformRole: 'STANDARD' },
+    artifact: {
+      organizationId: input.series.organizationId,
+      analysisKind: definition.analysisKind,
+      cohortSnapshotId: null,
+      artifactPayload: payload,
+    },
+  })
   return createOrReuseLongitudinalReportingArtifact({
     organizationId: input.series.organizationId,
     seriesId: input.series.id,
@@ -213,7 +227,7 @@ export const createProtectedFeedbackArtifact = async (input: {
     spec: input.spec.definition,
   })
   const { manifest, resolvedEvidence } = protectedManifest(input)
-  const evidence = reportingEvidenceFor(resolvedEvidence, input.spec.definition.reportEvidenceCeiling)
+  const evidence = reportingEvidenceFor(separated.observations ?? resolvedEvidence, input.spec.definition.reportEvidenceCeiling)
   const source = {
     kind: 'RUN_TRACK_PROTECTED' as const,
     runId: input.runId,
