@@ -44,7 +44,6 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
     runs-on:
       - self-hosted
       - linux
@@ -104,8 +103,19 @@ jobs:
           set -euo pipefail
           OUT="$AB_OUT"
           mkdir -p "$OUT"
-          PERF_GROUP_LIST="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
-          PERF_WARMUP_GROUP_LIST="scaleTypicalWarmup cognitiveNbackStandardWarmup cognitiveCptStandardWarmup sjtLinear30Warmup sjtLinear60Warmup"
+          PERF_GROUP_LIST="${{ inputs.ab_groups }}"
+          PERF_WARMUP_GROUP_LIST=""
+          for group in $PERF_GROUP_LIST; do
+            case "$group" in
+              scaleTypicalSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST scaleTypicalWarmup" ;;
+              cognitiveNbackStandardSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST cognitiveNbackStandardWarmup" ;;
+              cognitiveCptStandardSteady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST cognitiveCptStandardWarmup" ;;
+              sjtLinear30Steady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST sjtLinear30Warmup" ;;
+              sjtLinear60Steady) PERF_WARMUP_GROUP_LIST="$PERF_WARMUP_GROUP_LIST sjtLinear60Warmup" ;;
+              mixedSteady) ;;
+              *) echo "Unsupported A/B group: $group" >&2; exit 2 ;;
+            esac
+          done
 
           reset_and_seed() {
             local round="$1" variant="$2"
@@ -180,6 +190,7 @@ jobs:
 
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux
@@ -271,6 +282,7 @@ jobs:
 
   lost-response:
     name: committed response loss + retry/replay recovery
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux
@@ -353,6 +365,7 @@ jobs:
 
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
+    if: inputs.scope == 'full'
     runs-on:
       - self-hosted
       - linux
