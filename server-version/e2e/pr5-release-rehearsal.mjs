@@ -27,16 +27,43 @@ const sql = (container, query) => docker(['exec', container, 'psql', '-U', 'rest
 const record = name => { manifest.checks.push(name); console.log(`PASS ${name}`); };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function start(container) {
-  docker(['run', '-d', '--name', container, '-e', 'POSTGRES_USER=restore', '-e', `POSTGRES_PASSWORD=${pass}`, '-e', 'POSTGRES_DB=restore', '-p', '127.0.0.1::5432', 'postgres:14-alpine']);
-  for (let i = 0; i < 60; i++) {
-    const r = spawnSync('docker', ['exec', container, 'pg_isready', '-U', 'restore', '-d', 'restore']);
-    if (r.status === 0) {
-      const port = docker(['port', container, '5432/tcp']).split(':').pop();
-      return `postgresql://restore:${pass}@127.0.0.1:${port}/restore`;
+  // RootlessKit can race Docker's automatic host-port selection with another
+  // short-lived CI container. Treat bind collisions as infrastructure noise:
+  // remove the half-created container and let Docker choose a fresh port.
+  const maxPortAttempts = 10;
+  let lastPortError = '';
+  for (let attempt = 1; attempt <= maxPortAttempts; attempt++) {
+    const started = spawnSync('docker', [
+      'run', '-d', '--name', container,
+      '-e', 'POSTGRES_USER=restore',
+      '-e', `POSTGRES_PASSWORD=${pass}`,
+      '-e', 'POSTGRES_DB=restore',
+      '-p', '127.0.0.1::5432',
+      'postgres:14-alpine',
+    ], { encoding: 'utf8' });
+    if (!started.error && started.status === 0) {
+      for (let i = 0; i < 60; i++) {
+        const r = spawnSync('docker', ['exec', container, 'pg_isready', '-U', 'restore', '-d', 'restore']);
+        if (r.status === 0) {
+          const port = docker(['port', container, '5432/tcp']).split(':').pop();
+          assert.ok(port && /^\\d+$/.test(port), 'temporary PostgreSQL host port must be numeric');
+          return `postgresql://restore:${pass}@127.0.0.1:${port}/restore`;
+        }
+        await sleep(500);
+      }
+      spawnSync('docker', ['rm', '--force', '--volumes', container], { stdio: 'ignore' });
+      throw new Error('temporary PostgreSQL did not become ready');
     }
-    await sleep(500);
+
+    const detail = String(started.stderr || started.stdout || started.error || '');
+    spawnSync('docker', ['rm', '--force', '--volumes', container], { stdio: 'ignore' });
+    if (!/address already in use|bind:.*in use/i.test(detail)) {
+      throw new Error(`docker failed: ${detail.slice(-2000)}`);
+    }
+    lastPortError = detail;
+    await sleep(250 * attempt);
   }
-  throw new Error('temporary PostgreSQL did not become ready');
+  throw new Error(`temporary PostgreSQL host-port allocation failed after ${maxPortAttempts} attempts: ${lastPortError.slice(-1000)}`);
 }
 const tables = ['users', 'organization_memberships', 'organization_governance_audits', 'assessment_run_executions', 'assessment_run_actor_snapshots',
   'assessment_run_execution_start_claims', 'assessment_unit_snapshots', 'reporting_cohort_snapshots', 'reporting_analysis_artifacts', 'assessment_attempt_consents'];
