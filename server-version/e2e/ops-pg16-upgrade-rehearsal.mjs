@@ -14,6 +14,7 @@ const suffix = crypto.randomBytes(5).toString('hex')
 const source = `huisurvey-pg14-source-${suffix}`
 const target = `huisurvey-pg16-target-${suffix}`
 const password = crypto.randomBytes(24).toString('hex')
+const evidenceDir = process.env.OPS_PG16_EVIDENCE || '/tmp/huisurvey-pg16-upgrade-evidence'
 const manifest = { status: 'RUNNING', checks: [] }
 
 const run = (command, args, opts = {}) => {
@@ -50,7 +51,6 @@ async function start(container, image) {
       throw new Error(`${image} did not become ready`)
     }
     last = String(started.stderr || started.stdout || started.error || '')
-    docker(['rm', '--force', '--volumes', container]).catch?.(() => undefined)
     spawnSync('docker', ['rm', '--force', '--volumes', container], { stdio: 'ignore' })
     if (!/address already in use|bind:.*in use/i.test(last)) throw new Error(`docker failed: ${last.slice(-2000)}`)
     await sleep(250 * attempt)
@@ -125,7 +125,8 @@ main().catch((error) => {
   console.error(error)
   process.exitCode = 1
 }).finally(() => {
-  fs.writeFileSync(path.join(scratch, 'manifest.json'), JSON.stringify(manifest, null, 2))
+  fs.mkdirSync(evidenceDir, { recursive: true })
+  fs.writeFileSync(path.join(evidenceDir, 'manifest.json'), JSON.stringify(manifest, null, 2))
   for (const container of [source, target]) {
     spawnSync('docker', ['rm', '--force', '--volumes', container], { stdio: 'ignore' })
   }
