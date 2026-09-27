@@ -98,7 +98,7 @@ jobs:
 
       - name: Run PR2 deterministic contracts and PostgreSQL export fault injection
         run: |
-          npm test --             src/__tests__/config/runtime-resources.test.ts             src/__tests__/workers/worker-shutdown.test.ts             src/__tests__/workers/worker-subprocess-registry.test.ts             src/__tests__/services/export-preview-bounds.test.ts             src/__tests__/services/export-file-writer.test.ts             src/__tests__/integration/exportBatchRecovery.postgres.integration.test.ts             --no-file-parallelism
+          npm test --             src/__tests__/config/runtime-resources.test.ts             src/__tests__/workers/worker-shutdown.test.ts             src/__tests__/workers/worker-subprocess-registry.test.ts             src/__tests__/services/videoProcessingState.test.ts             src/__tests__/services/export-preview-bounds.test.ts             src/__tests__/services/export-file-writer.test.ts             src/__tests__/integration/exportBatchRecovery.postgres.integration.test.ts             --no-file-parallelism
 
       - name: Build backend under Node 24
         run: npm run build
