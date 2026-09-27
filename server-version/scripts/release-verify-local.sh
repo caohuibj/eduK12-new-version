@@ -161,10 +161,10 @@ docker run -d --name "$PG_NAME" \
   -e POSTGRES_PASSWORD="$TEST_DB_PASSWORD" \
   -e POSTGRES_DB="$TEST_DB_NAME" \
   -v "$PG_VOLUME:/var/lib/postgresql/data" \
-  -p 127.0.0.1::5432 postgres:14-alpine >"$REPORT_DIR/postgres-container-id.txt"
+  -p 127.0.0.1::5432 postgres:16.15-bookworm >"$REPORT_DIR/postgres-container-id.txt"
 docker run -d --name "$REDIS_NAME" \
   -v "$REDIS_VOLUME:/data" \
-  -p 127.0.0.1::6379 redis:7-alpine >"$REPORT_DIR/redis-container-id.txt"
+  -p 127.0.0.1::6379 redis:7.4.11-bookworm >"$REPORT_DIR/redis-container-id.txt"
 
 wait_for_service() {
   local name="$1"
