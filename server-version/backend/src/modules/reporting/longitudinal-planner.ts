@@ -9,6 +9,7 @@ import { buildReportingWaveInputManifest, createReportingSeries, bindReportingSe
 import { getPublishedReportingSpec } from './spec'
 import { generateOrganizationLongitudinalAnalysis } from './pr4Service'
 import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
+import type { ReportingPrivacyExposureV1 } from './artifact'
 import { reportingFail, type ReportingCohortSelectorInputV2, type ReportingResourceFamily, type ReportingCohortSnapshotRecord } from './types'
 
 export async function generateAutomaticLongitudinal(input: {
@@ -56,9 +57,10 @@ export async function generateAutomaticLongitudinal(input: {
     const batch = await resolveAuthoritativeRunResults(cohort)
     prepared.push({ source, cohort, batch, manifest: buildReportingWaveInputManifest(batch) })
   }
+  let privacyExposures: ReportingPrivacyExposureV1[] | undefined
   if (selector.clauses.length > 0) {
     const definition = spec.definition
-    await assertReportingSubgroupsPrivacy({
+    const privacy = await assertReportingSubgroupsPrivacy({
       principal: input.principal,
       organizationId: input.organizationId,
       specId: spec.id,
@@ -72,6 +74,17 @@ export async function generateAutomaticLongitudinal(input: {
         ),
       })),
     })
+    if (!privacy.organizationManager) {
+      privacyExposures = prepared.map((item) => ({
+        sourceRunId: item.cohort.sourceRunId,
+        sourceTrackId: item.cohort.sourceTrackId,
+        analysisKind: input.analysisKind,
+        specHash: spec.specHash,
+        eligibleSubjectUserIds: item.cohort.members.map((member) => member.userId),
+        resolvedSubjectUserIds: item.batch.resolved.map((row) => row.subjectUserId),
+        unresolvedSubjectUserIds: item.batch.unresolved.map((row) => row.subjectUserId),
+      }))
+    }
   }
   // Include actual frozen inputs: newly completed results produce a new series,
   // rather than conflicting with or silently reusing an earlier partial Wave.
@@ -92,5 +105,5 @@ export async function generateAutomaticLongitudinal(input: {
       cohortSnapshotId: p.cohort.id, createdByUserId: input.principal.userId, preparedBatch: p.batch })
     waveKeys.push(waveKey)
   }
-  return generateOrganizationLongitudinalAnalysis({ ...input, seriesId: series.id, waveKeys })
+  return generateOrganizationLongitudinalAnalysis({ ...input, seriesId: series.id, waveKeys, privacyExposures })
 }
