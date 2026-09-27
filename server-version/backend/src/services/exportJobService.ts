@@ -266,11 +266,20 @@ export const publishExportBatch = async (params: {
   fieldCount: number
   storageKeys: Array<{ artifactId: string; storageKey: string }>
 }): Promise<boolean> => prisma.$transaction(async (tx) => {
-  const batch = await tx.exportBatch.findFirst({
+  // Fence the generation first. The row lock is retained until the artifact
+  // metadata updates commit, so a stale worker cannot publish any READY row.
+  const fenced = await tx.exportBatch.updateMany({
     where: { id: params.batchId, status: ExportArtifactStatus.PROCESSING, generation: params.generation },
-    select: { id: true },
+    data: {
+      status: ExportArtifactStatus.READY,
+      fieldCount: params.fieldCount,
+      processingJobId: null,
+      processingStartedAt: null,
+      errorCode: null,
+    },
   })
-  if (!batch) return false
+  if (fenced.count !== 1) return false
+
   const artifacts = await tx.exportArtifact.findMany({
     where: { batchId: params.batchId, status: ExportArtifactStatus.PROCESSING },
     select: { id: true },
@@ -284,17 +293,7 @@ export const publishExportBatch = async (params: {
       data: { storageKey: entry.storageKey, status: ExportArtifactStatus.READY, errorCode: null },
     })
   }
-  const updated = await tx.exportBatch.updateMany({
-    where: { id: params.batchId, status: ExportArtifactStatus.PROCESSING, generation: params.generation },
-    data: {
-      status: ExportArtifactStatus.READY,
-      fieldCount: params.fieldCount,
-      processingJobId: null,
-      processingStartedAt: null,
-      errorCode: null,
-    },
-  })
-  return updated.count === 1
+  return true
 })
 
 export const failExportBatchFinal = async (batchId: string, generation: number, errorCode = 'EXPORT_FAILED'): Promise<boolean> =>
