@@ -44,7 +44,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.scope.outputs.relevant == 'true'
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - run: npm ci --ignore-scripts
         if: steps.scope.outputs.relevant == 'true'
         working-directory: server-version/backend
