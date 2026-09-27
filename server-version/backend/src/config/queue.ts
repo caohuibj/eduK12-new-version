@@ -30,7 +30,8 @@ export const videoQueue = new Queue('video processing', {
     },
     removeOnComplete: 100,
     removeOnFail: 50,
-    timeout: RESOURCE_LIMITS.videoTimeout * 1000,
+    // FFmpeg timeout/cancellation is enforced inside the tracked processor so
+    // capacity is not released while an OS subprocess is still running.
   },
 })
 
@@ -90,9 +91,28 @@ exportQueue.on('failed', (job, err) => {
   logger.error(`❌ 测评导出失败: ${job.id}`, { error: err.message, batchId: job.data?.batchId })
 })
 
-// 优雅关闭
-export const closeQueues = async () => {
-  await Promise.all([videoQueue.close(), imageQueue.close(), exportQueue.close()])
+// Worker shutdown: stop claiming new local jobs without waiting forever for
+// active handlers. The worker main loop performs a bounded drain/cancel pass.
+export const pauseQueueConsumers = async (): Promise<void> => {
+  await Promise.all([
+    videoQueue.pause(true, true),
+    imageQueue.pause(true, true),
+    exportQueue.pause(true, true),
+  ])
+}
+
+export const activeQueueJobCounts = async () => ({
+  video: await videoQueue.getActiveCount(),
+  image: await imageQueue.getActiveCount(),
+  export: await exportQueue.getActiveCount(),
+})
+
+export const closeQueues = async (doNotWaitJobs = false) => {
+  await Promise.all([
+    videoQueue.close(doNotWaitJobs),
+    imageQueue.close(doNotWaitJobs),
+    exportQueue.close(doNotWaitJobs),
+  ])
   logger.info('队列已关闭')
 }
 
