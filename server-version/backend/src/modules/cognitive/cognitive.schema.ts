@@ -124,7 +124,12 @@ export const cognitivePublicTokenSchema = z.object({
 
 export const cognitivePublicStartSchema = z.object({
   recoveryToken: z.string().min(20).max(200).optional(),
-}).strict()
+  // 32 random bytes encoded as unpadded base64url. It is a retry secret, not
+  // a participant identifier and never becomes a URL/query parameter.
+  startIntent: z.string().regex(/^[A-Za-z0-9_-]{43}$/).optional(),
+}).strict().refine((value) => !(value.recoveryToken && value.startIntent), {
+  message: 'recoveryToken and startIntent are mutually exclusive',
+})
 
 export const cognitivePublicTrialSchema = z.object({
   recoveryToken: z.string().min(20).max(200),
