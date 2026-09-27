@@ -480,6 +480,7 @@ model Video {
   // The queue job identity and start time make PROCESSING recoverable after a
   // worker crash or a stalled Bull job.
   processingJobId     String?      @map("processing_job_id")
+  processingGeneration Int         @default(0) @map("processing_generation")
   processingStartedAt DateTime?    @map("processing_started_at")
   originalUrl         String?      @map("original_url")
   originalCosUrl      String?      @map("original_cos_url") // 原始文件COS URL（低频存储）
