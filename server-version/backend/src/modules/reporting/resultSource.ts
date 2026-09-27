@@ -157,10 +157,59 @@ const queryTrackRows = async (tx: Tx, input: { organizationId: string; runId: st
   ORDER BY e."id"
 `
 
-const resolveTrackInTransaction = async (
+type TrackSelection =
+  | { kind: 'EXECUTION_IDS'; executionIds: ReadonlySet<string> }
+  | {
+      kind: 'PROTECTED_SOURCE'
+      subjectUserId: string
+      relationshipKind: string
+      perspective: ReportingObservationPerspectiveV1
+    }
+
+type AttemptRow = {
+  id: string
+  status: string
+  userId: string
+  subjectUserId: string | null
+  respondentUserId: string | null
+  assignmentRef: string | null
+  attemptEpoch: number
+}
+
+type SnapshotRow = {
+  compositeAttemptId: string | null
+  attemptEpoch: number
+  slotKey: string
+  canonicalResultEncrypted: string | null
+}
+
+type PreparedTrack = {
+  organizationId: string
+  runId: string
+  trackId: string
+  resourceFamily: ReportingResourceFamily
+  resourceKey: string
+  resourceVersion: string
+  resourceMinimumN: number | null
+  totalObservationCount: number
+  unresolved: ReportingUnresolvedObservationV1[]
+  completed: Array<{ row: ExecutionRow; attempt: AttemptRow }>
+  snapshots: SnapshotRow[]
+}
+
+const selectedBy = (row: ExecutionRow, selection?: TrackSelection): boolean => {
+  if (!selection) return true
+  if (selection.kind === 'EXECUTION_IDS') return selection.executionIds.has(row.executionId)
+  return row.subjectUserId === selection.subjectUserId
+    && row.relationshipKind === selection.relationshipKind
+    && asPerspective(row.perspective) === selection.perspective
+}
+
+const prepareTrackInTransaction = async (
   tx: Tx,
   input: { organizationId: string; runId: string; trackId: string },
-): Promise<ReportingObservationBatchV1> => {
+  selection?: TrackSelection,
+): Promise<PreparedTrack> => {
   const executions = await queryTrackRows(tx, input)
   const first = executions[0]
   if (!first) reportingFail('REPORT_COHORT_EMPTY', 'reporting Track has no executions', 409)
@@ -173,11 +222,20 @@ const resolveTrackInTransaction = async (
   if (executions.some((row) => row.policyDomain !== 'ORGANIZATION_RUN')) {
     reportingFail('REPORT_RESULT_INTEGRITY', 'Organization Run observation has invalid assignment policy provenance', 500)
   }
+  // Keep lightweight structural checks Track-wide even when canonical payload
+  // materialization is pushed down to a selected cohort/protected source.
+  for (const row of executions) {
+    actorFromRow(row, 'subject')
+    actorFromRow(row, 'respondent')
+    asPerspective(row.perspective)
+  }
+
   const resourceMinimumN = positiveMinimum(first.frozenResourcePolicy?.minimumRespondents)
   const trackMinimumN = positiveMinimum(first.requestedPolicy?.minimumRespondents)
   const effectiveMinimumN = Math.max(resourceMinimumN ?? 0, trackMinimumN ?? 0) || null
 
-  const unresolved: ReportingUnresolvedObservationV1[] = executions
+  const selectedRows = executions.filter((row) => selectedBy(row, selection))
+  const unresolved: ReportingUnresolvedObservationV1[] = selectedRows
     .filter((row) => row.executionStatus !== 'COMPLETED')
     .map((row) => ({
       executionId: row.executionId,
@@ -211,7 +269,7 @@ const resolveTrackInTransaction = async (
       assignmentRef: true,
       attemptEpoch: true,
     },
-  })
+  }) as AttemptRow[]
   const attemptById = new Map(attempts.map((attempt) => [attempt.id, attempt]))
   for (const row of completed) {
     const attempt = attemptById.get(row.runtimeBindingRef!)
@@ -225,23 +283,48 @@ const resolveTrackInTransaction = async (
     ) reportingFail('REPORT_RESULT_INTEGRITY', 'runtime result identity does not match Run execution', 500)
   }
 
-  const snapshots = attemptIds.length === 0 ? [] : await tx.assessmentUnitSnapshot.findMany({
-    where: { compositeAttemptId: { in: attemptIds }, terminalState: 'COMPLETED', payloadKind: 'UNIT_RESULT' },
+  const selectedCompleted = completed.filter((row) => selectedBy(row, selection))
+  const selectedAttemptIds = selectedCompleted.map((row) => row.runtimeBindingRef!)
+  const snapshots = selectedAttemptIds.length === 0 ? [] : await tx.assessmentUnitSnapshot.findMany({
+    where: {
+      compositeAttemptId: { in: selectedAttemptIds },
+      terminalState: 'COMPLETED',
+      payloadKind: 'UNIT_RESULT',
+    },
     orderBy: [{ compositeAttemptId: 'asc' }, { slotKey: 'asc' }],
     select: { compositeAttemptId: true, attemptEpoch: true, slotKey: true, canonicalResultEncrypted: true },
-  })
-  const snapshotsByAttempt = new Map<string, typeof snapshots>()
-  for (const snapshot of snapshots) {
+  }) as SnapshotRow[]
+
+  return {
+    organizationId: input.organizationId,
+    runId: input.runId,
+    trackId: input.trackId,
+    resourceFamily: first.resourceFamily as ReportingResourceFamily,
+    resourceKey: first.resourceKey,
+    resourceVersion: first.resourceVersion,
+    resourceMinimumN: effectiveMinimumN,
+    totalObservationCount: executions.length,
+    unresolved,
+    completed: selectedCompleted.map((row) => ({
+      row,
+      attempt: attemptById.get(row.runtimeBindingRef!)!,
+    })),
+    snapshots,
+  }
+}
+
+const materializePreparedTrack = (prepared: PreparedTrack): ReportingObservationBatchV1 => {
+  const snapshotsByAttempt = new Map<string, SnapshotRow[]>()
+  for (const snapshot of prepared.snapshots) {
     if (!snapshot.compositeAttemptId) continue
     const group = snapshotsByAttempt.get(snapshot.compositeAttemptId) ?? []
     group.push(snapshot)
     snapshotsByAttempt.set(snapshot.compositeAttemptId, group)
   }
 
-  const resolved: ReportingResolvedObservationV1[] = completed.map((row) => {
-    const attempt = attemptById.get(row.runtimeBindingRef!)
-    if (!attempt) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'authoritative runtime result disappeared during reporting read', 500)
-    const unitRows = (snapshotsByAttempt.get(attempt.id) ?? []).filter((snapshot) => snapshot.attemptEpoch === attempt.attemptEpoch)
+  const resolved: ReportingResolvedObservationV1[] = prepared.completed.map(({ row, attempt }) => {
+    const unitRows = (snapshotsByAttempt.get(attempt.id) ?? [])
+      .filter((snapshot) => snapshot.attemptEpoch === attempt.attemptEpoch)
     if (unitRows.length === 0) reportingFail('REPORT_RESULT_INTEGRITY', 'completed runtime has no canonical UNIT_RESULT snapshots', 500)
     const seen = new Set<string>()
     const metrics: ReportingResolvedMetricV1[] = []
@@ -269,7 +352,12 @@ const resolveTrackInTransaction = async (
       relationshipRef: row.relationshipRef,
       perspective: asPerspective(row.perspective),
       policyDomain: 'ORGANIZATION_RUN',
-      canonicalResultHash: canonicalHash({ schema: 'ReportingCompositeCanonicalProjectionV1', executionId: row.executionId, attemptId: attempt.id, unitResults: hashes }),
+      canonicalResultHash: canonicalHash({
+        schema: 'ReportingCompositeCanonicalProjectionV1',
+        executionId: row.executionId,
+        attemptId: attempt.id,
+        unitResults: hashes,
+      }),
       metrics,
       scientificMaturity: row.scientificMaturity,
       provenanceState: row.scientificMaturity && row.scientificProvenanceHash ? 'FROZEN' : 'LEGACY_UNFROZEN',
@@ -278,58 +366,88 @@ const resolveTrackInTransaction = async (
   })
 
   return {
-    organizationId: input.organizationId,
-    runId: input.runId,
-    trackId: input.trackId,
-    resourceFamily: first.resourceFamily as ReportingResourceFamily,
-    resourceKey: first.resourceKey,
-    resourceVersion: first.resourceVersion,
-    resourceMinimumN: effectiveMinimumN,
+    organizationId: prepared.organizationId,
+    runId: prepared.runId,
+    trackId: prepared.trackId,
+    resourceFamily: prepared.resourceFamily,
+    resourceKey: prepared.resourceKey,
+    resourceVersion: prepared.resourceVersion,
+    resourceMinimumN: prepared.resourceMinimumN,
     resolved,
-    unresolved,
+    unresolved: prepared.unresolved,
   }
 }
 
-export const resolveAuthoritativeTrackObservations = (input: {
+export const resolveAuthoritativeTrackObservations = async (input: {
   organizationId: string
   runId: string
   trackId: string
-}): Promise<ReportingObservationBatchV1> => (
-  prisma.$transaction((tx) => resolveTrackInTransaction(tx, input), { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
-)
+  selection?: {
+    subjectUserId: string
+    relationshipKind: string
+    perspective: ReportingObservationPerspectiveV1
+  }
+}): Promise<ReportingObservationBatchV1> => {
+  const prepared = await prisma.$transaction(
+    (tx) => prepareTrackInTransaction(tx, input, input.selection
+      ? { kind: 'PROTECTED_SOURCE', ...input.selection }
+      : undefined),
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+  )
+  return materializePreparedTrack(prepared)
+}
 
-export const resolveAuthoritativeRunResults = (cohort: ReportingCohortSnapshotRecord): Promise<ReportingResultBatchV1> => (
-  prisma.$transaction(async (tx) => {
-    const batch = await resolveTrackInTransaction(tx, {
+export const resolveAuthoritativeRunResults = async (
+  cohort: ReportingCohortSnapshotRecord,
+): Promise<ReportingResultBatchV1> => {
+  const selectedExecutionIds = new Set(cohort.members.map((member) => member.executionId))
+  const prepared = await prisma.$transaction(
+    (tx) => prepareTrackInTransaction(tx, {
       organizationId: cohort.organizationId,
       runId: cohort.sourceRunId,
       trackId: cohort.sourceTrackId,
-    })
-    if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && batch.resolved.length + batch.unresolved.length !== cohort.members.length) {
-      reportingFail('REPORT_RESULT_INTEGRITY', 'Run execution population no longer matches frozen cohort', 500)
-    }
-    const memberByExecution = new Map(cohort.members.map((member) => [member.executionId, member]))
-    const selectedResolved = batch.resolved.filter(o => memberByExecution.has(o.executionId))
-    const selectedUnresolved = batch.unresolved.filter(o => memberByExecution.has(o.executionId))
-    const executionIds = [...selectedResolved, ...selectedUnresolved].map(o => o.executionId)
-    if (memberByExecution.size !== cohort.members.length || executionIds.length !== cohort.members.length || new Set(executionIds).size !== cohort.members.length) {
-      reportingFail('REPORT_RESULT_INTEGRITY', 'frozen cohort executions must resolve exactly once', 500)
-    }
-    const assertSelf = (observation: ReportingResolvedObservationV1 | ReportingUnresolvedObservationV1) => {
-      const member = memberByExecution.get(observation.executionId)
-      if (
-        !member
-        || observation.relationshipKind !== 'SELF'
-        || observation.perspective !== 'SELF_REPORT'
-        || observation.subject.userId !== observation.respondent.userId
-        || observation.subject.userId !== member.userId
-        || observation.subject.membershipId !== member.membershipId
-        || observation.respondent.membershipId !== member.membershipId
-      ) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group result source accepts frozen SELF observations only', 409)
-    }
-    selectedResolved.forEach(assertSelf)
-    selectedUnresolved.forEach(assertSelf)
-    const resolved: ReportingResolvedExecutionV1[] = selectedResolved.map((observation) => ({
+    }, { kind: 'EXECUTION_IDS', executionIds: selectedExecutionIds }),
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+  )
+  if (cohort.selector.kind === 'RUN_TRACK_SUBJECTS' && prepared.totalObservationCount !== cohort.members.length) {
+    reportingFail('REPORT_RESULT_INTEGRITY', 'Run execution population no longer matches frozen cohort', 500)
+  }
+
+  // Decrypt/parse/hash happens after the repeatable-read transaction releases
+  // its connection. The encrypted canonical payload is immutable and all
+  // identity/epoch bindings needed to validate it were frozen in the prepared read.
+  const batch = materializePreparedTrack(prepared)
+  const memberByExecution = new Map(cohort.members.map((member) => [member.executionId, member]))
+  const executionIds = [...batch.resolved, ...batch.unresolved].map((observation) => observation.executionId)
+  if (
+    memberByExecution.size !== cohort.members.length
+    || executionIds.length !== cohort.members.length
+    || new Set(executionIds).size !== cohort.members.length
+  ) {
+    reportingFail('REPORT_RESULT_INTEGRITY', 'frozen cohort executions must resolve exactly once', 500)
+  }
+
+  const assertSelf = (observation: ReportingResolvedObservationV1 | ReportingUnresolvedObservationV1) => {
+    const member = memberByExecution.get(observation.executionId)
+    if (
+      !member
+      || observation.relationshipKind !== 'SELF'
+      || observation.perspective !== 'SELF_REPORT'
+      || observation.subject.userId !== observation.respondent.userId
+      || observation.subject.userId !== member.userId
+      || observation.subject.membershipId !== member.membershipId
+      || observation.respondent.membershipId !== member.membershipId
+    ) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group result source accepts frozen SELF observations only', 409)
+  }
+  batch.resolved.forEach(assertSelf)
+  batch.unresolved.forEach(assertSelf)
+
+  return {
+    resourceFamily: batch.resourceFamily,
+    resourceKey: batch.resourceKey,
+    resourceVersion: batch.resourceVersion,
+    resourceMinimumN: batch.resourceMinimumN,
+    resolved: batch.resolved.map((observation) => ({
       executionId: observation.executionId,
       subjectUserId: observation.subject.userId,
       membershipId: observation.subject.membershipId!,
@@ -339,20 +457,12 @@ export const resolveAuthoritativeRunResults = (cohort: ReportingCohortSnapshotRe
       scientificMaturity: observation.scientificMaturity,
       provenanceState: observation.provenanceState,
       scientificProvenanceHash: observation.scientificProvenanceHash,
-    }))
-    const unresolved: ReportingUnresolvedExecutionV1[] = selectedUnresolved.map((observation) => ({
+    })),
+    unresolved: batch.unresolved.map((observation) => ({
       executionId: observation.executionId,
       subjectUserId: observation.subject.userId,
       membershipId: observation.subject.membershipId!,
       reason: observation.reason,
-    }))
-    return {
-      resourceFamily: batch.resourceFamily,
-      resourceKey: batch.resourceKey,
-      resourceVersion: batch.resourceVersion,
-      resourceMinimumN: batch.resourceMinimumN,
-      resolved,
-      unresolved,
-    }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
-)
+    })),
+  }
+}
