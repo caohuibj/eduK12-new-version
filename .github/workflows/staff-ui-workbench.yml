@@ -1,0 +1,47 @@
+name: Staff UI review workspace (temporary)
+
+on:
+  push:
+    branches: [feat/staff-experience-upgrade]
+    paths: [.github/workflows/staff-ui-workbench.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staff-ui-review-workspace
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: [self-hosted, linux, eduk12-win-ci]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: Assemble tracked source and frontend-only test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/staff-ui-review-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir -p "$work/tools" "$work/output"
+          git archive --format=tar HEAD > "$work/output/source.tar"
+          git rev-parse HEAD > "$work/output/source.sha"
+          cp "$(command -v node)" "$work/tools/node"
+          npm ci --prefix server-version/frontend
+          pw=$(node -p "require('./server-version/backend/package-lock.json').packages['node_modules/playwright-core'].version")
+          npm install --prefix "$work/tools" --ignore-scripts --no-audit --no-fund "playwright-core@$pw"
+          tar -czf "$work/output/frontend-deps.tar.gz" -C server-version/frontend node_modules
+          tar -czf "$work/output/review-tools.tar.gz" -C "$work" tools
+          sha256sum "$work/output/"*.tar* > "$work/output/SHA256SUMS"
+          echo "STAFF_UI_REVIEW_OUTPUT=$work/output" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: staff-ui-review-workspace
+          path: ${{ env.STAFF_UI_REVIEW_OUTPUT }}
+          retention-days: 1
+          if-no-files-found: error
