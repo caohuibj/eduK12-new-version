@@ -3,11 +3,11 @@
 # ============================================================
 # eduK12 / PTool Frontend — Docker Baseline (Milestone C / 2A)
 # 唯一 Host HTTP ingress（Nginx）
-#   build   : Node 20 编译 Vite SPA
-#   runtime : nginx:alpine 提供静态资源 + 反向代理
+#   build   : Node 24 LTS 编译 Vite SPA
+#   runtime : pinned Nginx 提供静态资源 + 反向代理
 # ============================================================
 
-FROM node:20-bookworm-slim AS build
+FROM node:24.21.0-bookworm-slim AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -17,7 +17,7 @@ ARG VITE_COGNITIVE_MODULE_ENABLED
 ENV VITE_COGNITIVE_MODULE_ENABLED=${VITE_COGNITIVE_MODULE_ENABLED:-true}
 RUN npm run build
 
-FROM nginx:alpine AS runtime
+FROM nginx:1.31.6-alpine3.24-slim AS runtime
 # Apply the latest Alpine security updates to the runtime image before it is
 # scanned and before the static assets are copied in.
 RUN apk upgrade --no-cache \
