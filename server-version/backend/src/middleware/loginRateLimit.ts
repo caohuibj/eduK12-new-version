@@ -78,8 +78,23 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
     return
   }
 
-  // Failure budgets are evaluated only after a failed credential check. A
-  // correct password is never account-locked by somebody else's failures.
+  // A single source may not brute-force one account indefinitely. This scope
+  // cannot globally lock the account because another IP has an independent key.
+  const accountIpFailures = await cacheService.getRateLimitState(context.failureKey)
+  if (!accountIpFailures) {
+    res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
+    return
+  }
+  if (accountIpFailures.count >= ACCOUNT_FAILURE_LIMIT) {
+    res.setHeader('Retry-After', String(accountIpFailures.retryAfterSeconds))
+    res.status(429).json({ code: -1, message: '用户名或密码错误' })
+    return
+  }
+
+  // The account-global counter is deliberately not a hard pre-auth lock: an
+  // attacker must not be able to deny the legitimate user's correct password
+  // merely by distributing failures across IPs. Distributed verification work
+  // remains bounded by loginPasswordVerificationAdmission.
   ;(req as Request & { loginRateLimitContext?: LoginRateLimitContext }).loginRateLimitContext = context
   next()
 }
