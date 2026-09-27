@@ -17,6 +17,8 @@ interface ExportOptions {
     end?: string
   }
   includeLabels?: boolean       // 是否包含变量标签
+  // Internal bounded-preview knob. File exports intentionally omit this.
+  recordLimit?: number
 }
 
 export interface ExportField {
@@ -154,7 +156,8 @@ export async function getScaleExportData(
     anonymize = true,
     includeProgress = false,
     minProgress = 100,
-    dateRange
+    dateRange,
+    recordLimit,
   } = options
 
   const fieldNameContext = createFieldNameContext()
@@ -208,7 +211,8 @@ export async function getScaleExportData(
         }
       }
     },
-    orderBy: { completedAt: 'asc' }
+    orderBy: { completedAt: 'asc' },
+    ...(recordLimit ? { take: recordLimit } : {}),
   })
 
   // 构建字段定义
@@ -547,6 +551,7 @@ async function getQuestionnaireExportDataV2(
     includeProgress = false,
     minProgress = 100,
     dateRange,
+    recordLimit,
   } = options
 
   const fieldNameContext = createFieldNameContext()
@@ -587,6 +592,7 @@ async function getQuestionnaireExportDataV2(
       },
     },
     orderBy: { completedAt: 'asc' },
+    ...(recordLimit ? { take: recordLimit } : {}),
   })
 
   const fields: ExportField[] = [
