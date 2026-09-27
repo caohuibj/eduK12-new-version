@@ -8,7 +8,7 @@ import {
   getQuestionnaireExportData,
   writeExportDataFile,
 } from '../services/exportService'
-import { assertExportLimits } from '../services/exportStorage'
+import { assertExportLimits, EXPORT_MAX_BYTES } from '../services/exportStorage'
 import {
   claimExportBatch,
   failExportBatchFinal,
@@ -72,7 +72,7 @@ exportQueue.process(
         const finalPath = validateStorageKey(storageKey)
         const tempPath = `${finalPath}.tmp-${String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')}`
         temporaryPaths.push(tempPath)
-        await writeExportDataFile(tempPath, data, artifact.format as 'csv' | 'sav' | 'sps')
+        await writeExportDataFile(tempPath, data, artifact.format as 'csv' | 'sav' | 'sps', EXPORT_MAX_BYTES)
         const stat = await fs.stat(tempPath)
         assertExportLimits({ bytes: stat.size })
         await fs.rename(tempPath, finalPath)
