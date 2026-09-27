@@ -227,7 +227,7 @@ export const createProtectedFeedbackArtifact = async (input: {
     spec: input.spec.definition,
   })
   const { manifest, resolvedEvidence } = protectedManifest(input)
-  const evidence = reportingEvidenceFor(separated.observations ?? resolvedEvidence, input.spec.definition.reportEvidenceCeiling)
+  const evidence = reportingEvidenceFor(resolvedEvidence, input.spec.definition.reportEvidenceCeiling)
   const source = {
     kind: 'RUN_TRACK_PROTECTED' as const,
     runId: input.runId,
