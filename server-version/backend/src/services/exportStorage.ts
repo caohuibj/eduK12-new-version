@@ -159,7 +159,17 @@ export const cleanupExpiredExportArtifacts = async (
     take: 100,
   })
   if (expiredBatches.length > 0) {
-    await db.exportBatch.deleteMany({ where: { id: { in: expiredBatches.map((batch) => batch.id) } } })
+    const candidateIds = expiredBatches.map((batch) => batch.id)
+    const remainingArtifacts = await db.exportArtifact.findMany({
+      where: { batchId: { in: candidateIds } },
+      select: { batchId: true },
+      distinct: ['batchId'],
+    })
+    const blocked = new Set(remainingArtifacts.map((artifact) => artifact.batchId).filter(Boolean))
+    const deletable = candidateIds.filter((id) => !blocked.has(id))
+    if (deletable.length > 0) {
+      await db.exportBatch.deleteMany({ where: { id: { in: deletable } } })
+    }
   }
 
   // Clean only strictly-named, stale, unreferenced generation/temp files.
