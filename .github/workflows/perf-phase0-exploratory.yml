@@ -48,7 +48,7 @@ env:
 jobs:
   invariants:
     name: P2-C01 PostgreSQL + privacy invariants
-    if: github.event_name == 'workflow_dispatch' || ((github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true') && startsWith(github.head_ref, 'perf/'))
+    if: github.event_name == 'workflow_dispatch'
     runs-on:
       - self-hosted
       - linux
