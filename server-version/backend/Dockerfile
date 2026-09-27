@@ -8,7 +8,7 @@
 # ============================================================
 
 # ---------- Stage 1: deps（完整安装，供 build + prisma generate） ----------
-FROM node:20-bookworm-slim AS deps
+FROM node:24.21.0-bookworm-slim AS deps
 WORKDIR /app
 
 # 可通过 --build-arg npm_config_jobs=1 降低并行，避免 native 编译 OOM（Milestone C §18）
@@ -55,7 +55,7 @@ FROM build AS prod-deps
 RUN npm prune --omit=dev
 
 # ---------- Stage 3: runtime（生产运行，仅 production 依赖） ----------
-FROM node:20-bookworm-slim AS runtime
+FROM node:24.21.0-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
