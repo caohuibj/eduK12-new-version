@@ -15,18 +15,38 @@ concurrency:
 jobs:
   source-review:
     if: github.head_ref == 'fix/ops-supported-runtime-bounded-workers' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, linux]
-    timeout-minutes: 5
+    runs-on: [self-hosted, linux, eduk12-win-ci]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
-      - name: Archive tracked source for local engineering verification
-        run: git archive --format=tar.gz -o "$RUNNER_TEMP/ops-review-source.tar.gz" HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: Install and verify supported runtime dependencies
+        run: |
+          npm --prefix server-version/backend ci
+          (cd server-version/backend && npx prisma generate)
+          npm --prefix server-version/frontend ci
+          node -e "require('./server-version/backend/node_modules/canvas').createCanvas(2,2).toBuffer('image/png'); require('./server-version/backend/node_modules/sharp')({create:{width:2,height:2,channels:3,background:'#fff'}}).png().toBuffer().then(()=>console.log('Node24 canvas/sharp native ABI PASS'))"
+      - name: Archive tracked source and isolated test dependencies
+        run: |
+          git archive --format=tar.gz -o "$RUNNER_TEMP/ops-review-source.tar.gz" HEAD
+          tar -czf "$RUNNER_TEMP/ops-review-dependencies.tar.gz" server-version/backend/node_modules server-version/frontend/node_modules
+          cp "$(command -v node)" "$RUNNER_TEMP/ops-review-node"
       - uses: actions/upload-artifact@v4
         with:
           name: ops-review-source-${{ github.event.pull_request.head.sha }}
           path: ${{ runner.temp }}/ops-review-source.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ops-review-dependencies-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/ops-review-dependencies.tar.gz
+            ${{ runner.temp }}/ops-review-node
           retention-days: 1
           if-no-files-found: error
