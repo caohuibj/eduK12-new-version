@@ -134,10 +134,11 @@ test('Phase 0 closure is manual targeted evidence and never competes with PR CI'
   ]), false);
 });
 
-test('automatic exploratory invariant work stays off draft PRs unless full CI is explicitly forced', () => {
+test('Phase 0 exploratory work is manual evidence only', () => {
   const text = source('perf-phase0-exploratory');
-  assert.match(text, /github\.event\.pull_request\.draft == false/);
-  assert.match(text, /vars\.CI_FORCE_FULL == 'true'/);
+  assert.match(text, /workflow_dispatch:/);
+  assert.match(job(text, 'invariants'), /if: github\.event_name == 'workflow_dispatch'/);
+  assert.match(job(text, 'curve'), /if: github\.event_name == 'workflow_dispatch'/);
 });
 
 test('mixed A-B ordering is stable across independent BASE and HEAD fixture seeds', () => {
