@@ -136,6 +136,8 @@ jobs:
           ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
           ASSET_MIGRATION_COMPLETE: 'true'
           CORS_ORIGIN: http://127.0.0.1
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
         run: docker compose config >/tmp/huisurvey-pr2-compose.yml
 
       - name: Upload PR2 ops evidence
