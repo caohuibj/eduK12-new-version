@@ -110,18 +110,19 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       logger.warn('视频处理任务未能取得视频行所有权，跳过过期任务', { videoId, jobId: job.id })
       return { videoId, skipped: true }
     }
+    const generation = processingGeneration
     if (!(await ffmpegAvailability)) {
       throw new Error('FFmpeg 未安装')
     }
     const safeJobId = String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')
-    tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${processingGeneration}`)
+    tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${generation}`)
     if (isUrlMode) {
       const updated = await prisma.video.updateMany({
         where: {
           id: videoId,
           status: 'PROCESSING',
           processingJobId: String(job.id),
-          processingGeneration,
+          generation,
         },
         data: { originalUrl: videoUrl },
       })
@@ -183,7 +184,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
             id: videoId,
             status: 'PROCESSING',
             processingJobId: String(job.id),
-            processingGeneration,
+            generation,
           },
           data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
         })
@@ -284,7 +285,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           id: videoId,
           status: 'PROCESSING',
           processingJobId: String(job.id),
-          processingGeneration,
+          generation,
         },
         data: {
           status: 'COMPLETED',
