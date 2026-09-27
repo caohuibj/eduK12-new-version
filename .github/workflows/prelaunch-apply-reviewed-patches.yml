@@ -1,4 +1,4 @@
-name: Apply reviewed prelaunch change set
+name: Stage reviewed prelaunch change set
 
 on:
   pull_request:
@@ -10,10 +10,10 @@ permissions:
 
 concurrency:
   group: prelaunch-reviewed-patch-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  apply:
+  stage:
     if: github.event.pull_request.draft == true && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/runtime-prelaunch-serialization-reporting'
     runs-on: [self-hosted, linux]
     timeout-minutes: 5
@@ -22,64 +22,72 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 2
-      - name: Apply exact reviewed changes without executing repository code
+          persist-credentials: false
+      - name: Verify text hunks and stage content-addressed blobs without moving any ref
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, pathlib, subprocess
-          run = lambda *args, **kw: subprocess.run(args, check=True, **kw)
+          import base64, hashlib, json, os, pathlib, subprocess, urllib.request
+          manifest = '.prelaunch/reviewed-change-set.json'
+          if subprocess.run(['git','diff','--quiet','HEAD^','HEAD','--',manifest]).returncode == 0:
+              print('No new reviewed change set on this commit')
+              raise SystemExit(0)
           head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
           parent = subprocess.check_output(['git','rev-parse','HEAD^'], text=True).strip()
-          spec = json.loads(pathlib.Path('.prelaunch/reviewed-change-set.json').read_text())
+          spec = json.loads(pathlib.Path(manifest).read_text())
           if spec['parent_sha'] != parent:
               raise SystemExit('Change set parent does not match checkout; refusing stale changes')
           def blob(data):
               return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
           seen = set()
+          entries = []
           for edit in spec['edits']:
               name = edit['path']
               path = pathlib.Path(name)
               if name in seen or not name.startswith(('server-version/', 'docs/', '.github/')) or '..' in path.parts or path.is_symlink():
                   raise SystemExit('Duplicate or unsupported patch path')
               if not path.resolve().is_relative_to(pathlib.Path.cwd().resolve()) or 'prelaunch-apply-reviewed-patches' in name:
-                  raise SystemExit('The write bridge cannot change itself or leave this checkout')
+                  raise SystemExit('The staging job cannot change itself or leave this checkout')
               seen.add(name)
               original = path.read_bytes() if path.exists() else None
               if (blob(original) if original is not None else None) != edit['before_blob']:
                   raise SystemExit('Reviewed input blob mismatch: '+name)
+              mode = subprocess.check_output(['git','ls-files','--stage','--',name],text=True).split(' ',1)[0] if original is not None else '100644'
+              if mode not in ('100644','100755'):
+                  raise SystemExit('Unsupported file mode')
               if edit.get('delete'):
                   if original is None or edit['after_blob'] is not None:
                       raise SystemExit('Invalid deletion')
-                  path.unlink()
-              else:
-                  lines = (original or b'').decode('utf-8').splitlines(keepends=True)
-                  hunks = edit['hunks']
-                  end = 0
-                  for hunk in hunks:
-                      at, remove = hunk['at'], hunk['remove']
-                      if not isinstance(at,int) or not isinstance(remove,int) or at < end or remove < 0 or at+remove > len(lines):
-                          raise SystemExit('Invalid or overlapping reviewed hunk')
-                      if not isinstance(hunk['text'], str):
-                          raise SystemExit('Non-text hunk')
-                      end = at+remove
-                  for hunk in reversed(hunks):
-                      lines[hunk['at']:hunk['at']+hunk['remove']] = [hunk['text']]
-                  updated = ''.join(lines).encode('utf-8')
-                  if blob(updated) != edit['after_blob']:
-                      raise SystemExit('Reviewed output blob mismatch: '+name)
-                  path.parent.mkdir(parents=True, exist_ok=True)
-                  path.write_bytes(updated)
-              run('git','add','--',name)
-          message = spec['message']
-          if not isinstance(message,str) or not message.strip() or len(message)>1000:
-              raise SystemExit('Invalid commit message')
-          run('git','diff','--cached','--check')
-          run('git','diff','--cached','--stat')
-          run('git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m',message)
-          # A concurrent push makes this fast-forward-only push fail. No force
-          # update, main write, merge, dependency installation or code execution.
-          run('git','push','origin','HEAD:refs/heads/perf/runtime-prelaunch-serialization-reporting')
-          print('APPLIED_PARENT='+head)
-          print('APPLIED_HEAD='+subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip())
+                  entries.append({'path':name,'mode':mode,'type':'blob','sha':None})
+                  continue
+              lines = (original or b'').decode('utf-8').splitlines(keepends=True)
+              end = 0
+              for hunk in edit['hunks']:
+                  at, remove = hunk['at'], hunk['remove']
+                  if not isinstance(at,int) or not isinstance(remove,int) or at < end or remove < 0 or at+remove > len(lines) or not isinstance(hunk['text'],str):
+                      raise SystemExit('Invalid or overlapping reviewed hunk')
+                  end = at+remove
+              for hunk in reversed(edit['hunks']):
+                  lines[hunk['at']:hunk['at']+hunk['remove']] = [hunk['text']]
+              updated = ''.join(lines).encode('utf-8')
+              if blob(updated) != edit['after_blob']:
+                  raise SystemExit('Reviewed output blob mismatch: '+name)
+              # Same private repository only. This stores an unreferenced Git
+              # object; the job never creates commits, pushes, merges or changes
+              # workflow refs. Final changes require the explicit connected API.
+              request = urllib.request.Request(
+                  'https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/git/blobs',
+                  data=json.dumps({'content':base64.b64encode(updated).decode(),'encoding':'base64'}).encode(),
+                  headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+                  method='POST')
+              with urllib.request.urlopen(request,timeout=30) as response:
+                  result=json.load(response)
+              if result['sha'] != edit['after_blob']:
+                  raise SystemExit('GitHub returned an unexpected blob identity')
+              entries.append({'path':name,'mode':mode,'type':'blob','sha':result['sha']})
+          result = {'base_head':head,'base_tree':subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip(),'message':spec['message'],'entries':entries}
+          print('REVIEWED_OBJECTS='+json.dumps(result,separators=(',',':')))
           PY
