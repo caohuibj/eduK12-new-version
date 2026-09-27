@@ -66,8 +66,13 @@ export const cleanupExpiredExportArtifacts = async (
   now = new Date(),
 ): Promise<{ deletedArtifacts: number; deletedFiles: number; invalidPaths: number }> => {
   const rows = await db.exportArtifact.findMany({
-    where: { expiresAt: { lte: now } },
+    where: {
+      expiresAt: { lte: now },
+      status: { in: ['READY', 'FAILED'] },
+    },
     select: { id: true, storageKey: true },
+    orderBy: { expiresAt: 'asc' },
+    take: 100,
   })
   let deletedFiles = 0
   let invalidPaths = 0
@@ -87,6 +92,19 @@ export const cleanupExpiredExportArtifacts = async (
     deletedIds.push(row.id)
   }
   if (deletedIds.length > 0) await db.exportArtifact.deleteMany({ where: { id: { in: deletedIds } } })
+
+  // Batch intents are terminal metadata and can be reaped separately. Never
+  // delete PROCESSING batches: worker recovery owns those generations.
+  const expiredBatches = await db.exportBatch.findMany({
+    where: { expiresAt: { lte: now }, status: { in: ['READY', 'FAILED'] } },
+    select: { id: true },
+    orderBy: { expiresAt: 'asc' },
+    take: 100,
+  })
+  if (expiredBatches.length > 0) {
+    await db.exportBatch.deleteMany({ where: { id: { in: expiredBatches.map((batch) => batch.id) } } })
+  }
+
   // Touch the root to make the configured storage location explicit for
   // callers/metrics without recursively scanning it.
   void exportRoot()
