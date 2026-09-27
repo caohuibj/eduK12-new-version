@@ -15,12 +15,14 @@ try {
 }
 
 import { videoQueue, RESOURCE_LIMITS } from '../config/queue'
+import { runtimeResourceConfig } from '../config/runtimeResources'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
 import { markVideoFailed, markVideoProcessing } from '../services/videoProcessingState'
 import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery } from '../services/videoProcessingRecovery'
+import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
 
 // 处理策略类型
 interface ProcessingStrategy {
@@ -31,34 +33,16 @@ interface ProcessingStrategy {
   reason: string
 }
 
-// 配置选项 - 优化压缩配置
+// 配置选项来自统一、严格验证的 non-secret runtime resource config。
 const PROCESSING_CONFIG = {
-  // 硬件负担最小模式 - 低配服务器配置
-  lowPowerMode: process.env.VIDEO_LOW_POWER_MODE === 'true',
-
-  // 分辨率设置 - 强制480p
-  resolution: '480p',
-
-  // 编码速度预设 (影响CPU使用和压缩率)
-  // ultrafast = 最快, 文件大 | veryfast = 较快 | faster = 更好压缩率 | veryslow = 最慢, 文件小
-  // 优化：使用 veryfast 提升处理速度 30-50%
-  preset: 'veryfast',
-
-  // CRF 质量 (18-28, 越小质量越好, 文件越大)
-  // 优化：降低 CRF 值补偿质量
-  crf: 26,
-
-  // 视频码率 (480p推荐800k，适配6M带宽)
-  videoBitrate: '800k',
-
-  // 音频码率
-  audioBitrate: '96k',
-
-  // Keep the worker aligned with the queue-level bounded concurrency.
+  lowPowerMode: runtimeResourceConfig.videoLowPowerMode,
+  resolution: runtimeResourceConfig.videoResolution,
+  preset: runtimeResourceConfig.videoPreset,
+  crf: runtimeResourceConfig.videoCrf,
+  videoBitrate: runtimeResourceConfig.videoBitrate,
+  audioBitrate: runtimeResourceConfig.videoAudioBitrate,
   concurrency: RESOURCE_LIMITS.videoConcurrency,
-
-  // 启用压缩优化 - 如果原文件比处理后小，保留原文件
-  smartCompression: true,
+  smartCompression: runtimeResourceConfig.videoSmartCompression,
 }
 
 // 分辨率映射 - 适配6M带宽
@@ -76,13 +60,12 @@ const RESOLUTION_MAP: Record<string, { size: string; bitrate: string }> = {
 function determineProcessingStrategy(videoInfo: VideoValidationResult): ProcessingStrategy {
   const { height, codec } = videoInfo
 
-  // 强制转码到480P，增加压缩比
   return {
     mode: 'transcode',
     preset: PROCESSING_CONFIG.preset,
     crf: PROCESSING_CONFIG.crf,
-    resolution: '480p',
-    reason: `统一压缩策略: ${height}p/${codec} -> 480p/H.264`
+    resolution: PROCESSING_CONFIG.resolution,
+    reason: `统一压缩策略: ${height}p/${codec} -> ${PROCESSING_CONFIG.resolution}/H.264`
   }
 }
 
@@ -210,7 +193,8 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     await job.progress(20)
 
     // 获取目标分辨率尺寸
-    const resConfig = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
 
     // 步骤3：生成底部居中水印
