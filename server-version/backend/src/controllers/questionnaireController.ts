@@ -7,7 +7,6 @@ import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
 import * as path from 'path'
-import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import {
   applyQuestionnaireProgressDelta,
