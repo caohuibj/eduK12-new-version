@@ -1,8 +1,10 @@
 import { config } from '../config'
 import { startBackgroundWorkers } from '../config/backgroundWorkers'
 import { prisma } from '../config/database'
-import { closeQueues } from '../config/queue'
+import { activeQueueJobCounts, closeQueues, pauseQueueConsumers } from '../config/queue'
+import { effectiveRuntimeResourceConfig, runtimeResourceConfig } from '../config/runtimeResources'
 import { logger } from '../utils/logger'
+import { activeWorkerSubprocessCount, cancelActiveWorkerSubprocesses } from './workerSubprocessRegistry'
 
 /**
  * Media/export consumer process. This entrypoint must not open HTTP, Socket.IO,
@@ -11,19 +13,68 @@ import { logger } from '../utils/logger'
  */
 let shutdownStarted = false
 
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const totalActive = (counts: { video: number; image: number; export: number }) =>
+  counts.video + counts.image + counts.export
+
+const waitForDrain = async (deadline: number): Promise<number> => {
+  let active = totalActive(await activeQueueJobCounts())
+  while (active > 0 && Date.now() < deadline) {
+    await sleep(100)
+    active = totalActive(await activeQueueJobCounts())
+  }
+  return active
+}
+
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
-  logger.info(`${signal} received: stopping background workers`)
-  const forceExit = setTimeout(() => {
-    logger.warn('Forced worker exit after timeout')
-    process.exit(exitCode || 1)
-  }, 5000)
-  await Promise.allSettled([
-    closeQueues(),
-    prisma.$disconnect(),
-  ])
-  clearTimeout(forceExit)
+
+  const timeoutMs = runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000
+  const deadline = Date.now() + timeoutMs
+  logger.info(`${signal} received: stopping background workers`, {
+    shutdownTimeoutSeconds: runtimeResourceConfig.workerShutdownTimeoutSeconds,
+  })
+
+  let activeJobs = 0
+  let subprocessesRemaining = 0
+  try {
+    await pauseQueueConsumers()
+
+    // Give ordinary bounded image/export work an initial drain window. Reserve
+    // at least half of the shutdown budget for cancelling/settling subprocesses
+    // and closing connections.
+    const drainDeadline = Math.min(deadline, Date.now() + Math.floor(timeoutMs / 2))
+    activeJobs = await waitForDrain(drainDeadline)
+
+    if (activeJobs > 0 || activeWorkerSubprocessCount() > 0) {
+      const remainingForCancellation = Math.max(1, deadline - Date.now())
+      const cancelled = await cancelActiveWorkerSubprocesses(remainingForCancellation)
+      subprocessesRemaining = cancelled.remaining
+      activeJobs = await waitForDrain(deadline)
+    }
+
+    const doNotWaitJobs = activeJobs > 0
+    await closeQueues(doNotWaitJobs)
+  } catch (error) {
+    logger.error('Worker shutdown queue/cancellation phase failed', error)
+    exitCode = exitCode || 1
+  }
+
+  try {
+    await prisma.$disconnect()
+  } catch (error) {
+    logger.error('Worker Prisma disconnect failed', error)
+    exitCode = exitCode || 1
+  }
+
+  if (activeJobs > 0 || subprocessesRemaining > 0) {
+    logger.warn('Worker shutdown reached its bounded deadline; unfinished Bull jobs will recover by retry/stall reconciliation', {
+      activeJobs,
+      subprocessesRemaining,
+    })
+    exitCode = exitCode || 1
+  }
   process.exit(exitCode)
 }
 
@@ -42,10 +93,9 @@ const startWorker = async (): Promise<void> => {
   if (config.nodeEnv === 'production' && !config.assetMigrationComplete) {
     throw new Error('ASSET_MIGRATION_COMPLETE=true is required before starting production workers')
   }
+  logger.info('Effective worker resource config', effectiveRuntimeResourceConfig())
   const started = await startBackgroundWorkers(true)
-  if (started !== 'started') {
-    throw new Error('worker process must start video/image/export consumers')
-  }
+  if (started !== 'started') throw new Error('worker process must start video/image/export consumers')
   logger.info('Background worker process is consuming video/image/export jobs')
 }
 
