@@ -18,6 +18,12 @@ export const createCognitiveStartIntent = (): string => {
  * idempotency secret. The secret is removed only after a recovery credential
  * has been durably stored by the client.
  */
+export const readCognitiveStartIntent = (accessToken: string): string => {
+  if (typeof window === 'undefined') return ''
+  const value = window.localStorage.getItem(keyForAccessToken(accessToken)) || ''
+  return /^[A-Za-z0-9_-]{43}$/.test(value) ? value : ''
+}
+
 export const getOrCreateCognitiveStartIntent = (accessToken: string): string => {
   if (typeof window === 'undefined') return createCognitiveStartIntent()
   const key = keyForAccessToken(accessToken)
