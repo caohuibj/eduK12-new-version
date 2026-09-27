@@ -44,7 +44,8 @@ x-app-environment: &app-environment
   CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
   CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
   TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
-  # Gate-E locked operating envelope (UNIT=7 / Aggregate=3 / pool=10).
+  # Conservative pre-measurement defaults. Final 4C4G pool/admission values
+  # must be set from the production measurement pass; these are not certified optima.
   UNIT_SUBMIT_ADMISSION_LIMIT: ${UNIT_SUBMIT_ADMISSION_LIMIT:-7}
   UNIT_SUBMIT_ADMISSION_QUEUE: ${UNIT_SUBMIT_ADMISSION_QUEUE:-16}
   UNIT_SUBMIT_ADMISSION_TIMEOUT_MS: ${UNIT_SUBMIT_ADMISSION_TIMEOUT_MS:-500}
@@ -80,18 +81,26 @@ x-app-environment: &app-environment
   VIDEO_PRESET: ${VIDEO_PRESET:-ultrafast}
   VIDEO_CRF: ${VIDEO_CRF:-28}
   VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
+  VIDEO_AUDIO_BITRATE: ${VIDEO_AUDIO_BITRATE:-96k}
+  VIDEO_SMART_COMPRESSION: ${VIDEO_SMART_COMPRESSION:-true}
   VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
+  VIDEO_TIMEOUT: ${VIDEO_TIMEOUT:-1800}
+  IMAGE_CONCURRENCY: ${IMAGE_CONCURRENCY:-2}
+  IMAGE_TIMEOUT: ${IMAGE_TIMEOUT:-30}
+  EXPORT_CONCURRENCY: ${EXPORT_CONCURRENCY:-1}
+  EXPORT_TIMEOUT: ${EXPORT_TIMEOUT:-1800}
+  WORKER_SHUTDOWN_TIMEOUT_SECONDS: ${WORKER_SHUTDOWN_TIMEOUT_SECONDS:-30}
 
 services:
   postgres:
-    image: postgres:14-alpine
+    image: postgres:16.15-bookworm
     container_name: ptool-postgres
     environment:
       POSTGRES_USER: ${DB_USER:?DB_USER must be set}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       POSTGRES_DB: ${DB_NAME:?DB_NAME must be set}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres16_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:?DB_USER must be set} -d ${DB_NAME:?DB_NAME must be set}"]
       interval: 5s
@@ -101,7 +110,7 @@ services:
     # 默认不发布 Host port（仅容器内网可达）
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4.11-bookworm
     container_name: ptool-redis
     command: redis-server --appendonly yes
     volumes:
@@ -282,7 +291,7 @@ services:
     restart: "no"
 
 volumes:
-  postgres_data:
+  postgres16_data:
   redis_data:
   uploads_data:
   exports_data:
