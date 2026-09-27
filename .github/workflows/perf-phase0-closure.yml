@@ -86,7 +86,7 @@ jobs:
           git fetch --no-tags origin main
           BASE_SHA="$(git merge-base HEAD origin/main)"
           BASE_WORKTREE="$RUNNER_TEMP/huisurvey-phase0-base-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          AB_OUT="$RUNNER_TEMP/huisurvey-phase0-ab-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          AB_OUT="/tmp/huisurvey-phase0-ab-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "BASE_SHA=$BASE_SHA" >> "$GITHUB_ENV"
           echo "BASE_WORKTREE=$BASE_WORKTREE" >> "$GITHUB_ENV"
           echo "AB_OUT=$AB_OUT" >> "$GITHUB_ENV"
@@ -173,7 +173,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase0-ab-${{ github.event.pull_request.head.sha || github.sha }}
-          path: ${{ runner.temp }}/huisurvey-phase0-ab-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/huisurvey-phase0-ab-${{ github.run_id }}-${{ github.run_attempt }}
           retention-days: 7
           if-no-files-found: error
       - name: cleanup BASE worktree
