@@ -517,6 +517,7 @@ jobs:
       NODE_ENV: test
       PORT: '3000'
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
