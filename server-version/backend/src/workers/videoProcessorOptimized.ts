@@ -20,7 +20,7 @@ import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
-import { markVideoFailed, markVideoProcessing } from '../services/videoProcessingState'
+import { associateVideoRetryJob, markVideoFailed, markVideoProcessing, releaseVideoProcessingForRetry } from '../services/videoProcessingState'
 import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery } from '../services/videoProcessingRecovery'
 import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
 
@@ -304,15 +304,38 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     for (const result of cleanupResults) {
       if (result.status === 'rejected') logger.warn('视频失败清理资源失败', { videoId })
     }
+    if (isWorkerShutdownCancellationError(error)) {
+      await releaseVideoProcessingForRetry(videoId, String(job.id)).catch(() => false)
+      if (isFinalVideoAttempt(job)) {
+        try {
+          const retry = await videoQueue.add('transcode', job.data, {
+            delay: 5_000,
+            priority: job.opts?.priority ?? 1,
+            attempts: Math.max(2, Number(job.opts?.attempts || 3)),
+            backoff: job.opts?.backoff || { type: 'exponential', delay: 5_000 },
+          })
+          await associateVideoRetryJob(videoId, String(retry.id))
+          logger.warn('worker shutdown cancelled final video attempt; recovery job queued', {
+            videoId, priorJobId: job.id, recoveryJobId: retry.id,
+          })
+        } catch {
+          // Startup reconciliation repairs a PENDING row if Redis disappears
+          // during shutdown after the domain ownership was released.
+          logger.error('worker shutdown video recovery enqueue failed', { videoId, priorJobId: job.id })
+        }
+      }
+      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+      throw error
+    }
+
     // Bull retries non-terminal attempts. Persist FAILED only for the final
-    // attempt; otherwise the next attempt may not reclaim the row.
+    // real processing attempt; infrastructure shutdown cancellation is handled
+    // above and must not become a business failure.
     if (isFinalVideoAttempt(job)) {
       try {
         const recorded = await markVideoFailed(videoId, String(job.id))
         if (!recorded) logger.warn('视频最终失败状态未更新（任务可能已被其他流程处理）', { videoId, jobId: job.id })
       } catch {
-        // The queue-level failed listener and the stale sweep provide a later
-        // conditional retry if this database write is temporarily unavailable.
         logger.error('视频最终失败状态写入异常', { videoId, jobId: job.id })
       }
     }
