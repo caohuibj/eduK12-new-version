@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertFixedPopulationProjection } from '../../modules/reporting/fixedPopulationPrivacy'
+import { assertFixedPopulationProjection, protectedPopulationIsComplete } from '../../modules/reporting/fixedPopulationPrivacy'
 import type { ReportingCohortSnapshotRecord } from '../../modules/reporting/types'
 
 const cohort = (id: string, users: string[]): ReportingCohortSnapshotRecord => ({
@@ -65,4 +65,14 @@ describe('ordinary fixed-population numerical disclosure', () => {
     expect(() => assertFixedPopulationProjection({ analysisKind: 'REPEATED_COHORT', projection: {}, cohorts: [first, second], waveBindings: bindings })).toThrow()
     expect(() => checkMatched({ kind: 'MATCHED_LONGITUDINAL', state: 'present', matchedEligibleN: 4 }, [first])).toThrow()
   })
+  it('requires every numeric protected metric to include the complete fixed respondent set', () => {
+    const projection = { state: 'present', metrics: { score: { state: 'present' } } }
+    const internalCounts = { eligibleRespondentN: 4, resultContributorN: 4, metricValidN: { score: 4 } }
+    expect(protectedPopulationIsComplete({ projection, internalCounts })).toBe(true)
+    expect(protectedPopulationIsComplete({ projection, internalCounts: { ...internalCounts, resultContributorN: 3 } })).toBe(false)
+    expect(protectedPopulationIsComplete({ projection, internalCounts: { ...internalCounts, metricValidN: { score: 3 } } })).toBe(false)
+    expect(protectedPopulationIsComplete({ projection: { state: 'suppressed' }, internalCounts })).toBe(true)
+    expect(protectedPopulationIsComplete({ projection: { state: 'present', metrics: { score: { state: 'suppressed' } } }, internalCounts })).toBe(true)
+  })
+
 })

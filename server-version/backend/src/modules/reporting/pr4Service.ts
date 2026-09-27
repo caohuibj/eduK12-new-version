@@ -253,6 +253,7 @@ export const generateOrganizationProtectedFeedback = async (input: {
     allowedExecutionIds,
     spec: spec as ReportingAnalysisSpecRecord<ReportingProtectedFeedbackSpecV1>,
     generatedByUserId: input.principal.userId,
+    principal: input.principal,
   })
   await assertProtectedFeedbackManagerAccess({ principal: input.principal, organizationId: input.organizationId, subjectUserId: input.subjectUserId })
   return publicArtifact(artifact, input.principal)

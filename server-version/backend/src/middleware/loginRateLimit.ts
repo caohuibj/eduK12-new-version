@@ -1,21 +1,20 @@
 import crypto from 'node:crypto'
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction, type RequestHandler } from 'express'
+import { performance } from 'node:perf_hooks'
 import { cacheService } from '../services/cacheService'
 import { BoundedAdmissionGate, configuredInteger } from '../services/boundedAdmissionGate'
+import { recordBoundedAdmissionRejection, setBoundedAdmissionGateState } from '../services/runtimeObservability'
 
 const WINDOW_SECONDS = 15 * 60
 const ACCOUNT_FAILURE_LIMIT = 10
 const ACCOUNT_GLOBAL_FAILURE_LIMIT = 50
 
-const positiveInt = (value: string | undefined, fallback: number): number => {
-  const parsed = Number(value)
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback
-}
-
-// This is an ingress/NAT safety fuse, not the credential-abuse budget. Keep it
-// comfortably above a normal classroom burst and tune the production value on
-// the real 4C4G host.
-const ipRequestLimit = () => positiveInt(process.env.LOGIN_IP_REQUEST_LIMIT, 3000)
+// Ingress/NAT fuse, independent of credential failure budgets. This is an
+// operator-configurable conservative starting point, not a measured capacity.
+const ingressRequestLimit = configuredInteger('LOGIN_IP_REQUEST_LIMIT', 3000)
+const maxTrackedAccounts = configuredInteger('LOGIN_MAX_ACTIVE_ACCOUNTS', 2048)
+const accountFailureIntervalMs = 1000
+const activeAccounts = new Map<string, symbol>()
 
 export const loginPasswordVerificationAdmission = new BoundedAdmissionGate({
   name: 'login_password_verify',
@@ -35,6 +34,8 @@ export interface LoginRateLimitContext {
   failureKey: string
   globalFailureKey: string
   ipKey: string
+  globalFailureLimited?: boolean
+  credentialFailed?: boolean
 }
 
 export interface LoginFailureBudgetResult {
@@ -67,7 +68,7 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
   }
 
   const context = getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
-  const ipWindow = await cacheService.consumeRateLimit(context.ipKey, ipRequestLimit(), WINDOW_SECONDS)
+  const ipWindow = await cacheService.consumeRateLimit(context.ipKey, ingressRequestLimit, WINDOW_SECONDS)
   if (!ipWindow) {
     res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     return
@@ -80,8 +81,11 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
 
   // A single source may not brute-force one account indefinitely. This scope
   // cannot globally lock the account because another IP has an independent key.
-  const accountIpFailures = await cacheService.getRateLimitState(context.failureKey)
-  if (!accountIpFailures) {
+  const [accountIpFailures, accountGlobalFailures] = await Promise.all([
+    cacheService.getRateLimitState(context.failureKey),
+    cacheService.getRateLimitState(context.globalFailureKey),
+  ])
+  if (!accountIpFailures || !accountGlobalFailures) {
     res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     return
   }
@@ -91,10 +95,9 @@ export const loginRateLimit = async (req: Request, res: Response, next: NextFunc
     return
   }
 
-  // The account-global counter is deliberately not a hard pre-auth lock: an
-  // attacker must not be able to deny the legitimate user's correct password
-  // merely by distributing failures across IPs. Distributed verification work
-  // remains bounded by loginPasswordVerificationAdmission.
+  // A distributed attack activates a short real verification throttle, not
+  // a fifteen-minute account lockout. The wrapper owns its operation lifetime.
+  context.globalFailureLimited = accountGlobalFailures.count >= ACCOUNT_GLOBAL_FAILURE_LIMIT
   ;(req as Request & { loginRateLimitContext?: LoginRateLimitContext }).loginRateLimitContext = context
   next()
 }
@@ -107,10 +110,15 @@ export const recordLoginFailure = async (req: Request): Promise<LoginFailureBudg
     cacheService.consumeRateLimit(context.globalFailureKey, ACCOUNT_GLOBAL_FAILURE_LIMIT, WINDOW_SECONDS),
   ])
   if (!accountIp || !accountGlobal) return null
+  context.credentialFailed = true
+  context.globalFailureLimited ||= !accountGlobal.allowed
+  request.loginRateLimitContext = context
   return {
     accountIpAllowed: accountIp.allowed,
     accountGlobalAllowed: accountGlobal.allowed,
-    retryAfterSeconds: Math.max(accountIp.retryAfterSeconds, accountGlobal.retryAfterSeconds),
+    // Only a violated dimension imposes a wait. The global dimension is a
+    // one-second soft throttle; an IP-specific denial retains its real TTL.
+    retryAfterSeconds: !accountIp.allowed ? accountIp.retryAfterSeconds : 1,
   }
 }
 
@@ -121,4 +129,39 @@ export const clearLoginFailures = async (req: Request): Promise<void> => {
     cacheService.del(context.failureKey),
     cacheService.del(context.globalFailureKey),
   ])
+}
+
+/** At most one live login operation per account, without queueing same-account
+ * callers. Distinct accounts behind one school NAT do not block each other.
+ * After the shared failure budget is exhausted, failed operations retain only
+ * this lightweight permit for at least one second, outside the bcrypt gate.
+ * Correct credentials are not held for the failure window. All waits end in a
+ * finally block; HTTP disconnect cannot open an extra verification slot.
+ */
+export const withLoginAccountFailureThrottle = (handler: RequestHandler): RequestHandler => async (req, res, next) => {
+  const request = req as Request & { loginRateLimitContext?: LoginRateLimitContext }
+  const context = request.loginRateLimitContext ?? getLoginRateLimitContext(req, typeof req.body?.username === 'string' ? req.body.username : undefined)
+  request.loginRateLimitContext = context
+  if (activeAccounts.has(context.accountKey) || activeAccounts.size >= maxTrackedAccounts) {
+    recordBoundedAdmissionRejection('login_account_failure', 'queue_full')
+    res.setHeader('Retry-After', '1')
+    res.status(503).json({ code: -1, message: '登录服务繁忙，请稍后重试' })
+    return
+  }
+  const owner = Symbol()
+  const startedAt = performance.now()
+  activeAccounts.set(context.accountKey, owner)
+  setBoundedAdmissionGateState('login_account_failure', activeAccounts.size, 0)
+  try {
+    await handler(req, res, next)
+  } catch (error) {
+    next(error)
+  } finally {
+    if (context.globalFailureLimited && context.credentialFailed) {
+      const remaining = accountFailureIntervalMs - (performance.now() - startedAt)
+      if (remaining > 0) await new Promise<void>((resolve) => setTimeout(resolve, remaining))
+    }
+    if (activeAccounts.get(context.accountKey) === owner) activeAccounts.delete(context.accountKey)
+    setBoundedAdmissionGateState('login_account_failure', activeAccounts.size, 0)
+  }
 }

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { authController } from '../controllers/authController'
 import { authenticate, requireAdmin } from '../middleware/auth'
 import { issueCsrfToken } from '../utils/authCookies'
-import { loginRateLimit } from '../middleware/loginRateLimit'
+import { loginRateLimit, withLoginAccountFailureThrottle } from '../middleware/loginRateLimit'
 import { requirePositiveAccountExtension } from '../middleware/accountExtensionValidation'
 import rateLimit from 'express-rate-limit'
 
@@ -24,7 +24,7 @@ const registrationLimiter = rateLimit({
 })
 
 // 公开接口
-router.post('/login', loginRateLimit, authController.login)
+router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(authController.login))
 router.post('/register', registrationLimiter, authController.register)
 router.post('/student-register', registrationLimiter, authController.studentRegister)
 router.post('/verify-teacher-code', registrationLimiter, authController.verifyTeacherCode)

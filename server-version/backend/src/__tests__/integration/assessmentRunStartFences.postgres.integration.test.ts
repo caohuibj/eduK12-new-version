@@ -129,7 +129,7 @@ describe('START authority fence barriers (real PostgreSQL)', () => {
         await new Promise((resolve) => setTimeout(resolve, 10))
       }
       expect(observed).toBe(true)
-      await prisma.$queryRaw`SELECT pg_sleep(GREATEST(0, EXTRACT(EPOCH FROM (expires_at-clock_timestamp())))+0.02) FROM users WHERE id=${execution.actorUserId}`
+      await prisma.$queryRaw`SELECT pg_sleep(GREATEST(0, EXTRACT(EPOCH FROM (expires_at-clock_timestamp())))+0.02)::text FROM users WHERE id=${execution.actorUserId}`
     } finally { unlock.release() }
     expect(await holderOutcome).toBeUndefined()
     const result = await start

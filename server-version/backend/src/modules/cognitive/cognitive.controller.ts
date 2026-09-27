@@ -240,6 +240,7 @@ export const cognitiveController = {
   },
 
   async startPublicSession(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = cognitivePublicStartSchema.parse(req.body || {})
       const data = await publicCognitiveService.startPublicSession(req.params.token, input.recoveryToken, input.startIntent)

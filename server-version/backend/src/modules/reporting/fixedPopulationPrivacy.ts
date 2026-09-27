@@ -26,6 +26,7 @@ export type FixedPopulationArtifact = {
   cohortSnapshotId?: string | null
   artifactPayload: {
     projection: unknown
+    fixedPopulationDisclosure?: { schemaVersion: 1; complete: boolean }
     waveBindings?: Array<{ waveId: string; cohortSnapshotId: string }>
   }
 }
@@ -48,6 +49,25 @@ const assertWholeMetricContributors = (projection: Projection, population: numbe
     if (metric.state !== 'present' || metric.validN !== population || metric.missingN !== 0
       || projection.resultContributorN !== population) fixedPopulationPrivacyFailure()
   }
+}
+
+/** Private proof for protected feedback, whose public projection deliberately
+ * omits respondent counts. Never expose partially contributed exact averages
+ * to an ordinary reader merely because each individual report meets N>=3.
+ */
+export const protectedPopulationIsComplete = (input: {
+  projection: { state: string; metrics?: Record<string, { state: string }> }
+  internalCounts: { eligibleRespondentN: number; resultContributorN: number; metricValidN: Record<string, number> }
+}): boolean => {
+  if (input.projection.state === 'suppressed') return true
+  if (input.projection.state !== 'present' || !input.projection.metrics) return false
+  return Object.entries(input.projection.metrics).every(([id, metric]) => (
+    metric.state === 'suppressed'
+    || (metric.state === 'present'
+      && input.internalCounts.eligibleRespondentN >= 3
+      && input.internalCounts.resultContributorN === input.internalCounts.eligibleRespondentN
+      && input.internalCounts.metricValidN[id] === input.internalCounts.eligibleRespondentN)
+  ))
 }
 
 /** Exported pure policy for adversarial tests; it does not grant authority. */
@@ -105,21 +125,27 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
   artifact: FixedPopulationArtifact
 }): Promise<void> => {
   const { artifact } = input
-  if (!['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL'].includes(artifact.analysisKind)) return
+  if (!['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL', 'PROTECTED_FEEDBACK'].includes(artifact.analysisKind)) return
   // This supplements (never substitutes for) existing Run/read/export authority.
+  const domain = artifact.analysisKind === 'PROTECTED_FEEDBACK' ? 'ORG_PROTECTED_FEEDBACK_V1' : 'ORG_GROUP_REPORT_V1'
   const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: artifact.organizationId })
-  if (!context?.membershipId || context.explicitDenies.some((deny) => ['*', 'REPORT_READ', 'ORG_GROUP_REPORT_V1'].includes(deny))) {
-    reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  if (!context?.membershipId || context.explicitDenies.some((deny) => ['*', 'REPORT_READ', domain].includes(deny))) {
+    return reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
   }
   if (context.organizationStatus !== 'ACTIVE') {
     // Preserve the existing narrow current-member platform historical read.
     // Generation still refuses suspension before reaching this disclosure gate.
-    if (input.principal.platformRole === 'SYSTEM_ADMIN') return
+    if (input.principal.platformRole === 'SYSTEM_ADMIN' && artifact.analysisKind !== 'PROTECTED_FEEDBACK') return
     reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   }
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (!context.personas.some((persona) => persona === 'TEACHER' || persona === 'COUNSELOR')) {
     reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  }
+  if (artifact.analysisKind === 'PROTECTED_FEEDBACK') {
+    const proof = artifact.artifactPayload.fixedPopulationDisclosure
+    if (proof?.schemaVersion !== 1 || proof.complete !== true) fixedPopulationPrivacyFailure()
+    return
   }
   const bindings = artifact.artifactPayload.waveBindings
   const ids = artifact.analysisKind === 'GROUP'

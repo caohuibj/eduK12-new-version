@@ -5,7 +5,7 @@ import {
   createOrReuseProtectedReportingArtifact,
 } from './artifact'
 import type { ReportingPrincipal } from './authorization'
-import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
+import { assertFixedPopulationArtifactDisclosure, protectedPopulationIsComplete } from './fixedPopulationPrivacy'
 import { reportingEvidenceFor } from './engine'
 import { buildMatchedLongitudinalProjection } from './matched'
 import { buildSeparatedMultiRaterObservations } from './multiRater'
@@ -199,6 +199,7 @@ export const createProtectedFeedbackArtifact = async (input: {
   spec: ReportingAnalysisSpecRecord<ReportingProtectedFeedbackSpecV1>
   generatedByUserId: string
   generatedAt?: Date
+  principal?: ReportingPrincipal
 }): Promise<ReportingProtectedArtifactRecord> => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'protected feedback requires a published spec', 409)
   if (
@@ -248,6 +249,7 @@ export const createProtectedFeedbackArtifact = async (input: {
   })
   const analysisIdentityHash = canonicalHash({
     schema: 'ReportingPr4AnalysisIdentityV1',
+    disclosurePolicy: 'FIXED_POPULATION_V1',
     analysisKind: 'PROTECTED_FEEDBACK',
     policyDomain: 'ORG_PROTECTED_FEEDBACK_V1',
     organizationId: input.organizationId,
@@ -275,7 +277,12 @@ export const createProtectedFeedbackArtifact = async (input: {
     maturityProfile: evidence.profile,
     evidence: { level: evidence.level, limitations: evidence.limitations },
     projection: built.projection,
+    fixedPopulationDisclosure: { schemaVersion: 1, complete: protectedPopulationIsComplete(built) },
   }
+  await assertFixedPopulationArtifactDisclosure({
+    principal: input.principal ?? { userId: input.generatedByUserId, platformRole: 'STANDARD' },
+    artifact: { organizationId: input.organizationId, analysisKind: 'PROTECTED_FEEDBACK', artifactPayload: payload },
+  })
   return createOrReuseProtectedReportingArtifact({
     organizationId: input.organizationId,
     specId: input.spec.id,
