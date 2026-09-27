@@ -5,6 +5,7 @@ import { activeQueueJobCounts, closeQueues, pauseQueueConsumers } from '../confi
 import { effectiveRuntimeResourceConfig, runtimeResourceConfig } from '../config/runtimeResources'
 import { logger } from '../utils/logger'
 import { activeWorkerSubprocessCount, cancelActiveWorkerSubprocesses } from './workerSubprocessRegistry'
+import { shutdownWorkerRuntime } from './workerShutdown'
 
 /**
  * Media/export consumer process. This entrypoint must not open HTTP, Socket.IO,
@@ -13,68 +14,28 @@ import { activeWorkerSubprocessCount, cancelActiveWorkerSubprocesses } from './w
  */
 let shutdownStarted = false
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
-const totalActive = (counts: { video: number; image: number; export: number }) =>
-  counts.video + counts.image + counts.export
-
-const waitForDrain = async (deadline: number): Promise<number> => {
-  let active = totalActive(await activeQueueJobCounts())
-  while (active > 0 && Date.now() < deadline) {
-    await sleep(100)
-    active = totalActive(await activeQueueJobCounts())
-  }
-  return active
-}
-
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
 
-  const timeoutMs = runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000
-  const deadline = Date.now() + timeoutMs
   logger.info(`${signal} received: stopping background workers`, {
     shutdownTimeoutSeconds: runtimeResourceConfig.workerShutdownTimeoutSeconds,
   })
 
-  let activeJobs = 0
-  let subprocessesRemaining = 0
-  try {
-    await pauseQueueConsumers()
+  const result = await shutdownWorkerRuntime({
+    pauseConsumers: pauseQueueConsumers,
+    activeCounts: activeQueueJobCounts,
+    cancelSubprocesses: cancelActiveWorkerSubprocesses,
+    activeSubprocessCount: activeWorkerSubprocessCount,
+    closeQueues,
+    disconnectDatabase: () => prisma.$disconnect(),
+  }, runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000)
 
-    // Give ordinary bounded image/export work an initial drain window. Reserve
-    // at least half of the shutdown budget for cancelling/settling subprocesses
-    // and closing connections.
-    const drainDeadline = Math.min(deadline, Date.now() + Math.floor(timeoutMs / 2))
-    activeJobs = await waitForDrain(drainDeadline)
-
-    if (activeJobs > 0 || activeWorkerSubprocessCount() > 0) {
-      const remainingForCancellation = Math.max(1, deadline - Date.now())
-      const cancelled = await cancelActiveWorkerSubprocesses(remainingForCancellation)
-      subprocessesRemaining = cancelled.remaining
-      activeJobs = await waitForDrain(deadline)
-    }
-
-    const doNotWaitJobs = activeJobs > 0
-    await closeQueues(doNotWaitJobs)
-  } catch (error) {
-    logger.error('Worker shutdown queue/cancellation phase failed', error)
+  if (result.activeJobs > 0 || result.subprocessesRemaining > 0) {
+    logger.warn('Worker shutdown reached its bounded deadline; unfinished Bull jobs will recover by retry/stall reconciliation', result)
     exitCode = exitCode || 1
   }
-
-  try {
-    await prisma.$disconnect()
-  } catch (error) {
-    logger.error('Worker Prisma disconnect failed', error)
-    exitCode = exitCode || 1
-  }
-
-  if (activeJobs > 0 || subprocessesRemaining > 0) {
-    logger.warn('Worker shutdown reached its bounded deadline; unfinished Bull jobs will recover by retry/stall reconciliation', {
-      activeJobs,
-      subprocessesRemaining,
-    })
-    exitCode = exitCode || 1
-  }
+  if (result.failed) exitCode = exitCode || 1
   process.exit(exitCode)
 }
 
