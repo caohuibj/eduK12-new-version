@@ -4,7 +4,7 @@ import { prisma } from '../../config/database'
 import { MAX_TOKEN_USES } from '../../constants'
 import { logger } from '../../utils/logger'
 import { publicAccessExpiryWithinPolicy } from '../../services/publicAccessPolicy'
-import { createAccessToken, createRecoveryCredential, hashRecoveryToken } from '../../services/anonymousAccess'
+import { createAccessToken, createRecoveryCredential, derivePublicStartCredential, hashRecoveryToken, isValidPublicStartIntent } from '../../services/anonymousAccess'
 import {
   decryptPublicAccessToken,
   encryptPublicAccessToken,
@@ -86,61 +86,140 @@ export const getPublicAssignmentInfo = async (tokenValue: string) => {
   }
 }
 
-export const startPublicSession = async (tokenValue: string, recoveryToken?: string) => {
+export const startPublicSession = async (
+  tokenValue: string,
+  recoveryToken?: string,
+  startIntent?: string,
+) => {
   const token = await loadToken(tokenValue)
   if (isCompositeWrapper(token.assignment)) {
     throw FORBIDDEN('此认知任务仅用于综合测评，不能单独作答或公开分发')
   }
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
-    const existing = await prisma.cognitiveSession.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash, userId: null } })
+    const existing = await prisma.cognitiveSession.findFirst({
+      where: { accessTokenId: token.id, recoveryTokenHash, userId: null },
+    })
     if (existing) {
-      return { session: await sessionService.getPublicSession(recoveryTokenHash, existing.id), recoveryToken: null, anonymousCode: existing.anonymousCode }
+      return {
+        session: await sessionService.getPublicSession(recoveryTokenHash, existing.id),
+        recoveryToken: null,
+        anonymousCode: existing.anonymousCode,
+      }
     }
     throw FORBIDDEN('Invalid recovery credential')
   }
+
+  if (startIntent && !isValidPublicStartIntent(startIntent)) throw BAD_REQUEST('Invalid START intent')
+  const deterministic = startIntent ? derivePublicStartCredential(token.id, startIntent) : null
+  const findIntentSession = async () => deterministic
+    ? prisma.cognitiveSession.findFirst({
+        where: {
+          assignmentId: token.assignment.id,
+          accessTokenId: token.id,
+          participantKey: deterministic.participantKey,
+          attemptNo: 1,
+          userId: null,
+        },
+      })
+    : null
+
+  // Retry/replay is allowed even when the public link became exhausted or
+  // disabled after the first transaction committed. Possession of the public
+  // link alone is insufficient: the caller must present the strong START intent.
+  const replay = await findIntentSession()
+  if (replay && deterministic) {
+    return {
+      session: await sessionService.getPublicSession(deterministic.hash, replay.id),
+      recoveryToken: deterministic.token,
+      anonymousCode: replay.anonymousCode,
+    }
+  }
+
   assertWindow(token)
   const { config, parsedConfig } = validateAssignment(token.assignment)
-  const credential = createRecoveryCredential()
-  const created = await prisma.$transaction(async (tx) => {
-    const claimed = await tx.cognitiveAccessToken.updateMany({
-      where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
-      data: { usedCount: { increment: 1 } },
-    })
-    if (claimed.count !== 1) throw CONFLICT('Public link reached its maximum uses')
-    const unifiedSnapshot = await sessionService.createUnifiedCognitiveSessionConfigSnapshot({
-      db: tx as any,
-      testType: config.testType,
-      configVersion: config.configVersion,
-      engineVersion: config.engineVersion,
-      scoringVersion: config.scoringVersion,
-      config: parsedConfig,
-    })
-    return tx.cognitiveSession.create({
-      data: {
-        userId: null,
-        participantKey: credential.participantKey,
-        participantSnapshotEncrypted: encryptCognitivePayload({ anonymousCode: credential.anonymousCode }),
-        assignmentId: token.assignment.id,
-        accessTokenId: token.id,
-        recoveryTokenHash: credential.hash,
-        anonymousCode: credential.anonymousCode,
-        configId: config.id,
+  const credential = deterministic ?? createRecoveryCredential()
+
+  try {
+    const outcome = await prisma.$transaction(async (tx) => {
+      if (deterministic) {
+        const existing = await tx.cognitiveSession.findFirst({
+          where: {
+            assignmentId: token.assignment.id,
+            accessTokenId: token.id,
+            participantKey: deterministic.participantKey,
+            attemptNo: 1,
+            userId: null,
+          },
+        })
+        if (existing) return { session: existing, replayed: true }
+      }
+
+      const claimed = await tx.cognitiveAccessToken.updateMany({
+        where: {
+          id: token.id,
+          isActive: true,
+          expiresAt: { gt: new Date() },
+          OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }],
+        },
+        data: { usedCount: { increment: 1 } },
+      })
+      if (claimed.count !== 1) throw CONFLICT('Public link reached its maximum uses')
+
+      const unifiedSnapshot = await sessionService.createUnifiedCognitiveSessionConfigSnapshot({
+        db: tx as any,
         testType: config.testType,
-        attemptNo: 1,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
         configVersion: config.configVersion,
-        configSnapshotEncrypted: unifiedSnapshot.encrypted,
         engineVersion: config.engineVersion,
         scoringVersion: config.scoringVersion,
-        randomSeed: randomBytes(16).toString('hex'),
-        runtimeGeneration: 'UNIFIED_V1',
-        compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
-      },
+        config: parsedConfig,
+      })
+      const created = await tx.cognitiveSession.create({
+        data: {
+          userId: null,
+          participantKey: credential.participantKey,
+          participantSnapshotEncrypted: encryptCognitivePayload({ anonymousCode: credential.anonymousCode }),
+          assignmentId: token.assignment.id,
+          accessTokenId: token.id,
+          recoveryTokenHash: credential.hash,
+          anonymousCode: credential.anonymousCode,
+          configId: config.id,
+          testType: config.testType,
+          attemptNo: 1,
+          status: 'IN_PROGRESS',
+          deliveryMode: 'FINAL_ONLY',
+          configVersion: config.configVersion,
+          configSnapshotEncrypted: unifiedSnapshot.encrypted,
+          engineVersion: config.engineVersion,
+          scoringVersion: config.scoringVersion,
+          randomSeed: randomBytes(16).toString('hex'),
+          runtimeGeneration: 'UNIFIED_V1',
+          compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
+        },
+      })
+      return { session: created, replayed: false }
     })
-  })
-  return { session: await sessionService.getPublicSession(credential.hash, created.id), recoveryToken: credential.token, anonymousCode: credential.anonymousCode }
+
+    return {
+      session: await sessionService.getPublicSession(credential.hash, outcome.session.id),
+      recoveryToken: credential.token,
+      anonymousCode: outcome.session.anonymousCode,
+    }
+  } catch (error) {
+    // A concurrent request with the same intent may win the unique
+    // (assignmentId, participantKey, attemptNo) insert. Its losing transaction
+    // rolls the quota increment back; after the winner commits we can safely
+    // recover the one durable admission.
+    const existing = await findIntentSession()
+    if (existing && deterministic) {
+      return {
+        session: await sessionService.getPublicSession(deterministic.hash, existing.id),
+        recoveryToken: deterministic.token,
+        anonymousCode: existing.anonymousCode,
+      }
+    }
+    throw error
+  }
 }
 
 export const getSession = async (sessionId: string, recoveryToken: string) =>
