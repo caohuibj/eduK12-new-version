@@ -1,0 +1,58 @@
+name: Apply reviewed prelaunch change set
+
+on:
+  pull_request:
+    types: [synchronize]
+    paths: ['.prelaunch/reviewed-change-set.json']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prelaunch-reviewed-patch-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.event.pull_request.draft == true && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/runtime-prelaunch-serialization-reporting'
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+      - name: Apply exact reviewed patch without executing repository code
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          run = lambda *args, **kw: subprocess.run(args, check=True, **kw)
+          head = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+          parent = subprocess.check_output(['git','rev-parse','HEAD^'], text=True).strip()
+          spec = json.loads(pathlib.Path('.prelaunch/reviewed-change-set.json').read_text())
+          if spec['parent_sha'] != parent:
+              raise SystemExit('Change set parent does not match checkout; refusing a stale patch')
+          patch = spec['patch']
+          for line in patch.splitlines():
+              if line.startswith('+++ b/') or line.startswith('--- a/'):
+                  path = line[6:].split('\t')[0]
+                  if not path.startswith(('server-version/', 'docs/', '.github/')) or '..' in pathlib.PurePosixPath(path).parts:
+                      raise SystemExit('Patch path is outside the reviewed repository scope')
+                  if 'prelaunch-apply-reviewed-patches' in path:
+                      raise SystemExit('The write bridge cannot modify itself')
+          message = spec['message']
+          if not isinstance(message,str) or not message.strip() or len(message)>1000:
+              raise SystemExit('Invalid commit message')
+          run('git','apply','--check','--whitespace=error-all','-',input=patch,text=True)
+          run('git','apply','--index','--whitespace=error-all','-',input=patch,text=True)
+          run('git','diff','--cached','--check')
+          run('git','diff','--cached','--stat')
+          run('git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m',message)
+          # A concurrent push makes this fast-forward-only push fail. There is
+          # no force update, no main write, no merge, and no repository code run.
+          run('git','push','origin','HEAD:refs/heads/perf/runtime-prelaunch-serialization-reporting')
+          print('APPLIED_PARENT='+head)
+          print('APPLIED_HEAD='+subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip())
+          PY
