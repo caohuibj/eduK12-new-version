@@ -148,5 +148,9 @@ export const publicCognitiveApi = (recoveryToken: string): CognitiveSessionApi =
 
 export const publicCognitiveAssignmentApi = {
   info: (token: string) => apiClient.get<{ title: string; instruction: string | null; testType: string; expiresAt: string; maxUses: number; usedCount: number }>(`/public/cognitive/assignments/${token}`),
-  start: (token: string, recoveryToken?: string) => apiClient.post<{ session: CognitiveSession; recoveryToken: string | null; anonymousCode: string | null }>(`/public/cognitive/assignments/${token}/start`, recoveryToken ? { recoveryToken } : {}),
+  start: (token: string, input: { recoveryToken?: string; startIntent?: string } = {}) =>
+    apiClient.post<{ session: CognitiveSession; recoveryToken: string | null; anonymousCode: string | null }>(
+      `/public/cognitive/assignments/${token}/start`,
+      input,
+    ),
 }
