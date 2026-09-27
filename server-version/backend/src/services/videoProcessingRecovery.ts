@@ -30,13 +30,13 @@ const isFinalFailedEvent = (job: any): boolean => {
   return attemptsMade >= attempts
 }
 
-const reconcileJob = async (jobId: string, videoId: string): Promise<void> => {
+const reconcileJob = async (jobId: string, videoId: string, generation: number): Promise<void> => {
   const currentJob = await videoQueue.getJob(jobId)
   if (currentJob) {
     const state = await currentJob.getState()
     if (ACTIVE_JOB_STATES.has(state)) return
   }
-  const recovered = await markVideoFailed(videoId, jobId)
+  const recovered = await markVideoFailed(videoId, jobId, generation)
   if (recovered) logger.warn('视频处理任务已回收为失败状态', { videoId, jobId })
 }
 
@@ -99,8 +99,13 @@ export function registerVideoProcessingRecovery(): void {
 
   videoQueue.on('failed', (job: any, failure: unknown) => {
     if (!job?.data?.videoId || isWorkerShutdownCancellationError(failure) || !isFinalFailedEvent(job)) return
-    void markVideoFailed(String(job.data.videoId), String(job.id)).catch(() => {
-      logger.error('视频最终失败状态写入失败', { videoId: job.data.videoId, jobId: job.id })
+    // The processor persists final FAILED with its exact generation. Do not
+    // perform a generation-less fallback here: a stalled old attempt may emit
+    // after a newer retry has already claimed the same Bull job id. A DB write
+    // failure is recovered by the stale PROCESSING sweep below.
+    logger.warn('视频最终 Bull attempt 失败；状态由 generation-fenced processor/stale sweep 收口', {
+      videoId: job.data.videoId,
+      jobId: job.id,
     })
   })
 
@@ -110,7 +115,13 @@ export function registerVideoProcessingRecovery(): void {
     if (stalledTimers.has(jobId)) return
     const timer = setTimeout(() => {
       stalledTimers.delete(jobId)
-      void reconcileJob(jobId, String(job.data.videoId)).catch(() => {
+      void prisma.video.findUnique({
+        where: { id: String(job.data.videoId) },
+        select: { processingJobId: true, processingGeneration: true },
+      }).then((row) => {
+        if (!row || row.processingJobId !== jobId) return
+        return reconcileJob(jobId, String(job.data.videoId), row.processingGeneration)
+      }).catch(() => {
         logger.error('视频停滞任务回收检查失败', { videoId: job.data.videoId, jobId })
       })
     }, 60_000)
@@ -143,7 +154,7 @@ export async function reconcileStaleProcessingVideos(): Promise<number> {
         { processingStartedAt: null, updatedAt: { lt: cutoff } },
       ],
     },
-    select: { id: true, processingJobId: true },
+    select: { id: true, processingJobId: true, processingGeneration: true },
     take: 100,
   })
 
@@ -151,10 +162,10 @@ export async function reconcileStaleProcessingVideos(): Promise<number> {
   for (const row of rows) {
     if (row.processingJobId) {
       const before = await prisma.video.findUnique({ where: { id: row.id }, select: { status: true } })
-      await reconcileJob(row.processingJobId, row.id)
+      await reconcileJob(row.processingJobId, row.id, row.processingGeneration)
       const after = await prisma.video.findUnique({ where: { id: row.id }, select: { status: true } })
       if (before?.status === 'PROCESSING' && after?.status === 'FAILED') recovered += 1
-    } else if (await markVideoFailed(row.id)) {
+    } else if (await markVideoFailed(row.id, undefined, row.processingGeneration)) {
       recovered += 1
     }
   }
