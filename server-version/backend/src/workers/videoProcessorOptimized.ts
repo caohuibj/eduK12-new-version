@@ -99,20 +99,19 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
   logger.info(`🎬 开始处理视频: ${videoId} (${isUrlMode ? 'URL下载' : '本地上传'})`)
 
   let tempDir = ''
+  let processingGeneration: number | null = null
   const derivativeAssets: Array<{ id: string; objectKey: string; provider: string }> = []
 
   try {
-    // Await the asynchronous probe so the first queued job cannot race the
-    // availability check and be failed before FFmpeg reports ready.
-    if (!(await ffmpegAvailability)) {
-      throw new Error('FFmpeg 未安装')
-    }
-
-    // 更新状态为处理中
-    const processingGeneration = await markVideoProcessing(videoId, String(job.id))
+    // 先取得 generation ownership，再做 FFmpeg probe。这样即使运行环境
+    // 缺少 FFmpeg，最终 attempt 也能以 exact generation 安全落库 FAILED。
+    processingGeneration = await markVideoProcessing(videoId, String(job.id))
     if (processingGeneration === null) {
       logger.warn('视频处理任务未能取得视频行所有权，跳过过期任务', { videoId, jobId: job.id })
       return { videoId, skipped: true }
+    }
+    if (!(await ffmpegAvailability)) {
+      throw new Error('FFmpeg 未安装')
     }
     const safeJobId = String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')
     tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${processingGeneration}`)
@@ -322,7 +321,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     for (const result of cleanupResults) {
       if (result.status === 'rejected') logger.warn('视频失败清理资源失败', { videoId })
     }
-    if (isWorkerShutdownCancellationError(error)) {
+    if (isWorkerShutdownCancellationError(error) && processingGeneration !== null) {
       await releaseVideoProcessingForRetry(videoId, String(job.id), processingGeneration).catch(() => false)
       if (isFinalVideoAttempt(job)) {
         try {
@@ -349,7 +348,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     // Bull retries non-terminal attempts. Persist FAILED only for the final
     // real processing attempt; infrastructure shutdown cancellation is handled
     // above and must not become a business failure.
-    if (isFinalVideoAttempt(job)) {
+    if (isFinalVideoAttempt(job) && processingGeneration !== null) {
       try {
         const recorded = await markVideoFailed(videoId, String(job.id), processingGeneration)
         if (!recorded) logger.warn('视频最终失败状态未更新（任务可能已被其他流程处理）', { videoId, jobId: job.id })
