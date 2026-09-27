@@ -927,6 +927,37 @@ model QuestionnaireAccessToken {
   @@map("questionnaire_access_tokens")
 }
 
+// Durable intent authority for worker-generated Scale/Questionnaire exports.
+// Bull is a delivery mechanism only; PostgreSQL remains the recoverable source
+// of truth across queue outages, retries, worker restarts, and stale jobs.
+model ExportBatch {
+  id                  String               @id @default(uuid())
+  resourceType        String               @map("resource_type")
+  resourceId          String               @map("resource_id")
+  createdBy           String               @map("created_by")
+  anonymized          Boolean              @default(true)
+  formats             String[]
+  options             Json
+  requestKey          String               @map("request_key")
+  requestHash         String               @map("request_hash")
+  status              ExportArtifactStatus @default(PROCESSING)
+  generation          Int                  @default(0)
+  processingJobId     String?              @map("processing_job_id")
+  processingStartedAt DateTime?            @map("processing_started_at")
+  errorCode           String?              @map("error_code")
+  recordCount         Int                  @map("record_count")
+  fieldCount          Int?                 @map("field_count")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  expiresAt           DateTime             @map("expires_at")
+
+  @@unique([createdBy, requestKey])
+  @@index([resourceType, resourceId])
+  @@index([status, updatedAt])
+  @@index([expiresAt])
+  @@map("export_batches")
+}
+
 // Metadata authority for generated exports. The file itself remains on the
 // configured export storage; every download must resolve through this row.
 model ExportArtifact {
