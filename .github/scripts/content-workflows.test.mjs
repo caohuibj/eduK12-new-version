@@ -75,7 +75,8 @@ test('force-full override schedules full jobs and uses a full aggregate even for
 });
 
 
-test('performance gates only follow runtime hot paths', () => {
+test('automatic performance smoke only follows runtime hot paths', () => {
+  const workflow = 'perf-phase0-smoke';
   const cold = [
     'server-version/backend/src/modules/cognitive/public.service.ts',
     'server-version/backend/src/modules/reporting/service.ts',
@@ -88,13 +89,10 @@ test('performance gates only follow runtime hot paths', () => {
     'server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts',
     'server-version/backend/src/services/unitSubmitAdmission.ts',
   ];
-  for (const workflow of ['perf-phase0-smoke', 'perf-phase0-closure']) {
-    assert.equal(triggered(workflow, cold), false, workflow);
-    for (const file of hot) assert.equal(triggered(workflow, [file]), true, `${workflow}: ${file}`);
-    assert.equal(triggered(workflow, [`.github/workflows/${workflow}.yml`]), true, workflow);
-  }
+  assert.equal(triggered(workflow, cold), false, workflow);
+  for (const file of hot) assert.equal(triggered(workflow, [file]), true, `${workflow}: ${file}`);
+  assert.equal(triggered(workflow, [`.github/workflows/${workflow}.yml`]), true, workflow);
 });
-
 test('Cognitive management changes do not trigger the video gate', () => {
   const workflow = 'media-7-cross-runtime-acceptance';
   assert.equal(triggered(workflow, ['server-version/backend/src/modules/cognitive/public.service.ts']), false);
@@ -124,10 +122,26 @@ test('full CI preserves two physical self-hosted lanes', () => {
 });
 
 
-test('expensive performance work stays off draft PRs unless full CI is explicitly forced', () => {
-  for (const workflow of ['perf-phase0-closure', 'perf-phase0-exploratory']) {
-    const text = source(workflow);
-    assert.match(text, /github\.event\.pull_request\.draft == false/);
-    assert.match(text, /vars\.CI_FORCE_FULL == 'true'/);
-  }
+test('Phase 0 closure is manual targeted evidence and never competes with PR CI', () => {
+  const text = source('perf-phase0-closure');
+  assert.match(text, /workflow_dispatch:/);
+  assert.match(text, /ab_groups:/);
+  assert.match(text, /scope:/);
+  assert.doesNotMatch(text, /\n  pull_request:/);
+  assert.equal(triggered('perf-phase0-closure', [
+    'server-version/backend/src/modules/cognitive/final-submit.service.ts',
+    '.github/workflows/perf-phase0-closure.yml',
+  ]), false);
+});
+
+test('automatic exploratory invariant work stays off draft PRs unless full CI is explicitly forced', () => {
+  const text = source('perf-phase0-exploratory');
+  assert.match(text, /github\.event\.pull_request\.draft == false/);
+  assert.match(text, /vars\.CI_FORCE_FULL == 'true'/);
+});
+
+test('mixed A-B ordering is stable across independent BASE and HEAD fixture seeds', () => {
+  const text = fs.readFileSync(new URL('../../server-version/backend/scripts/current-main-seed-fixtures.ts', import.meta.url), 'utf8');
+  assert.match(text, /const mixKey = \(fixtureId: string\) => createHash\('sha256'\)\.update\(fixtureId\)/);
+  assert.doesNotMatch(text, /update\(.*runId.*fixtureId/);
 });
