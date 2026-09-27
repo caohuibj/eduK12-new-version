@@ -1,0 +1,71 @@
+{
+  "parent_sha": "531be8c196cd4c54cdb4cce2cef347df6f3c3999",
+  "message": "fix(prelaunch): remove obsolete exposure history and require fault gates",
+  "edits": [
+    {
+      "path": ".github/scripts/content-workflows.test.mjs",
+      "before_blob": "142df6442b9313087c09f2ec59a086ea68c1427c",
+      "after_blob": "f021cedc970b89cb440411d8a12ad74ebcbd82a6",
+      "hunks": [{"at":124,"remove":0,"text":"\n\ntest('expensive performance work stays off draft PRs unless full CI is explicitly forced', () => {\n  for (const workflow of ['perf-phase0-closure', 'perf-phase0-exploratory']) {\n    const text = source(workflow);\n    assert.match(text, /github\\.event\\.pull_request\\.draft == false/);\n    assert.match(text, /vars\\.CI_FORCE_FULL == 'true'/);\n  }\n});\n"}]
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "before_blob": "bb09b3697bce7bfaaf475b74bee732c79c2f9d82",
+      "after_blob": "4d9a7ef728ad282e95967c57548445905e504882",
+      "hunks": [{"at":418,"remove":0,"text":"          src/__tests__/integration/assessmentRunStartClaim.postgres.integration.test.ts\n          src/__tests__/integration/assessmentRunAllocationMatrix.postgres.integration.test.ts\n          src/__tests__/integration/assessmentRunStartFences.postgres.integration.test.ts\n          src/__tests__/integration/reportingSubgroupPrivacy.postgres.integration.test.ts\n"}]
+    },
+    {
+      "path": ".github/workflows/perf-phase0-closure.yml",
+      "before_blob": "f3393fb6e81a54eb2e39203c7f85b049cf2b4f57",
+      "after_blob": "1cdc483ae36c4d2214d6690f462ac4e72e5debc3",
+      "hunks": [{"at":51,"remove":0,"text":"    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'\n"}]
+    },
+    {
+      "path": ".github/workflows/perf-phase0-exploratory.yml",
+      "before_blob": "cd86d4960883ae88f4281558b1b0b12cdf73852e",
+      "after_blob": "ca0ce4d1617b99bf2026af3eb22bd42256bb4e2f",
+      "hunks": [{"at":50,"remove":1,"text":"    if: github.event_name == 'workflow_dispatch' || ((github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true') && startsWith(github.head_ref, 'perf/'))\n"}]
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/artifact.ts",
+      "before_blob": "e5641307126bc9488f4de7ff12e961580010ca39",
+      "after_blob": "bc0339ce8c6f819d9a0a6cccefe388d2afd8ab2f",
+      "hunks": [
+        {"at":49,"remove":145,"text":""},
+        {"at":353,"remove":1,"text":""},
+        {"at":355,"remove":1,"text":""},
+        {"at":392,"remove":1,"text":""},
+        {"at":395,"remove":1,"text":""}
+      ]
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/longitudinal-planner.ts",
+      "before_blob": "13b00db1773073e906a05e7d33ea9a89d5aa0ede",
+      "after_blob": "a1db16ee95e56bf413e4a0c8131c60854c877dca",
+      "hunks": [
+        {"at":11,"remove":1,"text":""},
+        {"at":56,"remove":0,"text":"    await assertReportingSubgroupsPrivacy({\n      principal: input.principal, organizationId: input.organizationId, specId: spec.id,\n      entries: [{ cohort, minimumN: 3 }],\n    })\n"},
+        {"at":58,"remove":29,"text":""},
+        {"at":107,"remove":1,"text":"  return generateOrganizationLongitudinalAnalysis({ ...input, seriesId: series.id, waveKeys })\n"}
+      ]
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/pr4Artifact.ts",
+      "before_blob": "7b72d2eb12c113f81362ee092de10c762ce02962",
+      "after_blob": "2739d3839d79c36ab719cfb8de3b7c80bea44de5",
+      "hunks": [{"at":5,"remove":1,"text":""},{"at":65,"remove":1,"text":""},{"at":139,"remove":1,"text":""}]
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/pr4Service.ts",
+      "before_blob": "0cb1bacef864089d629ed131e0ef9a617ba88a34",
+      "after_blob": "a99a1ad535ffe6f00d79adbd121a4b2438344439",
+      "hunks": [{"at":14,"remove":1,"text":""},{"at":156,"remove":1,"text":""},{"at":176,"remove":1,"text":""}]
+    },
+    {
+      "path": "server-version/e2e/fe-11-storage-fault-browser-e2e.cjs",
+      "before_blob": "22da3cd85c00bc8e3428007aa5d20a7b59b69849",
+      "after_blob": "ea59f56ff6c36f53b12089cf09ae814c3a89be14",
+      "hunks": [{"at":252,"remove":1,"text":"main().then(() => {\n  execFileSync(path.resolve(__dirname, '../backend/node_modules/.bin/tsx'), [\n    path.resolve(__dirname, 'prelaunch-start-intent-browser-e2e.cjs'),\n  ], { cwd: path.resolve(__dirname, '..'), env: process.env, stdio: 'inherit', timeout: 180000 })\n}).catch((error) => {\n"}]
+    }
+  ]
+}
