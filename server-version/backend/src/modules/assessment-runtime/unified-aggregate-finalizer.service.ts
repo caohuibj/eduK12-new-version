@@ -810,7 +810,7 @@ const persistIncompleteCompositeProgress = async (
         "last_saved_at"=transaction_timestamp()
     WHERE "id"=${parent.id}
       AND "status"='IN_PROGRESS'
-      AND "runtime_generation"=${unifiedRuntimeGeneration}
+      AND "runtime_generation"=${unifiedRuntimeGeneration}::"RuntimeGeneration"
       AND "attempt_epoch"=${parent.attemptEpoch}
       AND "frozen_active_slot_set_hash" IS NOT DISTINCT FROM ${parent.frozenActiveSlotSetHash ?? null}
       AND "context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash ?? null}
@@ -860,7 +860,7 @@ const persistIncompleteQuestionnaireProgress = async (
         "progress"=GREATEST("progress", ${next.progress})
     WHERE "id"=${parent.id}
       AND "status"='IN_PROGRESS'
-      AND "runtime_generation"=${unifiedRuntimeGeneration}
+      AND "runtime_generation"=${unifiedRuntimeGeneration}::"RuntimeGeneration"
       AND "attempt_epoch"=${parent.attemptEpoch}
       AND "frozen_active_slot_set_hash" IS NOT DISTINCT FROM ${parent.frozenActiveSlotSetHash ?? null}
       AND "context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash ?? null}
