@@ -9,7 +9,8 @@ import { Messages } from '../constants'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
 import { setSessionCookie, clearSessionCookie } from '../utils/authCookies'
-import { clearLoginFailures, recordLoginFailure } from '../middleware/loginRateLimit'
+import { clearLoginFailures, recordLoginFailure, withLoginPasswordVerification } from '../middleware/loginRateLimit'
+import { isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const loginSchema = z.object({
@@ -39,54 +40,34 @@ export const authController = {
   // 登录
   async login(req: Request, res: Response) {
     try {
-      const result = loginSchema.safeParse(req.body)
-      if (!result.success) {
-        await recordLoginFailure(req)
+      const failedLogin = async () => {
+        const budget = await recordLoginFailure(req)
+        if (!budget) {
+          return res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
+        }
+        // Failure budgets throttle bad credentials after the fact. They never
+        // pre-lock a username, so a correct login can still recover immediately.
+        if (!budget.accountIpAllowed || !budget.accountGlobalAllowed) {
+          res.setHeader('Retry-After', String(budget.retryAfterSeconds))
+          return res.status(429).json({ code: -1, message: '用户名或密码错误' })
+        }
         return unauthorized(res, '用户名或密码错误')
       }
+
+      const result = loginSchema.safeParse(req.body)
+      if (!result.success) return failedLogin()
 
       const { username, password } = result.data
-      const failedLogin = async () => {
-        await recordLoginFailure(req)
-        // Do not disclose whether a username exists, is disabled, frozen, or
-        // awaiting approval. The limiter still records the attempt by the
-        // hashed account+IP key.
-        return unauthorized(res, '用户名或密码错误')
-      }
-
-      const user = await prisma.user.findUnique({
-        where: { username }
-      })
-
-      if (!user) {
+      const user = await prisma.user.findUnique({ where: { username } })
+      if (!user || !user.isActive || user.isFrozen || (user.expiresAt && user.expiresAt < new Date())) {
         return failedLogin()
       }
 
-      if (!user.isActive) {
-        return failedLogin()
-      }
-
-      // 检查账号是否被冻结
-      if (user.isFrozen) {
-        return failedLogin()
-      }
-
-      // 检查账号是否过期
-      if (user.expiresAt && user.expiresAt < new Date()) {
-        return failedLogin()
-      }
-
-      const isValid = await comparePassword(password, user.passwordHash)
-      if (!isValid) {
-        return failedLogin()
-      }
-
-      if (user.role === UserRole.TEACHER && !user.teacherApproved) {
-        return failedLogin()
-      }
+      const isValid = await withLoginPasswordVerification(() => comparePassword(password, user.passwordHash))
+      if (!isValid) return failedLogin()
+      if (user.role === UserRole.TEACHER && !user.teacherApproved) return failedLogin()
 
       await clearLoginFailures(req)
-
       const token = generateToken({
         userId: user.id,
         username: user.username,
@@ -94,9 +75,7 @@ export const authController = {
         tokenVersion: user.tokenVersion,
         mustChangePassword: user.mustChangePassword,
       })
-
       setSessionCookie(req, res, token)
-
       return success(res, {
         user: {
           id: user.id,
@@ -111,8 +90,10 @@ export const authController = {
       }, '登录成功')
     } catch (err) {
       logger.error('登录错误', err)
-      await recordLoginFailure(req)
-      return unauthorized(res, '用户名或密码错误')
+      if (isBoundedAdmissionBusyError(err) && err.code === 'LOGIN_VERIFY_BUSY') {
+        res.setHeader('Retry-After', String(err.retryAfterSeconds))
+      }
+      return res.status(503).json({ code: -1, message: '登录服务暂时不可用，请稍后再试' })
     }
   },
 
