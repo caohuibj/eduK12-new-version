@@ -17,6 +17,12 @@ import {
 
 type Tx = Prisma.TransactionClient
 
+let payloadMaterializationObserver: (() => void) | null = null
+export const setReportingPayloadMaterializationObserverForTests = (observer: (() => void) | null): void => {
+  if (process.env.NODE_ENV !== 'test') throw new Error('reporting payload observer is test-only')
+  payloadMaterializationObserver = observer
+}
+
 export type ReportingObservationActorRoleV1 = 'TEACHER' | 'STUDENT' | 'COUNSELOR' | 'CLIENT' | 'PARENT'
 export type ReportingObservationPerspectiveV1 = 'SELF_REPORT' | 'OBSERVER_REPORT' | 'RELATIONAL_EXPERIENCE'
 
@@ -333,6 +339,7 @@ const materializePreparedTrack = (prepared: PreparedTrack): ReportingObservation
       const encrypted = snapshot.canonicalResultEncrypted
       if (!encrypted) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
       let envelope
+      payloadMaterializationObserver?.()
       try { envelope = parseStoredCanonicalUnitResult(encrypted) }
       catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
       hashes.push({ slotKey: snapshot.slotKey, resultHash: envelope.resultHash })
