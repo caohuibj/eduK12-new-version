@@ -1,0 +1,32 @@
+name: Ops prelaunch acceptance
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-prelaunch-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  source-review:
+    if: github.head_ref == 'fix/ops-supported-runtime-bounded-workers' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Archive tracked source for local engineering verification
+        run: git archive --format=tar.gz -o "$RUNNER_TEMP/ops-review-source.tar.gz" HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ops-review-source-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/ops-review-source.tar.gz
+          retention-days: 1
+          if-no-files-found: error
