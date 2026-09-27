@@ -13,6 +13,7 @@ import { freezeRunTrackCohort } from './cohort'
 import { assertOrganizationReportingWorkspaceAccess } from './pr4Authorization'
 import { createLongitudinalAnalysisArtifact, createProtectedFeedbackArtifact } from './pr4Artifact'
 import type { ReportingPrivacyExposureV1 } from './artifact'
+import { assertFixedPopulationArtifactDisclosure } from './fixedPopulationPrivacy'
 import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
 import { resolveAuthoritativeTrackObservations, type ReportingObservationPerspectiveV1 } from './resultSource'
 import {
@@ -50,7 +51,11 @@ const publicWave = (wave: Awaited<ReturnType<typeof bindReportingSeriesWave>>) =
   createdAt: wave.createdAt.toISOString(),
 })
 
-const publicArtifact = (artifact: ReportingArtifactRecord) => {
+const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
+  // Every aggregate response, including an old artifact and export projection,
+  // is checked with current authority. A trusted creator does not confer trusted
+  // disclosure rights on an ordinary reader of the same Run.
+  await assertFixedPopulationArtifactDisclosure({ principal, artifact })
   if (artifact.analysisKind === 'PROTECTED_FEEDBACK') {
     return {
       artifactId: artifact.id,
@@ -168,6 +173,7 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
     spec: governed,
     mode: input.mode,
     generatedByUserId: input.principal.userId,
+    principal: input.principal,
     privacyExposures: input.privacyExposures,
   })
   await assertOrganizationGroupReportsGenerateAccess({
@@ -175,7 +181,7 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
     organizationId: input.organizationId,
     runIds: waves.map((wave) => wave.sourceRunId),
   })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }
 
 type FrozenSubjectRow = { actorSnapshotId: string; userId: string }
@@ -252,7 +258,7 @@ export const generateOrganizationProtectedFeedback = async (input: {
     generatedByUserId: input.principal.userId,
   })
   await assertProtectedFeedbackManagerAccess({ principal: input.principal, organizationId: input.organizationId, subjectUserId: input.subjectUserId })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }
 
 export const readOrganizationReportingArtifact = async (input: {
@@ -271,7 +277,7 @@ export const readOrganizationReportingArtifact = async (input: {
       bindings: artifact.artifactPayload.waveBindings,
     })
     await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind === 'GROUP') {
@@ -280,7 +286,7 @@ export const readOrganizationReportingArtifact = async (input: {
       organizationId: input.organizationId,
       runId: artifact.artifactPayload.source.runId,
     }))
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind === 'REPEATED_COHORT' || artifact.analysisKind === 'MATCHED_LONGITUDINAL') {
@@ -294,7 +300,7 @@ export const readOrganizationReportingArtifact = async (input: {
       organizationId: input.organizationId,
       runIds: waves.map((wave) => wave.sourceRunId),
     }))
-    return publicArtifact(artifact)
+    return publicArtifact(artifact, input.principal)
   }
 
   if (artifact.analysisKind !== 'PROTECTED_FEEDBACK') {
@@ -305,5 +311,5 @@ export const readOrganizationReportingArtifact = async (input: {
     organizationId: input.organizationId,
     subjectUserId: artifact.artifactPayload.source.subjectUserId,
   })
-  return publicArtifact(artifact)
+  return publicArtifact(artifact, input.principal)
 }
