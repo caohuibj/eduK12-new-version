@@ -80,7 +80,7 @@ async function main() {
   const schema = path.join(root, 'backend/prisma/schema.prisma');
   const migrate = (url, args, schemaPath = schema) => run(process.execPath, [prisma, 'migrate', ...args, '--schema', schemaPath], { env: { ...process.env, DATABASE_URL: url } });
   fs.writeFileSync(path.join(out, 'fresh-migrate.log'), migrate(sourceUrl, ['deploy']));
-  record('fresh PostgreSQL14: all repository migrations applied');
+  record('fresh PostgreSQL16: all repository migrations applied');
   // Snapshot the real scenario DB, including encrypted canonical results and immutable reports.
   const dump = path.join(scratch, 'scenarios.dump');
   if (process.env.PR5_SOURCE_POSTGRES_CONTAINER) {
