@@ -398,14 +398,18 @@ function transcodeVideoOptimized(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     let totalTime = 0
-    const resConfig = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    let settled = false
+    let timedOut = false
+    let hardKillTimer: ReturnType<typeof setTimeout> | undefined
+    let settleTracked!: () => void
+    const tracked = new Promise<void>((done) => { settleTracked = done })
 
     ffmpeg(input).ffprobe((err, data) => {
-      if (!err && data.format?.duration) {
-        totalTime = data.format.duration
-      }
+      if (!err && data.format?.duration) totalTime = data.format.duration
     })
 
+    const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
     const cmd = ffmpeg(input)
       .videoCodec('libx264')
       .videoBitrate(resConfig.bitrate)
@@ -417,65 +421,117 @@ function transcodeVideoOptimized(
         '-movflags +faststart',
         '-threads 1',
         '-pix_fmt yuv420p',
-        ...(strategy.mode === 'transcode' ? [
-          '-tune fastdecode',
-          '-profile:v baseline',
-          '-level 3.0',
-        ] : []),
+        ...(strategy.mode === 'transcode' ? ['-tune fastdecode', '-profile:v baseline', '-level 3.0'] : []),
       ])
 
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
-
     if (cornerWatermark) {
       cmd.complexFilter([
-        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,` +
-        `pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,` +
-        `format=yuv420p[base]`,
-        `[1:v]format=rgba[wm]`,
-        `[base][wm]overlay=(W-w)/2:H-h-20:enable='between(t,0,999999)'`
+        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p[base]`,
+        '[1:v]format=rgba[wm]',
+        "[base][wm]overlay=(W-w)/2:H-h-20:enable='between(t,0,999999)'",
       ])
       cmd.input(cornerWatermark)
     } else {
       cmd.complexFilter([
-        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,` +
-        `pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,` +
-        `format=yuv420p`
+        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p`,
       ])
     }
 
-    cmd
-      .on('start', (cmdStr) => {
-        logger.debug('FFmpeg 命令:', cmdStr)
-      })
-      .on('progress', (progress) => {
-        if (totalTime > 0 && onProgress) {
-          const time = progress.timemark?.split(':').reduce((acc: number, time: string) => (60 * acc) + parseFloat(time), 0) || 0
-          const percent = Math.min(100, Math.round((time / totalTime) * 100))
-          onProgress(percent)
-        }
-      })
-      .on('end', () => {
+    const unregister = registerWorkerSubprocess(
+      `video-transcode:${path.basename(output)}`,
+      (signal) => cmd.kill(signal),
+      tracked,
+    )
+    const timeout = setTimeout(() => {
+      timedOut = true
+      try { cmd.kill('SIGTERM') } catch { /* already exiting */ }
+      hardKillTimer = setTimeout(() => {
+        try { cmd.kill('SIGKILL') } catch { /* already exiting */ }
+      }, 2_000)
+      hardKillTimer.unref?.()
+    }, runtimeResourceConfig.videoTimeoutSeconds * 1000)
+    timeout.unref?.()
+
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      if (hardKillTimer) clearTimeout(hardKillTimer)
+      unregister()
+      settleTracked()
+      if (workerShutdownCancellationRequested()) {
+        reject(new WorkerShutdownCancellationError())
+      } else if (timedOut) {
+        reject(new Error('FFmpeg 转码超时并已终止'))
+      } else if (error) {
+        reject(error)
+      } else {
         if (onProgress) onProgress(100)
         resolve()
+      }
+    }
+
+    cmd
+      .on('start', (cmdStr) => logger.debug('FFmpeg 命令:', cmdStr))
+      .on('progress', (progress) => {
+        if (totalTime > 0 && onProgress) {
+          const time = progress.timemark?.split(':').reduce((acc: number, value: string) => (60 * acc) + parseFloat(value), 0) || 0
+          onProgress(Math.min(100, Math.round((time / totalTime) * 100)))
+        }
       })
-      .on('error', (err) => {
-        reject(new Error(`FFmpeg 转码失败: ${err.message}`))
-      })
+      .on('end', () => finish())
+      .on('error', (err) => finish(new Error(`FFmpeg 转码失败: ${err.message}`)))
       .save(output)
   })
 }
 
 function generateThumbnailOptimized(input: string, output: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    ffmpeg(input)
+    let settled = false
+    let timedOut = false
+    let hardKillTimer: ReturnType<typeof setTimeout> | undefined
+    let settleTracked!: () => void
+    const tracked = new Promise<void>((done) => { settleTracked = done })
+    const cmd = ffmpeg(input)
+
+    const unregister = registerWorkerSubprocess(
+      `video-thumbnail:${path.basename(output)}`,
+      (signal) => cmd.kill(signal),
+      tracked,
+    )
+    const timeout = setTimeout(() => {
+      timedOut = true
+      try { cmd.kill('SIGTERM') } catch { /* already exiting */ }
+      hardKillTimer = setTimeout(() => {
+        try { cmd.kill('SIGKILL') } catch { /* already exiting */ }
+      }, 2_000)
+      hardKillTimer.unref?.()
+    }, Math.min(runtimeResourceConfig.videoTimeoutSeconds, 300) * 1000)
+    timeout.unref?.()
+
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      if (hardKillTimer) clearTimeout(hardKillTimer)
+      unregister()
+      settleTracked()
+      if (workerShutdownCancellationRequested()) reject(new WorkerShutdownCancellationError())
+      else if (timedOut) reject(new Error('FFmpeg 缩略图生成超时并已终止'))
+      else if (error) reject(error)
+      else resolve()
+    }
+
+    cmd
+      .on('end', () => finish())
+      .on('error', (err) => finish(err))
       .screenshots({
         timestamps: ['10%'],
         filename: path.basename(output),
         folder: path.dirname(output),
-        size: '640x360'
+        size: '640x360',
       })
-      .on('end', () => resolve())
-      .on('error', reject)
   })
 }
 
