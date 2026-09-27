@@ -122,7 +122,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           id: videoId,
           status: 'PROCESSING',
           processingJobId: String(job.id),
-          generation,
+          processingGeneration: generation,
         },
         data: { originalUrl: videoUrl },
       })
@@ -184,7 +184,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
             id: videoId,
             status: 'PROCESSING',
             processingJobId: String(job.id),
-            generation,
+            processingGeneration: generation,
           },
           data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
         })
@@ -285,7 +285,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           id: videoId,
           status: 'PROCESSING',
           processingJobId: String(job.id),
-          generation,
+          processingGeneration: generation,
         },
         data: {
           status: 'COMPLETED',
