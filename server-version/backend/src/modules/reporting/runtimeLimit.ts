@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
-import type { RequestHandler, Response } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
 import { cacheService } from '../../services/cacheService'
+import { BoundedAdmissionGate, configuredInteger } from '../../services/boundedAdmissionGate'
 
 const positiveInt = (value: string | undefined, fallback: number): number => {
   const parsed = Number(value)
@@ -11,6 +12,33 @@ const analysisBudget = () => positiveInt(process.env.REPORTING_COST_BUDGET, 120)
 const analysisWindowSeconds = () => positiveInt(process.env.REPORTING_COST_WINDOW_SECONDS, 60)
 const maxConcurrent = () => positiveInt(process.env.REPORTING_MAX_CONCURRENT_ANALYSES, 2)
 const semaphoreTtlSeconds = () => positiveInt(process.env.REPORTING_CONCURRENCY_TTL_SECONDS, 300)
+
+export const reportingAnalysisExecutionAdmission = new BoundedAdmissionGate({
+  name: 'reporting_analysis',
+  maxConcurrent: configuredInteger('REPORTING_GLOBAL_MAX_CONCURRENT', 1),
+  // No speculative queue before the 4C4G measurement pass: reject excess
+  // heavy work immediately rather than retaining additional request memory.
+  maxQueue: configuredInteger('REPORTING_GLOBAL_MAX_QUEUE', 0, true),
+  maxWaitMs: configuredInteger('REPORTING_GLOBAL_MAX_WAIT_MS', 250),
+  retryAfterSeconds: 1,
+  busyCode: 'REPORTING_BUSY',
+  busyMessage: '报告服务繁忙，请稍后再试',
+})
+
+export const withReportingAnalysisExecution = <T>(operation: () => Promise<T>): Promise<T> =>
+  reportingAnalysisExecutionAdmission.run(operation)
+
+type ReportingLeaseRequest = Request & {
+  reportingAnalysisLease?: { release: () => Promise<void> }
+}
+
+export const releaseReportingAnalysisLease = async (req: Request): Promise<void> => {
+  const request = req as ReportingLeaseRequest
+  const lease = request.reportingAnalysisLease
+  if (!lease) return
+  delete request.reportingAnalysisLease
+  await lease.release()
+}
 
 const digest = (value: string): string => crypto.createHash('sha256').update(value).digest('hex')
 
@@ -57,13 +85,13 @@ export const reportingAnalysisGuard: RequestHandler = async (req, res, next) => 
   }
 
   let released = false
-  const release = () => {
-    if (released) return
-    released = true
-    void cacheService.releaseSemaphore(semaphoreKey, holderId)
+  ;(req as ReportingLeaseRequest).reportingAnalysisLease = {
+    release: async () => {
+      if (released) return
+      released = true
+      await cacheService.releaseSemaphore(semaphoreKey, holderId)
+    },
   }
-  res.once('finish', release)
-  res.once('close', release)
   next()
 }
 
