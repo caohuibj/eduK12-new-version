@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../config/database'
 import { exportRoot, validateStorageKey } from './exportArtifactService'
+import { runtimeResourceConfig } from '../config/runtimeResources'
 
 const parsePositiveInt = (name: string, fallback: number): number => {
   const value = Number(process.env[name])
@@ -61,13 +62,74 @@ export const cleanupExpiredExportFiles = (
  * are intentionally not used for artifact cleanup: an operator can safely
  * keep unrelated legacy exports without them being guessed or deleted.
  */
+const GENERATION_FILE = /^(?:scale|questionnaire)_[A-Za-z0-9-]+_([0-9a-f-]{36})(?:__generation_\d+)?__projection_v1_[A-Za-z]+_[0-9a-f]{24}\.(?:csv|sav|sps)(?:\.tmp-[A-Za-z0-9_-]+)?$/
+
+const cleanupStaleOrphanExportFiles = async (
+  db: typeof prisma,
+  now: Date,
+): Promise<number> => {
+  const root = exportRoot()
+  if (!fs.existsSync(root)) return 0
+
+  const staleCutoff = now.getTime() - (runtimeResourceConfig.exportTimeoutSeconds + 60) * 1000
+  const entries = fs.readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && GENERATION_FILE.test(entry.name))
+    .slice(0, 500)
+  if (entries.length === 0) return 0
+
+  const candidates = entries
+    .map((entry) => {
+      const match = GENERATION_FILE.exec(entry.name)
+      if (!match) return null
+      const filePath = path.join(root, entry.name)
+      const stat = fs.statSync(filePath)
+      return stat.mtimeMs <= staleCutoff ? { name: entry.name, filePath, batchId: match[1] } : null
+    })
+    .filter((entry): entry is { name: string; filePath: string; batchId: string } => Boolean(entry))
+  if (candidates.length === 0) return 0
+
+  const [referenced, active] = await Promise.all([
+    db.exportArtifact.findMany({
+      where: { storageKey: { in: candidates.map((entry) => entry.name) } },
+      select: { storageKey: true },
+    }),
+    db.exportBatch.findMany({
+      where: {
+        id: { in: [...new Set(candidates.map((entry) => entry.batchId))] },
+        status: 'PROCESSING',
+      },
+      select: { id: true },
+    }),
+  ])
+  const referencedKeys = new Set(referenced.map((entry) => entry.storageKey))
+  const activeBatchIds = new Set(active.map((entry) => entry.id))
+
+  let deleted = 0
+  for (const entry of candidates) {
+    if (referencedKeys.has(entry.name) || activeBatchIds.has(entry.batchId)) continue
+    try {
+      fs.unlinkSync(entry.filePath)
+      deleted += 1
+    } catch {
+      // A concurrent cleanup or filesystem race is harmless; metadata remains
+      // authoritative and the next bounded sweep can retry.
+    }
+  }
+  return deleted
+}
+
 export const cleanupExpiredExportArtifacts = async (
   db: typeof prisma = prisma,
   now = new Date(),
 ): Promise<{ deletedArtifacts: number; deletedFiles: number; invalidPaths: number }> => {
   const rows = await db.exportArtifact.findMany({
-    where: { expiresAt: { lte: now } },
+    where: {
+      expiresAt: { lte: now },
+      status: { in: ['READY', 'FAILED'] },
+    },
     select: { id: true, storageKey: true },
+    orderBy: { expiresAt: 'asc' },
+    take: 100,
   })
   let deletedFiles = 0
   let invalidPaths = 0
@@ -87,9 +149,33 @@ export const cleanupExpiredExportArtifacts = async (
     deletedIds.push(row.id)
   }
   if (deletedIds.length > 0) await db.exportArtifact.deleteMany({ where: { id: { in: deletedIds } } })
-  // Touch the root to make the configured storage location explicit for
-  // callers/metrics without recursively scanning it.
-  void exportRoot()
+
+  // Batch intents are terminal metadata and can be reaped separately. Never
+  // delete PROCESSING batches: worker recovery owns those generations.
+  const expiredBatches = await db.exportBatch.findMany({
+    where: { expiresAt: { lte: now }, status: { in: ['READY', 'FAILED'] } },
+    select: { id: true },
+    orderBy: { expiresAt: 'asc' },
+    take: 100,
+  })
+  if (expiredBatches.length > 0) {
+    const candidateIds = expiredBatches.map((batch) => batch.id)
+    const remainingArtifacts = await db.exportArtifact.findMany({
+      where: { batchId: { in: candidateIds } },
+      select: { batchId: true },
+      distinct: ['batchId'],
+    })
+    const blocked = new Set(remainingArtifacts.map((artifact) => artifact.batchId).filter(Boolean))
+    const deletable = candidateIds.filter((id) => !blocked.has(id))
+    if (deletable.length > 0) {
+      await db.exportBatch.deleteMany({ where: { id: { in: deletable } } })
+    }
+  }
+
+  // Clean only strictly-named, stale, unreferenced generation/temp files.
+  // PROCESSING batch ids are excluded so active generations are never touched.
+  deletedFiles += await cleanupStaleOrphanExportFiles(db, now)
+
   return { deletedArtifacts: deletedIds.length, deletedFiles, invalidPaths }
 }
 

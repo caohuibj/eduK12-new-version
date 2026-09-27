@@ -480,6 +480,7 @@ model Video {
   // The queue job identity and start time make PROCESSING recoverable after a
   // worker crash or a stalled Bull job.
   processingJobId     String?      @map("processing_job_id")
+  processingGeneration Int         @default(0) @map("processing_generation")
   processingStartedAt DateTime?    @map("processing_started_at")
   originalUrl         String?      @map("original_url")
   originalCosUrl      String?      @map("original_cos_url") // 原始文件COS URL（低频存储）
@@ -925,6 +926,37 @@ model QuestionnaireAccessToken {
   @@index([expiresAt])
   @@index([isActive, expiresAt]) // 新增：有效令牌查询优化
   @@map("questionnaire_access_tokens")
+}
+
+// Durable intent authority for worker-generated Scale/Questionnaire exports.
+// Bull is a delivery mechanism only; PostgreSQL remains the recoverable source
+// of truth across queue outages, retries, worker restarts, and stale jobs.
+model ExportBatch {
+  id                  String               @id @default(uuid())
+  resourceType        String               @map("resource_type")
+  resourceId          String               @map("resource_id")
+  createdBy           String               @map("created_by")
+  anonymized          Boolean              @default(true)
+  formats             String[]
+  options             Json
+  requestKey          String               @map("request_key")
+  requestHash         String               @map("request_hash")
+  status              ExportArtifactStatus @default(PROCESSING)
+  generation          Int                  @default(0)
+  processingJobId     String?              @map("processing_job_id")
+  processingStartedAt DateTime?            @map("processing_started_at")
+  errorCode           String?              @map("error_code")
+  recordCount         Int                  @map("record_count")
+  fieldCount          Int?                 @map("field_count")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  expiresAt           DateTime             @map("expires_at")
+
+  @@unique([createdBy, requestKey])
+  @@index([resourceType, resourceId])
+  @@index([status, updatedAt])
+  @@index([expiresAt])
+  @@map("export_batches")
 }
 
 // Metadata authority for generated exports. The file itself remains on the

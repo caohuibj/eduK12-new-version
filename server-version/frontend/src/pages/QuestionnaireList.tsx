@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../api/client'
 import { Copy, Download, Edit, Eye, EyeOff, FileText, Layers, Plus, Trash2, Users, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
+import { createExportRequestKey, ExportJobFailedError, waitForExportArtifacts, type ExportArtifactRef } from '../utils/exportJobs'
 
 interface Questionnaire {
   id: string
@@ -44,6 +45,7 @@ const QuestionnaireList: React.FC = () => {
   const [exportQuestionnaireId, setExportQuestionnaireId] = useState<string | null>(null)
   const [exportPreview, setExportPreview] = useState<any>(null)
   const [exportLoading, setExportLoading] = useState(false)
+  const exportRequestRef = useRef<{ signature: string; key: string } | null>(null)
   const [exportOptions, setExportOptions] = useState({
     anonymize: true,
     minProgress: 100,
@@ -151,6 +153,18 @@ const QuestionnaireList: React.FC = () => {
   const handleExport = async () => {
     if (!exportQuestionnaireId) return
     setExportLoading(true)
+    const signature = JSON.stringify({
+      resourceId: exportQuestionnaireId,
+      anonymize: exportOptions.anonymize,
+      minProgress: exportOptions.minProgress,
+      dateStart: exportOptions.dateStart,
+      dateEnd: exportOptions.dateEnd,
+      format: exportOptions.format,
+    })
+    if (!exportRequestRef.current || exportRequestRef.current.signature !== signature) {
+      exportRequestRef.current = { signature, key: createExportRequestKey() }
+    }
+
     try {
       const response = await apiClient.post(`/questionnaires/${exportQuestionnaireId}/export`, {
         anonymize: exportOptions.anonymize,
@@ -160,29 +174,34 @@ const QuestionnaireList: React.FC = () => {
           end: exportOptions.dateEnd || undefined,
         },
         format: exportOptions.format,
+        requestKey: exportRequestRef.current.key,
       })
 
-      if (response.code === 0) {
-        const artifacts = Array.isArray(response.data.artifacts) ? response.data.artifacts : []
-        await Promise.all(artifacts.map(async (artifact: { downloadUrl: string; fileName: string }) => {
-          const downloadResponse = await sessionFetch(artifact.downloadUrl)
-          if (!downloadResponse.ok) throw new Error('导出文件下载失败')
-          const blob = await downloadResponse.blob()
-          const url = window.URL.createObjectURL(blob)
-          const anchor = document.createElement('a')
-          anchor.href = url
-          anchor.download = artifact.fileName
-          anchor.click()
-          window.URL.revokeObjectURL(url)
-        }))
+      if (response.code !== 0) throw new Error(response.message || '导出失败')
+      const artifacts = Array.isArray(response.data.artifacts)
+        ? response.data.artifacts as ExportArtifactRef[]
+        : []
+      const readyArtifacts = await waitForExportArtifacts(artifacts)
 
-        const formatLabel = exportOptions.format === 'sav' ? 'SAV' : 'CSV'
-        alert(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${response.data.fieldCount}\n\n文件已开始下载...`)
-        setShowExportModal(false)
-      } else {
-        alert(response.message || '导出失败')
+      for (const artifact of readyArtifacts) {
+        const downloadResponse = await sessionFetch(artifact.downloadUrl)
+        if (!downloadResponse.ok) throw new Error('导出文件下载失败')
+        const blob = await downloadResponse.blob()
+        const url = window.URL.createObjectURL(blob)
+        const anchor = document.createElement('a')
+        anchor.href = url
+        anchor.download = artifact.fileName
+        anchor.click()
+        window.URL.revokeObjectURL(url)
       }
+
+      exportRequestRef.current = null
+      const formatLabel = exportOptions.format === 'sav' ? 'SAV' : 'CSV'
+      const fieldCount = response.data.fieldCount ?? exportPreview?.fields?.length ?? '-'
+      alert(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${fieldCount}\n\n文件已开始下载...`)
+      setShowExportModal(false)
     } catch (operationError: any) {
+      if (operationError instanceof ExportJobFailedError) exportRequestRef.current = null
       alert(operationError.message || '导出失败')
     } finally {
       setExportLoading(false)

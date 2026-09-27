@@ -46,7 +46,7 @@ jobs:
       ASSESSMENT_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-assessment-video-e2e
     services:
       postgres:
-        image: postgres:14-alpine
+        image: postgres:16.15-bookworm
         env:
           POSTGRES_USER: ptool
           POSTGRES_PASSWORD: ptool123
@@ -59,7 +59,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
       redis:
-        image: redis:7-alpine
+        image: redis:7.4.11-bookworm
         ports:
           - 6379:6379
         options: >-
@@ -76,7 +76,7 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure isolated test keys
         run: |
           for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do

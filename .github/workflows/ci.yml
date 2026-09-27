@@ -71,7 +71,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
       - id: scope
         env:
@@ -112,7 +112,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -159,7 +159,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -187,7 +187,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -247,7 +247,7 @@ jobs:
       REDIS_URL: redis://localhost:6379
     services:
       postgres:
-        image: postgres:14-alpine
+        image: postgres:16.15-bookworm
         env:
           POSTGRES_USER: ptool
           POSTGRES_PASSWORD: ptool123
@@ -265,7 +265,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
       redis:
-        image: redis:7-alpine
+        image: redis:7.4.11-bookworm
         ports:
           - 6379:6379
         options: >-
@@ -284,7 +284,7 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -470,7 +470,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -541,7 +541,7 @@ jobs:
       SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-bundle-e2e
     services:
       postgres:
-        image: postgres:14-alpine
+        image: postgres:16.15-bookworm
         env:
           POSTGRES_USER: ptool
           POSTGRES_PASSWORD: ptool123
@@ -554,7 +554,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
       redis:
-        image: redis:7-alpine
+        image: redis:7.4.11-bookworm
         ports:
           - 6379:6379
         options: >-
@@ -574,7 +574,7 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local npm and Playwright caches
         run: |
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
@@ -804,7 +804,7 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: configure runner-local Trivy cache
         id: runner-cache
         run: |
@@ -879,7 +879,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -914,6 +914,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
       - name: require exact success for the selected route
         run: node .github/scripts/merge-gate.mjs

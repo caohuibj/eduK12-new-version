@@ -34,7 +34,7 @@ function run(args, options = {}) {
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function main() {
-  run(['run', '-d', '--name', container, '--env', 'POSTGRES_USER=restore', '--env', `POSTGRES_PASSWORD=${password}`, '--env', 'POSTGRES_DB=restore', 'postgres:14-alpine']);
+  run(['run', '-d', '--name', container, '--env', 'POSTGRES_USER=restore', '--env', `POSTGRES_PASSWORD=${password}`, '--env', 'POSTGRES_DB=restore', 'postgres:16.15-bookworm']);
   const deadline = Date.now() + 120_000;
   let ready = false;
   while (Date.now() < deadline) {

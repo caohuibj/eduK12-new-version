@@ -21,6 +21,7 @@ export interface ExportOptions {
   dateRange?: { start?: string; end?: string }
   includeLabels?: boolean
   projectionAudience?: ScaleDisclosureAudience
+  recordLimit?: number
 }
 
 export async function getScaleExportData(scaleId: string, options: ExportOptions = {}): Promise<legacy.ExportData> {

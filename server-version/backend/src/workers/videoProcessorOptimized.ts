@@ -15,12 +15,14 @@ try {
 }
 
 import { videoQueue, RESOURCE_LIMITS } from '../config/queue'
+import { runtimeResourceConfig } from '../config/runtimeResources'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
-import { markVideoFailed, markVideoProcessing } from '../services/videoProcessingState'
-import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery } from '../services/videoProcessingRecovery'
+import { associateVideoRetryJob, markVideoFailed, markVideoProcessing, releaseVideoProcessingForRetry } from '../services/videoProcessingState'
+import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery, stopVideoProcessingRecovery } from '../services/videoProcessingRecovery'
+import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
 
 // 处理策略类型
 interface ProcessingStrategy {
@@ -31,34 +33,16 @@ interface ProcessingStrategy {
   reason: string
 }
 
-// 配置选项 - 优化压缩配置
+// 配置选项来自统一、严格验证的 non-secret runtime resource config。
 const PROCESSING_CONFIG = {
-  // 硬件负担最小模式 - 低配服务器配置
-  lowPowerMode: process.env.VIDEO_LOW_POWER_MODE === 'true',
-
-  // 分辨率设置 - 强制480p
-  resolution: '480p',
-
-  // 编码速度预设 (影响CPU使用和压缩率)
-  // ultrafast = 最快, 文件大 | veryfast = 较快 | faster = 更好压缩率 | veryslow = 最慢, 文件小
-  // 优化：使用 veryfast 提升处理速度 30-50%
-  preset: 'veryfast',
-
-  // CRF 质量 (18-28, 越小质量越好, 文件越大)
-  // 优化：降低 CRF 值补偿质量
-  crf: 26,
-
-  // 视频码率 (480p推荐800k，适配6M带宽)
-  videoBitrate: '800k',
-
-  // 音频码率
-  audioBitrate: '96k',
-
-  // Keep the worker aligned with the queue-level bounded concurrency.
+  lowPowerMode: runtimeResourceConfig.videoLowPowerMode,
+  resolution: runtimeResourceConfig.videoResolution,
+  preset: runtimeResourceConfig.videoPreset,
+  crf: runtimeResourceConfig.videoCrf,
+  videoBitrate: runtimeResourceConfig.videoBitrate,
+  audioBitrate: runtimeResourceConfig.videoAudioBitrate,
   concurrency: RESOURCE_LIMITS.videoConcurrency,
-
-  // 启用压缩优化 - 如果原文件比处理后小，保留原文件
-  smartCompression: true,
+  smartCompression: runtimeResourceConfig.videoSmartCompression,
 }
 
 // 分辨率映射 - 适配6M带宽
@@ -76,13 +60,12 @@ const RESOLUTION_MAP: Record<string, { size: string; bitrate: string }> = {
 function determineProcessingStrategy(videoInfo: VideoValidationResult): ProcessingStrategy {
   const { height, codec } = videoInfo
 
-  // 强制转码到480P，增加压缩比
   return {
     mode: 'transcode',
     preset: PROCESSING_CONFIG.preset,
     crf: PROCESSING_CONFIG.crf,
-    resolution: '480p',
-    reason: `统一压缩策略: ${height}p/${codec} -> 480p/H.264`
+    resolution: PROCESSING_CONFIG.resolution,
+    reason: `统一压缩策略: ${height}p/${codec} -> ${PROCESSING_CONFIG.resolution}/H.264`
   }
 }
 
@@ -115,27 +98,35 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
   logger.info(`🎬 开始处理视频: ${videoId} (${isUrlMode ? 'URL下载' : '本地上传'})`)
 
-  const tempDir = path.join('/tmp', `video-${videoId}`)
+  let tempDir = ''
+  let processingGeneration: number | null = null
   const derivativeAssets: Array<{ id: string; objectKey: string; provider: string }> = []
 
   try {
-    // Await the asynchronous probe so the first queued job cannot race the
-    // availability check and be failed before FFmpeg reports ready.
-    if (!(await ffmpegAvailability)) {
-      throw new Error('FFmpeg 未安装')
-    }
-
-    // 更新状态为处理中
-    const claimed = await markVideoProcessing(videoId, String(job.id))
-    if (!claimed) {
+    // 先取得 generation ownership，再做 FFmpeg probe。这样即使运行环境
+    // 缺少 FFmpeg，最终 attempt 也能以 exact generation 安全落库 FAILED。
+    processingGeneration = await markVideoProcessing(videoId, String(job.id))
+    if (processingGeneration === null) {
       logger.warn('视频处理任务未能取得视频行所有权，跳过过期任务', { videoId, jobId: job.id })
       return { videoId, skipped: true }
     }
+    const generation = processingGeneration
+    if (!(await ffmpegAvailability)) {
+      throw new Error('FFmpeg 未安装')
+    }
+    const safeJobId = String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')
+    tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${generation}`)
     if (isUrlMode) {
-      await prisma.video.update({
-        where: { id: videoId },
+      const updated = await prisma.video.updateMany({
+        where: {
+          id: videoId,
+          status: 'PROCESSING',
+          processingJobId: String(job.id),
+          processingGeneration: generation,
+        },
         data: { originalUrl: videoUrl },
       })
+      if (updated.count !== 1) throw new Error('视频处理任务已失效')
     }
 
     await job.progress(5)
@@ -189,7 +180,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       derivativeAssets.push(originalAsset)
       await prisma.$transaction(async (tx) => {
         const updated = await tx.video.updateMany({
-          where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
+          where: {
+            id: videoId,
+            status: 'PROCESSING',
+            processingJobId: String(job.id),
+            processingGeneration: generation,
+          },
           data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
         })
         if (updated.count !== 1) throw new Error('视频处理任务已失效')
@@ -210,7 +206,8 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     await job.progress(20)
 
     // 获取目标分辨率尺寸
-    const resConfig = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
 
     // 步骤3：生成底部居中水印
@@ -284,7 +281,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     // Update the video and attach both derivatives atomically.
     await prisma.$transaction(async (tx) => {
       const updated = await tx.video.updateMany({
-        where: { id: videoId, status: 'PROCESSING', processingJobId: String(job.id) },
+        where: {
+          id: videoId,
+          status: 'PROCESSING',
+          processingJobId: String(job.id),
+          processingGeneration: generation,
+        },
         data: {
           status: 'COMPLETED',
           processedUrl: null,
@@ -308,7 +310,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     await job.progress(100)
 
     // 清理临时文件
-    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+    if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
 
     logger.info(`✅ 视频处理完成: ${videoId} (分辨率: ${PROCESSING_CONFIG.resolution})`)
 
@@ -320,19 +322,42 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     for (const result of cleanupResults) {
       if (result.status === 'rejected') logger.warn('视频失败清理资源失败', { videoId })
     }
+    if (isWorkerShutdownCancellationError(error) && processingGeneration !== null) {
+      await releaseVideoProcessingForRetry(videoId, String(job.id), processingGeneration).catch(() => false)
+      if (isFinalVideoAttempt(job)) {
+        try {
+          const retry = await videoQueue.add('transcode', job.data, {
+            delay: 5_000,
+            priority: job.opts?.priority ?? 1,
+            attempts: Math.max(2, Number(job.opts?.attempts || 3)),
+            backoff: job.opts?.backoff || { type: 'exponential', delay: 5_000 },
+          })
+          await associateVideoRetryJob(videoId, String(retry.id))
+          logger.warn('worker shutdown cancelled final video attempt; recovery job queued', {
+            videoId, priorJobId: job.id, recoveryJobId: retry.id,
+          })
+        } catch {
+          // Startup reconciliation repairs a PENDING row if Redis disappears
+          // during shutdown after the domain ownership was released.
+          logger.error('worker shutdown video recovery enqueue failed', { videoId, priorJobId: job.id })
+        }
+      }
+      if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+      throw error
+    }
+
     // Bull retries non-terminal attempts. Persist FAILED only for the final
-    // attempt; otherwise the next attempt may not reclaim the row.
-    if (isFinalVideoAttempt(job)) {
+    // real processing attempt; infrastructure shutdown cancellation is handled
+    // above and must not become a business failure.
+    if (isFinalVideoAttempt(job) && processingGeneration !== null) {
       try {
-        const recorded = await markVideoFailed(videoId, String(job.id))
+        const recorded = await markVideoFailed(videoId, String(job.id), processingGeneration)
         if (!recorded) logger.warn('视频最终失败状态未更新（任务可能已被其他流程处理）', { videoId, jobId: job.id })
       } catch {
-        // The queue-level failed listener and the stale sweep provide a later
-        // conditional retry if this database write is temporarily unavailable.
         logger.error('视频最终失败状态写入异常', { videoId, jobId: job.id })
       }
     }
-    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
+    if (tempDir) await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { })
     throw error
   }
 })
@@ -414,14 +439,18 @@ function transcodeVideoOptimized(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     let totalTime = 0
-    const resConfig = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    let settled = false
+    let timedOut = false
+    let hardKillTimer: ReturnType<typeof setTimeout> | undefined
+    let settleTracked!: () => void
+    const tracked = new Promise<void>((done) => { settleTracked = done })
 
     ffmpeg(input).ffprobe((err, data) => {
-      if (!err && data.format?.duration) {
-        totalTime = data.format.duration
-      }
+      if (!err && data.format?.duration) totalTime = data.format.duration
     })
 
+    const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
+    const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
     const cmd = ffmpeg(input)
       .videoCodec('libx264')
       .videoBitrate(resConfig.bitrate)
@@ -433,65 +462,117 @@ function transcodeVideoOptimized(
         '-movflags +faststart',
         '-threads 1',
         '-pix_fmt yuv420p',
-        ...(strategy.mode === 'transcode' ? [
-          '-tune fastdecode',
-          '-profile:v baseline',
-          '-level 3.0',
-        ] : []),
+        ...(strategy.mode === 'transcode' ? ['-tune fastdecode', '-profile:v baseline', '-level 3.0'] : []),
       ])
 
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
-
     if (cornerWatermark) {
       cmd.complexFilter([
-        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,` +
-        `pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,` +
-        `format=yuv420p[base]`,
-        `[1:v]format=rgba[wm]`,
-        `[base][wm]overlay=(W-w)/2:H-h-20:enable='between(t,0,999999)'`
+        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p[base]`,
+        '[1:v]format=rgba[wm]',
+        "[base][wm]overlay=(W-w)/2:H-h-20:enable='between(t,0,999999)'",
       ])
       cmd.input(cornerWatermark)
     } else {
       cmd.complexFilter([
-        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,` +
-        `pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,` +
-        `format=yuv420p`
+        `[0:v]scale=${targetWidth}:${targetHeight}:force_original_aspect_ratio=decrease,pad=${targetWidth}:${targetHeight}:(ow-iw)/2:(oh-ih)/2:black,format=yuv420p`,
       ])
     }
 
-    cmd
-      .on('start', (cmdStr) => {
-        logger.debug('FFmpeg 命令:', cmdStr)
-      })
-      .on('progress', (progress) => {
-        if (totalTime > 0 && onProgress) {
-          const time = progress.timemark?.split(':').reduce((acc: number, time: string) => (60 * acc) + parseFloat(time), 0) || 0
-          const percent = Math.min(100, Math.round((time / totalTime) * 100))
-          onProgress(percent)
-        }
-      })
-      .on('end', () => {
+    const unregister = registerWorkerSubprocess(
+      `video-transcode:${path.basename(output)}`,
+      (signal) => cmd.kill(signal),
+      tracked,
+    )
+    const timeout = setTimeout(() => {
+      timedOut = true
+      try { cmd.kill('SIGTERM') } catch { /* already exiting */ }
+      hardKillTimer = setTimeout(() => {
+        try { cmd.kill('SIGKILL') } catch { /* already exiting */ }
+      }, 2_000)
+      hardKillTimer.unref?.()
+    }, runtimeResourceConfig.videoTimeoutSeconds * 1000)
+    timeout.unref?.()
+
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      if (hardKillTimer) clearTimeout(hardKillTimer)
+      unregister()
+      settleTracked()
+      if (workerShutdownCancellationRequested()) {
+        reject(new WorkerShutdownCancellationError())
+      } else if (timedOut) {
+        reject(new Error('FFmpeg 转码超时并已终止'))
+      } else if (error) {
+        reject(error)
+      } else {
         if (onProgress) onProgress(100)
         resolve()
+      }
+    }
+
+    cmd
+      .on('start', (cmdStr) => logger.debug('FFmpeg 命令:', cmdStr))
+      .on('progress', (progress) => {
+        if (totalTime > 0 && onProgress) {
+          const time = progress.timemark?.split(':').reduce((acc: number, value: string) => (60 * acc) + parseFloat(value), 0) || 0
+          onProgress(Math.min(100, Math.round((time / totalTime) * 100)))
+        }
       })
-      .on('error', (err) => {
-        reject(new Error(`FFmpeg 转码失败: ${err.message}`))
-      })
+      .on('end', () => finish())
+      .on('error', (err) => finish(new Error(`FFmpeg 转码失败: ${err.message}`)))
       .save(output)
   })
 }
 
 function generateThumbnailOptimized(input: string, output: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    ffmpeg(input)
+    let settled = false
+    let timedOut = false
+    let hardKillTimer: ReturnType<typeof setTimeout> | undefined
+    let settleTracked!: () => void
+    const tracked = new Promise<void>((done) => { settleTracked = done })
+    const cmd = ffmpeg(input)
+
+    const unregister = registerWorkerSubprocess(
+      `video-thumbnail:${path.basename(output)}`,
+      (signal) => cmd.kill(signal),
+      tracked,
+    )
+    const timeout = setTimeout(() => {
+      timedOut = true
+      try { cmd.kill('SIGTERM') } catch { /* already exiting */ }
+      hardKillTimer = setTimeout(() => {
+        try { cmd.kill('SIGKILL') } catch { /* already exiting */ }
+      }, 2_000)
+      hardKillTimer.unref?.()
+    }, Math.min(runtimeResourceConfig.videoTimeoutSeconds, 300) * 1000)
+    timeout.unref?.()
+
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      if (hardKillTimer) clearTimeout(hardKillTimer)
+      unregister()
+      settleTracked()
+      if (workerShutdownCancellationRequested()) reject(new WorkerShutdownCancellationError())
+      else if (timedOut) reject(new Error('FFmpeg 缩略图生成超时并已终止'))
+      else if (error) reject(error)
+      else resolve()
+    }
+
+    cmd
+      .on('end', () => finish())
+      .on('error', (err) => finish(err))
       .screenshots({
         timestamps: ['10%'],
         filename: path.basename(output),
         folder: path.dirname(output),
-        size: '640x360'
+        size: '640x360',
       })
-      .on('end', () => resolve())
-      .on('error', reject)
   })
 }
 
@@ -508,7 +589,7 @@ function getVideoDuration(input: string): Promise<number> {
 }
 
 // 队列监控
-setInterval(async () => {
+const queueMonitorInterval = setInterval(async () => {
   try {
     const counts = await videoQueue.getJobCounts()
 
@@ -519,10 +600,18 @@ setInterval(async () => {
     if (counts.completed % 10 === 0 && counts.completed > 0) {
       logger.info(`视频处理统计: 完成 ${counts.completed}, 失败 ${counts.failed}`)
     }
-  } catch (e) {
-    // 忽略错误
+  } catch {
+    // Monitoring cannot affect processing.
   }
 }, 60000)
+queueMonitorInterval.unref?.()
+
+export const stopVideoProcessorLoops = (): void => {
+  clearTimeout(staleVideoReconciliationTimer)
+  clearInterval(staleVideoReconciliationInterval)
+  clearInterval(queueMonitorInterval)
+  stopVideoProcessingRecovery()
+}
 
 logger.info('🎬 视频处理 Worker (优化版) 已启动')
 logger.info('📥 统一处理模式: 本地上传 + URL下载')

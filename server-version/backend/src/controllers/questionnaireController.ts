@@ -7,7 +7,6 @@ import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
 import * as path from 'path'
-import * as fs from 'fs'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import {
   applyQuestionnaireProgressDelta,
@@ -28,8 +27,8 @@ import {
   isAssessmentContextServiceError,
 } from '../services/assessmentContextService'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
-import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
-import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
+import { getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { enqueueExportJob } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { isFormAnswerComplete, isFormAnswerRequiredComplete } from '../services/questionnaireFormAnswerState'
 import { normalizeQuestionnaireFormAnswer, validateQuestionnaireFormAnswer } from '../services/questionnaireFormAnswerValidation'
@@ -2985,107 +2984,50 @@ export const questionnaireController = {
         includeProgress = false,
         minProgress = 100,
         dateRange,
-        format = 'csv'
-      } = req.body
+        format = 'csv',
+        requestKey,
+      } = req.body || {}
 
       const questionnaire = await prisma.questionnaire.findFirst({
         where: { id, type: 'COURSE' },
-        select: { id: true, name: true, creatorId: true, type: true }
+        select: { id: true, name: true, creatorId: true, type: true },
       })
-
-      if (!questionnaire) {
-        return notFound(res, '问卷不存在')
-      }
-
+      if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await questionnaireAuth.canExport(actorFromRequest(req), questionnaire))) {
         return forbidden(res, '无权限导出此问卷数据')
       }
 
-      // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
-
       const countWhere: any = { questionnaireId: id, progress: { gte: minProgress } }
       if (!includeProgress) countWhere.status = 'COMPLETED'
       const countDateFilter = utcHalfOpenDateFilter(dateRange)
       if (countDateFilter) countWhere.completedAt = countDateFilter
       const recordCount = await prisma.questionnaireAssessment.count({ where: countWhere })
-      if (recordCount > EXPORT_ASYNC_RECORD_THRESHOLD) {
-        const queued = await enqueueExportJob({
-          resourceType: 'QUESTIONNAIRE',
-          resourceId: id,
-          createdBy: userId!,
-          anonymized: anonymize,
-          format,
-          options: { anonymize, includeProgress, minProgress, dateRange },
-        })
-        return success(res, {
-          status: 'PROCESSING',
-          recordCount,
-          fieldCount: null,
-          format,
-          anonymize,
-          batchId: queued.batchId,
-          artifacts: queued.artifacts,
-        }, '导出任务已创建')
-      }
 
-      const { exportService } = await import('../services/exportService')
-
-      const exportData = await exportService.getQuestionnaireExportData(id, {
-        anonymize,
-        includeProgress,
-        minProgress,
-        dateRange
+      const queued = await enqueueExportJob({
+        resourceType: 'QUESTIONNAIRE',
+        resourceId: id,
+        createdBy: userId!,
+        anonymized: anonymize,
+        format,
+        options: { anonymize, includeProgress, minProgress, dateRange },
+        recordCount,
+        requestKey: typeof requestKey === 'string' ? requestKey : undefined,
       })
-
-      const files = await exportService.saveQuestionnaireExportFiles(id, {
-        anonymize,
-        includeProgress,
-        minProgress,
-        dateRange
-      }, format as 'csv' | 'sav', exportData)
-
-      const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
-      const addArtifact = async (filePath: string, artifactFormat: string) => {
-        const artifact = await createExportArtifact({
-          resourceType: 'QUESTIONNAIRE',
-          resourceId: id,
-          createdBy: userId!,
-          format: artifactFormat,
-          anonymized: anonymize,
-          storageKey: path.basename(filePath),
-        })
-        artifacts.push({ id: artifact.id, format: artifactFormat, fileName: path.basename(filePath), expiresAt: artifact.expiresAt.toISOString(), downloadUrl: `/api/questionnaires/exports/${artifact.id}` })
-      }
-      if (files.csvPath) await addArtifact(files.csvPath, 'csv')
-      if (files.savPath) await addArtifact(files.savPath, 'sav')
-
-      logger.info('问卷数据导出成功', {
-        questionnaireId: questionnaire.id,
-        recordCount: exportData.rows.length,
+      return success(res, {
+        status: queued.status,
+        recordCount: queued.recordCount,
+        fieldCount: queued.fieldCount,
         format,
         anonymize,
-      })
-
-      const result: any = {
-        recordCount: exportData.rows.length,
-        fieldCount: exportData.fields.length,
-        format,
-        anonymize,
-        artifacts,
-      }
-
-      if (files.csvPath) {
-        result.fileName = path.basename(files.csvPath)
-      }
-      if (files.savPath) {
-        result.fileName = path.basename(files.savPath)
-      }
-
-      return success(res, result, '导出成功')
-    } catch (err) {
+        batchId: queued.batchId,
+        replayed: queued.replayed,
+        artifacts: queued.artifacts,
+      }, queued.status === 'READY' ? '导出任务已完成' : '导出任务已创建')
+    } catch (err: any) {
       logger.error('导出问卷数据错误', err)
-      return error(res, '导出问卷数据失败')
+      const statusCode = typeof err?.statusCode === 'number' ? err.statusCode : 500
+      return error(res, statusCode >= 500 ? '导出问卷数据失败' : err.message, -1, statusCode)
     }
   },
 
@@ -3132,7 +3074,8 @@ export const questionnaireController = {
 
       const previewData = await exportService.getQuestionnaireExportData(id, {
         anonymize: true,
-        minProgress: 100
+        minProgress: 100,
+        recordLimit: 5,
       })
 
       const totalItems = questionnaire.questionnaireScales.reduce(
@@ -3144,7 +3087,7 @@ export const questionnaireController = {
 
       return success(res, {
         questionnaireName: questionnaire.name,
-        totalRecords: previewData.rows.length,
+        totalRecords: questionnaire._count.assessments,
         completedCount: questionnaire._count.assessments,
         scaleCount: questionnaire.questionnaireScales.length,
         totalItems,

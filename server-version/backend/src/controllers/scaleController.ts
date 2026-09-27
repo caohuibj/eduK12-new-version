@@ -5,7 +5,6 @@ import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
 import * as path from 'path'
-import * as fs from 'fs'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { encryptField } from '../utils/encryption'
 import { canUseScale, scaleSource, scaleWhereForViewer } from '../services/materialGrant'
@@ -36,8 +35,8 @@ import { mergeScaleAnswersWithRevision } from '../modules/scale/scale-answer-con
 import { getScaleCustomScorerKeys, missingRequiredScaleItemCodes, validateScaleAnswer } from '../modules/scale/scale-scoring'
 import { retainFrozenScaleAssessmentImages } from '../modules/scale/scale-image.adapter'
 import { freezeQuestionnaireAssessmentContext, isAssessmentContextServiceError } from '../services/assessmentContextService'
-import { createExportArtifact, getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
-import { enqueueExportJob, EXPORT_ASYNC_RECORD_THRESHOLD } from '../services/exportJobService'
+import { getExportArtifactStatus, resolveArtifactForDownload } from '../services/exportArtifactService'
+import { enqueueExportJob } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { restartStandaloneScaleAssessment, submitScaleAssessmentFinalWithContext, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
 import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
@@ -1388,122 +1387,50 @@ export const scaleController = {
         includeProgress = false,
         minProgress = 100,
         dateRange,
-        format = 'csv'  // 'csv' | 'sav' | 'spss'
-      } = req.body
+        format = 'csv',
+        requestKey,
+      } = req.body || {}
 
-      // 检查量表是否存在和权限
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
-        select: { id: true, name: true, creatorId: true }
+        select: { id: true, name: true, creatorId: true },
       })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
+      if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限导出此量表数据')
       }
 
-      // 权限控制：教师必须脱敏，只有管理员可以导出非脱敏数据
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
-
       const countWhere: any = { scaleId, compositeAttemptId: null, progress: { gte: minProgress } }
       if (!includeProgress) countWhere.status = 'COMPLETED'
       const countDateFilter = utcHalfOpenDateFilter(dateRange)
       if (countDateFilter) countWhere.completedAt = countDateFilter
       const recordCount = await prisma.assessment.count({ where: countWhere })
-      if (recordCount > EXPORT_ASYNC_RECORD_THRESHOLD) {
-        const queued = await enqueueExportJob({
-          resourceType: 'SCALE',
-          resourceId: scaleId,
-          createdBy: userId!,
-          anonymized: anonymize,
-          format,
-          options: { anonymize, includeProgress, minProgress, dateRange },
-        })
-        return success(res, {
-          status: 'PROCESSING',
-          recordCount,
-          fieldCount: null,
-          format,
-          anonymize,
-          batchId: queued.batchId,
-          artifacts: queued.artifacts,
-        }, '导出任务已创建')
-      }
 
-      // 动态导入导出服务
-      const { exportService } = await import('../services/exportService')
-
-      // 获取导出数据预览
-      const exportData = await exportService.getScaleExportData(scaleId, {
-        anonymize,
-        includeProgress,
-        minProgress,
-        dateRange
+      const queued = await enqueueExportJob({
+        resourceType: 'SCALE',
+        resourceId: scaleId,
+        createdBy: userId!,
+        anonymized: anonymize,
+        format,
+        options: { anonymize, includeProgress, minProgress, dateRange },
+        recordCount,
+        requestKey: typeof requestKey === 'string' ? requestKey : undefined,
       })
-
-      // 保存导出文件
-      const files = await exportService.saveExportFiles(scaleId, {
-        anonymize,
-        includeProgress,
-        minProgress,
-        dateRange
-      }, format as 'csv' | 'sav' | 'spss', exportData)
-
-      const artifacts: Array<{ id: string; format: string; fileName: string; expiresAt: string; downloadUrl: string }> = []
-      const addArtifact = async (filePath: string, artifactFormat: string) => {
-        const artifact = await createExportArtifact({
-          resourceType: 'SCALE',
-          resourceId: scaleId,
-          createdBy: userId!,
-          format: artifactFormat,
-          anonymized: anonymize,
-          storageKey: path.basename(filePath),
-        })
-        artifacts.push({
-          id: artifact.id,
-          format: artifactFormat,
-          fileName: path.basename(filePath),
-          expiresAt: artifact.expiresAt.toISOString(),
-          downloadUrl: `/api/scales/exports/${artifact.id}`,
-        })
-      }
-      if (files.csvPath) await addArtifact(files.csvPath, 'csv')
-      if (files.savPath) await addArtifact(files.savPath, 'sav')
-      if (files.spsPath) await addArtifact(files.spsPath, 'sps')
-
-      logger.info(`量表数据导出成功: ${scale.name}, 记录数: ${exportData.rows.length}, 格式: ${format}, 脱敏: ${anonymize}`)
-
-      const result: any = {
-        recordCount: exportData.rows.length,
-        fieldCount: exportData.fields.length,
-        fields: exportData.fields.map(f => ({
-          name: f.name,
-          label: f.label,
-          type: f.type
-        })),
+      return success(res, {
+        status: queued.status,
+        recordCount: queued.recordCount,
+        fieldCount: queued.fieldCount,
         format,
         anonymize,
-        artifacts,
-      }
-
-      // 只向客户端返回可下载的文件名，不暴露服务器文件系统路径。
-      if (files.csvPath) {
-        result.fileName = path.basename(files.csvPath)
-      }
-      if (files.savPath) {
-        result.fileName = path.basename(files.savPath)
-      }
-      if (files.spsPath) {
-        result.additionalFileNames = [path.basename(files.spsPath)]
-      }
-
-      return success(res, result, '导出成功')
-    } catch (err) {
+        batchId: queued.batchId,
+        replayed: queued.replayed,
+        artifacts: queued.artifacts,
+      }, queued.status === 'READY' ? '导出任务已完成' : '导出任务已创建')
+    } catch (err: any) {
       logger.error('导出量表数据错误', err)
-      return error(res, '导出量表数据失败: ' + (err as Error).message)
+      const statusCode = typeof err?.statusCode === 'number' ? err.statusCode : 500
+      return error(res, statusCode >= 500 ? '导出量表数据失败' : err.message, -1, statusCode)
     }
   },
 
@@ -1538,7 +1465,8 @@ export const scaleController = {
       // 获取字段预览
       const previewData = await exportService.getScaleExportData(scaleId, {
         anonymize: true,
-        minProgress: 100
+        minProgress: 100,
+        recordLimit: 5,
       })
 
       // 只返回前5行数据
@@ -1546,7 +1474,7 @@ export const scaleController = {
 
       return success(res, {
         scaleName: scale.name,
-        totalRecords: previewData.rows.length,
+        totalRecords: scale._count.assessments,
         completedCount: scale._count.assessments,
         itemCount: Array.isArray((scale.definition as any)?.items) ? (scale.definition as any).items.length : 0,
         dimensionCount: Array.isArray((scale.definition as any)?.scoring?.scores)

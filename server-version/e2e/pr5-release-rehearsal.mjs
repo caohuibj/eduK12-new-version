@@ -39,7 +39,7 @@ async function start(container) {
       '-e', `POSTGRES_PASSWORD=${pass}`,
       '-e', 'POSTGRES_DB=restore',
       '-p', '127.0.0.1::5432',
-      'postgres:14-alpine',
+      'postgres:16.15-bookworm',
     ], { encoding: 'utf8' });
     if (!started.error && started.status === 0) {
       for (let i = 0; i < 60; i++) {
@@ -80,7 +80,7 @@ async function main() {
   const schema = path.join(root, 'backend/prisma/schema.prisma');
   const migrate = (url, args, schemaPath = schema) => run(process.execPath, [prisma, 'migrate', ...args, '--schema', schemaPath], { env: { ...process.env, DATABASE_URL: url } });
   fs.writeFileSync(path.join(out, 'fresh-migrate.log'), migrate(sourceUrl, ['deploy']));
-  record('fresh PostgreSQL14: all repository migrations applied');
+  record('fresh PostgreSQL16: all repository migrations applied');
   // Snapshot the real scenario DB, including encrypted canonical results and immutable reports.
   const dump = path.join(scratch, 'scenarios.dump');
   if (process.env.PR5_SOURCE_POSTGRES_CONTAINER) {
