@@ -1,0 +1,37 @@
+name: Prelaunch exact-head review workspace
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prelaunch-review-workspace-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review-source:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'perf/runtime-prelaunch-serialization-reporting'
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Archive tracked source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > "$RUNNER_TEMP/prelaunch-review-head.txt"
+          git archive --format=tar HEAD .github server-version docs > "$RUNNER_TEMP/prelaunch-review-source.tar"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prelaunch-review-workspace-${{ github.event.pull_request.head.sha }}
+          path: |
+            ${{ runner.temp }}/prelaunch-review-head.txt
+            ${{ runner.temp }}/prelaunch-review-source.tar
+          retention-days: 1
+          if-no-files-found: error
