@@ -46,7 +46,7 @@ async function start(container) {
         const r = spawnSync('docker', ['exec', container, 'pg_isready', '-U', 'restore', '-d', 'restore']);
         if (r.status === 0) {
           const port = docker(['port', container, '5432/tcp']).split(':').pop();
-          assert.ok(port && /^\\d+$/.test(port), 'temporary PostgreSQL host port must be numeric');
+          assert.ok(port && /^\d+$/.test(port), 'temporary PostgreSQL host port must be numeric');
           return `postgresql://restore:${pass}@127.0.0.1:${port}/restore`;
         }
         await sleep(500);
