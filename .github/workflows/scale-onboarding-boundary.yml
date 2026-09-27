@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     services:
       postgres:
-        image: postgres:14-alpine
+        image: postgres:16.15-bookworm
         env:
           POSTGRES_USER: ptool
           POSTGRES_PASSWORD: ptool123
@@ -36,7 +36,7 @@ jobs:
           --health-cmd "pg_isready -U ptool -d ptool"
           --health-interval 5s --health-timeout 5s --health-retries 10
       redis:
-        image: redis:7-alpine
+        image: redis:7.4.11-bookworm
         ports: ['6379:6379']
         options: >-
           --health-cmd "redis-cli ping"
@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/backend/package-lock.json
       - run: npm ci --ignore-scripts
