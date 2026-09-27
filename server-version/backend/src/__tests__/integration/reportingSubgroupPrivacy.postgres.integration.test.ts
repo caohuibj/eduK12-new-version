@@ -35,13 +35,25 @@ const fixture = async (population: number) => {
     username: `privacy-admin-${randomUUID()}`, passwordHash: 'test-only', role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN',
   } })
   const actor = { userId: admin.id, platformRole: 'SYSTEM_ADMIN' as const }
-  const publishSpec = async (kind: 'GROUP' | 'REPEATED_COHORT' = 'GROUP') => {
+  const publishSpec = async (
+    kind: 'GROUP' | 'REPEATED_COHORT' = 'GROUP',
+    resource?: { family: 'BUNDLE' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'; key: string },
+  ) => {
+    const longitudinalIdentity = kind === 'REPEATED_COHORT'
+      ? {
+          sourceFamily: resource?.family ?? 'BUNDLE',
+          sourceResourceKey: resource?.key ?? 'privacy-fixture',
+          valueType: 'NUMBER' as const,
+          longitudinalMetricKey: 'score',
+        }
+      : {}
     const spec = await createPlatformReportingSpec({ actor, specKey: `privacy-${randomUUID()}`, version: 1, definition: {
       schemaVersion: 1, analysisKind: kind, engineKey: kind === 'GROUP' ? 'ORG_GROUP_V1' : 'ORG_REPEATED_COHORT_V1', engineVersion: '1.0.0', privacyUnit: 'SUBJECT',
       selectionPolicy: 'UNIQUE_OR_REJECT', minimumCohortN: 3, minimumContributorN: 3, reportEvidenceCeiling: 'PILOT',
       ...(kind === 'REPEATED_COHORT' ? { comparabilityRules: [] } : {}),
       metricRules: [{ metricId: 'score', sourceMetricKey: 'score', acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY',
-        aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT' }],
+        aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT',
+        ...longitudinalIdentity }],
     } })
     await reviewPlatformReportingSpec({ actor, specId: spec.id })
     await publishPlatformReportingSpec({ actor, specId: spec.id })
@@ -123,7 +135,7 @@ describe('fixed-population aggregate disclosure (real PostgreSQL)', () => {
       await bindReportingSeriesWave({ organizationId: base.organizationId, seriesId: series.id, waveKey: `W${index + 1}`, ordinal: index + 1,
         cohortSnapshotId: selected.id, createdByUserId: f.ownerId })
     }
-    const spec = await publishSpec('REPEATED_COHORT')
+    const spec = await publishSpec('REPEATED_COHORT', { family: batch.resourceFamily, key: batch.resourceKey })
     await expect(generateOrganizationLongitudinalAnalysis({ ...base, seriesId: series.id, waveKeys: ['W1', 'W2'], specId: spec.id, analysisKind: 'REPEATED_COHORT' }))
       .rejects.toMatchObject({ code: 'REPORT_PRIVACY_GUARD' })
     expect(await artifactCount()).toBe(0)
