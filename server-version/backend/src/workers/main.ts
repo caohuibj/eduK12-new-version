@@ -13,6 +13,7 @@ import { shutdownWorkerRuntime } from './workerShutdown'
  * canonical Compose consumer when BACKGROUND_WORKERS_ENABLED=false on backend.
  */
 let shutdownStarted = false
+let workersStarted = false
 
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
@@ -21,6 +22,19 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
   logger.info(`${signal} received: stopping background workers`, {
     shutdownTimeoutSeconds: runtimeResourceConfig.workerShutdownTimeoutSeconds,
   })
+
+  if (workersStarted) {
+    try {
+      const [{ stopExportProcessingRecovery }, { stopVideoProcessorLoops }] = await Promise.all([
+        import('./exportProcessor'),
+        import('./videoProcessorOptimized'),
+      ])
+      stopExportProcessingRecovery()
+      stopVideoProcessorLoops()
+    } catch (error) {
+      logger.warn('Unable to stop one or more worker recovery loops before drain', error)
+    }
+  }
 
   const result = await shutdownWorkerRuntime({
     pauseConsumers: pauseQueueConsumers,
@@ -57,6 +71,7 @@ const startWorker = async (): Promise<void> => {
   logger.info('Effective worker resource config', effectiveRuntimeResourceConfig())
   const started = await startBackgroundWorkers(true)
   if (started !== 'started') throw new Error('worker process must start video/image/export consumers')
+  workersStarted = true
   logger.info('Background worker process is consuming video/image/export jobs')
 }
 
