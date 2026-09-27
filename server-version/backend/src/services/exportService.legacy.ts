@@ -507,45 +507,40 @@ const writeSavFile = async (savPath: string, exportData: ExportData): Promise<st
   return savPath
 }
 
-const writeChunk = async (
-  stream: fs.WriteStream,
-  chunk: string,
-  state: { bytes: number },
-  maxBytes: number,
-): Promise<void> => {
-  const bytes = Buffer.byteLength(chunk)
-  if (state.bytes + bytes > maxBytes) {
-    throw new Error('EXPORT_MAX_BYTES exceeded while writing export artifact')
-  }
-  state.bytes += bytes
-  if (!stream.write(chunk, 'utf8')) {
-    await new Promise<void>((resolve, reject) => {
-      stream.once('drain', resolve)
-      stream.once('error', reject)
-    })
-  }
-}
-
 const writeCsvIncrementally = async (
   filePath: string,
   exportData: ExportData,
   maxBytes: number,
 ): Promise<void> => {
-  const stream = fs.createWriteStream(filePath, { encoding: 'utf8', flags: 'wx' })
-  const state = { bytes: 0 }
+  const handle = await fs.promises.open(filePath, 'wx')
+  let writtenBytes = 0
+  let buffer = ''
+  const flush = async () => {
+    if (!buffer) return
+    await handle.write(buffer, null, 'utf8')
+    buffer = ''
+  }
+  const append = async (chunk: string) => {
+    const bytes = Buffer.byteLength(chunk)
+    if (writtenBytes + bytes > maxBytes) {
+      throw new Error('EXPORT_MAX_BYTES exceeded while writing export artifact')
+    }
+    writtenBytes += bytes
+    buffer += chunk
+    if (Buffer.byteLength(buffer) >= 64 * 1024) await flush()
+  }
+
   try {
-    await writeChunk(stream, '\uFEFF' + exportData.fields.map((field) => field.name).join(',') + '\n', state, maxBytes)
+    await append('\uFEFF' + exportData.fields.map((field) => field.name).join(',') + '\n')
     for (let index = 0; index < exportData.rows.length; index += 1) {
       const row = exportData.rows[index]
       const line = exportData.fields.map((field) => spreadsheetSafeCell(row[field.name])).join(',')
-      await writeChunk(stream, line + (index + 1 < exportData.rows.length ? '\n' : ''), state, maxBytes)
+      await append(line + (index + 1 < exportData.rows.length ? '\n' : ''))
     }
-    await new Promise<void>((resolve, reject) => {
-      stream.end(resolve)
-      stream.once('error', reject)
-    })
+    await flush()
+    await handle.close()
   } catch (error) {
-    stream.destroy()
+    await handle.close().catch(() => undefined)
     try { fs.unlinkSync(filePath) } catch {}
     throw error
   }
