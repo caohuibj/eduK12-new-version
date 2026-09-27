@@ -5,36 +5,18 @@
 import Queue from 'bull'
 import { logger } from '../utils/logger'
 import { getBullRedisOptions } from './redis'
+import { runtimeResourceConfig } from './runtimeResources'
 
 // Redis 连接配置（统一由 redis.ts 解析，禁止各自解析 REDIS_HOST/PORT）
 const redisConfig = getBullRedisOptions()
 
-const boundedPositiveInt = (name: string, fallback: number, maximum: number) => {
-  const parsed = Number(process.env[name] ?? fallback)
-  if (!Number.isSafeInteger(parsed)) return fallback
-  return Math.min(maximum, Math.max(1, parsed))
-}
-
-// 资源限制配置 - 防止 CPU/内存被占满
 export const RESOURCE_LIMITS = {
-  // Video processing is bounded across each backend process. Production
-  // defaults to two jobs; operators can tune it for the host, with a safe
-  // hard ceiling to avoid accidentally exhausting CPU and memory.
-  videoConcurrency: boundedPositiveInt('VIDEO_CONCURRENCY', 2, 8),
-
-  // 图片处理：相对轻量，允许 2 并发（PM2 2进程 × 1 = 2）
-  imageConcurrency: parseInt(process.env.IMAGE_CONCURRENCY || '2'),
-
-  // 单张图片处理超时（秒）
-  imageTimeout: parseInt(process.env.IMAGE_TIMEOUT || '30'),
-
-  // 单个视频处理超时（秒）- 30分钟
-  videoTimeout: parseInt(process.env.VIDEO_TIMEOUT || '1800'),
-
-  // Export jobs share one authoritative dataset build and are deliberately
-  // serialized by default to keep memory bounded.
-  exportConcurrency: Math.max(1, Math.min(4, parseInt(process.env.EXPORT_CONCURRENCY || '1'))),
-  exportTimeout: parseInt(process.env.EXPORT_TIMEOUT || '1800'),
+  videoConcurrency: runtimeResourceConfig.videoConcurrency,
+  imageConcurrency: runtimeResourceConfig.imageConcurrency,
+  imageTimeout: runtimeResourceConfig.imageTimeoutSeconds,
+  videoTimeout: runtimeResourceConfig.videoTimeoutSeconds,
+  exportConcurrency: runtimeResourceConfig.exportConcurrency,
+  exportTimeout: runtimeResourceConfig.exportTimeoutSeconds,
 }
 
 // 视频处理队列
