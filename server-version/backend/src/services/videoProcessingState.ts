@@ -55,3 +55,45 @@ export async function markVideoFailed(
   })
   return updated.count === 1
 }
+
+
+/** Release ownership after infrastructure cancellation without declaring the
+ * media invalid. A Bull retry or recovery job may claim the row again. */
+export async function releaseVideoProcessingForRetry(
+  videoId: string,
+  jobId: string,
+  db: VideoDatabase = prisma,
+): Promise<boolean> {
+  const updated = await db.video.updateMany({
+    where: {
+      id: videoId,
+      status: 'PROCESSING',
+      processingJobId: jobId,
+    },
+    data: {
+      status: 'PENDING',
+      processingJobId: null,
+      processingStartedAt: null,
+      errorMessage: null,
+    },
+  })
+  return updated.count === 1
+}
+
+/** Associate a queued recovery job when the row is still unowned. */
+export async function associateVideoRetryJob(
+  videoId: string,
+  jobId: string,
+  db: VideoDatabase = prisma,
+): Promise<boolean> {
+  const updated = await db.video.updateMany({
+    where: { id: videoId, status: 'PENDING', processingJobId: null },
+    data: { processingJobId: jobId },
+  })
+  if (updated.count === 1) return true
+  const current = await db.video.findUnique({
+    where: { id: videoId },
+    select: { processingJobId: true, status: true },
+  })
+  return current?.processingJobId === jobId || current?.status === 'COMPLETED'
+}
