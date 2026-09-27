@@ -62,6 +62,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
     const rows = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_counselor_client_relationships"
       WHERE "id" = ${relationship.ref} AND "organization_id" = ${envelope.organizationId} AND "valid_until" IS NULL
+      FOR SHARE
     `
     valid = Boolean(rows[0])
   } else if (relationship.kind === 'CLASS_TEACHER_STUDENT') {
@@ -70,6 +71,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       JOIN "organization_staff_class_assignments" sa ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id"
       WHERE sc."id" = ${relationship.facts.studentClassAssignmentId} AND sa."id" = ${relationship.facts.staffClassAssignmentId}
         AND sc."organization_id" = ${envelope.organizationId} AND sc."valid_until" IS NULL AND sa."valid_until" IS NULL
+      FOR SHARE OF sc, sa
     `
     valid = Boolean(rows[0])
   }
