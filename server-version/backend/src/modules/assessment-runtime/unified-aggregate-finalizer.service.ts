@@ -799,32 +799,116 @@ const readCasLoser = async (input: {
   }
 }
 
+const persistIncompleteCompositeProgress = async (
+  parent: any,
+  next: { progress: number; completedItems: number },
+): Promise<CompletionResult> => {
+  const rows = await prisma.$queryRaw<Array<{ progress: number; completedItems: number }>>`
+    UPDATE "composite_assessment_attempts"
+    SET "completed_items"=GREATEST("completed_items", ${next.completedItems}),
+        "progress"=GREATEST("progress", ${next.progress}),
+        "last_saved_at"=transaction_timestamp()
+    WHERE "id"=${parent.id}
+      AND "status"='IN_PROGRESS'
+      AND "runtime_generation"=${unifiedRuntimeGeneration}
+      AND "attempt_epoch"=${parent.attemptEpoch}
+      AND "frozen_active_slot_set_hash" IS NOT DISTINCT FROM ${parent.frozenActiveSlotSetHash ?? null}
+      AND "context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash ?? null}
+      AND "compiled_bundle_runtime_hash" IS NOT DISTINCT FROM ${parent.compiledBundleRuntimeHash ?? null}
+      AND ("progress" < ${next.progress} OR "completed_items" < ${next.completedItems})
+    RETURNING "progress", "completed_items" AS "completedItems"
+  `
+  if (rows[0]) return { status: 'IN_PROGRESS', progress: rows[0].progress, completedAt: null }
+
+  const current = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: parent.id },
+    select: {
+      status: true, progress: true, completedItems: true, completedAt: true,
+      runtimeGeneration: true, attemptEpoch: true, frozenActiveSlotSetHash: true,
+      contextSnapshotHash: true, compiledBundleRuntimeHash: true,
+    },
+  })
+  if (
+    current
+    && current.status === 'IN_PROGRESS'
+    && current.runtimeGeneration === unifiedRuntimeGeneration
+    && current.attemptEpoch === parent.attemptEpoch
+    && current.frozenActiveSlotSetHash === (parent.frozenActiveSlotSetHash ?? null)
+    && current.contextSnapshotHash === (parent.contextSnapshotHash ?? null)
+    && current.compiledBundleRuntimeHash === (parent.compiledBundleRuntimeHash ?? null)
+    && current.progress >= next.progress
+    && current.completedItems >= next.completedItems
+  ) return { status: 'IN_PROGRESS', progress: current.progress, completedAt: null }
+
+  return readCasLoser({
+    parentId: parent.id,
+    composite: true,
+    attemptEpoch: parent.attemptEpoch,
+    aggregateInputHash: null,
+    compiledBundleRuntimeHash: parent.compiledBundleRuntimeHash,
+  })
+}
+
+const persistIncompleteQuestionnaireProgress = async (
+  parent: any,
+  next: { progress: number; completedScales: number; completedForms: number },
+): Promise<CompletionResult> => {
+  const rows = await prisma.$queryRaw<Array<{ progress: number; completedScales: number; completedForms: number }>>`
+    UPDATE "questionnaire_assessments"
+    SET "completed_scales"=GREATEST("completed_scales", ${next.completedScales}),
+        "completed_forms"=GREATEST("completed_forms", ${next.completedForms}),
+        "progress"=GREATEST("progress", ${next.progress})
+    WHERE "id"=${parent.id}
+      AND "status"='IN_PROGRESS'
+      AND "runtime_generation"=${unifiedRuntimeGeneration}
+      AND "attempt_epoch"=${parent.attemptEpoch}
+      AND "frozen_active_slot_set_hash" IS NOT DISTINCT FROM ${parent.frozenActiveSlotSetHash ?? null}
+      AND "context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash ?? null}
+      AND (
+        "progress" < ${next.progress}
+        OR "completed_scales" < ${next.completedScales}
+        OR "completed_forms" < ${next.completedForms}
+      )
+    RETURNING "progress", "completed_scales" AS "completedScales", "completed_forms" AS "completedForms"
+  `
+  if (rows[0]) return { status: 'IN_PROGRESS', progress: rows[0].progress, completedAt: null }
+
+  const current = await prisma.questionnaireAssessment.findUnique({
+    where: { id: parent.id },
+    select: {
+      status: true, progress: true, completedScales: true, completedForms: true, completedAt: true,
+      runtimeGeneration: true, attemptEpoch: true, frozenActiveSlotSetHash: true, contextSnapshotHash: true,
+    },
+  })
+  if (
+    current
+    && current.status === 'IN_PROGRESS'
+    && current.runtimeGeneration === unifiedRuntimeGeneration
+    && current.attemptEpoch === parent.attemptEpoch
+    && current.frozenActiveSlotSetHash === (parent.frozenActiveSlotSetHash ?? null)
+    && current.contextSnapshotHash === (parent.contextSnapshotHash ?? null)
+    && current.progress >= next.progress
+    && current.completedScales >= next.completedScales
+    && current.completedForms >= next.completedForms
+  ) return { status: 'IN_PROGRESS', progress: current.progress, completedAt: null }
+
+  return readCasLoser({
+    parentId: parent.id,
+    composite: false,
+    attemptEpoch: parent.attemptEpoch,
+    aggregateInputHash: null,
+  })
+}
+
 const updateIncompleteComposite = async (parent: any, completeness: ReturnType<typeof evaluateCompleteness>) => {
-  // No-op when authoritative progress counters are unchanged.
   if (
     parent.progress === completeness.progress
     && Number(parent.completedItems ?? -1) === completeness.completedSlotCount
-  ) {
-    return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
-  }
-  const updated = await prisma.compositeAssessmentAttempt.updateMany({
-    where: parentGuard(parent),
-    data: {
-      completedItems: completeness.completedSlotCount,
-      progress: completeness.progress,
-      lastSavedAt: new Date(),
-    },
+  ) return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
+  return persistIncompleteCompositeProgress(parent, {
+    progress: completeness.progress,
+    completedItems: completeness.completedSlotCount,
   })
-  if (updated.count === 0) {
-    return readCasLoser({
-      parentId: parent.id,
-      composite: true,
-      attemptEpoch: parent.attemptEpoch,
-      aggregateInputHash: null,
-      compiledBundleRuntimeHash: parent.compiledBundleRuntimeHash,
-    })
-  }
-  return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
 }
 
 const updateIncompleteQuestionnaire = async (
@@ -849,26 +933,33 @@ const updateIncompleteQuestionnaire = async (
     parent.progress === completeness.progress
     && Number(parent.completedScales ?? -1) === nextCompletedScales
     && Number(parent.completedForms ?? -1) === completedForms
-  ) {
-    return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
-  }
-  const updated = await prisma.questionnaireAssessment.updateMany({
-    where: parentGuard(parent),
-    data: {
-      completedScales: nextCompletedScales,
-      completedForms,
-      progress: completeness.progress,
-    },
+  ) return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
+  return persistIncompleteQuestionnaireProgress(parent, {
+    progress: completeness.progress,
+    completedScales: nextCompletedScales,
+    completedForms,
   })
-  if (updated.count === 0) {
-    return readCasLoser({
-      parentId: parent.id,
-      composite: false,
-      attemptEpoch: parent.attemptEpoch,
-      aggregateInputHash: null,
-    })
-  }
-  return { status: 'IN_PROGRESS', progress: completeness.progress, completedAt: null }
+}
+
+export const persistObservedAggregateProgressForTests = async (input: {
+  parent: UnifiedParentHeader
+  composite: boolean
+  progress: number
+  completedItems?: number
+  completedScales?: number
+  completedForms?: number
+}): Promise<CompletionResult> => {
+  if (process.env.NODE_ENV !== 'test') throw new Error('aggregate progress test hook is test-only')
+  return input.composite
+    ? persistIncompleteCompositeProgress(input.parent, {
+        progress: input.progress,
+        completedItems: input.completedItems ?? 0,
+      })
+    : persistIncompleteQuestionnaireProgress(input.parent, {
+        progress: input.progress,
+        completedScales: input.completedScales ?? 0,
+        completedForms: input.completedForms ?? 0,
+      })
 }
 
 const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<CompletionResult | null> => {
