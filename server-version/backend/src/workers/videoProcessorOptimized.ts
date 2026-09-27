@@ -21,7 +21,7 @@ import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
 import { associateVideoRetryJob, markVideoFailed, markVideoProcessing, releaseVideoProcessingForRetry } from '../services/videoProcessingState'
-import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery } from '../services/videoProcessingRecovery'
+import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery, stopVideoProcessingRecovery } from '../services/videoProcessingRecovery'
 import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
 
 // 处理策略类型
@@ -571,7 +571,7 @@ function getVideoDuration(input: string): Promise<number> {
 }
 
 // 队列监控
-setInterval(async () => {
+const queueMonitorInterval = setInterval(async () => {
   try {
     const counts = await videoQueue.getJobCounts()
 
@@ -582,10 +582,18 @@ setInterval(async () => {
     if (counts.completed % 10 === 0 && counts.completed > 0) {
       logger.info(`视频处理统计: 完成 ${counts.completed}, 失败 ${counts.failed}`)
     }
-  } catch (e) {
-    // 忽略错误
+  } catch {
+    // Monitoring cannot affect processing.
   }
 }, 60000)
+queueMonitorInterval.unref?.()
+
+export const stopVideoProcessorLoops = (): void => {
+  clearTimeout(staleVideoReconciliationTimer)
+  clearInterval(staleVideoReconciliationInterval)
+  clearInterval(queueMonitorInterval)
+  stopVideoProcessingRecovery()
+}
 
 logger.info('🎬 视频处理 Worker (优化版) 已启动')
 logger.info('📥 统一处理模式: 本地上传 + URL下载')
