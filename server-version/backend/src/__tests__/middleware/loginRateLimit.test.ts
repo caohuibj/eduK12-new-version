@@ -65,20 +65,35 @@ describe('login Redis rate limits', () => {
     expect(first.ipKey).not.toBe(second.ipKey)
   })
 
-  it('does not pre-lock an account from somebody else\'s failure budget', async () => {
-    mockCacheService.getRateLimitState.mockResolvedValue({ count: 500, retryAfterSeconds: 900 })
+  it('checks only the account+IP failure key before password verification', async () => {
+    mockCacheService.getRateLimitState.mockResolvedValue({ count: 0, retryAfterSeconds: 900 })
+    const req = makeReq()
+    const context = getLoginRateLimitContext(req, req.body.username)
     const res = makeRes()
+    res.setHeader = vi.fn()
     const next = vi.fn()
 
-    await loginRateLimit(makeReq(), res, next)
+    await loginRateLimit(req, res, next)
 
     expect(next).toHaveBeenCalledOnce()
-    expect(mockCacheService.getRateLimitState).not.toHaveBeenCalled()
-    expect(mockCacheService.consumeRateLimit).toHaveBeenCalledWith(
-      expect.stringContaining('auth:login:ip:'),
-      3000,
-      900,
-    )
+    expect(mockCacheService.getRateLimitState).toHaveBeenCalledOnce()
+    expect(mockCacheService.getRateLimitState).toHaveBeenCalledWith(context.failureKey)
+    expect(mockCacheService.consumeRateLimit).toHaveBeenCalledWith(context.ipKey, 3000, 900)
+  })
+
+  it('blocks repeated bad credentials only for the same account+IP source', async () => {
+    mockCacheService.getRateLimitState.mockResolvedValue({ count: 10, retryAfterSeconds: 240 })
+    const req = makeReq()
+    const res = makeRes()
+    res.setHeader = vi.fn()
+    const next = vi.fn()
+
+    await loginRateLimit(req, res, next)
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(429)
+    expect(res.body.message).toBe('用户名或密码错误')
+    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', '240')
   })
 
   it('records and clears both account failure dimensions', async () => {
