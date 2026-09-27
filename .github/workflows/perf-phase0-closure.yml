@@ -3,6 +3,20 @@ name: PERF Phase 0 closure
 on:
   # Manual evidence only: do not compete with required backend/browser CI.
   workflow_dispatch:
+    inputs:
+      ab_groups:
+        description: Space-separated steady groups for same-host A/B
+        required: true
+        default: 'scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady'
+        type: string
+      scope:
+        description: Evidence scope
+        required: true
+        default: ab-only
+        type: choice
+        options:
+          - ab-only
+          - full
 
 concurrency:
   group: perf-phase0-closure-${{ github.event.pull_request.number || github.ref }}
