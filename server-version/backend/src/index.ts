@@ -23,6 +23,7 @@ import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
+import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 
 // 导入路由
 import authRoutes from './routes/auth'
@@ -323,6 +324,7 @@ const startServer = async (): Promise<void> => {
   // Video/image/export consumers share this process Prisma pool. Skip them on
   // assessment-only or test processes so FINAL_ONLY submit is not queued behind
   // stale-video reconciliation. Producers still enqueue through config/queue.
+  logger.info('Effective runtime resource config', effectiveRuntimeResourceConfig())
   await startBackgroundWorkers(config.backgroundWorkersEnabled)
 
   // ExportArtifact cleanup is metadata-driven: only exact expired objects are
