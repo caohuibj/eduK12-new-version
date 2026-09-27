@@ -165,7 +165,7 @@ export interface CompositePublicInfo {
 
 export interface CompositePublicAccessToken {
   id: string
-  token: string
+  token: string | null
   expiresAt: string
   maxUses: number
   usedCount: number

@@ -28,6 +28,7 @@ type SourceMetaRow = {
   resourceFamily: string
   at: Date | null
   populationN: number
+  uniqueSubjectMembershipN: number
   selfShape: boolean
   membershipShape: boolean
 }
@@ -98,6 +99,7 @@ export const freezeRunTrackCohort = async (input: {
     const sourceRows = await prisma.$queryRaw<SourceMetaRow[]>(Prisma.sql`
       SELECT r."status" AS "runStatus", t."resource_family" AS "resourceFamily", r."published_at" AS at,
         COUNT(e."id")::int AS "populationN",
+        COUNT(DISTINCT (subject."user_id", subject."membership_id"))::int AS "uniqueSubjectMembershipN",
         BOOL_AND(relationship."relationship_kind"='SELF' AND subject."user_id"=respondent."user_id") AS "selfShape",
         BOOL_AND(subject."membership_id" IS NOT NULL) AS "membershipShape"
       FROM "assessment_runs" r
@@ -120,6 +122,9 @@ export const freezeRunTrackCohort = async (input: {
     if (source.resourceFamily === 'FORM') reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
     if (!source.selfShape) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'PR3 generic group reporting accepts SELF observations only', 409)
     if (!source.membershipShape) reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
+    if (source.uniqueSubjectMembershipN !== source.populationN) {
+      reportingFail('AMBIGUOUS_OBSERVATION', 'Run Track contains more than one SELF execution for a subject Membership', 409)
+    }
     if (!source.at) reportingFail('REPORT_SELECTOR_ANCHOR', 'published measurement date is required', 409)
     const sourceAt = source.at as Date
     at = sourceAt

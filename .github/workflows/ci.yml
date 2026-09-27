@@ -11,10 +11,11 @@
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
 # 编排（双主机 self-hosted，两条 physical serial lane）：
-#   Mac lane:     backend
-#   Hosted:       main browser plus three independent browser gates, each isolated
+#   Router:       任意 self-hosted Linux，仅运行 scope / merge-gate 秒级调度任务
+#   Mac lane:     backend → main browser
 #   Windows lane: frontend → codeql → docker
-#   backend 与 frontend 在物理隔离的主机上并行启动；同一主机每次只匹配一个正式 runner。
+#   backend 与 frontend 在物理隔离的主机上并行启动；backend 完成后 Mac 执行 browser，
+#   同时 Windows 继续 CodeQL/Docker。日常必跑门禁不依赖 GitHub-hosted runner。
 #   这是 CI 调度稳定性优化，不代表 production performance improvement。
 #
 # jobs：
@@ -55,7 +56,9 @@ concurrency:
 jobs:
   scope:
     name: classify changed content
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
     outputs:
       content: ${{ steps.scope.outputs.content }}
       scale: ${{ steps.scope.outputs.scale }}
@@ -496,12 +499,15 @@ jobs:
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
-    # Browser acceptance must execute against the same commit after both
-    # production lanes have passed. It uses its own service containers and
-    # uses an isolated hosted runner so browser work cannot stall the Mac lane.
+    # Browser acceptance executes after both production lanes have passed.
+    # At that point the Mac backend lane is free, so browser reuses Mac while
+    # Windows continues CodeQL/Docker in parallel.
     needs: [scope, backend, frontend]
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(vars.CI_BROWSER_HOSTED != 'false' && '["ubuntu-24.04"]' || '["self-hosted","linux","eduk12-mac-ci"]') }}
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -893,7 +899,9 @@ jobs:
     name: merge gate / ready PR
     needs: [scope, content, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}

@@ -2,7 +2,9 @@ import { assertIndividualLongitudinalAccess } from './individualAuthorization'
 import { prisma } from '../../config/database'
 import {
   assertOrganizationGroupArtifactReadAccess,
+  assertOrganizationGroupArtifactsReadAccess,
   assertOrganizationGroupReportGenerateAccess,
+  assertOrganizationGroupReportsGenerateAccess,
   hideUnauthorizedArtifact,
   type ReportingPrincipal,
 } from './authorization'
@@ -12,7 +14,13 @@ import { assertOrganizationReportingWorkspaceAccess } from './pr4Authorization'
 import { createLongitudinalAnalysisArtifact, createProtectedFeedbackArtifact } from './pr4Artifact'
 import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
 import { resolveAuthoritativeTrackObservations, type ReportingObservationPerspectiveV1 } from './resultSource'
-import { bindReportingSeriesWave, createReportingSeries, readReportingSeries, readReportingSeriesWave } from './series'
+import {
+  bindReportingSeriesWave,
+  createReportingSeries,
+  readExactReportingSeriesWavesBatch,
+  readReportingSeries,
+  readReportingSeriesWavesByKeysBatch,
+} from './series'
 import { getPublishedReportingSpec } from './spec'
 import {
   reportingFail,
@@ -119,14 +127,16 @@ const readAuthorizedWavesForGenerate = async (input: {
   if (new Set(input.waveKeys).size !== input.waveKeys.length || input.waveKeys.length < 2) {
     reportingFail('REPORT_LONGITUDINAL_WAVES_REQUIRED', 'longitudinal analysis requires at least two distinct Waves', 400)
   }
-  const waves = await Promise.all(input.waveKeys.map((waveKey) => readReportingSeriesWave({
+  const waves = await readReportingSeriesWavesByKeysBatch({
     organizationId: input.organizationId,
     seriesId: series.id,
-    waveKey,
-  })))
-  for (const wave of waves) {
-    await assertOrganizationGroupReportGenerateAccess({ principal: input.principal, organizationId: input.organizationId, runId: wave.sourceRunId })
-  }
+    waveKeys: input.waveKeys,
+  })
+  await assertOrganizationGroupReportsGenerateAccess({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    runIds: waves.map((wave) => wave.sourceRunId),
+  })
   return { series, waves }
 }
 
@@ -144,9 +154,11 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
   if (spec.definition.analysisKind !== input.analysisKind) {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'published reporting spec does not match requested longitudinal analysis kind', 409)
   }
-  for (const wave of waves) {
-    await assertOrganizationGroupReportGenerateAccess({ principal: input.principal, organizationId: input.organizationId, runId: wave.sourceRunId })
-  }
+  await assertOrganizationGroupReportsGenerateAccess({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    runIds: waves.map((wave) => wave.sourceRunId),
+  })
   const governed = spec as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1 | ReportingMatchedLongitudinalSpecV1>
   const artifact = await createLongitudinalAnalysisArtifact({
     series,
@@ -155,9 +167,11 @@ export const generateOrganizationLongitudinalAnalysis = async (input: {
     mode: input.mode,
     generatedByUserId: input.principal.userId,
   })
-  for (const wave of waves) {
-    await assertOrganizationGroupReportGenerateAccess({ principal: input.principal, organizationId: input.organizationId, runId: wave.sourceRunId })
-  }
+  await assertOrganizationGroupReportsGenerateAccess({
+    principal: input.principal,
+    organizationId: input.organizationId,
+    runIds: waves.map((wave) => wave.sourceRunId),
+  })
   return publicArtifact(artifact)
 }
 
@@ -243,12 +257,11 @@ export const readOrganizationReportingArtifact = async (input: {
 
   if (artifact.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
     await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
-    for (const binding of artifact.artifactPayload.waveBindings) {
-      const wave = await readReportingSeriesWave({ organizationId: input.organizationId, seriesId: artifact.seriesId, waveKey: binding.waveKey })
-      if (wave.id !== binding.waveId || wave.snapshotHash !== binding.snapshotHash || wave.inputIdentityHash !== binding.inputIdentityHash) {
-        reportingFail('REPORT_ARTIFACT_INTEGRITY', 'individual Wave integrity mismatch', 500)
-      }
-    }
+    await readExactReportingSeriesWavesBatch({
+      organizationId: input.organizationId,
+      seriesId: artifact.seriesId,
+      bindings: artifact.artifactPayload.waveBindings,
+    })
     await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
     return publicArtifact(artifact)
   }
@@ -263,19 +276,16 @@ export const readOrganizationReportingArtifact = async (input: {
   }
 
   if (artifact.analysisKind === 'REPEATED_COHORT' || artifact.analysisKind === 'MATCHED_LONGITUDINAL') {
-    for (const binding of artifact.artifactPayload.waveBindings) {
-      const wave = await readReportingSeriesWave({
-        organizationId: input.organizationId,
-        seriesId: artifact.seriesId,
-        waveKey: binding.waveKey,
-      })
-      if (wave.id !== binding.waveId) reportingFail('REPORT_ARTIFACT_INTEGRITY', 'artifact Wave key no longer resolves to frozen Wave identity', 500)
-      await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactReadAccess({
-        principal: input.principal,
-        organizationId: input.organizationId,
-        runId: wave.sourceRunId,
-      }))
-    }
+    const waves = await readExactReportingSeriesWavesBatch({
+      organizationId: input.organizationId,
+      seriesId: artifact.seriesId,
+      bindings: artifact.artifactPayload.waveBindings,
+    })
+    await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactsReadAccess({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      runIds: waves.map((wave) => wave.sourceRunId),
+    }))
     return publicArtifact(artifact)
   }
 

@@ -78,6 +78,41 @@ local ttl = redis.call('TTL', KEYS[1])
 return { count, ttl }
 `
 
+const WEIGHTED_RATE_LIMIT_SCRIPT = `
+local cost = tonumber(ARGV[2])
+local count = redis.call('INCRBY', KEYS[1], cost)
+if count == cost then
+  redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+local ttl = redis.call('TTL', KEYS[1])
+return { count, ttl }
+`
+
+const SEMAPHORE_ACQUIRE_SCRIPT = `
+local clock = redis.call('TIME')
+local now_ms = tonumber(clock[1]) * 1000 + math.floor(tonumber(clock[2]) / 1000)
+local limit = tonumber(ARGV[1])
+local holder = ARGV[2]
+local ttl_seconds = tonumber(ARGV[3])
+redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now_ms)
+local current = tonumber(redis.call('ZCARD', KEYS[1]))
+if current >= limit then
+  return { 0, current }
+end
+redis.call('ZADD', KEYS[1], now_ms + ttl_seconds * 1000, holder)
+redis.call('EXPIRE', KEYS[1], ttl_seconds)
+return { 1, current + 1 }
+`
+
+const SEMAPHORE_RELEASE_SCRIPT = `
+redis.call('ZREM', KEYS[1], ARGV[1])
+local current = tonumber(redis.call('ZCARD', KEYS[1]))
+if current == 0 then
+  redis.call('DEL', KEYS[1])
+end
+return current
+`
+
 /**
  * Redis 缓存服务类
  */
@@ -280,6 +315,60 @@ class CacheService {
       }
     } catch {
       return null
+    }
+  }
+
+  /** Consume a variable-cost fixed-window budget atomically. */
+  async consumeWeightedRateLimit(
+    key: string,
+    limit: number,
+    windowSeconds: number,
+    cost: number,
+  ): Promise<RateLimitResult | null> {
+    if (!this.isConnected || !this.client) return null
+    if (!Number.isSafeInteger(cost) || cost < 1 || !Number.isSafeInteger(limit) || limit < 1) return null
+    try {
+      const rawResult = await this.client.eval(WEIGHTED_RATE_LIMIT_SCRIPT, {
+        keys: [key],
+        arguments: [String(windowSeconds), String(cost)],
+      }) as unknown
+      if (!Array.isArray(rawResult) || rawResult.length < 2) return null
+      const count = Number(rawResult[0])
+      const ttl = Number(rawResult[1])
+      if (!Number.isFinite(count) || count < cost || !Number.isFinite(ttl)) return null
+      const retryAfterSeconds = ttl > 0 ? ttl : windowSeconds
+      return {
+        allowed: count <= limit,
+        remaining: Math.max(0, limit - count),
+        retryAfterSeconds,
+      }
+    } catch {
+      return null
+    }
+  }
+
+  /** Acquire a small Redis-backed semaphore with a fail-safe TTL. */
+  async acquireSemaphore(key: string, holderId: string, limit: number, ttlSeconds: number): Promise<boolean | null> {
+    if (!this.isConnected || !this.client) return null
+    if (!holderId || !Number.isSafeInteger(limit) || limit < 1 || !Number.isSafeInteger(ttlSeconds) || ttlSeconds < 1) return null
+    try {
+      const rawResult = await this.client.eval(SEMAPHORE_ACQUIRE_SCRIPT, {
+        keys: [key],
+        arguments: [String(limit), holderId, String(ttlSeconds)],
+      }) as unknown
+      if (!Array.isArray(rawResult) || rawResult.length < 1) return null
+      return Number(rawResult[0]) === 1
+    } catch {
+      return null
+    }
+  }
+
+  async releaseSemaphore(key: string, holderId: string): Promise<void> {
+    if (!this.isConnected || !this.client || !holderId) return
+    try {
+      await this.client.eval(SEMAPHORE_RELEASE_SCRIPT, { keys: [key], arguments: [holderId] })
+    } catch {
+      logger.warn('[CacheService] Redis semaphore release failed')
     }
   }
 

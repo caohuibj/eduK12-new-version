@@ -4,6 +4,23 @@ on:
   pull_request:
     types: [ready_for_review, synchronize, reopened]
     branches: [main]
+    paths:
+      - '.github/workflows/perf-phase0-closure.yml'
+      - 'server-version/perf/**'
+      - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
+      - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
+      - 'server-version/backend/src/config/database.ts'
+      - 'server-version/backend/src/modules/assessment-runtime/**'
+      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
+      - 'server-version/backend/src/modules/scale/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/final-submit.service.ts'
+      - 'server-version/backend/src/modules/cognitive/unified-final-submit.service.ts'
+      - 'server-version/backend/src/modules/situational/situational-final-submit.service.ts'
+      - 'server-version/backend/src/services/unitSubmitAdmission.ts'
+      - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
+      - 'server-version/backend/src/services/boundedAdmissionGate.ts'
+      - 'server-version/backend/src/services/instrumentFinalSubmit.ts'
+      - 'server-version/backend/src/services/runtimeObservability.ts'
   workflow_dispatch:
 
 concurrency:
@@ -32,7 +49,10 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 90
     services:
       postgres:
@@ -65,9 +85,13 @@ jobs:
           set -euo pipefail
           git fetch --no-tags origin main
           BASE_SHA="$(git merge-base HEAD origin/main)"
+          BASE_WORKTREE="$RUNNER_TEMP/huisurvey-phase0-base-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          AB_OUT="/tmp/huisurvey-phase0-ab-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "BASE_SHA=$BASE_SHA" >> "$GITHUB_ENV"
-          git worktree add /tmp/huisurvey-phase0-base "$BASE_SHA"
-          for root in "$GITHUB_WORKSPACE" /tmp/huisurvey-phase0-base
+          echo "BASE_WORKTREE=$BASE_WORKTREE" >> "$GITHUB_ENV"
+          echo "AB_OUT=$AB_OUT" >> "$GITHUB_ENV"
+          git worktree add "$BASE_WORKTREE" "$BASE_SHA"
+          for root in "$GITHUB_WORKSPACE" "$BASE_WORKTREE"
           do
             (
               cd "$root/server-version/backend"
@@ -82,17 +106,17 @@ jobs:
           ADMIN_PASSWORD: ci-admin-password-2026
         run: |
           set -euo pipefail
-          OUT=/tmp/huisurvey-phase0-ab
+          OUT="$AB_OUT"
           mkdir -p "$OUT"
           PERF_GROUP_LIST="scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady"
+          PERF_WARMUP_GROUP_LIST="scaleTypicalWarmup cognitiveNbackStandardWarmup cognitiveCptStandardWarmup sjtLinear30Warmup sjtLinear60Warmup"
 
           reset_and_seed() {
             local round="$1" variant="$2"
             cd "$GITHUB_WORKSPACE/server-version/backend"
             npx prisma migrate reset --force --skip-seed >/tmp/ab-reset.log
             npm run db:seed >/tmp/ab-seed.log
-            local fixture_dir="/tmp/ab-fixtures-r${round}-${variant}"
-            rm -rf "$fixture_dir"
+            local fixture_dir="$AB_OUT/fixtures-r${round}-${variant}"
             PERF_CURRENT_MAIN_V1=1 FIXTURE_OUT_DIR="$fixture_dir"               PERF_WARMUP_FIXTURES=2 PERF_STEADY_FIXTURES=55 PERF_MIXED_PER_CLASS=18               PERF_SAME_PARENT_SIBLINGS=2 npm run perf:fixtures:seed >/tmp/ab-fixtures.log
             echo "$fixture_dir"
           }
@@ -100,7 +124,7 @@ jobs:
           start_api() {
             local variant="$1"
             local root="$GITHUB_WORKSPACE"
-            [ "$variant" = base ] && root=/tmp/huisurvey-phase0-base
+            [ "$variant" = base ] && root=$BASE_WORKTREE
             nohup node "$root/server-version/backend/dist/index.js" >"$OUT/api-${variant}.log" 2>&1 &
             API_PID=$!
             export API_PID
@@ -126,6 +150,9 @@ jobs:
             local fixture_dir
             fixture_dir="$(reset_and_seed "$round" "$variant")"
             start_api "$variant"
+            for group in $PERF_WARMUP_GROUP_LIST; do
+              PERF_FIXTURE_FILE="$fixture_dir/final-submit-fixtures.json"               PERF_FIXTURE_GROUP="$group" BASE_URL=http://127.0.0.1:3000               PERF_RUN_DIR="$OUT/warmup-r${round}-${variant}-${group}"               PERF_RATE=1 PERF_SECONDS=1 PERF_RATE_CEILING=5 PERF_DRAIN_SECONDS=0               PERF_PRE_VUS=2 PERF_MAX_VUS=4 PERF_REQUIRE_ALL_FRESH=0               PERF_TESTED_SHA="$tested_sha"               node "$GITHUB_WORKSPACE/server-version/perf/current-main-v1/run-full-request.mjs"
+            done
             for group in $PERF_GROUP_LIST; do
               PERF_FIXTURE_FILE="$fixture_dir/final-submit-fixtures.json"               PERF_FIXTURE_GROUP="$group" BASE_URL=http://127.0.0.1:3000               PERF_RUN_DIR="$OUT/r${round}-${variant}-${group}"               PERF_RATE=10 PERF_SECONDS=5 PERF_RATE_CEILING=20               PERF_PRE_VUS=32 PERF_MAX_VUS=128 PERF_REQUIRE_ALL_FRESH=0               PERF_TESTED_SHA="$tested_sha"               node "$GITHUB_WORKSPACE/server-version/perf/current-main-v1/run-full-request.mjs"
             done
@@ -146,13 +173,21 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase0-ab-${{ github.event.pull_request.head.sha || github.sha }}
-          path: /tmp/huisurvey-phase0-ab
+          path: /tmp/huisurvey-phase0-ab-${{ github.run_id }}-${{ github.run_attempt }}
           retention-days: 7
           if-no-files-found: error
+      - name: cleanup BASE worktree
+        if: always()
+        run: |
+          git worktree remove --force "$BASE_WORKTREE" 2>/dev/null || true
+          git worktree prune
 
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 45
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -240,7 +275,10 @@ jobs:
 
   lost-response:
     name: committed response loss + retry/replay recovery
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 35
     services:
       postgres:
@@ -319,7 +357,10 @@ jobs:
 
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-mac-ci
     timeout-minutes: 50
     services:
       postgres:

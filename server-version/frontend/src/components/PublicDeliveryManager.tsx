@@ -38,8 +38,9 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     if(current===generation.current){setLinks(old=>old.map(l=>l.id===link.id?{...l,isActive:false}:l));setNotice('链接已停用，不再接受新参与者')}
   })
   const copy=(link:PublicDeliveryLink)=>act(async()=>{
-    const url=adapter.getPublicEntry(link)
-    if(!url) throw new Error('此链接无法恢复，请生成新链接')
+    const revealed=link.token?link:await adapter.revealLink(link.id)
+    const url=adapter.getPublicEntry(revealed)
+    if(!url) throw new Error('此链接凭证无法恢复，请生成新链接')
     const current=generation.current
     await navigator.clipboard.writeText(url)
     if(current===generation.current)setNotice('链接已复制')
@@ -52,10 +53,10 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     <button disabled={busy} className="btn-secondary" onClick={()=>void act(async()=>{const current=generation.current;const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows)})}>刷新链接</button>
     {!links.length && !busy && !error && <p>尚未生成链接</p>}
     {links.map(link=>{const url=adapter.getPublicEntry(link);return <article key={link.id} className="rounded border p-3 text-sm space-y-2">
-      {url ? <a className="block break-all text-primary" href={url}>{url}</a> : <p>此链接无法恢复，请生成新链接</p>}
+      {url ? <a className="block break-all text-primary" href={url}>{url}</a> : <p>链接地址已隐藏，复制时会重新验证权限。</p>}
       <p>创建于：{link.createdAt?new Date(link.createdAt).toLocaleString():'刚刚'} · 有效期至：{new Date(link.expiresAt).toLocaleString()}</p>
       <p>已使用 {link.usedCount} 次 / 最大次数：{link.maxUses || '不限'} · {publicLinkStatus(link)}</p>
-      <div className="flex gap-3"><button disabled={busy || !url} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>
+      <div className="flex gap-3"><button disabled={busy} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>
     </article>})}
     {canCreate ? <div className="flex flex-wrap gap-3 items-end">
       <label className="grid gap-1">有效期<input type="datetime-local" value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>

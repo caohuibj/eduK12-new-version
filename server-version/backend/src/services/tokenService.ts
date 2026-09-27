@@ -5,7 +5,6 @@
  * - 生成唯一访问令牌
  * - 验证令牌有效性
  * - 检查过期和访问限制
- * - 记录访问次数
  */
 
 import { prisma } from '../config/database'
@@ -33,7 +32,7 @@ export const serializeQuestionnaireAccessToken = (row: any, reveal = false) => {
   } = row || {}
   return reveal
     ? { ...safe, token: legacyToken || (tokenEncrypted ? tokenService.decryptToken(tokenEncrypted) : null) }
-    : safe
+    : { ...safe, token: null }
 }
 
 export interface TokenValidation {
@@ -253,30 +252,6 @@ export const tokenService = {
   },
 
   /**
-   * 记录访问（增加 usedCount）
-   */
-  async recordAccess(tokenId: string, questionnaireId?: string): Promise<void> {
-    const token = await prisma.questionnaireAccessToken.findUnique({
-      where: { id: tokenId },
-      select: { token: true, maxUses: true, usedCount: true, questionnaireId: true },
-    })
-
-    if (!token || (questionnaireId && token.questionnaireId !== questionnaireId)) return
-
-    // 更新访问计数
-    const newUsedCount = token.usedCount + 1
-    
-    await prisma.questionnaireAccessToken.update({
-      where: { id: tokenId },
-      data: {
-        usedCount: {
-          increment: 1,
-        },
-      },
-    })
-  },
-
-  /**
    * 禁用令牌
    */
   async disableToken(tokenId: string): Promise<void> {
@@ -293,7 +268,7 @@ export const tokenService = {
   /**
    * 获取问卷的所有令牌
    */
-  async getTokensByQuestionnaire(questionnaireId: string, options: { reveal?: boolean } = {}) {
+  async getTokensByQuestionnaire(questionnaireId: string) {
     const rows = await prisma.questionnaireAccessToken.findMany({
       where: { questionnaireId },
       orderBy: { createdAt: 'desc' },
@@ -307,7 +282,7 @@ export const tokenService = {
         },
       },
     })
-    return rows.map((row) => serializeQuestionnaireAccessToken(row, options.reveal === true))
+    return rows.map((row) => serializeQuestionnaireAccessToken(row))
   },
 
   /**

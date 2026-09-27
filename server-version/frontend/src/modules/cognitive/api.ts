@@ -89,6 +89,8 @@ export const cognitiveApi = {
     apiClient.get<{ list: any[]; total: number }>(`/cognitive/assignments/${id}/public-tokens`),
   createPublicToken: (id: string, body: { expiresAt: string; maxUses: number }) =>
     apiClient.post<any>(`/cognitive/assignments/${id}/public-tokens`, body),
+  revealPublicToken: (id: string, tokenId: string) =>
+    apiClient.post<any>(`/cognitive/assignments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disablePublicToken: (id: string, tokenId: string) =>
     apiClient.delete<any>(`/cognitive/assignments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, body: { detail: 'summary' | 'full' | 'research'; format: 'csv' | 'sav' | 'zip' | 'xlsx' }) =>

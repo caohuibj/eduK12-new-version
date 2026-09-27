@@ -18,6 +18,8 @@ import {
 } from '../../modules/reporting/series'
 import { createLongitudinalAnalysisArtifact } from '../../modules/reporting/pr4Artifact'
 import { listOrganizationReportingSeries } from '../../modules/reporting/discovery'
+import { assertOrganizationGroupReportsGenerateAccess } from '../../modules/reporting/authorization'
+import { readOrganizationReportingArtifact } from '../../modules/reporting/pr4Service'
 import {
   createPlatformReportingSpec,
   publishPlatformReportingSpec,
@@ -219,6 +221,80 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
     expect(tenWaves).toBe(oneWave)
     expect(tenWaves).toBeLessThan(30)
   },120000)
+
+  it('keeps batch authority and exact artifact reads bounded through fifty Waves', async () => {
+    const first=await buildReportingFixture(db,3)
+    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+    const resource=(await db.$queryRaw<Array<{family:string;key:string}>>`
+      SELECT resource_family AS family, resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0]
+    const series=await createReportingSeries({
+      organizationId:first.organizationId,
+      seriesKey:key('runtime-budget'),
+      scope:{schemaVersion:1,resourceFamily:resource.family as any,resourceKey:resource.key},
+      createdByUserId:first.ownerId,
+    })
+    const bound=[]
+    for(let ordinal=1;ordinal<=50;ordinal++){
+      const fixture=ordinal===1?first:await buildReportingFixture(db,3,false,{
+        ownerId:first.ownerId,
+        organizationId:first.organizationId,
+        members:first.members,
+        resourceKey:resource.key,
+        at:new Date(Date.UTC(2026,8,18+ordinal)),
+      })
+      const cohort=await freezeRunTrackCohort({...fixture,generatedByUserId:first.ownerId})
+      bound.push(await bindReportingSeriesWave({
+        organizationId:first.organizationId,
+        seriesId:series.id,
+        waveKey:`W${ordinal}`,
+        ordinal,
+        cohortSnapshotId:cohort.id,
+        createdByUserId:first.ownerId,
+      }))
+    }
+    const actor={userId:first.ownerId,platformRole:'SYSTEM_ADMIN' as const}
+    const rawSpec=await createPlatformReportingSpec({actor,specKey:key('runtime-read'),version:1,definition:{
+      schemaVersion:1,analysisKind:'REPEATED_COHORT',engineKey:'ORG_REPEATED_COHORT_V1',engineVersion:'1.0.0',
+      privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',minimumCohortN:3,minimumContributorN:3,reportEvidenceCeiling:'PILOT',
+      metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:resource.key,valueType:'NUMBER',longitudinalMetricKey:'score',
+        acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',
+        minimumMetricN:3,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[],
+    }})
+    await reviewPlatformReportingSpec({actor,specId:rawSpec.id})
+    const spec=await publishPlatformReportingSpec({actor,specId:rawSpec.id}) as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1>
+    const sizes=[2,10,50]
+    const artifacts=[]
+    for(const size of sizes) artifacts.push(await createLongitudinalAnalysisArtifact({
+      series,waves:bound.slice(0,size),spec,generatedByUserId:first.ownerId,
+    }))
+
+    const { prisma }=await import('../../config/database')
+    let queries=0
+    prisma.$use(async (params,next)=>{queries++;return next(params)})
+    const principal={userId:first.ownerId,platformRole:'STANDARD' as const}
+
+    const authCounts:number[]=[]
+    for(const size of sizes){
+      queries=0
+      await assertOrganizationGroupReportsGenerateAccess({
+        principal,organizationId:first.organizationId,runIds:bound.slice(0,size).map(w=>w.sourceRunId),
+      })
+      authCounts.push(queries)
+    }
+    expect(new Set(authCounts).size).toBe(1)
+
+    const readCounts:number[]=[]
+    for(const artifact of artifacts){
+      queries=0
+      await readOrganizationReportingArtifact({
+        principal,organizationId:first.organizationId,artifactId:artifact.id,
+      })
+      readCounts.push(queries)
+    }
+    console.info('Longitudinal artifact read query budget',{sizes,authCounts,readCounts})
+    expect(new Set(readCounts).size).toBe(1)
+    expect(readCounts[2]).toBeLessThanOrEqual(25)
+  },240000)
 
   it('bounds queries for three completed waves of 1000 subjects', async () => {
     const { prisma }=await import('../../config/database')

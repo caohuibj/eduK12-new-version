@@ -318,6 +318,15 @@ export const compositeController = {
     } catch (err) { return handleError(res, err) }
   },
 
+  async revealToken(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const data = await service.revealAccessToken(req.user.userId, req.user.role, req.params.id, req.params.tokenId)
+      res.setHeader('Cache-Control', 'no-store')
+      return success(res, data)
+    } catch (err) { return handleError(res, err) }
+  },
+
   async createToken(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)

@@ -10,6 +10,7 @@ import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
 import { resolveAuthoritativeRunResults } from './resultSource'
 import { getPublishedReportingSpec } from './spec'
+import { assertReportingSubgroupsPrivacy } from './subgroupPrivacy'
 import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelectorInputV2, type ReportingGroupArtifactRecord } from './types'
 
 const publicArtifact = (artifact: ReportingArtifactRecord) => ({
@@ -40,6 +41,21 @@ export const generateOrganizationGroupAnalysis = async (input: {
     cohortSelector: input.cohortSelector,
   })
   const batch = await resolveAuthoritativeRunResults(cohort)
+  if (cohort.selector.kind === 'FILTERED_RUN_TRACK_SUBJECTS' && cohort.selector.clauses.length > 0) {
+    const definition = spec.definition
+    const minimumN = Math.max(
+      3,
+      'minimumCohortN' in definition ? definition.minimumCohortN : 3,
+      'minimumContributorN' in definition ? definition.minimumContributorN : 3,
+      batch.resourceMinimumN ?? 0,
+    )
+    await assertReportingSubgroupsPrivacy({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      specId: spec.id,
+      entries: [{ cohort, minimumN }],
+    })
+  }
   const generatedAt = new Date()
   const built = buildReportingArtifact({
     artifactId: randomUUID(),

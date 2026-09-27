@@ -50,9 +50,18 @@ for (const group of groups) {
   const base = rows.filter((row) => row.group === group && row.variant === 'base')
   const head = rows.filter((row) => row.group === group && row.variant === 'head')
   if (base.length !== 3 || head.length !== 3) throw new Error(`${group}: expected 3 base and 3 head rounds`)
+  const byRound = [1, 2, 3].map((round) => ({
+    base: base.find((row) => row.round === round),
+    head: head.find((row) => row.round === round),
+  }))
+  if (byRound.some((pair) => !pair.base || !pair.head)) throw new Error(`${group}: missing paired A/B round`)
+  const pairs = byRound.map((pair) => ({ base: pair.base, head: pair.head }))
   const baseP95 = median(base.map((row) => row.p95Ms))
   const headP95 = median(head.map((row) => row.p95Ms))
-  const delta = headP95 - baseP95
+  // Each round is intentionally interleaved. Compare paired round deltas
+  // rather than subtracting independently selected medians, which can pair
+  // unrelated host jitter from different rounds and create false regressions.
+  const delta = median(pairs.map((pair) => pair.head.p95Ms - pair.base.p95Ms))
   const allowed = Math.max(baseP95 * 0.10, 10)
   const completionRate = (row) => row.offered > 0 ? row.drainCompleted / row.offered : 0
   const dropRate = (row) => row.offered > 0 ? row.dropped / row.offered : 0
@@ -63,12 +72,15 @@ for (const group of groups) {
   const headDropRate = median(head.map(dropRate))
   const baseFailureRate = median(base.map(failureRate))
   const headFailureRate = median(head.map(failureRate))
+  const completionDelta = median(pairs.map((pair) => completionRate(pair.head) - completionRate(pair.base)))
+  const dropDelta = median(pairs.map((pair) => dropRate(pair.head) - dropRate(pair.base)))
+  const failureDelta = median(pairs.map((pair) => failureRate(pair.head) - failureRate(pair.base)))
   const regression = delta > allowed
-    || headCompletionRate + 1e-9 < baseCompletionRate
-    || headDropRate > baseDropRate + 1e-9
-    || headFailureRate > baseFailureRate + 1e-9
+    || completionDelta < -1e-9
+    || dropDelta > 1e-9
+    || failureDelta > 1e-9
   if (regression) failures.push(
-    `${group}: p95 ${baseP95.toFixed(2)} -> ${headP95.toFixed(2)} ms, completion ${(baseCompletionRate * 100).toFixed(2)}% -> ${(headCompletionRate * 100).toFixed(2)}%, drop ${(baseDropRate * 100).toFixed(2)}% -> ${(headDropRate * 100).toFixed(2)}%, failure ${(baseFailureRate * 100).toFixed(2)}% -> ${(headFailureRate * 100).toFixed(2)}%`,
+    `${group}: paired p95 delta ${delta.toFixed(2)} ms (median base/head ${baseP95.toFixed(2)}/${headP95.toFixed(2)}), completion ${(baseCompletionRate * 100).toFixed(2)}% -> ${(headCompletionRate * 100).toFixed(2)}%, drop ${(baseDropRate * 100).toFixed(2)}% -> ${(headDropRate * 100).toFixed(2)}%, failure ${(baseFailureRate * 100).toFixed(2)}% -> ${(headFailureRate * 100).toFixed(2)}%`,
   )
   comparisons.push({
     group,
@@ -93,7 +105,7 @@ writeFileSync(resolve(root, 'ab-summary.json'), JSON.stringify({ schemaVersion: 
 const md = [
   '# Phase 0 same-host A/B',
   '',
-  '| workload | base p95 ms | head p95 ms | p95 delta | base/head completion | base/head retry | base/head drop rate | verdict |',
+  '| workload | base p95 ms | head p95 ms | paired p95 delta | base/head completion | base/head retry | base/head drop rate | verdict |',
   '|---|---:|---:|---:|---:|---:|---:|---|',
   ...comparisons.map((row) => `| ${row.group} | ${row.baseP95Ms.toFixed(2)} | ${row.headP95Ms.toFixed(2)} | ${row.p95DeltaMs.toFixed(2)} | ${(row.baseCompletionRate * 100).toFixed(2)}%/${(row.headCompletionRate * 100).toFixed(2)}% | ${row.baseRetries}/${row.headRetries} | ${(row.baseDropRate * 100).toFixed(2)}%/${(row.headDropRate * 100).toFixed(2)}% | ${row.regression ? 'REGRESSION' : 'NON-DEGRADED'} |`),
   '',

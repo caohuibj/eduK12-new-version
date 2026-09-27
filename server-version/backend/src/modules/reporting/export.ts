@@ -3,9 +3,15 @@ import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
 import { readOrganizationSafetyCase } from '../assessment-safety/organization-view'
-import type { ReportingPrincipal } from './authorization'
+import {
+  assertOrganizationGroupArtifactsReadAccess,
+  hideUnauthorizedArtifact,
+  type ReportingPrincipal,
+} from './authorization'
+import { assertIndividualLongitudinalAccess } from './individualAuthorization'
 import { readOrganizationMemberProjection } from './memberProjection'
 import { readOrganizationReportingArtifact } from './pr4Service'
+import { assertProtectedFeedbackManagerAccess } from './protectedFeedback'
 import { reportingFail } from './types'
 
 export type ReportingExportTarget =
@@ -58,6 +64,50 @@ const authorizedProjection = async (input: ExportInput): Promise<unknown> => {
   return projection
 }
 
+const recheckExportAuthority = async (input: ExportInput): Promise<void> => {
+  if (input.target.kind !== 'AGGREGATE') {
+    await authorizedProjection(input)
+    return
+  }
+  const artifact = await readReportingArtifactRecord(input.target.artifactId)
+  if (artifact.organizationId !== input.organizationId) reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
+  if (artifact.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {
+    await assertIndividualLongitudinalAccess({ ...input, subjectUserId: artifact.subjectUserId })
+    reportingFail('EXPORT_NOT_ALLOWED', 'individual reports require member export capability', 403)
+  }
+  if (artifact.analysisKind === 'GROUP') {
+    await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactsReadAccess({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      runIds: [artifact.artifactPayload.source.runId],
+    }))
+  } else if (artifact.analysisKind === 'REPEATED_COHORT' || artifact.analysisKind === 'MATCHED_LONGITUDINAL') {
+    const rows = await prisma.$queryRaw<Array<{ runId: string }>>`
+      SELECT DISTINCT wave.source_run_id AS "runId"
+      FROM reporting_analysis_artifact_waves binding
+      JOIN reporting_series_waves wave
+        ON wave.organization_id=binding.organization_id
+       AND wave.series_id=binding.series_id
+       AND wave.id=binding.wave_id
+      WHERE binding.organization_id=${input.organizationId}
+        AND binding.artifact_id=${artifact.id}
+    `
+    if (!rows.length) reportingFail('REPORT_ARTIFACT_INTEGRITY', 'longitudinal artifact has no Wave authority bindings', 500)
+    await hideUnauthorizedArtifact(() => assertOrganizationGroupArtifactsReadAccess({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      runIds: rows.map((row) => row.runId),
+    }))
+  } else if (artifact.analysisKind === 'PROTECTED_FEEDBACK') {
+    await assertProtectedFeedbackManagerAccess({
+      principal: input.principal,
+      organizationId: input.organizationId,
+      subjectUserId: artifact.artifactPayload.source.subjectUserId,
+    })
+  }
+  await assertExportGrant(input)
+}
+
 export const createReportingExport = async (input: ExportInput) => {
   await authorizedProjection(input)
   const id = randomUUID()
@@ -77,7 +127,7 @@ export const createReportingExport = async (input: ExportInput) => {
     `
     return tickets
   })
-  await authorizedProjection(input)
+  await recheckExportAuthority(input)
   return { exportId: id, expiresAt: rows[0].expiresAt.toISOString() }
 }
 

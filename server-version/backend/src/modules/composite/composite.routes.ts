@@ -102,6 +102,7 @@ router.post('/:id/items/reorder', authenticate, requireTeacher, compositeControl
 router.post('/:id/publish', authenticate, requireTeacher, compositeImageController.publish)
 router.get('/:id/public-tokens', authenticate, requireTeacher, compositeController.listTokens)
 router.post('/:id/public-tokens', authenticate, requireTeacher, compositeController.createToken)
+router.post('/:id/public-tokens/:tokenId/reveal', authenticate, requireTeacher, compositeController.revealToken)
 router.delete('/:id/public-tokens/:tokenId', authenticate, requireTeacher, compositeController.disableToken)
 
 router.get('/:id/export/preview', authenticate, requireTeacher, compositeExportController.preview)

@@ -19,6 +19,7 @@ import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
 import { MAX_TOKEN_USES } from '../constants'
+import { MAX_PUBLIC_LINK_TTL_MS } from '../services/publicAccessPolicy'
 import { cacheService } from '../services/cacheService'
 import * as formSectionService from '../services/questionnaire-form-section.service'
 import { isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
@@ -214,7 +215,7 @@ export const generalQuestionnaireController = {
       if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
-      const tokens = await tokenService.getTokensByQuestionnaire(id, { reveal: true })
+      const tokens = await tokenService.getTokensByQuestionnaire(id)
 
       return success(res, {
         list: tokens,
@@ -265,7 +266,7 @@ export const generalQuestionnaireController = {
 
       // 计算过期时间
       const expiresAt = requestedExpiry ? new Date(requestedExpiry) : new Date(Date.now() + (expiresDays ?? 30) * 86400000)
-      if (expiresAt.getTime() <= Date.now() || expiresAt.getTime() > Date.now() + 365 * 86400000) {
+      if (expiresAt.getTime() <= Date.now() || expiresAt.getTime() > Date.now() + MAX_PUBLIC_LINK_TTL_MS) {
         return error(res, 'Expiry must be in the future and within one year', -1, 400)
       }
 
@@ -289,6 +290,26 @@ export const generalQuestionnaireController = {
     } catch (err) {
       logger.error('创建访问令牌错误', err)
       return error(res, '创建令牌失败')
+    }
+  },
+
+  async revealToken(req: Request, res: Response) {
+    try {
+      const userId = req.user?.userId
+      const { id, tokenId } = req.params
+      if (!userId) return error(res, '未登录')
+      const questionnaire = await generalQuestionnaire(id)
+      if (!questionnaire) return notFound(res, '问卷不存在')
+      if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
+      if (!(await questionnaireAuth.hasTokenBinding(id, tokenId))) return notFound(res, '令牌不存在')
+      const revealed = await tokenService.getTokenById(tokenId, id, { reveal: true })
+      if (!revealed?.token) return notFound(res, '令牌凭证不可恢复')
+      res.setHeader('Cache-Control', 'no-store')
+      logger.info('问卷公开链接凭证已读取', { questionnaireId: id, tokenId, actorUserId: userId })
+      return success(res, revealed)
+    } catch (err) {
+      logger.error('读取访问令牌错误', err)
+      return error(res, '读取令牌失败')
     }
   },
 
