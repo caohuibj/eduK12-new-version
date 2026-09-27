@@ -3075,7 +3075,8 @@ export const questionnaireController = {
 
       const previewData = await exportService.getQuestionnaireExportData(id, {
         anonymize: true,
-        minProgress: 100
+        minProgress: 100,
+        recordLimit: 5,
       })
 
       const totalItems = questionnaire.questionnaireScales.reduce(
@@ -3087,7 +3088,7 @@ export const questionnaireController = {
 
       return success(res, {
         questionnaireName: questionnaire.name,
-        totalRecords: previewData.rows.length,
+        totalRecords: questionnaire._count.assessments,
         completedCount: questionnaire._count.assessments,
         scaleCount: questionnaire.questionnaireScales.length,
         totalItems,
