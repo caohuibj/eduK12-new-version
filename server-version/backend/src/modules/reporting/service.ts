@@ -5,7 +5,7 @@ import {
   hideUnauthorizedArtifact,
   type ReportingPrincipal,
 } from './authorization'
-import { createOrReuseReportingArtifact, readReportingArtifactRecord } from './artifact'
+import { createOrReuseReportingArtifact, readReportingArtifactRecord, type ReportingPrivacyExposureV1 } from './artifact'
 import { freezeRunTrackCohort } from './cohort'
 import { buildReportingArtifact } from './engine'
 import { resolveAuthoritativeRunResults } from './resultSource'
@@ -41,6 +41,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     cohortSelector: input.cohortSelector,
   })
   const batch = await resolveAuthoritativeRunResults(cohort)
+  let privacyExposure: ReportingPrivacyExposureV1 | undefined
   if (cohort.selector.kind === 'FILTERED_RUN_TRACK_SUBJECTS' && cohort.selector.clauses.length > 0) {
     const definition = spec.definition
     const minimumN = Math.max(
@@ -49,12 +50,23 @@ export const generateOrganizationGroupAnalysis = async (input: {
       'minimumContributorN' in definition ? definition.minimumContributorN : 3,
       batch.resourceMinimumN ?? 0,
     )
-    await assertReportingSubgroupsPrivacy({
+    const privacy = await assertReportingSubgroupsPrivacy({
       principal: input.principal,
       organizationId: input.organizationId,
       specId: spec.id,
       entries: [{ cohort, minimumN }],
     })
+    if (!privacy.organizationManager) {
+      privacyExposure = {
+        sourceRunId: cohort.sourceRunId,
+        sourceTrackId: cohort.sourceTrackId,
+        analysisKind: 'GROUP',
+        specHash: spec.specHash,
+        eligibleSubjectUserIds: cohort.members.map((member) => member.userId),
+        resolvedSubjectUserIds: batch.resolved.map((row) => row.subjectUserId),
+        unresolvedSubjectUserIds: batch.unresolved.map((row) => row.subjectUserId),
+      }
+    }
   }
   const generatedAt = new Date()
   const built = buildReportingArtifact({
@@ -81,6 +93,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     snapshotHash: built.snapshotHash,
     generatedByUserId: input.principal.userId,
     generatedAt,
+    privacyExposure,
   })
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
