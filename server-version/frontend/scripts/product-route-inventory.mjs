@@ -54,6 +54,23 @@ function visit(node) {
   ts.forEachChild(node, visit)
 }
 visit(ast)
+const organizationRoutes = [
+  ['/organizations', 'OrganizationIndexPage'],
+  ['/organizations/new', 'OrganizationCreatePage'],
+  ['/organization-tasks', 'OrganizationTasksPage'],
+  ['/organizations/:organizationId', 'OrganizationAdminPage'],
+  ['/organizations/:organizationId/runs', 'OrganizationRunListPage'],
+  ['/organizations/:organizationId/runs/:runId', 'OrganizationRunDetailPage'],
+  ['/organizations/:organizationId/reporting', 'OrganizationReportingPage'],
+  ['/organizations/:organizationId/delivery', 'OrganizationDeliveryPage'],
+  ['/organizations/:organizationId/*', 'OrganizationNotFound'],
+]
+for (const [p, page] of organizationRoutes) routes.push([
+  p, page, 'Authenticated in page; server Organization/assignment authority', '—',
+  'AppShell (outside guards)', 'standard', 'FE-02 + FE-10', 'Staff UI chrome; server authority retained',
+])
+if (new Set(routes.map(([p]) => p)).size !== routes.length) throw new Error('Duplicate route paths require review')
+
 
 function organizationRow(routePath, page) {
   return [routePath, page, 'Authenticated in page; server Organization/assignment authority', '—', 'AppShell (outside guards)', 'standard', 'FE-02 + FE-10', 'Staff UI chrome; server authority retained']
@@ -92,7 +109,6 @@ function visitOrganizationConditionalEntries(node) {
 
 visitOrganizationConditionalEntries(organizationAst)
 visitOrganizationRoutes(organizationAst)
-if (new Set(routes.map(([p]) => p)).size !== routes.length) throw new Error('Duplicate route paths require review')
 const md = `# Frontend route inventory\n\nGenerated from \`frontend/src/App.tsx\` plus nested \`OrganizationProductRoutes.tsx\` by \`npm run inventory:product-ui\`. ${routes.length} explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.\n\n| Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |\n|---|---|---|---|---|---|---|---|\n${routes.map((r) => '| ' + r.map((v) => v.replaceAll('|', '\\|')).join(' | ') + ' |').join('\n')}\n\n## Additional boundaries\n\n- FirstLoginPasswordChange remains an inline guard flow. FE-02 preserves the original destination through reauthentication.\n- Parent login/home are explicitly registered with a PARENT-only route guard. Legacy relational task discovery retains its STUDENT / PARENT / TEACHER guard. Shared exact runtime/report routes accept authenticated sessions and enforce resource ownership on the server, including frozen Organization respondents whose legacy role is ADMIN.\n- User roles are STUDENT / TEACHER / ADMIN / PARENT; researcher report projection is not a new frontend login role.\n- Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.\n- Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.\n- BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.\n- Nested Organization routes are included as an audit projection; AppShell and server authority remain the routing/access sources of truth.\n- Non-route components and legacy branches are not declared dead code by this inventory.\n`
 if (process.argv.includes('--check')) {
   if (!fs.existsSync(output) || fs.readFileSync(output, 'utf8') !== md) {
