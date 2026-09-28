@@ -358,7 +358,7 @@ const ImageLibrary: React.FC = () => {
                     setSelectedFile(null)
                     setUploadError('')
                   }}
-                  className="flex-1 btn-secondary"
+                  className="flex-1 hui-button hui-button--secondary"
                 >
                   取消
                 </button>
@@ -366,7 +366,7 @@ const ImageLibrary: React.FC = () => {
                   type="button"
                   onClick={handleUpload}
                   disabled={!selectedFile || isUploading}
-                  className="flex-1 btn-primary disabled:opacity-50"
+                  className="flex-1 hui-button hui-button--primary disabled:opacity-50"
                 >
                   {isUploading ? '上传中...' : '上传'}
                 </button>
@@ -418,7 +418,7 @@ const ImageLibrary: React.FC = () => {
                     setEditingImage(null)
                     setEditName('')
                   }}
-                  className="flex-1 btn-secondary"
+                  className="flex-1 hui-button hui-button--secondary"
                   disabled={isUpdating}
                 >
                   取消
@@ -427,7 +427,7 @@ const ImageLibrary: React.FC = () => {
                   type="button"
                   onClick={handleRenameImage}
                   disabled={!editName.trim() || isUpdating}
-                  className="flex-1 btn-primary disabled:opacity-50"
+                  className="flex-1 hui-button hui-button--primary disabled:opacity-50"
                 >
                   {isUpdating ? '保存中...' : '保存'}
                 </button>
