@@ -62,15 +62,86 @@ async function run(page, org, key, subject = { kind: 'ALL_CURRENT' }, respondent
   if (!usedBuilder && key === 'teacher-self') {
     await page.goto(`${base}/organizations/${org}/runs/${r.id}`)
     await page.getByLabel('已发布资源', { exact: true }).selectOption({ label: `${entry.title} · BUNDLE/${policy.resourceKey}@${policy.resourceVersion}` })
-    const added = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/runs/${r.id}/tracks`))
-    await page.getByRole('button', { name: '添加测评项目', exact: true }).click()
-    const body = await (await added).json(); assert.equal(body.code, 0); t = body.data
-    const previewed = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/runs/${r.id}/preview`))
-    await page.getByRole('button', { name: '发布 Run', exact: true }).click()
-    const previewBody = await (await previewed).json(); assert.equal(previewBody.code, 0); preview = previewBody.data
-    const publishedResponse = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/runs/${r.id}/publish`))
-    await page.getByRole('dialog', { name: '确认发布测评' }).getByRole('button', { name: '确认发布', exact: true }).click()
-    assert.equal((await (await publishedResponse).json()).code, 0)
+    const addButton = page.getByRole('button', { name: '添加测评项目', exact: true })
+    assert.equal(await addButton.isEnabled(), true, 'selected published resource must enable add-track action')
+    await addButton.click()
+    await page.getByRole('heading', { name: new RegExp(`^测评项目 1: BUNDLE/${policy.resourceKey}@${policy.resourceVersion}// @ts-nocheck
+/** Real HTTP + browser + PostgreSQL: no request mocks or pre-completed results. */
+import assert from 'node:assert/strict'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
+import { prisma } from '../backend/src/config/database'
+import { parseStoredCanonicalUnitResult } from '../backend/src/modules/assessment-runtime/persistence'
+const { chromium } = require('../backend/node_modules/playwright-core')
+const { assertApiSuccess } = require('./helpers/api-response.cjs')
+const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const fixture = JSON.parse(readFileSync(process.env.PR5_SCENARIOS_FIXTURE || '/tmp/eduk12-pr5-scenarios.json', 'utf8'))
+const base = process.env.PR5_SCENARIOS_BASE_URL || 'http://127.0.0.1:5173'
+const output = process.env.PR5_SCENARIOS_OUTPUT || '/tmp/eduk12-pr5-scenarios-evidence'
+const evidence = { candidate: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), checks: [], artifacts: [], attempts: [] }
+const record = (name, details = {}) => { evidence.checks.push({ name, ...details }); console.log(`PASS ${name}`) }
+const sessions = new Map()
+let browser
+const api = async (page, path, body?) => sessionJsonFetch(page, path, body === undefined ? {} : {
+  method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomUUID() }, body: JSON.stringify(body),
+})
+const ok = async (page, path, body?) => {
+  const response = await api(page, path, body)
+  return assertApiSuccess(response.status, response.body, path)
+}
+const denied = async (page, path, body?) => {
+  const result = await api(page, path, body)
+  assert.ok([403, 404, 409].includes(result.status), `Expected denied ${path}: ${JSON.stringify(result)}`)
+  return result
+}
+async function pageFor(name, mobile = false) {
+  if (sessions.has(name)) return sessions.get(name)
+  const user = fixture.users[name]
+  const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 } })
+  const page = await context.newPage()
+  if (user.role === 'PARENT') {
+    await page.goto(`${base}/parent/login`)
+    await page.getByLabel('用户名', { exact: true }).fill(user.username)
+    await page.getByLabel('密码', { exact: true }).fill(user.password)
+    const response = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith('/api/auth/login'))
+    await page.getByRole('button', { name: '登录', exact: true }).click()
+    assert.equal((await response).status(), 200)
+  } else {
+    await loginWithSession(page, { baseUrl: base, route: user.role === 'ADMIN' ? '/admin/login' : user.role === 'TEACHER' ? '/teacher/account-login' : '/student/login', ...user,
+      submitName: user.role === 'ADMIN' ? '管理员登录' : '登录', usernamePlaceholder: user.role === 'ADMIN' ? '请输入管理员账号' : '请输入用户名' })
+  }
+  sessions.set(name, page)
+  return page
+}
+const entryFor = key => fixture.entries.find(entry => entry.title === `PR5 ${key}`)
+const member = async (page, org, name, personas) => {
+  const row = await ok(page, `/organizations/${org}/memberships`, { userId: fixture.users[name].id })
+  for (const persona of personas) await ok(page, `/organizations/${org}/memberships/${row.id}/personas`, { persona })
+  return row.id
+}
+let checkedProjectionRecovery = false
+let usedBuilder = false
+async function run(page, org, key, subject = { kind: 'ALL_CURRENT' }, respondent = { kind: 'ALL_CURRENT' }, suffix = '') {
+  const entry = entryFor(key), policy = entry.applicability
+  const r = await ok(page, `/organizations/${org}/runs`, { name: `${key}${suffix}-${randomUUID().slice(0, 6)}` })
+  let t, preview
+  if (!usedBuilder && key === 'teacher-self') {
+    await page.goto(`${base}/organizations/${org}/runs/${r.id}`)
+    await page.getByLabel('已发布资源', { exact: true }).selectOption({ label: `${entry.title} · BUNDLE/${policy.resourceKey}@${policy.resourceVersion}` })
+) }).waitFor()
+    const afterAdd = await ok(page, `/organizations/${org}/runs/${r.id}`)
+    t = afterAdd.tracks.find(track => track.resourceKey === policy.resourceKey && track.resourceVersion === policy.resourceVersion)
+    assert.ok(t, 'builder add-track action must persist the selected resource in the server read model')
+
+    await page.getByRole('button', { name: '发布测评批次', exact: true }).click()
+    const confirmDialog = page.getByRole('dialog', { name: '确认发布测评' })
+    await confirmDialog.waitFor()
+    preview = await ok(page, `/organizations/${org}/runs/${r.id}/preview`, { expectedVersion: afterAdd.run.version })
+    await confirmDialog.getByRole('button', { name: '确认发布', exact: true }).click()
+    await page.getByText('Run 已发布；人口、资源与策略身份已冻结。', { exact: true }).waitFor()
+    const afterPublish = await ok(page, `/organizations/${org}/runs/${r.id}`)
+    assert.equal(afterPublish.run.status, 'PUBLISHED', 'builder publish action must persist published state')
     usedBuilder = true
   } else {
   t = await ok(page, `/organizations/${org}/runs/${r.id}/tracks`, {
