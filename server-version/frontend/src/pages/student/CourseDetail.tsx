@@ -3,19 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, CheckCircle, Clock, ClipboardCheck } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Course, Assignment, Checkin } from '../../types'
-import { ProductPage, ProductStatus } from '../../components/product-ui'
-
-// 心理量表类型
-interface Scale {
-  id: string
-  code: string
-  name: string
-  description: string | null
-  estimatedTime: number | null
-  itemCount: number
-  completed: boolean
-  completedAt: string | null
-}
+import { ProductPage } from '../../components/product-ui'
 
 // 问卷类型
 interface Questionnaire {
@@ -26,9 +14,34 @@ interface Questionnaire {
   estimatedTime: number | null
   scaleCount: number
   completed: boolean
+  inProgress?: boolean
   completedAt: string | null
+  assessmentId: string | null
   createdAt?: string
 }
+
+type CourseSection = 'assignments' | 'checkins' | 'questionnaires' | 'composites'
+
+const initialSectionLoading: Record<CourseSection, boolean> = {
+  assignments: true,
+  checkins: true,
+  questionnaires: true,
+  composites: true,
+}
+
+const getErrorMessage = (reason: unknown, fallback: string) => (
+  reason instanceof Error ? reason.message : fallback
+)
+
+const hasCheckinSubmission = (checkin: Checkin) => Boolean(checkin.submission ?? checkin.submitted)
+
+const questionnaireDestination = (questionnaire: Questionnaire) => (
+  questionnaire.inProgress
+    ? `/student/questionnaires/${questionnaire.id}`
+    : questionnaire.completed && questionnaire.assessmentId
+      ? `/student/questionnaires/result/${questionnaire.assessmentId}`
+      : `/student/questionnaires/${questionnaire.id}`
+)
 
 interface CompositeAssessment {
   id: string
@@ -52,91 +65,115 @@ interface CompositeAssessment {
 const CourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'assignments' | 'checkins' | 'questionnaires' | 'composites'>('assignments')
+  const [activeTab, setActiveTab] = useState<CourseSection>('assignments')
   const [course, setCourse] = useState<Course | null>(null)
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [checkins, setCheckins] = useState<Checkin[]>([])
-  const [scales, setScales] = useState<Scale[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [composites, setComposites] = useState<CompositeAssessment[]>([])
-  const [loading, setLoading] = useState(true)
+  const [courseLoading, setCourseLoading] = useState(true)
+  const [courseError, setCourseError] = useState<string | null>(null)
+  const [sectionLoading, setSectionLoading] = useState<Record<CourseSection, boolean>>(initialSectionLoading)
+  const [sectionErrors, setSectionErrors] = useState<Partial<Record<CourseSection, string>>>({})
 
   useEffect(() => {
-    if (courseId) {
-      fetchCourseDetail()
-      fetchAssignments()
-      fetchCheckins()
-      fetchScales()
-      fetchQuestionnaires()
-      fetchComposites()
+    if (!courseId) {
+      setCourseLoading(false)
+      setCourseError('课程链接无效')
+      return
     }
+
+    void fetchCourseDetail()
+    void fetchAssignments()
+    void fetchCheckins()
+    void fetchQuestionnaires()
+    void fetchComposites()
   }, [courseId])
 
+  const beginSectionLoad = (section: CourseSection) => {
+    setSectionLoading((current) => ({ ...current, [section]: true }))
+    setSectionErrors((current) => {
+      const next = { ...current }
+      delete next[section]
+      return next
+    })
+  }
+
+  const finishSectionLoad = (section: CourseSection) => {
+    setSectionLoading((current) => ({ ...current, [section]: false }))
+  }
+
   const fetchCourseDetail = async () => {
+    setCourseLoading(true)
+    setCourseError(null)
     try {
       const response = await apiClient.get(`/courses/${courseId}`)
-      if (response.code === 0) {
-        setCourse(response.data)
+      if (response.code !== 0 || !response.data) {
+        throw new Error(response.message || '获取课程详情失败')
       }
-    } catch (error) {
-      console.error('获取课程详情失败:', error)
+      setCourse(response.data)
+    } catch (reason) {
+      console.error('获取课程详情失败:', reason)
+      setCourse(null)
+      setCourseError(getErrorMessage(reason, '获取课程详情失败'))
+    } finally {
+      setCourseLoading(false)
     }
   }
 
   const fetchAssignments = async () => {
+    beginSectionLoad('assignments')
     try {
       const response = await apiClient.get(`/courses/${courseId}/assignments`)
-      if (response.code === 0) {
-        setAssignments(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取作业列表失败:', error)
+      if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
+      setAssignments(response.data?.list || [])
+    } catch (reason) {
+      console.error('获取作业列表失败:', reason)
+      setSectionErrors((current) => ({ ...current, assignments: getErrorMessage(reason, '获取作业列表失败') }))
     } finally {
-      setLoading(false)
+      finishSectionLoad('assignments')
     }
   }
 
   const fetchCheckins = async () => {
+    beginSectionLoad('checkins')
     try {
       const response = await apiClient.get(`/courses/${courseId}/checkins`)
-      if (response.code === 0) {
-        setCheckins(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取打卡列表失败:', error)
-    }
-  }
-
-  const fetchScales = async () => {
-    try {
-      const response = await apiClient.get(`/scales/available?courseId=${courseId}`)
-      if (response.code === 0) {
-        setScales(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取心理测评列表失败:', error)
+      if (response.code !== 0) throw new Error(response.message || '获取打卡列表失败')
+      setCheckins(response.data?.list || [])
+    } catch (reason) {
+      console.error('获取打卡列表失败:', reason)
+      setSectionErrors((current) => ({ ...current, checkins: getErrorMessage(reason, '获取打卡列表失败') }))
+    } finally {
+      finishSectionLoad('checkins')
     }
   }
 
   const fetchQuestionnaires = async () => {
+    beginSectionLoad('questionnaires')
     try {
       const response = await apiClient.get(`/questionnaires/available?courseId=${courseId}`)
-      if (response.code === 0) {
-        setQuestionnaires(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取问卷列表失败:', error)
+      if (response.code !== 0) throw new Error(response.message || '获取问卷列表失败')
+      setQuestionnaires(response.data?.list || [])
+    } catch (reason) {
+      console.error('获取问卷列表失败:', reason)
+      setSectionErrors((current) => ({ ...current, questionnaires: getErrorMessage(reason, '获取问卷列表失败') }))
+    } finally {
+      finishSectionLoad('questionnaires')
     }
   }
 
   const fetchComposites = async () => {
+    beginSectionLoad('composites')
     try {
       const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available')
-      if (response.code === 0) {
-        setComposites((response.data?.list || []).filter((item) => item.course?.id === courseId))
-      }
-    } catch (error) {
-      console.error('获取综合测评列表失败:', error)
+      if (response.code !== 0) throw new Error(response.message || '获取综合测评列表失败')
+      setComposites((response.data?.list || []).filter((item) => item.course?.id === courseId))
+    } catch (reason) {
+      console.error('获取综合测评列表失败:', reason)
+      setSectionErrors((current) => ({ ...current, composites: getErrorMessage(reason, '获取综合测评列表失败') }))
+    } finally {
+      finishSectionLoad('composites')
     }
   }
 
@@ -156,7 +193,7 @@ const CourseDetail: React.FC = () => {
 
   // 计算未完成数量
   const uncompletedAssignments = assignments.filter(a => !a.submitted).length
-  const uncompletedCheckins = checkins.filter(c => !c.submission).length
+  const uncompletedCheckins = checkins.filter((checkin) => !hasCheckinSubmission(checkin)).length
   const uncompletedQuestionnaires = questionnaires.filter(q => !q.completed).length
   const uncompletedComposites = composites.filter((item) => {
     const hasActiveAttempt = item.canContinue || item.attempt?.status === 'IN_PROGRESS'
@@ -175,21 +212,53 @@ const CourseDetail: React.FC = () => {
     )
   }
 
-  if (loading) {
+  const SectionStatus: React.FC<{
+    section: CourseSection
+    label: string
+    onRetry: () => void
+  }> = ({ section, label, onRetry }) => {
+    if (sectionLoading[section]) {
+      return (
+        <div className="card text-center py-10" role="status" aria-live="polite">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3" />
+          <p className="text-gray-500">正在加载{label}...</p>
+        </div>
+      )
+    }
+
+    const sectionError = sectionErrors[section]
+    if (sectionError) {
+      return (
+        <div className="card text-center py-10" role="alert">
+          <p className="text-red-600 mb-2">{label}加载失败</p>
+          <p className="text-sm text-gray-500 mb-4">{sectionError}</p>
+          <button onClick={onRetry} className="btn-secondary">重试</button>
+        </div>
+      )
+    }
+
+    return null
+  }
+
+  if (courseLoading) {
     return (
-      <ProductPage width="report" className="hui-student-page hui-course-detail">
-        <ProductStatus kind="pending" title="正在加载课程" announce="polite">正在读取课程与任务。</ProductStatus>
-      </ProductPage>
+      <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+          <p className="text-gray-500">正在加载课程...</p>
+        </div>
+      </div>
     )
   }
 
   if (!course) {
     return (
-      <ProductPage width="report" className="hui-student-page hui-course-detail">
-        <ProductStatus kind="warning" title="课程不可用" actions={<button onClick={() => navigate('/student')} className="btn-primary">返回课程列表</button>}>
-          课程不存在或已删除。
-        </ProductStatus>
-      </ProductPage>
+      <div className="card text-center py-12">
+        <p className="text-gray-500">{courseError || '课程不存在、已删除或当前账户无法访问'}</p>
+        <button onClick={() => navigate('/student')} className="btn-primary mt-4">
+          返回课程列表
+        </button>
+      </div>
     )
   }
 
@@ -279,7 +348,10 @@ const CourseDetail: React.FC = () => {
       </div>
 
       {/* Content */}
-      {activeTab === 'assignments' && (
+      {activeTab === 'assignments' && (sectionLoading.assignments || sectionErrors.assignments) && (
+        <SectionStatus section="assignments" label="作业" onRetry={() => { void fetchAssignments() }} />
+      )}
+      {activeTab === 'assignments' && !sectionLoading.assignments && !sectionErrors.assignments && (
         <div className="hui-course-list space-y-4">
           {assignments.length === 0 ? (
             <div className="card text-center py-12">
@@ -328,7 +400,10 @@ const CourseDetail: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'checkins' && (
+      {activeTab === 'checkins' && (sectionLoading.checkins || sectionErrors.checkins) && (
+        <SectionStatus section="checkins" label="打卡" onRetry={() => { void fetchCheckins() }} />
+      )}
+      {activeTab === 'checkins' && !sectionLoading.checkins && !sectionErrors.checkins && (
         <div className="hui-course-list space-y-4">
           {checkins.length === 0 ? (
             <div className="card text-center py-12">
@@ -357,7 +432,7 @@ const CourseDetail: React.FC = () => {
                     onClick={() => navigate(`/student/checkins/${checkin.id}`)}
                     className="btn-primary"
                   >
-                    {checkin.submitted ? '查看' : '去打卡'}
+                    {hasCheckinSubmission(checkin) ? '查看' : '去打卡'}
                   </button>
                 </div>
               </div>
@@ -366,7 +441,10 @@ const CourseDetail: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'questionnaires' && (
+      {activeTab === 'questionnaires' && (sectionLoading.questionnaires || sectionErrors.questionnaires) && (
+        <SectionStatus section="questionnaires" label="问卷" onRetry={() => { void fetchQuestionnaires() }} />
+      )}
+      {activeTab === 'questionnaires' && !sectionLoading.questionnaires && !sectionErrors.questionnaires && (
         <div className="hui-course-list space-y-4">
           {questionnaires.length === 0 ? (
             <div className="card text-center py-12">
@@ -401,10 +479,10 @@ const CourseDetail: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => navigate(`/student/questionnaires/${questionnaire.id}`)}
+                    onClick={() => navigate(questionnaireDestination(questionnaire))}
                     className="btn-primary"
                   >
-                    {questionnaire.completed ? '查看报告' : '开始测评'}
+                    {questionnaire.inProgress ? '继续测评' : questionnaire.completed ? '查看报告' : '开始测评'}
                   </button>
                 </div>
               </div>
@@ -413,7 +491,10 @@ const CourseDetail: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'composites' && (
+      {activeTab === 'composites' && (sectionLoading.composites || sectionErrors.composites) && (
+        <SectionStatus section="composites" label="综合测评" onRetry={() => { void fetchComposites() }} />
+      )}
+      {activeTab === 'composites' && !sectionLoading.composites && !sectionErrors.composites && (
         <div className="hui-course-list space-y-4">
           {composites.length === 0 ? (
             <div className="card text-center py-12">
