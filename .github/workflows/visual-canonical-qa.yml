@@ -25,6 +25,11 @@ on:
       - 'server-version/frontend/src/pages/parent/**'
       - 'server-version/frontend/src/pages/teacher/TeacherProfile.tsx'
       - 'server-version/frontend/src/pages/organization/OrganizationIndexPage.tsx'
+      - 'server-version/frontend/src/modules/reporting/**'
+      - 'server-version/frontend/src/modules/cognitive/Cognitive*ReportCard.tsx'
+      - 'server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx'
+      - 'server-version/frontend/src/modules/composite/*Report*.tsx'
+      - 'server-version/frontend/src/pages/bundle/BundleReport.tsx'
       - 'server-version/frontend/src/modules/cognitive/pages/CognitiveHistory.tsx'
   workflow_dispatch:
 
