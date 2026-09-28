@@ -406,6 +406,22 @@
   .hui-app--student-submit [class*="items-center"][class*="justify-between"] > :where(button,a) {
     min-height: 44px;
   }
+  .hui-app--student-submit button[class*="w-6"][class*="h-6"],
+  .hui-app--student-submit button[title="关闭"] {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .hui-app--student-submit [class*="fixed"][class*="inset-0"] {
+    padding-top: max(16px,env(safe-area-inset-top));
+    padding-right: max(16px,env(safe-area-inset-right));
+    padding-bottom: max(16px,env(safe-area-inset-bottom));
+    padding-left: max(16px,env(safe-area-inset-left));
+  }
+  .hui-app--student-submit [class*="max-w-\[90vw\]"] {
+    max-width: 100%;
+  }
 
   .hui-app--report-surface .hui-product[data-testid="report-shell"] {
     padding-inline: 0;
