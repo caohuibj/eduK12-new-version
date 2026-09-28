@@ -291,6 +291,19 @@
 }
 
 /* Older report pages that do not use ReportShell yet. */
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) {
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) > button:first-child {
+  min-height: 44px;
+  font-weight: 600;
+}
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) > .card[class*="max-w-2xl"] {
+  margin-inline: auto;
+  padding: clamp(20px,4vw,32px);
+}
 .hui-app--report-surface .hui-app-main > [class~="max-w-4xl"],
 .hui-app--report-surface .hui-app-main > [class~="max-w-3xl"],
 .hui-app--report-surface .hui-app-main > [class~="max-w-2xl"] {
@@ -306,6 +319,17 @@
 }
 .hui-app--report-surface [class*="grid-cols-2"] {
   gap: 12px;
+}
+.hui-app--report-surface section [class~="bg-gray-50"][class*="rounded"],
+.hui-app--report-surface [data-testid^="situational-report-"] article {
+  border: 1px solid #e3ebf2;
+  border-radius: 14px;
+  background: #f8fbfd;
+}
+.hui-app--report-surface details > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 /* ------------------------------
