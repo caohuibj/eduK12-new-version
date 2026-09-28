@@ -202,7 +202,14 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
                       description={totalScores[0].description}
                       meta={scoreStatusLabel(totalScores[0]) || undefined}
                     />
-                    {rangeTrack(totalScores[0])}
+                    <ReportRangeTrack
+                      label={totalScores[0].label}
+                      value={totalScores[0].value}
+                      formattedValue={scoreStatusLabel(totalScores[0]) || '范围'}
+                      range={totalScores[0].range}
+                      reference={overlayFor(totalScores[0], references)}
+                      status={scoreStatusLabel(totalScores[0])}
+                    />
                   </div>
                 ) : (
                   <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
