@@ -91,7 +91,11 @@ const CourseDetail: React.FC = () => {
 
   const beginSectionLoad = (section: CourseSection) => {
     setSectionLoading((current) => ({ ...current, [section]: true }))
-    setSectionErrors((current) => ({ ...current, [section]: undefined }))
+    setSectionErrors((current) => {
+      const next = { ...current }
+      delete next[section]
+      return next
+    })
   }
 
   const finishSectionLoad = (section: CourseSection) => {
