@@ -3,16 +3,16 @@
  * Scope is STUDENT + standard shell only. Focused assessment runners are excluded.
  */
 .hui-app--student.hui-app--standard {
-  --student-ink: #14304a;
-  --student-muted: #64748b;
-  --student-line: #dde7f0;
-  --student-page: #f7fbff;
-  --student-soft: #eff7ff;
+  --student-ink: var(--hui-ds-color-ink);
+  --student-muted: var(--hui-ds-color-muted);
+  --student-line: var(--hui-ds-color-line);
+  --student-page: var(--hui-ds-color-page-strong);
+  --student-soft: var(--hui-ds-color-soft);
   --student-sky: #e1f6ff;
-  --student-blue: #2f6fed;
-  --student-blue-hover: #255dce;
-  --student-green: #22c55e;
-  --student-surface: #ffffff;
+  --student-blue: var(--hui-ds-color-action);
+  --student-blue-hover: var(--hui-ds-color-action-hover);
+  --student-green: var(--hui-ds-color-success);
+  --student-surface: var(--hui-ds-color-surface);
   background:
     radial-gradient(circle at 78% 12%, rgba(56,189,248,.08) 0 11rem, transparent 11.1rem),
     var(--student-page);
