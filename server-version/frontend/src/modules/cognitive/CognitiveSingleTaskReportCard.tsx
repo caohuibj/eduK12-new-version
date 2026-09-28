@@ -93,7 +93,7 @@ const CognitiveSingleTaskReportCard: React.FC<{
       )}
 
       {report.showProductIndex !== false && (
-        <ReportSection title="任务表现指数" headingLevel={sectionHeadingLevel}>
+        <ReportSection title="综合指标" headingLevel={sectionHeadingLevel}>
           <ReportMetric
             label="任务表现指数"
             value={report.productIndex ? `${Math.round(report.productIndex.value)} / 100` : '暂不显示'}
