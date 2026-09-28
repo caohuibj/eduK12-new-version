@@ -7,8 +7,12 @@ import { sessionAxios } from '../api/client'
 import type { Document } from '../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
 import MoreActions from '../components/staff-ui/MoreActions'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 const DocumentLibrary: React.FC = () => {
+  const { feedback, confirm, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { user } = useAuth()
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
@@ -140,7 +144,7 @@ const DocumentLibrary: React.FC = () => {
   }
 
   const handleDelete = async (document: Document) => {
-    if (!window.confirm(`确定要删除文档「${document.title}」吗？`)) return
+    if (!await ask(`确定要删除文档「${document.title}」吗？`)) return
     
     try {
       const response = await apiClient.delete(`/documents/${document.id}`)
@@ -148,12 +152,12 @@ const DocumentLibrary: React.FC = () => {
         fetchDocuments()
       }
     } catch (error: any) {
-      alert(error.message || '删除失败')
+      showMessage(error.message || '删除失败')
     }
   }
 
   const handleRestore = async (document: Document) => {
-    if (!window.confirm(`确定要恢复文档「${document.title}」吗？`)) return
+    if (!await ask(`确定要恢复文档「${document.title}」吗？`)) return
 
     try {
       const response = await apiClient.post(`/documents/${document.id}/restore`)
@@ -161,7 +165,7 @@ const DocumentLibrary: React.FC = () => {
         fetchDocuments()
       }
     } catch (error: any) {
-      alert(error.message || '恢复失败')
+      showMessage(error.message || '恢复失败')
     }
   }
 
@@ -175,6 +179,7 @@ const DocumentLibrary: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader title="文档库" description="管理 PDF 等文档资源，并查看复用情况。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setDocumentTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传文档</ProductButton>} />
       <div className="staff-toolbar"><div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索文档</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索文档" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div><span className="staff-help">共 {total} 个文档</span></div>
       {/* Document list */}

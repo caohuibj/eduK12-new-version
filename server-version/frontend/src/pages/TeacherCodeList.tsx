@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { Copy, Key, Plus, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { TeacherCode } from '../types'
 
 const TeacherCodeList: React.FC = () => {
+  const { feedback, confirm, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const [codes, setCodes] = useState<TeacherCode[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +56,7 @@ const TeacherCodeList: React.FC = () => {
   }
 
   const handleDelete = async (teacherCode: TeacherCode) => {
-    if (!window.confirm(`确定要删除教师码 ${teacherCode.code} 吗？`)) return
+    if (!await ask(`确定要删除教师码 ${teacherCode.code} 吗？`)) return
 
     try {
       setDeletingId(teacherCode.id)
@@ -73,7 +77,7 @@ const TeacherCodeList: React.FC = () => {
   const copyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code)
-      alert('已复制到剪贴板')
+      showMessage('已复制到剪贴板')
     } catch {
       setError('复制教师码失败，请手动复制。')
     }
@@ -81,6 +85,7 @@ const TeacherCodeList: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader
         title="教师码管理"
         description="生成一次性教师注册码，并撤销不再需要的注册码。"

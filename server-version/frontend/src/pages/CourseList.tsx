@@ -8,8 +8,12 @@ import { sessionAxios } from '../api/client'
 import type { Course, CourseShare, User } from '../types'
 import { PageHeader, ProductButton, ProductPage } from '../components/product-ui'
 import MoreActions from '../components/staff-ui/MoreActions'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 const CourseList: React.FC = () => {
+  const { feedback, confirm, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { user } = useAuth()
   const navigate = useNavigate()
   const [courses, setCourses] = useState<Course[]>([])
@@ -78,13 +82,13 @@ const CourseList: React.FC = () => {
     try {
       const response = await apiClient.post('/courses', coursePayload())
       if (response.code === 0) {
-        alert(`课程创建成功！课程码: ${response.data.courseCode}`)
+        showMessage(`课程创建成功！课程码: ${response.data.courseCode}`)
         setShowCreateModal(false)
         setFormData({ title: '', description: '', isLibrary: false })
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     }
   }
 
@@ -92,7 +96,7 @@ const CourseList: React.FC = () => {
     e.preventDefault()
     if (!editingCourse) return
     if (isAdmin && formData.isLibrary && !editingCourse.isLibrary) {
-      if (!window.confirm('标记为库课程后将停止招募，学生无法加入或作答。确定继续？')) return
+      if (!await ask('标记为库课程后将停止招募，学生无法加入或作答。确定继续？')) return
     }
 
     try {
@@ -103,7 +107,7 @@ const CourseList: React.FC = () => {
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     }
   }
 
@@ -113,7 +117,7 @@ const CourseList: React.FC = () => {
       ? `警告：该课程有 ${course.studentCount} 名学生！\n\n确定要删除吗？`
       : '确定要删除这门课程吗？'
 
-    if (!window.confirm(confirmMsg)) return
+    if (!await ask(confirmMsg)) return
 
     try {
       const response = await apiClient.delete(`/courses/${course.id}`)
@@ -121,71 +125,71 @@ const CourseList: React.FC = () => {
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '删除失败')
+      showMessage(error.message || '删除失败')
     }
   }
 
   const handleEndCourse = async (course: Course) => {
     const confirmMsg = '确定要结束这门课程吗？\n\n结束后将停止招募，已加入的学生账号不会被冻结，他们仍可登录并参加其他课程。此操作不可撤销。'
 
-    if (!window.confirm(confirmMsg)) return
+    if (!await ask(confirmMsg)) return
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/end`)
       if (response.code === 0) {
-        alert(response.message || '课程已结束')
+        showMessage(response.message || '课程已结束')
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '结束课程失败')
+      showMessage(error.message || '结束课程失败')
     }
   }
 
   const handleStopRecruiting = async (course: Course) => {
-    if (!window.confirm(`确定要停止课程「${course.title}」的招募吗？\n\n停止后，新学生将无法通过课程码加入，但已加入的学生不受影响。`)) {
+    if (!await ask(`确定要停止课程「${course.title}」的招募吗？\n\n停止后，新学生将无法通过课程码加入，但已加入的学生不受影响。`)) {
       return
     }
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/stop-recruiting`)
       if (response.code === 0) {
-        alert('课程已停止招募')
+        showMessage('课程已停止招募')
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '操作失败')
+      showMessage(error.message || '操作失败')
     }
   }
 
   const handleResumeRecruiting = async (course: Course) => {
-    if (!window.confirm(`确定要恢复课程「${course.title}」的招募吗？`)) {
+    if (!await ask(`确定要恢复课程「${course.title}」的招募吗？`)) {
       return
     }
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/resume-recruiting`)
       if (response.code === 0) {
-        alert('课程已恢复招募')
+        showMessage('课程已恢复招募')
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '操作失败')
+      showMessage(error.message || '操作失败')
     }
   }
 
   const handleCloneCourse = async (course: Course) => {
-    if (!window.confirm(`确定要复制课程「${course.title}」吗？\n\n将复制课程、作业和打卡内容（不含学生数据和作答信息），新课程将以草稿状态创建。`)) {
+    if (!await ask(`确定要复制课程「${course.title}」吗？\n\n将复制课程、作业和打卡内容（不含学生数据和作答信息），新课程将以草稿状态创建。`)) {
       return
     }
 
     try {
       const response = await apiClient.post(`/courses/${course.id}/clone`)
       if (response.code === 0) {
-        alert(`课程复制成功！新课程码: ${response.data.courseCode}`)
+        showMessage(`课程复制成功！新课程码: ${response.data.courseCode}`)
         fetchCourses()
       }
     } catch (error: any) {
-      alert(error.message || '复制失败')
+      showMessage(error.message || '复制失败')
     }
   }
 
@@ -212,7 +216,7 @@ const CourseList: React.FC = () => {
   // 分享课程
   const handleShare = async () => {
     if (!sharingCourse || selectedUsers.length === 0) {
-      alert('请选择要分享的用户')
+      showMessage('请选择要分享的用户')
       return
     }
 
@@ -221,19 +225,19 @@ const CourseList: React.FC = () => {
         userIds: selectedUsers
       })
       if (response.code === 0) {
-        alert(`成功分享给 ${response.data.sharedCount} 位用户`)
+        showMessage(`成功分享给 ${response.data.sharedCount} 位用户`)
         setShowShareModal(false)
         setSharingCourse(null)
         setSelectedUsers([])
       }
     } catch (error: any) {
-      alert(error.message || '分享失败')
+      showMessage(error.message || '分享失败')
     }
   }
 
   // 取消分享
   const handleRemoveShare = async (shareId: string) => {
-    if (!window.confirm('确定要取消分享吗？')) return
+    if (!await ask('确定要取消分享吗？')) return
 
     try {
       const response = await apiClient.delete(`/courses/share/${shareId}`)
@@ -241,25 +245,25 @@ const CourseList: React.FC = () => {
         fetchSharedToMe()
       }
     } catch (error: any) {
-      alert(error.message || '取消分享失败')
+      showMessage(error.message || '取消分享失败')
     }
   }
 
   // 从分享复制课程
   const handleCloneFromShare = async (share: CourseShare) => {
-    if (!window.confirm(`确定要复制课程「${share.course?.title}」吗？\n\n将复制课程、作业和打卡内容，新课程将以草稿状态创建。`)) {
+    if (!await ask(`确定要复制课程「${share.course?.title}」吗？\n\n将复制课程、作业和打卡内容，新课程将以草稿状态创建。`)) {
       return
     }
 
     try {
       const response = await apiClient.post(`/courses/share/${share.id}/clone`)
       if (response.code === 0) {
-        alert(`课程复制成功！新课程码: ${response.data.courseCode}`)
+        showMessage(`课程复制成功！新课程码: ${response.data.courseCode}`)
         fetchCourses()
         setActiveTab('my')
       }
     } catch (error: any) {
-      alert(error.message || '复制失败')
+      showMessage(error.message || '复制失败')
     }
   }
 
@@ -287,14 +291,14 @@ const CourseList: React.FC = () => {
     // 验证文件类型
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
     if (!allowedTypes.includes(file.type)) {
-      alert('只支持 JPG、PNG、WebP、GIF 格式的图片')
+      showMessage('只支持 JPG、PNG、WebP、GIF 格式的图片')
       return
     }
 
     // 验证文件大小 (5MB)
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
-      alert('文件大小不能超过 5MB')
+      showMessage('文件大小不能超过 5MB')
       return
     }
 
@@ -325,7 +329,7 @@ const CourseList: React.FC = () => {
       })
 
       if (response.data.code === 0) {
-        alert('封面上传成功')
+        showMessage('封面上传成功')
         fetchCourses()
         // 更新当前编辑的课程封面
         if (editingCourse) {
@@ -335,10 +339,10 @@ const CourseList: React.FC = () => {
           })
         }
       } else {
-        alert(response.data.message || '上传失败')
+        showMessage(response.data.message || '上传失败')
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || error.message || '上传失败')
+      showMessage(error.response?.data?.message || error.message || '上传失败')
     } finally {
       setIsUploadingCover(false)
     }
@@ -384,6 +388,7 @@ const CourseList: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader title="课程管理" description="管理授课课程、学生入口和课程生命周期。" actions={activeTab === 'my' ? <ProductButton variant="primary" onClick={() => { setFormData({ title: '', description: '', isLibrary: false }); setShowCreateModal(true) }}><Plus className="w-4 h-4" aria-hidden="true" />创建课程</ProductButton> : undefined} />
       <div className="staff-toolbar">
         <div className="staff-segmented" role="group" aria-label="课程范围">

@@ -18,6 +18,7 @@ export function useStaffFeedback() {
   const success = useCallback((title: string, body?: ReactNode) => setNotice({ kind: 'success', title, body }), [])
   const error = useCallback((title: string, body?: ReactNode) => setNotice({ kind: 'error', title, body }), [])
   const warning = useCallback((title: string, body?: ReactNode) => setNotice({ kind: 'warning', title, body }), [])
+  const info = useCallback((title: string, body?: ReactNode) => setNotice({ kind: 'info', title, body }), [])
   const clear = useCallback(() => setNotice(null), [])
   const feedback = <>
     {notice && <div className="staff-feedback"><ProductStatus kind={notice.kind} title={notice.title} announce={notice.kind === 'error' ? 'assertive' : 'polite'} actions={<button type="button" className="staff-text-button" onClick={clear}>关闭</button>}>{notice.body}</ProductStatus></div>}
@@ -26,5 +27,5 @@ export function useStaffFeedback() {
       <span className="sr-only">请确认是否继续此操作。</span>
     </ManagementDialog>
   </>
-  return { feedback, confirm, success, error, warning, clear }
+  return { feedback, confirm, success, error, warning, info, clear }
 }

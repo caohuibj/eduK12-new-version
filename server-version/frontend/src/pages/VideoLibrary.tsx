@@ -7,6 +7,7 @@ import { sessionAxios } from '../api/client'
 import type { Video } from '../types'
 import SecureVideoPlayer from '../components/SecureVideoPlayer'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 // 处理中视频类型
 interface ProcessingVideo {
@@ -30,6 +31,9 @@ interface UploadQueueItem {
 }
 
 const VideoLibrary: React.FC = () => {
+  const { feedback, confirm, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { user } = useAuth()
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
@@ -304,7 +308,7 @@ const VideoLibrary: React.FC = () => {
         startPollingStatus(id)
         
         // 提示用户
-        alert(message || '视频上传成功，正在后台处理中...')
+        showMessage(message || '视频上传成功，正在后台处理中...')
         
         // 刷新视频列表
         fetchVideos()
@@ -319,7 +323,7 @@ const VideoLibrary: React.FC = () => {
   }
 
   const handleDelete = async (video: Video) => {
-    if (!window.confirm(`确定要删除视频「${video.title}」吗？`)) return
+    if (!await ask(`确定要删除视频「${video.title}」吗？`)) return
     
     try {
       const response = await apiClient.delete(`/videos/${video.id}`)
@@ -327,7 +331,7 @@ const VideoLibrary: React.FC = () => {
         fetchVideos()
       }
     } catch (error: any) {
-      alert(error.message || '删除失败')
+      showMessage(error.message || '删除失败')
     }
   }
 
@@ -342,10 +346,10 @@ const VideoLibrary: React.FC = () => {
         setEditTitle('')
         fetchVideos()
       } else {
-        alert(response.message || '更新失败')
+        showMessage(response.message || '更新失败')
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     } finally {
       setIsUpdating(false)
     }
@@ -432,6 +436,7 @@ const VideoLibrary: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader title="视频库" description="上传、处理和复用课堂与测评视频。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setVideoTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传视频</ProductButton>} />
       <div className="staff-toolbar">
         <div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索视频</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索视频" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div>
