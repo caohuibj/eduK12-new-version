@@ -1,5 +1,14 @@
 import type { SituationalScientificContext } from '../situational/types'
 import React from 'react'
+import {
+  ReportCoreSummary,
+  ReportDetails,
+  ReportDisclaimer,
+  ReportMetric,
+  ReportMetricGrid,
+  ReportRangeTrack,
+  ReportSection,
+} from './ReportPrimitives'
 
 export interface SituationalReportMetric {
   key: string
@@ -55,6 +64,8 @@ const orderedMetricsOf = (report: SituationalReportView): SituationalReportMetri
   return [...ordered, ...report.metrics.filter((metric) => !used.has(metric.key))]
 }
 
+const unique = (values: string[]) => [...new Set(values)]
+
 const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ report }) => {
   if (report.decryptError) {
     return <p className="text-amber-700">该情境测评结果无法解密，指标未展示。</p>
@@ -63,64 +74,122 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
   const metrics = orderedMetricsOf(report)
   const interpretations = new Map((report.interpretations || []).map((item) => [item.metricKey, item]))
   const missingFrozenLabels = metrics.some((metric) => !metric.label)
+  const matrixReady = metrics.length > 0 && metrics.every((metric) => Boolean(metric.construct && metric.channelKey))
+  const constructs = matrixReady ? unique(metrics.map((metric) => metric.construct!)) : []
+  const channels = matrixReady ? unique(metrics.map((metric) => metric.channelKey!)) : []
+  const showMatrix = constructs.length > 0 && channels.length > 1
 
   return (
     <div data-testid={`situational-report-${report.itemId}`} className="space-y-5">
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-        <span>测评时科研等级：{report.scientificContext?.scientificMaturity ?? 'PILOT'}{!report.scientificContext || report.scientificContext.provenance === 'LEGACY_MISSING' ? '（历史科研快照缺失）' : ` · 治理修订 ${report.scientificContext.governanceRevision}`}</span>
-        {report.instrumentKey && <span>工具：{report.instrumentKey}</span>}
-        {report.instrumentVersion && <span>版本：{report.instrumentVersion}</span>}
-        {report.scoringVersion && <span>评分：{report.scoringVersion}</span>}
-        {report.qualityState && <span>数据质量：{report.qualityState}</span>}
-        {report.completedAt && <span>完成时间：{new Date(report.completedAt).toLocaleString('zh-CN')}</span>}
-      </div>
-
-      {report.scientificContext?.scope && <p className="text-sm text-gray-600">证据适用范围：{[report.scientificContext.scope.language, report.scientificContext.scope.population, report.scientificContext.scope.use, report.scientificContext.scope.claim].join(' · ')}</p>}
-      {report.disclaimer && (
-        <p className="rounded-lg bg-indigo-50 p-4 text-sm leading-6 text-indigo-900/80" data-testid="situational-report-disclaimer">
-          {report.disclaimer}
+      <ReportCoreSummary label="报告范围">
+        <p className="text-sm font-normal">
+          本报告按冻结的情境测评指标展示不同 construct 与 channel；各指标独立阅读，不由前端合成为新的总分。
         </p>
-      )}
+      </ReportCoreSummary>
 
-      <section aria-labelledby={`situational-metrics-${report.itemId}`}>
-        <h3 id={`situational-metrics-${report.itemId}`} className="text-base font-semibold text-gray-800 mb-3">Construct × Channel</h3>
+      <ReportSection
+        title="Construct × Channel"
+        eyebrow="结果概览"
+        description={showMatrix
+          ? '矩阵只重排冻结报告中已有的 construct、channel 与值；颜色不编码好坏。'
+          : '当前冻结报告未形成完整的 construct × channel 矩阵，改为逐项展示已有指标。'}
+      >
         {metrics.length === 0 ? (
           <p className="text-sm text-gray-500">当前冻结报告没有可展示的情境测评指标。</p>
+        ) : showMatrix ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-[34rem] w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-left text-gray-500">
+                  <th className="py-2 pr-3">Construct</th>
+                  {channels.map((channel) => <th key={channel} className="px-3 py-2 text-center">{channel}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {constructs.map((construct) => (
+                  <tr key={construct} className="border-b border-gray-100 last:border-0">
+                    <th className="py-3 pr-3 font-medium text-gray-800">{construct}</th>
+                    {channels.map((channel) => {
+                      const metric = metrics.find((item) => item.construct === construct && item.channelKey === channel)
+                      return (
+                        <td key={channel} className="px-3 py-3 text-center">
+                          {metric ? <strong className="text-gray-900">{formatMetric(metric)}</strong> : <span className="text-gray-400">—</span>}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {metrics.map((metric) => {
-              const interpretation = interpretations.get(metric.key)
+          <ReportMetricGrid>
+            {metrics.map((metric) => (
+              metric.range ? (
+                <ReportRangeTrack
+                  key={metric.key}
+                  label={metric.label || metric.key}
+                  value={metric.value}
+                  formattedValue={formatMetric(metric)}
+                  range={metric.range}
+                  status={metric.status || metric.quality || undefined}
+                />
+              ) : (
+                <ReportMetric
+                  key={metric.key}
+                  label={metric.label || metric.key}
+                  value={formatMetric(metric)}
+                  description={[metric.construct, metric.channelKey].filter(Boolean).join(' × ') || undefined}
+                  meta={metric.status || metric.quality || undefined}
+                />
+              )
+            ))}
+          </ReportMetricGrid>
+        )}
+      </ReportSection>
+
+      {(report.interpretations || []).length > 0 && (
+        <ReportSection title="如何理解这些结果" eyebrow="解释">
+          <div className="report-feedback-list">
+            {(report.interpretations || []).map((interpretation) => {
+              const metric = metrics.find((item) => item.key === interpretation.metricKey)
               return (
-                <article key={metric.key} className="rounded-xl bg-gray-50 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h4 className="font-semibold text-gray-800 break-words">{metric.label || metric.key}</h4>
-                      {(metric.construct || metric.channelKey) && <p className="mt-1 text-xs text-gray-500">{[metric.construct, metric.channelKey].filter(Boolean).join(' × ')}</p>}
-                    </div>
-                    <span className="shrink-0 rounded-lg bg-white px-3 py-2 text-lg font-semibold text-gray-900">{formatMetric(metric)}</span>
-                  </div>
-                  {interpretation && <><p className="mt-4 text-sm font-medium text-gray-800">{interpretation.headline}</p><p className="mt-1 text-sm leading-6 text-gray-600">{interpretation.summary}</p></>}
-                  {(metric.status || metric.range || metric.quality) && (
-                    <div className="mt-4 flex flex-wrap gap-3 text-xs text-gray-500">
-                      {metric.status && <span>状态：{metric.status}</span>}
-                      {metric.range && <span>范围：{metric.range.min}–{metric.range.max}</span>}
-                      {metric.quality && <span>质量：{metric.quality}</span>}
-                    </div>
-                  )}
+                <article key={interpretation.metricKey} className="report-feedback">
+                  <h4>{interpretation.headline}</h4>
+                  {metric && <p className="text-xs text-gray-500">{metric.label || metric.key}{metric.construct || metric.channelKey ? ` · ${[metric.construct, metric.channelKey].filter(Boolean).join(' × ')}` : ''}</p>}
+                  <p>{interpretation.summary}</p>
                 </article>
               )
             })}
           </div>
-        )}
-      </section>
+        </ReportSection>
+      )}
 
-      {(report.qualityFlags || []).length > 0 && <p className="text-sm text-gray-600">质量标记：{report.qualityFlags!.join('、')}</p>}
+      {(report.qualityFlags || []).length > 0 && (
+        <ReportSection title="数据质量提示" eyebrow="质量">
+          <p className="text-sm text-gray-600">{report.qualityFlags!.join('、')}</p>
+        </ReportSection>
+      )}
+
+      <ReportDetails title="科学依据与方法">
+        <div className="space-y-2">
+          <p>测评时科研等级：{report.scientificContext?.scientificMaturity ?? 'PILOT'}{!report.scientificContext || report.scientificContext.provenance === 'LEGACY_MISSING' ? '（历史科研快照缺失）' : ` · 治理修订 ${report.scientificContext.governanceRevision}`}</p>
+          {report.instrumentKey && <p>工具：{report.instrumentKey}</p>}
+          {report.instrumentVersion && <p>版本：{report.instrumentVersion}</p>}
+          {report.scoringVersion && <p>评分：{report.scoringVersion}</p>}
+          {report.qualityState && <p>数据质量：{report.qualityState}</p>}
+          {report.completedAt && <p>完成时间：{new Date(report.completedAt).toLocaleString('zh-CN')}</p>}
+          {report.scientificContext?.scope && <p>证据适用范围：{[report.scientificContext.scope.language, report.scientificContext.scope.population, report.scientificContext.scope.use, report.scientificContext.scope.claim].join(' · ')}</p>}
+        </div>
+      </ReportDetails>
 
       {missingFrozenLabels && (
         <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800" data-testid="situational-frozen-projection-limitation">
           当前冻结投影没有提供部分指标的冻结标签或解释文本；本页只展示本次结果中已有的指标键和值，不从最新内容定义补齐历史解释。
         </p>
       )}
+
+      {report.disclaimer && <ReportDisclaimer testId="situational-report-disclaimer">{report.disclaimer}</ReportDisclaimer>}
     </div>
   )
 }
