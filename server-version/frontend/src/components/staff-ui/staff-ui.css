@@ -26,3 +26,525 @@
 
 .staff-segmented{display:inline-flex;padding:3px;border:1px solid #dce4ec;border-radius:9px;background:#f3f6f9}.staff-segmented button{min-height:36px;padding:6px 12px;border:0;border-radius:6px;background:transparent;color:#5c6f85;font:inherit;cursor:pointer}.staff-segmented button[aria-pressed=true]{background:#fff;color:#274d92;font-weight:650;box-shadow:0 1px 3px #19334d14}
 .staff-course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}.staff-course-card{overflow:visible;border:1px solid #dce4ec;border-radius:12px;background:#fff;box-shadow:0 1px 2px #18324c08}.staff-course-cover{display:block;width:100%;height:132px;object-fit:cover;border-radius:12px 12px 0 0;background:#edf2f7;color:#6f8093}.staff-course-cover--placeholder{display:flex;align-items:center;justify-content:center}.staff-course-card__body{display:grid;gap:14px;padding:18px}.staff-course-card__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-course-card__heading h2{margin:0;font-size:17px;line-height:1.35}.staff-course-card__heading h2 a{color:#1e3854;text-decoration:none}.staff-course-card__heading h2 a:hover{text-decoration:underline}.staff-course-card__heading p{margin:4px 0 0;color:#77879a;font-size:12px}.staff-course-description{min-height:42px;margin:0;color:#5b6e83;font-size:13px;line-height:1.6}.staff-course-meta{display:flex;flex-wrap:wrap;gap:8px 16px;color:#607388;font-size:12px}.staff-course-meta span{display:inline-flex;align-items:center;gap:5px}.staff-course-actions{display:flex;align-items:center;gap:8px}.staff-course-actions .staff-more-actions{margin-left:auto}
+
+
+/* =========================================================
+ * Modern Education staff convergence
+ * Desktop productivity first; tablet/mobile remain operable.
+ * ========================================================= */
+.hui-app--staff{
+  --staff-ink:#14304a;
+  --staff-muted:#64778a;
+  --staff-line:#dce6ef;
+  --staff-accent:#315fc9;
+  --staff-accent-hover:#274da7;
+  --staff-surface:#fff;
+  --staff-bg:#f5f8fb;
+  background:
+    radial-gradient(circle at 86% 8%,rgba(56,189,248,.055) 0 12rem,transparent 12.1rem),
+    var(--staff-bg);
+}
+
+.hui-app--staff .hui-product{
+  --hui-color-text:var(--staff-ink);
+  --hui-color-muted:var(--staff-muted);
+  --hui-color-border:var(--staff-line);
+  --hui-color-action:var(--staff-accent);
+  --hui-color-action-hover:var(--staff-accent-hover);
+  --hui-color-focus:var(--staff-accent);
+  --hui-radius:11px;
+}
+
+.hui-app--staff .hui-app-header{
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 #e4ebf2;
+}
+.hui-app--staff .hui-brand{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  color:#14304a;
+}
+.hui-app--staff .hui-brand::before{
+  content:"";
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+  border-radius:56% 44% 58% 42%;
+  background:linear-gradient(145deg,#315fc9,#45b6e8);
+  box-shadow:0 5px 14px rgba(49,95,201,.17);
+  transform:rotate(-8deg);
+}
+
+.hui-app--staff .hui-navigation{
+  background:
+    linear-gradient(180deg,#173047 0%,#142a40 100%);
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.03);
+}
+.hui-app--staff .hui-navigation .hui-nav-group a{
+  transition:background .14s ease,color .14s ease,border-color .14s ease;
+}
+.hui-app--staff .hui-navigation .hui-nav-group a[aria-current=page]{
+  background:#eef4ff;
+  color:#21488e;
+  border-color:#ceddf8;
+  box-shadow:0 4px 14px rgba(5,27,48,.12);
+}
+.hui-nav-search{
+  border-color:#49617a;
+  background:rgba(255,255,255,.035);
+}
+.hui-nav-search:focus-within{
+  border-color:#91b5f5;
+  box-shadow:0 0 0 3px rgba(145,181,245,.12);
+}
+
+.hui-app--staff .hui-breadcrumb a{
+  color:#60758a;
+  text-decoration:none;
+}
+.hui-app--staff .hui-breadcrumb a:hover{
+  color:#244e91;
+}
+
+/* Product headers become the shared visual anchor for list/detail/editor pages. */
+.hui-staff-workspace .hui-page-header{
+  position:relative;
+  overflow:hidden;
+  margin-bottom:20px;
+  padding:22px 24px;
+  border:1px solid #dce8f2;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 91% 18%,rgba(56,189,248,.11) 0 5rem,transparent 5.1rem),
+    linear-gradient(135deg,#f2f7ff 0%,#fbfdff 68%,#f1f9f5 100%);
+}
+.hui-staff-workspace .hui-page-header::after{
+  content:"";
+  position:absolute;
+  right:38px;
+  bottom:-42px;
+  width:108px;
+  height:78px;
+  border:17px solid rgba(49,95,201,.045);
+  border-radius:60% 40% 60% 40%;
+  transform:rotate(-12deg);
+  pointer-events:none;
+}
+.hui-staff-workspace .hui-page-header__text,
+.hui-staff-workspace .hui-page-header__actions{
+  position:relative;
+  z-index:1;
+}
+.hui-staff-workspace .hui-page-header__title{
+  color:#14304a;
+  font-size:clamp(1.55rem,1.25rem + .6vw,2rem);
+  letter-spacing:-.035em;
+}
+.hui-staff-workspace .hui-page-header__description{
+  max-width:72ch;
+  color:#62778a;
+  font-size:13px;
+  line-height:1.75;
+}
+
+/* Toolbars and filters */
+.staff-toolbar{
+  padding:14px 16px;
+  border-color:#dde7ef;
+  border-radius:14px;
+  box-shadow:0 3px 15px rgba(20,48,74,.025);
+}
+.staff-search-field{
+  min-height:44px;
+  border-radius:10px;
+  border-color:#d7e1ea;
+  background:#fbfdff;
+}
+.staff-search-field:focus-within{
+  border-color:#8eabe5;
+  box-shadow:0 0 0 3px rgba(49,95,201,.09);
+}
+.staff-segmented{
+  border-radius:10px;
+  border-color:#dae4ec;
+  background:#f0f4f8;
+}
+.staff-segmented button{
+  min-height:38px;
+  border-radius:7px;
+}
+.staff-segmented button[aria-pressed=true]{
+  color:#244e91;
+  box-shadow:0 2px 7px rgba(20,48,74,.08);
+}
+
+/* Cards: both new staff cards and legacy .card surfaces. */
+.hui-staff-workspace :where(.staff-catalog-card,.staff-course-card,.staff-detail-header,.card){
+  border-color:#dce6ef;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(20,48,74,.035);
+}
+.staff-catalog-card,
+.staff-course-card{
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.staff-catalog-card:hover,
+.staff-course-card:hover{
+  transform:translateY(-2px);
+  border-color:#c2d5e7;
+  box-shadow:0 10px 28px rgba(20,48,74,.065);
+}
+.staff-course-grid{
+  gap:18px;
+}
+.staff-course-cover{
+  height:140px;
+  border-radius:15px 15px 0 0;
+}
+.staff-course-card__body{
+  gap:13px;
+  padding:18px;
+}
+.staff-course-card__heading h2{
+  color:#183650;
+  font-size:17px;
+  letter-spacing:-.015em;
+}
+.staff-primary-link{
+  min-height:42px;
+  border-radius:9px;
+  background:var(--staff-accent);
+}
+.staff-primary-link:hover{
+  background:var(--staff-accent-hover);
+}
+.staff-secondary-link{
+  min-height:42px;
+  border-color:#d6e1ea;
+  border-radius:9px;
+}
+
+/* Legacy controls within the authenticated staff workspace. */
+.hui-app--staff .hui-staff-workspace .btn-primary{
+  min-height:44px;
+  border:1px solid var(--staff-accent);
+  border-radius:10px;
+  background:var(--staff-accent);
+  color:#fff;
+  font-weight:650;
+  box-shadow:none;
+}
+.hui-app--staff .hui-staff-workspace .btn-primary:hover:not(:disabled){
+  background:var(--staff-accent-hover);
+  border-color:var(--staff-accent-hover);
+}
+.hui-app--staff .hui-staff-workspace .btn-secondary{
+  min-height:44px;
+  border:1px solid #d7e1ea;
+  border-radius:10px;
+  background:#fff;
+  color:#314a61;
+  font-weight:600;
+}
+.hui-app--staff .hui-staff-workspace :where(.input,input,select,textarea){
+  min-height:44px;
+  border-color:#d5e0e9;
+  border-radius:10px;
+}
+.hui-app--staff .hui-staff-workspace :where(.input,input,select,textarea):focus{
+  border-color:#7f9fdd;
+  box-shadow:0 0 0 3px rgba(49,95,201,.09);
+}
+
+/* Tables */
+.staff-table-container{
+  border-color:#dce6ef;
+  border-radius:14px;
+  box-shadow:0 3px 16px rgba(20,48,74,.03);
+}
+.staff-table{
+  min-width:760px;
+}
+.staff-table th{
+  position:sticky;
+  top:0;
+  z-index:1;
+  padding:11px 14px;
+  background:#f4f7fa;
+  color:#5e7184;
+}
+.staff-table td{
+  padding:13px 14px;
+}
+.staff-table tbody tr{
+  transition:background .12s ease;
+}
+.staff-table tbody tr:hover{
+  background:#f9fbfd;
+}
+
+/* Older tables that have not yet migrated to staff-table classes. */
+.hui-staff-workspace .overflow-x-auto{
+  border-radius:14px;
+  -webkit-overflow-scrolling:touch;
+}
+.hui-staff-workspace .overflow-x-auto > table{
+  width:100%;
+  min-width:720px;
+  border-collapse:collapse;
+  background:#fff;
+}
+.hui-staff-workspace .overflow-x-auto > table th{
+  padding:11px 14px;
+  background:#f4f7fa;
+  color:#5e7184;
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:.04em;
+  text-align:left;
+  white-space:nowrap;
+}
+.hui-staff-workspace .overflow-x-auto > table td{
+  padding:13px 14px;
+  border-top:1px solid #edf2f6;
+  color:#2b435b;
+  vertical-align:middle;
+}
+
+/* Detail / profile */
+.staff-detail-header{
+  padding:22px;
+  background:linear-gradient(135deg,#fff,#f8fbff);
+}
+.staff-detail-header h1{
+  color:#14304a;
+  font-size:26px;
+  letter-spacing:-.03em;
+}
+.staff-detail-meta{
+  color:#64798d;
+}
+.hui-staff-workspace section.card{
+  padding:clamp(18px,2.5vw,24px);
+}
+
+/* Dialogs */
+.staff-modal-backdrop{
+  padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+  background:rgba(10,27,44,.62);
+  backdrop-filter:blur(4px);
+}
+.staff-dialog{
+  border-color:#d7e2eb;
+  border-radius:16px;
+  box-shadow:0 26px 78px rgba(13,34,61,.22);
+}
+.staff-dialog__header{
+  padding:20px 22px;
+}
+.staff-dialog__body{
+  padding:22px;
+}
+.staff-dialog__actions{
+  background:#f8fafc;
+}
+
+/* Legacy fixed overlays used by old staff pages. */
+.hui-app--staff .hui-staff-workspace [class*="fixed"][class*="inset-0"][class*="bg-black"]{
+  padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));
+  background:rgba(10,27,44,.62)!important;
+  backdrop-filter:blur(4px);
+}
+.hui-app--staff .hui-staff-workspace [class*="fixed"][class*="inset-0"] > :where(.card,[class*="bg-white"]){
+  max-height:min(90dvh,920px);
+  overflow:auto;
+  border-radius:16px;
+}
+
+/* Sticky actions keep controls visible without covering mobile browser chrome. */
+.staff-action-footer{
+  bottom:max(0px,env(safe-area-inset-bottom));
+  border-color:#dbe5ed;
+  border-radius:12px;
+  box-shadow:0 -8px 30px rgba(20,48,74,.055);
+}
+
+/* Tablet */
+@media(max-width:63.999rem){
+  .hui-app--staff .hui-app-header{
+    padding-inline:18px;
+  }
+  .hui-app--staff .hui-app-main{
+    padding:18px 22px 34px;
+  }
+  .hui-app--staff .hui-navigation{
+    padding:12px 14px 16px;
+  }
+  .hui-staff-workspace .hui-page-header{
+    padding:20px 22px;
+  }
+  .staff-course-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+/* Mobile */
+@media(max-width:639px){
+  .hui-app--staff .hui-app-header{
+    gap:8px 12px;
+    padding:9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--staff .hui-brand{
+    font-size:18px;
+  }
+  .hui-app--staff .hui-account{
+    order:3;
+    width:100%;
+    margin-left:0;
+    justify-content:space-between;
+    gap:8px;
+    padding-top:4px;
+    border-top:1px solid #edf2f6;
+  }
+  .hui-app--staff .hui-organization-switch{
+    min-width:0;
+    flex:1;
+  }
+  .hui-app--staff .hui-organization-switch span{
+    display:none;
+  }
+  .hui-app--staff .hui-organization-switch select{
+    width:100%;
+    max-width:none;
+  }
+  .hui-app--staff .hui-breadcrumb{
+    display:none;
+  }
+  .hui-app--staff .hui-app-main{
+    padding:12px max(14px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+  .hui-staff-workspace .hui-page-header{
+    margin-bottom:14px;
+    padding:17px;
+    border-radius:16px;
+  }
+  .hui-staff-workspace .hui-page-header::after{
+    right:-10px;
+    bottom:-45px;
+  }
+  .hui-staff-workspace .hui-page-header__title{
+    font-size:1.48rem;
+  }
+  .hui-staff-workspace .hui-page-header__description{
+    font-size:12.5px;
+  }
+  .hui-staff-workspace .hui-page-header__actions{
+    width:100%;
+    max-width:none;
+  }
+  .hui-staff-workspace .hui-page-header__actions > *,
+  .hui-staff-workspace .hui-page-header__actions > div > *{
+    width:100%;
+    justify-content:center;
+  }
+  .staff-toolbar{
+    align-items:stretch;
+    padding:12px;
+  }
+  .staff-toolbar > *{
+    width:100%;
+  }
+  .staff-search-field{
+    min-width:0;
+  }
+  .staff-segmented{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .staff-segmented button{
+    width:100%;
+  }
+  .staff-course-grid{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .staff-course-card:hover,
+  .staff-catalog-card:hover{
+    transform:none;
+  }
+  .staff-course-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+  }
+  .staff-primary-link,
+  .staff-secondary-link{
+    width:100%;
+  }
+  .staff-detail-header{
+    padding:17px;
+  }
+  .staff-detail-header h1{
+    font-size:22px;
+  }
+  .staff-table-container,
+  .hui-staff-workspace .overflow-x-auto{
+    margin-inline:-2px;
+    border:1px solid #dce6ef;
+    background:#fff;
+  }
+  .staff-table th,
+  .staff-table td,
+  .hui-staff-workspace .overflow-x-auto > table th,
+  .hui-staff-workspace .overflow-x-auto > table td{
+    padding-inline:11px;
+  }
+  .staff-dialog{
+    max-height:calc(100dvh - max(20px,env(safe-area-inset-top)) - max(20px,env(safe-area-inset-bottom)));
+    border-radius:16px 16px 12px 12px;
+  }
+  .staff-dialog__header,
+  .staff-dialog__body{
+    padding:16px;
+  }
+  .staff-dialog__actions{
+    display:grid;
+    grid-template-columns:1fr;
+    padding:12px 16px max(12px,env(safe-area-inset-bottom));
+  }
+  .staff-dialog__actions > *{
+    width:100%;
+    justify-content:center;
+  }
+  .hui-app--staff .hui-staff-workspace [class*="fixed"][class*="inset-0"][class*="bg-black"]{
+    align-items:flex-end!important;
+    padding:10px max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+  }
+  .hui-app--staff .hui-staff-workspace [class*="fixed"][class*="inset-0"] > :where(.card,[class*="bg-white"]){
+    width:100%;
+    max-width:none!important;
+    max-height:90dvh;
+    border-radius:18px 18px 12px 12px;
+  }
+  .staff-action-footer{
+    display:grid;
+    grid-template-columns:1fr;
+    padding:10px 12px max(10px,env(safe-area-inset-bottom));
+  }
+  .staff-action-footer > *{
+    width:100%;
+    justify-content:center;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hui-app--staff *,
+  .hui-app--staff *::before,
+  .hui-app--staff *::after{
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important;
+  }
+}
