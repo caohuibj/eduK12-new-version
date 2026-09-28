@@ -287,20 +287,20 @@ const CompositeAssessmentEdit: React.FC = () => {
         </div>
         <div className="flex gap-2">
           {isDraft && (
-            <button onClick={() => void publish()} className="btn-primary">
+            <button onClick={() => void publish()} className="hui-button hui-button--primary">
               <Send className="w-4 h-4 inline mr-1" />发布
             </button>
           )}
-          <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="btn-secondary">查看结果</button>
-          <button onClick={() => void exportData('summary')} className="btn-secondary">
+          <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="hui-button hui-button--secondary">查看结果</button>
+          <button onClick={() => void exportData('summary')} className="hui-button hui-button--secondary">
             <Download className="w-4 h-4 inline mr-1" />导出摘要
           </button>
-          <button onClick={() => void exportData('full')} className="btn-secondary">导出完整数据</button>
+          <button onClick={() => void exportData('full')} className="hui-button hui-button--secondary">导出完整数据</button>
         </div>
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {detail.canSetCopyable && (
-        <div className="card p-6 mb-5">
+        <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-2">管理员模板</h2>
           <p className="text-sm text-gray-500 mb-3">
             打开后，教师可把这份已发布综合测评复制成自己的草稿。关闭后立即从教师模板目录消失，已复制的草稿不受影响。
@@ -317,7 +317,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         </div>
       )}
       {reportPackages.length > 0 && (
-        <div className="card p-6 mb-5">
+        <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-2">报告包</h2>
           {reportPackage ? (
             <p className="text-sm text-gray-600 mb-3">
@@ -357,7 +357,7 @@ const CompositeAssessmentEdit: React.FC = () => {
                   </label>
                 </div>
               )}
-              <button onClick={() => void saveReportPackage()} disabled={savingProtocol || !packageChoice || Boolean(detail.items?.length)} className="btn-secondary">
+              <button onClick={() => void saveReportPackage()} disabled={savingProtocol || !packageChoice || Boolean(detail.items?.length)} className="hui-button hui-button--secondary">
                 {savingProtocol ? '保存中...' : '启用报告包'}
               </button>
               {detail.items?.length > 0 && <p className="text-xs text-amber-600">已有自由组合模块；请先移除全部模块再启用报告包。</p>}
@@ -365,7 +365,7 @@ const CompositeAssessmentEdit: React.FC = () => {
           )}
         </div>
       )}
-      {!packageCatalogAvailable && reportPackages.length === 0 && <div className="card p-6 mb-5">
+      {!packageCatalogAvailable && reportPackages.length === 0 && <div className="staff-panel staff-panel--padded p-6 mb-5">
         <h2 className="font-semibold mb-2">报告模式</h2>
         {analysisProtocol ? (
           <p className="text-sm text-gray-600 mb-3">
@@ -441,7 +441,7 @@ const CompositeAssessmentEdit: React.FC = () => {
                 || Boolean(!analysisProtocol && detail.items?.length > 0 && protocolChoice)
                 || Boolean(protocolChoice && !selectedProtocol)
               }
-              className="btn-secondary"
+              className="hui-button hui-button--secondary"
             >
               {savingProtocol ? '保存中...' : '保存报告模式'}
             </button>
@@ -450,7 +450,7 @@ const CompositeAssessmentEdit: React.FC = () => {
           <p className="text-xs text-gray-500">发布后报告模式和协议版本不可更改。</p>
         )}
       </div>}
-      <div className="card p-6 mb-5">
+      <div className="staff-panel staff-panel--padded p-6 mb-5">
         <h2 className="font-semibold mb-4">测评顺序</h2>
         <p className="mb-3 text-xs text-gray-500">量表、认知任务和表单区段的统一顺序请在下方“表单区段”管理器中调整；这里仅移除模块。</p>
         {detail.items?.length ? (
@@ -486,7 +486,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         />
       )}
       {isDraft && !protocolLocked && (
-        <div className="card p-6 mb-5">
+        <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-4">添加模块</h2>
           <div className="flex flex-wrap gap-2 mb-3">
             <select value={type} onChange={(e) => { setType(e.target.value as any); setSelectedId('') }} className="border rounded px-3 py-2">
@@ -557,7 +557,7 @@ const CompositeAssessmentEdit: React.FC = () => {
               </>
             )}
           </div>
-          <button onClick={() => void addItem()} disabled={type !== 'FORM' ? !selectedId : !formLabel} className="btn-primary">
+          <button onClick={() => void addItem()} disabled={type !== 'FORM' ? !selectedId : !formLabel} className="hui-button hui-button--primary">
             <Plus className="w-4 h-4 inline mr-1" />添加到末尾
           </button>
         </div>
