@@ -74,7 +74,9 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
   const metrics = orderedMetricsOf(report)
   const interpretations = new Map((report.interpretations || []).map((item) => [item.metricKey, item]))
   const missingFrozenLabels = metrics.some((metric) => !metric.label)
-  const matrixReady = metrics.length > 0 && metrics.every((metric) => Boolean(metric.construct && metric.channelKey))
+  const matrixFieldsPresent = metrics.length > 0 && metrics.every((metric) => Boolean(metric.construct && metric.channelKey))
+  const pairKeys = matrixFieldsPresent ? metrics.map((metric) => `${metric.construct}::${metric.channelKey}`) : []
+  const matrixReady = matrixFieldsPresent && new Set(pairKeys).size === pairKeys.length
   const constructs = matrixReady ? unique(metrics.map((metric) => metric.construct!)) : []
   const channels = matrixReady ? unique(metrics.map((metric) => metric.channelKey!)) : []
   const showMatrix = constructs.length > 0 && channels.length > 1
@@ -91,8 +93,8 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
         title="Construct × Channel"
         eyebrow="结果概览"
         description={showMatrix
-          ? '矩阵只重排冻结报告中已有的 construct、channel 与值；颜色不编码好坏。'
-          : '当前冻结报告未形成完整的 construct × channel 矩阵，改为逐项展示已有指标。'}
+          ? '矩阵只重排冻结报告中已有且一一对应的 construct、channel 与值；颜色不编码好坏。'
+          : '当前冻结报告未形成唯一的一对一 construct × channel 矩阵，改为逐项展示已有指标，避免静默合并或丢失指标。'}
       >
         {metrics.length === 0 ? (
           <p className="text-sm text-gray-500">当前冻结报告没有可展示的情境测评指标。</p>
