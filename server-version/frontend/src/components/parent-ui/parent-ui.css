@@ -1,0 +1,395 @@
+/*
+ * Huisurvey Modern Education — Parent experience.
+ * Presentation-only and scoped to authenticated PARENT standard/report surfaces.
+ */
+.hui-app--parent.hui-app--standard {
+  --parent-ink: #173f48;
+  --parent-muted: #647b7f;
+  --parent-line: #dce9e5;
+  --parent-page: #f8fcfb;
+  --parent-soft: #eef9f5;
+  --parent-blue: #2f6fed;
+  --parent-green: #2da66f;
+  --parent-green-dark: #247f59;
+  --parent-surface: #ffffff;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(45,166,111,.08) 0 11rem, transparent 11.1rem),
+    radial-gradient(circle at 12% 84%, rgba(56,189,248,.06) 0 9rem, transparent 9.1rem),
+    var(--parent-page);
+  color: var(--parent-ink);
+}
+
+.hui-app--parent.hui-app--standard .hui-product {
+  --hui-color-text: var(--parent-ink);
+  --hui-color-muted: var(--parent-muted);
+  --hui-color-surface: var(--parent-surface);
+  --hui-color-background: var(--parent-page);
+  --hui-color-border: var(--parent-line);
+  --hui-color-action: var(--parent-blue);
+  --hui-color-action-hover: #255dce;
+  --hui-color-focus: var(--parent-blue);
+  --hui-radius: .9rem;
+}
+
+.hui-app--parent.hui-app--standard .hui-app-header {
+  min-height: 68px;
+  padding: 11px 24px;
+  border-bottom: 1px solid #e4efeb;
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(10px);
+}
+
+.hui-app--parent.hui-app--standard .hui-brand {
+  gap: 9px;
+  color: var(--parent-ink);
+  text-decoration: none;
+  letter-spacing: -.025em;
+}
+
+.hui-app--parent.hui-app--standard .hui-brand::before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  border-radius: 56% 44% 58% 42%;
+  background: linear-gradient(145deg,#2f6fed,#42b983);
+  box-shadow: 0 5px 14px rgba(45,166,111,.16);
+  transform: rotate(-8deg);
+}
+
+.hui-app--parent.hui-app--standard .hui-account {
+  color: #627a7e;
+  font-size: .82rem;
+}
+
+.hui-app--parent.hui-app--standard .hui-navigation {
+  width: 220px;
+  padding: 18px 14px 28px;
+  border-right: 1px solid #e3ede9;
+  background: rgba(255,255,255,.92);
+}
+
+.hui-app--parent.hui-app--standard .hui-navigation a {
+  min-height: 46px;
+  margin-block: 3px;
+  padding: 9px 13px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #536c70;
+  font-size: .875rem;
+  text-decoration: none;
+}
+
+.hui-app--parent.hui-app--standard .hui-navigation a:hover {
+  background: #f1f8f5;
+  color: #276c52;
+}
+
+.hui-app--parent.hui-app--standard .hui-navigation a[aria-current="page"] {
+  border-color: #cde7dc;
+  background: #eaf7f1;
+  color: #256c51;
+  font-weight: 650;
+}
+
+.hui-app--parent.hui-app--standard .hui-breadcrumb {
+  color: #75888a;
+  font-size: .78rem;
+}
+
+.hui-app--parent.hui-app--standard .hui-app-main {
+  max-width: 76rem;
+  padding: 22px 28px 42px;
+}
+
+.hui-app--parent.hui-app--standard .hui-page {
+  padding-top: 0;
+}
+
+.hui-app--parent.hui-app--standard .hui-page-header {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  padding: 24px 26px;
+  border: 1px solid #dcebe6;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(45,166,111,.14) 0 5rem, transparent 5.1rem),
+    linear-gradient(135deg,#f0faf6 0%,#fbfefd 62%,#eef7ff 100%);
+}
+
+.hui-app--parent.hui-app--standard .hui-page-header::after {
+  content: "";
+  position: absolute;
+  right: 34px;
+  bottom: -42px;
+  width: 106px;
+  height: 80px;
+  border: 18px solid rgba(47,111,237,.055);
+  border-radius: 60% 40% 60% 40%;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.hui-app--parent.hui-app--standard .hui-page-header__text,
+.hui-app--parent.hui-app--standard .hui-page-header__actions {
+  position: relative;
+  z-index: 1;
+}
+
+.hui-app--parent.hui-app--standard .hui-page-header__title {
+  color: var(--parent-ink);
+  font-size: clamp(1.65rem,1.3rem + .8vw,2.1rem);
+  letter-spacing: -.035em;
+}
+
+.hui-app--parent.hui-app--standard .hui-page-header__description {
+  max-width: 68ch;
+  color: #5f777b;
+  font-size: .9rem;
+  line-height: 1.78;
+}
+
+.hui-app--parent.hui-app--standard .hui-status {
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(23,63,72,.035);
+}
+
+.hui-app--parent.hui-app--standard .hui-status--info {
+  border-color: #cfe4dd;
+  background: #f4faf7;
+  color: #315f50;
+}
+
+.hui-app--parent.hui-app--standard .hui-status a {
+  color: #255dce;
+  font-weight: 650;
+}
+
+/* Parent observer task list */
+.hui-app--parent [data-testid="relational-task-list"] {
+  display: grid;
+  gap: 12px;
+}
+
+.hui-app--parent [data-testid="relational-task-list"] > article {
+  padding: 18px;
+  border: 1px solid var(--parent-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 15px rgba(23,63,72,.035);
+}
+
+.hui-app--parent [data-testid="relational-task-list"] > article > div {
+  gap: 16px;
+}
+
+.hui-app--parent [data-testid="relational-task-list"] h3 {
+  color: var(--parent-ink);
+  font-size: .98rem;
+  letter-spacing: -.01em;
+}
+
+.hui-app--parent [data-testid="relational-task-list"] article p {
+  line-height: 1.65;
+}
+
+.hui-app--parent [data-testid="relational-task-list"] article button {
+  min-height: 44px;
+  border-radius: 10px;
+  padding-inline: 14px;
+  font-weight: 650;
+}
+
+.hui-app--parent [data-testid="relational-task-list"] article button[class*="bg-blue-600"] {
+  background: var(--parent-blue);
+}
+
+.hui-app--parent [data-testid="relational-task-list"] article button[class*="border-blue-500"] {
+  border-color: #a9c8f7;
+  background: #f5f9ff;
+  color: #285aaa;
+}
+
+/* Parent self-serve observer creation */
+.hui-app--parent [data-testid="parent-observer-self-serve"] {
+  padding: 22px;
+  border: 1px solid var(--parent-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(23,63,72,.04);
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] > header {
+  max-width: 48rem;
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] > header h2 {
+  color: var(--parent-ink);
+  letter-spacing: -.015em;
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] > section {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #e0ebe7;
+  border-radius: 15px;
+  background: #f9fcfb;
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] > section > button {
+  grid-column: 1 / -1;
+  width: fit-content;
+  min-height: 46px;
+  border-radius: 11px;
+  background: var(--parent-blue);
+  padding-inline: 18px;
+  font-weight: 650;
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] select {
+  min-height: 46px;
+  border-color: #d4e2dd;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.hui-app--parent [data-testid="parent-observer-self-serve"] select:focus {
+  border-color: var(--parent-blue);
+  box-shadow: 0 0 0 3px rgba(47,111,237,.11);
+}
+
+/* Relational focused runner/report inherits the shared #180 assessment/report
+ * presentation; parent colors only adjust the surrounding page atmosphere. */
+.hui-app--parent.hui-app--assessment-runner {
+  background:
+    radial-gradient(circle at 84% 8%, rgba(45,166,111,.065) 0 9rem, transparent 9.1rem),
+    #f8fcfb;
+}
+
+.hui-app--parent.hui-app--report-surface {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(45,166,111,.065) 0 10rem, transparent 10.1rem),
+    #f8fcfb;
+}
+
+/* Tablet */
+@media (max-width: 63.999rem) {
+  .hui-app--parent.hui-app--standard .hui-app-header {
+    padding-inline: 18px;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-navigation {
+    width: 100%;
+    padding: 10px 14px 14px;
+    border-right: 0;
+    border-bottom: 1px solid #e3ede9;
+    background: #fff;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-app-main {
+    padding: 18px 22px 34px;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page-header {
+    padding: 21px 22px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 39.999rem) {
+  .hui-app--parent.hui-app--standard .hui-app-header {
+    gap: 8px 12px;
+    padding: 9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));
+  }
+
+  .hui-app--parent.hui-app--standard .hui-brand {
+    font-size: 1.08rem;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-account {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 3px;
+    border-top: 1px solid #edf4f1;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-app-main {
+    padding: 12px max(14px,env(safe-area-inset-right)) max(26px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+
+  .hui-app--parent.hui-app--standard .hui-breadcrumb {
+    display: none;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page {
+    padding-inline: 0;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page-header {
+    margin-bottom: 14px;
+    padding: 18px;
+    border-radius: 17px;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page-header::after {
+    right: -8px;
+    bottom: -45px;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page-header__title {
+    font-size: 1.5rem;
+  }
+
+  .hui-app--parent.hui-app--standard .hui-page-header__description {
+    font-size: .84rem;
+  }
+
+  .hui-app--parent [data-testid="relational-task-list"] > article {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .hui-app--parent [data-testid="relational-task-list"] article > div {
+    flex-direction: column;
+  }
+
+  .hui-app--parent [data-testid="relational-task-list"] article > div > div:last-child {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hui-app--parent [data-testid="relational-task-list"] article button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hui-app--parent [data-testid="parent-observer-self-serve"] {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .hui-app--parent [data-testid="parent-observer-self-serve"] > section {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .hui-app--parent [data-testid="parent-observer-self-serve"] > section > button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hui-app--parent *,
+  .hui-app--parent *::before,
+  .hui-app--parent *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
