@@ -1,0 +1,57 @@
+/*
+ * Huisurvey Modern Education foundation tokens.
+ * These variables are inert until consumed by a component/surface stylesheet.
+ * Component-scoped semantic tokens such as --hui-color-action remain opt-in.
+ */
+:root {
+  --hui-ds-color-ink: #14304a;
+  --hui-ds-color-muted: #64748b;
+  --hui-ds-color-surface: #ffffff;
+  --hui-ds-color-page: #f8fbff;
+  --hui-ds-color-page-strong: #f7fbff;
+  --hui-ds-color-soft: #eff7ff;
+  --hui-ds-color-line: #dde7f0;
+  --hui-ds-color-action: #2f6fed;
+  --hui-ds-color-action-hover: #255dce;
+  --hui-ds-color-focus: #2f6fed;
+  --hui-ds-color-sky: #38bdf8;
+  --hui-ds-color-success: #22c55e;
+  --hui-ds-color-success-strong: #15803d;
+  --hui-ds-color-warning: #f59e0b;
+  --hui-ds-color-danger: #dc2626;
+
+  --hui-ds-space-1: 0.25rem;
+  --hui-ds-space-2: 0.5rem;
+  --hui-ds-space-3: 0.75rem;
+  --hui-ds-space-4: 1rem;
+  --hui-ds-space-5: 1.25rem;
+  --hui-ds-space-6: 1.5rem;
+  --hui-ds-space-8: 2rem;
+  --hui-ds-space-10: 2.5rem;
+  --hui-ds-space-12: 3rem;
+  --hui-ds-space-16: 4rem;
+
+  --hui-ds-radius-sm: 0.5rem;
+  --hui-ds-radius-md: 0.75rem;
+  --hui-ds-radius-lg: 1rem;
+  --hui-ds-radius-xl: 1.25rem;
+  --hui-ds-radius-2xl: 1.5rem;
+  --hui-ds-radius-pill: 999px;
+
+  --hui-ds-target: 44px;
+  --hui-ds-control: 46px;
+  --hui-ds-control-prominent: 48px;
+
+  --hui-ds-shadow-subtle: 0 4px 18px rgba(20, 48, 74, .035);
+  --hui-ds-shadow-card: 0 6px 24px rgba(20, 48, 74, .045);
+  --hui-ds-shadow-raised: 0 14px 42px rgba(20, 48, 74, .08);
+  --hui-ds-shadow-dialog: 0 26px 78px rgba(13, 34, 61, .22);
+
+  --hui-ds-width-reading: 42rem;
+  --hui-ds-width-assessment: 48rem;
+  --hui-ds-width-report: 64rem;
+  --hui-ds-width-management: 80rem;
+
+  --hui-ds-breakpoint-mobile: 40rem;
+  --hui-ds-breakpoint-desktop: 64rem;
+}
