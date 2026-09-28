@@ -98,6 +98,8 @@ These are **not** part of the visual branch:
 5. `CourseDetail` counts incomplete check-ins through `checkin.submission` but labels the row action through `checkin.submitted`. The two state fields should be reconciled against the API contract.
 6. A completed questionnaire inside `CourseDetail` labels its action “查看报告” but still navigates to `/student/questionnaires/:id`; this differs from the standalone questionnaire list, which resolves a completed assessment to its result route. Confirm the intended destination before changing it.
 7. The Student Home “加入课程” dialog does not currently implement a complete modal focus/keyboard contract (focus trap / Escape close / focus return). Treat this as an interaction-accessibility PR rather than a visual-only change.
+8. `AssignmentSubmit` and `CheckinSubmit` still use native `alert()` for several upload/submission success and failure states. Replace these with in-page status presentation in a dedicated interaction PR so retry/idempotency behavior remains unchanged.
+9. `CheckinSubmit` image preview is a custom full-screen overlay without a complete dialog accessibility contract (dialog semantics, focus trap, Escape close, focus return). Handle this together with the Student Home modal work.
 
 ## 7. Visual acceptance checklist
 
@@ -110,3 +112,20 @@ Every migrated family must be checked at representative widths around 390px, 768
 - Error/loading/success states use the same visual language as the normal page.
 - Route, API, auth, validation, and submission semantics are unchanged.
 - Mobile presentation is intentionally composed, not merely a scaled-down desktop layout.
+
+
+## 8. Runner / submit / report visual convergence
+
+The Modern Education visual layer now distinguishes three route-level presentation families:
+
+- `hui-app--assessment-runner`: focused Scale / Questionnaire / Cognitive / Situational / Composite runners.
+- `hui-app--student-submit`: assignment and check-in submission surfaces.
+- `hui-app--report-surface`: student result/report surfaces.
+
+The shared stylesheet is `frontend/src/components/assessment-ui/assessment-ui.css`.
+
+Runner rules deliberately preserve task-owned stimulus geometry and timing semantics. Mobile changes are limited to shell spacing, non-stimulus card layout, navigation/control target sizes, safe-area handling, and legacy questionnaire/composite container composition.
+
+Report rules stack multi-column facts/metrics on mobile, constrain media to the viewport, provide local horizontal overflow for tables, and keep scientific/report wording untouched.
+
+QuestionnaireResult now uses the same `ReportShell` presentation frame as Scale, Situational and Composite reports; its API request and unit-report payloads are unchanged.
