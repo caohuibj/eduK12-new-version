@@ -57,7 +57,7 @@ const MaterialGrants: React.FC = () => {
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>{error}</span>
-            <button type="button" className="btn-secondary" onClick={() => void load()}>重试</button>
+            <button type="button" className="hui-button hui-button--secondary" onClick={() => void load()}>重试</button>
           </div>
         </div>
       )}
@@ -80,7 +80,7 @@ const MaterialGrants: React.FC = () => {
       {loading ? (
         <p role="status" aria-live="polite" className="text-gray-500">加载中...</p>
       ) : list.length === 0 ? (
-        <div className="card p-10 text-center text-gray-500">还没有授权记录</div>
+        <div className="staff-panel staff-panel--padded p-10 text-center text-gray-500">还没有授权记录</div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
           <div className="overflow-x-auto">
