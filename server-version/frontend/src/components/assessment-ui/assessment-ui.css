@@ -10,15 +10,15 @@
  * Focused assessment runners
  * ------------------------------ */
 .hui-app--assessment-runner {
-  --runner-ink: #14304a;
-  --runner-muted: #64748b;
-  --runner-line: #dbe6ef;
-  --runner-page: #f7fbff;
-  --runner-soft: #eef7ff;
-  --runner-blue: #2f6fed;
-  --runner-blue-hover: #255dce;
-  --runner-green: #22c55e;
-  --runner-surface: #ffffff;
+  --runner-ink: var(--hui-ds-color-ink);
+  --runner-muted: var(--hui-ds-color-muted);
+  --runner-line: var(--hui-ds-role-runner-line);
+  --runner-page: var(--hui-ds-color-page-strong);
+  --runner-soft: var(--hui-ds-color-soft);
+  --runner-blue: var(--hui-ds-color-action);
+  --runner-blue-hover: var(--hui-ds-color-action-hover);
+  --runner-green: var(--hui-ds-color-success);
+  --runner-surface: var(--hui-ds-color-surface);
   min-height: 100dvh;
   background:
     radial-gradient(circle at 85% 8%, rgba(56,189,248,.09) 0 9rem, transparent 9.1rem),
@@ -116,7 +116,7 @@
   border-color: #b8cce0;
 }
 .hui-app--assessment-runner :where(.card,[class~="bg-white"][class*="rounded"]) {
-  box-shadow: 0 5px 20px rgba(20,48,74,.045);
+  box-shadow: var(--hui-ds-shadow-card);
 }
 
 /* Legacy Questionnaire / Composite runners that predate AssessmentShell. */
@@ -142,7 +142,7 @@
 }
 .hui-app--assessment-runner [class~="max-w-2xl"] [class~="shadow"],
 .hui-app--assessment-runner [class~="max-w-3xl"] [class~="shadow"] {
-  box-shadow: 0 5px 20px rgba(20,48,74,.045);
+  box-shadow: var(--hui-ds-shadow-card);
 }
 .hui-app--assessment-runner [class~="max-w-2xl"] input,
 .hui-app--assessment-runner [class~="max-w-2xl"] select,

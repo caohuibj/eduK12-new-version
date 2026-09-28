@@ -10,12 +10,12 @@
   padding: 24px !important;
   background:
     radial-gradient(circle at 82% 12%,rgba(56,189,248,.08) 0 8rem,transparent 8.1rem),
-    #f8fbff;
+    var(--hui-ds-color-page);
 }
 
 .hui-auth-content > div:has(> .ant-card) > .ant-card {
   width: min(100%,460px) !important;
-  border: 1px solid #dce7f0;
+  border: 1px solid var(--hui-ds-color-line);
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 10px 34px rgba(20,48,74,.07);
@@ -27,7 +27,7 @@
 }
 
 .hui-auth-content > div:has(> .ant-card) > .ant-card .ant-card-head-title {
-  color: #14304a;
+  color: var(--hui-ds-color-ink);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -.02em;
@@ -55,13 +55,13 @@
 
 .hui-auth-content > div:has(> .ant-card) .ant-btn-primary {
   min-height: 48px;
-  background: #2f6fed;
-  border-color: #2f6fed;
+  background: var(--hui-ds-color-action);
+  border-color: var(--hui-ds-color-action);
 }
 
 .hui-auth-content > div:has(> .ant-card) .ant-btn-primary:hover {
-  background: #255dce;
-  border-color: #255dce;
+  background: var(--hui-ds-color-action-hover);
+  border-color: var(--hui-ds-color-action-hover);
 }
 
 /* Shared Scale Library */
@@ -69,10 +69,10 @@
 .hui-app--student .hui-app-main > div:has(a[href="/scale-library"]),
 .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]),
 .hui-app--staff .hui-staff-workspace > div:has(a[href="/scale-library"]) {
-  --library-ink:#14304a;
-  --library-muted:#64778a;
-  --library-line:#dce6ef;
-  --library-blue:#2f6fed;
+  --library-ink:var(--hui-ds-color-ink);
+  --library-muted:var(--hui-ds-role-staff-muted);
+  --library-line:var(--hui-ds-role-staff-line);
+  --library-blue:var(--hui-ds-color-action);
   width:100%;
   max-width:76rem;
   margin-inline:auto;

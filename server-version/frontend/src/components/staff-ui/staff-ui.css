@@ -1,6 +1,6 @@
 /* Staff-only presentation. Assessment runners and report bodies are intentionally outside this scope. */
-.hui-app--staff{--staff-ink:#182b42;--staff-muted:#617186;--staff-line:#dce4ec;--staff-accent:#3458c8;--staff-surface:#fff;--staff-bg:#f3f6fa;background:var(--staff-bg);color:var(--staff-ink)}
-.hui-app--staff .hui-product{--hui-color-text:#182b42;--hui-color-muted:#617186;--hui-color-border:#dce4ec;--hui-color-action:#3458c8;--hui-color-action-hover:#2845a4;--hui-radius:10px}
+.hui-app--staff{--staff-ink:var(--hui-ds-role-staff-ink);--staff-muted:var(--hui-ds-role-staff-muted);--staff-line:var(--hui-ds-role-staff-line);--staff-accent:var(--hui-ds-role-staff-accent);--staff-surface:var(--hui-ds-color-surface);--staff-bg:var(--hui-ds-role-staff-page);background:var(--staff-bg);color:var(--staff-ink)}
+.hui-app--staff .hui-product{--hui-color-text:var(--staff-ink);--hui-color-muted:var(--staff-muted);--hui-color-border:var(--staff-line);--hui-color-action:var(--staff-accent);--hui-color-action-hover:var(--hui-ds-role-staff-accent-hover);--hui-radius:10px}
 .hui-app--staff .hui-app-header{min-height:72px;padding:12px 24px;gap:12px 24px;box-shadow:0 1px 0 #e1e7ef;border:0;position:sticky;top:0;z-index:35}
 .hui-app--staff .hui-brand{color:#142c46;letter-spacing:-.6px;font-size:22px}.hui-app--staff .hui-account{margin-left:auto;gap:16px;font-size:13px}.hui-organization-switch{display:flex;min-height:40px;align-items:center;gap:8px;color:#617186}.hui-organization-switch select{max-width:210px;min-height:40px;border:1px solid #dce4ec;border-radius:8px;background:#f8fafc;padding:0 10px}
 .hui-context-retry{min-height:40px;border:0;background:transparent;color:#b42318;text-decoration:underline;cursor:pointer}.hui-app--staff .hui-app-body{align-items:flex-start}.hui-app--staff .hui-navigation{width:244px;flex-shrink:0;position:sticky;top:72px;height:calc(100dvh - 72px);overflow-y:auto;background:#152c43;color:#e7edf6;border:0;padding:22px 14px 32px}.hui-nav-intro{display:grid;gap:4px;padding:0 12px 18px}.hui-nav-intro>span{font-size:10px;letter-spacing:2px;color:#a9bad0}.hui-nav-intro>strong{font-size:16px;color:#fff}.hui-nav-search{display:flex;align-items:center;gap:8px;margin:0 6px 20px;padding:0 10px;min-height:40px;color:#bac8d8;border:1px solid #42556c;border-radius:8px}.hui-nav-search input{background:transparent;color:#fff;width:100%;min-width:0;min-height:38px;font-size:13px;border:0}.hui-nav-search input::placeholder{color:#acbdd1}.hui-nav-group{margin-bottom:10px}.hui-nav-group__toggle{width:100%;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 12px;border-radius:8px;text-align:left;color:#bdcbdc;font-size:12px;font-weight:600;letter-spacing:.7px;background:none;border:0;cursor:pointer}.hui-nav-group__toggle>span{flex:1}.hui-nav-group__toggle[aria-expanded=true] .hui-nav-chevron{transform:rotate(180deg)}.hui-nav-group__items{margin:0;padding:0;list-style:none}.hui-app--staff .hui-navigation .hui-nav-group a{min-height:44px;margin:2px 0;padding:9px 14px 9px 38px;color:#e0e8f3;font-size:13px;border-radius:8px;border:1px solid transparent;text-decoration:none}.hui-app--staff .hui-navigation .hui-nav-group a:hover{background:#ffffff0c}.hui-app--staff .hui-navigation .hui-nav-group a[aria-current=page]{background:#edf2ff;color:#213e86;border-color:#cbd9ff;font-weight:650}.hui-nav-empty{color:#d0dbea;font-size:13px;padding:12px}.hui-app--staff .hui-app-content{width:0}.hui-app--staff .hui-breadcrumb{padding:12px 32px 0;font-size:12px;color:#748299}.hui-app--staff .hui-breadcrumb ol{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0;padding:0;list-style:none}.hui-app--staff .hui-breadcrumb li{display:inline-flex;align-items:center;gap:5px}.hui-app--staff .hui-app-main{max-width:1440px;padding:20px 32px 40px}.hui-staff-workspace{min-width:0;width:100%;max-width:1280px;margin-inline:auto;font-size:14px;line-height:1.6}.hui-staff-workspace>.hui-page{padding:0}.hui-staff-workspace .hui-page--management{max-width:none}.staff-help{color:#65758b;font-size:12px;line-height:1.7}.staff-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px;border:1px solid #dce4ec;border-radius:10px;background:#fff;margin-bottom:20px}.staff-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px}.staff-catalog-card{display:grid;gap:10px;align-content:start;padding:20px;background:#fff;border:1px solid #dce4ec;border-radius:12px}.staff-catalog-card h2{margin:0;font-size:18px}.staff-pagination{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:20px}
@@ -33,13 +33,13 @@
  * Desktop productivity first; tablet/mobile remain operable.
  * ========================================================= */
 .hui-app--staff{
-  --staff-ink:#14304a;
-  --staff-muted:#64778a;
-  --staff-line:#dce6ef;
-  --staff-accent:#315fc9;
-  --staff-accent-hover:#274da7;
-  --staff-surface:#fff;
-  --staff-bg:#f5f8fb;
+  --staff-ink:var(--hui-ds-role-staff-ink);
+  --staff-muted:var(--hui-ds-role-staff-muted);
+  --staff-line:var(--hui-ds-role-staff-line);
+  --staff-accent:var(--hui-ds-role-staff-accent);
+  --staff-accent-hover:var(--hui-ds-role-staff-accent-hover);
+  --staff-surface:var(--hui-ds-color-surface);
+  --staff-bg:var(--hui-ds-role-staff-page);
   background:
     radial-gradient(circle at 86% 8%,rgba(56,189,248,.055) 0 12rem,transparent 12.1rem),
     var(--staff-bg);
@@ -185,7 +185,7 @@
   border-color:#dce6ef;
   border-radius:15px;
   background:#fff;
-  box-shadow:0 4px 18px rgba(20,48,74,.035);
+  box-shadow:var(--hui-ds-shadow-subtle);
 }
 .staff-catalog-card,
 .staff-course-card{
@@ -340,7 +340,7 @@
 .staff-dialog{
   border-color:#d7e2eb;
   border-radius:16px;
-  box-shadow:0 26px 78px rgba(13,34,61,.22);
+  box-shadow:var(--hui-ds-shadow-dialog);
 }
 .staff-dialog__header{
   padding:20px 22px;
@@ -555,7 +555,7 @@
   border:1px solid #dce6ef;
   border-radius:15px;
   background:#fff;
-  box-shadow:0 4px 18px rgba(20,48,74,.035);
+  box-shadow:var(--hui-ds-shadow-subtle);
 }
 .hui-app--staff .hui-staff-workspace .ant-card .ant-card-head {
   min-height:54px;
@@ -644,7 +644,7 @@
   overflow:hidden;
   border:1px solid #d7e2eb;
   border-radius:16px;
-  box-shadow:0 26px 78px rgba(13,34,61,.22);
+  box-shadow:var(--hui-ds-shadow-dialog);
 }
 .hui-app--staff .hui-staff-workspace .ant-modal-header {
   margin-bottom:0;

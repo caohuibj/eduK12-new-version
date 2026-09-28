@@ -11,26 +11,53 @@
 
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors;
+    @apply px-4 py-2 text-white transition-colors;
+    min-height: var(--hui-ds-target);
+    border-radius: var(--hui-ds-radius-sm);
+    background: var(--hui-ds-color-action);
   }
   
   .btn-secondary {
-    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors;
+    @apply px-4 py-2 text-gray-800 transition-colors;
+    min-height: var(--hui-ds-target);
+    border: 1px solid var(--hui-ds-color-line);
+    border-radius: var(--hui-ds-radius-sm);
+    background: var(--hui-ds-color-surface);
   }
   
   .btn-danger {
-    @apply px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors;
+    @apply px-4 py-2 text-white transition-colors;
+    min-height: var(--hui-ds-target);
+    border-radius: var(--hui-ds-radius-sm);
+    background: var(--hui-ds-color-danger);
   }
   
   .card {
-    @apply bg-white rounded-lg shadow p-6;
+    @apply bg-white p-6;
+    border: 1px solid var(--hui-ds-color-line);
+    border-radius: var(--hui-ds-radius-md);
+    box-shadow: var(--hui-ds-shadow-subtle);
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+    @apply w-full px-3 py-2 focus:outline-none;
+    min-height: var(--hui-ds-target);
+    border: 1px solid var(--hui-ds-color-line);
+    border-radius: var(--hui-ds-radius-sm);
+    background: var(--hui-ds-color-surface);
+  }
+  .input:focus {
+    border-color: var(--hui-ds-color-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--hui-ds-color-focus) 12%, transparent);
   }
   
   .label {
     @apply block text-sm font-medium text-gray-700 mb-1;
   }
+}
+
+@media (hover: hover) {
+  .btn-primary:hover { background: var(--hui-ds-color-action-hover); }
+  .btn-secondary:hover { background: var(--hui-ds-color-page); }
+  .btn-danger:hover { background: #b91c1c; }
 }
