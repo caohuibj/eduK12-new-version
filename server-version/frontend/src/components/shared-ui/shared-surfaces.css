@@ -1,0 +1,246 @@
+/*
+ * Huisurvey Modern Education — shared cross-role surfaces.
+ * Covers forced password change and the shared Scale Library without changing
+ * account-security or library data semantics.
+ */
+
+/* First-login forced password change */
+.hui-auth-content > div:has(> .ant-card) {
+  min-height: calc(100dvh - 150px) !important;
+  padding: 24px !important;
+  background:
+    radial-gradient(circle at 82% 12%,rgba(56,189,248,.08) 0 8rem,transparent 8.1rem),
+    #f8fbff;
+}
+
+.hui-auth-content > div:has(> .ant-card) > .ant-card {
+  width: min(100%,460px) !important;
+  border: 1px solid #dce7f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 34px rgba(20,48,74,.07);
+}
+
+.hui-auth-content > div:has(> .ant-card) > .ant-card .ant-card-head {
+  min-height: 60px;
+  border-color: #e5edf4;
+}
+
+.hui-auth-content > div:has(> .ant-card) > .ant-card .ant-card-head-title {
+  color: #14304a;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.hui-auth-content > div:has(> .ant-card) > .ant-card .ant-card-body {
+  padding: 24px;
+}
+
+.hui-auth-content > div:has(> .ant-card) .ant-alert {
+  border-radius: 12px;
+}
+
+.hui-auth-content > div:has(> .ant-card) :where(.ant-input,.ant-input-affix-wrapper) {
+  min-height: 46px;
+  border-color: #d5e1ea;
+  border-radius: 10px;
+}
+
+.hui-auth-content > div:has(> .ant-card) .ant-btn {
+  min-height: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.hui-auth-content > div:has(> .ant-card) .ant-btn-primary {
+  min-height: 48px;
+  background: #2f6fed;
+  border-color: #2f6fed;
+}
+
+.hui-auth-content > div:has(> .ant-card) .ant-btn-primary:hover {
+  background: #255dce;
+  border-color: #255dce;
+}
+
+/* Shared Scale Library */
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]),
+.hui-app--student .hui-app-main > div:has(a[href="/scale-library"]),
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]),
+.hui-app--staff .hui-staff-workspace > div:has(a[href="/scale-library"]) {
+  --library-ink:#14304a;
+  --library-muted:#64778a;
+  --library-line:#dce6ef;
+  --library-blue:#2f6fed;
+  width:100%;
+  max-width:76rem;
+  margin-inline:auto;
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child {
+  position:relative;
+  overflow:hidden;
+  margin-bottom:20px;
+  padding:22px 24px;
+  border:1px solid #dce8f2;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 90% 18%,rgba(56,189,248,.11) 0 5rem,transparent 5.1rem),
+    linear-gradient(135deg,#f2f8ff,#fbfdff 68%,#f1faf5);
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child h1,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child h1 {
+  color:var(--library-ink);
+  letter-spacing:-.035em;
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child p,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child p {
+  color:var(--library-muted);
+  line-height:1.75;
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form {
+  padding:20px;
+  border-color:var(--library-line);
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(20,48,74,.035);
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) :where(input,select),
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) :where(input,select) {
+  min-height:44px;
+  border-color:#d5e0e9;
+  border-radius:9px;
+  background:#fff;
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) article,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) article {
+  border-color:var(--library-line);
+  border-radius:16px;
+  box-shadow:0 4px 18px rgba(20,48,74,.035);
+  transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) article:hover,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) article:hover {
+  transform:translateY(-2px);
+  border-color:#c3d5e6;
+  box-shadow:0 10px 28px rgba(20,48,74,.065);
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) article h2,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) article h2 {
+  color:var(--library-ink);
+}
+
+.hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) article a,
+.hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) article a {
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+}
+
+/* Detail surface */
+.hui-app--student .hui-app-main > div:has(> a[href="/scale-library"]) > a[href="/scale-library"],
+.hui-app--staff .hui-staff-workspace > div:has(> a[href="/scale-library"]) > a[href="/scale-library"] {
+  min-height:44px;
+  font-weight:600;
+}
+
+.hui-app--student .hui-app-main > div:has(> a[href="/scale-library"]) > div[class*="rounded-xl"],
+.hui-app--staff .hui-staff-workspace > div:has(> a[href="/scale-library"]) > div[class*="rounded-xl"] {
+  border-color:var(--library-line);
+  border-radius:16px;
+  box-shadow:0 4px 18px rgba(20,48,74,.035);
+}
+
+.hui-app--student .hui-app-main > div:has(> a[href="/scale-library"]) section,
+.hui-app--staff .hui-staff-workspace > div:has(> a[href="/scale-library"]) section {
+  border-color:var(--library-line);
+  border-radius:16px;
+  box-shadow:0 4px 18px rgba(20,48,74,.03);
+}
+
+@media(max-width:63.999rem){
+  .hui-auth-content > div:has(> .ant-card) {
+    min-height:calc(100dvh - 120px)!important;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form > div[class*="grid"],
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form > div[class*="grid"] {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:39.999rem){
+  .hui-auth-content > div:has(> .ant-card) {
+    min-height:calc(100dvh - 100px)!important;
+    padding:12px max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))!important;
+  }
+
+  .hui-auth-content > div:has(> .ant-card) > .ant-card {
+    border-radius:16px;
+  }
+
+  .hui-auth-content > div:has(> .ant-card) > .ant-card .ant-card-body {
+    padding:18px;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > div[class~="mb-6"]:first-child {
+    padding:18px;
+    border-radius:16px;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form {
+    padding:16px;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form > div[class*="grid"],
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form > div[class*="grid"] {
+    grid-template-columns:1fr;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form > div:last-child,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form > div:last-child {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) > form > div:last-child button,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) > form > div:last-child button {
+    width:100%;
+    min-height:46px;
+  }
+
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) article:hover,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) article:hover {
+    transform:none;
+  }
+
+  .hui-app--student .hui-app-main > div:has(> a[href="/scale-library"]) > div[class*="rounded-xl"],
+  .hui-app--staff .hui-staff-workspace > div:has(> a[href="/scale-library"]) > div[class*="rounded-xl"],
+  .hui-app--student .hui-app-main > div:has(> a[href="/scale-library"]) section,
+  .hui-app--staff .hui-staff-workspace > div:has(> a[href="/scale-library"]) section {
+    padding:16px!important;
+    border-radius:15px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hui-auth-content > div:has(> .ant-card) *,
+  .hui-app--student .hui-app-main > div:has(a[href^="/scale-library/"]) *,
+  .hui-app--staff .hui-staff-workspace > div:has(a[href^="/scale-library/"]) * {
+    animation:none!important;
+    transition:none!important;
+  }
+}
