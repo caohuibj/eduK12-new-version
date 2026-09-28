@@ -3,15 +3,15 @@
  * Presentation-only and scoped to authenticated PARENT standard/report surfaces.
  */
 .hui-app--parent.hui-app--standard {
-  --parent-ink: #173f48;
-  --parent-muted: #647b7f;
-  --parent-line: #dce9e5;
-  --parent-page: #f8fcfb;
-  --parent-soft: #eef9f5;
-  --parent-blue: #2f6fed;
-  --parent-green: #2da66f;
-  --parent-green-dark: #247f59;
-  --parent-surface: #ffffff;
+  --parent-ink: var(--hui-ds-role-parent-ink);
+  --parent-muted: var(--hui-ds-role-parent-muted);
+  --parent-line: var(--hui-ds-role-parent-line);
+  --parent-page: var(--hui-ds-role-parent-page);
+  --parent-soft: var(--hui-ds-role-parent-soft);
+  --parent-blue: var(--hui-ds-color-action);
+  --parent-green: var(--hui-ds-role-parent-accent);
+  --parent-green-dark: var(--hui-ds-role-parent-accent-strong);
+  --parent-surface: var(--hui-ds-color-surface);
   background:
     radial-gradient(circle at 82% 10%, rgba(45,166,111,.08) 0 11rem, transparent 11.1rem),
     radial-gradient(circle at 12% 84%, rgba(56,189,248,.06) 0 9rem, transparent 9.1rem),
@@ -26,7 +26,7 @@
   --hui-color-background: var(--parent-page);
   --hui-color-border: var(--parent-line);
   --hui-color-action: var(--parent-blue);
-  --hui-color-action-hover: #255dce;
+  --hui-color-action-hover: var(--hui-ds-color-action-hover);
   --hui-color-focus: var(--parent-blue);
   --hui-radius: .9rem;
 }
