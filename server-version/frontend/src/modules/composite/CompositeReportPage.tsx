@@ -10,6 +10,7 @@ import type { CognitiveSingleTaskReport } from '../cognitive/types'
 import ReportShell from '../reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
 import SituationalReportCard, { type SituationalReportView } from '../reporting/SituationalReportCard'
+import { ReportSection } from '../reporting/ReportPrimitives'
 
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 const formatDuration = (ms: number) => {
@@ -146,37 +147,35 @@ const CompositeReportPage: React.FC = () => {
   }
 
   const showSnapshotControls = staffMode && (Boolean(report?.packageReport) || snapshots.length > 0)
-  const snapshotControls = showSnapshotControls && <div className="card p-5" data-testid="composite-snapshot-controls">
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <label className="text-sm font-medium text-gray-700" htmlFor="composite-snapshot-select">报告版本</label>
-      <select id="composite-snapshot-select" aria-label="报告版本" value={selectedSnapshotId || ''} onChange={(event) => selectSnapshot(event.target.value)} className="border rounded px-3 py-2 text-sm min-w-64">
+  const snapshotControls = showSnapshotControls && <ReportSection
+    title="报告版本"
+    eyebrow="Staff"
+    description="切换已冻结的报告 Snapshot；重新分析会追加历史，不覆盖原报告。"
+    testId="composite-snapshot-controls"
+  >
+    <div className="flex flex-wrap items-center gap-3">
+      <label className="text-sm font-medium text-gray-700" htmlFor="composite-snapshot-select">选择版本</label>
+      <select id="composite-snapshot-select" aria-label="报告版本" value={selectedSnapshotId || ''} onChange={(event) => selectSnapshot(event.target.value)} className="input min-w-64 flex-1">
         <option value="">完成时默认版本</option>
         {snapshots.map((snapshot) => <option key={snapshot.id} value={snapshot.id}>{snapshot.generationReason === 'COMPLETION' ? '完成时' : '重新分析'} · {new Date(snapshot.createdAt).toLocaleString('zh-CN')}</option>)}
       </select>
       {adminMode && <button type="button" onClick={() => void reanalyze()} disabled={reanalyzing} className="btn-primary">{reanalyzing ? '重新分析中...' : '重新分析'}</button>}
     </div>
-    {snapshotLoading && <p className="text-xs text-gray-500 mt-2">加载报告历史...</p>}
-    {snapshotError && <p className="text-sm text-red-600 mt-2">{snapshotError}</p>}
+    {snapshotLoading && <p className="mt-2 text-xs text-gray-500">加载报告历史...</p>}
+    {snapshotError && <p className="mt-2 text-sm text-red-600">{snapshotError}</p>}
     {report?.packageReport && (
       <div className="mt-4 border-t pt-4" data-testid="composite-analysis-export-controls">
-        <p className="text-sm font-medium text-gray-700 mb-2">当前 Snapshot 分析导出</p>
+        <p className="mb-2 text-sm font-medium text-gray-700">当前 Snapshot 分析导出</p>
         <div className="flex flex-wrap gap-2">
           {(['json', 'zip', 'xlsx'] as CompositeAnalysisExportFormat[]).map((format) => (
-            <button
-              key={format}
-              type="button"
-              onClick={() => void downloadAnalysisExport(format)}
-              disabled={exportingFormat !== null}
-              className="btn-secondary"
-              aria-label={`导出 ${format.toUpperCase()}`}
-            >
+            <button key={format} type="button" onClick={() => void downloadAnalysisExport(format)} disabled={exportingFormat !== null} className="btn-secondary" aria-label={`导出 ${format.toUpperCase()}`}>
               {exportingFormat === format ? '导出中...' : `导出 ${format.toUpperCase()}`}
             </button>
           ))}
         </div>
       </div>
     )}
-  </div>
+  </ReportSection>
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
 
@@ -190,11 +189,11 @@ const CompositeReportPage: React.FC = () => {
       >
         {snapshotControls}
         {publicMode && (
-          <div className="card p-5">
+          <ReportSection title="匿名报告恢复" eyebrow="访问凭证">
             <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="composite-recovery-input">恢复凭证</label>
-            <input id="composite-recovery-input" value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-3" placeholder="恢复凭证" />
+            <input id="composite-recovery-input" value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="input w-full mb-3" placeholder="恢复凭证" />
             <button onClick={() => { setRecoveryToken(recoveryInput); setLoading(true); void load(recoveryInput) }} className="btn-primary">查看匿名报告</button>
-          </div>
+          </ReportSection>
         )}
       </ReportShell>
     )
@@ -217,18 +216,33 @@ const CompositeReportPage: React.FC = () => {
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
-      {backgroundValues.length > 0 && <div className="card p-6" data-testid="composite-background-values">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3">背景信息</h2>
-        <div className="space-y-2">{backgroundValues.map((background) => (
-          <div key={background.itemId} className="flex justify-between gap-4 text-sm">
-            <span className="text-gray-500">{background.label || '背景信息'}</span>
-            <span className="text-gray-800 whitespace-pre-wrap">{background.value ?? '—'}</span>
+      {backgroundValues.length > 0 && <ReportSection title="背景信息" eyebrow="Context" testId="composite-background-values">
+        <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
+          <div key={background.itemId} className="report-metric">
+            <div className="report-metric__label">{background.label || '背景信息'}</div>
+            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.value ?? '—'}</div>
           </div>
         ))}</div>
-      </div>}
-      <div className="space-y-4">{unitReports.map((module) => (
-        <div key={module.itemId} className="card p-6" data-testid={`composite-unit-report-${module.itemId}`}>
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">{module.type === 'SCALE' ? module.scaleName : module.label || module.type}</h2>
+      </ReportSection>}
+      {unitReports.length > 1 && (
+        <ReportSection title="报告目录" eyebrow="Modules" description="每个模块继续保留自己的冻结报告语义。">
+          <nav className="report-module-index" aria-label="综合报告模块目录">
+            {unitReports.map((module, index) => (
+              <a key={module.itemId} href={`#composite-report-unit-${index}`}>
+                {index + 1}. {module.type === 'SCALE' ? module.scaleName : module.label || module.type}
+              </a>
+            ))}
+          </nav>
+        </ReportSection>
+      )}
+      {unitReports.map((module, index) => (
+        <ReportSection
+          key={module.itemId}
+          id={`composite-report-unit-${index}`}
+          title={module.type === 'SCALE' ? module.scaleName : module.label || module.type}
+          eyebrow={`模块 ${index + 1}`}
+          testId={`composite-unit-report-${module.itemId}`}
+        >
           {'decryptError' in module && module.decryptError ? (
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
@@ -236,14 +250,14 @@ const CompositeReportPage: React.FC = () => {
               {module.type === 'SCALE' && <ScaleUnitReportCard report={module as SafeScaleUnitReport} />}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
-                  ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} />
+                  ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} headingLevel={3} />
                   : <p className="text-gray-500">该认知任务尚未完成或没有可展示的单任务报告。</p>
               )}
               {module.type === 'SITUATIONAL' && <SituationalReportCard report={module as SituationalReportView} />}
             </>
           )}
-        </div>
-      ))}</div>
+        </ReportSection>
+      ))}
     </ReportShell>
   )
 }
