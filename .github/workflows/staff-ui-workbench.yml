@@ -15,29 +15,20 @@ concurrency:
 jobs:
   snapshot:
     runs-on: [self-hosted, linux, eduk12-win-ci]
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: Assemble tracked source and frontend-only test dependencies
+      - name: Archive exact tracked source including interrupted review payload
         shell: bash
         run: |
           set -euo pipefail
           work="$RUNNER_TEMP/staff-ui-review-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          mkdir -p "$work/tools" "$work/output"
+          mkdir -p "$work/output"
           git archive --format=tar HEAD > "$work/output/source.tar"
           git rev-parse HEAD > "$work/output/source.sha"
-          cp "$(command -v node)" "$work/tools/node"
-          npm ci --prefix server-version/frontend
-          pw=$(node -p "require('./server-version/backend/package-lock.json').packages['node_modules/playwright-core'].version")
-          npm install --prefix "$work/tools" --ignore-scripts --no-audit --no-fund "playwright-core@$pw"
-          tar -czf "$work/output/frontend-deps.tar.gz" -C server-version/frontend node_modules
-          tar -czf "$work/output/review-tools.tar.gz" -C "$work" tools
-          sha256sum "$work/output/"*.tar* > "$work/output/SHA256SUMS"
+          sha256sum "$work/output/source.tar" > "$work/output/SHA256SUMS"
           echo "STAFF_UI_REVIEW_OUTPUT=$work/output" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         with:
