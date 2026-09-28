@@ -8,6 +8,7 @@ import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
 import FormSectionManager from '../../components/FormSectionManager'
 import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 
 // 表单题目类型
 interface FormItem {
@@ -57,6 +58,8 @@ interface Questionnaire {
 }
 
 const GeneralQuestionnaireEdit: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
@@ -161,7 +164,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   const handleSaveBasic = async () => {
     if (!questionnaire.name) {
-      alert('问卷名称不能为空')
+      showMessage('问卷名称不能为空')
       return
     }
 
@@ -175,12 +178,12 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       })
       if (response.code === 0) {
         setQuestionnaire(response.data)
-        alert('保存成功')
+        showMessage('保存成功')
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '保存失败')
+      showMessage(err.message || '保存失败')
     } finally {
       setSaving(false)
     }
@@ -219,7 +222,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   // 添加表单题目
   const handleAddFormItem = async () => {
     if (!formData.label) {
-      alert('题目标签不能为空')
+      showMessage('题目标签不能为空')
       return
     }
 
@@ -240,7 +243,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       } else {
         const response = await apiClient.post<FormItem>(
@@ -252,11 +255,11 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       }
     } catch (err: any) {
-      alert(err.message || '操作失败')
+      showMessage(err.message || '操作失败')
     }
   }
 
@@ -269,10 +272,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setFormItems(formItems.filter(fi => fi.id !== itemId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      showMessage(err.message || '删除失败')
     }
   }
 
@@ -306,7 +309,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   // 发布问卷
   const handlePublish = async () => {
     if (questionnaireScales.length === 0 && formItems.length === 0) {
-      alert('问卷必须包含至少一个量表或表单题目')
+      showMessage('问卷必须包含至少一个量表或表单题目')
       return
     }
 
@@ -314,12 +317,12 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       const response = await apiClient.post(`/general-questionnaires/${id}/publish`)
       if (response.code === 0) {
         setQuestionnaire({ ...questionnaire, status: 'PUBLISHED' })
-        alert('发布成功')
+        showMessage('发布成功')
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '发布失败')
+      showMessage(err.message || '发布失败')
     }
   }
 
@@ -354,6 +357,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
+      {feedback}
       {/* Header */
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">

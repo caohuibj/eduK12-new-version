@@ -4,12 +4,15 @@ import apiClient from '../../api/client'
 import { Save, X } from 'lucide-react'
 
 import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 interface Course {
   id: string
   title: string
 }
 
 const ClassroomCreate: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [courses, setCourses] = useState<Course[]>([])
@@ -66,13 +69,13 @@ const ClassroomCreate: React.FC = () => {
       setLoading(true)
       const response = await apiClient.post<{ id: string; code: string }>('/classrooms', formData)
       if (response.code === 0) {
-        alert(`课堂创建成功！课堂码: ${response.data.code}`)
+        showMessage(`课堂创建成功！课堂码: ${response.data.code}`)
         navigate('/teacher/classrooms')
       } else {
-        alert(response.message || '创建失败')
+        showMessage(response.message || '创建失败')
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     } finally {
       setLoading(false)
     }
@@ -80,6 +83,7 @@ const ClassroomCreate: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
+      {feedback}
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-6">

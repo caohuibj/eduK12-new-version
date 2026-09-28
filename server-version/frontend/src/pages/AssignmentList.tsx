@@ -71,7 +71,8 @@ interface Submission {
 const AssignmentList: React.FC = () => {
   const [searchParams] = useSearchParams()
   const focusId = searchParams.get('id')
-  const { feedback, confirm, success, error: showError } = useStaffFeedback()
+  const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
@@ -167,7 +168,7 @@ const AssignmentList: React.FC = () => {
       }
     } catch (error) {
       console.error('获取提交列表失败:', error)
-      alert('获取提交列表失败')
+      showMessage('获取提交列表失败')
     } finally {
       setSubmissionsLoading(false)
     }
@@ -184,11 +185,11 @@ const AssignmentList: React.FC = () => {
   const handleBatchGrade = async () => {
     if (!selectedAssignment) return
     if (selectedSubmissions.size === 0) {
-      alert('请至少选择一份作业')
+      showMessage('请至少选择一份作业')
       return
     }
     if (!batchComment.trim()) {
-      alert('请输入评语')
+      showMessage('请输入评语')
       return
     }
 
@@ -209,14 +210,14 @@ const AssignmentList: React.FC = () => {
         }
       }
       
-      alert(`批量批复完成，成功批复 ${successCount} 份作业`)
+      showMessage(`批量批复完成，成功批复 ${successCount} 份作业`)
       setShowBatchGradeModal(false)
       // 刷新提交列表
       fetchSubmissions(selectedAssignment.id)
       // 清空选择
       setSelectedSubmissions(new Set())
     } catch (error: any) {
-      alert(error.message || '批量批复失败')
+      showMessage(error.message || '批量批复失败')
     } finally {
       setIsBatchGrading(false)
     }
@@ -265,7 +266,7 @@ const AssignmentList: React.FC = () => {
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     }
   }
 
@@ -290,7 +291,7 @@ const AssignmentList: React.FC = () => {
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     }
   }
 
@@ -347,7 +348,7 @@ const AssignmentList: React.FC = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch (error: any) {
-      alert(error.message || '导出失败')
+      showMessage(error.message || '导出失败')
     }
   }
 

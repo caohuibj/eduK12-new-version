@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import { ArrowLeft, Plus, Trash2, Save, GripVertical } from 'lucide-react'
 
 import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 interface Question {
   id: string
   questionIndex: number
@@ -50,6 +51,8 @@ const defaultQuestionData: QuestionFormData = {
 }
 
 const ClassroomQuestionEdit: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
@@ -114,10 +117,10 @@ const ClassroomQuestionEdit: React.FC = () => {
       if (response.code === 0) {
         setQuestions(questions.filter((q) => q.id !== questionId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      showMessage(err.message || '删除失败')
     }
   }
 
@@ -213,6 +216,7 @@ const ClassroomQuestionEdit: React.FC = () => {
   if (!classroom) {
     return (
       <ProductPage width="management" className="staff-editor-page">
+      {feedback}
         <div className="text-center text-gray-500">
           <p>课堂不存在</p>
           <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">

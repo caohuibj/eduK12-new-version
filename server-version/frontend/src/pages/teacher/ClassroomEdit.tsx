@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import { ArrowLeft, Save } from 'lucide-react'
 
 import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 interface Classroom {
   id: string
   name: string
@@ -16,6 +17,8 @@ interface Classroom {
 }
 
 const ClassroomEdit: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
@@ -60,7 +63,7 @@ const ClassroomEdit: React.FC = () => {
 
       const response = await apiClient.put(`/classrooms/${id}`, { name })
       if (response.code === 0) {
-        alert('课堂更新成功')
+        showMessage('课堂更新成功')
         navigate('/teacher/classrooms')
       } else {
         setError(response.message)
@@ -81,6 +84,7 @@ const ClassroomEdit: React.FC = () => {
   if (!classroom) {
     return (
       <ProductPage width="management" className="staff-editor-page">
+      {feedback}
         <div className="text-center text-gray-500">
           <p>课堂不存在</p>
           <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">

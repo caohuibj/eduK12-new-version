@@ -5,6 +5,7 @@ import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
 import { sessionAxios } from '../api/client'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface ImageItem {
   id: string
@@ -16,6 +17,8 @@ interface ImageItem {
 }
 
 const ImageLibrary: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { user } = useAuth()
   const [images, setImages] = useState<ImageItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -124,11 +127,11 @@ const ImageLibrary: React.FC = () => {
       if (response.code === 0) {
         fetchImages()
       } else {
-        alert(response.message || '删除失败')
+        showMessage(response.message || '删除失败')
       }
     } catch (error) {
       console.error('删除图片失败:', error)
-      alert('删除失败')
+      showMessage('删除失败')
     }
   }
 
@@ -145,10 +148,10 @@ const ImageLibrary: React.FC = () => {
         setEditName('')
         fetchImages()
       } else {
-        alert(response.message || '重命名失败')
+        showMessage(response.message || '重命名失败')
       }
     } catch (error: any) {
-      alert(error.message || '重命名失败')
+      showMessage(error.message || '重命名失败')
     } finally {
       setIsUpdating(false)
     }
@@ -200,6 +203,7 @@ const ImageLibrary: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader title="图片库" description="按视觉浏览和复用课堂、问卷与测评图片。" actions={<ProductButton variant="primary" onClick={() => setShowUploadModal(true)}><Plus className="w-4 h-4" aria-hidden="true" />上传图片</ProductButton>} />
       <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">当前显示 {filteredImages.length} 张图片</span></div>
       {/* Image Grid */}

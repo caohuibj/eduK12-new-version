@@ -67,7 +67,8 @@ interface CheckinSubmission {
 const CheckinList: React.FC = () => {
   const [searchParams] = useSearchParams()
   const focusId = searchParams.get('id')
-  const { feedback, confirm, success, error: showError } = useStaffFeedback()
+  const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
@@ -168,7 +169,7 @@ const CheckinList: React.FC = () => {
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     }
   }
 
@@ -194,7 +195,7 @@ const CheckinList: React.FC = () => {
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     }
   }
 
@@ -263,7 +264,7 @@ const CheckinList: React.FC = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch (error: any) {
-      alert(error.message || '导出失败')
+      showMessage(error.message || '导出失败')
     }
   }
 
@@ -283,7 +284,7 @@ const CheckinList: React.FC = () => {
       }
     } catch (error) {
       console.error('获取提交列表失败:', error)
-      alert('获取提交列表失败')
+      showMessage('获取提交列表失败')
     } finally {
       setSubmissionsLoading(false)
     }

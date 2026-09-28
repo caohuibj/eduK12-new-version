@@ -7,6 +7,7 @@ import type { Scale } from '../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../modules/assessment-context/options'
 import FormSectionManager from '../components/FormSectionManager'
 import { ProductPage, ProductStatus } from '../components/product-ui'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 // 表单题目类型
 interface FormItem {
@@ -63,6 +64,8 @@ interface Questionnaire {
 }
 
 const QuestionnaireEdit: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const isNew = id === 'new'
@@ -186,7 +189,7 @@ const QuestionnaireEdit: React.FC = () => {
 
   const handleSaveBasic = async () => {
     if (!questionnaire.code || !questionnaire.name) {
-      alert('问卷编码和名称不能为空')
+      showMessage('问卷编码和名称不能为空')
       return
     }
 
@@ -197,7 +200,7 @@ const QuestionnaireEdit: React.FC = () => {
         if (response.code === 0) {
           navigate(`/questionnaires/${response.data.id}`)
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       } else {
         const response = await apiClient.put<Questionnaire>(`/questionnaires/${id}`, {
@@ -209,13 +212,13 @@ const QuestionnaireEdit: React.FC = () => {
         })
         if (response.code === 0) {
           setQuestionnaire(response.data)
-          alert('保存成功')
+          showMessage('保存成功')
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       }
     } catch (err: any) {
-      alert(err.message || '保存失败')
+      showMessage(err.message || '保存失败')
     } finally {
       setSaving(false)
     }
@@ -224,7 +227,7 @@ const QuestionnaireEdit: React.FC = () => {
   // 添加表单题目
   const handleAddFormItem = async () => {
     if (!formData.label) {
-      alert('题目标签不能为空')
+      showMessage('题目标签不能为空')
       return
     }
 
@@ -246,7 +249,7 @@ const QuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       } else {
         // 新增
@@ -259,11 +262,11 @@ const QuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          showMessage(response.message)
         }
       }
     } catch (err: any) {
-      alert(err.message || '操作失败')
+      showMessage(err.message || '操作失败')
     }
   }
 
@@ -276,10 +279,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setFormItems(formItems.filter(fi => fi.id !== itemId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      showMessage(err.message || '删除失败')
     }
   }
 
@@ -320,10 +323,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         fetchContent()
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '添加失败')
+      showMessage(err.message || '添加失败')
     }
   }
 
@@ -351,10 +354,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setQuestionnaireScales(questionnaireScales.filter(qs => qs.scaleId !== scaleId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '移除失败')
+      showMessage(err.message || '移除失败')
     }
   }
 
@@ -369,10 +372,10 @@ const QuestionnaireEdit: React.FC = () => {
         fetchQuestionnaire()
         setSelectedCourses([])
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '添加失败')
+      showMessage(err.message || '添加失败')
     }
   }
 
@@ -388,7 +391,7 @@ const QuestionnaireEdit: React.FC = () => {
         })
       }
     } catch (err: any) {
-      alert(err.message || '移除失败')
+      showMessage(err.message || '移除失败')
     }
   }
 
@@ -424,6 +427,7 @@ const QuestionnaireEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
+      {feedback}
       {/* Header */
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
