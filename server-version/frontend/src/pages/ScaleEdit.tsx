@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Eye, Plus, Save, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
-import { ProductPage, ProductStatus } from '../components/product-ui'
+import { PageHeader, ProductPage, ProductStatus } from '../components/product-ui'
 
 type ResponseValue = string | number
 type Direction = 'higher_is_better' | 'higher_is_worse' | 'higher_is_more' | 'lower_is_better' | 'bipolar' | 'descriptive'
@@ -264,10 +264,19 @@ const ScaleEdit: React.FC = () => {
   const tabs: Array<[typeof activeTab, string]> = [['basic', '基本信息'], ['responses', '响应选项'], ['items', '题目'], ['scores', '计分'], ['report', '报告文案']]
   return (
     <ProductPage width="management" className="staff-editor-page">
-      <Link to="/scales" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft className="w-4 h-4 mr-1" />返回量表列表</Link>
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5"><div><h1 className="text-2xl font-bold text-gray-900">{isNew ? '创建描述性量表' : scale.name || '量表编辑'}</h1><p className="text-sm text-gray-500 mt-1">{standard ? 'STANDARD package · 只读' : '自定义量表 · 描述性结果 · 不提供群体参考'}</p></div><div className="flex gap-2">{!isNew && <button onClick={() => void previewDefinition()} disabled={saving || standard} className="hui-button hui-button--secondary"><Eye className="w-4 h-4 inline mr-1" />计分预览</button>}{!standard && <button onClick={() => void (isNew ? saveBasic() : saveDefinition())} disabled={saving} className="hui-button hui-button--secondary"><Save className="w-4 h-4 inline mr-1" />保存草稿</button>}</div></div>
+      <PageHeader
+        title={isNew ? '创建描述性量表' : scale.name || '量表编辑'}
+        description={standard ? 'STANDARD package · 只读' : '自定义量表 · 描述性结果 · 不提供群体参考'}
+        actions={(
+          <div className="staff-inline-actions">
+            <Link to="/scales" className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回量表列表</Link>
+            {!isNew && <button onClick={() => void previewDefinition()} disabled={saving || standard} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
+            {!standard && <button onClick={() => void (isNew ? saveBasic() : saveDefinition())} disabled={saving} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
+          </div>
+        )}
+      />
       {issues.length > 0 && <div className="mb-5 rounded-lg border p-4 bg-gray-50"><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
-      <div className="flex gap-1 border-b mb-6 overflow-x-auto">{tabs.map(([key, label]) => <button key={key} onClick={() => setActiveTab(key)} className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === key ? 'border-b-2 border-primary text-primary' : 'text-gray-500'}`}>{label}</button>)}</div>
+      <div className="staff-toolbar"><div className="staff-segmented" role="group" aria-label="量表编辑分区">{tabs.map(([key, label]) => <button key={key} type="button" aria-pressed={activeTab === key} onClick={() => setActiveTab(key)}>{label}</button>)}</div></div>
 
       {activeTab === 'basic' && <section className="staff-panel staff-panel--padded p-6 space-y-4"><div className="grid md:grid-cols-2 gap-4"><label className="text-sm text-gray-700">量表编码<input disabled={!isNew || standard} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">量表名称<input disabled={standard} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={standard} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select disabled={standard} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option><option value="PUBLIC">公开可用</option></select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={standard} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={standard} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={standard} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={saving || standard} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
