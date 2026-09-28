@@ -21,7 +21,6 @@ import TeacherCodeList from '../TeacherCodeList'
 describe('TeacherCodeList management actions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
     mockGet.mockResolvedValue({
       code: 0,
       data: {
@@ -48,8 +47,9 @@ describe('TeacherCodeList management actions', () => {
 
     expect(await screen.findByText('ABC123')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '删除教师码 ABC123' }))
+    expect(screen.getByRole('dialog', { name: '确认操作' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '确认' }))
 
-    expect(window.confirm).toHaveBeenCalled()
     expect(mockDelete).toHaveBeenCalledWith('/teacher-codes/code-1')
     expect(screen.queryByText('ABC123')).not.toBeInTheDocument()
   })

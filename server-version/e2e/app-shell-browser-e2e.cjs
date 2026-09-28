@@ -10,6 +10,9 @@ async function setup(browser, { role = 'STUDENT', width = 390, touch = false, co
   const context = await browser.newContext({ viewport: { width, height: 900 }, hasTouch: touch })
   const page = await context.newPage()
   page.setDefaultTimeout(15000)
+  // Vite's first module transform on self-hosted ARM runners can exceed the control timeout.
+  // Navigation gets its own budget; page-specific assertions below still fail at 15s.
+  page.setDefaultNavigationTimeout(30000)
   const state = { user: role ? userFor(role) : null, expires: false, loginUser: userFor('STUDENT'), requests: [], errors: [] }
   page.on('pageerror', (error) => state.errors.push(error.message))
   await page.route('**/api/**', async (route) => {
