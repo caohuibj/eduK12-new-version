@@ -548,3 +548,152 @@
     scroll-behavior:auto!important;
   }
 }
+
+
+/* Ant Design compatibility for remaining staff management/editor pages. */
+.hui-app--staff .hui-staff-workspace .ant-card {
+  border:1px solid #dce6ef;
+  border-radius:15px;
+  background:#fff;
+  box-shadow:0 4px 18px rgba(20,48,74,.035);
+}
+.hui-app--staff .hui-staff-workspace .ant-card .ant-card-head {
+  min-height:54px;
+  padding-inline:20px;
+  border-color:#e7edf3;
+}
+.hui-app--staff .hui-staff-workspace .ant-card .ant-card-head-title {
+  color:#183650;
+  font-weight:650;
+}
+.hui-app--staff .hui-staff-workspace .ant-card .ant-card-body {
+  padding:20px;
+}
+.hui-app--staff .hui-staff-workspace .ant-btn {
+  min-height:42px;
+  border-radius:9px;
+  font-weight:600;
+  box-shadow:none;
+}
+.hui-app--staff .hui-staff-workspace .ant-btn-primary {
+  background:var(--staff-accent);
+  border-color:var(--staff-accent);
+}
+.hui-app--staff .hui-staff-workspace .ant-btn-primary:hover,
+.hui-app--staff .hui-staff-workspace .ant-btn-primary:focus {
+  background:var(--staff-accent-hover);
+  border-color:var(--staff-accent-hover);
+}
+.hui-app--staff .hui-staff-workspace :where(
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  textarea.ant-input
+) {
+  min-height:44px;
+  border-color:#d5e0e9;
+  border-radius:9px!important;
+}
+.hui-app--staff .hui-staff-workspace :where(
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  textarea.ant-input
+):focus,
+.hui-app--staff .hui-staff-workspace .ant-input-affix-wrapper-focused,
+.hui-app--staff .hui-staff-workspace .ant-select-focused .ant-select-selector {
+  border-color:#7f9fdd!important;
+  box-shadow:0 0 0 3px rgba(49,95,201,.09)!important;
+}
+.hui-app--staff .hui-staff-workspace .ant-alert {
+  border-radius:12px;
+}
+.hui-app--staff .hui-staff-workspace .ant-table-wrapper {
+  overflow:hidden;
+  border:1px solid #dce6ef;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 3px 16px rgba(20,48,74,.03);
+}
+.hui-app--staff .hui-staff-workspace .ant-table {
+  background:#fff;
+}
+.hui-app--staff .hui-staff-workspace .ant-table-thead > tr > th {
+  background:#f4f7fa;
+  color:#5e7184;
+  font-size:12px;
+  font-weight:650;
+  white-space:nowrap;
+}
+.hui-app--staff .hui-staff-workspace .ant-table-tbody > tr > td {
+  color:#2b435b;
+}
+.hui-app--staff .hui-staff-workspace .ant-tag {
+  min-height:24px;
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding-inline:8px;
+  font-weight:600;
+}
+.hui-app--staff .hui-staff-workspace .ant-modal-content {
+  overflow:hidden;
+  border:1px solid #d7e2eb;
+  border-radius:16px;
+  box-shadow:0 26px 78px rgba(13,34,61,.22);
+}
+.hui-app--staff .hui-staff-workspace .ant-modal-header {
+  margin-bottom:0;
+  padding-bottom:16px;
+  border-bottom:1px solid #e6edf3;
+}
+.hui-app--staff .hui-staff-workspace .ant-modal-title {
+  color:#183650;
+  font-size:18px;
+}
+.hui-app--staff .hui-staff-workspace .ant-form-item-label > label {
+  color:#40566d;
+  font-weight:600;
+}
+.hui-app--staff .hui-staff-workspace .ant-pagination-item,
+.hui-app--staff .hui-staff-workspace .ant-pagination-prev,
+.hui-app--staff .hui-staff-workspace .ant-pagination-next {
+  min-width:36px;
+  min-height:36px;
+  border-radius:8px;
+}
+
+@media(max-width:639px){
+  .hui-app--staff .hui-staff-workspace .ant-card .ant-card-head {
+    padding-inline:16px;
+  }
+  .hui-app--staff .hui-staff-workspace .ant-card .ant-card-body {
+    padding:16px;
+  }
+  .hui-app--staff .hui-staff-workspace .ant-space {
+    max-width:100%;
+    flex-wrap:wrap;
+  }
+  .hui-app--staff .hui-staff-workspace .ant-table-wrapper {
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .hui-app--staff .hui-staff-workspace .ant-table {
+    min-width:720px;
+  }
+  .hui-app--staff .hui-staff-workspace .ant-modal {
+    width:calc(100vw - 20px)!important;
+    max-width:none;
+    margin:0 auto;
+    top:max(10px,env(safe-area-inset-top));
+    padding-bottom:max(10px,env(safe-area-inset-bottom));
+  }
+  .hui-app--staff .hui-staff-workspace .ant-modal-body {
+    max-height:calc(100dvh - 150px);
+    overflow:auto;
+  }
+}
