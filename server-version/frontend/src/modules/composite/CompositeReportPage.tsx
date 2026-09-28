@@ -159,7 +159,7 @@ const CompositeReportPage: React.FC = () => {
         <option value="">完成时默认版本</option>
         {snapshots.map((snapshot) => <option key={snapshot.id} value={snapshot.id}>{snapshot.generationReason === 'COMPLETION' ? '完成时' : '重新分析'} · {new Date(snapshot.createdAt).toLocaleString('zh-CN')}</option>)}
       </select>
-      {adminMode && <button type="button" onClick={() => void reanalyze()} disabled={reanalyzing} className="btn-primary">{reanalyzing ? '重新分析中...' : '重新分析'}</button>}
+      {adminMode && <button type="button" onClick={() => void reanalyze()} disabled={reanalyzing} className="hui-button hui-button--primary">{reanalyzing ? '重新分析中...' : '重新分析'}</button>}
     </div>
     {snapshotLoading && <p className="mt-2 text-xs text-gray-500">加载报告历史...</p>}
     {snapshotError && <p className="mt-2 text-sm text-red-600">{snapshotError}</p>}
@@ -168,7 +168,7 @@ const CompositeReportPage: React.FC = () => {
         <p className="mb-2 text-sm font-medium text-gray-700">当前 Snapshot 分析导出</p>
         <div className="flex flex-wrap gap-2">
           {(['json', 'zip', 'xlsx'] as CompositeAnalysisExportFormat[]).map((format) => (
-            <button key={format} type="button" onClick={() => void downloadAnalysisExport(format)} disabled={exportingFormat !== null} className="btn-secondary" aria-label={`导出 ${format.toUpperCase()}`}>
+            <button key={format} type="button" onClick={() => void downloadAnalysisExport(format)} disabled={exportingFormat !== null} className="hui-button hui-button--secondary" aria-label={`导出 ${format.toUpperCase()}`}>
               {exportingFormat === format ? '导出中...' : `导出 ${format.toUpperCase()}`}
             </button>
           ))}
@@ -185,14 +185,14 @@ const CompositeReportPage: React.FC = () => {
         title="综合测评报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '暂无报告' }}
-        actions={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
+        actions={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
       >
         {snapshotControls}
         {publicMode && (
           <ReportSection title="匿名报告恢复" eyebrow="访问凭证">
             <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="composite-recovery-input">恢复凭证</label>
             <input id="composite-recovery-input" value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="input w-full mb-3" placeholder="恢复凭证" />
-            <button onClick={() => { setRecoveryToken(recoveryInput); setLoading(true); void load(recoveryInput) }} className="btn-primary">查看匿名报告</button>
+            <button onClick={() => { setRecoveryToken(recoveryInput); setLoading(true); void load(recoveryInput) }} className="hui-button hui-button--primary">查看匿名报告</button>
           </ReportSection>
         )}
       </ReportShell>
@@ -211,7 +211,7 @@ const CompositeReportPage: React.FC = () => {
       description={report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
       facts={facts}
       status={{ kind: 'success', title: '已提交', description: '报告读取失败不会改变已经完成的提交状态。' }}
-      backAction={<button type="button" onClick={() => navigate(backTo)} className="btn-secondary">返回</button>}
+      backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
     >
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
