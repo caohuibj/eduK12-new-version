@@ -147,7 +147,7 @@ async function main() {
           const response = await page.goto(baseUrl + spec.route, { waitUntil: 'domcontentloaded' })
           assert.equal(response?.status(), 200, `${spec.id}/${viewport.name}: document failed`)
           await spec.ready(page)
-          await page.locator('main').waitFor({ state: 'visible' })
+          await page.locator('#hui-main').waitFor({ state: 'visible' })
           await page.evaluate(() => document.fonts?.ready)
           const metrics = await metricsFor(page)
           assert.ok(metrics.document.scrollWidth <= viewport.width + 1,
