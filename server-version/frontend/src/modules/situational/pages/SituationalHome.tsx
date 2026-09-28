@@ -34,7 +34,7 @@ const SituationalHome: React.FC = () => {
   }, [])
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
       <PageHeader
         title="情境化测评"
         description="通过文字情境记录具体任务中的反应选择。试点结果用于描述当前反应模式，不是诊断或常模比较。"
