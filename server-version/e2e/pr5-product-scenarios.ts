@@ -176,9 +176,9 @@ async function group(owner, r, specId) {
 }
 async function showArtifact(page, org, artifactId) {
   await page.goto(`${base}/organizations/${org}/reporting`)
-  await page.getByText('高级：受保护反馈与历史报告读取', { exact: true }).click()
+  await page.getByText('高级设置：受保护反馈与历史报告读取', { exact: true }).click()
   await page.getByPlaceholder('artifact UUID').fill(artifactId)
-  await page.getByRole('button', { name: /读取.*artifact|读取 Artifact|读取 artifact/i }).click()
+  await page.getByRole('button', { name: '读取历史报告', exact: true }).click()
   await page.getByRole('heading', { name: '报告结果', exact: true }).waitFor()
   await page.getByText('报告记录编号', { exact: true }).click()
   await page.getByText(`Artifact ${artifactId}`, { exact: false }).first().waitFor()
@@ -213,11 +213,11 @@ async function main() {
   await owner.goto(`${base}/organizations/${org}/delivery`)
   await owner.getByLabel('Artifact ID', { exact: true }).fill(artifact.artifactId)
   const ticketResponse = owner.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith('/reporting/exports'))
-  await owner.getByRole('button', { name: '创建 CSV ticket', exact: true }).click()
+  await owner.getByRole('button', { name: '准备 CSV 导出', exact: true }).click()
   const ticketBody = await (await ticketResponse).json(); assert.equal(ticketBody.code, 0)
   const ticket = ticketBody.data
   const download = owner.waitForEvent('download')
-  await owner.getByRole('button', { name: '下载服务器 CSV', exact: true }).click()
+  await owner.getByRole('button', { name: '下载 CSV', exact: true }).click()
   const downloaded = await download
   await downloaded.saveAs(`${output}/school-aggregate.csv`)
   assert.match(readFileSync(`${output}/school-aggregate.csv`, 'utf8'), /mean/)
