@@ -21,6 +21,19 @@
   --hui-ds-color-danger: #dc2626;
   --hui-ds-color-page-elevated: #fbfdff;
 
+  --hui-ds-status-success-border: #86b8a1;
+  --hui-ds-status-success-bg: #f0fdf4;
+  --hui-ds-status-success-text: #166534;
+  --hui-ds-status-warning-border: #d4b574;
+  --hui-ds-status-warning-bg: #fffbeb;
+  --hui-ds-status-warning-text: #854d0e;
+  --hui-ds-status-error-border: #e9a1a1;
+  --hui-ds-status-error-bg: #fef2f2;
+  --hui-ds-status-error-text: #991b1b;
+  --hui-ds-status-pending-border: #93b4e7;
+  --hui-ds-status-pending-bg: #eff6ff;
+  --hui-ds-status-pending-text: #1e40af;
+
   /* Role accents stay semantic so role identity does not fork component geometry. */
   --hui-ds-role-parent-ink: #173f48;
   --hui-ds-role-parent-muted: #647b7f;
