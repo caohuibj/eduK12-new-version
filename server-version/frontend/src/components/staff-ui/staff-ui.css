@@ -840,3 +840,27 @@
   .staff-inline-actions>*{width:100%;justify-content:center}
   .staff-editor-heading{display:grid;grid-template-columns:1fr}
 }
+
+.staff-panel--padded{padding:20px}
+.staff-panel :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea),
+.staff-dialog :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  min-height:44px;
+  border:1px solid #d5e0e9;
+  border-radius:9px;
+  background:#fff;
+  color:#253d57;
+  padding:9px 11px;
+  font:inherit;
+}
+.staff-panel :where(input,select,textarea):focus,
+.staff-dialog :where(input,select,textarea):focus{
+  outline:none;
+  border-color:#7f9fdd;
+  box-shadow:0 0 0 3px rgba(49,95,201,.09);
+}
+.staff-dialog textarea{min-height:96px;resize:vertical}
+.staff-row-actions{display:flex;align-items:center;gap:8px}
+@media(max-width:639px){
+  .staff-panel--padded{padding:16px}
+  .staff-row-actions{opacity:1!important}
+}
