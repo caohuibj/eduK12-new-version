@@ -325,6 +325,15 @@
   grid-template-columns: repeat(2,minmax(0,1fr));
 }
 
+.hui-student-modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+.hui-student-dialog {
+  max-height: min(88dvh,720px);
+  overflow: auto;
+  padding: 24px;
+}
+
 @media (max-width: 63.999rem) {
   .hui-app--student.hui-app--standard .hui-app-header {
     position: static;
@@ -453,6 +462,16 @@
   }
   .hui-student-profile .card {
     padding: 18px;
+  }
+  .hui-student-modal-backdrop {
+    align-items: flex-end;
+    padding: 12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  }
+  .hui-student-dialog {
+    max-width: none;
+    max-height: 86dvh;
+    padding: 18px;
+    border-radius: 18px 18px 14px 14px;
   }
 }
 
