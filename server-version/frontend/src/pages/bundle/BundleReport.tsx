@@ -108,7 +108,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
 
   return (
     <section className="space-y-5 break-words" aria-label="Bundle 综合报告">
-      <ReportCoreSummary label="Bundle 综合报告">
+      <ReportCoreSummary label="报告身份">
         <div>
           <h2 className="text-xl font-semibold">{report.reportDefinition.title}</h2>
           {view?.identity && <p className="mt-1 text-sm font-normal text-gray-600">{view.identity.bundleKey} · {view.identity.bundleVersion}</p>}
