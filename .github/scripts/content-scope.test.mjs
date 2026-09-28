@@ -7,10 +7,11 @@ const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
-  assert.deepEqual(classify([scale, cognitive, sjt]), { content: true, domains: ['cognitive', 'scale', 'situational'] });
+  assert.deepEqual(classify([scale, cognitive, sjt]), { content: true, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
 });
 test('empty, core, executable additions and mixed changes require full checks', () => {
   assert.equal(classify([]).content, false);
+  assert.equal(classify([]).presentation, false);
   for (const file of ['.github/workflows/ci.yml', 'server-version/backend/package-lock.json',
     `${root}scale/instruments/catalog-defaults.ts`, `${root}scale/scale-scoring.ts`,
     `${root}cognitive/tasks/STROOP/package.ts`, `${root}cognitive/tasks/STROOP/task-package.json`,
@@ -138,6 +139,32 @@ test('force full can only strengthen the selected route', () => {
   assert.equal(classifyChanges([entry]).content, true);
   assert.equal(classifyChanges([entry], true).content, false);
   assert.equal(classifyChanges([{...entry, file: 'core.ts'}], true).content, false);
+});
+
+test('presentation-only classification is narrow and fail-closed', () => {
+  const css = 'server-version/frontend/src/components/student-ui/student-ui.css';
+  const scss = 'server-version/frontend/src/styles/mobile.scss';
+  const doc = 'server-version/docs/frontend-modern-education.md';
+  for (const file of [css, scss, doc]) {
+    const result = classify([file]);
+    assert.equal(result.presentation, true, file);
+    assert.equal(result.content, false, file);
+  }
+  assert.equal(classify([css, doc]).presentation, true);
+  for (const file of [
+    'server-version/frontend/src/pages/student/StudentHome.tsx',
+    'server-version/frontend/package.json',
+    'server-version/frontend/vite.config.ts',
+    '.github/workflows/ci.yml',
+    'server-version/docs/backend-modern-education.md',
+    'server-version/frontend/src/styles/../api.ts',
+    'server-version/frontend/src/styles/theme.css\n',
+  ]) assert.equal(classify([css, file]).presentation, false, file);
+
+  const regular = { file: css, status: 'M', oldMode: '100644', newMode: '100644' };
+  assert.equal(classifyChanges([regular]).presentation, true);
+  assert.equal(classifyChanges([regular], true).presentation, false);
+  assert.equal(classifyChanges([{ ...regular, status: 'D', newMode: '000000' }]).presentation, false);
 });
 
 test('manual dispatch forces platform checks even with no base SHA', () => {
