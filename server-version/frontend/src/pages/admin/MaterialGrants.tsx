@@ -82,9 +82,8 @@ const MaterialGrants: React.FC = () => {
       ) : list.length === 0 ? (
         <div className="staff-panel staff-panel--padded p-10 text-center text-gray-500">还没有授权记录</div>
       ) : (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+        <div className="staff-table-container">
+            <table className="staff-table">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">材料</th>
@@ -116,7 +115,6 @@ const MaterialGrants: React.FC = () => {
                 })}
               </tbody>
             </table>
-          </div>
         </div>
       )}
     </ProductPage>
