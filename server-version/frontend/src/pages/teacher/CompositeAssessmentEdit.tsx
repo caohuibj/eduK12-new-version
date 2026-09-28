@@ -270,7 +270,13 @@ const CompositeAssessmentEdit: React.FC = () => {
     <ProductPage width="management" className="staff-editor-page">
       <PageHeader
         title={detail.name}
-        description={`${detail.code} · ${detail.status} · 已开始 ${detail.attemptCounts?.started ?? 0} · 已完成 ${detail.attemptCounts?.completed ?? 0}`}
+        description={(
+          <span className="flex flex-wrap items-center gap-2">
+            <span>{detail.code} · {detail.status} · 已开始 {detail.attemptCounts?.started ?? 0} · 已完成 {detail.attemptCounts?.completed ?? 0}</span>
+            {isLibraryCourse && <span className="staff-badge">库课程</span>}
+            {detail.copyable && <span className="staff-badge staff-badge--success">可复制</span>}
+          </span>
+        )}
         actions={(
           <div className="staff-inline-actions">
             <button type="button" onClick={() => navigate('/composite-assessments')} className="hui-button hui-button--secondary"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回综合测评</button>
