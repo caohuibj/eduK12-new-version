@@ -62,7 +62,7 @@ beforeEach(() => {
 describe('Organization Run product journey', () => {
   it('publishes using the exact server-returned optimistic version', async () => {
     renderPage()
-    const publish = await screen.findByRole('button', { name: '发布 Run' })
+    const publish = await screen.findByRole('button', { name: '发布测评批次' })
     await userEvent.click(publish)
     expect(api.publish).not.toHaveBeenCalled()
     await userEvent.click(await screen.findByRole('button', { name: '确认发布' }))
