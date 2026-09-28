@@ -69,7 +69,14 @@ async function installApiFixture(page, role) {
     else if (pathname === '/api/scales/available') data = { list: [] }
     else if (pathname === '/api/scale-library') data = { schemaVersion: 1, generatedAt: '2026-09-28T00:00:00.000Z', entries: [] }
     else if (pathname.startsWith('/api/cognitive/history')) data = { list: [], total: 0, totalPages: 1, hasMore: false }
-    else if (pathname.startsWith('/api/organizations')) data = { list: [], total: 0, totalPages: 1, hasMore: false }
+    else if (pathname.startsWith('/api/organizations')) data = {
+      allowedActions: role === 'ADMIN' ? ['CREATE_ORGANIZATION'] : [],
+      platformRole: role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD',
+      list: [],
+      total: 0,
+      page: 1,
+      pageSize: 24,
+    }
     else if (pathname.includes('/public/cognitive/sessions/')) { status = 404; data = null }
 
     await route.fulfill({
