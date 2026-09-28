@@ -63,7 +63,7 @@ async function run(page, org, key, subject = { kind: 'ALL_CURRENT' }, respondent
     await page.goto(`${base}/organizations/${org}/runs/${r.id}`)
     await page.getByLabel('已发布资源', { exact: true }).selectOption({ label: `${entry.title} · BUNDLE/${policy.resourceKey}@${policy.resourceVersion}` })
     const added = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/runs/${r.id}/tracks`))
-    await page.getByRole('button', { name: '添加 Track', exact: true }).click()
+    await page.getByRole('button', { name: '添加测评项目', exact: true }).click()
     const body = await (await added).json(); assert.equal(body.code, 0); t = body.data
     const previewed = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/runs/${r.id}/preview`))
     await page.getByRole('button', { name: '发布 Run', exact: true }).click()
