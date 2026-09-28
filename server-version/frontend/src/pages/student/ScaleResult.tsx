@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
 import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
+import { ReportSection } from '../../modules/reporting/ReportPrimitives'
 
 export interface Assessment {
   id: string
@@ -160,12 +161,9 @@ const ScaleResult: React.FC = () => {
       }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
     >
-      {(
-        <section className="card p-6" aria-labelledby="scale-report-detail-heading">
-          <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
-          <ScaleUnitReportCard report={safeReport} />
-        </section>
-      )}
+      <ReportSection title="结果详情" eyebrow="Report">
+        <ScaleUnitReportCard report={safeReport} />
+      </ReportSection>
     </ReportShell>
   )
 }
