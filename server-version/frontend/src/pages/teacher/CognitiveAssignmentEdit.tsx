@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import { sessionFetch } from '../../api/client'
-import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 
 const statusLabel: Record<string, string> = {
   DRAFT: '草稿',
@@ -105,45 +105,21 @@ const CognitiveAssignmentEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
-      <button onClick={() => navigate('/cognitive-assignments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
-        <ArrowLeft className="w-4 h-4 mr-1" />返回认知任务
-      </button>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-gray-800">{detail.title}</h1>
-            {isWrapper && (
-              <span className="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">综合测评用</span>
-            )}
+      <PageHeader
+        title={detail.title}
+        description={`${statusLabel[detail.status] || detail.status}${detail.config?.name ? ` · ${detail.config.name}` : ''}${isWrapper ? ' · 综合测评用' : ''}`}
+        actions={(
+          <div className="staff-inline-actions">
+            <button type="button" onClick={() => navigate('/cognitive-assignments')} className="hui-button hui-button--secondary">
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />返回认知任务
+            </button>
+            {isDraft && !isWrapper && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
+            {canArchive && !isPackageLocked && <button onClick={() => void archive()} className="hui-button hui-button--secondary"><Archive className="w-4 h-4" aria-hidden="true" />归档</button>}
+            {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50"><Download className="w-4 h-4" aria-hidden="true" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}</button>}
+            {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('full-csv', 'full')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'full-csv' ? '导出完整数据中...' : '导出完整数据'}</button>}
           </div>
-          <p className="text-sm text-gray-500">
-            {statusLabel[detail.status] || detail.status}
-            {detail.config?.name ? ` · ${detail.config.name}` : ''}
-          </p>
-        </div>
-        <div className="flex flex-wrap justify-end gap-2">
-          {isDraft && !isWrapper && (
-            <button onClick={() => void publish()} className="hui-button hui-button--primary">
-              <Send className="w-4 h-4 inline mr-1" />发布
-            </button>
-          )}
-          {canArchive && !isPackageLocked && (
-            <button onClick={() => void archive()} className="hui-button hui-button--secondary">
-              <Archive className="w-4 h-4 inline mr-1" />归档
-            </button>
-          )}
-          {!isWrapper && (
-            <>
-              <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">
-                <Download className="w-4 h-4 inline mr-1" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}
-              </button>
-              <button disabled={exporting !== null} onClick={() => void exportData('full-csv', 'full')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'full-csv' ? '导出完整数据中...' : '导出完整数据'}</button>
-              <button disabled={exporting !== null} onClick={() => void exportData('research-zip', 'research', 'zip')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'research-zip' ? '科研长表生成中...' : '科研长表 ZIP'}</button>
-              <button disabled={exporting !== null} onClick={() => void exportData('research-xlsx', 'research', 'xlsx')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'research-xlsx' ? '科研工作簿生成中...' : '科研工作簿 XLSX'}</button>
-            </>
-          )}
-        </div>
-      </div>
+        )}
+      />
       {error && <p role="alert" className="text-red-500 mb-4">{error}</p>}
       {isWrapper ? (
         <div className="staff-panel staff-panel--padded p-6 mb-5">
