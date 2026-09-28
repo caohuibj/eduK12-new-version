@@ -164,7 +164,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
                 {block.limitations?.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-700">{block.limitations.map((text: string) => <li key={text}>{text}</li>)}</ul>}
               </ReportSection>
             )
-            : <ProductStatus kind="error" title="报告结构不受支持" key={block.blockId}>请联系管理员。</ProductStatus>)}
+            : <div role="alert" key={block.blockId}><ProductStatus kind="error" title="报告结构不受支持">请联系管理员。</ProductStatus></div>)}
 
           <div data-report-screen-only>
             <ProductButton onClick={() => void download()}>导出综合报告 JSON</ProductButton>
