@@ -25,11 +25,6 @@ const organization = vi.hoisted(() => ({
   activeError: null as string | null,
   refresh: vi.fn(),
   selectOrganization: vi.fn(),
-  total: 0,
-  platformRole: null as null | 'SYSTEM_ADMIN' | 'STANDARD',
-  error: null as string | null,
-  isLoading: false,
-  refresh: vi.fn(),
 }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
