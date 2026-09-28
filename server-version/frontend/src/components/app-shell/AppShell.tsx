@@ -13,6 +13,7 @@ import { activeNavigation, breadcrumbsFor, isStaffWorkspacePath, navigationFor, 
 import './app-shell.css'
 import '../staff-ui/staff-ui.css'
 import '../student-ui/student-ui.css'
+import '../assessment-ui/assessment-ui.css'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -24,6 +25,9 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const desiredMode=shellModeFor(location.pathname), guestClassroom=location.pathname.startsWith('/student/classroom/')&&user?.role!=='STUDENT'
   const mode=guestClassroom||(desiredMode==='standard'&&!user)?'public':desiredMode
   const roleClass=user?.role?` hui-app--${user.role.toLowerCase()}`:''
+  const assessmentSurfaceClass=mode==='focused'?' hui-app--assessment-runner':''
+  const reportSurfaceClass=/^\/student\/(?:scales\/result\/|questionnaires\/result\/|cognitive\/sessions\/[^/]+\/result|situational\/attempts\/[^/]+\/result|composite\/attempts\/[^/]+\/report)/.test(location.pathname)||/^\/relational\/attempts\/[^/]+\/report/.test(location.pathname)?' hui-app--report-surface':''
+  const studentSubmitClass=/^\/student\/(?:assignments|checkins)\/[^/]+$/.test(location.pathname)?' hui-app--student-submit':''
   const entryMode=location.pathname==='/'||isAuthPath(location.pathname)
   const staffMode=mode==='standard'&&(user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
@@ -36,7 +40,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   useEffect(()=>{if(organizationError||!user||mode!=='standard'||activeOrganization||organizationLoading||organizations.length!==1)return;void selectOrganization(organizations[0].id)},[user,mode,activeOrganization,organizationLoading,organizations,selectOrganization,organizationError])
   useEffect(()=>{if(mode==='display')return;document.title=`${title==='Huisurvey'?'':`${title} · `}Huisurvey`;if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus();previousPath.current=location.pathname},[location.pathname,title,mode])
   if(mode==='display')return <>{children}</>
-  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${entryMode?' hui-app--entry':''}`} data-shell-mode={mode}>
+  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}`} data-shell-mode={mode}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
     {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>Huisurvey</Link>}
       {mode==='standard'&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
