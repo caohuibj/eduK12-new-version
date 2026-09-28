@@ -9,11 +9,11 @@
 .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]),
 .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) {
   min-height: calc(100dvh - 150px);
-  border: 1px solid #dce7f0;
+  border: 1px solid var(--hui-ds-color-line);
   border-radius: 20px;
   background:
     radial-gradient(circle at 84% 10%,rgba(56,189,248,.08) 0 7rem,transparent 7.1rem),
-    #f8fbff;
+    var(--hui-ds-color-page);
   overflow: hidden;
 }
 
@@ -28,7 +28,7 @@
 .hui-app--public .hui-app-main > main:has(#classroom-code) h1,
 .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) h1,
 .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) h1 {
-  color: #14304a;
+  color: var(--hui-ds-color-ink);
   letter-spacing: -.03em;
 }
 
@@ -36,7 +36,7 @@
 .hui-app--public .hui-app-main > main:has(#classroom-code) section,
 .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div,
 .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div {
-  border: 1px solid #dce7f0;
+  border: 1px solid var(--hui-ds-color-line);
   border-radius: 17px;
   box-shadow: 0 5px 20px rgba(20,48,74,.04);
 }
@@ -47,7 +47,7 @@
   border-color: #cedce8;
   border-radius: 11px;
   background: #fbfdff;
-  color: #14304a;
+  color: var(--hui-ds-color-ink);
   font-weight: 650;
 }
 
@@ -64,7 +64,7 @@
 .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"],
 .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"] {
   min-height: 50px;
-  background: #2f6fed;
+  background: var(--hui-ds-color-action);
   box-shadow: 0 7px 18px rgba(47,111,237,.13);
 }
 
@@ -72,9 +72,9 @@
 .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]),
 .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) {
   min-height: calc(100dvh - 150px);
-  border: 1px solid #dce7f0;
+  border: 1px solid var(--hui-ds-color-line);
   border-radius: 20px;
-  background: #f8fbff;
+  background: var(--hui-ds-color-page);
   overflow: hidden;
 }
 
