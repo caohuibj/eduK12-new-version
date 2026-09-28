@@ -51,7 +51,7 @@ export default function StudentRelationalPage() {
     })()
   }, [])
 
-  return <ProductPage width="reading">
+  return <ProductPage width="assessment" className="hui-student-page hui-student-relational">
     <PageHeader title="课堂与关系体验" description="你可以针对当前课程完成课堂/教学环境体验测评。面向教师的结果只以满足最低样本量后的群体汇总呈现，不展示你的个人评分。" />
     {loading ? <ProductStatus kind="info" title="加载中">正在读取课程、任务和已发布内容。</ProductStatus> : error ? (
       <ProductStatus kind="error" title="操作失败">{error}</ProductStatus>
@@ -62,7 +62,7 @@ export default function StudentRelationalPage() {
           <RelationalTaskList tasks={tasks} onRefresh={refreshTasks} />
         </section>
 
-        <section className="space-y-4 rounded border border-gray-200 p-4">
+        <section className="hui-relational-compose space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">开始一次课堂体验测评</h2>
             <p className="mt-1 text-sm text-gray-600">教师身份由课程创建者关系自动确定，前端不能自行选择被评价教师。</p>
