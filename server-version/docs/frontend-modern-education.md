@@ -129,28 +129,3 @@ Runner rules deliberately preserve task-owned stimulus geometry and timing seman
 Report rules stack multi-column facts/metrics on mobile, constrain media to the viewport, provide local horizontal overflow for tables, and keep scientific/report wording untouched.
 
 QuestionnaireResult now uses the same `ReportShell` presentation frame as Scale, Situational and Composite reports; its API request and unit-report payloads are unchanged.
-
-
-## 10. Staff experience visual review
-
-Staff presentation is a CSS-first convergence layered on the existing StaffNavigation / staff-ui patterns. The existing interaction primitives are retained:
-
-- grouped/searchable dark navigation
-- staff toolbar/search/segmented controls
-- staff course/catalog cards
-- staff table container/table/actions
-- staff dialog/modal
-- MoreActions overflow menu
-- staff detail header
-- sticky action footer
-
-Responsive intent:
-- Desktop: productivity-first persistent navigation, dense tables, visible bulk/detail controls.
-- Tablet: collapsed navigation, two-column card layouts where appropriate, local table scrolling.
-- Mobile: single-column toolbars/cards, full-width page-header actions, bottom-sheet-like legacy modal composition, safe-area-aware sticky actions, local table scrolling rather than page-level overflow.
-
-Interaction/logic findings intentionally excluded from the visual PR:
-
-12. Staff confirmation UX is not yet fully converged. Several pages still use browser-native/global `confirm()` or older confirmation flows while newer pages use `useStaffFeedback`. Confirmed examples include `ClassroomList`, `CognitiveAssignmentEdit`, `CompositeAssessmentEdit`, `ClassroomQuestionEdit`, `GeneralQuestionnaireEdit`, and `MaterialGrants`. Migrate them in a separate interaction PR so destructive-action semantics remain reviewable.
-13. `TeacherCourseDetail` uses the same partial-loading pattern as the earlier student course-detail page: the assignment request ends the shared loading state while the course/check-in/questionnaire requests are independent. A slow course-detail response can therefore transiently produce an unavailable-course state.
-14. `TeacherCourseDetail` defines `scales` and `fetchScales` but does not call the fetcher or render the scale state. Confirm whether the course detail intentionally omits scale management or whether this is dead/incomplete logic before removing or exposing it.
