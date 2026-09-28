@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, CheckCircle, Clock, ClipboardCheck } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Course, Assignment, Checkin } from '../../types'
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 
 // 心理量表类型
 interface Scale {
@@ -176,38 +177,37 @@ const CourseDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <ProductPage width="report" className="hui-student-page hui-course-detail">
+        <ProductStatus kind="pending" title="正在加载课程" announce="polite">正在读取课程与任务。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!course) {
     return (
-      <div className="card text-center py-12">
-        <p className="text-gray-500">课程不存在或已删除</p>
-        <button onClick={() => navigate('/student')} className="btn-primary mt-4">
-          返回课程列表
-        </button>
-      </div>
+      <ProductPage width="report" className="hui-student-page hui-course-detail">
+        <ProductStatus kind="warning" title="课程不可用" actions={<button onClick={() => navigate('/student')} className="btn-primary">返回课程列表</button>}>
+          课程不存在或已删除。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <ProductPage width="report" className="hui-student-page hui-course-detail space-y-5">
       {/* Back Button */}
       <button
         onClick={() => navigate('/student')}
-        className="flex items-center text-gray-600 hover:text-primary transition-colors"
+        className="hui-course-back flex items-center text-gray-600 hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-5 h-5 mr-1" />
         返回课程列表
       </button>
 
       {/* Course Header */}
-      <div className="card">
-        <div className="flex items-start space-x-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+      <div className="hui-course-hero card">
+        <div className="hui-course-hero__content">
+          <div className="hui-course-hero__icon">
             <BookOpen className="w-8 h-8 text-primary" />
           </div>
           <div className="flex-1">
@@ -215,7 +215,7 @@ const CourseDetail: React.FC = () => {
             {course.description && (
               <p className="text-gray-600 mb-4">{course.description}</p>
             )}
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
+            <div className="hui-course-meta">
               <div className="flex items-center space-x-1">
                 <Users className="w-4 h-4" />
                 <span>{course.studentCount || 0} 名学员</span>
@@ -227,12 +227,12 @@ const CourseDetail: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="hui-course-tabs">
         <button
           onClick={() => setActiveTab('assignments')}
-          className={`relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+          className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'assignments'
-              ? 'bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -242,9 +242,9 @@ const CourseDetail: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('checkins')}
-          className={`relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+          className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'checkins'
-              ? 'bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -254,9 +254,9 @@ const CourseDetail: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('questionnaires')}
-          className={`relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+          className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'questionnaires'
-              ? 'bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -266,9 +266,9 @@ const CourseDetail: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('composites')}
-          className={`relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+          className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'composites'
-              ? 'bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -280,7 +280,7 @@ const CourseDetail: React.FC = () => {
 
       {/* Content */}
       {activeTab === 'assignments' && (
-        <div className="space-y-4">
+        <div className="hui-course-list space-y-4">
           {assignments.length === 0 ? (
             <div className="card text-center py-12">
               <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -288,8 +288,8 @@ const CourseDetail: React.FC = () => {
             </div>
           ) : (
             assignments.map((assignment) => (
-              <div key={assignment.id} className="card hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
+              <div key={assignment.id} className="hui-course-task-card card hover:shadow-md transition-shadow">
+                <div className="hui-course-task-row flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
                       {assignment.title}
@@ -329,7 +329,7 @@ const CourseDetail: React.FC = () => {
       )}
 
       {activeTab === 'checkins' && (
-        <div className="space-y-4">
+        <div className="hui-course-list space-y-4">
           {checkins.length === 0 ? (
             <div className="card text-center py-12">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -337,8 +337,8 @@ const CourseDetail: React.FC = () => {
             </div>
           ) : (
             checkins.map((checkin) => (
-              <div key={checkin.id} className="card hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
+              <div key={checkin.id} className="hui-course-task-card card hover:shadow-md transition-shadow">
+                <div className="hui-course-task-row flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
                       {checkin.title}
@@ -367,7 +367,7 @@ const CourseDetail: React.FC = () => {
       )}
 
       {activeTab === 'questionnaires' && (
-        <div className="space-y-4">
+        <div className="hui-course-list space-y-4">
           {questionnaires.length === 0 ? (
             <div className="card text-center py-12">
               <ClipboardCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -375,8 +375,8 @@ const CourseDetail: React.FC = () => {
             </div>
           ) : (
             questionnaires.map((questionnaire) => (
-              <div key={questionnaire.id} className="card hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
+              <div key={questionnaire.id} className="hui-course-task-card card hover:shadow-md transition-shadow">
+                <div className="hui-course-task-row flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
                       {questionnaire.name}
@@ -414,7 +414,7 @@ const CourseDetail: React.FC = () => {
       )}
 
       {activeTab === 'composites' && (
-        <div className="space-y-4">
+        <div className="hui-course-list space-y-4">
           {composites.length === 0 ? (
             <div className="card text-center py-12">
               <ClipboardCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -455,8 +455,8 @@ const CourseDetail: React.FC = () => {
                     ? '查看报告'
                   : availabilityLabel
               return (
-                <div key={composite.id} className="card hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between">
+                <div key={composite.id} className="hui-course-task-card card hover:shadow-md transition-shadow">
+                  <div className="hui-course-task-row flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">{composite.name}</h3>
                       {composite.description && <p className="text-gray-600 text-sm mb-3">{composite.description}</p>}
@@ -474,7 +474,7 @@ const CourseDetail: React.FC = () => {
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="hui-course-task-actions flex items-center gap-2">
                       <button onClick={() => { if (target) navigate(target) }} disabled={!target} className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                         {actionLabel}
                       </button>
@@ -491,7 +491,7 @@ const CourseDetail: React.FC = () => {
           )}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
