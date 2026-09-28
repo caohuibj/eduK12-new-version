@@ -27,8 +27,17 @@ const StudentCourseLogin: React.FC = () => {
       )
 
       if (response.code === 0 && response.data) {
-        // 跳转到注册页面
-        navigate(authLink(`/student/register?course=${encodeURIComponent(courseCode.trim())}`))
+        const verifiedCourseCode = courseCode.trim()
+        // 将本次验证结果带入注册页，避免同一流程重复验证。
+        navigate(
+          authLink(`/student/register?course=${encodeURIComponent(verifiedCourseCode)}`),
+          {
+            state: {
+              verifiedCourseCode,
+              verifiedCourse: response.data,
+            },
+          }
+        )
       } else {
         setError(response.message || '课程码无效或课程已结束')
       }
