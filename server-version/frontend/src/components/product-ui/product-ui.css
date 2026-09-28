@@ -1,3 +1,4 @@
+@import './design-tokens.css';
 /* Opt-in: importing this sheet cannot restyle an existing page outside .hui-product. */
 .hui-product {
   box-sizing: border-box;
