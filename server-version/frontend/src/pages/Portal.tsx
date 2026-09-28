@@ -10,7 +10,7 @@ export default function Portal() {
       <Link to={authLink('/student/login')}><strong>学生入口</strong><span>参加课程，完成测评和学习任务</span></Link>
       <Link to={authLink('/teacher/account-login')}><strong>教师入口</strong><span>管理课程与测评，查看学习情况</span></Link>
       <Link to={authLink('/parent/login')}><strong>家长入口</strong><span>完成面向孩子的观察测评并查看自己的结果</span></Link>
-      <Link to={authLink('/admin/login')}><strong>管理员入口</strong><span>管理账户、内容与授权</span></Link>
+      <Link to={authLink('/admin/login')}><strong>管理员入口</strong><span>管理课程、账户、内容与授权</span></Link>
     </nav>
   </ProductPage>
 }

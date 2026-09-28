@@ -1,3 +1,4 @@
+import '../components/staff-ui/auth-ui.css'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
@@ -33,7 +34,7 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
+    <div className="hui-staff-auth min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
         <Link
@@ -60,7 +61,7 @@ const AdminLogin: React.FC = () => {
             <span className="font-semibold text-amber-800">管理员身份</span>
           </div>
           <p className="text-sm text-amber-700">
-            管理员账号为系统内置，拥有完整权限，可以生成教师码和管理所有课程。
+            用于平台管理、教师审核及内容授权。具体组织和数据访问范围以当前授予的权限为准。
           </p>
         </div>
 
