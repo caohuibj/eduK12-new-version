@@ -268,7 +268,7 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
-      <button onClick={() => navigate('/composite-assessments') className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
+      <button onClick={() => navigate('/composite-assessments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" />返回综合测评
       </button>
       <div className="flex items-center justify-between mb-6">

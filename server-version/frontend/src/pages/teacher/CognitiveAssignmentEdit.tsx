@@ -105,7 +105,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
-      <button onClick={() => navigate('/cognitive-assignments') className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
+      <button onClick={() => navigate('/cognitive-assignments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" />返回认知任务
       </button>
       <div className="flex items-center justify-between mb-6">

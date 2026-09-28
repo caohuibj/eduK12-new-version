@@ -437,6 +437,7 @@ const CourseList: React.FC = () => {
               </article>
             })}
           </div>
+        )
       ) : (
         /* 分享给我的列表 */
         sharedToMe.length === 0 ? (

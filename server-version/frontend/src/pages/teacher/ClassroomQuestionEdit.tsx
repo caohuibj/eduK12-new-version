@@ -3,8 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ArrowLeft, Plus, Trash2, Save, GripVertical } from 'lucide-react'
 
-import { ProductPage, ProductStatus } from '../../components/product-ui'
-import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 interface Question {
   id: string
   questionIndex: number
@@ -51,8 +49,6 @@ const defaultQuestionData: QuestionFormData = {
 }
 
 const ClassroomQuestionEdit: React.FC = () => {
-  const { feedback, info } = useStaffFeedback()
-  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
@@ -117,10 +113,10 @@ const ClassroomQuestionEdit: React.FC = () => {
       if (response.code === 0) {
         setQuestions(questions.filter((q) => q.id !== questionId))
       } else {
-        showMessage(response.message)
+        alert(response.message)
       }
     } catch (err: any) {
-      showMessage(err.message || '删除失败')
+      alert(err.message || '删除失败')
     }
   }
 
@@ -209,14 +205,15 @@ const ClassroomQuestionEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课堂">正在读取课堂配置。</ProductStatus></ProductPage>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">加载中...</div>
+      </div>
     )
   }
 
   if (!classroom) {
     return (
-      <ProductPage width="management" className="staff-editor-page">
-      {feedback}
+      <div className="p-6">
         <div className="text-center text-gray-500">
           <p>课堂不存在</p>
           <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
@@ -465,7 +462,7 @@ const ClassroomQuestionEdit: React.FC = () => {
           </div>
         )}
       </div>
-    </ProductPage>
+    </div>
   )
 }
 
