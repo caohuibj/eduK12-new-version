@@ -129,3 +129,5 @@ Runner rules deliberately preserve task-owned stimulus geometry and timing seman
 Report rules stack multi-column facts/metrics on mobile, constrain media to the viewport, provide local horizontal overflow for tables, and keep scientific/report wording untouched.
 
 QuestionnaireResult now uses the same `ReportShell` presentation frame as Scale, Situational and Composite reports; its API request and unit-report payloads are unchanged.
+
+Foundation PR merge policy: because this branch also changes TSX and CI routing, it requires the normal full platform gate before merge.
