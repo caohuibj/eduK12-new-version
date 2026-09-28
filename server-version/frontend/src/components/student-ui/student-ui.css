@@ -1,0 +1,464 @@
+/*
+ * Huisurvey Modern Education — Student application surfaces.
+ * Scope is STUDENT + standard shell only. Focused assessment runners are excluded.
+ */
+.hui-app--student.hui-app--standard {
+  --student-ink: #14304a;
+  --student-muted: #64748b;
+  --student-line: #dde7f0;
+  --student-page: #f7fbff;
+  --student-soft: #eff7ff;
+  --student-sky: #e1f6ff;
+  --student-blue: #2f6fed;
+  --student-blue-hover: #255dce;
+  --student-green: #22c55e;
+  --student-surface: #ffffff;
+  background:
+    radial-gradient(circle at 78% 12%, rgba(56,189,248,.08) 0 11rem, transparent 11.1rem),
+    var(--student-page);
+  color: var(--student-ink);
+}
+
+.hui-app--student.hui-app--standard .hui-product {
+  --hui-color-text: var(--student-ink);
+  --hui-color-muted: var(--student-muted);
+  --hui-color-surface: var(--student-surface);
+  --hui-color-background: var(--student-page);
+  --hui-color-border: var(--student-line);
+  --hui-color-action: var(--student-blue);
+  --hui-color-action-hover: var(--student-blue-hover);
+  --hui-color-focus: var(--student-blue);
+  --hui-radius: .875rem;
+}
+
+.hui-app--student.hui-app--standard .hui-app-header {
+  min-height: 68px;
+  padding: 11px 24px;
+  border-bottom: 1px solid #e5edf4;
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(10px);
+}
+.hui-app--student.hui-app--standard .hui-brand {
+  gap: 9px;
+  color: var(--student-ink);
+  text-decoration: none;
+  letter-spacing: -.025em;
+}
+.hui-app--student.hui-app--standard .hui-brand::before {
+  content: "";
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  border-radius: 58% 42% 58% 42%;
+  background: linear-gradient(145deg,#2f6fed,#4ac3ee);
+  box-shadow: 0 5px 14px rgba(47,111,237,.16);
+  transform: rotate(-8deg);
+}
+.hui-app--student.hui-app--standard .hui-account {
+  color: #607489;
+  font-size: .82rem;
+}
+
+.hui-app--student.hui-app--standard .hui-navigation {
+  width: 232px;
+  padding: 18px 14px 28px;
+  border-right: 1px solid #e2ebf3;
+  background: rgba(255,255,255,.9);
+}
+.hui-app--student.hui-app--standard .hui-navigation a {
+  min-height: 46px;
+  margin-block: 3px;
+  padding: 9px 13px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #4b647b;
+  font-size: .875rem;
+  text-decoration: none;
+}
+.hui-app--student.hui-app--standard .hui-navigation a:hover {
+  background: #f3f8fd;
+  color: #244e91;
+}
+.hui-app--student.hui-app--standard .hui-navigation a[aria-current="page"] {
+  border-color: #d1e1fb;
+  background: #eaf2ff;
+  color: #214b95;
+  font-weight: 650;
+}
+.hui-app--student.hui-app--standard .hui-breadcrumb {
+  color: #71869a;
+  font-size: .78rem;
+}
+
+.hui-app--student.hui-app--standard .hui-app-main {
+  max-width: 88rem;
+  padding: 22px 28px 42px;
+}
+.hui-app--student.hui-app--standard .hui-student-page.hui-page {
+  padding: 0;
+}
+
+.hui-app--student .hui-student-page .hui-page-header {
+  position: relative;
+  overflow: hidden;
+  margin-block-end: 20px;
+  padding: 24px 26px;
+  border: 1px solid #dceaf6;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(56,189,248,.18) 0 5rem, transparent 5.1rem),
+    linear-gradient(135deg,#f1f8ff 0%,#f8fcff 62%,#eefbf5 100%);
+}
+.hui-app--student .hui-student-page .hui-page-header::after {
+  content: "";
+  position: absolute;
+  right: 36px;
+  bottom: -38px;
+  width: 108px;
+  height: 78px;
+  border: 18px solid rgba(34,197,94,.07);
+  border-radius: 60% 40% 60% 40%;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.hui-app--student .hui-student-page .hui-page-header__text,
+.hui-app--student .hui-student-page .hui-page-header__actions {
+  position: relative;
+  z-index: 1;
+}
+.hui-app--student .hui-student-page .hui-page-header__title {
+  color: var(--student-ink);
+  font-size: clamp(1.65rem,1.3rem + .8vw,2.15rem);
+  letter-spacing: -.035em;
+}
+.hui-app--student .hui-student-page .hui-page-header__description {
+  max-width: 66ch;
+  color: #5f7488;
+  font-size: .9rem;
+  line-height: 1.75;
+}
+
+.hui-app--student .hui-student-page .hui-status {
+  border-radius: 16px;
+  box-shadow: 0 7px 24px rgba(20,48,74,.035);
+}
+.hui-app--student .hui-student-page .hui-discovery-card {
+  border-color: #dce7f0;
+  border-radius: 17px;
+  box-shadow: 0 2px 10px rgba(20,48,74,.025);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.hui-app--student .hui-student-page .hui-discovery-card:hover {
+  transform: translateY(-2px);
+  border-color: #bdd2eb;
+  box-shadow: 0 10px 28px rgba(28,73,115,.07);
+}
+.hui-app--student .hui-student-page .hui-discovery-card h2 {
+  color: var(--student-ink);
+  letter-spacing: -.015em;
+}
+
+/* Legacy student controls within standard pages are normalized without changing behavior. */
+.hui-app--student.hui-app--standard .card,
+.hui-app--student.hui-app--standard .hui-student-card {
+  border: 1px solid var(--student-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20,48,74,.045);
+}
+.hui-app--student.hui-app--standard .btn-primary {
+  min-height: 44px;
+  border: 1px solid var(--student-blue);
+  border-radius: 11px;
+  background: var(--student-blue);
+  color: #fff;
+  font-weight: 650;
+  box-shadow: none;
+}
+.hui-app--student.hui-app--standard .btn-primary:hover:not(:disabled) {
+  background: var(--student-blue-hover);
+  border-color: var(--student-blue-hover);
+}
+.hui-app--student.hui-app--standard .btn-secondary {
+  min-height: 44px;
+  border: 1px solid var(--student-line);
+  border-radius: 11px;
+  background: #fff;
+  color: #314a61;
+  font-weight: 600;
+}
+.hui-app--student.hui-app--standard .input,
+.hui-app--student.hui-app--standard input,
+.hui-app--student.hui-app--standard select,
+.hui-app--student.hui-app--standard textarea {
+  min-height: 46px;
+  border-color: #d4e0ea;
+  border-radius: 11px;
+}
+.hui-app--student.hui-app--standard :where(.input,input,select,textarea):focus {
+  border-color: var(--student-blue);
+  box-shadow: 0 0 0 3px rgba(47,111,237,.11);
+}
+
+.hui-student-home .hui-page-header__actions > div {
+  align-items: stretch;
+}
+.hui-student-home .hui-discovery-card {
+  min-height: 176px;
+}
+
+.hui-student-profile .card {
+  padding: clamp(20px,4vw,28px);
+}
+.hui-student-profile .card + .card {
+  margin-top: 4px;
+}
+
+/* Course detail keeps all existing route/actions; this only changes composition. */
+.hui-course-detail .hui-course-back {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #5e7387;
+  font-weight: 600;
+}
+.hui-course-detail .hui-course-hero {
+  padding: 24px;
+  background: linear-gradient(135deg,#f1f8ff 0%,#fff 58%,#effaf4 100%);
+}
+.hui-course-detail .hui-course-hero__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+.hui-course-detail .hui-course-hero__icon {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: #e7f1ff;
+  color: var(--student-blue);
+}
+.hui-course-detail .hui-course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  color: #64798d;
+  font-size: .82rem;
+}
+.hui-course-detail .hui-course-tabs {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,auto));
+  width: fit-content;
+  max-width: 100%;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #e0e9f1;
+  border-radius: 13px;
+  background: #eef3f8;
+}
+.hui-course-detail .hui-course-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  color: #5b7084;
+  font-size: .86rem;
+}
+.hui-course-detail .hui-course-tab--active {
+  background: #fff;
+  color: #2755a2;
+  box-shadow: 0 2px 8px rgba(20,48,74,.07);
+}
+.hui-course-detail .hui-course-list {
+  display: grid;
+  gap: 14px;
+}
+.hui-course-detail .hui-course-task-card {
+  padding: 20px;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+.hui-course-detail .hui-course-task-card:hover {
+  border-color: #c4d8eb;
+  box-shadow: 0 8px 24px rgba(20,48,74,.06);
+}
+.hui-course-detail .hui-course-task-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.hui-course-detail .hui-course-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px 16px;
+  color: #687d91;
+  font-size: .82rem;
+}
+.hui-course-detail .hui-course-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Student relationship creation form */
+.hui-student-relational .hui-relational-compose {
+  padding: 20px;
+  border: 1px solid var(--student-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20,48,74,.035);
+}
+.hui-student-relational .hui-relational-fields {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+}
+
+@media (max-width: 63.999rem) {
+  .hui-app--student.hui-app--standard .hui-app-header {
+    position: static;
+    padding-inline: 18px;
+  }
+  .hui-app--student.hui-app--standard .hui-navigation {
+    width: 100%;
+    padding: 10px 14px 14px;
+    border-right: 0;
+    border-bottom: 1px solid #e2ebf3;
+    background: #fff;
+  }
+  .hui-app--student.hui-app--standard .hui-navigation a {
+    margin-block: 2px;
+  }
+  .hui-app--student.hui-app--standard .hui-app-main {
+    padding: 18px 22px 34px;
+  }
+  .hui-app--student .hui-student-page .hui-page-header {
+    padding: 21px 22px;
+  }
+  .hui-student-home .hui-page-header__actions > div {
+    width: 100%;
+  }
+  .hui-student-relational .hui-relational-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 39.999rem) {
+  .hui-app--student.hui-app--standard .hui-app-header {
+    gap: 8px 12px;
+    padding: 9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--student.hui-app--standard .hui-brand {
+    font-size: 1.08rem;
+  }
+  .hui-app--student.hui-app--standard .hui-account {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 3px;
+    border-top: 1px solid #eef3f7;
+  }
+  .hui-app--student.hui-app--standard .hui-app-main {
+    padding: 12px max(14px,env(safe-area-inset-right)) max(26px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--student.hui-app--standard .hui-breadcrumb {
+    display: none;
+  }
+  .hui-app--student .hui-student-page .hui-page-header {
+    margin-block-end: 14px;
+    padding: 18px;
+    border-radius: 17px;
+  }
+  .hui-app--student .hui-student-page .hui-page-header::after {
+    right: -8px;
+    bottom: -45px;
+  }
+  .hui-app--student .hui-student-page .hui-page-header__title {
+    font-size: 1.55rem;
+  }
+  .hui-app--student .hui-student-page .hui-page-header__description {
+    font-size: .84rem;
+  }
+  .hui-app--student .hui-student-page .hui-page-header__actions {
+    width: 100%;
+    max-width: none;
+  }
+  .hui-app--student .hui-student-page .hui-page-header__actions > *,
+  .hui-app--student .hui-student-page .hui-page-header__actions > div > * {
+    width: 100%;
+    justify-content: center;
+  }
+  .hui-app--student .hui-student-page .hui-page-header__actions > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+  .hui-app--student .hui-student-page .hui-discovery-card {
+    padding: 15px;
+    border-radius: 15px;
+  }
+  .hui-app--student .hui-student-page .hui-discovery-card:hover {
+    transform: none;
+  }
+  .hui-student-home .hui-discovery-card {
+    min-height: 0;
+  }
+
+  .hui-course-detail .hui-course-hero {
+    padding: 18px;
+  }
+  .hui-course-detail .hui-course-hero__content {
+    gap: 12px;
+  }
+  .hui-course-detail .hui-course-hero__icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    border-radius: 14px;
+  }
+  .hui-course-detail .hui-course-tabs {
+    width: 100%;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+  .hui-course-detail .hui-course-tab {
+    width: 100%;
+    padding-inline: 8px;
+  }
+  .hui-course-detail .hui-course-task-card {
+    padding: 16px;
+  }
+  .hui-course-detail .hui-course-task-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .hui-course-detail .hui-course-task-actions,
+  .hui-course-detail .hui-course-task-actions > *,
+  .hui-course-detail .hui-course-task-row > button {
+    width: 100%;
+  }
+  .hui-course-detail .hui-course-task-actions > *,
+  .hui-course-detail .hui-course-task-row > button {
+    justify-content: center;
+  }
+  .hui-student-profile .card {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hui-app--student .hui-student-page .hui-discovery-card,
+  .hui-course-detail .hui-course-task-card {
+    transition: none;
+  }
+}
