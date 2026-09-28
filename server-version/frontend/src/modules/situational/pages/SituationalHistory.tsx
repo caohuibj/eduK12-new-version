@@ -32,7 +32,7 @@ const SituationalHistory: React.FC = () => {
   }, [])
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-history">
       <PageHeader
         title="情境测评历史"
         description="历史结果读取服务器保存的终态记录，不会用当前题包重新评分。当前接口返回服务器提供的历史范围，不在前端切片伪造分页。"
