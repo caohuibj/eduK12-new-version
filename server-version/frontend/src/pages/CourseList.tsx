@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Trash2, Edit, Users, BookOpen, UserCog, Flag, Copy, PauseCircle, PlayCircle, Image as ImageIcon, X, Share2, Inbox, UserPlus } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
 import { sessionAxios } from '../api/client'
 import type { Course, CourseShare, User } from '../types'
+import { PageHeader, ProductButton, ProductPage } from '../components/product-ui'
+import MoreActions from '../components/staff-ui/MoreActions'
 
 const CourseList: React.FC = () => {
   const { user } = useAuth()
@@ -381,64 +383,15 @@ const CourseList: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {/* Tab 切换 */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-            <button
-              onClick={() => setActiveTab('my')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'my'
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              我的课程
-            </button>
-            <button
-              onClick={() => setActiveTab('shared')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
-                activeTab === 'shared'
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <Inbox className="w-4 h-4" />
-              <span>分享给我的</span>
-              {sharedToMe.length > 0 && (
-                <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {sharedToMe.length}
-                </span>
-              )}
-            </button>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="搜索课程..."
-              className="input pl-10 w-64"
-            />
-          </div>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="课程管理" description="管理授课课程、学生入口和课程生命周期。" actions={activeTab === 'my' ? <ProductButton variant="primary" onClick={() => { setFormData({ title: '', description: '', isLibrary: false }); setShowCreateModal(true) }}><Plus className="w-4 h-4" aria-hidden="true" />创建课程</ProductButton> : undefined} />
+      <div className="staff-toolbar">
+        <div className="staff-segmented" role="group" aria-label="课程范围">
+          <button type="button" aria-pressed={activeTab === 'my'} onClick={() => setActiveTab('my')}>我的课程</button>
+          <button type="button" aria-pressed={activeTab === 'shared'} onClick={() => setActiveTab('shared')}>分享给我的{sharedToMe.length > 0 ? `（${sharedToMe.length}）` : ''}</button>
         </div>
-        {activeTab === 'my' && (
-          <button
-            onClick={() => {
-              setFormData({ title: '', description: '', isLibrary: false })
-              setShowCreateModal(true)
-            }}
-            className="btn-primary flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>创建课程</span>
-          </button>
-        )}
+        <label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索课程</span><input type="search" value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="搜索课程名称或课程码" /></label>
       </div>
-
       {/* Course Grid */}
       {activeTab === 'my' ? (
         loading ? (
@@ -451,133 +404,34 @@ const CourseList: React.FC = () => {
             <p className="text-gray-500">暂无课程</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => {
+          <div className="staff-course-grid">
+            {filteredCourses.map(course => {
               const status = getCourseStatusLabel(course)
-              return (
-                <div 
-                key={course.id} 
-                className="card hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/courses/${course.id}/detail`)}
-              >
-                  {/* 课程封面 */}
-                  {course.coverUrl && (
-                    <div className="w-full h-32 mb-4 rounded-lg overflow-hidden bg-gray-100">
-                      <img
-                        src={course.coverUrl}
-                        alt={course.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <h3 className="text-lg font-semibold text-gray-800 break-words" title={course.title}>{course.title}</h3>
-                        {course.isLibrary && (
-                          <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500">课程码: {course.courseCode}</p>
-                    </div>
-                    <div className="flex space-x-1 ml-2" onClick={(e) => e.stopPropagation()}>
-                      {/* 分享课程 - 仅管理员可分享自己创建的课程 v2 */}
-                      {isAdmin && course.creatorId === user?.id && (
-                        <button
-                          onClick={() => openShareModal(course)}
-                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
-                          title="分享课程"
-                        >
-                          <Share2 className="w-4 h-4" />
-                        </button>
-                      )}
-                      {/* 复制课程 */}
-                      <button
-                        onClick={() => handleCloneCourse(course)}
-                        className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded"
-                        title="复制课程"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      {/* 停止/恢复招募 */}
-                      {course.status === 'PUBLISHED' && !course.isLibrary && (
-                        course.isRecruiting ? (
-                          <button
-                            onClick={() => handleStopRecruiting(course)}
-                            className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded"
-                            title="停止招募"
-                          >
-                            <PauseCircle className="w-4 h-4" />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleResumeRecruiting(course)}
-                            className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded"
-                            title="恢复招募"
-                          >
-                            <PlayCircle className="w-4 h-4" />
-                          </button>
-                        )
-                      )}
-                      {/* 结束课程 */}
-                      {course.status !== 'COMPLETED' && (
-                        <button
-                          onClick={() => handleEndCourse(course)}
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
-                          title="结束课程"
-                        >
-                          <Flag className="w-4 h-4" />
-                        </button>
-                      )}
-                      {/* 编辑 */}
-                      <button
-                        onClick={() => openEditModal(course)}
-                        className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
-                        title="编辑"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      {/* 删除 */}
-                      <button
-                        onClick={() => handleDelete(course)}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
-                        title="删除"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              return <article key={course.id} className="staff-course-card">
+                {course.coverUrl ? <img src={course.coverUrl} alt="" className="staff-course-cover" /> : <div className="staff-course-cover staff-course-cover--placeholder"><BookOpen className="w-8 h-8" aria-hidden="true" /></div>}
+                <div className="staff-course-card__body">
+                  <div className="staff-course-card__heading">
+                    <div><h2><Link to={`/courses/${course.id}/detail`}>{course.title}</Link></h2><p>课程码：{course.courseCode}</p></div>
+                    <span className={`staff-badge ${course.status === 'PUBLISHED' && course.isRecruiting ? 'staff-badge--success' : course.status === 'COMPLETED' ? '' : 'staff-badge--warning'}`}>{status.text}</span>
                   </div>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {course.description || '暂无描述'}
-                  </p>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <button
-                      onClick={() => navigate(`/courses/${course.id}/students`)}
-                      className="flex items-center space-x-1 hover:text-primary transition-colors"
-                    >
-                      <Users className="w-4 h-4" />
-                      <span>{course.studentCount || 0} 名学生</span>
-                    </button>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => navigate(`/courses/${course.id}/students`)}
-                        className="p-1.5 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
-                        title="管理学生"
-                      >
-                        <UserCog className="w-4 h-4" />
-                      </button>
-                      <span className={`px-2 py-1 rounded text-xs ${status.className}`}>
-                        {status.text}
-                      </span>
-                    </div>
+                  <p className="staff-course-description">{course.description || '暂无课程描述'}</p>
+                  <div className="staff-course-meta"><span><Users className="w-4 h-4" aria-hidden="true" />{course.studentCount || 0} 名学生</span>{course.isLibrary && <span>库课程</span>}</div>
+                  <div className="staff-course-actions">
+                    <Link className="staff-primary-link" to={`/courses/${course.id}/detail`}>进入课程</Link>
+                    <Link className="staff-secondary-link" to={`/courses/${course.id}/students`}>管理学生</Link>
+                    <MoreActions label={`${course.title} 的更多操作`}>
+                      {isAdmin && course.creatorId === user?.id && <button type="button" onClick={() => void openShareModal(course)}>分享课程</button>}
+                      <button type="button" onClick={() => void handleCloneCourse(course)}>复制课程</button>
+                      {course.status === 'PUBLISHED' && !course.isLibrary && (course.isRecruiting ? <button type="button" onClick={() => void handleStopRecruiting(course)}>停止招募</button> : <button type="button" onClick={() => void handleResumeRecruiting(course)}>恢复招募</button>)}
+                      <button type="button" onClick={() => openEditModal(course)}>编辑课程</button>
+                      {course.status !== 'COMPLETED' && <button type="button" className="staff-danger-action" onClick={() => void handleEndCourse(course)}>结束课程</button>}
+                      <button type="button" className="staff-danger-action" onClick={() => void handleDelete(course)}>删除课程</button>
+                    </MoreActions>
                   </div>
                 </div>
-              )
+              </article>
             })}
           </div>
-        )
       ) : (
         /* 分享给我的列表 */
         sharedToMe.length === 0 ? (
@@ -654,7 +508,7 @@ const CourseList: React.FC = () => {
       {/* Create/Edit Modal */}
       {(showCreateModal || editingCourse) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6" role="dialog" aria-modal="true" aria-label={editingCourse ? '编辑课程' : '创建课程'}>
             <h2 className="text-xl font-semibold mb-4">
               {editingCourse ? '编辑课程' : '创建课程'}
             </h2>
@@ -773,7 +627,7 @@ const CourseList: React.FC = () => {
                   取消
                 </button>
                 <button type="submit" className="flex-1 btn-primary">
-                  {editingCourse ? '保存' : '创建'}
+                  {editingCourse ? '保存修改' : '创建课程'}
                 </button>
               </div>
             </form>
@@ -784,7 +638,7 @@ const CourseList: React.FC = () => {
       {/* Share Modal */}
       {showShareModal && sharingCourse && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4" role="dialog" aria-modal="true" aria-label={`分享课程「${sharingCourse.title}」`}>
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">分享课程「{sharingCourse.title}」</h3>
               <button
@@ -882,7 +736,7 @@ const CourseList: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
