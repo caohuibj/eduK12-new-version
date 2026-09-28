@@ -1,3 +1,4 @@
+@import '../public-ui/public-ui.css';
 @import '../parent-ui/parent-ui.css';
 /* Chrome scope deliberately excludes player descendants and their timing styles. */
 .hui-app { min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; }

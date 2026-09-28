@@ -1,0 +1,376 @@
+/*
+ * Huisurvey Modern Education — Public / anonymous participation.
+ * Presentation-only. Public capability, PoW, recovery credentials, quotas,
+ * anonymous session identity and submission semantics stay in page/runtime code.
+ */
+
+.hui-app--public:not(.hui-app--entry) {
+  --public-ink: #14304a;
+  --public-muted: #64788b;
+  --public-line: #dce7f0;
+  --public-page: #f8fbff;
+  --public-soft: #eff7ff;
+  --public-blue: #2f6fed;
+  --public-blue-hover: #255dce;
+  --public-green: #22a66f;
+  --public-surface: #fff;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 84% 8%, rgba(56,189,248,.075) 0 10rem, transparent 10.1rem),
+    radial-gradient(circle at 12% 88%, rgba(34,197,94,.05) 0 9rem, transparent 9.1rem),
+    var(--public-page);
+  color: var(--public-ink);
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-header {
+  min-height: 62px;
+  padding: 9px 24px;
+  border-bottom: 1px solid #e3edf5;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(10px);
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--public-ink);
+  text-decoration: none;
+  letter-spacing: -.025em;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-brand::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 56% 44% 58% 42%;
+  background: linear-gradient(145deg,#2f6fed,#45b9eb);
+  box-shadow: 0 5px 14px rgba(47,111,237,.16);
+  transform: rotate(-8deg);
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-account {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #dce7f0;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #60758a;
+  font-size: .78rem;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main {
+  width: 100%;
+  max-width: 76rem;
+  padding: 20px 24px 40px;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main > [class~="min-h-screen"] {
+  min-height: calc(100dvh - 122px);
+}
+
+/* Ant Design surfaces used by legacy public questionnaire/check-in pages. */
+.hui-app--public:not(.hui-app--entry) .ant-card {
+  border: 1px solid var(--public-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 24px rgba(20,48,74,.045) !important;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
+  padding: clamp(20px,3vw,28px);
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-btn {
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-btn-primary {
+  background: var(--public-blue);
+  border-color: var(--public-blue);
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-btn-primary:hover,
+.hui-app--public:not(.hui-app--entry) .ant-btn-primary:focus {
+  background: var(--public-blue-hover);
+  border-color: var(--public-blue-hover);
+}
+
+.hui-app--public:not(.hui-app--entry) :where(
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  textarea.ant-input
+) {
+  min-height: 46px;
+  border-color: #d5e1eb;
+  border-radius: 10px !important;
+}
+
+.hui-app--public:not(.hui-app--entry) :where(
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  textarea.ant-input
+):focus,
+.hui-app--public:not(.hui-app--entry) .ant-input-affix-wrapper-focused {
+  border-color: #7f9fe2;
+  box-shadow: 0 0 0 3px rgba(47,111,237,.1);
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-result {
+  width: min(100%,42rem);
+  margin-inline: auto;
+  padding: 34px 24px;
+  border: 1px solid #e0e9f1;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 7px 26px rgba(20,48,74,.045);
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-result-title {
+  color: var(--public-ink);
+  letter-spacing: -.02em;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-result-subtitle {
+  color: var(--public-muted);
+  line-height: 1.7;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-spin-text {
+  color: #60758a;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-progress-bg {
+  background: var(--public-blue) !important;
+}
+
+/* Shared legacy public cards/controls, including cognitive entry. */
+.hui-app--public:not(.hui-app--entry) .card {
+  border: 1px solid var(--public-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 6px 24px rgba(20,48,74,.045);
+}
+
+.hui-app--public:not(.hui-app--entry) .btn-primary {
+  min-height: 46px;
+  border: 1px solid var(--public-blue);
+  border-radius: 10px;
+  background: var(--public-blue);
+  color: #fff;
+  font-weight: 650;
+  box-shadow: none;
+}
+
+.hui-app--public:not(.hui-app--entry) .btn-primary:hover:not(:disabled) {
+  background: var(--public-blue-hover);
+  border-color: var(--public-blue-hover);
+}
+
+.hui-app--public:not(.hui-app--entry) .btn-secondary {
+  min-height: 44px;
+  border: 1px solid #d6e1ea;
+  border-radius: 10px;
+  background: #fff;
+  color: #314a61;
+  font-weight: 600;
+}
+
+.hui-app--public:not(.hui-app--entry) :where(input,select,textarea):not(.ant-input) {
+  min-height: 46px;
+  border-color: #d5e1eb;
+  border-radius: 10px;
+}
+
+/* Public content reading widths. */
+.hui-app--public:not(.hui-app--entry) .hui-app-main :where(
+  [class~="max-w-xl"],
+  [class~="max-w-2xl"],
+  [class~="max-w-3xl"],
+  [class~="max-w-4xl"]
+) {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-xl"].card {
+  padding: clamp(22px,4vw,32px);
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-xl"].card > svg:first-child {
+  padding: 10px;
+  border-radius: 16px;
+  background: #edf5ff;
+}
+
+/* Public questionnaire/check-in instructional blocks. */
+.hui-app--public:not(.hui-app--entry) [class*="bg-blue-50"][class*="rounded"],
+.hui-app--public:not(.hui-app--entry) [class*="bg-gray-50"][class*="rounded"] {
+  border: 1px solid #e0e9f1;
+}
+
+.hui-app--public:not(.hui-app--entry) .prose {
+  color: #40586e;
+  line-height: 1.8;
+}
+
+.hui-app--public:not(.hui-app--entry) video,
+.hui-app--public:not(.hui-app--entry) img,
+.hui-app--public:not(.hui-app--entry) canvas {
+  max-width: 100%;
+}
+
+/* Public questionnaire runners: raise legacy 32/40px navigation targets. */
+.hui-app--public:not(.hui-app--entry) button[class~="w-8"],
+.hui-app--public:not(.hui-app--entry) button[class~="h-8"],
+.hui-app--public:not(.hui-app--entry) button[class~="w-10"],
+.hui-app--public:not(.hui-app--entry) button[class~="h-10"] {
+  min-width: 44px;
+  width: 44px !important;
+  min-height: 44px;
+  height: 44px !important;
+}
+
+/* Result/readout cards. */
+.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] > h1:first-child {
+  color: var(--public-ink);
+  letter-spacing: -.035em;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] > .ant-card {
+  margin-bottom: 18px;
+}
+
+.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] [class*="grid-cols-2"] {
+  gap: 12px;
+}
+
+/* Upload area and anonymous participation hints. */
+.hui-app--public:not(.hui-app--entry) .ant-upload-wrapper .ant-upload-select {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.hui-app--public:not(.hui-app--entry) .ant-upload-list-item {
+  border-radius: 10px;
+}
+
+.hui-app--public:not(.hui-app--entry) [class*="bg-blue-50"][class*="text-blue-800"] {
+  border-color: #d7e8ff;
+  background: #f1f7ff;
+}
+
+/* Tablet */
+@media (max-width:63.999rem) {
+  .hui-app--public:not(.hui-app--entry) .hui-app-header {
+    padding-inline: 18px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main {
+    padding: 18px 22px 34px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
+    padding: 22px;
+  }
+}
+
+/* Mobile */
+@media (max-width:39.999rem) {
+  .hui-app--public:not(.hui-app--entry) .hui-app-header {
+    min-height: 56px;
+    gap: 8px;
+    padding: 7px max(14px,env(safe-area-inset-right)) 7px max(14px,env(safe-area-inset-left));
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-brand {
+    font-size: 1.08rem;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-account {
+    min-height: 34px;
+    padding-inline: 10px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main {
+    padding: 12px max(14px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main > [class~="min-h-screen"] {
+    min-height: calc(100dvh - 92px);
+    padding: 12px 0 max(20px,env(safe-area-inset-bottom)) !important;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-card {
+    border-radius: 16px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-result {
+    padding: 24px 16px;
+    border-radius: 16px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-result-extra {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-result-extra > * {
+    width: 100%;
+    margin-inline: 0 !important;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-xl"].card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-3xl"] > [class*="flex"][class*="justify-between"] {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-3xl"] > [class*="flex"][class*="justify-between"] > :where(button,.ant-btn) {
+    flex: 1 1 8rem;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] [class*="grid-cols-2"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Keep check-in media thumbnails usable rather than forcing one column. */
+  .hui-app--public:not(.hui-app--entry) main[class~="max-w-3xl"] [class*="grid-cols-2"] {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 10px;
+  }
+
+  .hui-app--public:not(.hui-app--entry) .ant-btn-block,
+  .hui-app--public:not(.hui-app--entry) .btn-primary.w-full,
+  .hui-app--public:not(.hui-app--entry) .btn-secondary.w-full {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .hui-app--public:not(.hui-app--entry) *,
+  .hui-app--public:not(.hui-app--entry) *::before,
+  .hui-app--public:not(.hui-app--entry) *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
