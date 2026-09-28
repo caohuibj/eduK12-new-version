@@ -95,8 +95,8 @@
   border-color: #dce7f0;
   box-shadow: 0 4px 18px rgba(20,48,74,.035);
 }
-.hui-app--assessment-runner [data-assessment-shell-actions] .hui-action-bar,
-.hui-app--assessment-runner [data-assessment-shell-navigation] .hui-action-bar {
+.hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions,
+.hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions {
   border-radius: 16px;
 }
 .hui-app--assessment-runner [data-assessment-shell-actions] button,
@@ -286,7 +286,7 @@
 .hui-app--report-surface details {
   border-radius: 12px;
 }
-.hui-app--report-surface .hui-action-bar {
+.hui-app--report-surface .hui-actions {
   border-radius: 16px;
 }
 
@@ -357,14 +357,14 @@
     padding: 16px;
     border-radius: 16px;
   }
-  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-action-bar,
-  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-action-bar {
+  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions,
+  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions {
     display: grid;
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-action-bar > *,
-  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-action-bar > * {
+  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions > *,
+  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions > * {
     width: 100%;
     justify-content: center;
   }
@@ -429,11 +429,11 @@
     gap: 10px;
     flex-wrap: wrap;
   }
-  .hui-app--report-surface .hui-action-bar {
+  .hui-app--report-surface .hui-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
-  .hui-app--report-surface .hui-action-bar > * {
+  .hui-app--report-surface .hui-actions > * {
     width: 100%;
     justify-content: center;
   }
@@ -441,8 +441,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hui-app--assessment-runner *,
+  .hui-app--assessment-runner *::before,
+  .hui-app--assessment-runner *::after,
   .hui-app--student-submit *,
-  .hui-app--report-surface * {
+  .hui-app--student-submit *::before,
+  .hui-app--student-submit *::after,
+  .hui-app--report-surface *,
+  .hui-app--report-surface *::before,
+  .hui-app--report-surface *::after {
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
