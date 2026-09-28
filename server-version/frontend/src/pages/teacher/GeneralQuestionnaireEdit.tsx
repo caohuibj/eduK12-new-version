@@ -376,7 +376,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           {questionnaire.status === 'DRAFT' && (
             <button
               onClick={handlePublish}
-              className="btn-primary inline-flex items-center gap-2"
+              className="hui-button hui-button--primary inline-flex items-center gap-2"
             >
               发布问卷
             </button>
@@ -385,7 +385,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
             <button
               onClick={handleSaveBasic}
               disabled={saving}
-              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+              className="hui-button hui-button--primary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <Save className="w-4 h-4 mr-2" />
               {saving ? '保存中...' : '保存'}
@@ -505,7 +505,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 resetFormData()
                 setShowFormItemModal(true)
               }}
-              className="btn-primary inline-flex items-center gap-2"
+              className="hui-button hui-button--primary inline-flex items-center gap-2"
             >
               <FileText className="w-4 h-4 mr-2" />
               添加表单题目
@@ -774,13 +774,13 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                   setShowFormItemModal(false)
                   resetFormData()
                 }}
-                className="btn-secondary"
+                className="hui-button hui-button--secondary"
               >
                 取消
               </button>
               <button
                 onClick={handleAddFormItem}
-                className="btn-primary"
+                className="hui-button hui-button--primary"
               >
                 {editingFormItem ? '保存' : '添加'}
               </button>
