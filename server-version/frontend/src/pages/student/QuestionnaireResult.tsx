@@ -48,7 +48,7 @@ const QuestionnaireResult: React.FC = () => {
         title="聚合问卷报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告不存在或暂时无法读取' }}
-        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">返回问卷列表</button>}
       />
     )
   }
@@ -65,7 +65,7 @@ const QuestionnaireResult: React.FC = () => {
       description="各量表结果独立展示。"
       facts={facts}
       status={{ kind: 'success', title: '问卷已完成', description: '以下内容来自当前已完成结果记录。' }}
-      backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+      backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">返回问卷列表</button>}
     >
       {result.backgroundValues.length > 0 && (
         <ReportSection title="背景信息" eyebrow="Context">
