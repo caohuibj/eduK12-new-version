@@ -325,7 +325,7 @@ const DocumentLibrary: React.FC = () => {
                     setDocumentTitle('')
                     setUploadError('')
                   }}
-                  className="flex-1 btn-secondary"
+                  className="flex-1 hui-button hui-button--secondary"
                   disabled={isUploading}
                 >
                   取消
@@ -334,7 +334,7 @@ const DocumentLibrary: React.FC = () => {
                   type="button"
                   onClick={handleUpload}
                   disabled={!selectedFile || !documentTitle.trim() || isUploading}
-                  className="flex-1 btn-primary disabled:opacity-50"
+                  className="flex-1 hui-button hui-button--primary disabled:opacity-50"
                 >
                   {isUploading ? '上传中...' : '上传'}
                 </button>
