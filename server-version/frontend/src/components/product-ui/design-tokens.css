@@ -19,6 +19,26 @@
   --hui-ds-color-success-strong: #15803d;
   --hui-ds-color-warning: #f59e0b;
   --hui-ds-color-danger: #dc2626;
+  --hui-ds-color-page-elevated: #fbfdff;
+
+  /* Role accents stay semantic so role identity does not fork component geometry. */
+  --hui-ds-role-parent-ink: #173f48;
+  --hui-ds-role-parent-muted: #647b7f;
+  --hui-ds-role-parent-line: #dce9e5;
+  --hui-ds-role-parent-page: #f8fcfb;
+  --hui-ds-role-parent-soft: #eef9f5;
+  --hui-ds-role-parent-accent: #2da66f;
+  --hui-ds-role-parent-accent-strong: #247f59;
+
+  --hui-ds-role-staff-ink: #14304a;
+  --hui-ds-role-staff-muted: #64778a;
+  --hui-ds-role-staff-line: #dce6ef;
+  --hui-ds-role-staff-page: #f5f8fb;
+  --hui-ds-role-staff-accent: #315fc9;
+  --hui-ds-role-staff-accent-hover: #274da7;
+
+  --hui-ds-role-public-muted: #64788b;
+  --hui-ds-role-runner-line: #dbe6ef;
 
   --hui-ds-space-1: 0.25rem;
   --hui-ds-space-2: 0.5rem;
