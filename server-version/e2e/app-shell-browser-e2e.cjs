@@ -107,7 +107,15 @@ async function main() {
       await gotoRoute(page, `${base}/profile`)
       await page.getByRole('heading', { name: '个人信息', exact: true }).or(page.getByRole('heading', { name: '个人资料', exact: true })).waitFor()
       const nav = await openNav(page)
-      assert.equal(await nav.getByRole('link', { name: '用户管理' }).count(), role === 'ADMIN' ? 1 : 0)
+      if (role === 'ADMIN') {
+        const systemGroup = nav.getByRole('button', { name: '系统管理', exact: true })
+        assert.equal(await systemGroup.count(), 1)
+        await systemGroup.click()
+        assert.equal(await nav.getByRole('link', { name: '用户管理', exact: true }).count(), 1)
+      } else {
+        assert.equal(await nav.getByRole('button', { name: '系统管理', exact: true }).count(), 0)
+        assert.equal(await nav.getByRole('link', { name: '用户管理', exact: true }).count(), 0)
+      }
       assert.equal(await nav.locator('[aria-current="page"]').count(), 1)
       assert.deepEqual(state.errors, [])
       cases.push({ role, passed: true }); await context.close()
