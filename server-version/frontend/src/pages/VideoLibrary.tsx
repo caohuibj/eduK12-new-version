@@ -6,6 +6,7 @@ import { ensureCsrfToken } from '../api/client'
 import { sessionAxios } from '../api/client'
 import type { Video } from '../types'
 import SecureVideoPlayer from '../components/SecureVideoPlayer'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
 
 // 处理中视频类型
 interface ProcessingVideo {
@@ -430,54 +431,12 @@ const VideoLibrary: React.FC = () => {
   const displayVideos = videos
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              placeholder="搜索视频..."
-              className="input pl-10 w-64"
-            />
-          </div>
-          <button onClick={handleSearch} className="btn-secondary">
-            搜索
-          </button>
-          {isAdmin && (
-            <label className="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showDeleted}
-                onChange={(e) => {
-                  setShowDeleted(e.target.checked)
-                  setPage(1)
-                }}
-                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <span>显示已删除</span>
-            </label>
-          )}
-        </div>
-        <button
-          onClick={() => {
-            setShowUploadModal(true)
-            setUploadError('')
-            setSelectedFile(null)
-            setVideoTitle('')
-            setUploadProgress(0)
-          }}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Upload className="w-4 h-4" />
-          <span>上传视频</span>
-        </button>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="视频库" description="上传、处理和复用课堂与测评视频。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setVideoTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传视频</ProductButton>} />
+      <div className="staff-toolbar">
+        <div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索视频</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索视频" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div>
+        <span className="staff-help">共 {total} 个视频</span>
       </div>
-
       {/* Processing Videos */}
       {processingVideos.length > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -533,14 +492,9 @@ const VideoLibrary: React.FC = () => {
 
       {/* Video Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
+        <ProductStatus kind="pending" title="正在加载视频">正在读取视频及处理状态。</ProductStatus>
       ) : displayVideos.length === 0 ? (
-        <div className="text-center py-12">
-          <VideoIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无视频</p>
-        </div>
+        <ProductStatus kind="info" title="暂无视频">上传第一段视频后，可以在课程、作业和测评中复用。</ProductStatus>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayVideos.map((video) => {
@@ -897,7 +851,7 @@ const VideoLibrary: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

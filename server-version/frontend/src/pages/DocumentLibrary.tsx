@@ -5,6 +5,8 @@ import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
 import { sessionAxios } from '../api/client'
 import type { Document } from '../types'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import MoreActions from '../components/staff-ui/MoreActions'
 
 const DocumentLibrary: React.FC = () => {
   const { user } = useAuth()
@@ -172,122 +174,19 @@ const DocumentLibrary: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              placeholder="搜索文档..."
-              className="input pl-10 w-64"
-            />
-          </div>
-          <button onClick={handleSearch} className="btn-secondary">
-            搜索
-          </button>
-          {isAdmin && (
-            <label className="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={showDeleted}
-                onChange={(e) => {
-                  setShowDeleted(e.target.checked)
-                  setPage(1)
-                }}
-                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <span>显示已删除</span>
-            </label>
-          )}
-        </div>
-        <button
-          onClick={() => {
-            setShowUploadModal(true)
-            setUploadError('')
-            setSelectedFile(null)
-            setDocumentTitle('')
-            setUploadProgress(0)
-          }}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Upload className="w-4 h-4" />
-          <span>上传文档</span>
-        </button>
-      </div>
-
-      {/* Document Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : documents.length === 0 ? (
-        <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无文档</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {documents.map((document) => (
-            <div key={document.id} className={`card hover:shadow-lg transition-shadow ${(document as any).isDeleted ? 'opacity-60' : ''}`}>
-              {/* Document Icon */}
-              <div className="aspect-video bg-red-50 rounded-lg mb-4 flex items-center justify-center relative">
-                <FileText className="w-16 h-16 text-red-500" />
-                {(document as any).isDeleted && (
-                  <div className="absolute top-2 left-2 px-2 py-1 bg-red-500 text-white text-xs rounded">
-                    已删除
-                  </div>
-                )}
-              </div>
-
-              {/* Document Info */}
-              <h3 className="text-lg font-semibold text-gray-800 mb-2 break-words">{document.title}</h3>
-              
-              <div className="space-y-1 text-sm text-gray-500 mb-4">
-                <div className="flex items-center space-x-2">
-                  <FileText className="w-4 h-4" />
-                  <span>{formatFileSize(document.fileSize)}</span>
-                </div>
-                <div>格式: PDF</div>
-                <div>使用 {document.usageCount} 次</div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-between pt-3 border-t">
-                {(document as any).isDeleted ? (
-                  <button
-                    onClick={() => handleRestore(document)}
-                    className="text-green-600 hover:text-green-700 text-sm flex items-center space-x-1"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    <span>恢复</span>
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => setPreviewDocument(document)}
-                    className="text-primary hover:text-primary-hover text-sm"
-                  >
-                    预览
-                  </button>
-                )}
-                {(isAdmin || document.teacherId === user?.id) && (
-                  <button
-                    onClick={() => handleDelete(document)}
-                    className="p-1 text-red-400 hover:text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="文档库" description="管理 PDF 等文档资源，并查看复用情况。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setDocumentTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传文档</ProductButton>} />
+      <div className="staff-toolbar"><div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索文档</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索文档" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div><span className="staff-help">共 {total} 个文档</span></div>
+      {/* Document list */}
+      {loading ? <ProductStatus kind="pending" title="正在加载文档">正在读取文档资源。</ProductStatus>
+      : documents.length === 0 ? <ProductStatus kind="info" title="暂无文档">上传第一份文档后，可以在教学内容中复用。</ProductStatus>
+      : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>文档</th><th>大小</th><th>使用次数</th><th>状态</th><th className="text-right">操作</th></tr></thead><tbody>
+        {documents.map(document => <tr key={document.id} className={(document as any).isDeleted ? 'opacity-60' : ''}>
+          <td><button type="button" className="staff-record-button" onClick={() => !(document as any).isDeleted && setPreviewDocument(document)}>{document.title}</button><div className="staff-muted">PDF</div></td>
+          <td>{formatFileSize(document.fileSize)}</td><td>{document.usageCount}</td><td><span className={`staff-badge ${(document as any).isDeleted ? 'staff-badge--danger' : 'staff-badge--success'}`}>{(document as any).isDeleted ? '已删除' : '可用'}</span></td>
+          <td><div className="staff-table-actions">{(document as any).isDeleted ? <ProductButton onClick={() => void handleRestore(document)}>恢复</ProductButton> : <ProductButton onClick={() => setPreviewDocument(document)}>预览</ProductButton>}{(isAdmin || document.teacherId === user?.id) && !(document as any).isDeleted && <MoreActions label={`${document.title} 的更多操作`}><button type="button" className="staff-danger-action" onClick={() => void handleDelete(document)}>删除文档</button></MoreActions>}</div></td>
+        </tr>)}
+      </tbody></table></div>}
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6 pt-4 border-t">
@@ -463,7 +362,7 @@ const DocumentLibrary: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 
