@@ -192,12 +192,12 @@ export default function OrganizationAdminPage() {
   }
 
   if (activeLoading && !context) {
-    return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+    return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
   }
 
   if (!context) {
     return (
-      <ProductPage>
+      <ProductPage width="management">
         <ProductStatus kind="error" title="无法进入组织空间" actions={<Link to="/">返回首页</Link>}>
           {activeError || '当前账户没有此组织的有效访问上下文。'}
         </ProductStatus>
@@ -209,7 +209,7 @@ export default function OrganizationAdminPage() {
   const currentCapabilities = new Set(accessHistory?.capabilities.filter(grantCurrent).map((grant) => grant.capability) ?? [])
 
   return (
-    <ProductPage>
+    <ProductPage width="management">
       <PageHeader
         title={context.organization.name}
         description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}

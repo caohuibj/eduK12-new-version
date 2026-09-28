@@ -68,28 +68,28 @@ export default function OrganizationRunListPage() {
       })
       navigate(`/organizations/${encodeURIComponent(organizationId)}/runs/${encodeURIComponent(run.id)}`)
     } catch (err) {
-      setCreateError(errorText(err, '无法创建 Run'))
+      setCreateError(errorText(err, '无法创建测评批次'))
     } finally {
       setCreating(false)
     }
   }
 
-  if (activeLoading && !context) return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage><ProductStatus kind="error" title="无法进入 Run 管理" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (!canGovern) return <ProductPage><ProductStatus kind="warning" title="无 Run 治理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>Run 创建、编辑和管理入口只在服务器投影 `canGovern=true` 时开放；发布动作仍会在服务端执行更细的 publisher boundary 检查。</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入 Run 管理" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无 Run 治理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>Run 创建、编辑和管理入口只在服务器投影 `canGovern=true` 时开放；发布动作仍会在服务端执行更细的 publisher boundary 检查。</ProductStatus></ProductPage>
 
   return (
-    <ProductPage>
+    <ProductPage width="management">
       <PageHeader
-        title="Assessment Runs"
-        description={`${context.organization.name} · ${total} 个 Run。Run 状态、冻结事实和执行进度均来自服务器。`}
+        title="测评批次"
+        description={`${context.organization.name} · ${total} 个测评批次。状态、冻结事实和执行进度均来自服务器。`}
         actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织治理</Link>}
       />
-      {loadError && <ProductStatus kind="error" title="Run 列表加载失败">{loadError}</ProductStatus>}
-      {createError && <ProductStatus kind="error" title="Run 创建失败" announce="assertive">{createError}</ProductStatus>}
+      {loadError && <ProductStatus kind="error" title="测评批次加载失败">{loadError}</ProductStatus>}
+      {createError && <ProductStatus kind="error" title="测评批次创建失败" announce="assertive">{createError}</ProductStatus>}
 
       <form className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-[2fr_1fr_auto]" onSubmit={createRun}>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Run 名称<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：2026 秋季学生支持 Pilot" /></label>
+        <label className="grid gap-1 text-sm font-medium text-slate-700">批次名称<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：2026 秋季学生支持 Pilot" /></label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">参与截止时间（可选）<input type="datetime-local" className="min-h-11 rounded-lg border border-slate-300 px-3" value={deadline} onChange={(event) => setDeadline(event.target.value)} /></label>
         <ProductButton type="submit" variant="primary" disabled={creating || !name.trim()}>{creating ? '正在创建…' : '创建草稿'}</ProductButton>
       </form>
@@ -99,14 +99,16 @@ export default function OrganizationRunListPage() {
         <ProductButton disabled={loading} onClick={() => void loadRuns()}>{loading ? '正在刷新…' : '刷新列表'}</ProductButton>
       </div>
 
-      <div className="mt-4 grid gap-3">
-        {runs.map((run) => (
-          <Link key={run.id} to={`/organizations/${encodeURIComponent(organizationId)}/runs/${encodeURIComponent(run.id)}`} className="block rounded-xl border border-slate-200 bg-white p-4 text-inherit no-underline hover:border-slate-300">
-            <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="font-semibold text-slate-900">{run.name}</h2><p className="mt-1 text-sm text-slate-600">{STATUS_LABELS[run.status]} · v{run.version} · Track {run.trackCount} · Execution {run.executionCount}</p></div><span className="text-sm text-slate-500">创建于 {formatTime(run.createdAt)}</span></div>
-            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-500"><span>发布：{formatTime(run.publishedAt)}</span><span>关闭：{formatTime(run.closedAt)}</span><span>取消：{formatTime(run.cancelledAt)}</span><span>截止：{formatTime(run.intakeDeadline)}</span></div>
-          </Link>
-        ))}
-        {!loading && runs.length === 0 && <ProductStatus kind="info" title="暂无匹配的 Run">可以先创建一个 DRAFT，再添加 Track 并在发布前审阅 selector 与 policy。</ProductStatus>}
+      <div className="mt-4 staff-table-container">
+        <table className="staff-table">
+          <thead><tr><th>测评批次</th><th>状态</th><th>测评项目</th><th>执行记录</th><th>参与截止</th><th>创建时间</th></tr></thead>
+          <tbody>{runs.map(run => <tr key={run.id}>
+            <td><Link className="staff-record-title" to={`/organizations/${encodeURIComponent(organizationId)}/runs/${encodeURIComponent(run.id)}`}>{run.name}</Link><div className="staff-muted">版本 {run.version}</div></td>
+            <td><span className={`staff-badge ${run.status === 'PUBLISHED' ? 'staff-badge--success' : run.status === 'CANCELLED' ? 'staff-badge--danger' : ''}`}>{STATUS_LABELS[run.status]}</span></td>
+            <td>{run.trackCount}</td><td>{run.executionCount}</td><td>{formatTime(run.intakeDeadline)}</td><td>{formatTime(run.createdAt)}</td>
+          </tr>)}</tbody>
+        </table>
+        {!loading && runs.length === 0 && <div className="p-4"><ProductStatus kind="info" title="暂无匹配的测评批次">可以先创建草稿批次，再添加测评项目并在发布前检查范围与策略。</ProductStatus></div>}
       </div>
     </ProductPage>
   )
