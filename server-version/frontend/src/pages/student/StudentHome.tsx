@@ -59,7 +59,7 @@ const StudentHome: React.FC = () => {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN')
 
   return (
-    <ProductPage>
+    <ProductPage width="management" className="hui-student-page hui-student-home">
       <PageHeader
         title="我的课程"
         description={`欢迎回来，${user?.nickname || user?.username || '同学'}。从课程进入作业、打卡、问卷和综合测评。`}
@@ -110,8 +110,8 @@ const StudentHome: React.FC = () => {
       )}
 
       {showJoinModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation">
-          <section role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="card w-full max-w-md">
+        <div className="hui-student-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="hui-student-dialog card w-full max-w-md">
             <h2 id="join-course-title" className="text-xl font-bold text-gray-800 mb-2">加入课程</h2>
             <p className="text-gray-500 mb-4">请输入老师提供的课程号。</p>
             {joinError ? <p role="alert" className="mb-4 text-sm text-red-600">{joinError}</p> : null}
