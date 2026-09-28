@@ -2,7 +2,8 @@
 #
 # 触发模型：
 #   Pure Scale / existing Cognitive / SJT / Bundle content: one targeted content gate.
-#   Routing always runs; the stable aggregate check also completes for content PRs.
+#   Presentation-only CSS/design-doc PR: frontend lint + typecheck + production build only.
+#   Routing always runs; the stable aggregate check completes for every selected route.
 #   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
 #   Ready platform PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
@@ -61,6 +62,7 @@ jobs:
       - linux
     outputs:
       content: ${{ steps.scope.outputs.content }}
+      presentation: ${{ steps.scope.outputs.presentation }}
       scale: ${{ steps.scope.outputs.scale }}
       cognitive: ${{ steps.scope.outputs.cognitive }}
       situational: ${{ steps.scope.outputs.situational }}
@@ -95,10 +97,42 @@ jobs:
       bundle: ${{ needs.scope.outputs.bundle == 'true' }}
       base: ${{ github.event.pull_request.base.sha || github.event.before }}
 
+  visual:
+    needs: scope
+    name: presentation / frontend lint + typecheck + build
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true'
+    runs-on:
+      - self-hosted
+      - linux
+      - eduk12-win-ci
+    timeout-minutes: 15
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: npm ci
+        run: npm ci
+      - name: lint
+        run: npm run lint
+      - name: typecheck
+        run: npm run typecheck
+      - name: production build
+        run: npm run build
+
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -145,7 +179,7 @@ jobs:
   pr-light-frontend:
     needs: scope
     name: PR light / frontend lint + typecheck
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -174,7 +208,7 @@ jobs:
   post-merge-smoke:
     needs: scope
     name: main / post-merge compile smoke
-    if: needs.scope.outputs.content == 'false' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
     runs-on:
       - self-hosted
       - linux
@@ -219,7 +253,7 @@ jobs:
   backend:
     needs: scope
     name: backend (ci + migrate + build + full regression)
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -466,7 +500,7 @@ jobs:
     name: frontend (lint + typecheck + full tests + build)
     # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
     # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -527,7 +561,7 @@ jobs:
     # At that point the Mac backend lane is free, so browser reuses Mac while
     # Windows continues CodeQL/Docker in parallel.
     needs: [scope, backend, frontend]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -791,7 +825,7 @@ jobs:
     # Windows has one heavy lane: frontend -> CodeQL -> Docker.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
     needs: [scope, codeql]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -886,7 +920,7 @@ jobs:
     # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
     # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
     needs: [scope, frontend]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on:
       - self-hosted
       - linux
@@ -922,7 +956,7 @@ jobs:
 
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, content, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
+    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, frontend, browser, docker, codeql]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on:
       - self-hosted

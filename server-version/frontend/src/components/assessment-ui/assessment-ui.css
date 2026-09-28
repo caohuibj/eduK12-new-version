@@ -1,0 +1,496 @@
+/*
+ * Huisurvey Modern Education — assessment runners, student submit surfaces,
+ * and report/result layouts.
+ *
+ * Presentation-only. These rules do not alter task reducers, timing,
+ * persistence, scoring, submission or navigation semantics.
+ */
+
+/* ------------------------------
+ * Focused assessment runners
+ * ------------------------------ */
+.hui-app--assessment-runner {
+  --runner-ink: #14304a;
+  --runner-muted: #64748b;
+  --runner-line: #dbe6ef;
+  --runner-page: #f7fbff;
+  --runner-soft: #eef7ff;
+  --runner-blue: #2f6fed;
+  --runner-blue-hover: #255dce;
+  --runner-green: #22c55e;
+  --runner-surface: #ffffff;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(56,189,248,.09) 0 9rem, transparent 9.1rem),
+    var(--runner-page);
+}
+.hui-app--assessment-runner .hui-app-header {
+  min-height: 58px;
+  padding-block: 7px;
+  border-color: #e3edf5;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(10px);
+}
+.hui-app--assessment-runner .hui-brand {
+  color: var(--runner-ink);
+  text-decoration: none;
+  letter-spacing: -.025em;
+}
+.hui-app--assessment-runner .hui-account {
+  color: #6c8195;
+  font-size: .78rem;
+}
+.hui-app--assessment-runner .hui-app-body,
+.hui-app--assessment-runner .hui-app-content {
+  width: 100%;
+}
+.hui-app--assessment-runner .hui-app-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+.hui-app--assessment-runner .hui-product.hui-page {
+  padding-block: 28px 42px;
+  padding-inline: max(18px,env(safe-area-inset-left)) max(18px,env(safe-area-inset-right));
+}
+.hui-app--assessment-runner .hui-product {
+  --hui-color-text: var(--runner-ink);
+  --hui-color-muted: var(--runner-muted);
+  --hui-color-surface: var(--runner-surface);
+  --hui-color-background: var(--runner-page);
+  --hui-color-border: var(--runner-line);
+  --hui-color-action: var(--runner-blue);
+  --hui-color-action-hover: var(--runner-blue-hover);
+  --hui-color-focus: var(--runner-blue);
+  --hui-radius: .9rem;
+}
+
+/* Shared AssessmentShell */
+.hui-app--assessment-runner [data-assessment-shell-header] {
+  margin-bottom: 20px;
+  padding: 20px 22px;
+  border: 1px solid #dce9f4;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 92% 16%, rgba(56,189,248,.14) 0 4.5rem, transparent 4.6rem),
+    linear-gradient(135deg,#f1f8ff 0%,#fbfdff 66%,#eefaf4 100%);
+}
+.hui-app--assessment-runner [data-assessment-shell-header] h1 {
+  color: var(--runner-ink);
+  letter-spacing: -.03em;
+}
+.hui-app--assessment-runner [data-assessment-shell-header] p {
+  color: #60768a;
+}
+.hui-app--assessment-runner [data-assessment-shell-statuses] .hui-status {
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(20,48,74,.03);
+}
+.hui-app--assessment-runner [data-assessment-shell-content] > :where(section,div.card) {
+  border-radius: 18px;
+}
+.hui-app--assessment-runner [data-assessment-shell-content] section.rounded-xl,
+.hui-app--assessment-runner [data-assessment-shell-navigation] > * {
+  border-color: #dce7f0;
+  box-shadow: 0 4px 18px rgba(20,48,74,.035);
+}
+.hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions,
+.hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions {
+  border-radius: 16px;
+}
+.hui-app--assessment-runner [data-assessment-shell-actions] button,
+.hui-app--assessment-runner [data-assessment-shell-navigation] button {
+  min-height: 44px;
+}
+
+/* Choice controls across Scale / Cognitive / Situational / Questionnaire runners. */
+.hui-app--assessment-runner :where(button,label)[class*="border"][class*="rounded"] {
+  border-color: #d8e3ed;
+}
+.hui-app--assessment-runner :where(button,label)[class*="border"][class*="rounded"]:focus-visible {
+  outline: 3px solid rgba(47,111,237,.42);
+  outline-offset: 3px;
+}
+.hui-app--assessment-runner :where(button,label)[class*="border"][class*="rounded"]:hover {
+  border-color: #b8cce0;
+}
+.hui-app--assessment-runner :where(.card,[class~="bg-white"][class*="rounded"]) {
+  box-shadow: 0 5px 20px rgba(20,48,74,.045);
+}
+
+/* Legacy Questionnaire / Composite runners that predate AssessmentShell. */
+.hui-app--assessment-runner [class~="max-w-2xl"],
+.hui-app--assessment-runner [class~="max-w-3xl"] {
+  width: min(100%,52rem);
+  padding: 26px max(18px,env(safe-area-inset-left)) 38px max(18px,env(safe-area-inset-right));
+}
+.hui-app--assessment-runner [class~="max-w-2xl"] > [class~="bg-white"][class*="rounded"],
+.hui-app--assessment-runner [class~="max-w-3xl"] > [class~="card"] {
+  border: 1px solid var(--runner-line);
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(20,48,74,.045);
+}
+.hui-app--assessment-runner [class~="max-w-2xl"] button,
+.hui-app--assessment-runner [class~="max-w-3xl"] button {
+  min-height: 44px;
+}
+.hui-app--assessment-runner [class~="max-w-2xl"] button[class~="w-8"],
+.hui-app--assessment-runner [class~="max-w-2xl"] button[class~="h-8"] {
+  width: 44px !important;
+  height: 44px !important;
+}
+.hui-app--assessment-runner [class~="max-w-2xl"] [class~="shadow"],
+.hui-app--assessment-runner [class~="max-w-3xl"] [class~="shadow"] {
+  box-shadow: 0 5px 20px rgba(20,48,74,.045);
+}
+.hui-app--assessment-runner [class~="max-w-2xl"] input,
+.hui-app--assessment-runner [class~="max-w-2xl"] select,
+.hui-app--assessment-runner [class~="max-w-2xl"] textarea,
+.hui-app--assessment-runner [class~="max-w-3xl"] input,
+.hui-app--assessment-runner [class~="max-w-3xl"] select,
+.hui-app--assessment-runner [class~="max-w-3xl"] textarea {
+  min-height: 46px;
+  border-color: #d4e0ea;
+  border-radius: 11px;
+}
+
+/* Keep stimulus/task-owned geometry intact. */
+.hui-app--assessment-runner [data-cognitive-task],
+.hui-app--assessment-runner [data-situational-scene],
+.hui-app--assessment-runner canvas,
+.hui-app--assessment-runner video {
+  max-width: 100%;
+}
+
+/* ------------------------------
+ * Student assignment / check-in submit
+ * ------------------------------ */
+.hui-app--student-submit.hui-app--student {
+  background: #f7fbff;
+}
+.hui-app--student-submit .hui-app-main {
+  max-width: 64rem;
+}
+.hui-app--student-submit .hui-app-main > .space-y-6 {
+  width: 100%;
+  max-width: 54rem;
+  margin-inline: auto;
+}
+.hui-app--student-submit .hui-app-main > .space-y-6 > button:first-child {
+  min-height: 44px;
+  font-weight: 600;
+}
+.hui-app--student-submit .card {
+  padding: clamp(18px,3vw,26px);
+  border-color: #dde7f0;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(20,48,74,.04);
+}
+.hui-app--student-submit .card > h1 {
+  color: #14304a;
+  letter-spacing: -.03em;
+}
+.hui-app--student-submit .prose {
+  color: #40576d;
+  line-height: 1.8;
+}
+.hui-app--student-submit textarea {
+  line-height: 1.7;
+}
+.hui-app--student-submit [class*="grid-cols-4"] {
+  grid-template-columns: repeat(4,minmax(0,1fr));
+}
+.hui-app--student-submit [class*="grid-cols-3"] {
+  grid-template-columns: repeat(3,minmax(0,1fr));
+}
+.hui-app--student-submit [class*="aspect-square"] {
+  min-width: 0;
+}
+.hui-app--student-submit [class*="bg-gray-50"][class*="rounded"] {
+  border: 1px solid #e3ebf2;
+  background: #f8fbfd;
+}
+.hui-app--student-submit form .btn-primary,
+.hui-app--student-submit form .btn-secondary {
+  min-height: 48px;
+}
+
+/* ------------------------------
+ * Result / report surfaces
+ * ------------------------------ */
+.hui-app--report-surface.hui-app--student {
+  background:
+    radial-gradient(circle at 86% 8%, rgba(56,189,248,.07) 0 10rem, transparent 10.1rem),
+    #f7fbff;
+}
+.hui-app--report-surface .hui-app-main {
+  max-width: 76rem;
+  padding-top: 18px;
+}
+.hui-app--report-surface .hui-product[data-testid="report-shell"] {
+  padding-top: 8px;
+}
+.hui-app--report-surface .hui-product[data-testid="report-shell"] .hui-page-header {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 26px;
+  border: 1px solid #dce9f4;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 90% 16%, rgba(56,189,248,.15) 0 5rem, transparent 5.1rem),
+    linear-gradient(135deg,#f1f8ff 0%,#fbfdff 64%,#effaf4 100%);
+}
+.hui-app--report-surface .hui-product[data-testid="report-shell"] .hui-page-header__title {
+  color: #14304a;
+  letter-spacing: -.035em;
+}
+.hui-app--report-surface .hui-product[data-testid="report-shell"] .hui-page-header__description {
+  color: #60768a;
+}
+.hui-app--report-surface .card,
+.hui-app--report-surface [class~="bg-white"][class*="rounded"] {
+  border: 1px solid #dde7f0;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(20,48,74,.04);
+}
+.hui-app--report-surface [data-testid="report-completion-facts"] dl {
+  gap: 12px 22px;
+}
+.hui-app--report-surface [data-testid="report-completion-facts"] dl > div {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f7fafc;
+}
+.hui-app--report-surface [data-testid="report-limitations"] {
+  background: #fffaf0;
+  border-color: #f0dfb4;
+}
+.hui-app--report-surface .hui-status {
+  border-radius: 15px;
+}
+.hui-app--report-surface :where(img,svg,canvas,video) {
+  max-width: 100%;
+}
+.hui-app--report-surface table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.hui-app--report-surface :where(pre,code) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.hui-app--report-surface details {
+  border-radius: 12px;
+}
+.hui-app--report-surface .hui-actions {
+  border-radius: 16px;
+}
+
+/* Older report pages that do not use ReportShell yet. */
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) {
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) > button:first-child {
+  min-height: 44px;
+  font-weight: 600;
+}
+.hui-app--report-surface .hui-app-main > div:not(.hui-product) > .card[class*="max-w-2xl"] {
+  margin-inline: auto;
+  padding: clamp(20px,4vw,32px);
+}
+.hui-app--report-surface .hui-app-main > [class~="max-w-4xl"],
+.hui-app--report-surface .hui-app-main > [class~="max-w-3xl"],
+.hui-app--report-surface .hui-app-main > [class~="max-w-2xl"] {
+  width: 100%;
+  margin-inline: auto;
+}
+.hui-app--report-surface .hui-app-main > [class~="max-w-4xl"] > :first-child,
+.hui-app--report-surface .hui-app-main > [class~="max-w-3xl"] > :first-child {
+  padding: 22px 24px;
+  border: 1px solid #dce9f4;
+  border-radius: 18px;
+  background: linear-gradient(135deg,#f2f8ff,#fbfdff);
+}
+.hui-app--report-surface [class*="grid-cols-2"] {
+  gap: 12px;
+}
+.hui-app--report-surface section [class~="bg-gray-50"][class*="rounded"],
+.hui-app--report-surface [data-testid^="situational-report-"] article {
+  border: 1px solid #e3ebf2;
+  border-radius: 14px;
+  background: #f8fbfd;
+}
+.hui-app--report-surface details > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* ------------------------------
+ * Tablet
+ * ------------------------------ */
+@media (max-width: 63.999rem) {
+  .hui-app--assessment-runner .hui-app-header {
+    padding-inline: 18px;
+  }
+  .hui-app--assessment-runner .hui-product.hui-page {
+    padding-top: 22px;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-header] {
+    padding: 18px 20px;
+  }
+  .hui-app--student-submit .hui-app-main,
+  .hui-app--report-surface .hui-app-main {
+    padding-inline: 22px;
+  }
+}
+
+/* ------------------------------
+ * Mobile
+ * ------------------------------ */
+@media (max-width: 39.999rem) {
+  .hui-app--assessment-runner .hui-app-header {
+    min-height: 54px;
+    padding: 6px max(14px,env(safe-area-inset-right)) 6px max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--assessment-runner .hui-account {
+    width: auto;
+    font-size: .72rem;
+  }
+  .hui-app--assessment-runner .hui-product.hui-page {
+    padding: 14px max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--assessment-runner [data-assessment-shell-header] {
+    margin-bottom: 14px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-header] h1 {
+    font-size: 1.45rem;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-header] > div {
+    gap: 8px;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-content] > :where(section,div.card) {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions,
+  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .hui-app--assessment-runner [data-assessment-shell-actions] .hui-actions > *,
+  .hui-app--assessment-runner [data-assessment-shell-navigation] .hui-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+  .hui-app--assessment-runner [class~="max-w-2xl"],
+  .hui-app--assessment-runner [class~="max-w-3xl"] {
+    padding: 14px max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--assessment-runner [class~="max-w-2xl"] [class~="p-6"],
+  .hui-app--assessment-runner [class~="max-w-3xl"] [class~="p-8"] {
+    padding: 16px !important;
+  }
+  .hui-app--assessment-runner [class~="max-w-2xl"] [class*="justify-between"],
+  .hui-app--assessment-runner [class~="max-w-3xl"] [class*="justify-between"] {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .hui-app--assessment-runner [class~="max-w-2xl"] [class*="justify-between"] > button,
+  .hui-app--assessment-runner [class~="max-w-3xl"] [class*="justify-between"] > button {
+    flex: 1 1 8rem;
+  }
+
+  .hui-app--student-submit .hui-app-main,
+  .hui-app--report-surface .hui-app-main {
+    padding: 12px max(14px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--student-submit .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .hui-app--student-submit [class*="grid-cols-4"],
+  .hui-app--student-submit [class*="grid-cols-3"] {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 10px;
+  }
+  .hui-app--student-submit [class*="items-center"][class*="justify-between"] {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hui-app--student-submit [class*="items-center"][class*="justify-between"] > :where(button,a) {
+    min-height: 44px;
+  }
+  .hui-app--student-submit button[class*="w-6"][class*="h-6"],
+  .hui-app--student-submit button[title="关闭"] {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .hui-app--student-submit [class*="fixed"][class*="inset-0"] {
+    padding-top: max(16px,env(safe-area-inset-top));
+    padding-right: max(16px,env(safe-area-inset-right));
+    padding-bottom: max(16px,env(safe-area-inset-bottom));
+    padding-left: max(16px,env(safe-area-inset-left));
+  }
+  .hui-app--student-submit [class*="max-w-\[90vw\]"] {
+    max-width: 100%;
+  }
+
+  .hui-app--report-surface .hui-product[data-testid="report-shell"] {
+    padding-inline: 0;
+  }
+  .hui-app--report-surface .hui-product[data-testid="report-shell"] .hui-page-header {
+    padding: 18px;
+    border-radius: 17px;
+  }
+  .hui-app--report-surface .card,
+  .hui-app--report-surface [class~="bg-white"][class*="rounded"] {
+    padding: 16px !important;
+    border-radius: 16px;
+  }
+  .hui-app--report-surface [data-testid="report-completion-facts"] dl {
+    grid-template-columns: 1fr;
+  }
+  .hui-app--report-surface [class*="grid-cols-2"] {
+    grid-template-columns: 1fr !important;
+  }
+  .hui-app--report-surface [class*="justify-between"] {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .hui-app--report-surface .hui-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .hui-app--report-surface .hui-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hui-app--assessment-runner *,
+  .hui-app--assessment-runner *::before,
+  .hui-app--assessment-runner *::after,
+  .hui-app--student-submit *,
+  .hui-app--student-submit *::before,
+  .hui-app--student-submit *::after,
+  .hui-app--report-surface *,
+  .hui-app--report-surface *::before,
+  .hui-app--report-surface *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

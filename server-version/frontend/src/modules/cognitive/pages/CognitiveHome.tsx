@@ -35,14 +35,14 @@ const CognitiveHome: React.FC = () => {
 
   if (loading) {
     return (
-      <ProductPage width="assessment">
+      <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
         <ProductStatus kind="pending" title="正在加载认知测评" announce="polite">正在读取已发布的认知任务。</ProductStatus>
       </ProductPage>
     )
   }
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
       <PageHeader
         title="认知测评"
         description="选择已发布的认知任务。任务入口会继续使用冻结的测试类型与引擎版本。"

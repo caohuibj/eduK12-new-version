@@ -51,7 +51,7 @@ export default function StudentRelationalPage() {
     })()
   }, [])
 
-  return <ProductPage width="reading">
+  return <ProductPage width="assessment" className="hui-student-page hui-student-relational">
     <PageHeader title="课堂与关系体验" description="你可以针对当前课程完成课堂/教学环境体验测评。面向教师的结果只以满足最低样本量后的群体汇总呈现，不展示你的个人评分。" />
     {loading ? <ProductStatus kind="info" title="加载中">正在读取课程、任务和已发布内容。</ProductStatus> : error ? (
       <ProductStatus kind="error" title="操作失败">{error}</ProductStatus>
@@ -62,7 +62,7 @@ export default function StudentRelationalPage() {
           <RelationalTaskList tasks={tasks} onRefresh={refreshTasks} />
         </section>
 
-        <section className="space-y-4 rounded border border-gray-200 p-4">
+        <section className="hui-relational-compose space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">开始一次课堂体验测评</h2>
             <p className="mt-1 text-sm text-gray-600">教师身份由课程创建者关系自动确定，前端不能自行选择被评价教师。</p>
@@ -73,22 +73,24 @@ export default function StudentRelationalPage() {
             </p>
           ) : (
             <>
-              <label className="block text-sm font-medium text-gray-700">
-                课程
-                <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
-                  {courses.map((course) => (
-                    <option key={course.courseId} value={course.courseId}>{course.title} · {course.teacher.displayName}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-sm font-medium text-gray-700">
-                测评内容
-                <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={selectedProductId} onChange={(event) => setSelectedProductId(event.target.value)}>
-                  {experienceProducts.map((product) => (
-                    <option key={productId(product)} value={productId(product)}>{product.title} · {product.resourceVersion}</option>
-                  ))}
-                </select>
-              </label>
+              <div className="hui-relational-fields">
+                <label className="block text-sm font-medium text-gray-700">
+                  课程
+                  <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
+                    {courses.map((course) => (
+                      <option key={course.courseId} value={course.courseId}>{course.title} · {course.teacher.displayName}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  测评内容
+                  <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={selectedProductId} onChange={(event) => setSelectedProductId(event.target.value)}>
+                    {experienceProducts.map((product) => (
+                      <option key={productId(product)} value={productId(product)}>{product.title} · {product.resourceVersion}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               {selectedProduct?.minimumRespondents && (
                 <p className="text-xs text-gray-600">该内容要求至少 {selectedProduct.minimumRespondents} 名有效 respondent 才能形成教师可见的群体汇总。</p>
               )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { ArrowLeft, Clock, FileText } from 'lucide-react'
+import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
 
@@ -31,28 +31,64 @@ const QuestionnaireResult: React.FC = () => {
     void fetchResult()
   }, [assessmentId])
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-gray-500">加载中...</div></div>
-  if (!result) return <div className="text-center py-12"><p className="text-gray-500">报告不存在</p><Link to="/student/questionnaires" className="text-primary mt-4 inline-block">返回问卷列表</Link></div>
+  if (loading) {
+    return (
+      <ReportShell
+        title="聚合问卷报告"
+        description="正在读取已完成的问卷结果。"
+        status={{ kind: 'pending', title: '加载报告中', announce: 'polite' }}
+      />
+    )
+  }
+
+  if (!result) {
+    return (
+      <ReportShell
+        title="聚合问卷报告"
+        description="无法读取当前结果记录。"
+        status={{ kind: 'error', title: '报告不存在或暂时无法读取' }}
+        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+      />
+    )
+  }
+
+  const facts = [
+    { label: '完成时间', value: result.completedAt ? new Date(result.completedAt).toLocaleString('zh-CN') : '—' },
+    ...(result.totalTime != null ? [{ label: '总用时', value: formatTime(result.totalTime) }] : []),
+    { label: '结果维度', value: `${result.totalDimensions} 个维度` },
+  ]
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <button onClick={() => navigate('/student/questionnaires')} className="flex items-center text-gray-600 hover:text-gray-800 mb-4"><ArrowLeft className="w-4 h-4 mr-1" />返回列表</button>
-        <h1 className="text-2xl font-bold text-gray-900">{result.questionnaireName}</h1>
-        <p className="text-gray-600 mt-1">各量表结果独立展示</p>
-      </div>
+    <ReportShell
+      title={result.questionnaireName}
+      description="各量表结果独立展示。"
+      facts={facts}
+      status={{ kind: 'success', title: '问卷已完成', description: '以下内容来自当前已完成结果记录。' }}
+      backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+    >
+      {result.backgroundValues.length > 0 && (
+        <section className="card p-5" aria-labelledby="questionnaire-background-heading">
+          <h2 id="questionnaire-background-heading" className="text-sm font-semibold text-gray-700 mb-3">背景信息</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {result.backgroundValues.map((item) => (
+              <div key={item.itemId} className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                <div className="text-xs text-gray-500">{item.label || '表单项'}</div>
+                <div className="mt-1 whitespace-pre-wrap">{item.value ?? '—'}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex items-center gap-6 text-sm text-gray-500 flex-wrap">
-          <span>完成时间: {result.completedAt ? new Date(result.completedAt).toLocaleString('zh-CN') : '—'}</span>
-          {result.totalTime != null && <span className="flex items-center"><Clock className="w-4 h-4 mr-1" />总用时: {formatTime(result.totalTime)}</span>}
-          <span className="flex items-center"><FileText className="w-4 h-4 mr-1" />{result.totalDimensions} 个维度</span>
-        </div>
-      </div>
-
-      {result.backgroundValues.length > 0 && <div className="bg-gray-50 rounded-lg p-4 mb-6"><h2 className="text-sm font-semibold text-gray-600 mb-2">背景信息</h2><div className="grid grid-cols-2 gap-2 text-sm text-gray-600">{result.backgroundValues.map((item) => <div key={item.itemId}><span className="font-medium">{item.label || '表单项'}：</span>{item.value ?? '—'}</div>)}</div></div>}
-      {result.unitReports.map((report, index) => <div key={report.itemId || report.scaleId || index} className="bg-white rounded-lg shadow p-6 mb-6"><h2 className="text-lg font-medium text-gray-900 mb-4">量表 {index + 1}: {report.scaleName}</h2><ScaleUnitReportCard report={report} /></div>)}
-    </div>
+      {result.unitReports.map((report, index) => (
+        <section key={report.itemId || report.scaleId || index} className="card p-6" aria-labelledby={`questionnaire-unit-${index}`}>
+          <h2 id={`questionnaire-unit-${index}`} className="text-lg font-semibold text-gray-800 mb-4">
+            量表 {index + 1}: {report.scaleName}
+          </h2>
+          <ScaleUnitReportCard report={report} />
+        </section>
+      ))}
+    </ReportShell>
   )
 }
 

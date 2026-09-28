@@ -58,14 +58,14 @@ const StudentScales: React.FC = () => {
 
   if (loading) {
     return (
-      <ProductPage width="assessment">
+      <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
         <ProductStatus kind="pending" title="正在加载心理测评" announce="polite">正在核对可用量表与当前尝试状态。</ProductStatus>
       </ProductPage>
     )
   }
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
       <PageHeader title="心理测评" description="完成已发布的心理量表；进行中的测评会从当前本地尝试继续。" />
 
       {loadError ? (

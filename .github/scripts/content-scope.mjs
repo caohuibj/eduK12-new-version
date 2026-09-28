@@ -3,6 +3,8 @@ import { appendFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const modules = 'server-version/backend/src/modules/';
+const frontendSrc = 'server-version/frontend/src/';
+
 // Only established content surfaces qualify. New engines, scorers, runners,
 // shared helpers, dependencies and CI changes require the full gate.
 export function domainFor(file) {
@@ -22,9 +24,20 @@ export function domainFor(file) {
   return null;
 }
 
+export function presentationFile(file) {
+  if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
+      || /[\\\x00-\x1f\x7f]/.test(file)) return false;
+  return (file.startsWith(frontendSrc) && /\.(?:css|scss)$/.test(file))
+    || /^server-version\/docs\/frontend-[a-zA-Z0-9_-]+\.md$/.test(file);
+}
+
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
-  return { content: files.length > 0 && files.every(domainFor), domains };
+  return {
+    content: files.length > 0 && files.every(domainFor),
+    presentation: files.length > 0 && files.every(presentationFile),
+    domains,
+  };
 }
 
 // Parse the full raw diff so a content-looking path never hides a deletion,
@@ -48,7 +61,11 @@ export function classifyChanges(entries, forceFull = false) {
   const regularChanges = entries.every(({ status, oldMode, newMode }) =>
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
-  return { ...result, content: !forceFull && result.content && regularChanges };
+  return {
+    ...result,
+    content: !forceFull && result.content && regularChanges,
+    presentation: !forceFull && result.presentation && regularChanges,
+  };
 }
 
 export function changedEntries(base, head = 'HEAD') {
@@ -67,10 +84,12 @@ export function changedFiles(base, head = 'HEAD') {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  const result = event === 'workflow_dispatch' ? { content: false, domains: [] } : classifyChanges(changedEntries(base), process.env.CI_FORCE_FULL === 'true');
-  const output = { content: result.content, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'), situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle') };
+  const result = event === 'workflow_dispatch' ? { content: false, presentation: false, domains: [] } : classifyChanges(changedEntries(base), process.env.CI_FORCE_FULL === 'true');
+  const output = { content: result.content, presentation: result.presentation, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'), situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle') };
   console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles',
-    reason: result.content ? 'allowlisted regular content files' : 'platform, manual override, empty or non-regular changes' }));
+    reason: result.content ? 'allowlisted regular content files'
+      : result.presentation ? 'allowlisted regular presentation-only files'
+        : 'platform, manual override, empty or non-regular changes' }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

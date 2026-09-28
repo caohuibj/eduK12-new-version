@@ -33,7 +33,7 @@ export function DiscoveryCard({
     <Link
       to={to}
       aria-label={ariaLabel}
-      className="group block min-h-11 rounded-xl border border-slate-200 bg-white p-4 text-inherit no-underline transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-700 hover:border-slate-300 sm:p-5"
+      className="hui-discovery-card group block min-h-11 rounded-xl border border-slate-200 bg-white p-4 text-inherit no-underline transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-blue-700 hover:border-slate-300 sm:p-5"
     >
       <div className="flex items-start gap-4">
         {leading ? <div className="shrink-0" aria-hidden="true">{leading}</div> : null}

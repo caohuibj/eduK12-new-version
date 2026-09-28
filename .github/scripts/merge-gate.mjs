@@ -1,11 +1,14 @@
 import { pathToFileURL } from 'node:url';
 export function requiredChecks(needs, draft) {
-  return ['scope', ...(needs.scope?.outputs?.content === 'true' ? ['content'] : draft
-    ? ['pr-light-backend', 'pr-light-frontend'] : ['backend', 'frontend', 'browser', 'docker', 'codeql'])];
+  return ['scope', ...(needs.scope?.outputs?.content === 'true' ? ['content']
+    : needs.scope?.outputs?.presentation === 'true' ? ['visual']
+      : draft ? ['pr-light-backend', 'pr-light-frontend']
+        : ['backend', 'frontend', 'browser', 'docker', 'codeql'])];
 }
 export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
-  if (!['true', 'false'].includes(needs.scope?.outputs?.content) && !failed.includes('scope')) failed.unshift('scope');
+  if ((!['true', 'false'].includes(needs.scope?.outputs?.content)
+      || !['true', 'false'].includes(needs.scope?.outputs?.presentation)) && !failed.includes('scope')) failed.unshift('scope');
   return failed;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

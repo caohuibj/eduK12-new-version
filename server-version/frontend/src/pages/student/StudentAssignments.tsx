@@ -48,7 +48,7 @@ const StudentAssignments: React.FC = () => {
   }
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-tasks">
       <PageHeader title="我的作业" description="查看课程作业状态，并打开对应提交记录。" />
 
       {loading ? (
