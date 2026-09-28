@@ -5,15 +5,15 @@
  */
 
 .hui-app--public:not(.hui-app--entry) {
-  --public-ink: #14304a;
-  --public-muted: #64788b;
-  --public-line: #dce7f0;
-  --public-page: #f8fbff;
-  --public-soft: #eff7ff;
-  --public-blue: #2f6fed;
-  --public-blue-hover: #255dce;
+  --public-ink: var(--hui-ds-color-ink);
+  --public-muted: var(--hui-ds-role-public-muted);
+  --public-line: var(--hui-ds-color-line);
+  --public-page: var(--hui-ds-color-page);
+  --public-soft: var(--hui-ds-color-soft);
+  --public-blue: var(--hui-ds-color-action);
+  --public-blue-hover: var(--hui-ds-color-action-hover);
   --public-green: #22a66f;
-  --public-surface: #fff;
+  --public-surface: var(--hui-ds-color-surface);
   min-height: 100dvh;
   background:
     radial-gradient(circle at 84% 8%, rgba(56,189,248,.075) 0 10rem, transparent 10.1rem),
@@ -75,7 +75,7 @@
   border: 1px solid var(--public-line);
   border-radius: 18px;
   background: #fff;
-  box-shadow: 0 6px 24px rgba(20,48,74,.045) !important;
+  box-shadow: var(--hui-ds-shadow-card) !important;
 }
 
 .hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
