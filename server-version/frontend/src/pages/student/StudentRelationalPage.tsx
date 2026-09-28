@@ -73,22 +73,24 @@ export default function StudentRelationalPage() {
             </p>
           ) : (
             <>
-              <label className="block text-sm font-medium text-gray-700">
-                课程
-                <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
-                  {courses.map((course) => (
-                    <option key={course.courseId} value={course.courseId}>{course.title} · {course.teacher.displayName}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-sm font-medium text-gray-700">
-                测评内容
-                <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={selectedProductId} onChange={(event) => setSelectedProductId(event.target.value)}>
-                  {experienceProducts.map((product) => (
-                    <option key={productId(product)} value={productId(product)}>{product.title} · {product.resourceVersion}</option>
-                  ))}
-                </select>
-              </label>
+              <div className="hui-relational-fields">
+                <label className="block text-sm font-medium text-gray-700">
+                  课程
+                  <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
+                    {courses.map((course) => (
+                      <option key={course.courseId} value={course.courseId}>{course.title} · {course.teacher.displayName}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  测评内容
+                  <select className="mt-1 w-full rounded border border-gray-300 px-3 py-2" value={selectedProductId} onChange={(event) => setSelectedProductId(event.target.value)}>
+                    {experienceProducts.map((product) => (
+                      <option key={productId(product)} value={productId(product)}>{product.title} · {product.resourceVersion}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               {selectedProduct?.minimumRespondents && (
                 <p className="text-xs text-gray-600">该内容要求至少 {selectedProduct.minimumRespondents} 名有效 respondent 才能形成教师可见的群体汇总。</p>
               )}
