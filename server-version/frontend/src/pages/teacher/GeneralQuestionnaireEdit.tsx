@@ -7,6 +7,7 @@ import { ScaleSelector } from '../../components/ScaleSelector'
 import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
 import FormSectionManager from '../../components/FormSectionManager'
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 
 // 表单题目类型
 interface FormItem {
@@ -340,11 +341,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    )
+    return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载泛化问卷" announce="polite">正在读取问卷配置。</ProductStatus></ProductPage>
   }
 
   // 合并所有内容项并排序
@@ -354,14 +351,15 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   ].sort((a, b) => a.position - b.position)
 
   return (
-    <div className="p-6">
+    <ProductPage width="management" className="staff-editor-page space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      <div className="staff-editor-heading">
+        <div className="staff-editor-heading__copy">
+          <div className="flex items-center gap-3">
           <Link to="/general-questionnaires" className="text-gray-500 hover:text-gray-700">
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">编辑泛化问卷</h1>
+          <h1>编辑泛化问卷</h1>
           <span
             className={`px-2 py-1 text-xs rounded-full ${
               questionnaire.status === 'PUBLISHED'
@@ -371,12 +369,14 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           >
             {questionnaire.status === 'PUBLISHED' ? '已发布' : '草稿'}
           </span>
+          </div>
+          <p>{questionnaire.name} · {questionnaire.code}</p>
         </div>
-        <div className="flex gap-3">
+        <div className="staff-inline-actions">
           {questionnaire.status === 'DRAFT' && (
             <button
               onClick={handlePublish}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              className="btn-primary inline-flex items-center gap-2"
             >
               发布问卷
             </button>
@@ -385,7 +385,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
             <button
               onClick={handleSaveBasic}
               disabled={saving}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <Save className="w-4 h-4 mr-2" />
               {saving ? '保存中...' : '保存'}
@@ -395,8 +395,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="flex gap-8">
+      <div className="staff-toolbar">
+        <nav className="staff-segmented" aria-label="问卷编辑分区">
           {[
             { key: 'basic', label: '基本信息' },
             { key: 'content', label: '内容编排' },
@@ -405,11 +405,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.key
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              aria-pressed={activeTab === tab.key}
+              className=""
             >
               {tab.label}
             </button>
@@ -419,43 +416,44 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
       {/* Basic Info Tab */}
       {activeTab === 'basic' && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section className="staff-panel">
+          <div className="staff-panel__body">
+          <div className="staff-form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="staff-field">
                 问卷编码
               </label>
               <input
                 type="text"
                 value={questionnaire.code}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                className="bg-slate-100"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="staff-field">
                 问卷名称 *
               </label>
               <input
                 type="text"
                 value={questionnaire.name}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className=""
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="staff-field">
                 问卷描述
               </label>
               <textarea
                 value={questionnaire.description || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className=""
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="staff-field">
                 预计用时（分钟）
               </label>
               <input
@@ -464,56 +462,60 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 onChange={(e) =>
                   setQuestionnaire({ ...questionnaire, estimatedTime: parseInt(e.target.value) || null })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className=""
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="staff-field">
                 指导语
               </label>
               <textarea
                 value={questionnaire.instruction || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className=""
                 placeholder="指导用户如何作答..."
               />
             </div>
           </div>
-        </div>
+          </div>
+        </section>
       )}
 
       {/* Content Tab */}
       {activeTab === 'content' && (
         <div className="space-y-6">
           {/* 量表选择 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium mb-4">选择量表</h3>
+          <section className="staff-panel">
+            <header className="staff-panel__header"><div><h2>选择量表</h2><p>从可用量表中选择问卷需要包含的测评内容。</p></div></header>
+            <div className="staff-panel__body">
             <ScaleSelector
               scales={availableScales}
               selected={selectedScaleIds}
               onChange={handleScaleChange}
               loading={false}
             />
-          </div>
+            </div>
+          </section>
 
           {/* 表单题目操作按钮 */}
-          <div className="bg-white rounded-lg shadow p-4">
+          <section className="staff-panel staff-panel--compact"><div className="staff-panel__body">
             <button
               onClick={() => {
                 resetFormData()
                 setShowFormItemModal(true)
               }}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="btn-primary inline-flex items-center gap-2"
             >
               <FileText className="w-4 h-4 mr-2" />
               添加表单题目
             </button>
-          </div>
+            </div></section>
 
           {/* 内容列表 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium mb-4">问卷内容（按顺序）</h3>
+          <section className="staff-panel">
+            <header className="staff-panel__header"><div><h2>问卷内容（按顺序）</h2><p>量表和表单题目按当前位置依次呈现。</p></div></header>
+            <div className="staff-panel__body">
             {allContentItems.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <p>暂无内容</p>
@@ -587,7 +589,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 ))}
               </div>
             )}
-          </div>
+            </div>
+          </section>
 
           {id && (
             <FormSectionManager
@@ -602,14 +605,15 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
       {/* 表单题目编辑弹窗 */}
       {showFormItemModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+        <div className="staff-modal-backdrop" role="presentation">
+          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-label={editingFormItem ? '编辑表单题目' : '添加表单题目'}>
+            <div className="staff-dialog__body">
             <h3 className="text-lg font-medium mb-4">
               {editingFormItem ? '编辑表单题目' : '添加表单题目'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="staff-field">
                   题目类型 *
                 </label>
                 <select
@@ -625,7 +629,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                       options: ['single_choice', 'multiple_choice'].includes(forcedType) ? formData.options : [],
                     })
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className=""
                 >
                   <option value="fill_blank">填空题（短文本）</option>
                   <option value="single_choice">单选题</option>
@@ -635,7 +639,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="staff-field">
                   用于测评参考
                 </label>
                 <select
@@ -656,7 +660,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                         : ['single_choice', 'multiple_choice'].includes(nextType) ? formData.options : [],
                     })
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className=""
                 >
                   <option value="">不绑定人口学含义</option>
                   <option value="birthYearMonth">出生年月（YYYY-MM）</option>
@@ -673,32 +677,32 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="staff-field">
                   题目标签 *
                 </label>
                 <input
                   type="text"
                   value={formData.label}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className=""
                   placeholder="如：性别、年龄、意见反馈"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="staff-field">
                   占位提示
                 </label>
                 <input
                   type="text"
                   value={formData.placeholder}
                   onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className=""
                   placeholder="输入提示文字"
                 />
               </div>
               {['single_choice', 'multiple_choice'].includes(formData.type) && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="staff-field">
                     选项列表
                   </label>
                   <div className="space-y-2">
@@ -711,7 +715,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                             newOptions[idx] = { ...opt, value: e.target.value }
                             setFormData({ ...formData, options: newOptions })
                           }}
-                          className="w-36 px-3 py-2 border border-gray-300 rounded-md"
+                          className=""
                           placeholder="稳定 value"
                         />
                         <input
@@ -722,7 +726,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                             newOptions[idx] = { ...opt, label: e.target.value }
                             setFormData({ ...formData, options: newOptions })
                           }}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                          className=""
                           placeholder={`选项 ${idx + 1}`}
                         />
                         <button
@@ -763,19 +767,20 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 </label>
               </div>
             </div>
-            <div className="flex justify-end gap-3 mt-6">
+            </div>
+            <div className="staff-dialog__actions">
               <button
                 onClick={() => {
                   setShowFormItemModal(false)
                   resetFormData()
                 }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                className="btn-secondary"
               >
                 取消
               </button>
               <button
                 onClick={handleAddFormItem}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                className="btn-primary"
               >
                 {editingFormItem ? '保存' : '添加'}
               </button>
@@ -786,7 +791,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
       {/* 令牌创建弹窗 */}
 
-    </div>
+    </ProductPage>
   )
 }
 
