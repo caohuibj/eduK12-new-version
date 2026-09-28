@@ -23,8 +23,15 @@ test('empty, core, executable additions and mixed changes require full checks', 
 
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
-  for (const [content, draft] of [['true', false], ['true', true], ['false', true], ['false', false]]) {
-    const needs = { scope: { outputs: { content }, result: 'success' } };
+  for (const [content, presentation, draft] of [
+    ['true', 'false', false],
+    ['true', 'false', true],
+    ['false', 'true', false],
+    ['false', 'true', true],
+    ['false', 'false', true],
+    ['false', 'false', false],
+  ]) {
+    const needs = { scope: { outputs: { content, presentation }, result: 'success' } };
     for (const job of requiredChecks(needs, draft)) needs[job] = { ...needs[job], result: 'success' };
     assert.deepEqual(failedChecks(needs, draft), []);
     for (const job of requiredChecks(needs, draft)) {
@@ -70,10 +77,15 @@ test('real git diff retains both rename sides and all files beyond API path limi
 import { chmodSync, symlinkSync, unlinkSync } from 'node:fs';
 import { classifyChanges, changedEntries, parseChangedEntries } from './content-scope.mjs';
 test('malformed classification output never authorizes a passing aggregate', () => {
-  for (const content of [undefined, '', 'TRUE', ' true', true, 'bundle']) {
-    const needs = { scope: { result: 'success', outputs: { content } } };
-    for (const name of requiredChecks(needs, false)) needs[name] = { ...needs[name], result: 'success' };
-    assert.ok(failedChecks(needs, false).includes('scope'));
+  for (const bad of [undefined, '', 'TRUE', ' true', true, 'bundle']) {
+    for (const outputs of [
+      { content: bad, presentation: 'false' },
+      { content: 'false', presentation: bad },
+    ]) {
+      const needs = { scope: { result: 'success', outputs } };
+      for (const name of requiredChecks(needs, false)) needs[name] = { ...needs[name], result: 'success' };
+      assert.ok(failedChecks(needs, false).includes('scope'));
+    }
   }
 });
 test('Git record parser rejects incomplete, renamed or unsupported records', () => {
