@@ -135,7 +135,7 @@ const ScaleResult: React.FC = () => {
         title="量表报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '测评结果不存在或不可访问' }}
-        actions={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+        actions={<button type="button" onClick={() => navigate('/student/scales')} className="hui-button hui-button--secondary">返回量表列表</button>}
       />
     )
   }
@@ -159,7 +159,7 @@ const ScaleResult: React.FC = () => {
           ? '下面是一份不提供受限个体分数或心理健康标签的教育性反馈。'
           : '以下内容来自当前已完成结果记录。',
       }}
-      backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+      backAction={<button type="button" onClick={() => navigate('/student/scales')} className="hui-button hui-button--secondary">返回量表列表</button>}
     >
       <ReportSection title="结果详情" eyebrow="Report">
         <ScaleUnitReportCard report={safeReport} />
