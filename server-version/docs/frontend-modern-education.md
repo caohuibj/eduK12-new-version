@@ -129,23 +129,3 @@ Runner rules deliberately preserve task-owned stimulus geometry and timing seman
 Report rules stack multi-column facts/metrics on mobile, constrain media to the viewport, provide local horizontal overflow for tables, and keep scientific/report wording untouched.
 
 QuestionnaireResult now uses the same `ReportShell` presentation frame as Scale, Situational and Composite reports; its API request and unit-report payloads are unchanged.
-
-
-## 11. Public / anonymous experience visual review
-
-Public participation is converged through CSS-only styling on top of the shared public and focused assessment shells.
-
-Responsive intent:
-- Public entry/result pages use a calm blue educational surface with constrained reading widths.
-- Legacy Ant Design Card / Button / Input / Result components are visually aligned without changing public-capability behavior.
-- Public questionnaire assessment remains a focused runner and inherits the shared assessment surface; its legacy Ant components receive focused-mode compatibility styling.
-- Public check-in media remains two-column on narrow screens where practical; report/background facts collapse to one column.
-- Legacy questionnaire navigation targets are raised to at least 44px.
-- Public Cognitive / Composite sessions continue to use the existing recovery and focused-runner semantics.
-
-Interaction/logic findings intentionally excluded from the visual PR:
-
-15. `PublicQuestionnaire.startAssessment` clears `powLoading` immediately after PoW computation but before the `/questionnaires/:token/start` request completes. The entry button can therefore reappear while the first start request is still in flight. Because a new public start without a resume capability creates a fresh server session and atomically claims another token-use slot, a second click can create a second anonymous attempt and consume another quota slot. Add an explicit in-flight lock/loading state that spans PoW + start + redirect in a dedicated logic PR.
-16. In the legacy public questionnaire form-item branch, the “内容导航” entries are rendered as `<button>` elements but have no `onClick` handler. They should either become non-interactive progress indicators or receive explicitly supported navigation behavior; do not silently add navigation in a visual PR.
-
-Anonymous public check-in submission was reviewed separately: the backend serializes upload/submit transitions per session and enforces one submission per `checkinId + sessionId`, so duplicate submit requests do not create a second record.
