@@ -107,7 +107,12 @@ const CognitiveAssignmentEdit: React.FC = () => {
     <ProductPage width="management" className="staff-editor-page">
       <PageHeader
         title={detail.title}
-        description={`${statusLabel[detail.status] || detail.status}${detail.config?.name ? ` · ${detail.config.name}` : ''}${isWrapper ? ' · 综合测评用' : ''}`}
+        description={(
+          <span className="flex flex-wrap items-center gap-2">
+            <span>{statusLabel[detail.status] || detail.status}{detail.config?.name ? ` · ${detail.config.name}` : ''}</span>
+            {isWrapper && <span className="staff-badge">综合测评用</span>}
+          </span>
+        )}
         actions={(
           <div className="staff-inline-actions">
             <button type="button" onClick={() => navigate('/cognitive-assignments')} className="hui-button hui-button--secondary">
