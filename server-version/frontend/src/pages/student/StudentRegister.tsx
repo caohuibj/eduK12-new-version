@@ -1,7 +1,7 @@
 import { returnAfterLogin } from '../../components/app-shell/access'
 import { useAuthLinks } from '../../components/app-shell/useAuthLinks'
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { GraduationCap, Loader2, ArrowLeft, CheckCircle } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
@@ -11,16 +11,39 @@ interface StudentRegisterData {
   user: User
 }
 
+interface CourseInfo {
+  courseId: string
+  courseName: string
+}
+
+interface StudentRegisterLocationState {
+  verifiedCourseCode?: string
+  verifiedCourse?: CourseInfo
+}
+
+type CourseVerificationState = 'verifying' | 'verified' | 'invalid'
+
 const StudentRegister: React.FC = () => {
   const authLink = useAuthLinks()
+  const location = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const courseCode = searchParams.get('course') || '' 
+  const courseCode = searchParams.get('course') || ''
   const { setAuthenticatedUser } = useAuth()
-  
+
+  const locationState = location.state as StudentRegisterLocationState | null
+  const preverifiedCourseInfo =
+    locationState?.verifiedCourseCode === courseCode
+      ? locationState.verifiedCourse ?? null
+      : null
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [courseInfo, setCourseInfo] = useState<{ courseId: string; courseName: string } | null>(null)
+  const [courseInfo, setCourseInfo] = useState<CourseInfo | null>(() => preverifiedCourseInfo)
+  const [verificationState, setVerificationState] = useState<CourseVerificationState>(() => {
+    if (!courseCode) return 'invalid'
+    return preverifiedCourseInfo ? 'verified' : 'verifying'
+  })
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -30,28 +53,55 @@ const StudentRegister: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    if (courseCode) {
-      // 验证课程码并获取课程信息
-      verifyCourseCode()
-    }
-  }, [courseCode])
+    let cancelled = false
 
-  const verifyCourseCode = async () => {
-    try {
-      const response = await apiClient.post<{ courseId: string; courseName: string }>(
-        '/courses/verify-code',
-        { courseCode }
-      )
-      
-      if (response.code === 0 && response.data) {
-        setCourseInfo(response.data)
-      } else {
-        setError('课程码无效或课程已结束')
-      }
-    } catch (err) {
-      setError('验证课程码失败')
+    if (!courseCode) {
+      setCourseInfo(null)
+      setVerificationState('invalid')
+      setError('')
+      return
     }
-  }
+
+    if (preverifiedCourseInfo) {
+      setCourseInfo(preverifiedCourseInfo)
+      setVerificationState('verified')
+      setError('')
+      return
+    }
+
+    setCourseInfo(null)
+    setVerificationState('verifying')
+    setError('')
+
+    const verifyCourseCode = async () => {
+      try {
+        const response = await apiClient.post<CourseInfo>(
+          '/courses/verify-code',
+          { courseCode }
+        )
+
+        if (cancelled) return
+
+        if (response.code === 0 && response.data) {
+          setCourseInfo(response.data)
+          setVerificationState('verified')
+        } else {
+          setError(response.message || '课程码无效或课程已结束')
+          setVerificationState('invalid')
+        }
+      } catch {
+        if (cancelled) return
+        setError('验证课程码失败')
+        setVerificationState('invalid')
+      }
+    }
+
+    void verifyCourseCode()
+
+    return () => {
+      cancelled = true
+    }
+  }, [courseCode, preverifiedCourseInfo])
 
   const validateUsername = (username: string) => {
     const regex = /^[a-zA-Z0-9]+$/
@@ -82,29 +132,29 @@ const StudentRegister: React.FC = () => {
 
   const validateForm = () => {
     const errors: Record<string, string> = {}
-    
+
     const usernameError = validateUsername(formData.username)
     if (usernameError) errors.username = usernameError
-    
+
     const passwordError = validatePassword(formData.password)
     if (passwordError) errors.password = passwordError
-    
+
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = '两次输入的密码不一致'
     }
-    
+
     const nicknameError = validateNickname(formData.nickname)
     if (nicknameError) errors.nickname = nicknameError
-    
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm() || !courseInfo) return
-    
+
     setLoading(true)
     setError('')
 
@@ -132,7 +182,18 @@ const StudentRegister: React.FC = () => {
     }
   }
 
-  if (!courseCode || !courseInfo) {
+  if (verificationState === 'verifying') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
+        <div className="card text-center" role="status" aria-live="polite">
+          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-3 text-blue-600" />
+          <p className="text-gray-700">正在验证课程码...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!courseCode || verificationState === 'invalid' || !courseInfo) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
         <div className="card text-center">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Brain, Clock, Keyboard, Plus, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -17,10 +17,75 @@ const StudentHome: React.FC = () => {
   const [courseCode, setCourseCode] = useState('')
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
+  const joinDialogRef = useRef<HTMLElement | null>(null)
+  const joinInputRef = useRef<HTMLInputElement | null>(null)
+  const restoreFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     void fetchCourses()
   }, [])
+
+  useEffect(() => {
+    if (!showJoinModal) return
+
+    joinInputRef.current?.focus()
+
+    const handleDialogKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setShowJoinModal(false)
+        setJoinError(null)
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const dialog = joinDialogRef.current
+      if (!dialog) return
+
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter((element) => element.getAttribute('aria-hidden') !== 'true')
+
+      if (focusable.length === 0) {
+        event.preventDefault()
+        dialog.focus()
+        return
+      }
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const activeElement = document.activeElement
+
+      if (!dialog.contains(activeElement)) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+      } else if (event.shiftKey && activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleDialogKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleDialogKeyDown)
+      restoreFocusRef.current?.focus()
+    }
+  }, [showJoinModal])
+
+  const openJoinModal = () => {
+    restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    setJoinError(null)
+    setShowJoinModal(true)
+  }
+
+  const closeJoinModal = () => {
+    setShowJoinModal(false)
+    setJoinError(null)
+  }
 
   const fetchCourses = async () => {
     try {
@@ -46,7 +111,7 @@ const StudentHome: React.FC = () => {
     try {
       const response = await apiClient.post('/courses/join', { courseCode: courseCode.trim() })
       if (response.code !== 0) throw new Error(response.message || '加入课程失败')
-      setShowJoinModal(false)
+      closeJoinModal()
       setCourseCode('')
       await fetchCourses()
     } catch (error) {
@@ -73,7 +138,7 @@ const StudentHome: React.FC = () => {
             <Link to="/student/classroom/enter" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
               <Keyboard className="h-5 w-5" aria-hidden="true" />加入课堂
             </Link>
-            <ProductButton variant="primary" onClick={() => { setJoinError(null); setShowJoinModal(true) }}>
+            <ProductButton variant="primary" onClick={openJoinModal}>
               <Plus className="mr-1 inline h-5 w-5" aria-hidden="true" />加入课程
             </ProductButton>
           </div>
@@ -85,7 +150,7 @@ const StudentHome: React.FC = () => {
       ) : loadError ? (
         <ProductStatus kind="error" title="课程列表加载失败" announce="assertive">{loadError}</ProductStatus>
       ) : courses.length === 0 ? (
-        <ProductStatus kind="info" title="还没有加入任何课程" actions={<ProductButton variant="primary" onClick={() => setShowJoinModal(true)}>加入课程</ProductButton>}>
+        <ProductStatus kind="info" title="还没有加入任何课程" actions={<ProductButton variant="primary" onClick={openJoinModal}>加入课程</ProductButton>}>
           输入老师提供的课程号即可加入。
         </ProductStatus>
       ) : (
@@ -111,13 +176,14 @@ const StudentHome: React.FC = () => {
 
       {showJoinModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation">
-          <section role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="card w-full max-w-md">
+          <section ref={joinDialogRef} role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="card w-full max-w-md" tabIndex={-1}>
             <h2 id="join-course-title" className="text-xl font-bold text-gray-800 mb-2">加入课程</h2>
             <p className="text-gray-500 mb-4">请输入老师提供的课程号。</p>
             {joinError ? <p role="alert" className="mb-4 text-sm text-red-600">{joinError}</p> : null}
             <form onSubmit={handleJoinCourse}>
               <label className="block text-sm font-medium text-slate-700" htmlFor="join-course-code">课程号</label>
               <input
+                ref={joinInputRef}
                 id="join-course-code"
                 type="text"
                 value={courseCode}
@@ -125,10 +191,9 @@ const StudentHome: React.FC = () => {
                 placeholder="例如：ABC123"
                 className="input mt-1 mb-4"
                 required
-                autoFocus
               />
               <div className="flex flex-wrap justify-end gap-3">
-                <ProductButton onClick={() => { setShowJoinModal(false); setJoinError(null) }}>取消</ProductButton>
+                <ProductButton onClick={closeJoinModal}>取消</ProductButton>
                 <ProductButton type="submit" variant="primary" disabled={joining || !courseCode.trim()}>{joining ? '加入中...' : '加入'}</ProductButton>
               </div>
             </form>
