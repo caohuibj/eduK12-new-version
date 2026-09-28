@@ -63,7 +63,7 @@ const StudentQuestionnaires: React.FC = () => {
   }
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-assessments">
       <PageHeader title="聚合问卷" description="按顺序完成量表、认知测验、情境判断与表单，各项结果独立展示。" />
 
       {loading ? (
