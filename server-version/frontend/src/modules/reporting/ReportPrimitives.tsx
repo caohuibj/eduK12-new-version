@@ -17,6 +17,7 @@ export function ReportSection({
   children,
   className = '',
   testId,
+  id,
   headingLevel = 2,
 }: {
   title: ReactNode
@@ -25,11 +26,12 @@ export function ReportSection({
   children: ReactNode
   className?: string
   testId?: string
+  id?: string
   headingLevel?: 2 | 3 | 4
 }) {
   const Heading = headingLevel === 2 ? 'h2' : headingLevel === 3 ? 'h3' : 'h4'
   return (
-    <section className={`report-section ${className}`.trim()} data-testid={testId}>
+    <section id={id} className={`report-section ${className}`.trim()} data-testid={testId}>
       <header className="report-section__header">
         <div className="min-w-0">
           {eyebrow && <p className="report-eyebrow">{eyebrow}</p>}
