@@ -1,0 +1,196 @@
+/*
+ * Huisurvey Modern Education — live classroom participant surfaces.
+ * CSS-only. Socket/session/question timing and submission behavior are untouched.
+ */
+
+/* Shared classroom atmosphere for authenticated students and guest participants. */
+.hui-app--student .hui-app-main > main:has(#classroom-code),
+.hui-app--public .hui-app-main > main:has(#classroom-code),
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) {
+  min-height: calc(100dvh - 150px);
+  border: 1px solid #dce7f0;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 84% 10%,rgba(56,189,248,.08) 0 7rem,transparent 7.1rem),
+    #f8fbff;
+  overflow: hidden;
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) > header,
+.hui-app--public .hui-app-main > main:has(#classroom-code) > header {
+  border-bottom: 1px solid #e2ebf2;
+  background: rgba(255,255,255,.95);
+  box-shadow: none;
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) h1,
+.hui-app--public .hui-app-main > main:has(#classroom-code) h1,
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) h1,
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) h1 {
+  color: #14304a;
+  letter-spacing: -.03em;
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) section,
+.hui-app--public .hui-app-main > main:has(#classroom-code) section,
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div,
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div {
+  border: 1px solid #dce7f0;
+  border-radius: 17px;
+  box-shadow: 0 5px 20px rgba(20,48,74,.04);
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) #classroom-code,
+.hui-app--public .hui-app-main > main:has(#classroom-code) #classroom-code {
+  min-height: 50px;
+  border-color: #cedce8;
+  border-radius: 11px;
+  background: #fbfdff;
+  color: #14304a;
+  font-weight: 650;
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) button,
+.hui-app--public .hui-app-main > main:has(#classroom-code) button,
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) :where(button,a),
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) :where(button,a) {
+  min-height: 44px;
+  border-radius: 11px;
+}
+
+.hui-app--student .hui-app-main > main:has(#classroom-code) form > button[type="submit"],
+.hui-app--public .hui-app-main > main:has(#classroom-code) form > button[type="submit"],
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"],
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"] {
+  min-height: 50px;
+  background: #2f6fed;
+  box-shadow: 0 7px 18px rgba(47,111,237,.13);
+}
+
+/* Real-time answer page: identify the page by its direct sticky status header. */
+.hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]),
+.hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) {
+  min-height: calc(100dvh - 150px);
+  border: 1px solid #dce7f0;
+  border-radius: 20px;
+  background: #f8fbff;
+  overflow: hidden;
+}
+
+.hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class*="sticky"],
+.hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class*="sticky"] {
+  border-color: #e2ebf2;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 2px 12px rgba(20,48,74,.04);
+  backdrop-filter: blur(9px);
+}
+
+.hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button,
+.hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button[class*="border-2"],
+.hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button[class*="border-2"] {
+  border-color: #d7e2ec;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(20,48,74,.025);
+}
+
+.hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) :where(input,textarea),
+.hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) :where(input,textarea) {
+  min-height: 48px;
+  border-color: #d4e0ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* Tablet */
+@media (max-width:63.999rem) {
+  .hui-app--student .hui-app-main > main:has(#classroom-code),
+  .hui-app--public .hui-app-main > main:has(#classroom-code),
+  .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+  .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]),
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) {
+    min-height: calc(100dvh - 120px);
+  }
+}
+
+/* Mobile */
+@media (max-width:39.999rem) {
+  .hui-app--student .hui-app-main > main:has(#classroom-code),
+  .hui-app--public .hui-app-main > main:has(#classroom-code),
+  .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+  .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]),
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) {
+    min-height: calc(100dvh - 104px);
+    border-radius: 16px;
+  }
+
+  .hui-app--student .hui-app-main > main:has(#classroom-code) > header > div,
+  .hui-app--public .hui-app-main > main:has(#classroom-code) > header > div {
+    padding: 18px 14px;
+  }
+
+  .hui-app--student .hui-app-main > main:has(#classroom-code) form,
+  .hui-app--public .hui-app-main > main:has(#classroom-code) form {
+    max-width: 100%;
+  }
+
+  .hui-app--student .hui-app-main > main:has(#classroom-code) form section,
+  .hui-app--public .hui-app-main > main:has(#classroom-code) form section {
+    padding: 16px;
+  }
+
+  /* Six code cells must fit inside a 390px viewport after shell/card padding. */
+  .hui-app--student .hui-app-main > main:has(#classroom-code) form section:first-child > div[aria-hidden="true"],
+  .hui-app--public .hui-app-main > main:has(#classroom-code) form section:first-child > div[aria-hidden="true"] {
+    gap: 5px;
+  }
+
+  .hui-app--student .hui-app-main > main:has(#classroom-code) form section:first-child > div[aria-hidden="true"] > div,
+  .hui-app--public .hui-app-main > main:has(#classroom-code) form section:first-child > div[aria-hidden="true"] > div {
+    width: calc((100% - 25px) / 6);
+    min-width: 0;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]),
+  .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) {
+    padding: 12px;
+  }
+
+  .hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div,
+  .hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) > div {
+    padding: 18px;
+  }
+
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class*="sticky"] > div,
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class*="sticky"] > div {
+    padding-inline: 14px;
+  }
+
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class~="max-w-2xl"],
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) > div[class~="max-w-2xl"] {
+    padding: 18px 14px;
+  }
+
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button[class*="p-4"],
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) button[class*="p-4"] {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .hui-app--student .hui-app-main > main:has(#classroom-code) *,
+  .hui-app--public .hui-app-main > main:has(#classroom-code) *,
+  .hui-app--student .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) *,
+  .hui-app--public .hui-app-main > div[class~="min-h-screen"]:has(> div[class*="sticky"]) * {
+    transition: none !important;
+  }
+}
