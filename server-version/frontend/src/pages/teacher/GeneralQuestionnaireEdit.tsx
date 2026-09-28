@@ -557,7 +557,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="staff-row-actions opacity-70 group-hover:opacity-100 transition-opacity">
                       {item.type === 'form' && (
                         <button
                           onClick={() => handleEditFormItem(item.data as FormItem)}
