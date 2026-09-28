@@ -40,6 +40,88 @@ const sampleCourse = {
   coverUrl: null,
 }
 
+const visualScaleReport = {
+  id: 'visual-scale-assessment',
+  status: 'COMPLETED',
+  startedAt: '2026-09-28T08:00:00.000Z',
+  completedAt: '2026-09-28T08:12:00.000Z',
+  totalTime: 720000,
+  scale: {
+    id: 'visual-scale',
+    code: 'VISUAL-MULTI',
+    name: '学习自我调节量表',
+    description: '用于报告视觉验收的确定性多维量表。',
+  },
+  report: {
+    schemaVersion: 1,
+    kind: 'full',
+    instrument: { scaleId: 'visual-scale', code: 'VISUAL-MULTI', name: '学习自我调节量表', instrumentVersion: '1.0.0' },
+    completedAt: '2026-09-28T08:12:00.000Z',
+    totalTime: 720000,
+    quality: { status: 'interpretable', flags: [] },
+    scores: [
+      { key: 'total', type: 'total', label: '总体自我调节', direction: 'higher_is_more', canonical: true, displayPrecision: 1, value: 72, range: { min: 0, max: 100 }, status: 'calculated', prorated: false },
+      { key: 'planning', type: 'dimension', label: '学习计划', direction: 'higher_is_more', canonical: false, displayPrecision: 1, value: 18, range: { min: 0, max: 25 }, status: 'calculated', prorated: false },
+      { key: 'persistence', type: 'dimension', label: '坚持性', direction: 'higher_is_more', canonical: false, displayPrecision: 1, value: 14, range: { min: 0, max: 20 }, status: 'calculated', prorated: false },
+      { key: 'monitoring', type: 'dimension', label: '自我监控', direction: 'higher_is_more', canonical: false, displayPrecision: 1, value: 21, range: { min: 0, max: 30 }, status: 'calculated', prorated: false },
+      { key: 'emotion', type: 'dimension', label: '情绪调节', direction: 'descriptive', canonical: false, displayPrecision: 1, value: 12, range: { min: 0, max: 20 }, status: 'calculated', prorated: false },
+    ],
+    references: [
+      {
+        scoreKey: 'planning',
+        referenceVersion: 'visual-ref-v1',
+        referenceKind: 'descriptive_sample',
+        evidenceLevel: 'literature_beta',
+        status: 'available',
+        label: '文献描述性样本',
+        value: 18,
+        mean: 16.4,
+        sd: 3.2,
+        z: 0.5,
+        t: null,
+        percentile: null,
+        criterionBand: null,
+        meanDifference: 1.6,
+        source: { citation: 'Visual QA illustrative source', publicationYear: 2026, sampleSize: 240 },
+        population: { description: '用于视觉验收的示意样本' },
+        instrumentVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        limitations: ['仅用于视觉验收。'],
+        disclaimer: '示意 reference，不代表真实常模。',
+      },
+      {
+        scoreKey: 'monitoring',
+        referenceVersion: 'visual-band-v1',
+        referenceKind: 'criterion_threshold',
+        evidenceLevel: 'literature_beta',
+        status: 'available',
+        label: '来源定义区间',
+        value: 21,
+        mean: null,
+        sd: null,
+        z: null,
+        t: null,
+        percentile: null,
+        criterionBand: { key: 'visual-band', label: '来源定义区间', minInclusive: 15, maxInclusive: 22.5 },
+        meanDifference: null,
+        source: { citation: 'Visual QA illustrative criterion' },
+        population: null,
+        instrumentVersion: '1.0.0',
+        scoringVersion: '1.0.0',
+        limitations: ['仅用于视觉验收。'],
+        disclaimer: '示意区间，不代表临床 cutoff。',
+      },
+    ],
+    interpretations: [
+      { scoreKey: 'total', headline: '总体结果概览', label: '总体自我调节', interpretation: '本次结果包含一个总体结果和四个独立维度。', guidance: [{ category: 'reflection', text: '结合近期学习任务理解各维度。' }], limitations: [], referenceVersion: null },
+      { scoreKey: 'planning', headline: '学习计划', label: '计划维度', interpretation: '能够形成较明确的学习计划。', guidance: [{ category: 'strategy', text: '多任务时继续关注优先级安排。' }], limitations: [], referenceVersion: 'visual-ref-v1' },
+    ],
+    method: { scaleId: 'visual-scale', instrumentVersion: '1.0.0', scoringVersion: '1.0.0', reportVersion: '1.0.0', referenceVersions: ['visual-ref-v1', 'visual-band-v1'], assessmentContext: null },
+    caveats: ['不同维度使用各自原始范围，不应仅按条形长度直接比较。'],
+    disclaimer: '结果仅反映本次作答，不构成医学诊断或人口常模。',
+  },
+}
+
 const envelope = (data, code = 0, message = 'ok') => ({ code, message, data })
 
 async function installApiFixture(page, role) {
@@ -67,6 +149,7 @@ async function installApiFixture(page, role) {
     else if (pathname === '/api/courses') data = { list: [sampleCourse], total: 1 }
     else if (pathname === '/api/courses/shared-to-me') data = { list: [] }
     else if (pathname === '/api/scales/available') data = { list: [] }
+    else if (pathname === '/api/scales/assessments/visual-scale-assessment') data = visualScaleReport
     else if (pathname === '/api/scale-library') data = { schemaVersion: 1, generatedAt: '2026-09-28T00:00:00.000Z', entries: [] }
     else if (pathname.startsWith('/api/cognitive/history')) data = { list: [], total: 0, totalPages: 1, hasMore: false }
     else if (pathname.startsWith('/api/organizations')) data = {
@@ -93,6 +176,7 @@ const cases = [
   { id: 'student-login', route: '/student/login', role: null, ready: (page) => page.getByRole('heading', { name: '学生登录', exact: true }).waitFor() },
   { id: 'student-home', route: '/student', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '我的课程', exact: true }).waitFor() },
   { id: 'student-scales', route: '/student/scales', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '心理测评', exact: true }).waitFor() },
+  { id: 'scale-report', route: '/student/scales/result/visual-scale-assessment', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '学习自我调节量表', exact: true }).waitFor() },
   { id: 'cognitive-history', route: '/student/cognitive/history', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor() },
   { id: 'classroom-enter', route: '/student/classroom/enter', role: null, ready: (page) => page.getByRole('heading', { name: '加入课堂', exact: true }).waitFor() },
   { id: 'parent-home', route: '/parent', role: 'PARENT', ready: (page) => page.getByRole('heading', { name: '家长首页', exact: true }).waitFor() },
@@ -166,6 +250,13 @@ async function main() {
           const directory = path.join(output, spec.id)
           fs.mkdirSync(directory, { recursive: true })
           await page.screenshot({ path: path.join(directory, `${viewport.name}.png`), fullPage: true })
+          if (spec.id === 'scale-report' && viewport.name === 'desktop-1440') {
+            await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' })
+            await page.setViewportSize({ width: 794, height: 1123 })
+            assert.equal(await page.locator('[data-report-screen-only]:visible').count(), 0, 'scale-report/print: screen-only controls must be hidden')
+            assert.equal(await page.locator('.hui-app-header:visible').count(), 0, 'scale-report/print: app header must be hidden')
+            await page.screenshot({ path: path.join(directory, 'a4-print.png'), fullPage: true })
+          }
           report.cases.push({
             id: spec.id,
             route: spec.route,
