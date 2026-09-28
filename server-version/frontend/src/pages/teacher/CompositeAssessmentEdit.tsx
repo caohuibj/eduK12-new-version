@@ -13,7 +13,7 @@ import type {
   ReportPackageProfile,
 } from '../../modules/composite/types'
 import { contextOptionsForKey, contextValueHint, parseDelimitedOptions, serializeDelimitedOptions } from '../../modules/assessment-context/options'
-import { ProductPage } from '../../components/product-ui'
+import { PageHeader, ProductPage } from '../../components/product-ui'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import FormSectionManager from '../../components/FormSectionManager'
 
@@ -268,36 +268,18 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page">
-      <button onClick={() => navigate('/composite-assessments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
-        <ArrowLeft className="w-4 h-4 mr-1" />返回综合测评
-      </button>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-gray-800">{detail.name}</h1>
-            {isLibraryCourse && (
-              <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
-            )}
-            {detail.copyable && (
-              <span className="px-2 py-0.5 text-xs rounded bg-emerald-100 text-emerald-700">可复制</span>
-            )}
+      <PageHeader
+        title={detail.name}
+        description={`${detail.code} · ${detail.status} · 已开始 ${detail.attemptCounts?.started ?? 0} · 已完成 ${detail.attemptCounts?.completed ?? 0}`}
+        actions={(
+          <div className="staff-inline-actions">
+            <button type="button" onClick={() => navigate('/composite-assessments')} className="hui-button hui-button--secondary"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回综合测评</button>
+            {isDraft && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
+            <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="hui-button hui-button--secondary">查看结果</button>
+            <button onClick={() => void exportData('summary')} className="hui-button hui-button--secondary"><Download className="w-4 h-4" aria-hidden="true" />导出摘要</button>
           </div>
-          <p className="text-sm text-gray-500">{detail.code} · {detail.status}</p>
-          <p className="text-sm text-gray-600 mt-1">已开始 {detail.attemptCounts?.started ?? 0} · 已完成 {detail.attemptCounts?.completed ?? 0}</p>
-        </div>
-        <div className="flex gap-2">
-          {isDraft && (
-            <button onClick={() => void publish()} className="hui-button hui-button--primary">
-              <Send className="w-4 h-4 inline mr-1" />发布
-            </button>
-          )}
-          <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="hui-button hui-button--secondary">查看结果</button>
-          <button onClick={() => void exportData('summary')} className="hui-button hui-button--secondary">
-            <Download className="w-4 h-4 inline mr-1" />导出摘要
-          </button>
-          <button onClick={() => void exportData('full')} className="hui-button hui-button--secondary">导出完整数据</button>
-        </div>
-      </div>
+        )}
+      />
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {detail.canSetCopyable && (
         <div className="staff-panel staff-panel--padded p-6 mb-5">
