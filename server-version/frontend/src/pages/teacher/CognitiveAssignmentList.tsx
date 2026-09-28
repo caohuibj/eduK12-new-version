@@ -145,7 +145,7 @@ const CognitiveAssignmentList: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="btn-primary"
+            className="hui-button hui-button--primary"
             aria-expanded={showForm}
             aria-controls="cognitive-assignment-create"
           >
@@ -157,7 +157,7 @@ const CognitiveAssignmentList: React.FC = () => {
       {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
       {showForm && (
-        <section id="cognitive-assignment-create" className="card p-6" aria-labelledby="cognitive-assignment-create-title">
+        <section id="cognitive-assignment-create" className="staff-panel staff-panel--padded p-6" aria-labelledby="cognitive-assignment-create-title">
           <div className="flex items-center gap-2 mb-4">
             <Brain className="w-5 h-5 text-primary" aria-hidden="true" />
             <h2 id="cognitive-assignment-create-title" className="text-lg font-semibold">新建认知任务</h2>
@@ -211,7 +211,7 @@ const CognitiveAssignmentList: React.FC = () => {
                   />
                   GRANT 需授权
                 </label>
-                <button type="button" onClick={() => setGrantConfig(selectedConfig)} className="btn-secondary">
+                <button type="button" onClick={() => setGrantConfig(selectedConfig)} className="hui-button hui-button--secondary">
                   授权给教师
                 </button>
               </fieldset>
@@ -250,8 +250,8 @@ const CognitiveAssignmentList: React.FC = () => {
             <p className="text-xs text-red-600 mt-3">任务配置与 Catalog 版本不一致，无法选择 Profile。请重新选择匹配 engineVersion / scoringVersion 的任务类型。</p>
           )}
           <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || !selectedTest} className="btn-primary">{saving ? '保存中...' : '保存草稿'}</button>
-            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
+            <button onClick={() => void create()} disabled={saving || !form.title || !form.courseId || !form.configId || !selectedTest} className="hui-button hui-button--primary">{saving ? '保存中...' : '保存草稿'}</button>
+            <button type="button" onClick={() => setShowForm(false)} className="hui-button hui-button--secondary">取消</button>
           </div>
         </section>
       )}
