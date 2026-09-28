@@ -215,7 +215,7 @@ const CognitiveResult: React.FC = () => {
           )}
 
           {interpretable && report?.showProductIndex !== false && (
-            <ReportSection title="任务表现指数">
+            <ReportSection title="综合指标">
               <ReportMetric label="任务表现指数" value={result.score !== undefined ? `${Math.round(result.score)} / 100` : '暂不显示'} description="内部综合指数，用于汇总本次任务表现；不代表百分位、年龄等级、学校成绩或诊断结论。" />
             </ReportSection>
           )}
