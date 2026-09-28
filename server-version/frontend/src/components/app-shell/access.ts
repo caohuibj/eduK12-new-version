@@ -44,10 +44,11 @@ export function returnAfterLogin(value: string | null | undefined, role: Role): 
   if (!target) return homeFor(role)
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
   if (isAuthPath(pathname)) return homeFor(role)
-  const allowed = role === 'PARENT'
+  const organizationTarget = inRoot(pathname, 'organizations') || inRoot(pathname, 'organization-tasks')
+  const allowed = organizationTarget || (role === 'PARENT'
     ? inRoot(pathname, 'parent') || inRoot(pathname, 'relational')
     : inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student') || inRoot(pathname, 'relational')
-      : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root))))
+      : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root)))))
   return allowed ? target : homeFor(role)
 }
 export function loginUrl(role: Role | undefined, destination: string) {
