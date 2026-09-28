@@ -10,6 +10,9 @@ async function setup(browser, { role = 'STUDENT', width = 390, touch = false, co
   const context = await browser.newContext({ viewport: { width, height: 900 }, hasTouch: touch })
   const page = await context.newPage()
   page.setDefaultTimeout(15000)
+  // Vite's first module transform on self-hosted ARM runners can exceed the control timeout.
+  // Navigation gets its own budget; page-specific assertions below still fail at 15s.
+  page.setDefaultNavigationTimeout(30000)
   const state = { user: role ? userFor(role) : null, expires: false, loginUser: userFor('STUDENT'), requests: [], errors: [] }
   page.on('pageerror', (error) => state.errors.push(error.message))
   await page.route('**/api/**', async (route) => {
@@ -29,6 +32,9 @@ async function setup(browser, { role = 'STUDENT', width = 390, touch = false, co
     await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ code: status === 200 ? 0 : status, message: status === 200 ? 'ok' : '测评不可访问', data }) })
   })
   return { context, page, state }
+}
+async function gotoRoute(page, url) {
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
 }
 async function login(page) {
   await page.getByLabel('用户名', { exact: true }).fill('pilot')
@@ -69,7 +75,7 @@ async function main() {
   try {
     for (const width of [360, 390, 768, 820, 1366]) for (const mode of inputModes) {
       const { context, page, state } = await setup(browser, { width, touch: mode.touch })
-      await page.goto(`${base}/student/cognitive/history`)
+      await gotoRoute(page, `${base}/student/cognitive/history`)
       await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
       let nav = await openNav(page, mode.name === 'emulated-touch' ? 'touch' : 'pointer')
       assert.equal(await nav.locator('[aria-current="page"]').count(), 1)
@@ -98,17 +104,25 @@ async function main() {
     }
     for (const role of ['TEACHER', 'ADMIN']) {
       const { context, page, state } = await setup(browser, { role, width: 1366 })
-      await page.goto(`${base}/profile`)
+      await gotoRoute(page, `${base}/profile`)
       await page.getByRole('heading', { name: '个人信息', exact: true }).or(page.getByRole('heading', { name: '个人资料', exact: true })).waitFor()
       const nav = await openNav(page)
-      assert.equal(await nav.getByRole('link', { name: '用户管理' }).count(), role === 'ADMIN' ? 1 : 0)
+      if (role === 'ADMIN') {
+        const systemGroup = nav.getByRole('button', { name: '系统管理', exact: true })
+        assert.equal(await systemGroup.count(), 1)
+        await systemGroup.click()
+        assert.equal(await nav.getByRole('link', { name: '用户管理', exact: true }).count(), 1)
+      } else {
+        assert.equal(await nav.getByRole('button', { name: '系统管理', exact: true }).count(), 0)
+        assert.equal(await nav.getByRole('link', { name: '用户管理', exact: true }).count(), 0)
+      }
       assert.equal(await nav.locator('[aria-current="page"]').count(), 1)
       assert.deepEqual(state.errors, [])
       cases.push({ role, passed: true }); await context.close()
     }
     {
       const { context, page, state } = await setup(browser, { role: null })
-      await page.goto(`${base}/public/cognitive/sessions/s1`)
+      await gotoRoute(page, `${base}/public/cognitive/sessions/s1`)
       await page.getByText('需要恢复凭证', { exact: true }).waitFor()
       assert.equal(await page.locator('[data-shell-mode="focused"]').count(), 1)
       assert.equal(state.requests.some((req) => req.pathname.includes('/cognitive/')), false)
@@ -118,21 +132,21 @@ async function main() {
       await page.getByText('测评不可访问', { exact: true }).waitFor()
       assert(state.requests.some((req) => req.pathname.includes('/public/cognitive/sessions/s1')))
       assert.equal(state.requests.some((req) => req.pathname.startsWith('/api/cognitive/')), false)
-      await page.goto(`${base}/public/cognitive/sessions`)
+      await gotoRoute(page, `${base}/public/cognitive/sessions`)
       await page.getByText('找不到此页面', { exact: true }).waitFor()
       assert.deepEqual(state.errors, [])
       cases.push({ publicCredentialAndMissingLink: true, passed: true }); await context.close()
     }
     {
       const { context, page } = await setup(browser, { cognitive: false })
-      await page.goto(`${base}/student/cognitive/history`)
+      await gotoRoute(page, `${base}/student/cognitive/history`)
       await page.getByText('找不到此页面', { exact: true }).waitFor()
       assert.equal(await (await openNav(page)).getByRole('link', { name: '认知测评', exact: true }).count(), 0)
       cases.push({ disabledCapability: true, passed: true }); await context.close()
     }
     {
       const { context, page, state } = await setup(browser)
-      await page.goto(`${base}/student/cognitive/history`)
+      await gotoRoute(page, `${base}/student/cognitive/history`)
       await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
       // Sentinel models existing browser data; FE-02 must not delete storage on 401.
       await page.evaluate(() => localStorage.setItem('fe02-draft-sentinel', 'keep'))
@@ -155,7 +169,7 @@ async function main() {
     }
     {
       const { context, page } = await setup(browser, { role: null, width: 360 })
-      await page.goto(`${base}/scale-library/test/v1`)
+      await gotoRoute(page, `${base}/scale-library/test/v1`)
       await page.getByRole('heading', { name: '欢迎使用 Huisurvey' }).waitFor()
       const target = new URL(page.url()).searchParams.get('returnTo')
       assert.equal(target, '/scale-library/test/v1')

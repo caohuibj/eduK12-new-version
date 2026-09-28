@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Key, Lock, Search, Unlock, Users, UserX } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { Course } from '../types'
 
@@ -16,6 +17,9 @@ interface Student {
 }
 
 const CourseStudents: React.FC = () => {
+  const { feedback, confirm, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { courseId } = useParams<{ courseId: string }>()
   const [course, setCourse] = useState<Course | null>(null)
   const [students, setStudents] = useState<Student[]>([])
@@ -64,7 +68,7 @@ const CourseStudents: React.FC = () => {
   }
 
   const handleToggleFreeze = async (student: Student) => {
-    if (!window.confirm(student.isFrozen ? '确定要解冻该学生账号吗？' : '确定要冻结该学生账号吗？')) return
+    if (!await ask(student.isFrozen ? '确定要解冻该学生账号吗？' : '确定要冻结该学生账号吗？')) return
 
     setProcessingId(student.id)
     try {
@@ -73,43 +77,43 @@ const CourseStudents: React.FC = () => {
       })
       if (response.code === 0) {
         setStudents(current => current.map(item => item.id === student.id ? { ...item, isFrozen: !item.isFrozen } : item))
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '操作失败')
+      showMessage(operationError.message || '操作失败')
     } finally {
       setProcessingId(null)
     }
   }
 
   const handleResetPassword = async (student: Student) => {
-    if (!window.confirm(`确定要为 ${student.nickname} 生成一次性临时密码吗？\n\n临时密码只会写入受保护的本地交接文件。`)) return
+    if (!await ask(`确定要为 ${student.nickname} 生成一次性临时密码吗？\n\n临时密码只会写入受保护的本地交接文件。`)) return
 
     setProcessingId(student.id)
     try {
       const response = await apiClient.post(`/courses/${courseId}/students/${student.id}/reset-password`)
       if (response.code === 0) {
-        alert(response.message || `已为 ${student.nickname} 生成一次性临时密码，请从受保护的本地交接文件中读取。`)
+        showMessage(response.message || `已为 ${student.nickname} 生成一次性临时密码，请从受保护的本地交接文件中读取。`)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '重置密码失败')
+      showMessage(operationError.message || '重置密码失败')
     } finally {
       setProcessingId(null)
     }
   }
 
   const handleRemoveStudent = async (student: Student) => {
-    if (!window.confirm(`确定要将 ${student.nickname} 从课程中移除吗？\n\n注意：此操作不会删除学生账号，只是将其从本课程中移除。`)) return
+    if (!await ask(`确定要将 ${student.nickname} 从课程中移除吗？\n\n注意：此操作不会删除学生账号，只是将其从本课程中移除。`)) return
 
     setProcessingId(student.id)
     try {
       const response = await apiClient.delete(`/courses/${courseId}/students/${student.id}`)
       if (response.code === 0) {
         setStudents(current => current.filter(item => item.id !== student.id))
-        alert('学生已从课程中移除')
+        showMessage('学生已从课程中移除')
       }
     } catch (operationError: any) {
-      alert(operationError.message || '移除学生失败')
+      showMessage(operationError.message || '移除学生失败')
     } finally {
       setProcessingId(null)
     }
@@ -124,6 +128,7 @@ const CourseStudents: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader
         title={course?.title || '课程学生管理'}
         description={`课程号: ${course?.courseCode || '—'} · 共 ${students.length} 名学生`}

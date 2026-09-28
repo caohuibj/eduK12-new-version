@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import { sessionFetch } from '../../api/client'
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 
 const statusLabel: Record<string, string> = {
   DRAFT: '草稿',
@@ -97,13 +98,13 @@ const CognitiveAssignmentEdit: React.FC = () => {
     }
   }
 
-  if (!detail) return <div className="p-8 text-gray-500">{error || '加载中...'}</div>
+  if (!detail) return <ProductPage width="management"><ProductStatus kind={error ? 'error' : 'pending'} title={error ? '认知任务不可用' : '正在加载认知任务'}>{error || '正在读取任务配置。'}</ProductStatus></ProductPage>
 
   const isDraft = detail.status === 'DRAFT'
   const canArchive = detail.status === 'DRAFT' || detail.status === 'PUBLISHED'
 
   return (
-    <div>
+    <ProductPage width="management" className="staff-editor-page">
       <button onClick={() => navigate('/cognitive-assignments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" />返回认知任务
       </button>
@@ -194,7 +195,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
       )}
       {detail.status === 'PUBLISHED' && !isWrapper && <PublicDeliveryManager key={id} family="COGNITIVE" resourceId={id} />}
 
-    </div>
+    </ProductPage>
   )
 }
 

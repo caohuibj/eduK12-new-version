@@ -171,31 +171,31 @@ export default function OrganizationRunDetailPage() {
   const totalFrozenActors = useMemo(() => detail?.frozenPopulation.actors.reduce((sum, item) => sum + item.count, 0) ?? 0, [detail])
   const totalFrozenRelationships = useMemo(() => detail?.frozenPopulation.relationships.reduce((sum, item) => sum + item.count, 0) ?? 0, [detail])
 
-  if (activeLoading && !context) return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage><ProductStatus kind="error" title="无法进入 Run" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (!canGovern) return <ProductPage><ProductStatus kind="warning" title="无 Run 治理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器投影未授予 Organization governance。</ProductStatus></ProductPage>
-  if (loading && !detail) return <ProductPage><ProductStatus kind="pending" title="正在加载 Run">正在读取 Run graph 的服务器投影。</ProductStatus></ProductPage>
-  if (!detail) return <ProductPage><ProductStatus kind="error" title="Run 无法加载" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>返回 Run 列表</Link>}>{loadError || 'Run 不存在或当前不可访问。'}</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入测评批次" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无测评批次管理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器投影未授予 Organization governance。</ProductStatus></ProductPage>
+  if (loading && !detail) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载测评批次">正在读取 Run graph 的服务器投影。</ProductStatus></ProductPage>
+  if (!detail) return <ProductPage width="management"><ProductStatus kind="error" title="测评批次无法加载" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>返回测评批次</Link>}>{loadError || '测评批次不存在或当前不可访问。'}</ProductStatus></ProductPage>
 
   return (
-    <ProductPage>
+    <ProductPage width="management">
       <PageHeader
         title={detail.run.name}
-        description={`状态：${detail.run.status} · version ${detail.run.version} · Track ${detail.run.trackCount} · Execution ${detail.run.executionCount}`}
-        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>Run 列表</Link>{detail.run.status === 'DRAFT' && <ProductButton variant="primary" disabled={busy || detail.tracks.length === 0} onClick={() => void previewPublish()}>发布 Run</ProductButton>}{detail.run.status === 'PUBLISHED' && <><ProductButton disabled={busy} onClick={() => void mutate('Run 已关闭。', () => runApi.close(organizationId, runId))}>关闭 Run</ProductButton><ProductButton variant="danger" disabled={busy} onClick={() => void mutate('Run 已取消。', () => runApi.cancel(organizationId, runId))}>取消 Run</ProductButton></>}</div>}
+        description={`状态：${detail.run.status} · 版本 ${detail.run.version} · 测评项目 ${detail.run.trackCount} · 执行记录 ${detail.run.executionCount}`}
+        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>测评批次</Link>{detail.run.status === 'DRAFT' && <ProductButton variant="primary" disabled={busy || detail.tracks.length === 0} onClick={() => void previewPublish()}>发布测评批次</ProductButton>}{detail.run.status === 'PUBLISHED' && <><ProductButton disabled={busy} onClick={() => void mutate('Run 已关闭。', () => runApi.close(organizationId, runId))}>关闭测评批次</ProductButton><ProductButton variant="danger" disabled={busy} onClick={() => void mutate('Run 已取消。', () => runApi.cancel(organizationId, runId))}>取消测评批次</ProductButton></>}</div>}
       />
       {confirmPublish && detail.run.status === 'DRAFT' && <section role="dialog" aria-modal="true" aria-label="确认发布测评" className="space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
         <h2 className="font-semibold">确认发布测评</h2>
-        <ul>{confirmPublish.tracks.map(track => <li key={track.trackId}>Track {track.trackId}：受测者 {track.subjectCount}，评价者 {track.respondentCount}，任务 {track.executionCount}</li>)}</ul>
-        <p>将按当前显示的 {detail.tracks.length} 个 Track 发布。服务器会重新检查资源限制、成员与关系；发布后配置不可修改。</p>
+        <ul>{confirmPublish.tracks.map(track => <li key={track.trackId}>测评项目 {track.trackId}：受测者 {track.subjectCount}，评价者 {track.respondentCount}，任务 {track.executionCount}</li>)}</ul>
+        <p>将按当前显示的 {detail.tracks.length} 个测评项目发布。服务器会重新检查资源限制、成员与关系；发布后配置不可修改。</p>
         <ProductButton autoFocus disabled={busy} onClick={() => setConfirmPublish(null)}>返回检查</ProductButton>
         <ProductButton disabled={busy} variant="primary" onClick={() => { setConfirmPublish(null); void mutate('Run 已发布；人口、资源与策略身份已冻结。', () => runApi.publish(organizationId, runId, confirmPublish.version)) }}>确认发布</ProductButton>
       </section>}
       {loadError && <ProductStatus kind="error" title="刷新失败">{loadError}</ProductStatus>}
-      {mutationError && <ProductStatus kind="error" title="Run 操作失败" announce="assertive">{mutationError}</ProductStatus>}
-      {notice && <ProductStatus kind="success" title="Run 已更新" announce="polite">{notice}</ProductStatus>}
+      {mutationError && <ProductStatus kind="error" title="测评批次操作失败" announce="assertive">{mutationError}</ProductStatus>}
+      {notice && <ProductStatus kind="success" title="测评批次已更新" announce="polite">{notice}</ProductStatus>}
 
-      <section className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Run 生命周期">
+      <section className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="测评批次生命周期">
         <div><span className="text-sm text-slate-500">创建时间</span><p className="mt-1 font-medium">{formatTime(detail.run.createdAt)}</p></div>
         <div><span className="text-sm text-slate-500">参与截止</span><p className="mt-1 font-medium">{formatTime(detail.run.intakeDeadline)}</p></div>
         <div><span className="text-sm text-slate-500">发布时间</span><p className="mt-1 font-medium">{formatTime(detail.run.publishedAt)}</p></div>
@@ -204,7 +204,7 @@ export default function OrganizationRunDetailPage() {
 
       {detail.run.status === 'DRAFT' && (
         <section className="mt-8 space-y-4" aria-labelledby="run-add-track-heading">
-          <div><h2 id="run-add-track-heading" className="text-xl font-semibold text-slate-900">添加 Track</h2><p className="mt-1 text-sm text-slate-600">这里只声明 resource、population selector 与 requested policy。发布时服务器重新解析 authority，并冻结 resource policy、actor 与 relationship snapshots。</p></div>
+          <div><h2 id="run-add-track-heading" className="text-xl font-semibold text-slate-900">添加测评项目</h2><p className="mt-1 text-sm text-slate-600">这里只声明 resource、population selector 与 requested policy。发布时服务器重新解析 authority，并冻结 resource policy、actor 与 relationship snapshots。</p></div>
           {resources.length === 0 && <ProductStatus kind="info" title="暂无已发布的可用资源">内容发布独立于代码发布。当前服务器没有允许用于此流程的资源。</ProductStatus>}
           <label className="grid gap-1 text-sm font-medium">已发布资源<select aria-label="已发布资源" className="min-h-11 rounded-lg border px-3" defaultValue="" onChange={event => chooseResource(event.target.value)}><option value="" disabled>请选择资源</option>{resources.map((item, index) => <option key={`${item.family}:${item.key}:${item.version}`} value={index}>{item.title} · {item.family}/{item.key}@{item.version}</option>)}</select></label>
           <form className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-3" onSubmit={addTrack}>
@@ -222,14 +222,14 @@ export default function OrganizationRunDetailPage() {
             <label className="grid gap-1 text-sm font-medium">Analysis mode<select className="min-h-11 rounded-lg border border-slate-300 px-3" disabled value={analysisMode} onChange={(event) => setAnalysisMode(event.target.value as RunAnalysisMode)}>{ANALYSIS_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">Visibility policy key<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={visibilityPolicyKey} onChange={(event) => setVisibilityPolicyKey(event.target.value)} /></label>
             <label className="grid gap-1 text-sm font-medium">Minimum respondents<input type="number" min={selectedResource?.minimumRespondents ?? 1} className="min-h-11 rounded-lg border border-slate-300 px-3" value={minimumRespondents} onChange={(event) => setMinimumRespondents(event.target.value)} placeholder="空 = null" /></label>
-            <div className="flex items-end"><ProductButton type="submit" variant="primary" disabled={busy || !selectedResource || !resourceKey.trim() || !resourceVersion.trim() || !visibilityPolicyKey.trim()}>添加 Track</ProductButton></div>
+            <div className="flex items-end"><ProductButton type="submit" variant="primary" disabled={busy || !selectedResource || !resourceKey.trim() || !resourceVersion.trim() || !visibilityPolicyKey.trim()}>添加测评项目</ProductButton></div>
           </form>
         </section>
       )}
 
       <section className="mt-8 space-y-4" aria-labelledby="run-tracks-heading">
-        <div><h2 id="run-tracks-heading" className="text-xl font-semibold text-slate-900">Track 与冻结事实</h2><p className="mt-1 text-sm text-slate-600">DRAFT 显示声明的 selector/policy；PUBLISHED 后额外显示服务器冻结的 resource policy hash 与人口摘要。</p></div>
-        <div className="grid gap-4">{detail.tracks.map((track, index) => <article key={track.id} className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap justify-between gap-3"><h3 className="font-semibold">Track {index + 1}: {track.resourceFamily}/{track.resourceKey}@{track.resourceVersion}</h3>{track.resourcePolicyHash && <span className="break-all font-mono text-xs text-slate-500">policy hash {track.resourcePolicyHash}</span>}</div><dl className="mt-3 grid gap-2 text-sm md:grid-cols-2"><div><dt className="font-medium">Subject selector</dt><dd className="text-slate-600">{selectorText(track.subjectSelector)}</dd></div><div><dt className="font-medium">Respondent selector</dt><dd className="text-slate-600">{selectorText(track.respondentSelector)}</dd></div><div><dt className="font-medium">Policy</dt><dd className="text-slate-600">{track.requestedPolicy.subjectRoles.join('/')} → {track.requestedPolicy.respondentRoles.join('/')} · {track.requestedPolicy.relationshipKinds.join('/')} · {track.requestedPolicy.perspectives.join('/')}</dd></div><div><dt className="font-medium">Analysis / visibility</dt><dd className="text-slate-600">{track.requestedPolicy.analysisMode} · {track.requestedPolicy.visibilityPolicyKey} · min {track.requestedPolicy.minimumRespondents ?? 'null'}</dd></div></dl>{track.frozenResourcePolicy != null && <details className="mt-3"><summary className="cursor-pointer text-sm font-medium">查看冻结 resource policy</summary><pre className="mt-2 max-h-72 overflow-auto rounded-lg bg-slate-50 p-3 text-xs">{JSON.stringify(track.frozenResourcePolicy, null, 2)}</pre></details>}</article>)}{detail.tracks.length === 0 && <ProductStatus kind="info" title="尚无 Track">至少添加一个 Track 后才可发布。</ProductStatus>}</div>
+        <div><h2 id="run-tracks-heading" className="text-xl font-semibold text-slate-900">测评项目与冻结事实</h2><p className="mt-1 text-sm text-slate-600">DRAFT 显示声明的 selector/policy；PUBLISHED 后额外显示服务器冻结的 resource policy hash 与人口摘要。</p></div>
+        <div className="grid gap-4">{detail.tracks.map((track, index) => <article key={track.id} className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap justify-between gap-3"><h3 className="font-semibold">测评项目 {index + 1}: {track.resourceFamily}/{track.resourceKey}@{track.resourceVersion}</h3>{track.resourcePolicyHash && <span className="break-all font-mono text-xs text-slate-500">policy hash {track.resourcePolicyHash}</span>}</div><dl className="mt-3 grid gap-2 text-sm md:grid-cols-2"><div><dt className="font-medium">Subject selector</dt><dd className="text-slate-600">{selectorText(track.subjectSelector)}</dd></div><div><dt className="font-medium">Respondent selector</dt><dd className="text-slate-600">{selectorText(track.respondentSelector)}</dd></div><div><dt className="font-medium">Policy</dt><dd className="text-slate-600">{track.requestedPolicy.subjectRoles.join('/')} → {track.requestedPolicy.respondentRoles.join('/')} · {track.requestedPolicy.relationshipKinds.join('/')} · {track.requestedPolicy.perspectives.join('/')}</dd></div><div><dt className="font-medium">Analysis / visibility</dt><dd className="text-slate-600">{track.requestedPolicy.analysisMode} · {track.requestedPolicy.visibilityPolicyKey} · min {track.requestedPolicy.minimumRespondents ?? 'null'}</dd></div></dl>{track.frozenResourcePolicy != null && <details className="mt-3"><summary className="cursor-pointer text-sm font-medium">查看冻结 resource policy</summary><pre className="mt-2 max-h-72 overflow-auto rounded-lg bg-slate-50 p-3 text-xs">{JSON.stringify(track.frozenResourcePolicy, null, 2)}</pre></details>}</article>)}{detail.tracks.length === 0 && <ProductStatus kind="info" title="尚无测评项目">至少添加一个测评项目后才可发布。</ProductStatus>}</div>
       </section>
 
       {detail.run.status !== 'DRAFT' && (
@@ -240,7 +240,7 @@ export default function OrganizationRunDetailPage() {
       )}
 
       {progress && (
-        <section className="mt-8 space-y-4" aria-labelledby="run-progress-heading"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 id="run-progress-heading" className="text-xl font-semibold text-slate-900">Runtime progress</h2><p className="mt-1 text-sm text-slate-600">progress 状态由 execution、start claim 与 runtime binding 的当前服务端状态合成。</p></div><ProductButton disabled={loading} onClick={() => void load()}>刷新进度</ProductButton></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{Object.entries(progress.counts).map(([state, count]) => <div key={state} className="rounded-xl border border-slate-200 bg-white p-4"><span className="text-sm text-slate-500">{state}</span><p className="mt-1 text-2xl font-semibold">{count}</p></div>)}</div></section>
+        <section className="mt-8 space-y-4" aria-labelledby="run-progress-heading"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 id="run-progress-heading" className="text-xl font-semibold text-slate-900">执行进度</h2><p className="mt-1 text-sm text-slate-600">progress 状态由 execution、start claim 与 runtime binding 的当前服务端状态合成。</p></div><ProductButton disabled={loading} onClick={() => void load()}>刷新进度</ProductButton></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{Object.entries(progress.counts).map(([state, count]) => <div key={state} className="rounded-xl border border-slate-200 bg-white p-4"><span className="text-sm text-slate-500">{state}</span><p className="mt-1 text-2xl font-semibold">{count}</p></div>)}</div></section>
       )}
     </ProductPage>
   )

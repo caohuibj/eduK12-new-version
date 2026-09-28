@@ -18,6 +18,10 @@ describe('safe access and return context', () => {
     expect(returnAfterLogin('/dashboard', 'PARENT')).toBe('/parent')
     expect(returnAfterLogin('/relational/tasks', 'PARENT')).toBe('/relational/tasks')
     expect(returnAfterLogin('/student/scales/1', 'PARENT')).toBe('/parent')
+    expect(returnAfterLogin('/organizations/org-1/reporting?wave=2', 'TEACHER')).toBe('/organizations/org-1/reporting?wave=2')
+    expect(returnAfterLogin('/organization-tasks', 'STUDENT')).toBe('/organization-tasks')
+    expect(returnAfterLogin('/organizations/org-1/reporting?tab=group', 'TEACHER')).toBe('/organizations/org-1/reporting?tab=group')
+    expect(returnAfterLogin('/organization-tasks', 'ADMIN')).toBe('/organization-tasks')
   })
   it('restricts child returns to the matching public/authenticated parent family', () => {
     expect(parentReturnTo('/student/composite/attempts/1?slot=a', false, '/')).toBe('/student/composite/attempts/1?slot=a')
@@ -55,5 +59,14 @@ describe('role navigation', () => {
   it('keeps admin and disabled capability items out of other menus', () => {
     expect(navigationFor('TEACHER', false).some((item) => item.path === '/users' || item.path === '/cognitive-assignments')).toBe(false)
     expect(navigationFor('ADMIN', true).some((item) => item.path === '/admin/instrument-authorizations')).toBe(true)
+  })
+  it('groups staff navigation by task without changing route destinations', () => {
+    const teacher = navigationFor('TEACHER', true)
+    expect(teacher.find(item => item.path === '/dashboard')?.section).toBe('teaching')
+    expect(teacher.find(item => item.path === '/cognitive-assignments')?.section).toBe('assessment')
+    expect(teacher.find(item => item.path === '/documents')?.section).toBe('content')
+    expect(teacher.find(item => item.path === '/profile')?.section).toBe('account')
+    const admin = navigationFor('ADMIN', true)
+    expect(admin.find(item => item.path === '/users')?.section).toBe('system')
   })
 })

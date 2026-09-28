@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 97 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 106 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -101,6 +101,15 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 97 expl
 | /public/checkin/:token | PublicCheckin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /bigscreen/:classroomId | BigScreen | Public / unguarded | — | Dedicated display | Dedicated display | FE-02 + FE-10 | Dedicated mode retained |
 | * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
+| /organizations | OrganizationIndexPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/new | OrganizationCreatePage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organization-tasks | OrganizationTasksPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId | OrganizationAdminPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/runs | OrganizationRunListPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/runs/:runId | OrganizationRunDetailPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/reporting | OrganizationReportingPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/delivery | OrganizationDeliveryPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/* | OrganizationNotFound | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 
 ## Additional boundaries
 
@@ -110,4 +119,5 @@ Generated from `frontend/src/App.tsx` by `npm run inventory:product-ui`. 97 expl
 - Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.
 - Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.
 - BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.
+- Nested Organization routes are included as an audit projection; AppShell and server authority remain the routing/access sources of truth.
 - Non-route components and legacy branches are not declared dead code by this inventory.

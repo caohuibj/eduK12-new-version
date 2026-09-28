@@ -186,7 +186,7 @@ describe('CompositeAssessmentList library tab', () => {
     const user = userEvent.setup()
     render(<CompositeAssessmentList />)
     await screen.findByText('我的测评')
-    await user.click(screen.getByRole('button', { name: '新建综合测评' }))
+    await user.click(screen.getByRole('button', { name: '创建综合测评' }))
     await user.type(screen.getByPlaceholderText('编码'), 'ATTN')
     await user.type(screen.getByPlaceholderText('名称'), '注意测评')
     await user.selectOptions(screen.getByLabelText(/绑定课程/), 'c1')

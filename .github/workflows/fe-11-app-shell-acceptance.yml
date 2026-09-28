@@ -55,10 +55,13 @@ jobs:
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
-      - name: start frontend
+      - name: build production frontend
+        working-directory: server-version/frontend
+        run: npm run build
+      - name: start production preview
         run: |
           rm -rf "$APP_SHELL_EVIDENCE_DIR"
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-fe-11-app-shell-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-fe-11-app-shell-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-fe-11-app-shell-frontend.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { sessionFetch } from '../api/client'
 import QuestionEditor, { Question } from '../components/QuestionEditor'
@@ -13,6 +13,9 @@ import { sanitizeHtml } from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAssignmentAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Assignment, Course } from '../types'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import MoreActions from '../components/staff-ui/MoreActions'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface VideoItem {
   type: 'library' | 'external' | 'upload'
@@ -66,7 +69,10 @@ interface Submission {
 }
 
 const AssignmentList: React.FC = () => {
-  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('id')
+  const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
@@ -105,6 +111,14 @@ const AssignmentList: React.FC = () => {
     fetchCourses()
     fetchTags()
   }, [])
+
+  useEffect(() => {
+    if (loading || !focusId) return
+    const element = document.getElementById(`assignment-record-${focusId}`)
+    if (!element) return
+    element.scrollIntoView({ block: 'center' })
+    element.focus()
+  }, [loading, focusId])
 
   const fetchAssignments = async () => {
     try {
@@ -154,7 +168,7 @@ const AssignmentList: React.FC = () => {
       }
     } catch (error) {
       console.error('获取提交列表失败:', error)
-      alert('获取提交列表失败')
+      showMessage('获取提交列表失败')
     } finally {
       setSubmissionsLoading(false)
     }
@@ -171,11 +185,11 @@ const AssignmentList: React.FC = () => {
   const handleBatchGrade = async () => {
     if (!selectedAssignment) return
     if (selectedSubmissions.size === 0) {
-      alert('请至少选择一份作业')
+      showMessage('请至少选择一份作业')
       return
     }
     if (!batchComment.trim()) {
-      alert('请输入评语')
+      showMessage('请输入评语')
       return
     }
 
@@ -196,14 +210,14 @@ const AssignmentList: React.FC = () => {
         }
       }
       
-      alert(`批量批复完成，成功批复 ${successCount} 份作业`)
+      showMessage(`批量批复完成，成功批复 ${successCount} 份作业`)
       setShowBatchGradeModal(false)
       // 刷新提交列表
       fetchSubmissions(selectedAssignment.id)
       // 清空选择
       setSelectedSubmissions(new Set())
     } catch (error: any) {
-      alert(error.message || '批量批复失败')
+      showMessage(error.message || '批量批复失败')
     } finally {
       setIsBatchGrading(false)
     }
@@ -252,7 +266,7 @@ const AssignmentList: React.FC = () => {
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     }
   }
 
@@ -277,25 +291,25 @@ const AssignmentList: React.FC = () => {
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     }
   }
 
   const handleDelete = async (assignment: Assignment) => {
-    if (!window.confirm('确定要删除这个作业吗？')) return
+    if (!(await confirm({ title: `删除作业「${assignment.title}」？`, body: '删除后将无法继续提交；已有业务约束仍由服务器检查。', confirmLabel: '删除作业', danger: true }))) return
     try {
       const response = await apiClient.delete(`/assignments/${assignment.id}`)
       if (response.code === 0) {
+        success('作业已删除')
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '删除失败')
+      showError('删除作业失败', error.message || '请稍后重试')
     }
   }
 
   const handleClone = async (assignment: Assignment) => {
-    if (!window.confirm('确定要复制这个作业吗？将清空截止时间和作答数据。')) return
-    
+    if (!(await confirm({ title: `复制作业「${assignment.title}」？`, body: '副本会清空截止时间和作答数据，原作业不会改变。', confirmLabel: '复制作业' }))) return
     try {
       const response = await apiClient.post(`/assignments`, {
         courseId: assignment.courseId,
@@ -308,10 +322,11 @@ const AssignmentList: React.FC = () => {
         documents: assignment.documents,
       })
       if (response.code === 0) {
+        success('作业已复制')
         fetchAssignments()
       }
     } catch (error: any) {
-      alert(error.message || '复制失败')
+      showError('复制作业失败', error.message || '请稍后重试')
     }
   }
 
@@ -333,7 +348,7 @@ const AssignmentList: React.FC = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch (error: any) {
-      alert(error.message || '导出失败')
+      showMessage(error.message || '导出失败')
     }
   }
 
@@ -444,131 +459,26 @@ const AssignmentList: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索作业..."
-            className="input pl-10 w-64"
-          />
-        </div>
-        <button
-          onClick={openCreateModal}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>布置作业</span>
-        </button>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="作业管理" description="集中查看课程作业、提交进度和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置作业</ProductButton>} />
+      {feedback}
+      <div className="staff-toolbar">
+        <label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索作业</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索作业或课程" /></label>
+        <span className="staff-help">共 {filteredAssignments.length} 个作业</span>
       </div>
-
-      {/* Tag Filter */}
-      {availableTags.length > 0 && (
-        <TagFilter
-          availableTags={availableTags}
-          selectedTags={selectedTags}
-          onChange={setSelectedTags}
-          title="标签筛选"
-        />
-      )}
-
-      {/* Assignment List */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : filteredAssignments.length === 0 ? (
-        <div className="text-center py-12">
-          <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无作业</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAssignments.map((assignment) => (
-            <div key={assignment.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1 break-words">{assignment.title}</h3>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-                    <BookOpen className="w-4 h-4" />
-                    <span>{assignment.course?.title || '未知课程'}</span>
-                  </div>
-                  {assignment.tags && assignment.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {assignment.tags.map((tag, index) => (
-                        <TagBadge key={index} tag={tag} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex space-x-1 ml-2">
-                  <button
-                    onClick={() => handleExport(assignment)}
-                    className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded"
-                    title="导出提交数据"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleClone(assignment)}
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded"
-                    title="复制作业"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openEditModal(assignment)}
-                    className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(assignment)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div 
-                className="text-gray-600 text-sm mb-4 line-clamp-2"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(assignment.content || assignment.description || '暂无描述') }}
-              />
-
-              <div className="flex items-center justify-between text-sm">
-                <button
-                  onClick={() => openSubmissionsModal(assignment)}
-                  className="flex items-center space-x-1 text-primary hover:text-primary-hover"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>{assignment._count?.submissions || 0} 份提交</span>
-                  <Eye className="w-3 h-3 ml-1" />
-                </button>
-                <div className="text-xs">
-                  {formatDeadline(assignment.deadline)}
-                </div>
-              </div>
-
-              {(assignment.questions?.length || 0) > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-100">
-                  <div className="flex items-center space-x-4 text-xs text-gray-500">
-                    <span className="flex items-center">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      {assignment.questions?.length || 0} 道题目
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
+      {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
+      {loading ? <ProductStatus kind="pending" title="正在加载作业">正在读取作业和提交概况。</ProductStatus>
+      : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配作业">可以调整筛选条件，或布置第一份作业。</ProductStatus>
+      : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>作业</th><th>课程</th><th>截止时间</th><th>提交</th><th>题目</th><th className="text-right">操作</th></tr></thead><tbody>
+        {filteredAssignments.map(assignment=><tr id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className={focusId===assignment.id?'staff-target-row':''}>
+          <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(assignment)}>{assignment.title}</button>{assignment.tags?.length?<div className="staff-inline-tags">{assignment.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
+          <td>{assignment.course?.title || '未知课程'}</td>
+          <td>{formatDeadline(assignment.deadline)}</td>
+          <td><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
+          <td>{assignment.questions?.length || 0}</td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制作业</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑作业</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除作业</button></MoreActions></div></td>
+        </tr>)}
+      </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
@@ -1025,7 +935,7 @@ const AssignmentList: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

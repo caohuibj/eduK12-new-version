@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import { BookOpen, Copy, Download, Edit, ExternalLink, Plus, QrCode, Trash2, Users } from 'lucide-react'
 import { PageHeader } from '../../components/product-ui/PageHeader'
 import { ProductPage } from '../../components/product-ui/ProductPage'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 
 interface Classroom {
   id: string
@@ -27,6 +28,8 @@ interface Classroom {
 }
 
 const ClassroomList: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,10 +63,10 @@ const ClassroomList: React.FC = () => {
       if (response.code === 0) {
         setClassrooms(current => current.filter(classroom => classroom.id !== id))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '删除失败')
+      showMessage(operationError.message || '删除失败')
     }
   }
 
@@ -73,13 +76,13 @@ const ClassroomList: React.FC = () => {
     try {
       const response = await apiClient.post(`/classrooms/${id}/duplicate`)
       if (response.code === 0) {
-        alert('课堂复制成功！新课堂码: ' + response.data.code)
+        showMessage('课堂复制成功！新课堂码: ' + response.data.code)
         void fetchClassrooms()
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '复制失败')
+      showMessage(operationError.message || '复制失败')
     }
   }
 
@@ -122,12 +125,12 @@ const ClassroomList: React.FC = () => {
         link.click()
         document.body.removeChild(link)
         URL.revokeObjectURL(url)
-        alert('数据导出成功！')
+        showMessage('数据导出成功！')
       } else {
-        alert('导出失败: ' + response.message)
+        showMessage('导出失败: ' + response.message)
       }
     } catch (operationError: any) {
-      alert('导出失败: ' + (operationError.message || '未知错误'))
+      showMessage('导出失败: ' + (operationError.message || '未知错误'))
     }
   }
 
@@ -147,6 +150,7 @@ const ClassroomList: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader
         title="课堂管理"
         description="创建课堂、进入控制面板，并管理已结束课堂的数据导出。"

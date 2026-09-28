@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
 import apiClient from '../api/client'
 import { sessionFetch } from '../api/client'
@@ -12,6 +13,9 @@ import { sanitizeHtml } from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Checkin, Course } from '../types'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import MoreActions from '../components/staff-ui/MoreActions'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface VideoItem {
   type: 'library' | 'external' | 'upload'
@@ -61,6 +65,10 @@ interface CheckinSubmission {
 }
 
 const CheckinList: React.FC = () => {
+  const [searchParams] = useSearchParams()
+  const focusId = searchParams.get('id')
+  const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
@@ -94,6 +102,14 @@ const CheckinList: React.FC = () => {
     fetchCourses()
     fetchTags()
   }, [])
+
+  useEffect(() => {
+    if (loading || !focusId) return
+    const element = document.getElementById(`checkin-record-${focusId}`)
+    if (!element) return
+    element.scrollIntoView({ block: 'center' })
+    element.focus()
+  }, [loading, focusId])
 
   const fetchCheckins = async () => {
     try {
@@ -153,7 +169,7 @@ const CheckinList: React.FC = () => {
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '创建失败')
+      showMessage(error.message || '创建失败')
     }
   }
 
@@ -179,25 +195,25 @@ const CheckinList: React.FC = () => {
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '更新失败')
+      showMessage(error.message || '更新失败')
     }
   }
 
   const handleDelete = async (checkin: Checkin) => {
-    if (!window.confirm('确定要删除这个打卡吗？')) return
+    if (!(await confirm({ title: `删除打卡「${checkin.title}」？`, body: '删除后将无法继续提交；已有业务约束仍由服务器检查。', confirmLabel: '删除打卡', danger: true }))) return
     try {
       const response = await apiClient.delete(`/checkins/${checkin.id}`)
       if (response.code === 0) {
+        success('打卡已删除')
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '删除失败')
+      showError('删除打卡失败', error.message || '请稍后重试')
     }
   }
 
   const handleClone = async (checkin: Checkin) => {
-    if (!window.confirm('确定要复制这个打卡吗？')) return
-    
+    if (!(await confirm({ title: `复制打卡「${checkin.title}」？`, body: '将创建独立副本，原打卡和历史提交不会改变。', confirmLabel: '复制打卡' }))) return
     try {
       // 确保 videos 和 images 是数组格式
       let videos = checkin.videos
@@ -222,10 +238,11 @@ const CheckinList: React.FC = () => {
         allowViewOthers: checkin.allowViewOthers || false,
       })
       if (response.code === 0) {
+        success('打卡已复制')
         fetchCheckins()
       }
     } catch (error: any) {
-      alert(error.message || '复制失败')
+      showError('复制打卡失败', error.message || '请稍后重试')
     }
   }
 
@@ -247,7 +264,7 @@ const CheckinList: React.FC = () => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch (error: any) {
-      alert(error.message || '导出失败')
+      showMessage(error.message || '导出失败')
     }
   }
 
@@ -267,7 +284,7 @@ const CheckinList: React.FC = () => {
       }
     } catch (error) {
       console.error('获取提交列表失败:', error)
-      alert('获取提交列表失败')
+      showMessage('获取提交列表失败')
     } finally {
       setSubmissionsLoading(false)
     }
@@ -364,132 +381,23 @@ const CheckinList: React.FC = () => {
   })
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索打卡..."
-            className="input pl-10 w-64"
-          />
-        </div>
-        <button
-          onClick={openCreateModal}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>创建打卡</span>
-        </button>
-      </div>
-
-      {/* Tag Filter */}
-      {availableTags.length > 0 && (
-        <TagFilter
-          availableTags={availableTags}
-          selectedTags={selectedTags}
-          onChange={setSelectedTags}
-          title="标签筛选"
-        />
-      )}
-
-      {/* Checkin List */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : filteredCheckins.length === 0 ? (
-        <div className="text-center py-12">
-          <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无打卡</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCheckins.map((checkin) => (
-            <div key={checkin.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1 break-words">{checkin.title}</h3>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-                    <BookOpen className="w-4 h-4" />
-                    <span>{checkin.course?.title || '未知课程'}</span>
-                  </div>
-                  {checkin.tags && checkin.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {checkin.tags.map((tag, index) => (
-                        <TagBadge key={index} tag={tag} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex space-x-1 ml-2">
-                  <CheckinTokenManager
-                    checkinId={checkin.id}
-                    checkinTitle={checkin.title}
-                    allowAnonymous={checkin.allowAnonymous || false}
-                    onAllowAnonymousChange={(value) => {
-                      // 更新本地状态
-                      setCheckins(checkins.map(c => 
-                        c.id === checkin.id ? { ...c, allowAnonymous: value } : c
-                      ))
-                    }}
-                  />
-                  <button
-                    onClick={() => handleExport(checkin)}
-                    className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded"
-                    title="导出打卡数据"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleClone(checkin)}
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded"
-                    title="复制打卡"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openEditModal(checkin)}
-                    className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(checkin)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div 
-                className="text-gray-600 text-sm mb-4 line-clamp-2"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content || checkin.description || '暂无描述') }}
-              />
-
-              <div className="flex items-center justify-between text-sm">
-                <button
-                  onClick={() => openSubmissionsModal(checkin)}
-                  className="flex items-center space-x-1 text-primary hover:text-primary-hover"
-                >
-                  <Users className="w-4 h-4" />
-                  <span>{checkin._count?.submissions || 0} 人参与</span>
-                  <Eye className="w-3 h-3 ml-1" />
-                </button>
-                <div className="flex items-center space-x-1 text-gray-500">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>由 {checkin.creator?.nickname || '未知'} 创建</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
+      {feedback}
+      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索打卡</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索打卡或课程" /></label><span className="staff-help">共 {filteredCheckins.length} 个打卡</span></div>
+      {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
+      {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
+      : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
+      : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
+        {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
+          <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(checkin)}>{checkin.title}</button>{checkin.tags?.length?<div className="staff-inline-tags">{checkin.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
+          <td>{checkin.course?.title || '未知课程'}</td>
+          <td>{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</td>
+          <td><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(checkin)}>{checkin._count?.submissions || 0} 人参与</button></td>
+          <td><span className={`staff-badge ${checkin.allowAnonymous?'staff-badge--success':''}`}>{checkin.allowAnonymous?'已开启':'未开启'}</span></td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleExport(checkin)}>导出数据</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
+        </tr>)}
+      </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
@@ -835,7 +743,7 @@ const CheckinList: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

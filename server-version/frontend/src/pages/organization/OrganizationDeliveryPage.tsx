@@ -148,22 +148,22 @@ export default function OrganizationDeliveryPage() {
     }
   })
 
-  if (activeLoading && !context) return <ProductPage><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage><ProductStatus kind="error" title="无法进入 Delivery" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入 Delivery" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
 
   return (
-    <ProductPage>
+    <ProductPage width="management">
       <PageHeader
-        title="Safety & CSV Delivery"
+        title="安全事项与数据导出"
         description="Safety audience、export capability、底层报告访问、ticket 有效期与下载权限都由服务器实时判断；浏览器不重建 CSV，也不扩大 Safety audience。"
-        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织空间</Link><Link to={`/organizations/${encodeURIComponent(organizationId)}/reporting`}>Reporting</Link></div>}
+        actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织空间</Link><Link to={`/organizations/${encodeURIComponent(organizationId)}/reporting`}>报告分析</Link></div>}
       />
-      {loadError && <ProductStatus kind="warning" title="Safety inbox 不可用">{loadError}</ProductStatus>}
-      {actionError && <ProductStatus kind="error" title="Delivery 操作失败" announce="assertive">{actionError}</ProductStatus>}
-      {notice && <ProductStatus kind="success" title="Delivery 已更新" announce="polite">{notice}</ProductStatus>}
+      {loadError && <ProductStatus kind="warning" title="安全事项不可用">{loadError}</ProductStatus>}
+      {actionError && <ProductStatus kind="error" title="操作失败" announce="assertive">{actionError}</ProductStatus>}
+      {notice && <ProductStatus kind="success" title="操作完成" announce="polite">{notice}</ProductStatus>}
 
       <section className="mt-6 space-y-4" aria-labelledby="safety-inbox-heading">
-        <div><h2 id="safety-inbox-heading" className="text-xl font-semibold">Safety inbox</h2><p className="mt-1 text-sm text-slate-600">列表已由服务器过滤，只返回 case ID、服务器选择的 projection kind 与必要时限字段；不返回 subject/trigger/owner identity。</p></div>
+        <div><h2 id="safety-inbox-heading" className="text-xl font-semibold">安全事项</h2><p className="mt-1 text-sm text-slate-600">列表已由服务器过滤，只返回 case ID、服务器选择的 projection kind 与必要时限字段；不返回 subject/trigger/owner identity。</p></div>
         {loading && cases.length === 0 ? <ProductStatus kind="pending" title="正在读取 Safety inbox">正在按当前责任范围筛选。</ProductStatus> : (
           <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -173,26 +173,26 @@ export default function OrganizationDeliveryPage() {
             <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
               <strong>当前 case</strong>
               <p className="break-all text-sm text-slate-600">{selectedCase?.caseId || '未选择'}</p>
-              <ProductButton disabled={busy || !selectedCaseId} onClick={() => void readSafety()}>读取 exact projection</ProductButton>
-              <ProductButton disabled={busy || !selectedCaseId} onClick={() => void createSafetyExport()}>创建 SAFETY CSV ticket</ProductButton>
+              <ProductButton disabled={busy || !selectedCaseId} onClick={() => void readSafety()}>查看安全事项详情</ProductButton>
+              <ProductButton disabled={busy || !selectedCaseId} onClick={() => void createSafetyExport()}>准备安全事项 CSV</ProductButton>
             </div>
           </div>
         )}
-        {safetyProjection && <div className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">Exact Safety projection</h3><span className="text-sm font-semibold">{safetyProjection.projection}</span></div><pre className="mt-3 max-h-96 overflow-auto rounded-lg bg-slate-50 p-3 text-xs">{JSON.stringify(safetyProjection.data, null, 2)}</pre></div>}
+        {safetyProjection && <div className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">安全事项详情</h3><span className="text-sm font-semibold">{safetyProjection.projection}</span></div><pre className="mt-3 max-h-96 overflow-auto rounded-lg bg-slate-50 p-3 text-xs">{JSON.stringify(safetyProjection.data, null, 2)}</pre></div>}
       </section>
 
       <section className="mt-8 space-y-4" aria-labelledby="artifact-export-heading">
-        <div><h2 id="artifact-export-heading" className="text-xl font-semibold">Reporting CSV export</h2><p className="mt-1 text-sm text-slate-600">AGGREGATE/MEMBER 都引用 immutable artifact ID。服务器会先重新读取底层 projection，再检查当前 export capability；MEMBER 不会因为拥有 aggregate artifact 就自动获准。</p></div>
+        <div><h2 id="artifact-export-heading" className="text-xl font-semibold">报告 CSV 导出</h2><p className="mt-1 text-sm text-slate-600">AGGREGATE/MEMBER 都引用 immutable artifact ID。服务器会先重新读取底层 projection，再检查当前 export capability；MEMBER 不会因为拥有 aggregate artifact 就自动获准。</p></div>
         <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-[1fr_2fr_auto]">
           <label className="grid gap-1 text-sm font-medium">Export kind<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactExportKind} disabled={busy} onChange={(event) => setArtifactExportKind(event.target.value as typeof artifactExportKind)}><option>AGGREGATE</option><option>MEMBER</option></select></label>
           <label className="grid gap-1 text-sm font-medium">Artifact ID<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={artifactId} disabled={busy} onChange={(event) => setArtifactId(event.target.value)} placeholder="artifact UUID" /></label>
-          <div className="flex items-end"><ProductButton variant="primary" disabled={busy || !artifactId.trim()} onClick={() => void createArtifactExport()}>创建 CSV ticket</ProductButton></div>
+          <div className="flex items-end"><ProductButton variant="primary" disabled={busy || !artifactId.trim()} onClick={() => void createArtifactExport()}>准备 CSV 导出</ProductButton></div>
         </div>
       </section>
 
       <section className="mt-8 space-y-4" aria-labelledby="tickets-heading">
-        <div><h2 id="tickets-heading" className="text-xl font-semibold">当前会话创建的 export tickets</h2><p className="mt-1 text-sm text-slate-600">Ticket 默认 15 分钟有效并绑定当前 viewer；下载时服务器再次检查底层 read authority 与 capability。</p></div>
-        {tickets.length === 0 ? <ProductStatus kind="info" title="尚无 ticket">创建 export 后会显示在这里。</ProductStatus> : <div className="grid gap-3">{tickets.map((ticket) => <article key={ticket.exportId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><div><strong>{ticket.label}</strong><p className="mt-1 break-all text-sm text-slate-600">ticket {ticket.exportId} · expires {formatTime(ticket.expiresAt)}</p></div><ProductButton disabled={busy} onClick={() => void download(ticket)}>下载服务器 CSV</ProductButton></article>)}</div>}
+        <div><h2 id="tickets-heading" className="text-xl font-semibold">当前会话准备的导出</h2><p className="mt-1 text-sm text-slate-600">Ticket 默认 15 分钟有效并绑定当前 viewer；下载时服务器再次检查底层 read authority 与 capability。</p></div>
+        {tickets.length === 0 ? <ProductStatus kind="info" title="尚无待下载文件">准备导出后会显示在这里。</ProductStatus> : <div className="grid gap-3">{tickets.map((ticket) => <article key={ticket.exportId} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"><div><strong>{ticket.label}</strong><p className="mt-1 break-all text-sm text-slate-600">ticket {ticket.exportId} · expires {formatTime(ticket.expiresAt)}</p></div><ProductButton disabled={busy} onClick={() => void download(ticket)}>下载 CSV</ProductButton></article>)}</div>}
       </section>
     </ProductPage>
   )

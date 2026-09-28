@@ -14,25 +14,25 @@ it('lazy loads advanced discovery only after the advanced section opens', async 
   expect(api.listSeries).not.toHaveBeenCalled()
   expect(api.listProtectedSources).not.toHaveBeenCalled()
 
-  await userEvent.click(screen.getByText('高级：手动管理历史报告系列'))
+  await userEvent.click(screen.getByText('高级设置：历史报告系列与时间点'))
   await waitFor(() => expect(api.listSeries).toHaveBeenCalledTimes(1))
   expect(api.listProtectedSources).not.toHaveBeenCalled()
 
-  await userEvent.click(screen.getByText('高级：受保护反馈与历史报告读取'))
+  await userEvent.click(screen.getByText('高级设置：受保护反馈与历史报告读取'))
   await waitFor(() => expect(api.listProtectedSources).toHaveBeenCalledTimes(1))
 })
 
 it('removes an existing artifact when exact read permission is revoked', async () => {
   api.readArtifact.mockResolvedValueOnce({ artifactId: 'private-artifact', generatedAt: '2026-09-19T00:00:00Z', projection: { kind: 'GROUP', state: 'present', eligibleN: 12, resultContributorN: 12, metrics: {} } })
   render(<MemoryRouter initialEntries={['/organizations/o1/reporting']}><Routes><Route path="/organizations/:organizationId/reporting" element={<OrganizationReportingPage />} /></Routes></MemoryRouter>)
-  await userEvent.click(await screen.findByText('高级：受保护反馈与历史报告读取'))
+  await userEvent.click(await screen.findByText('高级设置：受保护反馈与历史报告读取'))
   expect(screen.getByPlaceholderText('artifact UUID')).toBeVisible()
   await userEvent.type(screen.getByPlaceholderText('artifact UUID'), 'private-artifact')
-  await userEvent.click(screen.getByRole('button', { name: '读取 artifact' }))
+  await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
   await userEvent.click(await screen.findByText('报告记录编号'))
   expect(screen.getByText(/Artifact private-artifact/)).toBeVisible()
   api.readArtifact.mockRejectedValueOnce(new Error('read revoked'))
-  await userEvent.click(screen.getByRole('button', { name: '读取 artifact' }))
+  await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
   await waitFor(() => expect(screen.queryByText(/Artifact private-artifact/)).not.toBeInTheDocument())
   expect(await screen.findByText('read revoked')).toBeInTheDocument()
 })
@@ -49,7 +49,7 @@ it('uses the same label selection for group and automatic longitudinal reports',
   api.analyzeAutomatic.mockResolvedValue(result)
   render(<MemoryRouter initialEntries={['/organizations/o1/reporting']}><Routes><Route path="/organizations/:organizationId/reporting" element={<OrganizationReportingPage />} /></Routes></MemoryRouter>)
   await userEvent.click(await screen.findByLabelText('男生'))
-  await userEvent.click(screen.getByRole('button', { name: '生成群体报告' }))
+  await userEvent.click(screen.getByRole('button', { name: '生成单次群体报告' }))
   const selector = { schemaVersion: 2, combine: 'ALL', clauses: [{ kind: 'LABELS', labelIds: ['male'], match: 'ANY' }] }
   expect(api.analyzeGroup).toHaveBeenCalledWith('o1', expect.objectContaining({ cohortSelector: selector }))
   await screen.findByText('报告结果')
@@ -60,7 +60,7 @@ it('uses the same label selection for group and automatic longitudinal reports',
   const checkboxes = screen.getAllByRole('checkbox').filter(el => el.parentElement?.textContent?.includes('测量'))
   for (const checkbox of checkboxes) await userEvent.click(checkbox)
   await userEvent.selectOptions(screen.getByLabelText('人群定义'), 'BASELINE_FIXED')
-  await userEvent.click(screen.getByRole('button', { name: '生成纵向报告' }))
+  await userEvent.click(screen.getByRole('button', { name: '生成群体纵向报告' }))
   expect(api.analyzeAutomatic).toHaveBeenCalledWith('o1', expect.objectContaining({ cohortSelector: selector, cohortStrategy: 'BASELINE_FIXED', sources: [{ runId: 'run1', trackId: 'track1' }, { runId: 'run2', trackId: 'track2' }] }))
 })
 
@@ -71,12 +71,12 @@ it('locks conditions during generation and drops a late result after authority c
   api.analyzeGroup.mockReturnValue(new Promise(resolve => { finish=resolve }))
   const tree=()=> <MemoryRouter initialEntries={['/organizations/o1/reporting']}><Routes><Route path="/organizations/:organizationId/reporting" element={<OrganizationReportingPage />} /></Routes></MemoryRouter>
   const view=render(tree())
-  await userEvent.click(await screen.findByRole('button',{name:'生成群体报告'}))
+  await userEvent.click(await screen.findByRole('button',{name:'生成单次群体报告'}))
   expect(screen.getByRole('button',{name:'重置为全部受测者'})).toBeDisabled()
   org.active={organization:{id:'o1'},access:{canGovern:true}}
   view.rerender(tree())
   finish({artifactId:'old-context',projection:{kind:'GROUP',state:'present',metrics:{}}})
-  await waitFor(()=>expect(screen.getByRole('button',{name:'生成群体报告'})).not.toBeDisabled())
+  await waitFor(()=>expect(screen.getByRole('button',{name:'生成单次群体报告'})).not.toBeDisabled())
   expect(screen.queryByText('报告结果')).not.toBeInTheDocument()
   org.active={organization:{id:'o1'},access:{canGovern:false}}
 })

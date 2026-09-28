@@ -9,6 +9,7 @@ import MaterialGrantModal from '../components/MaterialGrantModal'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import { createExportRequestKey, ExportJobFailedError, waitForExportArtifacts, type ExportArtifactRef } from '../utils/exportJobs'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface Scale {
   id: string
@@ -58,6 +59,8 @@ const v2DimensionCount = (scale: Scale): number => (
 )
 
 const ScaleList: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
 
@@ -121,10 +124,10 @@ const ScaleList: React.FC = () => {
       if (response.code === 0) {
         setScales(current => current.filter(scale => scale.id !== id))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '删除失败')
+      showMessage(operationError.message || '删除失败')
     }
   }
 
@@ -134,10 +137,10 @@ const ScaleList: React.FC = () => {
       if (response.code === 0) {
         fetchScales()
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '发布失败')
+      showMessage(operationError.message || '发布失败')
     }
   }
 
@@ -149,10 +152,10 @@ const ScaleList: React.FC = () => {
       if (response.code === 0) {
         fetchScales()
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (operationError: any) {
-      alert(operationError.message || '废弃失败')
+      showMessage(operationError.message || '废弃失败')
     }
   }
 
@@ -165,10 +168,10 @@ const ScaleList: React.FC = () => {
         setExportPreview(response.data)
         setShowExportModal(true)
       } else {
-        alert(response.message || '获取预览失败')
+        showMessage(response.message || '获取预览失败')
       }
     } catch (operationError: any) {
-      alert(operationError.message || '获取预览失败')
+      showMessage(operationError.message || '获取预览失败')
     } finally {
       setExportLoading(false)
     }
@@ -222,11 +225,11 @@ const ScaleList: React.FC = () => {
       exportRequestRef.current = null
       const formatLabel = exportOptions.format === 'sav' ? 'SAV' : exportOptions.format === 'spss' ? 'CSV+SPS' : 'CSV'
       const fieldCount = response.data.fieldCount ?? exportPreview?.fields?.length ?? '-'
-      alert(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${fieldCount}\n\n文件已开始下载...`)
+      showMessage(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${fieldCount}\n\n文件已开始下载...`)
       setShowExportModal(false)
     } catch (operationError: any) {
       if (operationError instanceof ExportJobFailedError) exportRequestRef.current = null
-      alert(operationError.message || '导出失败')
+      showMessage(operationError.message || '导出失败')
     } finally {
       setExportLoading(false)
     }
@@ -254,6 +257,7 @@ const ScaleList: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader
         title="心理量表管理"
         actions={(

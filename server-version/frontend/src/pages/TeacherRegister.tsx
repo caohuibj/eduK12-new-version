@@ -1,3 +1,4 @@
+import '../components/staff-ui/auth-ui.css'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
@@ -96,12 +97,12 @@ const TeacherRegister: React.FC = () => {
 
   if (!teacherCode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="hui-staff-auth min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
         <div className="card text-center">
           <p className="text-red-500 mb-4">无效的访问</p>
-          <p className="text-gray-600 mb-4">请通过教师码登录页面进入</p>
+          <p className="text-gray-600 mb-4">请先验证教师邀请码，再创建账号</p>
           <Link to={authLink("/teacher/login")} className="btn-primary inline-block">
-            返回教师登录
+            返回邀请码验证
           </Link>
         </div>
       </div>
@@ -110,7 +111,7 @@ const TeacherRegister: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="hui-staff-auth min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
         <div className="card max-w-md text-center">
           <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
           <h1 className="text-xl font-bold text-gray-800 mb-2">已提交，等待管理员审核</h1>
@@ -126,7 +127,7 @@ const TeacherRegister: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="hui-staff-auth min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
         <Link

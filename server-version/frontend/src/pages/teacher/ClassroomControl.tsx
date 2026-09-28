@@ -5,6 +5,8 @@ import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, ArrowRight, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
+import { ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 
 interface Question {
   id: string
@@ -43,6 +45,7 @@ const ClassroomControl: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { isLoading: authLoading, user } = useAuth()
+  const { feedback, confirm, info } = useStaffFeedback()
 
   const [classroom, setClassroom] = useState<Classroom | null>(null)
   const [loading, setLoading] = useState(true)
@@ -54,6 +57,7 @@ const ClassroomControl: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('control')
   const [connectionNotice, setConnectionNotice] = useState<string | null>(null)
   const [statsUnknown, setStatsUnknown] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const refreshStats = useCallback(async () => {
     if (!id || !currentQuestion?.id) return
@@ -87,12 +91,12 @@ const ClassroomControl: React.FC = () => {
         setClassroom(response.data)
         setCurrentQuestion(response.data.questions.find((question) => question.startedAt && !question.endedAt) || null)
       } else {
-        alert(response.message || '课堂信息缺失')
-        navigate('/teacher/classrooms')
+        setClassroom(null)
+        setLoadError(response.message || '课堂信息缺失')
       }
     } catch (err: any) {
-      alert(err.message || '获取课堂信息失败')
-      navigate('/teacher/classrooms')
+      setClassroom(null)
+      setLoadError(err.message || '获取课堂信息失败')
     } finally {
       setLoading(false)
     }
@@ -187,7 +191,7 @@ const ClassroomControl: React.FC = () => {
     const unansweredQuestion = classroom.questions.find((q) => !q.startedAt)
 
     if (!unansweredQuestion) {
-      alert('没有可用的题目，请先添加题目')
+      info('没有可用的题目', '请先添加题目，再开始课堂答题。')
       return
     }
 
@@ -264,20 +268,14 @@ const ClassroomControl: React.FC = () => {
     })
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
-    )
-  }
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课堂控制">正在读取课堂状态和实时连接信息。</ProductStatus></ProductPage>
 
-  if (!classroom) {
-    return null
-  }
+  if (!classroom) return <ProductPage width="management"><ProductStatus kind="error" title="课堂不可用" actions={<><ProductButton onClick={() => void fetchClassroom()}>重新加载</ProductButton> <Link to="/teacher/classrooms">返回课堂列表</Link></>}>{loadError || '课堂不存在，或当前账户无法访问。'}</ProductStatus></ProductPage>
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <ProductPage width="management" className="p-0">
+      {feedback}
+      <div className="min-h-screen bg-gray-50">
       {/* 顶部状态栏 */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -563,16 +561,11 @@ const ClassroomControl: React.FC = () => {
                               ? 'bg-yellow-50 border-yellow-200 cursor-not-allowed'
                               : 'bg-gray-50 border-gray-200 hover:bg-gray-100 cursor-pointer'
                           }`}
-                          onClick={() => {
-                            // 已完成的题目，询问是否重新开始
+                          onClick={async () => {
                             if (question.endedAt) {
-                              if (window.confirm('该题目已完成，是否重新开始？')) {
-                                // 重置题目状态
-                                handleStartSpecificQuestion(question)
-                              }
-                            }
-                            // 未开始的题目可以直接开始
-                            else if (!question.startedAt) {
+                              const restart = await confirm({ title: '重新开始已完成题目？', body: '这会重新发起同一题目的课堂作答。服务器仍负责校验当前课堂状态。', confirmLabel: '重新开始' })
+                              if (restart) handleStartSpecificQuestion(question)
+                            } else if (!question.startedAt) {
                               handleStartSpecificQuestion(question)
                             }
                           }}
@@ -618,7 +611,8 @@ const ClassroomControl: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </ProductPage>
   )
 }
 

@@ -16,9 +16,14 @@ const auth = vi.hoisted(() => ({
 }))
 const organization = vi.hoisted(() => ({
   organizations: [] as Array<{ id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' }>,
-  active: null as null | { organization: { id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' } },
+  total: 0,
+  platformRole: null as string | null,
+  active: null as any,
+  isLoading: false,
+  error: null as string | null,
   activeLoading: false,
   activeError: null as string | null,
+  refresh: vi.fn(),
   selectOrganization: vi.fn(),
 }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
@@ -36,9 +41,15 @@ beforeEach(() => {
   auth.clearReauthentication.mockReset()
   auth.clearReauthentication.mockImplementation(() => sessionStorage.removeItem('huisurvey:reauth-return'))
   organization.organizations = []
+  organization.total = 0
+  organization.platformRole = null
   organization.active = null
+  organization.isLoading = false
+  organization.error = null
   organization.activeLoading = false
   organization.activeError = null
+  organization.refresh.mockReset()
+  organization.refresh.mockResolvedValue(undefined)
   organization.selectOrganization.mockReset()
   sessionStorage.clear()
 })
@@ -96,8 +107,9 @@ it('resumes the original account and retains mandatory password change', () => {
 describe('one shared chrome', () => {
   it('selects one active nav item and returns focus on Escape', async () => {
     render(<MemoryRouter initialEntries={['/student/cognitive/history']}><AppShell><h1>历史</h1></AppShell></MemoryRouter>)
-    expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
-    expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('认知测评')
+    const primaryNav = screen.getByRole('navigation', { name: '主要导航' })
+    expect(primaryNav.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
+    expect(primaryNav).toHaveTextContent('认知测评')
     const toggle = screen.getByRole('button', { name: '导航菜单' })
     await userEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
@@ -112,6 +124,8 @@ describe('one shared chrome', () => {
       { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
       { id: 'org-b', name: '组织 B', status: 'SUSPENDED' },
     ]
+    organization.total = 2
+    organization.total = 2
     organization.selectOrganization.mockResolvedValue(null)
     render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
     const selector = screen.getByRole('combobox', { name: '当前组织' })
@@ -134,7 +148,7 @@ describe('one shared chrome', () => {
       },
     } as any
     render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
-    expect(screen.queryByRole('link', { name: 'Safety/CSV' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '安全事项与导出' })).not.toBeInTheDocument()
   })
   it('keeps Safety responsibility discoverable for a suspended teacher owner', () => {
     organization.organizations = [{ id: 'org-a', name: '组织 A', status: 'SUSPENDED' }]
@@ -151,8 +165,21 @@ describe('one shared chrome', () => {
       },
     } as any
     render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)
-    expect(screen.getByRole('link', { name: 'Safety/CSV' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Reporting' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '安全事项与导出' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '报告分析' })).not.toBeInTheDocument()
+  })
+  it('renders grouped staff navigation without changing the active destination', async () => {
+    auth.user = { id: 't1', role: 'TEACHER', username: 'teacher' } as User
+    render(<MemoryRouter initialEntries={['/assignments']}><AppShell><h1>作业页面</h1></AppShell></MemoryRouter>)
+    const nav = screen.getByRole('navigation', { name: '主要导航' })
+    expect(nav).toHaveTextContent('教学管理')
+    expect(nav).toHaveTextContent('测评内容')
+    expect(nav).toHaveTextContent('内容资源')
+    expect(screen.getByRole('link', { name: '作业管理' })).toHaveAttribute('aria-current', 'page')
+    const search = screen.getByRole('searchbox', { name: '查找管理页面' })
+    await userEvent.type(search, '文档')
+    expect(screen.getByRole('link', { name: '文档库' })).toBeVisible()
+    expect(screen.queryByRole('link', { name: '作业管理' })).not.toBeInTheDocument()
   })
   it('keeps focused player descendants outside product token scope', () => {
     render(<MemoryRouter initialEntries={['/public/cognitive/sessions/s1']}><AppShell><button>task control</button></AppShell></MemoryRouter>)

@@ -55,8 +55,8 @@ const ownerJourney = async (browser) => {
     await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
     await page.getByRole('heading', { name: '成员关系', exact: true }).waitFor()
     await page.getByText(/· 学生$/).waitFor()
-    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count() > 0, true, 'ORG_ADMIN must see Run product entry even with legacy STUDENT role')
-    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count() > 0, true, 'ORG_ADMIN must see Reporting product entry from server Organization context')
+    assert.equal(await page.getByRole('link', { name: '测评批次', exact: true }).count() > 0, true, 'ORG_ADMIN must see Run product entry even with legacy STUDENT role')
+    assert.equal(await page.getByRole('link', { name: '报告分析', exact: true }).count() > 0, true, 'ORG_ADMIN must see Reporting product entry from server Organization context')
 
     await page.getByLabel('年级名称').fill(fixture.gradeName)
     await page.getByRole('button', { name: '新增年级' }).click()
@@ -85,13 +85,13 @@ const ownerJourney = async (browser) => {
 
     // Real Run mutation, then hard reload to prove durable read-model navigation.
     await page.goto(`${baseUrl}${organizationPath}/runs`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Assessment Runs', exact: true }).waitFor()
-    await page.getByLabel('Run 名称').fill(fixture.runName)
+    await page.getByRole('heading', { name: '测评批次', exact: true }).waitFor()
+    await page.getByLabel('批次名称').fill(fixture.runName)
     await page.getByRole('button', { name: '创建草稿' }).click()
     await page.getByRole('heading', { name: fixture.runName, exact: true }).waitFor()
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.runName, exact: true }).waitFor()
-    await page.getByRole('heading', { name: 'Track 与冻结事实', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '测评项目与冻结事实', exact: true }).waitFor()
     await page.getByText('暂无已发布的可用资源', { exact: true }).waitFor()
     await screenshot(page, '02-run-durable-direct-link')
 
@@ -99,8 +99,8 @@ const ownerJourney = async (browser) => {
     await page.getByRole('heading', { name: '群体与纵向报告', exact: true }).waitFor()
     await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
-    await page.getByRole('heading', { name: 'Safety inbox', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '安全事项与数据导出', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '安全事项', exact: true }).waitFor()
     await screenshot(page, '03-reporting-delivery')
 
     // Tenant isolation: exact context read and direct URL both fail closed.
@@ -139,15 +139,15 @@ const teacherJourney = async (browser) => {
     await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
     await page.getByText('只读组织上下文', { exact: true }).waitFor()
-    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count(), 0, 'TEACHER persona must not gain governance')
-    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count() > 0, true, 'TEACHER persona must get Reporting independently of legacy role')
-    assert.equal(await page.getByRole('link', { name: /Safety \/ CSV|Safety\/CSV/ }).count() > 0, true, 'TEACHER persona must get Safety responsibility surface')
+    assert.equal(await page.getByRole('link', { name: '测评批次', exact: true }).count(), 0, 'TEACHER persona must not gain governance')
+    assert.equal(await page.getByRole('link', { name: '报告分析', exact: true }).count() > 0, true, 'TEACHER persona must get Reporting independently of legacy role')
+    assert.equal(await page.getByRole('link', { name: '安全事项与导出', exact: true }).count() > 0, true, 'TEACHER persona must get Safety responsibility surface')
 
     await page.goto(`${baseUrl}${organizationPath}/reporting`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: '群体与纵向报告', exact: true }).waitFor()
     await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
-    await page.getByRole('heading', { name: 'Safety & CSV Delivery', exact: true }).waitFor()
+    await page.getByRole('heading', { name: '安全事项与数据导出', exact: true }).waitFor()
     await page.getByText('当前没有可见 Safety case。', { exact: true }).waitFor()
     console.log('[PASS] TEACHER persona legacy-STUDENT receives reporting/delivery without governance')
   } finally {
@@ -164,9 +164,9 @@ const studentJourney = async (browser) => {
     assert.equal(discovery.list.some((item) => item.id === fixture.organizationId), true, 'current student Membership must discover Organization')
     await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
     await page.getByText('只读组织上下文', { exact: true }).waitFor()
-    assert.equal(await page.getByRole('link', { name: 'Runs', exact: true }).count(), 0)
-    assert.equal(await page.getByRole('link', { name: 'Reporting', exact: true }).count(), 0)
-    assert.equal(await page.getByRole('link', { name: /Safety \/ CSV|Safety\/CSV/ }).count(), 0)
+    assert.equal(await page.getByRole('link', { name: '测评批次', exact: true }).count(), 0)
+    assert.equal(await page.getByRole('link', { name: '报告分析', exact: true }).count(), 0)
+    assert.equal(await page.getByRole('link', { name: '安全事项与导出', exact: true }).count(), 0)
     console.log('[PASS] STUDENT Membership gets tenant context without governance/reporting escalation')
   } finally {
     await context.close()

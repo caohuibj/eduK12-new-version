@@ -292,7 +292,17 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
-        run: npm audit --audit-level=high
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
+              sleep $((attempt * 10))
+            fi
+          done
+          exit 1
       - name: content routing boundary tests
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
@@ -478,7 +488,17 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
-        run: npm audit --audit-level=high
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
+              sleep $((attempt * 10))
+            fi
+          done
+          exit 1
       - name: lint
         run: npm run lint
       - name: typecheck

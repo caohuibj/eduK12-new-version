@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, Brain, Edit, UserCog, Settings, ClipboardCheck, RefreshCw } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Course, Assignment, Checkin } from '../../types'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 
 // 心理量表类型
 interface Scale {
@@ -39,6 +41,7 @@ interface CheckinWithStats extends Checkin {
 const TeacherCourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
+  const { feedback, confirm, success, error: showError } = useStaffFeedback()
   const [activeTab, setActiveTab] = useState<'assignments' | 'checkins' | 'questionnaires'>('assignments')
   const [course, setCourse] = useState<Course | null>(null)
   const [assignments, setAssignments] = useState<AssignmentWithStats[]>([])
@@ -123,117 +126,37 @@ const TeacherCourseDetail: React.FC = () => {
   }
 
   const rotateCourseCode = async () => {
-    if (!courseId || !window.confirm('轮换后旧课程码会立即失效，确定继续吗？')) return
+    if (!courseId || !(await confirm({ title: '轮换课程码？', body: '旧课程码会立即失效，请在轮换后把新课程码发给学生。', confirmLabel: '轮换课程码' }))) return
     try {
       const response = await apiClient.post(`/courses/${courseId}/rotate-code`)
       if (response.code === 0) {
-        setCourse((current) => current ? { ...current, courseCode: response.data.courseCode } : current)
-        alert('课程码已轮换，请把新课程码发给学生。')
+        setCourse(current => current ? { ...current, courseCode: response.data.courseCode } : current)
+        success('课程码已轮换', `新课程码：${response.data.courseCode}`)
       }
     } catch (error: any) {
-      alert(error?.message || '课程码轮换失败')
+      showError('课程码轮换失败', error?.message || '请稍后重试')
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-
-  if (!course) {
-    return (
-      <div className="card text-center py-12">
-        <p className="text-gray-500">课程不存在或已删除</p>
-        <button onClick={() => navigate('/courses')} className="btn-primary mt-4">
-          返回课程列表
-        </button>
-      </div>
-    )
-  }
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课程">正在读取课程、作业和打卡概况。</ProductStatus></ProductPage>
+  if (!course) return <ProductPage width="management"><ProductStatus kind="error" title="课程不可用" actions={<Link to="/courses">返回课程列表</Link>}>课程不存在、已删除，或当前账户无法访问。</ProductStatus></ProductPage>
 
   return (
-    <div className="space-y-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate('/courses')}
-        className="flex items-center text-gray-600 hover:text-primary transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5 mr-1" />
-        返回课程列表
-      </button>
-
-      {/* Course Header */}
-      <div className="card">
-        <div className="flex items-start space-x-4">
-          {/* 课程封面 */}
-          {course.coverUrl ? (
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-              <img
-                src={course.coverUrl}
-                alt={course.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-20 h-20 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-10 h-10 text-primary" />
-            </div>
-          )}
-          <div className="flex-1">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-2 flex-wrap mb-2">
-                  <h1 className="text-2xl font-bold text-gray-800">{course.title}</h1>
-                  {course.isLibrary && (
-                    <span className="px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-700">库课程</span>
-                  )}
-                </div>
-                {course.description && (
-                  <p className="text-gray-600 mb-3">{course.description}</p>
-                )}
-              </div>
-              {/* 操作按钮 */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => navigate(`/courses/${courseId}/students`)}
-                  className="btn-secondary flex items-center space-x-1"
-                  title="管理学生"
-                >
-                  <UserCog className="w-4 h-4" />
-                  <span>学生管理</span>
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
-              <div className="flex items-center space-x-1">
-                <Users className="w-4 h-4" />
-                <span>{course.studentCount || 0} 名学员</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>课程码: {course.courseCode}</span>
-                {!course.isLibrary && (
-                  <button
-                    type="button"
-                    onClick={rotateCourseCode}
-                    className="inline-flex items-center gap-1 text-primary hover:text-primary/80"
-                    title="轮换课程码"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>轮换</span>
-                  </button>
-                )}
-              </div>
-              <div>状态: {course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</div>
-            </div>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title={course.title} description={course.description || '课程详情、学生与教学任务'} actions={<Link className="staff-primary-link" to={`/courses/${courseId}/students`}>管理学生</Link>} />
+      {feedback}
+      <section className="staff-detail-header" aria-label="课程概况">
+        <div className="staff-detail-header__top">
+          <div className="flex items-start gap-4">
+            {course.coverUrl ? <img src={course.coverUrl} alt="" className="h-20 w-20 rounded-xl object-cover" /> : <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-slate-100"><BookOpen className="h-9 w-9 text-slate-500" aria-hidden="true" /></div>}
+            <div><strong className="text-lg">{course.isLibrary ? '库课程' : '授课课程'}</strong><div className="staff-detail-meta"><span>{course.studentCount || 0} 名学生</span><span>状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span></div></div>
           </div>
+          {!course.isLibrary && <ProductButton onClick={() => void rotateCourseCode()}><RefreshCw className="w-4 h-4" aria-hidden="true" />轮换课程码</ProductButton>}
         </div>
-      </div>
-
+        <div className="staff-detail-meta"><span>课程码：<strong>{course.courseCode}</strong></span><Link to="/courses">返回课程列表</Link></div>
+      </section>
       {/* Stats Overview */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="card bg-blue-50 border-blue-100">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -456,16 +379,14 @@ const TeacherCourseDetail: React.FC = () => {
                       navigate(`/questionnaires/${questionnaire.id}`)
                     }}
                     className="btn-secondary text-sm"
-                  >
-                    查看
-                  </button>
+                  >查看问卷</button>
                 </div>
               </div>
             ))
           )}
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

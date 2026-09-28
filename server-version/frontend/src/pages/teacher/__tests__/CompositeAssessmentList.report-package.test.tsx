@@ -51,7 +51,7 @@ describe('CompositeAssessmentList report package mode', () => {
   it('creates a fixed package selection instead of a bare analysis protocol', async () => {
     const user = userEvent.setup()
     render(<CompositeAssessmentList />)
-    await user.click(await screen.findByRole('button', { name: '新建综合测评' }))
+    await user.click(await screen.findByRole('button', { name: '创建综合测评' }))
     await user.type(screen.getByPlaceholderText('编码'), 'PKG')
     await user.type(screen.getByPlaceholderText('名称'), '固定包测评')
     await user.selectOptions(screen.getByLabelText('已授权报告包'), 'attention_stability_v1/1.0.0')

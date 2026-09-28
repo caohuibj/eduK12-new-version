@@ -4,10 +4,13 @@ import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { User } from '../types'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 type UserTab = 'TEACHER' | 'STUDENT'
 
 const UserList: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<UserTab>('TEACHER')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,13 +44,13 @@ const UserList: React.FC = () => {
     try {
       const response = await apiClient.post(`/users/${userId}/approve-teacher`)
       if (response.code === 0) {
-        alert('已通过该教师的注册审核')
+        showMessage('已通过该教师的注册审核')
         void fetchUsers()
       } else {
-        alert(response.message || '审核失败')
+        showMessage(response.message || '审核失败')
       }
     } catch (operationError: any) {
-      alert(operationError.message || '审核失败')
+      showMessage(operationError.message || '审核失败')
     }
   }
 
@@ -56,13 +59,13 @@ const UserList: React.FC = () => {
       setExtendingUser(userId)
       const response = await apiClient.post('/auth/extend-account', { userId, months })
       if (response.code === 0) {
-        alert(`账号已成功延期${months}个月`)
+        showMessage(`账号已成功延期${months}个月`)
         void fetchUsers()
       } else {
-        alert(response.message || '延期失败')
+        showMessage(response.message || '延期失败')
       }
     } catch (operationError: any) {
-      alert(operationError.message || '延期失败')
+      showMessage(operationError.message || '延期失败')
     } finally {
       setExtendingUser(null)
     }
@@ -95,6 +98,7 @@ const UserList: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
+      {feedback}
       <PageHeader
         title="用户管理"
         description="审核教师账号、查看学生账号，并维护教师账号有效期。"

@@ -6,6 +6,8 @@ import ts from 'typescript'
 const frontend = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const source = fs.readFileSync(path.join(frontend, 'src/App.tsx'), 'utf8')
 const ast = ts.createSourceFile('App.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+const organizationSource = fs.readFileSync(path.join(frontend, 'src/pages/organization/OrganizationProductRoutes.tsx'), 'utf8')
+const organizationAst = ts.createSourceFile('OrganizationProductRoutes.tsx', organizationSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
 const output = path.resolve(frontend, '../docs/frontend-convergence/routes.md')
 const routes = []
 const guards = new Set(['ProtectedRoute', 'ParentProtectedRoute', 'StudentProtectedRoute', 'RelationalProtectedRoute', 'LegacyRelationalTasksRoute', 'ScaleLibraryRoute', 'OptionalStudentRoute', 'EntryRoute', 'PublicRoute'])
@@ -52,8 +54,45 @@ function visit(node) {
   ts.forEachChild(node, visit)
 }
 visit(ast)
+function organizationRow(routePath, page) {
+  return [routePath, page, 'Authenticated in page; server Organization/assignment authority', '—', 'AppShell (outside guards)', 'standard', 'FE-02 + FE-10', 'Staff UI chrome; server authority retained']
+}
+function firstJsxTag(node, sourceFile) {
+  const tags = []
+  function collect(child) {
+    if (ts.isJsxOpeningElement(child) || ts.isJsxSelfClosingElement(child)) tags.push(child.tagName.getText(sourceFile))
+    ts.forEachChild(child, collect)
+  }
+  if (node) collect(node)
+  return tags[0] || '—'
+}
+function visitOrganizationRoutes(node) {
+  if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(organizationAst) === 'Route') {
+    const attrs = node.attributes.properties
+    const attribute = (name) => attrs.find((a) => ts.isJsxAttribute(a) && a.name.getText(organizationAst) === name)?.initializer
+    const routePath = attribute('path')
+    if (!routePath || !ts.isStringLiteral(routePath)) throw new Error('Organization inventory requires an explicit route path')
+    routes.push(organizationRow(routePath.text, firstJsxTag(attribute('element'), organizationAst)))
+  }
+  ts.forEachChild(node, visitOrganizationRoutes)
+}
+function visitOrganizationConditionalEntries(node) {
+  if (ts.isIfStatement(node) && ts.isBinaryExpression(node.expression)) {
+    const expression = node.expression
+    const exact = expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken
+      && expression.left.getText(organizationAst) === 'location.pathname'
+      && ts.isStringLiteral(expression.right)
+    if (exact && ts.isReturnStatement(node.thenStatement)) {
+      routes.push(organizationRow(expression.right.text, firstJsxTag(node.thenStatement.expression, organizationAst)))
+    }
+  }
+  ts.forEachChild(node, visitOrganizationConditionalEntries)
+}
+
+visitOrganizationConditionalEntries(organizationAst)
+visitOrganizationRoutes(organizationAst)
 if (new Set(routes.map(([p]) => p)).size !== routes.length) throw new Error('Duplicate route paths require review')
-const md = `# Frontend route inventory\n\nGenerated from \`frontend/src/App.tsx\` by \`npm run inventory:product-ui\`. ${routes.length} explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.\n\n| Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |\n|---|---|---|---|---|---|---|---|\n${routes.map((r) => '| ' + r.map((v) => v.replaceAll('|', '\\|')).join(' | ') + ' |').join('\n')}\n\n## Additional boundaries\n\n- FirstLoginPasswordChange remains an inline guard flow. FE-02 preserves the original destination through reauthentication.\n- Parent login/home are explicitly registered with a PARENT-only route guard. Legacy relational task discovery retains its STUDENT / PARENT / TEACHER guard. Shared exact runtime/report routes accept authenticated sessions and enforce resource ownership on the server, including frozen Organization respondents whose legacy role is ADMIN.\n- User roles are STUDENT / TEACHER / ADMIN / PARENT; researcher report projection is not a new frontend login role.\n- Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.\n- Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.\n- BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.\n- Non-route components and legacy branches are not declared dead code by this inventory.\n`
+const md = `# Frontend route inventory\n\nGenerated from \`frontend/src/App.tsx\` plus nested \`OrganizationProductRoutes.tsx\` by \`npm run inventory:product-ui\`. ${routes.length} explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.\n\n| Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |\n|---|---|---|---|---|---|---|---|\n${routes.map((r) => '| ' + r.map((v) => v.replaceAll('|', '\\|')).join(' | ') + ' |').join('\n')}\n\n## Additional boundaries\n\n- FirstLoginPasswordChange remains an inline guard flow. FE-02 preserves the original destination through reauthentication.\n- Parent login/home are explicitly registered with a PARENT-only route guard. Legacy relational task discovery retains its STUDENT / PARENT / TEACHER guard. Shared exact runtime/report routes accept authenticated sessions and enforce resource ownership on the server, including frozen Organization respondents whose legacy role is ADMIN.\n- User roles are STUDENT / TEACHER / ADMIN / PARENT; researcher report projection is not a new frontend login role.\n- Public Cognitive access now follows the route namespace; legacy public query parameters remain compatible but do not select the client.\n- Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.\n- BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.\n- Nested Organization routes are included as an audit projection; AppShell and server authority remain the routing/access sources of truth.\n- Non-route components and legacy branches are not declared dead code by this inventory.\n`
 if (process.argv.includes('--check')) {
   if (!fs.existsSync(output) || fs.readFileSync(output, 'utf8') !== md) {
     console.error('Product route inventory is stale; run npm run inventory:product-ui and review the changes.')

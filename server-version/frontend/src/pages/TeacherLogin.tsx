@@ -1,3 +1,4 @@
+import '../components/staff-ui/auth-ui.css'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
@@ -43,7 +44,7 @@ const TeacherLogin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="hui-staff-auth min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
         <Link

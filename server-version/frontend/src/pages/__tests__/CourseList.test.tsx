@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import type { Course } from '../../types'
 
 const { mockGet, authState } = vi.hoisted(() => ({
@@ -75,18 +76,20 @@ describe('CourseList library marking', () => {
 
   it('shows a library badge and lets another admin mark an admin-created course, but not a teacher course', async () => {
     const user = userEvent.setup()
-    render(<CourseList />)
+    render(<MemoryRouter><CourseList /></MemoryRouter>)
 
     expect(await screen.findByText('我的库课')).toBeInTheDocument()
     expect(screen.getAllByText('库课程').length).toBeGreaterThan(0)
 
-    const peerCard = screen.getByText('同事管理员课').closest('.card') as HTMLElement
-    await user.click(within(peerCard).getByTitle('编辑'))
+    const peerCard = screen.getByText('同事管理员课').closest('.staff-course-card') as HTMLElement
+    await user.click(within(peerCard).getByLabelText('同事管理员课 的更多操作'))
+    await user.click(within(peerCard).getByRole('button', { name: '编辑课程' }))
     expect(screen.getByText('标记为库课程')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '取消' }))
 
-    const teacherCard = screen.getByText('教师课').closest('.card') as HTMLElement
-    await user.click(within(teacherCard).getByTitle('编辑'))
+    const teacherCard = screen.getByText('教师课').closest('.staff-course-card') as HTMLElement
+    await user.click(within(teacherCard).getByLabelText('教师课 的更多操作'))
+    await user.click(within(teacherCard).getByRole('button', { name: '编辑课程' }))
     expect(screen.queryByText('标记为库课程')).not.toBeInTheDocument()
   })
 })

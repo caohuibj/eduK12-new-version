@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 import { compositeApi } from '../../modules/composite/api'
 import type {
   CompositeAttemptListStatus,
@@ -62,17 +63,9 @@ const CompositeAssessmentResults: React.FC = () => {
   const counts = data?.attemptCounts
 
   return (
-    <div>
-      <button onClick={() => navigate((data?.assessment as any)?.productKind === 'QUESTIONNAIRE' ? '/questionnaire-products/' + id : '/composite-assessments/' + id)} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
-        <ArrowLeft className="w-4 h-4 mr-1" />返回配置
-      </button>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{data?.assessment.name || '作答结果'}</h1>
-          <p className="text-sm text-gray-500">{data?.assessment.code}</p>
-        </div>
-      </div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title={data?.assessment.name || '作答与报告'} description={data?.assessment.code || '查看参与者进度与已完成报告'} actions={<button onClick={() => navigate((data?.assessment as any)?.productKind === 'QUESTIONNAIRE' ? '/questionnaire-products/' + id : '/composite-assessments/' + id)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回配置</button>} />
+      {error && <ProductStatus kind="error" title="作答名单加载失败">{error}</ProductStatus>}
       <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="card p-4"><p className="text-sm text-gray-500">已开始</p><p className="text-2xl font-semibold">{counts?.started ?? 0}</p></div>
         <div className="card p-4"><p className="text-sm text-gray-500">进行中</p><p className="text-2xl font-semibold">{counts?.inProgress ?? 0}</p></div>
@@ -115,13 +108,13 @@ const CompositeAssessmentResults: React.FC = () => {
           <button type="submit" className="btn-secondary">筛选</button>
         </form>
       </div>
-      <div className="card p-0 overflow-auto">
+      <div className="staff-table-container">
         {loading ? (
           <p className="p-6 text-gray-500">加载中...</p>
         ) : !data?.list.length ? (
           <p className="p-6 text-gray-500">还没有作答记录</p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="staff-table">
             <thead className="bg-gray-50 text-left text-gray-500">
               <tr>
                 <th className="px-4 py-3 font-medium">参与者</th>
@@ -171,7 +164,7 @@ const CompositeAssessmentResults: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

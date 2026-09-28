@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import { ensureCsrfToken } from '../api/client'
 import { sessionAxios } from '../api/client'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface ImageItem {
   id: string
@@ -15,6 +17,8 @@ interface ImageItem {
 }
 
 const ImageLibrary: React.FC = () => {
+  const { feedback, info } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const { user } = useAuth()
   const [images, setImages] = useState<ImageItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -123,11 +127,11 @@ const ImageLibrary: React.FC = () => {
       if (response.code === 0) {
         fetchImages()
       } else {
-        alert(response.message || '删除失败')
+        showMessage(response.message || '删除失败')
       }
     } catch (error) {
       console.error('删除图片失败:', error)
-      alert('删除失败')
+      showMessage('删除失败')
     }
   }
 
@@ -144,10 +148,10 @@ const ImageLibrary: React.FC = () => {
         setEditName('')
         fetchImages()
       } else {
-        alert(response.message || '重命名失败')
+        showMessage(response.message || '重命名失败')
       }
     } catch (error: any) {
-      alert(error.message || '重命名失败')
+      showMessage(error.message || '重命名失败')
     } finally {
       setIsUpdating(false)
     }
@@ -198,39 +202,15 @@ const ImageLibrary: React.FC = () => {
   }, [])
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索图片..."
-            className="input pl-10 w-64"
-          />
-        </div>
-        <button
-          onClick={() => setShowUploadModal(true)}
-          className="btn-primary flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>上传图片</span>
-        </button>
-      </div>
-
+    <ProductPage width="management" className="space-y-6">
+      {feedback}
+      <PageHeader title="图片库" description="按视觉浏览和复用课堂、问卷与测评图片。" actions={<ProductButton variant="primary" onClick={() => setShowUploadModal(true)}><Plus className="w-4 h-4" aria-hidden="true" />上传图片</ProductButton>} />
+      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">当前显示 {filteredImages.length} 张图片</span></div>
       {/* Image Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
+        <ProductStatus kind="pending" title="正在加载图片">正在读取图片资源。</ProductStatus>
       ) : filteredImages.length === 0 ? (
-        <div className="text-center py-12">
-          <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">暂无图片</p>
-          <p className="text-gray-400 text-sm mt-1">点击上方按钮上传图片</p>
-        </div>
+        <ProductStatus kind="info" title="暂无图片">上传第一张图片后，可以在支持图片的内容中复用。</ProductStatus>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {filteredImages.map((image) => (
@@ -456,7 +436,7 @@ const ImageLibrary: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

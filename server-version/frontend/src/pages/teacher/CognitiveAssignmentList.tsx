@@ -5,7 +5,7 @@ import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import MaterialGrantModal from '../../components/MaterialGrantModal'
-import { PageHeader, ProductPage } from '../../components/product-ui'
+import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 
 type CourseOption = { id: string; title: string; courseCode: string; isLibrary?: boolean }
 type ConfigOption = {
@@ -134,7 +134,7 @@ const CognitiveAssignmentList: React.FC = () => {
     }
   }
 
-  if (loading) return <div className="text-gray-500 p-8">加载中...</div>
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载认知任务">正在读取任务、课程与可用配置。</ProductStatus></ProductPage>
 
   return (
     <ProductPage width="management" className="space-y-6">
@@ -256,31 +256,10 @@ const CognitiveAssignmentList: React.FC = () => {
         </section>
       )}
 
-      {list.length === 0 ? (
-        <div className="card p-10 text-center text-gray-500">还没有认知任务。先创建并发布后，才能加入综合测评或发给学生。</div>
-      ) : (
-        <div className="grid gap-4">
-          {list.map((item) => (
-            <article key={item.id} className="card p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="font-semibold text-gray-800">{item.title}</h2>
-                  {item.listedStandalone === false && (
-                    <span className="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">综合测评用</span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  {statusLabel[item.status] || item.status}
-                  {item.config ? ` · ${item.config.name}` : ''}
-                  {` · 最多 ${item.maxAttempts} 次`}
-                </p>
-              </div>
-              <Link to={`/cognitive-assignments/${item.id}`} className="btn-secondary self-start sm:self-auto">
-                <Settings className="w-4 h-4 inline mr-1" aria-hidden="true" />配置
-              </Link>
-            </article>
-          ))}
-        </div>
+      {list.length === 0 ? <ProductStatus kind="info" title="暂无认知任务">先创建并发布后，才能加入综合测评或发给学生。</ProductStatus> : (
+        <div className="staff-table-container"><table className="staff-table"><thead><tr><th>任务</th><th>状态</th><th>任务类型</th><th>最大次数</th><th className="text-right">操作</th></tr></thead><tbody>
+          {list.map(item => <tr key={item.id}><td><Link className="staff-record-title" to={`/cognitive-assignments/${item.id}`}>{item.title}</Link>{item.listedStandalone === false && <div className="staff-muted">综合测评内部任务</div>}</td><td><span className={`staff-badge ${item.status === 'PUBLISHED' ? 'staff-badge--success' : ''}`}>{statusLabel[item.status] || item.status}</span></td><td>{item.config?.name || '—'}</td><td>{item.maxAttempts}</td><td><div className="staff-table-actions"><Link className="staff-secondary-link" to={`/cognitive-assignments/${item.id}`}><Settings className="w-4 h-4" aria-hidden="true" />配置任务</Link></div></td></tr>)}
+        </tbody></table></div>
       )}
       {grantConfig && (
         <MaterialGrantModal
