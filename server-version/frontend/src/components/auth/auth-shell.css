@@ -4,24 +4,24 @@
  */
 .hui-auth-page,
 .hui-entry-page {
-  --auth-ink: #14304a;
-  --auth-muted: #64748b;
-  --auth-line: #dde7f0;
-  --auth-page: #fbfdff;
-  --auth-soft: #eff7ff;
-  --auth-surface: #ffffff;
-  --auth-primary: #2f6fed;
-  --auth-primary-hover: #255dce;
-  --auth-success: #15803d;
-  --auth-error: #dc2626;
+  --auth-ink: var(--hui-ds-color-ink);
+  --auth-muted: var(--hui-ds-color-muted);
+  --auth-line: var(--hui-ds-color-line);
+  --auth-page: var(--hui-ds-color-page-elevated);
+  --auth-soft: var(--hui-ds-color-soft);
+  --auth-surface: var(--hui-ds-color-surface);
+  --auth-primary: var(--hui-ds-color-action);
+  --auth-primary-hover: var(--hui-ds-color-action-hover);
+  --auth-success: var(--hui-ds-color-success-strong);
+  --auth-error: var(--hui-ds-color-danger);
   color: var(--auth-ink);
   background: var(--auth-page);
 }
 
-.hui-auth-page--student { --auth-accent: #38bdf8; --auth-accent-soft: #e0f6ff; }
-.hui-auth-page--teacher { --auth-accent: #2f6fed; --auth-accent-soft: #e8efff; }
-.hui-auth-page--parent { --auth-accent: #22c55e; --auth-accent-soft: #e8f8ee; }
-.hui-auth-page--admin { --auth-accent: #f59e0b; --auth-accent-soft: #fff5dc; }
+.hui-auth-page--student { --auth-accent: var(--hui-ds-color-sky); --auth-accent-soft: #e0f6ff; }
+.hui-auth-page--teacher { --auth-accent: var(--hui-ds-color-action); --auth-accent-soft: #e8efff; }
+.hui-auth-page--parent { --auth-accent: var(--hui-ds-color-success); --auth-accent-soft: #e8f8ee; }
+.hui-auth-page--admin { --auth-accent: var(--hui-ds-color-warning); --auth-accent-soft: #fff5dc; }
 
 .hui-auth-page {
   min-height: 100dvh;
@@ -166,7 +166,7 @@
   border: 1px solid var(--auth-line);
   border-radius: 1.5rem;
   background: #fff;
-  box-shadow: 0 14px 42px rgba(20, 48, 74, .08);
+  box-shadow: var(--hui-ds-shadow-raised);
 }
 .hui-auth-card__header {
   display: flex;
