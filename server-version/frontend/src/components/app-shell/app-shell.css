@@ -1,3 +1,4 @@
+@import '../public-ui/public-ui.css';
 /* Chrome scope deliberately excludes player descendants and their timing styles. */
 .hui-app { min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; }
 .hui-app-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left)); border-bottom: 1px solid #cbd5e1; background: white; }
