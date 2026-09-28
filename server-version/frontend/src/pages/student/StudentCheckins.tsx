@@ -38,7 +38,7 @@ const StudentCheckins: React.FC = () => {
   }
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-tasks">
       <PageHeader title="我的打卡" description="查看打卡任务与已经提交的记录。" />
 
       {loading ? (
