@@ -57,7 +57,10 @@ const StudentHome: React.FC = () => {
       const last = focusable[focusable.length - 1]
       const activeElement = document.activeElement
 
-      if (event.shiftKey && (activeElement === first || !dialog.contains(activeElement))) {
+      if (!dialog.contains(activeElement)) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+      } else if (event.shiftKey && activeElement === first) {
         event.preventDefault()
         last.focus()
       } else if (!event.shiftKey && activeElement === last) {
