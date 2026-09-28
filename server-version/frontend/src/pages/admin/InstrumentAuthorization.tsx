@@ -154,12 +154,12 @@ const InstrumentAuthorizationPage: React.FC = () => {
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>{error}</span>
-            <button type="button" className="btn-secondary" onClick={() => void reload()}>重新加载列表</button>
+            <button type="button" className="hui-button hui-button--secondary" onClick={() => void reload()}>重新加载列表</button>
           </div>
         </div>
       )}
 
-      <section className="card space-y-4" aria-labelledby="authorization-draft-title">
+      <section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-draft-title">
         <h2 id="authorization-draft-title" className="text-lg font-semibold">新建授权草稿</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {textField('Instrument key（非法律身份）', 'instrumentKey')}
@@ -206,13 +206,13 @@ const InstrumentAuthorizationPage: React.FC = () => {
           </div>
         </fieldset>
 
-        <button type="button" className="btn-primary" onClick={() => void createDraft()}>创建授权草稿</button>
+        <button type="button" className="hui-button hui-button--primary" onClick={() => void createDraft()}>创建授权草稿</button>
       </section>
 
-      <section className="card space-y-4" aria-labelledby="authorization-gates-title">
+      <section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-gates-title">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="authorization-gates-title" className="text-lg font-semibold">Publish gate 预览与批准</h2>
-          <button type="button" className="btn-secondary" onClick={() => void runPublishPreview()}>Scale Publish 预览</button>
+          <button type="button" className="hui-button hui-button--secondary" onClick={() => void runPublishPreview()}>Scale Publish 预览</button>
         </div>
 
         <label className="block max-w-2xl text-sm text-gray-700">
@@ -258,7 +258,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
                       {(row.status === 'DRAFT' || row.status === 'EVIDENCE_PENDING') && (
                         <button
                           type="button"
-                          className="btn-secondary"
+                          className="hui-button hui-button--secondary"
                           onClick={() => void approve(row)}
                           aria-label={`批准 ${row.instrumentKey} ${row.instrumentVersion} 授权版本 ${row.version}`}
                         >

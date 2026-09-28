@@ -208,7 +208,7 @@ const CompositeAssessmentList: React.FC = () => {
       </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {isAdmin && reportPackages.length > 0 && (
-        <div className="card p-5 mb-6">
+        <div className="staff-panel staff-panel--padded p-5 mb-6">
           <h2 className="font-semibold text-gray-800">内置报告包目录</h2>
           <p className="text-xs text-gray-500 mt-1 mb-3">包定义由代码版本控制；只有已发布版本可以授权和实例化。</p>
           <div className="space-y-2">
@@ -222,7 +222,7 @@ const CompositeAssessmentList: React.FC = () => {
                   </p>
                 </div>
                 <button
-                  className="btn-secondary text-sm"
+                  className="hui-button hui-button--secondary text-sm"
                   disabled={pkg.status !== 'PUBLISHED'}
                   onClick={() => setGrantPackage(pkg)}
                 >
@@ -234,7 +234,7 @@ const CompositeAssessmentList: React.FC = () => {
         </div>
       )}
       {showForm && (
-        <div className="card p-6 mb-6">
+        <div className="staff-panel staff-panel--padded p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">新建综合测评</h2>
           <div className="grid md:grid-cols-2 gap-3">
             <input
@@ -413,21 +413,21 @@ const CompositeAssessmentList: React.FC = () => {
             <button
               onClick={() => void create()}
               disabled={saving || !form.code.trim() || !form.name.trim() || Boolean((selectedProtocol || selectedPackage) && !form.courseId)}
-              className="btn-primary"
+              className="hui-button hui-button--primary"
             >
               {saving ? '保存中...' : '保存'}
             </button>
-            <button onClick={() => setShowForm(false)} className="btn-secondary">取消</button>
+            <button onClick={() => setShowForm(false)} className="hui-button hui-button--secondary">取消</button>
           </div>
         </div>
       )}
       {tab === 'mine' ? (
         list.length === 0 ? (
-          <div className="card p-10 text-center text-gray-500">还没有综合测评模板</div>
+          <div className="staff-panel staff-panel--padded p-10 text-center text-gray-500">还没有综合测评模板</div>
         ) : (
           <div className="grid gap-4">
             {list.map((item) => (
-              <div key={item.id} className="card p-5 flex items-center justify-between">
+              <div key={item.id} className="staff-panel staff-panel--padded p-5 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="font-semibold text-gray-800">{item.name}</h2>
@@ -443,8 +443,8 @@ const CompositeAssessmentList: React.FC = () => {
                   {item.course && <p className="text-xs text-gray-400 mt-1">课程：{item.course.title}{item.course.courseCode ? `（${item.course.courseCode}）` : ''}</p>}
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <button onClick={() => navigate(`/composite-assessments/${item.id}/results`)} className="btn-secondary">结果</button>
-                  <button onClick={() => navigate(`/composite-assessments/${item.id}`)} className="btn-secondary">
+                  <button onClick={() => navigate(`/composite-assessments/${item.id}/results`)} className="hui-button hui-button--secondary">结果</button>
+                  <button onClick={() => navigate(`/composite-assessments/${item.id}`)} className="hui-button hui-button--secondary">
                     <Settings className="w-4 h-4 inline mr-1" />配置
                   </button>
                 </div>
@@ -453,7 +453,7 @@ const CompositeAssessmentList: React.FC = () => {
           </div>
         )
       ) : library.length === 0 ? (
-        <div className="card p-10 text-center text-gray-500">暂无管理员模板</div>
+        <div className="staff-panel staff-panel--padded p-10 text-center text-gray-500">暂无管理员模板</div>
       ) : (
         <div className="grid gap-4">
           {teachingCourses.length === 0 && (
@@ -462,7 +462,7 @@ const CompositeAssessmentList: React.FC = () => {
           {library.map((item) => {
             const courseId = selectedCopyCourse(item.id)
             return (
-              <div key={item.id} className="card p-5">
+              <div key={item.id} className="staff-panel staff-panel--padded p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="font-semibold text-gray-800">{item.name}</h2>
@@ -490,7 +490,7 @@ const CompositeAssessmentList: React.FC = () => {
                   <button
                     onClick={() => void copyTemplate(item.id)}
                     disabled={!courseId || copyingId === item.id}
-                    className="btn-primary shrink-0"
+                    className="hui-button hui-button--primary shrink-0"
                   >
                     <Copy className="w-4 h-4 inline mr-1" />
                     {copyingId === item.id ? '复制中...' : '复制到我的课程'}

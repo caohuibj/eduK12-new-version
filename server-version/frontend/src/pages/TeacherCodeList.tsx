@@ -90,7 +90,7 @@ const TeacherCodeList: React.FC = () => {
         title="教师码管理"
         description="生成一次性教师注册码，并撤销不再需要的注册码。"
         actions={(
-          <button type="button" onClick={() => void handleCreate()} disabled={creating} className="btn-primary inline-flex items-center gap-2">
+          <button type="button" onClick={() => void handleCreate()} disabled={creating} className="hui-button hui-button--primary inline-flex items-center gap-2">
             <Plus className="h-4 w-4" aria-hidden="true" />
             {creating ? '生成中...' : '生成教师码'}
           </button>
@@ -101,7 +101,7 @@ const TeacherCodeList: React.FC = () => {
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span>{error}</span>
-            <button type="button" className="btn-secondary" onClick={() => void fetchCodes()}>重新加载</button>
+            <button type="button" className="hui-button hui-button--secondary" onClick={() => void fetchCodes()}>重新加载</button>
           </div>
         </div>
       )}
@@ -121,7 +121,7 @@ const TeacherCodeList: React.FC = () => {
           {codes.map(code => {
             const valid = code.isActive && code.usedCount < code.maxUses
             return (
-              <article key={code.id} className="card transition-shadow hover:shadow-lg" aria-label={`教师码 ${code.code}`}>
+              <article key={code.id} className="staff-panel staff-panel--padded transition-shadow hover:shadow-lg" aria-label={`教师码 ${code.code}`}>
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
                     <Key className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
