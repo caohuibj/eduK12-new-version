@@ -1,8 +1,9 @@
 import { returnAfterLogin } from '../../components/app-shell/access'
 import { useAuthLinks } from '../../components/app-shell/useAuthLinks'
+import AuthShell from '../../components/auth/AuthShell'
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { GraduationCap, Loader2, ArrowLeft, CheckCircle } from 'lucide-react'
+import { Loader2, CheckCircle } from 'lucide-react'
 import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import type { User } from '../../types'
@@ -134,157 +135,133 @@ const StudentRegister: React.FC = () => {
 
   if (!courseCode || !courseInfo) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
-        <div className="card text-center">
-          <p className="text-red-500 mb-4">{error || '无效的访问'}</p>
-          <p className="text-gray-600 mb-4">请先输入课程码</p>
-          <Link to={authLink("/student/course-login")} className="btn-primary inline-block">
-            返回输入课程码
-          </Link>
+      <AuthShell tone="student" title="学生账号注册" description="需要先完成课程码验证" backTo={authLink("/student/course-login")} backLabel="返回输入课程码">
+        <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <strong className="block mb-1">{error || '无效的访问'}</strong>
+          <span>请先输入课程码。</span>
         </div>
-      </div>
+        <Link to={authLink("/student/course-login")} className="btn-primary inline-flex w-full mt-5 items-center justify-center">
+          返回输入课程码
+        </Link>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Back Button */}
-        <Link
-          to={authLink("/student/course-login")}
-          className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 mr-1" />
-          返回
-        </Link>
-
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <GraduationCap className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800">学生账号注册</h1>
-          <p className="text-gray-500 mt-2">加入课程：{courseInfo.courseName}</p>
+    <AuthShell tone="student" title="学生账号注册" description={`加入课程：${courseInfo.courseName}`} backTo={authLink("/student/course-login")} backLabel="返回课程码">
+      <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center space-x-2 text-green-700">
+          <CheckCircle className="w-5 h-5" aria-hidden="true" />
+          <span className="font-medium">课程码验证成功</span>
         </div>
-
-        {/* Course Info */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center space-x-2 text-green-700">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">课程码验证成功</span>
-          </div>
-          <p className="text-sm text-green-600 mt-1">
-            请设置您的学生账号信息
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="card">
-          {error && (
-            <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="auth-username" className="block text-sm font-medium text-gray-700 mb-1">
-                用户名 <span className="text-xs text-gray-500">(字母+数字)</span>
-              </label>
-              <input autoComplete="username" aria-invalid={Boolean(fieldErrors.username)} aria-describedby={fieldErrors.username ? "auth-username-error" : undefined} id="auth-username"
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className={`input ${fieldErrors.username ? 'border-red-500' : ''}`}
-                placeholder="如：student01"
-                required
-              />
-              {fieldErrors.username && (
-                <p role="alert" id="auth-username-error" className="mt-1 text-xs text-red-500">{fieldErrors.username}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="auth-nickname" className="block text-sm font-medium text-gray-700 mb-1">
-                中文昵称 <span className="text-xs text-gray-500">(中文或英文)</span>
-              </label>
-              <input aria-invalid={Boolean(fieldErrors.nickname)} aria-describedby={fieldErrors.nickname ? "auth-nickname-error" : undefined} id="auth-nickname"
-                type="text"
-                value={formData.nickname}
-                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                className={`input ${fieldErrors.nickname ? 'border-red-500' : ''}`}
-                placeholder="请输入中文昵称"
-                required
-              />
-              {fieldErrors.nickname && (
-                <p role="alert" id="auth-nickname-error" className="mt-1 text-xs text-red-500">{fieldErrors.nickname}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
-                密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
-              </label>
-              <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.password)} aria-describedby={fieldErrors.password ? "auth-password-error" : undefined} id="auth-password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className={`input ${fieldErrors.password ? 'border-red-500' : ''}`}
-                placeholder="请输入密码"
-                required
-              />
-              {fieldErrors.password && (
-                <p role="alert" id="auth-password-error" className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="auth-confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                确认密码
-              </label>
-              <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.confirmPassword)} aria-describedby={fieldErrors.confirmPassword ? "auth-confirmPassword-error" : undefined} id="auth-confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className={`input ${fieldErrors.confirmPassword ? 'border-red-500' : ''}`}
-                placeholder="请再次输入密码"
-                required
-              />
-              {fieldErrors.confirmPassword && (
-                <p role="alert" id="auth-confirmPassword-error" className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 flex items-center justify-center space-x-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>注册中...</span>
-                </>
-              ) : (
-                <span>完成注册并加入课程</span>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t text-center">
-            <p className="text-sm text-gray-500 mb-3">已经有账号？</p>
-            <Link to={authLink("/student/login")} className="inline-flex justify-center w-full btn-secondary">
-              已有账号，去登录
-            </Link>
-          </div>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
-            <p className="font-medium mb-1">💡 账号说明</p>
-            <p>注册后即可用该账号登录。结束课程不会冻结账号，你仍可参加其他课程。</p>
-          </div>
-        </div>
+        <p className="text-sm text-green-600 mt-1">
+          请设置您的学生账号信息
+        </p>
       </div>
-    </div>
+
+      {error && (
+        <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="auth-username" className="block text-sm font-medium text-gray-700 mb-1">
+            用户名 <span className="text-xs text-gray-500">(字母+数字)</span>
+          </label>
+          <input autoComplete="username" aria-invalid={Boolean(fieldErrors.username)} aria-describedby={fieldErrors.username ? "auth-username-error" : undefined} id="auth-username"
+            type="text"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            className={`input ${fieldErrors.username ? 'border-red-500' : ''}`}
+            placeholder="如：student01"
+            required
+          />
+          {fieldErrors.username && (
+            <p role="alert" id="auth-username-error" className="mt-1 text-xs text-red-500">{fieldErrors.username}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="auth-nickname" className="block text-sm font-medium text-gray-700 mb-1">
+            中文昵称 <span className="text-xs text-gray-500">(中文或英文)</span>
+          </label>
+          <input aria-invalid={Boolean(fieldErrors.nickname)} aria-describedby={fieldErrors.nickname ? "auth-nickname-error" : undefined} id="auth-nickname"
+            type="text"
+            value={formData.nickname}
+            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+            className={`input ${fieldErrors.nickname ? 'border-red-500' : ''}`}
+            placeholder="请输入中文昵称"
+            required
+          />
+          {fieldErrors.nickname && (
+            <p role="alert" id="auth-nickname-error" className="mt-1 text-xs text-red-500">{fieldErrors.nickname}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
+            密码 <span className="text-xs text-gray-500">(字母+数字，8-128位)</span>
+          </label>
+          <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.password)} aria-describedby={fieldErrors.password ? "auth-password-error" : undefined} id="auth-password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className={`input ${fieldErrors.password ? 'border-red-500' : ''}`}
+            placeholder="请输入密码"
+            required
+          />
+          {fieldErrors.password && (
+            <p role="alert" id="auth-password-error" className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="auth-confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            确认密码
+          </label>
+          <input autoComplete="new-password" aria-invalid={Boolean(fieldErrors.confirmPassword)} aria-describedby={fieldErrors.confirmPassword ? "auth-confirmPassword-error" : undefined} id="auth-confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+            className={`input ${fieldErrors.confirmPassword ? 'border-red-500' : ''}`}
+            placeholder="请再次输入密码"
+            required
+          />
+          {fieldErrors.confirmPassword && (
+            <p role="alert" id="auth-confirmPassword-error" className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full btn-primary flex items-center justify-center space-x-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>注册中...</span>
+            </>
+          ) : (
+            <span>完成注册并加入课程</span>
+          )}
+        </button>
+      </form>
+
+      <div className="mt-6 pt-6 border-t text-center">
+        <p className="text-sm text-gray-500 mb-3">已经有账号？</p>
+        <Link to={authLink("/student/login")} className="inline-flex justify-center w-full btn-secondary">
+          已有账号，去登录
+        </Link>
+      </div>
+
+      <div className="hui-auth-note">
+        <strong>账号说明</strong>
+        <div>注册后即可用该账号登录。结束课程不会冻结账号，你仍可参加其他课程。</div>
+      </div>
+    </AuthShell>
   )
 }
 
