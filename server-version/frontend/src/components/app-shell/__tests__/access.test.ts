@@ -18,6 +18,8 @@ describe('safe access and return context', () => {
     expect(returnAfterLogin('/dashboard', 'PARENT')).toBe('/parent')
     expect(returnAfterLogin('/relational/tasks', 'PARENT')).toBe('/relational/tasks')
     expect(returnAfterLogin('/student/scales/1', 'PARENT')).toBe('/parent')
+    expect(returnAfterLogin('/organizations/org-1/reporting?wave=2', 'TEACHER')).toBe('/organizations/org-1/reporting?wave=2')
+    expect(returnAfterLogin('/organization-tasks', 'STUDENT')).toBe('/organization-tasks')
     expect(returnAfterLogin('/organizations/org-1/reporting?tab=group', 'TEACHER')).toBe('/organizations/org-1/reporting?tab=group')
     expect(returnAfterLogin('/organization-tasks', 'ADMIN')).toBe('/organization-tasks')
   })

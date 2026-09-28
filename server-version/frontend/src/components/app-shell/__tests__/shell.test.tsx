@@ -25,6 +25,11 @@ const organization = vi.hoisted(() => ({
   activeError: null as string | null,
   refresh: vi.fn(),
   selectOrganization: vi.fn(),
+  total: 0,
+  platformRole: null as null | 'SYSTEM_ADMIN' | 'STANDARD',
+  error: null as string | null,
+  isLoading: false,
+  refresh: vi.fn(),
 }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
@@ -107,8 +112,9 @@ it('resumes the original account and retains mandatory password change', () => {
 describe('one shared chrome', () => {
   it('selects one active nav item and returns focus on Escape', async () => {
     render(<MemoryRouter initialEntries={['/student/cognitive/history']}><AppShell><h1>历史</h1></AppShell></MemoryRouter>)
-    expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
-    expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('认知测评')
+    const primaryNav = screen.getByRole('navigation', { name: '主要导航' })
+    expect(primaryNav.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
+    expect(primaryNav).toHaveTextContent('认知测评')
     const toggle = screen.getByRole('button', { name: '导航菜单' })
     await userEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
@@ -123,6 +129,7 @@ describe('one shared chrome', () => {
       { id: 'org-a', name: '组织 A', status: 'ACTIVE' },
       { id: 'org-b', name: '组织 B', status: 'SUSPENDED' },
     ]
+    organization.total = 2
     organization.total = 2
     organization.selectOrganization.mockResolvedValue(null)
     render(<MemoryRouter initialEntries={['/student']}><AppShell><h1>学生首页</h1></AppShell></MemoryRouter>)

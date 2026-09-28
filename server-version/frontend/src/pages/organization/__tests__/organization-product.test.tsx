@@ -113,6 +113,16 @@ describe('Organization product authority boundary', () => {
     expect(org.selectOrganization).toHaveBeenCalledTimes(1)
   })
 
+  it('does not route an unknown organization child path back to governance', async () => {
+    org.active = {
+      organization: { id: 'org-1', name: '成员组织', status: 'ACTIVE' },
+      access: { ...baseAccess },
+    }
+    renderProductRoutes('/organizations/org-1/not-a-page')
+    expect(await screen.findByText('找不到此组织页面')).toBeInTheDocument()
+    expect(screen.queryByText('只读组织上下文')).not.toBeInTheDocument()
+  })
+
   it('keeps an ordinary member read-only and does not probe governance endpoints', async () => {
     org.active = {
       organization: { id: 'org-1', name: '成员组织', status: 'ACTIVE' },
