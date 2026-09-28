@@ -93,6 +93,11 @@ These are **not** part of the visual branch:
 
 1. Student course code is verified in `StudentCourseLogin`, then verified again in `StudentRegister`. This is a workflow/API-state concern and should be reviewed in a dedicated PR.
 2. `StudentRegister` has no explicit verification-loading state. While `courseInfo` is still null, the current conditional can render the invalid-access state before verification completes. This should be fixed in the same dedicated logic PR.
+3. `CourseDetail` clears its shared loading flag when only the assignment request finishes, while course detail/check-ins/scales/questionnaires/composites are still loading independently. A slow course-detail request can therefore transiently render the unavailable-course branch.
+4. `CourseDetail` requests course scales and stores them in `scales`, but the current course-detail UI never renders a scale tab or consumes that state. Review whether this is an unnecessary request or a missing course-scale entry.
+5. `CourseDetail` counts incomplete check-ins through `checkin.submission` but labels the row action through `checkin.submitted`. The two state fields should be reconciled against the API contract.
+6. A completed questionnaire inside `CourseDetail` labels its action “查看报告” but still navigates to `/student/questionnaires/:id`; this differs from the standalone questionnaire list, which resolves a completed assessment to its result route. Confirm the intended destination before changing it.
+7. The Student Home “加入课程” dialog does not currently implement a complete modal focus/keyboard contract (focus trap / Escape close / focus return). Treat this as an interaction-accessibility PR rather than a visual-only change.
 
 ## 7. Visual acceptance checklist
 
