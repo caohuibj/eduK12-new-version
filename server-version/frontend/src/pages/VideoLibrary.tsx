@@ -506,7 +506,7 @@ const VideoLibrary: React.FC = () => {
             // @ts-expect-error - isProcessed 是后端返回但尚未进入旧版前端类型的字段
             const isProcessed = video.isProcessed || (video as any).status === 'COMPLETED'
             return (
-            <div key={video.id} className="card hover:shadow-lg transition-shadow">
+            <div key={video.id} className="staff-panel staff-panel--padded hover:shadow-lg transition-shadow">
               {/* Video Thumbnail */}
               <div className="aspect-video bg-gray-900 rounded-lg mb-4 flex items-center justify-center relative group">
                 <VideoIcon className="w-12 h-12 text-gray-600" />
@@ -757,7 +757,7 @@ const VideoLibrary: React.FC = () => {
                   setUploadQueue([])
                   setUploadError('')
                 }}
-                className="flex-1 btn-secondary"
+                className="flex-1 hui-button hui-button--secondary"
                 disabled={isBatchUploading}
               >
                 取消
@@ -766,7 +766,7 @@ const VideoLibrary: React.FC = () => {
                 type="button"
                 onClick={handleBatchUpload}
                 disabled={uploadQueue.filter(i => i.status === 'pending').length === 0 || isBatchUploading}
-                className="flex-1 btn-primary disabled:opacity-50"
+                className="flex-1 hui-button hui-button--primary disabled:opacity-50"
               >
                 {isBatchUploading ? '上传中...' : `开始上传 (${uploadQueue.filter(i => i.status === 'pending').length} 个文件)`}
               </button>
@@ -838,7 +838,7 @@ const VideoLibrary: React.FC = () => {
                     setEditingVideo(null)
                     setEditTitle('')
                   }}
-                  className="flex-1 btn-secondary"
+                  className="flex-1 hui-button hui-button--secondary"
                   disabled={isUpdating}
                 >
                   取消
@@ -847,7 +847,7 @@ const VideoLibrary: React.FC = () => {
                   type="button"
                   onClick={handleEdit}
                   disabled={!editTitle.trim() || isUpdating}
-                  className="flex-1 btn-primary disabled:opacity-50"
+                  className="flex-1 hui-button hui-button--primary disabled:opacity-50"
                 >
                   {isUpdating ? '保存中...' : '保存'}
                 </button>
