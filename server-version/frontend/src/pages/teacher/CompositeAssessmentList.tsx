@@ -5,6 +5,7 @@ import apiClient from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { compositeApi } from '../../modules/composite/api'
 import MaterialGrantModal from '../../components/MaterialGrantModal'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import type {
   AnalysisProtocolCatalogItem,
   AnalysisProtocolProfile,
@@ -179,19 +180,11 @@ const CompositeAssessmentList: React.FC = () => {
     }
   }
 
-  if (loading) return <div className="text-gray-500 p-8">加载中...</div>
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载综合测评">正在读取综合测评与模板目录。</ProductStatus></ProductPage>
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <ClipboardList className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold text-gray-800">综合测评</h1>
-        </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus className="w-4 h-4 inline mr-1" />新建综合测评
-        </button>
-      </div>
+    <ProductPage width="management" className="space-y-6">
+      <PageHeader title="综合测评" description="组合量表、认知任务、情境任务和表单，并查看独立作答报告。" actions={<ProductButton variant="primary" onClick={() => setShowForm(true)}><Plus className="w-4 h-4" aria-hidden="true" />创建综合测评</ProductButton>} />
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6 w-fit">
         <button
           onClick={() => setTab('mine')}
@@ -516,7 +509,7 @@ const CompositeAssessmentList: React.FC = () => {
           onClose={() => setGrantPackage(null)}
         />
       )}
-    </div>
+    </ProductPage>
   )
 }
 

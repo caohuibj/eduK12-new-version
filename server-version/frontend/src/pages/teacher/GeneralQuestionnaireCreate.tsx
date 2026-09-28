@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, Form, Input, Button, message, Space } from 'antd'
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons'
 import { sessionFetch } from '../../api/client'
+import { PageHeader, ProductPage } from '../../components/product-ui'
 
 const { TextArea } = Input
 
@@ -47,14 +48,15 @@ const GeneralQuestionnaireCreate: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <ProductPage width="management" className="staff-editor-page">
+      <PageHeader title="创建泛化问卷" description="设置问卷基本信息；创建后继续编排量表与表单内容。" />
       <Card
         title={
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/general-questionnaires')}>
               返回
             </Button>
-            <span>创建泛化问卷</span>
+            <span>基本信息</span>
           </Space>
         }
       >
@@ -118,7 +120,7 @@ const GeneralQuestionnaireCreate: React.FC = () => {
           </Form.Item>
         </Form>
       </Card>
-    </div>
+    </ProductPage>
   )
 }
 
