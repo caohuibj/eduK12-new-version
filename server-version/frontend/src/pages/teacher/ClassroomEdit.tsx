@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ArrowLeft, Save } from 'lucide-react'
 
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 interface Classroom {
   id: string
   name: string
@@ -73,15 +74,13 @@ const ClassroomEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课堂">正在读取课堂配置。</ProductStatus></ProductPage>
     )
   }
 
   if (!classroom) {
     return (
-      <div className="p-6">
+      <ProductPage width="management" className="staff-editor-page">
         <div className="text-center text-gray-500">
           <p>课堂不存在</p>
           <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
@@ -180,7 +179,7 @@ const ClassroomEdit: React.FC = () => {
           </div>
         </form>
       </div>
-    </div>
+    </ProductPage>
   )
 }
 

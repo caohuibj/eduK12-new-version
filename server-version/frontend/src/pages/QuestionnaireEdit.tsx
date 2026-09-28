@@ -6,6 +6,7 @@ import { ScaleSelector } from '../components/ScaleSelector'
 import type { Scale } from '../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../modules/assessment-context/options'
 import FormSectionManager from '../components/FormSectionManager'
+import { ProductPage, ProductStatus } from '../components/product-ui'
 
 // 表单题目类型
 interface FormItem {
@@ -411,9 +412,7 @@ const QuestionnaireEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management"><ProductStatus kind="pending" title="正在加载问卷编辑器">正在读取问卷内容与结构。</ProductStatus></ProductPage>
     )
   }
 
@@ -424,8 +423,8 @@ const QuestionnaireEdit: React.FC = () => {
   ].sort((a, b) => a.position - b.position)
 
   return (
-    <div className="p-6">
-      {/* Header */}
+    <ProductPage width="management" className="staff-editor-page">
+      {/* Header */
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Link to="/questionnaires" className="text-gray-500 hover:text-gray-700">
@@ -921,7 +920,7 @@ const QuestionnaireEdit: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </ProductPage>
   )
 }
 

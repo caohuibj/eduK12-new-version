@@ -13,6 +13,7 @@ import type {
   ReportPackageProfile,
 } from '../../modules/composite/types'
 import { contextOptionsForKey, contextValueHint, parseDelimitedOptions, serializeDelimitedOptions } from '../../modules/assessment-context/options'
+import { ProductPage } from '../../components/product-ui'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import FormSectionManager from '../../components/FormSectionManager'
 
@@ -266,8 +267,8 @@ const CompositeAssessmentEdit: React.FC = () => {
     item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.type === 'SITUATIONAL' ? item.situational?.key : item.form?.label
 
   return (
-    <div>
-      <button onClick={() => navigate('/composite-assessments')} className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
+    <ProductPage width="management" className="staff-editor-page">
+      <button onClick={() => navigate('/composite-assessments') className="flex items-center text-gray-500 hover:text-gray-700 mb-4">
         <ArrowLeft className="w-4 h-4 mr-1" />返回综合测评
       </button>
       <div className="flex items-center justify-between mb-6">
@@ -566,7 +567,7 @@ const CompositeAssessmentEdit: React.FC = () => {
       )}
       {detail.status === 'PUBLISHED' && !isLibraryCourse && <PublicDeliveryManager key={id} family="COMPOSITE" resourceId={id} maximumExpiry={detail.expiresAt} />}
 
-    </div>
+    </ProductPage>
   )
 }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { Save, X } from 'lucide-react'
 
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 interface Course {
   id: string
   title: string
@@ -78,7 +79,7 @@ const ClassroomCreate: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <ProductPage width="management" className="staff-editor-page">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-6">
@@ -167,7 +168,7 @@ const ClassroomCreate: React.FC = () => {
           </form>
         </div>
       </div>
-    </div>
+    </ProductPage>
   )
 }
 

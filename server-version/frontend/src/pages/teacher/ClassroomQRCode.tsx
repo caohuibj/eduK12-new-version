@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import { ArrowLeft, Download } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
 
+import { ProductPage, ProductStatus } from '../../components/product-ui'
 interface QRCodeData {
   classroomId: string
   code: string
@@ -51,15 +52,13 @@ const ClassroomQRCode: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课堂">正在读取课堂配置。</ProductStatus></ProductPage>
     )
   }
 
   if (error || !data) {
     return (
-      <div className="p-6">
+      <ProductPage width="management" className="staff-editor-page">
         <div className="text-center text-gray-500">
           <p>{error || '二维码不存在'}</p>
           <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
@@ -106,7 +105,7 @@ const ClassroomQRCode: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </ProductPage>
   )
 }
 

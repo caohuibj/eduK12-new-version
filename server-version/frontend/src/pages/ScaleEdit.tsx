@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Eye, Plus, Save, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
+import { ProductPage, ProductStatus } from '../components/product-ui'
 
 type ResponseValue = string | number
 type Direction = 'higher_is_better' | 'higher_is_worse' | 'higher_is_more' | 'lower_is_better' | 'bipolar' | 'descriptive'
@@ -258,11 +259,11 @@ const ScaleEdit: React.FC = () => {
   const removeScore = (key: string) => setDefinition((current) => updateReportContract({ ...current, scoring: { ...current.scoring, scores: current.scoring.scores.filter((score) => score.key !== key) } }))
   const updateInterpretation = (scoreKey: string, patch: { headline?: string; summary?: string }) => setDefinition((current) => ({ ...current, report: { ...current.report, interpretations: current.report.interpretations.map((entry) => entry.scoreKey === scoreKey ? { ...entry, ...patch } : entry) } }))
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载量表编辑器">正在读取量表定义与报告配置。</ProductStatus></ProductPage>
 
   const tabs: Array<[typeof activeTab, string]> = [['basic', '基本信息'], ['responses', '响应选项'], ['items', '题目'], ['scores', '计分'], ['report', '报告文案']]
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <ProductPage width="management" className="staff-editor-page">
       <Link to="/scales" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft className="w-4 h-4 mr-1" />返回量表列表</Link>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5"><div><h1 className="text-2xl font-bold text-gray-900">{isNew ? '创建描述性量表' : scale.name || '量表编辑'}</h1><p className="text-sm text-gray-500 mt-1">{standard ? 'STANDARD package · 只读' : '自定义量表 · 描述性结果 · 不提供群体参考'}</p></div><div className="flex gap-2">{!isNew && <button onClick={() => void previewDefinition()} disabled={saving || standard} className="btn-secondary"><Eye className="w-4 h-4 inline mr-1" />计分预览</button>}{!standard && <button onClick={() => void (isNew ? saveBasic() : saveDefinition())} disabled={saving} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存草稿</button>}</div></div>
       {issues.length > 0 && <div className="mb-5 rounded-lg border p-4 bg-gray-50"><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
@@ -280,7 +281,7 @@ const ScaleEdit: React.FC = () => {
 
       {preview && <section className="card p-6 mt-5"><h2 className="font-semibold mb-3">计分预览</h2><pre className="text-xs bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(preview, null, 2)}</pre></section>}
       {!isNew && !standard && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={saving} className="btn-secondary">运行发布检查</button><button onClick={() => void publish()} disabled={saving || scale.status !== 'DRAFT'} className="btn-primary">发布描述性量表</button></div>}
-    </div>
+    </ProductPage>
   )
 }
 
