@@ -129,3 +129,19 @@ Runner rules deliberately preserve task-owned stimulus geometry and timing seman
 Report rules stack multi-column facts/metrics on mobile, constrain media to the viewport, provide local horizontal overflow for tables, and keep scientific/report wording untouched.
 
 QuestionnaireResult now uses the same `ReportShell` presentation frame as Scale, Situational and Composite reports; its API request and unit-report payloads are unchanged.
+
+
+## 9. Parent experience visual review
+
+Parent presentation is implemented as a CSS-only stacked change on top of the shared entry/student foundation.
+
+Responsive intent:
+- Desktop: compact two-item navigation, calm green/blue parent palette, two-column self-serve selectors.
+- Tablet: standard collapsed application navigation and preserved reading width.
+- Mobile: single-column tasks and self-serve controls, full-width 44px+ actions, hidden breadcrumb, safe-area-aware shell spacing.
+- Relational runner/report routes reuse the shared assessment/report presentation from the preceding UI work.
+
+Interaction/logic findings intentionally excluded from the visual PR:
+
+10. Parent self-serve issuance currently creates a new episode/assignment on every successful “发起观察测评” request. Neither the frontend nor `issueParentSelfServe` checks for an existing OPEN/STARTED task for the same parent + child + released product. Existing persistence tests validate issuance but do not document duplicate suppression. Confirm the desired repeat-measurement policy and add explicit deduplication/idempotency if duplicate active tasks are not intended.
+11. Parent accounts have no profile/account-settings route or navigation item. There is no `ParentProfile` / `/parent/profile`, while Student and Teacher/Admin expose profile/password management. If parents are expected to manage their own password/display information, implement that in a separate functional PR.
