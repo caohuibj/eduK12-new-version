@@ -44,7 +44,7 @@ const CognitiveHistory: React.FC = () => {
   }, [page])
 
   return (
-    <ProductPage width="assessment">
+    <ProductPage width="assessment" className="hui-student-page hui-student-history">
       <PageHeader
         title="认知测评历史"
         description={(
