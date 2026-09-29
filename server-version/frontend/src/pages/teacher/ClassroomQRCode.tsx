@@ -100,7 +100,6 @@ const ClassroomQRCode: React.FC = () => {
       </section>
     </ProductPage>
   )
-  )
 }
 
 export default ClassroomQRCode
