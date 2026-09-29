@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpen, CheckCircle, Clock, ExternalLink, FileText, Filter, Lock, Play, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -48,6 +48,18 @@ const statusClass: Record<ScaleLibraryAvailabilityStatus, string> = {
 
 const respondentLabel = (value: string): string => RESPONDENT_OPTIONS.find(([key]) => key === value)?.[1] ?? value
 const domainLabel = (value: string): string => DOMAIN_OPTIONS.find(([key]) => key === value)?.[1] ?? value
+const filterLabels: Partial<Record<keyof ScaleLibraryFilters, string>> = {
+  keyword: '关键词', respondent: '作答者', availability: '可用性', primaryDomain: '主要构念',
+  locale: '内容语言', intendedUse: '用途', minAge: '年龄下界', maxAge: '年龄上界', minGrade: '年级下界', maxGrade: '年级上界',
+}
+const filterValueLabel = (key: string, value: string | number): string => {
+  if (key === 'respondent') return respondentLabel(String(value))
+  if (key === 'primaryDomain') return domainLabel(String(value))
+  if (key === 'availability') return statusLabel[value as ScaleLibraryAvailabilityStatus] ?? String(value)
+  if (key === 'intendedUse') return USE_OPTIONS.find(([option]) => option === value)?.[1] ?? String(value)
+  if (key === 'locale' && value === 'zh-CN') return '中文（简体）'
+  return String(value)
+}
 
 const formatAge = (entry: ScaleLibraryEntry): string => {
   if (entry.applicability.minAge === undefined || entry.applicability.maxAge === undefined) return '年龄边界见说明'
@@ -86,18 +98,13 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-lg font-semibold text-gray-900">{entry.identity.canonicalName}</h2>
-          <AvailabilityBadge entry={entry} />
         </div>
-        <p className="mt-1 text-sm text-gray-500">
-          {entry.identity.abbreviation || entry.identity.instrumentFamily || entry.identity.instrumentKey}
-          {' · '}{entry.localization.targetLocale}
-        </p>
       </div>
       <BookOpen className="h-6 w-6 shrink-0 text-action" />
     </div>
 
     <p className="mt-4 text-sm leading-6 text-gray-700">{entry.construct.constructDefinition}</p>
-    <div className="mt-4 flex flex-wrap gap-2 text-xs text-gray-600">
+    <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-600">
       <span className="rounded bg-gray-100 px-2 py-1">{domainLabel(entry.construct.primaryDomain)}</span>
       {entry.applicability.respondentTypes.map((respondent) => (
         <span key={respondent} className="rounded bg-gray-100 px-2 py-1">{respondentLabel(respondent)}</span>
@@ -110,6 +117,7 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
       <span className="rounded bg-gray-100 px-2 py-1">约 {entry.administration.estimatedMinutes} 分钟</span>
     </div>
 
+    <div className="mt-4"><AvailabilityBadge entry={entry} /></div>
     {entry.availability.reasons.length > 0 && (
       <p className="mt-4 text-sm text-amber-700">{entry.availability.reasons[0]}</p>
     )}
@@ -119,6 +127,12 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
     >
       查看详情 <ExternalLink className="ml-1 h-4 w-4" />
     </Link>
+    <details className="mt-3 border-t border-gray-200 pt-2 text-sm text-gray-600">
+      <summary className="min-h-11 cursor-pointer py-3 font-medium">版本与证据</summary>
+      <p>{entry.identity.abbreviation || entry.identity.instrumentFamily || entry.identity.instrumentKey} · v{entry.identity.instrumentVersion} · {entry.localization.targetLocale}</p>
+      <p className="mt-2 leading-6">{entry.evidence.coverageText}</p>
+      <p className="mt-2 leading-6">{entry.references.displayText}</p>
+    </details>
   </article>
 )
 
@@ -148,17 +162,30 @@ const FilterPanel: React.FC<{
           />
         </label>
         <label className="text-sm text-gray-700">
-          主要构念
-          <select value={filters.primaryDomain ?? ''} onChange={(event) => update('primaryDomain', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
-            <option value="">全部</option>
-            {DOMAIN_OPTIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-          </select>
-        </label>
-        <label className="text-sm text-gray-700">
           作答者
           <select value={filters.respondent ?? ''} onChange={(event) => update('respondent', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
             <option value="">全部</option>
             {RESPONDENT_OPTIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </select>
+        </label>
+        <label className="text-sm text-gray-700">
+          可用性
+          <select value={filters.availability ?? ''} onChange={(event) => update('availability', event.target.value as ScaleLibraryAvailabilityStatus)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
+            <option value="">全部状态</option>
+            <option value="AVAILABLE">可开始</option>
+            <option value="RESTRICTED">受限</option>
+            <option value="NOT_AVAILABLE">暂不可用</option>
+          </select>
+        </label>
+      </div>
+      <details className="mt-4 border-t border-gray-200 pt-2">
+        <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-gray-700">更多筛选</summary>
+        <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="text-sm text-gray-700">
+          主要构念
+          <select value={filters.primaryDomain ?? ''} onChange={(event) => update('primaryDomain', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
+            <option value="">全部</option>
+            {DOMAIN_OPTIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
           </select>
         </label>
         <label className="text-sm text-gray-700">
@@ -174,15 +201,6 @@ const FilterPanel: React.FC<{
           <select value={filters.intendedUse ?? ''} onChange={(event) => update('intendedUse', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
             <option value="">全部用途</option>
             {USE_OPTIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-          </select>
-        </label>
-        <label className="text-sm text-gray-700">
-          可用性
-          <select value={filters.availability ?? ''} onChange={(event) => update('availability', event.target.value as ScaleLibraryAvailabilityStatus)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
-            <option value="">全部状态</option>
-            <option value="AVAILABLE">可开始</option>
-            <option value="RESTRICTED">受限</option>
-            <option value="NOT_AVAILABLE">暂不可用</option>
           </select>
         </label>
         <label className="text-sm text-gray-700">
@@ -202,9 +220,10 @@ const FilterPanel: React.FC<{
           <input type="number" min="1" max="12" value={filters.maxGrade ?? ''} onChange={(event) => onChange({ ...filters, maxGrade: event.target.value ? Number(event.target.value) : undefined })} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
         </label>
       </div>
+      </details>
       <div className="mt-5 flex gap-3">
         <button type="submit" className="min-h-11 rounded-md bg-action px-4 py-2 text-sm font-medium text-white hover:opacity-90">应用筛选</button>
-        <button type="button" onClick={onClear} className="min-h-11 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">清除</button>
+        <button type="button" onClick={onClear} className="min-h-11 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">清除全部</button>
       </div>
     </form>
   )
@@ -338,8 +357,10 @@ const ScaleLibrary: React.FC = () => {
   const [appliedFilters, setAppliedFilters] = useState<ScaleLibraryFilters>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const loadRequest = useRef(0)
 
   const load = useCallback(() => {
+    const request = ++loadRequest.current
     setLoading(true)
     setError(null)
     if (isDetail && instrumentKey && instrumentVersion) {
@@ -349,29 +370,31 @@ const ScaleLibrary: React.FC = () => {
         respondent: appliedFilters.respondent,
       })
         .then((response) => {
+          if (request !== loadRequest.current) return
           if (response.code !== 0 || !response.data?.entry) throw new Error(response.message || '量表详情加载失败')
           setDetail(response.data.entry)
         })
-        .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : '量表详情加载失败'))
-        .finally(() => setLoading(false))
+        .catch((reason: unknown) => { if (request === loadRequest.current) setError(reason instanceof Error ? reason.message : '量表详情加载失败') })
+        .finally(() => { if (request === loadRequest.current) setLoading(false) })
       return
     }
     getScaleLibrary(appliedFilters)
       .then((response) => {
+        if (request !== loadRequest.current) return
         if (response.code !== 0 || !response.data) throw new Error(response.message || '量表库加载失败')
         setListData(response.data)
       })
-      .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : '量表库加载失败'))
-      .finally(() => setLoading(false))
+      .catch((reason: unknown) => { if (request === loadRequest.current) setError(reason instanceof Error ? reason.message : '量表库加载失败') })
+      .finally(() => { if (request === loadRequest.current) setLoading(false) })
   }, [appliedFilters, instrumentKey, instrumentVersion, isDetail])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load(); return () => { loadRequest.current += 1 } }, [load])
 
-  if (loading) return <div className="hui-scale-library"><LoadingState /></div>
-  if (error) return <div className="hui-scale-library"><ErrorState message={error} onRetry={load} /></div>
-  if (isDetail) return <div className="hui-scale-library hui-scale-library--detail">{detail ? <DetailPage entry={detail} /> : <ErrorState message="量表详情不存在" onRetry={load} />}</div>
+  if (isDetail) return <div className="hui-scale-library hui-scale-library--detail">{loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={load} /> : detail ? <DetailPage entry={detail} /> : <ErrorState message="量表详情不存在" onRetry={load} />}</div>
 
   const entries = listData?.entries ?? []
+  const activeFilters = Object.entries(appliedFilters).filter(([, value]) => value !== undefined && value !== '')
+  const clearFilters = () => { setFilters({}); setAppliedFilters({}) }
   return (
     <div className="hui-scale-library">
       <div className="mb-6">
@@ -382,17 +405,29 @@ const ScaleLibrary: React.FC = () => {
         filters={filters}
         onChange={setFilters}
         onApply={() => setAppliedFilters(filters)}
-        onClear={() => { setFilters({}); setAppliedFilters({}) }}
+        onClear={clearFilters}
       />
+      {activeFilters.length > 0 && <div className="mb-4 flex flex-wrap gap-2" aria-label="已应用筛选">
+        {activeFilters.map(([key, value]) => <button key={key} type="button"
+          className="min-h-11 max-w-full break-words rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700"
+          aria-label={`移除${filterLabels[key as keyof ScaleLibraryFilters] ?? key}：${filterValueLabel(key, value!)}`}
+          onClick={() => { setFilters({ ...filters, [key]: undefined }); setAppliedFilters({ ...appliedFilters, [key]: undefined }) }}>
+          {filterLabels[key as keyof ScaleLibraryFilters] ?? key}：{filterValueLabel(key, value!)} <span aria-hidden="true">×</span>
+        </button>)}
+      </div>}
+      {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={load} /> : <>
+      <p className="mb-4 text-sm text-gray-600" role="status">当前显示 {entries.length} 个量表</p>
       {entries.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
           <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-400" />
           <p className="text-gray-600">没有符合条件的量表</p>
           <p className="mt-1 text-sm text-gray-600">可以清除筛选后重新浏览。</p>
+          {activeFilters.length > 0 && <button type="button" className="btn-secondary mt-4" onClick={clearFilters}>清除筛选并浏览全部</button>}
         </div>
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">{entries.map((entry) => <ScaleCard key={`${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`} entry={entry} />)}</div>
       )}
+      </>}
     </div>
   )
 }
