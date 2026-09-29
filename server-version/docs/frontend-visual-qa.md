@@ -4,7 +4,7 @@ This gate provides repeatable visual evidence for the Modern Education frontend 
 
 ## Canonical screens
 
-The deterministic fixture captures twenty-one representative page families:
+The Visual QA gate captures twenty-two representative page families across the canonical fixture plus one focused Staff complex-controller fixture:
 
 1. Code-native UI Lab — foundations / Product UI / reports / canonical scenarios / visualization states
 2. Portal
@@ -27,6 +27,7 @@ The deterministic fixture captures twenty-one representative page families:
 19. Public Questionnaire result
 20. Public Checkin
 21. Public recovery / focused entry
+22. Staff assignment management — editor dialog / complex-controller presentation
 
 Each screen is captured at:
 
@@ -34,7 +35,7 @@ Each screen is captured at:
 - 768 × 1024 — tablet
 - 1440 × 1000 — desktop
 
-This produces 63 canonical responsive screenshots per run. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
+This produces 66 responsive screenshots per run: 63 from the canonical matrix plus 3 Staff complex-controller captures. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
 
 ## Hard assertions
 
