@@ -69,9 +69,13 @@ describe('ScaleUnitReportCard Wave 0 report presentation', () => {
     render(<ScaleUnitReportCard report={completeReport} />)
 
     expect(screen.getByTestId('scale-core-feedback')).toBeTruthy()
+    expect(screen.getByTestId('scale-score-layer').compareDocumentPosition(screen.getByTestId('scale-core-feedback')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByTestId('scale-caveats').compareDocumentPosition(screen.getByTestId('scale-reference-layer')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByTestId('scale-caveats').closest('details')).toBeNull()
     expect(screen.getByText('当前幸福感处于中等水平')).toBeTruthy()
     expect(screen.getByText('建议结合近期睡眠和社交活动进行一周记录。')).toBeTruthy()
     expect(screen.getByText('18.0')).toBeTruthy()
+    expect(screen.getAllByText('总体幸福感')).toHaveLength(1)
     expect(screen.getByTestId('scale-reference-layer')).toBeTruthy()
     expect(screen.getByText('未提供群体参考。')).toBeTruthy()
     expect(screen.getByText('结果需要结合近期生活情境理解。')).toBeTruthy()
