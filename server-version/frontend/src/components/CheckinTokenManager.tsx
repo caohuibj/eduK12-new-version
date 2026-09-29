@@ -149,10 +149,12 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
     <>
       <Tooltip title="管理匿名打卡链接">
         <button
+          type="button"
           onClick={() => setShowModal(true)}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
+          aria-label="管理匿名打卡链接"
         >
-          <Share2 className="w-4 h-4" />
+          <Share2 className="w-4 h-4" aria-hidden="true" />
         </button>
       </Tooltip>
 
@@ -162,6 +164,7 @@ const CheckinTokenManager: React.FC<CheckinTokenManagerProps> = ({
         onCancel={() => setShowModal(false)}
         footer={null}
         width={800}
+        rootClassName="staff-ant-modal"
       >
         <div className="space-y-6">
           {/* 开启匿名打卡开关 */}
