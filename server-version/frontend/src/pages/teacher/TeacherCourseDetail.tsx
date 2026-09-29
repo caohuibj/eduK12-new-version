@@ -51,11 +51,22 @@ const TeacherCourseDetail: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (courseId) {
-      fetchCourseDetail()
-      fetchAssignments()
-      fetchCheckins()
-      fetchQuestionnaires()
+    if (!courseId) return
+
+    let active = true
+    setLoading(true)
+
+    void Promise.all([
+      fetchCourseDetail(),
+      fetchAssignments(),
+      fetchCheckins(),
+      fetchQuestionnaires(),
+    ]).finally(() => {
+      if (active) setLoading(false)
+    })
+
+    return () => {
+      active = false
     }
   }, [courseId])
 
@@ -78,8 +89,6 @@ const TeacherCourseDetail: React.FC = () => {
       }
     } catch (error) {
       console.error('获取作业列表失败:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
