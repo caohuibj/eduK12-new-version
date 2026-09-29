@@ -171,7 +171,7 @@ const ClassroomAnswer: React.FC = () => {
   const renderQuestion = () => {
     if (!currentQuestion) {
       return (
-        <div className="text-center py-20">
+        <div className="text-center py-20 classroom-answer-empty">
           <div className="text-gray-400 mb-4">等待教师出题...</div>
           <div className="text-sm text-gray-300">请保持页面打开</div>
         </div>
@@ -196,7 +196,8 @@ const ClassroomAnswer: React.FC = () => {
                   key={optionValue}
                   onClick={() => setAnswer(optionValue)}
                   disabled={submitted}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  aria-pressed={answer === optionValue}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     answer === optionValue
                       ? 'border-primary bg-primary/10'
                       : 'border-gray-200 bg-white hover:border-gray-300'
@@ -227,7 +228,8 @@ const ClassroomAnswer: React.FC = () => {
                   key={optionValue}
                   onClick={() => toggleMultiAnswer(optionValue)}
                   disabled={submitted}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  aria-pressed={multiAnswers.includes(optionValue)}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     multiAnswers.includes(optionValue)
                       ? 'border-primary bg-primary/10'
                       : 'border-gray-200 bg-white hover:border-gray-300'
@@ -275,7 +277,7 @@ const ClassroomAnswer: React.FC = () => {
               onChange={(e) => setAnswer(e.target.value)}
               disabled={submitted}
               placeholder="请输入答案"
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50 classroom-answer-input"
             />
           </div>
         )
@@ -292,7 +294,7 @@ const ClassroomAnswer: React.FC = () => {
               disabled={submitted}
               placeholder="请输入答案"
               rows={5}
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50 resize-none"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50 resize-none classroom-answer-input"
             />
           </div>
         )
@@ -304,8 +306,8 @@ const ClassroomAnswer: React.FC = () => {
 
   if (!classroomId || !classroomCode) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center text-gray-500">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
+        <div className="classroom-answer-state__card text-center text-gray-500">
           缺少课堂码，请返回扫码入口重新加入课堂
         </div>
       </div>
@@ -314,8 +316,8 @@ const ClassroomAnswer: React.FC = () => {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 classroom-answer-state">
+        <div className="classroom-answer-state__card text-center">
           <div className="text-gray-500 mb-2">连接中...</div>
           <div className="text-sm text-gray-400">正在建立实时连接</div>
         </div>
@@ -324,9 +326,9 @@ const ClassroomAnswer: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 classroom-answer">
       {/* 顶部状态栏 */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-white shadow-sm border-b sticky top-0 z-10 classroom-answer__status">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500">
@@ -343,9 +345,9 @@ const ClassroomAnswer: React.FC = () => {
       </div>
 
       {/* 主要内容区 */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 classroom-answer__body">
         {/* 题目 */}
-        {renderQuestion()}
+        <section className="classroom-answer__question">{renderQuestion()}</section>
 
         {/* 提交按钮 */}
         {currentQuestion && !submitted && !isFinished && (
@@ -356,7 +358,7 @@ const ClassroomAnswer: React.FC = () => {
                 ? multiAnswers.length === 0
                 : !answer
             }
-            className="w-full mt-6 px-4 py-4 bg-primary text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full mt-6 px-4 py-4 bg-primary text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed classroom-answer-submit"
           >
             提交答案
           </button>
@@ -364,7 +366,7 @@ const ClassroomAnswer: React.FC = () => {
 
         {/* 答题已结束提示 */}
         {currentQuestion && !submitted && isFinished && (
-          <div className="mt-6 p-4 bg-red-50 rounded-lg flex items-center justify-center gap-2">
+          <div className="mt-6 p-4 bg-red-50 rounded-lg flex items-center justify-center gap-2 classroom-answer-notice classroom-answer-notice--ended">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <span className="text-red-700 font-medium">答题已结束，无法提交</span>
           </div>
@@ -372,7 +374,7 @@ const ClassroomAnswer: React.FC = () => {
 
         {/* 已提交提示 */}
         {submitted && (
-          <div className="mt-6 p-4 bg-green-50 rounded-lg flex items-center justify-center gap-2">
+          <div className="mt-6 p-4 bg-green-50 rounded-lg flex items-center justify-center gap-2 classroom-answer-notice classroom-answer-notice--submitted">
             <CheckCircle className="w-5 h-5 text-green-600" />
             <span className="text-green-700 font-medium">答案已提交</span>
           </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { Save, X } from 'lucide-react'
+import { Save } from 'lucide-react'
 
-import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 interface Course {
   id: string
@@ -82,96 +82,61 @@ const ClassroomCreate: React.FC = () => {
   }
 
   return (
-    <ProductPage width="management" className="staff-editor-page">
+    <ProductPage width="management" className="staff-editor-page space-y-6">
+      <PageHeader
+        title="创建课堂"
+        description="为课程创建实时互动课堂。创建完成后可继续添加题目并进入课堂控制。"
+        actions={<ProductButton onClick={() => navigate('/teacher/classrooms')}>返回课堂列表</ProductButton>}
+      />
       {feedback}
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">创建课堂</h1>
-            <button
-              onClick={() => navigate('/teacher/classrooms')}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* 课堂名称 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                课堂名称 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="例如: 第三章课堂互动"
-              />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-            </div>
+      <form onSubmit={handleSubmit} className="staff-panel staff-panel--padded staff-form">
+        <label className="staff-field">
+          <span>课堂名称 <span aria-hidden="true">*</span></span>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="例如：第三章课堂互动"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? 'classroom-name-error' : undefined}
+          />
+          {errors.name && <span id="classroom-name-error" className="text-sm text-red-600">{errors.name}</span>}
+        </label>
 
-            {/* 关联课程 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                关联课程 <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.courseId}
-                onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-                  errors.courseId ? 'border-red-500' : 'border-gray-300'
-                }`}
-              >
-                <option value="">请选择课程</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-              {errors.courseId && <p className="text-red-500 text-sm mt-1">{errors.courseId}</p>}
-              <p className="text-gray-500 text-sm mt-1">
-                学生必须加入该课程才能参与课堂互动
-              </p>
-            </div>
+        <label className="staff-field">
+          <span>关联课程 <span aria-hidden="true">*</span></span>
+          <select
+            value={formData.courseId}
+            onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+            aria-invalid={Boolean(errors.courseId)}
+            aria-describedby={errors.courseId ? 'classroom-course-error classroom-course-hint' : 'classroom-course-hint'}
+          >
+            <option value="">请选择课程</option>
+            {courses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.title}
+              </option>
+            ))}
+          </select>
+          {errors.courseId && <span id="classroom-course-error" className="text-sm text-red-600">{errors.courseId}</span>}
+          <span id="classroom-course-hint" className="staff-field__hint">学生必须加入该课程才能参与课堂互动。</span>
+        </label>
 
-            {/* 提示信息 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>提示：</strong>
-              </p>
-              <ul className="text-sm text-blue-700 mt-2 list-disc list-inside space-y-1">
-                <li>创建后会生成6位课堂码，学生可通过扫码或输入课堂码加入</li>
-                <li>只有该课程的学生才能加入课堂</li>
-                <li>课堂创建后可添加题目并开始互动</li>
-              </ul>
-            </div>
+        <ProductStatus kind="info" title="创建后">
+          系统会生成 6 位课堂码；该课程学生可以扫码或输入课堂码加入。创建后可继续添加题目并开始互动。
+        </ProductStatus>
 
-            {/* 提交按钮 */}
-            <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={() => navigate('/teacher/classrooms')}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-              >
-                取消
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {loading ? '创建中...' : '创建课堂'}
-              </button>
-            </div>
-          </form>
+        <div className="staff-action-footer">
+          <ProductButton type="button" onClick={() => navigate('/teacher/classrooms')}>
+            取消
+          </ProductButton>
+          <ProductButton type="submit" variant="primary" disabled={loading}>
+            <Save className="w-4 h-4" aria-hidden="true" />
+            {loading ? '创建中...' : '创建课堂'}
+          </ProductButton>
         </div>
-      </div>
+      </form>
     </ProductPage>
   )
 }
