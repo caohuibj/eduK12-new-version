@@ -1,3 +1,4 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Trash2, Edit, Users, BookOpen, UserCog, Flag, Copy, PauseCircle, PlayCircle, Image as ImageIcon, X, Share2, Inbox, UserPlus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -386,6 +387,19 @@ const CourseList: React.FC = () => {
     return { text: '停止招募', className: 'bg-orange-100 text-orange-700' }
   }
 
+  const closeEditor = () => {
+    setShowCreateModal(false)
+    setEditingCourse(null)
+    setCoverFile(null)
+    setCoverPreview('')
+  }
+
+  const closeShare = () => {
+    setShowShareModal(false)
+    setSharingCourse(null)
+    setSelectedUsers([])
+  }
+
   return (
     <ProductPage width="management" className="space-y-6">
       {feedback}
@@ -513,8 +527,8 @@ const CourseList: React.FC = () => {
 
       {/* Create/Edit Modal */}
       {(showCreateModal || editingCourse) && (
-        <div className="staff-modal-backdrop">
-          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
+        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
+          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="course-editor-title">{editingCourse ? '编辑课程' : '创建课程'}</h2>
@@ -626,12 +640,7 @@ const CourseList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={() => {
-                  setShowCreateModal(false)
-                  setEditingCourse(null)
-                  setCoverFile(null)
-                  setCoverPreview('')
-                }}
+                onClick={closeEditor}
               >
                 取消
               </ProductButton>
@@ -640,24 +649,20 @@ const CourseList: React.FC = () => {
               </ProductButton>
             </div>
           </form>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Share Modal */}
       {showShareModal && sharingCourse && (
-        <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-share-title">
+        <ModalSurface open onClose={closeShare} className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="course-share-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="course-share-title">分享课程</h2>
                 <p className="staff-dialog__description">{sharingCourse.title}</p>
               </div>
               <button
-                onClick={() => {
-                  setShowShareModal(false)
-                  setSharingCourse(null)
-                  setSelectedUsers([])
-                }}
+                onClick={closeShare}
                 className="staff-icon-button"
                 aria-label="关闭课程分享"
               >
@@ -728,11 +733,7 @@ const CourseList: React.FC = () => {
 
             <div className="staff-dialog__actions">
               <ProductButton
-                onClick={() => {
-                  setShowShareModal(false)
-                  setSharingCourse(null)
-                  setSelectedUsers([])
-                }}
+                onClick={closeShare}
               >
                 取消
               </ProductButton>
@@ -745,7 +746,7 @@ const CourseList: React.FC = () => {
               </ProductButton>
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
     </ProductPage>
   )

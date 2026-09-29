@@ -1,3 +1,4 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
@@ -380,6 +381,18 @@ const CheckinList: React.FC = () => {
     return matchesKeyword && matchesTags
   })
 
+  const closeEditor = () => {
+    setShowModal(false)
+    setEditingCheckin(null)
+    resetForm()
+  }
+
+  const closeSubmissions = () => {
+    setShowSubmissionsModal(false)
+    setSelectedCheckin(null)
+    setSubmissions([])
+  }
+
   return (
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
@@ -400,8 +413,8 @@ const CheckinList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="staff-modal-backdrop">
-          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
+        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
+          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
@@ -607,11 +620,7 @@ const CheckinList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={() => {
-                  setShowModal(false)
-                  setEditingCheckin(null)
-                  resetForm()
-                }}
+                onClick={closeEditor}
               >
                 取消
               </ProductButton>
@@ -620,7 +629,7 @@ const CheckinList: React.FC = () => {
               </ProductButton>
             </div>
           </form>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Media Selector */}
@@ -633,8 +642,8 @@ const CheckinList: React.FC = () => {
 
       {/* Submissions Modal */}
       {showSubmissionsModal && selectedCheckin && (
-        <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="checkin-submissions-title">
+        <ModalSurface open onClose={closeSubmissions} className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-submissions-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-submissions-title">打卡提交列表</h2>
@@ -646,11 +655,7 @@ const CheckinList: React.FC = () => {
                   <span>导出数据</span>
                 </ProductButton>
                 <button
-                  onClick={() => {
-                    setShowSubmissionsModal(false)
-                    setSelectedCheckin(null)
-                    setSubmissions([])
-                  }}
+                  onClick={closeSubmissions}
                   className="staff-icon-button"
                   aria-label="关闭打卡提交列表"
                 >
@@ -739,7 +744,7 @@ const CheckinList: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
     </ProductPage>
   )

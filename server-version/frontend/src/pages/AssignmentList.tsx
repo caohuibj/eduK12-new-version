@@ -1,3 +1,4 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
@@ -458,6 +459,23 @@ const AssignmentList: React.FC = () => {
     )
   }
 
+  const closeEditor = () => {
+    setShowModal(false)
+    setEditingAssignment(null)
+    resetForm()
+  }
+
+  const closeSubmissions = () => {
+    setShowSubmissionsModal(false)
+    setSelectedAssignment(null)
+    setSubmissions([])
+    setSelectedSubmissions(new Set())
+  }
+
+  const closeBatchGrade = () => {
+    if (!isBatchGrading) setShowBatchGradeModal(false)
+  }
+
   return (
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="作业管理" description="集中查看课程作业、提交进度和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置作业</ProductButton>} />
@@ -481,8 +499,8 @@ const AssignmentList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="staff-modal-backdrop">
-          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
+        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
+          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
@@ -685,11 +703,7 @@ const AssignmentList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={() => {
-                  setShowModal(false)
-                  setEditingAssignment(null)
-                  resetForm()
-                }}
+                onClick={closeEditor}
               >
                 取消
               </ProductButton>
@@ -698,7 +712,7 @@ const AssignmentList: React.FC = () => {
               </ProductButton>
             </div>
           </form>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Media Selector */}
@@ -711,20 +725,15 @@ const AssignmentList: React.FC = () => {
 
       {/* Submissions Modal */}
       {showSubmissionsModal && selectedAssignment && (
-        <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-submissions-title">
+        <ModalSurface open onClose={closeSubmissions} className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-submissions-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="assignment-submissions-title">作业提交列表</h2>
                 <p className="staff-dialog__description">{selectedAssignment.title}</p>
               </div>
               <button
-                onClick={() => {
-                  setShowSubmissionsModal(false)
-                  setSelectedAssignment(null)
-                  setSubmissions([])
-                  setSelectedSubmissions(new Set())
-                }}
+                onClick={closeSubmissions}
                 className="staff-icon-button"
                 aria-label="关闭作业提交列表"
               >
@@ -833,13 +842,13 @@ const AssignmentList: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Batch Grade Modal */}
       {showBatchGradeModal && (
-        <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="batch-grade-title">
+        <ModalSurface open onClose={closeBatchGrade} className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="batch-grade-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="batch-grade-title">一键批量批复</h2>
@@ -915,7 +924,7 @@ const AssignmentList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={() => setShowBatchGradeModal(false)}
+                onClick={closeBatchGrade}
                 disabled={isBatchGrading}
               >
                 取消
@@ -930,7 +939,7 @@ const AssignmentList: React.FC = () => {
               </ProductButton>
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
     </ProductPage>
   )

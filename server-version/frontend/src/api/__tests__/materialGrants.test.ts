@@ -59,4 +59,20 @@ describe('materialGrantApi', () => {
     expect(mockClient.get).toHaveBeenNthCalledWith(2, '/users?role=TEACHER&page=2&pageSize=100')
     expect(response.data?.list).toHaveLength(101)
   })
+
+  it.each([
+    { code: 0, data: { list: [], total: 2 } },
+    { code: 0, data: { total: 2 } },
+    { code: 0, data: { list: [{ id: 't2' }], total: 3 } },
+  ])('rejects truncated or changing teacher pages (%j)', async response => {
+    mockClient.get
+      .mockResolvedValueOnce({ code: 0, data: { list: [{ id: 't1' }], total: 2 } })
+      .mockResolvedValueOnce(response)
+    await expect(materialGrantApi.listTeachers()).rejects.toThrow('教师名单读取不完整')
+  })
+
+  it('rejects a missing first-page list rather than manufacturing an empty list', async () => {
+    mockClient.get.mockResolvedValueOnce({ code: 0, data: { total: 0 } })
+    await expect(materialGrantApi.listTeachers()).rejects.toThrow('教师名单格式不完整')
+  })
 })

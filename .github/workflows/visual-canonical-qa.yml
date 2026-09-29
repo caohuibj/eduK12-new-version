@@ -9,6 +9,8 @@ on:
       - 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'
       - 'server-version/frontend/tailwind.config.js'
       - 'server-version/frontend/src/components/MediaSelector.tsx'
+      - 'server-version/frontend/src/components/MaterialGrantModal.tsx'
+      - 'server-version/frontend/src/api/materialGrants.ts'
       - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireList.tsx'
       - 'server-version/e2e/visual-staff-complex-browser-e2e.cjs'
       - 'server-version/e2e/visual-classroom-control-browser-e2e.cjs'
