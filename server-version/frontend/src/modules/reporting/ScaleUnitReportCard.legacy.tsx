@@ -56,6 +56,12 @@ const scoreStatusLabel = (score: ExternalScaleScoreValue): string => {
   return ''
 }
 
+const qualityStatusLabel = (status: string): string => ({
+  interpretable: '可解释',
+  limited: '仅支持有限解释',
+  invalid: '当前结果不可解释',
+}[status] ?? status)
+
 const renderReferenceDetails = (reference: ScaleReferenceValue) => {
   if (reference.status !== 'available') {
     const reason = reference.unavailableReason === 'missing_context'
@@ -147,7 +153,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
         <span>{report.scaleName}</span>
         {report.method?.reportVersion && <span>报告版本 {report.method.reportVersion}</span>}
-        {quality?.status && <span>数据质量：{quality.status}</span>}
+        {quality?.status && <span>数据质量：{qualityStatusLabel(quality.status)}</span>}
       </div>
 
       {!invalid && interpretations.length > 0 && (

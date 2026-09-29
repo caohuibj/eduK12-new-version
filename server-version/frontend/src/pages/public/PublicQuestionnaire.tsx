@@ -119,7 +119,7 @@ const PublicQuestionnaire: React.FC = () => {
 
       {questionnaire?.instruction && (
         <section className="hui-public-participation__instruction" aria-labelledby="public-questionnaire-instruction">
-          <p className="hui-public-participation__eyebrow">Instructions</p>
+          <p className="hui-public-participation__eyebrow">参与说明</p>
           <h2 id="public-questionnaire-instruction">指导语</h2>
           <p>{questionnaire.instruction}</p>
         </section>

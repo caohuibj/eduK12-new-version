@@ -696,3 +696,30 @@
     width: 100%;
   }
 }
+
+
+/* Cross-surface polish carried into PR9. */
+.organization-report-result__artifact-print { display: none; }
+.organization-reporting-workspace > fieldset > details {
+  margin-top: 22px;
+  border: 1px solid #dfe7ef;
+  border-radius: 12px;
+  background: #fbfdff;
+}
+.organization-reporting-workspace > fieldset > details > summary {
+  min-height: 46px;
+  padding: 9px 13px;
+}
+.organization-reporting-workspace > fieldset > details[open] > summary {
+  border-bottom: 1px solid #e5ebf2;
+  background: #f6f9fc;
+}
+@media print {
+  .organization-report-result__artifact-print {
+    display: block;
+    margin: 6px 0 0;
+    color: var(--report-ink);
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+}
