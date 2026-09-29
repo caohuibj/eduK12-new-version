@@ -70,89 +70,8 @@
   min-height: calc(100dvh - 122px);
 }
 
-/* Ant Design surfaces used by legacy public questionnaire/check-in pages. */
-.hui-app--public:not(.hui-app--entry) .ant-card {
-  border: 1px solid var(--public-line);
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: var(--hui-ds-shadow-card) !important;
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
-  padding: clamp(20px,3vw,28px);
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-btn {
-  min-height: 44px;
-  padding-inline: 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  box-shadow: none;
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-btn-primary {
-  background: var(--public-blue);
-  border-color: var(--public-blue);
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-btn-primary:hover,
-.hui-app--public:not(.hui-app--entry) .ant-btn-primary:focus {
-  background: var(--public-blue-hover);
-  border-color: var(--public-blue-hover);
-}
-
-.hui-app--public:not(.hui-app--entry) :where(
-  .ant-input,
-  .ant-input-affix-wrapper,
-  .ant-select-selector,
-  .ant-picker,
-  textarea.ant-input
-) {
-  min-height: 46px;
-  border-color: #d5e1eb;
-  border-radius: 10px !important;
-}
-
-.hui-app--public:not(.hui-app--entry) :where(
-  .ant-input,
-  .ant-input-affix-wrapper,
-  .ant-select-selector,
-  .ant-picker,
-  textarea.ant-input
-):focus,
-.hui-app--public:not(.hui-app--entry) .ant-input-affix-wrapper-focused {
-  border-color: #7f9fe2;
-  box-shadow: 0 0 0 3px rgba(47,111,237,.1);
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-result {
-  width: min(100%,42rem);
-  margin-inline: auto;
-  padding: 34px 24px;
-  border: 1px solid #e0e9f1;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 7px 26px rgba(20,48,74,.045);
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-result-title {
-  color: var(--public-ink);
-  letter-spacing: -.02em;
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-result-subtitle {
-  color: var(--public-muted);
-  line-height: 1.7;
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-spin-text {
-  color: #60758a;
-}
-
-.hui-app--public:not(.hui-app--entry) .ant-progress-bg {
-  background: var(--public-blue) !important;
-}
-
+/* Ant Design remains only for PublicCheckin media selection / preview.
+ * Page chrome, form, result, loading and action semantics use Huisurvey Product UI. */
 /* Shared legacy public cards/controls, including cognitive entry. */
 .hui-app--public:not(.hui-app--entry) .card {
   border: 1px solid var(--public-line);
@@ -246,10 +165,6 @@
   letter-spacing: -.035em;
 }
 
-.hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] > .ant-card {
-  margin-bottom: 18px;
-}
-
 .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-4xl"] [class*="grid-cols-2"] {
   gap: 12px;
 }
@@ -279,9 +194,6 @@
     padding: 18px 22px 34px;
   }
 
-  .hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
-    padding: 22px;
-  }
 }
 
 /* Mobile */
@@ -310,30 +222,6 @@
     padding: 12px 0 max(20px,env(safe-area-inset-bottom)) !important;
   }
 
-  .hui-app--public:not(.hui-app--entry) .ant-card {
-    border-radius: 16px;
-  }
-
-  .hui-app--public:not(.hui-app--entry) .ant-card .ant-card-body {
-    padding: 16px;
-  }
-
-  .hui-app--public:not(.hui-app--entry) .ant-result {
-    padding: 24px 16px;
-    border-radius: 16px;
-  }
-
-  .hui-app--public:not(.hui-app--entry) .ant-result-extra {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .hui-app--public:not(.hui-app--entry) .ant-result-extra > * {
-    width: 100%;
-    margin-inline: 0 !important;
-  }
-
   .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-xl"].card {
     padding: 18px;
     border-radius: 16px;
@@ -344,7 +232,7 @@
     flex-wrap: wrap;
   }
 
-  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-3xl"] > [class*="flex"][class*="justify-between"] > :where(button,.ant-btn) {
+  .hui-app--public:not(.hui-app--entry) .hui-app-main [class~="max-w-3xl"] > [class*="flex"][class*="justify-between"] > button {
     flex: 1 1 8rem;
   }
 
@@ -358,7 +246,6 @@
     gap: 10px;
   }
 
-  .hui-app--public:not(.hui-app--entry) .ant-btn-block,
   .hui-app--public:not(.hui-app--entry) .btn-primary.w-full,
   .hui-app--public:not(.hui-app--entry) .btn-secondary.w-full {
     width: 100%;
