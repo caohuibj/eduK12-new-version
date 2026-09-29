@@ -108,7 +108,6 @@ const MaterialGrantModal: React.FC<MaterialGrantModalProps> = ({
       )}
     </ManagementDialog>
   )
-  )
 }
 
 export default MaterialGrantModal
