@@ -7,6 +7,7 @@ import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, Doc
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import PdfViewer from '../../components/PdfViewer'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import {
   createIdempotencyKey,
   fingerprintIdempotencyPayload,
@@ -202,20 +203,23 @@ const CheckinSubmit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <ProductPage width="reading" className="hui-student-page hui-student-submission">
+        <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡要求与已有提交。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!checkin) {
     return (
-      <div className="card text-center py-12">
-        <p className="text-gray-500">打卡不存在</p>
-        <button onClick={() => navigate('/student')} className="btn-primary mt-4">
-          返回
-        </button>
-      </div>
+      <ProductPage width="reading" className="hui-student-page hui-student-submission">
+        <ProductStatus
+          kind="warning"
+          title="打卡不存在"
+          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>返回学生首页</ProductButton>}
+        >
+          当前打卡可能已被移除，或您没有访问权限。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
@@ -223,22 +227,19 @@ const CheckinSubmit: React.FC = () => {
   const hasSubmitted = !!submission
 
   return (
-    <div className="space-y-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center text-gray-600 hover:text-primary transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5 mr-1" />
+    <ProductPage width="reading" className="hui-student-page hui-student-submission hui-checkin-submit">
+      <ProductButton className="student-submit-back" onClick={() => navigate(-1)}>
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         返回
-      </button>
+      </ProductButton>
+
+      <PageHeader
+        title={checkin.title}
+        description={checkin.description || '查看打卡要求并完成本次记录。'}
+      />
 
       {/* Checkin Info */}
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">{checkin.title}</h1>
-        {checkin.description && (
-          <p className="text-gray-600 mb-4">{checkin.description}</p>
-        )}
+      <section className="student-submit-info" aria-label="打卡说明">
         
         {/* 打卡内容 */}
         {checkin.content && (
@@ -249,24 +250,24 @@ const CheckinSubmit: React.FC = () => {
         )}
         
         {/* 打卡视频 */}
-        <div className="mb-4">
+        {checkin.videos && checkin.videos.length > 0 && (
           <VideoList
             videos={checkin.videos}
             title="相关视频"
             watermarkText="慧育空间专属教学视频"
             className="!p-0 !shadow-none !border-0"
           />
-        </div>
+        )}
         
         {/* 打卡图片 */}
-        <div className="mb-4">
+        {checkin.images && checkin.images.length > 0 && (
           <ImageList
             images={checkin.images}
             title="相关图片"
             watermarkText="慧育空间专属教学图片"
             className="!p-0 !shadow-none !border-0"
           />
-        </div>
+        )}
 
         {/* 打卡文档 */}
         {checkin.documents && checkin.documents.length > 0 && (
@@ -302,15 +303,15 @@ const CheckinSubmit: React.FC = () => {
           </div>
         )}
         
-        <div className={`flex items-center space-x-2 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
-          <Clock className="w-4 h-4" />
-          <span>截止: {formatDate(checkin.endTime)}</span>
+        <div className={`student-submit-deadline ${isOverdue ? 'student-submit-deadline--closed' : ''}`}>
+          <Clock className="w-4 h-4" aria-hidden="true" />
+          <span>截止时间：{formatDate(checkin.endTime)}</span>
         </div>
-      </div>
+      </section>
 
       {/* Others Submissions */}
       {checkin.allowViewOthers && othersSubmissions.length > 0 && (
-        <div className="card">
+        <section className="card student-submit-panel">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center">
               <Users className="w-5 h-5 mr-2" />
@@ -318,7 +319,7 @@ const CheckinSubmit: React.FC = () => {
             </h3>
             <button
               onClick={() => setShowOthers(!showOthers)}
-              className="text-sm text-primary hover:text-primary-hover flex items-center"
+              className="student-submit-inline-action"
             >
               <Eye className="w-4 h-4 mr-1" />
               {showOthers ? '收起' : `查看 (${othersSubmissions.length})`}
@@ -376,19 +377,19 @@ const CheckinSubmit: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
+        </section>
       )}
 
       {/* 图片预览弹窗 */}
       {previewImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4"
+        <div
+          className="student-submit-preview fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4"
           onClick={() => setPreviewImage(null)}
         >
           <div className="relative max-w-[90vw] max-h-[90vh]">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 z-10"
+              className="student-submit-preview__close absolute -top-10 right-0 p-2 text-white hover:text-gray-300 z-10"
               title="关闭"
             >
               <X className="w-6 h-6" />
@@ -407,7 +408,7 @@ const CheckinSubmit: React.FC = () => {
       )}
 
       {/* Submission Form */}
-      <div className="card">
+      <section className="card student-submit-panel">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
           {hasSubmitted ? (
             <>
@@ -424,11 +425,11 @@ const CheckinSubmit: React.FC = () => {
 
         {hasSubmitted ? (
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="student-submit-response">
               <p className="text-gray-800 whitespace-pre-wrap">{submission.content}</p>
             </div>
             {images.length > 0 && (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="student-submit-image-grid grid grid-cols-3 gap-4">
                 {images.map((image, index) => {
                   const imageUrl = normalizeImageUrl(imageUrlFor(image))
                   if (!imageUrlFor(image)) return null
@@ -474,7 +475,7 @@ const CheckinSubmit: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 上传图片
               </label>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="student-submit-image-grid grid grid-cols-4 gap-4">
                 {images.map((image, index) => {
                   const imageUrl = normalizeImageUrl(imageUrlFor(image))
                   if (!imageUrlFor(image)) return null
@@ -488,7 +489,7 @@ const CheckinSubmit: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                      className="student-submit-image-remove absolute top-1 right-1 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
                     >
                       ×
                     </button>
@@ -496,7 +497,7 @@ const CheckinSubmit: React.FC = () => {
                   )
                 })}
                 {images.length < 9 && (
-                  <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                  <label className="student-submit-image-add aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                     {uploading ? (
                       <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
                     ) : (
@@ -534,7 +535,7 @@ const CheckinSubmit: React.FC = () => {
             </button>
           </form>
         )}
-      </div>
+      </section>
 
       {/* PDF Viewer */}
       {selectedDocument && (
@@ -549,7 +550,7 @@ const CheckinSubmit: React.FC = () => {
         />
       )}
 
-    </div>
+    </ProductPage>
   )
 }
 

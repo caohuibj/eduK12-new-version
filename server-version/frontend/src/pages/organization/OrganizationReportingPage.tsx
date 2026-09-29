@@ -44,7 +44,7 @@ const RESOURCE_FAMILIES: ReportingResourceFamily[] = ['BUNDLE', 'SCALE', 'COGNIT
 const LONGITUDINAL_KINDS: Array<Extract<ReportingAnalysisKind, 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'>> = ['REPEATED_COHORT', 'MATCHED_LONGITUDINAL']
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
 const sourceKey = (source: Pick<ReportingSourceSummary, 'runId' | 'trackId'>) => `${source.runId}::${source.trackId}`
-const formatTime = (value: string | null) => value ? new Date(value).toLocaleString() : '—'
+const formatTime = (value: string | null) => value ? new Date(value).toLocaleString('zh-CN') : '—'
 const formatValue = (value: unknown) => typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
   ? String(value)
   : JSON.stringify(value)
@@ -166,6 +166,7 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
             <ReportDetails title="报告记录编号">
               <p>Artifact {artifact.artifactId}</p>
             </ReportDetails>
+            <p className="organization-report-result__artifact-print">Artifact {artifact.artifactId}</p>
           </div>
         </ReportCoreSummary>
 
@@ -632,7 +633,7 @@ function ReportingWorkspace() {
     }))
   })
 
-  const readArtifact = () => act('Artifact 已按当前权限重新读取。', async () => {
+  const readArtifact = () => act('历史报告已按当前权限重新读取。', async () => {
     if (!artifactId.trim()) throw new Error('请输入 artifact ID')
     setArtifact(await reportingApi.readArtifact(organizationId, artifactId.trim()))
   })

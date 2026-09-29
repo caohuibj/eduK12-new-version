@@ -6,6 +6,7 @@ import type { Assignment, Submission, MediaItem, DocumentItem } from '../../type
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import PdfViewer from '../../components/PdfViewer'
 import { sanitizeHtml } from '../../utils/sanitize'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import {
   createIdempotencyKey,
   fingerprintIdempotencyPayload,
@@ -185,20 +186,23 @@ const AssignmentSubmit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <ProductPage width="reading" className="hui-student-page hui-student-submission">
+        <ProductStatus kind="pending" title="正在加载作业">正在读取作业内容与已有提交。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!assignment) {
     return (
-      <div className="card text-center py-12">
-        <p className="text-gray-500">作业不存在</p>
-        <button onClick={() => navigate('/student')} className="btn-primary mt-4">
-          返回
-        </button>
-      </div>
+      <ProductPage width="reading" className="hui-student-page hui-student-submission">
+        <ProductStatus
+          kind="warning"
+          title="作业不存在"
+          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>返回学生首页</ProductButton>}
+        >
+          当前作业可能已被移除，或您没有访问权限。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
@@ -206,34 +210,29 @@ const AssignmentSubmit: React.FC = () => {
   const hasSubmitted = !!submission
 
   return (
-    <div className="space-y-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center text-gray-600 hover:text-primary transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5 mr-1" />
+    <ProductPage width="reading" className="hui-student-page hui-student-submission hui-assignment-submit">
+      <ProductButton className="student-submit-back" onClick={() => navigate(-1)}>
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         返回
-      </button>
+      </ProductButton>
 
-      {/* Assignment Info */}
-      <div className="card">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">{assignment.title}</h1>
-        {assignment.description && (
-          <p className="text-gray-600 mb-4">{assignment.description}</p>
-        )}
-        {/* 作业内容 - 富文本 */}
+      <PageHeader
+        title={assignment.title}
+        description={assignment.description || '查看作业要求并完成本次提交。'}
+      />
+
+      <section className="student-submit-info" aria-label="作业说明">
         {assignment.content && (
-          <div 
-            className="text-gray-700 mb-4 prose prose-sm max-w-none"
+          <div
+            className="student-submit-richtext prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(assignment.content) }}
           />
         )}
-        <div className={`flex items-center space-x-2 text-sm ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
-          <Clock className="w-4 h-4" />
-          <span>截止: {formatDate(assignment.deadline)}</span>
+        <div className={`student-submit-deadline ${isOverdue ? 'student-submit-deadline--closed' : ''}`}>
+          <Clock className="w-4 h-4" aria-hidden="true" />
+          <span>截止时间：{formatDate(assignment.deadline)}</span>
         </div>
-      </div>
+      </section>
 
       {/* Video Attachments */}
       <VideoList
@@ -251,7 +250,7 @@ const AssignmentSubmit: React.FC = () => {
 
       {/* Document Attachments */}
       {assignment.documents && assignment.documents.length > 0 && (
-        <div className="card">
+        <section className="card student-submit-panel">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <FileIcon className="w-5 h-5 mr-2 text-red-500" />
             相关文档
@@ -280,11 +279,11 @@ const AssignmentSubmit: React.FC = () => {
           <p className="text-xs text-gray-500 mt-2">
             提示：点击可在线预览文档，也可下载保存
           </p>
-        </div>
+        </section>
       )}
 
       {/* Submission Form */}
-      <div className="card">
+      <section className="card student-submit-panel">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
           <FileText className="w-5 h-5 mr-2" />
           {hasSubmitted && !isEditing ? '我的提交' : (isOverdue ? '作业已截止' : '提交作业')}
@@ -292,11 +291,11 @@ const AssignmentSubmit: React.FC = () => {
 
         {hasSubmitted && !isEditing ? (
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="student-submit-response">
               <p className="text-gray-800 whitespace-pre-wrap">{submission.content}</p>
             </div>
             {submission.comment && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="student-submit-feedback">
                 <h4 className="text-sm font-semibold text-blue-800 mb-2">教师评语</h4>
                 <p className="text-blue-700">{submission.comment}</p>
               </div>
@@ -324,7 +323,7 @@ const AssignmentSubmit: React.FC = () => {
               <div className="space-y-4">
                 <p className="text-sm text-gray-600 mb-2">请完成以下题目：</p>
                 {(assignment.questions as any[]).map((question: any, index: number) => (
-                  <div key={index} className="border rounded-lg p-4">
+                  <div key={index} className="student-submit-question">
                     <p className="font-medium text-gray-800 mb-3">
                       {index + 1}. {question.question}
                       {question.type === 'single_choice' && <span className="text-xs text-gray-500 ml-2">(单选题)</span>}
@@ -338,7 +337,7 @@ const AssignmentSubmit: React.FC = () => {
                         {question.options?.map((option: any) => (
                           <label
                             key={option.key || option.text || option}
-                            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                            className="student-submit-option"
                           >
                             <input
                               type="radio"
@@ -360,7 +359,7 @@ const AssignmentSubmit: React.FC = () => {
                         {question.options?.map((option: any) => (
                           <label
                             key={option.key || option.text || option}
-                            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                            className="student-submit-option"
                           >
                             <input
                               type="checkbox"
@@ -459,7 +458,7 @@ const AssignmentSubmit: React.FC = () => {
             )}
           </form>
         )}
-      </div>
+      </section>
 
       {/* PDF Viewer */}
       {selectedDocument && (
@@ -474,7 +473,7 @@ const AssignmentSubmit: React.FC = () => {
         />
       )}
 
-    </div>
+    </ProductPage>
   )
 }
 

@@ -18,6 +18,8 @@
 .hui-app--entry .hui-app-content { min-height: 100dvh; width: 100%; }
 .hui-app--entry .hui-app-main { max-width: none; margin: 0; padding: 0; }
 .hui-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 24px 0; }
+.hui-breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; margin: 0; padding: 0; list-style: none; }
+.hui-breadcrumb li { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
 .hui-breadcrumb a { min-height: 44px; display: inline-flex; align-items: center; }
 .hui-navigation { width: 220px; flex-shrink: 0; background: var(--hui-ds-color-surface); padding: 12px; border-right: 1px solid var(--hui-ds-color-line); }
 .hui-navigation a { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: 8px; margin-block: 4px; }

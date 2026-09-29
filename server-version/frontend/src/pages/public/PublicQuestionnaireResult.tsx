@@ -129,7 +129,7 @@ const PublicQuestionnaireResult: React.FC = () => {
 
       <div className="report-body">
         {report.backgroundValues.length > 0 && (
-          <ReportSection title="背景信息" eyebrow="Context">
+          <ReportSection title="背景信息" eyebrow="问卷背景">
             <dl className="hui-public-questionnaire-report__background">
               {report.backgroundValues.map((item) => (
                 <div key={item.itemId}>

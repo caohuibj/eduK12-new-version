@@ -161,7 +161,7 @@ const ScaleResult: React.FC = () => {
       }}
       backAction={<button type="button" onClick={() => navigate('/student/scales')} className="hui-button hui-button--secondary">返回量表列表</button>}
     >
-      <ReportSection title="结果详情" eyebrow="Report">
+      <ReportSection title="结果详情" eyebrow="量表结果">
         <ScaleUnitReportCard report={safeReport} />
       </ReportSection>
     </ReportShell>

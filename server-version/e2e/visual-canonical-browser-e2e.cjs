@@ -284,6 +284,36 @@ const visualPublicCheckin = {
   allowViewOthers: false,
 }
 
+
+const visualStudentAssignment = {
+  id: 'visual-assignment',
+  title: '本周学习反思作业',
+  description: '回顾本周学习过程，并完成下面的简短问题。',
+  content: '<p>请结合真实学习经历作答。内容会保存到您的课程作业记录中。</p>',
+  deadline: '2026-12-31T12:00:00.000Z',
+  videos: [],
+  images: [],
+  documents: [],
+  questions: [
+    { type: 'single_choice', question: '本周学习计划完成情况如何？', options: [{ key: 'a', text: '基本完成' }, { key: 'b', text: '完成一部分' }, { key: 'c', text: '需要重新安排' }] },
+    { type: 'multiple_choice', question: '哪些因素帮助了你？', options: [{ key: 'a', text: '时间安排' }, { key: 'b', text: '同伴支持' }, { key: 'c', text: '教师反馈' }] },
+    { type: 'text', question: '下周你最想调整的一件事是什么？' },
+  ],
+}
+
+const visualStudentCheckin = {
+  id: 'visual-student-checkin',
+  title: '今日学习打卡',
+  description: '记录今天完成的学习任务和一个值得保留的经验。',
+  content: '<p>可填写文字，并按需补充图片。请不要上传包含他人敏感信息的内容。</p>',
+  images: [],
+  videos: [],
+  documents: [],
+  endTime: '2026-12-31T12:00:00.000Z',
+  createdAt: '2026-09-29T00:00:00.000Z',
+  allowViewOthers: false,
+}
+
 const envelope = (data, code = 0, message = 'ok') => ({ code, message, data })
 
 async function installApiFixture(page, role) {
@@ -323,6 +353,10 @@ async function installApiFixture(page, role) {
       sessionCapability: 'visual-checkin-capability',
       sessionExpiresAt: '2026-12-31T12:00:00.000Z',
     }
+    else if (pathname === '/api/assignments/visual-assignment') data = visualStudentAssignment
+    else if (pathname === '/api/assignments/visual-assignment/my-submission') data = null
+    else if (pathname === '/api/checkins/visual-student-checkin') data = visualStudentCheckin
+    else if (pathname === '/api/checkins/visual-student-checkin/my-submission') data = null
     else if (pathname === '/api/organizations/visual-org/context') data = visualOrganizationContext
     else if (pathname === '/api/organizations/visual-org/reporting/specs') data = { list: [], total: 0, page: 1, pageSize: 100 }
     else if (pathname === '/api/organizations/visual-org/reporting/sources') data = { list: [], truncated: false, nextPage: null }
@@ -408,6 +442,24 @@ const cases = [
   { id: 'portal', route: '/', role: null, ready: (page) => page.getByRole('heading', { name: '欢迎使用 Huisurvey', exact: true }).waitFor() },
   { id: 'student-login', route: '/student/login', role: null, ready: (page) => page.getByRole('heading', { name: '学生登录', exact: true }).waitFor() },
   { id: 'student-home', route: '/student', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '我的课程', exact: true }).waitFor() },
+  {
+    id: 'student-assignment-submit',
+    route: '/student/assignments/visual-assignment',
+    role: 'STUDENT',
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '本周学习反思作业', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '提交作业', exact: true }).waitFor()
+    },
+  },
+  {
+    id: 'student-checkin-submit',
+    route: '/student/checkins/visual-student-checkin',
+    role: 'STUDENT',
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '今日学习打卡', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '去打卡', exact: true }).waitFor()
+    },
+  },
   { id: 'student-scales', route: '/student/scales', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '心理测评', exact: true }).waitFor() },
   { id: 'scale-report', route: '/student/scales/result/visual-scale-assessment', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '学习自我调节量表', exact: true }).waitFor() },
   { id: 'cognitive-history', route: '/student/cognitive/history', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor() },

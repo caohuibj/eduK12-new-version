@@ -4,27 +4,29 @@ This gate provides repeatable visual evidence for the Modern Education frontend 
 
 ## Canonical screens
 
-The deterministic fixture captures nineteen representative page families:
+The deterministic fixture captures twenty-one representative page families:
 
 1. Code-native UI Lab — foundations / Product UI / reports / canonical scenarios / visualization states
 2. Portal
 3. Student login
 4. Student home
-5. Student scale discovery
-6. Multi-dimensional Scale report
-7. Cognitive history
-8. Classroom entry
-9. Parent home
-10. Staff course management
-11. Staff profile
-12. Organization index
-13. Organization longitudinal report — comparable / not comparable / suppressed
-14. Shared Scale Library
-15. Public Questionnaire entry
-16. Public Questionnaire legacy runner
-17. Public Questionnaire result
-18. Public Checkin
-19. Public recovery / focused entry
+5. Student assignment submission
+6. Student check-in submission
+7. Student scale discovery
+8. Multi-dimensional Scale report
+9. Cognitive history
+10. Classroom entry
+11. Parent home
+12. Staff course management
+13. Staff profile
+14. Organization index
+15. Organization longitudinal report — comparable / not comparable / suppressed
+16. Shared Scale Library
+17. Public Questionnaire entry
+18. Public Questionnaire legacy runner
+19. Public Questionnaire result
+20. Public Checkin
+21. Public recovery / focused entry
 
 Each screen is captured at:
 
@@ -32,7 +34,7 @@ Each screen is captured at:
 - 768 × 1024 — tablet
 - 1440 × 1000 — desktop
 
-This produces 57 canonical responsive screenshots per run. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
+This produces 63 canonical responsive screenshots per run. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
 
 ## Hard assertions
 
