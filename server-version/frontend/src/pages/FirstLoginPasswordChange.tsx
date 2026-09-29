@@ -71,8 +71,8 @@ const FirstLoginPasswordChange: React.FC = () => {
       ) : null}
 
       <form onSubmit={submit} noValidate>
-        <label htmlFor="change-old-password">
-          临时密码
+        <div>
+          <label htmlFor="change-old-password">临时密码</label>
           <input
             id="change-old-password"
             className="input mt-1 w-full"
@@ -83,10 +83,10 @@ const FirstLoginPasswordChange: React.FC = () => {
             aria-describedby={feedback ? 'password-change-error' : undefined}
             required
           />
-        </label>
+        </div>
 
-        <label htmlFor="change-new-password">
-          新密码
+        <div>
+          <label htmlFor="change-new-password">新密码</label>
           <input
             id="change-new-password"
             className="input mt-1 w-full"
@@ -98,10 +98,10 @@ const FirstLoginPasswordChange: React.FC = () => {
             required
           />
           <span id="password-policy" className="mt-2 block text-xs text-slate-500">{passwordPolicyMessage}</span>
-        </label>
+        </div>
 
-        <label htmlFor="change-confirm-password">
-          确认新密码
+        <div>
+          <label htmlFor="change-confirm-password">确认新密码</label>
           <input
             id="change-confirm-password"
             className="input mt-1 w-full"
@@ -111,7 +111,7 @@ const FirstLoginPasswordChange: React.FC = () => {
             autoComplete="new-password"
             required
           />
-        </label>
+        </div>
 
         <button type="submit" className="btn-primary w-full" disabled={submitting}>
           {submitting ? '修改中...' : '修改密码并重新登录'}
