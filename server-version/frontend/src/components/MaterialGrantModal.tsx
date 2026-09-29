@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { X } from 'lucide-react'
+import ManagementDialog from './staff-ui/ManagementDialog'
+import { ProductButton } from './product-ui'
 import {
   eligibleGrantTeachers,
   materialGrantApi,
@@ -68,46 +69,44 @@ const MaterialGrantModal: React.FC<MaterialGrantModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex justify-between items-center p-4 border-b">
-          <div>
-            <h3 className="text-lg font-medium">授权给教师</h3>
-            <p className="text-sm text-gray-500 mt-1">{resourceName}</p>
-          </div>
-          <button onClick={onClose} aria-label="关闭">
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-        <div className="p-4 overflow-y-auto flex-1">
-          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-          {loading ? (
-            <p className="text-gray-500">加载中...</p>
-          ) : teachers.length === 0 ? (
-            <p className="text-gray-500">没有可授权的已审教师</p>
-          ) : (
-            <div className="space-y-2">
-              {teachers.map((teacher) => (
-                <label key={teacher.id} className="flex items-center gap-2 text-sm text-gray-800">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(selected[teacher.id])}
-                    onChange={(e) => setSelected((current) => ({ ...current, [teacher.id]: e.target.checked }))}
-                  />
-                  {teacherLabel(teacher)}
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex justify-end gap-2 p-4 border-t">
-          <button onClick={onClose} className="btn-secondary">取消</button>
-          <button onClick={() => void save()} disabled={loading || saving} className="btn-primary">
+    <ManagementDialog
+      open
+      title="授权给教师"
+      description={resourceName}
+      onClose={onClose}
+      width="compact"
+      actions={(
+        <>
+          <ProductButton onClick={onClose}>取消</ProductButton>
+          <ProductButton variant="primary" onClick={() => void save()} disabled={loading || saving}>
             {saving ? '保存中...' : '保存'}
-          </button>
+          </ProductButton>
+        </>
+      )}
+    >
+      {error ? <p role="alert" className="mb-3 text-sm text-red-600">{error}</p> : null}
+      {loading ? (
+        <p className="text-gray-500">加载中...</p>
+      ) : teachers.length === 0 ? (
+        <p className="text-gray-500">没有可授权的已审教师</p>
+      ) : (
+        <div className="staff-form">
+          <fieldset className="grid gap-2">
+            <legend className="sr-only">选择授权教师</legend>
+            {teachers.map((teacher) => (
+              <label key={teacher.id} className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={Boolean(selected[teacher.id])}
+                  onChange={(e) => setSelected((current) => ({ ...current, [teacher.id]: e.target.checked }))}
+                />
+                <span>{teacherLabel(teacher)}</span>
+              </label>
+            ))}
+          </fieldset>
         </div>
-      </div>
-    </div>
+      )}
+    </ManagementDialog>
   )
 }
 

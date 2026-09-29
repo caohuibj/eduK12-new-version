@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { BookOpen, Brain, Clock, Keyboard, Plus, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
@@ -9,6 +9,7 @@ import { DiscoveryCard, PageHeader, ProductButton, ProductPage, ProductStatus } 
 
 const StudentHome: React.FC = () => {
   const { user } = useAuth()
+  const location = useLocation()
   const cognitiveModuleEnabled = useCognitiveEnabled()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
@@ -122,6 +123,9 @@ const StudentHome: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN')
+  const routeNotice = typeof (location.state as { notice?: unknown } | null)?.notice === 'string'
+    ? (location.state as { notice: string }).notice
+    : null
 
   return (
     <ProductPage width="management" className="hui-student-page hui-student-home">
@@ -144,6 +148,10 @@ const StudentHome: React.FC = () => {
           </div>
         )}
       />
+
+      {routeNotice ? (
+        <ProductStatus kind="info" title="课堂提示" announce="polite">{routeNotice}</ProductStatus>
+      ) : null}
 
       {loading ? (
         <ProductStatus kind="pending" title="正在加载课程" announce="polite" />

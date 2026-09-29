@@ -60,7 +60,6 @@ const ClassroomEdit: React.FC = () => {
 
       const response = await apiClient.put(`/classrooms/${id}`, { name })
       if (response.code === 0) {
-        alert('课堂更新成功')
         navigate('/teacher/classrooms')
       } else {
         setError(response.message)

@@ -15,6 +15,8 @@ import {
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
+type CheckinFeedback = { kind: 'success' | 'error'; message: string }
+
 interface OtherSubmission {
   id: string
   studentId: string
@@ -55,14 +57,50 @@ const CheckinSubmit: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
+  const [feedback, setFeedback] = useState<CheckinFeedback | null>(null)
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
+  const previewCloseRef = useRef<HTMLButtonElement | null>(null)
+  const previewRestoreFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (checkinId) {
       fetchCheckinDetail()
     }
   }, [checkinId])
+
+
+  useEffect(() => {
+    if (!previewImage) return
+
+    previewCloseRef.current?.focus()
+
+    const handlePreviewKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setPreviewImage(null)
+        return
+      }
+
+      if (event.key === 'Tab') {
+        event.preventDefault()
+        previewCloseRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handlePreviewKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handlePreviewKeyDown)
+      previewRestoreFocusRef.current?.focus()
+    }
+  }, [previewImage])
+
+  const openPreviewImage = (image: { url: string; name: string }) => {
+    previewRestoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    setPreviewImage(image)
+  }
+
+  const closePreviewImage = () => setPreviewImage(null)
 
   const fetchCheckinDetail = async () => {
     try {
@@ -108,6 +146,7 @@ const CheckinSubmit: React.FC = () => {
     if (!file) return
 
     setUploading(true)
+    setFeedback(null)
     const formData = new FormData()
     formData.append('image', file)
 
@@ -124,11 +163,11 @@ const CheckinSubmit: React.FC = () => {
             : current
         ))
       } else {
-        alert('图片上传失败')
+        setFeedback({ kind: 'error', message: '图片上传失败，请重试。' })
       }
     } catch (error) {
       console.error('图片上传失败:', error)
-      alert('图片上传失败')
+      setFeedback({ kind: 'error', message: '图片上传失败，请重试。' })
     } finally {
       setUploading(false)
     }
@@ -144,6 +183,7 @@ const CheckinSubmit: React.FC = () => {
 
     submitInFlightRef.current = true
     setSubmitting(true)
+    setFeedback(null)
     try {
       const payload = {
         content,
@@ -170,11 +210,11 @@ const CheckinSubmit: React.FC = () => {
 
       if (response.code === 0) {
         submitIdempotencyKeyRef.current = null
-        alert('打卡成功！')
-        fetchCheckinDetail()
+        setFeedback({ kind: 'success', message: '打卡已成功提交。' })
+        void fetchCheckinDetail()
       } else {
         submitIdempotencyKeyRef.current = null
-        alert(response.message || '打卡失败')
+        setFeedback({ kind: 'error', message: response.message || '打卡失败' })
       }
     } catch (error: any) {
       // Only an explicit, non-retryable 4xx rejection invalidates this key.
@@ -183,7 +223,7 @@ const CheckinSubmit: React.FC = () => {
       if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      alert(submissionErrorMessage(error, '打卡失败'))
+      setFeedback({ kind: 'error', message: submissionErrorMessage(error, '打卡失败') })
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)
@@ -237,6 +277,17 @@ const CheckinSubmit: React.FC = () => {
         title={checkin.title}
         description={checkin.description || '查看打卡要求并完成本次记录。'}
       />
+
+
+      {feedback ? (
+        <ProductStatus
+          kind={feedback.kind}
+          title={feedback.kind === 'success' ? '操作已完成' : '操作未完成'}
+          announce={feedback.kind === 'success' ? 'polite' : 'assertive'}
+        >
+          {feedback.message}
+        </ProductStatus>
+      ) : null}
 
       {/* Checkin Info */}
       <section className="student-submit-info" aria-label="打卡说明">
@@ -353,10 +404,12 @@ const CheckinSubmit: React.FC = () => {
                       {other.images.map((imageUrl, idx) => {
                         const normalizedUrl = normalizeImageUrl(imageUrl)
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={idx}
-                            onClick={() => setPreviewImage({ url: normalizedUrl, name: `图片 ${idx + 1}` })}
-                            className="relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors cursor-pointer group"
+                            onClick={() => openPreviewImage({ url: normalizedUrl, name: `图片 ${idx + 1}` })}
+                            className="relative aspect-square overflow-hidden rounded-lg border bg-transparent p-0 text-left transition-colors hover:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 group"
+                            aria-label={`预览图片 ${idx + 1}`}
                           >
                             <img
                               src={normalizedUrl}
@@ -364,11 +417,10 @@ const CheckinSubmit: React.FC = () => {
                               className="w-full h-full object-cover"
                               onError={handleImageError}
                             />
-                            {/* 悬停提示 */}
-                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-center justify-center" aria-hidden="true">
                               <ZoomIn className="w-5 h-5 text-white" />
-                            </div>
-                          </div>
+                            </span>
+                          </button>
                         )
                       })}
                     </div>
@@ -384,24 +436,28 @@ const CheckinSubmit: React.FC = () => {
       {previewImage && (
         <div
           className="student-submit-preview fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4"
-          onClick={() => setPreviewImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${previewImage.name}预览`}
+          onClick={closePreviewImage}
         >
-          <div className="relative max-w-[90vw] max-h-[90vh]">
+          <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(event) => event.stopPropagation()}>
             <button
-              onClick={() => setPreviewImage(null)}
+              ref={previewCloseRef}
+              type="button"
+              onClick={closePreviewImage}
               className="student-submit-preview__close absolute -top-10 right-0 p-2 text-white hover:text-gray-300 z-10"
-              title="关闭"
+              aria-label="关闭图片预览"
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" aria-hidden="true" />
             </button>
-              <div className="relative">
-                <img
-                  src={previewImage.url}
-                  alt={previewImage.name}
-                  className="max-w-full max-h-[85vh] object-contain rounded-lg"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
+            <div className="relative">
+              <img
+                src={previewImage.url}
+                alt={previewImage.name}
+                className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              />
+            </div>
             <p className="text-white text-center mt-4 text-sm">{previewImage.name}</p>
           </div>
         </div>

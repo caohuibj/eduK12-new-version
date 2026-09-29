@@ -110,14 +110,15 @@ const ClassroomQuestionEdit: React.FC = () => {
     }
 
     try {
+      setError(null)
       const response = await apiClient.delete(`/classrooms/${id}/questions/${questionId}`)
       if (response.code === 0) {
         setQuestions(questions.filter((q) => q.id !== questionId))
       } else {
-        alert(response.message)
+        setError(response.message || '删除失败')
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      setError(err.message || '删除失败')
     }
   }
 

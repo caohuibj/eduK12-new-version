@@ -91,6 +91,7 @@ const ScaleSelector: React.FC<ScaleSelectorProps> = ({
   return (
     <div className="space-y-4">
       <Transfer
+        className="staff-ant-transfer"
         dataSource={transferDataSource}
         titles={['可选量表', '已选量表']}
         targetKeys={selected}

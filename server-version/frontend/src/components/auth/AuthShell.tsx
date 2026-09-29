@@ -43,6 +43,7 @@ type AuthShellProps = {
   children: ReactNode
   backTo?: string
   backLabel?: string
+  onBack?: () => void
   heroTitle?: string
   heroDescription?: string
   heroBullets?: readonly string[]
@@ -55,6 +56,7 @@ export default function AuthShell({
   children,
   backTo = '/',
   backLabel = '返回入口',
+  onBack,
   heroTitle,
   heroDescription,
   heroBullets,
@@ -86,7 +88,13 @@ export default function AuthShell({
 
       <section className="hui-auth-stage">
         <div className="hui-auth-stage__inner">
-          <Link to={backTo} className="hui-auth-back"><ArrowLeft size={18} aria-hidden="true" />{backLabel}</Link>
+          {onBack ? (
+            <button type="button" className="hui-auth-back hui-auth-back--button" onClick={onBack}>
+              <ArrowLeft size={18} aria-hidden="true" />{backLabel}
+            </button>
+          ) : (
+            <Link to={backTo} className="hui-auth-back"><ArrowLeft size={18} aria-hidden="true" />{backLabel}</Link>
+          )}
 
           <div className="hui-auth-card">
             <header className="hui-auth-card__header">
