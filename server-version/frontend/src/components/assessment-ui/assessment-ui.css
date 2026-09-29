@@ -736,3 +736,111 @@ button.hui-public-runner-nav__item:hover:not(:disabled) {
     transition: none;
   }
 }
+
+
+/* PR9 student submission convergence. Presentation only. */
+.hui-app--student-submit .hui-student-submission {
+  display: grid;
+  gap: 18px;
+}
+.hui-app--student-submit .student-submit-back {
+  width: fit-content;
+  gap: 7px;
+}
+.hui-app--student-submit .hui-page-header {
+  margin-bottom: 0;
+}
+.hui-app--student-submit .student-submit-info,
+.hui-app--student-submit .student-submit-panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #dce7f0;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: var(--hui-ds-shadow-subtle);
+}
+.hui-app--student-submit .student-submit-info {
+  display: grid;
+  gap: 16px;
+  background: linear-gradient(135deg,#f8fbff 0%,#fff 70%,#f5fbf7 100%);
+}
+.hui-app--student-submit .student-submit-richtext {
+  color: #314a61;
+  line-height: 1.75;
+}
+.hui-app--student-submit .student-submit-deadline {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #52677c;
+  font-size: 12px;
+  font-weight: 650;
+}
+.hui-app--student-submit .student-submit-deadline--closed {
+  background: #fff5dd;
+  color: #8a5a10;
+}
+.hui-app--student-submit .student-submit-panel > h3 {
+  margin-top: 0;
+}
+.hui-app--student-submit .student-submit-question {
+  padding: 16px;
+  border: 1px solid #dfe7ef;
+  border-radius: 13px;
+  background: #fbfdff;
+}
+.hui-app--student-submit .student-submit-option {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: border-color .14s ease, background .14s ease;
+}
+.hui-app--student-submit .student-submit-option:hover {
+  border-color: #d7e3ee;
+  background: #f8fbff;
+}
+.hui-app--student-submit .student-submit-option:has(input:checked) {
+  border-color: #b9ceef;
+  background: #f0f5ff;
+}
+.hui-app--student-submit .student-submit-option input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+.hui-app--student-submit .student-submit-response {
+  padding: 16px;
+  border: 1px solid #e2eaf1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.hui-app--student-submit .student-submit-feedback {
+  padding: 16px;
+  border: 1px solid #cfe0fa;
+  border-radius: 12px;
+  background: #f2f7ff;
+}
+.hui-app--student-submit .student-submit-panel textarea.input {
+  width: 100%;
+  resize: vertical;
+}
+@media(max-width:639px) {
+  .hui-app--student-submit .student-submit-info,
+  .hui-app--student-submit .student-submit-panel {
+    padding: 16px;
+    border-radius: 15px;
+  }
+  .hui-app--student-submit .student-submit-question {
+    padding: 14px;
+  }
+}
