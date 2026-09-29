@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { ArrowLeft, Download } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 interface QRCodeData {
   classroomId: string
@@ -51,62 +52,54 @@ const ClassroomQRCode: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus kind="pending" title="正在生成课堂二维码">正在读取课堂加入信息。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (error || !data) {
     return (
-      <div className="p-6">
-        <div className="text-center text-gray-500">
-          <p>{error || '二维码不存在'}</p>
-          <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
-            返回列表
-          </Link>
-        </div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus
+          kind="error"
+          title="二维码不可用"
+          actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+        >
+          {error || '课堂二维码不存在，或当前账户无法访问。'}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <div className="mb-6">
-        <Link
-          to="/teacher/classrooms"
-          className="inline-flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回列表
-        </Link>
-      </div>
+    <ProductPage width="management" className="staff-editor-page space-y-6">
+      <PageHeader
+        title={data.name}
+        description="课堂加入二维码"
+        actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+      />
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">{data.name}</h1>
-        <p className="text-gray-500 text-center mb-6">课堂码: {data.code}</p>
-
-        <div className="flex justify-center mb-6">
-          <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
-            <QRCodeCanvas value={data.qrcodeUrl} size={256} level="H" />
-          </div>
+      <section className="staff-panel staff-panel--padded classroom-qr-panel" aria-labelledby="classroom-qr-code-heading">
+        <div className="classroom-qr-code-copy">
+          <span className="staff-badge">课堂码</span>
+          <h2 id="classroom-qr-code-heading">{data.code}</h2>
+          <p>学生可扫码加入课堂，也可以在课堂入口手动输入课堂码。</p>
         </div>
 
-        <p className="text-sm text-gray-500 text-center mb-4">
-          学生扫码即可加入课堂
-        </p>
+        <div className="classroom-qr-code" aria-label={`课堂码 ${data.code} 的二维码`}>
+          <QRCodeCanvas value={data.qrcodeUrl} size={256} level="H" />
+        </div>
 
-        <div className="flex justify-center">
-          <button
-            onClick={handleDownload}
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-          >
-            <Download className="w-4 h-4 mr-2" />
+        <div className="staff-inline-actions classroom-qr-actions">
+          <ProductButton variant="primary" onClick={handleDownload}>
+            <Download className="w-4 h-4" aria-hidden="true" />
             下载二维码
-          </button>
+          </ProductButton>
         </div>
-      </div>
-    </div>
+      </section>
+    </ProductPage>
+  )
   )
 }
 
