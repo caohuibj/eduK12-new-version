@@ -116,7 +116,12 @@ Current families:
    - Scale total + dimensions;
    - Cognitive small multiples;
    - SJT Construct × Channel matrix.
-5. Visualization states
+5. Cognitive task presentation
+   - response controls;
+   - resolved progress;
+   - hint / key cue;
+   - instruction, practice, transition and completion states.
+6. Visualization states
    - comparable longitudinal trend;
    - partially/not comparable trend;
    - privacy-suppressed state.

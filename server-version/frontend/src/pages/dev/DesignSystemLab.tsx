@@ -16,7 +16,10 @@ import {
 import { ReportTrendChart } from '../../modules/reporting/ReportTrendChart'
 import type { LongitudinalTrendModel } from '../../modules/reporting/longitudinalVisualization'
 import {
+  CognitiveHint,
   CognitivePracticeResult,
+  CognitiveProgress,
+  CognitiveResponseButton,
   CognitiveTaskCompletionNotice,
   CognitiveTaskIntro,
   CognitiveTaskTransition,
@@ -282,6 +285,20 @@ function CognitiveRunnerSpecimens() {
         <h2 id="ui-lab-cognitive-runner">认知任务展示状态</h2>
         <p>只展示非计时 presentation states。正式 stimulus geometry、计时和输入事件继续由 task-owned runtime 与 timing tests 验证。</p>
       </header>
+
+      <div className="ui-lab-cognitive-kit">
+        <div className="ui-lab-cognitive-kit__column">
+          <h3>Response controls</h3>
+          <CognitiveResponseButton keyHint="F">左侧目标</CognitiveResponseButton>
+          <CognitiveResponseButton selected keyHint="J">右侧目标 · 已选择</CognitiveResponseButton>
+          <CognitiveResponseButton disabled>当前不可作答</CognitiveResponseButton>
+        </div>
+        <div className="ui-lab-cognitive-kit__column">
+          <h3>Progress & cue</h3>
+          <CognitiveProgress current={2} total={4} label="区块进度" />
+          <CognitiveHint label="作答提示" keyHint="Space">只在目标刺激出现时作答；任务规则仍由具体 runner 决定。</CognitiveHint>
+        </div>
+      </div>
 
       <div className="ui-lab-cognitive-grid">
         <CognitiveTaskIntro

@@ -150,3 +150,125 @@
     transition: none !important;
   }
 }
+
+
+/* Cognitive Design Kit: non-timed reusable presentation primitives. */
+.cognitive-task-cue{
+  width:min(100%,42rem);
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  margin-inline:auto;
+  padding:11px 12px;
+  border:1px solid var(--runner-line,var(--hui-ds-color-line));
+  border-radius:12px;
+  background:#f8fbfd;
+  color:var(--runner-muted,var(--hui-ds-color-muted));
+  font-size:12px;
+  line-height:1.55;
+}
+.cognitive-task-cue__label{
+  color:var(--runner-ink,var(--hui-ds-color-ink));
+  font-weight:750;
+}
+.cognitive-task-cue__body{
+  min-width:0;
+}
+.cognitive-task-keyhint{
+  display:inline-grid;
+  place-items:center;
+  min-width:32px;
+  min-height:28px;
+  padding:2px 8px;
+  border:1px solid #cfdbe6;
+  border-bottom-width:2px;
+  border-radius:8px;
+  background:#fff;
+  color:var(--runner-ink,var(--hui-ds-color-ink));
+  font:700 11px/1 system-ui,sans-serif;
+  white-space:nowrap;
+}
+.cognitive-task-progress{
+  width:min(100%,42rem);
+  display:grid;
+  gap:7px;
+  margin-inline:auto;
+}
+.cognitive-task-progress__meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  color:var(--runner-muted,var(--hui-ds-color-muted));
+  font-size:12px;
+}
+.cognitive-task-progress__meta strong{
+  color:var(--runner-ink,var(--hui-ds-color-ink));
+  font-size:12px;
+}
+.cognitive-task-progress__track{
+  height:9px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#e5edf4;
+}
+.cognitive-task-progress__value{
+  display:block;
+  width:var(--cognitive-progress-value,0%);
+  height:100%;
+  border-radius:inherit;
+  background:var(--runner-action,var(--hui-ds-color-action));
+  transition:width .18s ease;
+}
+.cognitive-response-button{
+  width:100%;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:11px 14px;
+  border:1px solid #cfdae5;
+  border-radius:12px;
+  background:#fff;
+  color:var(--runner-ink,var(--hui-ds-color-ink));
+  font-family:inherit;
+  font-size:14px;
+  font-weight:650;
+  line-height:1.45;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .14s ease,background .14s ease,box-shadow .14s ease;
+}
+.cognitive-response-button:hover:not(:disabled){
+  border-color:#aac0d5;
+  background:#fbfdff;
+}
+.cognitive-response-button[data-selected="true"]{
+  border-color:#91b2e7;
+  background:#f2f7ff;
+  box-shadow:0 0 0 3px rgba(47,111,237,.08);
+}
+.cognitive-response-button:focus-visible{
+  outline:3px solid rgba(47,111,237,.24);
+  outline-offset:2px;
+}
+.cognitive-response-button:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
+@media (max-width:39.999rem){
+  .cognitive-task-cue{
+    grid-template-columns:1fr auto;
+  }
+  .cognitive-task-cue__label{
+    grid-column:1 / -1;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .cognitive-task-progress__value,
+  .cognitive-response-button{
+    transition:none!important;
+  }
+}
