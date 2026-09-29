@@ -401,7 +401,7 @@ const CheckinList: React.FC = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="staff-modal-backdrop">
-          <div className="staff-dialog" role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
+          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
@@ -409,7 +409,7 @@ const CheckinList: React.FC = () => {
               </div>
             </div>
             
-            <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog__body staff-form">
+            <div className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
                 <label className="label">选择课程 *</label>
@@ -603,23 +603,23 @@ const CheckinList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="staff-dialog__actions">
-                <ProductButton
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setEditingCheckin(null)
-                    resetForm()
-                  }}
-                >
-                  取消
-                </ProductButton>
-                <ProductButton type="submit" variant="primary">
-                  {editingCheckin ? '保存修改' : '创建打卡'}
-                </ProductButton>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowModal(false)
+                  setEditingCheckin(null)
+                  resetForm()
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingCheckin ? '保存修改' : '创建打卡'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
