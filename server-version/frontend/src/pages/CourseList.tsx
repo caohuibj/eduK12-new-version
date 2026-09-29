@@ -514,14 +514,14 @@ const CourseList: React.FC = () => {
       {/* Create/Edit Modal */}
       {(showCreateModal || editingCourse) && (
         <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
+          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="course-editor-title">{editingCourse ? '编辑课程' : '创建课程'}</h2>
                 <p className="staff-dialog__description">维护课程基本信息；课程权限与生命周期规则保持现有逻辑。</p>
               </div>
             </div>
-            <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog__body staff-form">
+            <div className="staff-dialog__body staff-form">
               {/* 课程封面 */}
               {editingCourse && (
                 <div>
@@ -622,24 +622,24 @@ const CourseList: React.FC = () => {
                   </span>
                 </label>
               )}
-              <div className="staff-dialog__actions">
-                <ProductButton
-                  type="button"
-                  onClick={() => {
-                    setShowCreateModal(false)
-                    setEditingCourse(null)
-                    setCoverFile(null)
-                    setCoverPreview('')
-                  }}
-                >
-                  取消
-                </ProductButton>
-                <ProductButton type="submit" variant="primary">
-                  {editingCourse ? '保存修改' : '创建课程'}
-                </ProductButton>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setEditingCourse(null)
+                  setCoverFile(null)
+                  setCoverPreview('')
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingCourse ? '保存修改' : '创建课程'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
