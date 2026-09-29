@@ -373,7 +373,7 @@
   max-width:100%;
   flex-wrap:wrap;
 }
-.classroom-control-tabs button{
+.staff-segmented.classroom-control-tabs button{
   display:inline-flex;
   align-items:center;
   gap:7px;
