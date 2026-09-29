@@ -126,13 +126,13 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     fireEvent.change(input, { target: { value: '已填写' } })
     fireEvent.click(getButtonByText('提交并继续'))
 
-    expect(await screen.findByText('恢复失败，暂时不能继续作答。')).toBeInTheDocument()
+    expect(await screen.findByText('恢复失败，暂时不能继续作答')).toBeInTheDocument()
     expect(getButtonByText(/重\s*试/)).toBeInTheDocument()
     expect(screen.getByText('补充说明')).toBeInTheDocument()
 
     mockClient.get.mockResolvedValueOnce(response(formData(false)))
     fireEvent.click(getButtonByText(/重\s*试/))
-    await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答。')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答')).not.toBeInTheDocument())
     expect(await findButtonByText('提交并继续')).toBeEnabled()
   })
 })
