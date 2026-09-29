@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { ArrowLeft, Plus, Trash2, Save, GripVertical } from 'lucide-react'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import { Plus, Trash2, Save } from 'lucide-react'
 
 interface Question {
   id: string
@@ -205,84 +206,72 @@ const ClassroomQuestionEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus kind="pending" title="正在加载课堂题目">正在读取课堂与题目配置。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!classroom) {
     return (
-      <div className="p-6">
-        <div className="text-center text-gray-500">
-          <p>课堂不存在</p>
-          <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
-            返回列表
-          </Link>
-        </div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus
+          kind="error"
+          title="课堂不可用"
+          actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+        >
+          {error || '课堂不存在，或当前账户无法访问。'}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (classroom.status === 'ENDED') {
     return (
-      <div className="p-6">
-        <div className="text-center text-gray-500">
-          <p>已结束的课堂不能编辑题目</p>
-          <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
-            返回列表
-          </Link>
-        </div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus
+          kind="info"
+          title="课堂已经结束"
+          actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+        >
+          已结束的课堂不能继续编辑题目。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <Link
-          to={`/teacher/classrooms/${id}/control`}
-          className="inline-flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回控制面板
-        </Link>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{classroom.name}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              课程: {classroom.course.title} | 课堂码: {classroom.code}
-            </p>
+    <ProductPage width="management" className="staff-editor-page space-y-6 classroom-question-editor">
+      <PageHeader
+        title={classroom.name}
+        description={`${classroom.course.title} · 课堂码 ${classroom.code} · 题目管理`}
+        actions={
+          <div className="staff-inline-actions">
+            <Link to={`/teacher/classrooms/${id}/control`} className="staff-secondary-link">返回控制面板</Link>
+            {!editingQuestion && (
+              <ProductButton variant="primary" onClick={handleCreateQuestion}>
+                <Plus className="w-4 h-4" aria-hidden="true" />
+                添加题目
+              </ProductButton>
+            )}
           </div>
-          {!editingQuestion && (
-            <button
-              onClick={handleCreateQuestion}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              添加题目
-            </button>
-          )}
-        </div>
+        }
+      />
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>
-        )}
-      </div>
+      {error && <ProductStatus kind="error" title="题目无法保存">{error}</ProductStatus>}
 
       {editingQuestion && (
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {editingQuestion.id ? '编辑题目' : '添加题目'}
-          </h2>
-
-          <div className="space-y-4">
-            {/* 题目类型 */}
+        <section className="staff-panel" aria-labelledby="classroom-question-form-title">
+          <div className="staff-panel__header">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">题目类型</label>
+              <h2 id="classroom-question-form-title">{editingQuestion.id === 'new' ? '添加题目' : '编辑题目'}</h2>
+              <p>设置题型、内容、选项与答题时限。</p>
+            </div>
+          </div>
+
+          <div className="staff-panel__body staff-form">
+            <label className="staff-field">
+              <span>题目类型</span>
               <select
                 value={formData.type}
                 onChange={(e) => {
@@ -293,36 +282,30 @@ const ClassroomQuestionEdit: React.FC = () => {
                     options: type !== 'fill_blank' ? formData.options : undefined,
                   })
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="single_choice">单选题</option>
                 <option value="multiple_choice">多选题</option>
                 <option value="fill_blank">填空题</option>
               </select>
-            </div>
+            </label>
 
-            {/* 题目内容 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">题目内容</label>
+            <label className="staff-field">
+              <span>题目内容</span>
               <textarea
                 value={formData.question}
                 onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 rows={3}
                 placeholder="请输入题目内容"
               />
-            </div>
+            </label>
 
-            {/* 选项（单选/多选） */}
             {formData.type !== 'fill_blank' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">选项</label>
-                <div className="space-y-2">
+              <div className="staff-field">
+                <span>选项</span>
+                <div className="classroom-question-options">
                   {formData.options?.map((option, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="w-8 text-center font-medium text-gray-700">
-                        {option.value}
-                      </span>
+                    <div key={index} className="classroom-question-option">
+                      <span className="classroom-question-option__key">{option.value}</span>
                       <input
                         type="text"
                         value={option.label}
@@ -331,138 +314,120 @@ const ClassroomQuestionEdit: React.FC = () => {
                           newOptions[index] = { ...option, label: e.target.value }
                           setFormData({ ...formData, options: newOptions })
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder={`选项 ${option.value}`}
+                        aria-label={`选项 ${option.value}`}
                       />
                       <button
+                        type="button"
                         onClick={() => handleRemoveOption(index)}
                         disabled={(formData.options?.length || 0) <= 2}
-                        className="p-2 text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="staff-icon-button classroom-question-option__remove"
+                        aria-label={`删除选项 ${option.value}`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   ))}
                 </div>
-                <button
-                  onClick={handleAddOption}
-                  className="mt-2 text-sm text-primary hover:text-primary/80"
-                >
-                  + 添加选项
-                </button>
+                <div>
+                  <ProductButton onClick={handleAddOption}>
+                    <Plus className="w-4 h-4" aria-hidden="true" />
+                    添加选项
+                  </ProductButton>
+                </div>
               </div>
             )}
 
-            {/* 答题时限 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                答题时限（秒）
-              </label>
+            <label className="staff-field">
+              <span>答题时限（秒）</span>
               <input
                 type="number"
                 value={formData.timeLimit}
                 onChange={(e) => setFormData({ ...formData, timeLimit: parseInt(e.target.value) || 60 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 min={10}
                 max={600}
               />
-            </div>
-
-            {/* 操作按钮 */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleSaveQuestion}
-                disabled={saving}
-                className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {saving ? '保存中...' : '保存'}
-              </button>
-            </div>
+              <span className="staff-field__hint">可设置 10–600 秒。</span>
+            </label>
           </div>
-        </div>
+
+          <div className="staff-dialog__actions">
+            <ProductButton onClick={handleCancelEdit}>取消</ProductButton>
+            <ProductButton variant="primary" onClick={handleSaveQuestion} disabled={saving}>
+              <Save className="w-4 h-4" aria-hidden="true" />
+              {saving ? '保存中...' : '保存'}
+            </ProductButton>
+          </div>
+        </section>
       )}
 
-      {/* 题目列表 */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">题目列表</h2>
+      <section className="staff-panel" aria-labelledby="classroom-question-list-title">
+        <div className="staff-panel__header">
+          <div>
+            <h2 id="classroom-question-list-title">题目列表</h2>
+            <p>共 {questions.length} 道题；已经开始作答的题目保持只读。</p>
+          </div>
+          {!editingQuestion && questions.length > 0 && (
+            <ProductButton onClick={handleCreateQuestion}>
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              添加题目
+            </ProductButton>
+          )}
         </div>
 
-        {questions.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            <p>暂无题目，点击上方"添加题目"按钮创建</p>
-          </div>
-        ) : (
-          <div className="divide-y">
-            {questions.map((question, index) => (
-              <div
-                key={question.id}
-                className="p-4 hover:bg-gray-50 flex items-start justify-between"
-              >
-                <div className="flex items-start gap-3 flex-1">
-                  <GripVertical className="w-5 h-5 text-gray-400 mt-1 cursor-move" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-900">第 {index + 1} 题</span>
-                      <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
+        <div className="staff-panel__body">
+          {questions.length === 0 ? (
+            <ProductStatus
+              kind="info"
+              title="暂无题目"
+              actions={<ProductButton variant="primary" onClick={handleCreateQuestion}>添加第一道题</ProductButton>}
+            >
+              添加题目后即可在课堂控制面板中按顺序发起互动。
+            </ProductStatus>
+          ) : (
+            <div className="classroom-question-list">
+              {questions.map((question, index) => (
+                <article key={question.id} className="classroom-question-card">
+                  <div className="classroom-question-card__main">
+                    <div className="classroom-question-card__heading">
+                      <strong>第 {index + 1} 题</strong>
+                      <span className="staff-badge">
                         {question.questionContent.type === 'single_choice'
                           ? '单选题'
                           : question.questionContent.type === 'multiple_choice'
                           ? '多选题'
                           : '填空题'}
                       </span>
-                      {question.timeLimit && (
-                        <span className="text-xs text-gray-500">{question.timeLimit}秒</span>
-                      )}
+                      {question.timeLimit && <span className="staff-muted">{question.timeLimit} 秒</span>}
                     </div>
-                    <p className="text-gray-700 mb-2">{question.questionContent.question}</p>
+                    <p>{question.questionContent.question}</p>
                     {question.questionContent.options && (
-                      <div className="space-y-1 text-sm text-gray-600">
+                      <div className="classroom-question-card__options">
                         {question.questionContent.options.map((opt: any, i: number) => (
-                          <div key={i}>
-                            {opt.value}. {opt.label}
-                          </div>
+                          <span key={i}>{opt.value}. {opt.label}</span>
                         ))}
                       </div>
                     )}
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {!question.startedAt && (
-                    <>
-                      <button
-                        onClick={() => handleEditQuestion(question)}
-                        className="px-3 py-1 text-sm text-primary hover:text-primary/80"
-                      >
-                        编辑
-                      </button>
-                      <button
-                        onClick={() => handleDeleteQuestion(question.id)}
-                        className="px-3 py-1 text-sm text-red-600 hover:text-red-800"
-                      >
-                        删除
-                      </button>
-                    </>
-                  )}
-                  {question.startedAt && (
-                    <span className="text-xs text-gray-500">
-                      {question._count?.answers || 0} 人已答
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+
+                  <div className="staff-row-actions">
+                    {!question.startedAt ? (
+                      <>
+                        <ProductButton onClick={() => handleEditQuestion(question)}>编辑</ProductButton>
+                        <ProductButton danger onClick={() => handleDeleteQuestion(question.id)}>删除</ProductButton>
+                      </>
+                    ) : (
+                      <span className="staff-badge staff-badge--success">{question._count?.answers || 0} 人已答</span>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </ProductPage>
+  )
   )
 }
 
