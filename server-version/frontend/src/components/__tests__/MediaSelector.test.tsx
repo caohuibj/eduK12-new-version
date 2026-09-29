@@ -59,7 +59,8 @@ describe('MediaSelector', () => {
 
   it('opens the picker exactly once for Enter and Space on reselect without clearing the selected file', async () => {
     const user = userEvent.setup()
-    const { container } = render(<MediaSelector isOpen onClose={vi.fn()} onSelect={vi.fn()} type="video" />)
+    const onClose = vi.fn()
+    const { container } = render(<MediaSelector isOpen onClose={onClose} onSelect={vi.fn()} type="video" />)
     await user.click(screen.getByRole('button', { name: '上传' }))
     const input = container.querySelector<HTMLInputElement>('input[type=file]')!
     fireEvent.change(input, { target: { files: [new File(['clip'], 'long-video.mp4', { type: 'video/mp4' })] } })
@@ -71,6 +72,8 @@ describe('MediaSelector', () => {
     expect(click).toHaveBeenCalledTimes(1)
     await user.keyboard(' ')
     expect(click).toHaveBeenCalledTimes(2)
+    fireEvent(input, new Event('cancel', { bubbles: true }))
+    expect(onClose).not.toHaveBeenCalled()
     expect(screen.getByText('long-video.mp4')).toBeInTheDocument()
   })
 

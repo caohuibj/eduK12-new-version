@@ -175,6 +175,7 @@ async function main() {
           const chooser = page.waitForEvent('filechooser')
           await page.keyboard.press(key)
           await (await chooser).setFiles([])
+          assert.equal(await dialog.isVisible(), true, 'canceling the file picker keeps the media dialog open')
         }
         assert.equal(await reselect.evaluate(el => el.matches(':focus-visible')), true)
         await capture(page, 'media-selected-long-file', width)

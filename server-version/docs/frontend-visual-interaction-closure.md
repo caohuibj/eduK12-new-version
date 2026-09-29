@@ -34,6 +34,7 @@ No task TypeScript, stimulus assets, duration, response mapping, feedback timing
 - A pre-existing `primary-hover` class had no token. The migrated `action-hover` alias is defined.
 - The classroom join control's class-based selector was migrated with its action utility so its existing prominent target size remains intact.
 - MEDIA-7 still located the result heading through a removed legacy card wrapper. The browser assertion now targets the report's level-one heading, preserving the video, FINAL and provenance checks.
+- Canceling the native file picker could bubble a `cancel` event into the new modal. A failing regression test confirmed the unintended close; the shared surface now handles only its own cancel event. Picker cancellation is also asserted in real Chromium.
 
 ## Validation and visual review
 

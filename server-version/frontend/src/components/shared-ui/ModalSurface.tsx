@@ -36,7 +36,13 @@ export default function ModalSurface({ open, onClose, children, className, initi
     ref={surfaceRef}
     role="presentation"
     className={`hui-modal-surface ${className}`}
-    onCancel={event => { event.preventDefault(); event.stopPropagation(); closeRef.current() }}
+    onCancel={event => {
+      // A file input also emits a bubbling cancel event when its picker closes.
+      if (event.target !== event.currentTarget) return
+      event.preventDefault()
+      event.stopPropagation()
+      closeRef.current()
+    }}
     onMouseDown={event => {
       if (dismissOnBackdrop && event.target === event.currentTarget) closeRef.current()
     }}
