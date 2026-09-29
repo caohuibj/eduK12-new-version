@@ -374,3 +374,135 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Public participation surfaces using native Huisurvey Product / Report UI. */
+.hui-public-participation,
+.hui-public-questionnaire-report {
+  min-width: 0;
+}
+.hui-public-participation--centered {
+  min-height: min(72dvh, 46rem);
+  display: grid;
+  align-content: center;
+}
+.hui-public-participation .hui-page-header,
+.hui-public-questionnaire-report .hui-page-header {
+  margin-bottom: 20px;
+}
+.hui-public-participation__instruction {
+  margin-bottom: 16px;
+  padding: clamp(18px, 3vw, 24px);
+  border: 1px solid var(--public-line);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f3f8ff, #fbfdff);
+}
+.hui-public-participation__instruction h2 {
+  margin: 0;
+  color: var(--public-ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+.hui-public-participation__instruction p:last-child {
+  margin: 8px 0 0;
+  color: #40586e;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+.hui-public-participation__eyebrow {
+  margin: 0 0 5px;
+  color: var(--public-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.hui-public-participation__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.hui-public-participation__facts > div {
+  padding: 14px 16px;
+  border: 1px solid var(--public-line);
+  border-radius: 13px;
+  background: #fff;
+}
+.hui-public-participation__facts span,
+.hui-public-participation__facts strong {
+  display: block;
+}
+.hui-public-participation__facts span {
+  color: var(--public-muted);
+  font-size: 11px;
+}
+.hui-public-participation__facts strong {
+  margin-top: 4px;
+  color: var(--public-ink);
+  font-size: 15px;
+}
+.hui-public-participation__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.hui-public-participation__actions .hui-button {
+  min-width: 9rem;
+}
+.hui-public-participation__inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hui-public-participation__status-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.hui-public-questionnaire-report .report-core {
+  margin-bottom: 20px;
+}
+.hui-public-questionnaire-report__background {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+}
+.hui-public-questionnaire-report__background > div {
+  min-width: 0;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--public-line);
+}
+.hui-public-questionnaire-report__background dt {
+  color: var(--public-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+.hui-public-questionnaire-report__background dd {
+  margin: 3px 0 0;
+  color: var(--public-ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 39.999rem) {
+  .hui-public-participation--centered {
+    min-height: calc(100dvh - 110px);
+  }
+  .hui-public-participation__facts,
+  .hui-public-questionnaire-report__background {
+    grid-template-columns: 1fr;
+  }
+  .hui-public-participation__actions,
+  .hui-public-participation__inline-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .hui-public-participation__actions .hui-button,
+  .hui-public-participation__inline-actions .hui-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
