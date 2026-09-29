@@ -90,7 +90,7 @@ const ClassroomCreate: React.FC = () => {
       />
       {feedback}
 
-      <form onSubmit={handleSubmit} className="staff-panel staff-panel--padded staff-form" noValidate>
+      <form onSubmit={handleSubmit} className="staff-panel staff-panel--padded staff-form">
         <label className="staff-field">
           <span>课堂名称 <span aria-hidden="true">*</span></span>
           <input
@@ -119,7 +119,7 @@ const ClassroomCreate: React.FC = () => {
               </option>
             ))}
           </select>
-          {errors.courseId && <span id="classroom-course-error" className="staff-field__error">{errors.courseId}</span>}
+          {errors.courseId && <span id="classroom-course-error" className="text-sm text-red-600">{errors.courseId}</span>}
           <span id="classroom-course-hint" className="staff-field__hint">学生必须加入该课程才能参与课堂互动。</span>
         </label>
 
