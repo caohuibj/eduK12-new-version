@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
-import { ArrowLeft, Save } from 'lucide-react'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import { Save } from 'lucide-react'
 
 interface Classroom {
   id: string
@@ -73,114 +74,82 @@ const ClassroomEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus kind="pending" title="正在加载课堂">正在读取课堂信息。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!classroom) {
     return (
-      <div className="p-6">
-        <div className="text-center text-gray-500">
-          <p>课堂不存在</p>
-          <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
-            返回列表
-          </Link>
-        </div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus
+          kind="error"
+          title="课堂不可用"
+          actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+        >
+          {error || '课堂不存在，或当前账户无法访问。'}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (classroom.status !== 'PREPARING') {
     return (
-      <div className="p-6">
-        <div className="text-center text-gray-500">
-          <p>只能编辑准备中的课堂</p>
-          <Link to="/teacher/classrooms" className="text-primary hover:underline mt-2 inline-block">
-            返回列表
-          </Link>
-        </div>
-      </div>
+      <ProductPage width="management">
+        <ProductStatus
+          kind="info"
+          title="当前课堂不可编辑"
+          actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+        >
+          只有准备中的课堂可以修改基本信息。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="mb-6">
-        <Link
-          to="/teacher/classrooms"
-          className="inline-flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回列表
-        </Link>
-      </div>
+    <ProductPage width="management" className="staff-editor-page space-y-6">
+      <PageHeader
+        title="编辑课堂"
+        description={`${classroom.course.title} · 课堂码 ${classroom.code}`}
+        actions={<Link to="/teacher/classrooms" className="staff-secondary-link">返回课堂列表</Link>}
+      />
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">编辑课堂</h1>
+      {error && <ProductStatus kind="error" title="无法保存">{error}</ProductStatus>}
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">{error}</div>
-        )}
+      <form onSubmit={handleSubmit} className="staff-panel staff-panel--padded staff-form">
+        <label className="staff-field">
+          <span>课堂名称</span>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="请输入课堂名称"
+          />
+        </label>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              课堂名称
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="请输入课堂名称"
-            />
-          </div>
+        <label className="staff-field">
+          <span>课堂码</span>
+          <input type="text" value={classroom.code} disabled />
+          <span className="staff-field__hint">课堂码由系统管理，此处仅用于核对。</span>
+        </label>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              课堂码
-            </label>
-            <input
-              type="text"
-              value={classroom.code}
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
-            />
-          </div>
+        <label className="staff-field">
+          <span>所属课程</span>
+          <input type="text" value={classroom.course.title} disabled />
+        </label>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              所属课程
-            </label>
-            <input
-              type="text"
-              value={classroom.course.title}
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <Link
-              to="/teacher/classrooms"
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-            >
-              取消
-            </Link>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {saving ? '保存中...' : '保存'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="staff-action-footer">
+          <Link to="/teacher/classrooms" className="staff-secondary-link">取消</Link>
+          <ProductButton type="submit" variant="primary" disabled={saving}>
+            <Save className="w-4 h-4" aria-hidden="true" />
+            {saving ? '保存中...' : '保存'}
+          </ProductButton>
+        </div>
+      </form>
+    </ProductPage>
+  )
   )
 }
 
