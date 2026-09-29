@@ -234,10 +234,11 @@ function CanonicalScenarios() {
           <p className="ui-lab-kicker">Scale</p>
           <h3>Total + dimensions</h3>
           <div className="ui-lab-scenario__metric"><strong>72</strong><span>总体自我调节 / 100</span></div>
-          <div className="ui-lab-mini-bars" aria-label="量表维度示意">
-            <div><span>学习计划</span><progress max="25" value="18">18 / 25</progress><b>18 / 25</b></div>
-            <div><span>坚持性</span><progress max="20" value="14">14 / 20</progress><b>14 / 20</b></div>
+          <div className="ui-lab-dimension-list" aria-label="量表维度示意">
+            <div><span><strong>学习计划</strong><small>原始范围 0–25</small></span><b>18 / 25</b></div>
+            <div><span><strong>坚持性</strong><small>原始范围 0–20</small></span><b>14 / 20</b></div>
           </div>
+          <p className="ui-lab-note">不同维度保留各自 raw range；不使用填充长度暗示跨维度高低。</p>
         </article>
 
         <article className="ui-lab-scenario">

@@ -249,26 +249,39 @@
   color: var(--hui-ds-color-muted);
   font-size: 12px;
 }
-.ui-lab-mini-bars {
+.ui-lab-dimension-list {
   display: grid;
-  gap: 10px;
-}
-.ui-lab-mini-bars > div {
-  display: grid;
-  grid-template-columns: 72px 1fr auto;
-  align-items: center;
   gap: 8px;
-  color: var(--hui-ds-color-muted);
-  font-size: 11px;
 }
-.ui-lab-mini-bars progress {
-  width: 100%;
-  height: 7px;
-  accent-color: var(--hui-ds-color-action);
+.ui-lab-dimension-list > div {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid var(--hui-ds-color-line);
+  border-radius: var(--hui-ds-radius-md);
+  background: var(--hui-ds-color-surface);
 }
-.ui-lab-mini-bars b {
+.ui-lab-dimension-list span,
+.ui-lab-dimension-list strong,
+.ui-lab-dimension-list small {
+  display: block;
+}
+.ui-lab-dimension-list strong {
   color: var(--hui-ds-color-ink);
   font-size: 11px;
+}
+.ui-lab-dimension-list small {
+  margin-top: 2px;
+  color: var(--hui-ds-color-muted);
+  font-size: 9px;
+}
+.ui-lab-dimension-list b {
+  flex: 0 0 auto;
+  color: var(--hui-ds-color-ink);
+  font-size: 12px;
 }
 .ui-lab-kpi-grid {
   display: grid;
@@ -358,9 +371,6 @@
   .ui-lab-type > div {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-  .ui-lab-mini-bars > div {
-    grid-template-columns: 64px minmax(0, 1fr) auto;
   }
   .ui-lab-matrix {
     overflow-x: auto;
