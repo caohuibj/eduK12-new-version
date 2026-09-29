@@ -67,7 +67,7 @@ describe('Go/No-Go and CPT runners', () => {
         await act(async () => { vi.advanceTimersByTime(20 + 600) })
       }
 
-      expect(screen.getByText(/练习正确 4 \/ 4/)).toBeTruthy()
+      expect(screen.getByLabelText('练习结果')).toHaveTextContent('练习正确 4 / 4')
       fireEvent.click(screen.getByText('开始正式测验'))
       expect(screen.getByText('准备开始持续注意测验')).toBeTruthy()
       expect(screen.getByText(/区块 1 \/ 2/)).toBeTruthy()
