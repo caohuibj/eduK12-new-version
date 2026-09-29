@@ -351,7 +351,7 @@ const ClassroomQuestionEdit: React.FC = () => {
             </label>
           </div>
 
-          <div className="staff-dialog__actions">
+          <div className="classroom-question-editor__actions">
             <ProductButton onClick={handleCancelEdit}>取消</ProductButton>
             <ProductButton variant="primary" onClick={handleSaveQuestion} disabled={saving}>
               <Save className="w-4 h-4" aria-hidden="true" />
@@ -414,7 +414,7 @@ const ClassroomQuestionEdit: React.FC = () => {
                     {!question.startedAt ? (
                       <>
                         <ProductButton onClick={() => handleEditQuestion(question)}>编辑</ProductButton>
-                        <ProductButton danger onClick={() => handleDeleteQuestion(question.id)}>删除</ProductButton>
+                        <ProductButton variant="danger" onClick={() => handleDeleteQuestion(question.id)}>删除</ProductButton>
                       </>
                     ) : (
                       <span className="staff-badge staff-badge--success">{question._count?.answers || 0} 人已答</span>
