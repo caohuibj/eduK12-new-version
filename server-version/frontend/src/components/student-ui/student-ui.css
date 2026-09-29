@@ -537,3 +537,20 @@
     justify-content: center;
   }
 }
+.hui-student-next-step {
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:22px;
+  border:1px solid var(--hui-ds-color-line);
+  border-left:4px solid var(--hui-ds-color-action);
+  border-radius:12px;
+  background:#fff;
+}
+.hui-student-next-step > a { flex-shrink:0; text-decoration:none; }
+.hui-student-home > nav { margin-bottom:24px; }
+@media(max-width:639px) {
+  .hui-student-next-step { align-items:stretch; flex-direction:column; padding:18px; gap:14px; }
+}

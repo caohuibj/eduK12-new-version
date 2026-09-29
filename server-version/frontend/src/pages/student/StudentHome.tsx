@@ -74,31 +74,46 @@ const StudentHome: React.FC = () => {
     ? (location.state as { notice: string }).notice
     : null
 
+  const learningActions = (
+    <nav aria-label="学习入口" className="flex flex-wrap gap-2">
+      {cognitiveModuleEnabled ? (
+        <Link to="/student/cognitive" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+          <Brain className="h-5 w-5" aria-hidden="true" />认知测评
+        </Link>
+      ) : null}
+      <Link to="/student/classroom/enter" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+        <Keyboard className="h-5 w-5" aria-hidden="true" />加入课堂
+      </Link>
+      <ProductButton variant={!loading && !loadError && courses.length === 0 ? 'primary' : 'secondary'} onClick={openJoinModal}>
+        <Plus className="mr-1 inline h-5 w-5" aria-hidden="true" />加入课程
+      </ProductButton>
+    </nav>
+  )
+
   return (
     <ProductPage width="management" className="hui-student-page hui-student-home">
       <PageHeader
-        title="我的课程"
-        description={`欢迎回来，${user?.nickname || user?.username || '同学'}。从课程进入作业、打卡、问卷和综合测评。`}
-        actions={(
-          <div className="flex flex-wrap gap-2">
-            {cognitiveModuleEnabled ? (
-              <Link to="/student/cognitive" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
-                <Brain className="h-5 w-5" aria-hidden="true" />认知测评
-              </Link>
-            ) : null}
-            <Link to="/student/classroom/enter" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
-              <Keyboard className="h-5 w-5" aria-hidden="true" />加入课堂
-            </Link>
-            <ProductButton variant="primary" onClick={openJoinModal}>
-              <Plus className="mr-1 inline h-5 w-5" aria-hidden="true" />加入课程
-            </ProductButton>
-          </div>
-        )}
+        title={`欢迎回来，${user?.nickname || user?.username || '同学'}`}
+        description="从课程查看学习任务；上课时也可以使用课堂码加入课堂。"
       />
 
       {routeNotice ? (
         <ProductStatus kind="info" title="课堂提示" announce="polite">{routeNotice}</ProductStatus>
       ) : null}
+
+      {!loading && !loadError && courses.length > 0 && (
+          <section className="hui-student-next-step" aria-labelledby="student-next-step-title">
+            <div>
+              <p className="text-sm font-medium text-slate-600">下一步</p>
+              <h2 id="student-next-step-title" className="mt-1 text-xl font-semibold text-slate-900">进入课程查看任务</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">作业、打卡、问卷和综合测评都在课程中查看。请按老师的安排选择课程。</p>
+            </div>
+            {courses.length === 1
+              ? <Link className="hui-button hui-button--primary no-underline" to={`/student/courses/${courses[0].id}`}>进入课程</Link>
+              : <a className="hui-button hui-button--primary" href="#student-courses">选择课程</a>}
+          </section>
+      )}
+      {learningActions}
 
       {loading ? (
         <ProductStatus kind="pending" title="正在加载课程" announce="polite" />
@@ -109,7 +124,13 @@ const StudentHome: React.FC = () => {
           输入老师提供的课程号即可加入。
         </ProductStatus>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="space-y-6">
+          <section id="student-courses" className="scroll-mt-24" aria-labelledby="student-courses-title">
+            <div className="mb-4 flex items-baseline gap-3">
+              <h2 id="student-courses-title" className="text-xl font-semibold text-slate-900">我的课程</h2>
+              <span className="text-sm text-slate-600">{courses.length} 门课程</span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {courses.map((course) => (
             <DiscoveryCard
               key={course.id}
@@ -126,6 +147,8 @@ const StudentHome: React.FC = () => {
               )}
             />
           ))}
+            </div>
+          </section>
         </div>
       )}
 

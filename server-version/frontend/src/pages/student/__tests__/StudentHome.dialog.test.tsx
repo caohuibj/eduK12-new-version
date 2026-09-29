@@ -33,6 +33,13 @@ vi.mock('../../../contexts/CapabilitiesContext', () => ({
 import StudentHome from '../StudentHome'
 
 describe('StudentHome join-course dialog', () => {
+  it('offers the existing course as the next step without requesting task aggregation', async () => {
+    render(<MemoryRouter><StudentHome /></MemoryRouter>)
+    expect(await screen.findByRole('link', { name: '进入课程' })).toHaveAttribute('href', '/student/courses/course-1')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('欢迎回来，学生一')
+    expect(screen.getByRole('heading', { name: '我的课程', level: 2 })).toBeInTheDocument()
+    expect(mockGet.mock.calls).toEqual([['/courses/my']])
+  })
   it('shows a retry rather than an empty course list after a failed load', async () => {
     mockGet.mockRejectedValueOnce(new Error('Offline')).mockResolvedValueOnce({ code: 0, data: { list: [] } })
     const user = userEvent.setup()
