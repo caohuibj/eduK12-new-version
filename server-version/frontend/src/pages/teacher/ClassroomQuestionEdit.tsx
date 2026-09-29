@@ -428,7 +428,6 @@ const ClassroomQuestionEdit: React.FC = () => {
       </section>
     </ProductPage>
   )
-  )
 }
 
 export default ClassroomQuestionEdit
