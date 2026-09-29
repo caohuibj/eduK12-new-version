@@ -20,7 +20,7 @@ const Footer: React.FC<FooterProps> = ({ variant = 'light' }) => {
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noopener noreferrer"
-          className={`hover:underline transition-colors ${
+          className={`inline-flex min-h-11 items-center px-2 hover:underline transition-colors ${
             isDark ? 'hover:text-gray-300' : 'hover:text-primary'
           }`}
         >
