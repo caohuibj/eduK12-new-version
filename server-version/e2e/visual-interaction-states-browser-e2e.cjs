@@ -8,6 +8,7 @@ const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', 'interaction-states')
 const widths = [360, 390, 768, 1440]
 const longTitle = '面向学生与教师的学习反思及成长观察量表 · Long English Instrument Title for Responsive Reading'
+const selectedFile = { name: '非常长的文件名-LongFilenameWithoutSpacesToStressWrapping'.repeat(3) + '.mp4', mimeType: 'video/mp4', buffer: Buffer.from('visual fixture') }
 const entry = {
   identity: { instrumentKey: 'visual', instrumentVersion: '1.0.0', canonicalName: longTitle, abbreviation: 'VISUAL' },
   construct: { primaryDomain: 'SELF_REGULATION', constructDefinition: '了解学习计划、坚持与自我监控的日常表现。'.repeat(4), constructLevel: 'SPECIFIC_CONSTRUCT' },
@@ -168,20 +169,36 @@ async function main() {
         await dialog.getByRole('button', { name: '选择文件', exact: true }).focus()
         const chooserPromise = page.waitForEvent('filechooser')
         await page.keyboard.press('Space')
-        await (await chooserPromise).setFiles({ name: '非常长的文件名-LongFilenameWithoutSpacesToStressWrapping'.repeat(3) + '.mp4', mimeType: 'video/mp4', buffer: Buffer.from('visual fixture') })
+        await (await chooserPromise).setFiles(selectedFile)
         const reselect = dialog.getByRole('button', { name: '重新选择' })
-        for (const key of ['Enter', 'Space']) {
-          await reselect.focus()
-          const chooser = page.waitForEvent('filechooser')
-          await page.keyboard.press(key)
-          await (await chooser).setFiles([])
-          assert.equal(await dialog.isVisible(), true, 'canceling the file picker keeps the media dialog open')
-        }
+        await reselect.focus()
         assert.equal(await reselect.evaluate(el => el.matches(':focus-visible')), true)
         await capture(page, 'media-selected-long-file', width)
         await dialog.getByRole('button', { name: '取消', exact: true }).click()
         assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
       })
+      // Exercise each native picker activation in an independent browser context.
+      // Chained intercepted system pickers can retain asynchronous close/focus state.
+      for (const key of ['Enter', 'Space']) {
+        await scenario(width, 'TEACHER', async page => {
+          await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
+          await page.goto(base + '/assignments')
+          await page.getByRole('button', { name: '布置作业', exact: true }).click()
+          const trigger = page.getByRole('button', { name: '添加视频', exact: true })
+          await trigger.click()
+          const dialog = page.getByRole('dialog', { name: '选择视频' })
+          await dialog.getByRole('button', { name: '上传', exact: true }).click()
+          await dialog.locator('input[type=file]').setInputFiles(selectedFile)
+          const reselect = dialog.getByRole('button', { name: '重新选择' })
+          const chooser = page.waitForEvent('filechooser')
+          await reselect.press(key)
+          await (await chooser).setFiles([])
+          assert.equal(await dialog.isVisible(), true, `${key}: cancel keeps the media dialog open`)
+          assert.equal(await dialog.getByText(selectedFile.name, { exact: true }).isVisible(), true, `${key}: cancel retains the selected file`)
+          await dialog.getByRole('button', { name: '取消', exact: true }).click()
+          assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
+        })
+      }
       results.push({ width, passed: true })
       console.log(`Interaction and state QA passed at ${width}px`)
     }
