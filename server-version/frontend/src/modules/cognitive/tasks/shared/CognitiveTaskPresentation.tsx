@@ -58,6 +58,7 @@ export function CognitivePracticeResult({
   onRetry,
   continueLabel = '开始正式测验',
   retryLabel = '重新练习',
+  detail,
 }: {
   correct: number
   total: number
@@ -66,12 +67,14 @@ export function CognitivePracticeResult({
   onRetry: () => void
   continueLabel?: string
   retryLabel?: string
+  detail?: ReactNode
 }) {
   return (
     <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result">
       <p className="cognitive-task-eyebrow">Practice result</p>
       <h2 className="cognitive-task-title">练习完成</h2>
       <p className="cognitive-task-result-score">练习正确 <strong>{correct}</strong> / {total}</p>
+      {detail ? <div className="cognitive-task-result-detail">{detail}</div> : null}
       <p className="cognitive-task-result-note">
         {passed ? '已达到开始正式测验的练习要求。' : '尚未达到练习要求，可以重新练习后再开始正式测验。'}
       </p>

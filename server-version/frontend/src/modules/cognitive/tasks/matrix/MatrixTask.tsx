@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { matrixSequence, type MatrixItemSpec } from '../shared/prng'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 const PRACTICE = matrixSequence('matrix-practice-v1', 6).slice(0, 4)
@@ -84,7 +89,28 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     else setPracticeIndex((value) => value + 1)
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">矩阵规则推理</h2><p className="mb-2 text-gray-600">观察前两行的变化规律，选择最适合填入第三行问号的图形。</p><p className="mb-2 text-xs text-gray-400">本任务依赖视觉规则归纳；正式题目不会提示设计难度。</p><p className="mb-6 text-xs text-gray-400">内部生成题目；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-  if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-2">练习正确 {practiceCorrect} / 4</p><p className="mb-4 text-sm text-gray-500">上一题：{feedback}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
+  if (phase === 'instruction') {
+    return (
+      <CognitiveTaskIntro
+        title="矩阵规则推理"
+        description="观察前两行的变化规律，选择最适合填入第三行问号的图形。"
+        hint={<>本任务依赖视觉规则归纳；正式题目不会提示设计难度。内部生成题目；练习至少答对 3 / 4。</>}
+        onAction={startPractice}
+      />
+    )
+  }
+  if (phase === 'practice-result') {
+    const passed = practiceCorrect >= 3
+    return (
+      <CognitivePracticeResult
+        correct={practiceCorrect}
+        total={4}
+        passed={passed}
+        onContinue={startFormal}
+        onRetry={startPractice}
+        detail={<>上一题：{feedback}</>}
+      />
+    )
+  }
   return <div className="p-6 text-center"><p className="mb-4 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / 4${feedback ? ` · 上一题：${feedback}` : ''}` : `正式题目 ${trialIndex + 1} / ${itemCount}`}</p><ItemView item={item} disabled={submittingRef.current} choose={(option) => phase === 'practice' ? choosePractice(option) : void submitFormal(option)} /></div>
 }

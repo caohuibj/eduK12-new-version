@@ -4,6 +4,11 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import { cardsortCorrectResponse, cardsortSequence, type CardsortTrialSpec } from '../shared/prng'
 import { PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'block-gate' | 'formal'
 
@@ -130,9 +135,39 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     respond(response)
   }
 
-  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">规则卡片分类</h2><p className="mb-2 text-gray-600">按屏幕提示的“颜色”或“形状”规则，把中间卡片分到左侧或右侧目标卡。</p><p className="mb-2 text-sm text-gray-500">左侧目标：红色圆形；右侧目标：蓝色星形。键盘可用 ← / →。</p><p className="mb-6 text-xs text-gray-400">颜色同时用文字标注。练习不计入成绩，至少答对 3 题才能开始。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
-  if (phase === 'practice-result') { const passed = practiceCorrect >= PRACTICE_PASS_CORRECT; return <div className="p-8 text-center"><p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
-  if (phase === 'block-gate') { const blockIndex = sequence[trialIndex]?.blockIndex ?? 0; return <div className="p-8 text-center"><h3 className="mb-3 text-lg font-semibold">区块完成，可以短暂休息</h3><p className="mb-5 text-sm text-gray-500">准备好后继续下一组规则分类。</p><button className="btn-primary" onClick={() => { releasedBlockRef.current = blockIndex; setPhase('formal') }}>继续</button></div> }
+  if (phase === 'instruction') {
+    return (
+      <CognitiveTaskIntro
+        title="规则卡片分类"
+        description="按屏幕提示的“颜色”或“形状”规则，把中间卡片分到左侧或右侧目标卡。"
+        hint="左侧目标：红色圆形；右侧目标：蓝色星形。键盘可用 ← / →。颜色同时用文字标注。练习不计入成绩，至少答对 3 题才能开始。"
+        onAction={startPractice}
+      />
+    )
+  }
+  if (phase === 'practice-result') {
+    const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
+    return (
+      <CognitivePracticeResult
+        correct={practiceCorrect}
+        total={PRACTICE_TRIAL_COUNT}
+        passed={passed}
+        onContinue={startFormal}
+        onRetry={startPractice}
+      />
+    )
+  }
+  if (phase === 'block-gate') {
+    const blockIndex = sequence[trialIndex]?.blockIndex ?? 0
+    return (
+      <CognitiveTaskTransition
+        title="区块完成，可以短暂休息"
+        description="准备好后继续下一组规则分类。"
+        actionLabel="继续"
+        onAction={() => { releasedBlockRef.current = blockIndex; setPhase('formal') }}
+      />
+    )
+  }
 
   const current = phase === 'practice' ? PRACTICE[practiceIndex] : sequence[trialIndex]
   const content = <div className="p-6 text-center"><p className="mb-2 text-sm text-gray-500">{phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE_TRIAL_COUNT}` : `试次 ${trialIndex + 1} / ${total}`}</p>{phase === 'practice' && practiceFeedback && <p className="mb-2 text-sm">上一题：{practiceFeedback}</p>}<p className="mb-4 text-xl font-semibold text-primary">按{current?.ruleCue === 'color' ? '颜色' : '形状'}分类</p><div className="flex items-end justify-center gap-2 sm:gap-8"><button aria-label="分到左侧红色圆形" className="rounded border-2 border-transparent hover:border-primary" onPointerDown={(event) => onPointerResponse(event, 'left')} onClick={(event) => { if (event.detail === 0) respond('left') }}><Card color="red" shape="circle" compact /></button><div className={phase === 'formal' && !visible ? 'invisible' : ''}>{current && <Card color={current.stimulusColor} shape={current.stimulusShape} />}</div><button aria-label="分到右侧蓝色星形" className="rounded border-2 border-transparent hover:border-primary" onPointerDown={(event) => onPointerResponse(event, 'right')} onClick={(event) => { if (event.detail === 0) respond('right') }}><Card color="blue" shape="star" compact /></button></div></div>
