@@ -101,7 +101,7 @@ const ClassroomCreate: React.FC = () => {
             aria-invalid={Boolean(errors.name)}
             aria-describedby={errors.name ? 'classroom-name-error' : undefined}
           />
-          {errors.name && <span id="classroom-name-error" className="staff-field__error">{errors.name}</span>}
+          {errors.name && <span id="classroom-name-error" className="text-sm text-red-600">{errors.name}</span>}
         </label>
 
         <label className="staff-field">
