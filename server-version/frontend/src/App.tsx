@@ -100,6 +100,9 @@ const PublicCognitiveAssignment = React.lazy(() => import('./modules/cognitive/p
 // BigScreen Pages
 const BigScreen = React.lazy(() => import('./pages/bigscreen/BigScreen'))
 
+const uiLabEnabled = import.meta.env.VITE_UI_LAB_ENABLED === 'true'
+const DesignSystemLab = uiLabEnabled ? React.lazy(() => import('./pages/dev/DesignSystemLab')) : null
+
 class RouteErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean; message: string }
@@ -800,6 +803,10 @@ function AppRoutes() {
             path="/bigscreen/:classroomId"
             element={<BigScreen />}
           />
+
+          {uiLabEnabled && (
+            <Route path="/__ui-lab" element={DesignSystemLab ? <DesignSystemLab /> : null} />
+          )}
 
           {/* Default Redirect */}
           <Route path="*" element={<ProductPage><ProductStatus kind="warning" title="找不到此页面" actions={<Link to="/">返回入口</Link>}>链接可能不完整或该功能当前不可用。请检查原链接，或联系老师获取完整链接。</ProductStatus></ProductPage>} />

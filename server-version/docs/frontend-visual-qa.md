@@ -4,22 +4,23 @@ This gate provides repeatable visual evidence for the Modern Education frontend 
 
 ## Canonical screens
 
-The deterministic fixture captures fourteen representative page families:
+The deterministic fixture captures fifteen representative page families:
 
-1. Portal
-2. Student login
-3. Student home
-4. Student scale discovery
-5. Multi-dimensional Scale report
-6. Cognitive history
-7. Classroom entry
-8. Parent home
-9. Staff course management
-10. Staff profile
-11. Organization index
-12. Organization longitudinal report — comparable / not comparable / suppressed
-13. Shared Scale Library
-14. Public recovery / focused entry
+1. Code-native UI Lab — foundations / Product UI / reports / canonical scenarios / visualization states
+2. Portal
+3. Student login
+4. Student home
+5. Student scale discovery
+6. Multi-dimensional Scale report
+7. Cognitive history
+8. Classroom entry
+9. Parent home
+10. Staff course management
+11. Staff profile
+12. Organization index
+13. Organization longitudinal report — comparable / not comparable / suppressed
+14. Shared Scale Library
+15. Public recovery / focused entry
 
 Each screen is captured at:
 
@@ -27,7 +28,7 @@ Each screen is captured at:
 - 768 × 1024 — tablet
 - 1440 × 1000 — desktop
 
-This produces 42 canonical responsive screenshots per run. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
+This produces 45 canonical responsive screenshots per run. The multi-dimensional Scale report produces one A4-oriented print-media screenshot, and the Organization longitudinal case produces one A4 print-media screenshot of the report artifact.
 
 ## Hard assertions
 
