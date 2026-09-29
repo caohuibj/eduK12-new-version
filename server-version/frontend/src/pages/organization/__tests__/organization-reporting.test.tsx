@@ -30,10 +30,10 @@ it('removes an existing artifact when exact read permission is revoked', async (
   await userEvent.type(screen.getByPlaceholderText('artifact UUID'), 'private-artifact')
   await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
   await userEvent.click(await screen.findByText('报告记录编号'))
-  expect(screen.getByText(/Artifact private-artifact/)).toBeVisible()
+  expect(screen.getByText('private-artifact')).toBeVisible()
   api.readArtifact.mockRejectedValueOnce(new Error('read revoked'))
   await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
-  await waitFor(() => expect(screen.queryByText(/Artifact private-artifact/)).not.toBeInTheDocument())
+  await waitFor(() => expect(screen.queryByText('private-artifact')).not.toBeInTheDocument())
   expect(await screen.findByText('read revoked')).toBeInTheDocument()
 })
 
@@ -121,4 +121,33 @@ it('does not surface malformed values attached to a suppressed matched metric', 
  expect(screen.getByText(/图表不包含被抑制的统计值/)).toBeInTheDocument()
  expect(screen.queryByText(/^99$/)).not.toBeInTheDocument()
  expect(screen.queryByText(/^100$/)).not.toBeInTheDocument()
+})
+
+
+it('uses reader-facing labels instead of reporting engine enums', () => {
+ const decision={schemaVersion:1 as const,metricId:'score',level:'EXACT',allowedOperations:['SIDE_BY_SIDE','DESCRIPTIVE_TREND','NUMERIC_DELTA'],evidenceRef:null,evidenceHash:null,limitations:['DESCRIPTIVE_ONLY']}
+ render(<ProjectionPanel artifact={{artifactId:'reader-labels',generatedAt:'2026-09-26',projection:{schemaVersion:1,kind:'MATCHED_LONGITUDINAL',state:'present',mode:'FULL_CASE',waveIds:['w1','w2'],matchedEligibleN:8,evidence:{level:'PILOT',limitations:['DESCRIPTIVE_ONLY']},metrics:{score:{state:'present',countKind:'PAIRED_VALID',validCaseN:8,waveMeans:[{waveId:'w1',waveKey:'2026-01-01T00:00:00Z / T1',mean:3},{waveId:'w2',waveKey:'2026-02-01T00:00:00Z / T2',mean:4}],comparisons:[{fromWaveId:'w1',toWaveId:'w2',comparability:decision,delta:1}]}}}}} />)
+ expect(screen.getByText('全部时间点均有测量')).toBeInTheDocument()
+ expect(screen.getByText(/有效配对 · 有效人数 8/)).toBeInTheDocument()
+ expect(screen.getByText(/证据与解释边界 · 试行证据/)).toBeInTheDocument()
+ expect(screen.queryByText(/FULL_CASE|PAIRWISE|Server projection|PILOT/)).not.toBeInTheDocument()
+})
+
+it('renders suppressed metrics without leaking malformed values or engine state labels', () => {
+ const projection:any={schemaVersion:1,kind:'GROUP',state:'present',eligibleN:6,resultContributorN:5,metrics:{sensitive:{state:'suppressed',aggregations:{mean:99,median:98}}},evidence:{level:'PILOT',limitations:[]}}
+ render(<ProjectionPanel artifact={{artifactId:'suppressed-reader',generatedAt:'2026-09-26',projection}} />)
+ expect(screen.getByText('隐私保护')).toBeInTheDocument()
+ expect(screen.getByText(/当前人数或隐私阈值未满足/)).toBeInTheDocument()
+ expect(screen.queryByText(/^99$/)).not.toBeInTheDocument()
+ expect(screen.queryByText(/^98$/)).not.toBeInTheDocument()
+ expect(screen.queryByText(/SUPPRESSED/)).not.toBeInTheDocument()
+})
+
+it('renders protected feedback as reader-facing protected content', () => {
+ const projection:any={schemaVersion:1,kind:'PROTECTED_FEEDBACK',state:'present',limitations:['DESCRIPTIVE_ONLY'],metrics:{support:{state:'present',aggregations:{mean:4.2}}}}
+ render(<ProjectionPanel artifact={{artifactId:'protected-reader',generatedAt:'2026-09-26',projection,evidence:{level:'PILOT',limitations:['DESCRIPTIVE_ONLY']}} as any} />)
+ expect(screen.getByText('受保护反馈')).toBeInTheDocument()
+ expect(screen.getByText(/不展示被反馈者身份或参与人数/)).toBeInTheDocument()
+ expect(screen.getByText('均值')).toBeInTheDocument()
+ expect(screen.queryByText(/Protected feedback/)).not.toBeInTheDocument()
 })
