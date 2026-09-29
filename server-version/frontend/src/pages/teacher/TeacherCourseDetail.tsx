@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, BookOpen, Users, ClipboardList, Calendar, Brain, Edit, UserCog, Settings, ClipboardCheck, RefreshCw } from 'lucide-react'
+import { BookOpen, ClipboardList, Calendar, ClipboardCheck, RefreshCw } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Course, Assignment, Checkin } from '../../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
@@ -151,249 +151,192 @@ const TeacherCourseDetail: React.FC = () => {
   if (!course) return <ProductPage width="management"><ProductStatus kind="error" title="课程不可用" actions={<Link to="/courses">返回课程列表</Link>}>课程不存在、已删除，或当前账户无法访问。</ProductStatus></ProductPage>
 
   return (
-    <ProductPage width="management" className="space-y-6">
-      <PageHeader title={course.title} description={course.description || '课程详情、学生与教学任务'} actions={<Link className="staff-primary-link" to={`/courses/${courseId}/students`}>管理学生</Link>} />
+    <ProductPage width="management" className="space-y-6 staff-course-detail">
+      <PageHeader
+        title={course.title}
+        description={course.description || '课程详情、学生与教学任务'}
+        actions={<Link className="staff-primary-link" to={`/courses/${courseId}/students`}>管理学生</Link>}
+      />
       {feedback}
+
       <section className="staff-detail-header" aria-label="课程概况">
         <div className="staff-detail-header__top">
-          <div className="flex items-start gap-4">
-            {course.coverUrl ? <img src={course.coverUrl} alt="" className="h-20 w-20 rounded-xl object-cover" /> : <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-slate-100"><BookOpen className="h-9 w-9 text-slate-500" aria-hidden="true" /></div>}
-            <div><strong className="text-lg">{course.isLibrary ? '库课程' : '授课课程'}</strong><div className="staff-detail-meta"><span>{course.studentCount || 0} 名学生</span><span>状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span></div></div>
-          </div>
-          {!course.isLibrary && <ProductButton onClick={() => void rotateCourseCode()}><RefreshCw className="w-4 h-4" aria-hidden="true" />轮换课程码</ProductButton>}
-        </div>
-        <div className="staff-detail-meta"><span>课程码：<strong>{course.courseCode}</strong></span><Link to="/courses">返回课程列表</Link></div>
-      </section>
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="card bg-blue-50 border-blue-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-700">{assignments.length}</p>
-              <p className="text-sm text-blue-600">作业</p>
-            </div>
-          </div>
-        </div>
-        <div className="card bg-green-50 border-green-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-green-700">{checkins.length}</p>
-              <p className="text-sm text-green-600">打卡</p>
-            </div>
-          </div>
-        </div>
-        {/* 心理测评 tab 暂时隐藏 */}
-        <div className="card bg-orange-50 border-orange-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <ClipboardCheck className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-orange-700">{questionnaires.length}</p>
-              <p className="text-sm text-orange-600">问卷</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-        <button
-          onClick={() => setActiveTab('assignments')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-            activeTab === 'assignments'
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          <ClipboardList className="w-4 h-4" />
-          <span>作业 ({assignments.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('checkins')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-            activeTab === 'checkins'
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          <Calendar className="w-4 h-4" />
-          <span>打卡 ({checkins.length})</span>
-        </button>
-        {/* 心理测评 tab 暂时隐藏 */}
-        <button
-          onClick={() => setActiveTab('questionnaires')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-            activeTab === 'questionnaires'
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          <ClipboardCheck className="w-4 h-4" />
-          <span>问卷 ({questionnaires.length})</span>
-        </button>
-      </div>
-
-      {/* Content */}
-      {activeTab === 'assignments' && (
-        <div className="space-y-4">
-          {assignments.length === 0 ? (
-            <div className="card text-center py-12">
-              <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">暂无作业</p>
-              <button
-                onClick={() => navigate('/assignments')}
-                className="btn-primary"
-              >
-                去创建作业
-              </button>
-            </div>
-          ) : (
-            assignments.map((assignment) => (
-              <div key={assignment.id} className="card hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/assignments?id=${assignment.id}`)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      {assignment.title}
-                    </h3>
-                    {assignment.description && (
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{assignment.description}</p>
-                    )}
-                    <div className="flex items-center space-x-4 text-sm">
-                      <span className={`flex items-center space-x-1 ${
-                        isOverdue(assignment.deadline) ? 'text-red-500' : 'text-gray-500'
-                      }`}>
-                        <span>截止: {assignment.deadline ? formatDate(assignment.deadline) : '无截止时间'}</span>
-                      </span>
-                      {assignment.submissionCount !== undefined && (
-                        <span className="text-gray-500">
-                          已提交: {assignment.submissionCount} / {assignment.totalStudents || course.studentCount || 0}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      assignment.status === 'PUBLISHED' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}>
-                      {assignment.status === 'PUBLISHED' ? '已发布' : '草稿'}
-                    </span>
-                  </div>
-                </div>
+          <div className="staff-course-detail-summary">
+            {course.coverUrl
+              ? <img src={course.coverUrl} alt="" className="h-20 w-20 rounded-xl object-cover" />
+              : <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-slate-100"><BookOpen className="h-9 w-9 text-slate-500" aria-hidden="true" /></div>}
+            <div className="staff-course-detail-summary__copy">
+              <strong>{course.isLibrary ? '库课程' : '授课课程'}</strong>
+              <div className="staff-detail-meta">
+                <span>{course.studentCount || 0} 名学生</span>
+                <span>状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span>
               </div>
-            ))
+            </div>
+          </div>
+          {!course.isLibrary && (
+            <ProductButton onClick={() => void rotateCourseCode()}>
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
+              轮换课程码
+            </ProductButton>
           )}
         </div>
+        <div className="staff-detail-meta">
+          <span>课程码：<strong>{course.courseCode}</strong></span>
+          <Link to="/courses">返回课程列表</Link>
+        </div>
+      </section>
+
+      <dl className="staff-stat-grid" aria-label="课程内容概况">
+        <div className="staff-stat">
+          <dt>作业</dt>
+          <dd>{assignments.length}</dd>
+        </div>
+        <div className="staff-stat">
+          <dt>打卡</dt>
+          <dd>{checkins.length}</dd>
+        </div>
+        <div className="staff-stat">
+          <dt>问卷</dt>
+          <dd>{questionnaires.length}</dd>
+        </div>
+      </dl>
+
+      <div className="staff-toolbar staff-course-detail-tabs">
+        <div className="staff-segmented" role="group" aria-label="课程内容">
+          <button type="button" aria-pressed={activeTab === 'assignments'} onClick={() => setActiveTab('assignments')}>
+            <ClipboardList className="w-4 h-4" aria-hidden="true" />
+            作业 ({assignments.length})
+          </button>
+          <button type="button" aria-pressed={activeTab === 'checkins'} onClick={() => setActiveTab('checkins')}>
+            <Calendar className="w-4 h-4" aria-hidden="true" />
+            打卡 ({checkins.length})
+          </button>
+          <button type="button" aria-pressed={activeTab === 'questionnaires'} onClick={() => setActiveTab('questionnaires')}>
+            <ClipboardCheck className="w-4 h-4" aria-hidden="true" />
+            问卷 ({questionnaires.length})
+          </button>
+        </div>
+      </div>
+
+      {activeTab === 'assignments' && (
+        <section aria-label="课程作业">
+          {assignments.length === 0 ? (
+            <ProductStatus
+              kind="info"
+              title="暂无作业"
+              actions={<ProductButton variant="primary" onClick={() => navigate('/assignments')}>去创建作业</ProductButton>}
+            >
+              当前课程还没有作业。
+            </ProductStatus>
+          ) : (
+            <div className="staff-course-detail-list">
+              {assignments.map((assignment) => (
+                <button
+                  type="button"
+                  key={assignment.id}
+                  className="staff-panel staff-course-detail-item"
+                  onClick={() => navigate(`/assignments?id=${assignment.id}`)}
+                >
+                  <span className="staff-course-detail-item__main">
+                    <span>
+                      <strong className="staff-course-detail-item__title">{assignment.title}</strong>
+                      {assignment.description && <span className="staff-course-detail-item__description">{assignment.description}</span>}
+                    </span>
+                    <span className={`staff-badge ${assignment.status === 'PUBLISHED' ? 'staff-badge--success' : 'staff-badge--warning'}`}>
+                      {assignment.status === 'PUBLISHED' ? '已发布' : '草稿'}
+                    </span>
+                  </span>
+                  <span className="staff-detail-meta">
+                    <span className={isOverdue(assignment.deadline) ? 'staff-course-detail-item__overdue' : undefined}>
+                      截止：{assignment.deadline ? formatDate(assignment.deadline) : '无截止时间'}
+                    </span>
+                    {assignment.submissionCount !== undefined && (
+                      <span>已提交：{assignment.submissionCount} / {assignment.totalStudents || course.studentCount || 0}</span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       {activeTab === 'checkins' && (
-        <div className="space-y-4">
+        <section aria-label="课程打卡">
           {checkins.length === 0 ? (
-            <div className="card text-center py-12">
-              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">暂无打卡</p>
-              <button
-                onClick={() => navigate('/checkins')}
-                className="btn-primary"
-              >
-                去创建打卡
-              </button>
-            </div>
+            <ProductStatus
+              kind="info"
+              title="暂无打卡"
+              actions={<ProductButton variant="primary" onClick={() => navigate('/checkins')}>去创建打卡</ProductButton>}
+            >
+              当前课程还没有打卡任务。
+            </ProductStatus>
           ) : (
-            checkins.map((checkin) => (
-              <div key={checkin.id} className="card hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/checkins?id=${checkin.id}`)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      {checkin.title}
-                    </h3>
-                    {checkin.description && (
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{checkin.description}</p>
-                    )}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span>截止: {checkin.endTime ? formatDate(checkin.endTime) : '无截止时间'}</span>
-                      {checkin.submissionCount !== undefined && (
-                        <span>
-                          已打卡: {checkin.submissionCount} / {checkin.totalStudents || course.studentCount || 0}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      checkin.status === 'PUBLISHED' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}>
+            <div className="staff-course-detail-list">
+              {checkins.map((checkin) => (
+                <button
+                  type="button"
+                  key={checkin.id}
+                  className="staff-panel staff-course-detail-item"
+                  onClick={() => navigate(`/checkins?id=${checkin.id}`)}
+                >
+                  <span className="staff-course-detail-item__main">
+                    <span>
+                      <strong className="staff-course-detail-item__title">{checkin.title}</strong>
+                      {checkin.description && <span className="staff-course-detail-item__description">{checkin.description}</span>}
+                    </span>
+                    <span className={`staff-badge ${checkin.status === 'PUBLISHED' ? 'staff-badge--success' : 'staff-badge--warning'}`}>
                       {checkin.status === 'PUBLISHED' ? '已发布' : '草稿'}
                     </span>
-                  </div>
-                </div>
-              </div>
-            ))
+                  </span>
+                  <span className="staff-detail-meta">
+                    <span>截止：{checkin.endTime ? formatDate(checkin.endTime) : '无截止时间'}</span>
+                    {checkin.submissionCount !== undefined && (
+                      <span>已打卡：{checkin.submissionCount} / {checkin.totalStudents || course.studentCount || 0}</span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
           )}
-        </div>
+        </section>
       )}
 
-      {/* 心理测评内容暂时隐藏 */}
-
       {activeTab === 'questionnaires' && (
-        <div className="space-y-4">
+        <section aria-label="课程问卷">
           {questionnaires.length === 0 ? (
-            <div className="card text-center py-12">
-              <ClipboardCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">暂无问卷</p>
-              <button
-                onClick={() => navigate('/questionnaires')}
-                className="btn-primary"
-              >
-                去创建问卷
-              </button>
-            </div>
+            <ProductStatus
+              kind="info"
+              title="暂无问卷"
+              actions={<ProductButton variant="primary" onClick={() => navigate('/questionnaires')}>去创建问卷</ProductButton>}
+            >
+              当前课程还没有可用问卷。
+            </ProductStatus>
           ) : (
-            questionnaires.map((questionnaire) => (
-              <div key={questionnaire.id} className="card hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/questionnaires/${questionnaire.id}`)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      {questionnaire.name}
-                    </h3>
-                    {questionnaire.description && (
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{questionnaire.description}</p>
-                    )}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <span>{questionnaire.scaleCount} 个量表</span>
-                      {questionnaire.estimatedTime && (
-                        <span>预计 {questionnaire.estimatedTime} 分钟</span>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/questionnaires/${questionnaire.id}`)
-                    }}
-                    className="btn-secondary text-sm"
-                  >查看问卷</button>
-                </div>
-              </div>
-            ))
+            <div className="staff-course-detail-list">
+              {questionnaires.map((questionnaire) => (
+                <button
+                  type="button"
+                  key={questionnaire.id}
+                  className="staff-panel staff-course-detail-item"
+                  onClick={() => navigate(`/questionnaires/${questionnaire.id}`)}
+                >
+                  <span className="staff-course-detail-item__main">
+                    <span>
+                      <strong className="staff-course-detail-item__title">{questionnaire.name}</strong>
+                      {questionnaire.description && <span className="staff-course-detail-item__description">{questionnaire.description}</span>}
+                    </span>
+                    <span className="staff-badge">{questionnaire.scaleCount} 个量表</span>
+                  </span>
+                  <span className="staff-detail-meta">
+                    {questionnaire.estimatedTime && <span>预计 {questionnaire.estimatedTime} 分钟</span>}
+                    <span>查看问卷</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           )}
-        </div>
+        </section>
       )}
     </ProductPage>
   )
