@@ -16,6 +16,10 @@ The presentation layer may standardize:
 
 It must not become a task engine.
 
+The reusable visual vocabulary is documented in
+`frontend-cognitive-design-kit.md`. That document is the compact visual
+reference; this contract remains the authority for runtime boundaries.
+
 ## Runtime ownership
 
 Each Cognitive task continues to own:
