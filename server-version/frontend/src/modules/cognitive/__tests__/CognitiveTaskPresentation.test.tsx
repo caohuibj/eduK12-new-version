@@ -29,8 +29,9 @@ describe('Cognitive task presentation primitives', () => {
     const proceed = vi.fn()
     const retry = vi.fn()
     const { rerender } = render(
-      <CognitivePracticeResult correct={4} total={4} passed onContinue={proceed} onRetry={retry} detail="上一题：正确" />,
+      <CognitivePracticeResult correct={4} total={4} passed onContinue={proceed} onRetry={retry} detail="上一题：正确" title="第一阶段练习结果" />,
     )
+    expect(screen.getByRole('heading', { name: '第一阶段练习结果' })).toBeInTheDocument()
     expect(screen.getByText('上一题：正确')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '开始正式测验' }))
     expect(proceed).toHaveBeenCalledTimes(1)

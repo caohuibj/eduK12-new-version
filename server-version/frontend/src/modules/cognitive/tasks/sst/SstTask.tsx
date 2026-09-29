@@ -3,6 +3,11 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { sstSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 type PracticeStage = 'go' | 'mixed'
@@ -226,14 +231,12 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">停止信号任务</h2>
-        <p className="text-gray-600 mb-2">箭头出现时请立即、尽快按对应方向。</p>
-        <p className="text-gray-600 mb-2">偶尔会在箭头出现后看到红色停止信号；只有看到停止信号时才尝试停止按键。</p>
-        <p className="text-gray-600 mb-4 font-medium">不要为了等待停止信号而故意放慢普通箭头反应。</p>
-        <p className="text-xs text-gray-400 mb-6">电脑使用左右方向键；触屏使用下方左右按键。练习不计入正式成绩。</p>
-        <button className="btn-primary" onClick={startPractice}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro
+        title="停止信号任务"
+        description={<>箭头出现时请立即、尽快按对应方向。偶尔会在箭头出现后看到红色停止信号；只有看到停止信号时才尝试停止按键。<strong className="block mt-2">不要为了等待停止信号而故意放慢普通箭头反应。</strong></>}
+        hint="电脑使用左右方向键；触屏使用下方左右按键。练习不计入正式成绩。"
+        onAction={startPractice}
+      />
     )
   }
 
@@ -242,23 +245,22 @@ export const SstTask: React.FC<CognitiveTaskProps> = ({
     const mixedPassed = practiceCorrect >= 6 && practiceStopCorrect >= 1
     const passed = practiceStage === 'go' ? goPassed : mixedPassed
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">{practiceStage === 'go' ? '第一阶段：方向反应' : '第二阶段：Go / Stop 混合'}练习结果</h2>
-        <p className="mb-2">练习正确 {practiceCorrect} / {practiceTrials.length}</p>
-        {practiceStage === 'mixed' && <p className="text-sm text-gray-500 mb-2">Stop 试次正确 {practiceStopCorrect} / 2</p>}
-        <p className="text-sm text-gray-500 mb-4">
-          {practiceStage === 'go' ? '至少正确 3 / 4 才进入停止信号练习。' : '至少正确 6 / 8，且至少成功停止 1 次。'}
-        </p>
-        {passed ? (
-          practiceStage === 'go' ? (
-            <button className="btn-primary" onClick={() => startPracticeStage('mixed')}>继续停止信号练习</button>
-          ) : (
-            <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
-          )
-        ) : (
-          <button className="btn-secondary" onClick={() => startPracticeStage(practiceStage)}>重新练习本阶段</button>
+      <CognitivePracticeResult
+        title={`${practiceStage === 'go' ? '第一阶段：方向反应' : '第二阶段：Go / Stop 混合'}练习结果`}
+        correct={practiceCorrect}
+        total={practiceTrials.length}
+        passed={passed}
+        onContinue={() => practiceStage === 'go' ? startPracticeStage('mixed') : startFormal()}
+        onRetry={() => startPracticeStage(practiceStage)}
+        continueLabel={practiceStage === 'go' ? '继续停止信号练习' : '开始正式测验'}
+        retryLabel="重新练习本阶段"
+        detail={(
+          <>
+            {practiceStage === 'mixed' ? <p>Stop 试次正确 {practiceStopCorrect} / 2</p> : null}
+            <p>{practiceStage === 'go' ? '至少正确 3 / 4 才进入停止信号练习。' : '至少正确 6 / 8，且至少成功停止 1 次。'}</p>
+          </>
         )}
-      </div>
+      />
     )
   }
 
