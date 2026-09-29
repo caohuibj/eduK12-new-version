@@ -1,4 +1,14 @@
 import React from 'react'
+import {
+  ReportCoreSummary,
+  ReportDetails,
+  ReportDisclaimer,
+  ReportMetric,
+  ReportMetricGrid,
+  ReportRangeTrack,
+  ReportSection,
+  type ReportRangeReference,
+} from './ReportPrimitives'
 import type {
   ExternalScaleMethod,
   ExternalScaleQuality,
@@ -33,17 +43,18 @@ const kindLabel = (kind: ScaleReferenceValue['referenceKind']): string => {
   return '参考分布'
 }
 
-const valuePosition = (score: ExternalScaleScoreValue): number | null => {
-  if (score.value === null || !score.range || score.range.max <= score.range.min) return null
-  return Math.max(0, Math.min(100, ((score.value - score.range.min) / (score.range.max - score.range.min)) * 100))
-}
-
 const guidanceLabel = (category: 'reflection' | 'strategy' | 'environment' | 'support'): string => ({
   reflection: '自我观察',
   strategy: '策略建议',
   environment: '环境支持',
   support: '支持建议',
 }[category])
+
+const scoreStatusLabel = (score: ExternalScaleScoreValue): string => {
+  if (score.status === 'limited') return score.prorated ? '有限数据 · 已折算' : '有限数据'
+  if (score.status === 'not_calculable') return '无法计算'
+  return ''
+}
 
 const renderReferenceDetails = (reference: ScaleReferenceValue) => {
   if (reference.status !== 'available') {
@@ -54,11 +65,11 @@ const renderReferenceDetails = (reference: ScaleReferenceValue) => {
         : reference.unavailableReason === 'inactive'
           ? '该 reference 尚未激活。'
           : '当前没有可用的匹配 reference。'
-    return <p className="text-sm text-gray-500">{reason}</p>
+    return <p>{reason}</p>
   }
 
   return (
-    <div className="space-y-2 text-sm text-gray-600">
+    <div className="space-y-2">
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span>类型：{kindLabel(reference.referenceKind)}</span>
         <span>版本：{reference.referenceVersion}</span>
@@ -79,9 +90,29 @@ const renderReferenceDetails = (reference: ScaleReferenceValue) => {
       {reference.source?.url && <p>链接：{reference.source.url}</p>}
       {reference.population?.description && <p>样本说明：{reference.population.description}</p>}
       {reference.limitations.length > 0 && <p>限制：{reference.limitations.join('；')}</p>}
-      <p className="text-xs text-gray-500">{reference.disclaimer}</p>
+      <p className="text-xs">{reference.disclaimer}</p>
     </div>
   )
+}
+
+const overlayFor = (score: ExternalScaleScoreValue, references: ScaleReferenceValue[]): ReportRangeReference | null => {
+  const available = references.filter((reference) => reference.scoreKey === score.key && reference.status === 'available')
+  if (available.length !== 1) return null
+  const reference = available[0]
+  return {
+    ...(reference.mean !== null
+      ? { mean: reference.mean, label: reference.label || `参考均值 ${formatNumber(reference.mean)}` }
+      : {}),
+    ...(reference.criterionBand
+      ? {
+          band: {
+            label: reference.criterionBand.label,
+            min: reference.criterionBand.minInclusive,
+            max: reference.criterionBand.maxInclusive,
+          },
+        }
+      : {}),
+  }
 }
 
 const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report }) => {
@@ -95,95 +126,153 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
   const references = result?.references ?? report.references ?? []
   const interpretations = result?.interpretations ?? report.interpretations ?? []
   const invalid = quality?.status === 'invalid'
+  const totalScores = scores.filter((score) => score.type === 'total')
+  const dimensionScores = scores.filter((score) => score.type === 'dimension')
+  const unclassifiedScores = scores.filter((score) => score.type !== 'total' && score.type !== 'dimension')
+
+  const rangeTrack = (score: ExternalScaleScoreValue) => (
+    <ReportRangeTrack
+      key={score.key}
+      label={score.label}
+      value={score.value}
+      formattedValue={formatNumber(score.value, score.displayPrecision)}
+      range={score.range}
+      reference={overlayFor(score, references)}
+      status={scoreStatusLabel(score)}
+    />
+  )
 
   return (
-    <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`} className="space-y-6">
-      <p className="text-xs text-gray-500">
-        {report.scaleName}
-        {report.method?.reportVersion ? ` · 报告版本 ${report.method.reportVersion}` : ''}
-      </p>
+    <div data-testid={`scale-unit-report-${report.itemId || report.scaleId}`} className="space-y-5">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+        <span>{report.scaleName}</span>
+        {report.method?.reportVersion && <span>报告版本 {report.method.reportVersion}</span>}
+        {quality?.status && <span>数据质量：{quality.status}</span>}
+      </div>
 
       {!invalid && interpretations.length > 0 && (
-        <section data-testid="scale-core-feedback">
-          <h3 className="text-base font-semibold text-gray-800 mb-3">核心反馈</h3>
-          <div className="space-y-4">
-            {interpretations.map((interpretation) => (
-              <article key={interpretation.scoreKey} className="rounded-lg bg-gray-50 p-4">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h4 className="font-medium text-gray-800">{interpretation.headline}</h4>
-                  {interpretation.label && <span className="text-sm text-gray-600">{interpretation.label}</span>}
-                </div>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{interpretation.interpretation}</p>
-                {interpretation.guidance.length > 0 && (
-                  <ul className="mt-3 space-y-1 text-sm text-gray-600">
-                    {interpretation.guidance.map((entry, index) => <li key={`${entry.category}-${index}`}><span className="font-medium">{guidanceLabel(entry.category)}：</span>{entry.text}</li>)}
-                  </ul>
-                )}
-              </article>
-            ))}
-          </div>
-        </section>
+        <div data-testid="scale-core-feedback">
+          <ReportCoreSummary label="核心反馈">
+            <div className="report-feedback-list">
+              {interpretations.map((interpretation) => (
+                <article key={interpretation.scoreKey} className="report-feedback">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4>{interpretation.headline}</h4>
+                    {interpretation.label && <span className="text-sm font-normal text-gray-500">{interpretation.label}</span>}
+                  </div>
+                  <p>{interpretation.interpretation}</p>
+                  {interpretation.guidance.length > 0 && (
+                    <ul>
+                      {interpretation.guidance.map((entry, index) => (
+                        <li key={`${entry.category}-${index}`}><span className="font-medium">{guidanceLabel(entry.category)}：</span>{entry.text}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {interpretation.limitations.length > 0 && (
+                    <p className="text-xs text-amber-700">解释限制：{interpretation.limitations.join('；')}</p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </ReportCoreSummary>
+        </div>
       )}
 
-      <section data-testid="scale-score-layer">
-        <h3 className="text-base font-semibold text-gray-800 mb-3">实际得分</h3>
+      <ReportSection
+        title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
+        eyebrow="分数层"
+        description={dimensionScores.length > 0
+          ? '总体结果与各维度按后台定义分别展示；不同量表范围不会被前端标准化后直接比较。'
+          : '展示后台报告投影中已有的分数和原始范围。'}
+        testId="scale-score-layer"
+      >
         {scores.length === 0 ? (
           <p className="text-sm text-gray-500">该量表尚未形成可展示的分数。</p>
         ) : (
-          <div className="space-y-4">
-            {scores.map((score) => {
-              const position = valuePosition(score)
-              return (
-                <div key={score.key}>
-                  <div className="flex justify-between gap-4 text-sm mb-1">
-                    <span className="font-medium text-gray-700">{score.label}</span>
-                    <span className="text-gray-700">
-                      <span>{formatNumber(score.value, score.displayPrecision)}</span>
-                      {score.range && <span>{` / ${formatNumber(score.range.min, score.displayPrecision)}–${formatNumber(score.range.max, score.displayPrecision)}`}</span>}
-                    </span>
+          <div className="space-y-5">
+            {totalScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">总体结果</p>
+                {totalScores.length === 1 ? (
+                  <div className="space-y-3">
+                    <ReportMetric
+                      emphasis
+                      label={totalScores[0].label}
+                      value={formatNumber(totalScores[0].value, totalScores[0].displayPrecision)}
+                      description={totalScores[0].description}
+                      meta={scoreStatusLabel(totalScores[0]) || undefined}
+                    />
+                    <ReportRangeTrack
+                      label={totalScores[0].label}
+                      value={totalScores[0].value}
+                      formattedValue={scoreStatusLabel(totalScores[0]) || '范围'}
+                      range={totalScores[0].range}
+                      reference={overlayFor(totalScores[0], references)}
+                      status={scoreStatusLabel(totalScores[0])}
+                    />
                   </div>
-                  <div className="relative w-full h-2 rounded-full bg-gray-200" aria-label={`${score.label}量表范围`}>
-                    {position !== null && <div className="absolute top-1/2 h-4 w-4 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-primary bg-white" style={{ left: `${position}%` }} />}
-                  </div>
-                  <div className="mt-1 flex justify-between text-xs text-gray-400">
-                    <span>{score.range ? formatNumber(score.range.min, score.displayPrecision) : '—'}</span>
-                    <span>{score.status === 'limited' ? (score.prorated ? '有限数据 · 已折算' : '有限数据') : score.status === 'not_calculable' ? '无法计算' : ''}</span>
-                    <span>{score.range ? formatNumber(score.range.max, score.displayPrecision) : '—'}</span>
-                  </div>
-                </div>
-              )
-            })}
+                ) : (
+                  <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
+                )}
+              </div>
+            )}
+
+            {dimensionScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">维度结果</p>
+                <div className="report-range-grid">{dimensionScores.map(rangeTrack)}</div>
+              </div>
+            )}
+
+            {unclassifiedScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">其他得分</p>
+                <p className="mb-3 text-xs text-gray-500">这些历史或受众安全分数未携带 total / dimension 类型，页面不会自行推断其层级。</p>
+                <div className="report-range-grid">{unclassifiedScores.map(rangeTrack)}</div>
+              </div>
+            )}
           </div>
         )}
-      </section>
+      </ReportSection>
 
       {!invalid && (
-        <section data-testid="scale-reference-layer">
-          <h3 className="text-base font-semibold text-gray-800 mb-3">详细参考</h3>
+        <ReportDetails title="科学依据与详细参考" testId="scale-reference-layer">
           {references.length === 0 ? (
-            <p className="text-sm text-gray-500">未提供群体参考。</p>
+            <p>未提供群体参考。</p>
           ) : (
             <div className="space-y-4">
               {references.map((reference) => {
                 const score = scores.find((candidate) => candidate.key === reference.scoreKey)
                 return (
-                  <article key={`${reference.scoreKey}-${reference.referenceVersion}-${reference.referenceKind}`} className="border rounded-lg p-4">
-                    <div className="flex flex-wrap justify-between gap-2 mb-2">
-                      <h4 className="font-medium text-gray-800">{score?.label || reference.scoreKey}</h4>
-                      <span className="text-sm text-gray-500">{reference.label}</span>
+                  <article key={`${reference.scoreKey}-${reference.referenceVersion}-${reference.referenceKind}`} className="report-feedback">
+                    <div className="flex flex-wrap justify-between gap-2">
+                      <h4>{score?.label || reference.scoreKey}</h4>
+                      <span className="text-xs text-gray-500">{reference.label}</span>
                     </div>
-                    {renderReferenceDetails(reference)}
+                    <div className="mt-2">{renderReferenceDetails(reference)}</div>
                   </article>
                 )
               })}
             </div>
           )}
-        </section>
+        </ReportDetails>
       )}
 
-      {invalid && <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。</p>}
-      {(report.caveats || []).length > 0 && <ul className="list-disc list-inside text-sm text-amber-700 space-y-1" data-testid="scale-caveats">{report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}</ul>}
-      {report.disclaimer && <p className="text-xs text-gray-500" data-testid="scale-disclaimer">{report.disclaimer}</p>}
+      {invalid && (
+        <ReportCoreSummary label="数据质量">
+          <p>当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。</p>
+        </ReportCoreSummary>
+      )}
+
+      {(report.caveats || []).length > 0 && (
+        <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
+          <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
+            {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
+          </ul>
+        </ReportSection>
+      )}
+
+      {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
     </div>
   )
 }

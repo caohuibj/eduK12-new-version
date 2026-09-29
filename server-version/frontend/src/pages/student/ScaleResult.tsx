@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../../modules/reporting/ScaleUnitReportCard'
 import type { ExternalScaleReport, ScaleResultV2 } from '../../modules/reporting/types'
+import { ReportSection } from '../../modules/reporting/ReportPrimitives'
 
 export interface Assessment {
   id: string
@@ -134,7 +135,7 @@ const ScaleResult: React.FC = () => {
         title="量表报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '测评结果不存在或不可访问' }}
-        actions={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+        actions={<button type="button" onClick={() => navigate('/student/scales')} className="hui-button hui-button--secondary">返回量表列表</button>}
       />
     )
   }
@@ -158,14 +159,11 @@ const ScaleResult: React.FC = () => {
           ? '下面是一份不提供受限个体分数或心理健康标签的教育性反馈。'
           : '以下内容来自当前已完成结果记录。',
       }}
-      backAction={<button type="button" onClick={() => navigate('/student/scales')} className="btn-secondary">返回量表列表</button>}
+      backAction={<button type="button" onClick={() => navigate('/student/scales')} className="hui-button hui-button--secondary">返回量表列表</button>}
     >
-      {(
-        <section className="card p-6" aria-labelledby="scale-report-detail-heading">
-          <h2 id="scale-report-detail-heading" className="text-lg font-semibold text-gray-800 mb-4">结果详情</h2>
-          <ScaleUnitReportCard report={safeReport} />
-        </section>
-      )}
+      <ReportSection title="结果详情" eyebrow="Report">
+        <ScaleUnitReportCard report={safeReport} />
+      </ReportSection>
     </ReportShell>
   )
 }

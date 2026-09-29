@@ -4,6 +4,7 @@ import apiClient from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
+import { ReportSection } from '../../modules/reporting/ReportPrimitives'
 
 const formatTime = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -47,7 +48,7 @@ const QuestionnaireResult: React.FC = () => {
         title="聚合问卷报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告不存在或暂时无法读取' }}
-        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+        actions={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">返回问卷列表</button>}
       />
     )
   }
@@ -64,29 +65,32 @@ const QuestionnaireResult: React.FC = () => {
       description="各量表结果独立展示。"
       facts={facts}
       status={{ kind: 'success', title: '问卷已完成', description: '以下内容来自当前已完成结果记录。' }}
-      backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="btn-secondary">返回问卷列表</button>}
+      backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">返回问卷列表</button>}
     >
       {result.backgroundValues.length > 0 && (
-        <section className="card p-5" aria-labelledby="questionnaire-background-heading">
-          <h2 id="questionnaire-background-heading" className="text-sm font-semibold text-gray-700 mb-3">背景信息</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ReportSection title="背景信息" eyebrow="Context">
+          <div className="report-metric-grid">
             {result.backgroundValues.map((item) => (
-              <div key={item.itemId} className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
-                <div className="text-xs text-gray-500">{item.label || '表单项'}</div>
-                <div className="mt-1 whitespace-pre-wrap">{item.value ?? '—'}</div>
+              <div key={item.itemId} className="report-metric">
+                <div className="report-metric__label">{item.label || '表单项'}</div>
+                <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{item.value ?? '—'}</div>
               </div>
             ))}
           </div>
-        </section>
+        </ReportSection>
       )}
 
+      {result.unitReports.length > 1 && (
+        <ReportSection title="报告目录" eyebrow="Scales" description="问卷内各量表保持独立评分、解释与 reference。">
+          <nav className="report-module-index" aria-label="问卷量表目录">
+            {result.unitReports.map((report, index) => <a key={report.itemId || report.scaleId || index} href={`#questionnaire-unit-${index}`}>{index + 1}. {report.scaleName}</a>)}
+          </nav>
+        </ReportSection>
+      )}
       {result.unitReports.map((report, index) => (
-        <section key={report.itemId || report.scaleId || index} className="card p-6" aria-labelledby={`questionnaire-unit-${index}`}>
-          <h2 id={`questionnaire-unit-${index}`} className="text-lg font-semibold text-gray-800 mb-4">
-            量表 {index + 1}: {report.scaleName}
-          </h2>
+        <ReportSection key={report.itemId || report.scaleId || index} id={`questionnaire-unit-${index}`} title={`量表 ${index + 1}: ${report.scaleName}`} eyebrow="Scale">
           <ScaleUnitReportCard report={report} />
-        </section>
+        </ReportSection>
       ))}
     </ReportShell>
   )

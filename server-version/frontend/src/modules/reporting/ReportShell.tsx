@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import './report-ui.css'
 import {
   ActionBar,
   PageHeader,
@@ -51,13 +52,13 @@ export function ReportShell({
   testId = 'report-shell',
 }: ReportShellProps) {
   return (
-    <ProductPage width="report" data-testid={testId}>
-      {backAction && <div className="mb-4">{backAction}</div>}
+    <ProductPage width="report" className="hui-report" data-testid={testId}>
+      {backAction && <div className="mb-4" data-report-screen-only>{backAction}</div>}
       <PageHeader title={title} description={description} />
 
       {facts.length > 0 && (
-        <section className="card p-5 mb-5" aria-label="完成信息" data-testid="report-completion-facts">
-          <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <section className="report-facts" aria-label="完成信息" data-testid="report-completion-facts">
+          <dl>
             {facts.map((fact) => (
               <div key={fact.label} className="min-w-0">
                 <dt className="text-xs text-gray-500">{fact.label}</dt>
@@ -76,19 +77,19 @@ export function ReportShell({
         </div>
       )}
 
-      {children && <div className="space-y-5">{children}</div>}
+      {children && <div className="report-body">{children}</div>}
 
       {limitations.length > 0 && (
-        <section className="card p-5 mt-5" aria-labelledby="report-limitations-title" data-testid="report-limitations">
-          <h2 id="report-limitations-title" className="text-base font-semibold text-gray-800">阅读限制</h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-600">
+        <section className="report-section mt-5" aria-labelledby="report-limitations-title" data-testid="report-limitations">
+          <header className="report-section__header"><h2 id="report-limitations-title" className="report-section__title">阅读限制</h2></header>
+          <div className="report-section__body"><ul className="list-disc space-y-2 pl-5 text-sm text-gray-600">
             {limitations.map((limitation, index) => <li key={index}>{limitation}</li>)}
-          </ul>
+          </ul></div>
         </section>
       )}
 
       {actions && (
-        <ActionBar label="报告操作" className="mt-5">
+        <ActionBar label="报告操作" className="mt-5" data-report-screen-only>
           {actions}
         </ActionBar>
       )}
