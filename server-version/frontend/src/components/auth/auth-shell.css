@@ -160,6 +160,12 @@
   text-decoration: none;
 }
 .hui-auth-back:hover { color: var(--auth-ink); }
+.hui-auth-back--button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
 
 .hui-auth-card {
   padding: clamp(1.4rem, 3vw, 2rem);
