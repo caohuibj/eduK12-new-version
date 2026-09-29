@@ -566,7 +566,6 @@ const ClassroomControl: React.FC = () => {
       )}
     </ProductPage>
   )
-  )
 }
 
 export default ClassroomControl
