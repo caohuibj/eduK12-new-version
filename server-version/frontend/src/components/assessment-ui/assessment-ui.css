@@ -816,6 +816,7 @@ button.hui-public-runner-nav__item:hover:not(:disabled) {
 .hui-app--student-submit .student-submit-option input {
   width: 18px;
   height: 18px;
+  min-height: 18px;
   flex: 0 0 18px;
 }
 .hui-app--student-submit .student-submit-response {

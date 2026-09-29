@@ -250,24 +250,24 @@ const CheckinSubmit: React.FC = () => {
         )}
         
         {/* 打卡视频 */}
-        <div className="mb-4">
+        {checkin.videos && checkin.videos.length > 0 && (
           <VideoList
             videos={checkin.videos}
             title="相关视频"
             watermarkText="慧育空间专属教学视频"
             className="!p-0 !shadow-none !border-0"
           />
-        </div>
+        )}
         
         {/* 打卡图片 */}
-        <div className="mb-4">
+        {checkin.images && checkin.images.length > 0 && (
           <ImageList
             images={checkin.images}
             title="相关图片"
             watermarkText="慧育空间专属教学图片"
             className="!p-0 !shadow-none !border-0"
           />
-        </div>
+        )}
 
         {/* 打卡文档 */}
         {checkin.documents && checkin.documents.length > 0 && (
