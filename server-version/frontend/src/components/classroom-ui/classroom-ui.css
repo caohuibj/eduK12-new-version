@@ -194,3 +194,66 @@
     transition: none !important;
   }
 }
+
+
+/* Teacher authoring / QR presentation. Runtime and realtime behavior stay page-owned. */
+.classroom-qr-panel{
+  display:grid;
+  justify-items:center;
+  gap:22px;
+  max-width:620px;
+  margin-inline:auto;
+  text-align:center;
+}
+.classroom-qr-code-copy{
+  display:grid;
+  justify-items:center;
+  gap:8px;
+}
+.classroom-qr-code-copy h2{
+  margin:0;
+  color:var(--hui-ds-color-ink);
+  font-size:clamp(2rem,1.6rem + 1.5vw,2.75rem);
+  letter-spacing:.16em;
+}
+.classroom-qr-code-copy p{
+  max-width:46ch;
+  margin:0;
+  color:var(--hui-ds-color-muted);
+  font-size:13px;
+  line-height:1.7;
+}
+.classroom-qr-code{
+  display:grid;
+  place-items:center;
+  width:min(100%,304px);
+  padding:22px;
+  border:1px solid var(--hui-ds-color-line);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 10px 30px rgba(20,48,74,.05);
+}
+.classroom-qr-code canvas{
+  display:block;
+  max-width:100%;
+  height:auto!important;
+}
+.classroom-qr-actions{
+  justify-content:center;
+}
+
+@media (max-width:39.999rem) {
+  .classroom-qr-panel{
+    padding:18px;
+  }
+  .classroom-qr-code{
+    padding:16px;
+  }
+  .classroom-qr-actions{
+    width:100%;
+  }
+  .classroom-qr-actions>*{
+    width:100%;
+    justify-content:center;
+  }
+}
