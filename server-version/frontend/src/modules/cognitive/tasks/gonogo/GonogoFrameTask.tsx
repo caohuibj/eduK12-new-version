@@ -5,6 +5,12 @@ import { createTaskTimingDiagnostics } from '../../core/task-timing-diagnostics'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { gonogoSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskCompletionNotice,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 
@@ -126,12 +132,29 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     if (phase === 'formal') timingDiagnostics.pointerCancelled(performance.now(), trialIndex)
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">Go/No-Go</h2><p className="text-gray-600 mb-4">绿色出现时尽快按下；红色出现时不要按。</p><p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') {
+    return (
+      <CognitiveTaskIntro
+        title="Go/No-Go"
+        description="绿色出现时尽快按下；红色出现时不要按。"
+        hint="电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。"
+        onAction={startPractice}
+      />
+    )
+  }
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
-    return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>{passed ? <button className="btn-primary" onClick={startFormal}>开始正式测验</button> : <button className="btn-secondary" onClick={startPractice}>重新练习</button>}</div>
+    return (
+      <CognitivePracticeResult
+        correct={practiceCorrect}
+        total={PRACTICE_TRIAL_COUNT}
+        passed={passed}
+        onContinue={startFormal}
+        onRetry={startPractice}
+      />
+    )
   }
-  if (phase === 'formal' && trialIndex >= total) return <div className="card p-8 text-center text-gray-600">正式试次已完成，请完成本次测评。</div>
+  if (phase === 'formal' && trialIndex >= total) return <CognitiveTaskCompletionNotice />
 
   const taskBody = <div className="mx-auto max-w-2xl text-center p-8">{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<button type="button" aria-label="respond" className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`} onPointerDown={pointerDown} onPointerCancel={cancelPointer}/>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">绿色：按空格 / Enter 或点击圆形；红色：不要按</p> : null}</div>
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验">{taskBody}</CognitiveFocusStage> : taskBody

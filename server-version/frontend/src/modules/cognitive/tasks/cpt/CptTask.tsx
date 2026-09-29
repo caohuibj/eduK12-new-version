@@ -3,6 +3,12 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { cptSequence } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } from '../shared/practice'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskCompletionNotice,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 
@@ -155,46 +161,44 @@ export const CptTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex,
 
   if (phase === 'instruction') {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">连续执行任务</h2>
-        <p className="text-gray-600 mb-4">只在出现字母 X 时按下，其他字母不要按。</p>
-        <p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩，多区块版本会在区块之间暂停。</p>
-        <button className="btn-primary" onClick={startPractice}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro
+        title="连续执行任务"
+        description="只在出现字母 X 时按下，其他字母不要按。"
+        hint="电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩，多区块版本会在区块之间暂停。"
+        onAction={startPractice}
+      />
     )
   }
 
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
     return (
-      <div className="text-center p-8">
-        <p className="mb-4">练习正确 {practiceCorrect} / {PRACTICE_TRIAL_COUNT}</p>
-        {passed ? (
-          <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
-        ) : (
-          <button className="btn-secondary" onClick={startPractice}>重新练习</button>
-        )}
-      </div>
+      <CognitivePracticeResult
+        correct={practiceCorrect}
+        total={PRACTICE_TRIAL_COUNT}
+        passed={passed}
+        onContinue={startFormal}
+        onRetry={startPractice}
+      />
     )
   }
 
   if (phase === 'formal' && trialIndex >= total) {
-    return <div className="card p-8 text-center text-gray-600">正式试次已完成，请完成本次测评。</div>
+    return <CognitiveTaskCompletionNotice />
   }
 
   if (phase === 'formal' && current && blockCount > 1 && acknowledgedBlockIndex !== current.blockIndex) {
     const isFirstBlock = current.blockIndex === 0
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">{isFirstBlock ? '准备开始持续注意测验' : '区块完成，可以短暂休息'}</h2>
-        <p className="text-gray-600 mb-2">即将开始区块 {current.blockIndex + 1} / {blockCount}</p>
-        <p className="text-sm text-gray-500 mb-6">
-          {isFirstBlock ? '正式测验分为多个区块。每个区块都保持同一规则：只对 X 作答。' : '准备好后继续。休息时请不要离开测评页面太久。'}
-        </p>
-        <button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>
-          {isFirstBlock ? '开始第 1 区块' : '继续下一组'}
-        </button>
-      </div>
+      <CognitiveTaskTransition
+        title={isFirstBlock ? '准备开始持续注意测验' : '区块完成，可以短暂休息'}
+        meta={`即将开始区块 ${current.blockIndex + 1} / ${blockCount}`}
+        description={isFirstBlock
+          ? '正式测验分为多个区块。每个区块都保持同一规则：只对 X 作答。'
+          : '准备好后继续。休息时请不要离开测评页面太久。'}
+        actionLabel={isFirstBlock ? '开始第 1 区块' : '继续下一组'}
+        onAction={() => setAcknowledgedBlockIndex(current.blockIndex)}
+      />
     )
   }
 
