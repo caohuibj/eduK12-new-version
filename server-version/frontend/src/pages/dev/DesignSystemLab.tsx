@@ -320,7 +320,7 @@ function LongitudinalSpecimens() {
       </header>
 
       <div className="ui-lab-chart-grid">
-        <ReportTrendChart model={comparableTrend} title="Engagement" description="服务端允许 DESCRIPTIVE_TREND，并明确返回 delta。" valueLabel="示意均值" />
+        <ReportTrendChart model={comparableTrend} title="Engagement" description="服务端允许描述性趋势展示，并明确返回变化量。" valueLabel="示意均值" />
         <ReportTrendChart model={notComparableTrend} title="Stress" description="第一段不可直接比较，因此保持断线；第二段允许描述趋势。" valueLabel="示意均值" />
         <ReportTrendChart model={suppressedTrend} title="Support" description="隐私保护状态不进入图表 series 或辅助文本数值。" valueLabel="示意均值" />
       </div>

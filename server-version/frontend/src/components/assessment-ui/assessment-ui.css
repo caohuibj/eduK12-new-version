@@ -558,12 +558,16 @@
   margin-bottom: 10px;
 }
 .hui-public-runner-question-meta span {
-  padding: 4px 8px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
   border-radius: 999px;
   background: var(--runner-soft);
   color: #52677c;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.2;
 }
 .hui-public-runner-question {
   margin: 0 0 20px;
@@ -709,9 +713,11 @@ button.hui-public-runner-nav__item:hover:not(:disabled) {
     border-radius: 15px;
   }
   .hui-public-runner-progress__meta {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 5px;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 10px;
   }
   .hui-public-runner-actions,
   .hui-public-runner-question-actions {

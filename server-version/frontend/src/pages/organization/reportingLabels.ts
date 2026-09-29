@@ -37,3 +37,41 @@ export function limitationLabel(value: string) {
     NO_CAUSAL_INFERENCE:'不能据此推断因果',
   } as Record<string,string>)[value] ?? value
 }
+
+
+export function evidenceLevelLabel(level: string) {
+  return ({
+    PILOT:'试行证据',
+    RESEARCH_READY:'研究就绪',
+    RESEARCH_GRADE:'研究级证据',
+  } as Record<string,string>)[level] ?? level.replace(/_/g,' ')
+}
+
+export function matchedModeLabel(mode: string) {
+  return ({
+    PAIRWISE:'两个时间点配对',
+    FULL_CASE:'全部时间点均有测量',
+  } as Record<string,string>)[mode] ?? '按报告方案匹配'
+}
+
+export function countKindLabel(kind: string | undefined) {
+  return ({
+    PAIRED_VALID:'有效配对',
+    COMPLETE_CASE:'完整测量',
+  } as Record<string,string>)[kind || ''] ?? '有效结果'
+}
+
+export function aggregationLabel(key: string) {
+  return ({
+    mean:'均值',
+    median:'中位数',
+    min:'最小值',
+    max:'最大值',
+    sum:'总和',
+    count:'数量',
+    rate:'比例',
+    proportion:'比例',
+    standardDeviation:'标准差',
+    sd:'标准差',
+  } as Record<string,string>)[key] ?? key.replace(/_/g,' ')
+}
