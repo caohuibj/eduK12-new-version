@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { expect, it } from 'vitest'
 import DesignSystemLab from '../DesignSystemLab'
 
@@ -16,9 +16,10 @@ it('renders the code-native design workspace from shared production primitives',
   expect(screen.getByRole('button', { name: '主要操作' })).toBeInTheDocument()
   expect(screen.getByText('总体自我调节')).toBeInTheDocument()
   expect(screen.getByText('Construct × Channel')).toBeInTheDocument()
-  expect(screen.getByText('原始范围 0–25')).toBeInTheDocument()
-  expect(screen.getByText('原始范围 0–20')).toBeInTheDocument()
-  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+  const scaleDimensions = screen.getByLabelText('量表维度示意')
+  expect(within(scaleDimensions).getByText('原始范围 0–25')).toBeInTheDocument()
+  expect(within(scaleDimensions).getByText('原始范围 0–20')).toBeInTheDocument()
+  expect(within(scaleDimensions).queryByRole('progressbar')).not.toBeInTheDocument()
   expect(screen.getByText('允许描述趋势')).toBeInTheDocument()
   expect(screen.getByText('存在不可直接比较区段')).toBeInTheDocument()
   expect(screen.getByText(/图表不包含被抑制的统计值/)).toBeInTheDocument()
