@@ -205,6 +205,85 @@ const visualLongitudinalArtifact = {
   },
 }
 
+const visualPublicQuestionnaire = {
+  id: 'visual-questionnaire',
+  name: '学习体验匿名问卷',
+  description: '了解近期学习体验与支持需求，用于公共参与界面的视觉验收。',
+  instruction: '请根据最近两周的实际情况作答。没有标准答案，选择最符合您的情况即可。',
+  estimatedTime: 8,
+}
+
+const visualPublicQuestionnaireAssessment = {
+  questionnaireAssessment: {
+    id: 'visual-q-session',
+    status: 'IN_PROGRESS',
+    progress: 0,
+    currentIndex: 0,
+    attemptEpoch: 1,
+  },
+  currentFormItem: {
+    id: 'visual-form-item',
+    type: 'text_input',
+    label: '最近的学习中，哪件事最需要更多支持？',
+    placeholder: '可以简要描述您的情况',
+    required: false,
+    position: 0,
+    options: null,
+    contextKey: null,
+  },
+  currentScale: null,
+  contentItems: [
+    { type: 'form', position: 0, id: 'visual-form-item', label: '学习支持', completed: false },
+    { type: 'form', position: 1, id: 'visual-form-item-2', label: '后续体验', completed: false },
+  ],
+  totalItems: 2,
+  sessionId: 'visual-q-session',
+  currentFormAnswerRevision: 0,
+}
+
+const visualPublicQuestionnaireReport = {
+  questionnaireId: 'visual-questionnaire',
+  questionnaireName: '学习体验匿名问卷',
+  completedAt: '2026-09-29T02:00:00.000Z',
+  totalTime: 385000,
+  totalDimensions: 2,
+  backgroundValues: [
+    { itemId: 'grade', type: 'FORM', kind: 'background', label: '年级', value: '八年级' },
+    { itemId: 'context', type: 'FORM', kind: 'background', label: '参与场景', value: '课堂学习' },
+  ],
+  unitReports: [
+    {
+      itemId: 'visual-scale',
+      type: 'SCALE',
+      kind: 'scale',
+      scaleId: 'visual-scale',
+      scaleCode: 'VISUAL-PUBLIC',
+      scaleName: '学习投入',
+      reportKind: 'completion',
+      dimensionScores: [],
+      feedback: { overall: '', dimensions: [] },
+      caveats: [],
+      disclaimer: '结果仅用于本次匿名参与反馈。',
+      completedAt: '2026-09-29T02:00:00.000Z',
+      totalTime: 210000,
+      method: { scaleId: 'visual-scale', scaleCode: 'VISUAL-PUBLIC', reportDefinitionVersion: 'visual-v1' },
+    },
+  ],
+}
+
+const visualPublicCheckin = {
+  id: 'visual-checkin',
+  title: '本周学习打卡',
+  description: '记录一次本周最重要的学习进展。',
+  content: '<p>可以填写文字，也可以补充图片。请不要填写可识别他人的敏感信息。</p>',
+  images: [],
+  videos: [],
+  documents: [],
+  endTime: '2026-12-31T12:00:00.000Z',
+  createdAt: '2026-09-29T00:00:00.000Z',
+  allowViewOthers: false,
+}
+
 const envelope = (data, code = 0, message = 'ok') => ({ code, message, data })
 
 async function installApiFixture(page, role) {
@@ -235,6 +314,15 @@ async function installApiFixture(page, role) {
     else if (pathname === '/api/scales/assessments/visual-scale-assessment') data = visualScaleReport
     else if (pathname === '/api/scale-library') data = { schemaVersion: 1, generatedAt: '2026-09-28T00:00:00.000Z', entries: [] }
     else if (pathname.startsWith('/api/cognitive/history')) data = { list: [], total: 0, totalPages: 1, hasMore: false }
+    else if (pathname === '/api/public/questionnaires/visual-questionnaire') data = { questionnaire: visualPublicQuestionnaire }
+    else if (pathname === '/api/public/assessments/visual-q-session') data = visualPublicQuestionnaireAssessment
+    else if (pathname === '/api/public/assessments/visual-q-session/report') data = visualPublicQuestionnaireReport
+    else if (pathname === '/api/checkins/public/visual-checkin') data = {
+      checkin: visualPublicCheckin,
+      sessionId: 'visual-checkin-session',
+      sessionCapability: 'visual-checkin-capability',
+      sessionExpiresAt: '2026-12-31T12:00:00.000Z',
+    }
     else if (pathname === '/api/organizations/visual-org/context') data = visualOrganizationContext
     else if (pathname === '/api/organizations/visual-org/reporting/specs') data = { list: [], total: 0, page: 1, pageSize: 100 }
     else if (pathname === '/api/organizations/visual-org/reporting/sources') data = { list: [], truncated: false, nextPage: null }
@@ -270,6 +358,51 @@ const cases = [
       await page.getByRole('heading', { name: '设计基础', exact: true }).waitFor()
       await page.getByRole('heading', { name: '纵向可视化状态', exact: true }).waitFor()
       await page.locator('.report-trend-chart svg').first().waitFor()
+    },
+  },
+  {
+    id: 'public-questionnaire-entry',
+    route: '/public/questionnaire/visual-questionnaire',
+    role: null,
+    ready: (page) => page.getByRole('heading', { name: '学习体验匿名问卷', exact: true }).waitFor(),
+  },
+  {
+    id: 'public-questionnaire-runner',
+    route: '/public/questionnaire/visual-questionnaire/assessment?sessionId=visual-q-session',
+    role: null,
+    prepare: (page) => page.addInitScript(() => {
+      sessionStorage.setItem('questionnaire_resume_visual-questionnaire', JSON.stringify({
+        sessionId: 'visual-q-session',
+        resumeToken: 'visual-resume-capability',
+      }))
+    }),
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '匿名问卷', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '最近的学习中，哪件事最需要更多支持？', exact: true }).waitFor()
+    },
+  },
+  {
+    id: 'public-questionnaire-result',
+    route: '/public/questionnaire/visual-questionnaire/result?sessionId=visual-q-session',
+    role: null,
+    prepare: (page) => page.addInitScript(() => {
+      sessionStorage.setItem('questionnaire_resume_visual-questionnaire', JSON.stringify({
+        sessionId: 'visual-q-session',
+        resumeToken: 'visual-resume-capability',
+      }))
+    }),
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '学习体验匿名问卷', exact: true }).waitFor()
+      await page.getByText('各量表结果独立展示，不生成跨量表总体分。', { exact: true }).waitFor()
+    },
+  },
+  {
+    id: 'public-checkin',
+    route: '/public/checkin/visual-checkin',
+    role: null,
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '本周学习打卡', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '提交打卡', exact: true }).waitFor()
     },
   },
   { id: 'portal', route: '/', role: null, ready: (page) => page.getByRole('heading', { name: '欢迎使用 Huisurvey', exact: true }).waitFor() },
@@ -351,6 +484,7 @@ async function main() {
         const pageErrors = []
         page.on('pageerror', (error) => pageErrors.push(error.message))
         const apiRequests = await installApiFixture(page, spec.role)
+        if (spec.prepare) await spec.prepare(page)
 
         try {
           const response = await page.goto(baseUrl + spec.route, { waitUntil: 'domcontentloaded' })

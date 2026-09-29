@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
-import { Spin, message, Progress, Card, Button, Input, Result } from 'antd'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { CheckCircle, FileText, Layers } from 'lucide-react'
 import { createPublicCapabilityClient } from '../../api/publicCapabilityClient'
 import { readQuestionnaireResumeToken, saveQuestionnaireResumeToken } from '../../utils/questionnaireResume'
@@ -396,7 +396,6 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     
     if (action === 'answer' && isEmpty) {
       const warning = formItem.required ? '此题为必填项' : '请填写答案或选择跳过'
-      message.warning(warning)
       setRunnerError(warning)
       return
     }
@@ -434,7 +433,6 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     } catch (err: any) {
       const normalized = normalizeApiError(err)
       setRunnerError(normalized.message)
-      message.error(normalized.message)
     } finally {
       savingAnswerRef.current = false
       setSubmitting(false)
@@ -473,7 +471,6 @@ const PublicQuestionnaireAssessment: React.FC = () => {
     } catch (err: any) {
       const normalized = normalizeApiError(err)
       setRunnerError(normalized.message)
-      message.error(normalized.message)
     } finally {
       savingAnswerRef.current = false
       setSubmitting(false)
@@ -558,51 +555,70 @@ const PublicQuestionnaireAssessment: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spin size="large" tip="正在加载测评..." />
-      </div>
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus kind="pending" title="正在加载测评" announce="polite">
+          正在恢复本次匿名问卷状态。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (recoveryState === 'recoverFailed' && !data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Result
-          status="error"
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus
+          kind="error"
           title="恢复测评失败"
-          subTitle={runnerError || '无法恢复当前测评状态，请重试'}
-          extra={<Button type="primary" onClick={() => void fetchAssessment(true)}>重试</Button>}
-        />
-      </div>
+          announce="assertive"
+          actions={<ProductButton variant="primary" onClick={() => void fetchAssessment(true)}>重试</ProductButton>}
+        >
+          {runnerError || '无法恢复当前测评状态，请重试'}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Result
-          status="error"
-          title="测评不存在"
-          subTitle="该测评已失效或已过期"
-        />
-      </div>
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus kind="error" title="测评不存在">该测评已失效或已过期。</ProductStatus>
+      </ProductPage>
     )
   }
 
   if (data.questionnaireAssessment.status === 'COMPLETED') {
-    return <Result status="success" title="问卷测评已完成" extra={<Button type="primary" onClick={() => navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)}>查看结果</Button>} />
+    return (
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus
+          kind="success"
+          title="问卷测评已完成"
+          actions={<ProductButton variant="primary" onClick={() => navigate(`/public/questionnaire/${token}/result?sessionId=${sessionId}`)}>查看结果</ProductButton>}
+        >
+          本次匿名问卷已提交。
+        </ProductStatus>
+      </ProductPage>
+    )
   }
 
   if (data.questionnaireAssessment.deliveryMode === 'LEGACY') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Result
-          status="warning"
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus
+          kind="warning"
           title="这是旧版进行中的问卷"
-          subTitle={runnerError || '旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整段提交测评。'}
-          extra={<Button type="primary" loading={recoveryState === 'retrying'} onClick={() => void restartLegacyAttempt()}>重启并继续作答</Button>}
-        />
-      </div>
+          actions={(
+            <ProductButton
+              variant="primary"
+              disabled={recoveryState === 'retrying'}
+              onClick={() => void restartLegacyAttempt()}
+            >
+              {recoveryState === 'retrying' ? '正在重启…' : '重启并继续作答'}
+            </ProductButton>
+          )}
+        >
+          {runnerError || '旧版答案仍可读取，但不能继续写入。重启会保留历史记录，并创建新的整段提交测评。'}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
@@ -621,216 +637,181 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   }
 
   const runnerBusy = submitting || savingAnswer || answersLoading || recoveryState !== 'ready'
+  const overallProgress = Math.max(0, Math.min(100, ((data.questionnaireAssessment.currentIndex + 1) / Math.max(1, data.totalItems)) * 100))
 
-  // 渲染表单题目
   if (data.currentFormItem) {
     const formItem = data.currentFormItem
+    const answerEmpty = Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-3xl mx-auto">
-          {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
-          {recoveryState === 'recoverFailed' && (
-            <div role="alert" className="mb-4 flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              <span>恢复失败，暂时不能继续作答。</span>
-              <Button size="small" onClick={() => void fetchAssessment(true)}>重试</Button>
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner">
+        <PageHeader
+          title="匿名问卷"
+          description="答案会在当前匿名会话内保存；请按题目提示完成当前内容。"
+        />
+
+        {runnerError && (
+          <ProductStatus kind="error" title="当前操作未完成" announce="assertive">
+            {runnerError}
+          </ProductStatus>
+        )}
+        {recoveryState === 'recoverFailed' && (
+          <ProductStatus
+            kind="warning"
+            title="恢复失败，暂时不能继续作答"
+            actions={<ProductButton onClick={() => void fetchAssessment(true)}>重试</ProductButton>}
+          >
+            已保留当前页面内容；恢复成功后再继续。
+          </ProductStatus>
+        )}
+
+        <section className="hui-public-runner-progress" aria-label="问卷整体进度">
+          <div className="hui-public-runner-progress__meta">
+            <span>进度 {data.questionnaireAssessment.currentIndex + 1} / {data.totalItems}</span>
+            <span><FileText size={15} aria-hidden="true" />表单题目</span>
+          </div>
+          <div
+            className="hui-public-runner-progress__track"
+            role="progressbar"
+            aria-label="问卷整体进度"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(overallProgress)}
+          >
+            <span style={{ width: `${overallProgress}%` }} />
+          </div>
+        </section>
+
+        <section className="hui-public-runner-card" aria-labelledby="public-form-question">
+          <div className="hui-public-runner-question-meta">
+            <span>{formItem.required ? '必答' : '选答'}</span>
+            <span>{formItem.type === 'fill_blank' ? '填空' :
+              formItem.type === 'single_choice' ? '单选' :
+              formItem.type === 'multiple_choice' ? '多选' :
+              formItem.type === 'text_input' ? '长文本' :
+              formItem.type === 'year_month' ? '年月' : '题目'}</span>
+          </div>
+          <h1 id="public-form-question" className="hui-public-runner-question">{formItem.label}</h1>
+
+          {formItem.type === 'fill_blank' && (
+            <input
+              value={typeof formAnswer === 'string' ? formAnswer : ''}
+              onChange={(event) => setFormAnswer(event.target.value)}
+              disabled={runnerBusy}
+              placeholder={formItem.placeholder || '请输入'}
+              className="hui-public-runner-input"
+            />
+          )}
+
+          {formItem.type === 'text_input' && (
+            <textarea
+              value={typeof formAnswer === 'string' ? formAnswer : ''}
+              onChange={(event) => setFormAnswer(event.target.value)}
+              disabled={runnerBusy}
+              placeholder={formItem.placeholder || '请输入'}
+              rows={5}
+              className="hui-public-runner-input"
+            />
+          )}
+
+          {formItem.type === 'year_month' && (
+            <input
+              type="month"
+              value={typeof formAnswer === 'string' ? formAnswer : ''}
+              onChange={(event) => setFormAnswer(event.target.value)}
+              disabled={runnerBusy}
+              className="hui-public-runner-input"
+            />
+          )}
+
+          {formItem.contextKey && (
+            <p className="hui-public-runner-note">此字段用于本次问卷的测评参考；进入量表后将冻结，并由同一问卷中的后续量表共享。</p>
+          )}
+
+          {formItem.type === 'single_choice' && (
+            <div className="hui-public-runner-options">
+              {parseFormOptions(formItem.options).map((option) => {
+                const selected = formAnswer === option.value
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setFormAnswer(option.value)}
+                    disabled={runnerBusy}
+                    className={`hui-public-runner-option${selected ? ' hui-public-runner-option--selected' : ''}`}
+                  >
+                    {option.label}
+                  </button>
+                )
+              })}
             </div>
           )}
-          {/* 整体进度 */}
-          <Card className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">
-                进度：{data.questionnaireAssessment.currentIndex + 1} / {data.totalItems}
-              </span>
-              <span className="flex items-center gap-1 text-gray-600">
-                <FileText className="w-4 h-4" />
-                表单题目
-              </span>
+
+          {formItem.type === 'multiple_choice' && (
+            <div className="hui-public-runner-options">
+              {parseFormOptions(formItem.options).map((option) => {
+                const currentAnswers = Array.isArray(formAnswer) ? formAnswer : []
+                const selected = currentAnswers.includes(option.value)
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      if (runnerBusy) return
+                      setFormAnswer(selected
+                        ? currentAnswers.filter((value) => value !== option.value)
+                        : [...currentAnswers, option.value])
+                    }}
+                    disabled={runnerBusy}
+                    className={`hui-public-runner-option hui-public-runner-option--multiple${selected ? ' hui-public-runner-option--selected' : ''}`}
+                  >
+                    <span className="hui-public-runner-option__check" aria-hidden="true">{selected ? '✓' : ''}</span>
+                    {option.label}
+                  </button>
+                )
+              })}
             </div>
-            <Progress 
-              percent={((data.questionnaireAssessment.currentIndex + 1) / data.totalItems) * 100}
-              showInfo={false}
-            />
-          </Card>
+          )}
+        </section>
 
-          {/* 表单内容 */}
-          <Card className="shadow-lg mb-4">
-            <h3 className="text-xl font-medium mb-6">
-              {formItem.label}
-              <span className="ml-2 text-sm font-normal">
-                {formItem.required ? (
-                  <span className="text-red-500">【必答】</span>
-                ) : (
-                  <span className="text-gray-400">【选答】</span>
-                )}
-              </span>
-              <span className="ml-2 text-sm font-normal text-gray-500">
-                【{formItem.type === 'fill_blank' ? '填空' : 
-                    formItem.type === 'single_choice' ? '单选' : 
-                    formItem.type === 'multiple_choice' ? '多选' : 
-                    formItem.type === 'text_input' ? '长文本' :
-                    formItem.type === 'year_month' ? '年月' : '未知'}】
-              </span>
-            </h3>
-
-            {formItem.type === 'fill_blank' && (
-              <Input
-                value={formAnswer}
-                onChange={(e) => setFormAnswer(e.target.value)}
-                disabled={runnerBusy}
-                placeholder={formItem.placeholder || '请输入'}
-                size="large"
-              />
-            )}
-
-            {formItem.type === 'text_input' && (
-              <Input.TextArea
-                value={formAnswer}
-                onChange={(e) => setFormAnswer(e.target.value)}
-                disabled={runnerBusy}
-                placeholder={formItem.placeholder || '请输入'}
-                rows={5}
-                size="large"
-              />
-            )}
-
-            {formItem.type === 'year_month' && (
-              <Input
-                type="month"
-                value={typeof formAnswer === 'string' ? formAnswer : ''}
-                onChange={(e) => setFormAnswer(e.target.value)}
-                disabled={runnerBusy}
-                size="large"
-              />
-            )}
-
-            {formItem.contextKey && (
-              <p className="text-sm text-gray-500 mt-3">此字段用于本次问卷的测评参考；进入量表后将冻结，并由同一问卷中的后续量表共享。</p>
-            )}
-
-            {formItem.type === 'single_choice' && (
-              <div className="space-y-3">
-                {(() => {
-                  // 解析 options（兼容字符串和数组）
-                  const options = parseFormOptions(formItem.options)
-                  
-                  return options.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setFormAnswer(option.value)}
-                      disabled={runnerBusy}
-                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
-                        formAnswer === option.value
-                          ? 'border-blue-500 bg-blue-50 text-blue-600'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))
-                })()}
-              </div>
-            )}
-
-            {formItem.type === 'multiple_choice' && (
-              <div className="space-y-3">
-                {(() => {
-                  // 解析 options（兼容字符串和数组）
-                  const options = parseFormOptions(formItem.options)
-                  
-                  return options.map((option) => {
-                    const currentAnswers = Array.isArray(formAnswer) ? formAnswer : []
-                    const isSelected = currentAnswers.includes(option.value)
-                    
-                    return (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          if (runnerBusy) return
-                          if (isSelected) {
-                            setFormAnswer(currentAnswers.filter(v => v !== option.value))
-                          } else {
-                            setFormAnswer([...currentAnswers, option.value])
-                          }
-                        }}
-                        className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
-                          isSelected
-                            ? 'border-purple-500 bg-purple-50 text-purple-700'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={isSelected} 
-                          readOnly 
-                          className="mr-2"
-                        />
-                        {option.label}
-                      </button>
-                    )
-                  })
-                })()}
-              </div>
-            )}
-          </Card>
-
-          {/* 提交按钮 */}
-          <div className="flex justify-end">
-            <Button
-              type="primary"
-              size="large"
-              onClick={() => void handleFormSubmit()}
-              loading={submitting}
-              disabled={runnerBusy || (formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()))}
-              icon={<CheckCircle className="w-4 h-4 mr-1" />}
-            >
-              {submitting ? '提交中...' : '提交并继续'}
-            </Button>
-            {!formItem.required && !formItem.contextKey && (
-              <Button
-                className="ml-3"
-                onClick={() => void handleFormSubmit('skip')}
-                disabled={runnerBusy}
-              >
-                跳过
-              </Button>
-            )}
-          </div>
-
-          {/* 内容导航 */}
-          <Card className="mt-6">
-            <div className="text-sm text-gray-600 mb-3">内容导航</div>
-            <div className="flex flex-wrap gap-2">
-              {data.contentItems.map((item, idx) => (
-                <button
-                  key={item.id}
-                  className={`w-10 h-10 rounded text-sm font-medium transition-colors ${
-                    idx === data.questionnaireAssessment.currentIndex
-                      ? 'bg-blue-500 text-white'
-                      : item.completed
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {idx + 1}
-                </button>
-              ))}
-            </div>
-          </Card>
+        <div className="hui-public-runner-actions">
+          <ProductButton
+            variant="primary"
+            onClick={() => void handleFormSubmit()}
+            disabled={runnerBusy || (formItem.required && answerEmpty)}
+          >
+            <CheckCircle size={16} aria-hidden="true" />
+            {submitting ? '提交中...' : '提交并继续'}
+          </ProductButton>
+          {!formItem.required && !formItem.contextKey && (
+            <ProductButton onClick={() => void handleFormSubmit('skip')} disabled={runnerBusy}>跳过</ProductButton>
+          )}
         </div>
-      </div>
+
+        <section className="hui-public-runner-nav" aria-label="内容导航">
+          <span className="hui-public-runner-nav__label">内容导航</span>
+          <div>
+            {data.contentItems.map((item, index) => (
+              <span
+                key={item.id}
+                aria-current={index === data.questionnaireAssessment.currentIndex ? 'step' : undefined}
+                className={`hui-public-runner-nav__item${index === data.questionnaireAssessment.currentIndex ? ' is-current' : item.completed ? ' is-complete' : ''}`}
+              >
+                {index + 1}
+              </span>
+            ))}
+          </div>
+        </section>
+      </ProductPage>
     )
   }
 
-  // 渲染量表题目
   if (!data.currentScale) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Result
-          status="error"
-          title="测评已结束"
-          subTitle="该测评已失效或已过期"
-        />
-      </div>
+      <ProductPage width="assessment" className="hui-public-questionnaire-runner hui-public-runner--centered">
+        <ProductStatus kind="error" title="测评已结束">该测评已失效或已过期。</ProductStatus>
+      </ProductPage>
     )
   }
 
@@ -840,125 +821,106 @@ const PublicQuestionnaireAssessment: React.FC = () => {
   const handleAnswer = async (value: number | string) => {
     try {
       await handleSelectAnswer(value)
-    } catch (err: any) {
-      message.error(err.message || '提交失败')
+    } catch (err) {
+      setRunnerError(err instanceof Error ? err.message : '提交失败')
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        {runnerError && <p role="alert" className="mb-4 text-sm text-red-600">{runnerError}</p>}
-        {recoveryState === 'recoverFailed' && (
-          <div role="alert" className="mb-4 flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <span>恢复失败，暂时不能继续作答。</span>
-            <Button size="small" onClick={() => void fetchAssessment(true)}>重试</Button>
-          </div>
-        )}
-        {/* 进度条 */}
-        <Card className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">
-              <Layers className="w-4 h-4 inline mr-1" />
-              量表：{data.currentScale.name}
-            </span>
-            <span className="text-gray-600">
-              整体进度：{data.questionnaireAssessment.currentIndex + 1} / {data.totalItems}
-            </span>
-          </div>
-          <Progress 
-            percent={((data.questionnaireAssessment.currentIndex + 1) / data.totalItems) * 100}
-            showInfo={false}
-          />
-        </Card>
+    <ProductPage width="assessment" className="hui-public-questionnaire-runner">
+      <PageHeader
+        title={data.currentScale.name}
+        description="请根据当前题目选择最符合实际情况的答案。"
+      />
 
-        {/* 题目卡片 */}
-        <Card className="shadow-lg">
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-gray-500 text-sm">
-                第 {scaleIndex + 1} / {items.length} 题
-              </span>
-            </div>
+      {runnerError && (
+        <ProductStatus kind="error" title="当前操作未完成" announce="assertive">
+          {runnerError}
+        </ProductStatus>
+      )}
+      {recoveryState === 'recoverFailed' && (
+        <ProductStatus
+          kind="warning"
+          title="恢复失败，暂时不能继续作答"
+          actions={<ProductButton onClick={() => void fetchAssessment(true)}>重试</ProductButton>}
+        >
+          已保留当前页面内容；恢复成功后再继续。
+        </ProductStatus>
+      )}
 
-            <h3 className="text-xl font-medium mb-8">
-              {currentItem.content}
-            </h3>
+      <section className="hui-public-runner-progress" aria-label="问卷整体进度">
+        <div className="hui-public-runner-progress__meta">
+          <span><Layers size={15} aria-hidden="true" />量表</span>
+          <span>整体进度 {data.questionnaireAssessment.currentIndex + 1} / {data.totalItems}</span>
+        </div>
+        <div
+          className="hui-public-runner-progress__track"
+          role="progressbar"
+          aria-label="问卷整体进度"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(overallProgress)}
+        >
+          <span style={{ width: `${overallProgress}%` }} />
+        </div>
+      </section>
 
-            {/* 答题区域 */}
-            <div className="space-y-3">
-              {currentItem.options.map((option) => (
-                <button
-                  key={`${typeof option.value}:${String(option.value)}`}
-                  onClick={() => void handleAnswer(option.value)}
-                  disabled={runnerBusy}
-                  className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
-                    answers[currentItem.itemCode] === option.value
-                      ? 'border-blue-500 bg-blue-50 text-blue-600'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
+      <section className="hui-public-runner-card" aria-labelledby="public-scale-question">
+        <div className="hui-public-runner-question-meta">
+          <span>第 {scaleIndex + 1} / {items.length} 题</span>
+        </div>
+        <h1 id="public-scale-question" className="hui-public-runner-question">{currentItem.content}</h1>
 
-          {/* 导航按钮 */}
-          <div className="flex justify-between mt-8">
-            <Button
-              onClick={handlePrevious}
-              disabled={scaleIndex === 0 || runnerBusy}
+        <div className="hui-public-runner-options">
+          {currentItem.options.map((option) => {
+            const selected = answers[currentItem.itemCode] === option.value
+            return (
+              <button
+                key={`${typeof option.value}:${String(option.value)}`}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => void handleAnswer(option.value)}
+                disabled={runnerBusy}
+                className={`hui-public-runner-option${selected ? ' hui-public-runner-option--selected' : ''}`}
+              >
+                {option.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="hui-public-runner-question-actions">
+          <ProductButton onClick={handlePrevious} disabled={scaleIndex === 0 || runnerBusy}>上一题</ProductButton>
+          {scaleIndex === items.length - 1 ? (
+            <ProductButton variant="primary" onClick={() => void handleCompleteScale()} disabled={runnerBusy}>
+              <CheckCircle size={16} aria-hidden="true" />
+              {submitting ? '提交中...' : `完成量表${data.questionnaireAssessment.currentIndex + 1 < data.totalItems ? '（进入下一个内容）' : '（完成测评）'}`}
+            </ProductButton>
+          ) : (
+            <ProductButton variant="primary" onClick={handleNext} disabled={runnerBusy}>下一题</ProductButton>
+          )}
+        </div>
+      </section>
+
+      <section className="hui-public-runner-nav" aria-label="题目导航">
+        <span className="hui-public-runner-nav__label">题目导航</span>
+        <div>
+          {items.map((item, index) => (
+            <button
+              key={item.itemCode}
+              type="button"
+              aria-label={`第 ${index + 1} 题`}
+              aria-current={scaleIndex === index ? 'step' : undefined}
+              onClick={() => setScaleIndex(index)}
+              disabled={runnerBusy}
+              className={`hui-public-runner-nav__item${scaleIndex === index ? ' is-current' : answers[item.itemCode] !== undefined ? ' is-complete' : ''}`}
             >
-              上一题
-            </Button>
-            
-            {scaleIndex === items.length - 1 ? (
-              <Button
-                type="primary"
-                onClick={handleCompleteScale}
-                loading={submitting}
-                disabled={runnerBusy}
-                icon={<CheckCircle className="w-4 h-4 mr-1" />}
-              >
-                {submitting ? '提交中...' : `完成量表${data.questionnaireAssessment.currentIndex + 1 < data.totalItems ? '（进入下一个内容）' : '（完成测评）'}`}
-              </Button>
-            ) : (
-              <Button
-                type="primary"
-                onClick={handleNext}
-                disabled={runnerBusy}
-              >
-                下一题
-              </Button>
-            )}
-          </div>
-
-          {/* 题目导航 */}
-          <Card className="mt-6 bg-gray-50">
-            <div className="text-sm text-gray-600 mb-3">题目导航</div>
-            <div className="flex flex-wrap gap-2">
-              {items.map((item, index) => (
-                <button
-                  key={item.itemCode}
-                  onClick={() => setScaleIndex(index)}
-                  disabled={runnerBusy}
-                  className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
-                    scaleIndex === index
-                      ? 'bg-blue-500 text-white'
-                      : answers[item.itemCode] !== undefined
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-          </Card>
-        </Card>
-      </div>
-    </div>
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      </section>
+    </ProductPage>
   )
 }
 

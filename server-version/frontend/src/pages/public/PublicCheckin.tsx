@@ -5,11 +5,12 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button, Card, Image, Input, Result, Spin, Upload, message } from 'antd'
-import { CameraOutlined, CheckCircleOutlined, FileTextOutlined, UploadOutlined, VideoCameraOutlined } from '@ant-design/icons'
+import { Image, Upload } from 'antd'
 import type { UploadFile } from 'antd/es/upload/interface'
+import { Camera, FileText, Upload as UploadIcon, Video } from 'lucide-react'
 import { sanitizeHtml } from '../../utils/sanitize'
 import { isSafeExternalMediaUrl } from '../../utils/mediaUtils'
+import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 type PublicAssetSource = string | {
   assetId?: string
@@ -119,29 +120,28 @@ const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string 
 const PublicAssetImage: React.FC<{ source: PublicAssetSource; token?: string; alt: string }> = ({ source, token, alt }) => {
   const url = usePublicAssetUrl(source, token)
   return url ? (
-    <Image src={url} alt={alt} className="rounded-lg object-cover" style={{ maxHeight: '200px', width: '100%' }} />
+    <Image src={url} alt={alt} className="hui-public-checkin__image" preview={{ mask: '查看大图' }} />
   ) : (
-    <div className="flex h-32 items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-500">图片暂不可用</div>
+    <div className="hui-public-checkin__asset-unavailable">图片暂不可用</div>
   )
 }
 
 const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; title: string }> = ({ source, token, title }) => {
   const url = usePublicAssetUrl(source, token)
-  if (!url) return <div className="rounded-lg border bg-red-50 p-4 text-sm text-red-600">{title}：视频暂不可用</div>
+  if (!url) return <div className="hui-public-checkin__asset-error">{title}：视频暂不可用</div>
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-gray-50">
-      <div className="flex items-center p-3">
-        <VideoCameraOutlined className="mr-2 text-blue-500" aria-hidden="true" />
-        <span className="text-sm font-medium">{title}</span>
+    <div className="hui-public-checkin__video">
+      <div className="hui-public-checkin__asset-heading">
+        <Video size={17} aria-hidden="true" />
+        <span>{title}</span>
       </div>
-      <div onContextMenu={event => event.preventDefault()} className="relative">
+      <div onContextMenu={event => event.preventDefault()}>
         <video
           src={url}
           controls
           controlsList="nodownload"
           disablePictureInPicture
-          className="max-h-80 w-full bg-black"
           preload="metadata"
           onContextMenu={event => event.preventDefault()}
           poster="/video-error.png"
@@ -156,14 +156,14 @@ const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; ti
 
 const DocumentBody: React.FC<{ title: string; size?: string; available: boolean }> = ({ title, size, available }) => (
   <>
-    <div className="flex items-center gap-3">
-      <FileTextOutlined className="text-xl text-red-500" aria-hidden="true" />
+    <div className="hui-public-checkin__document-copy">
+      <FileText size={20} aria-hidden="true" />
       <div>
-        <div className="text-sm font-medium text-gray-900">{title}</div>
-        {size && <div className="text-xs text-gray-500">{size}</div>}
+        <strong>{title}</strong>
+        {size && <small>{size}</small>}
       </div>
     </div>
-    <span className="text-sm text-blue-600">{available ? '在线查看' : '暂不可用'}</span>
+    <span>{available ? '在线查看' : '暂不可用'}</span>
   </>
 )
 
@@ -171,7 +171,7 @@ const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string;
   const url = usePublicAssetUrl(source, token)
   if (!url) {
     return (
-      <div className="flex items-center justify-between rounded-lg border p-3 opacity-60" aria-disabled="true">
+      <div className="hui-public-checkin__document hui-public-checkin__document--disabled" aria-disabled="true">
         <DocumentBody title={title} size={size} available={false} />
       </div>
     )
@@ -182,7 +182,7 @@ const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string;
       type="button"
       onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
       onContextMenu={event => event.preventDefault()}
-      className="flex w-full items-center justify-between rounded-lg border p-3 text-left transition-colors hover:bg-gray-50"
+      className="hui-public-checkin__document"
       aria-label={`在线查看 ${title}`}
     >
       <DocumentBody title={title} size={size} available />
@@ -223,9 +223,8 @@ const PublicCheckin: React.FC = () => {
       setSessionCapability(data.data.sessionCapability)
       sessionStorage.setItem(`checkin_session_${token}`, data.data.sessionId)
       sessionStorage.setItem(`checkin_session_capability_${token}`, data.data.sessionCapability)
-    } catch (fetchError: any) {
-      setError(fetchError.message || '打卡访问失败')
-      message.error(fetchError.message || '打卡访问失败')
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : '打卡访问失败')
     } finally {
       setLoading(false)
     }
@@ -274,12 +273,9 @@ const PublicCheckin: React.FC = () => {
         throw new Error(errorData.message || '提交失败')
       }
 
-      message.success('提交成功！')
       setSubmitted(true)
-    } catch (operationError: any) {
-      const text = operationError.message || '提交失败'
-      setSubmitError(text)
-      message.error(text)
+    } catch (operationError) {
+      setSubmitError(operationError instanceof Error ? operationError.message : '提交失败')
     } finally {
       setSubmitting(false)
     }
@@ -287,158 +283,162 @@ const PublicCheckin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" role="status" aria-live="polite">
-        <div className="text-center">
-          <Spin size="large" />
-          <div className="mt-4 text-gray-600">正在加载打卡信息...</div>
-        </div>
-      </div>
+      <ProductPage width="reading" className="hui-public-participation hui-public-participation--centered">
+        <ProductStatus kind="pending" title="正在加载打卡信息" announce="polite">
+          正在确认匿名入口与本次打卡会话。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Result
-          status="error"
+      <ProductPage width="reading" className="hui-public-participation hui-public-participation--centered">
+        <ProductStatus
+          kind="error"
           title="访问失败"
-          subTitle={error}
-          extra={<Button type="primary" onClick={() => void validateAndFetchCheckin()}>重试</Button>}
-        />
-      </div>
+          announce="assertive"
+          actions={<ProductButton variant="primary" onClick={() => void validateAndFetchCheckin()}>重试</ProductButton>}
+        >
+          {error}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Result status="success" icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />} title="提交成功" subTitle="感谢您的参与！" />
-      </div>
+      <ProductPage width="reading" className="hui-public-participation hui-public-participation--centered">
+        <ProductStatus kind="success" title="提交成功" announce="polite">
+          感谢您的参与。
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   const isEnded = checkin?.endTime && new Date(checkin.endTime) < new Date()
   if (isEnded) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Result status="warning" title="打卡已结束" subTitle={`截止时间：${new Date(checkin.endTime!).toLocaleString('zh-CN')}`} />
-      </div>
+      <ProductPage width="reading" className="hui-public-participation hui-public-participation--centered">
+        <ProductStatus kind="warning" title="打卡已结束">
+          截止时间：{new Date(checkin.endTime!).toLocaleString('zh-CN')}
+        </ProductStatus>
+      </ProductPage>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:py-12">
-      <main className="mx-auto max-w-3xl">
-        <Card className="shadow-lg">
-          <header className="mb-8">
-            <h1 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl">{checkin?.title}</h1>
-            {checkin?.description && <p className="mb-6 text-gray-600">{checkin.description}</p>}
-            {checkin?.endTime && (
-              <div className="mb-6 rounded-lg bg-yellow-50 p-4">
-                <p className="text-sm text-yellow-800">📅 截止时间：{new Date(checkin.endTime).toLocaleString('zh-CN')}</p>
+    <ProductPage width="reading" className="hui-public-participation hui-public-checkin">
+      <PageHeader title={checkin?.title || '匿名打卡'} description={checkin?.description || '请根据页面说明完成本次打卡。'} />
+
+      {checkin?.endTime && (
+        <ProductStatus kind="warning" title="截止时间">
+          {new Date(checkin.endTime).toLocaleString('zh-CN')}
+        </ProductStatus>
+      )}
+
+      {checkin?.content && (
+        <section className="hui-public-checkin__content" aria-label="打卡说明">
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }} />
+        </section>
+      )}
+
+      {checkin?.images && checkin.images.length > 0 && (
+        <section className="hui-public-checkin__section" aria-labelledby="public-checkin-images-title">
+          <h2 id="public-checkin-images-title">参考图片</h2>
+          <div className="hui-public-checkin__image-grid">
+            {checkin.images.map((image, index) => (
+              <PublicAssetImage key={index} source={image} token={token} alt={`参考图片 ${index + 1}`} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {checkin?.videos && checkin.videos.length > 0 && (
+        <section className="hui-public-checkin__section" aria-labelledby="public-checkin-videos-title">
+          <h2 id="public-checkin-videos-title">参考视频</h2>
+          <div className="hui-public-checkin__asset-list">
+            {checkin.videos.map((video, index) => {
+              const videoTitle = typeof video === 'string' ? `视频 ${index + 1}` : (video.title || `视频 ${index + 1}`)
+              return <PublicAssetVideo key={index} source={video} token={token} title={videoTitle} />
+            })}
+          </div>
+        </section>
+      )}
+
+      {checkin?.documents && checkin.documents.length > 0 && (
+        <section className="hui-public-checkin__section" aria-labelledby="public-checkin-documents-title">
+          <h2 id="public-checkin-documents-title">参考文档</h2>
+          <div className="hui-public-checkin__asset-list">
+            {checkin.documents.map((document, index) => {
+              const documentTitle = typeof document === 'string' ? `文档 ${index + 1}` : (document.title || document.fileName || `文档 ${index + 1}`)
+              const documentBytes = typeof document === 'string' ? undefined : (document.size || document.fileSize)
+              const documentSize = documentBytes ? `${(documentBytes / 1024).toFixed(1)} KB` : ''
+              return <PublicAssetDocument key={index} source={document} token={token} title={documentTitle} size={documentSize} />
+            })}
+          </div>
+        </section>
+      )}
+
+      <section className="hui-public-checkin__response" aria-labelledby="public-checkin-response-title">
+        <h2 id="public-checkin-response-title">提交打卡</h2>
+
+        <label htmlFor="public-checkin-content" className="hui-public-checkin__field">
+          <span>打卡内容</span>
+          <textarea
+            id="public-checkin-content"
+            rows={5}
+            value={content}
+            onChange={event => setContent(event.target.value)}
+            placeholder="请输入打卡内容..."
+            maxLength={1000}
+          />
+          <small>{content.length} / 1000</small>
+        </label>
+
+        <div className="hui-public-checkin__field">
+          <div id="public-checkin-upload-label" className="hui-public-checkin__field-label">
+            <Camera size={17} aria-hidden="true" />
+            上传图片（可选）
+          </div>
+          <Upload
+            aria-labelledby="public-checkin-upload-label"
+            listType="picture-card"
+            fileList={imageList}
+            onChange={({ fileList }) => setImageList(fileList)}
+            beforeUpload={() => false}
+            maxCount={9}
+            accept="image/*"
+          >
+            {imageList.length < 9 && (
+              <div className="hui-public-checkin__upload-trigger">
+                <UploadIcon size={18} aria-hidden="true" />
+                <span>上传</span>
               </div>
             )}
-          </header>
+          </Upload>
+        </div>
 
-          {checkin?.content && (
-            <div className="mb-8 rounded-lg bg-gray-50 p-4 sm:p-6">
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }} />
-            </div>
-          )}
+        <ProductStatus kind="info" title="匿名提交">
+          本次打卡采用匿名方式，您的提交将被记录，但不会在该公共页面显示个人身份信息。
+        </ProductStatus>
 
-          {checkin?.images && checkin.images.length > 0 && (
-            <section className="mb-8" aria-labelledby="public-checkin-images-title">
-              <h2 id="public-checkin-images-title" className="mb-4 font-semibold text-gray-900">参考图片</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {checkin.images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <PublicAssetImage source={image} token={token} alt={`参考图片 ${index + 1}`} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+        {submitError && (
+          <ProductStatus kind="error" title="提交失败" announce="assertive">
+            {submitError}
+          </ProductStatus>
+        )}
 
-          {checkin?.videos && checkin.videos.length > 0 && (
-            <section className="mb-8" aria-labelledby="public-checkin-videos-title">
-              <h2 id="public-checkin-videos-title" className="mb-4 flex items-center font-semibold text-gray-900">
-                <VideoCameraOutlined className="mr-2" aria-hidden="true" />参考视频
-              </h2>
-              <div className="space-y-3">
-                {checkin.videos.map((video, index) => {
-                  const videoTitle = typeof video === 'string' ? `视频 ${index + 1}` : (video.title || `视频 ${index + 1}`)
-                  return <PublicAssetVideo key={index} source={video} token={token} title={videoTitle} />
-                })}
-              </div>
-            </section>
-          )}
-
-          {checkin?.documents && checkin.documents.length > 0 && (
-            <section className="mb-8" aria-labelledby="public-checkin-documents-title">
-              <h2 id="public-checkin-documents-title" className="mb-4 flex items-center font-semibold text-gray-900">
-                <FileTextOutlined className="mr-2" aria-hidden="true" />参考文档
-              </h2>
-              <div className="space-y-2">
-                {checkin.documents.map((document, index) => {
-                  const documentTitle = typeof document === 'string' ? `文档 ${index + 1}` : (document.title || document.fileName || `文档 ${index + 1}`)
-                  const documentBytes = typeof document === 'string' ? undefined : (document.size || document.fileSize)
-                  const documentSize = documentBytes ? `${(documentBytes / 1024).toFixed(1)} KB` : ''
-                  return <PublicAssetDocument key={index} source={document} token={token} title={documentTitle} size={documentSize} />
-                })}
-              </div>
-            </section>
-          )}
-
-          <section className="space-y-6" aria-labelledby="public-checkin-response-title">
-            <h2 id="public-checkin-response-title" className="sr-only">提交打卡</h2>
-            <div>
-              <label htmlFor="public-checkin-content" className="mb-2 block text-sm font-medium text-gray-700">打卡内容</label>
-              <Input.TextArea
-                id="public-checkin-content"
-                rows={4}
-                value={content}
-                onChange={event => setContent(event.target.value)}
-                placeholder="请输入打卡内容..."
-                maxLength={1000}
-                showCount
-              />
-            </div>
-
-            <div>
-              <div id="public-checkin-upload-label" className="mb-2 block text-sm font-medium text-gray-700">
-                <CameraOutlined className="mr-2" aria-hidden="true" />上传图片（可选）
-              </div>
-              <Upload
-                aria-labelledby="public-checkin-upload-label"
-                listType="picture-card"
-                fileList={imageList}
-                onChange={({ fileList }) => setImageList(fileList)}
-                beforeUpload={() => false}
-                maxCount={9}
-                accept="image/*"
-              >
-                {imageList.length < 9 && (
-                  <div>
-                    <UploadOutlined aria-hidden="true" />
-                    <div style={{ marginTop: 8 }}>上传</div>
-                  </div>
-                )}
-              </Upload>
-            </div>
-
-            <div className="rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">ℹ️ 本次打卡采用匿名方式，您的提交将被记录但不会显示个人信息</p>
-            </div>
-
-            {submitError && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{submitError}</div>}
-
-            <Button type="primary" size="large" block onClick={handleSubmit} loading={submitting} disabled={!content && imageList.length === 0}>
-              提交打卡
-            </Button>
-          </section>
-        </Card>
-      </main>
-    </div>
+        <ProductButton
+          variant="primary"
+          className="hui-public-checkin__submit"
+          onClick={() => void handleSubmit()}
+          disabled={submitting || (!content && imageList.length === 0)}
+        >
+          {submitting ? '提交中…' : '提交打卡'}
+        </ProductButton>
+      </section>
+    </ProductPage>
   )
 }
 

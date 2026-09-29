@@ -496,70 +496,237 @@
 }
 
 
-/* Ant Design compatibility for the legacy public questionnaire runner.
- * Kept inside focused mode so standard/public pages are unaffected. */
-.hui-app--assessment-runner .ant-card {
-  border: 1px solid var(--runner-line);
+/* Public Questionnaire legacy-delivery runner after Product UI convergence. */
+.hui-public-questionnaire-runner {
+  display: grid;
+  gap: 16px;
+}
+.hui-public-runner--centered {
+  min-height: min(76dvh, 48rem);
+  align-content: center;
+}
+.hui-public-questionnaire-runner .hui-page-header {
+  margin-bottom: 2px;
+  padding: 20px 22px;
+  border: 1px solid #dce9f4;
   border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 5px 20px rgba(20,48,74,.045) !important;
+  background:
+    radial-gradient(circle at 92% 16%, rgba(56,189,248,.13) 0 4.5rem, transparent 4.6rem),
+    linear-gradient(135deg,#f1f8ff 0%,#fbfdff 68%,#eefaf4 100%);
 }
-.hui-app--assessment-runner .ant-card .ant-card-body {
-  padding: clamp(20px,3vw,26px);
+.hui-public-runner-progress,
+.hui-public-runner-card,
+.hui-public-runner-nav {
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--runner-line);
+  border-radius: 16px;
+  background: var(--runner-surface);
+  box-shadow: var(--hui-ds-shadow-subtle);
 }
-.hui-app--assessment-runner .ant-btn {
-  min-height: 44px;
-  border-radius: 10px;
-  font-weight: 600;
-  box-shadow: none;
+.hui-public-runner-progress__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--runner-muted);
+  font-size: 12px;
 }
-.hui-app--assessment-runner .ant-btn-primary {
+.hui-public-runner-progress__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hui-public-runner-progress__track {
+  overflow: hidden;
+  height: 7px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: #e6edf4;
+}
+.hui-public-runner-progress__track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
   background: var(--runner-blue);
-  border-color: var(--runner-blue);
+  transition: width .18s ease;
 }
-.hui-app--assessment-runner .ant-btn-primary:hover,
-.hui-app--assessment-runner .ant-btn-primary:focus {
-  background: var(--runner-blue-hover);
-  border-color: var(--runner-blue-hover);
+.hui-public-runner-question-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
 }
-.hui-app--assessment-runner :where(
-  .ant-input,
-  .ant-input-affix-wrapper,
-  .ant-select-selector,
-  .ant-picker,
-  textarea.ant-input
-) {
-  min-height: 46px;
-  border-color: #d4e0ea;
-  border-radius: 10px !important;
+.hui-public-runner-question-meta span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--runner-soft);
+  color: #52677c;
+  font-size: 10px;
+  font-weight: 700;
 }
-.hui-app--assessment-runner .ant-progress-bg {
-  background: var(--runner-blue) !important;
+.hui-public-runner-question {
+  margin: 0 0 20px;
+  color: var(--runner-ink);
+  font-size: clamp(18px, 1rem + .55vw, 22px);
+  font-weight: 700;
+  line-height: 1.55;
 }
-.hui-app--assessment-runner .ant-result {
-  width: min(100%,42rem);
-  margin-inline: auto;
-  padding: 28px 22px;
-  border: 1px solid var(--runner-line);
-  border-radius: 18px;
+.hui-public-runner-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 12px;
+  border: 1px solid #d4e0ea;
+  border-radius: 11px;
   background: #fff;
+  color: var(--runner-ink);
+  font: inherit;
+  line-height: 1.6;
+}
+textarea.hui-public-runner-input {
+  min-height: 132px;
+  resize: vertical;
+}
+.hui-public-runner-input:focus {
+  border-color: var(--runner-blue);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(47,111,237,.11);
+}
+.hui-public-runner-note {
+  margin: 10px 0 0;
+  color: var(--runner-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+.hui-public-runner-options {
+  display: grid;
+  gap: 9px;
+}
+.hui-public-runner-option {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid #d5e0e9;
+  border-radius: 11px;
+  background: #fff;
+  color: #314a61;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  text-align: left;
+}
+.hui-public-runner-option:hover:not(:disabled) {
+  border-color: #b7cbe0;
+  background: #fbfdff;
+}
+.hui-public-runner-option--selected {
+  border-color: #8aace3;
+  background: #eff5ff;
+  color: #244f96;
+  box-shadow: inset 0 0 0 1px rgba(47,111,237,.08);
+}
+.hui-public-runner-option__check {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #b8c9d8;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--runner-blue);
+  font-size: 12px;
+}
+.hui-public-runner-option--selected .hui-public-runner-option__check {
+  border-color: #8aace3;
+  background: #fff;
+}
+.hui-public-runner-actions,
+.hui-public-runner-question-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+.hui-public-runner-question-actions {
+  justify-content: space-between;
+  margin-top: 22px;
+}
+.hui-public-runner-actions .hui-button,
+.hui-public-runner-question-actions .hui-button {
+  gap: 7px;
+}
+.hui-public-runner-nav__label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--runner-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.hui-public-runner-nav > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.hui-public-runner-nav__item {
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #d9e3ec;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #52677c;
+  font-size: 12px;
+  font-weight: 700;
+}
+button.hui-public-runner-nav__item:hover:not(:disabled) {
+  border-color: #b9ccdf;
+  background: #f2f7fb;
+}
+.hui-public-runner-nav__item.is-current {
+  border-color: var(--runner-blue);
+  background: var(--runner-blue);
+  color: #fff;
+}
+.hui-public-runner-nav__item.is-complete:not(.is-current) {
+  border-color: #b9d9c9;
+  background: #f0f8f4;
+  color: #2f6d50;
 }
 
 @media (max-width:39.999rem) {
-  .hui-app--assessment-runner .ant-card .ant-card-body {
-    padding: 16px;
+  .hui-public-runner--centered {
+    min-height: calc(100dvh - 88px);
   }
-  .hui-app--assessment-runner .ant-result {
-    padding: 22px 16px;
-    border-radius: 16px;
+  .hui-public-questionnaire-runner .hui-page-header,
+  .hui-public-runner-progress,
+  .hui-public-runner-card,
+  .hui-public-runner-nav {
+    padding: 15px;
+    border-radius: 15px;
   }
-  .hui-app--assessment-runner .ant-result-extra {
+  .hui-public-runner-progress__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .hui-public-runner-actions,
+  .hui-public-runner-question-actions {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
   }
-  .hui-app--assessment-runner .ant-result-extra > * {
+  .hui-public-runner-actions .hui-button,
+  .hui-public-runner-question-actions .hui-button {
     width: 100%;
-    margin-inline: 0 !important;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hui-public-runner-progress__track > span {
+    transition: none;
   }
 }

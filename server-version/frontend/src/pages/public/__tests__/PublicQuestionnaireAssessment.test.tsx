@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { message } from 'antd'
 
 const { mockClient } = vi.hoisted(() => ({
   mockClient: {
@@ -80,7 +79,6 @@ const getButtonByText = (text: string | RegExp): HTMLButtonElement => (
 
 beforeEach(() => {
   vi.clearAllMocks()
-  vi.spyOn(message, 'warning').mockImplementation(() => undefined as never)
 })
 
 afterEach(() => {
@@ -102,7 +100,7 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('请填写答案或选择跳过')
     expect(mockClient.post).not.toHaveBeenCalled()
 
-    fireEvent.click(getButtonByText('跳 过'))
+    fireEvent.click(getButtonByText('跳过'))
     await waitFor(() => expect(mockClient.patch).toHaveBeenCalledWith(
       '/assessments/session-1/form-answers/batch',
       expect.objectContaining({
@@ -128,13 +126,13 @@ describe('PublicQuestionnaireAssessment recovery and answer states', () => {
     fireEvent.change(input, { target: { value: '已填写' } })
     fireEvent.click(getButtonByText('提交并继续'))
 
-    expect(await screen.findByText('恢复失败，暂时不能继续作答。')).toBeInTheDocument()
+    expect(await screen.findByText('恢复失败，暂时不能继续作答')).toBeInTheDocument()
     expect(getButtonByText(/重\s*试/)).toBeInTheDocument()
     expect(screen.getByText('补充说明')).toBeInTheDocument()
 
     mockClient.get.mockResolvedValueOnce(response(formData(false)))
     fireEvent.click(getButtonByText(/重\s*试/))
-    await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答。')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('恢复失败，暂时不能继续作答')).not.toBeInTheDocument())
     expect(await findButtonByText('提交并继续')).toBeEnabled()
   })
 })
