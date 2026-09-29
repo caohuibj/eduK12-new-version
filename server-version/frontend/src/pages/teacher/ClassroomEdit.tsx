@@ -150,7 +150,6 @@ const ClassroomEdit: React.FC = () => {
       </form>
     </ProductPage>
   )
-  )
 }
 
 export default ClassroomEdit
