@@ -233,7 +233,10 @@
   border-radius:12px;
   background:#fff;
   color:var(--runner-ink,var(--hui-ds-color-ink));
-  font:650 14px/1.45 inherit;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:650;
+  line-height:1.45;
   text-align:left;
   cursor:pointer;
   transition:border-color .14s ease,background .14s ease,box-shadow .14s ease;
