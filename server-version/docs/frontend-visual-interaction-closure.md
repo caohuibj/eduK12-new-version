@@ -32,6 +32,7 @@ No task TypeScript, stimulus assets, duration, response mapping, feedback timing
 - Media search and external/upload fields lacked associated names. Added labels; upload progress and errors are announced.
 - Long document filenames could overflow a two-column mobile grid. The grid becomes one column on narrow screens and filenames wrap.
 - A pre-existing `primary-hover` class had no token. The migrated `action-hover` alias is defined.
+- The classroom join control's class-based selector was migrated with its action utility so its existing prominent target size remains intact.
 
 ## Validation and visual review
 
