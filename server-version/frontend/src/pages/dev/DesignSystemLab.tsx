@@ -15,6 +15,12 @@ import {
 } from '../../modules/reporting/ReportPrimitives'
 import { ReportTrendChart } from '../../modules/reporting/ReportTrendChart'
 import type { LongitudinalTrendModel } from '../../modules/reporting/longitudinalVisualization'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskCompletionNotice,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../../modules/cognitive/tasks/shared/CognitiveTaskPresentation'
 import './design-system-lab.css'
 
 const colors = [
@@ -267,6 +273,43 @@ function CanonicalScenarios() {
   )
 }
 
+function CognitiveRunnerSpecimens() {
+  const noop = () => undefined
+  return (
+    <section id="cognitive-runner" className="ui-lab-panel" aria-labelledby="ui-lab-cognitive-runner">
+      <header className="ui-lab-panel__header">
+        <p className="ui-lab-kicker">Cognitive runner</p>
+        <h2 id="ui-lab-cognitive-runner">认知任务展示状态</h2>
+        <p>只展示非计时 presentation states。正式 stimulus geometry、计时和输入事件继续由 task-owned runtime 与 timing tests 验证。</p>
+      </header>
+
+      <div className="ui-lab-cognitive-grid">
+        <CognitiveTaskIntro
+          title="连续执行任务"
+          description="只在出现字母 X 时按下，其他字母不要按。"
+          hint="电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩。"
+          onAction={noop}
+        />
+        <CognitivePracticeResult
+          correct={4}
+          total={4}
+          passed
+          onContinue={noop}
+          onRetry={noop}
+        />
+        <CognitiveTaskTransition
+          title="区块完成，可以短暂休息"
+          meta="即将开始区块 2 / 3"
+          description="准备好后继续。休息时请不要离开测评页面太久。"
+          actionLabel="继续下一组"
+          onAction={noop}
+        />
+        <CognitiveTaskCompletionNotice />
+      </div>
+    </section>
+  )
+}
+
 function LongitudinalSpecimens() {
   return (
     <section id="longitudinal" className="ui-lab-panel" aria-labelledby="ui-lab-longitudinal">
@@ -302,6 +345,7 @@ export default function DesignSystemLab() {
         <a href="#product-ui">Product UI</a>
         <a href="#reports">Reports</a>
         <a href="#scenarios">Scenarios</a>
+        <a href="#cognitive-runner">Cognitive Runner</a>
         <a href="#longitudinal">Visualization</a>
       </nav>
 
@@ -309,6 +353,7 @@ export default function DesignSystemLab() {
       <ProductUISpecimens />
       <ReportPrimitiveSpecimens />
       <CanonicalScenarios />
+      <CognitiveRunnerSpecimens />
       <LongitudinalSpecimens />
     </ProductPage>
   )
