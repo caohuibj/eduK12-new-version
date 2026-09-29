@@ -91,8 +91,34 @@ it('renders repeated comparisons with measurement dates instead of internal IDs'
 })
 
 it('renders matched comparisons without exposing wave IDs', () => {
- const decision={schemaVersion:1 as const,metricId:'score',level:'EXACT',allowedOperations:['NUMERIC_DELTA'],evidenceRef:null,evidenceHash:null,limitations:[]}
+ const decision={schemaVersion:1 as const,metricId:'score',level:'EXACT',allowedOperations:['SIDE_BY_SIDE','DESCRIPTIVE_TREND','NUMERIC_DELTA'],evidenceRef:null,evidenceHash:null,limitations:[]}
  render(<ProjectionPanel artifact={{artifactId:'report',generatedAt:'2026-09-26',projection:{schemaVersion:1,kind:'MATCHED_LONGITUDINAL',state:'present',mode:'FULL_CASE',waveIds:['secret-1','secret-2'],matchedEligibleN:10,evidence:{level:'PILOT',limitations:[]},metrics:{score:{state:'present',validCaseN:10,waveMeans:[{waveId:'secret-1',waveKey:'2026-01-01T00:00:00Z / T1',mean:3},{waveId:'secret-2',waveKey:'2026-02-01T00:00:00Z / T2',mean:4}],comparisons:[{fromWaveId:'secret-1',toWaveId:'secret-2',comparability:decision,delta:1}]}}}}} />)
  expect(screen.queryByText(/secret-/)).not.toBeInTheDocument()
  expect(screen.getByText(/完全可比 · 变化量 1/)).toBeInTheDocument()
+})
+
+
+it('renders matched longitudinal chart from server projection without exposing internal IDs', () => {
+ const decision={schemaVersion:1 as const,metricId:'score',level:'EXACT',allowedOperations:['SIDE_BY_SIDE','DESCRIPTIVE_TREND','NUMERIC_DELTA'],evidenceRef:null,evidenceHash:null,limitations:[]}
+ render(<ProjectionPanel artifact={{artifactId:'chart',generatedAt:'2026-09-26',projection:{schemaVersion:1,kind:'MATCHED_LONGITUDINAL',state:'present',mode:'FULL_CASE',waveIds:['hidden-a','hidden-b'],matchedEligibleN:12,evidence:{level:'PILOT',limitations:[]},metrics:{score:{state:'present',validCaseN:12,waveMeans:[{waveId:'hidden-a',waveKey:'2026-01-01T00:00:00Z / T1',mean:3},{waveId:'hidden-b',waveKey:'2026-02-01T00:00:00Z / T2',mean:4}],comparisons:[{fromWaveId:'hidden-a',toWaveId:'hidden-b',comparability:decision,delta:1}]}}}}} />)
+ expect(screen.getByText('纵向趋势')).toBeInTheDocument()
+ expect(screen.getByText('允许描述趋势')).toBeInTheDocument()
+ expect(screen.getByLabelText('服务端变化量')).toHaveTextContent('Δ 1')
+ expect(screen.queryByText(/hidden-/)).not.toBeInTheDocument()
+})
+
+it('keeps not-comparable matched points disconnected and hides an unpermitted delta', () => {
+ const decision={schemaVersion:1 as const,metricId:'score',level:'NOT_COMPARABLE',allowedOperations:['SIDE_BY_SIDE'],evidenceRef:null,evidenceHash:null,limitations:[]}
+ render(<ProjectionPanel artifact={{artifactId:'chart',generatedAt:'2026-09-26',projection:{schemaVersion:1,kind:'MATCHED_LONGITUDINAL',state:'present',mode:'PAIRWISE',waveIds:['a','b'],evidence:{level:'PILOT',limitations:[]},metrics:{score:{state:'present',waveMeans:[{waveId:'a',waveKey:'2026-01-01T00:00:00Z / T1',mean:3},{waveId:'b',waveKey:'2026-02-01T00:00:00Z / T2',mean:9}],comparisons:[{fromWaveId:'a',toWaveId:'b',comparability:decision,delta:99}]}}}}} />)
+ expect(screen.getByText('存在不可直接比较区段')).toBeInTheDocument()
+ expect(screen.queryByText(/Δ 99/)).not.toBeInTheDocument()
+ expect(screen.queryByText(/变化量 99/)).not.toBeInTheDocument()
+})
+
+it('does not surface malformed values attached to a suppressed matched metric', () => {
+ const projection:any={schemaVersion:1,kind:'MATCHED_LONGITUDINAL',state:'present',mode:'FULL_CASE',waveIds:['a','b'],evidence:{level:'PILOT',limitations:[]},metrics:{score:{state:'suppressed',waveMeans:[{waveId:'a',waveKey:'A',mean:99},{waveId:'b',waveKey:'B',mean:100}]}}}
+ render(<ProjectionPanel artifact={{artifactId:'suppressed',generatedAt:'2026-09-26',projection}} />)
+ expect(screen.getByText(/图表不包含被抑制的统计值/)).toBeInTheDocument()
+ expect(screen.queryByText(/^99$/)).not.toBeInTheDocument()
+ expect(screen.queryByText(/^100$/)).not.toBeInTheDocument()
 })

@@ -111,7 +111,8 @@ export function ReportTrendChart({
       chart.resize()
     }
 
-    const frame = window.requestAnimationFrame(render)
+    const frame = typeof window.requestAnimationFrame === 'function' ? window.requestAnimationFrame(render) : null
+    if (frame === null) render()
     const resize = () => chartRef.current?.resize()
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null
     observer?.observe(host)
@@ -119,7 +120,7 @@ export function ReportTrendChart({
 
     return () => {
       disposed = true
-      window.cancelAnimationFrame(frame)
+      if (frame !== null && typeof window.cancelAnimationFrame === 'function') window.cancelAnimationFrame(frame)
       observer?.disconnect()
       window.removeEventListener('resize', resize)
       chartRef.current?.dispose()
