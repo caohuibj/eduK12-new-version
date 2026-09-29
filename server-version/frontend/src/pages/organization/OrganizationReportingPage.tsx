@@ -164,7 +164,7 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
             <h2 id="report-artifact-heading" className="organization-report-result__title">报告结果</h2>
             <p className="organization-report-result__meta">生成时间：{formatTime(artifact.generatedAt)}</p>
             <ReportDetails title="报告记录编号">
-              <p>{artifact.artifactId}</p>
+              <p>Artifact {artifact.artifactId}</p>
             </ReportDetails>
           </div>
         </ReportCoreSummary>
