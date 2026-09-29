@@ -122,6 +122,89 @@ const visualScaleReport = {
   },
 }
 
+const visualOrganizationContext = {
+  allowedActions: ['GOVERN', 'RUNS', 'REPORTING', 'DELIVERY'],
+  organization: { id: 'visual-org', name: '示例学校', status: 'ACTIVE' },
+  access: {
+    organizationId: 'visual-org',
+    organizationStatus: 'ACTIVE',
+    userId: 'admin-visual-user',
+    platformRole: 'SYSTEM_ADMIN',
+    membershipId: 'visual-membership',
+    orgRole: 'ORG_ADMIN',
+    personas: ['TEACHER'],
+    capabilities: ['PSYCHOLOGY_STAFF', 'REPORT_EXPORT'],
+    explicitDenies: [],
+    basis: ['ORG_ADMIN'],
+    canGovern: true,
+  },
+}
+
+const visualLongitudinalArtifact = {
+  artifactId: 'visual-longitudinal-artifact',
+  generatedAt: '2026-09-29T00:30:00.000Z',
+  projection: {
+    schemaVersion: 1,
+    kind: 'MATCHED_LONGITUDINAL',
+    mode: 'FULL_CASE',
+    state: 'present',
+    waveIds: ['visual-wave-1', 'visual-wave-2', 'visual-wave-3'],
+    matchedEligibleN: 18,
+    evidence: { level: 'PILOT', limitations: ['DESCRIPTIVE_ONLY'] },
+    metrics: {
+      engagement: {
+        state: 'present',
+        countKind: 'COMPLETE_CASE',
+        validCaseN: 18,
+        waveMeans: [
+          { waveId: 'visual-wave-1', waveKey: '2026-03-01T00:00:00Z / T1', mean: 62.4 },
+          { waveId: 'visual-wave-2', waveKey: '2026-05-01T00:00:00Z / T2', mean: 66.8 },
+          { waveId: 'visual-wave-3', waveKey: '2026-07-01T00:00:00Z / T3', mean: 68.1 },
+        ],
+        comparisons: [
+          {
+            fromWaveId: 'visual-wave-1',
+            toWaveId: 'visual-wave-2',
+            comparability: { schemaVersion: 1, metricId: 'engagement', level: 'EXACT', allowedOperations: ['SIDE_BY_SIDE', 'DESCRIPTIVE_TREND', 'NUMERIC_DELTA'], evidenceRef: null, evidenceHash: null, limitations: [] },
+            delta: 4.4,
+          },
+          {
+            fromWaveId: 'visual-wave-2',
+            toWaveId: 'visual-wave-3',
+            comparability: { schemaVersion: 1, metricId: 'engagement', level: 'COMPATIBLE', allowedOperations: ['SIDE_BY_SIDE', 'DESCRIPTIVE_TREND', 'NUMERIC_DELTA'], evidenceRef: null, evidenceHash: null, limitations: [] },
+            delta: 1.3,
+          },
+        ],
+      },
+      stress: {
+        state: 'present',
+        countKind: 'COMPLETE_CASE',
+        validCaseN: 18,
+        waveMeans: [
+          { waveId: 'visual-wave-1', waveKey: '2026-03-01T00:00:00Z / T1', mean: 41.2 },
+          { waveId: 'visual-wave-2', waveKey: '2026-05-01T00:00:00Z / T2', mean: 39.6 },
+          { waveId: 'visual-wave-3', waveKey: '2026-07-01T00:00:00Z / T3', mean: 38.9 },
+        ],
+        comparisons: [
+          {
+            fromWaveId: 'visual-wave-1',
+            toWaveId: 'visual-wave-2',
+            comparability: { schemaVersion: 1, metricId: 'stress', level: 'NOT_COMPARABLE', allowedOperations: ['SIDE_BY_SIDE'], evidenceRef: null, evidenceHash: null, limitations: ['COMPARABILITY_EVIDENCE_REQUIRED'] },
+          },
+          {
+            fromWaveId: 'visual-wave-2',
+            toWaveId: 'visual-wave-3',
+            comparability: { schemaVersion: 1, metricId: 'stress', level: 'LIMITED', allowedOperations: ['SIDE_BY_SIDE', 'DESCRIPTIVE_TREND'], evidenceRef: null, evidenceHash: null, limitations: ['LIMITED_COMPARABILITY'] },
+          },
+        ],
+      },
+      support: {
+        state: 'suppressed',
+      },
+    },
+  },
+}
+
 const envelope = (data, code = 0, message = 'ok') => ({ code, message, data })
 
 async function installApiFixture(page, role) {
@@ -152,6 +235,12 @@ async function installApiFixture(page, role) {
     else if (pathname === '/api/scales/assessments/visual-scale-assessment') data = visualScaleReport
     else if (pathname === '/api/scale-library') data = { schemaVersion: 1, generatedAt: '2026-09-28T00:00:00.000Z', entries: [] }
     else if (pathname.startsWith('/api/cognitive/history')) data = { list: [], total: 0, totalPages: 1, hasMore: false }
+    else if (pathname === '/api/organizations/visual-org/context') data = visualOrganizationContext
+    else if (pathname === '/api/organizations/visual-org/reporting/specs') data = { list: [], total: 0, page: 1, pageSize: 100 }
+    else if (pathname === '/api/organizations/visual-org/reporting/sources') data = { list: [], truncated: false, nextPage: null }
+    else if (pathname === '/api/organizations/visual-org/reporting/cohort-options') data = { classes: [], dimensions: [], labels: [] }
+    else if (pathname === '/api/organizations/visual-org/reporting/protected-sources') data = { list: [], truncated: false }
+    else if (pathname === '/api/organizations/visual-org/reporting/artifacts/visual-longitudinal-artifact') data = visualLongitudinalArtifact
     else if (pathname.startsWith('/api/organizations')) data = {
       allowedActions: role === 'ADMIN' ? ['CREATE_ORGANIZATION'] : [],
       platformRole: role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD',
@@ -182,6 +271,24 @@ const cases = [
   { id: 'parent-home', route: '/parent', role: 'PARENT', ready: (page) => page.getByRole('heading', { name: '家长首页', exact: true }).waitFor() },
   { id: 'staff-courses', route: '/courses', role: 'TEACHER', ready: (page) => page.getByRole('heading', { name: '课程管理', exact: true }).waitFor() },
   { id: 'staff-profile', route: '/profile', role: 'TEACHER', ready: (page) => page.getByRole('heading').filter({ hasText: '个人' }).first().waitFor() },
+  {
+    id: 'organization-longitudinal',
+    route: '/organizations/visual-org/reporting',
+    role: 'ADMIN',
+    ready: async (page) => {
+      await page.getByRole('heading', { name: '群体与纵向报告', exact: true }).waitFor()
+      const advanced = page.getByText('高级设置：受保护反馈与历史报告读取', { exact: true })
+      await advanced.click()
+      await page.getByPlaceholder('artifact UUID').fill('visual-longitudinal-artifact')
+      await page.getByRole('button', { name: '读取历史报告', exact: true }).click()
+      await page.getByRole('heading', { name: '纵向趋势', exact: true }).waitFor()
+      await page.getByText('允许描述趋势', { exact: true }).waitFor()
+      await page.getByText('存在不可直接比较区段', { exact: true }).waitFor()
+      await page.getByText(/图表不包含被抑制的统计值/).waitFor()
+      await page.locator('.report-trend-chart svg').first().waitFor()
+      await advanced.click()
+    },
+  },
   { id: 'organization-index', route: '/organizations', role: 'ADMIN', ready: (page) => page.getByRole('heading', { name: '组织空间', exact: true }).waitFor() },
   { id: 'scale-library', route: '/scale-library', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '量表库', exact: true }).waitFor() },
   { id: 'public-recovery', route: '/public/cognitive/sessions/visual-session', role: null, ready: (page) => page.getByText('需要恢复凭证', { exact: true }).waitFor() },
@@ -256,6 +363,12 @@ async function main() {
             assert.equal(await page.locator('[data-report-screen-only]:visible').count(), 0, 'scale-report/print: screen-only controls must be hidden')
             assert.equal(await page.locator('.hui-app-header:visible').count(), 0, 'scale-report/print: app header must be hidden')
             await page.screenshot({ path: path.join(directory, 'a4-print.png'), fullPage: true })
+          }
+          if (spec.id === 'organization-longitudinal' && viewport.name === 'desktop-1440') {
+            await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' })
+            await page.setViewportSize({ width: 794, height: 1123 })
+            await page.waitForTimeout(100)
+            await page.locator('section[aria-labelledby="report-artifact-heading"]').screenshot({ path: path.join(directory, 'a4-report-artifact.png') })
           }
           report.cases.push({
             id: spec.id,
