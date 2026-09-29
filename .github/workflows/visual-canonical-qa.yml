@@ -7,6 +7,8 @@ on:
       - '.github/workflows/visual-canonical-qa.yml'
       - 'server-version/e2e/visual-canonical-browser-e2e.cjs'
       - 'server-version/frontend/src/index.css'
+      - 'server-version/frontend/src/App.tsx'
+      - 'server-version/frontend/src/pages/dev/**'
       - 'server-version/frontend/src/components/app-shell/**'
       - 'server-version/frontend/src/components/product-ui/**'
       - 'server-version/frontend/src/components/auth/**'
@@ -49,6 +51,7 @@ jobs:
       VISUAL_QA_BASE_URL: http://127.0.0.1:5173
       VISUAL_QA_EVIDENCE_DIR: /tmp/eduk12-visual-qa
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_UI_LAB_ENABLED: 'true'
     defaults:
       run:
         working-directory: server-version

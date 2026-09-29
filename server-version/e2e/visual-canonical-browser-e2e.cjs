@@ -261,6 +261,17 @@ async function installApiFixture(page, role) {
 }
 
 const cases = [
+  {
+    id: 'ui-lab',
+    route: '/__ui-lab',
+    role: null,
+    ready: async (page) => {
+      await page.getByRole('heading', { name: 'Huisurvey UI Lab', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '设计基础', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '纵向可视化状态', exact: true }).waitFor()
+      await page.locator('.report-trend-chart svg').first().waitFor()
+    },
+  },
   { id: 'portal', route: '/', role: null, ready: (page) => page.getByRole('heading', { name: '欢迎使用 Huisurvey', exact: true }).waitFor() },
   { id: 'student-login', route: '/student/login', role: null, ready: (page) => page.getByRole('heading', { name: '学生登录', exact: true }).waitFor() },
   { id: 'student-home', route: '/student', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '我的课程', exact: true }).waitFor() },
