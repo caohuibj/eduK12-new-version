@@ -68,6 +68,93 @@ async function main() {
   }
   try {
     for (const width of widths) {
+      await scenario(width, 'ADMIN', async page => {
+        let failed = true
+        const teacher = { id: 'grant-teacher', username: 'teacher', nickname: '示例教师', role: 'TEACHER', teacherApproved: true, isActive: true, isFrozen: false }
+        await page.route('**/api/scales?*', route => fulfill(route, { list: [{ id: 'grant-scale', code: 'GRANT', name: '授权保护示例', status: 'PUBLISHED', tags: [], createdAt: '2026-09-01', creator: { id: 'admin-visual-user', username: 'admin' }, _count: {} }], total: 1 }))
+        await page.route('**/api/scales/tags', route => fulfill(route, { tags: [] }))
+        await page.route('**/api/users?role=TEACHER*', route => fulfill(route, { list: [teacher], total: 1 }))
+        await page.route('**/api/admin/material-grants?*', route => fulfill(route, { list: [{ teacherId: teacher.id }] }, failed ? 503 : 200))
+        await page.goto(base + '/scales')
+        const trigger = page.getByRole('button', { name: '将 授权保护示例 授权给教师' })
+        await trigger.click()
+        const dialog = page.getByRole('dialog', { name: '授权给教师' })
+        await dialog.getByRole('alert').waitFor()
+        assert.equal(await dialog.getByRole('button', { name: '保存', exact: true }).isDisabled(), true)
+        assert.equal(await dialog.getByRole('checkbox').count(), 0)
+        await assertModal(page, dialog, trigger)
+        await capture(page, 'grant-read-error', width)
+        failed = false
+        await dialog.getByRole('button', { name: '重新加载' }).click()
+        await dialog.getByLabel('示例教师（teacher）').waitFor()
+        assert.equal(await dialog.getByLabel('示例教师（teacher）').isChecked(), true)
+        assert.equal(await dialog.getByRole('button', { name: '保存', exact: true }).isEnabled(), true)
+        await capture(page, 'grant-retry-success', width)
+        await page.keyboard.press('Escape')
+        assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
+      })
+      for (const kind of ['assignments', 'checkins', 'courses']) {
+        await scenario(width, kind === 'courses' ? 'ADMIN' : 'TEACHER', async page => {
+          const record = { id: 'modal-record', title: '弹窗回归示例', content: '', description: '', courseId: sampleCourse.id, course: sampleCourse, questions: [], videos: [], images: [], documents: [], tags: [], createdAt: '2026-09-01', endTime: '2026-12-31', _count: { submissions: 1 } }
+          const submission = { id: 'submission-1', status: 'SUBMITTED', content: '学习反思', answers: [], images: [], createdAt: '2026-09-01', student: { id: 'student-1', username: 'student', nickname: '示例学生' } }
+          await page.route(`**/api/${kind}`, route => fulfill(route, { list: kind === 'courses' ? [{ ...sampleCourse, creatorId: 'admin-visual-user' }] : [record], total: 1 }))
+          await page.route(`**/api/${kind}/modal-record/submissions`, route => fulfill(route, { list: [submission] }))
+          await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
+          await page.route('**/api/checkins/tags', route => fulfill(route, { tags: [] }))
+          await page.goto(base + '/' + kind)
+          const createName = kind === 'assignments' ? '布置作业' : kind === 'checkins' ? '创建打卡' : '创建课程'
+          const trigger = page.getByRole('button', { name: createName, exact: true }).first()
+          await trigger.click()
+          const editor = page.getByRole('dialog')
+          await assertModal(page, editor, trigger)
+          await capture(page, `${kind}-editor-modal`, width)
+          assert.equal(await editor.locator('button[type=submit]').count(), 1, 'native form submit remains available')
+          if (kind !== 'courses') {
+            const mediaTrigger = editor.getByRole('button', { name: '添加文档', exact: true })
+            await mediaTrigger.click()
+            const media = page.getByRole('dialog', { name: '选择文档' })
+            await assertModal(page, media, mediaTrigger)
+            assert.equal(await page.locator('dialog:modal').count(), 2)
+            await page.keyboard.press('Escape')
+            assert.equal(await page.locator('dialog:modal').count(), 1, 'Escape closes only the top dialog')
+            assert.equal(await mediaTrigger.evaluate(el => el === document.activeElement), true)
+            assert.equal(await page.evaluate(() => document.body.style.overflow), 'hidden')
+          }
+          await page.keyboard.press('Escape')
+          assert.equal(await page.locator('dialog:modal').count(), 0)
+          assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
+          assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden')
+          if (kind === 'courses') {
+            await page.getByLabel(`${sampleCourse.title} 的更多操作`, { exact: true }).click()
+            await page.getByRole('button', { name: '分享课程', exact: true }).click()
+            const share = page.getByRole('dialog', { name: '分享课程' })
+            await assertModal(page, share, trigger)
+            await capture(page, 'courses-share-modal', width)
+            await page.keyboard.press('Escape')
+          } else {
+            const submissionsTrigger = page.getByRole('button', { name: '查看提交', exact: true })
+            await submissionsTrigger.click()
+            const submissions = page.getByRole('dialog')
+            await submissions.getByText('示例学生', { exact: true }).waitFor()
+            await assertModal(page, submissions, trigger)
+            await capture(page, `${kind}-submissions-modal`, width)
+            if (kind === 'assignments') {
+              const batchTrigger = submissions.getByRole('button', { name: '一键批量批复', exact: true })
+              await batchTrigger.click()
+              const batch = page.getByRole('dialog', { name: '一键批量批复' })
+              await assertModal(page, batch, batchTrigger)
+              await capture(page, 'assignments-batch-modal', width)
+              await page.keyboard.press('Escape')
+              assert.equal(await page.locator('dialog:modal').count(), 1)
+              assert.equal(await batchTrigger.evaluate(el => el === document.activeElement), true)
+            }
+            await page.keyboard.press('Escape')
+            assert.equal(await submissionsTrigger.evaluate(el => el === document.activeElement), true)
+          }
+          assert.equal(await page.locator('dialog:modal').count(), 0)
+          assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden')
+        })
+      }
       for (const state of ['loading', 'populated', 'empty', 'filtered-empty', 'error', 'detail']) {
         await scenario(width, 'STUDENT', async page => {
           let release

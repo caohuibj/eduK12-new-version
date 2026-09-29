@@ -38,14 +38,17 @@ export const materialGrantApi = {
     let page = 1
     let last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
     if (last.code !== 0 || !last.data) return last
-    list.push(...(last.data.list || []))
+    if (!Array.isArray(last.data.list)) throw new Error('教师名单格式不完整')
+    list.push(...last.data.list)
     const total = last.data.total ?? list.length
     while (list.length < total) {
       page += 1
       last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
       if (last.code !== 0 || !last.data) return last
-      const chunk = last.data.list || []
-      if (chunk.length === 0) break
+      const chunk = last.data.list
+      if (!Array.isArray(chunk) || chunk.length === 0 || (last.data.total != null && last.data.total !== total)) {
+        throw new Error('教师名单读取不完整，请重新加载')
+      }
       list.push(...chunk)
     }
     return { ...last, data: { ...last.data, list, total } }

@@ -52,8 +52,8 @@ No task TypeScript, stimulus assets, duration, response mapping, feedback timing
 ### Before release
 
 - Complete required CI gates on the exact PR head; local screenshot evidence does not replace backend, Browser, Docker, CodeQL, Situational or Merge gate.
-- Separate authorization review: MaterialGrantModal currently falls back to empty teacher/grant lists for nonzero responses and can enable Save after load failure. This predates this work. Fixing it crosses the explicitly protected authorization boundary, so it is recorded rather than changed here.
-- Legacy hand-built staff editor dialogs outside ManagementDialog still need modality review. The shared primitive is ready for migration; this PR does not claim those independent dialogs are fixed.
+- Resolved in the authorized [follow-up](frontend-grant-modal-followup.md): MaterialGrantModal now blocks editing/saving until both reads succeed, supports retry and protects pending writes.
+- The follow-up migrates seven frequent legacy dialogs. Remaining lower-frequency hand-built overlays still need a bounded modality review.
 
 ### PR B / can defer
 
@@ -61,5 +61,5 @@ No task TypeScript, stimulus assets, duration, response mapping, feedback timing
 - Scale Library: default filters occupy excessive mobile space. Use progressive disclosure, applied-filter chips and clearer card hierarchy.
 - Staff high-frequency lists: replace one-dimensional mobile records with compact summaries where appropriate; retain genuinely comparative tables.
 - Reports: refine reading order without changing interpretation, suppression, reference eligibility or dimension comparability.
-- DocumentSelector and legacy library/editor fetch states warrant the same bounded state review; they are separate from the MediaSelector fixed here.
+- Follow-up: the unused DocumentSelector has been removed, and seven frequent legacy overlays plus grant read/save protection are covered by [the grant and modal follow-up](frontend-grant-modal-followup.md). Other legacy library/editor fetch states still warrant a bounded state review.
 - Broader screen-reader testing across browser/AT combinations remains useful; real Chromium modality tests are not an all-platform accessibility certification.

@@ -1,5 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode, type RefObject } from 'react'
 
+const scrollLocks = new Set<HTMLDialogElement>()
+let unlockedOverflow = ''
+
 /** Native top-layer modality makes the background inert for pointer, keyboard,
  * and assistive technology. Keep this in the caller's tree to inherit its theme. */
 export default function ModalSurface({ open, onClose, children, className, initialFocusRef, dismissOnBackdrop = false }: {
@@ -19,14 +22,16 @@ export default function ModalSurface({ open, onClose, children, className, initi
     const surface = surfaceRef.current
     if (!surface) return
     const before = document.activeElement instanceof HTMLElement ? document.activeElement : null
-    const overflow = document.body.style.overflow
     surface.showModal()
+    if (scrollLocks.size === 0) unlockedOverflow = document.body.style.overflow
+    scrollLocks.add(surface)
     document.body.style.overflow = 'hidden'
     const panel = surface.querySelector<HTMLElement>('[role="dialog"]')
     ;(initialFocusRef?.current ?? panel)?.focus()
     return () => {
       surface.close()
-      document.body.style.overflow = overflow
+      scrollLocks.delete(surface)
+      if (scrollLocks.size === 0) document.body.style.overflow = unlockedOverflow
       if (before?.isConnected) before.focus()
     }
   }, [open, initialFocusRef])

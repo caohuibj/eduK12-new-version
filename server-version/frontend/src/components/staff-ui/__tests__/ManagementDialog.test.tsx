@@ -19,6 +19,23 @@ function Example() {
 }
 
 describe('ManagementDialog', () => {
+  it.each([false, true])('releases stacked scroll locks even if the lower dialog closes first (%s)', closeLowerFirst => {
+    document.body.style.overflow = 'auto'
+    const stack = (lowerOpen: boolean) => <>
+      <ManagementDialog open={lowerOpen} title="Lower" onClose={() => {}}>Lower content</ManagementDialog>
+      <ManagementDialog open title="Upper" onClose={() => {}}>Upper content</ManagementDialog>
+    </>
+    const view = render(stack(true))
+    expect(document.body.style.overflow).toBe('hidden')
+    if (closeLowerFirst) {
+      view.rerender(stack(false))
+      expect(document.body.style.overflow).toBe('hidden')
+    }
+    view.unmount()
+    expect(document.body.style.overflow).toBe('auto')
+    document.body.style.overflow = ''
+  })
+
   it('focuses once, loops in both directions, survives inline callbacks, and restores the trigger', async () => {
     const user = userEvent.setup()
     render(<Example />)
