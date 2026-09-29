@@ -200,7 +200,7 @@ const ClassroomAnswer: React.FC = () => {
                   aria-pressed={answer === optionValue}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     answer === optionValue
-                      ? 'border-primary bg-primary/10'
+                      ? 'border-action bg-action/10'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   } ${submitted ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -232,7 +232,7 @@ const ClassroomAnswer: React.FC = () => {
                   aria-pressed={multiAnswers.includes(optionValue)}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     multiAnswers.includes(optionValue)
-                      ? 'border-primary bg-primary/10'
+                      ? 'border-action bg-action/10'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   } ${submitted ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -240,7 +240,7 @@ const ClassroomAnswer: React.FC = () => {
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                         multiAnswers.includes(optionValue)
-                          ? 'border-primary bg-primary'
+                          ? 'border-action bg-action'
                           : 'border-gray-300'
                       }`}
                     >
@@ -278,7 +278,7 @@ const ClassroomAnswer: React.FC = () => {
               onChange={(e) => setAnswer(e.target.value)}
               disabled={submitted}
               placeholder="请输入答案"
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50 classroom-answer-input"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-none disabled:opacity-50 classroom-answer-input"
             />
           </div>
         )
@@ -295,7 +295,7 @@ const ClassroomAnswer: React.FC = () => {
               disabled={submitted}
               placeholder="请输入答案"
               rows={5}
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none disabled:opacity-50 resize-none classroom-answer-input"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-none disabled:opacity-50 resize-none classroom-answer-input"
             />
           </div>
         )
@@ -369,7 +369,7 @@ const ClassroomAnswer: React.FC = () => {
                 ? multiAnswers.length === 0
                 : !answer
             }
-            className="w-full mt-6 px-4 py-4 bg-primary text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed classroom-answer-submit"
+            className="w-full mt-6 px-4 py-4 bg-action text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed classroom-answer-submit"
           >
             提交答案
           </button>

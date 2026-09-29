@@ -5,13 +5,14 @@
  */
 :root {
   --hui-ds-color-ink: #14304a;
-  --hui-ds-color-muted: #64748b;
+  --hui-ds-color-muted: #596b80;
   --hui-ds-color-surface: #ffffff;
   --hui-ds-color-page: #f8fbff;
   --hui-ds-color-page-strong: #f7fbff;
   --hui-ds-color-soft: #eff7ff;
   --hui-ds-color-line: #dde7f0;
-  --hui-ds-color-action: #2f6fed;
+  --hui-ds-color-action-rgb: 47 111 237;
+  --hui-ds-color-action: rgb(var(--hui-ds-color-action-rgb));
   --hui-ds-color-action-hover: #255dce;
   --hui-ds-color-focus: #2f6fed;
   --hui-ds-color-sky: #38bdf8;
@@ -36,7 +37,7 @@
 
   /* Role accents stay semantic so role identity does not fork component geometry. */
   --hui-ds-role-parent-ink: #173f48;
-  --hui-ds-role-parent-muted: #647b7f;
+  --hui-ds-role-parent-muted: #536d72;
   --hui-ds-role-parent-line: #dce9e5;
   --hui-ds-role-parent-page: #f8fcfb;
   --hui-ds-role-parent-soft: #eef9f5;
@@ -44,13 +45,13 @@
   --hui-ds-role-parent-accent-strong: #247f59;
 
   --hui-ds-role-staff-ink: #14304a;
-  --hui-ds-role-staff-muted: #64778a;
+  --hui-ds-role-staff-muted: #52677c;
   --hui-ds-role-staff-line: #dce6ef;
   --hui-ds-role-staff-page: #f5f8fb;
-  --hui-ds-role-staff-accent: #315fc9;
-  --hui-ds-role-staff-accent-hover: #274da7;
+  --hui-ds-role-staff-accent: var(--hui-ds-color-action);
+  --hui-ds-role-staff-accent-hover: var(--hui-ds-color-action-hover);
 
-  --hui-ds-role-public-muted: #64788b;
+  --hui-ds-role-public-muted: #52677c;
   --hui-ds-role-runner-line: #dbe6ef;
 
   --hui-ds-space-1: 0.25rem;
@@ -70,6 +71,11 @@
   --hui-ds-radius-xl: 1.25rem;
   --hui-ds-radius-2xl: 1.5rem;
   --hui-ds-radius-pill: 999px;
+
+  --hui-ds-text-body: 1rem;
+  --hui-ds-text-secondary: .875rem;
+  --hui-ds-text-metadata: .8125rem;
+  --hui-ds-text-micro: .75rem;
 
   --hui-ds-target: 44px;
   --hui-ds-control: 46px;

@@ -132,7 +132,7 @@ const StudentProfile: React.FC = () => {
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+          <Loader2 className="h-8 w-8 animate-spin text-action" aria-hidden="true" />
           <span className="sr-only">正在加载个人资料</span>
         </div>
       ) : (
@@ -151,8 +151,8 @@ const StudentProfile: React.FC = () => {
 
           <section className="card" aria-labelledby="student-profile-info-title">
             <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <User className="h-8 w-8 text-primary" aria-hidden="true" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-action/10">
+                <User className="h-8 w-8 text-action" aria-hidden="true" />
               </div>
               <div>
                 <h2 id="student-profile-info-title" className="text-lg font-semibold text-gray-800">{user?.nickname || user?.username}</h2>
@@ -196,7 +196,7 @@ const StudentProfile: React.FC = () => {
                 <Lock className="h-5 w-5 text-gray-600" aria-hidden="true" />
                 <h2 id="student-password-title" className="text-lg font-semibold text-gray-800">修改密码</h2>
               </div>
-              <button type="button" onClick={() => setShowPasswordForm(current => !current)} className="text-sm text-primary hover:underline" aria-expanded={showPasswordForm}>
+              <button type="button" onClick={() => setShowPasswordForm(current => !current)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
                 {showPasswordForm ? '取消' : '修改密码'}
               </button>
             </div>

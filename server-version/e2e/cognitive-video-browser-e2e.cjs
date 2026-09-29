@@ -164,7 +164,7 @@ const completeFakeTask = async (page, publicMode) => {
     ? /\/public\/cognitive\/sessions\/[^/]+\/result\?public=1/u
     : /\/student\/cognitive\/sessions\/[^/]+\/result/u
   await page.waitForURL(resultPattern, { timeout: 30000 })
-  const resultHeading = page.locator('div.card h1').first()
+  const resultHeading = page.locator('.hui-report').getByRole('heading', { level: 1 }).first()
   await resultHeading.waitFor({ state: 'visible', timeout: 30000 })
   assert.ok((await resultHeading.textContent())?.trim(), 'result heading missing after Cognitive FINAL')
 }

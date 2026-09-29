@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Video, Image as ImageIcon, Link as LinkIcon, Upload, Search, Check, FileVideo, AlertCircle, FileText } from 'lucide-react'
 import apiClient from '../api/client'
 import { ensureCsrfToken, sessionAxios } from '../api/client'
 import type { Video as VideoType, Document as DocumentType } from '../types'
 import { isSafeExternalMediaUrl } from '../utils/mediaUtils'
+import ModalSurface from './shared-ui/ModalSurface'
 
 export interface MediaItem {
   type: 'library' | 'external' | 'upload'
@@ -39,6 +40,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   const [images, setImages] = useState<ImageItem[]>([])
   const [documents, setDocuments] = useState<DocumentType[]>([])
   const [loading, setLoading] = useState(false)
+  const [libraryError, setLibraryError] = useState('')
+  const requestRef = useRef(0)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [selectedVideo, setSelectedVideo] = useState<VideoType | null>(null)
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null)
@@ -56,15 +59,30 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   const [uploadError, setUploadError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const fetchLibrary = useCallback(async () => {
+    const request = ++requestRef.current
+    setLoading(true)
+    setLibraryError('')
+    setSelectedVideo(null)
+    setSelectedImage(null)
+    setSelectedDocument(null)
+    try {
+      const response = await apiClient.get(isDocumentMode ? '/documents' : isImageMode ? '/uploads/images' : '/videos?pageSize=100')
+      if (response.code !== 0) throw new Error(response.message || '素材库加载失败')
+      if (request !== requestRef.current) return
+      if (isDocumentMode) setDocuments(response.data.list)
+      else if (isImageMode) setImages(response.data.list)
+      else setVideos(response.data.list)
+    } catch (error) {
+      if (request === requestRef.current) setLibraryError(error instanceof Error ? error.message : '素材库加载失败')
+    } finally {
+      if (request === requestRef.current) setLoading(false)
+    }
+  }, [isDocumentMode, isImageMode])
+
   useEffect(() => {
     if (isOpen && activeTab === 'library') {
-      if (isDocumentMode) {
-        fetchDocuments()
-      } else if (isImageMode) {
-        fetchImages()
-      } else {
-        fetchVideos()
-      }
+      void fetchLibrary()
     }
     // 弹窗关闭时重置上传状态
     if (!isOpen) {
@@ -78,49 +96,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
       setSelectedImage(null)
       setSelectedDocument(null)
     }
-  }, [isOpen, activeTab, isImageMode, isDocumentMode])
-
-  const fetchVideos = async () => {
-    try {
-      setLoading(true)
-      const response = await apiClient.get('/videos?pageSize=100')
-      if (response.code === 0) {
-        setVideos(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取视频列表失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchImages = async () => {
-    try {
-      setLoading(true)
-      const response = await apiClient.get('/uploads/images')
-      if (response.code === 0) {
-        setImages(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取图片列表失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchDocuments = async () => {
-    try {
-      setLoading(true)
-      const response = await apiClient.get('/documents')
-      if (response.code === 0) {
-        setDocuments(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取文档列表失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    return () => { requestRef.current += 1 }
+  }, [isOpen, activeTab, fetchLibrary])
 
   const filteredVideos = videos.filter(v =>
     v.title.toLowerCase().includes(searchKeyword.toLowerCase())
@@ -374,13 +351,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   const dialogTitle = isDocumentMode ? '选择文档' : isImageMode ? '选择图片' : '选择视频'
 
   return (
-    <div className="staff-modal-backdrop" role="presentation">
-      <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="media-selector-title">
+    <ModalSurface open={isOpen} onClose={onClose} className="staff-modal-backdrop">
+      <div className="staff-dialog staff-dialog--wide hui-media-selector" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="media-selector-title">
         {/* Header */}
         <div className="staff-dialog__header">
           <div>
             <h2 id="media-selector-title">{dialogTitle}</h2>
-            <p className="staff-dialog__description">从素材库选择、添加外部链接，或上传新的素材。</p>
+            <p className="staff-dialog__description">{isImageMode || isDocumentMode ? '从素材库选择，或上传新的素材。' : '从素材库选择、添加外部链接，或上传新的素材。'}</p>
           </div>
           <button type="button" onClick={onClose} className="staff-icon-button" aria-label="关闭素材选择">
             <X className="w-5 h-5" aria-hidden="true" />
@@ -391,9 +368,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         <div className="flex border-b">
           <button
             type="button"
+            aria-pressed={activeTab === 'library'}
             onClick={() => setActiveTab('library')}
             className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
-              activeTab === 'library' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
+              activeTab === 'library' ? 'text-action border-b-2 border-action' : 'text-gray-500'
             }`}
           >
             {isDocumentMode ? <FileText className="w-4 h-4" /> : isImageMode ? <ImageIcon className="w-4 h-4" /> : <Video className="w-4 h-4" />}
@@ -402,9 +380,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           {!isImageMode && !isDocumentMode && (
             <button
               type="button"
+              aria-pressed={activeTab === 'external'}
               onClick={() => setActiveTab('external')}
               className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
-                activeTab === 'external' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
+                activeTab === 'external' ? 'text-action border-b-2 border-action' : 'text-gray-500'
               }`}
             >
               <LinkIcon className="w-4 h-4" />
@@ -413,9 +392,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           )}
           <button
             type="button"
+            aria-pressed={activeTab === 'upload'}
             onClick={() => setActiveTab('upload')}
             className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
-              activeTab === 'upload' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
+              activeTab === 'upload' ? 'text-action border-b-2 border-action' : 'text-gray-500'
             }`}
           >
             <Upload className="w-4 h-4" />
@@ -431,6 +411,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
+                  aria-label="搜索素材"
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
                   placeholder={isDocumentMode ? "搜索文档..." : isImageMode ? "搜索图片..." : "搜索视频..."}
@@ -439,13 +420,18 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
               </div>
 
               {loading ? (
-                <div className="text-center py-8">加载中...</div>
+                <div role="status" className="text-center py-8">加载中...</div>
+              ) : libraryError ? (
+                <div role="alert" className="text-center py-8">
+                  <p className="text-red-700">{libraryError}</p>
+                  <button type="button" className="btn-secondary mt-3" onClick={() => void fetchLibrary()}>重试</button>
+                </div>
               ) : isDocumentMode ? (
                 // 文档库
                 filteredDocuments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">暂无文档</div>
+                  <div role="status" className="text-center py-8 text-gray-600">{searchKeyword ? '没有符合搜索条件的文档' : '暂无文档'}</div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {filteredDocuments.map((doc) => (
                       <button
                         type="button"
@@ -454,7 +440,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                         aria-pressed={selectedDocument?.id === doc.id}
                         className={`w-full p-3 border rounded-lg cursor-pointer transition-all text-left ${
                           selectedDocument?.id === doc.id
-                            ? 'border-primary bg-blue-50'
+                            ? 'border-action bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -464,12 +450,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{doc.title}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm text-gray-600 break-all">
                               {doc.fileName}
                             </p>
                           </div>
                           {selectedDocument?.id === doc.id && (
-                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                            <Check className="w-5 h-5 text-action flex-shrink-0" />
                           )}
                         </div>
                       </button>
@@ -479,7 +465,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
               ) : isImageMode ? (
                 // 图片库
                 filteredImages.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">暂无图片</div>
+                  <div role="status" className="text-center py-8 text-gray-600">{searchKeyword ? '没有符合搜索条件的图片' : '暂无图片'}</div>
                 ) : (
                   <div className="grid grid-cols-3 gap-3">
                     {filteredImages.map((image) => (
@@ -490,7 +476,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                         aria-pressed={selectedImage?.id === image.id}
                         className={`relative aspect-square border rounded-lg cursor-pointer transition-all overflow-hidden bg-white p-0 ${
                           selectedImage?.id === image.id
-                            ? 'border-primary ring-2 ring-primary'
+                            ? 'border-action ring-2 ring-action'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -500,8 +486,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                           className="w-full h-full object-cover"
                         />
                         {selectedImage?.id === image.id && (
-                          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                            <Check className="w-8 h-8 text-primary" />
+                          <div className="absolute inset-0 bg-action/20 flex items-center justify-center">
+                            <Check className="w-8 h-8 text-action" />
                           </div>
                         )}
                       </button>
@@ -511,9 +497,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
               ) : (
                 // 视频库
                 filteredVideos.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">暂无视频</div>
+                  <div role="status" className="text-center py-8 text-gray-600">{searchKeyword ? '没有符合搜索条件的视频' : '暂无视频'}</div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {filteredVideos.map((video) => (
                       <button
                         type="button"
@@ -522,7 +508,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                         aria-pressed={selectedVideo?.id === video.id}
                         className={`w-full p-3 border rounded-lg cursor-pointer transition-all text-left ${
                           selectedVideo?.id === video.id
-                            ? 'border-primary bg-blue-50'
+                            ? 'border-action bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -537,7 +523,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                             </p>
                           </div>
                           {selectedVideo?.id === video.id && (
-                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                            <Check className="w-5 h-5 text-action flex-shrink-0" />
                           )}
                         </div>
                       </button>
@@ -551,8 +537,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           {activeTab === 'external' && !isImageMode && (
             <div className="space-y-4">
               <div>
-                <label className="label">视频链接或嵌入代码</label>
+                <label className="label" htmlFor="media-external-url">HTTPS 视频链接</label>
                 <textarea
+                  id="media-external-url"
                   value={externalUrl}
                   onChange={(e) => setExternalUrl(e.target.value)}
                   className="input w-full h-24"
@@ -560,8 +547,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 />
               </div>
               <div>
-                <label className="label">视频标题</label>
+                <label className="label" htmlFor="media-external-title">视频标题</label>
                 <input
+                  id="media-external-title"
                   type="text"
                   value={externalTitle}
                   onChange={(e) => setExternalTitle(e.target.value)}
@@ -573,7 +561,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 提示：仅接受 HTTPS 链接；不支持 iframe 或 HTML 嵌入代码
               </p>
               {uploadError && (
-                <div className="flex items-start space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded">
+                <div role="alert" className="flex items-start space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{uploadError}</span>
                 </div>
@@ -584,18 +572,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           {activeTab === 'upload' && (
             <div className="space-y-4">
               <div
-                role="button"
-                tabIndex={isUploading ? -1 : 0}
-                aria-disabled={isUploading}
-                onClick={() => !isUploading && fileInputRef.current?.click()}
-                onKeyDown={(event) => {
-                  if (!isUploading && (event.key === 'Enter' || event.key === ' ')) {
-                    event.preventDefault()
-                    fileInputRef.current?.click()
-                  }
-                }}
-                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${
-                  uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-primary'
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-action'
                 } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
@@ -615,18 +593,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                     ) : (
                       <FileVideo className="w-12 h-12 text-green-500 mx-auto" />
                     )}
-                    <p className="text-green-700 font-medium">{uploadFile.name}</p>
+                    <p className="text-green-700 font-medium break-all">{uploadFile.name}</p>
                     <p className="text-sm text-gray-500">{formatFileSize(uploadFile.size)}</p>
                     {!isUploading && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setUploadFile(null)
-                          setUploadTitle('')
-                          setUploadError('')
-                        }}
-                        className="text-sm text-red-500 hover:text-red-600"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="btn-secondary text-sm"
                       >
                         重新选择
                       </button>
@@ -641,8 +614,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                     ) : (
                       <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                     )}
-                    <p className="text-gray-600">点击选择文件</p>
-                    <p className="text-sm text-gray-400">
+                    <button type="button" className="btn-secondary" disabled={isUploading} onClick={() => fileInputRef.current?.click()}>选择文件</button>
+                    <p className="text-sm text-gray-600">
                       {isDocumentMode
                         ? '支持 PDF 格式，最大 100MB'
                         : isImageMode
@@ -655,8 +628,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
               {uploadFile && !isImageMode && !isDocumentMode && (
                 <div>
-                  <label className="label">视频标题 *</label>
+                  <label className="label" htmlFor="media-upload-title">视频标题 *</label>
                   <input
+                    id="media-upload-title"
                     type="text"
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
@@ -668,8 +642,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
               )}
               {uploadFile && isDocumentMode && (
                 <div>
-                  <label className="label">文档标题 *</label>
+                  <label className="label" htmlFor="media-upload-title">文档标题 *</label>
                   <input
+                    id="media-upload-title"
                     type="text"
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
@@ -687,9 +662,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                     <span>上传中...</span>
                     <span>{uploadProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div role="progressbar" aria-label="上传进度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={uploadProgress} className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      className="bg-action h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
@@ -698,7 +673,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
               {/* Error */}
               {uploadError && (
-                <div className="flex items-start space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded">
+                <div role="alert" className="flex items-start space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{uploadError}</span>
                 </div>
@@ -716,7 +691,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
             <button
               type="button"
               onClick={handleSelectFromLibrary}
-              disabled={isDocumentMode ? !selectedDocument : isImageMode ? !selectedImage : !selectedVideo}
+              disabled={loading || Boolean(libraryError) || (isDocumentMode ? !selectedDocument : isImageMode ? !selectedImage : !selectedVideo)}
               className="btn-primary disabled:opacity-50"
             >
               选择
@@ -744,7 +719,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           )}
         </div>
       </div>
-    </div>
+    </ModalSurface>
   )
 }
 

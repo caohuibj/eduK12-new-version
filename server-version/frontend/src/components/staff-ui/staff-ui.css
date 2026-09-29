@@ -104,6 +104,15 @@
   color:#60758a;
   text-decoration:none;
 }
+.hui-app--staff .hui-breadcrumb {
+  color: var(--staff-muted);
+  font-size: var(--hui-ds-text-metadata);
+}
+.staff-help, .staff-muted, .staff-badge, .staff-stat dt {
+  font-size: var(--hui-ds-text-metadata);
+}
+.staff-muted { color: var(--staff-muted, var(--hui-ds-color-muted)); }
+.hui-context-retry { color: var(--hui-ds-color-action); }
 .hui-app--staff .hui-breadcrumb a:hover{
   color:#244e91;
 }
@@ -269,6 +278,7 @@
   min-width:760px;
 }
 .staff-table th{
+  font-size: var(--hui-ds-text-metadata);
   position:sticky;
   top:0;
   z-index:1;
@@ -822,7 +832,7 @@
 }
 .staff-stat dt{
   color:var(--staff-muted);
-  font-size:11px;
+  font-size:var(--hui-ds-text-metadata);
   font-weight:650;
   letter-spacing:.04em;
 }

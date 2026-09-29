@@ -112,7 +112,7 @@ const ClassroomEnter: React.FC = () => {
 
             {error && <div id="classroom-code-error" role="alert" className="mt-2 text-center text-sm text-red-600">{error}</div>}
             {isEntering && (
-              <div role="status" aria-live="polite" className="mt-2 flex items-center justify-center gap-2 text-sm text-primary">
+              <div role="status" aria-live="polite" className="mt-2 flex items-center justify-center gap-2 text-sm text-action">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />正在进入课堂...
               </div>
             )}
@@ -162,7 +162,7 @@ const ClassroomEnter: React.FC = () => {
           <button
             type="submit"
             disabled={code.length !== 6 || isEntering}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-action px-4 py-3 font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             {isEntering ? (
               <><Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />正在进入...</>

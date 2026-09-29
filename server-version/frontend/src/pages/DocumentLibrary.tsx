@@ -223,7 +223,7 @@ const DocumentLibrary: React.FC = () => {
                   onClick={() => setPage(pageNum)}
                   className={`w-8 h-8 rounded-lg text-sm ${
                     pageNum === page
-                      ? 'bg-primary text-white'
+                      ? 'bg-action text-white'
                       : 'border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -271,7 +271,7 @@ const DocumentLibrary: React.FC = () => {
 
               <div
                 onClick={() => !isUploading && fileInputRef.current?.click()}
-                className={`border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary cursor-pointer transition-colors ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
+                className={`border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-action cursor-pointer transition-colors ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
                   ref={fileInputRef}
@@ -309,7 +309,7 @@ const DocumentLibrary: React.FC = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-primary h-2 rounded-full transition-all"
+                      className="bg-action h-2 rounded-full transition-all"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>

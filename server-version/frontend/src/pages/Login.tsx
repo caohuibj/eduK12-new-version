@@ -48,7 +48,7 @@ const Login: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-action rounded-full mb-4">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-800">
@@ -146,7 +146,7 @@ const Login: React.FC = () => {
                 setIsRegister(!isRegister)
                 setError('')
               }}
-              className="text-primary hover:underline text-sm"
+              className="text-action hover:underline text-sm"
             >
               {isRegister ? '已有账号？去登录' : '没有账号？去注册'}
             </button>

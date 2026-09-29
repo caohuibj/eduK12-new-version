@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Legacy primary is retained for protected cognitive stimuli.
+        action: {
+          DEFAULT: 'rgb(var(--hui-ds-color-action-rgb) / <alpha-value>)',
+          light: 'var(--hui-ds-color-soft)',
+          dark: 'var(--hui-ds-color-action-hover)',
+          hover: 'var(--hui-ds-color-action-hover)',
+        },
         primary: {
           DEFAULT: '#1890FF',
           light: '#40A9FF',

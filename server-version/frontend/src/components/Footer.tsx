@@ -21,7 +21,7 @@ const Footer: React.FC<FooterProps> = ({ variant = 'light' }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={`inline-flex min-h-11 items-center px-2 hover:underline transition-colors ${
-            isDark ? 'hover:text-gray-300' : 'hover:text-primary'
+            isDark ? 'hover:text-gray-300' : 'hover:text-action'
           }`}
         >
           京ICP备2026001512号-2

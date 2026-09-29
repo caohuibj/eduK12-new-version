@@ -173,7 +173,7 @@ const CourseStudents: React.FC = () => {
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-action" />
           <span className="sr-only">正在加载课程学生</span>
         </div>
       ) : filteredStudents.length === 0 ? (
@@ -203,8 +203,8 @@ const CourseStudents: React.FC = () => {
                           {student.avatarUrl ? (
                             <img className="h-10 w-10 rounded-full" src={student.avatarUrl} alt="" />
                           ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                              <span className="font-medium text-primary">{student.nickname?.charAt(0) || '?'}</span>
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-action/10">
+                              <span className="font-medium text-action">{student.nickname?.charAt(0) || '?'}</span>
                             </div>
                           )}
                         </div>

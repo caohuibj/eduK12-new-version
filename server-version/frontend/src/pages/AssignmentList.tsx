@@ -486,7 +486,7 @@ const AssignmentList: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
-                <p className="staff-dialog__description">设置课程、截止时间、内容与附件；发布与提交规则保持现有逻辑。</p>
+                <p className="staff-dialog__description">设置课程、截止时间、作业内容与附件。</p>
               </div>
             </div>
             
@@ -562,7 +562,7 @@ const AssignmentList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('video')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <Video className="w-4 h-4 mr-1" />
                     添加视频
@@ -599,7 +599,7 @@ const AssignmentList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('image')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <ImageIcon className="w-4 h-4 mr-1" />
                     添加图片
@@ -641,7 +641,7 @@ const AssignmentList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('document')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <FileText className="w-4 h-4 mr-1" />
                     添加文档
@@ -756,7 +756,7 @@ const AssignmentList: React.FC = () => {
 
               {submissionsLoading ? (
                 <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
                 </div>
               ) : submissions.length === 0 ? (
                 <div className="text-center py-12">
@@ -776,8 +776,8 @@ const AssignmentList: React.FC = () => {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                            <Users className="w-5 h-5 text-primary" />
+                          <div className="w-10 h-10 bg-action/10 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-action" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-800">
@@ -855,7 +855,7 @@ const AssignmentList: React.FC = () => {
                 </span>
                 <button
                   onClick={toggleSelectAll}
-                  className="text-sm text-primary hover:text-primary-hover flex items-center space-x-1"
+                  className="text-sm text-action hover:text-action-hover flex items-center space-x-1"
                 >
                   {selectedSubmissions.size === submissions.filter(s => s.status !== 'GRADED').length ? (
                     <>
@@ -884,7 +884,7 @@ const AssignmentList: React.FC = () => {
                         type="checkbox"
                         checked={selectedSubmissions.has(submission.id)}
                         onChange={() => toggleSelectSubmission(submission.id)}
-                        className="w-4 h-4 text-primary rounded"
+                        className="w-4 h-4 text-action rounded"
                       />
                       <span className="text-sm text-gray-700">
                         {submission.student.nickname || submission.student.username}

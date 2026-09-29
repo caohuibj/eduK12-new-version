@@ -401,7 +401,7 @@ const CourseList: React.FC = () => {
       {activeTab === 'my' ? (
         loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
           </div>
         ) : filteredCourses.length === 0 ? (
           <div className="text-center py-12">
@@ -518,7 +518,7 @@ const CourseList: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="course-editor-title">{editingCourse ? '编辑课程' : '创建课程'}</h2>
-                <p className="staff-dialog__description">维护课程基本信息；课程权限与生命周期规则保持现有逻辑。</p>
+                <p className="staff-dialog__description">设置课程名称、简介与参与方式。</p>
               </div>
             </div>
             <div className="staff-dialog__body staff-form">
@@ -546,7 +546,7 @@ const CourseList: React.FC = () => {
                     ) : (
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-100 transition-colors"
+                        className="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-action hover:bg-gray-100 transition-colors"
                       >
                         <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
                         <span className="text-sm text-gray-500">点击上传封面</span>
@@ -577,7 +577,7 @@ const CourseList: React.FC = () => {
                             type="button"
                             onClick={() => handleCoverUpload(editingCourse.id)}
                             disabled={isUploadingCover}
-                            className="flex-1 py-2 px-4 bg-primary text-white rounded hover:bg-primary-hover disabled:opacity-50 text-sm"
+                            className="flex-1 py-2 px-4 bg-action text-white rounded hover:bg-action-hover disabled:opacity-50 text-sm"
                           >
                             {isUploadingCover ? '上传中...' : '保存封面'}
                           </button>
@@ -702,7 +702,7 @@ const CourseList: React.FC = () => {
                               setSelectedUsers(selectedUsers.filter((id) => id !== u.id))
                             }
                           }}
-                          className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          className="w-4 h-4 text-action border-gray-300 rounded focus:ring-action"
                         />
                         <div className="ml-3">
                           <p className="text-sm font-medium text-gray-800">
@@ -721,7 +721,7 @@ const CourseList: React.FC = () => {
               {/* 已选择数量 */}
               {selectedUsers.length > 0 && (
                 <p className="text-sm text-gray-600">
-                  已选择 <span className="font-medium text-primary">{selectedUsers.length}</span> 位用户
+                  已选择 <span className="font-medium text-action">{selectedUsers.length}</span> 位用户
                 </p>
               )}
             </div>

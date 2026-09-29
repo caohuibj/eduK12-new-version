@@ -61,8 +61,8 @@
 
 .hui-app--student .hui-app-main > main:has(#classroom-code) form > button[type="submit"],
 .hui-app--public .hui-app-main > main:has(#classroom-code) form > button[type="submit"],
-.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"],
-.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-primary"] {
+.hui-app--student .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-action"],
+.hui-app--public .hui-app-main > main:has(a[href="/student/classroom/enter"]) button[class*="bg-action"] {
   min-height: 50px;
   background: var(--hui-ds-color-action);
   box-shadow: 0 7px 18px rgba(47,111,237,.13);

@@ -95,7 +95,7 @@ const StudentLogin: React.FC = () => {
         <span className="text-gray-500">还没有账号？</span>
         <Link
           to={authLink("/student/course-login")}
-          className="text-primary hover:underline font-medium"
+          className="text-action hover:underline font-medium"
         >
           使用课程码注册
         </Link>

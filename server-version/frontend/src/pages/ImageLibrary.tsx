@@ -314,7 +314,7 @@ const ImageLibrary: React.FC = () => {
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary cursor-pointer transition-colors"
+                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-action cursor-pointer transition-colors"
               >
                 <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600">点击选择图片</p>
@@ -343,7 +343,7 @@ const ImageLibrary: React.FC = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-primary h-2 rounded-full transition-all"
+                      className="bg-action h-2 rounded-full transition-all"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>

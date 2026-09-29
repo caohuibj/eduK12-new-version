@@ -220,7 +220,7 @@ const CourseDetail: React.FC = () => {
     if (sectionLoading[section]) {
       return (
         <div className="card text-center py-10" role="status" aria-live="polite">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-action mx-auto mb-3" />
           <p className="text-gray-500">正在加载{label}...</p>
         </div>
       )
@@ -244,7 +244,7 @@ const CourseDetail: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action mx-auto mb-3"></div>
           <p className="text-gray-500">正在加载课程...</p>
         </div>
       </div>
@@ -267,7 +267,7 @@ const CourseDetail: React.FC = () => {
       {/* Back Button */}
       <button
         onClick={() => navigate('/student')}
-        className="hui-course-back flex items-center text-gray-600 hover:text-primary transition-colors"
+        className="hui-course-back flex items-center text-gray-600 hover:text-action transition-colors"
       >
         <ArrowLeft className="w-5 h-5 mr-1" />
         返回课程列表
@@ -277,7 +277,7 @@ const CourseDetail: React.FC = () => {
       <div className="hui-course-hero card">
         <div className="hui-course-hero__content">
           <div className="hui-course-hero__icon">
-            <BookOpen className="w-8 h-8 text-primary" />
+            <BookOpen className="w-8 h-8 text-action" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{course.title}</h1>
@@ -301,7 +301,7 @@ const CourseDetail: React.FC = () => {
           onClick={() => setActiveTab('assignments')}
           className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'assignments'
-              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-action shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -313,7 +313,7 @@ const CourseDetail: React.FC = () => {
           onClick={() => setActiveTab('checkins')}
           className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'checkins'
-              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-action shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -325,7 +325,7 @@ const CourseDetail: React.FC = () => {
           onClick={() => setActiveTab('questionnaires')}
           className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'questionnaires'
-              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-action shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
@@ -337,7 +337,7 @@ const CourseDetail: React.FC = () => {
           onClick={() => setActiveTab('composites')}
           className={`hui-course-tab relative flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
             activeTab === 'composites'
-              ? 'hui-course-tab--active bg-white text-primary shadow-sm'
+              ? 'hui-course-tab--active bg-white text-action shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >

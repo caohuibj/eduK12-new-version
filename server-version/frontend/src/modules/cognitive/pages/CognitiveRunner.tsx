@@ -30,7 +30,7 @@ const presentationItems = (
 
 const LoadingContent = ({ message }: { message: string }) => (
   <div className="flex min-h-40 items-center justify-center" role="status">
-    <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary" />
+    <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-action" />
     <span className="ml-3 text-slate-600">{message}</span>
   </div>
 )

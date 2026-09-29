@@ -6,6 +6,10 @@ on:
     paths:
       - '.github/workflows/visual-canonical-qa.yml'
       - 'server-version/e2e/visual-canonical-browser-e2e.cjs'
+      - 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'
+      - 'server-version/frontend/tailwind.config.js'
+      - 'server-version/frontend/src/components/MediaSelector.tsx'
+      - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireList.tsx'
       - 'server-version/e2e/visual-staff-complex-browser-e2e.cjs'
       - 'server-version/e2e/visual-classroom-control-browser-e2e.cjs'
       - 'server-version/frontend/src/index.css'
@@ -116,6 +120,8 @@ jobs:
         run: node e2e/visual-staff-complex-browser-e2e.cjs
       - name: capture classroom teacher control family
         run: node e2e/visual-classroom-control-browser-e2e.cjs
+      - name: verify interaction and loading error empty states
+        run: node e2e/visual-interaction-states-browser-e2e.cjs
       - name: upload canonical visual evidence
         if: always()
         continue-on-error: true

@@ -189,7 +189,7 @@ const CompositeAssessmentList: React.FC = () => {
         <button
           onClick={() => setTab('mine')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            tab === 'mine' ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-800'
+            tab === 'mine' ? 'bg-white text-action shadow-sm' : 'text-gray-600 hover:text-gray-800'
           }`}
         >
           我的
@@ -197,12 +197,12 @@ const CompositeAssessmentList: React.FC = () => {
         <button
           onClick={() => setTab('library')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-            tab === 'library' ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-800'
+            tab === 'library' ? 'bg-white text-action shadow-sm' : 'text-gray-600 hover:text-gray-800'
           }`}
         >
           管理员模板
           {library.length > 0 && (
-            <span className="bg-primary text-white text-xs px-1.5 py-0.5 rounded-full">{library.length}</span>
+            <span className="bg-action text-white text-xs px-1.5 py-0.5 rounded-full">{library.length}</span>
           )}
         </button>
       </div>

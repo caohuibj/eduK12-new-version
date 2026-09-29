@@ -170,7 +170,7 @@ const VideoItemRenderer: React.FC<VideoItemRendererProps> = ({
           {embedUrl ? (
             <button
               onClick={() => setShowEmbedPlayer(true)}
-              className="text-sm text-primary hover:underline flex items-center"
+              className="text-sm text-action hover:underline flex items-center"
             >
               <Play className="w-4 h-4 mr-1" />
               {isBilibili ? '播放B站视频' : isYouTube ? '播放YouTube视频' : '播放视频'}
@@ -178,7 +178,7 @@ const VideoItemRenderer: React.FC<VideoItemRendererProps> = ({
           ) : (
             <button
               onClick={handleExternalPlay}
-              className="text-sm text-primary hover:underline flex items-center"
+              className="text-sm text-action hover:underline flex items-center"
             >
               <Play className="w-4 h-4 mr-1" />
               点击观看视频
@@ -217,7 +217,7 @@ const VideoItemRenderer: React.FC<VideoItemRendererProps> = ({
       <p className="font-medium text-gray-800 mb-2">{item.title || '视频'}</p>
       <button
         onClick={handlePlay}
-        className="text-sm text-primary hover:underline flex items-center"
+        className="text-sm text-action hover:underline flex items-center"
       >
         <Play className="w-4 h-4 mr-1" />
         点击观看视频
@@ -242,7 +242,7 @@ const ImageItemRenderer: React.FC<ImageItemRendererProps> = ({ item, watermarkTe
     <>
       <div
         onClick={() => setShowPreview(true)}
-        className="aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors block relative group cursor-pointer"
+        className="aspect-square rounded-lg overflow-hidden border hover:border-action transition-colors block relative group cursor-pointer"
       >
         <img
           src={imageUrl}

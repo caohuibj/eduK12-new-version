@@ -309,7 +309,7 @@ const StudentManagement: React.FC = () => {
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-action" />
           <span className="sr-only">正在加载学生列表</span>
         </div>
       ) : selectedCourseId !== 'all' ? (
@@ -334,8 +334,8 @@ const StudentManagement: React.FC = () => {
                           {student.avatarUrl ? (
                             <img className="h-10 w-10 rounded-full" src={student.avatarUrl} alt="" />
                           ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                              <span className="font-medium text-primary">{student.nickname?.charAt(0) || '?'}</span>
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-action/10">
+                              <span className="font-medium text-action">{student.nickname?.charAt(0) || '?'}</span>
                             </div>
                           )}
                         </div>
@@ -388,7 +388,7 @@ const StudentManagement: React.FC = () => {
                   aria-controls={panelId}
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <BookOpen className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
+                    <BookOpen className="h-5 w-5 flex-none text-action" aria-hidden="true" />
                     <div className="min-w-0">
                       <span className="block truncate font-medium text-gray-900">{course.title}</span>
                       <span className="block text-sm text-gray-500">课程号: {course.courseCode}</span>
@@ -417,8 +417,8 @@ const StudentManagement: React.FC = () => {
                             <tr key={`${course.id}-${student.id}`} className={student.isFrozen ? 'bg-gray-50' : ''}>
                               <td className="px-6 py-2 whitespace-nowrap">
                                 <div className="flex items-center">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                                    <span className="text-sm font-medium text-primary">{student.nickname?.charAt(0) || '?'}</span>
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-action/10">
+                                    <span className="text-sm font-medium text-action">{student.nickname?.charAt(0) || '?'}</span>
                                   </div>
                                   <span className="ml-2 text-sm text-gray-900">{student.nickname}</span>
                                   {student.isFrozen && <span className="ml-2 text-xs text-gray-500">(已冻结)</span>}
@@ -438,7 +438,7 @@ const StudentManagement: React.FC = () => {
                     </div>
                     {courseStudents.length > 5 && (
                       <div className="border-t px-6 py-2 text-center">
-                        <button type="button" onClick={() => setSelectedCourseId(course.id)} className="text-sm text-primary hover:text-primary-hover">
+                        <button type="button" onClick={() => setSelectedCourseId(course.id)} className="text-sm text-action hover:text-action-hover">
                           查看全部 {courseStudents.length} 名学生 →
                         </button>
                       </div>

@@ -344,7 +344,7 @@ const CheckinSubmit: React.FC = () => {
                       <span className="text-xs text-gray-500">({doc.fileName})</span>
                     )}
                   </div>
-                  <span className="text-xs text-primary">点击查看</span>
+                  <span className="text-xs text-action">点击查看</span>
                 </div>
               ))}
             </div>
@@ -382,8 +382,8 @@ const CheckinSubmit: React.FC = () => {
               {othersSubmissions.map((other) => (
                 <div key={other.id} className="border rounded-lg p-4 bg-gray-50">
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                      <span className="text-primary text-sm font-medium">
+                    <div className="w-8 h-8 bg-action/10 rounded-full flex items-center justify-center">
+                      <span className="text-action text-sm font-medium">
                         {other.student.nickname?.charAt(0) || other.student.username.charAt(0)}
                       </span>
                     </div>
@@ -408,7 +408,7 @@ const CheckinSubmit: React.FC = () => {
                             type="button"
                             key={idx}
                             onClick={() => openPreviewImage({ url: normalizedUrl, name: `图片 ${idx + 1}` })}
-                            className="relative aspect-square overflow-hidden rounded-lg border bg-transparent p-0 text-left transition-colors hover:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 group"
+                            className="relative aspect-square overflow-hidden rounded-lg border bg-transparent p-0 text-left transition-colors hover:border-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 group"
                             aria-label={`预览图片 ${idx + 1}`}
                           >
                             <img
@@ -553,7 +553,7 @@ const CheckinSubmit: React.FC = () => {
                   )
                 })}
                 {images.length < 9 && (
-                  <label className="student-submit-image-add aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                  <label className="student-submit-image-add aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-action hover:bg-action/5 transition-colors">
                     {uploading ? (
                       <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
                     ) : (

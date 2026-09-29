@@ -119,7 +119,7 @@ const UserList: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('TEACHER')}
             aria-pressed={activeTab === 'TEACHER'}
-            className={`flex items-center gap-2 rounded-md px-4 py-2 transition-colors sm:px-6 ${activeTab === 'TEACHER' ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
+            className={`flex items-center gap-2 rounded-md px-4 py-2 transition-colors sm:px-6 ${activeTab === 'TEACHER' ? 'bg-white text-action shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
             <Users className="h-4 w-4" aria-hidden="true" />教师 ({teacherCount})
           </button>
@@ -127,7 +127,7 @@ const UserList: React.FC = () => {
             type="button"
             onClick={() => setActiveTab('STUDENT')}
             aria-pressed={activeTab === 'STUDENT'}
-            className={`flex items-center gap-2 rounded-md px-4 py-2 transition-colors sm:px-6 ${activeTab === 'STUDENT' ? 'bg-white text-primary shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
+            className={`flex items-center gap-2 rounded-md px-4 py-2 transition-colors sm:px-6 ${activeTab === 'STUDENT' ? 'bg-white text-action shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
             <Users className="h-4 w-4" aria-hidden="true" />学生 ({studentCount})
           </button>
@@ -150,7 +150,7 @@ const UserList: React.FC = () => {
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-action" />
           <span className="sr-only">正在加载用户列表</span>
         </div>
       ) : filteredUsers.length === 0 ? (
@@ -216,7 +216,7 @@ const UserList: React.FC = () => {
                               type="button"
                               onClick={() => handleExtend(user.id, 12)}
                               disabled={extendingUser === user.id}
-                              className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark disabled:opacity-50"
+                              className="flex items-center gap-1 text-sm text-action hover:text-action-dark disabled:opacity-50"
                               aria-label={`将教师 ${displayName} 的账号延期 1 年`}
                             >
                               <Clock className="h-4 w-4" aria-hidden="true" />
