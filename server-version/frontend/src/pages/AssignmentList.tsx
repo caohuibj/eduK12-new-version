@@ -482,7 +482,7 @@ const AssignmentList: React.FC = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="staff-modal-backdrop">
-          <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
+          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
@@ -490,7 +490,7 @@ const AssignmentList: React.FC = () => {
               </div>
             </div>
             
-            <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog__body staff-form">
+            <div className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
                 <label className="label">选择课程 *</label>
@@ -681,23 +681,23 @@ const AssignmentList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="staff-dialog__actions">
-                <ProductButton
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setEditingAssignment(null)
-                    resetForm()
-                  }}
-                >
-                  取消
-                </ProductButton>
-                <ProductButton type="submit" variant="primary">
-                  {editingAssignment ? '保存修改' : '创建作业'}
-                </ProductButton>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowModal(false)
+                  setEditingAssignment(null)
+                  resetForm()
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingAssignment ? '保存修改' : '创建作业'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
@@ -911,23 +911,23 @@ const AssignmentList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="staff-dialog__actions">
-                <ProductButton
-                  type="button"
-                  onClick={() => setShowBatchGradeModal(false)}
-                  disabled={isBatchGrading}
-                >
-                  取消
-                </ProductButton>
-                <ProductButton
-                  type="button"
-                  variant="primary"
-                  onClick={handleBatchGrade}
-                  disabled={isBatchGrading || selectedSubmissions.size === 0}
-                >
-                  {isBatchGrading ? '批复中...' : `确认批复 (${selectedSubmissions.size}份)`}
-                </ProductButton>
-              </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => setShowBatchGradeModal(false)}
+                disabled={isBatchGrading}
+              >
+                取消
+              </ProductButton>
+              <ProductButton
+                type="button"
+                variant="primary"
+                onClick={handleBatchGrade}
+                disabled={isBatchGrading || selectedSubmissions.size === 0}
+              >
+                {isBatchGrading ? '批复中...' : `确认批复 (${selectedSubmissions.size}份)`}
+              </ProductButton>
             </div>
           </div>
         </div>
