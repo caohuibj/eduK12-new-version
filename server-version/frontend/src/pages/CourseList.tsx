@@ -513,12 +513,15 @@ const CourseList: React.FC = () => {
 
       {/* Create/Edit Modal */}
       {(showCreateModal || editingCourse) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6" role="dialog" aria-modal="true" aria-label={editingCourse ? '编辑课程' : '创建课程'}>
-            <h2 className="text-xl font-semibold mb-4">
-              {editingCourse ? '编辑课程' : '创建课程'}
-            </h2>
-            <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="space-y-4">
+        <div className="staff-modal-backdrop">
+          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
+            <div className="staff-dialog__header">
+              <div>
+                <h2 id="course-editor-title">{editingCourse ? '编辑课程' : '创建课程'}</h2>
+                <p className="staff-dialog__description">维护课程基本信息；课程权限与生命周期规则保持现有逻辑。</p>
+              </div>
+            </div>
+            <div className="staff-dialog__body staff-form">
               {/* 课程封面 */}
               {editingCourse && (
                 <div>
@@ -619,47 +622,50 @@ const CourseList: React.FC = () => {
                   </span>
                 </label>
               )}
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCreateModal(false)
-                    setEditingCourse(null)
-                    setCoverFile(null)
-                    setCoverPreview('')
-                  }}
-                  className="flex-1 btn-secondary"
-                >
-                  取消
-                </button>
-                <button type="submit" className="flex-1 btn-primary">
-                  {editingCourse ? '保存修改' : '创建课程'}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setEditingCourse(null)
+                  setCoverFile(null)
+                  setCoverPreview('')
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingCourse ? '保存修改' : '创建课程'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
       {/* Share Modal */}
       {showShareModal && sharingCourse && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4" role="dialog" aria-modal="true" aria-label={`分享课程「${sharingCourse.title}」`}>
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">分享课程「{sharingCourse.title}」</h3>
+        <div className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="course-share-title">
+            <div className="staff-dialog__header">
+              <div>
+                <h2 id="course-share-title">分享课程</h2>
+                <p className="staff-dialog__description">{sharingCourse.title}</p>
+              </div>
               <button
                 onClick={() => {
                   setShowShareModal(false)
                   setSharingCourse(null)
                   setSelectedUsers([])
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="staff-icon-button"
+                aria-label="关闭课程分享"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="staff-dialog__body staff-form">
               {/* 搜索用户 */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -720,24 +726,23 @@ const CourseList: React.FC = () => {
               )}
             </div>
 
-            <div className="flex space-x-3 p-4 border-t">
-              <button
+            <div className="staff-dialog__actions">
+              <ProductButton
                 onClick={() => {
                   setShowShareModal(false)
                   setSharingCourse(null)
                   setSelectedUsers([])
                 }}
-                className="flex-1 btn-secondary"
               >
                 取消
-              </button>
-              <button
+              </ProductButton>
+              <ProductButton
+                variant="primary"
                 onClick={handleShare}
                 disabled={selectedUsers.length === 0}
-                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 确认分享
-              </button>
+              </ProductButton>
             </div>
           </div>
         </div>

@@ -481,15 +481,16 @@ const AssignmentList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 my-auto max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold">
-                {editingAssignment ? '编辑作业' : '布置作业'}
-              </h2>
+        <div className="staff-modal-backdrop">
+          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
+            <div className="staff-dialog__header">
+              <div>
+                <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
+                <p className="staff-dialog__description">设置课程、截止时间、内容与附件；发布与提交规则保持现有逻辑。</p>
+              </div>
             </div>
             
-            <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="p-6 space-y-6">
+            <div className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
                 <label className="label">选择课程 *</label>
@@ -680,24 +681,23 @@ const AssignmentList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setEditingAssignment(null)
-                    resetForm()
-                  }}
-                  className="flex-1 btn-secondary"
-                >
-                  取消
-                </button>
-                <button type="submit" className="flex-1 btn-primary">
-                  {editingAssignment ? '保存修改' : '创建作业'}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowModal(false)
+                  setEditingAssignment(null)
+                  resetForm()
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingAssignment ? '保存修改' : '创建作业'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
@@ -711,12 +711,12 @@ const AssignmentList: React.FC = () => {
 
       {/* Submissions Modal */}
       {showSubmissionsModal && selectedAssignment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 my-auto max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b flex items-center justify-between">
+        <div className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="assignment-submissions-title">
+            <div className="staff-dialog__header">
               <div>
-                <h2 className="text-xl font-semibold">作业提交列表</h2>
-                <p className="text-sm text-gray-500 mt-1">{selectedAssignment.title}</p>
+                <h2 id="assignment-submissions-title">作业提交列表</h2>
+                <p className="staff-dialog__description">{selectedAssignment.title}</p>
               </div>
               <button
                 onClick={() => {
@@ -725,15 +725,16 @@ const AssignmentList: React.FC = () => {
                   setSubmissions([])
                   setSelectedSubmissions(new Set())
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="staff-icon-button"
+                aria-label="关闭作业提交列表"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
             
-            <div className="p-6">
+            <div className="staff-dialog__body">
               {/* Toolbar */}
-              <div className="flex items-center justify-between mb-4">
+              <div className="staff-toolbar staff-submission-toolbar">
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-500">
                     共 {submissions.length} 份提交
@@ -746,13 +747,10 @@ const AssignmentList: React.FC = () => {
                   </span>
                 </div>
                 {submissions.filter(s => s.status !== 'GRADED').length > 0 && (
-                  <button
-                    onClick={() => setShowBatchGradeModal(true)}
-                    className="btn-primary flex items-center space-x-2"
-                  >
-                    <CheckSquare className="w-4 h-4" />
+                  <ProductButton variant="primary" onClick={() => setShowBatchGradeModal(true)}>
+                    <CheckSquare className="w-4 h-4" aria-hidden="true" />
                     <span>一键批量批复</span>
-                  </button>
+                  </ProductButton>
                 )}
               </div>
 
@@ -840,16 +838,16 @@ const AssignmentList: React.FC = () => {
 
       {/* Batch Grade Modal */}
       {showBatchGradeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
-            <div className="p-6 border-b">
-              <h3 className="text-lg font-semibold">一键批量批复</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                已选择 {selectedSubmissions.size} 份待批改作业
-              </p>
+        <div className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-labelledby="batch-grade-title">
+            <div className="staff-dialog__header">
+              <div>
+                <h2 id="batch-grade-title">一键批量批复</h2>
+                <p className="staff-dialog__description">已选择 {selectedSubmissions.size} 份待批改作业</p>
+              </div>
             </div>
             
-            <div className="p-6 space-y-4">
+            <div className="staff-dialog__body staff-form">
               {/* Select All */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                 <span className="text-sm font-medium text-gray-700">
@@ -913,24 +911,23 @@ const AssignmentList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => setShowBatchGradeModal(false)}
-                  className="flex-1 btn-secondary"
-                  disabled={isBatchGrading}
-                >
-                  取消
-                </button>
-                <button
-                  type="button"
-                  onClick={handleBatchGrade}
-                  disabled={isBatchGrading || selectedSubmissions.size === 0}
-                  className="flex-1 btn-primary disabled:opacity-50"
-                >
-                  {isBatchGrading ? '批复中...' : `确认批复 (${selectedSubmissions.size}份)`}
-                </button>
-              </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => setShowBatchGradeModal(false)}
+                disabled={isBatchGrading}
+              >
+                取消
+              </ProductButton>
+              <ProductButton
+                type="button"
+                variant="primary"
+                onClick={handleBatchGrade}
+                disabled={isBatchGrading || selectedSubmissions.size === 0}
+              >
+                {isBatchGrading ? '批复中...' : `确认批复 (${selectedSubmissions.size}份)`}
+              </ProductButton>
             </div>
           </div>
         </div>

@@ -879,3 +879,104 @@
   padding-block: 8px;
   line-height: 1.2;
 }
+
+
+/* PR10A course detail presentation. */
+.staff-course-detail-summary{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  min-width:0;
+}
+.staff-course-detail-summary__copy{
+  display:grid;
+  gap:6px;
+  min-width:0;
+}
+.staff-course-detail-summary__copy>strong{
+  color:var(--staff-ink);
+  font-size:17px;
+}
+.staff-course-detail-tabs{
+  justify-content:flex-start;
+  margin-bottom:0;
+}
+.staff-course-detail-tabs .staff-segmented{
+  max-width:100%;
+  flex-wrap:wrap;
+}
+.staff-course-detail-tabs .staff-segmented button{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:44px;
+}
+.staff-course-detail-list{
+  display:grid;
+  gap:12px;
+}
+.staff-course-detail-item{
+  width:100%;
+  padding:18px 20px;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .14s ease,background .14s ease,box-shadow .14s ease;
+}
+.staff-course-detail-item:hover{
+  border-color:#bfd2e4;
+  background:#fbfdff;
+  box-shadow:0 8px 22px rgba(20,48,74,.055);
+}
+.staff-course-detail-item:focus-visible{
+  outline:3px solid rgba(47,111,237,.24);
+  outline-offset:2px;
+}
+.staff-course-detail-item__main{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.staff-course-detail-item__main>span:first-child{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+.staff-course-detail-item__title{
+  color:var(--staff-ink);
+  font-size:16px;
+  line-height:1.45;
+}
+.staff-course-detail-item__description{
+  display:-webkit-box;
+  overflow:hidden;
+  color:var(--staff-muted);
+  font-size:13px;
+  line-height:1.6;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+}
+.staff-course-detail-item .staff-detail-meta{
+  margin-top:10px;
+}
+.staff-course-detail-item__overdue{
+  color:#a52920;
+}
+@media(max-width:639px){
+  .staff-course-detail-summary{
+    align-items:center;
+  }
+  .staff-course-detail-tabs .staff-segmented{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .staff-course-detail-item{
+    padding:16px;
+  }
+  .staff-course-detail-item__main{
+    flex-direction:column;
+  }
+}

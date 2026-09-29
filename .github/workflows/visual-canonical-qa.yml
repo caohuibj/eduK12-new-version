@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/visual-canonical-qa.yml'
       - 'server-version/e2e/visual-canonical-browser-e2e.cjs'
+      - 'server-version/e2e/visual-staff-complex-browser-e2e.cjs'
       - 'server-version/frontend/src/index.css'
       - 'server-version/frontend/src/App.tsx'
       - 'server-version/frontend/src/pages/dev/**'
@@ -23,6 +24,9 @@ on:
       - 'server-version/frontend/src/pages/*Login.tsx'
       - 'server-version/frontend/src/pages/ScaleLibrary.tsx'
       - 'server-version/frontend/src/pages/CourseList.tsx'
+      - 'server-version/frontend/src/pages/AssignmentList.tsx'
+      - 'server-version/frontend/src/pages/CheckinList.tsx'
+      - 'server-version/frontend/src/pages/teacher/TeacherCourseDetail.tsx'
       - 'server-version/frontend/src/pages/student/**'
       - 'server-version/frontend/src/pages/parent/**'
       - 'server-version/frontend/src/pages/public/**'
@@ -106,6 +110,8 @@ jobs:
           exit 1
       - name: capture canonical visual matrix
         run: node e2e/visual-canonical-browser-e2e.cjs
+      - name: capture staff complex controller family
+        run: node e2e/visual-staff-complex-browser-e2e.cjs
       - name: upload canonical visual evidence
         if: always()
         continue-on-error: true

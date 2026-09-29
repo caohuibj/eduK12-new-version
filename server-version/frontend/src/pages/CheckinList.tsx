@@ -400,15 +400,16 @@ const CheckinList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-auto">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold">
-                {editingCheckin ? '编辑打卡' : '创建打卡'}
-              </h2>
+        <div className="staff-modal-backdrop">
+          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
+            <div className="staff-dialog__header">
+              <div>
+                <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
+                <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件；打卡业务规则保持现有逻辑。</p>
+              </div>
             </div>
             
-            <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="p-6 space-y-4">
+            <div className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
                 <label className="label">选择课程 *</label>
@@ -602,24 +603,23 @@ const CheckinList: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setEditingCheckin(null)
-                    resetForm()
-                  }}
-                  className="flex-1 btn-secondary"
-                >
-                  取消
-                </button>
-                <button type="submit" className="flex-1 btn-primary">
-                  {editingCheckin ? '保存修改' : '创建打卡'}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div className="staff-dialog__actions">
+              <ProductButton
+                type="button"
+                onClick={() => {
+                  setShowModal(false)
+                  setEditingCheckin(null)
+                  resetForm()
+                }}
+              >
+                取消
+              </ProductButton>
+              <ProductButton type="submit" variant="primary">
+                {editingCheckin ? '保存修改' : '创建打卡'}
+              </ProductButton>
+            </div>
+          </form>
         </div>
       )}
 
@@ -633,37 +633,35 @@ const CheckinList: React.FC = () => {
 
       {/* Submissions Modal */}
       {showSubmissionsModal && selectedCheckin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-10">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 my-auto max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b flex items-center justify-between">
+        <div className="staff-modal-backdrop">
+          <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="checkin-submissions-title">
+            <div className="staff-dialog__header">
               <div>
-                <h2 className="text-xl font-semibold">打卡提交列表</h2>
-                <p className="text-sm text-gray-500 mt-1">{selectedCheckin.title}</p>
+                <h2 id="checkin-submissions-title">打卡提交列表</h2>
+                <p className="staff-dialog__description">{selectedCheckin.title}</p>
               </div>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => handleExport(selectedCheckin)}
-                  className="btn-secondary flex items-center space-x-2"
-                >
-                  <Download className="w-4 h-4" />
+              <div className="staff-inline-actions">
+                <ProductButton onClick={() => handleExport(selectedCheckin)}>
+                  <Download className="w-4 h-4" aria-hidden="true" />
                   <span>导出数据</span>
-                </button>
+                </ProductButton>
                 <button
                   onClick={() => {
                     setShowSubmissionsModal(false)
                     setSelectedCheckin(null)
                     setSubmissions([])
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="staff-icon-button"
+                  aria-label="关闭打卡提交列表"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" aria-hidden="true" />
                 </button>
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="staff-dialog__body">
               {/* Stats */}
-              <div className="flex items-center space-x-4 mb-4">
+              <div className="staff-toolbar staff-submission-toolbar">
                 <span className="text-sm text-gray-500">
                   共 {submissions.length} 人提交
                 </span>
