@@ -3,6 +3,11 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { taskswitchSequence, type TaskswitchTrialSpec } from '../shared/prng'
 import { PRACTICE_FEEDBACK_MS } from '../shared/practice'
+import {
+  CognitivePracticeResult,
+  CognitiveTaskIntro,
+  CognitiveTaskTransition,
+} from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
 type SubPhase = 'cue' | 'stimulus'
@@ -236,14 +241,12 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">任务转换</h2>
-        <p className="text-gray-600 mb-2">看到“奇偶”：奇数按左，偶数按右。</p>
-        <p className="text-gray-600 mb-2">看到“大小”：小于 5 按左，大于 5 按右。</p>
-        <p className="text-gray-600 mb-4">正式测验中规则会在试次之间切换，所以每一题都先看规则提示，再按对应规则作答。</p>
-        <p className="text-xs text-gray-400 mb-6">电脑使用左右方向键；触屏使用下方左右按键。先分别练习两条规则，再练习混合转换。</p>
-        <button className="btn-primary" onClick={startPractice}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro
+        title="任务转换"
+        description={<>看到“奇偶”：奇数按左，偶数按右。看到“大小”：小于 5 按左，大于 5 按右。正式测验中规则会在试次之间切换，所以每一题都先看规则提示，再按对应规则作答。</>}
+        hint="电脑使用左右方向键；触屏使用下方左右按键。先分别练习两条规则，再练习混合转换。"
+        onAction={startPractice}
+      />
     )
   }
 
@@ -252,34 +255,30 @@ export const TaskswitchTask: React.FC<CognitiveTaskProps> = ({
     const passed = practiceCorrect >= passCorrect
     const nextStage: PracticeStage | null = practiceStage === 'parity' ? 'magnitude' : practiceStage === 'magnitude' ? 'mixed' : null
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">{stageLabel(practiceStage)}练习结果</h2>
-        <p className="mb-2">练习正确 {practiceCorrect} / {practiceTrials.length}</p>
-        <p className="text-sm text-gray-500 mb-4">需要至少正确 {passCorrect} 题才能继续。</p>
-        {passed ? (
-          nextStage ? (
-            <button className="btn-primary" onClick={() => startPracticeStage(nextStage)}>继续{stageLabel(nextStage)}练习</button>
-          ) : (
-            <button className="btn-primary" onClick={startFormal}>开始正式测验</button>
-          )
-        ) : (
-          <button className="btn-secondary" onClick={() => startPracticeStage(practiceStage)}>重新练习本阶段</button>
-        )}
-      </div>
+      <CognitivePracticeResult
+        title={`${stageLabel(practiceStage)}练习结果`}
+        correct={practiceCorrect}
+        total={practiceTrials.length}
+        passed={passed}
+        onContinue={() => nextStage ? startPracticeStage(nextStage) : startFormal()}
+        onRetry={() => startPracticeStage(practiceStage)}
+        continueLabel={nextStage ? `继续${stageLabel(nextStage)}练习` : '开始正式测验'}
+        retryLabel="重新练习本阶段"
+        detail={<>需要至少正确 {passCorrect} 题才能继续。</>}
+      />
     )
   }
 
   if (phase === 'formal' && isTaskswitchFormalTrial(current) && acknowledgedBlockIndex !== current.blockIndex) {
     const isFirstBlock = current.blockIndex === 0
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">{isFirstBlock ? '准备开始任务转换测验' : '区块完成，可以短暂休息'}</h2>
-        <p className="text-gray-600 mb-2">即将开始区块 {current.blockIndex + 1} / {blockCount}</p>
-        <p className="text-sm text-gray-500 mb-6">准备好后继续；每题先看“奇偶 / 大小”规则提示，再使用左右方向作答。</p>
-        <button className="btn-primary" onClick={() => setAcknowledgedBlockIndex(current.blockIndex)}>
-          {isFirstBlock ? '开始第 1 区块' : '继续下一组'}
-        </button>
-      </div>
+      <CognitiveTaskTransition
+        title={isFirstBlock ? '准备开始任务转换测验' : '区块完成，可以短暂休息'}
+        meta={`即将开始区块 ${current.blockIndex + 1} / ${blockCount}`}
+        description="准备好后继续；每题先看“奇偶 / 大小”规则提示，再使用左右方向作答。"
+        actionLabel={isFirstBlock ? '开始第 1 区块' : '继续下一组'}
+        onAction={() => setAcknowledgedBlockIndex(current.blockIndex)}
+      />
     )
   }
 

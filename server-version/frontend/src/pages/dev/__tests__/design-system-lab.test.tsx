@@ -11,6 +11,9 @@ it('renders the code-native design workspace from shared production primitives',
   expect(screen.getByRole('heading', { name: '报告阅读组件' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: '典型报告场景' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: '纵向可视化状态' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: '认知任务展示状态' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: '连续执行任务' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: '练习完成' })).toBeInTheDocument()
 
   expect(screen.getByText('--hui-ds-color-action')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '主要操作' })).toBeInTheDocument()
