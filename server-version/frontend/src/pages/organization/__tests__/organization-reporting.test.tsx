@@ -30,10 +30,10 @@ it('removes an existing artifact when exact read permission is revoked', async (
   await userEvent.type(screen.getByPlaceholderText('artifact UUID'), 'private-artifact')
   await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
   await userEvent.click(await screen.findByText('报告记录编号'))
-  expect(screen.getByText('private-artifact')).toBeVisible()
+  expect(screen.getByText('Artifact private-artifact')).toBeVisible()
   api.readArtifact.mockRejectedValueOnce(new Error('read revoked'))
   await userEvent.click(screen.getByRole('button', { name: '读取历史报告' }))
-  await waitFor(() => expect(screen.queryByText('private-artifact')).not.toBeInTheDocument())
+  await waitFor(() => expect(screen.queryByText('Artifact private-artifact')).not.toBeInTheDocument())
   expect(await screen.findByText('read revoked')).toBeInTheDocument()
 })
 
