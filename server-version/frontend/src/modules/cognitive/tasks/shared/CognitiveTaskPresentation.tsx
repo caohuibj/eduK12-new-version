@@ -1,6 +1,92 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { ProductButton } from '../../../../components/product-ui'
 import './cognitive-task-presentation.css'
+
+export function CognitiveHint({
+  children,
+  label = '提示',
+  keyHint,
+}: {
+  children: ReactNode
+  label?: ReactNode
+  keyHint?: ReactNode
+}) {
+  return (
+    <aside className="cognitive-task-cue" role="note" data-cognitive-presentation="hint">
+      <span className="cognitive-task-cue__label">{label}</span>
+      <span className="cognitive-task-cue__body">{children}</span>
+      {keyHint ? <kbd className="cognitive-task-keyhint">{keyHint}</kbd> : null}
+    </aside>
+  )
+}
+
+export function CognitiveProgress({
+  current,
+  total,
+  label = '任务进度',
+}: {
+  current: number
+  total: number
+  label?: ReactNode
+}) {
+  const safeTotal = Math.max(0, total)
+  const safeCurrent = safeTotal > 0 ? Math.min(Math.max(0, current), safeTotal) : 0
+  const percentage = safeTotal > 0 ? (safeCurrent / safeTotal) * 100 : 0
+
+  return (
+    <div className="cognitive-task-progress" data-cognitive-presentation="progress">
+      <div className="cognitive-task-progress__meta">
+        <span>{label}</span>
+        <strong>{safeCurrent} / {safeTotal}</strong>
+      </div>
+      <div
+        className="cognitive-task-progress__track"
+        role="progressbar"
+        aria-label={typeof label === 'string' ? label : '任务进度'}
+        aria-valuemin={0}
+        aria-valuemax={safeTotal}
+        aria-valuenow={safeCurrent}
+      >
+        <span
+          className="cognitive-task-progress__value"
+          style={{ '--cognitive-progress-value': `${percentage}%` } as CSSProperties}
+        />
+      </div>
+    </div>
+  )
+}
+
+export function CognitiveResponseButton({
+  children,
+  onClick,
+  selected,
+  disabled = false,
+  keyHint,
+  ariaLabel,
+}: {
+  children: ReactNode
+  onClick?: () => void
+  selected?: boolean
+  disabled?: boolean
+  keyHint?: ReactNode
+  ariaLabel?: string
+}) {
+  return (
+    <button
+      type="button"
+      className="cognitive-response-button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      aria-pressed={selected === undefined ? undefined : selected}
+      data-selected={selected ? 'true' : undefined}
+      data-cognitive-presentation="response"
+    >
+      <span>{children}</span>
+      {keyHint ? <kbd className="cognitive-task-keyhint">{keyHint}</kbd> : null}
+    </button>
+  )
+}
 
 export function CognitiveTaskPanel({
   children,
