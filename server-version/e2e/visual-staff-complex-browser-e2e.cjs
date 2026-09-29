@@ -134,6 +134,7 @@ async function main() {
         for (const name of ['取消', '创建作业']) {
           const box = await dialog.getByRole('button', { name, exact: true }).boundingBox()
           assert.ok(box && box.height >= 44, `${viewport.name}: ${name} touch target is below 44px`)
+          assert.ok(box.y >= 0 && box.y + box.height <= viewport.height + 1, `${viewport.name}: ${name} action is outside the visible dialog viewport`)
         }
 
         await page.screenshot({ path: path.join(directory, `${viewport.name}.png`), fullPage: true })
