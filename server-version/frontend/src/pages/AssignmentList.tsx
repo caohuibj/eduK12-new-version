@@ -76,6 +76,7 @@ const AssignmentList: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [keyword, setKeyword] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
@@ -123,12 +124,15 @@ const AssignmentList: React.FC = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true)
+      setLoadError(null)
       const response = await apiClient.get('/assignments')
+      if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
       if (response.code === 0) {
         setAssignments(response.data.list)
       }
     } catch (error) {
       console.error('获取作业列表失败:', error)
+      setLoadError(error instanceof Error ? error.message : '获取作业列表失败')
     } finally {
       setLoading(false)
     }
@@ -464,18 +468,19 @@ const AssignmentList: React.FC = () => {
       {feedback}
       <div className="staff-toolbar">
         <label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索作业</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索作业或课程" /></label>
-        <span className="staff-help">共 {filteredAssignments.length} 个作业</span>
+        {!loading && !loadError && <span className="staff-help">共 {filteredAssignments.length} 个作业</span>}
       </div>
       {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
       {loading ? <ProductStatus kind="pending" title="正在加载作业">正在读取作业和提交概况。</ProductStatus>
+      : loadError ? <ProductStatus kind="error" title="作业列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配作业">可以调整筛选条件，或布置第一份作业。</ProductStatus>
-      : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>作业</th><th>课程</th><th>截止时间</th><th>提交</th><th>题目</th><th className="text-right">操作</th></tr></thead><tbody>
+      : <div className="staff-table-container staff-record-table"><table className="staff-table" aria-label="作业记录"><thead><tr><th scope="col">作业</th><th scope="col">课程</th><th scope="col">截止时间</th><th scope="col">提交</th><th scope="col">题目</th><th scope="col" className="text-right">操作</th></tr></thead><tbody>
         {filteredAssignments.map(assignment=><tr id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className={focusId===assignment.id?'staff-target-row':''}>
           <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(assignment)}>{assignment.title}</button>{assignment.tags?.length?<div className="staff-inline-tags">{assignment.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
-          <td>{assignment.course?.title || '未知课程'}</td>
-          <td>{formatDeadline(assignment.deadline)}</td>
-          <td><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
-          <td>{assignment.questions?.length || 0}</td>
+          <td className="staff-record-course" data-label="课程">{assignment.course?.title || '未知课程'}</td>
+          <td data-label="截止时间">{formatDeadline(assignment.deadline)}</td>
+          <td data-label="提交"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
+          <td data-label="题目">{assignment.questions?.length || 0}</td>
           <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制作业</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑作业</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除作业</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
