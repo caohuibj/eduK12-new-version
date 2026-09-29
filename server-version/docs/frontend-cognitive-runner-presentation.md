@@ -44,7 +44,10 @@ The first migration covers non-timed presentation states in:
 - CPT;
 - CPT frame-timing runner;
 - Go/No-Go;
-- Go/No-Go frame-timing runner.
+- Go/No-Go frame-timing runner;
+- Matrix reasoning;
+- Flanker;
+- Card sort.
 
 Formal stimulus containers remain structurally unchanged in this phase.
 
