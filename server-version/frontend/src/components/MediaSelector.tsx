@@ -371,24 +371,28 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
   if (!isOpen) return null
 
+  const dialogTitle = isDocumentMode ? '选择文档' : isImageMode ? '选择图片' : '选择视频'
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+    <div className="staff-modal-backdrop" role="presentation">
+      <div className="staff-dialog staff-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="media-selector-title">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">
-            {isDocumentMode ? '选择文档' : isImageMode ? '选择图片' : '选择视频'}
-          </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="w-5 h-5" />
+        <div className="staff-dialog__header">
+          <div>
+            <h2 id="media-selector-title">{dialogTitle}</h2>
+            <p className="staff-dialog__description">从素材库选择、添加外部链接，或上传新的素材。</p>
+          </div>
+          <button type="button" onClick={onClose} className="staff-icon-button" aria-label="关闭素材选择">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Tabs */}
         <div className="flex border-b">
           <button
+            type="button"
             onClick={() => setActiveTab('library')}
-            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
+            className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
               activeTab === 'library' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
             }`}
           >
@@ -397,8 +401,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           </button>
           {!isImageMode && !isDocumentMode && (
             <button
+              type="button"
               onClick={() => setActiveTab('external')}
-              className={`flex-1 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
+              className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
                 activeTab === 'external' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
               }`}
             >
@@ -407,8 +412,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
             </button>
           )}
           <button
+            type="button"
             onClick={() => setActiveTab('upload')}
-            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
+            className={`flex-1 min-h-11 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
               activeTab === 'upload' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
             }`}
           >
@@ -441,10 +447,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     {filteredDocuments.map((doc) => (
-                      <div
+                      <button
+                        type="button"
                         key={doc.id}
                         onClick={() => setSelectedDocument(doc)}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                        aria-pressed={selectedDocument?.id === doc.id}
+                        className={`w-full p-3 border rounded-lg cursor-pointer transition-all text-left ${
                           selectedDocument?.id === doc.id
                             ? 'border-primary bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
@@ -464,7 +472,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                             <Check className="w-5 h-5 text-primary flex-shrink-0" />
                           )}
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )
@@ -475,10 +483,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 ) : (
                   <div className="grid grid-cols-3 gap-3">
                     {filteredImages.map((image) => (
-                      <div
+                      <button
+                        type="button"
                         key={image.id}
                         onClick={() => setSelectedImage(image)}
-                        className={`relative aspect-square border rounded-lg cursor-pointer transition-all overflow-hidden ${
+                        aria-pressed={selectedImage?.id === image.id}
+                        className={`relative aspect-square border rounded-lg cursor-pointer transition-all overflow-hidden bg-white p-0 ${
                           selectedImage?.id === image.id
                             ? 'border-primary ring-2 ring-primary'
                             : 'border-gray-200 hover:border-gray-300'
@@ -494,7 +504,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                             <Check className="w-8 h-8 text-primary" />
                           </div>
                         )}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )
@@ -505,10 +515,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     {filteredVideos.map((video) => (
-                      <div
+                      <button
+                        type="button"
                         key={video.id}
                         onClick={() => setSelectedVideo(video)}
-                        className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                        aria-pressed={selectedVideo?.id === video.id}
+                        className={`w-full p-3 border rounded-lg cursor-pointer transition-all text-left ${
                           selectedVideo?.id === video.id
                             ? 'border-primary bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
@@ -528,7 +540,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                             <Check className="w-5 h-5 text-primary flex-shrink-0" />
                           )}
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )
@@ -572,8 +584,17 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           {activeTab === 'upload' && (
             <div className="space-y-4">
               <div
+                role="button"
+                tabIndex={isUploading ? -1 : 0}
+                aria-disabled={isUploading}
                 onClick={() => !isUploading && fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                onKeyDown={(event) => {
+                  if (!isUploading && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault()
+                    fileInputRef.current?.click()
+                  }
+                }}
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 ${
                   uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-primary'
                 } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
@@ -687,12 +708,13 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end space-x-3 p-4 border-t">
-          <button onClick={onClose} className="btn-secondary" disabled={isUploading}>
+        <div className="staff-dialog__actions">
+          <button type="button" onClick={onClose} className="btn-secondary" disabled={isUploading}>
             取消
           </button>
           {activeTab === 'library' && (
             <button
+              type="button"
               onClick={handleSelectFromLibrary}
               disabled={isDocumentMode ? !selectedDocument : isImageMode ? !selectedImage : !selectedVideo}
               className="btn-primary disabled:opacity-50"
@@ -702,6 +724,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           )}
           {activeTab === 'external' && !isImageMode && !isDocumentMode && (
             <button
+              type="button"
               onClick={handleSelectExternal}
               disabled={!externalUrl.trim()}
               className="btn-primary disabled:opacity-50"
@@ -711,6 +734,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           )}
           {activeTab === 'upload' && (
             <button
+              type="button"
               onClick={handleUpload}
               disabled={!uploadFile || (isImageMode ? false : !uploadTitle.trim()) || isUploading}
               className="btn-primary disabled:opacity-50"
