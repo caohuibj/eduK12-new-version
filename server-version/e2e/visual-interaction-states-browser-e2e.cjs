@@ -26,6 +26,7 @@ const entry = {
 const fulfill = (route, data, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ code: status === 200 ? 0 : status, message: status === 200 ? 'ok' : '暂时无法加载，请重试', data }) })
 
 async function capture(page, name, width) {
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
   const metrics = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth }))
   assert.ok(metrics.scroll <= width + 1, `${name}/${width}: page overflow ${metrics.scroll}`)
   await page.screenshot({ path: path.join(output, `${name}-${width}.png`), fullPage: true })
@@ -81,6 +82,8 @@ async function main() {
           if (state === 'error') await page.getByRole('alert').waitFor()
           else if (state === 'loading') await page.getByText(ready, { exact: true }).waitFor()
           else await page.getByRole('heading', { name: state === 'detail' ? longTitle : '量表库', exact: true }).waitFor()
+          if (state === 'populated') await page.getByRole('heading', { name: longTitle, exact: true }).waitFor()
+          if (state === 'empty' || state === 'filtered-empty') await page.getByText('没有符合条件的量表').waitFor()
           if (state === 'filtered-empty') {
             await page.getByPlaceholder('名称、缩写或构念').fill('不存在的量表')
             await page.getByRole('button', { name: '应用筛选' }).click()
@@ -90,6 +93,70 @@ async function main() {
           assert.equal(await page.locator('.hui-scale-library').evaluate(el => getComputedStyle(el).maxWidth), '1216px')
           await capture(page, `scale-${state}`, width)
           release()
+        })
+      }
+      await scenario(width, 'STUDENT', async page => {
+        await page.route('**/api/scale-library**', route => fulfill(route, { entries: new URL(route.request().url()).searchParams.get('keyword') ? [] : [entry] }))
+        await page.goto(base + '/scale-library')
+        await page.getByRole('heading', { name: longTitle, exact: true }).waitFor()
+        assert.equal(await page.getByLabel('年龄下界', { exact: true }).isVisible(), false, 'advanced fields are initially collapsed')
+        const more = page.getByText('更多筛选', { exact: true })
+        await more.press('Enter')
+        await page.getByLabel('年龄下界', { exact: true }).fill('10')
+        await capture(page, 'scale-more-filters', width)
+        await page.getByLabel('关键词', { exact: true }).fill('未找到')
+        await page.getByRole('button', { name: '应用筛选', exact: true }).click()
+        await page.getByText('当前显示 0 个量表').waitFor()
+        assert.equal(await page.getByLabel('年龄下界', { exact: true }).isVisible(), true, 'filter disclosure survives a request')
+        assert.equal(await page.getByRole('button', { name: '移除年龄下界：10' }).isVisible(), true)
+        await capture(page, 'scale-applied-filters', width)
+        await page.getByRole('button', { name: '清除筛选并浏览全部' }).click()
+        await page.getByRole('heading', { name: longTitle, exact: true }).waitFor()
+        assert.equal(await page.getByLabel('已应用筛选').count(), 0)
+        await page.getByText('版本与证据', { exact: true }).press('Enter')
+        await capture(page, 'scale-card-evidence', width)
+      })
+      for (const state of ['loading', 'populated', 'empty', 'filtered-empty', 'error']) {
+        await scenario(width, 'TEACHER', async page => {
+          let release
+          const wait = new Promise(resolve => { release = resolve })
+          let failed = state === 'error'
+          await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
+          await page.route('**/api/assignments', async route => {
+            if (state === 'loading') await wait
+            return fulfill(route, { list: ['populated', 'filtered-empty'].includes(state) ? [{ id: 'visual-list', title: longTitle, course: { title: '跨学科学习与成长观察课程 · Long Course Name' }, deadline: '2099-10-01T10:00:00Z', tags: ['学习反思', '成长观察'], questions: [], _count: { submissions: 13 } }] : [] }, failed ? 503 : 200)
+          })
+          await page.goto(base + '/assignments?id=visual-list')
+          if (state === 'loading') await page.getByText('正在加载作业', { exact: true }).waitFor()
+          else if (failed) await page.getByText('作业列表加载失败', { exact: true }).waitFor()
+          else if (state === 'empty') await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+          else {
+            await page.getByRole('button', { name: longTitle, exact: true }).waitFor()
+            assert.equal(await page.locator('#assignment-record-visual-list').count(), 1, 'one record at all widths')
+            assert.equal(await page.locator('#assignment-record-visual-list').evaluate(el => el === document.activeElement), true, 'course handoff focuses the record')
+            if (width < 768) assert.equal(await page.locator('.staff-record-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1), true, 'mobile records need no horizontal scrolling')
+            if (state === 'filtered-empty') {
+              await page.getByRole('searchbox', { name: '搜索作业' }).fill('unmatched')
+              await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+            }
+          }
+          await capture(page, `assignments-${state}`, width)
+          if (state === 'populated') {
+            const request = page.waitForRequest(request => request.url().endsWith('/assignments/visual-list/submissions'))
+            await page.getByRole('button', { name: '查看提交', exact: true }).press('Enter')
+            assert.equal((await request).method(), 'GET')
+            await page.getByRole('dialog', { name: '作业提交列表', exact: true }).waitFor()
+            await page.getByLabel('关闭作业提交列表', { exact: true }).click()
+            await page.getByLabel(`${longTitle} 的更多操作`, { exact: true }).press('Enter')
+            assert.equal(await page.getByRole('button', { name: '导出提交', exact: true }).isVisible(), true)
+          }
+          release()
+          if (failed) {
+            assert.equal(await page.getByText('暂无匹配作业', { exact: true }).count(), 0)
+            failed = false
+            await page.getByRole('button', { name: '重试', exact: true }).click()
+            await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+          }
         })
       }
       for (const state of ['loading', 'empty', 'error', 'populated']) {
