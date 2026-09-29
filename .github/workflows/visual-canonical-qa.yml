@@ -36,6 +36,8 @@ on:
       - 'server-version/frontend/src/modules/cognitive/tasks/matrix/**'
       - 'server-version/frontend/src/modules/cognitive/tasks/flanker/**'
       - 'server-version/frontend/src/modules/cognitive/tasks/cardsort/**'
+      - 'server-version/frontend/src/modules/cognitive/tasks/taskswitch/**'
+      - 'server-version/frontend/src/modules/cognitive/tasks/sst/**'
       - 'server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx'
       - 'server-version/frontend/src/modules/composite/*Report*.tsx'
       - 'server-version/frontend/src/pages/bundle/BundleReport.tsx'

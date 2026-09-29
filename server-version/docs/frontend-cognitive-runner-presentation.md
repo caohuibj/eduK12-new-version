@@ -47,7 +47,9 @@ The first migration covers non-timed presentation states in:
 - Go/No-Go frame-timing runner;
 - Matrix reasoning;
 - Flanker;
-- Card sort.
+- Card sort;
+- Task switch;
+- Stop-signal task.
 
 Formal stimulus containers remain structurally unchanged in this phase.
 
@@ -111,3 +113,15 @@ Cognitive runner presentation should be:
 
 Practice success/failure presentation must not introduce unsupported claims
 about cognitive ability or score quality.
+
+
+## PR7 scope boundary
+
+PR7 intentionally stops after the first nine representative task implementations.
+
+Tasks such as Stroop, Memory, BART, Tower, Trail Making and other specialized
+runners retain their current presentation in this PR because their practice or
+interaction states are more tightly coupled to task-specific visual geometry.
+
+They can adopt the same primitives later, but should be reviewed task-by-task
+rather than converted through a mechanical global replacement.

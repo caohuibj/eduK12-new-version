@@ -93,6 +93,20 @@
   font-size: 24px;
 }
 
+.cognitive-task-result-detail {
+  max-width: 54ch;
+  margin: 10px auto 0;
+  color: #52677c;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.cognitive-task-result-detail p {
+  margin: 0;
+}
+.cognitive-task-result-detail p + p {
+  margin-top: 4px;
+}
+
 .cognitive-task-result-note {
   margin: 8px 0 0;
   color: var(--runner-muted, var(--hui-ds-color-muted));
