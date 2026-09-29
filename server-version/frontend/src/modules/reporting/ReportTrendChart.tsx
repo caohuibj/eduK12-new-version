@@ -135,7 +135,7 @@ export function ReportTrendChart({
     <figure className={`report-trend-chart report-trend-chart--${model.state}`}>
       <div className="report-trend-chart__header">
         <div className="min-w-0">
-          <p className="report-eyebrow">纵向趋势</p>
+          <p className="report-eyebrow">趋势图</p>
           <h4 className="report-trend-chart__title">{title}</h4>
           {description && <p className="report-trend-chart__description">{description}</p>}
         </div>
