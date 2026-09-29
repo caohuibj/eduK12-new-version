@@ -135,7 +135,7 @@ export function ReportTrendChart({
     <figure className={`report-trend-chart report-trend-chart--${model.state}`}>
       <div className="report-trend-chart__header">
         <div className="min-w-0">
-          <p className="report-eyebrow">Longitudinal</p>
+          <p className="report-eyebrow">纵向趋势</p>
           <h4 className="report-trend-chart__title">{title}</h4>
           {description && <p className="report-trend-chart__description">{description}</p>}
         </div>
@@ -144,7 +144,7 @@ export function ReportTrendChart({
 
       {model.state === 'suppressed' ? (
         <div className="report-trend-chart__empty" role="status">
-          隐私保护规则已生效；图表不包含被抑制的统计值、tooltip 数据或可访问文本值。
+          隐私保护规则已生效；图表不包含被抑制的统计值、悬浮信息或可访问文本值。
         </div>
       ) : model.state === 'unavailable' ? (
         <div className="report-trend-chart__empty" role="status">
@@ -156,7 +156,7 @@ export function ReportTrendChart({
           <figcaption className="report-trend-chart__caption">
             <p>
               {model.state === 'not_comparable'
-                ? '只有服务端明确允许 DESCRIPTIVE_TREND 的相邻时间点才会连线；不可直接比较的区段保持断开。'
+                ? '只有服务端明确允许描述性趋势展示的相邻时间点才会连线；不可直接比较的区段保持断开。'
                 : '连线仅表示服务端明确允许的描述性纵向趋势。'}
             </p>
             {model.hasSuppressedValues && (
