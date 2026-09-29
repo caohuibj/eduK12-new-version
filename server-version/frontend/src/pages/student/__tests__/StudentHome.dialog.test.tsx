@@ -33,6 +33,15 @@ vi.mock('../../../contexts/CapabilitiesContext', () => ({
 import StudentHome from '../StudentHome'
 
 describe('StudentHome join-course dialog', () => {
+  it('shows a retry rather than an empty course list after a failed load', async () => {
+    mockGet.mockRejectedValueOnce(new Error('Offline')).mockResolvedValueOnce({ code: 0, data: { list: [] } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><StudentHome /></MemoryRouter>)
+    expect(await screen.findByText('课程列表加载失败')).toBeInTheDocument()
+    expect(screen.queryByText('还没有加入任何课程')).toBeNull()
+    await user.click(screen.getByText('重试'))
+    expect(await screen.findByText('还没有加入任何课程')).toBeInTheDocument()
+  })
   beforeEach(() => {
     vi.clearAllMocks()
     mockGet.mockResolvedValue({

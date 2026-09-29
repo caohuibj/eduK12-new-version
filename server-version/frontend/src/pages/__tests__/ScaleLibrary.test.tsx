@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { ScaleLibraryEntry } from '../../api/scaleLibrary'
@@ -98,6 +99,19 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
 })
 
 describe('ScaleLibrary page', () => {
+  it('keeps an explicit root through loading, failure, retry and empty results', async () => {
+    let reject!: (reason: Error) => void
+    mockList.mockImplementationOnce(() => new Promise((_, no) => { reject = no }))
+      .mockResolvedValueOnce({ code: 0, data: { entries: [] } })
+    const user = userEvent.setup()
+    const { container } = render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
+    expect(screen.getByText('量表库加载中...').closest('.hui-scale-library')).not.toBeNull()
+    reject(new Error('Offline'))
+    expect((await screen.findByRole('alert')).closest('.hui-scale-library')).not.toBeNull()
+    await user.click(screen.getByRole('button', { name: '重试' }))
+    expect((await screen.findByText('没有符合条件的量表')).closest('.hui-scale-library')).not.toBeNull()
+    expect(container.querySelectorAll('.hui-scale-library')).toHaveLength(1)
+  })
   beforeEach(() => {
     vi.clearAllMocks()
     authState.user = { id: 'student-1', role: 'STUDENT' }
