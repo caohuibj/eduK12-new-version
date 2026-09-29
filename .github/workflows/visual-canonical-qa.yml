@@ -25,6 +25,7 @@ on:
       - 'server-version/frontend/src/pages/CourseList.tsx'
       - 'server-version/frontend/src/pages/student/**'
       - 'server-version/frontend/src/pages/parent/**'
+      - 'server-version/frontend/src/pages/public/**'
       - 'server-version/frontend/src/pages/teacher/TeacherProfile.tsx'
       - 'server-version/frontend/src/pages/organization/OrganizationIndexPage.tsx'
       - 'server-version/frontend/src/modules/reporting/**'
