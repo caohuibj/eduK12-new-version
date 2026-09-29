@@ -93,7 +93,7 @@ export function ReportTrendChart({
         xAxis: {
           type: 'category',
           data: model.points.map((point) => point.label),
-          boundaryGap: false,
+          boundaryGap: true,
           axisTick: { show: false },
           axisLine: { lineStyle: { color: line } },
           axisLabel: { color: muted, fontSize: 11, interval: 0, hideOverlap: true, margin: 14 },
@@ -106,7 +106,7 @@ export function ReportTrendChart({
           axisLabel: { color: muted, fontSize: 10 },
           splitLine: { lineStyle: { color: line, type: 'dashed' } },
         },
-        series: [baseSeries, ...segmentSeries],
+        series: [...segmentSeries, baseSeries],
       }, { notMerge: true, lazyUpdate: false })
       chart.resize()
     }
