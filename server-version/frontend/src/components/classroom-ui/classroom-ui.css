@@ -357,6 +357,9 @@
 
 
 /* Realtime teacher control: presentation only; socket handlers remain page-owned. */
+.classroom-control-page .staff-secondary-link{
+  min-height:44px;
+}
 .classroom-control-summary__meta{
   margin-top:0;
   align-items:center;
