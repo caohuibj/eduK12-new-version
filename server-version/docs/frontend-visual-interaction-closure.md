@@ -33,10 +33,11 @@ No task TypeScript, stimulus assets, duration, response mapping, feedback timing
 - Long document filenames could overflow a two-column mobile grid. The grid becomes one column on narrow screens and filenames wrap.
 - A pre-existing `primary-hover` class had no token. The migrated `action-hover` alias is defined.
 - The classroom join control's class-based selector was migrated with its action utility so its existing prominent target size remains intact.
+- MEDIA-7 still located the result heading through a removed legacy card wrapper. The browser assertion now targets the report's level-one heading, preserving the video, FINAL and provenance checks.
 
 ## Validation and visual review
 
-- Frontend full regression under required Node 24.21.0: 156 files / 597 tests passed before adding two further media tests; the resulting 10-test media suite also passed. Final CI is authoritative for the exact PR head.
+- Frontend full regression under required Node 24.21.0: 156 files / 599 tests passed. Final CI is authoritative for the exact PR head.
 - Frontend typecheck, route inventory, session-auth gate contracts and production build passed. Lint: no errors, 119 warnings.
 - Local Node 25 produced six `localStorage.clear` environment failures. All six pass under required Node 24 without changing those tests.
 - Production canonical visual matrix: 63 responsive captures, plus two print captures.
