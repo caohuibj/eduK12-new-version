@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 106 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 107 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -100,7 +100,7 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /public/questionnaire/:token/result | PublicQuestionnaireResult | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
 | /public/checkin/:token | PublicCheckin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /bigscreen/:classroomId | BigScreen | Public / unguarded | — | Dedicated display | Dedicated display | FE-02 + FE-10 | Dedicated mode retained |
-| * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
+| /__ui-lab | DesignSystemLab | Visual QA / local development only | UI Lab build flag | AppShell (outside guards) | development | Visual PR5 | Code-native design workspace; production flag off |\n| * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
 | /organizations | OrganizationIndexPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/new | OrganizationCreatePage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organization-tasks | OrganizationTasksPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
@@ -120,4 +120,4 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 - Bundle child runners retain parent/unit identifiers; focused mode must not create a second shell or attempt.
 - BigScreen retains its dedicated presentation layout. Classroom/assignment/check-in business protocols are outside this convergence change.
 - Nested Organization routes are included as an audit projection; AppShell and server authority remain the routing/access sources of truth.
-- Non-route components and legacy branches are not declared dead code by this inventory.
+- The UI Lab route is build-flagged for local development and canonical Visual QA only; ordinary production builds leave the flag off and do not register the route.\n- Non-route components and legacy branches are not declared dead code by this inventory.
