@@ -980,3 +980,78 @@
     flex-direction:column;
   }
 }
+
+
+/* Final compatibility layer for retained Ant Design staff controls. */
+.staff-ant-modal .ant-modal-content{
+  overflow:hidden;
+  padding:0;
+  border:1px solid var(--staff-line,#dde7f0);
+  border-radius:16px;
+  box-shadow:0 18px 50px rgba(20,48,74,.16);
+}
+.staff-ant-modal .ant-modal-header{
+  margin:0;
+  padding:18px 56px 16px 20px;
+  border-bottom:1px solid var(--staff-line,#dde7f0);
+  background:#fff;
+}
+.staff-ant-modal .ant-modal-body{
+  padding:20px;
+}
+.staff-ant-modal .ant-modal-close{
+  min-width:44px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.staff-ant-modal :where(.ant-btn,.ant-picker,.ant-input-number,.ant-switch){
+  min-height:44px;
+}
+.staff-ant-modal .ant-picker,
+.staff-ant-modal .ant-input-number{
+  border-radius:10px;
+}
+
+.staff-ant-transfer.ant-transfer{
+  align-items:stretch;
+}
+.staff-ant-transfer .ant-transfer-list{
+  border-color:var(--staff-line,#dde7f0);
+  border-radius:12px;
+}
+.staff-ant-transfer .ant-transfer-list-header{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+}
+.staff-ant-transfer .ant-transfer-list-search{
+  min-height:44px;
+}
+.staff-ant-transfer .ant-transfer-list-content-item{
+  min-height:44px;
+  padding-block:8px;
+}
+.staff-ant-transfer .ant-transfer-operation .ant-btn{
+  min-width:44px;
+  min-height:44px;
+  border-radius:10px;
+}
+@media(max-width:767px){
+  .staff-ant-modal .ant-modal{
+    max-width:calc(100vw - 24px);
+    margin:12px auto;
+  }
+  .staff-ant-transfer.ant-transfer{
+    flex-direction:column;
+  }
+  .staff-ant-transfer .ant-transfer-list{
+    width:100%!important;
+  }
+  .staff-ant-transfer .ant-transfer-operation{
+    flex-direction:row;
+    justify-content:center;
+    margin:8px 0;
+  }
+}
