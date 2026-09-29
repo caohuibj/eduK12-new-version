@@ -53,7 +53,7 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     <button disabled={busy} className="btn-secondary" onClick={()=>void act(async()=>{const current=generation.current;const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows)})}>刷新链接</button>
     {!links.length && !busy && !error && <p>尚未生成链接</p>}
     {links.map(link=>{const url=adapter.getPublicEntry(link);return <article key={link.id} className="rounded border p-3 text-sm space-y-2">
-      {url ? <a className="block break-all text-primary" href={url}>{url}</a> : <p>链接地址已隐藏，复制时会重新验证权限。</p>}
+      {url ? <a className="block break-all text-action" href={url}>{url}</a> : <p>链接地址已隐藏，复制时会重新验证权限。</p>}
       <p>创建于：{link.createdAt?new Date(link.createdAt).toLocaleString():'刚刚'} · 有效期至：{new Date(link.expiresAt).toLocaleString()}</p>
       <p>已使用 {link.usedCount} 次 / 最大次数：{link.maxUses || '不限'} · {publicLinkStatus(link)}</p>
       <div className="flex gap-3"><button disabled={busy} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>

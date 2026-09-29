@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { BookOpen, Brain, Clock, Keyboard, Plus, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
+import ModalSurface from '../../components/shared-ui/ModalSurface'
 import type { Course } from '../../types'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { DiscoveryCard, PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
@@ -18,67 +19,13 @@ const StudentHome: React.FC = () => {
   const [courseCode, setCourseCode] = useState('')
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
-  const joinDialogRef = useRef<HTMLElement | null>(null)
   const joinInputRef = useRef<HTMLInputElement | null>(null)
-  const restoreFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     void fetchCourses()
   }, [])
 
-  useEffect(() => {
-    if (!showJoinModal) return
-
-    joinInputRef.current?.focus()
-
-    const handleDialogKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        setShowJoinModal(false)
-        setJoinError(null)
-        return
-      }
-
-      if (event.key !== 'Tab') return
-
-      const dialog = joinDialogRef.current
-      if (!dialog) return
-
-      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )).filter((element) => element.getAttribute('aria-hidden') !== 'true')
-
-      if (focusable.length === 0) {
-        event.preventDefault()
-        dialog.focus()
-        return
-      }
-
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      const activeElement = document.activeElement
-
-      if (!dialog.contains(activeElement)) {
-        event.preventDefault()
-        ;(event.shiftKey ? last : first).focus()
-      } else if (event.shiftKey && activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handleDialogKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handleDialogKeyDown)
-      restoreFocusRef.current?.focus()
-    }
-  }, [showJoinModal])
-
   const openJoinModal = () => {
-    restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setJoinError(null)
     setShowJoinModal(true)
   }
@@ -156,7 +103,7 @@ const StudentHome: React.FC = () => {
       {loading ? (
         <ProductStatus kind="pending" title="正在加载课程" announce="polite" />
       ) : loadError ? (
-        <ProductStatus kind="error" title="课程列表加载失败" announce="assertive">{loadError}</ProductStatus>
+        <ProductStatus kind="error" title="课程列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchCourses()}>重试</ProductButton>}>{loadError}</ProductStatus>
       ) : courses.length === 0 ? (
         <ProductStatus kind="info" title="还没有加入任何课程" actions={<ProductButton variant="primary" onClick={openJoinModal}>加入课程</ProductButton>}>
           输入老师提供的课程号即可加入。
@@ -183,8 +130,8 @@ const StudentHome: React.FC = () => {
       )}
 
       {showJoinModal ? (
-        <div className="hui-student-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation">
-          <section ref={joinDialogRef} role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="hui-student-dialog card w-full max-w-md" tabIndex={-1}>
+        <ModalSurface open={showJoinModal} onClose={closeJoinModal} initialFocusRef={joinInputRef} className="hui-student-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <section role="dialog" aria-modal="true" aria-labelledby="join-course-title" className="hui-student-dialog card w-full max-w-md" tabIndex={-1}>
             <h2 id="join-course-title" className="text-xl font-bold text-gray-800 mb-2">加入课程</h2>
             <p className="text-gray-500 mb-4">请输入老师提供的课程号。</p>
             {joinError ? <p role="alert" className="mb-4 text-sm text-red-600">{joinError}</p> : null}
@@ -206,7 +153,7 @@ const StudentHome: React.FC = () => {
               </div>
             </form>
           </section>
-        </div>
+        </ModalSurface>
       ) : null}
     </ProductPage>
   )

@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Full viewport native modal surface; the inner panel owns the accessible name. */
+dialog.hui-modal-surface {
+  /* Page stack spacing must not offset a top-layer viewport surface. */
+  margin: 0 !important;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  color: inherit;
+}
+dialog.hui-modal-surface:not([open]) { display: none; }
+dialog.hui-modal-surface::backdrop { background: transparent; }
+.hui-modal-surface :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--hui-ds-color-focus);
+  outline-offset: 3px;
+}
+
 @layer base {
   body {
     @apply bg-gray-100 text-gray-800;

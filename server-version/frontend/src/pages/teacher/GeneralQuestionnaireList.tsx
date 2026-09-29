@@ -91,7 +91,7 @@ const GeneralQuestionnaireList: React.FC = () => {
       {feedback}
       <PageHeader
         title="泛化问卷管理"
-        description="创建、发布和管理泛化问卷；公开令牌与数据导出仍使用现有授权接口。"
+        description="创建和发布问卷，管理公开参与链接并导出作答数据。"
         actions={(
           <ProductButton variant="primary" onClick={() => navigate('/general-questionnaires/create')}>
             <Plus className="h-4 w-4" aria-hidden="true" />创建问卷
@@ -112,7 +112,7 @@ const GeneralQuestionnaireList: React.FC = () => {
 
       {loading ? (
         <ProductStatus kind="pending" title="正在加载泛化问卷" announce="polite">正在读取问卷目录。</ProductStatus>
-      ) : questionnaires.length === 0 ? (
+      ) : error ? null : questionnaires.length === 0 ? (
         <div className="staff-empty">
           <span>暂无泛化问卷</span>
           <ProductButton variant="primary" onClick={() => navigate('/general-questionnaires/create')}>

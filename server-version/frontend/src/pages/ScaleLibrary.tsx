@@ -69,7 +69,7 @@ const LoadingState: React.FC = () => (
 const ErrorState: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => (
   <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-700">
     <p>{message}</p>
-    <button type="button" onClick={onRetry} className="mt-3 min-h-11 rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">重试</button>
+    <button type="button" onClick={onRetry} className="btn-secondary mt-3">重试</button>
   </div>
 )
 
@@ -93,7 +93,7 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
           {' · '}{entry.localization.targetLocale}
         </p>
       </div>
-      <BookOpen className="h-6 w-6 shrink-0 text-primary" />
+      <BookOpen className="h-6 w-6 shrink-0 text-action" />
     </div>
 
     <p className="mt-4 text-sm leading-6 text-gray-700">{entry.construct.constructDefinition}</p>
@@ -115,7 +115,7 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
     )}
     <Link
       to={`/scale-library/${encodeURIComponent(entry.identity.instrumentKey)}/${encodeURIComponent(entry.identity.instrumentVersion)}`}
-      className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
+      className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-action hover:underline"
     >
       查看详情 <ExternalLink className="ml-1 h-4 w-4" />
     </Link>
@@ -144,7 +144,7 @@ const FilterPanel: React.FC<{
             value={filters.keyword ?? ''}
             onChange={(event) => update('keyword', event.target.value)}
             placeholder="名称、缩写或构念"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-action focus:ring-1 focus:ring-action"
           />
         </label>
         <label className="text-sm text-gray-700">
@@ -203,7 +203,7 @@ const FilterPanel: React.FC<{
         </label>
       </div>
       <div className="mt-5 flex gap-3">
-        <button type="submit" className="min-h-11 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-90">应用筛选</button>
+        <button type="submit" className="min-h-11 rounded-md bg-action px-4 py-2 text-sm font-medium text-white hover:opacity-90">应用筛选</button>
         <button type="button" onClick={onClear} className="min-h-11 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">清除</button>
       </div>
     </form>
@@ -237,7 +237,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
             </p>
           </div>
           {user?.role === 'STUDENT' && entry.availability.status === 'AVAILABLE' && entry.availability.launch && (
-            <button type="button" onClick={() => navigate(entry.availability.launch!.route)} className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-90">
+            <button type="button" onClick={() => navigate(entry.availability.launch!.route)} className="inline-flex min-h-11 items-center justify-center rounded-md bg-action px-4 py-2 text-sm font-medium text-white hover:opacity-90">
               <Play className="mr-2 h-4 w-4" /> 开始量表
             </button>
           )}
@@ -285,17 +285,17 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
           <p>当前内容：{entry.localization.targetLocale}；来源语言：{entry.localization.sourceLocale}；版本 {entry.localization.localizationVersion}。</p>
           <p className="mt-2">适配方式：{entry.localization.adaptationMethod}；审核状态：{entry.localization.reviewStatus}。</p>
           {entry.source.citation && <p className="mt-2">{entry.source.citation}</p>}
-          {entry.source.url && <a className="mt-2 inline-flex items-center text-primary hover:underline" href={entry.source.url} target="_blank" rel="noreferrer">查看来源 <ExternalLink className="ml-1 h-3.5 w-3.5" /></a>}
+          {entry.source.url && <a className="mt-2 inline-flex items-center text-action hover:underline" href={entry.source.url} target="_blank" rel="noreferrer">查看来源 <ExternalLink className="ml-1 h-3.5 w-3.5" /></a>}
         </Section>
         <Section title="授权与参考">
           <p>授权状态：{formatStatus(entry.rights.status)}；商业性质：{entry.rights.commercialNature}。</p>
-          <p className="mt-2">覆盖语言：{entry.rights.locales.length > 0 ? entry.rights.locales.join('、') : '暂无可用授权范围'}；territory：{entry.rights.territories.length > 0 ? entry.rights.territories.join('、') : '暂无'}</p>
+          <p className="mt-2">覆盖语言：{entry.rights.locales.length > 0 ? entry.rights.locales.join('、') : '暂无可用授权范围'}；适用地区：{entry.rights.territories.length > 0 ? entry.rights.territories.join('、') : '暂无'}</p>
           <p className="mt-3">{entry.references.displayText}</p>
           <p className="mt-1 text-gray-500">参考版本 {entry.references.packageReferenceCount} 个；适用性记录 {entry.references.applicabilityCount} 条。</p>
         </Section>
         <Section title="报告说明">
           {entry.report.maxEligibleLevel === null ? (
-            <p>当前展示的是报告设计预览；尚无可执行 report contract，因此不会生成个人结果。完成 exact-form package、授权与报告门后才可启用。</p>
+            <p>当前仅展示报告设计预览，暂不能生成个人结果。需完成量表版本确认、授权和报告审核后才能启用。</p>
           ) : (
             <p>本量表提供分数与维度解释、教育性引导、限制说明和免责声明；报告不会把描述性分数升级为诊断结论。</p>
           )}
@@ -305,7 +305,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
         </Section>
         <Section title="证据摘要">
           <p>{entry.evidence.coverageText}</p>
-          <p className="mt-2 text-gray-500">Scientific Evidence Matrix 记录数：{entry.evidence.recordCount}。</p>
+          <p className="mt-2 text-gray-500">科学证据记录数：{entry.evidence.recordCount}。</p>
         </Section>
       </div>
 
@@ -367,16 +367,16 @@ const ScaleLibrary: React.FC = () => {
 
   useEffect(() => { load() }, [load])
 
-  if (loading) return <LoadingState />
-  if (error) return <ErrorState message={error} onRetry={load} />
-  if (isDetail) return detail ? <DetailPage entry={detail} /> : <ErrorState message="量表详情不存在" onRetry={load} />
+  if (loading) return <div className="hui-scale-library"><LoadingState /></div>
+  if (error) return <div className="hui-scale-library"><ErrorState message={error} onRetry={load} /></div>
+  if (isDetail) return <div className="hui-scale-library hui-scale-library--detail">{detail ? <DetailPage entry={detail} /> : <ErrorState message="量表详情不存在" onRetry={load} />}</div>
 
   const entries = listData?.entries ?? []
   return (
-    <div>
+    <div className="hui-scale-library">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">量表库</h1>
-        <p className="mt-1 text-gray-600">浏览已接入的可执行量表与 Wave 1 P1 科学候选；候选量表会明确显示证据、报告设计和发布阻断条件，不会被误当作可启动测评。</p>
+        <p className="mt-1 text-gray-600">浏览可用量表与研究候选量表，了解适用范围、证据和使用限制。只有标注“可开始”的量表能够进入测评。</p>
       </div>
       <FilterPanel
         filters={filters}
@@ -388,7 +388,7 @@ const ScaleLibrary: React.FC = () => {
         <div className="rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
           <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-400" />
           <p className="text-gray-600">没有符合条件的量表</p>
-          <p className="mt-1 text-sm text-gray-400">可以清除筛选后重新浏览。</p>
+          <p className="mt-1 text-sm text-gray-600">可以清除筛选后重新浏览。</p>
         </div>
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">{entries.map((entry) => <ScaleCard key={`${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`} entry={entry} />)}</div>

@@ -176,7 +176,7 @@ const ClassroomList: React.FC = () => {
         <div className="rounded-lg bg-white py-12 text-center shadow">
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
           <p className="mb-4 text-gray-500">暂无课堂</p>
-          <Link to="/teacher/classrooms/create" className="text-primary hover:text-primary/80">创建第一个课堂</Link>
+          <Link to="/teacher/classrooms/create" className="text-action hover:text-action/80">创建第一个课堂</Link>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
@@ -234,7 +234,7 @@ const ClassroomList: React.FC = () => {
                             >
                               <QrCode className="h-4 w-4" aria-hidden="true" />
                             </button>
-                            <Link to={`/teacher/classrooms/${classroom.id}/edit`} className="text-primary hover:text-primary/80" title="编辑" aria-label={`编辑课堂 ${classroom.name}`}>
+                            <Link to={`/teacher/classrooms/${classroom.id}/edit`} className="text-action hover:text-action/80" title="编辑" aria-label={`编辑课堂 ${classroom.name}`}>
                               <Edit className="h-4 w-4" aria-hidden="true" />
                             </Link>
                             <button type="button" onClick={() => handleDelete(classroom.id, classroom.name)} className="text-red-600 hover:text-red-800" title="删除" aria-label={`删除课堂 ${classroom.name}`}>

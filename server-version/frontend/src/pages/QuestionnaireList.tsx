@@ -253,7 +253,7 @@ const QuestionnaireList: React.FC = () => {
         <div className="rounded-lg bg-white py-12 text-center shadow">
           <Layers className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
           <p className="mb-4 text-gray-500">暂无问卷</p>
-          <Link to="/questionnaires/new" className="text-primary hover:text-primary/80">创建第一个问卷</Link>
+          <Link to="/questionnaires/new" className="text-action hover:text-action/80">创建第一个问卷</Link>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
@@ -295,7 +295,7 @@ const QuestionnaireList: React.FC = () => {
                       <div className="flex justify-end gap-2">
                         <Link
                           to={`/questionnaires/${questionnaire.id}`}
-                          className="text-primary hover:text-primary/80"
+                          className="text-action hover:text-action/80"
                           title="编辑"
                           aria-label={`编辑 ${questionnaire.name}`}
                         >
@@ -419,7 +419,7 @@ const QuestionnaireList: React.FC = () => {
 
             <div className="flex flex-wrap justify-end gap-3 border-t p-4">
               <button type="button" onClick={() => setShowExportModal(false)} className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">取消</button>
-              <button type="button" onClick={handleExport} disabled={exportLoading} className="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90 disabled:opacity-50">
+              <button type="button" onClick={handleExport} disabled={exportLoading} className="rounded-lg bg-action px-4 py-2 text-white hover:bg-action/90 disabled:opacity-50">
                 {exportLoading ? '导出中...' : '确认导出'}
               </button>
             </div>

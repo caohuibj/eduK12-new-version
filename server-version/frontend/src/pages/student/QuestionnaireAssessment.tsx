@@ -633,7 +633,7 @@ const QuestionnaireAssessment: React.FC = () => {
               onChange={(e) => setFormAnswer(e.target.value)}
               disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
             />
           )}
 
@@ -644,7 +644,7 @@ const QuestionnaireAssessment: React.FC = () => {
               disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
               rows={5}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
             />
           )}
 
@@ -654,7 +654,7 @@ const QuestionnaireAssessment: React.FC = () => {
               value={typeof formAnswer === 'string' ? formAnswer : ''}
               onChange={(e) => setFormAnswer(e.target.value)}
               disabled={runnerBusy}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-primary focus:border-primary"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
             />
           )}
 
@@ -671,7 +671,7 @@ const QuestionnaireAssessment: React.FC = () => {
                   disabled={runnerBusy}
                   className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                     formAnswer === option.value
-                      ? 'border-primary bg-primary/5 text-primary'
+                      ? 'border-action bg-action/5 text-action'
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
@@ -723,7 +723,7 @@ const QuestionnaireAssessment: React.FC = () => {
           <button
             onClick={() => void handleFormSubmit()}
             disabled={runnerBusy || (formItem.required && (Array.isArray(formAnswer) ? formAnswer.length === 0 : !formAnswer.trim()))}
-            className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            className="flex items-center px-6 py-2 bg-action text-white rounded-lg hover:bg-action/90 disabled:opacity-50"
           >
             <CheckCircle className="w-5 h-5 mr-1" />
             {submitting ? '提交中...' : '提交并继续'}
@@ -749,7 +749,7 @@ const QuestionnaireAssessment: React.FC = () => {
                 key={`${item.type}-${item.id}`}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm ${
                   index === data.questionnaireAssessment.currentIndex
-                    ? 'bg-primary text-white'
+                    ? 'bg-action text-white'
                     : item.completed
                     ? 'bg-green-100 text-green-800'
                     : 'bg-gray-100 text-gray-600'
@@ -821,7 +821,7 @@ const QuestionnaireAssessment: React.FC = () => {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-primary h-2 rounded-full transition-all"
+              className="bg-action h-2 rounded-full transition-all"
               style={{ width: `${scaleProgress}%` }}
             />
           </div>
@@ -845,7 +845,7 @@ const QuestionnaireAssessment: React.FC = () => {
                 disabled={runnerBusy}
                 className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                   selectedValue === option.value
-                    ? 'border-primary bg-primary/5 text-primary'
+                    ? 'border-action bg-action/5 text-action'
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
@@ -870,7 +870,7 @@ const QuestionnaireAssessment: React.FC = () => {
             <button
               onClick={handleCompleteScale}
               disabled={runnerBusy}
-              className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+              className="flex items-center px-6 py-2 bg-action text-white rounded-lg hover:bg-action/90 disabled:opacity-50"
             >
               <CheckCircle className="w-5 h-5 mr-1" />
               {submitting ? '提交中...' : '完成量表'}
@@ -879,7 +879,7 @@ const QuestionnaireAssessment: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={runnerBusy}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+              className="flex items-center px-4 py-2 bg-action text-white rounded-lg hover:bg-action/90"
             >
               下一题
               <ChevronRight className="w-5 h-5 ml-1" />
@@ -898,7 +898,7 @@ const QuestionnaireAssessment: React.FC = () => {
                 disabled={runnerBusy}
                 className={`w-8 h-8 rounded text-sm font-medium ${
                   scaleIndex === index
-                    ? 'bg-primary text-white'
+                    ? 'bg-action text-white'
                     : answers[item.itemCode] !== undefined
                     ? 'bg-green-100 text-green-800'
                     : 'bg-gray-100 text-gray-600'

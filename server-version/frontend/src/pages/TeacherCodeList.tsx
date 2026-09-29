@@ -108,7 +108,7 @@ const TeacherCodeList: React.FC = () => {
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-action" />
           <span className="sr-only">正在加载教师码</span>
         </div>
       ) : codes.length === 0 ? (
@@ -124,13 +124,13 @@ const TeacherCodeList: React.FC = () => {
               <article key={code.id} className="staff-panel staff-panel--padded transition-shadow hover:shadow-lg" aria-label={`教师码 ${code.code}`}>
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
-                    <Key className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
+                    <Key className="h-5 w-5 flex-none text-action" aria-hidden="true" />
                     <span className="truncate font-mono text-lg font-bold tracking-wider">{code.code}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => void copyCode(code.code)}
-                    className="rounded p-2 text-gray-400 hover:bg-blue-50 hover:text-primary"
+                    className="rounded p-2 text-gray-400 hover:bg-blue-50 hover:text-action"
                     aria-label={`复制教师码 ${code.code}`}
                     title="复制教师码"
                   >

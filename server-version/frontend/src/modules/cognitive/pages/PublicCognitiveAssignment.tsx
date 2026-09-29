@@ -112,7 +112,7 @@ const PublicCognitiveAssignment: React.FC = () => {
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
   return <div className="max-w-xl mx-auto card p-8">
-    <LockKeyhole className="w-10 h-10 text-primary mx-auto mb-4" />
+    <LockKeyhole className="w-10 h-10 text-action mx-auto mb-4" />
     <h1 className="text-2xl font-bold text-center mb-3">{info?.title || (infoUnavailable ? '继续匿名认知测评' : '公开认知测评')}</h1>
     <p className="text-gray-600 whitespace-pre-wrap mb-6">{info?.instruction || (infoUnavailable
       ? '公开链接当前不能创建新的测评，但已有恢复凭证仍可继续之前的测评。'

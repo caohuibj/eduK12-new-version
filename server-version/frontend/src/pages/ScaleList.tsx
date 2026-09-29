@@ -292,7 +292,7 @@ const ScaleList: React.FC = () => {
         <div className="rounded-lg bg-white py-12 text-center shadow">
           <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
           <p className="mb-4 text-gray-500">暂无量表</p>
-          <Link to="/scales/new" className="text-primary hover:text-primary/80">创建第一个量表</Link>
+          <Link to="/scales/new" className="text-action hover:text-action/80">创建第一个量表</Link>
         </div>
       ) : filteredScales.length === 0 ? (
         <div className="rounded-lg bg-white py-12 text-center shadow text-gray-500">没有符合当前标签筛选条件的量表。</div>
@@ -354,7 +354,7 @@ const ScaleList: React.FC = () => {
                           <>
                             <Link
                               to={`/scales/${scale.id}`}
-                              className="text-primary hover:text-primary/80"
+                              className="text-action hover:text-action/80"
                               title="编辑"
                               aria-label={`编辑 ${scale.name}`}
                             >
@@ -504,7 +504,7 @@ const ScaleList: React.FC = () => {
 
             <div className="flex flex-wrap justify-end gap-3 border-t p-4">
               <button type="button" onClick={() => setShowExportModal(false)} className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">取消</button>
-              <button type="button" onClick={handleExport} disabled={exportLoading} className="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90 disabled:opacity-50">
+              <button type="button" onClick={handleExport} disabled={exportLoading} className="rounded-lg bg-action px-4 py-2 text-white hover:bg-action/90 disabled:opacity-50">
                 {exportLoading ? '导出中...' : '确认导出'}
               </button>
             </div>

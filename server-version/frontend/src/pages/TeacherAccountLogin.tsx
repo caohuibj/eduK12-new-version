@@ -93,7 +93,7 @@ const TeacherAccountLogin: React.FC = () => {
 
       <div className="mt-6 pt-6 border-t text-center">
         <p className="text-sm text-gray-500 mb-2">还没有教师账号？</p>
-        <Link to={authLink("/teacher/login")} className="text-primary hover:underline font-medium">
+        <Link to={authLink("/teacher/login")} className="text-action hover:underline font-medium">
           使用教师码注册
         </Link>
       </div>

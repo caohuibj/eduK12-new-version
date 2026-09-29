@@ -448,7 +448,7 @@ const QuestionnaireEdit: React.FC = () => {
           <button
             onClick={handleSaveBasic}
             disabled={saving}
-            className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            className="flex items-center px-4 py-2 bg-action text-white rounded-lg hover:bg-action/90 disabled:opacity-50"
           >
             <Save className="w-4 h-4 mr-2" />
             {saving ? '保存中...' : '保存'}
@@ -470,7 +470,7 @@ const QuestionnaireEdit: React.FC = () => {
               disabled={isNew && tab.key !== 'basic'}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.key
-                  ? 'border-primary text-primary'
+                  ? 'border-action text-action'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               } ${(isNew && tab.key !== 'basic') ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
@@ -493,7 +493,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.code}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, code: e.target.value })}
                 disabled={!isNew}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action disabled:bg-gray-100"
                 placeholder="如: mental-health-composite"
               />
             </div>
@@ -505,7 +505,7 @@ const QuestionnaireEdit: React.FC = () => {
                 type="text"
                 value={questionnaire.name}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
                 placeholder="如: 心理健康综合评估"
               />
             </div>
@@ -517,7 +517,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.description || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
                 placeholder="简要描述问卷的用途和特点"
               />
             </div>
@@ -531,7 +531,7 @@ const QuestionnaireEdit: React.FC = () => {
                 onChange={(e) =>
                   setQuestionnaire({ ...questionnaire, estimatedTime: parseInt(e.target.value) || null })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
               />
             </div>
             <div>
@@ -541,7 +541,7 @@ const QuestionnaireEdit: React.FC = () => {
               <select
                 value={questionnaire.visibility}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, visibility: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
               >
                 <option value="HIDDEN">未关联不可见</option>
                 <option value="COURSE">关联课程后可见</option>
@@ -561,7 +561,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.instruction || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
                 placeholder="指导用户如何作答..."
               />
             </div>
@@ -707,7 +707,7 @@ const QuestionnaireEdit: React.FC = () => {
               <button
                 onClick={handleAddCourses}
                 disabled={selectedCourses.length === 0}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+                className="px-4 py-2 bg-action text-white rounded-md hover:bg-action/90 disabled:opacity-50"
               >
                 添加
               </button>
@@ -913,7 +913,7 @@ const QuestionnaireEdit: React.FC = () => {
               </button>
               <button
                 onClick={handleAddFormItem}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+                className="px-4 py-2 bg-action text-white rounded-md hover:bg-action/90"
               >
                 {editingFormItem ? '保存' : '添加'}
               </button>

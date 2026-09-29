@@ -272,7 +272,7 @@ const AssignmentSubmit: React.FC = () => {
                     <span className="text-xs text-gray-500">({doc.fileName})</span>
                   )}
                 </div>
-                <span className="text-xs text-primary">点击查看</span>
+                <span className="text-xs text-action">点击查看</span>
               </div>
             ))}
           </div>
@@ -345,7 +345,7 @@ const AssignmentSubmit: React.FC = () => {
                               value={option.key || option.text || option}
                               checked={selectedOptions[index] === (option.key || option.text || option)}
                               onChange={() => handleOptionSelect(index, option.key || option.text || option)}
-                              className="w-4 h-4 text-primary"
+                              className="w-4 h-4 text-action"
                             />
                             <span className="text-gray-700">{option.text || option}</span>
                           </label>
@@ -367,7 +367,7 @@ const AssignmentSubmit: React.FC = () => {
                               value={option.key || option.text || option}
                               checked={(multipleOptions[index] || []).includes(option.key || option.text || option)}
                               onChange={() => handleMultipleOptionToggle(index, option.key || option.text || option)}
-                              className="w-4 h-4 text-primary rounded"
+                              className="w-4 h-4 text-action rounded"
                             />
                             <span className="text-gray-700">{option.text || option}</span>
                           </label>

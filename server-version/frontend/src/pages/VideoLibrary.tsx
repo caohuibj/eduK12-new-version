@@ -552,7 +552,7 @@ const VideoLibrary: React.FC = () => {
               <div className="flex items-center justify-between pt-3 border-t">
                 <button 
                   onClick={() => openEditModal(video)}
-                  className="text-primary hover:text-primary-hover text-sm"
+                  className="text-action hover:text-action-hover text-sm"
                 >
                   编辑标题
                 </button>
@@ -601,7 +601,7 @@ const VideoLibrary: React.FC = () => {
                   onClick={() => setPage(pageNum)}
                   className={`w-8 h-8 rounded-lg text-sm ${
                     pageNum === page
-                      ? 'bg-primary text-white'
+                      ? 'bg-action text-white'
                       : 'border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -641,7 +641,7 @@ const VideoLibrary: React.FC = () => {
               {/* Add Files Button */}
               <div
                 onClick={() => !isBatchUploading && fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors border-gray-300 hover:border-primary ${isBatchUploading ? 'pointer-events-none opacity-50' : ''}`}
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors border-gray-300 hover:border-action ${isBatchUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
                   ref={fileInputRef}
@@ -702,7 +702,7 @@ const VideoLibrary: React.FC = () => {
                             <AlertCircle className="w-5 h-5 text-red-500" />
                           )}
                           {(item.status === 'uploading' || item.status === 'processing') && (
-                            <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                            <Loader2 className="w-5 h-5 text-action animate-spin" />
                           )}
                         </div>
                       </div>

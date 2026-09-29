@@ -191,7 +191,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
           <button
             onClick={() => setActiveTab('library')}
             className={`flex-1 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
-              activeTab === 'library' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
+              activeTab === 'library' ? 'text-action border-b-2 border-action' : 'text-gray-500'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -200,7 +200,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
           <button
             onClick={() => setActiveTab('upload')}
             className={`flex-1 py-3 text-sm font-medium flex items-center justify-center space-x-2 ${
-              activeTab === 'upload' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'
+              activeTab === 'upload' ? 'text-action border-b-2 border-action' : 'text-gray-500'
             }`}
           >
             <Upload className="w-4 h-4" />
@@ -245,7 +245,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                         onClick={() => toggleDocument(doc)}
                         className={`p-3 border rounded-lg cursor-pointer transition-all ${
                           isSelected
-                            ? 'border-primary bg-blue-50'
+                            ? 'border-action bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -260,7 +260,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                             </p>
                           </div>
                           {isSelected && (
-                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                            <Check className="w-5 h-5 text-action flex-shrink-0" />
                           )}
                         </div>
                       </div>
@@ -276,7 +276,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
               <div
                 onClick={() => !isUploading && fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                  uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-primary'
+                  uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-action'
                 } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
@@ -339,7 +339,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      className="bg-action h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>

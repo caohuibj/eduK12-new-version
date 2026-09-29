@@ -63,7 +63,7 @@
   border-radius: 11px;
   background: #f8fbfd;
   color: var(--runner-muted, var(--hui-ds-color-muted));
-  font-size: 11px;
+  font-size: var(--hui-ds-text-secondary);
   line-height: 1.65;
 }
 

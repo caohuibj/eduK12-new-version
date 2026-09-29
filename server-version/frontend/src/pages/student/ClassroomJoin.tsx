@@ -96,8 +96,8 @@ const ClassroomJoin: React.FC = () => {
     <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
         <header className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <QrCode className="h-8 w-8 text-primary" aria-hidden="true" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-action/10">
+            <QrCode className="h-8 w-8 text-action" aria-hidden="true" />
           </div>
           <h1 className="mb-2 text-2xl font-bold text-gray-900">{classroom.name}</h1>
           <p className="text-gray-500">课堂码: <span className="font-mono">{classroom.code}</span></p>
@@ -129,7 +129,7 @@ const ClassroomJoin: React.FC = () => {
             <Link to="/student/classroom/enter" className="btn-secondary block w-full text-center">输入其他课堂码</Link>
           </div>
         ) : (
-          <button type="button" onClick={handleJoin} className="w-full rounded-lg bg-primary px-4 py-3 font-medium text-white hover:bg-primary/90">
+          <button type="button" onClick={handleJoin} className="w-full rounded-lg bg-action px-4 py-3 font-medium text-white hover:bg-action/90">
             进入课堂
           </button>
         )}

@@ -405,7 +405,7 @@ const CheckinList: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
-                <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件；打卡业务规则保持现有逻辑。</p>
+                <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件。</p>
               </div>
             </div>
             
@@ -482,7 +482,7 @@ const CheckinList: React.FC = () => {
                   id="allowViewOthers"
                   checked={formData.allowViewOthers}
                   onChange={(e) => setFormData({ ...formData, allowViewOthers: e.target.checked })}
-                  className="w-4 h-4 text-primary rounded"
+                  className="w-4 h-4 text-action rounded"
                 />
                 <label htmlFor="allowViewOthers" className="text-sm text-gray-700">
                   允许学生查看其他人的打卡内容
@@ -496,7 +496,7 @@ const CheckinList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('video')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <Video className="w-4 h-4 mr-1" />
                     添加视频
@@ -533,7 +533,7 @@ const CheckinList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('image')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <ImageIcon className="w-4 h-4 mr-1" />
                     添加图片
@@ -572,7 +572,7 @@ const CheckinList: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleAddMedia('document')}
-                    className="text-sm text-primary hover:text-primary-hover flex items-center"
+                    className="text-sm text-action hover:text-action-hover flex items-center"
                   >
                     <FileText className="w-4 h-4 mr-1" />
                     添加文档
@@ -669,7 +669,7 @@ const CheckinList: React.FC = () => {
 
               {submissionsLoading ? (
                 <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
                 </div>
               ) : submissions.length === 0 ? (
                 <div className="text-center py-12">
@@ -685,8 +685,8 @@ const CheckinList: React.FC = () => {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                            <Users className="w-5 h-5 text-primary" />
+                          <div className="w-10 h-10 bg-action/10 rounded-full flex items-center justify-center">
+                            <Users className="w-5 h-5 text-action" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-800">
@@ -719,7 +719,7 @@ const CheckinList: React.FC = () => {
                                   href={normalizedUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors"
+                                  className="relative aspect-square rounded-lg overflow-hidden border hover:border-action transition-colors"
                                 >
                                   <img
                                     src={normalizedUrl}

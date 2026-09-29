@@ -159,7 +159,7 @@ const CognitiveAssignmentList: React.FC = () => {
       {showForm && (
         <section id="cognitive-assignment-create" className="staff-panel staff-panel--padded p-6" aria-labelledby="cognitive-assignment-create-title">
           <div className="flex items-center gap-2 mb-4">
-            <Brain className="w-5 h-5 text-primary" aria-hidden="true" />
+            <Brain className="w-5 h-5 text-action" aria-hidden="true" />
             <h2 id="cognitive-assignment-create-title" className="text-lg font-semibold">新建认知任务</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

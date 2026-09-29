@@ -251,7 +251,7 @@
   outline-offset: 3px;
 }
 .hui-auth-card__body [role="alert"] { border-radius: .75rem; }
-.hui-auth-card__body .text-primary { color: var(--auth-primary); }
+.hui-auth-card__body .text-action { color: var(--auth-primary); }
 .hui-auth-card__body .bg-blue-50 { background: var(--auth-soft); }
 .hui-auth-card__body .text-blue-700 { color: #315c8a; }
 .hui-auth-card__body .border-t { border-color: var(--auth-line); }
@@ -268,8 +268,8 @@
 }
 .hui-auth-stage__tagline {
   margin: 0;
-  color: #8a9aaa;
-  font-size: .7rem;
+  color: var(--hui-ds-color-muted);
+  font-size: var(--hui-ds-text-metadata);
   line-height: 1.5;
   text-align: center;
 }
@@ -403,7 +403,7 @@
   white-space: nowrap;
 }
 .hui-entry-role:focus-visible { outline: 3px solid rgba(47, 111, 237, .42); outline-offset: 3px; }
-.hui-entry-tagline { margin: 1.15rem 0 0; color: #8a9aaa; font-size: .68rem; text-align: center; }
+.hui-entry-tagline { margin: 1.15rem 0 0; color: var(--hui-ds-color-muted); font-size: var(--hui-ds-text-metadata); text-align: center; }
 
 @media (max-width: 63.999rem) {
   .hui-auth-page { grid-template-columns: 1fr; }
