@@ -24,6 +24,7 @@ const ClassroomAnswer: React.FC = () => {
   const [submitted, setSubmitted] = useState(false)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [isFinished, setIsFinished] = useState(false) // 答题是否已结束
+  const [notice, setNotice] = useState<{ kind: 'info' | 'error'; message: string } | null>(null)
 
   // Socket 连接只使用课堂码；session 由服务端创建并绑定。
   const { isConnected, on, off, emit } = useClassroomSocket({
@@ -48,6 +49,7 @@ const ClassroomAnswer: React.FC = () => {
       setSubmitted(false)
       setIsFinished(false) // 重置结束状态
       setCountdown(null) // 先清除旧倒计时，避免状态残留
+      setNotice(null)
 
       // 启动倒计时（支持剩余时间）
       if (data.timeLimit) {
@@ -75,8 +77,7 @@ const ClassroomAnswer: React.FC = () => {
 
     // 课堂关闭
     on('broadcast:closed', () => {
-      alert('课堂已结束')
-      navigate('/student')
+      navigate('/student', { state: { notice: '课堂已结束。' } })
     })
 
     // 提交成功
@@ -86,7 +87,7 @@ const ClassroomAnswer: React.FC = () => {
 
     // 错误处理
     const handleError = (data: { message?: string }) => {
-      alert(data.message || '发生错误')
+      setNotice({ kind: 'error', message: data.message || '发生错误' })
     }
     on('error', handleError)
 
@@ -126,7 +127,7 @@ const ClassroomAnswer: React.FC = () => {
 
     // 检查答题是否已结束
     if (isFinished) {
-      alert('答题已结束，无法提交答案')
+      setNotice({ kind: 'error', message: '答题已结束，无法提交答案。' })
       return
     }
 
@@ -346,6 +347,16 @@ const ClassroomAnswer: React.FC = () => {
 
       {/* 主要内容区 */}
       <div className="max-w-2xl mx-auto px-4 py-6 classroom-answer__body">
+        {notice ? (
+          <div
+            role={notice.kind === 'error' ? 'alert' : 'status'}
+            aria-live={notice.kind === 'error' ? 'assertive' : 'polite'}
+            className={`classroom-answer-notice ${notice.kind === 'error' ? 'classroom-answer-notice--ended bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'} p-4 rounded-lg`}
+          >
+            {notice.message}
+          </div>
+        ) : null}
+
         {/* 题目 */}
         <section className="classroom-answer__question">{renderQuestion()}</section>
 
