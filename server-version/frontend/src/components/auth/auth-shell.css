@@ -384,7 +384,18 @@
 .hui-entry-role--admin .hui-entry-role__icon { color: #a96705; background: #fff5dc; }
 .hui-entry-role strong { font-size: .95rem; }
 .hui-entry-role p { margin: 0; color: var(--auth-muted); font-size: .78rem; line-height: 1.55; }
-.hui-entry-role__action { margin-top: auto; color: var(--auth-primary); font-size: .76rem; font-weight: 650; }
+.hui-entry-role__action {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  margin-top: auto;
+  color: var(--auth-primary);
+  font-size: .78rem;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+}
 .hui-entry-role:focus-visible { outline: 3px solid rgba(47, 111, 237, .42); outline-offset: 3px; }
 .hui-entry-tagline { margin: 1.15rem 0 0; color: #8a9aaa; font-size: .68rem; text-align: center; }
 

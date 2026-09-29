@@ -864,3 +864,18 @@
   .staff-panel--padded{padding:16px}
   .staff-row-actions{opacity:1!important}
 }
+
+
+/* Canonical visual polish: align course-card actions on one control axis. */
+.staff-course-actions {
+  min-height: 44px;
+  align-items: stretch;
+}
+.staff-course-actions :where(.staff-primary-link,.staff-secondary-link),
+.staff-course-actions .staff-more-actions > summary {
+  min-height: 44px;
+}
+.staff-course-actions :where(.staff-primary-link,.staff-secondary-link) {
+  padding-block: 8px;
+  line-height: 1.2;
+}

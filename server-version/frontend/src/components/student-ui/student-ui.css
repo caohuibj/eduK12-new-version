@@ -481,3 +481,59 @@
     transition: none;
   }
 }
+
+
+/* Canonical visual polish: keep the mobile chrome intentional instead of relying on flex wrap. */
+@media (max-width: 39.999rem) {
+  .hui-app--student.hui-app--standard .hui-app-header {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    align-items: center;
+    gap: 6px 10px;
+    min-height: 0;
+    padding: 8px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));
+  }
+  .hui-app--student.hui-app--standard .hui-brand {
+    min-height: 40px;
+  }
+  .hui-app--student.hui-app--standard .hui-menu-toggle {
+    grid-column: 2;
+    justify-self: end;
+    min-height: 40px;
+  }
+  .hui-app--student.hui-app--standard .hui-account {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 44px;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid #edf2f6;
+  }
+  .hui-app--student.hui-app--standard .hui-account > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hui-app--student.hui-app--standard .hui-account .hui-button {
+    flex: 0 0 auto;
+  }
+  .hui-student-home .hui-page-header {
+    margin-bottom: 14px;
+    padding: 18px;
+  }
+  .hui-student-home .hui-page-header__actions,
+  .hui-student-home .hui-page-header__actions > div {
+    width: 100%;
+  }
+  .hui-student-home .hui-page-header__actions > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .hui-student-home .hui-page-header__actions .hui-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

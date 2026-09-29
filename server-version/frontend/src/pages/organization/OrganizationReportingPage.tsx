@@ -643,8 +643,8 @@ function ReportingWorkspace() {
   if (loadError && specs.length === 0) return <ProductPage width="management"><ProductStatus kind="warning" title="报告工作区 不可用" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>{loadError}</ProductStatus><IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} /></ProductPage>
 
   return (
-    <ProductPage width="management">
-      <PageHeader title="群体与纵向报告" description="选择分析人群与测量时间，查看单次群体表现或多次测量变化。" actions={<div className="flex gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织管理</Link>{context.access.canGovern && <Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>测评批次</Link>}</div>} />
+    <ProductPage width="management" className="organization-reporting-workspace">
+      <PageHeader title="群体与纵向报告" description="选择分析人群与测量时间，查看单次群体表现或多次测量变化。" actions={<div className="organization-reporting-header-actions"><Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织管理</Link>{context.access.canGovern && <Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>测评批次</Link>}</div>} />
       {loadError && <ProductStatus kind="warning" title="部分测量列表刷新失败">{loadError}</ProductStatus>}
       {actionError && <ProductStatus kind="error" title="报告分析操作失败" announce="assertive">{actionError}</ProductStatus>}
       {notice && <ProductStatus kind="success" title="报告分析已更新" announce="polite">{notice}</ProductStatus>}
