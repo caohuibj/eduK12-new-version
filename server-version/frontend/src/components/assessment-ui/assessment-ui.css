@@ -844,3 +844,53 @@ button.hui-public-runner-nav__item:hover:not(:disabled) {
     padding: 14px;
   }
 }
+
+
+.hui-app--student-submit .student-submit-inline-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--hui-ds-color-action);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.hui-app--student-submit .student-submit-inline-action:hover {
+  background: #f1f6ff;
+}
+.hui-app--student-submit .student-submit-image-grid {
+  gap: 10px;
+}
+.hui-app--student-submit .student-submit-image-remove,
+.hui-app--student-submit .student-submit-preview__close {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px;
+  min-height: 44px;
+}
+.hui-app--student-submit .student-submit-image-remove {
+  top: 4px;
+  right: 4px;
+  transform: scale(.82);
+  transform-origin: top right;
+}
+.hui-app--student-submit .student-submit-image-add {
+  min-height: 76px;
+}
+.hui-app--student-submit .student-submit-preview {
+  padding-top: max(16px,env(safe-area-inset-top));
+  padding-right: max(16px,env(safe-area-inset-right));
+  padding-bottom: max(16px,env(safe-area-inset-bottom));
+  padding-left: max(16px,env(safe-area-inset-left));
+}
+@media(max-width:639px) {
+  .hui-app--student-submit .student-submit-image-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
