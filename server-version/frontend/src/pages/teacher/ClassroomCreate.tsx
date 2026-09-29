@@ -139,7 +139,6 @@ const ClassroomCreate: React.FC = () => {
       </form>
     </ProductPage>
   )
-  )
 }
 
 export default ClassroomCreate
