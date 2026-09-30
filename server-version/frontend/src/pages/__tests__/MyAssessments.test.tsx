@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import MyAssessments from '../MyAssessments'
 
+vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{role:'PARENT'}})}))
 const mocks = vi.hoisted(() => ({ get: vi.fn(), start: vi.fn(), acceptConsent: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: { get: mocks.get } }))
 vi.mock('../../api/runs', () => ({ runApi: { start: mocks.start, acceptConsent: mocks.acceptConsent } }))
@@ -15,6 +16,7 @@ describe('My Assessments', () => {
     fireEvent.click(await screen.findByRole('button', { name: '开始测评' }))
     expect(await screen.findByText('请先阅读并同意本次测评说明')).toBeInTheDocument()
     expect(mocks.start).not.toHaveBeenCalled()
+    expect(screen.queryByRole('link',{name:'选择适合自己的测评'})).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('checkbox'))
     mocks.start.mockResolvedValue({ state: 'IN_PROGRESS' })
     fireEvent.click(screen.getByRole('button', { name: '开始测评' }))

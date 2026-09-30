@@ -20,7 +20,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const navigate = useNavigate()
   const publicMode = window.location.pathname.startsWith('/public/composite')
   const relationalMode = window.location.pathname.startsWith('/relational/')
-  const organizationTask = relationalMode && new URLSearchParams(window.location.search).get('returnTo') === '/organization-tasks'
+  const organizationTask = relationalMode && ['/organization-tasks', '/my-assessments'].includes(new URLSearchParams(window.location.search).get('returnTo') ?? '')
   const token = params.token || ''
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -58,7 +58,7 @@ const CompositeAssessmentPage: React.FC = () => {
 
   const goReport = (id: string) => {
     if (relationalMode) {
-      navigate(organizationTask ? '/organization-tasks' : '/relational/tasks')
+      navigate(organizationTask ? '/my-assessments' : '/relational/tasks')
       return
     }
     navigate(publicMode ? `/public/composite/attempts/${id}/report` : `/student/composite/attempts/${id}/report`)
@@ -201,7 +201,7 @@ const CompositeAssessmentPage: React.FC = () => {
     if (!attemptId) return
     if (state?.deliveryMode === 'FINAL_ONLY') {
       const studyReturn=sessionStorage.getItem(`composite:study:return:${attemptId}`)
-      navigate(publicMode ? (studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:'/') : relationalMode ? (organizationTask ? '/organization-tasks' : '/relational/tasks') : '/student')
+      navigate(publicMode ? (studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:'/') : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')
       return
     }
     try {
@@ -341,7 +341,7 @@ const CompositeAssessmentPage: React.FC = () => {
         submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
         submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
         onReload={() => loadAttempt(state.id, recoveryToken)}
-        onExit={() => navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/organization-tasks' : '/relational/tasks') : '/student')}
+        onExit={() => navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')}
         onCompleted={() => goReport(state.id)}
         onEnterCognitive={enterChild}
         onEnterSituational={enterChild}
