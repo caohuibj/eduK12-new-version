@@ -72,3 +72,25 @@ export const withUploadCleanup = (uploadMiddleware: RequestHandler): RequestHand
     next()
   })
 }
+
+/** Reclaim staging left by a terminated process. This bounded asynchronous
+ * sweep only removes old UUID request directories created by this module. */
+export async function cleanupStaleUploadDirectories(now = Date.now()): Promise<number> {
+  let directory: Awaited<ReturnType<typeof fsPromises.opendir>>
+  try { directory = await fsPromises.opendir(TEMP_ROOT) } catch { return 0 }
+  let scanned = 0, removed = 0
+  try {
+    for await (const entry of directory) {
+      if (++scanned > 500) break
+      if (!entry.isDirectory() || !/^[a-f0-9-]{36}$/.test(entry.name)) continue
+      const candidate = path.join(TEMP_ROOT, entry.name)
+      try {
+        const stat = await fsPromises.stat(candidate)
+        if (stat.mtimeMs > now - 24 * 60 * 60 * 1000) continue
+        await fsPromises.rm(candidate, { recursive: true, force: true })
+        removed++
+      } catch { /* A concurrent request/cleanup may already have removed it. */ }
+    }
+  } catch { /* Cleanup must not affect request admission. */ }
+  return removed
+}

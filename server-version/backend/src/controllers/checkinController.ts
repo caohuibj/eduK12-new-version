@@ -1,3 +1,5 @@
+import { readTemporaryUpload, acceptedImageTypes } from '../middleware/uploadAdmission'
+import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound, unauthorized } from '../utils/response'
@@ -177,6 +179,7 @@ const publicSubmissionImageSchema = z.object({
   assetId: z.string().min(1).max(100),
 }).strict()
 
+export const STUDENT_UPLOAD_REFERENCE_ENTITY = 'CheckinStudentUploadSession'
 export const PUBLIC_UPLOAD_REFERENCE_ENTITY = 'CheckinUploadSession'
 export const PUBLIC_UPLOAD_REFERENCE_FIELD = 'staging'
 export const MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION = 9
@@ -218,6 +221,14 @@ export const withPublicUploadSessionLock = async <T>(
   return operation()
 }
 
+export async function stageStudentUploadAsset(db: AssetDatabase, checkinId: string, userId: string, assetId: string): Promise<void> {
+  await db.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`checkin-submission:${checkinId}:${userId}`}))`
+  const entityId = `${checkinId}:${userId}`
+  const count = await db.assetReference.count({ where: { entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId } })
+  if (count >= 9) throw new PublicUploadSessionLimitError()
+  await attachAssetReference({ assetId, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId, field: 'staging' }, db)
+}
+
 let lastPublicUploadCleanupAt = 0
 
 /** Remove abandoned anonymous upload references and their unreferenced blobs. */
@@ -227,24 +238,20 @@ export const cleanupStalePublicUploadAssets = async (): Promise<void> => {
   lastPublicUploadCleanupAt = now
 
   const cutoff = new Date(now - PUBLIC_UPLOAD_STAGING_TTL_MS)
-  await prisma.assetReference.deleteMany({
-    where: {
-      entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY,
-      field: PUBLIC_UPLOAD_REFERENCE_FIELD,
-      createdAt: { lt: cutoff },
-    },
+  const staleReferences = await prisma.assetReference.findMany({
+    where: { entityType: { in: [PUBLIC_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_REFERENCE_ENTITY] }, createdAt: { lt: cutoff } },
+    select: { id: true, asset: { select: { id: true, objectKey: true, provider: true } } },
+    orderBy: { createdAt: 'asc' }, take: 100,
   })
-
+  if (staleReferences.length) {
+    await prisma.assetReference.deleteMany({ where: { id: { in: staleReferences.map(row => row.id) }, createdAt: { lt: cutoff } } })
+    for (const row of staleReferences) await discardUnreferencedAsset(row.asset)
+  }
   const staleAssets = await prisma.storedAsset.findMany({
-    where: {
-      accessScope: 'PUBLIC_CHECKIN',
-      deletedAt: null,
-      createdAt: { lt: cutoff },
-      references: { none: {} },
-    },
-    select: { id: true, objectKey: true, provider: true },
+    where: { accessScope: 'PUBLIC_CHECKIN', deletedAt: null, createdAt: { lt: cutoff }, references: { none: {} } },
+    select: { id: true, objectKey: true, provider: true }, orderBy: { createdAt: 'asc' }, take: 100,
   })
-  await Promise.all(staleAssets.map((asset) => discardUnreferencedAsset(asset)))
+  for (const asset of staleAssets) await discardUnreferencedAsset(asset)
 }
 
 const runPublicUploadCleanup = async (): Promise<void> => {
@@ -375,9 +382,9 @@ const syncSubmissionAssetReferences = async (
 }
 
 const publicImageUpload = multer({
-  storage: multer.memoryStorage(),
+  storage: createTemporaryUploadStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
+    fileSize: 10 * 1024 * 1024, files: 1, fields: 10, fieldSize: 16 * 1024, parts: 11, // 10MB
   },
   // Client MIME is only a hint; detectAcceptedImageMimeType validates bytes.
   fileFilter: (_req, _file, cb) => cb(null, true),
@@ -389,8 +396,7 @@ const detectAcceptedImageMimeType = (file: { buffer: Buffer }): string | null =>
   return detected && acceptedImageMimeTypes.has(detected) ? detected : null
 }
 
-// Student submissions use memory storage so a file is never exposed through
-// the legacy public /uploads tree before it has an ownership record.
+// Upload staging stays private until an authorized StoredAsset is created.
 export const submissionImageUpload = publicImageUpload
 
 export const checkinController = {
@@ -991,6 +997,10 @@ export const checkinController = {
             },
         })
         await syncSubmissionAssetReferences(saved.id, validatedImages, tx)
+        await tx.assetReference.deleteMany({ where: {
+          entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId: `${id}:${userId}`,
+          assetId: { in: validatedImages.filter(isSubmissionAssetImage).map(image => image.assetId) },
+        } })
         if (idempotencyKeyHash && idempotencyPayloadHash) {
           await createCheckinIdempotencyReceipt(tx, {
             checkinId: id,
@@ -1028,6 +1038,7 @@ export const checkinController = {
 
   // 学生提交打卡图片。文件先写入私有资产存储，提交接口会再次校验资产归属。
   async uploadStudentSubmissionImage(req: Request, res: Response) {
+    let uploadedAsset: Awaited<ReturnType<typeof storeAsset>> | undefined
     try {
       const userId = req.user?.userId
       const { id } = req.params
@@ -1052,6 +1063,7 @@ export const checkinController = {
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
+      await runPublicUploadCleanup()
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
@@ -1060,11 +1072,10 @@ export const checkinController = {
         accessScope: 'COURSE',
         scopeId: checkin.courseId,
       })
+      uploadedAsset = asset
+      await prisma.$transaction(tx => stageStudentUploadAsset(tx, id, userId, asset.id))
       const url = await getSignedAssetUrl(asset.id)
-      if (!url) {
-        await discardUnreferencedAsset(asset)
-        return error(res, '图片上传失败')
-      }
+      if (!url) throw new Error('图片上传失败')
 
       logger.info('学生上传打卡图片', {
         assetId: asset.id,
@@ -1076,6 +1087,11 @@ export const checkinController = {
         size: asset.sizeBytes,
       }, '上传成功')
     } catch (err) {
+      if (uploadedAsset) {
+        await prisma.assetReference.deleteMany({ where: { assetId: uploadedAsset.id, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY } }).catch(() => undefined)
+        await discardUnreferencedAsset(uploadedAsset).catch(() => undefined)
+      }
+      if (err instanceof PublicUploadSessionLimitError) return error(res, '每个打卡最多暂存9张图片', -1, 409)
       logger.error('学生上传打卡图片错误', err)
       return error(res, '上传失败')
     }
@@ -1790,6 +1806,14 @@ export const checkinController = {
       })) {
         return unauthorized(res, '匿名签到会话凭据无效')
       }
+      const stagedCount = await prisma.assetReference.count({ where: {
+        entityType: PUBLIC_UPLOAD_REFERENCE_ENTITY, entityId: stagingReferenceEntityId,
+        field: PUBLIC_UPLOAD_REFERENCE_FIELD,
+      } })
+      if (stagedCount >= MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION) {
+        return error(res, `每个会话最多上传${MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION}张图片`, -1, 409)
+      }
+      await readTemporaryUpload(req, acceptedImageTypes)
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 

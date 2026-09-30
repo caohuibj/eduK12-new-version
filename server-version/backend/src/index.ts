@@ -1,3 +1,5 @@
+import { cleanupStaleUploadDirectories } from './utils/uploadTemp'
+import { cleanupStalePublicUploadAssets } from './controllers/checkinController'
 import bundleProductRoutes from './modules/bundle-product/routes'
 import express from 'express'
 import { publicAssessmentRateLimiters } from './middleware/publicAssessmentRateLimit'
@@ -331,6 +333,8 @@ const startServer = async (): Promise<void> => {
   // removed, never an exploratory directory scan. Keep one bounded hourly task
   // per backend process and make shutdown cancel it.
   exportCleanupTimer = setInterval(() => {
+    void cleanupStaleUploadDirectories()
+    void cleanupStalePublicUploadAssets().catch(err => logger.warn('过期上传暂存清理失败', err))
     void cleanupExpiredExportArtifacts().then((result) => {
       if (result.deletedArtifacts > 0 || result.invalidPaths > 0) {
         logger.info('过期导出产物清理完成', result)

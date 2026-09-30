@@ -1,3 +1,4 @@
+import { boundedUpload, uploadPrincipalRateLimit, acceptedImageTypes, withUploadAdmission } from '../middleware/uploadAdmission'
 import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
@@ -62,7 +63,7 @@ const publicSubmitTokenLimiter = rateLimit({
 router.get('/public/:token', checkinController.getPublicCheckin)
 
 // 公开上传图片（通过令牌）
-router.post('/public/:token/upload', publicUploadIpLimiter, publicUploadTokenLimiter, checkinController.uploadPublicImage)
+router.post('/public/:token/upload', publicUploadIpLimiter, publicUploadTokenLimiter, uploadPrincipalRateLimit, withUploadAdmission(checkinController.uploadPublicImage))
 
 // 公开提交打卡（通过令牌）
 router.post('/public/:token/submit', publicSubmitIpLimiter, publicSubmitTokenLimiter, checkinController.submitPublicCheckin)
@@ -84,8 +85,8 @@ router.post(
   '/:id/submission-image',
   authenticate,
   requireRole(UserRole.STUDENT),
-  submissionImageUpload.single('image'),
-  checkinController.uploadStudentSubmissionImage,
+  uploadPrincipalRateLimit,
+  boundedUpload('image', 10 * 1024 * 1024, acceptedImageTypes, checkinController.uploadStudentSubmissionImage),
 )
 router.post('/:id/submit', authenticate, requireRole(UserRole.STUDENT), studentSubmissionLimiter, checkinController.submit)
 router.get('/:id/export', authenticate, requireTeacher, checkinController.export)
