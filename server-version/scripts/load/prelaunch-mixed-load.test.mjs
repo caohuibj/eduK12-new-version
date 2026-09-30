@@ -46,3 +46,18 @@ test('rejects cross-origin credentials, duplicate logical IDs and acknowledgemen
  assert.throws(()=>validateFixture({...fixture,operations:[{...fixture.operations[0],steps:[{...step,path:'https://other.test'}]}]}))
  assert.throws(()=>validateFixture({...fixture,operations:[{...fixture.operations[0],steps:[{...step,expect:{status:200}}]}]}))
 })
+
+test('planned Redis dependency refusal is distinct from admission busy and recovers',async()=>{
+ let calls=0
+ await serve((_req,res)=>{
+  if(++calls===1){res.writeHead(503,{'Retry-After':'0'});res.end(JSON.stringify({code:'REDIS_UNAVAILABLE'}))}
+  else res.end(JSON.stringify({status:'FINAL'}))
+ },async(baseUrl)=>{
+  const report=await runMixedLoad({baseUrl,operations:[{id:'1',category:'redis-recovery',steps:[{...step,unavailable:{path:'code',equals:'REDIS_UNAVAILABLE'}}]}]},{concurrency:1,deadlineMs:1000})
+  assert.equal(report.logicalCompleted,1);assert.equal(report.expectedDependency503,1);assert.equal(report.intendedBusy503,0);assert.equal(report.unexpected5xx,0)
+ })
+})
+test('bad upload fixture fails locally and resource sampling stops without hanging',async()=>{
+ const report=await runMixedLoad({baseUrl:'http://127.0.0.1:1',operations:[{id:'1',category:'image-abuse',steps:[{...step,bodyFile:'/nonexistent/prelaunch-fixture',headers:{'Content-Type':'multipart/form-data; boundary=fixed'}}]}]},{concurrency:1,deadlineMs:1000,metricsUrl:'http://127.0.0.1:1/metrics'})
+ assert.equal(report.fixtureErrors,1);assert.equal(report.logicalFailed,1);assert.equal(report.attempts,0);assert.ok(report.elapsedAndDrainMs<1000)
+})

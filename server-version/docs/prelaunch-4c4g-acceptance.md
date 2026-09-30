@@ -83,17 +83,17 @@ node scripts/load/prelaunch-mixed-load.mjs   --fixture /private/run-scale-final-
 | 学生 FINAL | Scale、n-back、CPT、SJT 30项/60项、Questionnaire、Composite、Bundle 各自与混合；保留每种 category |
 | START | 100/300；同组织、同 run、同组织不同 execution、不同 run；注册集中同校 NAT（global 6000/IP和course 3000/account 10/teacher code 120，每15分钟；均可配置） |
 | 教师工作 | 当前报告、纵向报告、导出、protected feedback、图片库、export preview 单独及与学生 FINAL 混合 |
-| 后台竞争 | W0 停 worker；W1 export 单并发；W2 export + FFmpeg 1；W3 FFmpeg 2（实验，不作为默认） |
+| 后台竞争 | W0 worker 空闲且不投重型任务；W1 export 单并发；W2 export + FFmpeg 1；W3 FFmpeg 2（实验，不作为默认） |
 | 滥用 | 错误密码登录、错误 oldPassword、图片上传异常/多次/并发/超过9张、过期导出；正常学生流量持续并行 |
 | 故障 | 显式丢弃首次响应后重放、真实 socket 断线、导出超时 kill、源文件 EIO/消失、客户端中断、API/worker 重启恢复、Redis 暂停/重启 |
 
-lost-response fixture 设置 discardFirstResponse=true，必须 retrySafe=true；服务端已受理的同一请求在原始 body/key 下重放。429 和具有 Retry-After 且正文匹配 busy 谓词的 503 才计入预期繁忙重试；其他 5xx 立即计入非预期错误并失败。每种入口 busy 谓词必须来自真实接口，避免把 Redis/DB 故障误当容量拒绝。恢复能力和当前权限被撤销等负向案例不允许通用重试掩盖。
+lost-response fixture 设置 discardFirstResponse=true，必须 retrySafe=true；服务端已受理的同一请求在原始 body/key 下重放。429 和具有 Retry-After 且正文匹配 busy 谓词的 503 才计入预期繁忙重试；明确的 Redis/依赖中断可配置 unavailable 谓词，单列 expectedDependency503 并重试，不能混入 admission busy；其他 5xx 立即计入非预期错误并失败。每种入口 busy 谓词必须来自真实接口，避免把 Redis/DB 故障误当容量拒绝。恢复能力和当前权限被撤销等负向案例不允许通用重试掩盖。
 
-Redis 故障只能对隔离测试容器操作。现有 `redis-runtime-recovery.integration.test.ts` 使用 PRELAUNCH_REDIS_FAULT_CONTAINER 并要求正确匹配 REDIS_URL；停止/启动任务专用 redis-fault，验证 cache、limiter、Socket 以及 Bull 恢复，无须进程重启。禁止在共享或生产 Redis 上注入停机。worker 子进程 deadline 及文件故障已有自动化测试；实机另测进程重启、磁盘满与故障后的 drain。
+Redis 故障只能对隔离测试容器操作。现有 `redis-runtime-recovery.integration.test.ts` 使用 PRELAUNCH_REDIS_FAULT_CONTAINER 并要求正确匹配 REDIS_URL；停止/启动任务专用 redis-fault，验证 cache、limiter、Socket 以及 Bull 恢复，无须进程重启。禁止在共享或生产 Redis 上注入停机。学生暂存资产入库时原子建立 pending reference，现有9张配额事务将其转为正式暂存引用，进程中断窗口也受24小时清理覆盖。blob写入和数据库并非跨存储原子事务，极短的写文件后/入库前故障仍须由运行期孤立 blob 检查保守识别；不可删除无引用但合法的教师素材。worker 子进程 deadline 及文件故障已有自动化测试；实机另测进程重启、磁盘满与故障后的 drain。
 
 ## 必须记录与通过条件
 
-报告含 logicalTotal/completed/failed、最终成功率、attempts、retryAttempts、confirmationPollAttempts、排除 polling 后的 retryAmplification、p50/p95/p99（HTTP 与整个逻辑生命周期分开）、429、预期 busy503、非预期5xx、网络错误、elapsedAndDrainMs、各 category 计数、Docker CPU/RSS/内存/PIDs、内部指标采样。原始答案、响应正文、token、URL 和 user ID 不进入报告。另采 worker 子进程 RSS、PG lock/slow-query 聚合、磁盘余量、连接池、export/Bull 队列峰值/回落及 SQL 汇总计时； unavailable 不能记作 0。指标记录权限与范围随 private topology 审核。
+报告含 logicalTotal/completed/failed、最终成功率、attempts、retryAttempts、confirmationPollAttempts、排除 polling 后的 retryAmplification、p50/p95/p99（HTTP 与整个逻辑生命周期分开）、429、预期 busy503、预期依赖503、非预期5xx、fixture 错误、网络错误、elapsedAndDrainMs（本工具内逻辑完成/轮询耗时；外部 FFmpeg/Bull drain 必须另记）、各 category 计数、Docker CPU/RSS/内存/PIDs、内部指标采样。原始答案、响应正文、token、URL 和 user ID 不进入报告。另采 worker 子进程 RSS、PG lock/slow-query 聚合、磁盘余量、连接池、export/Bull 队列峰值/回落及 SQL 汇总计时； unavailable 不能记作 0。指标记录权限与范围随 private topology 审核。
 
 起始门槛为预期请求 eventual success >=99%，正常身份无终态丢失/重复，非预期5xx=0，所有重试 deadline 内收敛，队列 drain 回到基线、无持续 RSS 增长/OOM/Redis 写拒绝。同步提交 p95<=1000ms、p99<=3000ms 是实验目标；导出生命周期单列，不与同步请求混算。压测峰值后持续正常业务 10分钟以确认恢复。任何失败必须解释并修复或降低可发布并发。通过某一阶梯不代表更高阶梯稳定；已知稳定区间只能由这台真实 4C4G 服务器的完整矩阵复测确定。
 

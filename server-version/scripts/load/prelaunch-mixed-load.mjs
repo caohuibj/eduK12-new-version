@@ -26,7 +26,7 @@ export function validateFixture(fixture) {
     for (const step of op.steps) {
       for (const request of [step, ...(step.confirm ? [step.confirm] : [])]) {
         const url = new URL(request.path, origin)
-        if (url.origin !== origin.origin) throw new Error('Requests must stay on the fixture origin')
+        if (url.origin !== origin.origin || url.username || url.password) throw new Error('Requests must stay on the fixture origin')
         if (!request.expect || !positive(request.expect.status, 599) || request.expect.status < 100) throw new Error('Every request needs an explicit status expectation')
         if (request.expect.status >= 200 && request.expect.status < 300 && !request.expect.path && !positive(request.expect.minBytes, 104857600)) throw new Error('Success requires an application-level assertion, not HTTP acknowledgement alone')
       }
@@ -86,7 +86,7 @@ export async function runMixedLoad(input, supplied = {}) {
   options.started=performance.now()
   const end = options.started + options.deadlineMs
   const attemptLatency=[]; const logicalLatency=[]; const categories={}; const statusCounts={}; const samples=[]
-  let cursor=0, complete=0, unexpected5xx=0, intendedBusy503=0, networkErrors=0, discardedResponses=0, failure=0
+  let cursor=0, complete=0, unexpected5xx=0, intendedBusy503=0, networkErrors=0, discardedResponses=0, failure=0, fixtureErrors=0, expectedDependency503=0
   let confirmationPollAttempts=0, retryAttempts=0
   let stopped=false
   const sampling = (options.containers.length || options.metricsUrl) ? (async () => {
@@ -98,13 +98,18 @@ export async function runMixedLoad(input, supplied = {}) {
   })() : Promise.resolve()
   async function requestUntil(request, retrySafe, discard=false, poll=false) {
     const url = new URL(request.path, fixture.baseUrl)
-    let body = request.body === undefined ? undefined : JSON.stringify(request.body)
-    if (request.bodyFile) {
-      const stat=await fs.stat(request.bodyFile); if(stat.size>20971520) throw new Error('upload-fixture-limit')
-      body=await fs.readFile(request.bodyFile)
-    }
+    let body
+    try {
+      body = request.body === undefined ? undefined : JSON.stringify(request.body)
+      if (request.bodyFile) {
+        const stat=await fs.stat(request.bodyFile); if(stat.size>20971520) throw new Error('upload-fixture-limit')
+        if(!Object.keys(request.headers || {}).some(key=>key.toLowerCase()==='content-type'))throw new Error('multipart-content-type-required')
+        body=await fs.readFile(request.bodyFile)
+      }
+    } catch { fixtureErrors++; return false }
     // These exact bytes/headers are reused; this harness never invents new idempotency keys.
-    const headers = {...request.headers}; if(body && !headers['Content-Type']) headers['Content-Type']='application/json'
+    const headers = {...request.headers}; if(body && !request.bodyFile && !Object.keys(headers).some(key=>key.toLowerCase()==='content-type')) headers['Content-Type']='application/json'
+    let responseDiscarded=false
     for(let attempt=0;attempt<options.maxAttempts && performance.now()<end;attempt++) {
       if(poll)confirmationPollAttempts++;else if(attempt>0)retryAttempts++
       const started=performance.now(); let response; let waitMs=100
@@ -118,12 +123,14 @@ export async function runMixedLoad(input, supplied = {}) {
         }
         response={status:raw.status,...await boundedJson(raw,Boolean(request.expect.minBytes) && raw.status===request.expect.status)}
         const busy=raw.status === 503 && request.busy && at(response.body,request.busy.path) === request.busy.equals && Boolean(retryHeader)
+        const dependency=raw.status===503 && request.unavailable && at(response.body,request.unavailable.path)===request.unavailable.equals && Boolean(retryHeader)
         if(raw.status===503 && busy) intendedBusy503++
+        else if(dependency)expectedDependency503++
         else if(raw.status>=500) unexpected5xx++
-        if(discard && attempt===0) { discardedResponses++; response=null }
+        if(discard && !responseDiscarded && matches(response,request.expect)) { discardedResponses++; responseDiscarded=true; response=null }
         else if(matches(response,request.expect)) return true
         else if(poll && raw.status>=200 && raw.status<300 && request.pending && at(response.body,request.pending.path)===request.pending.equals) { /* status not completed yet */ }
-        else if(!retrySafe || (raw.status!==429 && !busy)) return false
+        else if(!retrySafe || (raw.status!==429 && !busy && !dependency)) return false
       } catch { networkErrors++; if(!retrySafe) return false }
       finally { attemptLatency.push(performance.now()-started) }
       if (!retrySafe) return false
@@ -151,7 +158,7 @@ export async function runMixedLoad(input, supplied = {}) {
     eventualSuccessRate:complete/fixture.operations.length, attempts:attemptLatency.length,
     confirmationPollAttempts,retryAttempts,
     retryAmplification:(attemptLatency.length-confirmationPollAttempts)/fixture.operations.reduce((n,op)=>n+op.steps.length,0),
-    statusCounts,intendedBusy503,unexpected5xx,networkErrors,discardedResponses,
+    statusCounts,intendedBusy503,expectedDependency503,unexpected5xx,networkErrors,discardedResponses,fixtureErrors,
     attemptLatencyMs:quantiles(attemptLatency),logicalLatencyMs:quantiles(logicalLatency),
     elapsedAndDrainMs:performance.now()-options.started,categories,resources:samples,
     unavailableMetrics:['Worker/child Prisma pools unless separately instrumented','per-query SQL timing unless separately sampled']}
