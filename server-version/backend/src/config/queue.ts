@@ -57,7 +57,7 @@ export const exportQueue = new Queue('assessment export processing', {
     backoff: { type: 'fixed', delay: 5000 },
     removeOnComplete: 100,
     removeOnFail: 100,
-    timeout: RESOURCE_LIMITS.exportTimeout * 1000,
+    // The tracked export subprocess enforces timeout and retains capacity until exit.
   },
 })
 

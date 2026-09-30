@@ -36,6 +36,7 @@ export interface CompositeExportField {
 }
 
 export interface CompositeExportData {
+  totalCount?: number
   assessmentId: string
   assessmentName: string
   detail: CompositeExportDetail
@@ -45,6 +46,7 @@ export interface CompositeExportData {
 }
 
 export interface CompositeExportOptions {
+  previewLimit?: number
   detail?: CompositeExportDetail
   anonymize?: boolean
   dateRange?: { start?: string; end?: string }
@@ -164,8 +166,8 @@ export const getExportData = async (
   // remain in place to protect against concurrent changes and generated-field
   // growth.
   const recordCount = await prisma.compositeAssessmentAttempt.count({ where: completedAttemptWhere })
-  assertExportLimits({ records: recordCount })
-  if (detail === 'full') {
+  if (!options.previewLimit) assertExportLimits({ records: recordCount })
+  if (!options.previewLimit && detail === 'full') {
     const trialCount = await prisma.cognitiveTrial.count({
       where: {
         session: {
@@ -207,7 +209,7 @@ export const getExportData = async (
       attempts: {
         where: completedAttemptWhere,
         orderBy: [{ completedAt: 'asc' }, { startedAt: 'asc' }],
-        take: EXPORT_MAX_RECORDS + 1,
+        take: options.previewLimit ?? EXPORT_MAX_RECORDS + 1,
         include: {
           user: { select: { id: true, nickname: true, username: true } },
           formAnswers: true,
@@ -221,7 +223,7 @@ export const getExportData = async (
           cognitiveSessions: {
             include: {
               assignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true } },
-              ...(detail === 'full' ? {
+              ...(!options.previewLimit && detail === 'full' ? {
                 trials: {
                   orderBy: { trialIndex: 'asc' },
                   take: EXPORT_MAX_TRIALS + 1,
