@@ -1,6 +1,6 @@
 type MetricsDatabase = { $metrics?: { prometheus: () => Promise<string> } }
 type QueueCounts = { getJobCounts: (...states: string[]) => Promise<object> }
-const allowed = /^prisma_(?:client_queries|datasource_queries|pool_connections)[a-z_]*(?:\{[^\n]*\})? / 
+const allowed = /^prisma_(?:client_queries|datasource_queries|pool_connections)[a-z_]*(?:\{[^\n]*\})? /
 /** Engine metrics contain only numeric pool/query aggregates, never SQL or data. */
 export const prismaPoolMetricLines = async (db: MetricsDatabase): Promise<string[]> => {
   try {
