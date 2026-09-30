@@ -1,3 +1,4 @@
+import { exportRoot } from '../../services/exportArtifactService'
 import * as fs from 'fs'
 import { createHash } from 'crypto'
 import * as path from 'path'
@@ -50,7 +51,7 @@ export interface CompositeExportOptions {
   actor?: { userId: string; role: UserRole }
 }
 
-const EXPORT_DIR = path.join(__dirname, '../../../exports')
+const EXPORT_DIR = exportRoot()
 
 const fieldName = (prefix: string, value: string) => {
   const safe = value.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase() || 'value'
@@ -120,7 +121,7 @@ const completedDateWhere = (dateRange?: { start?: string; end?: string }) => {
   return value
 }
 
-const teacherRelationalExportVisibility = async (
+export const teacherRelationalExportVisibility = async (
   actor: CompositeExportOptions['actor'],
 ): Promise<Prisma.CompositeAssessmentAttemptWhereInput | null> => {
   if (!actor || actor.role !== UserRole.TEACHER) return null
