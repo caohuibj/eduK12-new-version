@@ -36,7 +36,7 @@ export const waitForExportArtifacts = async (
 
   while (Date.now() < deadline) {
     const states = await Promise.all(artifacts.map(async (artifact) => {
-      const response = await sessionFetch(`${artifact.downloadUrl}/status`, { cache: 'no-store' })
+      const response = await sessionFetch(`${artifact.downloadUrl}/status`, { cache: 'no-store', signal: AbortSignal.timeout(Math.min(15000, Math.max(1, deadline - Date.now()))) })
       if (!response.ok) throw new Error('无法读取导出任务状态')
       const payload = await response.json()
       if (payload?.code !== 0 || !payload?.data) throw new Error(payload?.message || '无法读取导出任务状态')
@@ -56,3 +56,14 @@ export const waitForExportArtifacts = async (
 
   throw new Error('导出任务仍在处理中，可稍后使用相同操作继续等待')
 }
+
+// Persist only an opaque idempotency key. A lost response or page refresh replays the same server intent.
+export const getExportIntentKey = (scope: string): string => {
+  const name = `export-intent:${scope}`
+  const existing = sessionStorage.getItem(name)
+  if (existing) return existing
+  const key = createExportRequestKey()
+  sessionStorage.setItem(name, key)
+  return key
+}
+export const clearExportIntentKey = (scope: string): void => { sessionStorage.removeItem(`export-intent:${scope}`) }

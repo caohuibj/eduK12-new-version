@@ -1,3 +1,4 @@
+import { waitForExportArtifacts, getExportIntentKey, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -232,19 +233,22 @@ const CompositeAssessmentEdit: React.FC = () => {
 
   const exportData = async (detailMode: 'summary' | 'full') => {
     try {
-      const response = await compositeApi.exportData(id, { detail: detailMode, format: 'csv' })
-      if (response.code !== 0 || !response.data?.fileName) {
-        setError(response.message || '导出失败')
-        return
-      }
-      const download = await sessionFetch(`/api/composite-assessments/${id}/export/files/${response.data.fileName}`)
+      const scope = `compositeApi:${id}:${JSON.stringify({ detail: detailMode, format: 'csv' })}`
+      const response = await compositeApi.exportData(id, { detail: detailMode, format: 'csv' }, getExportIntentKey(scope))
+      if (response.code !== 0 || !response.data?.artifacts) throw new Error(response.message || '导出失败')
+      let artifacts
+      try { artifacts = await waitForExportArtifacts(response.data.artifacts) }
+      catch (err) { if (err instanceof ExportJobFailedError) clearExportIntentKey(scope); throw err }
+      const artifact = artifacts[0]
+      const download = await sessionFetch(artifact.downloadUrl, { signal: AbortSignal.timeout(60000) })
       if (!download.ok) throw new Error('下载导出文件失败')
       const blobUrl = URL.createObjectURL(await download.blob())
       const anchor = document.createElement('a')
       anchor.href = blobUrl
-      anchor.download = response.data.fileName
+      anchor.download = artifact.fileName
       anchor.click()
       URL.revokeObjectURL(blobUrl)
+      clearExportIntentKey(scope)
     } catch (err) {
       setError(errorMessage(err, '下载导出文件失败'))
     }
