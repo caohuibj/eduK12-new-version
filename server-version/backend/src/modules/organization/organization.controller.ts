@@ -29,6 +29,12 @@ export function organizationProductActions(context: OrganizationAccessContext): 
   const actions: string[] = []
   if (context.canGovern) actions.push('GOVERN')
   if (context.canGovern && active) actions.push('RUNS')
+  if (
+    member
+    && active
+    && !denied('ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
+    && (context.orgRole === 'ORG_ADMIN' || professional)
+  ) actions.push('ASSESSMENT_DELIVERY')
   if (context.platformRole === 'SYSTEM_ADMIN' || context.canGovern) actions.push('MANAGE_DENIES')
   if (context.platformRole === 'SYSTEM_ADMIN' && !denied('ORGANIZATION_GOVERNANCE')) actions.push(active ? 'SUSPEND' : 'RESUME')
   if (member && active && !denied('REPORT_READ', 'ORG_GROUP_REPORT_V1') && (context.orgRole === 'ORG_ADMIN' || psychology || professional)) actions.push('REPORTING')

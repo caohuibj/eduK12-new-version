@@ -90,6 +90,14 @@ async function jsonRequest(path: string, user: TestUser) {
   const response = await fetch(`${baseUrl}${path}`, { headers: authHeaders(user) })
   return { status: response.status, body: await response.json() as Record<string, any> }
 }
+async function jsonPost(path: string, user: TestUser, body: unknown) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method: 'POST',
+    headers: authHeaders(user),
+    body: JSON.stringify(body),
+  })
+  return { status: response.status, body: await response.json() as Record<string, any> }
+}
 
 suite('PR5 Run product read models (real PostgreSQL)', () => {
   beforeAll(async () => {
@@ -118,6 +126,7 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
   it('lists and reads frozen Run facts without exposing a second state model', async () => {
     const owner = await createUser('owner', UserRole.TEACHER)
     const student = await createUser('student')
+    const scopedTeacher = await createUser('scoped-teacher')
     const outsider = await createUser('outsider')
     const created = await createOrganization({
       name: `PR5 Run ${suffix}`,
@@ -133,6 +142,17 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
       membershipId: member.id,
       persona: 'STUDENT',
       meta: { actorUserId: owner.id, commandKey: commandKey('student-persona') },
+    })
+    const scopedTeacherMembership = await createMembership({
+      organizationId: created.organization.id,
+      userId: scopedTeacher.id,
+      meta: { actorUserId: owner.id, commandKey: commandKey('scoped-teacher') },
+    })
+    await grantPersona({
+      organizationId: created.organization.id,
+      membershipId: scopedTeacherMembership.id,
+      persona: 'TEACHER',
+      meta: { actorUserId: owner.id, commandKey: commandKey('scoped-teacher-persona') },
     })
 
     const run = await createAssessmentRunDraft({
@@ -164,6 +184,20 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
 
     const denied = await jsonRequest(`/api/organizations/${created.organization.id}/runs`, outsider)
     expect(denied.status).toBe(403)
+
+    const scopedCreate = await jsonPost(
+      `/api/organizations/${created.organization.id}/runs`,
+      scopedTeacher,
+      { name: `Scoped teacher campaign ${suffix}` },
+    )
+    expect(scopedCreate.status).toBe(200)
+    const scopedRunId = scopedCreate.body.data.id
+    const scopedList = await jsonRequest(`/api/organizations/${created.organization.id}/runs`, scopedTeacher)
+    expect(scopedList.status).toBe(200)
+    expect(scopedList.body.data.list.map((item: any) => item.id)).toContain(scopedRunId)
+    expect(scopedList.body.data.list.map((item: any) => item.id)).not.toContain(run.id)
+    expect((await jsonRequest(`/api/organizations/${created.organization.id}/runs/${run.id}`, scopedTeacher)).status).toBe(403)
+    expect((await jsonRequest(`/api/organizations/${created.organization.id}/memberships`, scopedTeacher)).status).toBe(403)
 
     const list = await jsonRequest(`/api/organizations/${created.organization.id}/runs?status=PUBLISHED`, owner)
     expect(list.status).toBe(200)

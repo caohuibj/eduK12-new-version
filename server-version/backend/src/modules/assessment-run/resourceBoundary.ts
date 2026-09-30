@@ -26,50 +26,89 @@ export const assertRunExecutionParent = async (input: {
 }
 
 /**
- * Publish is not platform administration. A current Organization membership plus
- * ORG_ADMIN, TEACHER or COUNSELOR product authority is required even for an
- * idempotent replay of an already-published Run. Population scope is still
- * rechecked by publishAssessmentRun for the first publish transaction.
+ * Run management is assessment delivery, not tenant governance.
+ *
+ * ORG_ADMIN may manage any Run in the organization. A TEACHER/COUNSELOR
+ * persona may manage only a Run it created; publish/preview additionally
+ * re-check every resolved pair against class/client scope.
+ */
+export const assertCurrentRunManagerBoundary = async (input: {
+  organizationId: string
+  runId: string
+  actorUserId: string
+}): Promise<void> => {
+  const rows = await prisma.$queryRaw<Array<{
+    createdByUserId: string
+    membershipId: string | null
+    orgRole: string | null
+    teacherPersona: boolean
+    counselorPersona: boolean
+    denied: boolean
+  }>>`
+    SELECT r."created_by_user_id" AS "createdByUserId",
+      m."id" AS "membershipId", m."org_role" AS "orgRole",
+      COALESCE(EXISTS (
+        SELECT 1 FROM "organization_persona_grants" pg
+        WHERE pg."organization_id" = r."organization_id"
+          AND pg."membership_id" = m."id"
+          AND pg."persona" = 'TEACHER'
+          AND pg."revoked_at" IS NULL
+      ), FALSE) AS "teacherPersona",
+      COALESCE(EXISTS (
+        SELECT 1 FROM "organization_persona_grants" pg
+        WHERE pg."organization_id" = r."organization_id"
+          AND pg."membership_id" = m."id"
+          AND pg."persona" = 'COUNSELOR'
+          AND pg."revoked_at" IS NULL
+      ), FALSE) AS "counselorPersona",
+      EXISTS (
+        SELECT 1 FROM "organization_access_denies" d
+        WHERE d."organization_id" = r."organization_id"
+          AND d."user_id" = ${input.actorUserId}
+          AND d."lifted_at" IS NULL
+          AND d."permission" IN ('*','ORGANIZATION_GOVERNANCE','ASSESSMENT_DELIVERY','ASSESSMENT_RUN_PUBLISH','RUN_PUBLISH')
+      ) AS "denied"
+    FROM "assessment_runs" r
+    LEFT JOIN "organization_memberships" m
+      ON m."organization_id" = r."organization_id"
+      AND m."user_id" = ${input.actorUserId}
+      AND m."valid_from" <= statement_timestamp()
+      AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+    WHERE r."organization_id" = ${input.organizationId}
+      AND r."id" = ${input.runId}
+    ORDER BY m."valid_from" DESC NULLS LAST
+    LIMIT 1
+  `
+  const row = rows[0]
+  if (!row) throw new RunResourceBoundaryError('RUN_NOT_FOUND', 'Run not found in organization', 404)
+  if (!row.membershipId || row.denied) {
+    throw new RunResourceBoundaryError('RUN_DELIVERY_FORBIDDEN', 'current Organization delivery authority is required', 403)
+  }
+  if (row.orgRole === 'ORG_ADMIN') return
+  if (!row.teacherPersona && !row.counselorPersona) {
+    throw new RunResourceBoundaryError('RUN_DELIVERY_FORBIDDEN', 'delivery requires ORG_ADMIN, TEACHER, or COUNSELOR authority', 403)
+  }
+  if (row.createdByUserId !== input.actorUserId) {
+    throw new RunResourceBoundaryError('RUN_DELIVERY_FORBIDDEN', 'scoped professionals may manage only their own assessment campaigns', 403)
+  }
+}
+
+/**
+ * Backward-compatible publisher contract. New management callers use the
+ * delivery-specific error code; existing publish callers retain the historical
+ * RUN_PUBLISH_FORBIDDEN code while sharing the same authority decision.
  */
 export const assertCurrentRunPublisherBoundary = async (input: {
   organizationId: string
   runId: string
   actorUserId: string
 }): Promise<void> => {
-  const rows = await prisma.$queryRaw<Array<{
-    orgRole: string
-    teacherPersona: boolean
-    counselorPersona: boolean
-  }>>`
-    SELECT m."org_role" AS "orgRole",
-      EXISTS (
-        SELECT 1 FROM "organization_persona_grants" pg
-        WHERE pg."organization_id" = m."organization_id"
-          AND pg."membership_id" = m."id"
-          AND pg."persona" = 'TEACHER'
-          AND pg."revoked_at" IS NULL
-      ) AS "teacherPersona",
-      EXISTS (
-        SELECT 1 FROM "organization_persona_grants" pg
-        WHERE pg."organization_id" = m."organization_id"
-          AND pg."membership_id" = m."id"
-          AND pg."persona" = 'COUNSELOR'
-          AND pg."revoked_at" IS NULL
-      ) AS "counselorPersona"
-    FROM "assessment_runs" r
-    JOIN "organization_memberships" m
-      ON m."organization_id" = r."organization_id"
-      AND m."user_id" = ${input.actorUserId}
-      AND m."valid_until" IS NULL
-    WHERE r."organization_id" = ${input.organizationId}
-      AND r."id" = ${input.runId}
-    LIMIT 1
-  `
-  const row = rows[0]
-  if (!row) {
-    throw new RunResourceBoundaryError('RUN_PUBLISH_FORBIDDEN', 'current Organization publisher authority is required', 403)
-  }
-  if (row.orgRole !== 'ORG_ADMIN' && !row.teacherPersona && !row.counselorPersona) {
-    throw new RunResourceBoundaryError('RUN_PUBLISH_FORBIDDEN', 'publisher requires ORG_ADMIN, TEACHER, or COUNSELOR authority', 403)
+  try {
+    await assertCurrentRunManagerBoundary(input)
+  } catch (error) {
+    if (error instanceof RunResourceBoundaryError && error.code === 'RUN_DELIVERY_FORBIDDEN') {
+      throw new RunResourceBoundaryError('RUN_PUBLISH_FORBIDDEN', error.message, error.statusCode)
+    }
+    throw error
   }
 }

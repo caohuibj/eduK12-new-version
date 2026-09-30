@@ -8,7 +8,11 @@ import { previewAssessmentRun, publishAssessmentRun } from './publish'
 import { startAssessmentRunExecution } from './startExecution'
 import { readAssessmentRunProgress } from './progress'
 import { cancelAssessmentRun, closeAssessmentRun } from './lifecycle'
-import { assertCurrentRunPublisherBoundary, assertRunExecutionParent } from './resourceBoundary'
+import {
+  assertCurrentRunManagerBoundary,
+  assertCurrentRunPublisherBoundary,
+  assertRunExecutionParent,
+} from './resourceBoundary'
 import { relationalProductRegistry } from '../assessment-relational/product-registry'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
 import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
@@ -84,11 +88,13 @@ export const assessmentRunController = {
     const parsed = listRunSchema.safeParse(req.query)
     if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
     try {
+      const organizationWide = req.assessmentDeliveryAccess?.deliveryScopes.includes('ORGANIZATION') === true
       return success(res, await listAssessmentRunProducts({
         organizationId: req.params.organizationId,
         page: parsed.data.page,
         pageSize: parsed.data.pageSize,
         status: parsed.data.status as AssessmentRunStatus | undefined,
+        ...(organizationWide ? {} : { createdByUserId: req.user.userId }),
       }))
     } catch (err) { return fail(res, err) }
   },
@@ -96,6 +102,11 @@ export const assessmentRunController = {
   async detail(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await readAssessmentRunProduct(
         req.params.organizationId,
         req.params.runId,
@@ -122,6 +133,11 @@ export const assessmentRunController = {
     const parsed = addTrackSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await addAssessmentRunTrackDraft({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
@@ -138,6 +154,11 @@ export const assessmentRunController = {
     const parsed = publishSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await previewAssessmentRun({ organizationId: req.params.organizationId, runId: req.params.runId, actorUserId: req.user.userId, expectedVersion: parsed.data.expectedVersion }))
     } catch (err) { return fail(res, err) }
   },
@@ -187,6 +208,11 @@ export const assessmentRunController = {
   async progress(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await readAssessmentRunProgress(
         req.params.organizationId,
         req.params.runId,
@@ -197,6 +223,11 @@ export const assessmentRunController = {
   async close(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await closeAssessmentRun({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
@@ -207,6 +238,11 @@ export const assessmentRunController = {
   async cancel(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try {
+      await assertCurrentRunManagerBoundary({
+        organizationId: req.params.organizationId,
+        runId: req.params.runId,
+        actorUserId: req.user.userId,
+      })
       return success(res, await cancelAssessmentRun({
         organizationId: req.params.organizationId,
         runId: req.params.runId,

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -70,31 +71,28 @@ export async function listAssessmentRunProducts(input: {
   page: number
   pageSize: number
   status?: AssessmentRunStatus
+  /** Scoped professionals see only campaigns they created; ORG_ADMIN omits this filter. */
+  createdByUserId?: string
 }): Promise<{ list: AssessmentRunProductListItem[]; total: number; page: number; pageSize: number }> {
   const offset = (input.page - 1) * input.pageSize
-  const whereStatus = input.status ? 'AND r."status" = $4' : ''
-  const params = input.status
-    ? [input.organizationId, input.pageSize, offset, input.status]
-    : [input.organizationId, input.pageSize, offset]
-  const list = await prisma.$queryRawUnsafe<AssessmentRunProductListItem[]>(
-    `SELECT ${runSelect}
-     FROM "assessment_runs" r
-     WHERE r."organization_id" = $1 ${whereStatus}
-     ORDER BY r."created_at" DESC, r."id" DESC
-     LIMIT $2 OFFSET $3`,
-    ...params,
-  )
-  const totals = input.status
-    ? await prisma.$queryRaw<Array<{ count: number }>>`
-        SELECT COUNT(*)::int AS "count"
-        FROM "assessment_runs"
-        WHERE "organization_id" = ${input.organizationId} AND "status" = ${input.status}
-      `
-    : await prisma.$queryRaw<Array<{ count: number }>>`
-        SELECT COUNT(*)::int AS "count"
-        FROM "assessment_runs"
-        WHERE "organization_id" = ${input.organizationId}
-      `
+  const ownerFilter = input.createdByUserId ?? null
+  const statusFilter = input.status ?? null
+  const list = await prisma.$queryRaw<AssessmentRunProductListItem[]>`
+    SELECT ${Prisma.raw(runSelect)}
+    FROM "assessment_runs" r
+    WHERE r."organization_id" = ${input.organizationId}
+      AND (${ownerFilter}::text IS NULL OR r."created_by_user_id" = ${ownerFilter})
+      AND (${statusFilter}::text IS NULL OR r."status" = ${statusFilter})
+    ORDER BY r."created_at" DESC, r."id" DESC
+    LIMIT ${input.pageSize} OFFSET ${offset}
+  `
+  const totals = await prisma.$queryRaw<Array<{ count: number }>>`
+    SELECT COUNT(*)::int AS "count"
+    FROM "assessment_runs" r
+    WHERE r."organization_id" = ${input.organizationId}
+      AND (${ownerFilter}::text IS NULL OR r."created_by_user_id" = ${ownerFilter})
+      AND (${statusFilter}::text IS NULL OR r."status" = ${statusFilter})
+  `
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize }
 }
 

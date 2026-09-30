@@ -416,7 +416,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     SELECT "permission" FROM "organization_access_denies"
     WHERE "organization_id" = ${organizationId} AND "user_id" = ${actorUserId} AND "lifted_at" IS NULL
   `
-  if (deny.some((row) => row.permission === '*' || row.permission === 'ORGANIZATION_GOVERNANCE' || row.permission === 'ASSESSMENT_RUN_PUBLISH')) {
+  if (deny.some((row) => ['*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH'].includes(row.permission))) {
     throw new RunPublishError('AUTHORITY_REVOKED', 'publisher is explicitly denied', 403)
   }
   const memberships = await tx.$queryRaw<Array<{ id: string; orgRole: string }>>`
@@ -589,18 +589,22 @@ export const publishAssessmentRun = async (input: {
     `
     if (!organizations[0]) throw new RunPublishError('ORG_NOT_FOUND', 'Organization not found', 404)
     if (organizations[0].status !== 'ACTIVE') throw new RunPublishError('ORGANIZATION_SUSPENDED', 'Organization is suspended', 409)
-    const runs = await tx.$queryRaw<Array<{ status: string; version: number }>>`
-      SELECT "status", "version" FROM "assessment_runs"
+    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string }>>`
+      SELECT "status", "version", "created_by_user_id" AS "createdByUserId" FROM "assessment_runs"
       WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR UPDATE
     `
     const run = runs[0]
     if (!run) throw new RunPublishError('RUN_NOT_FOUND', 'Run not found', 404)
     const denies = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_access_denies" WHERE "organization_id" = ${input.organizationId}
-        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'RUN_PUBLISH')
+        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL
+        AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run publication', 403)
     const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    if (!authority.isOrgAdmin && run.createdByUserId !== input.actorUserId) {
+      throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may publish only their own assessment campaigns', 403)
+    }
     if (run.status === 'PUBLISHED') {
       const countRows = await tx.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS "count" FROM "assessment_run_executions" WHERE "run_id" = ${input.runId}
@@ -738,16 +742,21 @@ export const previewAssessmentRun = async (input: {
       SELECT "status" FROM "organizations" WHERE "id" = ${input.organizationId} FOR SHARE
     `
     if (organizations[0]?.status !== 'ACTIVE') throw new RunPublishError('ORGANIZATION_SUSPENDED', 'Organization is not active', 409)
-    const runs = await tx.$queryRaw<Array<{ status: string; version: number }>>`
-      SELECT "status", "version" FROM "assessment_runs" WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR SHARE
+    const runs = await tx.$queryRaw<Array<{ status: string; version: number; createdByUserId: string }>>`
+      SELECT "status", "version", "created_by_user_id" AS "createdByUserId"
+      FROM "assessment_runs" WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR SHARE
     `
     if (runs[0]?.status !== 'DRAFT' || runs[0]?.version !== input.expectedVersion) throw new RunPublishError('RUN_STATE_CONFLICT', 'Run changed; refresh before preview', 409)
     const denies = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_access_denies" WHERE "organization_id" = ${input.organizationId}
-        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'RUN_PUBLISH')
+        AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL
+        AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run preview', 403)
     const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
+      throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
+    }
     const tracks = []
     for (const track of prepared) {
       const pairs = await resolvePairs(tx, input.organizationId, track)
