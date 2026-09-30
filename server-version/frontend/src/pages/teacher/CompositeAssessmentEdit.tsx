@@ -66,7 +66,11 @@ const CompositeAssessmentEdit: React.FC = () => {
         packageCatalogAvailable
           ? compositeApi.listReportPackages!()
           : Promise.resolve({ code: 0, data: { list: [] } }),
-        apiClient.get<any>('/situational/instruments'),
+        apiClient.get<any>('/situational/instruments').catch(() => ({
+          code: -1,
+          data: { list: [] },
+          message: '情境测评题包暂不可用，已加载的综合测评仍可管理和导出。',
+        })),
       ])
       if (detailResponse.code !== 0 || !detailResponse.data) throw new Error(detailResponse.message || '综合测评不存在')
       setDetail(detailResponse.data)
@@ -83,6 +87,7 @@ const CompositeAssessmentEdit: React.FC = () => {
       setScales(scaleData)
       const situationalData = Array.isArray(situationalResponse.data) ? situationalResponse.data : situationalResponse.data?.list || []
       setSituationalInstruments(situationalData)
+      if (situationalResponse.code !== 0) setError(situationalResponse.message || '情境测评题包暂不可用')
       try {
         const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED&listedStandalone=true')
         const cognitiveData = Array.isArray(cognitiveResponse.data)
