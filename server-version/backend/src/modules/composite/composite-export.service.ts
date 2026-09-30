@@ -48,6 +48,7 @@ export interface CompositeExportData {
 
 export interface CompositeExportOptions {
   previewLimit?: number
+  accessTokenId?: string // Internal exact-wave filter; never supplied directly by the generic export route.
   detail?: CompositeExportDetail
   anonymize?: boolean
   dateRange?: { start?: string; end?: string }
@@ -161,6 +162,7 @@ export const getExportData = async (
   const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{
     compositeAssessmentId: assessmentId,
     status: 'COMPLETED',
+    ...(options.accessTokenId ? {accessTokenId: options.accessTokenId, userId: null} : {}),
     ...(completedDateWhere(options.dateRange) ? { completedAt: completedDateWhere(options.dateRange) } : {}),
   }]
   const relationalVisibility = await teacherRelationalExportVisibility(options.actor)

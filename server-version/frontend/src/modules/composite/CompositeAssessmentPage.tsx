@@ -200,7 +200,8 @@ const CompositeAssessmentPage: React.FC = () => {
   const saveAndExit = async () => {
     if (!attemptId) return
     if (state?.deliveryMode === 'FINAL_ONLY') {
-      navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/organization-tasks' : '/relational/tasks') : '/student')
+      const studyReturn=sessionStorage.getItem(`composite:study:return:${attemptId}`)
+      navigate(publicMode ? (studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:'/') : relationalMode ? (organizationTask ? '/organization-tasks' : '/relational/tasks') : '/student')
       return
     }
     try {

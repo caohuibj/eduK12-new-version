@@ -37,6 +37,8 @@ vi.mock('../../../contexts/CapabilitiesContext', () => ({
   useCognitiveEnabled: () => true,
 }))
 
+vi.mock('../../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'publisher'}})}))
+
 import CompositeAssessmentEdit from '../CompositeAssessmentEdit'
 
 describe('CompositeAssessmentEdit copyable toggle', () => {

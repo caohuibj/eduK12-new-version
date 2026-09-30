@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 106 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 108 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -92,6 +92,8 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
 | /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | Cognitive capability | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
 | /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /public/studies/waves/:waveId/:token | AnonymousStudyPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /public/studies/:studyId | AnonymousStudyPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /public/composite/:token | CompositeAssessmentPage | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /public/composite/attempts/:attemptId | CompositeAssessmentPage | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /public/composite/attempts/:attemptId/report | CompositeReportPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-09 | FE-02 chrome; domain UI retained |

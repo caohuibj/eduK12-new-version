@@ -2663,7 +2663,14 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
   }
 }
 
-export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string) => {
+// Internal study orchestration joins the same admission transaction. It cannot
+// alter scoring, respondent role, content, or final submission semantics.
+export type PublicStudyAdmission = {
+  credential: ReturnType<typeof createRecoveryCredential>
+  beforeAdmission: (tx: Prisma.TransactionClient) => Promise<string | null>
+  afterAdmission: (tx: Prisma.TransactionClient, attemptId: string) => Promise<void>
+}
+export const startPublicAttempt = async (tokenValue: string, recoveryToken?: string, study?: PublicStudyAdmission) => {
   const token = await findPublicToken(tokenValue)
   // Pure-read (write-time invariant): the public start path never lazily
   // repairs sections on a published composite. loadComposite already includes
@@ -2675,16 +2682,25 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     if (existing) return { attempt: await getAttemptState(existing.id, { recoveryTokenHash }), recoveryToken: null }
     throw compositeForbidden('恢复凭证无效')
   }
-  assertTokenWindow(token)
+  if (!study) assertTokenWindow(token)
   assertCompositeWindow(token.compositeAssessment)
-  const credential = createRecoveryCredential()
+  const credential = study?.credential ?? createRecoveryCredential()
   const attempt = await prisma.$transaction(async (tx) => {
+    const existingId = study ? await study.beforeAdmission(tx) : null
+    if (existingId) {
+      const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})
+      if (!existing || existing.userId !== null || existing.accessTokenId !== token.id || existing.recoveryTokenHash !== credential.hash) throw compositeForbidden('研究作答记录不可恢复')
+      return existing
+    }
+    assertTokenWindow(token)
     const claimed = await tx.compositeAssessmentAccessToken.updateMany({
       where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
       data: { usedCount: { increment: 1 } },
     })
     if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
-    return createAttempt(tx, composite, null, token.id, credential)
+    const admitted = await createAttempt(tx, composite, null, token.id, credential)
+    if (study) await study.afterAdmission(tx, admitted.id)
+    return admitted
   })
   return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
@@ -2705,6 +2721,8 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   if (existing.userId !== null || existing.recoveryTokenHash !== recoveryTokenHash) {
     throw compositeForbidden('恢复凭证无权重启此综合测评')
   }
+  const studyBinding = await prisma.$queryRaw<Array<{id:string}>>`SELECT attempt_id AS id FROM anonymous_study_attempts WHERE attempt_id=${attemptId} LIMIT 1`
+  if(studyBinding.length) throw compositeConflict('研究作答请从研究任务入口恢复；该波次不创建重复作答。')
   const accessToken = existing.accessTokenId
     ? await prisma.compositeAssessmentAccessToken.findUnique({
         where: { id: existing.accessTokenId },

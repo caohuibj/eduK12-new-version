@@ -778,6 +778,11 @@ jobs:
           INBOX_E2E_BASE_URL: http://127.0.0.1:5173
           INBOX_E2E_OUTPUT: /tmp/eduk12-inbox-e2e
         run: node e2e/multi-role-inbox-browser-e2e.cjs
+      - name: anonymous study identity responsive acceptance
+        env:
+          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
+          STUDY_E2E_OUTPUT: /tmp/eduk12-anonymous-study-e2e
+        run: node e2e/anonymous-study-browser-e2e.cjs
       - name: Reporting V2.2 final product scenarios
         env:
           REPORTING_BROWSER_ISOLATED_DB: '1'
