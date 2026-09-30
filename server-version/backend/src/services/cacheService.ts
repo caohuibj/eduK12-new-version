@@ -136,6 +136,13 @@ class CacheService {
         this.isConnected = false
       })
 
+      this.client.on('ready', () => {
+        this.isConnected = true
+      })
+      this.client.on('reconnecting', () => {
+        this.isConnected = false
+      })
+
       this.client.on('end', () => {
         logger.warn('[CacheService] Redis客户端已断开')
         this.isConnected = false
