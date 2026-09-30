@@ -10,7 +10,7 @@ export const navigationSections: Array<{ id: NavigationSection; label: string }>
 ]
 const student: NavigationItem[] = [
   { path: '/student', label: '课程', aliases: ['/student/courses', '/student/assignments', '/student/checkins', '/student/classroom'] },
-  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite'] },
+  { path: '/student/scales', label: '课程测评', aliases: ['/student/questionnaires', '/student/composite'] },
   { path: '/relational/tasks', label: '课堂体验', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
   { path: '/student/situational', label: '情境测评' }, { path: '/scale-library', label: '量表库' },
 ]

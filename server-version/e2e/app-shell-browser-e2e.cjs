@@ -50,7 +50,7 @@ async function openNav(page, method = 'pointer') {
   return page.getByRole('navigation', { name: '主要导航' })
 }
 async function activateAssessmentLink(page, nav, mode) {
-  const target = nav.getByRole('link', { name: '我的测评' })
+  const target = nav.getByRole('link', { name: '课程测评' })
   if (mode === 'keyboard' || mode === 'hybrid') {
     await target.focus()
     await page.keyboard.press('Enter')
@@ -151,7 +151,7 @@ async function main() {
       // Sentinel models existing browser data; FE-02 must not delete storage on 401.
       await page.evaluate(() => localStorage.setItem('fe02-draft-sentinel', 'keep'))
       state.expires = true
-      await (await openNav(page)).getByRole('link', { name: '我的测评' }).click()
+      await (await openNav(page)).getByRole('link', { name: '课程测评' }).click()
       await page.getByRole('heading', { name: '学生登录', exact: true }).waitFor()
       assert.equal(new URL(page.url()).searchParams.get('returnTo'), '/student/scales')
       state.expires = false
