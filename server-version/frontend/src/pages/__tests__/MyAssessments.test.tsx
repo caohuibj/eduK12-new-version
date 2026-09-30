@@ -40,6 +40,16 @@ describe('My Assessments', () => {
     expect(await screen.findByText('报告权限已变化')).toBeInTheDocument()
     expect(screen.queryByText('指标 1：4')).not.toBeInTheDocument()
   })
+  it('clears the previous subject and actions when refreshing authority fails', async () => {
+    mocks.get.mockResolvedValue({ code: 0, data: { list: [{ ...task, subject: { role: 'STUDENT', displayName: 'A' } }], pendingCount: 1, truncated: false } })
+    render(<MemoryRouter><MyAssessments /></MemoryRouter>)
+    expect(await screen.findByText('测评对象：A')).toBeInTheDocument()
+    mocks.get.mockRejectedValueOnce(new Error('权限已撤销'))
+    fireEvent.click(screen.getByRole('button', { name: '刷新任务' }))
+    expect(await screen.findByText('权限已撤销')).toBeInTheDocument()
+    expect(screen.queryByText('测评对象：A')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '开始测评' })).not.toBeInTheDocument()
+  })
   it('does not retain stale tasks after an initial failed read', async () => {
     mocks.get.mockRejectedValue(new Error('权限已变化'))
     render(<MemoryRouter><MyAssessments /></MemoryRouter>)

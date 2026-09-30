@@ -130,6 +130,8 @@ async function complete(name, r) {
   const after = await ok(page, '/organizations/assigned-tasks')
   assert.equal(after.list.find(t => t.executionId === task.executionId).status, 'COMPLETED')
   assert.equal(rows[0].status, 'COMPLETED', 'canonical completion must reconcile Run reporting readiness')
+  const feedback=await ok(page,`/my-assessments/results/${task.executionId}`)
+  assert.equal(feedback.mode,'COMPLETION_ONLY');assert.equal(feedback.state,'COMPLETED');assert.equal(feedback.metrics,undefined)
   console.log(`Runtime FINAL verified: ${name} / ${r.key}`)
   return { task, attemptId, snapshot: snapshots[0], canonical, page, executionStatus: rows[0].status }
 }
@@ -300,7 +302,7 @@ async function schoolMentalHealth({ platform, owner, org, members, groupSpec, sc
   await denied(parentPage, `/organizations/${org}/runs/${pendingParent.id}/executions/${pending.executionId}/start`, {})
   await denied(parentPage, `/organizations/${org}`)
   await denied(parentPage, `/composite-assessments/attempts/${parentCompleted.attemptId}/report`)
-  await denied(parentPage, `/my-assessments/run-results/${parentCompleted.task.executionId}`)
+  await denied(parentPage, `/my-assessments/results/${parentCompleted.task.executionId}`)
   await parentPage.goto(`${base}/organization-tasks`)
   await parentPage.getByRole('heading', { name: '我的测评', exact: true }).waitFor()
   assert.equal(await parentPage.getByRole('heading',{name:parentObserver.name,exact:true}).count(),0)

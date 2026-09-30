@@ -26,10 +26,11 @@ async function main() {
   const entries: RelationalProductEntryV1[] = []
   function resource(key: string, subject: any, respondent: any, relationship: any, protectedFeedback = false) {
     const resultDisclosure: ResultDisclosureContractV1 = {schemaVersion:1,policyKey:'pr5:explicit-aggregate-v1',minimumRespondents:3,audiences:Object.fromEntries(resultAudiences.map(a=>[a,{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]}])) as ResultDisclosureContractV1['audiences']}
+    if(protectedFeedback)resultDisclosure.audiences.SUBJECT={mode:'AGGREGATE_ONLY',metricKeys:['bfi2.assertiveness.behavior'],longitudinalMetricKeys:[]}
     resultDisclosure.audiences.RESPONDENT={mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]}
     for(const audience of ['TEACHER','PROFESSIONAL','ORGANIZATION'] as const) resultDisclosure.audiences[audience]={mode:audience==='ORGANIZATION'?'ORGANIZATION_AGGREGATE':'CLASS_AGGREGATE',metricKeys:['bfi2.assertiveness.behavior'],longitudinalMetricKeys:[]}
     entries.push({ resultDisclosure, title: `PR5 ${key}`, description: 'Isolated acceptance fixture, not released scientific content',
-      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT',
+      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', subjectReportMode: protectedFeedback ? 'AGGREGATE_ONLY' : 'NONE',
       initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN', 'PROFESSIONAL_ASSIGN', 'RELATED_OBSERVER_ASSIGN'],
       ...(subject === 'TEACHER' && respondent === 'STUDENT' ? { allowedTargetModes: [relationship === 'COURSE_TEACHER_STUDENT' ? 'COURSE_TEACHER' as const : 'HOMEROOM_TEACHER' as const] } : {}),
       launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: composite.id },
