@@ -12,6 +12,8 @@ import {
   assignStudentToClass,
   endStaffClassAssignment,
   endStudentClassAssignment,
+  grantTeachingAssessmentDelivery,
+  revokeTeachingAssessmentDelivery,
 } from './classRelationships'
 import { OrganizationDomainError } from './types'
 import { createClassificationDimension, createOrganizationLabel, assignOrganizationLabel, endOrganizationLabelAssignment, createCounselorClientRelationship, endCounselorClientRelationship } from './classificationRelations'
@@ -30,6 +32,10 @@ const staffAssignmentSchema = z.object({
   membershipId: z.string().min(1),
   classUnitId: z.string().min(1),
   staffRole: z.enum(['HOMEROOM', 'TEACHING']),
+})
+const deliveryGrantSchema = z.object({
+  teacherMembershipId: z.string().min(1),
+  classUnitId: z.string().min(1),
 })
 
 function sendDomainError(res: Response, err: unknown) {
@@ -279,5 +285,44 @@ export const organizationAdminController = {
     } catch (err) {
       return sendDomainError(res, err)
     }
+  },
+
+  async listAssessmentDeliveryGrants(req: Request, res: Response) {
+    try {
+      const organizationId = req.params.organizationId
+      const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+        SELECT "id","teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
+          "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
+          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt"
+        FROM "organization_assessment_delivery_grants"
+        WHERE "organization_id" = ${organizationId}
+        ORDER BY "granted_at" DESC,"id" DESC LIMIT 200
+      `
+      return success(res, { list: rows, total: rows.length })
+    } catch (err) { return sendDomainError(res, err) }
+  },
+
+  async grantAssessmentDelivery(req: Request, res: Response) {
+    const parsed = deliveryGrantSchema.safeParse(req.body)
+    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!req.user) return error(res, '未登录', -1, 401)
+    try {
+      return success(res, await grantTeachingAssessmentDelivery({
+        organizationId: req.params.organizationId,
+        ...parsed.data,
+        grantedByUserId: req.user.userId,
+      }))
+    } catch (err) { return sendDomainError(res, err) }
+  },
+
+  async revokeAssessmentDelivery(req: Request, res: Response) {
+    if (!req.user) return error(res, '未登录', -1, 401)
+    try {
+      return success(res, await revokeTeachingAssessmentDelivery({
+        organizationId: req.params.organizationId,
+        grantId: req.params.grantId,
+        revokedByUserId: req.user.userId,
+      }))
+    } catch (err) { return sendDomainError(res, err) }
   },
 }

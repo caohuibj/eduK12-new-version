@@ -153,8 +153,42 @@ export async function resolveAssessmentDeliveryAuthority(input: {
 
   const deliveryScopes: AssessmentDeliveryScope[] = []
   if (context.orgRole === 'ORG_ADMIN') deliveryScopes.push('ORGANIZATION')
-  if (context.personas.includes('TEACHER')) deliveryScopes.push('CLASS')
-  if (context.personas.includes('COUNSELOR')) deliveryScopes.push('PROFESSIONAL')
+  if (context.personas.includes('TEACHER')) {
+    const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1 FROM "organization_staff_class_assignments" sa
+        WHERE sa."organization_id" = ${input.organizationId}
+          AND sa."membership_id" = ${context.membershipId}
+          AND sa."valid_until" IS NULL
+          AND (
+            sa."staff_role" = 'HOMEROOM'
+            OR (
+              sa."staff_role" = 'TEACHING'
+              AND EXISTS (
+                SELECT 1 FROM "organization_assessment_delivery_grants" g
+                WHERE g."organization_id" = sa."organization_id"
+                  AND g."teacher_membership_id" = sa."membership_id"
+                  AND g."class_unit_id" = sa."class_unit_id"
+                  AND g."permission" = 'CLASS_ASSESSMENT_DELIVERY'
+                  AND g."revoked_at" IS NULL
+              )
+            )
+          )
+      ) AS "allowed"
+    `
+    if (rows[0]?.allowed) deliveryScopes.push('CLASS')
+  }
+  if (context.personas.includes('COUNSELOR')) {
+    const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1 FROM "organization_counselor_client_relationships" r
+        WHERE r."organization_id" = ${input.organizationId}
+          AND r."counselor_membership_id" = ${context.membershipId}
+          AND r."valid_until" IS NULL
+      ) AS "allowed"
+    `
+    if (rows[0]?.allowed) deliveryScopes.push('PROFESSIONAL')
+  }
   if (deliveryScopes.length === 0) return null
   return { ...context, deliveryScopes }
 }

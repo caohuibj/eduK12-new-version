@@ -437,7 +437,23 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     FROM "organization_staff_class_assignments" sa
     LEFT JOIN "organization_student_class_assignments" sc
       ON sc."organization_id" = sa."organization_id" AND sc."class_unit_id" = sa."class_unit_id" AND sc."valid_until" IS NULL
-    WHERE sa."organization_id" = ${organizationId} AND sa."membership_id" = ${membership.id} AND sa."valid_until" IS NULL
+    WHERE sa."organization_id" = ${organizationId}
+      AND sa."membership_id" = ${membership.id}
+      AND sa."valid_until" IS NULL
+      AND (
+        sa."staff_role" = 'HOMEROOM'
+        OR (
+          sa."staff_role" = 'TEACHING'
+          AND EXISTS (
+            SELECT 1 FROM "organization_assessment_delivery_grants" g
+            WHERE g."organization_id" = sa."organization_id"
+              AND g."teacher_membership_id" = sa."membership_id"
+              AND g."class_unit_id" = sa."class_unit_id"
+              AND g."permission" = 'CLASS_ASSESSMENT_DELIVERY'
+              AND g."revoked_at" IS NULL
+          )
+        )
+      )
   ` : []
   const clientRows = counselorPersona ? await tx.$queryRaw<Array<{ clientMembershipId: string }>>`
     SELECT "client_membership_id" AS "clientMembershipId"

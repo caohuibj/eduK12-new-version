@@ -66,6 +66,9 @@ router.post('/:organizationId/student-class-assignments/:assignmentId/end', auth
 router.get('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.listStaffClassAssignments)
 router.post('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStaff)
 router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStaffAssignment)
+router.get('/:organizationId/assessment-delivery-grants', authenticate, requireOrganizationGovernance, organizationAdminController.listAssessmentDeliveryGrants)
+router.post('/:organizationId/assessment-delivery-grants', authenticate, requireOrganizationGovernance, organizationAdminController.grantAssessmentDelivery)
+router.post('/:organizationId/assessment-delivery-grants/:grantId/revoke', authenticate, requireOrganizationGovernance, organizationAdminController.revokeAssessmentDelivery)
 
 // Organization Run delivery is intentionally separate from Organization
 // governance. ORG_ADMIN gets organization scope; TEACHER/COUNSELOR personas get
