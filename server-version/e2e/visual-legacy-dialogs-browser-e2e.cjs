@@ -150,6 +150,7 @@ async function main() {
         await editor.waitFor({ state: 'detached' })
         assert.equal(writes, 2)
         results.push({ engine, width, scenario: 'assignment pending/failure/retry', passed: true })
+        await require('./material-recovery-browser-e2e.cjs').verifyRecovery(page, { base, engine, width, results, output })
         assert.deepEqual(errors, [])
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true)
         await page.screenshot({ path: path.join(output, `legacy-${width}.png`), fullPage: true })

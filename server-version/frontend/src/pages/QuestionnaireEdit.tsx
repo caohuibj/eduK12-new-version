@@ -1,3 +1,6 @@
+import { usePageEditorGuard } from '../components/shared-ui/usePageEditorGuard'
+import { useLatestRequest, requestError } from '../components/shared-ui/useLatestRequest'
+import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect } from 'react'
@@ -7,6 +10,7 @@ import { Save, Plus, Trash2, ChevronLeft, Layers, FileText, Edit3 } from 'lucide
 import { ScaleSelector } from '../components/ScaleSelector'
 import type { Scale } from '../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../modules/assessment-context/options'
+import { ProductButton, ProductStatus } from '../components/product-ui'
 import FormSectionManager from '../components/FormSectionManager'
 
 // 表单题目类型
@@ -63,13 +67,16 @@ interface Questionnaire {
   }>
 }
 
+const basicValue = (value: Questionnaire) => ({ code: value.code, name: value.name, description: value.description || '', instruction: value.instruction || '', visibility: value.visibility, estimatedTime: value.estimatedTime })
+
 const QuestionnaireEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const isNew = id === 'new'
 
-  const [loading, setLoading] = useState(!isNew)
-  const [saving, setSaving] = useState(false)
+  const { loading, error: loadError, run: runLoad, invalidate: invalidateLoad } = useLatestRequest(!isNew)
+  const { feedback, success, error: showError, info, clear } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<'basic' | 'content' | 'courses'>('basic')
 
   // 问卷基本信息
@@ -122,6 +129,9 @@ const QuestionnaireEdit: React.FC = () => {
 
   const itemGuard = useEditorGuard({ open: showFormItemModal, value: formData, onClose: () => { setShowFormItemModal(false); resetFormData() } })
 
+  const pageGuard = usePageEditorGuard(basicValue(questionnaire), { dirty: itemGuard.dirty, busy: itemGuard.busy })
+  const saving = pageGuard.busy
+
   useEffect(() => {
     if (!isNew && id) {
       fetchQuestionnaire()
@@ -129,20 +139,20 @@ const QuestionnaireEdit: React.FC = () => {
     }
     fetchAvailableScales()
     fetchAvailableCourses()
+    return invalidateLoad
   }, [id, isNew])
 
-  const fetchQuestionnaire = async () => {
-    try {
-      const response = await apiClient.get<Questionnaire>(`/questionnaires/${id}`)
-      if (response.code === 0) {
-        setQuestionnaire(response.data)
-      }
-    } catch (err) {
-      console.error('获取问卷信息失败', err)
-    } finally {
-      setLoading(false)
+  const fetchQuestionnaire = (preserveBasic = false) => runLoad(async () => {
+    const response = await apiClient.get<Questionnaire>(`/questionnaires/${id}`)
+    if (response.code !== 0) throw new Error(response.message || '问卷加载失败')
+    return response.data
+  }, data => {
+    if (preserveBasic) setQuestionnaire(current => ({ ...data, ...basicValue(current) }))
+    else {
+      setQuestionnaire(data)
+      pageGuard.reset(basicValue(data))
     }
-  }
+  }, '问卷加载失败，请重试')
 
   const fetchContent = async () => {
     try {
@@ -188,39 +198,28 @@ const QuestionnaireEdit: React.FC = () => {
   }
 
   const handleSaveBasic = async () => {
-    if (!questionnaire.code || !questionnaire.name) {
-      alert('问卷编码和名称不能为空')
+    if (!questionnaire.code.trim() || !questionnaire.name.trim()) {
+      showError('无法保存', '请填写问卷编码和名称')
       return
     }
-
+    if (!pageGuard.begin()) return
+    clear()
     try {
-      setSaving(true)
+      const response = isNew
+        ? await apiClient.post<Questionnaire>('/questionnaires', questionnaire)
+        : await apiClient.put<Questionnaire>(`/questionnaires/${id}`, basicValue(questionnaire))
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
+      setQuestionnaire(response.data)
+      pageGuard.reset(basicValue(response.data))
+      success('保存成功')
       if (isNew) {
-        const response = await apiClient.post<Questionnaire>('/questionnaires', questionnaire)
-        if (response.code === 0) {
-          navigate(`/questionnaires/${response.data.id}`)
-        } else {
-          alert(response.message)
-        }
-      } else {
-        const response = await apiClient.put<Questionnaire>(`/questionnaires/${id}`, {
-          name: questionnaire.name,
-          description: questionnaire.description,
-          instruction: questionnaire.instruction,
-          visibility: questionnaire.visibility,
-          estimatedTime: questionnaire.estimatedTime,
-        })
-        if (response.code === 0) {
-          setQuestionnaire(response.data)
-          alert('保存成功')
-        } else {
-          alert(response.message)
-        }
+        pageGuard.finish()
+        navigate(`/questionnaires/${response.data.id}`)
       }
-    } catch (err: any) {
-      alert(err.message || '保存失败')
+    } catch (error) {
+      showError('保存失败', requestError(error, '保存失败，请重试；修改仍保留在当前页面。'))
     } finally {
-      setSaving(false)
+      pageGuard.finish()
     }
   }
 
@@ -282,10 +281,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setFormItems(formItems.filter(fi => fi.id !== itemId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      showMessage(err.message || '删除失败')
     }
   }
 
@@ -326,10 +325,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         fetchContent()
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '添加失败')
+      showMessage(err.message || '添加失败')
     }
   }
 
@@ -357,10 +356,10 @@ const QuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setQuestionnaireScales(questionnaireScales.filter(qs => qs.scaleId !== scaleId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '移除失败')
+      showMessage(err.message || '移除失败')
     }
   }
 
@@ -372,13 +371,13 @@ const QuestionnaireEdit: React.FC = () => {
         courseIds: selectedCourses,
       })
       if (response.code === 0) {
-        fetchQuestionnaire()
+        fetchQuestionnaire(true)
         setSelectedCourses([])
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '添加失败')
+      showMessage(err.message || '添加失败')
     }
   }
 
@@ -386,15 +385,15 @@ const QuestionnaireEdit: React.FC = () => {
     try {
       const response = await apiClient.delete(`/questionnaires/${id}/courses/${courseId}`)
       if (response.code === 0) {
-        setQuestionnaire({
-          ...questionnaire,
-          courseQuestionnaires: questionnaire.courseQuestionnaires.filter(
+        setQuestionnaire(current => ({
+          ...current,
+          courseQuestionnaires: current.courseQuestionnaires.filter(
             cq => cq.course.id !== courseId
           ),
-        })
+        }))
       }
     } catch (err: any) {
-      alert(err.message || '移除失败')
+      showMessage(err.message || '移除失败')
     }
   }
 
@@ -424,6 +423,8 @@ const QuestionnaireEdit: React.FC = () => {
     )
   }
 
+  if (loadError) return <ProductStatus kind="error" title="问卷加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchQuestionnaire(questionnaire.id === id)}>重试</ProductButton>}>{loadError}</ProductStatus>
+
   // 合并所有内容项并排序
   const allContentItems: ContentItem[] = [
     ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
@@ -432,6 +433,8 @@ const QuestionnaireEdit: React.FC = () => {
 
   return (
     <div className="p-6">
+      {feedback}
+      <fieldset disabled={saving} className="min-w-0">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -926,6 +929,8 @@ const QuestionnaireEdit: React.FC = () => {
         </ModalSurface>
       )}
       {itemGuard.confirmation}
+      </fieldset>
+      {pageGuard.confirmation}
     </div>
   )
 }

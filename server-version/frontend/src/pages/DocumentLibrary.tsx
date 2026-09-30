@@ -1,3 +1,4 @@
+import { useLatestRequest } from '../components/shared-ui/useLatestRequest'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
@@ -17,7 +18,7 @@ const DocumentLibrary: React.FC = () => {
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { user } = useAuth()
   const [documents, setDocuments] = useState<Document[]>([])
-  const [loading, setLoading] = useState(true)
+  const { loading, error: listError, run: runList, invalidate: invalidateList } = useLatestRequest()
   const [keyword, setKeyword] = useState('')
   const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
@@ -35,38 +36,29 @@ const DocumentLibrary: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isAdmin = user?.role === 'ADMIN'
+  const listQuery = useRef({ page, keyword, showDeleted })
+  listQuery.current = { page, keyword, showDeleted }
 
   const uploadGuard = useEditorGuard({ open: showUploadModal, value: { file: selectedFile ? [selectedFile.name, selectedFile.size, selectedFile.lastModified] : null, title: documentTitle }, externalBusy: isUploading, onClose: () => { setShowUploadModal(false); setSelectedFile(null); setUploadError(''); setDocumentTitle('') } })
 
   useEffect(() => {
-    fetchDocuments()
+    void fetchDocuments()
+    return invalidateList
   }, [page, keyword, showDeleted])
 
-  const fetchDocuments = async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        page: String(page),
-        pageSize: String(pageSize),
-      })
-      if (keyword) {
-        params.set('keyword', keyword)
-      }
-      if (showDeleted) {
-        params.set('includeDeleted', 'true')
-      }
-      const response = await apiClient.get(`/documents?${params.toString()}`)
-      if (response.code === 0) {
-        setDocuments(response.data.list)
-        setTotal(response.data.total)
-        setTotalPages(response.data.totalPages)
-      }
-    } catch (error) {
-      console.error('获取文档列表失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const fetchDocuments = () => runList(async () => {
+    const current = listQuery.current
+    const params = new URLSearchParams({ page: String(current.page), pageSize: String(pageSize) })
+    if (current.keyword) params.set('keyword', current.keyword)
+    if (current.showDeleted) params.set('includeDeleted', 'true')
+    const response = await apiClient.get(`/documents?${params.toString()}`)
+    if (response.code !== 0) throw new Error(response.message || '获取文档列表失败')
+    return response.data
+  }, data => {
+    setDocuments(data.list)
+    setTotal(data.total)
+    setTotalPages(data.totalPages)
+  }, '获取文档列表失败，请重试')
 
   const handleSearch = () => {
     setKeyword(searchKeyword)
@@ -187,9 +179,10 @@ const DocumentLibrary: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader title="文档库" description="管理 PDF 等文档资源，并查看复用情况。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setDocumentTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传文档</ProductButton>} />
-      <div className="staff-toolbar"><div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索文档</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索文档" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div><span className="staff-help">共 {total} 个文档</span></div>
+      <div className="staff-toolbar"><div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索文档</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索文档" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div><span className="staff-help">{loading || listError ? '数量暂不可用' : `共 ${total} 个文档`}</span></div>
       {/* Document list */}
       {loading ? <ProductStatus kind="pending" title="正在加载文档">正在读取文档资源。</ProductStatus>
+      : listError ? <ProductStatus kind="error" title="文档列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchDocuments()}>重试</ProductButton>}>{listError}</ProductStatus>
       : documents.length === 0 ? <ProductStatus kind="info" title="暂无文档">上传第一份文档后，可以在教学内容中复用。</ProductStatus>
       : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>文档</th><th>大小</th><th>使用次数</th><th>状态</th><th className="text-right">操作</th></tr></thead><tbody>
         {documents.map(document => <tr key={document.id} className={(document as any).isDeleted ? 'opacity-60' : ''}>
@@ -199,10 +192,10 @@ const DocumentLibrary: React.FC = () => {
         </tr>)}
       </tbody></table></div>}
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!loading && !listError && totalPages > 1 && (
         <div className="flex items-center justify-between mt-6 pt-4 border-t">
           <div className="text-sm text-gray-500">
-            共 {total} 个文档，第 {page}/{totalPages} 页
+            {loading || listError ? '数量暂不可用' : `共 ${total} 个文档`}，第 {page}/{totalPages} 页
           </div>
           <div className="flex items-center space-x-2">
             <button

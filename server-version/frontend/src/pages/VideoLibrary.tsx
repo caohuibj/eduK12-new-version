@@ -1,6 +1,7 @@
+import { useLatestRequest, requestError } from '../components/shared-ui/useLatestRequest'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Video as VideoIcon, Trash2, Edit, Upload, X, FileVideo, AlertCircle, Loader2, CheckCircle2, Play, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
@@ -38,7 +39,7 @@ const VideoLibrary: React.FC = () => {
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { user } = useAuth()
   const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(true)
+  const { loading, error: listError, run: runList, invalidate: invalidateList } = useLatestRequest()
   const [keyword, setKeyword] = useState('')
   const [searchKeyword, setSearchKeyword] = useState('')
   const [page, setPage] = useState(1)
@@ -61,46 +62,44 @@ const VideoLibrary: React.FC = () => {
   const [isBatchUploading, setIsBatchUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pollingIntervals = useRef<Map<string, number>>(new Map())
+  const pollingEpoch = useRef(new Map<string, number>())
 
   const isAdmin = user?.role === 'ADMIN'
+  const listQuery = useRef({ page, keyword, showDeleted })
+  listQuery.current = { page, keyword, showDeleted }
+  const retrying = useRef(new Set<string>())
+  const [retryingIds, setRetryingIds] = useState<string[]>([])
 
   const uploadGuard = useEditorGuard({ open: showUploadModal, value: uploadQueue.filter(item => item.status === 'pending' || item.status === 'failed').map(item => ({ id: item.id, title: item.title })), externalBusy: isBatchUploading, onClose: () => { setShowUploadModal(false); setUploadQueue([]); setUploadError('') } })
   const renameGuard = useEditorGuard({ open: Boolean(editingVideo), value: editTitle, externalBusy: isUpdating, onClose: () => { setEditingVideo(null); setEditTitle('') } })
 
   useEffect(() => {
-    fetchVideos()
-    // 清理轮询
-    return () => {
-      pollingIntervals.current.forEach((interval) => clearInterval(interval))
-      pollingIntervals.current.clear()
-    }
+    void fetchVideos()
+    return invalidateList
   }, [page, keyword, showDeleted])
 
-  const fetchVideos = async () => {
-    try {
-      setLoading(true)
-      const params = new URLSearchParams({
-        page: String(page),
-        pageSize: String(pageSize),
-      })
-      if (keyword) {
-        params.set('keyword', keyword)
-      }
-      if (showDeleted) {
-        params.set('includeDeleted', 'true')
-      }
-      const response = await apiClient.get(`/videos?${params.toString()}`)
-      if (response.code === 0) {
-        setVideos(response.data.list)
-        setTotal(response.data.total)
-        setTotalPages(response.data.totalPages)
-      }
-    } catch (error) {
-      console.error('获取视频列表失败:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  useEffect(() => () => {
+    pollingIntervals.current.forEach(interval => clearInterval(interval))
+    pollingIntervals.current.clear()
+    pollingEpoch.current.forEach((epoch, key) => pollingEpoch.current.set(key, epoch + 1))
+  }, [])
+
+  const fetchVideos = () => runList(async () => {
+    const current = listQuery.current
+    const params = new URLSearchParams({ page: String(current.page), pageSize: String(pageSize) })
+    if (current.keyword) params.set('keyword', current.keyword)
+    if (current.showDeleted) params.set('includeDeleted', 'true')
+    const response = await apiClient.get(`/videos?${params.toString()}`)
+    if (response.code !== 0) throw new Error(response.message || '获取视频列表失败')
+    return response.data
+  }, data => {
+    setVideos(data.list)
+    setTotal(data.total)
+    setTotalPages(data.totalPages)
+  }, '获取视频列表失败，请重试')
+
+  const refreshVideos = useRef(fetchVideos)
+  refreshVideos.current = fetchVideos
 
   const handleSearch = () => {
     setKeyword(searchKeyword)
@@ -156,7 +155,7 @@ const VideoLibrary: React.FC = () => {
     }
 
     try {
-      updateItem({ status: 'uploading', uploadProgress: 0 })
+      updateItem({ status: 'uploading', uploadProgress: 0, error: undefined })
 
       const formData = new FormData()
       formData.append('video', item.file)
@@ -178,9 +177,9 @@ const VideoLibrary: React.FC = () => {
       })
 
       if (response.data.code === 0) {
-        const { id } = response.data.data
-        updateItem({ status: 'processing', videoId: id, uploadProgress: 100 })
-        startPollingQueueItem(item.id, id)
+        const { id, status } = response.data.data
+        updateItem({ status: status === 'FAILED' ? 'failed' : 'processing', videoId: id, uploadProgress: 100, error: status === 'FAILED' ? '文件已上传，但转码启动失败，请重新转码' : undefined })
+        if (status !== 'FAILED') startPollingQueueItem(item.id, id)
         return true
       } else {
         updateItem({ status: 'failed', error: response.data.message || '上传失败' })
@@ -192,40 +191,83 @@ const VideoLibrary: React.FC = () => {
     }
   }
 
-  const startPollingQueueItem = (queueId: string, videoId: string) => {
-    const interval = window.setInterval(async () => {
-      try {
-        const response = await apiClient.get(`/videos/${videoId}/status`)
-        if (response.code === 0) {
-          const { status, progress, errorMessage } = response.data
-          
-          setUploadQueue((prev) =>
-            prev.map((item) =>
-              item.id === queueId
-                ? {
-                    ...item,
-                    status: status === 'COMPLETED' ? 'completed' : 'processing',
-                    processProgress: progress || 0,
-                    error: errorMessage,
-                  }
-                : item
-            )
-          )
-
-          if (status === 'COMPLETED' || status === 'FAILED') {
-            clearInterval(interval)
-            pollingIntervals.current.delete(queueId)
-            if (status === 'COMPLETED') {
-              fetchVideos()
-            }
-          }
-        }
-      } catch (error) {
-        console.error('轮询状态失败:', error)
+  const checkQueueStatus = async (queueId: string, videoId: string) => {
+    const epoch = (pollingEpoch.current.get(queueId) ?? 0) + 1
+    pollingEpoch.current.set(queueId, epoch)
+    try {
+      const response = await apiClient.get(`/videos/${videoId}/status`)
+      if (pollingEpoch.current.get(queueId) !== epoch) return
+      if (response.code !== 0) throw new Error(response.message || '获取处理状态失败')
+      const { status, progress, errorMessage } = response.data
+      setUploadQueue(prev => prev.map(item => item.id === queueId ? { ...item,
+        status: status === 'COMPLETED' ? 'completed' : status === 'FAILED' ? 'failed' : 'processing',
+        processProgress: progress || 0, error: status === 'FAILED' ? errorMessage || '转码失败，请重新转码' : undefined,
+      } : item))
+      if (status === 'COMPLETED' || status === 'FAILED') {
+        const interval = pollingIntervals.current.get(queueId)
+        if (interval) clearInterval(interval)
+        pollingIntervals.current.delete(queueId)
+        void refreshVideos.current()
       }
-    }, 3000)
+    } catch (error) {
+      if (pollingEpoch.current.get(queueId) !== epoch) return
+      setUploadQueue(prev => prev.map(item => item.id === queueId ? { ...item, error: requestError(error, '暂时无法读取转码状态，请刷新处理状态') } : item))
+    }
+  }
 
+  const startPollingQueueItem = (queueId: string, videoId: string) => {
+    const previous = pollingIntervals.current.get(queueId)
+    if (previous) clearInterval(previous)
+    let checking = false
+    const interval = window.setInterval(async () => {
+      if (checking) return
+      checking = true
+      try { await checkQueueStatus(queueId, videoId) } finally { checking = false }
+    }, 3000)
     pollingIntervals.current.set(queueId, interval)
+  }
+
+  const retryTranscode = async (videoId: string, queueId?: string) => {
+    if (retrying.current.has(videoId)) return
+    if (queueId && !uploadGuard.begin()) return
+    const key = queueId ?? videoId
+    pollingEpoch.current.set(key, (pollingEpoch.current.get(key) ?? 0) + 1)
+    const interval = pollingIntervals.current.get(key)
+    if (interval) clearInterval(interval)
+    pollingIntervals.current.delete(key)
+    retrying.current.add(videoId)
+    setRetryingIds([...retrying.current])
+    try {
+      const response = await apiClient.post(`/videos/${videoId}/retry`)
+      if (response.code !== 0) throw new Error(response.message || '重新转码失败')
+      if (queueId) {
+        setUploadQueue(prev => prev.map(item => item.id === queueId ? { ...item, status: 'processing', processProgress: 0, error: undefined } : item))
+        startPollingQueueItem(queueId, videoId)
+      }
+      if (!queueId) {
+        const title = videos.find(item => item.id === videoId)?.title || '视频'
+        setProcessingVideos(prev => prev.some(item => item.id === videoId)
+          ? prev.map(item => item.id === videoId ? { ...item, status: 'PENDING', progress: 0, errorMessage: undefined } : item)
+          : [...prev, { id: videoId, title, status: 'PENDING', progress: 0 }])
+        startPollingStatus(videoId)
+      }
+      void refreshVideos.current()
+    } catch (error) {
+      const message = requestError(error, '重新转码失败，请刷新状态后重试')
+      if (queueId) setUploadQueue(prev => prev.map(item => item.id === queueId ? { ...item, error: message } : item))
+      else showMessage(message)
+    } finally {
+      retrying.current.delete(videoId)
+      setRetryingIds([...retrying.current])
+      if (queueId) uploadGuard.finish()
+    }
+  }
+
+  const retryUpload = async (item: UploadQueueItem) => {
+    if (item.videoId || !uploadGuard.begin()) return
+    setIsBatchUploading(true)
+    try { await uploadSingleFile(item) }
+    finally { setIsBatchUploading(false); uploadGuard.finish() }
   }
 
   const handleBatchUpload = async () => {
@@ -247,6 +289,7 @@ const VideoLibrary: React.FC = () => {
   }
 
   const removeFromQueue = (id: string) => {
+    pollingEpoch.current.set(id, (pollingEpoch.current.get(id) ?? 0) + 1)
     const interval = pollingIntervals.current.get(id)
     if (interval) {
       clearInterval(interval)
@@ -257,7 +300,7 @@ const VideoLibrary: React.FC = () => {
 
   const clearCompletedFromQueue = () => {
     uploadQueue
-      .filter((item) => item.status === 'completed' || item.status === 'failed')
+      .filter((item) => item.status === 'completed')
       .forEach((item) => {
         const interval = pollingIntervals.current.get(item.id)
         if (interval) {
@@ -265,7 +308,7 @@ const VideoLibrary: React.FC = () => {
           pollingIntervals.current.delete(item.id)
         }
       })
-    setUploadQueue((prev) => prev.filter((item) => item.status !== 'completed' && item.status !== 'failed'))
+    setUploadQueue((prev) => prev.filter((item) => item.status !== 'completed'))
   }
 
   const handleUpload = async () => {
@@ -380,53 +423,38 @@ const VideoLibrary: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  // 轮询视频处理状态
-  const startPollingStatus = useCallback((videoId: string) => {
-    if (pollingIntervals.current.has(videoId)) return
-
-    const interval = window.setInterval(async () => {
-      try {
-        const response = await apiClient.get(`/videos/${videoId}/status`)
-        if (response.code === 0) {
-          const { status, progress, errorMessage, processedUrl } = response.data
-          
-          setProcessingVideos(prev => 
-            prev.map(v => 
-              v.id === videoId 
-                ? { ...v, status, progress, errorMessage }
-                : v
-            )
-          )
-          
-          // 处理完成或失败，停止轮询
-          if (status === 'COMPLETED' || status === 'FAILED') {
-            clearInterval(interval)
-            pollingIntervals.current.delete(videoId)
-            
-            if (status === 'COMPLETED') {
-              // 从处理列表移除
-              setTimeout(() => {
-                setProcessingVideos(prev => prev.filter(v => v.id !== videoId))
-                fetchVideos() // 刷新列表显示处理后的视频
-              }, 3000)
-            }
-          }
-        }
-      } catch (error) {
-        console.error('获取视频状态失败:', error)
-      }
-    }, 3000) // 每3秒查询一次
-
-    pollingIntervals.current.set(videoId, interval)
-
-    // 5分钟后自动停止轮询
-    setTimeout(() => {
-      if (pollingIntervals.current.has(videoId)) {
-        clearInterval(interval)
+  const checkProcessingStatus = async (videoId: string) => {
+    const epoch = (pollingEpoch.current.get(videoId) ?? 0) + 1
+    pollingEpoch.current.set(videoId, epoch)
+    try {
+      const response = await apiClient.get(`/videos/${videoId}/status`)
+      if (pollingEpoch.current.get(videoId) !== epoch) return
+      if (response.code !== 0) throw new Error(response.message || '获取处理状态失败')
+      const { status, progress, errorMessage } = response.data
+      setProcessingVideos(prev => prev.map(item => item.id === videoId ? { ...item, status, progress, errorMessage } : item))
+      if (status === 'COMPLETED' || status === 'FAILED') {
+        const interval = pollingIntervals.current.get(videoId)
+        if (interval) clearInterval(interval)
         pollingIntervals.current.delete(videoId)
+        if (status === 'COMPLETED') setProcessingVideos(prev => prev.filter(item => item.id !== videoId))
+        void refreshVideos.current()
       }
-    }, 5 * 60 * 1000)
-  }, [fetchVideos])
+    } catch (error) {
+      if (pollingEpoch.current.get(videoId) !== epoch) return
+      setProcessingVideos(prev => prev.map(item => item.id === videoId ? { ...item, errorMessage: requestError(error, '暂时无法读取转码状态，请刷新处理状态') } : item))
+    }
+  }
+
+  const startPollingStatus = (videoId: string) => {
+    if (pollingIntervals.current.has(videoId)) return
+    let checking = false
+    const interval = window.setInterval(async () => {
+      if (checking) return
+      checking = true
+      try { await checkProcessingStatus(videoId) } finally { checking = false }
+    }, 3000)
+    pollingIntervals.current.set(videoId, interval)
+  }
 
   // 获取状态显示文本和颜色
   const getStatusDisplay = (status: string) => {
@@ -452,14 +480,14 @@ const VideoLibrary: React.FC = () => {
       <PageHeader title="视频库" description="上传、处理和复用课堂与测评视频。" actions={<ProductButton variant="primary" onClick={() => { setShowUploadModal(true); setUploadError(''); setSelectedFile(null); setVideoTitle(''); setUploadProgress(0) }}><Upload className="w-4 h-4" aria-hidden="true" />上传视频</ProductButton>} />
       <div className="staff-toolbar">
         <div className="flex flex-wrap items-center gap-3"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索视频</span><input type="search" value={searchKeyword} onChange={e=>setSearchKeyword(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="搜索视频" /></label><ProductButton onClick={handleSearch}>搜索</ProductButton>{isAdmin && <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showDeleted} onChange={e=>{setShowDeleted(e.target.checked);setPage(1)}} />显示已删除</label>}</div>
-        <span className="staff-help">共 {total} 个视频</span>
+        <span className="staff-help">{loading || listError ? '数量暂不可用' : `共 ${total} 个视频`}</span>
       </div>
       {/* Processing Videos */}
       {processingVideos.length > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center">
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            处理中的视频 ({processingVideos.length})
+            视频处理状态 ({processingVideos.length})
           </h3>
           <div className="space-y-3">
             {processingVideos.map((video) => {
@@ -495,11 +523,9 @@ const VideoLibrary: React.FC = () => {
                     </div>
                   )}
                   
-                  {video.status === 'FAILED' && (
-                    <div className="text-red-500 text-xs">
-                      处理失败: {video.errorMessage || '未知错误'}
-                    </div>
-                  )}
+                  {video.errorMessage && video.status !== 'FAILED' && <div className="text-red-600 text-sm" role="alert">{video.errorMessage}</div>}
+                  <ProductButton onClick={() => void checkProcessingStatus(video.id)} disabled={retryingIds.includes(video.id)}>刷新处理状态</ProductButton>
+                  {video.status === 'FAILED' && <div className="text-red-500 text-xs">处理失败: {video.errorMessage || '未知错误'}<ProductButton disabled={retryingIds.includes(video.id)} onClick={() => void retryTranscode(video.id)}>重新转码</ProductButton></div>}
                 </div>
               )
             })}
@@ -510,7 +536,7 @@ const VideoLibrary: React.FC = () => {
       {/* Video Grid */}
       {loading ? (
         <ProductStatus kind="pending" title="正在加载视频">正在读取视频及处理状态。</ProductStatus>
-      ) : displayVideos.length === 0 ? (
+      ) : listError ? <ProductStatus kind="error" title="视频列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchVideos()}>重试</ProductButton>}>{listError}</ProductStatus> : displayVideos.length === 0 ? (
         <ProductStatus kind="info" title="暂无视频">上传第一段视频后，可以在课程、作业和测评中复用。</ProductStatus>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -519,13 +545,14 @@ const VideoLibrary: React.FC = () => {
             const isProcessed = video.isProcessed || (video as any).status === 'COMPLETED'
             return (
             <div key={video.id} className="staff-panel staff-panel--padded hover:shadow-lg transition-shadow">
+              {(video as any).status === 'FAILED' && !(video as any).isDeleted && <div className="mb-3 text-red-600 text-sm">转码失败，原始视频仍保留。<ProductButton disabled={retryingIds.includes(video.id)} onClick={() => void retryTranscode(video.id)}>重新转码</ProductButton></div>}
               {/* Video Thumbnail */}
               <div className="aspect-video bg-gray-900 rounded-lg mb-4 flex items-center justify-center relative group">
                 <VideoIcon className="w-12 h-12 text-gray-600" />
                 {/* 处理状态标签 */}
                 {(video as any).status && (video as any).status !== 'COMPLETED' && (
                   <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded">
-                    {(video as any).status === 'PENDING' ? '等待处理' : '处理中'}
+                    {getStatusDisplay((video as any).status).text}
                   </div>
                 )}
                 {/* 已处理标签 */}
@@ -584,10 +611,10 @@ const VideoLibrary: React.FC = () => {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!loading && !listError && totalPages > 1 && (
         <div className="flex items-center justify-between mt-6 pt-4 border-t">
           <div className="text-sm text-gray-500">
-            共 {total} 个视频，第 {page}/{totalPages} 页
+            {loading || listError ? '数量暂不可用' : `共 ${total} 个视频`}，第 {page}/{totalPages} 页
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -644,7 +671,7 @@ const VideoLibrary: React.FC = () => {
               <button
                 onClick={uploadGuard.close}
                 className="text-gray-400 hover:text-gray-600"
-                disabled={isBatchUploading} aria-label="关闭"
+                disabled={uploadGuard.busy} aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -702,11 +729,11 @@ const VideoLibrary: React.FC = () => {
                           <p className="text-xs text-gray-500 mt-1">{formatFileSize(item.file.size)}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          {item.status === 'pending' && (
+                          {(item.status === 'pending' || item.status === 'failed') && (
                             <button
                               onClick={() => removeFromQueue(item.id)}
                               className="text-gray-400 hover:text-red-500"
-                              disabled={isBatchUploading} aria-label="关闭"
+                              disabled={uploadGuard.busy} aria-label={`移除 ${item.title}`}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -739,6 +766,9 @@ const VideoLibrary: React.FC = () => {
                         </span>
                       </div>
                       
+                      {item.status === 'failed' && <ProductButton disabled={uploadGuard.busy || Boolean(item.videoId && retryingIds.includes(item.videoId))} onClick={() => item.videoId ? void retryTranscode(item.videoId, item.id) : void retryUpload(item)}>{item.videoId ? '重新转码' : '重新上传'}</ProductButton>}
+                      {item.error && item.status !== 'failed' && <div className="text-red-600 text-sm" role="alert">{item.error}</div>}
+                      {item.videoId && (item.status === 'failed' || item.status === 'processing') && <ProductButton disabled={uploadGuard.busy} onClick={() => void checkQueueStatus(item.id, item.videoId!)}>刷新处理状态</ProductButton>}
                       {/* Progress Bar */}
                       {(item.status === 'uploading' || item.status === 'processing') && (
                         <div className="w-full bg-gray-200 rounded-full h-1.5">
