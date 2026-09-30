@@ -1,3 +1,5 @@
+import { recordCspReport, cspMetricLines } from './services/cspReports'
+import { createRedisRateLimiter } from './middleware/redisRateLimit'
 import { cleanupStaleUploadDirectories } from './utils/uploadTemp'
 import { cleanupStalePublicUploadAssets } from './controllers/checkinController'
 import bundleProductRoutes from './modules/bundle-product/routes'
@@ -20,7 +22,8 @@ import { legacyUploadGuard } from './middleware/legacyUploadGuard'
 
 // Redis缓存服务
 import { cacheService } from './services/cacheService'
-import { closeQueues } from './config/queue'
+import { closeQueues, exportQueue, imageQueue, videoQueue } from './config/queue'
+import { prismaPoolMetricLines, createQueueMetricSampler } from './services/resourceMetrics'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
@@ -85,6 +88,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
 app.use(cors({ origin: config.corsOrigin, credentials: true }))
+app.post('/api/security/csp-report', createRedisRateLimiter({ name: 'csp_report', limit: 600, windowSeconds: 900 }), express.json({ type: 'application/csp-report', limit: '8kb' }), recordCspReport)
 const jsonBodyParser = express.json({ limit: '2mb' })
 const urlencodedBodyParser = express.urlencoded({ extended: true, limit: '1mb' })
 app.use((req, res, next) => {
@@ -177,9 +181,14 @@ app.get('/ready', async (_req, res) => {
 // Prometheus-compatible process metrics.  The backend is only reachable from
 // the Compose network in production; the endpoint intentionally contains no
 // request payload, account, or assessment data.
+const queueMetricLines = createQueueMetricSampler({ export: exportQueue, image: imageQueue, video: videoQueue })
 app.get('/metrics', async (_req, res) => {
   const lines = [
     ...runtimeMetricLines(),
+    ...cspMetricLines(),
+    ...await prismaPoolMetricLines(prisma),
+    ...await queueMetricLines(),
+    `ptool_cache_redis_connected ${cacheService.getStatus().connected ? 1 : 0}`,
     ...await postgresActivityMetricLines(prisma),
     '# HELP ptool_socket_redis_state Socket Redis adapter state (1 for current state).',
     '# TYPE ptool_socket_redis_state gauge',

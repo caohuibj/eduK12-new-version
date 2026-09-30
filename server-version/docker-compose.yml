@@ -43,7 +43,7 @@ x-app-environment: &app-environment
   CREDENTIAL_HANDOFF_DIR: /app/.local
   CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
   CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
-  TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
+  TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
   # Conservative pre-measurement defaults. Final 4C4G pool/admission values
   # must be set from the production measurement pass; these are not certified optima.
   UNIT_SUBMIT_ADMISSION_LIMIT: ${UNIT_SUBMIT_ADMISSION_LIMIT:-7}
@@ -70,6 +70,23 @@ x-app-environment: &app-environment
   EXPORT_MAX_FIELDS: ${EXPORT_MAX_FIELDS:-2000}
   EXPORT_MAX_BYTES: ${EXPORT_MAX_BYTES:-52428800}
   EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-24}
+  UPLOAD_MAX_CONCURRENT: ${UPLOAD_MAX_CONCURRENT:-2}
+  UPLOAD_IMAGE_MAX_PIXELS: ${UPLOAD_IMAGE_MAX_PIXELS:-16000000}
+  LOGIN_IP_REQUEST_LIMIT: ${LOGIN_IP_REQUEST_LIMIT:-3000}
+  LOGIN_PASSWORD_MAX_WAIT_MS: ${LOGIN_PASSWORD_MAX_WAIT_MS:-30000}
+  UPLOAD_REQUEST_LIMIT: ${UPLOAD_REQUEST_LIMIT:-30}
+  UPLOAD_BYTE_BUDGET: ${UPLOAD_BYTE_BUDGET:-629145600}
+  REGISTRATION_GLOBAL_LIMIT: ${REGISTRATION_GLOBAL_LIMIT:-6000}
+  REGISTRATION_IP_LIMIT: ${REGISTRATION_IP_LIMIT:-3000}
+  REGISTRATION_RESOURCE_LIMIT: ${REGISTRATION_RESOURCE_LIMIT:-3000}
+  REGISTRATION_MAX_CONCURRENT: ${REGISTRATION_MAX_CONCURRENT:-2}
+  REGISTRATION_MAX_QUEUE: ${REGISTRATION_MAX_QUEUE:-16}
+  REGISTRATION_MAX_WAIT_MS: ${REGISTRATION_MAX_WAIT_MS:-3000}
+  REGISTRATION_ACCOUNT_LIMIT: ${REGISTRATION_ACCOUNT_LIMIT:-10}
+  REGISTRATION_TEACHER_CODE_LIMIT: ${REGISTRATION_TEACHER_CODE_LIMIT:-120}
+  LOGIN_PASSWORD_MAX_CONCURRENT: ${LOGIN_PASSWORD_MAX_CONCURRENT:-4}
+  LOGIN_PASSWORD_MAX_QUEUE: ${LOGIN_PASSWORD_MAX_QUEUE:-32}
+  PASSWORD_CHANGE_REQUEST_LIMIT: ${PASSWORD_CHANGE_REQUEST_LIMIT:-10}
   EXPORT_DIR: /app/exports
   COS_SECRET_ID: ${COS_SECRET_ID:-}
   COS_SECRET_KEY: ${COS_SECRET_KEY:-}
@@ -83,9 +100,9 @@ x-app-environment: &app-environment
   VIDEO_BITRATE: ${VIDEO_BITRATE:-800k}
   VIDEO_AUDIO_BITRATE: ${VIDEO_AUDIO_BITRATE:-96k}
   VIDEO_SMART_COMPRESSION: ${VIDEO_SMART_COMPRESSION:-true}
-  VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-2}
+  VIDEO_CONCURRENCY: ${VIDEO_CONCURRENCY:-1}
   VIDEO_TIMEOUT: ${VIDEO_TIMEOUT:-1800}
-  IMAGE_CONCURRENCY: ${IMAGE_CONCURRENCY:-2}
+  IMAGE_CONCURRENCY: ${IMAGE_CONCURRENCY:-1}
   IMAGE_TIMEOUT: ${IMAGE_TIMEOUT:-30}
   EXPORT_CONCURRENCY: ${EXPORT_CONCURRENCY:-1}
   EXPORT_TIMEOUT: ${EXPORT_TIMEOUT:-1800}
@@ -93,6 +110,9 @@ x-app-environment: &app-environment
 
 services:
   postgres:
+    cpus: ${POSTGRES_CPUS:-1.0}
+    mem_limit: ${POSTGRES_MEM_LIMIT:-1024m}
+    command: ["postgres", "-c", "shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}", "-c", "work_mem=${POSTGRES_WORK_MEM:-4MB}", "-c", "maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}", "-c", "max_connections=${POSTGRES_MAX_CONNECTIONS:-80}"]
     image: postgres:16.15-bookworm
     container_name: ptool-postgres
     environment:
@@ -110,9 +130,11 @@ services:
     # 默认不发布 Host port（仅容器内网可达）
 
   redis:
+    cpus: ${REDIS_CPUS:-0.25}
+    mem_limit: ${REDIS_MEM_LIMIT:-256m}
     image: redis:7.4.11-bookworm
     container_name: ptool-redis
-    command: redis-server --appendonly yes
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "${REDIS_MAXMEMORY:-128mb}", "--maxmemory-policy", "noeviction"]
     volumes:
       - redis_data:/data
     healthcheck:
@@ -124,6 +146,8 @@ services:
     # 默认不发布 Host port
 
   backend:
+    cpus: ${BACKEND_CPUS:-1.75}
+    mem_limit: ${BACKEND_MEM_LIMIT:-1024m}
     image: server-version-backend:latest
     build:
       context: ./backend
@@ -132,6 +156,7 @@ services:
     container_name: ptool-backend
     environment:
       <<: *app-environment
+      NODE_OPTIONS: --max-old-space-size=${BACKEND_NODE_HEAP_MB:-640}
       BACKGROUND_WORKERS_ENABLED: ${BACKGROUND_WORKERS_ENABLED:-false}
     volumes:
       - uploads_data:/app/uploads
@@ -169,6 +194,8 @@ services:
   # BACKGROUND_WORKERS_ENABLED=false so FINAL_ONLY submit does not share this
   # process's Prisma pool with transcode/export.
   worker:
+    cpus: ${WORKER_CPUS:-0.75}
+    mem_limit: ${WORKER_MEM_LIMIT:-768m}
     image: server-version-backend:latest
     build:
       context: ./backend
@@ -178,6 +205,7 @@ services:
     command: ["node", "dist/workers/main.js"]
     environment:
       <<: *app-environment
+      NODE_OPTIONS: --max-old-space-size=${WORKER_NODE_HEAP_MB:-192}
       BACKGROUND_WORKERS_ENABLED: "true"
       PRISMA_CONNECTION_POOL_SIZE: ${WORKER_PRISMA_CONNECTION_POOL_SIZE:-4}
     volumes:
@@ -194,6 +222,8 @@ services:
     restart: unless-stopped
 
   frontend:
+    cpus: ${FRONTEND_CPUS:-0.25}
+    mem_limit: ${FRONTEND_MEM_LIMIT:-128m}
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -202,7 +232,7 @@ services:
         VITE_COGNITIVE_MODULE_ENABLED: ${VITE_COGNITIVE_MODULE_ENABLED:-true}
     container_name: ptool-frontend
     ports:
-      - "${FRONTEND_HTTP_PORT:-80}:80"
+      - "${FRONTEND_BIND_ADDRESS:-127.0.0.1}:${FRONTEND_HTTP_PORT:-80}:80"
     depends_on:
       backend:
         condition: service_healthy

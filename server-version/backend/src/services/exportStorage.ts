@@ -5,8 +5,11 @@ import { exportRoot, validateStorageKey } from './exportArtifactService'
 import { runtimeResourceConfig } from '../config/runtimeResources'
 
 const parsePositiveInt = (name: string, fallback: number): number => {
-  const value = Number(process.env[name])
-  return Number.isInteger(value) && value > 0 ? value : fallback
+  const raw = process.env[name]
+  if (raw === undefined || raw === '') return fallback
+  const value = Number(raw)
+  if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`${name} must be a positive safe integer`)
+  return value
 }
 
 export const EXPORT_MAX_RECORDS = parsePositiveInt('EXPORT_MAX_RECORDS', 10_000)
