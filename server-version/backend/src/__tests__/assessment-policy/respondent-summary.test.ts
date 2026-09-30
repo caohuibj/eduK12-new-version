@@ -16,6 +16,8 @@ describe('own Run feedback summary',()=>{
     mocks.resolve.mockResolvedValue({resolved:[{executionId:'e',respondent:{userId:'own'},metrics:[{key:'score',value:4,resultQuality:'interpretable'},{key:'secret',value:5,resultQuality:'interpretable'}]}]})
     expect(await readRespondentRunSummary('own','e')).toEqual({schemaVersion:1,mode:'INDIVIDUAL_SUMMARY',state:'READY',metrics:{score:4}})
     expect(mocks.query.mock.calls[0][1]).toBe('e');expect(mocks.query.mock.calls[0][2]).toBe('own')
+    mocks.query.mockResolvedValueOnce([{organizationId:'org',runId:'run',trackId:'track',subjectUserId:'subject',relationship:'SELF',perspective:'SELF_REPORT',family:'BUNDLE',key:'key',version:'1',policy,hash:canonicalHash(policy)}]).mockResolvedValueOnce([])
+    await expect(readRespondentRunSummary('own','e')).rejects.toMatchObject({statusCode:404})
     mocks.query.mockResolvedValue([])
     await expect(readRespondentRunSummary('other','e')).rejects.toMatchObject({statusCode:404})
   })

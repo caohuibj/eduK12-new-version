@@ -7,7 +7,7 @@ import { reportingFail } from './types'
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
 export async function readRespondentRunSummary(userId: string, executionId: string) {
-  const own = await prisma.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
+  const readOwn = () => prisma.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
     SELECT e.organization_id AS "organizationId",e.run_id AS "runId",e.track_id AS "trackId",s.user_id AS "subjectUserId",
       a.relationship_kind AS relationship,a.perspective,t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
       t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash
@@ -22,7 +22,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
       AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=e.organization_id AND d.user_id=${userId}
         AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))
   `
-  const row = own[0]
+  const row = (await readOwn())[0]
   if (!row?.policy?.resultDisclosure || canonicalHash(row.policy) !== row.hash) return hidden()
   const entry = relationalProductRegistry.findExact({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
   if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(row.policy.resultDisclosure)) return hidden()
@@ -35,5 +35,11 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   const result = batch.resolved.find(r => r.executionId === executionId && r.respondent.userId === userId)
   if (!result) return hidden()
   const metrics = Object.fromEntries(result.metrics.filter(m=>m.resultQuality!=='invalid').map(m=>[m.key,m.value]))
+  // Recheck revocation after awaiting canonical result reads.
+  const current = (await readOwn())[0]
+  const currentEntry = relationalProductRegistry.findExact({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+  if (!current || current.hash !== row.hash || canonicalHash(current.policy) !== current.hash
+      || !currentEntry || currentEntry.releaseStatus !== 'PUBLISHED' || !currentEntry.resultDisclosure
+      || canonicalHash(currentEntry.resultDisclosure) !== canonicalHash(contract)) return hidden()
   return projectAudienceResult({contract,audience:'RESPONDENT',metrics})
 }
