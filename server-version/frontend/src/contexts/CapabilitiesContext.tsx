@@ -8,7 +8,7 @@ interface CapabilitiesContextType {
 }
 
 const CapabilitiesContext = createContext<CapabilitiesContextType>({
-  cognitiveEnabled: cognitiveBuildEnabled,
+  cognitiveEnabled: false,
   isLoading: false,
 })
 
@@ -17,25 +17,27 @@ export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    let cancelled = false
-    capabilitiesApi.get()
-      .then((response) => {
-        if (cancelled) return
-        if (response.code === 0 && typeof response.data?.cognitive === 'boolean') {
-          setCognitiveEnabled(response.data.cognitive)
-        } else {
-          setCognitiveEnabled(cognitiveBuildEnabled)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setCognitiveEnabled(cognitiveBuildEnabled)
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false)
-      })
-    return () => {
-      cancelled = true
+    const controller = new AbortController()
+    const load = async () => {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        let timer: ReturnType<typeof setTimeout> | undefined
+        try {
+          const response = await Promise.race([
+            capabilitiesApi.get(controller.signal),
+            new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('Capability request timed out')), 3000) }),
+          ])
+          if (controller.signal.aborted) return
+          if (response.code !== 0 || typeof response.data?.cognitive !== 'boolean') throw new Error('Invalid capabilities')
+          setCognitiveEnabled(cognitiveBuildEnabled && response.data.cognitive)
+          setIsLoading(false)
+          return
+        } catch { if (controller.signal.aborted) return }
+        finally { clearTimeout(timer) }
+      }
+      if (!controller.signal.aborted) { setCognitiveEnabled(false); setIsLoading(false) }
     }
+    void load()
+    return () => controller.abort()
   }, [])
 
   return (

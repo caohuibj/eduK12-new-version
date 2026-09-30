@@ -159,12 +159,14 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>
 }
 
-function AppRoutes() {
-  const { cognitiveEnabled: cognitiveModuleEnabled, isLoading } = useCapabilities()
+const CognitiveCapabilityRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { cognitiveEnabled, isLoading } = useCapabilities()
+  if (isLoading) return <RouteLoading />
+  if (!cognitiveEnabled) return <ProductPage><ProductStatus kind="warning" title="认知测评暂不可用">服务能力暂未确认，请稍后刷新重试。其他功能可以继续使用。</ProductStatus></ProductPage>
+  return <>{children}</>
+}
 
-  if (isLoading) {
-    return <RouteLoading />
-  }
+function AppRoutes() {
 
   return (
     <React.Suspense fallback={<RouteLoading />}>
@@ -386,13 +388,13 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-          {cognitiveModuleEnabled && (
+          {(
             <>
               <Route
                 path="/cognitive-assignments"
                 element={
                   <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                    <CognitiveAssignmentList />
+                    <CognitiveCapabilityRoute><CognitiveAssignmentList /></CognitiveCapabilityRoute>
                   </ProtectedRoute>
                 }
               />
@@ -400,7 +402,7 @@ function AppRoutes() {
                 path="/cognitive-assignments/:id"
                 element={
                   <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                    <CognitiveAssignmentEdit />
+                    <CognitiveCapabilityRoute><CognitiveAssignmentEdit /></CognitiveCapabilityRoute>
                   </ProtectedRoute>
                 }
               />
@@ -719,14 +721,14 @@ function AppRoutes() {
             element={<StudentProtectedRoute><CompositeReportPage /></StudentProtectedRoute>}
           />
 
-          {/* Cognitive 路由（Option A：flag=false 时不注册，/student/cognitive* 落 * → /） */}
-          {cognitiveModuleEnabled && (
+          {/* Cognitive 能力仅局部控制；保留深链接以等待有界的能力确认。 */}
+          {(
             <>
               <Route
                 path="/student/cognitive"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveHome />
+                    <CognitiveCapabilityRoute><CognitiveHome /></CognitiveCapabilityRoute>
                   </StudentProtectedRoute>
                 }
               />
@@ -734,7 +736,7 @@ function AppRoutes() {
                 path="/student/cognitive/assignments/:assignmentId"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveAssignmentEntry />
+                    <CognitiveCapabilityRoute><CognitiveAssignmentEntry /></CognitiveCapabilityRoute>
                   </StudentProtectedRoute>
                 }
               />
@@ -742,7 +744,7 @@ function AppRoutes() {
                 path="/student/cognitive/history"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveHistory />
+                    <CognitiveCapabilityRoute><CognitiveHistory /></CognitiveCapabilityRoute>
                   </StudentProtectedRoute>
                 }
               />
@@ -750,7 +752,7 @@ function AppRoutes() {
                 path="/student/cognitive/sessions/:sessionId"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveRunner />
+                    <CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute>
                   </StudentProtectedRoute>
                 }
               />
@@ -758,17 +760,17 @@ function AppRoutes() {
                 path="/student/cognitive/sessions/:sessionId/result"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveResult />
+                    <CognitiveCapabilityRoute><CognitiveResult /></CognitiveCapabilityRoute>
                   </StudentProtectedRoute>
                 }
               />
               <Route
                 path="/relational/cognitive/sessions/:sessionId"
-                element={<RelationalProtectedRoute><CognitiveRunner /></RelationalProtectedRoute>}
+                element={<RelationalProtectedRoute><CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute></RelationalProtectedRoute>}
               />
-              <Route path="/public/cognitive/assignments/:token" element={<PublicCognitiveAssignment />} />
-              <Route path="/public/cognitive/sessions/:sessionId" element={<CognitiveRunner />} />
-              <Route path="/public/cognitive/sessions/:sessionId/result" element={<CognitiveResult />} />
+              <Route path="/public/cognitive/assignments/:token" element={<CognitiveCapabilityRoute><PublicCognitiveAssignment /></CognitiveCapabilityRoute>} />
+              <Route path="/public/cognitive/sessions/:sessionId" element={<CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute>} />
+              <Route path="/public/cognitive/sessions/:sessionId/result" element={<CognitiveCapabilityRoute><CognitiveResult /></CognitiveCapabilityRoute>} />
             </>
           )}
 

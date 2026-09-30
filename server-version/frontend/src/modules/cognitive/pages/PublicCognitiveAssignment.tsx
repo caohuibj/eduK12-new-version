@@ -125,7 +125,7 @@ const PublicCognitiveAssignment: React.FC = () => {
       <Play className="w-4 h-4 inline mr-1" />{recoveryInput ? '继续测评' : '开始匿名测评'}
     </button>
     {(startIntent || recoveryInput) && info && <div className="mt-4 text-sm text-gray-600 space-y-2">
-      <p>本设备会保留本次匿名作答的恢复记录。由另一位参与者使用前，请明确开始新的作答，并保存原参与者的恢复凭证。</p>
+      <p>恢复凭证可恢复服务器中的测评身份，但未提交草稿及已封存、尚未送达的最终提交只保存在原设备。换设备不能恢复这些本地内容。本设备会保留本次匿名作答的恢复记录。由另一位参与者使用前，请明确开始新的作答，并保存原参与者的恢复凭证。</p>
       <button type="button" disabled={starting} onClick={() => void newParticipant()} className="btn-secondary w-full">为另一位参与者开始新作答</button>
     </div>}
   </div>

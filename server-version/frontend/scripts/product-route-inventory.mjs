@@ -34,7 +34,8 @@ function visit(node) {
       }
     }
     const p = routePath.text
-    const page = tags.find((t) => !guards.has(t)) || '—'
+    if (tags.includes('CognitiveCapabilityRoute')) cognitive = true
+    const page = tags.find((t) => !guards.has(t) && t !== 'CognitiveCapabilityRoute') || '—'
     const access = uiLab ? 'Visual QA / local development only'
       : guard === 'ProtectedRoute' ? (element.getText(ast).includes("['ADMIN']") ? 'ADMIN' : 'TEACHER / ADMIN')
       : guard === 'ParentProtectedRoute' ? 'PARENT'

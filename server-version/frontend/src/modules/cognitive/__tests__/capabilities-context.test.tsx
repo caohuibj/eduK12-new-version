@@ -38,7 +38,7 @@ describe('CapabilitiesProvider', () => {
     )
 
     expect(screen.getByText('cognitive:false loading:true')).toBeInTheDocument()
-    expect(mockGet).toHaveBeenCalledWith('/capabilities')
+    expect(mockGet).toHaveBeenCalledWith('/capabilities', expect.objectContaining({ timeout: 3000 }))
   })
 
   it('uses the backend cognitive flag as the runtime source of truth', async () => {
@@ -55,7 +55,7 @@ describe('CapabilitiesProvider', () => {
     })
   })
 
-  it('falls back to the build-time flag when the capabilities endpoint fails', async () => {
+  it('fails closed locally after bounded retries when capabilities fail', async () => {
     mockGet.mockRejectedValue(new Error('network'))
 
     render(
@@ -65,7 +65,20 @@ describe('CapabilitiesProvider', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('cognitive:true loading:false')).toBeInTheDocument()
+      expect(screen.getByText('cognitive:false loading:false')).toBeInTheDocument()
     })
   })
+})
+
+it('bounds an indefinitely hanging capability request while unrelated children remain rendered', async () => {
+  mockGet.mockClear()
+  vi.useFakeTimers()
+  mockGet.mockReturnValue(new Promise(() => {}))
+  const { act } = await import('@testing-library/react')
+  const view = render(<CapabilitiesProvider><p>登录入口</p><Probe /></CapabilitiesProvider>)
+  expect(screen.getByText('登录入口')).toBeVisible()
+  await act(async () => { await vi.advanceTimersByTimeAsync(6100) })
+  expect(screen.getByText('cognitive:false loading:false')).toBeVisible()
+  expect(mockGet).toHaveBeenCalledTimes(2)
+  view.unmount(); vi.useRealTimers()
 })
