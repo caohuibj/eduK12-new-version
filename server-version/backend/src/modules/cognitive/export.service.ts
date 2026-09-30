@@ -1,3 +1,4 @@
+import { exportRoot } from '../../services/exportArtifactService'
 import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../../config/database'
@@ -104,7 +105,7 @@ interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'sc
 }
 
 const MAX_FIELD_NAME_LENGTH = 64
-const EXPORT_DIR = path.join(__dirname, '../../../exports')
+const EXPORT_DIR = exportRoot()
 
 export const isAllowedCognitiveExportFileName = (fileName: string): boolean =>
   /^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)

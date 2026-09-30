@@ -1,22 +1,14 @@
+import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
 import { Router } from 'express'
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
 import { authenticate, requireTeacher, requireStudent } from '../middleware/auth'
 import { studentTaskList } from '../controllers/studentTaskController'
-import multer from 'multer'
-import { validateUploadedFile } from '../utils/fileValidator'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
 
-const coverUpload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
-  },
-  // Client MIME is only a hint; validateUploadedFile checks magic bytes.
-  fileFilter: (_req, _file, cb) => cb(null, true),
-})
+
 
 const allowedCoverTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const courseCodeVerifyLimiter = createRedisRateLimiter({
@@ -50,7 +42,7 @@ router.delete('/:id', authenticate, requireTeacher, courseController.delete)
 router.post('/join', authenticate, courseController.join)
 
 // 上传课程封面
-router.post('/:id/cover', authenticate, requireTeacher, coverUpload.single('cover'), validateUploadedFile(allowedCoverTypes), courseController.uploadCover)
+router.post('/:id/cover', authenticate, requireTeacher, uploadPrincipalRateLimit, boundedUpload('cover', 5 * 1024 * 1024, allowedCoverTypes, courseController.uploadCover))
 
 // 结束课程
 router.post('/:id/end', authenticate, requireTeacher, courseController.endCourse)

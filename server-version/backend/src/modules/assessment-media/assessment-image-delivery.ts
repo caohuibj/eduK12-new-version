@@ -1,3 +1,4 @@
+import { streamResponse } from '../../utils/streamResponse'
 import { Readable } from 'node:stream'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
@@ -42,8 +43,7 @@ const proxyCosImage = async (asset: StoredAssetRecord, res: Response): Promise<R
   res.setHeader('Content-Length', String(asset.sizeBytes))
   res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.id)}"`)
   const stream = Readable.fromWeb(upstream.body as Parameters<typeof Readable.fromWeb>[0])
-  stream.on('error', () => res.destroy())
-  return stream.pipe(res)
+  return streamResponse(stream, res)
 }
 
 export const serveAssessmentImageContent = async (params: {

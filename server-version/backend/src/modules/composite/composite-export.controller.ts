@@ -1,6 +1,6 @@
+import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
-import * as fs from 'fs'
 import * as path from 'path'
 import { z } from 'zod'
 import { error, notFound, success, unauthorized } from '../../utils/response'
@@ -78,6 +78,13 @@ export const compositeExportController = {
       const data = projectCompositeExportData(raw, binding)
       const files = await compositeExportService.saveExportFiles(req.params.id, exportOptions, input.format, data)
       const boundPath = bindCompositeExportFilePath(files.filePath, binding)
+      await registerAssessmentExport({
+        resourceType: 'COMPOSITE', resourceId: req.params.id,
+        actor: exportOptions.actor, anonymized: anonymize, filePath: boundPath,
+        format: input.format, detail: input.detail, dateRange: input.dateRange,
+        projectionFingerprint: binding.fingerprint,
+        attemptIds: data.rows.map((row) => String(row.A_attempt_id)),
+      })
       return success(res, {
         assessmentId: data.assessmentId,
         detail: input.detail,
@@ -102,8 +109,12 @@ export const compositeExportController = {
       if (!safeName || !compositeExportFileNameMatchesProjection(fileName, binding)) {
         return notFound(res, '文件不存在')
       }
-      const filePath = path.join(__dirname, '../../../exports', fileName)
-      if (!fs.existsSync(filePath)) return notFound(res, '文件不存在')
+      const filePath = await resolveAssessmentExport({
+        resourceType: 'COMPOSITE', resourceId: req.params.id, fileName,
+        actor: { userId: req.user.userId, role: req.user.role },
+        projectionFingerprint: binding.fingerprint,
+      })
+      if (!filePath) return notFound(res, '文件不存在')
       return res.download(filePath)
     } catch (err) { return handleError(res, err) }
   },

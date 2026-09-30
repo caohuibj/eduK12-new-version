@@ -975,6 +975,8 @@ model ExportArtifact {
   createdAt    DateTime             @default(now()) @map("created_at")
   expiresAt    DateTime             @map("expires_at")
 
+  provenance Json?
+
   creator User @relation("ExportArtifactCreator", fields: [createdBy], references: [id], onDelete: Restrict)
 
   @@index([resourceType, resourceId])

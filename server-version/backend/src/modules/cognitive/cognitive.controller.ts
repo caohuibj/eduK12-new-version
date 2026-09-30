@@ -1,3 +1,4 @@
+import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
 import { success, error, unauthorized, notFound, completionBusy, assessmentSubmitBusy, instrumentError } from '../../utils/response'
 import { UserRole } from '../../types'
@@ -33,7 +34,6 @@ import {
 } from './cognitive.schema'
 import { z } from 'zod'
 import { getPaginationParams, buildPaginatedResult } from '../../utils/pagination'
-import * as fs from 'fs'
 import * as path from 'path'
 import { isAllowedCognitiveExportFileName } from './export.service'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -401,6 +401,15 @@ export const cognitiveController = {
         result.fileName = path.basename(files.zipPath)
       }
 
+      const generatedPath = files.csvPath || files.savPath || files.xlsxPath || files.zipPath
+      if (!generatedPath) throw new Error('Missing generated export')
+      await registerAssessmentExport({
+        resourceType: 'COGNITIVE', resourceId: req.params.id,
+        actor: { userId: req.user.userId, role: req.user.role },
+        anonymized: anonymize, filePath: generatedPath, format: input.format,
+        detail: input.detail, dateRange: input.dateRange,
+        projectionFingerprint: 'cognitive-frozen-export-v1',
+      })
       return success(res, result, '导出成功')
     } catch (err) {
       return handleError(res, err)
@@ -425,9 +434,12 @@ export const cognitiveController = {
         return notFound(res, '文件不存在')
       }
 
-      const exportDir = path.join(__dirname, '../../../exports')
-      const filePath = path.join(exportDir, fileName)
-      if (!fs.existsSync(filePath)) return notFound(res, '文件不存在')
+      const filePath = await resolveAssessmentExport({
+        resourceType: 'COGNITIVE', resourceId: assignmentId, fileName,
+        actor: { userId: req.user.userId, role: req.user.role },
+        projectionFingerprint: 'cognitive-frozen-export-v1',
+      })
+      if (!filePath) return notFound(res, '文件不存在')
 
       return res.download(filePath)
     } catch (err) {

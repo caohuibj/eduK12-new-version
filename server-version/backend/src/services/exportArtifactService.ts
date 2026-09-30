@@ -14,7 +14,7 @@ export type ExportResourceType = 'SCALE' | 'QUESTIONNAIRE'
 export type ExportActor = { userId: string; role: UserRole }
 
 const EXPORT_ROOT = path.resolve(process.env.EXPORT_DIR || path.join(__dirname, '../../exports'))
-const ALLOWED_EXTENSIONS = new Set(['.csv', '.sav', '.sps'])
+const ALLOWED_EXTENSIONS = new Set(['.csv', '.sav', '.sps', '.xlsx', '.zip'])
 
 export const exportRoot = (): string => EXPORT_ROOT
 
@@ -107,6 +107,7 @@ export async function authorizeExportDownload(actor: ExportActor, artifact: { cr
 export async function resolveArtifactForDownload(artifactId: string, actor: ExportActor) {
   const artifact = await prisma.exportArtifact.findUnique({ where: { id: artifactId } })
   if (!artifact) return { artifact: null, filePath: null, reason: 'not-found' as const }
+  if (artifact.resourceType !== 'SCALE' && artifact.resourceType !== 'QUESTIONNAIRE') return { artifact: null, filePath: null, reason: 'not-found' as const }
   if (artifact.status !== ExportArtifactStatus.READY) return { artifact: null, filePath: null, reason: artifact.status === ExportArtifactStatus.PROCESSING ? 'processing' as const : 'failed' as const }
   const resource = artifact.resourceType === 'SCALE'
     ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
@@ -125,6 +126,7 @@ export async function resolveArtifactForDownload(artifactId: string, actor: Expo
 export async function getExportArtifactStatus(artifactId: string, actor: ExportActor) {
   const artifact = await prisma.exportArtifact.findUnique({ where: { id: artifactId } })
   if (!artifact) return { artifact: null, reason: 'not-found' as const }
+  if (artifact.resourceType !== 'SCALE' && artifact.resourceType !== 'QUESTIONNAIRE') return { artifact: null, reason: 'not-found' as const }
   const resource = artifact.resourceType === 'SCALE'
     ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
     : await prisma.questionnaire.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })

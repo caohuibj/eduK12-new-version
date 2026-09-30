@@ -385,7 +385,7 @@ export const authController = {
       }
 
       const { oldPassword, newPassword } = req.body
-      if (!oldPassword || !newPassword) {
+      if (typeof oldPassword !== 'string' || !oldPassword || oldPassword.length > 128 || !newPassword) {
         return error(res, '请提供旧密码和新密码')
       }
 

@@ -1,7 +1,7 @@
+import { boundedUpload, uploadPrincipalRateLimit, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { Router, Request } from 'express'
 import { success, error } from '../utils/response'
 import { authenticate, requireTeacher } from '../middleware/auth'
-import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 
@@ -62,16 +62,7 @@ const resolveImagePath = (filename: string): string | null => {
 }
 
 // 配置图片存储
-const imageUpload = multer({
-  // New uploads go straight into StoredAsset. Memory storage prevents a
-  // partially handled file from appearing in the legacy public /uploads tree.
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-  },
-  // Client MIME is only a hint; the route checks magic bytes after Multer.
-  fileFilter: (_req, _file, cb) => cb(null, true),
-})
+
 
 const canManageAsset = (req: Request, ownerId: string | null): boolean =>
   req.user?.role === UserRole.ADMIN || ownerId === req.user?.userId
@@ -322,7 +313,7 @@ router.put('/images/:filename', async (req, res) => {
 // Upload into the unified StoredAsset catalog using bounded memory storage.
 // The 10 MB route limit keeps this compatibility endpoint below the ordinary
 // API body ceiling while the bytes are validated before persistence.
-router.post('/image', imageUpload.single('image'), async (req, res) => {
+router.post('/image', uploadPrincipalRateLimit, boundedUpload('image', 10 * 1024 * 1024, acceptedImageTypes, async (req, res) => {
   let asset: Awaited<ReturnType<typeof storeAsset>> | undefined
   try {
     const file = req.file
@@ -361,7 +352,7 @@ router.post('/image', imageUpload.single('image'), async (req, res) => {
     logger.error('上传图片错误', err)
     return error(res, '上传失败')
   }
-})
+}))
 
 // 查询图片处理状态
 router.get('/image/status/:imageId', async (req, res) => {

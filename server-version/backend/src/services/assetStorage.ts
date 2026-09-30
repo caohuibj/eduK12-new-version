@@ -1,3 +1,4 @@
+import { streamResponse } from '../utils/streamResponse'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
@@ -43,6 +44,7 @@ export class AssetReferenceValidationError extends Error {
 }
 
 export interface StoreAssetInput {
+  initialReference?: { entityType: string; entityId: string; field: string }
   buffer: Buffer
   originalName?: string
   mimeType: string
@@ -126,6 +128,7 @@ export const storeAsset = async (input: StoreAssetInput) => {
         ownerId: input.ownerId,
         accessScope: input.accessScope || 'PRIVATE',
         scopeId: input.scopeId,
+        ...(input.initialReference ? { references: { create: input.initialReference } } : {}),
       },
     })
   } catch (error) {
@@ -616,7 +619,7 @@ export const serveStoredAssetContent = async (
   res.setHeader('Content-Type', asset.mimeType)
   res.setHeader('Content-Length', String(asset.sizeBytes))
   res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.originalName || asset.id)}"`)
-  return fs.createReadStream(localPath).pipe(res)
+  return streamResponse(fs.createReadStream(localPath), res)
 }
 
 export const serveAsset = async (req: Request, res: Response) => {

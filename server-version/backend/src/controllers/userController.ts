@@ -329,7 +329,7 @@ export const userController = {
       const userId = req.user?.userId
       const { oldPassword, newPassword } = req.body
 
-      if (!oldPassword || !newPassword) {
+      if (typeof oldPassword !== 'string' || !oldPassword || oldPassword.length > 128 || !newPassword) {
         return error(res, '请输入原密码和新密码')
       }
 
