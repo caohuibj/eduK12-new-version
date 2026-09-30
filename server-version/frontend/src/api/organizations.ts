@@ -92,6 +92,17 @@ export interface StaffClassAssignment {
   validUntil: string | null
 }
 
+export interface AssessmentDeliveryGrant {
+  id: string
+  teacherMembershipId: string
+  classUnitId: string
+  permission: 'CLASS_ASSESSMENT_DELIVERY'
+  grantedByUserId: string
+  grantedAt: string
+  revokedByUserId: string | null
+  revokedAt: string | null
+}
+
 export interface PersonaGrantHistory {
   id: string
   persona: OrganizationPersona
@@ -277,4 +288,19 @@ export const organizationApi = {
   async endStaffAssignment(organizationId: string, assignmentId: string): Promise<StaffClassAssignment> {
     return requireData(await apiClient.post<StaffClassAssignment>(`${orgPath(organizationId)}/staff-class-assignments/${encodeURIComponent(assignmentId)}/end`))
   },
+  async listAssessmentDeliveryGrants(organizationId: string): Promise<{ list: AssessmentDeliveryGrant[]; total: number }> {
+    return requireData(await apiClient.get(`${orgPath(organizationId)}/assessment-delivery-grants`))
+  },
+
+  async grantAssessmentDelivery(organizationId: string, teacherMembershipId: string, classUnitId: string): Promise<AssessmentDeliveryGrant> {
+    return requireData(await apiClient.post(`${orgPath(organizationId)}/assessment-delivery-grants`, {
+      teacherMembershipId,
+      classUnitId,
+    }))
+  },
+
+  async revokeAssessmentDelivery(organizationId: string, grantId: string): Promise<AssessmentDeliveryGrant> {
+    return requireData(await apiClient.post(`${orgPath(organizationId)}/assessment-delivery-grants/${encodeURIComponent(grantId)}/revoke`))
+  },
+
 }
