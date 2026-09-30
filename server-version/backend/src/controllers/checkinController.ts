@@ -180,6 +180,7 @@ const publicSubmissionImageSchema = z.object({
 }).strict()
 
 export const STUDENT_UPLOAD_REFERENCE_ENTITY = 'CheckinStudentUploadSession'
+export const STUDENT_UPLOAD_PENDING_ENTITY = 'CheckinStudentUploadPending'
 export const PUBLIC_UPLOAD_REFERENCE_ENTITY = 'CheckinUploadSession'
 export const PUBLIC_UPLOAD_REFERENCE_FIELD = 'staging'
 export const MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION = 9
@@ -227,6 +228,7 @@ export async function stageStudentUploadAsset(db: AssetDatabase, checkinId: stri
   const count = await db.assetReference.count({ where: { entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId } })
   if (count >= 9) throw new PublicUploadSessionLimitError()
   await attachAssetReference({ assetId, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId, field: 'staging' }, db)
+  await db.assetReference.deleteMany({ where: { assetId, entityType: STUDENT_UPLOAD_PENDING_ENTITY, entityId } })
 }
 
 let lastPublicUploadCleanupAt = 0
@@ -239,7 +241,7 @@ export const cleanupStalePublicUploadAssets = async (): Promise<void> => {
 
   const cutoff = new Date(now - PUBLIC_UPLOAD_STAGING_TTL_MS)
   const staleReferences = await prisma.assetReference.findMany({
-    where: { entityType: { in: [PUBLIC_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_REFERENCE_ENTITY] }, createdAt: { lt: cutoff } },
+    where: { entityType: { in: [PUBLIC_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_PENDING_ENTITY] }, createdAt: { lt: cutoff } },
     select: { id: true, asset: { select: { id: true, objectKey: true, provider: true } } },
     orderBy: { createdAt: 'asc' }, take: 100,
   })
@@ -1071,6 +1073,7 @@ export const checkinController = {
         ownerId: userId,
         accessScope: 'COURSE',
         scopeId: checkin.courseId,
+        initialReference: { entityType: STUDENT_UPLOAD_PENDING_ENTITY, entityId: `${id}:${userId}`, field: 'pending' },
       })
       uploadedAsset = asset
       await prisma.$transaction(tx => stageStudentUploadAsset(tx, id, userId, asset.id))
@@ -1088,7 +1091,7 @@ export const checkinController = {
       }, '上传成功')
     } catch (err) {
       if (uploadedAsset) {
-        await prisma.assetReference.deleteMany({ where: { assetId: uploadedAsset.id, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY } }).catch(() => undefined)
+        await prisma.assetReference.deleteMany({ where: { assetId: uploadedAsset.id, entityType: { in: [STUDENT_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_PENDING_ENTITY] } } }).catch(() => undefined)
         await discardUnreferencedAsset(uploadedAsset).catch(() => undefined)
       }
       if (err instanceof PublicUploadSessionLimitError) return error(res, '每个打卡最多暂存9张图片', -1, 409)

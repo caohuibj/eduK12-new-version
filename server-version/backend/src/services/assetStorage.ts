@@ -44,6 +44,7 @@ export class AssetReferenceValidationError extends Error {
 }
 
 export interface StoreAssetInput {
+  initialReference?: { entityType: string; entityId: string; field: string }
   buffer: Buffer
   originalName?: string
   mimeType: string
@@ -127,6 +128,7 @@ export const storeAsset = async (input: StoreAssetInput) => {
         ownerId: input.ownerId,
         accessScope: input.accessScope || 'PRIVATE',
         scopeId: input.scopeId,
+        ...(input.initialReference ? { references: { create: input.initialReference } } : {}),
       },
     })
   } catch (error) {
