@@ -214,7 +214,7 @@ export default function OrganizationAdminPage() {
 
   return (
     <ProductPage width="management">
-      {canGovern && organizationId && <DeliveryPolicySettings organizationId={organizationId} />}
+      {canGovern && organizationId && <DeliveryPolicySettings key={organizationId} organizationId={organizationId} />}
       <PageHeader
         title={context.organization.name}
         description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}
