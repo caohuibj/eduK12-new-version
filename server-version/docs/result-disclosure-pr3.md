@@ -1,6 +1,6 @@
 # PR3：结果权限与本人长期反馈（开发阶段）
 
-依赖 PR2 `f57a08b7`，以叠加草稿提交；不合并、不部署、不发布科学内容。
+依赖 PR2；先通过完整 CI，再按 PR2 → PR3 → PR4 顺序合并。科学内容发布仍独立验收。
 
 ## 已实现
 
@@ -33,3 +33,11 @@ Node 24.21.0、独立 PostgreSQL 14。后端类型检查通过；相关关系测
 ## 最终权限复查
 
 即时反馈在 canonical 结果读取前后检查当前成员/persona、外部家长批准关联、执行状态及访问拒绝。刷新任务时立即清空旧反馈。外部家长本人纵向报告仍留置：现有纵向 artifact 使用组织成员模型，不能把外部家长静默改为组织成员。
+
+## 2026-10-01 review 补充验收
+
+- 自建单题他评问卷见 `fixtures/interaction-frequency-observer.scale.json`：请你评价 A 的交互频率，七个选项由非常少至非常多，数值 1–7。CUSTOM_DESCRIPTIVE、自建许可、纯描述性报告，无常模、诊断或排名。
+- `observerSingleQuestion.postgres.integration.test.ts` 在真实 PostgreSQL 中安装该 Scale 和 Composite，通过正常内容注册校验、Run 发布、精确被评对象任务、同意、START、Unified FINAL、完成协调和 canonical 摘要。家长、教师、咨询师三条路径通过；不同用户代作答、被评对象或机构管理员代读、被评对象 persona 撤销后的任务和报告访问均拒绝。
+- 夹具只注入测试注册表，不放宽生产 gate。它关闭没有正式题目所以无法验收他评运行链路的工程缺口；正式科学内容的十个 Journey 发布仍须各自内容审批。
+- 即时摘要复用当前 population 校验，同时检查双方账户、身份、关系和访问拒绝；撤销被评对象权限后也不可继续读取。
+- 内容适配器省略未声明的可选投放字段，避免 undefined 进入冻结 JSON 后导致正式发布失败。

@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 2,
+  "respondentType": "observer_report",
+  "source": {
+    "title": "交互频率单题他评",
+    "citation": "Huisurvey 自建描述性问卷，2026-10-01"
+  },
+  "license": {
+    "status": "self_authored",
+    "redistribution": "allowed"
+  },
+  "display": {
+    "randomizeItems": false
+  },
+  "responseSets": [
+    {
+      "key": "frequency",
+      "options": [
+        {
+          "value": 1,
+          "label": "非常少",
+          "score": 1
+        },
+        {
+          "value": 2,
+          "label": "很少",
+          "score": 2
+        },
+        {
+          "value": 3,
+          "label": "较少",
+          "score": 3
+        },
+        {
+          "value": 4,
+          "label": "一般",
+          "score": 4
+        },
+        {
+          "value": 5,
+          "label": "较多",
+          "score": 5
+        },
+        {
+          "value": 6,
+          "label": "很多",
+          "score": 6
+        },
+        {
+          "value": 7,
+          "label": "非常多",
+          "score": 7
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "interaction_frequency",
+      "content": "请你评价 A：你与 A 的交互频率如何？",
+      "type": "single",
+      "required": true,
+      "sortOrder": 0,
+      "responseSetKey": "frequency",
+      "randomizeOptions": false
+    }
+  ],
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "itemRules": [
+      {
+        "itemCode": "interaction_frequency",
+        "transform": {
+          "type": "identity"
+        }
+      }
+    ],
+    "defaultMissingPolicy": {
+      "type": "complete_required"
+    },
+    "scores": [
+      {
+        "key": "interaction_frequency",
+        "type": "total",
+        "label": "交互频率",
+        "direction": "descriptive",
+        "canonical": true,
+        "displayPrecision": 0,
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "interaction_frequency",
+              "weight": 1
+            }
+          ],
+          "aggregation": "sum"
+        }
+      }
+    ]
+  },
+  "report": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "interaction_frequency"
+    ],
+    "scoreOrder": [
+      "interaction_frequency"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "interaction_frequency",
+        "headline": "交互频率",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "记录本次作答者所感知的交互频率。",
+        "bands": [],
+        "guidance": []
+      }
+    ],
+    "limitations": [
+      "单题描述性自陈，不推断人格、关系质量或健康状况。"
+    ],
+    "disclaimer": "自建描述性问卷，仅用于交互频率记录和功能验收，不提供常模、诊断或排名。"
+  },
+  "referencePolicy": {
+    "type": "none"
+  }
+}
