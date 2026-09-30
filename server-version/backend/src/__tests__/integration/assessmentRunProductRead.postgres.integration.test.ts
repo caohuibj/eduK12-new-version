@@ -1,3 +1,4 @@
+import { closeAssessmentRun } from '../../modules/assessment-run/lifecycle'
 import { createOrganizationUnit } from '../../modules/organization/structure'
 import { assignStaffToClass } from '../../modules/organization/classRelationships'
 import { randomUUID } from 'node:crypto'
@@ -247,6 +248,9 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, student)).status).toBe(200)
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, outsider)).status).toBe(403)
     expect((await jsonRequest(`/api/runtime-probe/${randomUUID()}`, student)).status).toBe(403)
+    await closeAssessmentRun({ organizationId: created.organization.id, runId: run.id, actorUserId: owner.id })
+    const closedTasks = await jsonRequest('/api/organizations/assigned-tasks', student)
+    expect(closedTasks.body.data.list.find((item: any) => item.runId === run.id).status).toBe('EXPIRED')
 
   })
 })

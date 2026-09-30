@@ -44,13 +44,11 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
-  if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
   return items
 }
 export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
   const items: NavigationItem[] = [
     { path: '/organizations', label: '组织空间', section: 'organization' },
-    { path: '/organization-tasks', label: '组织测评任务', section: 'organization' },
   ]
   if (organizationId) {
     const root = `/organizations/${encodeURIComponent(organizationId)}`

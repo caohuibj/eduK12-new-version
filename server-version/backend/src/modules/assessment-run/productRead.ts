@@ -151,7 +151,7 @@ export async function readAssessmentRunProduct(
   }
 }
 
-/** Assigned-respondent inbox: no tenant navigation, subjects or other respondents. */
+/** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
 export async function listAssignedRunTasks(userId: string) {
   const list = await prisma.$queryRaw<Array<{
     executionId: string; organizationId: string; runId: string; runName: string;
@@ -164,7 +164,11 @@ export async function listAssignedRunTasks(userId: string) {
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
       a."relationship_kind" AS "relationship", a."perspective" AS "perspective",
-      CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED' ELSE e."status" END AS "status",
+      CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
+        WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
+        WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
+        WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
+        ELSE e."status" END AS "status",
       c."state" AS "claimState", t."resource_family" AS "resourceFamily",
       t."resource_key" AS "resourceKey", t."resource_version" AS "resourceVersion",
       (a."consent_id" IS NOT NULL) AS "consentRequired",

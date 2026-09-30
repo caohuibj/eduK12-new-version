@@ -555,7 +555,7 @@ const assertPublisherScope = (authority: PublisherAuthority, actorUserId: string
         ))
         || (parent && pair.scopeClassUnitIds.some((id) => authority.teacherClassIds.has(id)))
       )
-    } else if (pair.relationshipKind === 'CLASS_TEACHER_STUDENT') {
+    } else if ((pair.relationshipKind === 'CLASS_TEACHER_STUDENT' || pair.relationshipKind === 'COURSE_TEACHER_STUDENT')) {
       allowed = pair.scopeClassUnitIds.some((id) => authority.teacherClassIds.has(id))
     } else if (pair.relationshipKind === 'PARENT_CHILD') {
       const student = pair.subject.actorRole === 'STUDENT' ? pair.subject : pair.respondent
