@@ -66,7 +66,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         packageCatalogAvailable
           ? compositeApi.listReportPackages!()
           : Promise.resolve({ code: 0, data: { list: [] } }),
-        apiClient.get<any>('/situational/instruments').catch(() => ({
+        apiClient.get<any>('/situational/instruments', { timeout: 3000 }).catch(() => ({
           code: -1,
           data: { list: [] },
           message: '情境测评题包暂不可用，已加载的综合测评仍可管理和导出。',
