@@ -107,6 +107,8 @@ async function main() {
           await trigger.click()
           const editor = page.getByRole('dialog')
           await assertModal(page, editor, trigger)
+          const bodyWidth = await editor.locator('.staff-dialog__body').evaluate(element => ({ available: element.clientWidth, content: element.scrollWidth }))
+          assert.ok(bodyWidth.content <= bodyWidth.available + 1, `${kind}/${width}: editor contents overflow horizontally`)
           await capture(page, `${kind}-editor-modal`, width)
           assert.equal(await editor.locator('button[type=submit]').count(), 1, 'native form submit remains available')
           if (kind !== 'courses') {

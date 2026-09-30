@@ -159,9 +159,12 @@ jobs:
           done
           cat /tmp/eduk12-media-2-backend.log
           exit 1
+      - name: build production frontend
+        working-directory: server-version/frontend
+        run: npm run build
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-media-2-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-media-2-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-media-2-frontend.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
@@ -169,6 +172,8 @@ jobs:
           done
           cat /tmp/eduk12-media-2-frontend.log
           exit 1
+      - name: verify built application readiness
+        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-media-2-readiness
       - name: run MEDIA-2 browser acceptance
         run: node e2e/media-2-browser-e2e.cjs
       - name: upload MEDIA-2 browser evidence
@@ -180,6 +185,7 @@ jobs:
           path: |
             /tmp/eduk12-media-2-backend.log
             /tmp/eduk12-media-2-frontend.log
+            /tmp/eduk12-media-2-readiness
           if-no-files-found: ignore
       - name: stop seeded services
         if: always()

@@ -740,8 +740,10 @@
 .staff-panel--compact .staff-panel__body{padding:16px}
 .staff-form{
   display:grid;
+  grid-template-columns:minmax(0,1fr);
   gap:18px;
 }
+.staff-form > *{min-width:0}
 .staff-form-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
