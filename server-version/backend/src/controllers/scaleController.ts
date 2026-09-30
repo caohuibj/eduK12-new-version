@@ -1195,10 +1195,13 @@ export const scaleController = {
         return forbidden(res, '无权限查看此量表的测评记录')
       }
 
+      // This legacy Scale-management surface is standalone-only for every role.
+      // Embedded Composite/Relational child results must stay behind their
+      // parent report/disclosure authority; ADMIN is not a privacy bypass.
       const assessments = await prisma.assessment.findMany({
         where: {
           scaleId,
-          ...(userRole === UserRole.ADMIN ? {} : { compositeAttemptId: null }),
+          compositeAttemptId: null,
         },
         include: {
           user: {
