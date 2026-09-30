@@ -82,6 +82,29 @@ describe('CompositeAssessmentEdit copyable toggle', () => {
     })
   })
 
+  it('keeps an authorized composite and export usable when the optional situational catalog is forbidden', async () => {
+    mockGet.mockImplementation((path: string) => path === '/situational/instruments'
+      ? Promise.reject({ status: 403, message: '需要特定权限' })
+      : Promise.resolve({ code: 0, data: { list: [] } }))
+    mockCompositeApi.detail.mockResolvedValue({
+      code: 0,
+      data: {
+        id: 'tpl-1', name: '可导出的教师测评', code: 'T1', status: 'DRAFT',
+        items: [], attemptCounts: { started: 0, completed: 0 },
+      },
+    })
+    mockCompositeApi.exportData.mockRejectedValue({ status: 503, message: '稍后重试' })
+    const user = userEvent.setup()
+    render(<CompositeAssessmentEdit />)
+    expect(await screen.findByText('可导出的教师测评')).toBeInTheDocument()
+    expect(mockGet).toHaveBeenCalledWith('/situational/instruments', { timeout: 3000 })
+    expect(screen.getByText('情境测评题包暂不可用，已加载的综合测评仍可管理和导出。')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '导出摘要' }))
+    await waitFor(() => expect(mockCompositeApi.exportData).toHaveBeenCalledWith(
+      'tpl-1', { detail: 'summary', format: 'csv' }, expect.any(String),
+    ))
+  })
+
   it('does not guess the copy switch from creator identity', async () => {
     mockCompositeApi.detail.mockResolvedValue({
       code: 0,

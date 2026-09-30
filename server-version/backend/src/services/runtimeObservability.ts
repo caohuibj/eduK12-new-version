@@ -120,6 +120,10 @@ let gcEvents = 0
 let gcDurationMs = 0
 let completionAdmissionActive = 0
 let completionAdmissionQueue = 0
+const boundedAdmissionGateLimits = new Map<string, { active: number; queued: number; waitMs: number }>()
+export const setBoundedAdmissionGateLimits = (gate: string, active: number, queued: number, waitMs: number) => {
+  boundedAdmissionGateLimits.set(gate, { active, queued, waitMs })
+}
 const boundedAdmissionGateStates = new Map<string, { active: number; queued: number }>()
 const boundedAdmissionRejectionCounts = new Map<string, LabeledCounter>()
 
@@ -616,6 +620,12 @@ export const runtimeMetricLines = (): string[] => {
     '# HELP ptool_bounded_admission_active Active operations admitted by a named BoundedAdmissionGate.',
     '# TYPE ptool_bounded_admission_active gauge',
     ...[...boundedAdmissionGateStates.entries()].map(([gate, state]) => `ptool_bounded_admission_active{gate="${escapeLabel(gate)}"} ${state.active}`),
+    '# TYPE ptool_bounded_admission_active_limit gauge',
+    ...[...boundedAdmissionGateLimits].map(([gate, limits]) => `ptool_bounded_admission_active_limit{gate="${escapeLabel(gate)}"} ${limits.active}`),
+    '# TYPE ptool_bounded_admission_queue_limit gauge',
+    ...[...boundedAdmissionGateLimits].map(([gate, limits]) => `ptool_bounded_admission_queue_limit{gate="${escapeLabel(gate)}"} ${limits.queued}`),
+    '# TYPE ptool_bounded_admission_wait_limit_ms gauge',
+    ...[...boundedAdmissionGateLimits].map(([gate, limits]) => `ptool_bounded_admission_wait_limit_ms{gate="${escapeLabel(gate)}"} ${limits.waitMs}`),
     '# HELP ptool_bounded_admission_queue Queued operations waiting on a named BoundedAdmissionGate.',
     '# TYPE ptool_bounded_admission_queue gauge',
     ...[...boundedAdmissionGateStates.entries()].map(([gate, state]) => `ptool_bounded_admission_queue{gate="${escapeLabel(gate)}"} ${state.queued}`),
@@ -666,6 +676,7 @@ export const resetRuntimeObservabilityForTests = (): void => {
   completionAdmissionRejectionCounts.clear()
   boundedAdmissionRejectionCounts.clear()
   boundedAdmissionGateStates.clear()
+  boundedAdmissionGateLimits.clear()
   prismaErrorCounts.clear()
   prismaSqlEventCount = 0
   prismaSqlEventDurationMs = 0

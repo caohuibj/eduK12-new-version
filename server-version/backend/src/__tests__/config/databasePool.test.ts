@@ -26,13 +26,18 @@ describe('Prisma database pool contract', () => {
     expect(result.searchParams.get('pool_timeout')).toBe('7')
   })
 
-  it('falls back safely for missing or invalid environment values', () => {
+  it('uses conservative defaults only when environment values are absent', () => {
     const result = new URL(buildDatabaseUrl(
       'postgresql://user:pass@localhost:5432/ptool',
-      { PRISMA_CONNECTION_POOL_SIZE: 'not-a-number', PRISMA_POOL_TIMEOUT: '0' },
+      {},
     )!)
 
     expect(result.searchParams.get('connection_limit')).toBe(String(DEFAULT_PRISMA_CONNECTION_POOL_SIZE))
     expect(result.searchParams.get('pool_timeout')).toBe(String(DEFAULT_PRISMA_POOL_TIMEOUT_SECONDS))
   })
+})
+
+it.each(['0', '-1', 'NaN', '1.2', '999999'])('rejects malformed pool configuration %s', value => {
+  expect(() => buildDatabaseUrl('postgresql://localhost/db', { PRISMA_CONNECTION_POOL_SIZE: value })).toThrow('PRISMA_CONNECTION_POOL_SIZE')
+  expect(() => buildDatabaseUrl(`postgresql://localhost/db?pool_timeout=${value}`, {})).toThrow('pool_timeout')
 })

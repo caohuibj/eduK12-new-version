@@ -16,6 +16,8 @@ const SAVED = [
   'DATA_PSEUDONYM_KEY',
   'COGNITIVE_MODULE_ENABLED',
   'BACKGROUND_WORKERS_ENABLED',
+  'COOKIE_SECURE',
+  'TRUST_PROXY_HOPS',
 ] as const
 let savedValues: Partial<Record<(typeof SAVED)[number], string | undefined>>
 
@@ -83,4 +85,17 @@ describe('config — data key hex validation (production, Cognitive flag)', () =
     process.env.BACKGROUND_WORKERS_ENABLED = ''
     await expect(import('../../config')).rejects.toThrow(/BACKGROUND_WORKERS_ENABLED/)
   })
+  it('rejects insecure cookies behind HTTPS', async () => {
+    process.env.COOKIE_SECURE = 'false'
+    await expect(import('../../config')).rejects.toThrow(/COOKIE_SECURE/)
+  })
+  it('rejects a zero trusted proxy count behind HTTPS', async () => {
+    process.env.TRUST_PROXY_HOPS = '0'
+    await expect(import('../../config')).rejects.toThrow(/TRUST_PROXY_HOPS/)
+  })
+  it.each(['https://example.test/path', 'https://user:secret@example.test', '*'])('rejects non-origin CORS values %s', async value => {
+    process.env.CORS_ORIGIN = value
+    await expect(import('../../config')).rejects.toThrow(/CORS_ORIGIN/)
+  })
+
 })

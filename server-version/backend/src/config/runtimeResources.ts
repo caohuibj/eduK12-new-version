@@ -1,3 +1,5 @@
+import { getHeapStatistics } from 'node:v8'
+import { buildDatabaseUrl } from './databasePool'
 const intEnv = (name: string, fallback: number, min: number, max: number): number => {
   const raw = process.env[name]
   if (raw === undefined || raw === '') return fallback
@@ -54,6 +56,10 @@ export const runtimeResourceConfig = Object.freeze({
 })
 
 export const effectiveRuntimeResourceConfig = () => ({
+  heapLimitMiB: Math.round(getHeapStatistics().heap_size_limit / 1048576),
+  prismaConnectionLimit: new URL(buildDatabaseUrl(process.env.DATABASE_URL) ?? 'postgresql://localhost').searchParams.get('connection_limit'),
+  prismaPoolTimeoutSeconds: new URL(buildDatabaseUrl(process.env.DATABASE_URL) ?? 'postgresql://localhost').searchParams.get('pool_timeout'),
+  admissionOverrides: Object.fromEntries(Object.entries(process.env).filter(([name]) => /^(?:UNIT_SUBMIT|AGGREGATE_FINALIZATION|QUESTIONNAIRE_COMPLETION|UPLOAD|LOGIN|PASSWORD_CHANGE|REGISTRATION)_/.test(name) && /(?:LIMIT|QUEUE|TIMEOUT_MS|MAX_WAIT_MS|MAX_CONCURRENT|MAX_PIXELS|MAX_ACTIVE_ACCOUNTS|BYTE_BUDGET|RETRY_AFTER_SECONDS)$/.test(name)).map(([name]) => [name, intEnv(name, 1, name.endsWith('_QUEUE') ? 0 : 1, Number.MAX_SAFE_INTEGER)])),
   videoConcurrency: runtimeResourceConfig.videoConcurrency,
   imageConcurrency: runtimeResourceConfig.imageConcurrency,
   exportConcurrency: runtimeResourceConfig.exportConcurrency,

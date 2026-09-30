@@ -19,22 +19,22 @@ services:
   postgres:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-postgres
     # cpu / memory placeholders (Compose classic fields; adjust per host)
-    cpus: ${CAPACITY_POSTGRES_CPUS:-2.0}
-    mem_limit: ${CAPACITY_POSTGRES_MEM_LIMIT:-2g}
+    cpus: ${POSTGRES_CPUS:-1.0}
+    mem_limit: ${POSTGRES_MEM_LIMIT:-1024m}
     # cpuset: ${CAPACITY_POSTGRES_CPUSET:-0-1}
     ports: []
 
   redis:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-redis
-    cpus: ${CAPACITY_REDIS_CPUS:-0.5}
-    mem_limit: ${CAPACITY_REDIS_MEM_LIMIT:-512m}
+    cpus: ${REDIS_CPUS:-0.25}
+    mem_limit: ${REDIS_MEM_LIMIT:-256m}
     # cpuset: ${CAPACITY_REDIS_CPUSET:-2}
     ports: []
 
   backend:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-backend
-    cpus: ${CAPACITY_BACKEND_CPUS:-4.0}
-    mem_limit: ${CAPACITY_BACKEND_MEM_LIMIT:-3g}
+    cpus: ${BACKEND_CPUS:-1.75}
+    mem_limit: ${BACKEND_MEM_LIMIT:-1024m}
     # cpuset: ${CAPACITY_BACKEND_CPUSET:-0-3}
     environment:
       BACKGROUND_WORKERS_ENABLED: ${BACKGROUND_WORKERS_ENABLED:-false}
@@ -43,7 +43,7 @@ services:
       AGGREGATE_FINALIZATION_ADMISSION_LIMIT: ${AGGREGATE_FINALIZATION_ADMISSION_LIMIT:-3}
       PRISMA_CONNECTION_POOL_SIZE: ${PRISMA_CONNECTION_POOL_SIZE:-10}
     ports:
-      - "${CAPACITY_BACKEND_HOST_PORT:-3300}:3000"
+      - "127.0.0.1:${CAPACITY_BACKEND_HOST_PORT:-3300}:3000"
 
   backend-volume-init:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-backend-volume-init
@@ -52,17 +52,17 @@ services:
     # Capacity Assessment mainline is API-only; keep worker off unless explicitly profiled.
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-worker
     profiles: ["capacity-worker"]
-    cpus: ${CAPACITY_WORKER_CPUS:-1.0}
-    mem_limit: ${CAPACITY_WORKER_MEM_LIMIT:-1g}
+    cpus: ${WORKER_CPUS:-0.75}
+    mem_limit: ${WORKER_MEM_LIMIT:-768m}
     # cpuset: ${CAPACITY_WORKER_CPUSET:-4}
 
   frontend:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-frontend
-    cpus: ${CAPACITY_FRONTEND_CPUS:-1.0}
-    mem_limit: ${CAPACITY_FRONTEND_MEM_LIMIT:-512m}
+    cpus: ${FRONTEND_CPUS:-0.25}
+    mem_limit: ${FRONTEND_MEM_LIMIT:-128m}
     # cpuset: ${CAPACITY_FRONTEND_CPUSET:-5}
     ports:
-      - "${CAPACITY_FRONTEND_HTTP_PORT:-3380}:80"
+      - "127.0.0.1:${CAPACITY_FRONTEND_HTTP_PORT:-3380}:80"
 
   migrate:
     container_name: ${CAPACITY_PREFIX:-eduk12-capacity}-migrate

@@ -1,6 +1,7 @@
 import {
   recordBoundedAdmissionRejection,
   setBoundedAdmissionGateState,
+  setBoundedAdmissionGateLimits,
 } from './runtimeObservability'
 
 export type BoundedAdmissionReason = 'queue_full' | 'timeout' | 'database_busy'
@@ -107,6 +108,7 @@ export class BoundedAdmissionGate {
     )
     this.busyCode = options.busyCode ?? 'ADMISSION_BUSY'
     this.busyMessage = options.busyMessage ?? '请求繁忙，请稍后重试'
+    setBoundedAdmissionGateLimits(this.gateName, options.maxConcurrent, options.maxQueue, options.maxWaitMs)
     this.publishState()
   }
 

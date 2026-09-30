@@ -43,6 +43,17 @@ async function preflight(baseUrl, evidenceDir) {
     assert.equal(csrf.status(), 200, 'API proxy must reach the authentication service')
     assert.ok((await csrf.json()).data?.csrfToken, 'API proxy returned no CSRF token')
     assert.deepEqual(report.pageErrors, [], 'application raised an uncaught error')
+    const isolated = await browser.newContext()
+    const capabilityPage = await isolated.newPage()
+    await capabilityPage.route('**/api/capabilities', () => {})
+    try {
+      for (const route of ['/student/login', '/teacher/account-login', '/admin/login']) {
+        const start = Date.now()
+        await capabilityPage.goto(origin + route, { waitUntil: 'domcontentloaded', timeout: 60000 })
+        await capabilityPage.getByPlaceholder(route === '/admin/login' ? '请输入管理员账号' : '请输入用户名').waitFor({ state: 'visible', timeout: 5000 })
+        report.routes.push({ route, fault: 'capabilities never responds', elapsedMs: Date.now() - start })
+      }
+    } finally { await isolated.close() }
     report.status = 'PASS'
     console.log('Built frontend readiness: PASS (student, teacher, admin, API proxy)')
   } catch (error) {

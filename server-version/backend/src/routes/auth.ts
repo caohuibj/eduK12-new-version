@@ -5,31 +5,16 @@ import { authenticate, requireAdmin } from '../middleware/auth'
 import { issueCsrfToken } from '../utils/authCookies'
 import { loginRateLimit, withLoginAccountFailureThrottle } from '../middleware/loginRateLimit'
 import { requirePositiveAccountExtension } from '../middleware/accountExtensionValidation'
-import rateLimit from 'express-rate-limit'
+import { registrationRateLimit, withRegistrationAdmission } from '../middleware/registrationAdmission'
 
 const router = Router()
 
-// 注册及公开验证限流，避免批量账号创建和验证码枚举
-const registrationLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    res.status(429).json({
-      code: -1,
-      message: '请求过于频繁，请15分钟后再试'
-    })
-  },
-  skip: (req) => process.env.NODE_ENV === 'development'
-})
-
 // 公开接口
 router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(authController.login))
-router.post('/register', registrationLimiter, authController.register)
-router.post('/student-register', registrationLimiter, authController.studentRegister)
-router.post('/verify-teacher-code', registrationLimiter, authController.verifyTeacherCode)
-router.post('/teacher-register', registrationLimiter, authController.teacherRegister)
+router.post('/register', registrationRateLimit, withRegistrationAdmission(authController.register))
+router.post('/student-register', registrationRateLimit, withRegistrationAdmission(authController.studentRegister))
+router.post('/verify-teacher-code', registrationRateLimit, withRegistrationAdmission(authController.verifyTeacherCode, false))
+router.post('/teacher-register', registrationRateLimit, withRegistrationAdmission(authController.teacherRegister))
 
 router.get('/csrf', (req, res) => {
   return res.json({ code: 0, message: '操作成功', data: { csrfToken: issueCsrfToken(req, res) } })

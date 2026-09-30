@@ -59,8 +59,8 @@ const configSchema = z.object({
 })
 
 const parsePort = () => {
-  const port = parseInt(process.env.PORT || '3000')
-  if (isNaN(port)) return 3000
+  const port = Number(process.env.PORT ?? '3000')
+  if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer between 1 and 65535')
   return port
 }
 
@@ -230,6 +230,10 @@ if (rawConfig.nodeEnv === 'production') {
   if (!process.env.CORS_ORIGIN || process.env.CORS_ORIGIN.trim() === '*') {
     throw new Error('❌ CORS_ORIGIN must be set to a specific frontend origin in production mode')
   }
+  const origin = new URL(rawConfig.corsOrigin)
+  if (!['http:', 'https:'].includes(origin.protocol) || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('CORS_ORIGIN must be one exact HTTP(S) origin')
+  if (origin.protocol === 'https:' && !rawConfig.cookieSecure) throw new Error('COOKIE_SECURE=true is required for HTTPS production')
+  if (rawConfig.trustProxyHops < 1) throw new Error('TRUST_PROXY_HOPS must match the production single ingress (at least 1)')
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
     throw new Error('❌ JWT_SECRET must be set and at least 32 characters in production mode')
   }
