@@ -462,7 +462,13 @@ const cases = [
     },
   },
   { id: 'student-scales', route: '/student/scales', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '心理测评', exact: true }).waitFor() },
-  { id: 'scale-report', route: '/student/scales/result/visual-scale-assessment', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '学习自我调节量表', exact: true }).waitFor() },
+  { id: 'scale-report', route: '/student/scales/result/visual-scale-assessment', role: 'STUDENT', ready: async (page) => {
+    await page.getByRole('heading', { name: '学习自我调节量表', exact: true }).waitFor()
+    await page.getByTestId('scale-core-feedback').waitFor()
+    assert.equal(await page.getByTestId('scale-score-layer').evaluate(el => Boolean(el.compareDocumentPosition(document.querySelector('[data-testid="scale-core-feedback"]')) & Node.DOCUMENT_POSITION_FOLLOWING)), true, 'scores precede interpretation')
+    assert.equal(await page.getByTestId('scale-caveats').evaluate(el => el.closest('details') === null), true, 'limitations remain expanded')
+    assert.equal(await page.locator('.report-primary-score .report-range').count(), 1, 'total and range share one reading unit')
+  } },
   { id: 'cognitive-history', route: '/student/cognitive/history', role: 'STUDENT', ready: (page) => page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor() },
   { id: 'classroom-enter', route: '/student/classroom/enter', role: null, ready: (page) => page.getByRole('heading', { name: '加入课堂', exact: true }).waitFor() },
   { id: 'parent-home', route: '/parent', role: 'PARENT', ready: (page) => page.getByRole('heading', { name: '家长首页', exact: true }).waitFor() },
@@ -554,6 +560,7 @@ async function main() {
 
           const directory = path.join(output, spec.id)
           fs.mkdirSync(directory, { recursive: true })
+          await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
           await page.screenshot({ path: path.join(directory, `${viewport.name}.png`), fullPage: true })
           if (spec.id === 'scale-report' && viewport.name === 'desktop-1440') {
             await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' })

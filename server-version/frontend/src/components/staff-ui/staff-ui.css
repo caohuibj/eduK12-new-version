@@ -1067,3 +1067,20 @@
     margin:8px 0;
   }
 }
+
+/* One record tree preserves handoff IDs and action callbacks at every width. */
+@media(max-width:767px) {
+  .staff-record-table.staff-table-container { overflow:visible; border:0; border-radius:0; background:transparent; }
+  .staff-record-table .staff-table { display:block; min-width:0; }
+  .staff-record-table .staff-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .staff-record-table .staff-table tbody { display:grid; gap:12px; }
+  .staff-record-table .staff-table tbody tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 16px; padding:16px; border:1px solid #dce4ec; border-radius:12px; background:#fff; }
+  .staff-record-table .staff-table td { display:block; min-width:0; padding:0; border:0; overflow-wrap:anywhere; }
+  .staff-record-table .staff-table td:first-child,
+  .staff-record-table .staff-table td:last-child,
+  .staff-record-table .staff-table .staff-record-course { grid-column:1/-1; }
+  .staff-record-table .staff-table td[data-label]::before { content:attr(data-label); display:block; margin-bottom:3px; color:#52677c; font-size:13px; font-weight:600; }
+  .staff-record-table .staff-record-button { min-height:44px; font-size:16px; line-height:1.5; }
+  .staff-record-table .staff-table-actions { justify-content:space-between; border-top:1px solid #edf1f5; padding-top:12px; }
+  .staff-record-table .staff-text-action { min-height:44px; }
+}

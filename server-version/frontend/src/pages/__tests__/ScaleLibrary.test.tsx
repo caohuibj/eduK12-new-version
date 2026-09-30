@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -99,6 +99,34 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
 })
 
 describe('ScaleLibrary page', () => {
+  it('keeps progressive filters open and ignores late results after a newer filter request', async () => {
+    let resolveOld!: (value: unknown) => void
+    mockList.mockResolvedValueOnce({ code: 0, data: { entries: [entry()] } })
+      .mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve }))
+      .mockResolvedValue({ code: 0, data: { entries: [] } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
+    await screen.findByText('WHO-5 Well-Being Index')
+    const more = screen.getByText('更多筛选').closest('details')!
+    expect(more).not.toHaveAttribute('open')
+    await user.click(screen.getByText('更多筛选'))
+    await user.type(screen.getByLabelText('年龄下界'), '10')
+    await user.type(screen.getByLabelText('关键词'), 'older')
+    await user.click(screen.getByRole('button', { name: '应用筛选' }))
+    expect(more).toHaveAttribute('open')
+    expect(screen.getByRole('button', { name: '移除年龄下界：10' })).toBeInTheDocument()
+    await user.clear(screen.getByLabelText('关键词'))
+    await user.type(screen.getByLabelText('关键词'), 'newer')
+    await user.click(screen.getByRole('button', { name: '应用筛选' }))
+    await screen.findByText('当前显示 0 个量表')
+    await act(async () => resolveOld({ code: 0, data: { entries: [entry()] } }))
+    expect(screen.queryByText('WHO-5 Well-Being Index')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '移除关键词：newer' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({ minAge: 10, keyword: undefined }))
+    await user.click(screen.getByRole('button', { name: '清除全部' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({}))
+    expect(screen.queryByLabelText('已应用筛选')).not.toBeInTheDocument()
+  })
   it('keeps an explicit root through loading, failure, retry and empty results', async () => {
     let reject!: (reason: Error) => void
     mockList.mockImplementationOnce(() => new Promise((_, no) => { reject = no }))

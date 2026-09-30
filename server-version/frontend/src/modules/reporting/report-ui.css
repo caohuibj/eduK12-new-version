@@ -723,3 +723,4 @@
     overflow-wrap: anywhere;
   }
 }
+.report-primary-score .report-range__heading strong { font-size:1.5rem; }
