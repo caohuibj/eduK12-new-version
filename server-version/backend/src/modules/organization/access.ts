@@ -1,3 +1,4 @@
+import { currentClassDeliverySql } from './deliveryPolicy'
 import { NextFunction, Request, Response } from 'express'
 import { prisma } from '../../config/database'
 import { AuthenticatedPrincipal } from '../../types'
@@ -159,21 +160,7 @@ export async function resolveAssessmentDeliveryAuthority(input: {
         SELECT 1 FROM "organization_staff_class_assignments" sa
         WHERE sa."organization_id" = ${input.organizationId}
           AND sa."membership_id" = ${context.membershipId}
-          AND sa."valid_until" IS NULL
-          AND (
-            sa."staff_role" = 'HOMEROOM'
-            OR (
-              sa."staff_role" = 'TEACHING'
-              AND EXISTS (
-                SELECT 1 FROM "organization_assessment_delivery_grants" g
-                WHERE g."organization_id" = sa."organization_id"
-                  AND g."teacher_membership_id" = sa."membership_id"
-                  AND g."class_unit_id" = sa."class_unit_id"
-                  AND g."permission" = 'CLASS_ASSESSMENT_DELIVERY'
-                  AND g."revoked_at" IS NULL
-              )
-            )
-          )
+          AND ${currentClassDeliverySql}
       ) AS "allowed"
     `
     if (rows[0]?.allowed) deliveryScopes.push('CLASS')

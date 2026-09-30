@@ -255,7 +255,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
               {entry.identity.abbreviation || entry.identity.instrumentFamily} · v{entry.identity.instrumentVersion} · {entry.localization.targetLocale}
             </p>
           </div>
-          {user?.role === 'STUDENT' && entry.availability.status === 'AVAILABLE' && entry.availability.launch && (
+          {user && entry.availability.status === 'AVAILABLE' && entry.availability.launch && (
             <button type="button" onClick={() => navigate(entry.availability.launch!.route)} className="inline-flex min-h-11 items-center justify-center rounded-md bg-action px-4 py-2 text-sm font-medium text-white hover:opacity-90">
               <Play className="mr-2 h-4 w-4" /> 开始量表
             </button>

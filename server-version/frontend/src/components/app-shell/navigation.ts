@@ -43,6 +43,8 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
     { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
+  if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
+  if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
   return items
 }
 export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
@@ -53,7 +55,7 @@ export function organizationNavigation(organizationId: string | undefined, allow
   if (organizationId) {
     const root = `/organizations/${encodeURIComponent(organizationId)}`
     items.push({ path: root, label: '组织概览', section: 'organization' })
-    if (allowedActions.includes('RUNS')) items.push({ path: `${root}/runs`, label: '测评批次', section: 'organization' })
+    if ((allowedActions.includes('RUNS') || allowedActions.includes('ASSESSMENT_DELIVERY'))) items.push({ path: `${root}/runs`, label: '测评批次', section: 'organization' })
     if (allowedActions.includes('REPORTING')) items.push({ path: `${root}/reporting`, label: '报告分析', section: 'organization' })
     if (allowedActions.includes('DELIVERY')) items.push({ path: `${root}/delivery`, label: '安全事项与导出', section: 'organization' })
   }

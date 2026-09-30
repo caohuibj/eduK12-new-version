@@ -1,3 +1,4 @@
+import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, PanelLeft } from 'lucide-react'
@@ -20,7 +21,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const cognitive = useCognitiveEnabled()
   const { organizations, total: organizationTotal, platformRole, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
-  const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||location.pathname==='/organization-tasks'
+  const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
   const organizationWorkspaceRoute=location.pathname.startsWith('/organizations/')
   const desiredMode=shellModeFor(location.pathname), guestClassroom=location.pathname.startsWith('/student/classroom/')&&user?.role!=='STUDENT'
   const mode=guestClassroom||(desiredMode==='standard'&&!user)?'public':desiredMode
@@ -53,7 +54,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     </header>}
     <div className="hui-app-body">{mode==='standard'&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
       <div className="hui-app-content">{mode==='standard'&&<nav className="hui-product hui-breadcrumb" aria-label="当前位置"><ol>{breadcrumbs.map((crumb,index)=><li key={`${index}:${crumb.label}`}>{index>0&&<ChevronRight size={14} aria-hidden="true"/>}{crumb.path?<Link to={crumb.path}>{crumb.label}</Link>:<span aria-current="page">{crumb.label}</span>}</li>)}</ol></nav>}
-        <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}>{organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</main>
+        <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}>{user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</main>
       </div>
     </div>{!entryMode&&mode!=='focused'&&<Footer variant="light"/>}
   </div>

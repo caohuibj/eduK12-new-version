@@ -34,6 +34,8 @@ const staffAssignmentSchema = z.object({
   staffRole: z.enum(['HOMEROOM', 'TEACHING']),
 })
 const deliveryGrantSchema = z.object({
+  validFrom: z.string().datetime().transform(v => new Date(v)).optional(),
+  validUntil: z.string().datetime().transform(v => new Date(v)).nullable().optional(),
   teacherMembershipId: z.string().min(1),
   classUnitId: z.string().min(1),
 })
@@ -56,6 +58,22 @@ function currentOnly(req: Request) {
 }
 
 export const organizationAdminController = {
+  async readDeliveryPolicy(req: Request, res: Response) {
+    try {
+      const rows = await prisma.$queryRaw<Array<{ homeroomDeliveryEnabled: boolean }>>`
+        SELECT "homeroom_delivery_enabled" AS "homeroomDeliveryEnabled" FROM "organizations" WHERE "id" = ${req.params.organizationId}
+      `
+      return success(res, rows[0])
+    } catch (err) { return sendDomainError(res, err) }
+  },
+  async updateDeliveryPolicy(req: Request, res: Response) {
+    const parsed = z.object({ homeroomDeliveryEnabled: z.boolean() }).strict().safeParse(req.body)
+    if (!parsed.success) return error(res, 'Invalid delivery policy', -1, 400)
+    try {
+      await prisma.$executeRaw`UPDATE "organizations" SET "homeroom_delivery_enabled" = ${parsed.data.homeroomDeliveryEnabled}, "updated_at" = statement_timestamp() WHERE "id" = ${req.params.organizationId}`
+      return success(res, parsed.data)
+    } catch (err) { return sendDomainError(res, err) }
+  },
   async listClassification(req: Request, res: Response) {
     try {
       const id = req.params.organizationId
@@ -293,7 +311,7 @@ export const organizationAdminController = {
       const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
         SELECT "id","teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
           "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
-          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt"
+          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
         FROM "organization_assessment_delivery_grants"
         WHERE "organization_id" = ${organizationId}
         ORDER BY "granted_at" DESC,"id" DESC LIMIT 200

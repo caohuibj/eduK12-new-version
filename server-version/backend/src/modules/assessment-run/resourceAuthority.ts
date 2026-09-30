@@ -1,3 +1,6 @@
+import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
+import type { EvaluationTargetMode, EvaluationTargetRequest } from '../assessment-policy/target'
+import { assertEvaluationTarget } from '../assessment-policy/target'
 import {
   relationalProductRegistry,
   type RelationalProductEntryV1,
@@ -16,6 +19,8 @@ export interface RunResourceRef {
 }
 
 export interface RunResourcePolicy {
+  initiationModes?: readonly AssessmentInitiationModeV1[]
+  allowedTargetModes?: readonly EvaluationTargetMode[]
   family: RunResourceFamily
   key: string
   version: string
@@ -118,6 +123,8 @@ const relationalEntryToRunPolicy = (
   entry: RelationalProductEntryV1,
   registry: RelationalProductRegistryV1,
 ): RunResourcePolicy => ({
+  initiationModes: entry.initiationModes,
+  allowedTargetModes: entry.allowedTargetModes,
   family: entry.applicability.resourceKind,
   key: entry.applicability.resourceKey,
   version: entry.applicability.resourceVersion,
@@ -169,12 +176,17 @@ export const createRelationalRunResourceAdapter = (input: {
       if (!entry.launchTarget) {
         throw new RunResourceAuthorityError('RUN_RESOURCE_RUNTIME_UNAVAILABLE', 'resource has no runtime launch target', 409)
       }
+      if (entry.applicability.subjectRoles.includes('TEACHER') && entry.applicability.respondentRoles.includes('STUDENT') && !entry.allowedTargetModes?.length) {
+        throw new RunResourceAuthorityError('RUN_TARGET_POLICY_MISSING', 'Published teacher-evaluation content must declare target modes', 409)
+      }
+      if (!entry.initiationModes?.length) throw new RunResourceAuthorityError('RUN_INITIATION_POLICY_MISSING', 'Published delivery content must declare initiation modes', 409)
       return relationalEntryToRunPolicy(entry, registry)
     },
   }
 }
 
 export interface RunTrackNarrowingRequest {
+  targetPolicy?: EvaluationTargetRequest
   subjectRoles: readonly string[]
   respondentRoles: readonly string[]
   relationshipKinds: readonly string[]
@@ -195,6 +207,10 @@ export const assertRunTrackNarrowing = (
   policy: RunResourcePolicy,
   requested: RunTrackNarrowingRequest,
 ): void => {
+  if (requested.targetPolicy || (policy.allowedTargetModes?.length && requested.subjectRoles.includes('TEACHER') && requested.respondentRoles.includes('STUDENT'))) {
+    try { assertEvaluationTarget(policy.allowedTargetModes, requested.targetPolicy) }
+    catch { throw new RunResourceAuthorityError('RUN_TARGET_POLICY', 'A content-authorized evaluation target is required', 409) }
+  }
   assertSubset('subjectRoles', requested.subjectRoles, policy.subjectRoles)
   assertSubset('respondentRoles', requested.respondentRoles, policy.respondentRoles)
   assertSubset('relationshipKinds', requested.relationshipKinds, policy.relationshipKinds)

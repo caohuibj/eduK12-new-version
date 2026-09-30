@@ -89,7 +89,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       FOR SHARE
     `
     valid = Boolean(rows[0])
-  } else if (relationship.kind === 'CLASS_TEACHER_STUDENT') {
+  } else if ((relationship.kind === 'CLASS_TEACHER_STUDENT' || relationship.kind === 'COURSE_TEACHER_STUDENT')) {
     const rows = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT sc."id" FROM "organization_student_class_assignments" sc
       JOIN "organization_staff_class_assignments" sa ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id"
@@ -98,6 +98,19 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       FOR SHARE OF sc, sa
     `
     valid = Boolean(rows[0])
+  }
+  if (valid && relationship.facts.courseId) {
+    const rows = await tx.$queryRaw<Array<{ valid: boolean }>>`
+      SELECT EXISTS (SELECT 1 FROM courses c
+        JOIN course_students cs ON cs.course_id = c.id AND cs.status IN ('ACTIVE', 'APPROVED')
+        JOIN assessment_run_executions e ON e.id = ${executionId}
+        JOIN assessment_run_actor_snapshots subject ON subject.id = e.subject_actor_snapshot_id
+        JOIN assessment_run_actor_snapshots respondent ON respondent.id = e.respondent_actor_snapshot_id
+        WHERE c.id = ${relationship.facts.courseId} AND c.status = 'PUBLISHED' AND c.ended_at IS NULL
+          AND c.creator_id = CASE WHEN subject.actor_role = 'TEACHER' THEN subject.user_id ELSE respondent.user_id END
+          AND cs.student_id = CASE WHEN subject.actor_role = 'STUDENT' THEN subject.user_id ELSE respondent.user_id END) AS valid
+    `
+    valid = rows[0]?.valid === true
   }
   if (!valid) fail('RUN_RELATIONSHIP_REVOKED')
 

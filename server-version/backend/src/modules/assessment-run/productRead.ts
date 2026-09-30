@@ -155,12 +155,15 @@ export async function readAssessmentRunProduct(
 export async function listAssignedRunTasks(userId: string) {
   const list = await prisma.$queryRaw<Array<{
     executionId: string; organizationId: string; runId: string; runName: string;
+    subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
     runStatus: string; status: string; claimState: string | null;
     resourceFamily: string; resourceKey: string; resourceVersion: string;
     reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
     SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
-      r."name" AS "runName", r."status" AS "runStatus",
+      r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
+      subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
+      a."relationship_kind" AS "relationship", a."perspective" AS "perspective",
       CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED' ELSE e."status" END AS "status",
       c."state" AS "claimState", t."resource_family" AS "resourceFamily",
       t."resource_key" AS "resourceKey", t."resource_version" AS "resourceVersion",
@@ -172,6 +175,8 @@ export async function listAssignedRunTasks(userId: string) {
     FROM "assessment_run_executions" e
     JOIN "assessment_run_actor_snapshots" respondent ON respondent."id" = e."respondent_actor_snapshot_id"
       AND respondent."organization_id" = e."organization_id" AND respondent."run_id" = e."run_id"
+    JOIN "assessment_run_actor_snapshots" subject ON subject."id" = e."subject_actor_snapshot_id" AND subject."organization_id" = e."organization_id"
+    JOIN "users" subject_user ON subject_user."id" = subject."user_id"
     JOIN "assessment_runs" r ON r."id" = e."run_id" AND r."organization_id" = e."organization_id"
     JOIN "assessment_run_tracks" t ON t."id" = e."track_id" AND t."organization_id" = e."organization_id"
     LEFT JOIN "assessment_run_execution_start_claims" c ON c."execution_id" = e."id"

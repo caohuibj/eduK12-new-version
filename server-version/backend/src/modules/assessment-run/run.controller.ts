@@ -19,6 +19,11 @@ import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProdu
 
 const selectorSchema = z.record(z.unknown()).default({})
 const policySchema = z.object({
+  targetPolicy: z.object({
+    mode: z.enum(['SELF', 'HOMEROOM_TEACHER', 'ALL_CLASS_TEACHERS', 'SELECTED_CLASS_TEACHERS', 'COURSE_TEACHER']),
+    teacherMembershipIds: z.array(z.string().min(1)).optional(),
+    courseId: z.string().min(1).optional(),
+  }).strict().optional(),
   subjectRoles: z.array(z.string().min(1)).min(1),
   respondentRoles: z.array(z.string().min(1)).min(1),
   relationshipKinds: z.array(z.string().min(1)).min(1),

@@ -44,8 +44,9 @@ export function returnAfterLogin(value: string | null | undefined, role: Role): 
   if (!target) return homeFor(role)
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
   if (isAuthPath(pathname)) return homeFor(role)
-  const organizationTarget = inRoot(pathname, 'organizations') || inRoot(pathname, 'organization-tasks')
-  const allowed = organizationTarget || (role === 'PARENT'
+  const organizationTarget = inRoot(pathname, 'organizations') || inRoot(pathname, 'organization-tasks') || inRoot(pathname, 'my-assessments')
+  const participantScaleTarget = /^\/student\/scales\/(?:result\/)?[^/]+$/.test(pathname)
+  const allowed = participantScaleTarget || inRoot(pathname, 'scale-library') || organizationTarget || (role === 'PARENT'
     ? inRoot(pathname, 'parent') || inRoot(pathname, 'relational')
     : inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student') || inRoot(pathname, 'relational')
       : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root)))))

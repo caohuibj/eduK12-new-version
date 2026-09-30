@@ -42,7 +42,7 @@ export interface OrganizationAccessContext {
   canGovern: boolean
 }
 
-export type OrganizationProductAction = 'GOVERN' | 'RUNS' | 'MANAGE_DENIES' | 'SUSPEND' | 'RESUME' | 'REPORTING' | 'SAFETY' | 'EXPORT_AGGREGATE' | 'EXPORT_MEMBER' | 'DELIVERY'
+export type OrganizationProductAction = 'ASSESSMENT_DELIVERY' | 'GOVERN' | 'RUNS' | 'MANAGE_DENIES' | 'SUSPEND' | 'RESUME' | 'REPORTING' | 'SAFETY' | 'EXPORT_AGGREGATE' | 'EXPORT_MEMBER' | 'DELIVERY'
 
 export interface OrganizationContextProjection {
   allowedActions: OrganizationProductAction[]
@@ -93,6 +93,8 @@ export interface StaffClassAssignment {
 }
 
 export interface AssessmentDeliveryGrant {
+  validFrom: string
+  validUntil: string | null
   id: string
   teacherMembershipId: string
   classUnitId: string
@@ -288,14 +290,21 @@ export const organizationApi = {
   async endStaffAssignment(organizationId: string, assignmentId: string): Promise<StaffClassAssignment> {
     return requireData(await apiClient.post<StaffClassAssignment>(`${orgPath(organizationId)}/staff-class-assignments/${encodeURIComponent(assignmentId)}/end`))
   },
+  async readDeliveryPolicy(organizationId: string): Promise<{ homeroomDeliveryEnabled: boolean }> {
+    return requireData(await apiClient.get(`${orgPath(organizationId)}/delivery-policy`))
+  },
+  async updateDeliveryPolicy(organizationId: string, homeroomDeliveryEnabled: boolean): Promise<{ homeroomDeliveryEnabled: boolean }> {
+    return requireData(await apiClient.put(`${orgPath(organizationId)}/delivery-policy`, { homeroomDeliveryEnabled }))
+  },
   async listAssessmentDeliveryGrants(organizationId: string): Promise<{ list: AssessmentDeliveryGrant[]; total: number }> {
     return requireData(await apiClient.get(`${orgPath(organizationId)}/assessment-delivery-grants`))
   },
 
-  async grantAssessmentDelivery(organizationId: string, teacherMembershipId: string, classUnitId: string): Promise<AssessmentDeliveryGrant> {
+  async grantAssessmentDelivery(organizationId: string, teacherMembershipId: string, classUnitId: string, validity?: { validFrom?: string; validUntil?: string | null }): Promise<AssessmentDeliveryGrant> {
     return requireData(await apiClient.post(`${orgPath(organizationId)}/assessment-delivery-grants`, {
       teacherMembershipId,
       classUnitId,
+      ...validity,
     }))
   },
 

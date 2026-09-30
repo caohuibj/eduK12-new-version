@@ -1,3 +1,4 @@
+import { validDeliveryWindow } from './deliveryPolicy'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -185,6 +186,8 @@ export async function endStaffClassAssignment(input: {
 }
 
 export interface AssessmentDeliveryGrantRecord {
+  validFrom: Date
+  validUntil: Date | null
   id: string
   organizationId: string
   teacherMembershipId: string
@@ -201,7 +204,12 @@ export async function grantTeachingAssessmentDelivery(input: {
   teacherMembershipId: string
   classUnitId: string
   grantedByUserId: string
+  validFrom?: Date
+  validUntil?: Date | null
 }): Promise<AssessmentDeliveryGrantRecord> {
+  const validFrom = input.validFrom ?? new Date()
+  const validUntil = input.validUntil ?? null
+  if (!validDeliveryWindow(validFrom, validUntil)) throw new OrganizationDomainError("DELIVERY_WINDOW_INVALID", "Invalid grant validity window", 400)
   try {
     return await prisma.$transaction(async (tx) => {
       await assertCurrentMembershipPersona(tx, {
@@ -215,7 +223,8 @@ export async function grantTeachingAssessmentDelivery(input: {
         WHERE "organization_id" = ${input.organizationId}
           AND "membership_id" = ${input.teacherMembershipId}
           AND "class_unit_id" = ${input.classUnitId}
-          AND "staff_role" = 'TEACHING'
+          AND "staff_role" IN ('HOMEROOM', 'TEACHING')
+            AND "valid_from" <= statement_timestamp()
           AND "valid_until" IS NULL
         LIMIT 1 FOR SHARE
       `
@@ -227,15 +236,15 @@ export async function grantTeachingAssessmentDelivery(input: {
       const id = randomUUID()
       const rows = await tx.$queryRaw<AssessmentDeliveryGrantRecord[]>`
         INSERT INTO "organization_assessment_delivery_grants" (
-          "id","organization_id","teacher_membership_id","class_unit_id","permission","granted_by_user_id"
+          "id","organization_id","teacher_membership_id","class_unit_id","permission","granted_by_user_id","valid_from","valid_until"
         ) VALUES (
           ${id},${input.organizationId},${input.teacherMembershipId},${input.classUnitId},
-          'CLASS_ASSESSMENT_DELIVERY',${input.grantedByUserId}
+          'CLASS_ASSESSMENT_DELIVERY',${input.grantedByUserId},${validFrom},${validUntil}
         )
         RETURNING "id","organization_id" AS "organizationId",
           "teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
           "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
-          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt"
+          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
       `
       return rows[0]
     })
@@ -256,7 +265,7 @@ export async function revokeTeachingAssessmentDelivery(input: {
     RETURNING "id","organization_id" AS "organizationId",
       "teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
       "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
-      "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt"
+      "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
   `
   if (!rows[0]) throw new OrganizationDomainError(
     'ASSESSMENT_DELIVERY_GRANT_NOT_CURRENT',

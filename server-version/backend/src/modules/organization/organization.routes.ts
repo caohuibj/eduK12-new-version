@@ -34,6 +34,8 @@ router.get('/:organizationId/context', authenticate, organizationController.read
 // and legacy User.role never grant create/suspend/resume authority.
 router.post('/', authenticate, organizationController.create)
 
+router.get('/:organizationId/delivery-policy', authenticate, requireOrganizationGovernance, organizationAdminController.readDeliveryPolicy)
+router.put('/:organizationId/delivery-policy', authenticate, requireOrganizationGovernance, organizationAdminController.updateDeliveryPolicy)
 router.get('/:organizationId/memberships', authenticate, requireOrganizationGovernance, organizationController.listMemberships)
 router.get('/:organizationId/memberships/:membershipId/access-history', authenticate, requireOrganizationGovernance, organizationAdminController.membershipAccessHistory)
 router.post('/:organizationId/suspend', authenticate, requireOrganizationGovernance, organizationController.suspend)

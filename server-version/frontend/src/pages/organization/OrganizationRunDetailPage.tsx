@@ -1,7 +1,7 @@
 import ManagementDialog from '../../components/staff-ui/ManagementDialog'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { runApi, type RunResourceChoice, type RunPreview, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
+import { runApi, type EvaluationTargetMode, type RunResourceChoice, type RunPreview, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
@@ -10,8 +10,8 @@ const RELATIONSHIPS: RunRelationshipKind[] = ['SELF', 'PARENT_CHILD', 'COURSE_TE
 const PERSPECTIVES: RunPerspective[] = ['SELF_REPORT', 'OBSERVER_REPORT', 'RELATIONAL_EXPERIENCE']
 const ANALYSIS_MODES: RunAnalysisMode[] = ['INDIVIDUAL_ONLY', 'COHORT_AGGREGATE', 'MULTI_INFORMANT_SYNTHESIS']
 const RESOURCE_FAMILIES: RunResourceFamily[] = ['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL']
-const SELECTOR_KINDS = ['ALL_CURRENT', 'MEMBERSHIP_IDS', 'CLASS_UNITS', 'LABELS'] as const
-const RESPONDENT_SELECTOR_KINDS = [...SELECTOR_KINDS, 'RELATED_PARENT'] as const
+const SELECTOR_KINDS = ['ALL_CURRENT', 'MEMBERSHIP_IDS', 'CLASS_UNITS', 'LABELS', 'RELATED_PARENT'] as const
+const RESPONDENT_SELECTOR_KINDS = SELECTOR_KINDS
 
 type SelectorKind = typeof SELECTOR_KINDS[number] | 'RELATED_PARENT'
 const splitIds = (value: string) => [...new Set(value.split(',').map((item) => item.trim()).filter(Boolean))]
@@ -36,7 +36,7 @@ export default function OrganizationRunDetailPage() {
   const { organizationId = '', runId = '' } = useParams<{ organizationId: string; runId: string }>()
   const { active, activeLoading, activeError, selectOrganization } = useOrganization()
   const context = active?.organization.id === organizationId ? active : null
-  const canGovern = context?.access.canGovern === true
+  const canGovern = context?.allowedActions.some(action => action === 'ASSESSMENT_DELIVERY' || action === 'RUNS') === true
   const [detail, setDetail] = useState<AssessmentRunDetail | null>(null)
   const [progress, setProgress] = useState<RunProgressProjection | null>(null)
   const [loading, setLoading] = useState(false)
@@ -46,6 +46,9 @@ export default function OrganizationRunDetailPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [confirmPublish, setConfirmPublish] = useState<RunPreview | null>(null)
 
+  const [targetMode, setTargetMode] = useState<EvaluationTargetMode | ''>('')
+  const [targetIds, setTargetIds] = useState('')
+  const [targetCourse, setTargetCourse] = useState('')
   const [resources, setResources] = useState<RunResourceChoice[]>([])
   const [selectedResource, setSelectedResource] = useState<RunResourceChoice | null>(null)
   const [resourceFamily, setResourceFamily] = useState<RunResourceFamily>('BUNDLE')
@@ -112,6 +115,8 @@ export default function OrganizationRunDetailPage() {
     const resource = resources[Number(index)]
     if (!resource) return
     setSelectedResource(resource)
+    setTargetMode(resource.allowedTargetModes?.[0] ?? '')
+    setTargetIds(''); setTargetCourse('')
     setResourceFamily(resource.family)
     setResourceKey(resource.key)
     setResourceVersion(resource.version)
@@ -158,6 +163,7 @@ export default function OrganizationRunDetailPage() {
       subjectSelector,
       respondentSelector,
       requestedPolicy: {
+        ...(targetMode ? { targetPolicy: { mode: targetMode, ...(targetMode === 'SELECTED_CLASS_TEACHERS' ? { teacherMembershipIds: targetIds.split(/[\s,]+/).filter(Boolean) } : {}), ...(targetMode === 'COURSE_TEACHER' ? { courseId: targetCourse } : {}) } } : {}),
         subjectRoles: [subjectRole],
         respondentRoles: [respondentRole],
         relationshipKinds: [relationshipKind],
@@ -174,7 +180,7 @@ export default function OrganizationRunDetailPage() {
 
   if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
   if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入测评批次" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无测评批次管理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器投影未授予 Organization governance。</ProductStatus></ProductPage>
+  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无测评批次管理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器未授予测评投放权限。</ProductStatus></ProductPage>
   if (loading && !detail) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载测评批次">正在读取 Run graph 的服务器投影。</ProductStatus></ProductPage>
   if (!detail) return <ProductPage width="management"><ProductStatus kind="error" title="测评批次无法加载" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>返回测评批次</Link>}>{loadError || '测评批次不存在或当前不可访问。'}</ProductStatus></ProductPage>
 
@@ -209,6 +215,7 @@ export default function OrganizationRunDetailPage() {
           {resources.length === 0 && <ProductStatus kind="info" title="暂无已发布的可用资源">内容发布独立于代码发布。当前服务器没有允许用于此流程的资源。</ProductStatus>}
           <label className="grid gap-1 text-sm font-medium">已发布资源<select aria-label="已发布资源" className="min-h-11 rounded-lg border px-3" defaultValue="" onChange={event => chooseResource(event.target.value)}><option value="" disabled>请选择资源</option>{resources.map((item, index) => <option key={`${item.family}:${item.key}:${item.version}`} value={index}>{item.title} · {item.family}/{item.key}@{item.version}</option>)}</select></label>
           <form className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-3" onSubmit={addTrack}>
+            {selectedResource?.allowedTargetModes?.length ? <fieldset className="space-y-2 lg:col-span-3"><legend>评价对象（由服务器解析关系）</legend><select aria-label="评价对象模式" value={targetMode} onChange={e => setTargetMode(e.target.value as EvaluationTargetMode)}>{selectedResource.allowedTargetModes.map(mode => <option key={mode} value={mode}>{mode}</option>)}</select>{targetMode === 'SELECTED_CLASS_TEACHERS' && <input aria-label="指定教师成员编号" value={targetIds} onChange={e => setTargetIds(e.target.value)} placeholder="教师成员编号，以逗号分隔" />}{targetMode === 'COURSE_TEACHER' && <input aria-label="评价课程编号" value={targetCourse} onChange={e => setTargetCourse(e.target.value)} placeholder="课程编号" />}<p>指定编号只会收窄合法关系范围，不能新增评价对象。</p></fieldset> : null}
             <label className="grid gap-1 text-sm font-medium">资源类型<select className="min-h-11 rounded-lg border border-slate-300 px-3" disabled value={resourceFamily} onChange={(event) => setResourceFamily(event.target.value as RunResourceFamily)}>{RESOURCE_FAMILIES.map((family) => <option key={family}>{family}</option>)}</select></label>
             <label className="grid gap-1 text-sm font-medium">资源 key<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={resourceKey} onChange={(event) => setResourceKey(event.target.value)} /></label>
             <label className="grid gap-1 text-sm font-medium">资源 version<input className="min-h-11 rounded-lg border border-slate-300 px-3" readOnly value={resourceVersion} onChange={(event) => setResourceVersion(event.target.value)} /></label>

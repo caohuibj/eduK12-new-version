@@ -1,3 +1,5 @@
+import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
+import type { EvaluationTargetMode } from '../assessment-policy/target'
 import { validateRelationalCohortPolicy, type RelationalCohortAnalysisPolicyV1 } from './analysis'
 import { hashRelationalApplicability, validateRelationalApplicability } from './contracts'
 import { relationalFail } from './errors'
@@ -12,6 +14,9 @@ export interface RelationalCompositeLaunchTargetV1 {
 }
 
 export interface RelationalProductEntryV1 {
+  subjectReportMode?: 'NONE' | 'AGGREGATE_ONLY'
+  initiationModes?: readonly AssessmentInitiationModeV1[]
+  allowedTargetModes?: readonly EvaluationTargetMode[]
   title: string
   description: string | null
   releaseStatus: RelationalProductReleaseStatusV1

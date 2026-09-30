@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 107 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 106 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -72,8 +72,8 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /student/situational/attempts/:attemptId/result | SituationalResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /student/composite/situational/:attemptId | SituationalRunner | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /student/scales | StudentScales | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
-| /student/scales/:scaleId | ScaleAssessment | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
-| /student/scales/result/:assessmentId | ScaleResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
+| /student/scales/:scaleId | RouteAccess | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/scales/result/:assessmentId | RouteAccess | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/questionnaires | StudentQuestionnaires | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/questionnaires/:questionnaireId | QuestionnaireAssessment | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-08 | FE-02 chrome; domain UI retained |
 | /student/questionnaires/result/:assessmentId | QuestionnaireResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
@@ -104,7 +104,6 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
 | /organizations | OrganizationIndexPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/new | OrganizationCreatePage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
-| /organization-tasks | OrganizationTasksPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId | OrganizationAdminPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs | OrganizationRunListPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs/:runId | OrganizationRunDetailPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
