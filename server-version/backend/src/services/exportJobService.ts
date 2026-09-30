@@ -1,3 +1,4 @@
+import { provenanceSchema } from './assessmentExportArtifact'
 import { randomUUID } from 'crypto'
 import { ExportArtifactStatus, Prisma } from '@prisma/client'
 import { exportQueue } from '../config/queue'
@@ -7,9 +8,12 @@ import { createExportArtifact } from './exportArtifactService'
 import { assertExportLimits, EXPORT_RETENTION_HOURS } from './exportStorage'
 import { logger } from '../utils/logger'
 
-export type ExportJobFormat = 'csv' | 'sav' | 'sps'
+export type ExportJobFormat = 'csv' | 'sav' | 'sps' | 'xlsx' | 'zip'
 
 export type ExportJobOptions = {
+  creatorRole?: 'ADMIN' | 'TEACHER'
+  projectionFingerprint?: string
+  detail?: 'summary' | 'full' | 'research'
   anonymize: boolean
   includeProgress?: boolean
   minProgress?: number
@@ -35,12 +39,18 @@ export type ExportBatchResponse = {
   replayed: boolean
 }
 
+export const exportArtifactUrl = (type: string, id: string, artifactId: string): string =>
+  type === 'COGNITIVE' ? `/api/cognitive/assignments/${id}/export/artifacts/${artifactId}`
+  : type === 'COMPOSITE' ? `/api/composite-assessments/${id}/export/artifacts/${artifactId}`
+  : `/api/${type === 'SCALE' ? 'scales' : 'questionnaires'}/exports/${artifactId}`
+
 const ACTIVE_JOB_STATES = new Set(['active', 'waiting', 'delayed', 'paused'])
 const REQUEST_KEY = /^[A-Za-z0-9_-]{16,160}$/
 
-export const formatsForRequest = (resourceType: 'SCALE' | 'QUESTIONNAIRE', format: unknown): ExportJobFormat[] => {
+export const formatsForRequest = (resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE', format: unknown): ExportJobFormat[] => {
   const normalized = typeof format === 'string' ? format.toLowerCase() : 'csv'
   if (resourceType === 'SCALE' && normalized === 'spss') return ['csv', 'sps']
+  if (resourceType === 'COGNITIVE' && (normalized === 'zip' || normalized === 'xlsx')) return [normalized]
   if (normalized === 'csv' || normalized === 'sav') return [normalized]
   throw Object.assign(new Error('不支持的导出格式'), { statusCode: 400 })
 }
@@ -50,6 +60,9 @@ const pendingStorageKey = (resourceType: string, resourceId: string, batchId: st
 
 const normalizeOptions = (options: ExportJobOptions): ExportJobOptions => ({
   anonymize: Boolean(options.anonymize),
+  ...(options.creatorRole ? { creatorRole: options.creatorRole } : {}),
+  ...(options.projectionFingerprint ? { projectionFingerprint: options.projectionFingerprint } : {}),
+  ...(options.detail ? { detail: options.detail } : {}),
   ...(options.includeProgress !== undefined ? { includeProgress: Boolean(options.includeProgress) } : {}),
   ...(options.minProgress !== undefined ? { minProgress: Number(options.minProgress) } : {}),
   ...(options.dateRange ? {
@@ -83,7 +96,7 @@ const responseForBatch = async (batchId: string, replayed: boolean): Promise<Exp
       format: artifact.format,
       fileName: artifact.storageKey,
       expiresAt: artifact.expiresAt.toISOString(),
-      downloadUrl: `/api/${batch.resourceType === 'SCALE' ? 'scales' : 'questionnaires'}/exports/${artifact.id}`,
+      downloadUrl: exportArtifactUrl(batch.resourceType, batch.resourceId, artifact.id),
     })),
   }
 }
@@ -112,7 +125,7 @@ export const ensureExportBatchEnqueued = async (batchId: string): Promise<boolea
 }
 
 export const enqueueExportJob = async (params: {
-  resourceType: 'SCALE' | 'QUESTIONNAIRE'
+  resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE'
   resourceId: string
   createdBy: string
   anonymized: boolean
@@ -171,6 +184,15 @@ export const enqueueExportJob = async (params: {
         },
       })
       for (const format of formats) {
+        if (params.resourceType === 'COGNITIVE' || params.resourceType === 'COMPOSITE') {
+          const provenance = provenanceSchema.parse({ version: 1, generation: batchId,
+            creatorRole: options.creatorRole, audience: 'teacher', detail: options.detail ?? 'summary',
+            dateRange: options.dateRange ?? {}, projectionFingerprint: options.projectionFingerprint, attemptIds: [] })
+          await tx.exportArtifact.create({ data: { resourceType: params.resourceType, resourceId: params.resourceId,
+            createdBy: params.createdBy, format, anonymized: params.anonymized,
+            storageKey: pendingStorageKey(params.resourceType, params.resourceId, batchId, format),
+            status: ExportArtifactStatus.PROCESSING, batchId, expiresAt, provenance } })
+        } else {
         await createExportArtifact({
           resourceType: params.resourceType,
           resourceId: params.resourceId,
@@ -182,6 +204,7 @@ export const enqueueExportJob = async (params: {
           batchId,
           expiresAt,
         }, tx)
+        }
       }
     })
     created = true
@@ -216,9 +239,11 @@ export const enqueueExportJob = async (params: {
 export type ClaimedExportBatch = {
   batchId: string
   generation: number
-  resourceType: 'SCALE' | 'QUESTIONNAIRE'
+  resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE'
   resourceId: string
   options: ExportJobOptions
+  createdBy: string
+  createdAt: Date
   artifactIds: string[]
 }
 
@@ -226,6 +251,11 @@ export const claimExportBatch = async (batchId: string, jobId: string): Promise<
   prisma.$transaction(async (tx) => {
     const current = await tx.exportBatch.findUnique({ where: { id: batchId } })
     if (!current || current.status !== ExportArtifactStatus.PROCESSING) return null
+    if (current.expiresAt <= new Date()) {
+      await tx.exportBatch.update({ where: { id: batchId }, data: { status: ExportArtifactStatus.FAILED, errorCode: 'EXPORT_EXPIRED' } })
+      await tx.exportArtifact.updateMany({ where: { batchId }, data: { status: ExportArtifactStatus.FAILED, errorCode: 'EXPORT_EXPIRED' } })
+      return null
+    }
     const generation = current.generation + 1
     const claimed = await tx.exportBatch.updateMany({
       where: { id: batchId, status: ExportArtifactStatus.PROCESSING, generation: current.generation },
@@ -246,8 +276,9 @@ export const claimExportBatch = async (batchId: string, jobId: string): Promise<
     return {
       batchId,
       generation,
-      resourceType: current.resourceType as 'SCALE' | 'QUESTIONNAIRE',
+      resourceType: current.resourceType as 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE',
       resourceId: current.resourceId,
+      createdBy: current.createdBy, createdAt: current.createdAt,
       options: current.options as unknown as ExportJobOptions,
       artifactIds: artifacts.map((artifact) => artifact.id),
     }
@@ -264,7 +295,8 @@ export const publishExportBatch = async (params: {
   batchId: string
   generation: number
   fieldCount: number
-  storageKeys: Array<{ artifactId: string; storageKey: string }>
+  recordCount?: number
+  storageKeys: Array<{ artifactId: string; storageKey: string; provenance?: Prisma.InputJsonValue }>
 }): Promise<boolean> => prisma.$transaction(async (tx) => {
   // Fence the generation first. The row lock is retained until the artifact
   // metadata updates commit, so a stale worker cannot publish any READY row.
@@ -273,6 +305,7 @@ export const publishExportBatch = async (params: {
     data: {
       status: ExportArtifactStatus.READY,
       fieldCount: params.fieldCount,
+      ...(params.recordCount !== undefined ? { recordCount: params.recordCount } : {}),
       processingJobId: null,
       processingStartedAt: null,
       errorCode: null,
@@ -290,7 +323,7 @@ export const publishExportBatch = async (params: {
   for (const entry of params.storageKeys) {
     await tx.exportArtifact.update({
       where: { id: entry.artifactId },
-      data: { storageKey: entry.storageKey, status: ExportArtifactStatus.READY, errorCode: null },
+      data: { storageKey: entry.storageKey, ...(entry.provenance ? { provenance: entry.provenance } : {}), status: ExportArtifactStatus.READY, errorCode: null },
     })
   }
   return true

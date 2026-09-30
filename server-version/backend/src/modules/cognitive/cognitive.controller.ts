@@ -1,3 +1,4 @@
+import { enqueueExportJob } from '../../services/exportJobService'
 import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
 import { success, error, unauthorized, notFound, completionBusy, assessmentSubmitBusy, instrumentError } from '../../utils/response'
@@ -337,16 +338,18 @@ export const cognitiveController = {
       const { cognitiveExportService } = await import('./export.service')
       const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
         detail: query.detail,
-        anonymize: true,
+        anonymize: true, previewLimit: 1,
       })
 
       return success(res, {
+        sampled: true, sampleSize: data.rows.length,
         assignmentId: data.assignmentId,
         assignmentTitle: data.assignmentTitle,
         testType: data.testType,
         detail: data.detail,
         completedCount: data.completedCount,
-        trialCount: data.trialCount,
+        trialCount: null,
+        fieldsAreSampled: true,
         fieldCount: data.fields.length,
         fields: data.fields,
       })
@@ -364,53 +367,12 @@ export const cognitiveController = {
       await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
 
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
-      const { cognitiveExportService } = await import('./export.service')
-      const data = await cognitiveExportService.getCognitiveExportData(req.params.id, {
-        detail: input.detail,
-        anonymize,
-        dateRange: input.dateRange,
-      })
-      const files = await cognitiveExportService.saveCognitiveExportFiles(
-        req.params.id,
-        { detail: input.detail, anonymize, dateRange: input.dateRange },
-        input.format,
-        data
-      )
-
-      const result: Record<string, unknown> = {
-        assignmentId: data.assignmentId,
-        assignmentTitle: data.assignmentTitle,
-        detail: data.detail,
-        format: input.format,
-        anonymize,
-        recordCount: data.completedCount,
-        trialCount: data.trialCount,
-        fieldCount: data.fields.length,
-      }
-
-      if (files.csvPath) {
-        result.fileName = path.basename(files.csvPath)
-      }
-      if (files.savPath) {
-        result.fileName = path.basename(files.savPath)
-      }
-      if (files.xlsxPath) {
-        result.fileName = path.basename(files.xlsxPath)
-      }
-      if (files.zipPath) {
-        result.fileName = path.basename(files.zipPath)
-      }
-
-      const generatedPath = files.csvPath || files.savPath || files.xlsxPath || files.zipPath
-      if (!generatedPath) throw new Error('Missing generated export')
-      await registerAssessmentExport({
-        resourceType: 'COGNITIVE', resourceId: req.params.id,
-        actor: { userId: req.user.userId, role: req.user.role },
-        anonymized: anonymize, filePath: generatedPath, format: input.format,
-        detail: input.detail, dateRange: input.dateRange,
-        projectionFingerprint: 'cognitive-frozen-export-v1',
-      })
-      return success(res, result, '导出成功')
+      const result = await enqueueExportJob({ resourceType: 'COGNITIVE', resourceId: req.params.id,
+        createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
+        requestKey: req.get('X-Export-Request-Key'),
+        options: { detail: input.detail, anonymize, dateRange: input.dateRange,
+          creatorRole: req.user.role as 'ADMIN' | 'TEACHER', projectionFingerprint: 'cognitive-frozen-export-v1' } })
+      return success(res, result, '导出已排队')
     } catch (err) {
       return handleError(res, err)
     }

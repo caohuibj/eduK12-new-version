@@ -41,6 +41,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   const [documents, setDocuments] = useState<DocumentType[]>([])
   const [loading, setLoading] = useState(false)
   const [libraryError, setLibraryError] = useState('')
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const requestRef = useRef(0)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [selectedVideo, setSelectedVideo] = useState<VideoType | null>(null)
@@ -59,7 +61,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
   const [uploadError, setUploadError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const fetchLibrary = useCallback(async () => {
+  const fetchLibrary = useCallback(async (nextPage = 1) => {
     const request = ++requestRef.current
     setLoading(true)
     setLibraryError('')
@@ -67,18 +69,19 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
     setSelectedImage(null)
     setSelectedDocument(null)
     try {
-      const response = await apiClient.get(isDocumentMode ? '/documents' : isImageMode ? '/uploads/images' : '/videos?pageSize=100')
+      const response = await apiClient.get(isDocumentMode ? '/documents' : isImageMode ? '/uploads/images' : '/videos', { params: { page: nextPage, pageSize: 40, keyword: searchKeyword } })
       if (response.code !== 0) throw new Error(response.message || '素材库加载失败')
       if (request !== requestRef.current) return
-      if (isDocumentMode) setDocuments(response.data.list)
-      else if (isImageMode) setImages(response.data.list)
-      else setVideos(response.data.list)
+      setPage(nextPage); setHasMore(Boolean(response.data.hasMore))
+      if (isDocumentMode) setDocuments(previous => nextPage === 1 ? response.data.list : [...previous, ...response.data.list])
+      else if (isImageMode) setImages(previous => nextPage === 1 ? response.data.list : [...previous, ...response.data.list])
+      else setVideos(previous => nextPage === 1 ? response.data.list : [...previous, ...response.data.list])
     } catch (error) {
       if (request === requestRef.current) setLibraryError(error instanceof Error ? error.message : '素材库加载失败')
     } finally {
       if (request === requestRef.current) setLoading(false)
     }
-  }, [isDocumentMode, isImageMode])
+  }, [isDocumentMode, isImageMode, searchKeyword])
 
   useEffect(() => {
     if (isOpen && activeTab === 'library') {
@@ -419,6 +422,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
                 />
               </div>
 
+              {hasMore && <button type="button" disabled={loading} className="btn-secondary" onClick={() => void fetchLibrary(page + 1)}>加载更多素材</button>}
               {loading ? (
                 <div role="status" className="text-center py-8">加载中...</div>
               ) : libraryError ? (

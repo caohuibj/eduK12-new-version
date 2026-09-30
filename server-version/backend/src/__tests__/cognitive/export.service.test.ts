@@ -16,6 +16,7 @@ import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/s
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
 import { createUnifiedCognitiveRawSubmissionPayload } from '../../modules/cognitive/unified-raw-submission'
 import {
+  saveCognitiveExportFiles,
   buildCognitiveResearchPackage,
   exportCognitiveToCSV,
   getCognitiveExportData,
@@ -440,4 +441,23 @@ describe('cognitive export service', () => {
     expect(names).not.toContain('M_block_slope_rt')
     expect(names).not.toContain('M_block_slope_omission')
   })
+})
+
+it('reuses one immutable research materialization even if newer completed sessions appear', async () => {
+  mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue(assignment)
+  mockPrisma.cognitiveSession.count.mockResolvedValue(1)
+  mockPrisma.cognitiveTrial.count.mockResolvedValue(2)
+  mockPrisma.cognitiveRawSubmission.aggregate.mockResolvedValue({ _sum: { trialCount: 0 } })
+  mockPrisma.cognitiveSession.findMany.mockResolvedValue([session(true)])
+  const data = await getCognitiveExportData('assignment-1', { detail: 'research', anonymize: true })
+  mockPrisma.cognitiveSession.findMany.mockResolvedValue([{ ...session(true), id: 'late-session' }])
+  const files = await saveCognitiveExportFiles('assignment-1', { detail: 'research', anonymize: true }, 'zip', data)
+  const fs = await import('node:fs/promises')
+  try {
+    const bytes = await fs.readFile(files.zipPath!)
+    expect(bytes.toString()).toContain('session-1')
+    expect(bytes.toString()).not.toContain('late-session')
+    expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledOnce()
+    expect(mockPrisma.cognitiveAssignment.findUnique).toHaveBeenCalledOnce()
+  } finally { await fs.rm(files.zipPath!, { force: true }) }
 })

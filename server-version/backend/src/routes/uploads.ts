@@ -1,3 +1,4 @@
+import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { boundedUpload, uploadPrincipalRateLimit, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { Router, Request } from 'express'
 import { success, error } from '../utils/response'
@@ -9,7 +10,7 @@ import { config } from '../config'
 import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS } from '../utils/cos'
 import { logger } from '../utils/logger'
-import { discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { detectMimeType } from '../utils/fileValidator'
@@ -71,27 +72,34 @@ const canManageAsset = (req: Request, ownerId: string | null): boolean =>
 router.get('/images', async (req, res) => {
   try {
     const images: any[] = []
+    const pagination = getPaginationParams(req)
+    const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.slice(0, 200) : ''
 
     const assetWhere = {
       mimeType: { startsWith: 'image/' },
       deletedAt: null,
+      ...(keyword ? { originalName: { contains: keyword, mode: 'insensitive' as const } } : {}),
       // Anonymous check-in uploads are temporary/submission-scoped assets,
       // not part of a teacher's reusable media library.
       accessScope: { not: 'PUBLIC_CHECKIN' },
       ...(req.user?.role === UserRole.TEACHER ? { ownerId: req.user.userId } : {}),
     }
-    const assets = await prisma.storedAsset.findMany({ where: assetWhere, orderBy: { createdAt: 'desc' } })
+    const [assets, total] = await Promise.all([
+      prisma.storedAsset.findMany({ where: assetWhere, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: pagination.skip, take: pagination.take, select: { id: true, originalName: true, sizeBytes: true, createdAt: true, provider: true, accessScope: true, deletedAt: true } }),
+      prisma.storedAsset.count({ where: assetWhere }),
+    ])
     images.push(...await Promise.all(assets.map(async (asset) => ({
       id: asset.id,
       assetId: asset.id,
-      url: await getSignedAssetUrl(asset.id),
+      url: signKnownAsset(asset),
       filename: asset.id,
       name: asset.originalName || asset.id,
       size: asset.sizeBytes,
       createdAt: asset.createdAt,
       storage: asset.provider,
     }))))
-    
+
+    if (!config.legacyUploadsEnabled) return success(res, buildPaginatedResult(images, total, pagination))
     // 1. 从本地文件系统获取旧图片 during the migration window only.
     const imagesDir = path.join(config.uploadDir, 'images')
     if (config.legacyUploadsEnabled && fs.existsSync(imagesDir)) {
@@ -150,8 +158,7 @@ router.get('/images', async (req, res) => {
     images.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
     return success(res, {
-      list: images,
-      total: images.length,
+      ...buildPaginatedResult(images.slice(0, pagination.take), total + Math.max(0, images.length - assets.length), pagination),
     })
   } catch (err) {
     logger.error('获取图片列表错误', err)

@@ -36,6 +36,7 @@ export type CognitiveExportFormat = 'csv' | 'sav' | 'xlsx' | 'zip'
 export interface CognitiveExportOptions {
   detail?: CognitiveExportDetail
   anonymize?: boolean
+  previewLimit?: number
   dateRange?: {
     start?: string
     end?: string
@@ -103,6 +104,9 @@ interface DecodedCognitiveExportSession extends Omit<CognitiveExportSession, 'sc
   resultSnapshot: CognitiveResultSnapshot | null
   trials: Array<{ trialIndex: number; payload: unknown }>
 }
+
+const previewCounts = new WeakMap<CognitiveExportSession[], number>()
+const materialized = new WeakMap<CognitiveExportData, { assignment: Awaited<ReturnType<typeof getAssignment>>; sessions: DecodedCognitiveExportSession[]; anonymize: boolean }>()
 
 const MAX_FIELD_NAME_LENGTH = 64
 const EXPORT_DIR = exportRoot()
@@ -265,7 +269,8 @@ const getAssignment = async (assignmentId: string) => {
 const getSessions = async (
   assignmentId: string,
   detail: CognitiveExportDetail,
-  dateRange?: CognitiveExportOptions['dateRange']
+  dateRange?: CognitiveExportOptions['dateRange'],
+  previewLimit?: number,
 ): Promise<CognitiveExportSession[]> => {
   const finishedAt = toDateRange(dateRange)
   const where = {
@@ -284,9 +289,9 @@ const getSessions = async (
   // session payloads. The bounded query below remains as a defense-in-depth
   // check for races and keeps the existing nested take limits in place.
   const recordCount = await prisma.cognitiveSession.count({ where })
-  assertExportLimits({ records: recordCount })
+  if (!previewLimit) assertExportLimits({ records: recordCount })
 
-  if (detail === 'full' || detail === 'research') {
+  if (!previewLimit && (detail === 'full' || detail === 'research')) {
     const [legacyTrialCount, unifiedTrialCount] = await Promise.all([
       prisma.cognitiveTrial.count({
         where: { session: { is: where } },
@@ -319,7 +324,7 @@ const getSessions = async (
         },
       },
       orderBy: [{ finishedAt: 'asc' }, { createdAt: 'asc' }],
-      take: EXPORT_MAX_RECORDS + 1,
+      take: previewLimit ?? EXPORT_MAX_RECORDS + 1,
     })
     assertExportLimits({ records: sessions.length })
     return sessions as unknown as CognitiveExportSession[]
@@ -329,9 +334,10 @@ const getSessions = async (
     where,
     include: includeUser,
     orderBy: [{ finishedAt: 'asc' }, { createdAt: 'asc' }],
-    take: EXPORT_MAX_RECORDS + 1,
+    take: previewLimit ?? EXPORT_MAX_RECORDS + 1,
   })
   assertExportLimits({ records: sessions.length })
+  if (previewLimit) previewCounts.set(sessions as unknown as CognitiveExportSession[], recordCount)
   return sessions as unknown as CognitiveExportSession[]
 }
 
@@ -613,7 +619,7 @@ export async function getCognitiveExportData(
   const detail = options.detail || 'summary'
   const anonymize = options.anonymize ?? true
   const assignment = await getAssignment(assignmentId)
-  const sessions = await getSessions(assignmentId, detail, options.dateRange)
+  const sessions = await getSessions(assignmentId, detail, options.dateRange, options.previewLimit)
   const decodedSessions = sessions.map(decodeSession)
   const builder = new ExportFieldBuilder()
   const includeProductIndex = decodedSessions.length === 0
@@ -631,16 +637,18 @@ export async function getCognitiveExportData(
     trials: trialCount,
   })
 
-  return {
+  const data: CognitiveExportData = {
     assignmentId: assignment.id,
     assignmentTitle: assignment.title,
     testType: assignment.config?.testType || decodedSessions[0]?.testType || null,
     detail,
     fields: builder.fields,
     rows,
-    completedCount: decodedSessions.length,
+    completedCount: previewCounts.get(sessions) ?? decodedSessions.length,
     trialCount,
   }
+  materialized.set(data, { assignment, sessions: decodedSessions, anonymize })
+  return data
 }
 
 const csvValue = (value: unknown, type?: CognitiveExportField['type']): string => {
@@ -839,9 +847,10 @@ export async function saveCognitiveExportFiles(
     return { data: exportData, savPath }
   }
 
-  const assignment = await getAssignment(assignmentId)
-  const sessions = (await getSessions(assignmentId, 'research', options.dateRange)).map(decodeSession)
-  const pack = buildCognitiveResearchPackage(assignment, sessions, options.anonymize ?? true)
+  const snapshot = materialized.get(exportData)
+  if (!snapshot || exportData.assignmentId !== assignmentId || exportData.detail !== 'research' || snapshot.anonymize !== (options.anonymize ?? true)) throw new Error('Research export requires the original materialized research snapshot')
+  const { assignment, sessions } = snapshot
+  const pack = buildCognitiveResearchPackage(assignment, sessions, snapshot.anonymize)
   const dictionaryKeys = pack.dictionaryRows.map((row) => String(row.key))
   const registryKeys = sessions.flatMap((session) => {
     const context = reportContextFor(assignment, session)

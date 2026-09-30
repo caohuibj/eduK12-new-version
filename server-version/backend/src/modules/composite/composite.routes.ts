@@ -1,3 +1,4 @@
+import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
 import { compositeController } from './composite.controller'
@@ -105,6 +106,8 @@ router.post('/:id/public-tokens', authenticate, requireTeacher, compositeControl
 router.post('/:id/public-tokens/:tokenId/reveal', authenticate, requireTeacher, compositeController.revealToken)
 router.delete('/:id/public-tokens/:tokenId', authenticate, requireTeacher, compositeController.disableToken)
 
+router.get('/:id/export/artifacts/:artifactId/status', authenticate, requireTeacher, assessmentExportHttp('COMPOSITE', true))
+router.get('/:id/export/artifacts/:artifactId', authenticate, requireTeacher, assessmentExportHttp('COMPOSITE', false))
 router.get('/:id/export/preview', authenticate, requireTeacher, compositeExportController.preview)
 router.post('/:id/export', authenticate, requireTeacher, compositeExportController.export)
 router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeExportController.download)

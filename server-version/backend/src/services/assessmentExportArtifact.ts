@@ -7,7 +7,7 @@ import { prisma } from '../config/database'
 import { validateStorageKey, type ExportActor } from './exportArtifactService'
 import { EXPORT_RETENTION_HOURS, EXPORT_MAX_RECORDS } from './exportStorage'
 
-const provenanceSchema = z.object({
+export const provenanceSchema = z.object({
   version: z.literal(1),
   generation: z.string().uuid(),
   creatorRole: z.enum(['ADMIN', 'TEACHER']),
@@ -56,13 +56,13 @@ export async function registerAssessmentExport(input: {
  * live assignment/Composite authority check before invoking this resolver. */
 export async function resolveAssessmentExport(input: {
   resourceType: ResourceType; resourceId: string; actor: ExportActor;
-  fileName: string; projectionFingerprint: string;
+  fileName: string; projectionFingerprint: string; metadataOnly?: boolean;
 }): Promise<string | null> {
   if (path.basename(input.fileName) !== input.fileName) return null
   const artifact = await prisma.exportArtifact.findFirst({ where: {
     resourceType: input.resourceType, resourceId: input.resourceId, storageKey: input.fileName,
   } })
-  if (!artifact || artifact.status !== 'READY'
+  if (!artifact || (!input.metadataOnly && artifact.status !== 'READY')
     || !Number.isFinite(artifact.expiresAt.getTime()) || artifact.expiresAt.getTime() <= Date.now()
     || artifact.resourceType !== input.resourceType || artifact.resourceId !== input.resourceId
     || artifact.storageKey !== input.fileName) return null
@@ -72,7 +72,7 @@ export async function resolveAssessmentExport(input: {
     input.actor.role !== UserRole.TEACHER || artifact.createdBy !== input.actor.userId
     || !artifact.anonymized || parsed.data.creatorRole !== input.actor.role
   )) return null
-  if (input.resourceType === 'COMPOSITE') {
+  if (input.resourceType === 'COMPOSITE' && artifact.status === 'READY') {
     const { teacherRelationalExportVisibility } = await import('../modules/composite/composite-export.service')
     const visibility = await teacherRelationalExportVisibility(input.actor)
     const ids = parsed.data.attemptIds
@@ -82,6 +82,7 @@ export async function resolveAssessmentExport(input: {
     ] } })
     if (count !== ids.length) return null
   }
+  if (input.metadataOnly) return artifact.storageKey
   try {
     const filePath = validateStorageKey(artifact.storageKey)
     if (path.extname(filePath) !== `.${artifact.format}`) return null

@@ -1,3 +1,4 @@
+import { enqueueExportJob } from '../../services/exportJobService'
 import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
@@ -41,7 +42,7 @@ export const compositeExportController = {
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const [raw, binding] = await Promise.all([
         compositeExportService.getExportData(req.params.id, {
-          detail: query.detail,
+          previewLimit: 1, detail: query.detail,
           anonymize: true,
           actor: { userId: req.user.userId, role: req.user.role },
         }),
@@ -49,10 +50,12 @@ export const compositeExportController = {
       ])
       const data = projectCompositeExportData(raw, binding)
       return success(res, {
+        sampled: true, sampleSize: data.rows.length,
         assessmentId: data.assessmentId,
         assessmentName: data.assessmentName,
         detail: data.detail,
-        recordCount: data.rows.length,
+        recordCount: data.totalCount ?? data.rows.length,
+        fieldsAreSampled: true,
         fieldCount: data.fields.length,
         fields: data.fields,
       })
@@ -65,35 +68,11 @@ export const compositeExportController = {
       const input = compositeExportRequestSchema.parse(req.body || {})
       await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
-      const exportOptions = {
-        detail: input.detail,
-        anonymize,
-        dateRange: input.dateRange,
-        actor: { userId: req.user.userId, role: req.user.role },
-      }
-      const [raw, binding] = await Promise.all([
-        compositeExportService.getExportData(req.params.id, exportOptions),
-        resolveCompositeExportProjectionBinding(req.params.id, 'teacher'),
-      ])
-      const data = projectCompositeExportData(raw, binding)
-      const files = await compositeExportService.saveExportFiles(req.params.id, exportOptions, input.format, data)
-      const boundPath = bindCompositeExportFilePath(files.filePath, binding)
-      await registerAssessmentExport({
-        resourceType: 'COMPOSITE', resourceId: req.params.id,
-        actor: exportOptions.actor, anonymized: anonymize, filePath: boundPath,
-        format: input.format, detail: input.detail, dateRange: input.dateRange,
-        projectionFingerprint: binding.fingerprint,
-        attemptIds: data.rows.map((row) => String(row.A_attempt_id)),
-      })
-      return success(res, {
-        assessmentId: data.assessmentId,
-        detail: input.detail,
-        format: input.format,
-        anonymize,
-        recordCount: data.rows.length,
-        fieldCount: data.fields.length,
-        fileName: path.basename(boundPath),
-      }, '导出成功')
+      const binding = await resolveCompositeExportProjectionBinding(req.params.id, 'teacher')
+      return success(res, await enqueueExportJob({ resourceType: 'COMPOSITE', resourceId: req.params.id,
+        createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
+        requestKey: req.get('X-Export-Request-Key'), options: { detail: input.detail, anonymize, dateRange: input.dateRange,
+          creatorRole: req.user.role as 'ADMIN' | 'TEACHER', projectionFingerprint: binding.fingerprint } }), '导出已排队')
     } catch (err) { return handleError(res, err) }
   },
 

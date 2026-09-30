@@ -36,7 +36,8 @@ export const waitForExportArtifacts = async (
 
   while (Date.now() < deadline) {
     const states = await Promise.all(artifacts.map(async (artifact) => {
-      const response = await sessionFetch(`${artifact.downloadUrl}/status`, { cache: 'no-store' })
+      const response = await sessionFetch(`${artifact.downloadUrl}/status`, { cache: 'no-store', signal: AbortSignal.timeout(Math.min(15000, Math.max(1, deadline - Date.now()))) })
+      if (response.status === 404 || response.status === 410) throw new ExportJobFailedError('导出文件已到期或不可用，请重新导出')
       if (!response.ok) throw new Error('无法读取导出任务状态')
       const payload = await response.json()
       if (payload?.code !== 0 || !payload?.data) throw new Error(payload?.message || '无法读取导出任务状态')
@@ -55,4 +56,33 @@ export const waitForExportArtifacts = async (
   }
 
   throw new Error('导出任务仍在处理中，可稍后使用相同操作继续等待')
+}
+
+// Persist only an opaque idempotency key. A lost response or page refresh replays the same server intent.
+export const getExportIntentKey = (scope: string): string => {
+  const name = `export-intent:${scope}`
+  const existing = sessionStorage.getItem(name)
+  if (existing) return existing
+  const key = createExportRequestKey()
+  sessionStorage.setItem(name, key)
+  return key
+}
+export const clearExportIntentKey = (scope: string): void => { sessionStorage.removeItem(`export-intent:${scope}`) }
+
+/** Terminal conflicts require a fresh intent; transient transport failures replay the old one. */
+export const requestExportIntent = async <T>(scope: string, request: (key: string) => Promise<T>): Promise<T> => {
+  try { return await request(getExportIntentKey(scope)) }
+  catch (error) {
+    const apiError = error as { status?: number; response?: { status?: number } }
+    const status = apiError?.status ?? apiError?.response?.status
+    if (status === 404 || status === 409 || status === 410) {
+      clearExportIntentKey(scope)
+      throw new ExportJobFailedError('导出条件已变化或文件已失效，请重新导出')
+    }
+    throw error
+  }
+}
+export const assertExportDownload = (response: Response): void => {
+  if (response.status === 404 || response.status === 410) throw new ExportJobFailedError('导出文件已到期或不可用，请重新导出')
+  if (!response.ok) throw new Error('下载导出文件失败')
 }
