@@ -3,8 +3,6 @@ import {
   ReportCoreSummary,
   ReportDetails,
   ReportDisclaimer,
-  ReportMetric,
-  ReportMetricGrid,
   ReportRangeTrack,
   ReportSection,
   type ReportRangeReference,
@@ -156,6 +154,50 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         {quality?.status && <span>数据质量：{qualityStatusLabel(quality.status)}</span>}
       </div>
 
+      <ReportSection
+        title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
+        eyebrow="分数层"
+        description={dimensionScores.length > 0
+          ? '总体结果与各维度分别展示。请结合各自的量尺范围阅读，不同量表的条形长度不能直接比较。'
+          : '查看本次得分及其原始量尺范围。'}
+        testId="scale-score-layer"
+      >
+        {scores.length === 0 ? (
+          <p className="text-sm text-gray-500">该量表尚未形成可展示的分数。</p>
+        ) : (
+          <div className="space-y-5">
+            {totalScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">总体结果</p>
+                {totalScores.length === 1 ? (
+                  <div className="report-primary-score space-y-2">
+                    {rangeTrack(totalScores[0])}
+                    {totalScores[0].description && <p className="text-sm text-gray-600">{totalScores[0].description}</p>}
+                  </div>
+                ) : (
+                  <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
+                )}
+              </div>
+            )}
+
+            {dimensionScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">维度结果</p>
+                <div className="report-range-grid">{dimensionScores.map(rangeTrack)}</div>
+              </div>
+            )}
+
+            {unclassifiedScores.length > 0 && (
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">其他得分</p>
+                <p className="mb-3 text-sm text-gray-500">这些得分未标注为总分或维度，因此单独列出，不推断其层级。</p>
+                <div className="report-range-grid">{unclassifiedScores.map(rangeTrack)}</div>
+              </div>
+            )}
+          </div>
+        )}
+      </ReportSection>
+
       {!invalid && interpretations.length > 0 && (
         <div data-testid="scale-core-feedback">
           <ReportCoreSummary label="核心反馈">
@@ -184,63 +226,21 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         </div>
       )}
 
-      <ReportSection
-        title={dimensionScores.length > 0 ? '结果概览' : '实际得分'}
-        eyebrow="分数层"
-        description={dimensionScores.length > 0
-          ? '总体结果与各维度按后台定义分别展示；不同量表范围不会被前端标准化后直接比较。'
-          : '展示后台报告投影中已有的分数和原始范围。'}
-        testId="scale-score-layer"
-      >
-        {scores.length === 0 ? (
-          <p className="text-sm text-gray-500">该量表尚未形成可展示的分数。</p>
-        ) : (
-          <div className="space-y-5">
-            {totalScores.length > 0 && (
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">总体结果</p>
-                {totalScores.length === 1 ? (
-                  <div className="space-y-3">
-                    <ReportMetric
-                      emphasis
-                      label={totalScores[0].label}
-                      value={formatNumber(totalScores[0].value, totalScores[0].displayPrecision)}
-                      description={totalScores[0].description}
-                      meta={scoreStatusLabel(totalScores[0]) || undefined}
-                    />
-                    <ReportRangeTrack
-                      label={totalScores[0].label}
-                      value={totalScores[0].value}
-                      formattedValue={scoreStatusLabel(totalScores[0]) || '范围'}
-                      range={totalScores[0].range}
-                      reference={overlayFor(totalScores[0], references)}
-                      status={scoreStatusLabel(totalScores[0])}
-                    />
-                  </div>
-                ) : (
-                  <div className="report-range-grid">{totalScores.map(rangeTrack)}</div>
-                )}
-              </div>
-            )}
+      {invalid && (
+        <ReportCoreSummary label="数据质量">
+          <p>当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。</p>
+        </ReportCoreSummary>
+      )}
 
-            {dimensionScores.length > 0 && (
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">维度结果</p>
-                <div className="report-range-grid">{dimensionScores.map(rangeTrack)}</div>
-              </div>
-            )}
+      {(report.caveats || []).length > 0 && (
+        <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
+          <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
+            {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
+          </ul>
+        </ReportSection>
+      )}
 
-            {unclassifiedScores.length > 0 && (
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">其他得分</p>
-                <p className="mb-3 text-xs text-gray-500">这些历史或受众安全分数未携带 total / dimension 类型，页面不会自行推断其层级。</p>
-                <div className="report-range-grid">{unclassifiedScores.map(rangeTrack)}</div>
-              </div>
-            )}
-          </div>
-        )}
-      </ReportSection>
-
+      {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
       {!invalid && (
         <ReportDetails title="科学依据与详细参考" testId="scale-reference-layer">
           {references.length === 0 ? (
@@ -264,21 +264,6 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
         </ReportDetails>
       )}
 
-      {invalid && (
-        <ReportCoreSummary label="数据质量">
-          <p>当前作答不足以稳定计算核心分数，因此不提供解释或群体参考。</p>
-        </ReportCoreSummary>
-      )}
-
-      {(report.caveats || []).length > 0 && (
-        <ReportSection title="阅读提示" eyebrow="限制" headingLevel={3}>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-amber-700" data-testid="scale-caveats">
-            {report.caveats.map((caveat) => <li key={caveat}>{caveat}</li>)}
-          </ul>
-        </ReportSection>
-      )}
-
-      {report.disclaimer && <ReportDisclaimer testId="scale-disclaimer">{report.disclaimer}</ReportDisclaimer>}
     </div>
   )
 }
