@@ -55,5 +55,5 @@ export function useEditorGuard({ open, value, onClose, externalBusy = false }: {
   </ManagementDialog>
   const fail = (message: string) => { if (alive.current) setErrorMessage(message) }
   const error = errorMessage ? <div role="alert" className="mx-4 my-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errorMessage}</div> : null
-  return { busy: busy || externalBusy, close, begin, finish, fail, error, confirmation }
+  return { dirty, busy: busy || externalBusy, close, begin, finish, fail, error, confirmation }
 }

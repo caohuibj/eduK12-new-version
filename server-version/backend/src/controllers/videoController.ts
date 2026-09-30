@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, storeAssetFromFile } from '../services/assetStorage'
 import { markVideoFailed } from '../services/videoProcessingState'
+import { retryVideo, VideoRetryError } from '../services/videoRetry'
 
 const updateVideoSchema = z.object({
   title: z.string().min(1, '视频标题不能为空'),
@@ -41,6 +42,16 @@ const associateProcessingJob = async (videoId: string, jobId: string): Promise<v
 }
 
 export const videoController = {
+  async retry(req: Request, res: Response) {
+    if (!req.user) return forbidden(res, '未登录')
+    try {
+      return success(res, await retryVideo(req.params.id, req.user), '已重新加入转码队列')
+    } catch (err) {
+      if (err instanceof VideoRetryError) return error(res, err.message, -1, err.status)
+      logger.error('重新转码入队失败', err)
+      return error(res, '暂时无法启动转码，请刷新处理状态后重试', -1, 503)
+    }
+  },
   // 获取视频列表（添加分页优化）
   async list(req: Request, res: Response) {
     try {
@@ -212,8 +223,15 @@ export const videoController = {
         })
         await associateProcessingJob(video.id, String(job.id))
       } catch (queueError) {
-        await markVideoFailed(video.id).catch(() => undefined)
-        throw queueError
+        // Only fail this upload's unclaimed row. A worker or a newer manual
+        // retry may already own it; preserve its generation and return the ID.
+        await prisma.video.updateMany({
+          where: { id: video.id, status: 'PENDING', processingJobId: null, processingGeneration: video.processingGeneration },
+          data: { status: 'FAILED', errorMessage: '视频处理失败，请稍后重试或联系管理员' },
+        }).catch(() => undefined)
+        const retained = await prisma.video.findUnique({ where: { id: video.id }, select: { status: true } }).catch(() => null)
+        logger.error('视频已保存，但转码入队失败', { videoId: video.id })
+        return success(res, { id: video.id, title: video.title, status: retained?.status ?? 'PENDING' }, '文件已保存，请查看处理状态；失败后可重新转码')
       }
 
       logger.info(`视频已加入处理队列: ${video.id}`)

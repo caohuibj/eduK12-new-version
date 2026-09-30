@@ -1,0 +1,114 @@
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
+
+const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), upload: vi.fn() }))
+vi.mock('../../api/client', () => ({ default: { get: mocks.get, post: mocks.post }, sessionAxios: { post: mocks.upload }, ensureCsrfToken: async () => 'token' }))
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner', role: 'TEACHER' } }) }))
+vi.mock('../../components/SecureVideoPlayer', () => ({ default: () => <div>video</div> }))
+import DocumentLibrary from '../DocumentLibrary'
+import ImageLibrary from '../ImageLibrary'
+import VideoLibrary from '../VideoLibrary'
+
+const result = (list: unknown[] = [], extra = {}) => ({ code: 0, data: { list, total: list.length, totalPages: 1, ...extra } })
+const document = (title: string) => ({ id: title, title, teacherId: 'owner', fileSize: 123, usageCount: 0 })
+const image = (name: string) => ({ id: name, name, filename: name, size: 123, url: '/image' })
+const video = (title: string, status = 'COMPLETED') => ({ id: title, title, status, fileSize: 123, tags: [], url: '/video', teacherId: 'owner' })
+describe('material lists and upload recovery', () => {
+  beforeEach(() => { vi.resetAllMocks(); mocks.get.mockResolvedValue(result()) })
+  afterEach(() => vi.useRealTimers())
+  it.each([[DocumentLibrary, '文档'], [ImageLibrary, '图片'], [VideoLibrary, '视频']] as const)('shows a read error, never a fake empty state, and retries %s', async (Page, noun) => {
+    mocks.get.mockRejectedValueOnce({ message: 'offline' }).mockResolvedValue(result())
+    const user = userEvent.setup()
+    render(<Page />)
+    expect(await screen.findByText(`${noun}列表加载失败`)).toBeInTheDocument()
+    expect(screen.queryByText(`暂无${noun}`)).toBeNull()
+    await user.click(screen.getByText('重试'))
+    expect(await screen.findByText(`暂无${noun}`)).toBeInTheDocument()
+  })
+  it.each([[DocumentLibrary, '文档', document], [VideoLibrary, '视频', video]] as const)('ignores late success and late failure on %s searches', async (Page, noun, item) => {
+    let late!: (value: unknown) => void
+    mocks.get.mockImplementationOnce(() => new Promise(resolve => { late = resolve })).mockResolvedValue(result([item('new')]))
+    const user = userEvent.setup()
+    render(<Page />)
+    await user.type(screen.getByRole('searchbox', { name: `搜索${noun}` }), 'new')
+    await user.click(screen.getByRole('button', { name: '搜索' }))
+    expect(await screen.findByText('new')).toBeInTheDocument()
+    await act(async () => late(result([item('old')])))
+    expect(screen.queryByText('old')).toBeNull()
+    expect(screen.getByText('new')).toBeInTheDocument()
+  })
+  it.each([[DocumentLibrary, '文档'], [VideoLibrary, '视频']] as const)('ignores an old rejected request and hides previous rows on a new business error for %s', async (Page, noun) => {
+    let late!: (reason: unknown) => void
+    mocks.get.mockImplementationOnce(() => new Promise((_resolve, reject) => { late = reject }))
+      .mockResolvedValueOnce(result([noun === '文档' ? document('current') : video('current')]))
+      .mockResolvedValueOnce({ code: 7, message: 'not available' })
+    const user = userEvent.setup()
+    render(<Page />)
+    const search = screen.getByRole('searchbox', { name: `搜索${noun}` })
+    await user.type(search, 'current'); await user.click(screen.getByRole('button', { name: '搜索' }))
+    await screen.findByText('current')
+    await act(async () => late({ message: 'old failure' }))
+    expect(screen.queryByText('old failure')).toBeNull()
+    await user.type(search, ' changed'); await user.click(screen.getByRole('button', { name: '搜索' }))
+    await screen.findByText('not available')
+    expect(screen.queryByText('current')).toBeNull()
+    expect(screen.queryByText(`暂无${noun}`)).toBeNull()
+  })
+  it('retries the failed image page without skipping or duplicating prior pages', async () => {
+    mocks.get.mockResolvedValueOnce(result([image('first')], { hasMore: true, total: 2 }))
+      .mockRejectedValueOnce({ message: 'page two failed' }).mockResolvedValueOnce(result([image('second')], { hasMore: false, total: 2 }))
+    const user = userEvent.setup()
+    render(<ImageLibrary />)
+    await screen.findByText('first')
+    await user.click(screen.getByText('加载更多图片'))
+    await screen.findByText('图片列表加载失败')
+    await user.click(screen.getByText('重试'))
+    await screen.findByText('second')
+    expect(screen.getAllByText('first')).toHaveLength(1)
+    expect(mocks.get.mock.calls.map(call => call[1]?.params?.page)).toEqual([1, 2, 2])
+  })
+  it('retains failed uploads on clear-completed, retries upload once and recovers transcode without reuploading', async () => {
+    const user = userEvent.setup()
+    mocks.upload.mockRejectedValueOnce(new Error('upload offline')).mockResolvedValueOnce({ data: { code: 0, data: { id: 'server-video', status: 'PENDING' } } })
+    mocks.post.mockResolvedValue({ code: 0, data: { id: 'server-video', status: 'PENDING' } })
+    render(<VideoLibrary />)
+    await screen.findByText('暂无视频')
+    await user.click(screen.getByRole('button', { name: '上传视频' }))
+    const input = window.document.querySelector('input[type="file"]') as HTMLInputElement
+    await user.upload(input, new File(['video'], 'lesson.mp4', { type: 'video/mp4' }))
+    await user.click(screen.getByRole('button', { name: /开始上传/ }))
+    await screen.findByText('upload offline')
+    await user.click(screen.getByText('清除已完成'))
+    const retry = screen.getByText('重新上传')
+    act(() => { fireEvent.click(retry); fireEvent.click(retry) })
+    await waitFor(() => expect(mocks.upload).toHaveBeenCalledTimes(2))
+    mocks.get.mockImplementation((path: string) => Promise.resolve(path.includes('/status') ? { code: 0, data: { status: 'FAILED', errorMessage: '转码失败' } } : result()))
+    await user.click(await screen.findByText('刷新处理状态'))
+    await screen.findByText('转码失败')
+    const dialog = screen.getByRole('dialog', { name: '批量上传视频' })
+    const transcode = within(dialog).getByText('重新转码')
+    act(() => { fireEvent.click(transcode); fireEvent.click(transcode) })
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledTimes(1))
+    expect(mocks.post).toHaveBeenCalledWith('/videos/server-video/retry')
+    expect(mocks.upload).toHaveBeenCalledTimes(2)
+  })
+  it('tracks a retry started from a persisted failed video through completion without another upload', async () => {
+    let restarted = false
+    let completed = false
+    mocks.get.mockImplementation((path: string) => Promise.resolve(path.includes('/status')
+      ? { code: 0, data: { status: 'COMPLETED', progress: 100 } }
+      : result([video('retained', completed ? 'COMPLETED' : restarted ? 'PENDING' : 'FAILED')])))
+    mocks.post.mockImplementation(async () => { restarted = true; return { code: 0, data: { id: 'retained' } } })
+    const user = userEvent.setup()
+    render(<VideoLibrary />)
+    await user.click(await screen.findByRole('button', { name: '重新转码' }))
+    expect(await screen.findByText(/视频处理状态/)).toBeInTheDocument()
+    completed = true
+    await user.click(screen.getByRole('button', { name: '刷新处理状态' }))
+    await waitFor(() => expect(screen.queryByText(/视频处理状态/)).toBeNull())
+    expect(mocks.get).toHaveBeenCalledWith('/videos/retained/status')
+    expect(mocks.post).toHaveBeenCalledWith('/videos/retained/retry')
+    expect(mocks.upload).not.toHaveBeenCalled()
+  })
+})

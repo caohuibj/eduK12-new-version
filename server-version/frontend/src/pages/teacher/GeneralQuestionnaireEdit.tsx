@@ -1,15 +1,18 @@
+import { usePageEditorGuard } from '../../components/shared-ui/usePageEditorGuard'
+import { useLatestRequest, requestError } from '../../components/shared-ui/useLatestRequest'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../../components/shared-ui/useEditorGuard'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { Save, Plus, Trash2, ChevronLeft, GripVertical, Layers, FileText, Edit3 } from 'lucide-react'
 import { ScaleSelector } from '../../components/ScaleSelector'
 import type { Scale } from '../../components/ScaleSelector/types'
 import { contextOptionsForKey, contextValueHint } from '../../modules/assessment-context/options'
 import FormSectionManager from '../../components/FormSectionManager'
-import { ProductPage, ProductStatus } from '../../components/product-ui'
+import { ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 // 表单题目类型
 interface FormItem {
@@ -58,12 +61,14 @@ interface Questionnaire {
   estimatedTime: number | null
 }
 
+const basicValue = (value: Questionnaire) => ({ name: value.name, description: value.description || '', instruction: value.instruction || '', estimatedTime: value.estimatedTime })
+
 const GeneralQuestionnaireEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const { loading, error: loadError, run: runLoad, invalidate: invalidateLoad } = useLatestRequest()
+  const { feedback, success, error: showError, info, clear } = useStaffFeedback()
+  const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<'basic' | 'content' | 'tokens'>('basic')
 
   // 问卷基本信息
@@ -111,26 +116,26 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   const itemGuard = useEditorGuard({ open: showFormItemModal, value: formData, onClose: () => { setShowFormItemModal(false); resetFormData() } })
 
+  const pageGuard = usePageEditorGuard(basicValue(questionnaire), { dirty: itemGuard.dirty, busy: itemGuard.busy })
+  const saving = pageGuard.busy
+
   useEffect(() => {
     if (id) {
       fetchQuestionnaire()
       fetchContent()
     }
     fetchAvailableScales()
+    return invalidateLoad
   }, [id])
 
-  const fetchQuestionnaire = async () => {
-    try {
-      const response = await apiClient.get<Questionnaire>(`/general-questionnaires/${id}`)
-      if (response.code === 0) {
-        setQuestionnaire(response.data)
-      }
-    } catch (err) {
-      console.error('获取问卷信息失败', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const fetchQuestionnaire = () => runLoad(async () => {
+    const response = await apiClient.get<Questionnaire>(`/general-questionnaires/${id}`)
+    if (response.code !== 0) throw new Error(response.message || '问卷加载失败')
+    return response.data
+  }, data => {
+    setQuestionnaire(data)
+    pageGuard.reset(basicValue(data))
+  }, '问卷加载失败，请重试')
 
   const fetchContent = async () => {
     try {
@@ -164,29 +169,22 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   }
 
   const handleSaveBasic = async () => {
-    if (!questionnaire.name) {
-      alert('问卷名称不能为空')
+    if (!questionnaire.name.trim()) {
+      showError('无法保存', '请填写问卷名称')
       return
     }
-
+    if (!pageGuard.begin()) return
+    clear()
     try {
-      setSaving(true)
-      const response = await apiClient.put<Questionnaire>(`/general-questionnaires/${id}`, {
-        name: questionnaire.name,
-        description: questionnaire.description,
-        instruction: questionnaire.instruction,
-        estimatedTime: questionnaire.estimatedTime,
-      })
-      if (response.code === 0) {
-        setQuestionnaire(response.data)
-        alert('保存成功')
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '保存失败')
+      const response = await apiClient.put<Questionnaire>(`/general-questionnaires/${id}`, basicValue(questionnaire))
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
+      setQuestionnaire(response.data)
+      pageGuard.reset(basicValue(response.data))
+      success('保存成功')
+    } catch (error) {
+      showError('保存失败', requestError(error, '保存失败，请重试；修改仍保留在当前页面。'))
     } finally {
-      setSaving(false)
+      pageGuard.finish()
     }
   }
 
@@ -276,10 +274,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       if (response.code === 0) {
         setFormItems(formItems.filter(fi => fi.id !== itemId))
       } else {
-        alert(response.message)
+        showMessage(response.message)
       }
     } catch (err: any) {
-      alert(err.message || '删除失败')
+      showMessage(err.message || '删除失败')
     }
   }
 
@@ -312,21 +310,22 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   // 发布问卷
   const handlePublish = async () => {
+    if (pageGuard.dirty) { showError('请先保存修改', '保存基本信息后再发布问卷。'); return }
     if (questionnaireScales.length === 0 && formItems.length === 0) {
-      alert('问卷必须包含至少一个量表或表单题目')
+      showError('无法发布', '问卷必须包含至少一个量表或表单题目')
       return
     }
-
+    if (!pageGuard.begin()) return
+    clear()
     try {
       const response = await apiClient.post(`/general-questionnaires/${id}/publish`)
-      if (response.code === 0) {
-        setQuestionnaire({ ...questionnaire, status: 'PUBLISHED' })
-        alert('发布成功')
-      } else {
-        alert(response.message)
-      }
-    } catch (err: any) {
-      alert(err.message || '发布失败')
+      if (response.code !== 0) throw new Error(response.message || '发布失败')
+      setQuestionnaire(current => ({ ...current, status: 'PUBLISHED' }))
+      success('发布成功')
+    } catch (error) {
+      showError('发布失败', requestError(error, '发布失败，请重试'))
+    } finally {
+      pageGuard.finish()
     }
   }
 
@@ -351,6 +350,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载泛化问卷" announce="polite">正在读取问卷配置。</ProductStatus></ProductPage>
   }
 
+  if (loadError) return <ProductStatus kind="error" title="问卷加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchQuestionnaire()}>重试</ProductButton>}>{loadError}</ProductStatus>
+
   // 合并所有内容项并排序
   const allContentItems: ContentItem[] = [
     ...formItems.map(fi => ({ type: 'form' as const, id: fi.id, position: fi.position, data: fi })),
@@ -359,6 +360,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
   return (
     <ProductPage width="management" className="staff-editor-page space-y-6">
+      {feedback}
+      <fieldset disabled={saving} className="min-w-0 space-y-6">
       {/* Header */}
       <div className="staff-editor-heading">
         <div className="staff-editor-heading__copy">
@@ -796,6 +799,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
       {/* 令牌创建弹窗 */}
 
       {itemGuard.confirmation}
+      </fieldset>
+      {pageGuard.confirmation}
     </ProductPage>
   )
 }

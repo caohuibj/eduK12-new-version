@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesContext'
 import AppShell from './components/app-shell/AppShell'
@@ -822,13 +822,13 @@ function ApplicationFrame() {
   return <AppShell><RouteErrorBoundary key={location.pathname}><AppRoutes /></RouteErrorBoundary></AppShell>
 }
 
+const router = createBrowserRouter([{ path: '*', element: <ApplicationFrame /> }])
+
 function App() {
   return (
     <CapabilitiesProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <ApplicationFrame />
-        </BrowserRouter>
+        <RouterProvider router={router} />
       </AuthProvider>
     </CapabilitiesProvider>
   )
