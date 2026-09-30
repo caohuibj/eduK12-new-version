@@ -10,6 +10,7 @@ import { getExportContext } from '../modules/composite/composite.service'
 import { resolveCompositeExportProjectionBinding, projectCompositeExportData } from '../modules/composite/composite-export-projection'
 import type { ClaimedExportBatch } from './exportJobService'
 import { provenanceSchema } from './assessmentExportArtifact'
+import { exportIntentDateRange } from './exportIntentDateRange'
 export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
   const principal = await loadCurrentPrincipal(claim.createdBy)
   if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword || principal.role !== claim.options.creatorRole
@@ -33,9 +34,7 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
 export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
   const actor = await revalidateAssessmentExport(claim)
   // Upper bound fixed by durable intent, so late completions cannot enlarge retries.
-  const cutoff = claim.createdAt.toISOString()
-  const requestedEnd = claim.options.dateRange?.end
-  const dateRange = { ...claim.options.dateRange, end: requestedEnd && new Date(requestedEnd) < claim.createdAt ? requestedEnd : cutoff }
+  const dateRange = exportIntentDateRange(claim.createdAt, claim.options.dateRange)
   const options = { anonymize: claim.options.anonymize, dateRange, actor }
   if (claim.resourceType === 'COGNITIVE') {
     const cognitiveOptions = { ...options, detail: claim.options.detail ?? 'summary' }
