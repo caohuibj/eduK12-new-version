@@ -40,6 +40,34 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
     WHERE e."id" = ${executionId}
   `
   if (actors.some((a) => !a.valid || a.denied)) fail('RUN_ACTOR_AUTHORITY_REVOKED')
+  const externalParents = await tx.$queryRaw<Array<{ userId: string }>>`
+    SELECT DISTINCT a."user_id" AS "userId"
+    FROM "assessment_run_actor_snapshots" a
+    JOIN "assessment_run_executions" e
+      ON a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
+    WHERE e."id" = ${executionId} AND a."provenance_kind" = 'EXTERNAL_PARENT'
+  `
+  for (const parent of externalParents) {
+    const tether = await tx.$queryRaw<Array<{ valid: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1
+        FROM "parent_student_relationships" r
+        JOIN "organization_memberships" m
+          ON m."organization_id" = ${envelope.organizationId}
+          AND m."user_id" = r."student_user_id"
+          AND m."valid_until" IS NULL
+        JOIN "organization_persona_grants" pg
+          ON pg."organization_id" = m."organization_id"
+          AND pg."membership_id" = m."id"
+          AND pg."persona" = 'STUDENT'
+          AND pg."revoked_at" IS NULL
+        WHERE r."parent_user_id" = ${parent.userId}
+          AND r."status" = 'ACTIVE'
+          AND r."approved_at" IS NOT NULL
+      ) AS "valid"
+    `
+    if (!tether[0]?.valid) fail('RUN_PARENT_ORGANIZATION_TETHER_REVOKED')
+  }
   const relationships = await tx.$queryRaw<Array<{ kind: string; ref: string | null; facts: Record<string, string> }>>`
     SELECT s."relationship_kind" AS "kind", s."relationship_ref" AS "ref", s."snapshot_payload"->'facts' AS "facts"
     FROM "assessment_run_relationship_snapshots" s JOIN "assessment_run_executions" e ON e."relationship_snapshot_id" = s."id"

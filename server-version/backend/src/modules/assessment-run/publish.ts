@@ -250,6 +250,60 @@ const resolveSelfPairs = async (tx: Tx, organizationId: string, role: Exclude<Ru
   return [...byMembership.values()]
 }
 
+const resolveParentSelfPairs = async (tx: Tx, organizationId: string): Promise<PopulationPair[]> => {
+  const rows = await tx.$queryRaw<Array<{
+    parentUserId: string
+    relationshipId: string
+    classUnitId: string | null
+  }>>`
+    SELECT r."parent_user_id" AS "parentUserId", r."id" AS "relationshipId",
+      sc."class_unit_id" AS "classUnitId"
+    FROM "parent_student_relationships" r
+    JOIN "organization_memberships" m
+      ON m."organization_id" = ${organizationId}
+      AND m."user_id" = r."student_user_id"
+      AND m."valid_until" IS NULL
+    JOIN "organization_persona_grants" pg
+      ON pg."organization_id" = m."organization_id"
+      AND pg."membership_id" = m."id"
+      AND pg."persona" = 'STUDENT'
+      AND pg."revoked_at" IS NULL
+    LEFT JOIN "organization_student_class_assignments" sc
+      ON sc."organization_id" = m."organization_id"
+      AND sc."membership_id" = m."id"
+      AND sc."valid_until" IS NULL
+    WHERE r."status" = 'ACTIVE' AND r."approved_at" IS NOT NULL
+    ORDER BY r."parent_user_id", r."id", sc."class_unit_id" NULLS LAST
+  `
+  const byParent = new Map<string, PopulationPair>()
+  for (const row of rows) {
+    const existing = byParent.get(row.parentUserId)
+    if (existing) {
+      if (row.classUnitId && !existing.scopeClassUnitIds.includes(row.classUnitId)) existing.scopeClassUnitIds.push(row.classUnitId)
+      continue
+    }
+    const parent: FrozenParentActor = {
+      provenanceKind: 'EXTERNAL_PARENT',
+      userId: row.parentUserId,
+      membershipId: null,
+      actorRole: 'PARENT',
+      parentRelationshipId: row.relationshipId,
+    }
+    byParent.set(row.parentUserId, {
+      subject: parent,
+      respondent: parent,
+      relationshipKind: 'SELF',
+      relationshipRef: null,
+      scopeClassUnitIds: row.classUnitId ? [row.classUnitId] : [],
+      facts: {
+        source: 'active-parent-relationship-self',
+        parentOrganizationRelationshipId: row.relationshipId,
+      },
+    })
+  }
+  return [...byParent.values()]
+}
+
 const resolveClassPairs = async (tx: Tx, organizationId: string, subjectRole: RunActorRole, respondentRole: RunActorRole): Promise<PopulationPair[]> => {
   if (!new Set([subjectRole, respondentRole]).has('TEACHER') || !new Set([subjectRole, respondentRole]).has('STUDENT')) {
     throw new RunPublishError('RUN_RELATIONSHIP_ROLE', 'CLASS_TEACHER_STUDENT requires TEACHER + STUDENT', 409)
@@ -374,8 +428,10 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
   const relationshipKind = requireSingle(track.requestedPolicy.relationshipKinds, 'relationshipKinds') as RelationalRelationshipKindV1
   let pairs: PopulationPair[]
   if (relationshipKind === 'SELF') {
-    if (subjectRole !== respondentRole || subjectRole === 'PARENT') throw new RunPublishError('RUN_RELATIONSHIP_ROLE', 'SELF requires the same Organization persona role', 409)
-    pairs = await resolveSelfPairs(tx, organizationId, subjectRole as Exclude<RunActorRole, 'PARENT'>)
+    if (subjectRole !== respondentRole) throw new RunPublishError('RUN_RELATIONSHIP_ROLE', 'SELF requires the same actor role', 409)
+    pairs = subjectRole === 'PARENT'
+      ? await resolveParentSelfPairs(tx, organizationId)
+      : await resolveSelfPairs(tx, organizationId, subjectRole as Exclude<RunActorRole, 'PARENT'>)
   } else if (relationshipKind === 'CLASS_TEACHER_STUDENT') {
     pairs = await resolveClassPairs(tx, organizationId, subjectRole, respondentRole)
   } else if (relationshipKind === 'COUNSELOR_CLIENT') {
@@ -481,10 +537,14 @@ const assertPublisherScope = (authority: PublisherAuthority, actorUserId: string
   if (authority.teacherPersona) {
     if (pair.relationshipKind === 'SELF') {
       const member = pair.subject.provenanceKind === 'ORG_MEMBER' ? pair.subject : null
-      allowed = Boolean(member && (
-        (member.actorRole === 'TEACHER' && member.userId === actorUserId)
-        || (member.actorRole === 'STUDENT' && authority.teacherStudentMembershipIds.has(member.membershipId))
-      ))
+      const parent = pair.subject.provenanceKind === 'EXTERNAL_PARENT' ? pair.subject : null
+      allowed = Boolean(
+        (member && (
+          (member.actorRole === 'TEACHER' && member.userId === actorUserId)
+          || (member.actorRole === 'STUDENT' && authority.teacherStudentMembershipIds.has(member.membershipId))
+        ))
+        || (parent && pair.scopeClassUnitIds.some((id) => authority.teacherClassIds.has(id)))
+      )
     } else if (pair.relationshipKind === 'CLASS_TEACHER_STUDENT') {
       const teacher = pair.subject.actorRole === 'TEACHER' ? pair.subject : pair.respondent
       allowed = teacher.userId === actorUserId && pair.scopeClassUnitIds.some((id) => authority.teacherClassIds.has(id))
