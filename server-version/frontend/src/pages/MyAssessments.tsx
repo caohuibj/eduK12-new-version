@@ -26,6 +26,7 @@ export default function MyAssessments() {
   const [busy, setBusy] = useState<string | null>(null)
   const [consent, setConsent] = useState<Record<string, boolean>>({})
   const load = useCallback(async () => {
+    setSummaries({}); setInbox(null)
     const response = await apiClient.get<AssessmentInbox>('/my-assessments')
     if (response.code !== 0 || !response.data) throw new Error(response.message || '任务加载失败')
     setSummaries({}); setInbox(response.data)

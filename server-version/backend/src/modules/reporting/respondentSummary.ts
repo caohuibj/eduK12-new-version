@@ -19,6 +19,21 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
     JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
     WHERE e.id=${executionId} AND r.user_id=${userId} AND org.status='ACTIVE' AND run.status IN ('PUBLISHED','CLOSED')
       AND e.status NOT IN ('REVOKED','CANCELLED') AND a.status='COMPLETED'
+      AND ((r.provenance_kind='ORG_MEMBER' AND EXISTS (
+        SELECT 1 FROM organization_memberships m JOIN organization_persona_grants pg
+          ON pg.organization_id=m.organization_id AND pg.membership_id=m.id
+        WHERE m.id=r.membership_id AND m.organization_id=r.organization_id AND m.user_id=r.user_id
+          AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())
+          AND pg.id=r.snapshot_payload->>'personaGrantId' AND pg.persona=r.actor_role AND pg.revoked_at IS NULL
+      )) OR (r.provenance_kind='EXTERNAL_PARENT' AND r.actor_role='PARENT' AND EXISTS (
+        SELECT 1 FROM parent_student_relationships ps JOIN organization_memberships m
+          ON m.user_id=ps.student_user_id AND m.organization_id=r.organization_id
+        JOIN organization_persona_grants pg ON pg.organization_id=m.organization_id AND pg.membership_id=m.id
+        WHERE ps.parent_user_id=r.user_id AND ps.status='ACTIVE' AND ps.approved_at IS NOT NULL
+          AND (a.relationship_kind='SELF' OR ps.student_user_id=s.user_id)
+          AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())
+          AND pg.persona='STUDENT' AND pg.revoked_at IS NULL
+      )))
       AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=e.organization_id AND d.user_id=${userId}
         AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ'))
   `
