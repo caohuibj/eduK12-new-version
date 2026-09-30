@@ -1,3 +1,4 @@
+import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../middleware/passwordChangeAdmission'
 import { Router } from 'express'
 import { authController } from '../controllers/authController'
 import { authenticate, requireAdmin } from '../middleware/auth'
@@ -36,7 +37,7 @@ router.get('/csrf', (req, res) => {
 
 // 需要认证的接口
 router.get('/me', authenticate, authController.me)
-router.post('/change-password', authenticate, authController.changePassword)
+router.post('/change-password', authenticate, passwordChangeRateLimit, withPasswordChangeAdmission(authController.changePassword))
 router.post('/logout', authenticate, authController.logout)
 
 // 管理员专属接口 - 仅允许延期，不允许通过负 months 缩短有效期。
