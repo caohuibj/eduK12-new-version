@@ -1,3 +1,4 @@
+import { respondentCompletionFeedback } from './feedback'
 import { prisma } from '../../config/database'
 import { listStudentAssignments } from '../cognitive/assignment.service'
 import type { UserRole } from '@prisma/client'
@@ -103,6 +104,6 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
     }
   }
   list.sort((a, b) => Number(a.state === 'COMPLETED') - Number(b.state === 'COMPLETED') || a.title.localeCompare(b.title) || a.taskId.localeCompare(b.taskId))
-  return { list, pendingCount: list.filter(task => ['OPEN', 'ASSIGNED', 'PENDING', 'STARTED', 'IN_PROGRESS'].includes(task.state)).length,
+  return { list: list.map(task => ({ ...task, feedback: respondentCompletionFeedback(task) })), pendingCount: list.filter(task => ['OPEN', 'ASSIGNED', 'PENDING', 'STARTED', 'IN_PROGRESS'].includes(task.state)).length,
     truncated: ownScales.length > 100 || runs.truncated || relational.length >= 100 || (course?.total ?? 0) > 200 }
 }

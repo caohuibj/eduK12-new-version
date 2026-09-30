@@ -7,6 +7,7 @@ import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../compon
 export interface InboxTask {
   taskId: string; sourceId: string; sourceType: string; title: string; state: string; deadline: string | null
   launchTarget: string | null; reportTarget: string | null; resultAvailability: string
+  feedback?: { title: string; message: string } | null
   subject?: { role: string; displayName?: string }; consentState: string; runTask?: AssignedRunTask
 }
 export interface AssessmentInbox { list: InboxTask[]; pendingCount: number; truncated: boolean }
@@ -69,7 +70,7 @@ export default function MyAssessments() {
           {task.launchTarget && <Link to={task.launchTarget}>{task.state === 'IN_PROGRESS' ? '继续作答' : '进入测评'}</Link>}
           {task.reportTarget && <Link to={task.reportTarget}>我的报告</Link>}
         </div>
-        {task.state === 'COMPLETED' && task.resultAvailability === 'COMPLETION_ONLY' && <p>感谢你的填写。本次回答记录了你的个人体验，不用于向你展示被评价者的个人得分或排名。</p>}
+        {task.state === 'COMPLETED' && <div role="status" className="space-y-1 rounded-lg bg-slate-50 p-3"><p className="font-medium">{task.feedback?.title ?? '你已完成本次测评'}</p><p>{task.feedback?.message ?? '本次作答已保存。可提供的反馈按本测评的说明展示。'}</p></div>}
       </article>)}
     </section>)}</div>
     {inbox?.list.length === 0 && <p>暂无分配给你的测评。</p>}
