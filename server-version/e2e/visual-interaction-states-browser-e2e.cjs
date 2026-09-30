@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { chromium } = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
+const browsers = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 const { installApiFixture, sampleCourse } = require('./visual-canonical-browser-e2e.cjs')
 const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', 'interaction-states')
@@ -47,7 +47,7 @@ async function assertModal(page, dialog, background) {
 
 async function main() {
   fs.mkdirSync(output, { recursive: true })
-  const browser = await chromium.launch({ headless: true, channel: process.env.VISUAL_QA_BROWSER_CHANNEL || undefined })
+  const browser = await browsers[process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium'].launch({ headless: true, channel: process.env.VISUAL_QA_BROWSER_CHANNEL || undefined })
   const results = []
   async function scenario(width, role, run) {
     const context = await browser.newContext({ viewport: { width, height: width < 768 ? 844 : 1024 }, reducedMotion: 'reduce' })

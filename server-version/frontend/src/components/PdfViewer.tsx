@@ -1,3 +1,4 @@
+import ModalSurface from './shared-ui/ModalSurface'
 import React, { useEffect, useRef, useState } from 'react'
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Loader2, Download } from 'lucide-react'
 import * as pdfjsLib from 'pdfjs-dist'
@@ -114,20 +115,15 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
       goToPrevPage()
     } else if (e.key === 'ArrowRight') {
       goToNextPage()
-    } else if (e.key === 'Escape') {
-      onClose()
+
     }
   }
 
   if (!isOpen) return null
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col"
-      ref={containerRef}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-    >
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
+    <div ref={containerRef} onKeyDown={handleKeyDown} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title || "PDF \u6587\u6863"} className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-900 text-white">
         <div className="flex items-center space-x-4">
@@ -141,7 +137,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
           )}
         </div>
         <button
-          onClick={onClose}
+          onClick={onClose} aria-label="关闭PDF预览"
           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
         >
           <X className="w-5 h-5" />
@@ -222,7 +218,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
           <div className="text-white text-center">
             <p className="text-red-400 mb-2">{error}</p>
             <button
-              onClick={onClose}
+              onClick={onClose} aria-label="关闭PDF预览"
               className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
             >
               关闭
@@ -241,6 +237,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
         使用左右方向键翻页 | 按 Esc 关闭
       </div>
     </div>
+    </ModalSurface>
   )
 }
 

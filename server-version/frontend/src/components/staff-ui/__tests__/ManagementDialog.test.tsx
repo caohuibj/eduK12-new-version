@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import ManagementDialog from '../ManagementDialog'
@@ -27,6 +27,8 @@ describe('ManagementDialog', () => {
     </>
     const view = render(stack(true))
     expect(document.body.style.overflow).toBe('hidden')
+    expect(screen.getByRole('dialog', { name: 'Lower' }).closest('dialog')).toHaveAttribute('inert')
+    expect(screen.getByRole('dialog', { name: 'Upper' }).closest('dialog')).not.toHaveAttribute('inert')
     if (closeLowerFirst) {
       view.rerender(stack(false))
       expect(document.body.style.overflow).toBe('hidden')
@@ -34,6 +36,16 @@ describe('ManagementDialog', () => {
     view.unmount()
     expect(document.body.style.overflow).toBe('auto')
     document.body.style.overflow = ''
+  })
+
+  it('restores a pointer trigger even when the browser did not focus the clicked button', () => {
+    render(<Example />)
+    const trigger = screen.getByText('Open')
+    fireEvent.pointerDown(trigger)
+    fireEvent.click(trigger)
+    fireEvent.keyDown(screen.getByRole('dialog', { name: 'Edit' }), { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(trigger).toHaveFocus()
   })
 
   it('focuses once, loops in both directions, survives inline callbacks, and restores the trigger', async () => {

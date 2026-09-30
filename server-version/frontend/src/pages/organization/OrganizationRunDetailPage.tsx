@@ -1,3 +1,4 @@
+import ManagementDialog from '../../components/staff-ui/ManagementDialog'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { runApi, type RunResourceChoice, type RunPreview, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
@@ -184,13 +185,13 @@ export default function OrganizationRunDetailPage() {
         description={`状态：${detail.run.status} · 版本 ${detail.run.version} · 测评项目 ${detail.run.trackCount} · 执行记录 ${detail.run.executionCount}`}
         actions={<div className="flex flex-wrap gap-3"><Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>测评批次</Link>{detail.run.status === 'DRAFT' && <ProductButton variant="primary" disabled={busy || detail.tracks.length === 0} onClick={() => void previewPublish()}>发布测评批次</ProductButton>}{detail.run.status === 'PUBLISHED' && <><ProductButton disabled={busy} onClick={() => void mutate('Run 已关闭。', () => runApi.close(organizationId, runId))}>关闭测评批次</ProductButton><ProductButton variant="danger" disabled={busy} onClick={() => void mutate('Run 已取消。', () => runApi.cancel(organizationId, runId))}>取消测评批次</ProductButton></>}</div>}
       />
-      {confirmPublish && detail.run.status === 'DRAFT' && <section role="dialog" aria-modal="true" aria-label="确认发布测评" className="space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
+      {confirmPublish && detail.run.status === 'DRAFT' && <ManagementDialog open title="确认发布测评" width="wide" closeDisabled={busy} onClose={() => setConfirmPublish(null)}>
         <h2 className="font-semibold">确认发布测评</h2>
         <ul>{confirmPublish.tracks.map(track => <li key={track.trackId}>测评项目 {track.trackId}：受测者 {track.subjectCount}，评价者 {track.respondentCount}，任务 {track.executionCount}</li>)}</ul>
         <p>将按当前显示的 {detail.tracks.length} 个测评项目发布。服务器会重新检查资源限制、成员与关系；发布后配置不可修改。</p>
-        <ProductButton autoFocus disabled={busy} onClick={() => setConfirmPublish(null)}>返回检查</ProductButton>
+        <ProductButton disabled={busy} onClick={() => setConfirmPublish(null)}>返回检查</ProductButton>
         <ProductButton disabled={busy} variant="primary" onClick={() => { setConfirmPublish(null); void mutate('Run 已发布；人口、资源与策略身份已冻结。', () => runApi.publish(organizationId, runId, confirmPublish.version)) }}>确认发布</ProductButton>
-      </section>}
+      </ManagementDialog>}
       {loadError && <ProductStatus kind="error" title="刷新失败">{loadError}</ProductStatus>}
       {mutationError && <ProductStatus kind="error" title="测评批次操作失败" announce="assertive">{mutationError}</ProductStatus>}
       {notice && <ProductStatus kind="success" title="测评批次已更新" announce="polite">{notice}</ProductStatus>}

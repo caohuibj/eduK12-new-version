@@ -4,6 +4,7 @@ import { BookOpen, Brain, Clock, Keyboard, Plus, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
+import StudentTasks from '../../components/student/StudentTasks'
 import type { Course } from '../../types'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { DiscoveryCard, PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
@@ -18,6 +19,7 @@ const StudentHome: React.FC = () => {
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [courseCode, setCourseCode] = useState('')
   const [joining, setJoining] = useState(false)
+  const [taskRefresh, setTaskRefresh] = useState(0)
   const [joinError, setJoinError] = useState<string | null>(null)
   const joinInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -61,6 +63,7 @@ const StudentHome: React.FC = () => {
       if (response.code !== 0) throw new Error(response.message || '加入课程失败')
       closeJoinModal()
       setCourseCode('')
+      setTaskRefresh(value => value + 1)
       await fetchCourses()
     } catch (error) {
       setJoinError(error instanceof Error ? error.message : '加入课程失败')
@@ -99,6 +102,8 @@ const StudentHome: React.FC = () => {
       {routeNotice ? (
         <ProductStatus kind="info" title="课堂提示" announce="polite">{routeNotice}</ProductStatus>
       ) : null}
+
+      <StudentTasks refreshKey={taskRefresh} />
 
       {loading ? (
         <ProductStatus kind="pending" title="正在加载课程" announce="polite" />

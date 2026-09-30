@@ -337,6 +337,7 @@ async function installApiFixture(page, role) {
       if (user) data = user
       else { status = 401; data = null }
     } else if (pathname === '/api/auth/csrf') data = { csrfToken: 'visual-qa-csrf' }
+    else if (pathname === '/api/courses/my/tasks') data = { list: [], total: 0, page: 1, pageSize: 20, generatedAt: '2026-09-30T00:00:00Z', counts: { PENDING: 0, IN_PROGRESS: 0, UPCOMING: 0, EXPIRED: 0, COMPLETED: 0, UNAVAILABLE: 0 } }
     else if (pathname === '/api/courses/my') data = { list: [sampleCourse] }
     else if (pathname === '/api/courses') data = { list: [sampleCourse], total: 1 }
     else if (pathname === '/api/courses/shared-to-me') data = { list: [] }

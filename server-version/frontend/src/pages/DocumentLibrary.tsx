@@ -1,3 +1,5 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, FileText, Trash2, Upload, X, AlertCircle, Eye, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -33,6 +35,8 @@ const DocumentLibrary: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isAdmin = user?.role === 'ADMIN'
+
+  const uploadGuard = useEditorGuard({ open: showUploadModal, value: { file: selectedFile ? [selectedFile.name, selectedFile.size, selectedFile.lastModified] : null, title: documentTitle }, externalBusy: isUploading, onClose: () => { setShowUploadModal(false); setSelectedFile(null); setUploadError(''); setDocumentTitle('') } })
 
   useEffect(() => {
     fetchDocuments()
@@ -103,6 +107,7 @@ const DocumentLibrary: React.FC = () => {
       return
     }
 
+    if (!uploadGuard.begin()) return
     setIsUploading(true)
     setUploadProgress(0)
     setUploadError('')
@@ -139,6 +144,7 @@ const DocumentLibrary: React.FC = () => {
     } catch (error: any) {
       setUploadError(error.response?.data?.message || error.message || '上传失败')
     } finally {
+      uploadGuard.finish()
       setIsUploading(false)
     }
   }
@@ -244,18 +250,13 @@ const DocumentLibrary: React.FC = () => {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"上传PDF文档"}><fieldset disabled={uploadGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">上传PDF文档</h3>
               <button
-                onClick={() => {
-                  setShowUploadModal(false)
-                  setSelectedFile(null)
-                  setDocumentTitle('')
-                  setUploadError('')
-                }}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={uploadGuard.close}
+                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -270,11 +271,14 @@ const DocumentLibrary: React.FC = () => {
               )}
 
               <div
+                role="button" tabIndex={isUploading ? -1 : 0} aria-label="选择PDF文件" aria-disabled={isUploading}
+                onKeyDown={event => { if (!isUploading && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); fileInputRef.current?.click() } }}
                 onClick={() => !isUploading && fileInputRef.current?.click()}
                 className={`border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-action cursor-pointer transition-colors ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
                   ref={fileInputRef}
+                  onClick={event => event.stopPropagation()}
                   type="file"
                   accept="application/pdf"
                   onChange={handleFileSelect}
@@ -288,8 +292,8 @@ const DocumentLibrary: React.FC = () => {
 
               {selectedFile && (
                 <div>
-                  <label className="label">文档标题 *</label>
-                  <input
+                  <label htmlFor="DocumentLibrary-field-1" className="label">文档标题 *</label>
+                  <input id="DocumentLibrary-field-1"
                     type="text"
                     value={documentTitle}
                     onChange={(e) => setDocumentTitle(e.target.value)}
@@ -319,12 +323,7 @@ const DocumentLibrary: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowUploadModal(false)
-                    setSelectedFile(null)
-                    setDocumentTitle('')
-                    setUploadError('')
-                  }}
+                  onClick={uploadGuard.close}
                   className="flex-1 hui-button hui-button--secondary"
                   disabled={isUploading}
                 >
@@ -340,33 +339,36 @@ const DocumentLibrary: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
 
       {/* Preview Modal */}
       {previewDocument && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg overflow-hidden max-w-5xl w-full h-[90vh] flex flex-col">
+        <ModalSurface open onClose={() => setPreviewDocument(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+          <div className="bg-white rounded-lg overflow-hidden max-w-5xl w-full h-[90vh] flex flex-col" tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewDocument.title + "预览"}>
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="font-medium truncate flex-1 mr-4">{previewDocument.title}</h3>
+              <a href={previewDocument.url || `/uploads/documents/${previewDocument.fileName}`} target="_blank" rel="noopener noreferrer" className="mr-4 rounded px-2 py-2 text-sm text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" aria-label={`单独打开 ${previewDocument.title}`}>单独打开文档</a>
               <button
                 onClick={() => setPreviewDocument(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="flex-1 overflow-hidden">
               <iframe
+                tabIndex={-1}
                 src={previewDocument.url || `/uploads/documents/${previewDocument.fileName}`}
                 className="w-full h-full"
                 title={previewDocument.title}
               />
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
+      {uploadGuard.confirmation}
     </ProductPage>
   )
 }

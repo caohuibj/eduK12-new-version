@@ -7,8 +7,19 @@ on:
       - '.github/workflows/visual-canonical-qa.yml'
       - 'server-version/e2e/visual-canonical-browser-e2e.cjs'
       - 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'
+      - 'server-version/e2e/visual-legacy-dialogs-browser-e2e.cjs'
       - 'server-version/frontend/tailwind.config.js'
       - 'server-version/frontend/src/components/MediaSelector.tsx'
+      - 'server-version/frontend/src/components/MediaRenderer.tsx'
+      - 'server-version/frontend/src/components/PdfViewer.tsx'
+      - 'server-version/frontend/src/components/student/**'
+      - 'server-version/frontend/src/pages/DocumentLibrary.tsx'
+      - 'server-version/frontend/src/pages/ImageLibrary.tsx'
+      - 'server-version/frontend/src/pages/VideoLibrary.tsx'
+      - 'server-version/frontend/src/pages/QuestionnaireEdit.tsx'
+      - 'server-version/frontend/src/pages/QuestionnaireList.tsx'
+      - 'server-version/frontend/src/pages/ScaleList.tsx'
+      - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx'
       - 'server-version/frontend/src/components/MaterialGrantModal.tsx'
       - 'server-version/frontend/src/api/materialGrants.ts'
       - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireList.tsx'
@@ -89,16 +100,16 @@ jobs:
       - name: backend npm ci for Playwright runtime
         working-directory: server-version/backend
         run: npm ci
-      - name: prepare Chromium
+      - name: prepare Chromium Firefox and WebKit
         working-directory: server-version/backend
         run: |
           playwright_version="$(node -p "require('playwright-core/package.json').version")"
-          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-three-browser-deps-${playwright_version}"
           if [ ! -f "$deps_marker" ]; then
-            npx playwright-core install-deps chromium
+            npx playwright-core install-deps chromium firefox webkit
             touch "$deps_marker"
           fi
-          npx playwright-core install chromium
+          npx playwright-core install chromium firefox webkit
       - name: frontend npm ci
         working-directory: server-version/frontend
         run: npm ci
@@ -122,8 +133,12 @@ jobs:
         run: node e2e/visual-staff-complex-browser-e2e.cjs
       - name: capture classroom teacher control family
         run: node e2e/visual-classroom-control-browser-e2e.cjs
-      - name: verify interaction and loading error empty states
-        run: node e2e/visual-interaction-states-browser-e2e.cjs
+      - name: verify interactions and legacy dialogs in three browsers
+        run: |
+          for engine in chromium firefox webkit; do
+            VISUAL_QA_BROWSER_ENGINE="$engine" VISUAL_QA_EVIDENCE_DIR="$VISUAL_QA_EVIDENCE_DIR/cross-browser-$engine" node e2e/visual-interaction-states-browser-e2e.cjs
+            VISUAL_QA_BROWSER_ENGINE="$engine" VISUAL_QA_EVIDENCE_DIR="$VISUAL_QA_EVIDENCE_DIR/cross-browser-$engine" node e2e/visual-legacy-dialogs-browser-e2e.cjs
+          done
       - name: upload canonical visual evidence
         if: always()
         continue-on-error: true

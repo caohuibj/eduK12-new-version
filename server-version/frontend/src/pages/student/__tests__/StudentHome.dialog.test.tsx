@@ -34,7 +34,11 @@ import StudentHome from '../StudentHome'
 
 describe('StudentHome join-course dialog', () => {
   it('shows a retry rather than an empty course list after a failed load', async () => {
-    mockGet.mockRejectedValueOnce(new Error('Offline')).mockResolvedValueOnce({ code: 0, data: { list: [] } })
+    let courseRequests = 0
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/courses/my' && courseRequests++ === 0) return Promise.reject(new Error('Offline'))
+      return Promise.resolve({ code: 0, data: { list: [], total: 0, pageSize: 20, counts: {} } })
+    })
     const user = userEvent.setup()
     render(<MemoryRouter><StudentHome /></MemoryRouter>)
     expect(await screen.findByText('课程列表加载失败')).toBeInTheDocument()

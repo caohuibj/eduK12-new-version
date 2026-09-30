@@ -1,3 +1,4 @@
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
@@ -247,6 +248,7 @@ const AssignmentList: React.FC = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!editorGuard.begin()) return
     try {
       const data = {
         courseId: formData.courseId,
@@ -261,13 +263,16 @@ const AssignmentList: React.FC = () => {
         tags: formData.tags,
       }
       const response = await apiClient.post('/assignments', data)
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
         fetchAssignments()
       }
     } catch (error: any) {
-      showMessage(error.message || '创建失败')
+      editorGuard.fail(String(error.message || '创建失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
@@ -275,6 +280,7 @@ const AssignmentList: React.FC = () => {
     e.preventDefault()
     if (!editingAssignment) return
 
+    if (!editorGuard.begin()) return
     try {
       const data = {
         title: formData.title,
@@ -285,6 +291,7 @@ const AssignmentList: React.FC = () => {
         tags: formData.tags,
       }
       const response = await apiClient.put(`/assignments/${editingAssignment.id}`, data)
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setShowModal(false)
         setEditingAssignment(null)
@@ -292,7 +299,9 @@ const AssignmentList: React.FC = () => {
         fetchAssignments()
       }
     } catch (error: any) {
-      showMessage(error.message || '更新失败')
+      editorGuard.fail(String(error.message || '更新失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
@@ -476,6 +485,8 @@ const AssignmentList: React.FC = () => {
     if (!isBatchGrading) setShowBatchGradeModal(false)
   }
 
+  const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
+
   return (
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="作业管理" description="集中查看课程作业、提交进度和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置作业</ProductButton>} />
@@ -499,8 +510,9 @@ const AssignmentList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
-          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title">
+        <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">
+          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title" aria-busy={editorGuard.busy}>
+            {editorGuard.error}<fieldset disabled={editorGuard.busy} className="contents">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
@@ -508,11 +520,11 @@ const AssignmentList: React.FC = () => {
               </div>
             </div>
             
-            <div className="staff-dialog__body staff-form">
+            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
-                <label className="label">选择课程 *</label>
-                <select
+                <label htmlFor="AssignmentList-field-101" className="label">选择课程 *</label>
+                <select id="AssignmentList-field-101"
                   value={formData.courseId}
                   onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
                   className="input w-full"
@@ -530,8 +542,8 @@ const AssignmentList: React.FC = () => {
 
               {/* Title */}
               <div>
-                <label className="label">作业标题 *</label>
-                <input
+                <label htmlFor="AssignmentList-field-102" className="label">作业标题 *</label>
+                <input id="AssignmentList-field-102"
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -554,8 +566,8 @@ const AssignmentList: React.FC = () => {
 
               {/* Deadline */}
               <div>
-                <label className="label">截止时间</label>
-                <input
+                <label htmlFor="AssignmentList-field-103" className="label">截止时间</label>
+                <input id="AssignmentList-field-103"
                   type="datetime-local"
                   value={formData.deadline}
                   onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
@@ -703,14 +715,15 @@ const AssignmentList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={closeEditor}
+                onClick={editorGuard.close}
               >
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editingAssignment ? '保存修改' : '创建作业'}
+                {editorGuard.busy ? '保存中...' : editingAssignment ? '保存修改' : '创建作业'}
               </ProductButton>
             </div>
+            </fieldset>
           </form>
         </ModalSurface>
       )}
@@ -941,6 +954,7 @@ const AssignmentList: React.FC = () => {
           </div>
         </ModalSurface>
       )}
+      {editorGuard.confirmation}
     </ProductPage>
   )
 }

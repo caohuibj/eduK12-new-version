@@ -1,3 +1,5 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../api/client'
@@ -118,6 +120,8 @@ const QuestionnaireEdit: React.FC = () => {
     contextKey: '',
   })
 
+  const itemGuard = useEditorGuard({ open: showFormItemModal, value: formData, onClose: () => { setShowFormItemModal(false); resetFormData() } })
+
   useEffect(() => {
     if (!isNew && id) {
       fetchQuestionnaire()
@@ -223,10 +227,11 @@ const QuestionnaireEdit: React.FC = () => {
   // 添加表单题目
   const handleAddFormItem = async () => {
     if (!formData.label) {
-      alert('题目标签不能为空')
+      itemGuard.fail('题目标签不能为空')
       return
     }
 
+    if (!itemGuard.begin()) return
     try {
       const dataToSend = {
         ...formData,
@@ -245,7 +250,7 @@ const QuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          itemGuard.fail(String(response.message || '保存失败'))
         }
       } else {
         // 新增
@@ -258,11 +263,13 @@ const QuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          itemGuard.fail(String(response.message || '保存失败'))
         }
       }
     } catch (err: any) {
-      alert(err.message || '操作失败')
+      itemGuard.fail(String(err.message || '操作失败'))
+    } finally {
+      itemGuard.finish()
     }
   }
 
@@ -485,10 +492,10 @@ const QuestionnaireEdit: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-101" className="block text-sm font-medium text-gray-700 mb-1">
                 问卷编码 *
               </label>
-              <input
+              <input id="QuestionnaireEdit-field-101"
                 type="text"
                 value={questionnaire.code}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, code: e.target.value })}
@@ -498,10 +505,10 @@ const QuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-102" className="block text-sm font-medium text-gray-700 mb-1">
                 问卷名称 *
               </label>
-              <input
+              <input id="QuestionnaireEdit-field-102"
                 type="text"
                 value={questionnaire.name}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
@@ -510,10 +517,10 @@ const QuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-103" className="block text-sm font-medium text-gray-700 mb-1">
                 问卷描述
               </label>
-              <textarea
+              <textarea id="QuestionnaireEdit-field-103"
                 value={questionnaire.description || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
                 rows={3}
@@ -522,10 +529,10 @@ const QuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-104" className="block text-sm font-medium text-gray-700 mb-1">
                 预计用时（分钟）
               </label>
-              <input
+              <input id="QuestionnaireEdit-field-104"
                 type="number"
                 value={questionnaire.estimatedTime || ''}
                 onChange={(e) =>
@@ -535,10 +542,10 @@ const QuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-105" className="block text-sm font-medium text-gray-700 mb-1">
                 可见性设置 *
               </label>
-              <select
+              <select id="QuestionnaireEdit-field-105"
                 value={questionnaire.visibility}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, visibility: e.target.value as any })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
@@ -554,10 +561,10 @@ const QuestionnaireEdit: React.FC = () => {
               </p>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="QuestionnaireEdit-field-106" className="block text-sm font-medium text-gray-700 mb-1">
                 指导语
               </label>
-              <textarea
+              <textarea id="QuestionnaireEdit-field-106"
                 value={questionnaire.instruction || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
                 rows={4}
@@ -740,17 +747,17 @@ const QuestionnaireEdit: React.FC = () => {
 
       {/* 表单题目编辑弹窗 */}
       {showFormItemModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+        <ModalSurface open onClose={itemGuard.close} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md" tabIndex={-1} role="dialog" aria-modal="true" aria-label={editingFormItem ? "编辑表单题目" : "添加表单题目"}>{itemGuard.error}<fieldset disabled={itemGuard.busy} className="contents">
             <h3 className="text-lg font-medium mb-4">
               {editingFormItem ? '编辑表单题目' : '添加表单题目'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="QuestionnaireEdit-field-107" className="block text-sm font-medium text-gray-700 mb-1">
                   题目类型 *
                 </label>
-                <select
+                <select id="QuestionnaireEdit-field-107"
                   value={formData.type}
                   onChange={(e) => {
                     const nextType = e.target.value as typeof formData.type
@@ -773,10 +780,10 @@ const QuestionnaireEdit: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="QuestionnaireEdit-field-108" className="block text-sm font-medium text-gray-700 mb-1">
                   用于测评参考
                 </label>
-                <select
+                <select id="QuestionnaireEdit-field-108"
                   value={formData.contextKey}
                   onChange={(e) => {
                     const contextKey = e.target.value
@@ -811,10 +818,10 @@ const QuestionnaireEdit: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="QuestionnaireEdit-field-109" className="block text-sm font-medium text-gray-700 mb-1">
                   题目标签 *
                 </label>
-                <input
+                <input id="QuestionnaireEdit-field-109"
                   type="text"
                   value={formData.label}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
@@ -823,10 +830,10 @@ const QuestionnaireEdit: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="QuestionnaireEdit-field-110" className="block text-sm font-medium text-gray-700 mb-1">
                   占位提示
                 </label>
-                <input
+                <input id="QuestionnaireEdit-field-110"
                   type="text"
                   value={formData.placeholder}
                   onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
@@ -903,10 +910,7 @@ const QuestionnaireEdit: React.FC = () => {
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => {
-                  setShowFormItemModal(false)
-                  resetFormData()
-                }}
+                onClick={itemGuard.close}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
               >
                 取消
@@ -918,9 +922,10 @@ const QuestionnaireEdit: React.FC = () => {
                 {editingFormItem ? '保存' : '添加'}
               </button>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
+      {itemGuard.confirmation}
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import ModalSurface from './shared-ui/ModalSurface'
 import React, { useState } from 'react'
 import { Play, X, ZoomIn } from 'lucide-react'
 import {
@@ -136,7 +137,7 @@ const VideoItemRenderer: React.FC<VideoItemRendererProps> = ({
             <p className="font-medium text-gray-800">{item.title || '外部视频'}</p>
             <button
               onClick={() => setShowEmbedPlayer(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600" aria-label="关闭"
             >
               <X className="w-4 h-4" />
             </button>
@@ -373,16 +374,13 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
   onClose
 }) => {
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div className="relative max-w-[90vw] max-h-[90vh]">
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+      <div className="relative max-w-[90vw] max-h-[90vh]" tabIndex={-1} role="dialog" aria-modal="true" aria-label={imageName + "预览"}>
         {/* 关闭按钮 */}
         <button
           onClick={onClose}
           className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 z-10"
-          title="关闭"
+          title="关闭" aria-label="关闭"
         >
           <X className="w-6 h-6" />
         </button>
@@ -400,7 +398,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
         {/* 图片名称 */}
         <p className="text-white text-center mt-4 text-sm">{imageName}</p>
       </div>
-    </div>
+    </ModalSurface>
   )
 }
 
@@ -423,20 +421,18 @@ const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
   const videoUrl = normalizeVideoUrl(item.url)
   
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
       <div 
         className="bg-black rounded-lg overflow-hidden max-w-5xl w-full"
         onClick={e => e.stopPropagation()}
-      >
+       tabIndex={-1} role="dialog" aria-modal="true" aria-label={item.title || "视频播放"}>
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-white font-medium truncate flex-1 mr-4">
             {item.title || '视频播放'}
           </h3>
           <button
             onClick={onClose}
+            aria-label="关闭视频预览"
             className="text-gray-400 hover:text-white"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -454,7 +450,7 @@ const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
           />
         </div>
       </div>
-    </div>
+    </ModalSurface>
   )
 }
 

@@ -1,3 +1,4 @@
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -150,6 +151,7 @@ const CheckinList: React.FC = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!editorGuard.begin()) return
     try {
       const data = {
         courseId: formData.courseId,
@@ -164,13 +166,16 @@ const CheckinList: React.FC = () => {
         tags: formData.tags,
       }
       const response = await apiClient.post('/checkins', data)
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
         fetchCheckins()
       }
     } catch (error: any) {
-      showMessage(error.message || '创建失败')
+      editorGuard.fail(String(error.message || '创建失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
@@ -178,6 +183,7 @@ const CheckinList: React.FC = () => {
     e.preventDefault()
     if (!editingCheckin) return
 
+    if (!editorGuard.begin()) return
     try {
       const data = {
         title: formData.title,
@@ -189,6 +195,7 @@ const CheckinList: React.FC = () => {
         tags: formData.tags,
       }
       const response = await apiClient.put(`/checkins/${editingCheckin.id}`, data)
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setShowModal(false)
         setEditingCheckin(null)
@@ -196,7 +203,9 @@ const CheckinList: React.FC = () => {
         fetchCheckins()
       }
     } catch (error: any) {
-      showMessage(error.message || '更新失败')
+      editorGuard.fail(String(error.message || '更新失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
@@ -393,6 +402,8 @@ const CheckinList: React.FC = () => {
     setSubmissions([])
   }
 
+  const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
+
   return (
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
@@ -413,8 +424,9 @@ const CheckinList: React.FC = () => {
       </tbody></table></div>}
       {/* Create/Edit Modal */}
       {showModal && (
-        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
-          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title">
+        <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">
+          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title" aria-busy={editorGuard.busy}>
+            {editorGuard.error}<fieldset disabled={editorGuard.busy} className="contents">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
@@ -422,11 +434,11 @@ const CheckinList: React.FC = () => {
               </div>
             </div>
             
-            <div className="staff-dialog__body staff-form">
+            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
               {/* Course Selection */}
               <div>
-                <label className="label">选择课程 *</label>
-                <select
+                <label htmlFor="CheckinList-field-101" className="label">选择课程 *</label>
+                <select id="CheckinList-field-101"
                   value={formData.courseId}
                   onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
                   className="input w-full"
@@ -444,8 +456,8 @@ const CheckinList: React.FC = () => {
 
               {/* Title */}
               <div>
-                <label className="label">打卡标题 *</label>
-                <input
+                <label htmlFor="CheckinList-field-102" className="label">打卡标题 *</label>
+                <input id="CheckinList-field-102"
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -468,8 +480,8 @@ const CheckinList: React.FC = () => {
 
               {/* End Time */}
               <div>
-                <label className="label">截止时间</label>
-                <input
+                <label htmlFor="CheckinList-field-103" className="label">截止时间</label>
+                <input id="CheckinList-field-103"
                   type="datetime-local"
                   value={formData.endTime}
                   onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
@@ -620,14 +632,15 @@ const CheckinList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={closeEditor}
+                onClick={editorGuard.close}
               >
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editingCheckin ? '保存修改' : '创建打卡'}
+                {editorGuard.busy ? '保存中...' : editingCheckin ? '保存修改' : '创建打卡'}
               </ProductButton>
             </div>
+            </fieldset>
           </form>
         </ModalSurface>
       )}
@@ -746,6 +759,7 @@ const CheckinList: React.FC = () => {
           </div>
         </ModalSurface>
       )}
+      {editorGuard.confirmation}
     </ProductPage>
   )
 }
