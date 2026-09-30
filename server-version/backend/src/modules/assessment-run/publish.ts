@@ -212,6 +212,7 @@ const selectorAllows = (
   pair: PopulationPair,
 ): boolean => {
   if (selector.kind === 'RELATED_PARENT') return actor.actorRole === 'PARENT'
+  if (selector.kind === 'CLASS_UNITS' && actor.provenanceKind === 'EXTERNAL_PARENT') return pair.scopeClassUnitIds.some((id) => selector.classUnitIds.includes(id))
   if (actor.provenanceKind !== 'ORG_MEMBER') return false
   if (membershipFilter && !membershipFilter.has(actor.membershipId)) return false
   if (selector.kind === 'CLASS_UNITS') return pair.scopeClassUnitIds.some((id) => selector.classUnitIds.includes(id))
@@ -544,7 +545,7 @@ const assertPublisherScope = (authority: PublisherAuthority, actorUserId: string
   }
   if (authority.isOrgAdmin) return
   let allowed = false
-  if (authority.teacherPersona) {
+  if (authority.teacherPersona && (!policy?.initiationModes || policy.initiationModes.includes('CLASS_ASSIGN'))) {
     if (pair.relationshipKind === 'SELF') {
       const member = pair.subject.provenanceKind === 'ORG_MEMBER' ? pair.subject : null
       const parent = pair.subject.provenanceKind === 'EXTERNAL_PARENT' ? pair.subject : null
@@ -562,7 +563,7 @@ const assertPublisherScope = (authority: PublisherAuthority, actorUserId: string
       allowed = student.provenanceKind === 'ORG_MEMBER' && authority.teacherStudentMembershipIds.has(student.membershipId)
     }
   }
-  if (!allowed && authority.counselorPersona) {
+  if (!allowed && authority.counselorPersona && (!policy?.initiationModes || policy.initiationModes.includes('PROFESSIONAL_ASSIGN'))) {
     if (pair.relationshipKind === 'SELF') {
       const member = pair.subject.provenanceKind === 'ORG_MEMBER' ? pair.subject : null
       allowed = Boolean(member && (

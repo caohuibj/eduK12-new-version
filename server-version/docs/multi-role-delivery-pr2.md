@@ -15,3 +15,7 @@ Supplemental review fixes: course-teacher publishing uses the same current class
 Production relational registry remains empty. Parent→Student, Teacher→Student, Student→Teacher, Counselor→Client and Client→Counselor content require source-owned applicability, initiation, disclosure, rights and human scientific release evidence. This change does not publish test fixtures or invent approved scientific content. Consequently the ten production Journeys are not claimed end-to-end accepted. Organization Run resource selection remains empty until approved registry entries with supported runtime adapters are registered.
 
 Scoring, canonical FINAL, report calculations and scientific snapshots are unchanged. The added database migration affects delivery controls only.
+
+## 最终复查补正
+
+投放渠道与同一 persona 的范围绑定，双 TEACHER/COUNSELOR 身份不能交叉拼接内容权限。Parent SELF 的 CLASS_UNITS 选择器按当前批准关联的学生班级定位，不要求家长成为组织成员。真实 PostgreSQL 回归覆盖两种渠道各自的正反例和同班/跨班家长；机构切换会清空策略界面。

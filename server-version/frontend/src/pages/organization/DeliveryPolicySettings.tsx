@@ -8,6 +8,7 @@ export default function DeliveryPolicySettings({ organizationId }: { organizatio
   const [message, setMessage] = useState('')
   useEffect(() => {
     let active = true
+    setEnabled(null); setMessage('')
     void (async () => {
       try { const policy = await organizationApi.readDeliveryPolicy(organizationId); if (active) setEnabled(policy.homeroomDeliveryEnabled) }
       catch { if (active) setMessage('无法加载投放策略，请刷新重试。') }
