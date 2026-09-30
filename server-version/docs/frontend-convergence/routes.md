@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 106 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 108 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -104,6 +104,8 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | * | ProductPage | Public / unguarded | — | AppShell (outside guards) | Not-found / redirect decision | FE-02 | FE-02 chrome; domain UI retained |
 | /organizations | OrganizationIndexPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/new | OrganizationCreatePage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organization-tasks | Navigate | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /my-assessments | MyAssessments | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId | OrganizationAdminPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs | OrganizationRunListPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs/:runId | OrganizationRunDetailPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
