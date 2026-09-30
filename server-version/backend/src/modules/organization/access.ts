@@ -22,6 +22,7 @@ declare global {
   namespace Express {
     interface Request {
       organizationAccess?: OrganizationAccessContext
+      assessmentDeliveryAccess?: AssessmentDeliveryAuthorityContext
     }
   }
 }
@@ -120,6 +121,60 @@ export function contextHasCapability(
   if (context.organizationStatus !== 'ACTIVE') return false
   if (context.platformRole === 'SYSTEM_ADMIN' || context.orgRole === 'ORG_ADMIN') return true
   return context.capabilities.includes(capability)
+}
+
+export type AssessmentDeliveryScope = 'ORGANIZATION' | 'CLASS' | 'PROFESSIONAL'
+
+export interface AssessmentDeliveryAuthorityContext extends OrganizationAccessContext {
+  deliveryScopes: AssessmentDeliveryScope[]
+}
+
+/**
+ * Assessment delivery is narrower than Organization governance.
+ *
+ * A current ORG_ADMIN may create institution-wide campaigns. TEACHER and
+ * COUNSELOR personas may create campaigns only inside their relationship scope;
+ * publish/preview re-check every resolved pair. Platform role alone is not
+ * delivery authority and explicit denies remain fail-closed.
+ */
+export async function resolveAssessmentDeliveryAuthority(input: {
+  principal: Pick<AuthenticatedPrincipal, 'userId' | 'platformRole'>
+  organizationId: string
+}): Promise<AssessmentDeliveryAuthorityContext | null> {
+  const context = await resolveOrganizationAccessContext(input)
+  if (!context?.membershipId || context.organizationStatus !== 'ACTIVE') return null
+  if (context.explicitDenies.some((permission) => [
+    '*',
+    'ORGANIZATION_GOVERNANCE',
+    'ASSESSMENT_DELIVERY',
+    'ASSESSMENT_RUN_PUBLISH',
+    'RUN_PUBLISH',
+  ].includes(permission))) return null
+
+  const deliveryScopes: AssessmentDeliveryScope[] = []
+  if (context.orgRole === 'ORG_ADMIN') deliveryScopes.push('ORGANIZATION')
+  if (context.personas.includes('TEACHER')) deliveryScopes.push('CLASS')
+  if (context.personas.includes('COUNSELOR')) deliveryScopes.push('PROFESSIONAL')
+  if (deliveryScopes.length === 0) return null
+  return { ...context, deliveryScopes }
+}
+
+export const requireAssessmentDeliveryAuthority = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (!req.user) return unauthorized(res)
+    const organizationId = req.params.organizationId
+    if (!organizationId) return notFound(res, '组织不存在')
+    const context = await resolveAssessmentDeliveryAuthority({ principal: req.user, organizationId })
+    if (!context) return forbidden(res, '无测评投放权限')
+    req.assessmentDeliveryAccess = context
+    next()
+  } catch (err) {
+    next(err)
+  }
 }
 
 export const requireOrganizationGovernance = async (req: Request, res: Response, next: NextFunction) => {

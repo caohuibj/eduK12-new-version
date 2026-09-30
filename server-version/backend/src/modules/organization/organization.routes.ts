@@ -4,7 +4,11 @@ import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
 import { reportingDiscoveryController } from '../reporting/discovery.controller'
 import { reportingAnalysisGuard, reportingExportBudget } from '../reporting/runtimeLimit'
-import { requireOrganizationDenyGovernance, requireOrganizationGovernance } from './access'
+import {
+  requireAssessmentDeliveryAuthority,
+  requireOrganizationDenyGovernance,
+  requireOrganizationGovernance,
+} from './access'
 import { organizationAdminController } from './organization.admin.controller'
 import { organizationController } from './organization.controller'
 
@@ -63,21 +67,20 @@ router.get('/:organizationId/staff-class-assignments', authenticate, requireOrga
 router.post('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStaff)
 router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStaffAssignment)
 
-// Organization Run V1. Product list/detail reads are bounded summaries over the
-// authoritative Run graph. Draft governance and lifecycle management are
-// tenant-governance operations. Publish intentionally delegates scoped
-// TEACHER/COUNSELOR authority to the domain service; START is respondent-scoped
-// by frozen actor identity.
-router.get('/:organizationId/run-resources', authenticate, requireOrganizationGovernance, assessmentRunController.resources)
-router.get('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.list)
-router.get('/:organizationId/runs/:runId', authenticate, requireOrganizationGovernance, assessmentRunController.detail)
-router.post('/:organizationId/runs', authenticate, requireOrganizationGovernance, assessmentRunController.create)
-router.post('/:organizationId/runs/:runId/tracks', authenticate, requireOrganizationGovernance, assessmentRunController.addTrack)
-router.post('/:organizationId/runs/:runId/preview', authenticate, requireOrganizationGovernance, assessmentRunController.preview)
-router.post('/:organizationId/runs/:runId/publish', authenticate, assessmentRunController.publish)
-router.get('/:organizationId/runs/:runId/progress', authenticate, requireOrganizationGovernance, assessmentRunController.progress)
-router.post('/:organizationId/runs/:runId/close', authenticate, requireOrganizationGovernance, assessmentRunController.close)
-router.post('/:organizationId/runs/:runId/cancel', authenticate, requireOrganizationGovernance, assessmentRunController.cancel)
+// Organization Run delivery is intentionally separate from Organization
+// governance. ORG_ADMIN gets organization scope; TEACHER/COUNSELOR personas get
+// relationship-scoped delivery. Exact Run ownership and every resolved actor
+// pair are re-authorized in the domain layer.
+router.get('/:organizationId/run-resources', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.resources)
+router.get('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.list)
+router.get('/:organizationId/runs/:runId', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.detail)
+router.post('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.create)
+router.post('/:organizationId/runs/:runId/tracks', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.addTrack)
+router.post('/:organizationId/runs/:runId/preview', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.preview)
+router.post('/:organizationId/runs/:runId/publish', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.publish)
+router.get('/:organizationId/runs/:runId/progress', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.progress)
+router.post('/:organizationId/runs/:runId/close', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.close)
+router.post('/:organizationId/runs/:runId/cancel', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.cancel)
 router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, assessmentRunController.acceptConsent)
 router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
 
