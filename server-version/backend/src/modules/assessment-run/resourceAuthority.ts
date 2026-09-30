@@ -123,8 +123,8 @@ const relationalEntryToRunPolicy = (
   entry: RelationalProductEntryV1,
   registry: RelationalProductRegistryV1,
 ): RunResourcePolicy => ({
-  initiationModes: entry.initiationModes,
-  allowedTargetModes: entry.allowedTargetModes,
+  ...(entry.initiationModes ? { initiationModes: entry.initiationModes } : {}),
+  ...(entry.allowedTargetModes ? { allowedTargetModes: entry.allowedTargetModes } : {}),
   family: entry.applicability.resourceKind,
   key: entry.applicability.resourceKey,
   version: entry.applicability.resourceVersion,
