@@ -24,6 +24,10 @@ const ImageLibrary: React.FC = () => {
   const { user } = useAuth()
   const [images, setImages] = useState<ImageItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [total, setTotal] = useState(0)
+  const imageRequest = useRef(0)
   const [keyword, setKeyword] = useState('')
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -40,21 +44,25 @@ const ImageLibrary: React.FC = () => {
   const renameGuard = useEditorGuard({ open: Boolean(editingImage), value: editName, externalBusy: isUpdating, onClose: () => { setEditingImage(null); setEditName('') } })
 
   useEffect(() => {
-    fetchImages()
-  }, [])
+    const timer = setTimeout(() => void fetchImages(), 250)
+    return () => { clearTimeout(timer); imageRequest.current += 1 }
+  }, [keyword])
 
-  const fetchImages = async () => {
+  const fetchImages = async (nextPage = 1) => {
+    const request = ++imageRequest.current
     try {
       setLoading(true)
       // 从后端获取图片列表
-      const response = await apiClient.get('/uploads/images')
+      const response = await apiClient.get('/uploads/images', { params: { page: nextPage, pageSize: 40, keyword } })
+      if (request !== imageRequest.current) return
       if (response.code === 0) {
-        setImages(response.data.list || [])
+        setPage(nextPage); setHasMore(Boolean(response.data.hasMore)); setTotal(response.data.total ?? 0)
+        setImages(previous => nextPage === 1 ? (response.data.list || []) : [...previous, ...(response.data.list || [])])
       }
     } catch (error) {
       console.error('获取图片列表失败:', error)
     } finally {
-      setLoading(false)
+      if (request === imageRequest.current) setLoading(false)
     }
   }
 
@@ -179,9 +187,7 @@ const ImageLibrary: React.FC = () => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
-  const filteredImages = images.filter(img =>
-    img.name.toLowerCase().includes(keyword.toLowerCase())
-  )
+  const filteredImages = images
 
   // 禁用右键菜单
   const preventContextMenu = (e: React.MouseEvent) => {
@@ -214,7 +220,7 @@ const ImageLibrary: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader title="图片库" description="按视觉浏览和复用课堂、问卷与测评图片。" actions={<ProductButton variant="primary" onClick={() => setShowUploadModal(true)}><Plus className="w-4 h-4" aria-hidden="true" />上传图片</ProductButton>} />
-      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">当前显示 {filteredImages.length} 张图片</span></div>
+      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">当前显示 {filteredImages.length} / {total} 张图片</span></div>
       {/* Image Grid */}
       {loading ? (
         <ProductStatus kind="pending" title="正在加载图片">正在读取图片资源。</ProductStatus>
@@ -267,6 +273,7 @@ const ImageLibrary: React.FC = () => {
       )}
 
       {/* Preview Modal - 防下载保护 */}
+      {hasMore && <ProductButton disabled={loading} onClick={() => void fetchImages(page + 1)}>加载更多图片</ProductButton>}
       {previewImage && (
         <ModalSurface open onClose={() => setPreviewImage(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" dismissOnBackdrop>
           <div className="relative max-w-[90vw] max-h-[90vh]" onContextMenu={preventContextMenu} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>

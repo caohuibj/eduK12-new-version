@@ -385,8 +385,8 @@ const signedPath = (assetId: string, expiresAt: number, publicRoute = false): st
   return `/api/${publicRoute ? 'public/' : ''}assets/${encodeURIComponent(assetId)}/content?${query.toString()}`
 }
 
-export const getSignedAssetUrl = async (assetId: string, publicRoute = false): Promise<string | null> => {
-  const asset = await prisma.storedAsset.findUnique({ where: { id: assetId } })
+// Only pass rows selected under the caller's current library authorization.
+export const signKnownAsset = (asset: { id: string; deletedAt: Date | null; accessScope: string } | null, publicRoute = false): string | null => {
   if (!asset || asset.deletedAt) return null
   if (publicRoute && asset.accessScope !== 'PUBLIC_CHECKIN') return null
   if (!publicRoute && asset.accessScope === 'PUBLIC_CHECKIN') return null
@@ -394,6 +394,17 @@ export const getSignedAssetUrl = async (assetId: string, publicRoute = false): P
   // The client always receives an application URL. COS credentials and COS
   // URLs remain server-side and are generated only while serving the asset.
   return signedPath(asset.id, expiresAt, publicRoute)
+}
+
+export const getSignedAssetUrl = async (assetId: string, publicRoute = false): Promise<string | null> =>
+  signKnownAsset(await prisma.storedAsset.findUnique({ where: { id: assetId } }), publicRoute)
+
+export const getSignedAssetUrls = async (ids: Array<string | null | undefined>): Promise<Map<string, string | null>> => {
+  const unique = [...new Set(ids.filter((id): id is string => Boolean(id)))]
+  if (!unique.length) return new Map()
+  if (unique.length > 300) throw new Error('Asset signing batch exceeds page budget')
+  const assets = await prisma.storedAsset.findMany({ where: { id: { in: unique } }, select: { id: true, deletedAt: true, accessScope: true } })
+  return new Map(assets.map(asset => [asset.id, signKnownAsset(asset)]))
 }
 
 const isExpectedAssetScope = (

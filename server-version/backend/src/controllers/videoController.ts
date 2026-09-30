@@ -7,7 +7,7 @@ import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
-import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, storeAssetFromFile } from '../services/assetStorage'
 import { markVideoFailed } from '../services/videoProcessingState'
 
 const updateVideoSchema = z.object({
@@ -95,18 +95,19 @@ export const videoController = {
         prisma.video.count({ where })
       ])
 
+      const urls = await getSignedAssetUrls(videos.flatMap(video => [video.processedAssetId, video.originalAssetId, video.thumbnailAssetId]))
       // 添加视频URL - 优先使用处理后的URL
       const videosWithUrl = await Promise.all(videos.map(async video => {
         // Legacy URLs remain a migration-window fallback. New rows only use
         // short-lived signed asset URLs.
         const processedUrl = video.processedAssetId
-          ? await getSignedAssetUrl(video.processedAssetId)
+          ? urls.get(video.processedAssetId)
           : (video.processedUrl && !video.processedUrl.startsWith('file://') ? video.processedUrl : null)
         const originalUrl = video.originalAssetId
-          ? await getSignedAssetUrl(video.originalAssetId)
+          ? urls.get(video.originalAssetId)
           : `/uploads/videos/${video.fileName}`
         const thumbnailUrl = video.thumbnailAssetId
-          ? await getSignedAssetUrl(video.thumbnailAssetId)
+          ? urls.get(video.thumbnailAssetId)
           : video.thumbnailUrl
         return {
           ...video,

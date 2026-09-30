@@ -405,3 +405,14 @@ describe('stored asset access boundary', () => {
     expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })
 })
+
+it('signs a library page with one projected lookup and no per-asset reads', async () => {
+  const { getSignedAssetUrls } = await import('../../services/assetStorage')
+  mockPrisma.storedAsset.findMany.mockResolvedValue(Array.from({ length: 40 }, (_, n) => ({ id: `page-${n}`, deletedAt: null, accessScope: 'PRIVATE' })))
+  mockPrisma.storedAsset.findMany.mockClear(); mockPrisma.storedAsset.findUnique.mockClear()
+  const urls = await getSignedAssetUrls(Array.from({ length: 40 }, (_, n) => `page-${n}`))
+  expect(urls.size).toBe(40)
+  expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledOnce()
+  expect(mockPrisma.storedAsset.findUnique).not.toHaveBeenCalled()
+  await expect(getSignedAssetUrls(Array.from({ length: 301 }, (_, n) => `large-${n}`))).rejects.toThrow('page budget')
+})

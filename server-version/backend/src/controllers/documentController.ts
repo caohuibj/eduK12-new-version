@@ -4,7 +4,7 @@ import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
-import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, storeAsset } from '../services/assetStorage'
 
 export const documentController = {
   // 获取文档列表（添加分页和缓存优化）
@@ -55,10 +55,11 @@ export const documentController = {
         prisma.document.count({ where })
       ])
 
+      const urls = await getSignedAssetUrls(documents.map(doc => doc.assetId))
       // 添加URL（优先使用COS URL）
       const documentsWithUrl = await Promise.all(documents.map(async doc => ({
         ...doc,
-        url: doc.assetId ? await getSignedAssetUrl(doc.assetId) : (doc.cosUrl || ''),
+        url: doc.assetId ? urls.get(doc.assetId) : (doc.cosUrl || ''),
       })))
 
       return success(res, buildPaginatedResult(documentsWithUrl, total, pagination))
