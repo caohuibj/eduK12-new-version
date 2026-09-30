@@ -1,3 +1,4 @@
+import { streamResponse } from '../../utils/streamResponse'
 import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
 import { Readable } from 'node:stream'
@@ -154,8 +155,7 @@ const proxyCosContent = async (params: {
   applyDeliveryHeaders(res, capability, length, range, asset.sizeBytes)
   res.status(expectedStatus)
   const stream = Readable.fromWeb(upstream.body as Parameters<typeof Readable.fromWeb>[0])
-  stream.on('error', () => res.destroy())
-  return stream.pipe(res)
+  return streamResponse(stream, res)
 }
 
 const serveLocalContent = async (params: {
@@ -186,8 +186,7 @@ const serveLocalContent = async (params: {
   const stream = range
     ? fs.createReadStream(localPath, { start: range.start, end: range.end })
     : fs.createReadStream(localPath)
-  stream.on('error', () => res.destroy())
-  return stream.pipe(res)
+  return streamResponse(stream, res)
 }
 
 export const serveAssessmentMediaCapabilityContent = async (params: {

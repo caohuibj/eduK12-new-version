@@ -1,3 +1,4 @@
+import { streamResponse } from '../utils/streamResponse'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
@@ -616,7 +617,7 @@ export const serveStoredAssetContent = async (
   res.setHeader('Content-Type', asset.mimeType)
   res.setHeader('Content-Length', String(asset.sizeBytes))
   res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(asset.originalName || asset.id)}"`)
-  return fs.createReadStream(localPath).pipe(res)
+  return streamResponse(fs.createReadStream(localPath), res)
 }
 
 export const serveAsset = async (req: Request, res: Response) => {

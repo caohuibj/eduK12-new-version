@@ -23,6 +23,8 @@ export const uploadToCOS = async (
   storageClass: StorageClass = 'STANDARD'
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
+    const source = fs.createReadStream(filePath)
+    source.on('error', reject)
     cos.putObject(
       {
         Bucket: config.cosBucket!,
@@ -30,10 +32,11 @@ export const uploadToCOS = async (
         Key: key,
         // The SDK accepts a readable stream; avoid materialising large videos
         // in a Node Buffer before sending them to object storage.
-        Body: fs.createReadStream(filePath),
+        Body: source,
         StorageClass: storageClass,
       } as any,
       (err, data) => {
+        source.destroy()
         if (err) {
           reject(err)
         } else {
