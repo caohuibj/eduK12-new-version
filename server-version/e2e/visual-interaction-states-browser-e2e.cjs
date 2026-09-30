@@ -260,7 +260,11 @@ async function main() {
         await page.keyboard.press('Space')
         await (await chooserPromise).setFiles(selectedFile)
         const reselect = dialog.getByRole('button', { name: '重新选择' })
-        await reselect.focus()
+        // Exercise actual keyboard modality after the native picker closes.
+        // Firefox does not promise :focus-visible for programmatic focus.
+        await dialog.focus()
+        for (let step = 0; step < 12 && !await reselect.evaluate(el => el === document.activeElement); step++) await page.keyboard.press('Tab')
+        assert.equal(await reselect.evaluate(el => el === document.activeElement), true, 'reselect is reachable by keyboard')
         assert.equal(await reselect.evaluate(el => el.matches(':focus-visible')), true)
         await capture(page, 'media-selected-long-file', width)
         await dialog.getByRole('button', { name: '取消', exact: true }).click()

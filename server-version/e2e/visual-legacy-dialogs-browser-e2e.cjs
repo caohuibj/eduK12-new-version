@@ -80,6 +80,12 @@ async function main() {
           await trigger.click()
           const panel = page.getByRole('dialog', { name: label, exact: true })
           await assertModal(page, panel, trigger)
+          if (route === '/videos') {
+            await panel.focus()
+            await page.keyboard.press('Tab')
+            await page.keyboard.press('Tab')
+            assert.equal(await panel.locator('video').evaluate(element => element === document.activeElement), true, 'video controls have a keyboard entry')
+          }
           // Embedded PDF documents have their own keyboard event scope.
           await panel.getByRole('button', { name: '关闭', exact: true }).focus()
           await page.keyboard.press('Escape')

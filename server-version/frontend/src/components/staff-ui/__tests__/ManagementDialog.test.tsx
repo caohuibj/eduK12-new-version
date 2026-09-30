@@ -12,6 +12,7 @@ function Example() {
     <button>Background</button>
     <ManagementDialog open={open} title="Edit" onClose={() => setOpen(false)} actions={<button onClick={() => setOpen(false)}>Done</button>}>
       <input aria-label="Name" value={value} onChange={event => setValue(event.target.value)} />
+      <video controls tabIndex={0} aria-label="Lesson video" />
       <button disabled>Disabled</button>
       <button hidden>Hidden</button>
     </ManagementDialog>
@@ -66,6 +67,10 @@ describe('ManagementDialog', () => {
     await user.keyboard('long input')
     expect(screen.getByLabelText('Name')).toHaveValue('long input')
     expect(screen.getByLabelText('Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText('Lesson video')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByText('Done')).toHaveFocus()
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(trigger).toHaveFocus()

@@ -85,7 +85,7 @@ export default function ModalSurface({ open, onClose, children, className, initi
       event.stopPropagation()
       const surface = event.currentTarget
       const candidates = Array.from(surface.querySelectorAll<HTMLElement>(
-        'a[href], button, input:not([type="hidden"]), select, textarea, summary, [contenteditable="true"], [tabindex]'
+        'a[href], button, input:not([type="hidden"]), select, textarea, summary, video[controls], audio[controls], [contenteditable="true"], [tabindex]'
       )).filter(element => element.tabIndex >= 0 && !element.matches(':disabled') &&
         !element.closest('[hidden], [inert], [aria-hidden="true"]') &&
         (typeof element.checkVisibility !== 'function' || element.checkVisibility({ checkVisibilityCSS: true })) &&
