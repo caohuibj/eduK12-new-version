@@ -140,7 +140,7 @@ async function main() {
     {
       const { context, page } = await setup(browser, { cognitive: false })
       await gotoRoute(page, `${base}/student/cognitive/history`)
-      await page.getByText('找不到此页面', { exact: true }).waitFor()
+      await page.getByText('认知测评暂不可用', { exact: true }).waitFor()
       assert.equal(await (await openNav(page)).getByRole('link', { name: '认知测评', exact: true }).count(), 0)
       cases.push({ disabledCapability: true, passed: true }); await context.close()
     }
