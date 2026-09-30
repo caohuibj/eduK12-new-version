@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { writeFileSync } from 'node:fs'
 import bcrypt from '../backend/node_modules/bcryptjs'
 import { prisma } from '../backend/src/config/database'
+import { resultAudiences, type ResultDisclosureContractV1 } from '../backend/src/modules/assessment-policy/result-disclosure'
 import type { RelationalProductEntryV1 } from '../backend/src/modules/assessment-relational/product-registry'
 
 async function main() {
@@ -24,15 +25,21 @@ async function main() {
     type: 'SITUATIONAL', position: 0, required: true, situationalInstrumentKey: 'sjt-assertiveness-golden', situationalInstrumentVersion: '1.0.0' } })
   const entries: RelationalProductEntryV1[] = []
   function resource(key: string, subject: any, respondent: any, relationship: any, protectedFeedback = false) {
-    entries.push({ title: `PR5 ${key}`, description: 'Isolated acceptance fixture, not released scientific content',
-      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: composite.id },
+    const resultDisclosure: ResultDisclosureContractV1 = {schemaVersion:1,policyKey:'pr5:explicit-aggregate-v1',minimumRespondents:3,audiences:Object.fromEntries(resultAudiences.map(a=>[a,{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]}])) as ResultDisclosureContractV1['audiences']}
+    resultDisclosure.audiences.RESPONDENT={mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]}
+    for(const audience of ['TEACHER','PROFESSIONAL','ORGANIZATION'] as const) resultDisclosure.audiences[audience]={mode:audience==='ORGANIZATION'?'ORGANIZATION_AGGREGATE':'CLASS_AGGREGATE',metricKeys:['bfi2.assertiveness.behavior'],longitudinalMetricKeys:[]}
+    entries.push({ resultDisclosure, title: `PR5 ${key}`, description: 'Isolated acceptance fixture, not released scientific content',
+      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT',
+      initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN', 'PROFESSIONAL_ASSIGN', 'RELATED_OBSERVER_ASSIGN'],
+      ...(subject === 'TEACHER' && respondent === 'STUDENT' ? { allowedTargetModes: [relationship === 'COURSE_TEACHER_STUDENT' ? 'COURSE_TEACHER' as const : 'HOMEROOM_TEACHER' as const] } : {}),
+      launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: composite.id },
       applicability: { schemaVersion: 1, resourceKind: 'BUNDLE', resourceKey: `pr5-${key}-${suffix}`, resourceVersion: '1.0.0',
         subjectRoles: [subject], respondentRoles: [respondent], relationshipKinds: [relationship],
         perspectives: [protectedFeedback ? 'RELATIONAL_EXPERIENCE' : relationship === 'SELF' ? 'SELF_REPORT' : 'OBSERVER_REPORT'],
-        analysisMode: protectedFeedback ? 'COHORT_AGGREGATE' : 'INDIVIDUAL_ONLY',
+        analysisMode: 'COHORT_AGGREGATE',
         visibilityPolicyKey: protectedFeedback ? 'ORG_PROTECTED_FEEDBACK_V1' : ['PARENT', 'TEACHER'].includes(respondent) && relationship !== 'SELF' ? 'observer_assigning_teacher_v1' : 'ORG_SELF_V1',
-        minimumRespondents: protectedFeedback ? 3 : null },
-      cohortAnalysisPolicy: protectedFeedback ? { schemaVersion: 1, policyKey: 'pr5-test', policyVersion: '1.0.0', minimumRespondents: 3, metricKeys: ['bfi2.assertiveness.behavior'] } : null })
+        minimumRespondents: 3 },
+      cohortAnalysisPolicy: { schemaVersion: 1, policyKey: 'pr5-test', policyVersion: '1.0.0', minimumRespondents: 3, metricKeys: ['bfi2.assertiveness.behavior'] } })
   }
   resource('teacher-self', 'TEACHER', 'TEACHER', 'SELF')
   resource('student-self', 'STUDENT', 'STUDENT', 'SELF')

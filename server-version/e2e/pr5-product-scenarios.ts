@@ -81,7 +81,7 @@ async function run(page, org, key, subject = { kind: 'ALL_CURRENT' }, respondent
   } else {
   t = await ok(page, `/organizations/${org}/runs/${r.id}/tracks`, {
     resource: { family: policy.resourceKind, key: policy.resourceKey, version: policy.resourceVersion }, subjectSelector: subject, respondentSelector: respondent,
-    requestedPolicy: { subjectRoles: policy.subjectRoles, respondentRoles: policy.respondentRoles, relationshipKinds: policy.relationshipKinds,
+    requestedPolicy: { ...(entry.allowedTargetModes?.includes('HOMEROOM_TEACHER') ? {targetPolicy:{mode:'HOMEROOM_TEACHER'}} : {}), subjectRoles: policy.subjectRoles, respondentRoles: policy.respondentRoles, relationshipKinds: policy.relationshipKinds,
       perspectives: policy.perspectives, analysisMode: policy.analysisMode, visibilityPolicyKey: policy.visibilityPolicyKey, minimumRespondents: policy.minimumRespondents },
   })
   const detail = await ok(page, `/organizations/${org}/runs/${r.id}`)
@@ -98,16 +98,16 @@ async function complete(name, r) {
   const inbox = await ok(page, '/organizations/assigned-tasks')
   const task = inbox.list.find(task => task.runId === r.id)
   assert.ok(task, `${name} assigned task for ${r.name}`)
-  const card = page.getByRole('article').filter({ has: page.getByRole('heading', { name: r.name, exact: true }) })
+  const card = page.locator('section').filter({ has: page.getByRole('heading', { name: r.name, exact: true }) })
   await card.waitFor()
   if (task.consentRequired) await card.getByRole('checkbox').check()
   const started = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/executions/${task.executionId}/start`))
-  await card.getByRole('button', { name: '开始任务', exact: true }).click()
+  await card.getByRole('button', { name: '开始测评', exact: true }).click()
   const start = await (await started).json()
   assert.equal(start.code, 0, JSON.stringify(start))
   const attemptId = start.data.runtimeBindingRef
   assert.ok(attemptId)
-  await card.getByRole('link', { name: '进入测评' }).click()
+  await page.waitForURL(new RegExp(`/relational/attempts/${attemptId}`))
   const { snapshots, canonical } = await finishRuntime(page, attemptId)
   if (!checkedProjectionRecovery) {
     // Inject only projection loss after authoritative FINAL; GET must repair it.
@@ -144,7 +144,7 @@ async function finishRuntime(page, attemptId) {
   const final = page.waitForResponse(response => response.request().method() === 'POST' && response.url().includes(`/attempts/${attemptId}/items/`) && response.url().endsWith('/submit'))
   await page.getByRole('button', { name: '提交测评', exact: true }).click()
   assert.equal((await (await final).json()).code, 0)
-  await page.waitForURL(/\/relational\/attempts\//)
+  await page.waitForURL(/\/(my-assessments|relational\/tasks)$/)
   const persisted = await prisma.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })
   assert.equal(persisted.status, 'COMPLETED')
   const snapshots = await prisma.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attemptId, attemptEpoch: persisted.attemptEpoch } })
@@ -291,19 +291,20 @@ async function schoolMentalHealth({ platform, owner, org, members, groupSpec, sc
   const [consentRow] = await prisma.$queryRaw`SELECT a.consent_id FROM assessment_run_executions e JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id WHERE e.id=${consentTask.executionId}`
   await prisma.assessmentAttemptConsent.updateMany({ where: { OR: [{ id: consentRow.consent_id }, { priorConsentId: consentRow.consent_id }] }, data: { revokedAt: new Date() } })
   await denied(teacherPage, `/organizations/${org}/runs/${pendingConsent.id}/executions/${consentTask.executionId}/start`, {})
-  await prisma.parentStudentRelationship.update({ where: { id: parentRelation.id }, data: { status: 'REVOKED', revokedAt: new Date() } })
-  await ok(owner, `/organizations/${org}/memberships/${members.student0}/end`, {})
   const parentPage = await pageFor('parent')
   const pending = (await ok(parentPage, '/organizations/assigned-tasks')).list.find(t => t.runId === pendingParent.id)
+  assert.ok(pending)
+  await prisma.parentStudentRelationship.update({ where: { id: parentRelation.id }, data: { status: 'REVOKED', revokedAt: new Date() } })
+  await ok(owner, `/organizations/${org}/memberships/${members.student0}/end`, {})
+  assert.equal((await ok(parentPage, '/organizations/assigned-tasks')).list.some(t=>t.runId===pendingParent.id || t.runId===parentObserver.id),false,'revoked parent must not discover old subjects')
   await denied(parentPage, `/organizations/${org}/runs/${pendingParent.id}/executions/${pending.executionId}/start`, {})
   await denied(parentPage, `/organizations/${org}`)
-  await ok(parentPage, `/composite-assessments/attempts/${parentCompleted.attemptId}/report`)
+  await denied(parentPage, `/composite-assessments/attempts/${parentCompleted.attemptId}/report`)
+  await denied(parentPage, `/my-assessments/run-results/${parentCompleted.task.executionId}`)
   await parentPage.goto(`${base}/organization-tasks`)
-  const historyCard = parentPage.getByRole('article').filter({ hasText: parentObserver.name })
-  await historyCard.getByRole('link', { name: '查看本次历史报告' }).click()
-  await parentPage.waitForURL(new RegExp(`${parentCompleted.attemptId}/report`))
-  await parentPage.getByText('以下按容器顺序展示各模块的独立结果。', { exact: true }).first().waitFor()
-  await parentPage.screenshot({ path: `${output}/parent-historical.png`, fullPage: true })
+  await parentPage.getByRole('heading', { name: '我的测评', exact: true }).waitFor()
+  assert.equal(await parentPage.getByRole('heading',{name:parentObserver.name,exact:true}).count(),0)
+  await parentPage.screenshot({ path: `${output}/parent-revoked-inbox.png`, fullPage: true })
   await denied(parentPage, `/composite-assessments/attempts/${parentCompleted.attemptId}/analysis-export`)
   await denied(parentPage, `/organizations/${org}/reporting/exports`, { kind: 'AGGREGATE', artifactId: a.artifactId })
   // Inject only a test Safety trigger tied to the real canonical result, never a production trigger rule.
@@ -322,7 +323,7 @@ async function schoolMentalHealth({ platform, owner, org, members, groupSpec, sc
   assert.equal((await ok(teacherPage, safetyPath)).projection, 'FULL')
   await denied(owner, `/organizations/${org}/reporting/artifacts/${a.artifactId}`)
   await ok(platform, `/organizations/${org}/resume`, {})
-  record('school mental health: four directions, protected subject/generic report denial, consent and relationship revocation, historical Parent report, Safety SUMMARY/ACTION/FULL')
+  record('school mental health: four directions, protected subject/generic report denial, consent and relationship revocation, revoked Parent discovery, legacy historical policy, Safety SUMMARY/ACTION/FULL')
 }
 async function consultation({ platform, owner, groupSpec }) {
   const created = await ok(platform, '/organizations', { name: `PR5 Clinic ${fixture.suffix}`, firstAdminUserId: fixture.users.owner.id })
@@ -354,9 +355,11 @@ async function consultation({ platform, owner, groupSpec }) {
   const series = await ok(owner, `/organizations/${org}/reporting/series`, { seriesKey: `clinic-${randomUUID()}`, scope: { resourceFamily: 'BUNDLE', resourceKey: entryFor('counselor-self').applicability.resourceKey } })
   await ok(owner, `/organizations/${org}/reporting/series/${series.seriesId}/waves`, { waveKey: 'before', ordinal: 1, runId: first.id, trackId: first.track })
   const pending = await run(owner, org, 'counselor-client', { kind: 'MEMBERSHIP_IDS', membershipIds: [members.client0] })
+  const task = (await ok(counselor, '/organizations/assigned-tasks')).list.find(t => t.runId === pending.id)
+  assert.ok(task)
   await ok(owner, `/organizations/${org}/classification`, { operation: 'END_RELATIONSHIP', relationshipId: relations[0].id })
   await denied(counselor, `/organizations/${org}/reporting/artifacts/${clientReport.artifactId}`)
-  const task = (await ok(counselor, '/organizations/assigned-tasks')).list.find(t => t.runId === pending.id)
+  assert.equal((await ok(counselor, '/organizations/assigned-tasks')).list.some(t=>t.runId===pending.id),false)
   await denied(counselor, `/organizations/${org}/runs/${pending.id}/executions/${task.executionId}/start`, {})
   const oldMembership = members.counselor0
   await ok(owner, `/organizations/${org}/memberships/${oldMembership}/end`, {})
@@ -376,7 +379,7 @@ async function consultation({ platform, owner, groupSpec }) {
   const episodes = await prisma.$queryRaw`SELECT membership_id FROM assessment_run_actor_snapshots WHERE user_id=${fixture.users.counselor0.id} AND run_id IN (${first.id}, ${second.id})`
   assert.deepEqual(new Set(episodes.map(e => e.membership_id)), new Set([oldMembership, members.counselor0]))
   await owner.screenshot({ path: `${output}/clinic-longitudinal.png`, fullPage: true })
-  const mobile = await pageFor('client0'); await mobile.goto(`${base}/organization-tasks`); await mobile.getByRole('heading', { name: '组织测评任务' }).waitFor()
+  const mobile = await pageFor('client0'); await mobile.goto(`${base}/organization-tasks`); await mobile.getByRole('heading', { name: '我的测评' }).waitFor()
   await mobile.keyboard.press('Tab')
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true)
   record('consultation: Client SELF, both professional directions, exact ADMIN respondent, ended relation START denial, Counselor M1/M2 matched and repeated, mobile keyboard')
