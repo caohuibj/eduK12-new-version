@@ -421,6 +421,8 @@ jobs:
       - name: frontend dependencies for cross-tree Cognitive package tests
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
+      - name: prelaunch load and resource contract self-tests
+        run: node --test ../scripts/load/prelaunch-mixed-load.test.mjs ../scripts/prelaunch-resource-preflight.test.mjs
       - name: full regression
         # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
         # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
@@ -837,7 +839,7 @@ jobs:
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
       ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
       ASSET_MIGRATION_COMPLETE: 'true'
-      COOKIE_SECURE: 'false'
+      COOKIE_SECURE: 'true'
       DB_USER: ci-ptool
       DB_PASSWORD: ci-ptool-password
       DB_NAME: ptool
@@ -848,7 +850,7 @@ jobs:
       GRAFANA_PASSWORD: ci-grafana-password-2026
       COGNITIVE_MODULE_ENABLED: 'true'
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      CORS_ORIGIN: http://localhost
+      CORS_ORIGIN: https://localhost
     defaults:
       run:
         working-directory: server-version
@@ -884,6 +886,8 @@ jobs:
           cache: false
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
+      - name: assert prelaunch resource and HTTPS contract
+        run: node scripts/prelaunch-resource-preflight.mjs --compose-json /tmp/eduk12-compose-config.json
       - name: assert API/worker isolation topology
         run: node scripts/assert-compose-worker-topology.mjs /tmp/eduk12-compose-config.json
       - name: validate monitoring compose
