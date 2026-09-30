@@ -94,7 +94,7 @@ export const assessmentRunController = {
         page: parsed.data.page,
         pageSize: parsed.data.pageSize,
         status: parsed.data.status as AssessmentRunStatus | undefined,
-        createdByUserId: organizationWide ? undefined : req.user.userId,
+        ...(organizationWide ? {} : { createdByUserId: req.user.userId }),
       }))
     } catch (err) { return fail(res, err) }
   },

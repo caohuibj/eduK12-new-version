@@ -93,5 +93,22 @@ export const assertCurrentRunManagerBoundary = async (input: {
   }
 }
 
-/** Backward-compatible name used by publish routes and existing tests. */
-export const assertCurrentRunPublisherBoundary = assertCurrentRunManagerBoundary
+/**
+ * Backward-compatible publisher contract. New management callers use the
+ * delivery-specific error code; existing publish callers retain the historical
+ * RUN_PUBLISH_FORBIDDEN code while sharing the same authority decision.
+ */
+export const assertCurrentRunPublisherBoundary = async (input: {
+  organizationId: string
+  runId: string
+  actorUserId: string
+}): Promise<void> => {
+  try {
+    await assertCurrentRunManagerBoundary(input)
+  } catch (error) {
+    if (error instanceof RunResourceBoundaryError && error.code === 'RUN_DELIVERY_FORBIDDEN') {
+      throw new RunResourceBoundaryError('RUN_PUBLISH_FORBIDDEN', error.message, error.statusCode)
+    }
+    throw error
+  }
+}
