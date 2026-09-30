@@ -1,3 +1,5 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Image as ImageIcon, Trash2, Upload, X, AlertCircle, Eye, Edit2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -33,6 +35,9 @@ const ImageLibrary: React.FC = () => {
   const [editName, setEditName] = useState('')
   const [isUpdating, setIsUpdating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const uploadGuard = useEditorGuard({ open: showUploadModal, value: { file: selectedFile ? [selectedFile.name, selectedFile.size, selectedFile.lastModified] : null }, externalBusy: isUploading, onClose: () => { setShowUploadModal(false); setSelectedFile(null); setUploadError('') } })
+  const renameGuard = useEditorGuard({ open: Boolean(editingImage), value: editName, externalBusy: isUpdating, onClose: () => { setEditingImage(null); setEditName('') } })
 
   useEffect(() => {
     fetchImages()
@@ -81,6 +86,7 @@ const ImageLibrary: React.FC = () => {
       return
     }
 
+    if (!uploadGuard.begin()) return
     setIsUploading(true)
     setUploadProgress(0)
     setUploadError('')
@@ -115,6 +121,7 @@ const ImageLibrary: React.FC = () => {
     } catch (error: any) {
       setUploadError(error.response?.data?.message || '上传失败，请重试')
     } finally {
+      uploadGuard.finish()
       setIsUploading(false)
     }
   }
@@ -138,6 +145,7 @@ const ImageLibrary: React.FC = () => {
   const handleRenameImage = async () => {
     if (!editingImage || !editName.trim()) return
     
+    if (!renameGuard.begin()) return
     setIsUpdating(true)
     try {
       const response = await apiClient.put(`/uploads/images/${editingImage.filename}`, { 
@@ -148,11 +156,12 @@ const ImageLibrary: React.FC = () => {
         setEditName('')
         fetchImages()
       } else {
-        showMessage(response.message || '重命名失败')
+        renameGuard.fail(String(response.message || '重命名失败'))
       }
     } catch (error: any) {
-      showMessage(error.message || '重命名失败')
+      renameGuard.fail(String(error.message || '重命名失败'))
     } finally {
+      renameGuard.finish()
       setIsUpdating(false)
     }
   }
@@ -259,16 +268,12 @@ const ImageLibrary: React.FC = () => {
 
       {/* Preview Modal - 防下载保护 */}
       {previewImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" 
-          onClick={() => setPreviewImage(null)}
-          onContextMenu={preventContextMenu}
-        >
-          <div className="relative max-w-[90vw] max-h-[90vh]" onContextMenu={preventContextMenu}>
+        <ModalSurface open onClose={() => setPreviewImage(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" dismissOnBackdrop>
+          <div className="relative max-w-[90vw] max-h-[90vh]" onContextMenu={preventContextMenu} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>
             <button
               onClick={() => setPreviewImage(null)}
               className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300"
-              title="关闭"
+              title="关闭" aria-label="关闭"
             >
               <X className="w-6 h-6" />
             </button>
@@ -283,22 +288,18 @@ const ImageLibrary: React.FC = () => {
             />
             <p className="text-white text-center mt-4 text-sm select-none">{previewImage.name}</p>
           </div>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"上传图片"}><fieldset disabled={uploadGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">上传图片</h3>
               <button
-                onClick={() => {
-                  setShowUploadModal(false)
-                  setSelectedFile(null)
-                  setUploadError('')
-                }}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={uploadGuard.close}
+                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -313,7 +314,9 @@ const ImageLibrary: React.FC = () => {
               )}
 
               <div
-                onClick={() => fileInputRef.current?.click()}
+                role="button" tabIndex={isUploading ? -1 : 0} aria-label="选择图片文件" aria-disabled={isUploading}
+                onKeyDown={event => { if (!isUploading && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); fileInputRef.current?.click() } }}
+                onClick={() => !isUploading && fileInputRef.current?.click()}
                 className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-action cursor-pointer transition-colors"
               >
                 <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -321,6 +324,7 @@ const ImageLibrary: React.FC = () => {
                 <p className="text-gray-400 text-sm mt-1">支持 JPG、PNG、GIF、WebP，最大 10MB</p>
                 <input
                   ref={fileInputRef}
+                  onClick={event => event.stopPropagation()}
                   type="file"
                   accept="image/jpeg,image/png,image/gif,image/webp"
                   onChange={handleFileSelect}
@@ -353,11 +357,7 @@ const ImageLibrary: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowUploadModal(false)
-                    setSelectedFile(null)
-                    setUploadError('')
-                  }}
+                  onClick={uploadGuard.close}
                   className="flex-1 hui-button hui-button--secondary"
                 >
                   取消
@@ -372,22 +372,19 @@ const ImageLibrary: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
 
       {/* Edit Image Modal */}
       {editingImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"重命名图片"}>{renameGuard.error}<fieldset disabled={renameGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">重命名图片</h3>
               <button
-                onClick={() => {
-                  setEditingImage(null)
-                  setEditName('')
-                }}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={renameGuard.close}
+                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -400,8 +397,8 @@ const ImageLibrary: React.FC = () => {
                   className="w-20 h-20 object-cover rounded"
                 />
                 <div className="flex-1">
-                  <label className="label">图片名称</label>
-                  <input
+                  <label htmlFor="ImageLibrary-field-1" className="label">图片名称</label>
+                  <input id="ImageLibrary-field-1"
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
@@ -414,10 +411,7 @@ const ImageLibrary: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditingImage(null)
-                    setEditName('')
-                  }}
+                  onClick={renameGuard.close}
                   className="flex-1 hui-button hui-button--secondary"
                   disabled={isUpdating}
                 >
@@ -433,9 +427,11 @@ const ImageLibrary: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
+      {uploadGuard.confirmation}
+      {renameGuard.confirmation}
     </ProductPage>
   )
 }

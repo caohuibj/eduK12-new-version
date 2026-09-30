@@ -1,3 +1,4 @@
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Trash2, Edit, Users, BookOpen, UserCog, Flag, Copy, PauseCircle, PlayCircle, Image as ImageIcon, X, Share2, Inbox, UserPlus } from 'lucide-react'
@@ -80,8 +81,10 @@ const CourseList: React.FC = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!editorGuard.begin()) return
     try {
       const response = await apiClient.post('/courses', coursePayload())
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         showMessage(`课程创建成功！课程码: ${response.data.courseCode}`)
         setShowCreateModal(false)
@@ -89,26 +92,32 @@ const CourseList: React.FC = () => {
         fetchCourses()
       }
     } catch (error: any) {
-      showMessage(error.message || '创建失败')
+      editorGuard.fail(String(error.message || '创建失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingCourse) return
-    if (isAdmin && formData.isLibrary && !editingCourse.isLibrary) {
-      if (!await ask('标记为库课程后将停止招募，学生无法加入或作答。确定继续？')) return
-    }
-
+    if (!editorGuard.begin()) return
     try {
+      if (isAdmin && formData.isLibrary && !editingCourse.isLibrary) {
+        if (!await ask('标记为库课程后将停止招募，学生无法加入或作答。确定继续？')) return
+      }
+
       const response = await apiClient.put(`/courses/${editingCourse.id}`, coursePayload())
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setEditingCourse(null)
         setFormData({ title: '', description: '', isLibrary: false })
         fetchCourses()
       }
     } catch (error: any) {
-      showMessage(error.message || '更新失败')
+      editorGuard.fail(String(error.message || '更新失败'))
+    } finally {
+      editorGuard.finish()
     }
   }
 
@@ -217,14 +226,16 @@ const CourseList: React.FC = () => {
   // 分享课程
   const handleShare = async () => {
     if (!sharingCourse || selectedUsers.length === 0) {
-      showMessage('请选择要分享的用户')
+      shareGuard.fail('请选择要分享的用户')
       return
     }
 
+    if (!shareGuard.begin()) return
     try {
       const response = await apiClient.post(`/courses/${sharingCourse.id}/share`, {
         userIds: selectedUsers
       })
+      if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         showMessage(`成功分享给 ${response.data.sharedCount} 位用户`)
         setShowShareModal(false)
@@ -232,7 +243,9 @@ const CourseList: React.FC = () => {
         setSelectedUsers([])
       }
     } catch (error: any) {
-      showMessage(error.message || '分享失败')
+      shareGuard.fail(String(error.message || '分享失败'))
+    } finally {
+      shareGuard.finish()
     }
   }
 
@@ -313,7 +326,7 @@ const CourseList: React.FC = () => {
   }
 
   const handleCoverUpload = async (courseId: string) => {
-    if (!coverFile) return
+    if (!coverFile || !editorGuard.begin()) return
 
     setIsUploadingCover(true)
     try {
@@ -331,6 +344,7 @@ const CourseList: React.FC = () => {
 
       if (response.data.code === 0) {
         showMessage('封面上传成功')
+        setCoverFile(null)
         fetchCourses()
         // 更新当前编辑的课程封面
         if (editingCourse) {
@@ -340,11 +354,12 @@ const CourseList: React.FC = () => {
           })
         }
       } else {
-        showMessage(response.data.message || '上传失败')
+        editorGuard.fail(String(response.data.message || '上传失败'))
       }
     } catch (error: any) {
-      showMessage(error.response?.data?.message || error.message || '上传失败')
+      editorGuard.fail(String(error.response?.data?.message || error.message || '上传失败'))
     } finally {
+      editorGuard.finish()
       setIsUploadingCover(false)
     }
   }
@@ -399,6 +414,9 @@ const CourseList: React.FC = () => {
     setSharingCourse(null)
     setSelectedUsers([])
   }
+
+  const editorGuard = useEditorGuard({ open: Boolean(showCreateModal || editingCourse), value: { ...formData, coverFile: coverFile ? [coverFile.name, coverFile.size, coverFile.lastModified] : null }, onClose: closeEditor, externalBusy: isUploadingCover })
+  const shareGuard = useEditorGuard({ open: showShareModal, value: selectedUsers, onClose: closeShare })
 
   return (
     <ProductPage width="management" className="space-y-6">
@@ -527,15 +545,16 @@ const CourseList: React.FC = () => {
 
       {/* Create/Edit Modal */}
       {(showCreateModal || editingCourse) && (
-        <ModalSurface open onClose={closeEditor} className="staff-modal-backdrop">
-          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="course-editor-title">
+        <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">
+          <form onSubmit={editingCourse ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="course-editor-title" aria-busy={editorGuard.busy}>
+            {editorGuard.error}<fieldset disabled={editorGuard.busy} className="contents">
             <div className="staff-dialog__header">
               <div>
                 <h2 id="course-editor-title">{editingCourse ? '编辑课程' : '创建课程'}</h2>
                 <p className="staff-dialog__description">设置课程名称、简介与参与方式。</p>
               </div>
             </div>
-            <div className="staff-dialog__body staff-form">
+            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
               {/* 课程封面 */}
               {editingCourse && (
                 <div>
@@ -603,8 +622,8 @@ const CourseList: React.FC = () => {
               )}
 
               <div>
-                <label className="label">课程标题 *</label>
-                <input
+                <label htmlFor="CourseList-field-101" className="label">课程标题 *</label>
+                <input id="CourseList-field-101"
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -614,8 +633,8 @@ const CourseList: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="label">课程描述</label>
-                <textarea
+                <label htmlFor="CourseList-field-102" className="label">课程描述</label>
+                <textarea id="CourseList-field-102"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input h-24 resize-none"
@@ -640,21 +659,22 @@ const CourseList: React.FC = () => {
             <div className="staff-dialog__actions">
               <ProductButton
                 type="button"
-                onClick={closeEditor}
+                onClick={editorGuard.close}
               >
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editingCourse ? '保存修改' : '创建课程'}
+                {editorGuard.busy ? '保存中...' : editingCourse ? '保存修改' : '创建课程'}
               </ProductButton>
             </div>
+            </fieldset>
           </form>
         </ModalSurface>
       )}
 
       {/* Share Modal */}
       {showShareModal && sharingCourse && (
-        <ModalSurface open onClose={closeShare} className="staff-modal-backdrop">
+        <ModalSurface open onClose={shareGuard.close} className="staff-modal-backdrop">
           <div className="staff-dialog staff-dialog--compact" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="course-share-title">
             <div className="staff-dialog__header">
               <div>
@@ -662,7 +682,7 @@ const CourseList: React.FC = () => {
                 <p className="staff-dialog__description">{sharingCourse.title}</p>
               </div>
               <button
-                onClick={closeShare}
+                disabled={shareGuard.busy} onClick={shareGuard.close}
                 className="staff-icon-button"
                 aria-label="关闭课程分享"
               >
@@ -670,7 +690,8 @@ const CourseList: React.FC = () => {
               </button>
             </div>
 
-            <div className="staff-dialog__body staff-form">
+            {shareGuard.error}
+            <div {...(shareGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
               {/* 搜索用户 */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -733,14 +754,14 @@ const CourseList: React.FC = () => {
 
             <div className="staff-dialog__actions">
               <ProductButton
-                onClick={closeShare}
+                disabled={shareGuard.busy} onClick={shareGuard.close}
               >
                 取消
               </ProductButton>
               <ProductButton
                 variant="primary"
                 onClick={handleShare}
-                disabled={selectedUsers.length === 0}
+                disabled={shareGuard.busy || selectedUsers.length === 0}
               >
                 确认分享
               </ProductButton>
@@ -748,6 +769,8 @@ const CourseList: React.FC = () => {
           </div>
         </ModalSurface>
       )}
+      {editorGuard.confirmation}
+      {shareGuard.confirmation}
     </ProductPage>
   )
 }

@@ -1,3 +1,5 @@
+import ModalSurface from '../../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../../components/shared-ui/useEditorGuard'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
@@ -106,6 +108,8 @@ const GeneralQuestionnaireEdit: React.FC = () => {
     options: [],
     contextKey: '',
   })
+
+  const itemGuard = useEditorGuard({ open: showFormItemModal, value: formData, onClose: () => { setShowFormItemModal(false); resetFormData() } })
 
   useEffect(() => {
     if (id) {
@@ -219,10 +223,11 @@ const GeneralQuestionnaireEdit: React.FC = () => {
   // 添加表单题目
   const handleAddFormItem = async () => {
     if (!formData.label) {
-      alert('题目标签不能为空')
+      itemGuard.fail(String('题目标签不能为空'))
       return
     }
 
+    if (!itemGuard.begin()) return
     try {
       const dataToSend = {
         ...formData,
@@ -240,7 +245,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          itemGuard.fail(String(response.message || '保存失败'))
         }
       } else {
         const response = await apiClient.post<FormItem>(
@@ -252,11 +257,13 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           setShowFormItemModal(false)
           resetFormData()
         } else {
-          alert(response.message)
+          itemGuard.fail(String(response.message || '保存失败'))
         }
       }
     } catch (err: any) {
-      alert(err.message || '操作失败')
+      itemGuard.fail(String(err.message || '操作失败'))
+    } finally {
+      itemGuard.finish()
     }
   }
 
@@ -420,10 +427,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           <div className="staff-panel__body">
           <div className="staff-form-grid">
             <div>
-              <label className="staff-field">
+              <label htmlFor="GeneralQuestionnaireEdit-field-101" className="staff-field">
                 问卷编码
               </label>
-              <input
+              <input id="GeneralQuestionnaireEdit-field-101"
                 type="text"
                 value={questionnaire.code}
                 disabled
@@ -431,10 +438,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="staff-field">
+              <label htmlFor="GeneralQuestionnaireEdit-field-102" className="staff-field">
                 问卷名称 *
               </label>
-              <input
+              <input id="GeneralQuestionnaireEdit-field-102"
                 type="text"
                 value={questionnaire.name}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
@@ -442,10 +449,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="staff-field">
+              <label htmlFor="GeneralQuestionnaireEdit-field-103" className="staff-field">
                 问卷描述
               </label>
-              <textarea
+              <textarea id="GeneralQuestionnaireEdit-field-103"
                 value={questionnaire.description || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
                 rows={3}
@@ -453,10 +460,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="staff-field">
+              <label htmlFor="GeneralQuestionnaireEdit-field-104" className="staff-field">
                 预计用时（分钟）
               </label>
-              <input
+              <input id="GeneralQuestionnaireEdit-field-104"
                 type="number"
                 value={questionnaire.estimatedTime || ''}
                 onChange={(e) =>
@@ -466,10 +473,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="staff-field">
+              <label htmlFor="GeneralQuestionnaireEdit-field-105" className="staff-field">
                 指导语
               </label>
-              <textarea
+              <textarea id="GeneralQuestionnaireEdit-field-105"
                 value={questionnaire.instruction || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
                 rows={4}
@@ -605,18 +612,18 @@ const GeneralQuestionnaireEdit: React.FC = () => {
 
       {/* 表单题目编辑弹窗 */}
       {showFormItemModal && (
-        <div className="staff-modal-backdrop" role="presentation">
-          <div className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-label={editingFormItem ? '编辑表单题目' : '添加表单题目'}>
+        <ModalSurface open onClose={itemGuard.close} className="staff-modal-backdrop">
+          <div tabIndex={-1} className="staff-dialog staff-dialog--compact" role="dialog" aria-modal="true" aria-label={editingFormItem ? '编辑表单题目' : '添加表单题目'}>{itemGuard.error}<fieldset disabled={itemGuard.busy} className="contents">
             <div className="staff-dialog__body">
             <h3 className="text-lg font-medium mb-4">
               {editingFormItem ? '编辑表单题目' : '添加表单题目'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="staff-field">
+                <label htmlFor="GeneralQuestionnaireEdit-field-106" className="staff-field">
                   题目类型 *
                 </label>
-                <select
+                <select id="GeneralQuestionnaireEdit-field-106"
                   value={formData.type}
                   onChange={(e) => {
                     const nextType = e.target.value as typeof formData.type
@@ -639,10 +646,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="staff-field">
+                <label htmlFor="GeneralQuestionnaireEdit-field-107" className="staff-field">
                   用于测评参考
                 </label>
-                <select
+                <select id="GeneralQuestionnaireEdit-field-107"
                   value={formData.contextKey}
                   onChange={(e) => {
                     const contextKey = e.target.value
@@ -677,10 +684,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 )}
               </div>
               <div>
-                <label className="staff-field">
+                <label htmlFor="GeneralQuestionnaireEdit-field-108" className="staff-field">
                   题目标签 *
                 </label>
-                <input
+                <input id="GeneralQuestionnaireEdit-field-108"
                   type="text"
                   value={formData.label}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
@@ -689,10 +696,10 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="staff-field">
+                <label htmlFor="GeneralQuestionnaireEdit-field-109" className="staff-field">
                   占位提示
                 </label>
-                <input
+                <input id="GeneralQuestionnaireEdit-field-109"
                   type="text"
                   value={formData.placeholder}
                   onChange={(e) => setFormData({ ...formData, placeholder: e.target.value })}
@@ -770,10 +777,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
             </div>
             <div className="staff-dialog__actions">
               <button
-                onClick={() => {
-                  setShowFormItemModal(false)
-                  resetFormData()
-                }}
+                onClick={itemGuard.close}
                 className="hui-button hui-button--secondary"
               >
                 取消
@@ -785,12 +789,13 @@ const GeneralQuestionnaireEdit: React.FC = () => {
                 {editingFormItem ? '保存' : '添加'}
               </button>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
 
       {/* 令牌创建弹窗 */}
 
+      {itemGuard.confirmation}
     </ProductPage>
   )
 }

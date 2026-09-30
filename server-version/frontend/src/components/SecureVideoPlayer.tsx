@@ -154,14 +154,15 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({
       {/* 视频元素 */}
       <video
         ref={videoRef}
-        className="w-full h-full"
+        className="w-full h-full focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500"
+        tabIndex={0}
+        aria-label={title}
         controls
         controlsList="nodownload noremoteplayback"
         disablePictureInPicture
         disableRemotePlayback
         playsInline
         onContextMenu={(e) => e.preventDefault()}
-        style={{ outline: 'none' }}
       />
 
       {/* 清晰度标识 - 只显示当前分辨率 */}

@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
-import { authenticate, requireTeacher } from '../middleware/auth'
+import { authenticate, requireTeacher, requireStudent } from '../middleware/auth'
+import { studentTaskList } from '../controllers/studentTaskController'
 import multer from 'multer'
 import { validateUploadedFile } from '../utils/fileValidator'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
@@ -37,6 +38,7 @@ router.post('/verify-code', courseCodeVerifyLimiter, courseCodeVerifyCodeLimiter
 router.get('/', authenticate, courseController.list)
 router.post('/', authenticate, requireTeacher, courseController.create)
 router.get('/my', authenticate, courseController.myCourses)
+router.get('/my/tasks', authenticate, requireStudent, studentTaskList)
 router.get('/shared-to-me', authenticate, courseController.getSharedToMe)
 
 // 动态路由（:id）放在静态路由之后

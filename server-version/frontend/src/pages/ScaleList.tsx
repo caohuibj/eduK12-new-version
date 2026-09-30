@@ -1,3 +1,5 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../api/client'
@@ -82,6 +84,8 @@ const ScaleList: React.FC = () => {
     format: 'csv' as 'csv' | 'sav' | 'spss',
   })
   const [grantTarget, setGrantTarget] = useState<Scale | null>(null)
+
+  const exportGuard = useEditorGuard({ open: showExportModal, value: exportOptions, externalBusy: exportLoading, onClose: () => setShowExportModal(false) })
 
   useEffect(() => {
     fetchScales()
@@ -179,6 +183,7 @@ const ScaleList: React.FC = () => {
 
   const handleExport = async () => {
     if (!exportScaleId) return
+    if (!exportGuard.begin()) return
     setExportLoading(true)
     const signature = JSON.stringify({
       resourceId: exportScaleId,
@@ -229,8 +234,9 @@ const ScaleList: React.FC = () => {
       setShowExportModal(false)
     } catch (operationError: any) {
       if (operationError instanceof ExportJobFailedError) exportRequestRef.current = null
-      showMessage(operationError.message || '导出失败')
+      exportGuard.fail(String(operationError.message || '导出失败'))
     } finally {
+      exportGuard.finish()
       setExportLoading(false)
     }
   }
@@ -398,16 +404,16 @@ const ScaleList: React.FC = () => {
       )}
 
       {showExportModal && exportPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div
+        <ModalSurface open onClose={exportGuard.close} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="scale-export-title"
             className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl"
-          >
+          >{exportGuard.error}<fieldset disabled={exportGuard.busy} className="contents">
             <div className="flex items-center justify-between border-b p-4">
               <h2 id="scale-export-title" className="text-lg font-medium">导出测评数据</h2>
-              <button type="button" onClick={() => setShowExportModal(false)} aria-label="关闭导出测评数据对话框">
+              <button type="button" disabled={exportGuard.busy} onClick={exportGuard.close} aria-label="关闭导出测评数据对话框">
                 <X className="h-5 w-5 text-gray-500" aria-hidden="true" />
               </button>
             </div>
@@ -503,13 +509,13 @@ const ScaleList: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap justify-end gap-3 border-t p-4">
-              <button type="button" onClick={() => setShowExportModal(false)} className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">取消</button>
+              <button type="button" disabled={exportGuard.busy} onClick={exportGuard.close} className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200">取消</button>
               <button type="button" onClick={handleExport} disabled={exportLoading} className="rounded-lg bg-action px-4 py-2 text-white hover:bg-action/90 disabled:opacity-50">
                 {exportLoading ? '导出中...' : '确认导出'}
               </button>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
 
       {grantTarget && (
@@ -520,6 +526,7 @@ const ScaleList: React.FC = () => {
           onClose={() => setGrantTarget(null)}
         />
       )}
+      {exportGuard.confirmation}
     </ProductPage>
   )
 }

@@ -1,3 +1,4 @@
+import ModalSurface from '../../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, ZoomIn, FileText } from 'lucide-react'
@@ -61,7 +62,6 @@ const CheckinSubmit: React.FC = () => {
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
   const previewCloseRef = useRef<HTMLButtonElement | null>(null)
-  const previewRestoreFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (checkinId) {
@@ -69,34 +69,7 @@ const CheckinSubmit: React.FC = () => {
     }
   }, [checkinId])
 
-
-  useEffect(() => {
-    if (!previewImage) return
-
-    previewCloseRef.current?.focus()
-
-    const handlePreviewKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        setPreviewImage(null)
-        return
-      }
-
-      if (event.key === 'Tab') {
-        event.preventDefault()
-        previewCloseRef.current?.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handlePreviewKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handlePreviewKeyDown)
-      previewRestoreFocusRef.current?.focus()
-    }
-  }, [previewImage])
-
   const openPreviewImage = (image: { url: string; name: string }) => {
-    previewRestoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setPreviewImage(image)
   }
 
@@ -434,14 +407,8 @@ const CheckinSubmit: React.FC = () => {
 
       {/* 图片预览弹窗 */}
       {previewImage && (
-        <div
-          className="student-submit-preview fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${previewImage.name}预览`}
-          onClick={closePreviewImage}
-        >
-          <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(event) => event.stopPropagation()}>
+        <ModalSurface open initialFocusRef={previewCloseRef} onClose={closePreviewImage} className="student-submit-preview fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+          <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(event) => event.stopPropagation()} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>
             <button
               ref={previewCloseRef}
               type="button"
@@ -460,7 +427,7 @@ const CheckinSubmit: React.FC = () => {
             </div>
             <p className="text-white text-center mt-4 text-sm">{previewImage.name}</p>
           </div>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Submission Form */}

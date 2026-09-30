@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { chromium } = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
+const browsers = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 const { installApiFixture, sampleCourse } = require('./visual-canonical-browser-e2e.cjs')
 const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', 'interaction-states')
@@ -47,7 +47,7 @@ async function assertModal(page, dialog, background) {
 
 async function main() {
   fs.mkdirSync(output, { recursive: true })
-  const browser = await chromium.launch({ headless: true, channel: process.env.VISUAL_QA_BROWSER_CHANNEL || undefined })
+  const browser = await browsers[process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium'].launch({ headless: true, channel: process.env.VISUAL_QA_BROWSER_CHANNEL || undefined })
   const results = []
   async function scenario(width, role, run) {
     const context = await browser.newContext({ viewport: { width, height: width < 768 ? 844 : 1024 }, reducedMotion: 'reduce' })
@@ -107,6 +107,8 @@ async function main() {
           await trigger.click()
           const editor = page.getByRole('dialog')
           await assertModal(page, editor, trigger)
+          const bodyWidth = await editor.locator('.staff-dialog__body').evaluate(element => ({ available: element.clientWidth, content: element.scrollWidth }))
+          assert.ok(bodyWidth.content <= bodyWidth.available + 1, `${kind}/${width}: editor contents overflow horizontally`)
           await capture(page, `${kind}-editor-modal`, width)
           assert.equal(await editor.locator('button[type=submit]').count(), 1, 'native form submit remains available')
           if (kind !== 'courses') {
@@ -258,7 +260,11 @@ async function main() {
         await page.keyboard.press('Space')
         await (await chooserPromise).setFiles(selectedFile)
         const reselect = dialog.getByRole('button', { name: '重新选择' })
-        await reselect.focus()
+        // Exercise actual keyboard modality after the native picker closes.
+        // Firefox does not promise :focus-visible for programmatic focus.
+        await dialog.focus()
+        for (let step = 0; step < 12 && !await reselect.evaluate(el => el === document.activeElement); step++) await page.keyboard.press('Tab')
+        assert.equal(await reselect.evaluate(el => el === document.activeElement), true, 'reselect is reachable by keyboard')
         assert.equal(await reselect.evaluate(el => el.matches(':focus-visible')), true)
         await capture(page, 'media-selected-long-file', width)
         await dialog.getByRole('button', { name: '取消', exact: true }).click()

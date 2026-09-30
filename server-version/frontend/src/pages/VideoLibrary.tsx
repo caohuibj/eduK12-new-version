@@ -1,3 +1,5 @@
+import ModalSurface from '../components/shared-ui/ModalSurface'
+import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, Search, Video as VideoIcon, Trash2, Edit, Upload, X, FileVideo, AlertCircle, Loader2, CheckCircle2, Play, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -61,6 +63,9 @@ const VideoLibrary: React.FC = () => {
   const pollingIntervals = useRef<Map<string, number>>(new Map())
 
   const isAdmin = user?.role === 'ADMIN'
+
+  const uploadGuard = useEditorGuard({ open: showUploadModal, value: uploadQueue.filter(item => item.status === 'pending' || item.status === 'failed').map(item => ({ id: item.id, title: item.title })), externalBusy: isBatchUploading, onClose: () => { setShowUploadModal(false); setUploadQueue([]); setUploadError('') } })
+  const renameGuard = useEditorGuard({ open: Boolean(editingVideo), value: editTitle, externalBusy: isUpdating, onClose: () => { setEditingVideo(null); setEditTitle('') } })
 
   useEffect(() => {
     fetchVideos()
@@ -227,13 +232,18 @@ const VideoLibrary: React.FC = () => {
     const pendingItems = uploadQueue.filter((item) => item.status === 'pending')
     if (pendingItems.length === 0) return
 
+    if (!uploadGuard.begin()) return
     setIsBatchUploading(true)
+    try {
 
     for (const item of pendingItems) {
       await uploadSingleFile(item)
     }
 
-    setIsBatchUploading(false)
+    } finally {
+      setIsBatchUploading(false)
+      uploadGuard.finish()
+    }
   }
 
   const removeFromQueue = (id: string) => {
@@ -338,6 +348,7 @@ const VideoLibrary: React.FC = () => {
   const handleEdit = async () => {
     if (!editingVideo || !editTitle.trim()) return
     
+    if (!renameGuard.begin()) return
     setIsUpdating(true)
     try {
       const response = await apiClient.put(`/videos/${editingVideo.id}`, { title: editTitle.trim() })
@@ -346,11 +357,12 @@ const VideoLibrary: React.FC = () => {
         setEditTitle('')
         fetchVideos()
       } else {
-        showMessage(response.message || '更新失败')
+        renameGuard.fail(String(response.message || '更新失败'))
       }
     } catch (error: any) {
-      showMessage(error.message || '更新失败')
+      renameGuard.fail(String(error.message || '更新失败'))
     } finally {
+      renameGuard.finish()
       setIsUpdating(false)
     }
   }
@@ -526,9 +538,10 @@ const VideoLibrary: React.FC = () => {
                 {video.url && (
                   <button
                     onClick={() => setPlayingVideo(video)}
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all"
+                    aria-label={`预览 ${video.title}`}
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all focus-visible:bg-black/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
                   >
-                    <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
+                    <span className="text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center">
                       <Play className="w-6 h-6 mr-2" />
                       点击播放
                     </span>
@@ -622,16 +635,16 @@ const VideoLibrary: React.FC = () => {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"批量上传视频"}><fieldset disabled={uploadGuard.busy} className="contents">
             <div className="p-4 border-b flex items-center justify-between">
               <h2 className="text-xl font-semibold">
                 批量上传视频 {uploadQueue.length > 0 && `(${uploadQueue.length} 个文件)`}
               </h2>
               <button
-                onClick={() => !isBatchUploading && setShowUploadModal(false)}
+                onClick={uploadGuard.close}
                 className="text-gray-400 hover:text-gray-600"
-                disabled={isBatchUploading}
+                disabled={isBatchUploading} aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -640,11 +653,14 @@ const VideoLibrary: React.FC = () => {
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {/* Add Files Button */}
               <div
+                role="button" tabIndex={isBatchUploading ? -1 : 0} aria-label="添加视频文件" aria-disabled={isBatchUploading}
+                onKeyDown={event => { if (!isBatchUploading && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); fileInputRef.current?.click() } }}
                 onClick={() => !isBatchUploading && fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors border-gray-300 hover:border-action ${isBatchUploading ? 'pointer-events-none opacity-50' : ''}`}
               >
                 <input
                   ref={fileInputRef}
+                  onClick={event => event.stopPropagation()}
                   type="file"
                   accept="video/mp4,video/webm,video/ogg,video/quicktime"
                   multiple
@@ -690,7 +706,7 @@ const VideoLibrary: React.FC = () => {
                             <button
                               onClick={() => removeFromQueue(item.id)}
                               className="text-gray-400 hover:text-red-500"
-                              disabled={isBatchUploading}
+                              disabled={isBatchUploading} aria-label="关闭"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -752,11 +768,7 @@ const VideoLibrary: React.FC = () => {
             <div className="p-4 border-t flex space-x-3">
               <button
                 type="button"
-                onClick={() => {
-                  setShowUploadModal(false)
-                  setUploadQueue([])
-                  setUploadError('')
-                }}
+                onClick={uploadGuard.close}
                 className="flex-1 hui-button hui-button--secondary"
                 disabled={isBatchUploading}
               >
@@ -771,21 +783,21 @@ const VideoLibrary: React.FC = () => {
                 {isBatchUploading ? '上传中...' : `开始上传 (${uploadQueue.filter(i => i.status === 'pending').length} 个文件)`}
               </button>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
 
       {/* Video Player Modal */}
       {playingVideo && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
-          <div className="bg-black rounded-lg overflow-hidden max-w-5xl w-full">
+        <ModalSurface open onClose={() => setPlayingVideo(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+          <div className="bg-black rounded-lg overflow-hidden max-w-5xl w-full" tabIndex={-1} role="dialog" aria-modal="true" aria-label={playingVideo.title + "预览"}>
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
               <h3 className="text-white font-medium truncate flex-1 mr-4">
                 {playingVideo.title}
               </h3>
               <button
                 onClick={() => setPlayingVideo(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white" aria-label="关闭"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -800,29 +812,26 @@ const VideoLibrary: React.FC = () => {
               />
             </div>
           </div>
-        </div>
+        </ModalSurface>
       )}
 
       {/* Edit Video Modal */}
       {editingVideo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"编辑视频标题"}>{renameGuard.error}<fieldset disabled={renameGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">编辑视频标题</h3>
               <button
-                onClick={() => {
-                  setEditingVideo(null)
-                  setEditTitle('')
-                }}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={renameGuard.close}
+                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="label">视频标题</label>
-                <input
+                <label htmlFor="VideoLibrary-field-1" className="label">视频标题</label>
+                <input id="VideoLibrary-field-1"
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
@@ -834,10 +843,7 @@ const VideoLibrary: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setEditingVideo(null)
-                    setEditTitle('')
-                  }}
+                  onClick={renameGuard.close}
                   className="flex-1 hui-button hui-button--secondary"
                   disabled={isUpdating}
                 >
@@ -853,9 +859,11 @@ const VideoLibrary: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </fieldset></div>
+        </ModalSurface>
       )}
+      {uploadGuard.confirmation}
+      {renameGuard.confirmation}
     </ProductPage>
   )
 }

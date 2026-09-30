@@ -1979,7 +1979,7 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
-export const listAvailableForStudent = async (userId: string) => {
+export const listAvailableForStudent = async (userId: string, now = Date.now()) => {
   const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] } }, select: { courseId: true } })
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
@@ -2023,7 +2023,6 @@ export const listAvailableForStudent = async (userId: string) => {
     compositeAttempts.push(attempt)
     attemptsByCompositeId.set(attempt.compositeAssessmentId, compositeAttempts)
   }
-  const now = Date.now()
   const availabilityFor = (item: any): 'UPCOMING' | 'OPEN' | 'EXPIRED' => {
     if (item.opensAt && item.opensAt.getTime() > now) return 'UPCOMING'
     if (item.expiresAt && item.expiresAt.getTime() < now) return 'EXPIRED'
