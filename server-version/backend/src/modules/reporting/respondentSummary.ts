@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { projectAudienceResult, validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
@@ -19,6 +21,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
     JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
     WHERE e.id=${executionId} AND r.user_id=${userId} AND org.status='ACTIVE' AND run.status IN ('PUBLISHED','CLOSED')
       AND e.status NOT IN ('REVOKED','CANCELLED') AND a.status='COMPLETED'
+      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}
       AND ((r.provenance_kind='ORG_MEMBER' AND EXISTS (
         SELECT 1 FROM organization_memberships m JOIN organization_persona_grants pg
           ON pg.organization_id=m.organization_id AND pg.membership_id=m.id
