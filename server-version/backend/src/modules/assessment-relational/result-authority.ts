@@ -1,9 +1,10 @@
+import {
+  disclosureFromRelationalDisposition,
+  type RelationalDisclosureDispositionV1,
+} from '../assessment-policy/disclosure'
 import { prisma } from '../../config/database'
 
-export type RelationalResultDispositionV1 =
-  | 'NON_RELATIONAL'
-  | 'INDIVIDUAL_ALLOWED'
-  | 'COHORT_ONLY'
+export type RelationalResultDispositionV1 = RelationalDisclosureDispositionV1
 
 type FrozenRelationalAttemptIdentity = {
   assignmentRef: string | null
@@ -71,7 +72,13 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
   replayed: boolean
   completed: true
 }> => {
-  if (!(await isRelationalCohortOnlyCompositeAttempt(compositeAttemptId, db))) return data
+  const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db)
+  const disclosure = disclosureFromRelationalDisposition({
+    disposition,
+    audience: 'RESPONDENT',
+    policyKey: 'frozen-relational-final-v1',
+  })
+  if (disclosure.mode !== 'COMPLETION_ONLY') return data
   return {
     ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
     ...(typeof data.payloadHash === 'string' ? { payloadHash: data.payloadHash } : {}),

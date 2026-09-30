@@ -54,6 +54,7 @@ export const normalizeBundleInitiationModes = (
     case 'ANONYMOUS_SELF':
       return ['PUBLIC_LINK']
   }
+  return []
 }))
 
 export const normalizeRelationalJourneyInitiationModes = (
@@ -71,6 +72,7 @@ export const normalizeRelationalJourneyInitiationModes = (
     case 'TEACHER_COHORT_REPORT':
       return []
   }
+  return []
 }))
 
 export const journeyPolicyFromRelationalApplicability = (
