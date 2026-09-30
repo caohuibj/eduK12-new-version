@@ -1,3 +1,4 @@
+import { governedArtifactMetrics, narrowGovernedProjection } from './governedDisclosure'
 import { assertIndividualLongitudinalAccess } from './individualAuthorization'
 import { prisma } from '../../config/database'
 import {
@@ -55,18 +56,19 @@ const publicArtifact = async (artifact: ReportingArtifactRecord, principal: Repo
   // is checked with current authority. A trusted creator does not confer trusted
   // disclosure rights on an ordinary reader of the same Run.
   await assertFixedPopulationArtifactDisclosure({ principal, artifact })
+  const allowedMetrics = await governedArtifactMetrics({ principal, artifact })
   if (artifact.analysisKind === 'PROTECTED_FEEDBACK') {
     return {
       artifactId: artifact.id,
       generatedAt: artifact.generatedAt.toISOString(),
-      projection: artifact.artifactPayload.projection,
+      projection: narrowGovernedProjection(artifact.artifactPayload.projection, allowedMetrics),
       evidence: artifact.artifactPayload.evidence,
     }
   }
   return {
     artifactId: artifact.id,
     generatedAt: artifact.generatedAt.toISOString(),
-    projection: artifact.artifactPayload.projection,
+    projection: narrowGovernedProjection(artifact.artifactPayload.projection, allowedMetrics),
   }
 }
 

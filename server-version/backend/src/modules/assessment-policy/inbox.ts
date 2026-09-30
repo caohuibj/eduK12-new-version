@@ -23,6 +23,7 @@ export interface RespondentAssessmentTask {
   perspective: string | null
   consentState: 'REQUIRED' | 'NOT_REQUIRED'
   launchTarget: string | null
+  summaryTarget?: string | null
   reportTarget: string | null
   resultAvailability: 'REPORT' | 'COMPLETION_ONLY' | 'PENDING'
   organization: { id: string } | null
@@ -46,6 +47,7 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
     resourceFamily: task.resourceFamily, resourceKey: task.resourceKey, resourceVersion: task.resourceVersion,
     subject: { userId: task.subjectUserId, role: task.subjectRole, displayName: task.subjectName }, respondent: { userId, role: task.respondentRole }, relationship: task.relationship, perspective: task.perspective,
     consentState: task.consentRequired ? 'REQUIRED' : 'NOT_REQUIRED', launchTarget: null,
+    summaryTarget: task.governedReport && task.status === 'COMPLETED' ? `/my-assessments/results/${encodeURIComponent(task.executionId)}` : null,
     reportTarget: task.reportAttemptId ? `/relational/attempts/${encodeURIComponent(task.reportAttemptId)}/report` : null,
     resultAvailability: task.reportAttemptId ? 'REPORT' : task.status === 'COMPLETED' ? 'COMPLETION_ONLY' : 'PENDING',
     organization: { id: task.organizationId }, course: [], runTask: task,

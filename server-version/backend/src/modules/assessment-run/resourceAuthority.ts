@@ -1,3 +1,4 @@
+import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode, EvaluationTargetRequest } from '../assessment-policy/target'
 import { assertEvaluationTarget } from '../assessment-policy/target'
@@ -19,6 +20,7 @@ export interface RunResourceRef {
 }
 
 export interface RunResourcePolicy {
+  resultDisclosure?: ResultDisclosureContractV1
   initiationModes?: readonly AssessmentInitiationModeV1[]
   allowedTargetModes?: readonly EvaluationTargetMode[]
   family: RunResourceFamily
@@ -123,6 +125,7 @@ const relationalEntryToRunPolicy = (
   entry: RelationalProductEntryV1,
   registry: RelationalProductRegistryV1,
 ): RunResourcePolicy => ({
+  resultDisclosure: entry.resultDisclosure,
   initiationModes: entry.initiationModes,
   allowedTargetModes: entry.allowedTargetModes,
   family: entry.applicability.resourceKind,

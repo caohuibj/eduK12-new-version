@@ -1,3 +1,4 @@
+import type { ResultDisclosureContractV1 } from '../../modules/assessment-policy/result-disclosure'
 import { randomUUID } from 'node:crypto'
 import {
   AssessmentUnitPayloadKind,
@@ -34,7 +35,7 @@ type PopulationFixture = {
 
 export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false, repeated?: {
   ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date; resourceVersion?: string
-}): Promise<PopulationFixture> => {
+}, resultDisclosure?: ResultDisclosureContractV1): Promise<PopulationFixture> => {
   const prefix = `reporting-qb-${population}-${randomUUID().slice(0, 8)}`
   const ownerId = repeated?.ownerId ?? randomUUID()
   const organizationId = repeated?.organizationId ?? randomUUID()
@@ -89,7 +90,8 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
 
   }
 
-  const resourcePolicyHash = canonicalHash({ prefix, policy: 'reporting-query-budget' })
+  const frozenPolicy = resultDisclosure ? { minimumRespondents: resultDisclosure.minimumRespondents, resultDisclosure } : { minimumRespondents: 3 }
+  const resourcePolicyHash = resultDisclosure ? canonicalHash(frozenPolicy) : canonicalHash({ prefix, policy: 'reporting-query-budget' })
   await prisma.$executeRawUnsafe(
     `INSERT INTO assessment_runs
       (id, organization_id, name, status, version, created_by_user_id, published_at)
@@ -110,7 +112,7 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     runId,
     resourceKey,
     JSON.stringify({ analysisMode: protectedSubject ? 'COHORT_AGGREGATE' : 'INDIVIDUAL_ONLY', perspectives: [protectedSubject ? 'RELATIONAL_EXPERIENCE' : 'SELF_REPORT'] }),
-    JSON.stringify({ minimumRespondents: 3 }),
+    JSON.stringify(frozenPolicy),
     resourcePolicyHash,
     resourceVersion,
   )

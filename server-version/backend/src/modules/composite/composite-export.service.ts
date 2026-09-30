@@ -1,3 +1,4 @@
+import { compositeForbidden } from './composite.errors'
 import { exportRoot } from '../../services/exportArtifactService'
 import * as fs from 'fs'
 import { createHash } from 'crypto'
@@ -148,6 +149,13 @@ export const getExportData = async (
   assessmentId: string,
   options: CompositeExportOptions = {},
 ): Promise<CompositeExportData> => {
+  const governed = await prisma.$queryRaw<Array<{id:string}>>`
+    SELECT e.id FROM assessment_run_executions e JOIN assessment_run_tracks t
+      ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id
+    JOIN composite_assessment_attempts a ON e.runtime_binding_kind='COMPOSITE' AND a.id=e.runtime_binding_ref
+    WHERE a.composite_assessment_id=${assessmentId} AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1
+  `
+  if (governed.length) throw compositeForbidden('本测评包含按内容权限保护的投放结果，请使用有权限的投放报告导出。')
   const detail = options.detail ?? 'summary'
   const anonymize = options.anonymize ?? true
   const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{

@@ -158,12 +158,13 @@ export async function listAssignedRunTasks(userId: string) {
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
     runStatus: string; status: string; claimState: string | null;
     resourceFamily: string; resourceKey: string; resourceVersion: string;
-    reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
+    governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
     SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
       a."relationship_kind" AS "relationship", a."perspective" AS "perspective",
+      (t."frozen_resource_policy" ? 'resultDisclosure') AS "governedReport",
       CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
         WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
         WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
@@ -174,7 +175,7 @@ export async function listAssignedRunTasks(userId: string) {
       (a."consent_id" IS NOT NULL) AS "consentRequired",
       consent."purpose" AS "consentPurpose", consent."visibility_scope" AS "consentVisibility",
       CASE WHEN ca."status" = 'COMPLETED' AND a."analysis_mode" = 'INDIVIDUAL_ONLY'
-        AND a."perspective" <> 'RELATIONAL_EXPERIENCE'
+        AND a."perspective" <> 'RELATIONAL_EXPERIENCE' AND NOT (t."frozen_resource_policy" ? 'resultDisclosure')
         THEN ca."id" ELSE NULL END AS "reportAttemptId"
     FROM "assessment_run_executions" e
     JOIN "assessment_run_actor_snapshots" respondent ON respondent."id" = e."respondent_actor_snapshot_id"

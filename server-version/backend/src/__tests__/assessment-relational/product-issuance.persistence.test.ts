@@ -1,3 +1,4 @@
+import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
 import { randomUUID } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
@@ -54,6 +55,7 @@ const registry = createRelationalProductRegistry([
   teacherObserver,
   studentExperience,
 ].map((entry) => ({
+  resultDisclosure: testDisclosure(entry.minimumRespondents),
   title: entry.resourceKey,
   description: null,
   releaseStatus: 'PUBLISHED' as const,

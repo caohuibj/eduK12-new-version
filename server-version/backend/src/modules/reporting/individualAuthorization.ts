@@ -12,7 +12,7 @@ export async function individualSubjectScope(input: IndividualScopeInput): Promi
   const context = await resolveOrganizationAccessContext(input)
   if (!context?.membershipId || context.explicitDenies.some(d => ['*', 'REPORT_READ', 'REPORT_MEMBER_READ', 'ORG_INDIVIDUAL_REPORT_V1'].includes(d))) return hidden()
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
-  const manager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const manager = context.capabilities.includes('PSYCHOLOGY_STAFF')
   if (!manager && !context.personas.some(p => p === 'TEACHER' || p === 'COUNSELOR')) return hidden()
   return Prisma.sql`m.user_id <> ${input.principal.userId} AND (
     ${manager} OR (m.valid_from <= statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until > statement_timestamp()) AND (
