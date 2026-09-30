@@ -19,3 +19,9 @@ Scoring, canonical FINAL, report calculations and scientific snapshots are uncha
 ## 最终复查补正
 
 投放渠道与同一 persona 的范围绑定，双 TEACHER/COUNSELOR 身份不能交叉拼接内容权限。Parent SELF 的 CLASS_UNITS 选择器按当前批准关联的学生班级定位，不要求家长成为组织成员。真实 PostgreSQL 回归覆盖两种渠道各自的正反例和同班/跨班家长；机构切换会清空策略界面。
+
+## Review 收口
+
+任务发现与 START 最后检查共用当前账号、成员、persona、外部家长和关系条件；撤权后隐藏任务及冻结对象名。关闭/过期不会单独移除仍有当前权限的历史任务。Parent 保留 source-filtered catalog 卡片，隐藏其无权进入的旧量表库入口。新流程回到 /my-assessments，旧任务 URL 兼容重定向。
+
+Standalone Scale 的 creator / UserRole.ADMIN 管理与导出是明确保留的 legacy policy，仅限 standalone 记录；不能推导为 SYSTEM_ADMIN 或 ORG_ADMIN 的通用个体报告权限。迁移此历史政策需要独立兼容方案，本次保持既有权限范围。

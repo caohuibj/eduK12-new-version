@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
 import { runApi, type AssignedRunTask } from '../api/runs'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
 
@@ -16,6 +17,7 @@ interface CatalogCard { title: string; launchTarget: string; journey: { resource
 
 export default function MyAssessments() {
   const navigate = useNavigate()
+  const {user}=useAuth()
   const [catalog, setCatalog] = useState<CatalogCard[]>([])
   const [catalogError, setCatalogError] = useState(false)
   const [inbox, setInbox] = useState<AssessmentInbox | null>(null)
@@ -43,7 +45,7 @@ export default function MyAssessments() {
       }
       const result = await runApi.start(run)
       if (result.state === 'IN_PROGRESS') throw new Error('正在准备测评，请稍后重试。')
-      if (result.runtimeBindingKind === 'COMPOSITE') navigate(`/relational/attempts/${encodeURIComponent(result.runtimeBindingRef)}?returnTo=%2Forganization-tasks`)
+      if (result.runtimeBindingKind === 'COMPOSITE') navigate(`/relational/attempts/${encodeURIComponent(result.runtimeBindingRef)}?returnTo=%2Fmy-assessments`)
       else throw new Error('测评入口暂不可用，请联系投放者。')
       await load()
     } catch (err) { setError(err instanceof Error ? err.message : '暂时无法开始测评') }
@@ -55,7 +57,7 @@ export default function MyAssessments() {
     <PageHeader title="我的测评" description={`待完成测评：${inbox?.pendingCount ?? '…'}。开始、继续作答和查看自己的报告。`} actions={<ProductButton disabled={busy !== null} onClick={() => { setError(null); void load().catch(err => setError(String(err.message || err))) }}>刷新任务</ProductButton>} />
     {error && <ProductStatus kind="error" title="操作未完成">{error}</ProductStatus>}
     {!inbox && !error && <p role="status">正在加载测评…</p>}
-    <p className="mb-4"><Link to="/scale-library">选择适合自己的测评</Link></p>
+    {user?.role !== 'PARENT' && <p className="mb-4"><Link to="/scale-library">选择适合自己的测评</Link></p>}
     <div className="grid min-w-0 gap-4">{[...groups.entries()].map(([key, tasks]) => <section key={key} className="min-w-0 space-y-3 rounded-xl border bg-white p-4">
       <h2 className="break-words font-semibold">{tasks[0].title}</h2>
       {tasks.length > 1 && <p>已完成 {tasks.filter(t => t.state === 'COMPLETED').length} / {tasks.length}</p>}

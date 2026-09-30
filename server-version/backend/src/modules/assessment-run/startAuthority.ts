@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { RunStartAdmissionError } from './startAdmission'
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
@@ -117,8 +118,8 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   // A separate statement is essential here: statement_timestamp() is fixed at
   // the beginning of its statement, not the end of a lock wait. All authority
   // fences are now held; this is the time-window admission decision.
-  const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean }>>`
-    SELECT (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
+  const windows = await tx.$queryRaw<Array<{ intakeOpen: boolean; accountsCurrent: boolean; populationCurrent: boolean }>>`
+    SELECT ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} AS "populationCurrent", (r."intake_deadline" IS NULL OR r."intake_deadline" > statement_timestamp()) AS "intakeOpen",
       NOT EXISTS (
         SELECT 1 FROM "assessment_run_actor_snapshots" a JOIN "users" u ON u."id"=a."user_id"
         WHERE a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
@@ -128,5 +129,6 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
     WHERE e."id"=${executionId}
   `
   if (!windows[0]?.accountsCurrent) fail('RUN_ACCOUNT_INACTIVE')
+  if (!windows[0]?.populationCurrent) fail('RUN_ACTOR_AUTHORITY_REVOKED')
   if (!windows[0].intakeOpen) fail('RUN_INTAKE_CLOSED')
 }

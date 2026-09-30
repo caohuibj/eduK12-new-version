@@ -46,7 +46,7 @@ export const resolveCompositeChildRouteContext = ({
     return { ok: false, message: '综合测评父级记录缺失，请刷新后重试' }
   }
 
-  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId, relationalMode) + (relationalMode && organizationTask ? '?returnTo=%2Forganization-tasks' : '')
+  const parentReturnTo = compositeParentAttemptPath(publicMode, parentAttemptId, relationalMode) + (relationalMode && organizationTask ? '?returnTo=%2Fmy-assessments' : '')
 
   if (item.type === 'COGNITIVE') {
     const sessionId = item.cognitiveSession?.sessionId || ''

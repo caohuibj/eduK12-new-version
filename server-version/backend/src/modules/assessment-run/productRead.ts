@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -189,6 +190,7 @@ export async function listAssignedRunTasks(userId: string) {
       AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
+      AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START'))
