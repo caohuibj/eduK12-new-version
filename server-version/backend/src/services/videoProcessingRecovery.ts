@@ -40,7 +40,7 @@ const reconcileJob = async (jobId: string, videoId: string, generation: number):
   if (recovered) logger.warn('视频处理任务已回收为失败状态', { videoId, jobId })
 }
 
-const recoveryPayload = (row: { id: string; originalUrl: string | null; filePath: string; teacherId: string }) => {
+export const recoveryPayload = (row: { id: string; originalUrl: string | null; filePath: string; teacherId: string }) => {
   if (row.originalUrl && /^https?:\/\//i.test(row.originalUrl)) {
     return {
       videoId: row.id,

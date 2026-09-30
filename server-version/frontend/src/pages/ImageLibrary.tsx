@@ -1,3 +1,4 @@
+import { requestError } from '../components/shared-ui/useLatestRequest'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
@@ -28,7 +29,11 @@ const ImageLibrary: React.FC = () => {
   const [hasMore, setHasMore] = useState(false)
   const [total, setTotal] = useState(0)
   const imageRequest = useRef(0)
+  const [listError, setListError] = useState('')
+  const retryPage = useRef(1)
   const [keyword, setKeyword] = useState('')
+  const currentKeyword = useRef(keyword)
+  currentKeyword.current = keyword
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -44,6 +49,8 @@ const ImageLibrary: React.FC = () => {
   const renameGuard = useEditorGuard({ open: Boolean(editingImage), value: editName, externalBusy: isUpdating, onClose: () => { setEditingImage(null); setEditName('') } })
 
   useEffect(() => {
+    setLoading(true)
+    setListError('')
     const timer = setTimeout(() => void fetchImages(), 250)
     return () => { clearTimeout(timer); imageRequest.current += 1 }
   }, [keyword])
@@ -52,15 +59,16 @@ const ImageLibrary: React.FC = () => {
     const request = ++imageRequest.current
     try {
       setLoading(true)
+      setListError('')
+      retryPage.current = nextPage
       // 从后端获取图片列表
-      const response = await apiClient.get('/uploads/images', { params: { page: nextPage, pageSize: 40, keyword } })
+      const response = await apiClient.get('/uploads/images', { params: { page: nextPage, pageSize: 40, keyword: currentKeyword.current } })
       if (request !== imageRequest.current) return
-      if (response.code === 0) {
-        setPage(nextPage); setHasMore(Boolean(response.data.hasMore)); setTotal(response.data.total ?? 0)
-        setImages(previous => nextPage === 1 ? (response.data.list || []) : [...previous, ...(response.data.list || [])])
-      }
+      if (response.code !== 0) throw new Error(response.message || '获取图片列表失败')
+      setPage(nextPage); setHasMore(Boolean(response.data.hasMore)); setTotal(response.data.total ?? 0)
+      setImages(previous => nextPage === 1 ? (response.data.list || []) : [...previous, ...(response.data.list || [])])
     } catch (error) {
-      console.error('获取图片列表失败:', error)
+      if (request === imageRequest.current) setListError(requestError(error, '获取图片列表失败，请重试'))
     } finally {
       if (request === imageRequest.current) setLoading(false)
     }
@@ -220,11 +228,11 @@ const ImageLibrary: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader title="图片库" description="按视觉浏览和复用课堂、问卷与测评图片。" actions={<ProductButton variant="primary" onClick={() => setShowUploadModal(true)}><Plus className="w-4 h-4" aria-hidden="true" />上传图片</ProductButton>} />
-      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">当前显示 {filteredImages.length} / {total} 张图片</span></div>
+      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索图片</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索图片" /></label><span className="staff-help">{loading || listError ? '数量暂不可用' : `当前显示 ${filteredImages.length} / ${total} 张图片`}</span></div>
       {/* Image Grid */}
       {loading ? (
         <ProductStatus kind="pending" title="正在加载图片">正在读取图片资源。</ProductStatus>
-      ) : filteredImages.length === 0 ? (
+      ) : listError ? <ProductStatus kind="error" title="图片列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchImages(retryPage.current)}>重试</ProductButton>}>{listError}</ProductStatus> : filteredImages.length === 0 ? (
         <ProductStatus kind="info" title="暂无图片">上传第一张图片后，可以在支持图片的内容中复用。</ProductStatus>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -273,7 +281,7 @@ const ImageLibrary: React.FC = () => {
       )}
 
       {/* Preview Modal - 防下载保护 */}
-      {hasMore && <ProductButton disabled={loading} onClick={() => void fetchImages(page + 1)}>加载更多图片</ProductButton>}
+      {!listError && hasMore && <ProductButton disabled={loading} onClick={() => void fetchImages(page + 1)}>加载更多图片</ProductButton>}
       {previewImage && (
         <ModalSurface open onClose={() => setPreviewImage(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" dismissOnBackdrop>
           <div className="relative max-w-[90vw] max-h-[90vh]" onContextMenu={preventContextMenu} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>
