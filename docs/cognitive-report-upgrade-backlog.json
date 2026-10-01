@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "baseline": "f70078adcd7c1220f205559e34cd3d719b3b6ce4",
+  "createdDate": "2026-10-01",
+  "timezone": "Asia/Tokyo",
+  "state": "plan_ready_implementation_pending",
+  "publicationHold": {
+    "status": "waiting_for_user_main_clean_signal",
+    "remoteWritesAllowed": false,
+    "ciDispatchAllowed": false,
+    "mergeAllowed": false
+  },
+  "tasks": [
+    {
+      "id": "CR-01",
+      "batch": "A",
+      "title": "版本化报告契约与冻结的解释策略",
+      "status": "planned",
+      "dependsOn": [],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/participant-presentation.types.ts",
+        "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+        "server-version/backend/src/modules/cognitive/v2/types.ts",
+        "server-version/backend/src/modules/cognitive/v2/report.ts",
+        "server-version/frontend/src/modules/cognitive/types.ts"
+      ],
+      "acceptanceCriteria": [
+        "采用报告契约版本2，旧报告适配兼容",
+        "解释策略随assignment冻结",
+        "quality与interpretation分别表达",
+        "呈现修改不改变计时、评分或runtime hash"
+      ]
+    },
+    {
+      "id": "CR-02",
+      "batch": "A",
+      "title": "接通caveats、完成持久化与历史兼容",
+      "status": "planned",
+      "dependsOn": [
+        "CR-01"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/completion.service.ts",
+        "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts",
+        "server-version/backend/src/modules/cognitive/session.service.ts",
+        "server-version/backend/src/modules/cognitive/history.service.ts",
+        "server-version/backend/src/__tests__/cognitive/participant-presentation-freeze.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "新报告读取冻结的协议限制",
+        "重复完成返回相同快照",
+        "新旧解析和已发布未完成assignment兼容",
+        "历史提醒独立版本，不静默改写旧报告"
+      ]
+    },
+    {
+      "id": "CR-03",
+      "batch": "A",
+      "title": "图表与科研层的服务端受控投影",
+      "status": "planned",
+      "dependsOn": [
+        "CR-01",
+        "CR-02"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/completion.service.ts",
+        "server-version/backend/src/modules/cognitive/session.service.ts",
+        "server-version/backend/src/modules/cognitive/cognitive.controller.ts"
+      ],
+      "acceptanceCriteria": [
+        "图表数据完成时生成和冻结",
+        "权限不足响应不含research与原始trials",
+        "cohort-only与匿名任务限制维持",
+        "研究指标满足协议及质量条件"
+      ]
+    },
+    {
+      "id": "CR-04",
+      "batch": "B",
+      "title": "双读者报告壳、状态与视觉标准",
+      "status": "planned",
+      "dependsOn": [
+        "CR-02",
+        "CR-03"
+      ],
+      "expectedPaths": [
+        "server-version/frontend/src/modules/cognitive/CognitiveV2ReportCard.tsx",
+        "server-version/frontend/src/modules/cognitive/CognitiveSingleTaskReportCard.tsx",
+        "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx",
+        "server-version/frontend/src/modules/reporting/report-ui.css"
+      ],
+      "acceptanceCriteria": [
+        "分层视图仅渲染服务端允许字段",
+        "质量提醒首屏可见",
+        "缺失不是0",
+        "手机、键盘、文字图解和基础打印可读",
+        "共用样式相关报告回归"
+      ]
+    },
+    {
+      "id": "CR-05",
+      "batch": "B",
+      "title": "reaction与memory样板",
+      "status": "planned",
+      "dependsOn": [
+        "CR-04"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/reaction/participant-presentation.ts",
+        "server-version/backend/src/modules/cognitive/tasks/memory/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks/reaction",
+        "server-version/frontend/src/modules/cognitive/tasks/memory"
+      ],
+      "acceptanceCriteria": [
+        "18/20有效显示310ms、5/20与0/20撤下速度主结论",
+        "中断限定比较性解释",
+        "早按计数与试次计数分开",
+        "记忆跨度与协议上限区分",
+        "核查suppressTips，不无条件开启旧建议"
+      ]
+    },
+    {
+      "id": "CR-06",
+      "batch": "B",
+      "title": "SST样板与局部解释门控",
+      "status": "planned",
+      "dependsOn": [
+        "CR-04"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/sst/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks/sst"
+      ],
+      "acceptanceCriteria": [
+        "短程不输出个人抑制能力结论",
+        "SSRT门控与其他允许过程指标独立",
+        "停止响应概率不按越低越好展示",
+        "协议与估计限制可见",
+        "三种协议实际提交链路检查"
+      ]
+    },
+    {
+      "id": "CR-07",
+      "batch": "C",
+      "title": "第一轮其余六个家族及并存身份覆盖",
+      "status": "planned",
+      "dependsOn": [
+        "CR-05",
+        "CR-06"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/{stroop,gonogo,cpt,nback,corsi,taskswitch}/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks"
+      ],
+      "acceptanceCriteria": [
+        "按条件和难度呈现，分母准确",
+        "不遗漏reaction/memory/stroop并存身份",
+        "每个反馈句绑定evidence keys",
+        "旧冻结报告兼容"
+      ]
+    },
+    {
+      "id": "CR-08",
+      "batch": "C",
+      "title": "第二轮十五个家族分组扩展",
+      "status": "planned",
+      "dependsOn": [
+        "CR-07"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks",
+        "server-version/frontend/src/modules/cognitive/tasks"
+      ],
+      "acceptanceCriteria": [
+        "按方案四组覆盖十五项",
+        "BART1.1优先与1.0兼容分开",
+        "只展示实际测量阶段",
+        "合成面孔不解释为共情或人格",
+        "最终24家族逐身份核对且不夹带scoring数学修改"
+      ]
+    },
+    {
+      "id": "CR-09",
+      "batch": "D",
+      "title": "打印、导出与受控分享设计",
+      "status": "planned",
+      "dependsOn": [
+        "CR-08"
+      ],
+      "expectedPaths": [
+        "server-version/frontend/src/modules/cognitive",
+        "server-version/frontend/src/modules/reporting/report-ui.css"
+      ],
+      "acceptanceCriteria": [
+        "打印保留质量限制、单位和版本",
+        "导出不扩大现有权限",
+        "分享若实施需用户选择，不默认公开链接",
+        "无身份或未经验证的排名标签"
+      ]
+    },
+    {
+      "id": "CR-10",
+      "batch": "D",
+      "title": "本地交付验收与main clean后的合入",
+      "status": "planned",
+      "dependsOn": [
+        "CR-09"
+      ],
+      "expectedPaths": [
+        "docs/cognitive-report-upgrade-plan.md",
+        "docs/cognitive-report-upgrade-working-agreement.md"
+      ],
+      "acceptanceCriteria": [
+        "提交、差异、版本、测试与截图交付清单完整",
+        "clean信号前零远端写入",
+        "信号后先对齐main并检查语义兼容",
+        "最终SHA满足当前CI与保护要求后merge",
+        "确认post-merge smoke"
+      ]
+    }
+  ]
+}
