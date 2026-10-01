@@ -21,6 +21,9 @@ export interface SituationalReportMetric {
   displayPrecision?: number
   range?: { min: number; max: number } | null
   status?: string | null
+  precision?: { status: 'NOT_ESTIMATED' | 'ESTIMATED'; standardError: number | null; interval: { lower: number; upper: number; level: number; kind: 'CONFIDENCE' | 'CREDIBLE' } | null }
+  coverage?: { numberOfOpportunities: number; numberOfAnsweredOpportunities: number; numberOfIndependentScenes: number }
+  maturity?: 'PROVISIONAL' | 'CALIBRATED'
 }
 
 export interface SituationalReportInterpretationView {
@@ -149,6 +152,14 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
           </ReportMetricGrid>
         )}
       </ReportSection>
+
+      {metrics.some(metric => metric.coverage || metric.precision) ? <ReportSection title="证据覆盖与精度" eyebrow="结果边界">
+        {metrics.filter(metric => metric.coverage || metric.precision).map(metric => <div key={metric.key} className="space-y-1 text-sm text-gray-600">
+          <p className="font-medium">{metric.label || metric.key}{metric.maturity === 'PROVISIONAL' ? '（暂定）' : ''}</p>
+          {metric.coverage ? <p>已回答 {metric.coverage.numberOfAnsweredOpportunities} / {metric.coverage.numberOfOpportunities} 个测量机会，覆盖 {metric.coverage.numberOfIndependentScenes} 个独立母情境。</p> : null}
+          {metric.precision?.status === 'NOT_ESTIMATED' ? <p>当前评分尚未估计测量误差或区间。</p> : metric.precision?.interval ? <p>估计区间：{metric.precision.interval.lower}–{metric.precision.interval.upper}（{Math.round(metric.precision.interval.level * 100)}%）</p> : null}
+        </div>)}
+      </ReportSection> : null}
 
       {(report.interpretations || []).length > 0 && (
         <ReportSection title="如何理解这些结果" eyebrow="解释">

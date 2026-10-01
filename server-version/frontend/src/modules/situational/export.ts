@@ -1,6 +1,7 @@
 import type { SituationalAttemptResponse, SituationalScientificContext } from './types'
 
 export interface SituationalExportPayload {
+  model?: NonNullable<SituationalAttemptResponse['result']>['model']
   scientificContext: SituationalScientificContext
   instrumentKey: string
   instrumentVersion: string
@@ -13,6 +14,10 @@ export interface SituationalExportPayload {
     channelKey: string
     value: number | null
     status: string
+    estimate?: number | null
+    precision?: import('./types').SituationalMetric['precision']
+    coverage?: import('./types').SituationalMetric['coverage']
+    maturity?: import('./types').SituationalMetric['maturity']
   }>
   disclaimer: string
   referencePolicy: 'NONE'
@@ -31,8 +36,13 @@ export const buildSituationalExportPayload = (data: SituationalAttemptResponse):
     channelKey: metric.channelKey,
     value: metric.value,
     status: metric.status,
+    ...(metric.estimate === undefined ? {} : { estimate: metric.estimate }),
+    ...(metric.precision ? { precision: metric.precision } : {}),
+    ...(metric.coverage ? { coverage: metric.coverage } : {}),
+    ...(metric.maturity ? { maturity: metric.maturity } : {}),
   })),
   disclaimer: data.instrument.report.disclaimer,
+  ...(data.result?.model ? { model: data.result.model } : {}),
   referencePolicy: 'NONE',
 })
 
@@ -43,6 +53,7 @@ const csvCell = (value: unknown): string => {
 
 export const buildSituationalCsv = (data: SituationalAttemptResponse): string => {
   const payload = buildSituationalExportPayload(data)
+  const rich = payload.metrics.some(m => m.precision || m.coverage)
   const rows = [
     ['instrumentKey', payload.instrumentKey],
     ['instrumentVersion', payload.instrumentVersion],
@@ -58,8 +69,8 @@ export const buildSituationalCsv = (data: SituationalAttemptResponse): string =>
     ['referencePolicy', payload.referencePolicy],
     ['disclaimer', payload.disclaimer],
     [],
-    ['metricKey', 'construct', 'channelKey', 'value', 'status'],
-    ...payload.metrics.map((metric) => [metric.key, metric.construct, metric.channelKey, metric.value ?? '', metric.status]),
+    ['metricKey', 'construct', 'channelKey', 'value', 'status', ...(rich ? ['precisionStatus', 'standardError', 'interval', 'opportunities', 'answeredOpportunities', 'independentScenes', 'maturity'] : [])],
+    ...payload.metrics.map((metric) => [metric.key, metric.construct, metric.channelKey, metric.value ?? '', metric.status, ...(rich ? [metric.precision?.status ?? '', metric.precision?.standardError ?? '', metric.precision?.interval ? JSON.stringify(metric.precision.interval) : '', metric.coverage?.numberOfOpportunities ?? '', metric.coverage?.numberOfAnsweredOpportunities ?? '', metric.coverage?.numberOfIndependentScenes ?? '', metric.maturity ?? ''] : [])]),
   ]
   return `\ufeff${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}\r\n`
 }
