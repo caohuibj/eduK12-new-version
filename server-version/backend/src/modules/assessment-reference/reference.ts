@@ -176,8 +176,7 @@ export const validateReferenceSetDefinition = (
     if (!candidate.population || typeof candidate.population !== 'object') {
       issues.push({ path: `${path}.population`, message: '必须提供 population 描述', severity: 'error' })
     } else {
-      validateReferenceGovernance(candidate).forEach(message => issues.push({ path: path + '.governance', message, severity: 'error' }))
-    const population = candidate.population as ReferencePopulation
+      const population = candidate.population as ReferencePopulation
       ;(['description', 'ageBand', 'sexScope', 'language', 'countryOrRegion'] as const).forEach((field) => {
         const fieldValue = population[field]
         if (fieldValue !== undefined && fieldValue !== null && typeof fieldValue !== 'string') {

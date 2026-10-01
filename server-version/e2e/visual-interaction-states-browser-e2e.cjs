@@ -53,6 +53,8 @@ async function main() {
   async function scenario(width, role, run) {
     const context = await browser.newContext({ viewport: { width, height: width < 768 ? 844 : 1024 }, reducedMotion: 'reduce' })
     const page = await context.newPage()
+    // Keep WebKit requestAnimationFrame actionability checks on an active page.
+    await page.bringToFront()
     page.setDefaultTimeout(15000)
     const errors = []
     page.on('pageerror', error => errors.push(error.message))

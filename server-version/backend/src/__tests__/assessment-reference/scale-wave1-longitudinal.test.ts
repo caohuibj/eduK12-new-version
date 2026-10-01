@@ -26,3 +26,25 @@ describe('longitudinal later-reference priority',()=>{
   expect(()=>buildLongitudinalReferenceSnapshot({points,references:changed,generatedAt:'2026-10-01T00:00:00Z'})).toThrow('FROZEN_REFERENCE_INVALID')
  })
 })
+
+describe('longitudinal provenance regression',()=>{
+ it('does not silently adopt a newly imported backdated reference during fallback',()=>{
+  const sourcePoints=structuredClone(points.slice(0,2))
+  sourcePoints[0].identity.direction='different-direction'
+  const input={points:sourcePoints,references:refs.slice(0,2),generatedAt:'2026-10-01T00:00:00Z'}
+  const before=buildLongitudinalReferenceSnapshot(input)
+  expect(before.compatibilityDecision).toBe('FALLBACK_TIME_MATCHED')
+  const imported=structuredClone(refs[1]);imported.referenceVersion='backdated-import'
+  imported.entries[0].governance!.effectiveFrom='2026-02-05T00:00:00Z'
+  expect(buildLongitudinalReferenceSnapshot({...input,references:[...input.references,imported]})).toEqual(before)
+ })
+ it('uses the matching score entry effective date, not an unrelated first entry',()=>{
+  const newer=structuredClone(refs[3]);const unrelated=structuredClone(newer.entries[0])
+  unrelated.scoreKey='other';unrelated.governance!.effectiveFrom='2027-01-01T00:00:00Z'
+  newer.entries.unshift(unrelated)
+  expect(buildLongitudinalReferenceSnapshot({points,references:[...refs.slice(0,3),newer],explicitLatest:true,generatedAt:'2026-10-01T00:00:00Z'}).selectedReferenceVersions).toEqual(['v4'])
+ })
+ it('rejects non-finite raw observations rather than freezing JSON null',()=>{
+  expect(()=>buildLongitudinalReferenceSnapshot({points:[{...points[0],value:NaN},points[1]],references:refs,generatedAt:'2026-10-01T00:00:00Z'})).toThrow('LONGITUDINAL_SOURCE_INVALID')
+ })
+})
