@@ -1,0 +1,722 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "teacher_subject_liking_english_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "学生感知的教师学科喜爱｜英语",
+      "abbreviation": "TSL-3",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学生感知的教师学科喜爱；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "teacher_subject_liking",
+        "english",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "学科替换 PILOT；没有 exact-version 本地经验验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "subject-adaptation-pilot",
+        "evidenceType": "CONTENT_VALIDITY",
+        "studyDesign": "Explicit subject substitution; content audit only, no empirical validation.",
+        "population": "Chinese secondary school students; adapted subject form",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "rating": "UNKNOWN",
+        "citation": "Huisurvey first-wave subject adaptation; canonical chemistry wording with explicit subject substitution",
+        "notes": "No exact-version empirical validation. PUBLISHED + PILOT with theoretical provisional bands only."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Project-authored subject adaptation of verified canonical Chinese chemistry items",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "subject-adaptation-pilot"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "english",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "学生感知的教师学科喜爱／英语／项目中文版本",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有点同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "比较同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "老师发自内心地喜欢英语这个学科",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "老师认为英语学科的知识非常有趣",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "老师觉得学习英语学科内容是充满乐趣的",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "teacher_subject_liking",
+            "type": "total",
+            "label": "学生感知的教师学科兴趣",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 2
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "teacher_subject_liking"
+        ],
+        "scoreOrder": [
+          "teacher_subject_liking"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "headline": "我从课堂里感受到的学科兴趣",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对英语学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "你目前较少从课堂里感受到老师对英语的兴趣",
+                "summary": "回想英语课，你可能很少感觉到老师发自内心地喜欢这门课，或觉得内容有趣。有时课堂主要围绕作业、步骤和考试，也可能让你不容易看见老师对学科的兴趣。\n\n这个结果测的是你的感受，没有读到老师心里，也不是对老师专业能力的评分。表达方式、近期内容和你当时的体验，都可能影响判断。如果你希望课堂里多一点“为什么值得了解”，可以从一个具体问题开始，看看老师怎样解释。你的感受值得被听见，也不需要被当成对老师动机的结论。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你较少感受到兴趣，是因为老师没表达、内容太赶，还是有一个让你印象特别深的课堂经历？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个你真正想知道的“为什么”，课后用具体问题请教老师。记录得到的回应和自己的感受；先观察这一次，不替老师下长期结论。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你从老师那里感受到的英语兴趣暂时不算明显",
+                "summary": "你可能偶尔看到老师对英语某些内容感兴趣，但整体印象还不太鲜明。也许老师表达比较平实，或者最近课堂更多在赶进度和练题。\n\n这份结果只反映你观察到的样子，没有证明老师真正喜不喜欢这门课，更不能拿来给老师排好坏。你可以把具体行为和自己的感受分开：老师举了什么例子、怎样回答问题，你当时又怎样理解。这样既能认真看待自己的体验，也能给判断留一点空间。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "有没有一次老师讲得特别投入？那时的话题或例子，与你平时感受到的有什么不同？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "这一周留意一个具体例子或回答，把老师做了什么和你感受到什么分别记一句。如果仍希望得到更多说明，可以提出一个具体的课堂问题。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你有时能感受到老师对英语的兴趣",
+                "summary": "在一些英语课上，你可能能感觉到老师觉得内容有趣；在另一些课上，这种感觉就没那么明显。不同章节、课堂节奏和表达方式，可能让你的体验有所变化。\n\n这个结果并没有说老师的兴趣“一半高一半低”，也不是对教学能力作评价。它记录的是你目前的观察。可以看看哪些具体行为让你产生兴趣感，例如多讲一个现象、认真追问原因或愿意回答新问题，再想想这些部分有没有帮助你理解和参与。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "哪一种课堂行为最让你觉得老师对内容有兴趣？它也会让你更愿意提问或学习吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选两节课，各记一个具体片段，写下它怎样影响自己的理解。挑一个还没懂的问题继续问，把感受到的兴趣连接到一个学习行动。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "你比较能从课堂里感受到老师对英语的兴趣",
+                "summary": "上英语课时，你可能比较常感觉老师喜欢这门课，或者觉得这些知识有趣。一个投入的讲解、一个额外的例子，都可能让你觉得内容值得了解。\n\n这份结果记录的是你的感受，不是在认证老师的真实内心或教学水平。老师表现出的兴趣，也不代表你必须喜欢同样的内容。可以看看哪些讲解真正帮助了你，再为自己的疑问留出位置：欣赏课堂，也可以指出哪里需要更清楚的说明。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "老师的哪些例子让你印象深？你只是觉得讲得热闹，还是也能解释那个问题了？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "挑一个老师讲得投入的例子，自己用两三句话解释它。再提出一个延伸问题或没听懂的地方，看看课堂兴趣能不能变成自己的理解。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你很明显地感受到老师对英语的热情",
+                "summary": "你可能常常觉得老师发自内心地喜欢英语，讲到知识时也显得有兴趣和乐趣。这样的课堂体验可能让你愿意听下去，或者产生新的好奇。\n\n不过，这个分数测的是学生感受到的热情，没有直接测老师的真实态度，也不等于教学效果一定很好。你仍然可以有没听懂、节奏跟不上或需要其它讲解的地方。可以把这份好的体验用在一个具体行动上，同时保留对自己学习需要的判断，不必因为老师很投入就不好意思说“这一步我还没懂”。\n\n比如读一篇短文时，是几个单词不认识、句子结构没看懂，还是找不到题目需要的信息？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你感受到的热情有没有带来一个自己想追问的问题？遇到没懂的地方，你还愿意说出来吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个由课堂引发的好奇问题，做一次小查找或小练习。把发现带回课堂，也带上一个需要说明的卡点，让兴趣和实际理解一起往前走。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次英语课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。",
+          "这里测的是学生感受到的学科兴趣，不是老师真实内心或教学质量，不能用于教师排名与问责。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "theoretical_range"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "teacher_subject_liking_english_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "英语／初中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "english",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "english-junior_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少感受到课堂学科兴趣",
+                  "lower": 1,
+                  "upper": 2
+                },
+                {
+                  "key": "low",
+                  "label": "感受到的兴趣不明显",
+                  "lower": 2,
+                  "upper": 3
+                },
+                {
+                  "key": "middle",
+                  "label": "有时感受到学科兴趣",
+                  "lower": 3,
+                  "upper": 4
+                },
+                {
+                  "key": "high",
+                  "label": "比较能感受到学科兴趣",
+                  "lower": 4,
+                  "upper": 5
+                },
+                {
+                  "key": "very_high",
+                  "label": "明显感受到学科兴趣",
+                  "lower": 5,
+                  "upper": 6
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "teacher_subject_liking_english_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "7018e5618555b14b3bb7a9862f7a4860260aad96f9e56753436f6efc08fa5dd0"
+            }
+          },
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "英语／高中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "english",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "english-upper_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少感受到课堂学科兴趣",
+                  "lower": 1,
+                  "upper": 2
+                },
+                {
+                  "key": "low",
+                  "label": "感受到的兴趣不明显",
+                  "lower": 2,
+                  "upper": 3
+                },
+                {
+                  "key": "middle",
+                  "label": "有时感受到学科兴趣",
+                  "lower": 3,
+                  "upper": 4
+                },
+                {
+                  "key": "high",
+                  "label": "比较能感受到学科兴趣",
+                  "lower": 4,
+                  "upper": 5
+                },
+                {
+                  "key": "very_high",
+                  "label": "明显感受到学科兴趣",
+                  "lower": 5,
+                  "upper": 6
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "teacher_subject_liking_english_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "7018e5618555b14b3bb7a9862f7a4860260aad96f9e56753436f6efc08fa5dd0"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_subject_liking": 1
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      },
+      {
+        "name": "all-6",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_subject_liking": 6
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "teacher_subject_liking": 2
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      }
+    ]
+  }
+}
