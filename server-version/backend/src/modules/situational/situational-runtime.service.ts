@@ -1,3 +1,4 @@
+import { deriveSituationalAssignment, assignedSituationalRunnerDefinition } from './situation-assignment'
 import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -311,7 +312,12 @@ export const situationalAttemptForResponse = (
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     },
-    instrument: instrumentResponse(snapshot),
+    instrument: { ...instrumentResponse(snapshot),
+      ...(snapshot.definition.schemaVersion === 2 && (snapshot.definition.researchAssignment || snapshot.definition.flow.nodes.some(n => n.nodeType === 'SCENE' && n.responseStages)) ? {
+        assignment: deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash),
+        definition: assignedSituationalRunnerDefinition(snapshot.definition, deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)),
+      } : {}),
+    },
     ...(stored ? { result: stored.result, canonicalResult: stored.canonicalResult } : {}),
     ...(options.replayed === undefined ? {} : { replayed: options.replayed }),
   }
