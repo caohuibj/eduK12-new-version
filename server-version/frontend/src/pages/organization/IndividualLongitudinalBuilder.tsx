@@ -1,3 +1,4 @@
+import { ScaleReferenceTrajectory } from '../../modules/reporting/ScaleReferenceTrajectory'
 import { limitationLabel, comparabilityLabel, resourceLabel } from './reportingLabels'
 import { useEffect, useRef, useState } from 'react'
 import { reportingApi, type ReportingArtifactProjection, type ReportingSourceSummary, type PublishedReportingSpecSummary } from '../../api/reporting'
@@ -17,12 +18,13 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
   const [resource, setResource] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [artifact, setArtifact] = useState<ReportingArtifactProjection | null>(null)
+  const [latestReference,setLatestReference]=useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const epoch = useRef(0)
   useEffect(() => () => { epoch.current++ }, [])
   const key = (s: ReportingSourceSummary) => `${s.runId}/${s.trackId}`
-  const reset = () => { epoch.current++; setArtifact(null); setSources([]); setSourcePage(null); setSelected([]); setResource(''); setError('') }
+  const reset = () => { epoch.current++; setArtifact(null); setSources([]); setSourcePage(null); setSelected([]); setResource(''); setLatestReference(false); setError('') }
   async function act(work: (current: () => boolean) => Promise<void>) {
     const request = ++epoch.current
     setBusy(true); setError(''); setArtifact(null)
@@ -41,7 +43,7 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
     setSources(old => page === 1 ? result.list : [...old, ...result.list]); setSourcePage(result.nextPage)
   })
   const generate = () => act(async current => {
-    const result = await reportingApi.analyzeIndividual(organizationId, {subjectUserId:subject,specId,sources:sources.filter(s=>selected.includes(key(s))).map(s=>({runId:s.runId,trackId:s.trackId}))})
+    const result = await reportingApi.analyzeIndividual(organizationId, {subjectUserId:subject,specId,...(latestReference?{regenerateWithLatestReference:true}:{}),sources:sources.filter(s=>selected.includes(key(s))).map(s=>({runId:s.runId,trackId:s.trackId}))})
     if (current()) setArtifact(result)
   })
   const exportReport = async () => {
@@ -70,10 +72,12 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
       {sourcePage && <ProductButton disabled={busy} onClick={()=>void findSources(subject,sourcePage)}>更早的个人测量</ProductButton>}
       <label className="grid gap-1">个人报告方案<select aria-label="个人报告方案" disabled={busy} value={specId} onChange={e=>{setSpecId(e.target.value);setArtifact(null)}}><option value="">请选择</option>{specs.map(s=><option key={s.specId} value={s.specId}>{s.specKey} v{s.version}</option>)}</select></label>
       {specs.length===0 && <p>尚无已发布的个人纵向报告方案，请由平台管理员审核并发布。</p>}
+      <label className="grid gap-1">参考范围<select aria-label="参考范围" disabled={busy} value={latestReference?'latest':'attached'} onChange={e=>{setLatestReference(e.target.value==='latest');setArtifact(null)}}><option value="attached">按所选测量中较晚的兼容参考范围</option><option value="latest">使用最新兼容参考范围重新生成（保留已有报告）</option></select></label>
       <ProductButton disabled={busy || !subject || !specId || selected.length<2} onClick={()=>void generate()}>生成个人纵向报告</ProductButton>
     </>}
     {error && <p role="alert">{error}</p>}
     {projection && <div className="space-y-4" aria-label="个人报告结果">
+      <ScaleReferenceTrajectory projection={projection} />
       {projection.waves.map(w=><article className="rounded border p-3" key={w.waveId}><h3>第 {w.ordinal} 次 · {w.waveKey.split(' / ')[0]}</h3><dl>{Object.entries(w.metrics).map(([id,m])=><div key={id}><dt>{id}</dt><dd>{m.state==='present'?m.value:(m.reason==='NOT_COMPLETED'?'本次未完成':'指标缺失或质量不足')}</dd></div>)}</dl><p>证据等级：{w.evidence.level}</p><p>{w.evidence.limitations.map(limitationLabel).join(' · ')}</p></article>)}
       {projection.comparisons.map((c,i)=><div key={`${c.fromWaveId}/${c.toWaveId}`}><h3>第 {i+1} 次 → 第 {i+2} 次</h3>{Object.entries(c.metrics).map(([id,m])=><p key={id}>{id}：{comparabilityLabel(m.comparability.level)} · {m.delta===undefined?'未计算变化量':`变化量 ${m.delta}`} {m.comparability.limitations.map(limitationLabel).join(' · ')}</p>)}</div>)}
       <p>用于描述测量变化，不用于诊断或推断因果。</p>

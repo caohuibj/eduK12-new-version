@@ -13,3 +13,8 @@ DRAFT→ACTIVE→SUPERSEDED→RETIRED. Reviewed reference activation is Serializ
 Report publication/QC binds respondent, audience, locale and reportVersion. Required: overview, understandable explanation, situated reflection, concrete action, limitations. Student language addresses middle-school experience; Parent language addresses family support; Teacher language addresses classroom practice. An absent audience version must fail closed, never reuse student copy for an adult audience. Existing restricted-report policies remain effective.
 
 Notion principle updated and verified in Scale Library, Scientific Maturity Governance and Bundle Report Design on 2026-10-01.
+
+## Report publication gate
+New governed packages require a respondent/audience/locale contract and recorded editorial review. CI checks explanation coverage, reflection, actionable steps and boundaries for every score and band. Student copy is blocked from teacher/researcher interpretations unless a matching authored audience version is supplied. Automatic structural checks complement editorial review; length and keyword checks do not establish readability alone.
+
+Canonical Scale metrics carry the exact original reference hash, measurement identity, subject, stage, locale, direction and range. Individual longitudinal generation defaults to the later reference attached to selected measurements. It freezes the resolution decision and references into the artifact; normal reads never look up a newer version. Explicit regeneration may select the latest compatible ACTIVE reference. Cross-stage or incompatible measurements use time-matched positions without claiming numeric equivalence.
