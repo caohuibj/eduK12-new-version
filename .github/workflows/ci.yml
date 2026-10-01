@@ -48,6 +48,8 @@ on:
       - main
       - 'refactor/unified-runtime-v32-unit'
       - 'content/cognitive-expansion'
+      - 'feat/scale-wave1-governance'
+      - 'feat/scale-wave1-reports'
   workflow_dispatch:
 
 concurrency:
