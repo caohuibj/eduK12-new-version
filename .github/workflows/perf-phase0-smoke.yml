@@ -133,7 +133,10 @@ jobs:
           PERF_RATE: '5'
           PERF_SECONDS: '5'
           PERF_RATE_CEILING: '10'
-          PERF_PRE_VUS: '8'
+          # Allocate the bounded pool before the 5-second accounting window.
+          # Dynamic VU creation on a shared runner caused 3 missed arrivals despite
+          # every issued N-back request succeeding freshly; keep the rate/gates unchanged.
+          PERF_PRE_VUS: '32'
           PERF_MAX_VUS: '32'
           PERF_REQUIRE_ALL_FRESH: '1'
         run: |
