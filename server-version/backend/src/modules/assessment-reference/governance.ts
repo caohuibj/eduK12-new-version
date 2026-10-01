@@ -22,9 +22,11 @@ export interface ReferenceGovernanceV1 {
 export function validateReferenceGovernance(entry: Partial<AssessmentReferenceEntry>): string[] {
   const g = entry.governance
   if (!g) return entry.referenceKind === 'theoretical_range' ? ['THEORETICAL_GOVERNANCE_REQUIRED'] : []
+  if (typeof g!=='object' || !Array.isArray(g.bands) || g.bands.some(b=>!b || typeof b!=='object')) return ['REFERENCE_GOVERNANCE_INVALID']
   const errors: string[] = []
   if (g.schemaVersion !== 1 || !['THEORETICAL_RANGE','LOCAL_PILOT','LOCAL_REFERENCE','MULTISITE_REFERENCE','VALIDATED_NORM','CRITERION'].includes(g.kind)) errors.push('REFERENCE_KIND_INVALID')
   if (!g.subjectKey || !g.locale || !g.populationKey || !g.sourceDataset || !g.sourceSnapshot || !Number.isFinite(Date.parse(g.effectiveFrom))) errors.push('REFERENCE_PROVENANCE_REQUIRED')
+  if(typeof g.crossStageReReferenceAllowed!=='boolean') errors.push('REFERENCE_CROSS_STAGE_DECISION_REQUIRED')
   const grades = g.schoolStage === 'junior_secondary' ? ['7','8','9'] : g.schoolStage === 'upper_secondary' ? ['10','11','12'] : []
   if (!grades.length || JSON.stringify(entry.population?.match?.gradeLevels) !== JSON.stringify(grades) || entry.population?.language !== g.locale) errors.push('REFERENCE_POPULATION_IDENTITY_INVALID')
   const bands = g.bands

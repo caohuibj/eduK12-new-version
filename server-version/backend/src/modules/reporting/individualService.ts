@@ -1,3 +1,5 @@
+import { buildLongitudinalReferenceSnapshot, type ReferenceResolutionMode } from '../assessment-reference/longitudinal'
+import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
 import { governedArtifactMetrics, narrowGovernedProjection } from './governedDisclosure'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -72,7 +74,7 @@ export async function listIndividualSources(input: IndividualScopeInput & { subj
   return { list: rows.map(r => ({ runId: r.runId, trackId: r.trackId, runName: r.runName, publishedAt: r.at.toISOString(), resource: { family:r.family,key:r.key,version:r.version } })),
     nextPage: rows.length === input.pageSize ? input.page+1 : null }
 }
-export async function generateIndividualLongitudinal(input: IndividualScopeInput & { subjectUserId: string; sources: Source[]; specId: string }) {
+export async function generateIndividualLongitudinal(input: IndividualScopeInput & { subjectUserId: string; sources: Source[]; specId: string; referenceResolutionMode?:ReferenceResolutionMode; regenerateWithLatestReference?:boolean }) {
   await assertIndividualLongitudinalAccess(input)
   if (input.sources.length < 2 || input.sources.length > 50 || new Set(input.sources.map(s=>s.runId)).size !== input.sources.length) {
     reportingFail('REPORT_LONGITUDINAL_WAVES_REQUIRED', 'select two to fifty distinct measurements', 400)
@@ -84,7 +86,7 @@ export async function generateIndividualLongitudinal(input: IndividualScopeInput
   if (sources.length !== input.sources.length || sources.some(s=>s.family !== sources[0].family || s.key !== sources[0].key)) {
     reportingFail('REPORT_INDIVIDUAL_SOURCE_INVALID', 'each source must contain this subject with the same resource identity', 409)
   }
-  const prepared = []
+  const prepared: Array<{source:SourceRow;cohort:Awaited<ReturnType<typeof freezeRunTrackCohort>>;batch:Awaited<ReturnType<typeof resolveAuthoritativeRunResults>>;manifest:ReturnType<typeof buildReportingWaveInputManifest>}> = []
   for (const source of sources) {
     const cohort = await freezeRunTrackCohort({ ...source, organizationId: input.organizationId, generatedByUserId: input.principal.userId,
       cohortSelector: { schemaVersion:2,combine:'ALL',clauses:[{kind:'MEMBERSHIP_IDS',membershipIds:[source.membershipId]}] } })
@@ -102,9 +104,33 @@ export async function generateIndividualLongitudinal(input: IndividualScopeInput
   for (const [i,p] of prepared.entries()) waves.push(await bindReportingSeriesWave({organizationId:input.organizationId,seriesId:series.id,
     waveKey:`${p.source.at.toISOString()} / T${i+1}`,ordinal:i+1,cohortSnapshotId:p.cohort.id,preparedBatch:p.batch,createdByUserId:input.principal.userId}))
   const projection = buildIndividualLongitudinalProjection({subjectUserId:input.subjectUserId,waves,spec:spec.definition})
+  const trajectories: NonNullable<typeof projection.referenceTrajectories>['metrics'] = {}
+  const instrumentKeys = [...new Set(waves.flatMap(w => w.inputManifest.resolved.flatMap(r => r.metrics.flatMap(m => m.scaleReference ? [m.scaleReference.instrumentKey] : []))))]
+  if (instrumentKeys.length) {
+    const rows = await prisma.assessmentReferenceSet.findMany({where:{instrumentType:'SCALE',instrumentKey:{in:instrumentKeys},status:{not:'DRAFT'}}})
+    const references: AssessmentReferenceSetDefinition[] = rows.map(row=>{
+      const parsed = validateReferenceSetDefinition({...row.definition as object,status:row.status})
+      if (!parsed.definition || parsed.issues.some(i=>i.severity==='error')) reportingFail('REPORT_RESULT_INTEGRITY','reference snapshot is invalid',500)
+      return parsed.definition!
+    })
+    for (const rule of spec.definition.metricRules) {
+      const points = waves.flatMap((wave,i)=>{
+        const metric=wave.inputManifest.resolved[0]?.metrics.find(m=>m.key===rule.sourceMetricKey)
+        const projected=projection.waves[i].metrics[rule.metricId]
+        return metric?.scaleReference && projected.state==='present' ? [{resultVersion:wave.inputManifest.resolved[0].canonicalResultHash,at:prepared[i].source.at.toISOString(),value:projected.value,identity:metric.scaleReference}] : []
+      })
+      if(points.length>=2) {
+        try { trajectories[rule.metricId]=buildLongitudinalReferenceSnapshot({points,references,mode:input.referenceResolutionMode,explicitLatest:input.regenerateWithLatestReference,generatedAt:new Date().toISOString()}) }
+        catch { reportingFail('REPORT_RESULT_INTEGRITY','longitudinal reference replay failed',500) }
+      }
+    }
+    if(Object.keys(trajectories).length) projection.referenceTrajectories={metrics:trajectories}
+  }
+  // Freeze the chosen references into this artifact. Reading never queries a newer reference.
+  const referenceIdentity = Object.fromEntries(Object.entries(trajectories).map(([key,{generatedAt,snapshotHash,...snapshot}])=>[key,snapshot]))
   const waveBindings = waves.map(w=>({waveId:w.id,waveKey:w.waveKey,ordinal:w.ordinal,cohortSnapshotId:w.cohortSnapshotId,inputIdentityHash:w.inputIdentityHash,snapshotHash:w.snapshotHash}))
   const generatedAt = new Date()
-  const analysisIdentityHash = canonicalHash({schema:'IndividualLongitudinalAnalysisV1',subjectUserId:input.subjectUserId,seriesIdentityHash:series.seriesIdentityHash,specId:spec.id,specHash:spec.specHash,waveBindings})
+  const analysisIdentityHash = canonicalHash({schema:'IndividualLongitudinalAnalysisV1',subjectUserId:input.subjectUserId,seriesIdentityHash:series.seriesIdentityHash,specId:spec.id,specHash:spec.specHash,waveBindings,...(Object.keys(trajectories).length ? {referenceIdentity} : {})})
   const payload: ReportingIndividualArtifactPayloadV1 = {schemaVersion:1,artifactId:randomUUID(),organizationId:input.organizationId,
     analysisKind:'INDIVIDUAL_LONGITUDINAL',policyDomain:'ORG_INDIVIDUAL_REPORT_V1',subjectUserId:input.subjectUserId,
     source:{kind:'SERIES',seriesId:series.id,seriesIdentityHash:series.seriesIdentityHash},specId:spec.id,specHash:spec.specHash,analysisIdentityHash,

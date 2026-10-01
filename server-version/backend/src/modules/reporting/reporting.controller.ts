@@ -84,6 +84,8 @@ const automaticAnalysisSchema = z.object({
   mode: z.enum(['PAIRWISE', 'FULL_CASE']).optional(),
 }).strict()
 const individualAnalysisSchema = z.object({
+  referenceResolutionMode:z.enum(['ORIGINAL','TIME_MATCHED','LATER_REFERENCE']).optional(),
+  regenerateWithLatestReference:z.boolean().optional(),
   analysisKind: z.literal('INDIVIDUAL_LONGITUDINAL'), subjectUserId: z.string().uuid(), specId: z.string().uuid(),
   sources: z.array(z.object({ runId: z.string().uuid(), trackId: z.string().uuid() }).strict()).min(2).max(50),
 }).strict()
