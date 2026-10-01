@@ -255,6 +255,9 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \
     src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts \
     src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts \
+    src/__tests__/integration/assessmentRunDeliveryModes.postgres.integration.test.ts \
+    src/__tests__/integration/respondentAuthority.postgres.integration.test.ts \
+    src/__tests__/integration/observerSingleQuestion.postgres.integration.test.ts \
     src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts \
     src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts \
     src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts \
