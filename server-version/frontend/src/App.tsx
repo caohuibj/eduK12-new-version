@@ -83,6 +83,7 @@ const QuestionnaireResult = React.lazy(() => import('./pages/student/Questionnai
 const ClassroomJoin = React.lazy(() => import('./pages/student/ClassroomJoin'))
 const ClassroomAnswer = React.lazy(() => import('./pages/student/ClassroomAnswer'))
 const ClassroomEnter = React.lazy(() => import('./pages/student/ClassroomEnter'))
+const AnonymousStudyPage = React.lazy(() => import('./pages/public/AnonymousStudyPage'))
 const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
 const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
 const ParentHome = React.lazy(() => import('./pages/parent/ParentHome'))
@@ -772,6 +773,8 @@ function AppRoutes() {
 
           {/* 综合测评公开匿名入口 */}
           <Route path="/public/composite/situational/:attemptId" element={<SituationalRunner />} />
+          <Route path="/public/studies/waves/:waveId/:token" element={<AnonymousStudyPage />} />
+          <Route path="/public/studies/:studyId" element={<AnonymousStudyPage />} />
           <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
           <Route path="/public/composite/attempts/:attemptId/report" element={<CompositeReportPage />} />

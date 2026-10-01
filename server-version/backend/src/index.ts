@@ -1,3 +1,4 @@
+import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
 import { createRedisRateLimiter } from './middleware/redisRateLimit'
@@ -244,6 +245,8 @@ app.use('/api/general-questionnaires', generalQuestionnaireRoutes)
 // 综合测评：将量表、表单和认知任务放入同一完成容器；公开入口不要求登录。
 app.use('/api/composite-assessments', compositeRoutes)
 app.use('/api/relational-assessments', relationalProductRoutes)
+app.use('/api/anonymous-studies', anonymousStudyRouter)
+app.use('/api/public/anonymous-studies', ...publicAssessmentRateLimiters, publicAnonymousStudyRouter)
 app.use('/api/public/composite-assessments', ...publicAssessmentRateLimiters, compositePublicRoutes)
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)

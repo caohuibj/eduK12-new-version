@@ -200,7 +200,8 @@ const CompositeAssessmentPage: React.FC = () => {
   const saveAndExit = async () => {
     if (!attemptId) return
     if (state?.deliveryMode === 'FINAL_ONLY') {
-      navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')
+      const studyReturn=sessionStorage.getItem(`composite:study:return:${attemptId}`)
+      navigate(publicMode ? (studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:'/') : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')
       return
     }
     try {
@@ -340,7 +341,7 @@ const CompositeAssessmentPage: React.FC = () => {
         submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
         submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
         onReload={() => loadAttempt(state.id, recoveryToken)}
-        onExit={() => navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')}
+        onExit={() => void saveAndExit()}
         onCompleted={() => goReport(state.id)}
         onEnterCognitive={enterChild}
         onEnterSituational={enterChild}

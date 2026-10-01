@@ -1,3 +1,4 @@
+import { AnonymousStudyManager } from './AnonymousStudyManager'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily, type PublicDeliveryLink } from '../api/publicDelivery'
 
@@ -47,10 +48,11 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
   })
   return <section className="card p-6 space-y-4" aria-label="匿名作答链接管理">
     <h2 className="font-semibold">公开匿名链接</h2>
-    <p className="text-sm text-gray-600">参与者无需登录，完成后查看当次个人报告。匿名作答不进入组织群体或纵向报告。</p>
+    <p className="text-sm text-gray-600">参与者无需登录，按内容权限查看当次个人反馈。发布者可统计参与和完成情况、导出授权数据。{family==='COMPOSITE' && '保存研究内身份后，可在同一研究内参与多波次并查看本人历史报告。'}</p>
     {error && <p role="alert" className="text-red-600">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     <button disabled={busy} className="btn-secondary" onClick={()=>void act(async()=>{const current=generation.current;const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows)})}>刷新链接</button>
+    {family==='COMPOSITE' && <AnonymousStudyManager compositeId={resourceId} links={links}/>}
     {!links.length && !busy && !error && <p>尚未生成链接</p>}
     {links.map(link=>{const url=adapter.getPublicEntry(link);return <article key={link.id} className="rounded border p-3 text-sm space-y-2">
       {url ? <a className="block break-all text-action" href={url}>{url}</a> : <p>链接地址已隐藏，复制时会重新验证权限。</p>}
