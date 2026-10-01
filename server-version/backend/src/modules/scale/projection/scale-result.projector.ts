@@ -60,7 +60,9 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
   if (input.decryptError) return { ...base, kind: 'unavailable', reason: 'RESULT_UNAVAILABLE' }
   if (!input.result) return { ...base, kind: 'completion' }
 
-  const capabilities = resolveEffectiveScaleDisclosure(input.context)
+  const capabilities = { ...resolveEffectiveScaleDisclosure(input.context) }
+  const expectedAudience = ['respondent','subject'].includes(input.context.audience) ? 'student' : input.context.audience === 'teacher' ? 'teacher' : null
+  if (input.result.method.reportAudience && input.result.method.reportAudience !== expectedAudience) capabilities.individualInterpretations = false
   const feedback = projectExternalEducationalFeedback(input.context.frozenPolicy.educationalFeedback)
 
   if (!capabilities.numericScores && !hasRichCapability(capabilities)) {

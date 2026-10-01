@@ -1,3 +1,4 @@
+import { validateAudienceReport } from '../library/audience-report-gate'
 import { validateReferenceSetDefinition } from '../../assessment-reference/reference'
 import { parseScaleCatalogManifest } from '../library/catalog-manifest'
 import { parseLocalizationManifest } from '../library/localization-manifest'
@@ -93,6 +94,7 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
     severity: issue.severity,
   }))
 
+  issues.push(...validateAudienceReport(source.executable.definition))
   const scoreKeys = new Set(source.executable.definition.scoring.scores.map((score) => score.key))
   const referenceVersions = new Set<string>()
   source.executable.references.forEach((reference, referenceIndex) => {

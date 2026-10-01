@@ -1,3 +1,4 @@
+import { validateAudienceReport } from './library/audience-report-gate'
 import { hashScaleDefinition, runnerDefinition, validateScaleDefinition, type DefinitionIssue } from './scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from './scale-scoring'
 import { validateReferenceSetDefinition } from '../assessment-reference/reference'
@@ -72,6 +73,7 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
     issues.push({ path: 'goldenCases', message: '标准量表缺少 golden scoring fixture', severity: 'error' })
   }
 
+  issues.push(...validateAudienceReport(scalePackage.definition))
   const scoreKeys = new Set(scalePackage.definition.scoring.scores.map((score) => score.key))
   const referenceVersions = new Set<string>()
   scalePackage.references.forEach((reference, referenceIndex) => {
@@ -83,6 +85,8 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
     if (referenceVersions.has(reference.referenceVersion)) issues.push({ path: `${path}.referenceVersion`, message: '同一 package 不能重复声明 referenceVersion', severity: 'error' })
     referenceVersions.add(reference.referenceVersion)
     reference.entries.forEach((entry, entryIndex) => {
+      const axes=scalePackage.definition.versionAxes
+      if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale)) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
       if (!scoreKeys.has(entry.scoreKey)) issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference 引用了不存在的 score：${entry.scoreKey}`, severity: 'error' })
       if (entry.instrumentVersion !== scalePackage.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 必须与 package 一致', severity: 'error' })
       if (entry.scoringVersion !== scalePackage.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 必须与 definition 一致', severity: 'error' })
