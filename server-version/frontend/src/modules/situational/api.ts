@@ -1,3 +1,4 @@
+import type { SituationalResearchCapture } from './research'
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type {
@@ -12,12 +13,16 @@ export interface SituationalFinalSubmitPayload {
   instrumentVersion: string
   compiledRuntimeHash: string
   scoringVersion: string
+  researchCapture?: SituationalResearchCapture
   responses: Array<{
     sceneKey: string
     channelKey: string
     responseValue: string | number
     responseTimeMs?: number
     answeredAt?: string
+    historyIdentity?: string
+    responseRevision?: number
+    stageConfirmed?: boolean
   }>
 }
 
