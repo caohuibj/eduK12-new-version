@@ -165,7 +165,7 @@ export const projectExternalScaleReference = (
     !input
     || typeof input.scoreKey !== 'string'
     || typeof input.referenceVersion !== 'string'
-    || !['normative_distribution', 'criterion_threshold', 'descriptive_sample'].includes(input.referenceKind)
+    || !['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range'].includes(input.referenceKind)
     || !['available', 'unavailable'].includes(input.status)
     || typeof input.label !== 'string'
     || typeof input.disclaimer !== 'string'
@@ -180,7 +180,7 @@ export const projectExternalScaleReference = (
     scoreKey: input.scoreKey,
     referenceVersion: input.referenceVersion,
     referenceKind: input.referenceKind,
-    evidenceLevel: ['literature_beta', 'local_pilot', 'local_norm', 'validated_norm'].includes(input.evidenceLevel) ? input.evidenceLevel : null,
+    evidenceLevel: ['theoretical', 'literature_beta', 'local_pilot', 'local_norm', 'validated_norm'].includes(input.evidenceLevel) ? input.evidenceLevel : null,
     status: input.status,
     ...(typeof input.unavailableReason === 'string' ? { unavailableReason: input.unavailableReason } : {}),
     label: input.label,

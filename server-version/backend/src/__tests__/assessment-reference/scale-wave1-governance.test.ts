@@ -1,0 +1,18 @@
+import { describe,it,expect } from 'vitest'
+import { hashScaleDefinition } from '../../modules/scale/scale-definition'
+import { WHO5_ZH_CN_V1_PACKAGE } from '../../modules/scale/scale-package.registry'
+import { scoreScale } from '../../modules/scale/scale-scoring'
+import { validateReferenceSetDefinition,resolveAssessmentReference,type AssessmentReferenceSetDefinition } from '../../modules/assessment-reference/reference'
+import { referenceSetHash,loadFrozenReferenceSets } from '../../modules/assessment-runtime/reference-binding'
+import { testReference } from './wave1-reference.fixture'
+describe('Wave1 governance',()=>{
+it('separates report/reference versions from opt-in measurement identity and raw scores',()=>{
+ const legacy=structuredClone(WHO5_ZH_CN_V1_PACKAGE.definition);const d={...legacy,versionAxes:{schemaVersion:1 as const,subjectKey:'physics',locale:'zh-CN',localizationVersion:'1.0.0'}};const next=structuredClone(d);next.report.reportVersion='2.0.0';next.report.disclaimer+='copy';expect(hashScaleDefinition(next)).toBe(hashScaleDefinition(d));expect(scoreScale(next,WHO5_ZH_CN_V1_PACKAGE.goldenCases[0].answers)).toEqual(scoreScale(d,WHO5_ZH_CN_V1_PACKAGE.goldenCases[0].answers));next.items[0].content+='change';expect(hashScaleDefinition(next)).not.toBe(hashScaleDefinition(d));const h=hashScaleDefinition(legacy);legacy.report.disclaimer+='copy';expect(hashScaleDefinition(legacy)).not.toBe(h)
+})
+it('theoretical bands are exhaustive, exclusive and never empirical',()=>{
+ const r=testReference();expect(validateReferenceSetDefinition(r).issues).toEqual([]);const input={instrumentType:'scale' as const,instrumentKey:r.instrumentKey,instrumentVersion:'1.0.0',scoringVersion:'1.0.0',references:[r],selections:[{scoreKey:'wellbeing',referenceVersion:'v1',referenceKind:'theoretical_range' as const}],score:{key:'wellbeing',value:2}};const [v]=resolveAssessmentReference({...input,context:{gradeLevel:'8',language:'zh-CN'}});expect(v.criterionBand?.key).toBe('low');expect(v.percentile).toBeNull();expect(v.z).toBeNull();expect(v.meanDifference).toBeNull();expect(resolveAssessmentReference(input)[0].status).toBe('unavailable');expect(resolveAssessmentReference({...input,context:{gradeLevel:'11',language:'zh-CN'}})[0].status).toBe('unavailable');r.entries[0].statistics={mean:3};expect(validateReferenceSetDefinition(r).issues.some(i=>i.message==='THEORETICAL_EMPIRICAL_CLAIM_FORBIDDEN')).toBe(true);r.entries[0].governance!.bands[1].lower=2.01;expect(validateReferenceSetDefinition(r).issues.some(i=>i.message==='BAND_COVERAGE_INVALID')).toBe(true)
+})
+it('frozen historical replay survives supersession but detects changed payload',async()=>{
+ const r=testReference(),h=referenceSetHash(r);r.status='SUPERSEDED';expect(referenceSetHash(r)).toBe(h);const db={assessmentReferenceSet:{findMany:async()=>[{instrumentType:'SCALE' as const,instrumentKey:r.instrumentKey,referenceVersion:'v1',status:'SUPERSEDED' as const,definition:r}]}};const input={instrumentType:'SCALE' as const,instrumentKey:r.instrumentKey,bindings:[{referenceKey:r.instrumentKey,referenceVersion:'v1',referenceHash:h}]};expect((await loadFrozenReferenceSets(db,input))[0].status).toBe('ACTIVE');r.entries[0].disclaimer='changed';await expect(loadFrozenReferenceSets(db,input)).rejects.toThrow('hash mismatch')
+})
+})

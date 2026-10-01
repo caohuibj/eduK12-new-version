@@ -265,6 +265,7 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
     src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
     src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
+    src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts \
     src/__tests__/hotpath/query-budget.postgres.integration.test.ts
 
   run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci

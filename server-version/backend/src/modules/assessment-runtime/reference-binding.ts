@@ -9,7 +9,7 @@ type ExactReferenceRow = {
   instrumentType: 'SCALE' | 'COGNITIVE'
   instrumentKey: string
   referenceVersion: string
-  status: 'DRAFT' | 'ACTIVE' | 'RETIRED'
+  status: 'DRAFT' | 'ACTIVE' | 'SUPERSEDED' | 'RETIRED'
   definition: unknown
 }
 
@@ -42,7 +42,7 @@ const toDefinition = (row: ExactReferenceRow): AssessmentReferenceSetDefinition 
   return validation.definition
 }
 
-export const referenceSetHash = (definition: AssessmentReferenceSetDefinition): string => canonicalHash(definition)
+export const referenceSetHash = (definition: AssessmentReferenceSetDefinition): string => canonicalHash(definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' } : definition)
 
 export const loadExactReferenceSet = async (
   db: SingleExactReferenceDb,
@@ -149,6 +149,7 @@ export const loadFrozenReferenceSets = async (
     if (hash !== binding.referenceHash) {
       throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} hash mismatch`)
     }
-    return definition
+    // A frozen binding proves the immutable payload. Lifecycle changes cannot invalidate historical attempts.
+    return definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' as const } : definition
   })
 }
