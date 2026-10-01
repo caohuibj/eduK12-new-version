@@ -670,10 +670,37 @@ jobs:
         working-directory: server-version/frontend
         run: npm ci
       - name: restore tested frontend build
+        id: frontend-build-download
+        # Runner DNS/transport can fail transiently even when the artifact exists.
+        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist-${{ github.sha }}
           path: server-version/frontend/dist
+      - name: wait before retrying frontend build download
+        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry tested frontend build download
+        id: frontend-build-download-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: wait before final frontend build download
+        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final tested frontend build download
+        # Final failure remains fatal, even if earlier attempts left partial files.
+        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify restored frontend entry point
+        run: test -s frontend/dist/index.html
       - name: prisma generate and guarded migration
         working-directory: server-version/backend
         run: |
@@ -686,10 +713,37 @@ jobs:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: restore tested backend build
+        id: backend-build-download
+        # Runner DNS/transport can fail transiently even when the artifact exists.
+        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: backend-dist-${{ github.sha }}
           path: server-version/backend/dist
+      - name: wait before retrying backend build download
+        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry tested backend build download
+        id: backend-build-download-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: wait before final backend build download
+        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final tested backend build download
+        # Final failure remains fatal, even if earlier attempts left partial files.
+        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify restored backend entry point
+        run: test -s backend/dist/index.js
       - name: seed isolated Bundle fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
