@@ -46,7 +46,7 @@ const CognitiveV2ReportCard: React.FC<{
   anonymousCode?: string | null
 }> = ({ report, references = [], attemptNo, finishedAt, anonymousCode }) => {
   if (report.schemaVersion === 2 && report.reading?.popular && report.reading?.professional) {
-    return <CognitiveMagazineReport report={report} attemptNo={attemptNo} finishedAt={finishedAt} />
+    return <CognitiveMagazineReport report={report} references={references} attemptNo={attemptNo} finishedAt={finishedAt} anonymousCode={anonymousCode} />
   }
   if (report.schemaVersion === 2 && report.reading?.schemaVersion === 2) {
     return <CognitiveReportReadingCard report={report} references={references} attemptNo={attemptNo} finishedAt={finishedAt} anonymousCode={anonymousCode} />

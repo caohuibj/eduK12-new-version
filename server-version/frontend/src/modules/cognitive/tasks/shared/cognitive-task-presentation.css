@@ -13,7 +13,7 @@
 
 .cognitive-task-panel--intro {
   background:
-    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, .11) 0 4.25rem, transparent 4.35rem),
+    radial-gradient(circle at 88% 12%, rgba(22, 139, 131, .09) 0 4.25rem, transparent 4.35rem),
     linear-gradient(135deg, #f8fbff 0%, #ffffff 72%, #f3fbf7 100%);
 }
 
@@ -31,8 +31,8 @@
 
 .cognitive-task-eyebrow {
   margin: 0 0 6px;
-  color: var(--runner-muted, var(--hui-ds-color-muted));
-  font-size: 10px;
+  color: #0b706a;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .09em;
   text-transform: uppercase;
@@ -53,6 +53,19 @@
   color: #40586e;
   font-size: 14px;
   line-height: 1.75;
+}
+
+.cognitive-task-description p {
+  margin: 0;
+}
+
+.cognitive-task-description p + p,
+.cognitive-task-hint p + p {
+  margin-top: 8px;
+}
+
+.cognitive-task-hint p {
+  margin: 0;
 }
 
 .cognitive-task-hint {

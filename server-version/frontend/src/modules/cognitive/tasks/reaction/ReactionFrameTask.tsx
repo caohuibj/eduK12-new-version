@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -152,7 +153,7 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   }
   const handlePointerCancel = (event: React.PointerEvent<HTMLButtonElement>) => { if (event.isPrimary) { timingDiagnostics.pointerCancelled(performance.now(), trialIndex); markInterrupted() } }
 
-  if (phase === 'instruction') return <div className="card p-8 max-w-2xl text-center"><h1 className="text-2xl font-bold text-gray-800 mb-4">反应速度</h1><p className="text-gray-600 mb-3">屏幕上的圆点会在短暂等待后变成<span className="text-green-600 font-semibold">绿色</span>。看到绿色后，尽快点击或按任意键。</p><p className="text-gray-400 text-xs mb-6">练习不计分；正式测验只以颜色变化作为目标刺激，不再同时改变指令文字。</p><button onClick={() => setPhase('practice')} className="btn-primary">开始练习</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="反应速度" description={<p>屏幕上的圆点会在短暂等待后变成<span className="text-green-600 font-semibold">绿色</span>。看到绿色后，尽快点击或按任意键。</p>} hint={<><p>练习不计分；正式测验只以颜色变化作为目标刺激，不再同时改变指令文字。</p></>} onAction={() => setPhase('practice')} />
   if (phase === 'practice') return <div className="card p-8 max-w-2xl text-center"><div className="text-sm text-gray-500 mb-4">练习 {practiceIndex + 1} / {PRACTICE_TRIALS}</div>{practiceSub !== 'feedback' ? <button aria-label={`practice trial ${practiceIndex}`} onClick={handlePracticeInput} className={`w-40 h-40 rounded-full mx-auto flex items-center justify-center ${stimulusClass(practiceSub === 'green')}`}><span className={`text-2xl font-bold ${practiceSub === 'green' ? 'text-white' : 'text-gray-600'}`}>{practiceSub === 'green' ? '点击！' : '等待…'}</span></button> : <div><p className="text-gray-700 mb-6">{practiceFeedback}</p><button onClick={practicePremature ? retryPractice : advancePractice} className="btn-primary">{practicePremature ? '重试' : practiceIndex + 1 >= PRACTICE_TRIALS ? '开始正式测评' : '下一个'}</button></div>}</div>
   if (trialIndex >= total) return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">正式试次已完成，请提交测评结果。</p></div>
 

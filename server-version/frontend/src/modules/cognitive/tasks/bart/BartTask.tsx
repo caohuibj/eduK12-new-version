@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { bartSequence, type BartBalloonSpec } from '../shared/prng'
@@ -167,12 +168,7 @@ export const BartTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">气球泵压行为任务</h1>
-        <p className="mb-3 text-gray-600">每次可以继续泵压，也可以现金化当前虚拟计数。爆破只表示本次气球达到内部阈值。</p>
-        <p className="mb-6 text-xs text-gray-400">练习至少完成 3 / 4；不产生真实货币或奖励，也不输出风险高低判断。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="气球泵压行为任务" description={<p>每次可以继续泵压，也可以现金化当前虚拟计数。爆破只表示本次气球达到内部阈值。</p>} hint={<><p>练习至少完成 3 / 4；不产生真实货币或奖励，也不输出风险高低判断。</p></>} onAction={startPractice} />
     )
   }
 

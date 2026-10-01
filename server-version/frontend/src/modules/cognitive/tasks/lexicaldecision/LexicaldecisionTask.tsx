@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { lexicalDecisionSequence, type LexicalStimulus } from '../shared/pr13Stimuli'
@@ -183,12 +184,7 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">中文词汇判断</h1>
-        <p className="mb-3 text-gray-600">判断屏幕上的字符串是不是中文真词。可以点击按钮，也可以按 1 / W 选择“真词”，按 2 / N 选择“伪词”。</p>
-        <p className="mb-6 text-xs text-gray-400">先完成 4 道练习，至少答对 3 道再开始。练习不计入正式结果；正式作答时请兼顾准确和速度。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="中文词汇判断" description={<p>判断屏幕上的字符串是不是中文真词。可以点击按钮，也可以按 1 / W 选择“真词”，按 2 / N 选择“伪词”。</p>} hint={<><p>先完成 4 道练习，至少答对 3 道再开始。练习不计入正式结果；正式作答时请兼顾准确和速度。</p></>} onAction={startPractice} />
     )
   }
 

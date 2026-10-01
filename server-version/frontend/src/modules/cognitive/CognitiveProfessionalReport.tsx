@@ -1,10 +1,11 @@
 import type { CognitiveV2Report } from './types'
 import CognitiveReportVisual from './CognitiveReportVisual'
+import CognitiveReportRecord from './CognitiveReportRecord'
 import './cognitive-report-reading.css'
 import './cognitive-report-audiences.css'
 
 const units: Record<string, string> = { ms: '毫秒', ratio: '比例', count: '次数', level: '内部水平', 'd-prime': 'd′', score: '任务内得分', map: '分条件/分轮次' }
-export default function CognitiveProfessionalReport({ report, recordLabel, references = [] }: { report: CognitiveV2Report; recordLabel?: string; references?: Array<Record<string, unknown>> }) {
+export default function CognitiveProfessionalReport({ report, recordLabel, reportId, assignmentTitle, finishedAt, references = [] }: { report: CognitiveV2Report; recordLabel?: string; reportId?: string | null; assignmentTitle?: string | null; finishedAt?: string | null; references?: Array<Record<string, unknown>> }) {
   const reading = report.reading
   const professional = reading?.professional
   const state = reading?.interpretation.state ?? (report.qualityState === 'invalid' ? 'withheld' : report.qualityState === 'limited' ? 'qualified' : 'available')
@@ -14,6 +15,7 @@ export default function CognitiveProfessionalReport({ report, recordLabel, refer
   return <article className="cognitive-reading cognitive-professional" aria-label={`${report.title}专业报告`}>
     <header className="cognitive-professional__masthead"><strong>认知探索 / 专业报告</strong><span>{recordLabel ?? '单次结果审阅'} · {report.profileLabel ?? '认知任务'}</span><button type="button" onClick={() => window.print()} data-report-screen-only>打印专业报告</button></header>
     <div className="cognitive-professional__body"><p className="cognitive-professional__eyebrow">教师与管理员 · 现有权限内的结果解释</p><h1>{report.title}：结果与解释依据</h1>
+      <CognitiveReportRecord assignmentTitle={assignmentTitle} reportId={reportId} finishedAt={finishedAt} />
       {!professional && <p className="cognitive-professional__notice">历史冻结版本：保留原始结果与解释。本报告未使用当前规则补写历史指标或方法。</p>}
       <section className={`cognitive-professional__summary cognitive-professional__summary--${state}`} aria-label="专业结果摘要"><h2>01 结果摘要</h2><dl><div><dt>原始数据质量</dt><dd>{report.qualityState}</dd></div><div><dt>当前解释状态</dt><dd>{state === 'available' ? '可作本次任务描述' : state === 'qualified' ? '受限解释' : '关键指标暂不解释'}</dd></div><div><dt>已展示指标</dt><dd>{metrics.length} 项</dd></div></dl><p>{state === 'withheld' ? '关键指标未满足解释条件。仅保留允许的过程记录，禁止将撤下的数值补零或据此作个体排序。' : metrics.slice(0, 3).map(metric => `${metric.label} ${metric.formatted}`).join('；') || '没有可展示的指标。'}</p><p>{professional?.interpretation ?? report.conclusion}</p></section>
       {professional && <section><h2>02 测量任务与方法</h2><dl className="cognitive-professional__method"><div><dt>任务构念</dt><dd>{professional.construct}</dd></div><div><dt>操作与计算口径</dt><dd>{professional.procedure}</dd></div></dl>{professional.parameters.length > 0 && <dl className="cognitive-professional__parameters">{professional.parameters.map(parameter => <div key={parameter.label}><dt>{parameter.label}</dt><dd>{parameter.value}</dd></div>)}</dl>}</section>}

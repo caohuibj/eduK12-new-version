@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { StroopColor, StroopConfig, StroopTrialPayload } from '../../types'
@@ -105,7 +106,7 @@ export const StroopTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 
-  if (phase === 'instruction') return <div className="card p-8 max-w-2xl text-center"><h1 className="text-2xl font-bold text-gray-800 mb-4">色词 Stroop</h1><p className="text-gray-600 mb-3">请忽略汉字含义，只报告文字显示的字体颜色。正式测验包含一致与冲突试次。</p><p className="text-gray-400 text-xs mb-6">按键 1–4 或点击颜色按钮作答；练习不计入成绩。</p><button type="button" onClick={startPractice} className="btn-primary">开始练习</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="色词 Stroop" description={<p>请忽略汉字含义，只报告文字显示的字体颜色。正式测验包含一致与冲突试次。</p>} hint={<><p>按键 1–4 或点击颜色按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

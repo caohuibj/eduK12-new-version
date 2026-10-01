@@ -1,0 +1,8 @@
+/* Preserve the published 96px cells and 8px gaps. Narrow shells must not
+   shrink grid tracks underneath fixed-width stimuli. Supported width: >=320px. */
+.cognitive-matrix-grid {
+  width: 320px;
+  max-width: none;
+  grid-template-columns: repeat(3, 96px);
+  margin-inline: calc((100% - 320px) / 2);
+}

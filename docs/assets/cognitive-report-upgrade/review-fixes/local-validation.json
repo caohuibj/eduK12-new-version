@@ -1,0 +1,667 @@
+{
+  "date": "2026-10-01",
+  "baseline": "54500a89739fcde54c73264197be0d352234fb7b",
+  "branch": "feat/cognitive-review-fixes-local",
+  "localOnly": true,
+  "pushed": false,
+  "remoteCITriggered": false,
+  "syntheticScreenshots": true,
+  "historicalResultsRewritten": false,
+  "researchPermissionsExpanded": false,
+  "backend": {
+    "passedFiles": 105,
+    "passedTests": 766,
+    "skippedFiles": 6,
+    "skippedTests": 29
+  },
+  "frontend": {
+    "passedFiles": 71,
+    "passedTests": 306,
+    "finalTargetedReportTests": 7,
+    "targetedTestsOverlapFullSuite": true
+  },
+  "postgres": {
+    "passedTests": 2,
+    "realFinalSubmissionAndFrozenReplay": true,
+    "auditDoesNotMutateSnapshots": true
+  },
+  "staticChecks": {
+    "frontendTypes": "passed",
+    "frontendBuild": "passed",
+    "backendBuild": "passed",
+    "cognitiveContracts": "passed",
+    "frontendLintErrors": 0,
+    "frontendLintExistingWarnings": 112,
+    "finalChangedComponentLint": "passed"
+  },
+  "reports": {
+    "passed": true,
+    "syntheticRecords": 36,
+    "audiences": 2,
+    "viewportWidths": [
+      1280,
+      390,
+      320
+    ],
+    "checks": 216
+  },
+  "runner": {
+    "passed": true,
+    "tasks": 24,
+    "widths": [
+      1280,
+      390,
+      360,
+      320
+    ],
+    "layoutChecks": 120,
+    "overflowCount": 0,
+    "matrix": [
+      {
+        "phase": "practice",
+        "width": 1280,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 525.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 525.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 525.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "formal",
+        "width": 1280,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 349.59375
+            },
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 437.59375
+            },
+            {
+              "left": 488,
+              "right": 584,
+              "width": 96,
+              "top": 525.59375
+            },
+            {
+              "left": 592,
+              "right": 688,
+              "width": 96,
+              "top": 525.59375
+            },
+            {
+              "left": 696,
+              "right": 792,
+              "width": 96,
+              "top": 525.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "practice",
+        "width": 390,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 711.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 711.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 711.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "formal",
+        "width": 390,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 535.59375
+            },
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 623.59375
+            },
+            {
+              "left": 43,
+              "right": 139,
+              "width": 96,
+              "top": 711.59375
+            },
+            {
+              "left": 147,
+              "right": 243,
+              "width": 96,
+              "top": 711.59375
+            },
+            {
+              "left": 251,
+              "right": 347,
+              "width": 96,
+              "top": 711.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "practice",
+        "width": 360,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 731.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "formal",
+        "width": 360,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 28,
+              "right": 124,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 132,
+              "right": 228,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 236,
+              "right": 332,
+              "width": 96,
+              "top": 731.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "practice",
+        "width": 320,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 731.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      },
+      {
+        "phase": "formal",
+        "width": 320,
+        "matrixGrid": {
+          "clientWidth": 320,
+          "scrollWidth": 320,
+          "cells": [
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 555.59375
+            },
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 643.59375
+            },
+            {
+              "left": 8,
+              "right": 104,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 112,
+              "right": 208,
+              "width": 96,
+              "top": 731.59375
+            },
+            {
+              "left": 216,
+              "right": 312,
+              "width": 96,
+              "top": 731.59375
+            }
+          ],
+          "adjacentOverlapPx": 0
+        }
+      }
+    ]
+  },
+  "additionalInteractions": {
+    "staffMobileWidths": [
+      390,
+      320
+    ],
+    "staffRecordSwitching": true,
+    "keyboardDetailsExpansion": true,
+    "reportTitleVisibleInPrint": true,
+    "staffControlsHiddenInPrint": true,
+    "anonymousVisible": true,
+    "completionDateVisibleInPrint": true,
+    "browserErrors": []
+  },
+  "contrast": {
+    "color": "rgb(11, 112, 106)",
+    "fontSize": "11px",
+    "fontWeight": "700",
+    "background": "rgb(255, 255, 255)",
+    "contrastRatio": 5.9321712637230455,
+    "mutedRecordCaption": {
+      "color": "rgb(82, 103, 123)",
+      "background": "rgb(244, 248, 251)",
+      "contrastRatio": 5.48598362291398
+    }
+  },
+  "pdfPages": {
+    "participant-report.pdf": 2,
+    "professional-report.pdf": 3,
+    "matrix-details.pdf": 2
+  },
+  "publishedInventory": {
+    "scopeLabel": "disposable-local-test-db",
+    "readOnly": true,
+    "status": "NO_PUBLISHED_ASSIGNMENTS",
+    "summary": {
+      "publishedConfigs": 12,
+      "publishedAssignments": 0,
+      "pendingAssignments": 0,
+      "unsupportedConfigs": 0,
+      "counts": {
+        "current_two_audiences": 0,
+        "historical_reading": 0,
+        "missing_snapshot": 0,
+        "unreadable_snapshot": 0,
+        "unsupported_identity": 0,
+        "original_composite_flow": 0
+      }
+    },
+    "deploymentInventoryVerified": false,
+    "deploymentBrowserFlowVerified": false
+  },
+  "limitations": [
+    "Local disposable database has no published assignments; deployment rollout coverage is not established.",
+    "Synthetic browser previews do not substitute for deployment end-to-end acceptance.",
+    "29 backend tests are skipped, not passed."
+  ],
+  "fullEvidenceDirectory": "/workspace/cognitive-report-fixes-20261001",
+  "generatedAt": "2026-10-01T11:17:06.260066+00:00",
+  "printValidation": [
+    {
+      "name": "anonymous-new-report-print.pdf",
+      "pages": 2,
+      "lastPageTextLength": 449
+    },
+    {
+      "name": "matrix-expanded-participant-print.pdf",
+      "pages": 2,
+      "lastPageTextLength": 587
+    },
+    {
+      "name": "teacher-reader-print.pdf",
+      "pages": 3,
+      "lastPageTextLength": 474
+    }
+  ],
+  "printLastPagesContainReportContent": true,
+  "deliveryOverview": {
+    "passed": true,
+    "widths": [
+      1280,
+      390,
+      320
+    ]
+  },
+  "printKeyboardFocusDecorationHidden": true
+}

@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { applyTowerMove, towerSequence, type TowerMove, type TowerProblemSpec, type TowerState } from '../shared/prng'
@@ -89,7 +90,7 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => window.clearTimeout(timer)
   }, [phase, trialIndex, moves, inactivityGuardMs, submitFormal])
 
-  if (phase === 'instruction') return <div className="p-8 text-center"><h2 className="mb-3 text-xl font-semibold">塔式规划</h2><p className="mb-2 text-gray-600">把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p><p className="mb-6 text-xs text-gray-400">尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="塔式规划" description={<p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p>} hint={<><p>尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p></>} onAction={startPractice} />
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 

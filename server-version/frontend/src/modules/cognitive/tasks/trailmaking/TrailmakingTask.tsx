@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { trailmakingSequence, type TrailmakingItemSpec } from '../shared/prng'
@@ -191,13 +192,7 @@ export const TrailmakingTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">Trail Making 视觉搜索与切换</h1>
-        <p className="mb-3 text-gray-600">A 部分按 1 → 2 → 3 的顺序选择数字；B 部分按 1 → A → 2 → B 的顺序交替选择数字和字母。可点击目标，或用 Tab 定位后按 Enter / 空格选择。</p>
-        <p className="mb-3 text-sm text-gray-600">本次包含 A 部分 {partAItemCount} 个目标{form === 'AB' ? `、B 部分 ${partBItemCount} 个目标` : '，不包含 B 部分'}。每一步有 {stepTimeoutMs / 1000} 秒作答时间。</p>
-        <p className="mb-6 text-xs text-gray-400">练习至少完成 3 / 4；练习不计入正式结果。动作速度、设备和指针方式可能影响完成时间。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="Trail Making 视觉搜索与切换" description={<p>A 部分按 1 → 2 → 3 的顺序选择数字；B 部分按 1 → A → 2 → B 的顺序交替选择数字和字母。可点击目标，或用 Tab 定位后按 Enter / 空格选择。</p>} hint={<><p>本次包含 A 部分 {partAItemCount} 个目标{form === 'AB' ? `、B 部分 ${partBItemCount} 个目标` : '，不包含 B 部分'}。每一步有 {stepTimeoutMs / 1000} 秒作答时间。</p><p>练习至少完成 3 / 4；练习不计入正式结果。动作速度、设备和指针方式可能影响完成时间。</p></>} onAction={startPractice} />
     )
   }
 

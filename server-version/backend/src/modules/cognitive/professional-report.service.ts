@@ -5,6 +5,13 @@ import { FORBIDDEN } from './cognitive.errors'
 import { decryptCognitivePayload } from './cognitive.security'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
+import { createHash } from 'crypto'
+
+/** A report-scoped pseudonym of a random session ID, stable across pagination
+ * and key rotation. Never expose participant/user/session IDs or join persons. */
+const reportReference = (assignmentId: string, sessionId: string): string => `CR-${createHash('sha256')
+  .update('cognitive-report-reference:v1\0').update(assignmentId).update('\0').update(sessionId)
+  .digest('hex').slice(0, 24).toUpperCase()}`
 
 /** Read the persisted presentation only. No rescoring, raw submissions or research expansion. */
 export async function listProfessionalReports(input: { userId: string; role: UserRole; assignmentId: string; offset: number }) {
@@ -14,15 +21,17 @@ export async function listProfessionalReports(input: { userId: string; role: Use
   const [total, sessions] = await Promise.all([
     prisma.cognitiveSession.count({ where }),
     prisma.cognitiveSession.findMany({ where, orderBy: [{ finishedAt: 'desc' }, { id: 'desc' }], skip: input.offset, take: 10,
-      select: { attemptNo: true, compositeAttemptId: true, resultSnapshotEncrypted: true } }),
+      select: { id: true, finishedAt: true, attemptNo: true, compositeAttemptId: true, resultSnapshotEncrypted: true } }),
   ])
   const records = []
   for (let index = 0; index < sessions.length; index++) {
     const session = sessions[index]
     if (session.compositeAttemptId && await isRelationalCohortOnlyCompositeAttempt(session.compositeAttemptId)) continue
-    const label = `记录 ${input.offset + index + 1} · 尝试 ${session.attemptNo}`
+    const reportId = reportReference(assignment.id, session.id)
+    const metadata = { reportId, finishedAt: session.finishedAt?.toISOString() ?? null }
+    const label = `${reportId} · 尝试 ${session.attemptNo}`
     if (!session.resultSnapshotEncrypted) {
-      records.push({ label, report: null, references: [], unavailableReason: '历史格式未保存版本化报告，请使用原有授权导出入口。' })
+      records.push({ ...metadata, label, report: null, references: [], unavailableReason: '历史格式未保存版本化报告，请使用原有授权导出入口。' })
       continue
     }
     try {
@@ -33,10 +42,10 @@ export async function listProfessionalReports(input: { userId: string; role: Use
         || !['interpretable', 'limited', 'invalid'].includes(String(report.qualityState))
         || typeof report.conclusion !== 'string' || typeof report.disclaimer !== 'string' || !Array.isArray(report.practicalTips)) throw new Error('Unsupported frozen report shape')
       const allowedKeys = new Set([...report.headline, ...report.user, ...report.detail].map(metric => metric.key))
-      records.push({ label, report, references: result.quality.state === 'invalid' ? [] : (result.references ?? []).filter(reference => allowedKeys.has(reference.metricKey)), unavailableReason: null })
+      records.push({ ...metadata, finishedAt: result.completedAt, label, report, references: result.quality.state === 'invalid' ? [] : (result.references ?? []).filter(reference => allowedKeys.has(reference.metricKey)), unavailableReason: null })
     } catch {
       // An unreadable record must not abort other reports or be replaced with live registry content.
-      records.push({ label, report: null, references: [], unavailableReason: '冻结报告暂不可读，请核查记录完整性；未重算或补值。' })
+      records.push({ ...metadata, label, report: null, references: [], unavailableReason: '冻结报告暂不可读，请核查记录完整性；未重算或补值。' })
     }
   }
   return { assignmentId: assignment.id, assignmentTitle: assignment.title, total, offset: input.offset,

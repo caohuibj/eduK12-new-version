@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { CognitiveV2Report } from './types'
 import CognitiveReportVisual from './CognitiveReportVisual'
+import CognitiveReportRecord from './CognitiveReportRecord'
 import './cognitive-report-reading.css'
 import './cognitive-report-audiences.css'
 
@@ -28,26 +29,36 @@ function ProcessDiagram({ scene, step }: { scene: string; step: number }) {
   </svg>
 }
 
-export default function CognitiveMagazineReport({ report, attemptNo, finishedAt }: { report: CognitiveV2Report; attemptNo?: number; finishedAt?: string | null }) {
+export default function CognitiveMagazineReport({ report, references = [], attemptNo, finishedAt, anonymousCode }: { report: CognitiveV2Report; references?: Array<Record<string, unknown>>; attemptNo?: number; finishedAt?: string | null; anonymousCode?: string | null }) {
   const id = useId()
   const reading = report.reading!
   const popular = reading.popular!
   const state = reading.interpretation.state
-  const metrics = [...report.headline, ...report.user]
+  const allowed = (key: string) => !reading.interpretation.withheldMetricKeys.includes(key)
+  const metrics = [...report.headline, ...report.user].filter(metric => allowed(metric.key))
+  const primaryKeys = new Set(metrics.map(metric => metric.key))
+  const details = [...new Map(report.detail.filter(metric => allowed(metric.key) && !primaryKeys.has(metric.key)).map(metric => [metric.key, metric])).values()]
+  const visibleKeys = new Set([...metrics, ...details].map(metric => metric.key))
+  const referenceRows = report.qualityState === 'invalid' ? [] : references.filter(reference => typeof reference.metricKey === 'string' && visibleKeys.has(reference.metricKey))
   const limitations = state === 'withheld' ? '这次先保留记录，不急着下结论' : state === 'qualified' ? '这次记录有些情况，需要一起看' : '你这次留下的记录'
   return <article className="cognitive-reading cognitive-magazine" aria-label={`${report.title}科普报告`}>
     <header className="cognitive-magazine__masthead"><strong>认知探索 <span>COGNITIVE NOTES</span></strong><span>个体报告 · {report.title}{attemptNo != null ? ` · 第 ${attemptNo} 次` : ''}</span></header>
     <div className="cognitive-magazine__body">
+      <CognitiveReportRecord anonymousCode={anonymousCode} finishedAt={finishedAt} />
       <div className="cognitive-magazine__cover"><p className="cognitive-magazine__eyebrow">一次作答，一次关于自己的发现</p><h1>{reading.title}</h1><p>{popular.takeaway}</p><button type="button" onClick={() => window.print()} data-report-screen-only>打印这份报告</button></div>
       <section className={`cognitive-magazine__result cognitive-magazine__result--${state}`} aria-label="本次反馈"><p className="cognitive-magazine__eyebrow">{limitations}</p><h2>{state === 'withheld' ? '有些关键记录还不够完整。这次先保留尝试，再看看任务操作和作答环境。' : reading.feedback.summary}</h2>{state !== 'available' && reading.interpretation.reasons.length > 0 && <p>需要一起看：{reading.interpretation.reasons.join('、')}。这不能说明原因，更不代表你有某种问题。</p>}</section>
       <p className="cognitive-magazine__scope" role="note">{report.method.profile === 'experience' ? '本次是简短体验，记录较少，只用于理解这次任务。' : ''}这是一份关于本次作答的记录，不是给你定级。同龄人排名、诊断和职业适合度，都不能由这个小任务得出。</p>
       {metrics.length > 0 && <section className="cognitive-magazine__metrics" aria-label="本次记录">{metrics.map(metric => <div key={metric.key}><p>{popular.metricHelp[metric.key]?.label ?? metric.participantLabel ?? metric.label}</p><strong>{metric.formatted}</strong><p>{popular.metricHelp[metric.key]?.explanation ?? metric.explanation}</p></div>)}</section>}
       <section className="cognitive-magazine__concept" aria-labelledby={`${id}-concept`}><p className="cognitive-magazine__eyebrow">概念小读本</p><h2 id={`${id}-concept`}>{popular.conceptTitle}</h2><p>{popular.concept}</p><ol className="cognitive-magazine__story">{popular.frames.map((frame, index) => <li key={frame.title}><ProcessDiagram scene={popular.scene} step={index} /><div><span>0{index + 1}</span><h3>{frame.title}</h3><p>{frame.text}</p></div></li>)}</ol><p className="cognitive-magazine__diagram-note">图解解释任务过程，与你的分数或能力等级无关。</p></section>
       {reading.visuals.length > 0 && <section aria-label="作答记录图"><p className="cognitive-magazine__eyebrow">回到你的这次作答</p>{reading.visuals.map((visual, index) => <CognitiveReportVisual visual={visual} key={`${visual.kind}-${index}`} />)}</section>}
+      {(details.length > 0 || referenceRows.length > 0) && <details className="cognitive-magazine__details"><summary>进一步看这次记录</summary><p>这里补充本次已允许查看的记录。它们描述任务中的不同环节，不代表能力等级；先结合记录数量和作答条件一起看。</p>
+        {details.length > 0 && <dl className="cognitive-magazine__detail-metrics">{details.map(metric => <div key={metric.key}><dt>{popular.metricHelp[metric.key]?.label ?? metric.participantLabel ?? metric.label}</dt><dd><strong>{metric.formatted}</strong><p>{popular.metricHelp[metric.key]?.explanation ?? metric.explanation}</p></dd></div>)}</dl>}
+        {referenceRows.length > 0 && <section aria-label="本次参考说明"><h3>本次参考说明</h3>{referenceRows.map((reference, index) => <p key={index}>{String(reference.label ?? '参考说明')}：{String(reference.status === 'available' ? reference.disclaimer ?? '按本次记录的适用范围阅读。' : reference.unavailableReason ?? reference.disclaimer ?? '本次未使用该参考。')}</p>)}</section>}
+      </details>}
       <aside className="cognitive-magazine__example"><p className="cognitive-magazine__eyebrow">认知与日常</p><h2>{popular.exampleTitle}</h2><p>{popular.example}</p><small>{popular.boundary}</small></aside>
       <div className="cognitive-magazine__closing"><section><p className="cognitive-magazine__eyebrow">带走一句话</p><blockquote>{popular.takeaway}</blockquote><p>一次记录，帮助你理解过程；认识自己，需要更多情境和时间。</p></section><section><h2>接下来，可以这样做</h2><p>{reading.feedback.nextStep}</p></section></div>
-      <details className="cognitive-magazine__notes"><summary>查看本次任务的阅读说明</summary><p>设备、操作方式、任务理解和当时状态可能影响记录。</p>{reading.caveats.map(caveat => <p key={caveat}>{caveat}</p>)}<p>呈现 {reading.presentationVersion} · 报告规则 {reading.reportVersion}{finishedAt && Number.isFinite(Date.parse(finishedAt)) ? ` · 完成于 ${new Date(finishedAt).toLocaleString('zh-CN')}` : ''}</p></details>
-      <section className="cognitive-magazine__print-notes"><h2>本次记录的阅读依据</h2><p>设备、操作方式、任务理解和当时状态可能影响记录。</p>{reading.caveats.map(caveat => <p key={caveat}>{caveat}</p>)}<p>呈现 {reading.presentationVersion} · 报告规则 {reading.reportVersion}</p></section>
-    </div><footer className="cognitive-magazine__footer">认知探索 · 用科学的眼光，读懂这一次</footer>
+      <details className="cognitive-magazine__notes"><summary>查看本次任务的阅读说明</summary><p>设备、操作方式、任务理解和当时状态可能影响记录。</p>{reading.caveats.map(caveat => <p key={caveat}>{caveat}</p>)}<p>呈现 {reading.presentationVersion} · 报告规则 {reading.reportVersion}</p></details>
+      <section className="cognitive-magazine__print-notes"><h2>本次记录的阅读依据</h2><p>设备、操作方式、任务理解和当时状态可能影响记录。</p>{reading.caveats.map(caveat => <p key={caveat}>{caveat}</p>)}<p>呈现 {reading.presentationVersion} · 报告规则 {reading.reportVersion}</p><footer className="cognitive-magazine__footer">认知探索 · 用科学的眼光，读懂这一次</footer></section>
+    </div><footer className="cognitive-magazine__footer" data-report-screen-only>认知探索 · 用科学的眼光，读懂这一次</footer>
   </article>
 }

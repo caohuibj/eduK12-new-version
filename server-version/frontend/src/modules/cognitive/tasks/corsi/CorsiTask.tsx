@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
@@ -220,12 +221,7 @@ export const CorsiTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">Corsi 方块广度</h2>
-        <p className="text-gray-600 mb-4">方块会依次亮起，请按同样顺序点击。</p>
-        <p className="text-xs text-gray-400 mb-6">练习不计入正式成绩，未通过可以重练。</p>
-        <button className="btn-primary" onClick={startPractice}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="Corsi 方块广度" description={<p>方块会依次亮起，请按同样顺序点击。</p>} hint={<><p>练习不计入正式成绩，未通过可以重练。</p></>} onAction={startPractice} />
     )
   }
 

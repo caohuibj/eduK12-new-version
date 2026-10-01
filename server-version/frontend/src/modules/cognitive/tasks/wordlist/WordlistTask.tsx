@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { normalizeWordlistResponse } from './wordlist.utils'
@@ -216,12 +217,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">中文词表自由回忆</h1>
-        <p className="mb-3 text-gray-600">请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。</p>
-        <p className="mb-6 text-xs text-gray-400">练习需要至少 3 / 4 轮达到基本熟悉；正式结果只描述本次作答，不进行繁简转换、同义词匹配或模糊纠错。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="中文词表自由回忆" description={<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。</p>} hint={<><p>练习需要至少 3 / 4 轮达到基本熟悉；正式结果只描述本次作答，不进行繁简转换、同义词匹配或模糊纠错。</p></>} onAction={startPractice} />
     )
   }
 

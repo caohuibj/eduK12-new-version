@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { pairedAssociateSet } from '../shared/prng'
@@ -114,7 +115,7 @@ export const PairedassociateTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     setPracticeIndex((value) => value + 1); resetRecall(); setPhase('practice-study')
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">图形—位置配对学习</h2><p className="mb-2 text-gray-600">记住每个抽象图形所在的位置，随后为每个图形选择原位置。</p><p className="mb-2 text-xs text-gray-400">本任务依赖视觉辨认图形；练习至少答对 3 / 4。</p><p className="mb-6 text-xs text-gray-400">练习不计分。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="图形—位置配对学习" description={<p>记住每个抽象图形所在的位置，随后为每个图形选择原位置。</p>} hint={<><p>本任务依赖视觉辨认图形；练习至少答对 3 / 4。</p><p>练习不计分。</p></>} onAction={startPractice} />
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
   if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现配对的情况下再次作答。</p></div>

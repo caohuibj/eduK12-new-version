@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { reversallearningSequence, type ReversallearningTrialSpec } from '../shared/prng'
@@ -147,12 +148,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">概率反馈与规则反转</h1>
-        <p className="mb-3 text-gray-600">每个试次请选择左侧或右侧符号，并根据反馈逐渐发现当前规则。规则会在中途反转。</p>
-        <p className="mb-6 text-xs text-gray-400">练习至少完成 3 / 4；练习不计入正式结果。结果不用于人格或风险判断。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="概率反馈与规则反转" description={<p>每个试次请选择左侧或右侧符号，并根据反馈逐渐发现当前规则。规则会在中途反转。</p>} hint={<><p>练习至少完成 3 / 4；练习不计入正式结果。结果不用于人格或风险判断。</p></>} onAction={startPractice} />
     )
   }
 
