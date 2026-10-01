@@ -1,0 +1,920 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "domain_fixed_mindset_mathematics_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "RESEARCH_READY",
+    "identity": {
+      "canonicalName": "学科固定心态｜数学",
+      "abbreviation": "DFM-3",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学科固定心态；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain_fixed_mindset",
+        "mathematics",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "精确历史版本，科研用途限已确认项目范围；非全国常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "domain_fixed_mindset-junior_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "数学 junior_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=737; complete-case alpha=0.9000, alpha N=730; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'2': ['d2_mminddom1', 'd2_mminddom2', 'd2_mminddom3'], '3': ['d3_mminddom1', 'd3_mminddom2', 'd3_mminddom3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      },
+      {
+        "evidenceId": "domain_fixed_mindset-upper_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "数学 upper_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=702; complete-case alpha=0.9251, alpha N=702; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'2': ['d2_mminddom1', 'd2_mminddom2', 'd2_mminddom3'], '3': ['d3_mminddom1', 'd3_mminddom2', 'd3_mminddom3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Verified canonical exact Chinese questionnaire",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "COMPLETED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "domain_fixed_mindset-junior_secondary-exact-audit",
+      "domain_fixed_mindset-upper_secondary-exact-audit"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mathematics",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "学科固定心态／数学／项目中文版本",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有点同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "每个人的数学学习天赋是大致确定的，很难改变",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "每个人的数学学习天赋不可能改变很多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "每个人都能够学会新的数学知识，但是不能改变本来的数学学习天赋",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "domain_fixed_mindset",
+            "type": "total",
+            "label": "学科天赋固定信念",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 2
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "domain_fixed_mindset"
+        ],
+        "scoreOrder": [
+          "domain_fixed_mindset"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "domain_fixed_mindset",
+            "headline": "我怎样看学科天赋",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对数学学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "你较少把数学学习看成天生定好的事",
+                "summary": "你可能更愿意相信，一个人学数学的表现能随着学习经历改变。遇到难题时，你未必马上想到“我天生不适合”，而是比较容易想到还可以学什么、试什么。\n\n这是一种关于能力会不会改变的想法，不是你的成绩证明，也不是说只要努力就一定能达到任何目标。时间、方法、基础和支持都会影响结果。如果一直练却没有进展，可以调整方法，而不必把责任全压在“还不够努力”上。能改变的空间，最好通过一个具体的小问题来观察。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你说“练一练就能好”时，有没有一个明确的练法？如果没进展，你会换方法还是只加时间？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "挑一类经常错的题，只改一个学习方法，比如先画图或先口头解释。练三次后比较错误在哪里变少，再决定保留或换方法。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你通常不太愿意用“天赋”给自己下结论",
+                "summary": "学习数学时，你可能不太认同“天赋一开始就定好了”。你愿意给学习和练习留一些空间，不过看到别人做得特别快，或者自己连续卡住时，也可能还是会有点怀疑。\n\n这份结果描述的是你对能力能不能改变的想法，没有把你分成某种固定的人。愿意相信变化，是一个起点；接下来更有用的是找到变化可能发生在哪一步。既不用跟别人的进度证明自己，也不用在没有帮助的情况下一个人撑着。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你觉得可以进步的地方，是速度、知识理解还是做题方法？哪一项最近最有证据？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "找一个以前不会、现在会的步骤，写下中间做了什么；把其中一个办法用到这周的新问题上，看看是否也有效。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你对“学科天赋能不能改变”可能有点拿不准",
+                "summary": "有时你可能觉得数学学得好靠练习，有时又觉得有些人就是天生擅长。顺利时愿意相信自己能进步，连续失败时又觉得“可能就这样了”，这两种想法可能轮流出现。\n\n这个分数没有判断哪一种想法永远属于你，也没测出你的天赋。与其急着选一边，可以看一个具体过程：同一类困难，在得到讲解、换过方法、练习之后有没有变化。如果暂时没变，也可以继续查找条件和帮助，而不是马上给整个人定一个上限。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "什么经历最容易让你觉得“能力定好了”？那时你比较的是同一知识基础、同一练习机会吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个小知识点，用同一种小测记下现在能做什么。换一种讲解或获得提示，隔几天再试；只比较自己的这个具体步骤。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "遇到困难时，你可能比较容易想到“这是天赋的问题”",
+                "summary": "学数学卡住时，你可能较容易认为，有些人就是天生能学好，自己再练也很难变多少。这个想法有时会让继续尝试显得不太值得，也可能让一次失误变成对整门课的结论。\n\n这份作答记录了这种想法的强度，没有证明它就是事实。一次练习没效果，也可能与方法、先前知识或反馈有关。你不用马上否认自己的感受，可以先把“天赋不行”拆成一个能检查的问题。只有看清具体卡点，才知道有没有不同的办法可试。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "最近一次想到“我没天赋”，你在哪一步卡住？当时有没有得到针对那一步的解释？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个卡点，请老师用另一种方式讲一次。随后做一道同类但没看过答案的题，比较哪一步改变了；先检验办法，不急着检验“天赋”。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你可能很认同“数学天赋很难改变”",
+                "summary": "你可能比较坚定地觉得，数学学得好不好与天赋有关，而且这种天赋很难改变。如果最近接连受挫，继续投入可能让你觉得没有把握；如果一直学得顺，也可能担心失败会说明自己其实没那么擅长。\n\n这里测的是你对天赋的看法，不是系统发现了你的能力上限。你无需一次改变整个观点。可以只留一个小例外：在足够具体的问题上，得到提示或换一种方法后，表现会不会不同。这个小尝试的目的，是给判断多一点事实，而不是要求你证明自己。\n\n比如做函数题时，是看不懂图像、列不出关系式，还是计算时漏了一个符号？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "这个想法是来自长期经历，还是最近几次考试？如果某一步学会了，你会把它算作变化吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "与老师一起选一个十分钟能练的小步骤，先做一次，再获得具体反馈后做一次。只记录这个步骤发生了什么，不用给整门课或整个人打分。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次数学课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "domain_fixed_mindset",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "normative_distribution"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "domain_fixed_mindset_mathematics_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "domain_fixed_mindset",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "数学／初中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 737
+            },
+            "statistics": {
+              "mean": 2.86341022,
+              "sd": 1.36185802,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 7.53052917
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 16.14654003
+                },
+                {
+                  "score": 1.5,
+                  "percentile": 17.36770692
+                },
+                {
+                  "score": 1.66666667,
+                  "percentile": 18.79240163
+                },
+                {
+                  "score": 2,
+                  "percentile": 29.51153324
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 41.04477612
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 46.81139756
+                },
+                {
+                  "score": 3,
+                  "percentile": 57.9375848
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 68.385346
+                },
+                {
+                  "score": 3.5,
+                  "percentile": 71.50610583
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 74.08412483
+                },
+                {
+                  "score": 4,
+                  "percentile": 80.18995929
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 85.41383989
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 87.92401628
+                },
+                {
+                  "score": 5,
+                  "percentile": 91.24830393
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 94.09769335
+                },
+                {
+                  "score": 6,
+                  "percentile": 97.28629579
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "mathematics",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "mathematics-junior_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少认同天赋固定",
+                  "lower": 1,
+                  "upper": 1.16666667,
+                  "sampleN": 111
+                },
+                {
+                  "key": "low",
+                  "label": "不太认同天赋固定",
+                  "lower": 1.16666667,
+                  "upper": 2.16666667,
+                  "sampleN": 176
+                },
+                {
+                  "key": "middle",
+                  "label": "对天赋变化有些犹豫",
+                  "lower": 2.16666667,
+                  "upper": 3.41666667,
+                  "sampleN": 239
+                },
+                {
+                  "key": "high",
+                  "label": "比较认同天赋固定",
+                  "lower": 3.41666667,
+                  "upper": 4.83333333,
+                  "sampleN": 129
+                },
+                {
+                  "key": "very_high",
+                  "label": "很认同天赋固定",
+                  "lower": 4.83333333,
+                  "upper": 6,
+                  "sampleN": 82
+                }
+              ],
+              "sampleN": 737,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0,
+                "floor": 0.15061058,
+                "ceiling": 0.05427408,
+                "skew": 0.55438304,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "debb364b92b5bee93bbf4941971231440576b1837ffa575db882dad99de2abf4"
+            }
+          },
+          {
+            "scoreKey": "domain_fixed_mindset",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "数学／高中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 702
+            },
+            "statistics": {
+              "mean": 3.0954416,
+              "sd": 1.34901905,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 6.33903134
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 13.96011396
+                },
+                {
+                  "score": 1.66666667,
+                  "percentile": 16.66666667
+                },
+                {
+                  "score": 2,
+                  "percentile": 23.07692308
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 30.62678063
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 35.8974359
+                },
+                {
+                  "score": 3,
+                  "percentile": 46.93732194
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 59.25925926
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 66.45299145
+                },
+                {
+                  "score": 4,
+                  "percentile": 75.78347578
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 83.68945869
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 86.3960114
+                },
+                {
+                  "score": 5,
+                  "percentile": 90.45584046
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 93.94586895
+                },
+                {
+                  "score": 5.66666667,
+                  "percentile": 94.51566952
+                },
+                {
+                  "score": 6,
+                  "percentile": 97.36467236
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "mathematics",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "mathematics-upper_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少认同天赋固定",
+                  "lower": 1,
+                  "upper": 1.16666667,
+                  "sampleN": 89
+                },
+                {
+                  "key": "low",
+                  "label": "不太认同天赋固定",
+                  "lower": 1.16666667,
+                  "upper": 2.16666667,
+                  "sampleN": 108
+                },
+                {
+                  "key": "middle",
+                  "label": "对天赋变化有些犹豫",
+                  "lower": 2.16666667,
+                  "upper": 3.83333333,
+                  "sampleN": 292
+                },
+                {
+                  "key": "high",
+                  "label": "比较认同天赋固定",
+                  "lower": 3.83333333,
+                  "upper": 4.83333333,
+                  "sampleN": 124
+                },
+                {
+                  "key": "very_high",
+                  "label": "很认同天赋固定",
+                  "lower": 4.83333333,
+                  "upper": 6,
+                  "sampleN": 89
+                }
+              ],
+              "sampleN": 702,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0,
+                "floor": 0.12678063,
+                "ceiling": 0.05270655,
+                "skew": 0.23300453,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "debb364b92b5bee93bbf4941971231440576b1837ffa575db882dad99de2abf4"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "domain_fixed_mindset": 1
+          },
+          "totalScoreKeys": [
+            "domain_fixed_mindset"
+          ]
+        }
+      },
+      {
+        "name": "all-6",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "domain_fixed_mindset": 6
+          },
+          "totalScoreKeys": [
+            "domain_fixed_mindset"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "domain_fixed_mindset": 2
+          },
+          "totalScoreKeys": [
+            "domain_fixed_mindset"
+          ]
+        }
+      }
+    ]
+  },
+  "scientificReview": {
+    "schemaVersion": 1,
+    "reviewer": "Project owner — confirmed exact-version Wave1 RESEARCH_READY policy",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "approvedMaturity": "RESEARCH_READY",
+    "territory": "CN",
+    "intendedUses": [
+      "RESEARCH"
+    ],
+    "evidenceIds": [
+      "domain_fixed_mindset-junior_secondary-exact-audit",
+      "domain_fixed_mindset-upper_secondary-exact-audit"
+    ],
+    "scopeHash": "d46650f459ab646d8673551cf6174dccc324dd474dc337b4b6b2614a5c84f554"
+  }
+}
