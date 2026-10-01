@@ -128,7 +128,7 @@ export const validateReferenceSetDefinition = (
   if (value.instrumentType !== 'scale' && value.instrumentType !== 'cognitive') issues.push({ path: 'instrumentType', message: 'instrumentType 必须为 scale 或 cognitive', severity: 'error' })
   if (typeof value.instrumentKey !== 'string' || value.instrumentKey.length === 0) issues.push({ path: 'instrumentKey', message: 'instrumentKey 不能为空', severity: 'error' })
   if (typeof value.referenceVersion !== 'string' || value.referenceVersion.length === 0) issues.push({ path: 'referenceVersion', message: 'referenceVersion 不能为空', severity: 'error' })
-  if (value.status !== 'DRAFT' && value.status !== 'ACTIVE' && value.status !== 'RETIRED') issues.push({ path: 'status', message: 'status 不合法', severity: 'error' })
+  if (value.status !== 'DRAFT' && value.status !== 'ACTIVE' && value.status !== 'SUPERSEDED' && value.status !== 'RETIRED') issues.push({ path: 'status', message: 'status 不合法', severity: 'error' })
   if (!Array.isArray(value.entries) || value.entries.length === 0) issues.push({ path: 'entries', message: '至少需要一条 reference entry', severity: 'error' })
   const entries = Array.isArray(value.entries) ? value.entries : []
   const seen = new Set<string>()
