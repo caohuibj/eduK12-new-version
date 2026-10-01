@@ -10,6 +10,7 @@ import { assertRowMatchesSnapshot } from './situational-runtime.service'
 import { parseSituationalRawSubmissionPayload } from './situational-raw-submission'
 import { assignedSituationalDefinition, deriveSituationalAssignment } from './situation-assignment'
 import { deriveAuthoritativeSituationalTrajectory } from './situation-trajectory'
+import { situationalResponseHistoryIdentities } from './situation-research-capture'
 import { MISSINGNESS_REASONS } from './situation-scientific-contract'
 
 /** Exact resource grants must be configured after research approval.
@@ -52,16 +53,20 @@ export function buildSituationalResearchArtifact(input: {
   const trajectory = deriveAuthoritativeSituationalTrajectory(definition, raw.responses)
   const reached = new Set(trajectory.sceneKeys), answered = new Map(raw.responses.map(r => [`${r.sceneKey}:${r.channelKey}`, r]))
   const rawResponses = raw.responses.map(r => ({ sceneKey: r.sceneKey, channelKey: r.channelKey, responseValue: r.responseValue, ...(r.responseTimeMs === undefined ? {} : { responseTimeMs: r.responseTimeMs }), ...(r.historyIdentity ? { historyIdentity: r.historyIdentity } : {}), ...(r.responseRevision ? { responseRevision: r.responseRevision } : {}) }))
+  const histories = situationalResponseHistoryIdentities(definition, raw.responses)
   const opportunities = snapshot.definition.scenes.flatMap(scene => scene.channels.map(channel => {
     const node = snapshot.definition.schemaVersion === 2 ? snapshot.definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
     const pair = `${scene.sceneKey}:${channel.channelKey}`, value = answered.get(pair)
     const planned = node && assignment.selections.some(s => s.nodeKey === node.nodeKey && s.omittedChannelKeys.includes(channel.channelKey))
     const events = raw.researchCapture?.events.filter(e => e.nodeKey === node?.nodeKey && e.channelKey === channel.channelKey && (e.type === 'RESPONSE_FIRST_COMMITTED' || e.type === 'RESPONSE_CHANGED')) ?? []
+    const firstCurrent = events.find(e => e.historyIdentity === histories.get(scene.sceneKey))
+    const invalidated = raw.researchCapture?.events.filter(e => e.nodeKey === node?.nodeKey && e.channelKey === channel.channelKey && e.type === 'RESPONSE_INVALIDATED') ?? []
+    const historicalOnly = events.length > 0 && !firstCurrent
     return { sceneKey: scene.sceneKey, nodeKey: node?.nodeKey ?? null, channelKey: channel.channelKey,
-      finalResponse: value?.responseValue ?? null, firstEverResponse: events[0]?.responseValue ?? null, firstResponse: events.find(e => e.historyIdentity === value?.historyIdentity)?.responseValue ?? null,
-      firstResponseStatus: raw.researchCapture ? events.length ? 'RECORDED' : 'NOT_ANSWERED' : 'LEGACY_NOT_CAPTURED',
-      missingness: value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? 'PARTICIPANT_SKIPPED',
-      invalidatedHistoricalResponses: raw.researchCapture?.events.filter(e => e.nodeKey === node?.nodeKey && e.channelKey === channel.channelKey && e.type === 'RESPONSE_INVALIDATED').length ?? 0,
+      finalResponse: value?.responseValue ?? null, firstEverResponse: events[0]?.responseValue ?? null, firstResponse: firstCurrent?.responseValue ?? null,
+      firstResponseStatus: raw.researchCapture ? firstCurrent ? 'RECORDED' : 'NOT_ANSWERED' : 'LEGACY_NOT_CAPTURED',
+      missingness: value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? (historicalOnly || invalidated.length ? 'INVALIDATED_BY_HISTORY_CHANGE' : 'PARTICIPANT_SKIPPED'),
+      invalidatedHistoricalResponses: invalidated.length,
       eligibility: reached.has(scene.sceneKey) && !planned,
     }
   }))
