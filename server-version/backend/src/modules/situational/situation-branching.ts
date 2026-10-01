@@ -1,8 +1,11 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { responseStageSchema, researchAssignmentSchema } from './situation-scientific-contract'
+import { validateSituationalScientificDesign } from './situation-scientific-validation'
 import {
   runnerSituationDefinition,
   situationDefinitionSchema,
+  situationalMeasurementSceneSchema,
   situationalOpaqueKeySchema,
   validateSituationDefinition,
   type DefinitionIssue,
@@ -15,7 +18,7 @@ import {
  * published V1 scientific channel schema. Omitted policy preserves the V2-C
  * contract: channels are required and scored.
  */
-export const situationalMeasurementRoleSchema = z.enum(['SCORED', 'ROUTING_ONLY'])
+export const situationalMeasurementRoleSchema = z.enum(['SCORED', 'ROUTING_ONLY', 'RAW_ONLY', 'DESCRIPTIVE'])
 export type SituationalMeasurementRole = z.infer<typeof situationalMeasurementRoleSchema>
 
 export const situationalInteractionRoleSchema = z.enum(['DECISION', 'DIAGNOSTIC'])
@@ -25,6 +28,7 @@ export const situationalBranchChannelPolicySchema = z.object({
   channelKey: situationalOpaqueKeySchema,
   measurementRole: situationalMeasurementRoleSchema.optional(),
   required: z.boolean().optional(),
+  interactionRole: situationalInteractionRoleSchema.optional(),
 }).strict()
 export type SituationalBranchChannelPolicy = z.infer<typeof situationalBranchChannelPolicySchema>
 
@@ -65,6 +69,8 @@ export const situationalBranchSceneNodeSchema = z.object({
    * is frozen definition metadata, never a mutable server-side round state.
    */
   channelPolicies: z.array(situationalBranchChannelPolicySchema).optional(),
+  responseStages: z.array(responseStageSchema).min(1).max(6).optional(),
+  stimulusVariants: z.array(z.object({ variantKey: situationalOpaqueKeySchema, compatibilityGroup: situationalOpaqueKeySchema, stimulus: z.object({ type: z.literal('TEXT_V1'), text: z.string().trim().min(1).max(16000) }).strict() }).strict()).max(8).optional(),
   transition: z.union([
     situationalNextTransitionSchema,
     situationalDecisionTransitionSchema,
@@ -107,8 +113,10 @@ export const situationalBranchSamplingSchema = z.object({
  */
 export const situationDefinitionV2Schema = situationDefinitionSchema.extend({
   schemaVersion: z.literal(2),
+  scenes: z.array(situationalMeasurementSceneSchema).min(1).max(120),
   sampling: situationalBranchSamplingSchema,
   flow: situationalBranchFlowSchema,
+  researchAssignment: researchAssignmentSchema.optional(),
 })
 export type SituationDefinitionV2 = z.infer<typeof situationDefinitionV2Schema>
 
@@ -201,8 +209,12 @@ export const validateBranchingSituationDefinition = (
   }
 
   const definition = parsed.data
-  const commonValidation = validateSituationDefinition(asScoredV1Definition(definition), options)
-  const issues: DefinitionIssue[] = [...commonValidation.issues]
+  const commonValidation = validateSituationDefinition(asScoredV1Definition(definition), { ...options, allowMeasurementBundle: true })
+  // Expert models own construct × response mappings; retain common report/media/identity gates.
+  if (definition.scoring.model && definition.scoring.model.modelKey !== 'PROVISIONAL_SCALAR') {
+    commonValidation.issues = commonValidation.issues.filter(i => !(i.path.startsWith('scoring.choiceScores') || i.path.startsWith('scoring.publishedMetrics') && !i.path.endsWith('.key') || /scenes\.\d+\.channels/.test(i.path)))
+  }
+  const issues: DefinitionIssue[] = [...commonValidation.issues, ...validateSituationalScientificDesign(definition)]
   const nodeIndexByKey = new Map<string, number>()
   const nodeByKey = new Map<string, SituationalBranchFlowNode>()
   const sceneNodeIndexBySceneKey = new Map<string, number>()
@@ -226,7 +238,7 @@ export const validateBranchingSituationDefinition = (
         issues.push(issue(`scenes.${sceneIndex}.channels.${channelIndex}.channelKey`, `同一场景内通道不能重复：${channel.channelKey}`))
       }
       channelKeys.add(channel.channelKey)
-      if (!declaredConstructs.has(channel.scoredConstruct)) {
+      if (channel.scoredConstruct && !declaredConstructs.has(channel.scoredConstruct)) {
         issues.push(issue(
           `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
           `通道构念 ${channel.scoredConstruct} 未在场景 primary/secondary constructs 中声明`,
@@ -322,7 +334,7 @@ export const validateBranchingSituationDefinition = (
           `channel policy 引用了不存在的场景通道：${node.sceneKey}:${policy.channelKey}`,
         ))
       }
-      if (policy.measurementRole === 'ROUTING_ONLY') {
+      if (policy.measurementRole && policy.measurementRole !== 'SCORED') {
         const hasContribution = definition.scoring.choiceScores.some((entry) => (
           entry.sceneKey === node.sceneKey && entry.channelKey === policy.channelKey
         ))
@@ -535,6 +547,7 @@ export const runnerBranchingSituationDefinition = (definition: SituationDefiniti
               roundKey: node.roundKey,
               stepKey: node.stepKey,
               ...(node.interactionRole ? { interactionRole: node.interactionRole } : {}),
+              ...(node.responseStages ? { responseStages: node.responseStages } : {}),
               transition: node.transition.type === 'NEXT'
                 ? { type: 'NEXT' as const, nextNodeKey: node.transition.nextNodeKey }
                 : {

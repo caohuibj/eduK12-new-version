@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { measurementBundleSchema, optionEvidenceSchema, scoringModelSchema } from './situation-scientific-contract'
 import type { AssessmentAssetIdentityV1 } from '../assessment-media/assessment-asset-identity'
 import {
   ASSESSMENT_STATIC_IMAGE_MIME_TYPES,
@@ -68,6 +69,8 @@ export const situationalPurposeSchema = z.enum([
   'APPRAISAL',
   'NORM_JUDGMENT',
   'CONFIDENCE',
+  'PROFESSIONAL_JUDGMENT', 'SELF_EFFICACY', 'ROLE_LEGITIMACY',
+  'FELT_RESPONSIBILITY', 'STATE_EMOTION', 'SOCIAL_PERCEPTION',
 ])
 export type SituationalPurpose = z.infer<typeof situationalPurposeSchema>
 
@@ -133,6 +136,7 @@ export const situationDefinitionAssetReferences = (definition: SituationDefiniti
 const choiceOptionSchema = z.object({
   optionKey: situationalOpaqueKeySchema,
   label: z.string().min(1),
+  evidence: optionEvidenceSchema.optional(),
 })
 export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
 
@@ -151,7 +155,7 @@ export const situationalChannelSchema = z.discriminatedUnion('responseType', [
     channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('SINGLE_CHOICE'),
-    scoredConstruct: z.string().min(1),
+    scoredConstruct: z.string().min(1).optional(),
     prompt: z.string().min(1),
     options: z.array(choiceOptionSchema).min(2),
   }),
@@ -159,7 +163,7 @@ export const situationalChannelSchema = z.discriminatedUnion('responseType', [
     channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('CONTINUOUS'),
-    scoredConstruct: z.string().min(1),
+    scoredConstruct: z.string().min(1).optional(),
     prompt: z.string().min(1),
     /** Explicit answer range — the scorer never assumes 0–100. */
     range: z.object({
@@ -187,7 +191,9 @@ export const situationalSceneSchema = z.object({
   /** DIAMONDS-style situation coding metadata (dimension → intensity). */
   situationFeatures: z.record(z.string(), z.number().finite()).default({}),
   channels: z.array(situationalChannelSchema).min(1).max(3),
+  measurementBundle: measurementBundleSchema.optional(),
 })
+export const situationalMeasurementSceneSchema = situationalSceneSchema.extend({ channels: z.array(situationalChannelSchema).min(1).max(6) })
 export type SituationalSceneDefinition = z.infer<typeof situationalSceneSchema>
 
 /**
@@ -258,6 +264,7 @@ export const situationDefinitionSchema = z.object({
   scenes: z.array(situationalSceneSchema).min(1),
   scoring: z.object({
     scoringVersion: z.string().min(1),
+    model: scoringModelSchema.optional(),
     choiceScores: z.array(choiceContributionSchema).default([]),
     publishedMetrics: z.array(situationalMetricDefinitionSchema).min(1),
   }),
@@ -283,6 +290,7 @@ export interface SituationDefinitionValidationOptions {
   forPublish?: boolean
   requireGoldenFixture?: boolean
   hasGoldenFixture?: boolean
+  allowMeasurementBundle?: boolean
 }
 
 const hasText = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
@@ -291,7 +299,8 @@ export const validateSituationDefinition = (
   value: unknown,
   options: SituationDefinitionValidationOptions = {},
 ): { definition?: SituationDefinitionV1; issues: DefinitionIssue[] } => {
-  const parsed = situationDefinitionSchema.safeParse(value)
+  const schema = options.allowMeasurementBundle ? situationDefinitionSchema.extend({ scenes: z.array(situationalMeasurementSceneSchema).min(1) }) : situationDefinitionSchema
+  const parsed = schema.safeParse(value)
   if (!parsed.success) {
     return {
       issues: parsed.error.issues.map((issue) => ({ path: issue.path.join('.') || 'definition', message: issue.message, severity: 'error' })),
@@ -312,6 +321,8 @@ export const validateSituationDefinition = (
       issues.push({ path: `scenes.${sceneIndex}.sortOrder`, message: `场景 sortOrder 不能重复：${scene.sortOrder}`, severity: 'error' })
     }
     sceneSortOrders.add(scene.sortOrder)
+    if (scene.measurementBundle && !options.allowMeasurementBundle) issues.push({ path: `scenes.${sceneIndex}.measurementBundle`, message: 'Measurement bundles require V2', severity: 'error' })
+    if (!scene.measurementBundle && scene.channels.length > 3) issues.push({ path: `scenes.${sceneIndex}.channels`, message: '超过三个响应需要 measurementBundle', severity: 'error' })
     const declaredConstructs = new Set([scene.primaryConstruct, ...scene.secondaryConstructs])
     const channelKeys = new Set<string>()
     scene.channels.forEach((channel, channelIndex) => {
@@ -335,7 +346,7 @@ export const validateSituationDefinition = (
       if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })
       }
-      if (!declaredConstructs.has(channel.scoredConstruct)) {
+      if (!channel.scoredConstruct || !declaredConstructs.has(channel.scoredConstruct)) {
         issues.push({
           path: `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
           message: `计分构念 ${channel.scoredConstruct} 未在场景的 primary/secondary constructs 中声明`,
