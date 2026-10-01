@@ -93,6 +93,49 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "输入归一化只清理 Unicode 格式、空白和标点，并统一英文字母大小写；不做繁简转换、同义词匹配或模糊纠错。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次中文词表的键盘自由回忆表现，不是记忆能力、临床状态或人口常模判断。"
+    "disclaimer": "结果只描述本次中文词表的键盘自由回忆表现，不是记忆能力、临床状态或人口常模判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "这些词，你这次记住了多少？",
+      "introduction": "观察本次学习后的即时回忆记录。",
+      "summary": {
+        "template": "本次即时回忆正确率为 {immediateAccuracy}，即时正确回忆总数为 {totalImmediateCorrect}。",
+        "metricKeys": [
+          "immediateAccuracy",
+          "totalImmediateCorrect"
+        ]
+      },
+      "studentMetricKeys": [
+        "immediateAccuracy",
+        "totalImmediateCorrect",
+        "intrusionCount"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "emptyImmediateRecall"
+      ],
+      "metricGates": {
+        "delayedRecallAccuracy": [
+          "delayedStageIncomplete"
+        ]
+      },
+      "nextStep": "只阅读实际测量的学习与回忆阶段，不推断一般记忆能力。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "immediateAccuracy",
+          "delayedRecallAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "sequence"
+    }
   }
 ]

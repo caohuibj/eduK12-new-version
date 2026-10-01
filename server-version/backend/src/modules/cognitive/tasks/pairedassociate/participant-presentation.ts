@@ -10,6 +10,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "title": "图形—位置配对学习",
     "metrics": {
       "correctByTrial": {
+        "valueUnit": "count",
         "label": "各轮正确数",
         "explanation": "各学习轮次中图形位置配对正确的数量。",
         "singleExplanation": "各学习轮次中图形位置配对正确的数量。"
@@ -73,6 +74,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "学习斜率、达到标准轮次与最终正确率应一起阅读；延迟缺失不按 0 计。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果来自内部非语言配对刺激，不等同 CANTAB PAL、临床记忆判断或人口常模。"
+    "disclaimer": "结果来自内部非语言配对刺激，不等同 CANTAB PAL、临床记忆判断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "一一配对，你记住了多少？",
+      "introduction": "观察本次配对学习与即时测试的记录。",
+      "summary": {
+        "template": "本次即时配对正确率为 {immediateAccuracy}。",
+        "metricKeys": [
+          "immediateAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "immediateAccuracy",
+        "trialsToCriterion"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable"
+      ],
+      "metricGates": {
+        "delayedAccuracy": [
+          "delayedStageIncomplete"
+        ]
+      },
+      "nextStep": "即时记录与延迟测试分开看，不推断没有测量的长期保持。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "immediateAccuracy",
+          "delayedAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "sequence"
+    }
   }
 ]

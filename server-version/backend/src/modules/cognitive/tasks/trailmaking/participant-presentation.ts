@@ -93,6 +93,47 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "累计正确步骤时长应与错误尝试、A/B 部分和设备/指针信息一起阅读；它不是从任务开始到结束的端到端用时。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次视觉搜索、动作速度和规则切换任务表现，不是 motor 能力诊断或人口常模。"
+    "disclaimer": "结果只描述本次视觉搜索、动作速度和规则切换任务表现，不是 motor 能力诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "连成顺序，看看这一次",
+      "introduction": "一起观察完成用时、步骤和错误记录。",
+      "summary": {
+        "template": "本次完成用时为 {completionTimeMs}，错误记录为 {errorCount}。",
+        "metricKeys": [
+          "completionTimeMs",
+          "errorCount"
+        ]
+      },
+      "studentMetricKeys": [
+        "completionTimeMs",
+        "errorCount",
+        "completedStepCount"
+      ],
+      "processMetricKeys": [
+        "completedStepCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedSteps"
+      ],
+      "metricGates": {},
+      "nextStep": "时间与纠错过程一起看；不套用临床判断标准。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "partACompletionTimeMs",
+          "partBCompletionTimeMs"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

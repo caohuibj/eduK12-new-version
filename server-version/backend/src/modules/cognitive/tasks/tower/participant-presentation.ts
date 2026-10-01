@@ -78,6 +78,45 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "解题比例、额外步数和规则违反应分开阅读；首步时长只作方法信息。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只反映本次内部塔式任务表现，不是商业 Tower 测验、计划能力诊断或人口常模。"
+    "disclaimer": "结果只反映本次内部塔式任务表现，不是商业 Tower 测验、计划能力诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "走向目标，你用了几步？",
+      "introduction": "把解决问题与最少步数解法分开阅读。",
+      "summary": {
+        "template": "本次解出比例为 {solveRate}，最少步数解出比例为 {minimumMoveSolveRate}。",
+        "metricKeys": [
+          "solveRate",
+          "minimumMoveSolveRate"
+        ]
+      },
+      "studentMetricKeys": [
+        "solveRate",
+        "minimumMoveSolveRate",
+        "excessMoves"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientAttemptedProblems"
+      ],
+      "metricGates": {},
+      "nextStep": "达到目标与达到最优解是两件事，不直接评价一般规划能力。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "solveRate",
+          "minimumMoveSolveRate"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

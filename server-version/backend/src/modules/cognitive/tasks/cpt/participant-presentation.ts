@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "cpt",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -58,6 +58,45 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "单一反应时不能代表持续注意，请同时看遗漏与误报。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果反映本次持续注意任务表现，不是临床诊断或常模。"
+    "disclaimer": "结果反映本次持续注意任务表现，不是临床诊断或常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "信号不断出现，你找到了多少？",
+      "introduction": "观察这次目标检测中的命中、漏报与误报。",
+      "summary": {
+        "template": "本次目标遗漏比例为 {omissionRate}，非目标误按比例为 {commissionRate}。",
+        "metricKeys": [
+          "omissionRate",
+          "commissionRate"
+        ]
+      },
+      "studentMetricKeys": [
+        "omissionRate",
+        "commissionRate",
+        "dPrime"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientTargets"
+      ],
+      "metricGates": {},
+      "nextStep": "先核对目标规则和作答环境。一次记录不能用于注意力障碍判断。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "omissionRate",
+          "commissionRate"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "signal"
+    }
   }
 ]

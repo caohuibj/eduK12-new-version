@@ -93,6 +93,48 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "结果应结合词长、词频带、反应时下限和遗漏情况阅读；冻结词库与伪词生成器均处于 DRAFT 审查阶段。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次中文真词/伪词判断表现，不是语言能力、阅读能力或临床判断。"
+    "disclaimer": "结果只描述本次中文真词/伪词判断表现，不是语言能力、阅读能力或临床判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "是词还是非词，你如何分辨？",
+      "introduction": "将词与非词的判断记录分开看。",
+      "summary": {
+        "template": "本次词判断正确率为 {accuracyReal}，非词判断正确率为 {accuracyPseudo}。",
+        "metricKeys": [
+          "accuracyReal",
+          "accuracyPseudo"
+        ]
+      },
+      "studentMetricKeys": [
+        "accuracyReal",
+        "accuracyPseudo",
+        "dPrime"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientRealWords",
+        "insufficientPseudoWords"
+      ],
+      "metricGates": {},
+      "nextStep": "区分指标描述当前刺激中的判断，不等于词汇量或阅读等级。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracyReal",
+          "accuracyPseudo"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

@@ -88,6 +88,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "干扰效应必须与两种条件的准确率一起解释，避免速度—准确权衡误读。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果反映本次箭头干扰任务表现，不是临床诊断或人口常模。"
+    "disclaimer": "结果反映本次箭头干扰任务表现，不是临床诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "周围的提示，会怎样影响选择？",
+      "introduction": "对照提示一致与冲突时的记录。",
+      "summary": {
+        "template": "本次两种提示条件的用时差为 {flankerEffectMs}，冲突条件正确率为 {incongruentAccuracy}。",
+        "metricKeys": [
+          "flankerEffectMs",
+          "incongruentAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "flankerEffectMs",
+        "incongruentAccuracy",
+        "congruentAccuracy"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCongruentTrials",
+        "insufficientIncongruentTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "先确认操作规则，再一起阅读用时差与正确率。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "congruentAccuracy",
+          "incongruentAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

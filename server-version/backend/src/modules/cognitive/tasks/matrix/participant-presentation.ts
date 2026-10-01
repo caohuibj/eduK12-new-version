@@ -15,6 +15,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "正确率：正式作答中判断正确的比例。"
       },
       "accuracyByRuleFamily": {
+        "valueUnit": "ratio",
+        "valueLabels": { "progression": "递进规律", "alternation": "交替规律", "combination": "组合规律" },
         "label": "各规则族正确率",
         "explanation": "按图形规则类别分别统计正确率。",
         "singleExplanation": "按图形规则类别分别统计正确率。"
@@ -75,6 +77,41 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "正确率按规则族和难度覆盖一起阅读，不换算 IQ 或智力等级。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。"
+    "disclaimer": "结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "图形有规律，你发现了什么？",
+      "introduction": "观察这次图形规律题的作答记录。",
+      "summary": {
+        "template": "本次图形规律题正确率为 {accuracy}。",
+        "metricKeys": [
+          "accuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "accuracy",
+        "reachedDifficulty"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable"
+      ],
+      "metricGates": {},
+      "nextStep": "题目内容与难度会影响记录；这里不提供智商或一般推理能力等级。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

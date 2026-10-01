@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "bart",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -40,11 +40,57 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "Adjusted pumps、爆破次数和现金化次数应作为本次任务内的描述性指标阅读，不形成风险高低或好坏等级。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次虚拟 balloon 任务中的泵压、爆破和现金化行为，不是风险偏好、冲动性、人格或临床判断。"
+    "disclaimer": "结果只描述本次虚拟 balloon 任务中的泵压、爆破和现金化行为，不是风险偏好、冲动性、人格或临床判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "继续加压，还是及时兑现？",
+      "introduction": "分别阅读完成、兑现与爆炸的记录。",
+      "summary": {
+        "template": "本次已兑现轮次的平均加压数为 {adjustedPumps}，兑现次数为 {cashoutCount}，爆炸次数为 {explosionCount}。",
+        "metricKeys": [
+          "adjustedPumps",
+          "cashoutCount",
+          "explosionCount"
+        ]
+      },
+      "studentMetricKeys": [
+        "adjustedPumps",
+        "cashoutCount",
+        "explosionCount"
+      ],
+      "processMetricKeys": [
+        "completedBalloonCount",
+        "cashoutCount",
+        "explosionCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedBalloons",
+        "insufficientCashoutBalloons",
+        "invalidOutcome"
+      ],
+      "metricGates": {},
+      "nextStep": "平均加压数只纳入规定的兑现轮次，不用它定义风险人格。",
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "cashoutCount",
+          "explosionCount"
+        ]
+      }
+    }
   },
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.2.0",
+    "presentationVersion": "1.1.0",
     "testType": "bart",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.1.0",
@@ -124,6 +170,52 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "平均充气次数、爆破和主动收取次数一起描述本次任务行为，不形成风险高低或好坏等级。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次虚拟气球任务中的充气、爆破和收取行为，不是风险偏好、冲动性、人格或临床判断。"
+    "disclaimer": "结果只描述本次虚拟气球任务中的充气、爆破和收取行为，不是风险偏好、冲动性、人格或临床判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "继续加压，还是及时兑现？",
+      "introduction": "分别阅读完成、兑现与爆炸的记录。",
+      "summary": {
+        "template": "本次已兑现轮次的平均加压数为 {adjustedPumps}，兑现次数为 {cashoutCount}，爆炸次数为 {explosionCount}。",
+        "metricKeys": [
+          "adjustedPumps",
+          "cashoutCount",
+          "explosionCount"
+        ]
+      },
+      "studentMetricKeys": [
+        "adjustedPumps",
+        "cashoutCount",
+        "explosionCount"
+      ],
+      "processMetricKeys": [
+        "completedBalloonCount",
+        "cashoutCount",
+        "explosionCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedBalloons",
+        "insufficientCashoutBalloons",
+        "invalidOutcome"
+      ],
+      "metricGates": {},
+      "nextStep": "平均加压数只纳入规定的兑现轮次，不用它定义风险人格。",
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "cashoutCount",
+          "explosionCount"
+        ]
+      }
+    }
   }
 ]

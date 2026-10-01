@@ -7,7 +7,8 @@
 - 在专用本地工作区制定方案、修改代码、生成样稿、执行验证、保存本地 Git 提交。
 - 保留基线 `f70078adcd7c1220f205559e34cd3d719b3b6ce4` 与 review 证据；必要的远端只读查询允许。
 - 主工作区 `/workspace/eduK12-new-version` 不用于本轮实现；专用工作区 `/workspace/eduK12-cognitive-report-upgrade`。
-- 当前本地分支 `design/cognitive-report-upgrade-plan`。后续实现可在此基础上建立本地实现分支，继续遵循本约定。
+- 方案保存在 `design/cognitive-report-upgrade-plan`；本轮实现保存在 `feat/cognitive-report-upgrade-local`，继续遵循本约定。
+- 用户确认本轮仅完善已有权限内的分层解读，不新增科研专用指标入口。实施及验证见 [本地交付说明](cognitive-report-upgrade-implementation.md)。
 
 ## 用户 clean 信号到来前
 

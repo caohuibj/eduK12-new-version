@@ -30,11 +30,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "短延迟排序与最后一轮即时排序的相邻顺序正确率之差；未完成时不显示数值。"
       },
       "adjacentPairScoreByRound": {
+        "valueUnit": "ratio",
         "label": "各轮相邻顺序得分",
         "explanation": "按学习轮次列出相邻图片顺序正确的比例。",
         "singleExplanation": "按学习轮次列出相邻图片顺序正确的比例。"
       },
       "positionScoreByRound": {
+        "valueUnit": "ratio",
         "label": "各轮位置得分",
         "explanation": "按学习轮次列出图片处于正确位置的比例。",
         "singleExplanation": "按学习轮次列出图片处于正确位置的比例。"
@@ -78,6 +80,49 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "延迟保持只有在科研档延迟阶段实际完成时展示；缺失不等于低分。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "使用内部自制场景刺激，只反映本次序列学习表现，不等同 NIH PSM、临床诊断或人口常模。"
+    "disclaimer": "使用内部自制场景刺激，只反映本次序列学习表现，不等同 NIH PSM、临床诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "图片的顺序，你记住了哪些？",
+      "introduction": "观察本次图片相邻关系与位置的复现。",
+      "summary": {
+        "template": "本次相邻关系得分为 {adjacentPairScore}，位置得分为 {positionScore}。",
+        "metricKeys": [
+          "adjacentPairScore",
+          "positionScore"
+        ]
+      },
+      "studentMetricKeys": [
+        "adjacentPairScore",
+        "positionScore",
+        "learningGain"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "emptyResponse"
+      ],
+      "metricGates": {
+        "delayedRetention": [
+          "delayedStageIncomplete"
+        ]
+      },
+      "nextStep": "相邻关系得分不同于整条序列正确率；只阅读本次实际测量的阶段。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "adjacentPairScore",
+          "positionScore"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "sequence"
+    }
   }
 ]

@@ -78,6 +78,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "速度指标必须与准确率同屏阅读，避免把快速猜测当作加工速度。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果来自内部自制几何刺激，只反映本次任务表现，不是 NIH Toolbox 分数、临床诊断或人口常模。"
+    "disclaimer": "结果来自内部自制几何刺激，只反映本次任务表现，不是 NIH Toolbox 分数、临床诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "找出不同，看看这一次",
+      "introduction": "同时阅读完成速度与判断正确率。",
+      "summary": {
+        "template": "本次每分钟正确判断数为 {correctPerMinute}，正确率为 {accuracy}。",
+        "metricKeys": [
+          "correctPerMinute",
+          "accuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "correctPerMinute",
+        "accuracy",
+        "completedTrialCount"
+      ],
+      "processMetricKeys": [
+        "completedTrialCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "速度与正确率需要一起看，不需要为了速度反复刷分。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "actualReactComponents": true,
+  "corpusChecked": 36,
+  "viewportWidths": [
+    1280,
+    390,
+    320
+  ],
+  "checks": [
+    "quality states and speed withholding",
+    "SST short protocol caveat",
+    "teacher detail existing data only",
+    "keyboard activation",
+    "all previews at 390px and 320px without page or chart overflow",
+    "mobile detail without page overflow",
+    "print details visible",
+    "no browser runtime errors"
+  ],
+  "screenshots": [
+    "reaction-desktop",
+    "reaction-detail",
+    "reaction-insufficient",
+    "reaction-interrupted",
+    "memory-desktop",
+    "sst-experience",
+    "sst-standard",
+    "picturesequence-detail-mobile",
+    "pairedassociate-detail-mobile",
+    "matrix-detail-mobile",
+    "reaction-valid-mobile",
+    "reaction-detail-mobile",
+    "memory-standard-mobile",
+    "sst-standard-mobile"
+  ]
+}

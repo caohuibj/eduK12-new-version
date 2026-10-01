@@ -103,6 +103,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "持续性错误由冻结规则和实际响应推导，不等同于临床执行功能判断。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果反映本次双规则分类任务表现，不是商业卡片分类测验、临床诊断或人口常模。"
+    "disclaimer": "结果反映本次双规则分类任务表现，不是商业卡片分类测验、临床诊断或人口常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "分类规则变了，你如何继续？",
+      "introduction": "对照规则保持与切换时的记录。",
+      "summary": {
+        "template": "本次切换与重复条件的用时差为 {switchCostRtMs}，切换条件正确率为 {accuracySwitch}。",
+        "metricKeys": [
+          "switchCostRtMs",
+          "accuracySwitch"
+        ]
+      },
+      "studentMetricKeys": [
+        "switchCostRtMs",
+        "accuracySwitch",
+        "accuracyRepeat"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientSwitchTrials",
+        "insufficientRepeatTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "先看规则变化后的作答记录，不据此判断一般认知灵活性。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracySwitch",
+          "accuracyRepeat"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

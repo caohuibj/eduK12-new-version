@@ -98,6 +98,51 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "结果描述本次 acquisition/reversal 阶段的作答轨迹，不评价人格、风险偏好或因果机制。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次概率学习和规则反转任务表现，不是人格、风险偏好或临床判断。"
+    "disclaimer": "结果只描述本次概率学习和规则反转任务表现，不是人格、风险偏好或临床判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "反馈规则变了，你如何学习？",
+      "introduction": "把规则变化前后的选择分别阅读。",
+      "summary": {
+        "template": "本次规则变化前正确率为 {acquisitionAccuracy}，变化后为 {reversalAccuracy}。",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "acquisitionAccuracy",
+        "reversalAccuracy",
+        "perseverativeErrorCount"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientAcquisitionTrials",
+        "insufficientReversalTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "反馈具有概率性，一次选择轨迹不能说明人格或风险偏好。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "acquisition": "规则变化前阶段",
+        "reversal": "规则变化后阶段",
+        "criterion": "达标规则"
+      },
+      "illustration": "rules"
+    }
   }
 ]

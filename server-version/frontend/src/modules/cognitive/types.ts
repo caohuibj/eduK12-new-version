@@ -52,6 +52,9 @@ export interface CognitiveV2ReportMetricView extends CognitiveReportMetricView {
 }
 
 export interface CognitiveV2Report {
+  schemaVersion?: 2
+  reading?: CognitiveReportReading
+  profileLabel?: string | null
   title: string
   qualityState: 'interpretable' | 'limited' | 'invalid'
   conclusion: string
@@ -69,6 +72,26 @@ export interface CognitiveV2Report {
   }
   disclaimer: string
   practicalTips: string[]
+}
+
+export interface CognitiveReportReading {
+  schemaVersion: 2
+  reportVersion: string
+  presentationVersion: string
+  title: string
+  introduction: string
+  illustration?: 'signal' | 'sequence' | 'stop' | 'rules'
+  interpretation: { state: 'available' | 'qualified' | 'withheld'; reasons: string[]; withheldMetricKeys: string[] }
+  feedback: { summary: string; evidenceMetricKeys: string[]; nextStep: string }
+  caveats: string[]
+  methodCaveats?: string[]
+  visuals: Array<{
+    kind: 'reaction_trials' | 'memory_lengths' | 'metrics'
+    title: string
+    unit: string
+    points: Array<{ label: string; value: number | null; status?: 'recorded' | 'missing' }>
+    caption: string
+  }>
 }
 
 export interface CognitiveSingleTaskReport {

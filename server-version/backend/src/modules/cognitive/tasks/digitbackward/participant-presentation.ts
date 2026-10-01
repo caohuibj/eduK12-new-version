@@ -12,7 +12,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "maxSpan": {
         "label": "最大倒背广度",
         "explanation": "最长正确序列：本次任务中能够正确完成的最高序列长度。",
-        "singleExplanation": "最长正确序列：本次任务中能够正确完成的最高序列长度。"
+        "singleExplanation": "最长正确序列：本次任务中能够正确完成的最高序列长度。",
+        "displayUnit": "位"
       },
       "totalCorrectTrials": {
         "label": "正确试次总数",
@@ -73,6 +74,38 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "倒背要求在短时保持之外进行顺序操作，应与顺背结果分开阅读。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只反映本次数字倒背任务表现，不是完整工作记忆、Wechsler 等价值或年龄常模。"
+    "disclaimer": "结果只反映本次数字倒背任务表现，不是完整工作记忆、Wechsler 等价值或年龄常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "把顺序倒过来，看看这一次",
+      "introduction": "观察这次倒序复现数字的记录。",
+      "summary": {
+        "template": "本次正确倒序复现的最长数字序列为 {maxSpan}。",
+        "metricKeys": [
+          "maxSpan"
+        ]
+      },
+      "studentMetricKeys": [
+        "maxSpan",
+        "totalCorrectTrials",
+        "completedLevelCount"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedLevels"
+      ],
+      "metricGates": {},
+      "nextStep": "倒背与顺背分别解释，不能拼成智商或一般工作记忆分。",
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "maxSpan": "本次最长正确序列长度"
+      },
+      "illustration": "sequence"
+    }
   }
 ]

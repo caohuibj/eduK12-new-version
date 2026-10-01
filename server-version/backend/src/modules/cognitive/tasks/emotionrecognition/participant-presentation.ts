@@ -83,6 +83,47 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "本任务只描述对当前版本六类合成面孔的分类响应；不输出情绪识别能力、共情能力、人格、临床或文化能力结论。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果只描述本次六类合成面孔分类表现，不是情绪能力、共情、人格、文化能力或临床判断。"
+    "disclaimer": "结果只描述本次六类合成面孔分类表现，不是情绪能力、共情、人格、文化能力或临床判断。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "这组面孔，你如何分类？",
+      "introduction": "观察本版六类合成面孔的分类记录。",
+      "summary": {
+        "template": "本次六类面孔平衡正确率为 {balancedAccuracy}，总体正确率为 {accuracy}。",
+        "metricKeys": [
+          "balancedAccuracy",
+          "accuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "balancedAccuracy",
+        "accuracy",
+        "validResponseCount"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientPerCategory"
+      ],
+      "metricGates": {},
+      "nextStep": "只描述这组合成面孔分类，不判断共情、人格或一般情绪能力。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "balancedAccuracy",
+          "accuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

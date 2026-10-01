@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "stroop",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -60,11 +60,51 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "protocols": {},
     "practicalTips": [],
     "singleHiddenMetrics": [],
-    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。"
+    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "文字与颜色不同，你如何选择？",
+      "introduction": "同时阅读不同条件下的用时与正确率。",
+      "summary": {
+        "template": "本次两类条件的用时差为 {stroopEffectMs}；冲突条件的正确率为 {incongruentAccuracy}。",
+        "metricKeys": [
+          "stroopEffectMs",
+          "incongruentAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "stroopEffectMs",
+        "incongruentAccuracy",
+        "congruentAccuracy"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientValidCongruentRt",
+        "insufficientValidIncongruentRt"
+      ],
+      "metricGates": {},
+      "nextStep": "先看正确率，再理解条件间的用时差；负差值也不代表抑制能力优秀。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "medianRtCongruent",
+          "medianRtIncongruent"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   },
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "stroop",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.1.0",
@@ -124,6 +164,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "减少多任务切换可降低无关信息干扰。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。"
+    "disclaimer": "不得仅以总体准确率代表抑制能力，也不是年龄常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "文字与颜色不同，你如何选择？",
+      "introduction": "同时阅读不同条件下的用时与正确率。",
+      "summary": {
+        "template": "本次两类条件的用时差为 {stroopEffectMs}；冲突条件的正确率为 {incongruentAccuracy}。",
+        "metricKeys": [
+          "stroopEffectMs",
+          "incongruentAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "stroopEffectMs",
+        "incongruentAccuracy",
+        "congruentAccuracy"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientValidCongruentRt",
+        "insufficientValidIncongruentRt"
+      ],
+      "metricGates": {},
+      "nextStep": "先看正确率，再理解条件间的用时差；负差值也不代表抑制能力优秀。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "medianRtCongruent",
+          "medianRtIncongruent"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "rules"
+    }
   }
 ]

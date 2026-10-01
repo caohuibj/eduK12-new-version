@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.0.0",
+    "presentationVersion": "1.1.0",
     "testType": "nback",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -20,12 +20,15 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "本次配置内达到评分门槛的最高 N 难度，不是标准化能力等级。"
       },
       "hitRateByN": {
+        "valueUnit": "ratio",
         "label": "各 N 命中率"
       },
       "falseAlarmRateByN": {
+        "valueUnit": "ratio",
         "label": "各 N 误报率"
       },
       "medianRtByN": {
+        "valueUnit": "ms",
         "label": "各 N 正确反应中位RT"
       },
       "loadCostDPrime": {
@@ -40,6 +43,42 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "maxReliableN 只是本次配置内表现，不是标准化工作记忆等级。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "结果反映本次工作记忆更新任务表现，不是临床诊断或常模。"
+    "disclaimer": "结果反映本次工作记忆更新任务表现，不是临床诊断或常模。",
+    "reportReading": {
+      "version": "1.0.0",
+      "title": "回看几步，你如何记住？",
+      "introduction": "把不同回看难度下的记录分别阅读。",
+      "summary": {
+        "template": "本次达到可靠作答条件的最高回看难度为 {maxReliableN}。",
+        "metricKeys": [
+          "maxReliableN"
+        ]
+      },
+      "studentMetricKeys": [
+        "maxReliableN"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientTargetsByN"
+      ],
+      "metricGates": {},
+      "nextStep": "不同难度不可直接混成能力总分；详细解读保留按难度的命中与误报。",
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议"
+      },
+      "illustration": "sequence",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "dPrimeByN"
+        ],
+        "pointUnit": "d-prime"
+      }
+    }
   }
 ]
