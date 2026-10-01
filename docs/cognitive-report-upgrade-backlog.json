@@ -3,12 +3,13 @@
   "baseline": "f70078adcd7c1220f205559e34cd3d719b3b6ce4",
   "createdDate": "2026-10-01",
   "timezone": "Asia/Tokyo",
-  "state": "local_implementation_verified_awaiting_main_clean",
+  "state": "main_clean_authorized_sync_and_publication_in_progress",
   "publicationHold": {
-    "status": "waiting_for_user_main_clean_signal",
-    "remoteWritesAllowed": false,
-    "ciDispatchAllowed": false,
-    "mergeAllowed": false
+    "status": "user_main_clean_signal_received_2026-10-01",
+    "remoteWritesAllowed": true,
+    "ciDispatchAllowed": true,
+    "mergeAllowed": true,
+    "mergeCondition": "current_head_ci_and_repository_requirements_pass"
   },
   "tasks": [
     {
@@ -240,5 +241,25 @@
     "historicalRewrite": false,
     "researchPermissionExpanded": false,
     "evidence": "docs/cognitive-report-audiences-implementation.md"
+  },
+  "publicationProgress": {
+    "syncedMain": "9dd4b301",
+    "syncCommit": "6a35be40",
+    "conflictingFiles": [],
+    "apiAccess": "blocked_pending_cloud_network_settings",
+    "remotePush": "prepared_after_validation",
+    "remoteCi": "not_triggered_yet",
+    "merge": "not_performed",
+    "localVerification": {
+      "backendPassed": 761,
+      "backendSkipped": 29,
+      "postgresPassed": 2,
+      "frontendPassed": 258,
+      "browserCombinations": 216,
+      "ciRoutingTests": 24,
+      "lintErrors": 0,
+      "lintWarnings": 112
+    },
+    "evidence": "docs/cognitive-report-upgrade-publication.md"
   }
 }
