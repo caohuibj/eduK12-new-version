@@ -5,6 +5,9 @@ import { authenticate, requireStudent } from '../middleware/auth'
 
 const router = Router()
 
+// Explicit current resource grant required; authenticated role alone grants nothing.
+router.get('/attempts/:attemptId/research-export', authenticate, situationalController.researchExport)
+
 router.get('/instruments', authenticate, requireStudent, situationalController.listInstruments)
 router.get('/instruments/:instrumentKey', authenticate, requireStudent, situationalController.getInstrument)
 router.get('/history', authenticate, requireStudent, situationalController.history)

@@ -1,3 +1,4 @@
+import { exportSituationalResearchAttempt } from '../modules/situational/situation-research-export'
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
 import { assessmentSubmitBusy, completionBusy, error, instrumentError, success } from '../utils/response'
@@ -35,6 +36,15 @@ const handleSituationalError = (res: Response, errorValue: unknown, operation: s
 }
 
 export const situationalController = {
+  async researchExport(req: Request, res: Response) {
+    try {
+      const artifact = await exportSituationalResearchAttempt(req.params.attemptId, req.user!.userId)
+      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Content-Disposition', 'attachment; filename="situational-research.json"')
+      return success(res, artifact)
+    } catch (errorValue) { return handleSituationalError(res, errorValue, '情境研究导出失败') }
+  },
+
   async listInstruments(_req: Request, res: Response) {
     try {
       return success(res, { list: listSituationalInstruments() })
