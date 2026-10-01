@@ -70,6 +70,7 @@ const CheckinSubmit = React.lazy(() => import('./pages/student/CheckinSubmit'))
 const StudentCheckins = React.lazy(() => import('./pages/student/StudentCheckins'))
 const StudentAssignments = React.lazy(() => import('./pages/student/StudentAssignments'))
 const StudentProfile = React.lazy(() => import('./pages/student/StudentProfile'))
+const SjtAuthoring = React.lazy(() => import('./modules/situational/pages/SjtAuthoring'))
 const SituationalHome = React.lazy(() => import('./modules/situational/pages/SituationalHome'))
 const SituationalRunner = React.lazy(() => import('./modules/situational/pages/SituationalRunner'))
 const SituationalResult = React.lazy(() => import('./modules/situational/pages/SituationalResult'))
@@ -603,6 +604,12 @@ function AppRoutes() {
               </StudentProtectedRoute>
             }
           />
+          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><SjtAuthoring /></ProtectedRoute>} />
+          <Route path="/teacher/situational" element={<ProtectedRoute roles={['TEACHER']}><SituationalHome /></ProtectedRoute>} />
+          <Route path="/teacher/situational/history" element={<ProtectedRoute roles={['TEACHER']}><SituationalHistory /></ProtectedRoute>} />
+          <Route path="/teacher/situational/:instrumentKey" element={<ProtectedRoute roles={['TEACHER']}><SituationalRunner /></ProtectedRoute>} />
+          <Route path="/teacher/situational/attempts/:attemptId" element={<ProtectedRoute roles={['TEACHER']}><SituationalRunner /></ProtectedRoute>} />
+          <Route path="/teacher/situational/attempts/:attemptId/result" element={<ProtectedRoute roles={['TEACHER']}><SituationalResult /></ProtectedRoute>} />
           <Route
             path="/student/situational"
             element={

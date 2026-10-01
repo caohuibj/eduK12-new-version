@@ -1,3 +1,4 @@
+import { assertSituationalScorerAvailable } from '../situational/situation-model-resolver'
 import { situationalScientificContextSchema, type SituationalScientificContextV1 } from '../situational/onboarding/scientific-schema'
 import {
   situationalOpaqueKeySchema,
@@ -41,6 +42,7 @@ export interface FrozenSituationalRuntimeSnapshotV1 {
 }
 
 const runnerChannelSchema = z.union([
+  z.object({ channelKey: situationalOpaqueKeySchema, responseType: z.literal('FREE_TEXT'), prompt: z.string().min(1), required: z.literal(false).optional(), maxLength: z.number().int().min(1).max(2000) }).strict(),
   z.object({
     channelKey: situationalOpaqueKeySchema,
     responseType: z.literal('SINGLE_CHOICE'),
@@ -65,7 +67,7 @@ const runnerSceneSchema = z.object({
   title: z.string().min(1),
   sortOrder: z.number().int().nonnegative(),
   stimulus: situationalStimulusSchema,
-  channels: z.array(runnerChannelSchema).min(1).max(3),
+  channels: z.array(runnerChannelSchema).min(1).max(6),
 }).strict()
 
 const runnerDefinitionV1Schema = z.object({
@@ -146,6 +148,7 @@ const buildFrozenSnapshot = (input: {
     throw new Error('Situational definition cannot be frozen')
   }
   const definition = validation.definition
+  assertSituationalScorerAvailable(definition)
   const definitionHash = hashSituationRuntimeDefinition(definition)
   const compiledRuntime = compileSituationRuntime({
     instrumentKey: input.instrumentKey,

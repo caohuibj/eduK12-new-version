@@ -44,6 +44,8 @@ import uploadRoutes from './routes/uploads'
 import scaleRoutes from './routes/scales'
 import scaleLibraryRoutes from './routes/scaleLibrary'
 import situationalRoutes from './routes/situational'
+import sjtAuthoringRoutes from './routes/sjtAuthoring'
+import sjtTeacherParticipationRoutes from './routes/sjtTeacherParticipation'
 import questionnaireRoutes from './routes/questionnaires'
 import questionnaireProductRoutes from './modules/questionnaire-product/routes'
 import documentRoutes from './routes/documents'
@@ -232,6 +234,8 @@ app.use('/api/teacher-codes', teacherCodeRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use('/api/scales', scaleRoutes)
 app.use('/api/scale-library', scaleLibraryRoutes)
+app.use('/api/situational/authoring', sjtAuthoringRoutes)
+app.use('/api/teacher/situational', sjtTeacherParticipationRoutes)
 app.use('/api/situational', situationalRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/questionnaire-products', questionnaireProductRoutes)

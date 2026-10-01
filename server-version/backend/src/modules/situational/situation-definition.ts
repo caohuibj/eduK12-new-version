@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { measurementBundleSchema, optionEvidenceSchema, scoringModelSchema } from './situation-scientific-contract'
 import type { AssessmentAssetIdentityV1 } from '../assessment-media/assessment-asset-identity'
 import {
   ASSESSMENT_STATIC_IMAGE_MIME_TYPES,
@@ -68,6 +69,8 @@ export const situationalPurposeSchema = z.enum([
   'APPRAISAL',
   'NORM_JUDGMENT',
   'CONFIDENCE',
+  'PROFESSIONAL_JUDGMENT', 'SELF_EFFICACY', 'ROLE_LEGITIMACY',
+  'FELT_RESPONSIBILITY', 'STATE_EMOTION', 'SOCIAL_PERCEPTION',
 ])
 export type SituationalPurpose = z.infer<typeof situationalPurposeSchema>
 
@@ -75,7 +78,7 @@ export type SituationalPurpose = z.infer<typeof situationalPurposeSchema>
  * Response primitive: how the participant answers and how the scorer treats
  * the raw value. Deliberately orthogonal to `purpose`.
  */
-export const situationalResponseTypeSchema = z.enum(['SINGLE_CHOICE', 'CONTINUOUS'])
+export const situationalResponseTypeSchema = z.enum(['SINGLE_CHOICE', 'CONTINUOUS', 'FREE_TEXT'])
 export type SituationalResponseType = z.infer<typeof situationalResponseTypeSchema>
 
 /**
@@ -133,6 +136,8 @@ export const situationDefinitionAssetReferences = (definition: SituationDefiniti
 const choiceOptionSchema = z.object({
   optionKey: situationalOpaqueKeySchema,
   label: z.string().min(1),
+  evidence: optionEvidenceSchema.optional(),
+  nonanswerReason: z.enum(['UNABLE_TO_JUDGE', 'DECLINED', 'UNAVAILABLE_OR_DECLINED']).optional(),
 })
 export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
 
@@ -147,11 +152,12 @@ export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
  * in `scoring.choiceScores` keyed by scoringVersion.
  */
 export const situationalChannelSchema = z.discriminatedUnion('responseType', [
+  z.object({ channelKey: situationalOpaqueKeySchema, purpose: situationalPurposeSchema, responseType: z.literal('FREE_TEXT'), prompt: z.string().min(1), maxLength: z.number().int().min(1).max(2000), scoredConstruct: z.string().min(1).optional() }),
   z.object({
     channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('SINGLE_CHOICE'),
-    scoredConstruct: z.string().min(1),
+    scoredConstruct: z.string().min(1).optional(),
     prompt: z.string().min(1),
     options: z.array(choiceOptionSchema).min(2),
   }),
@@ -159,7 +165,7 @@ export const situationalChannelSchema = z.discriminatedUnion('responseType', [
     channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
     responseType: z.literal('CONTINUOUS'),
-    scoredConstruct: z.string().min(1),
+    scoredConstruct: z.string().min(1).optional(),
     prompt: z.string().min(1),
     /** Explicit answer range — the scorer never assumes 0–100. */
     range: z.object({
@@ -187,7 +193,9 @@ export const situationalSceneSchema = z.object({
   /** DIAMONDS-style situation coding metadata (dimension → intensity). */
   situationFeatures: z.record(z.string(), z.number().finite()).default({}),
   channels: z.array(situationalChannelSchema).min(1).max(3),
+  measurementBundle: measurementBundleSchema.optional(),
 })
+export const situationalMeasurementSceneSchema = situationalSceneSchema.extend({ channels: z.array(situationalChannelSchema).min(1).max(6) })
 export type SituationalSceneDefinition = z.infer<typeof situationalSceneSchema>
 
 /**
@@ -258,10 +266,12 @@ export const situationDefinitionSchema = z.object({
   scenes: z.array(situationalSceneSchema).min(1),
   scoring: z.object({
     scoringVersion: z.string().min(1),
+    model: scoringModelSchema.optional(),
     choiceScores: z.array(choiceContributionSchema).default([]),
     publishedMetrics: z.array(situationalMetricDefinitionSchema).min(1),
   }),
   report: z.object({
+    narrative: z.object({ version: z.literal('sjt-narrative-v1'), fragments: z.array(z.object({ sceneKey: situationalOpaqueKeySchema, channelKey: situationalOpaqueKeySchema, optionKey: situationalOpaqueKeySchema, text: z.string().min(1).max(2000), kind: z.enum(['ACTION', 'PROBE', 'GUIDANCE']) }).strict()).max(4000), comparisons: z.array(z.object({ firstChannelKey: situationalOpaqueKeySchema, secondChannelKey: situationalOpaqueKeySchema, motherSceneKey: situationalOpaqueKeySchema, label: z.string().min(1).max(200), categories: z.array(situationalOpaqueKeySchema).min(2).max(10) }).strict()).max(20) }).strict().optional(),
     reportVersion: z.string().min(1),
     primaryMetricKeys: z.array(z.string().min(1)).min(1),
     metricOrder: z.array(z.string().min(1)).min(1),
@@ -283,6 +293,7 @@ export interface SituationDefinitionValidationOptions {
   forPublish?: boolean
   requireGoldenFixture?: boolean
   hasGoldenFixture?: boolean
+  allowMeasurementBundle?: boolean
 }
 
 const hasText = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
@@ -291,7 +302,8 @@ export const validateSituationDefinition = (
   value: unknown,
   options: SituationDefinitionValidationOptions = {},
 ): { definition?: SituationDefinitionV1; issues: DefinitionIssue[] } => {
-  const parsed = situationDefinitionSchema.safeParse(value)
+  const schema = options.allowMeasurementBundle ? situationDefinitionSchema.extend({ scenes: z.array(situationalMeasurementSceneSchema).min(1) }) : situationDefinitionSchema
+  const parsed = schema.safeParse(value)
   if (!parsed.success) {
     return {
       issues: parsed.error.issues.map((issue) => ({ path: issue.path.join('.') || 'definition', message: issue.message, severity: 'error' })),
@@ -300,6 +312,14 @@ export const validateSituationDefinition = (
 
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
+  // V2 calls this validator on an internal scalar projection, then owns model validation.
+  if (!options.allowMeasurementBundle && definition.scoring.model) {
+    const model = definition.scoring.model
+    if (model.modelKey !== 'PROVISIONAL_SCALAR') issues.push({ path: 'scoring.model', message: 'Non-scalar scoring models require the V2 scientific contract', severity: 'error' })
+    if (model.parameterSet || model.expertKey) issues.push({ path: 'scoring.model', message: 'V1 scalar scoring cannot claim calibration parameters or expert keys', severity: 'error' })
+  }
+
+  if (definition.report.narrative && !options.allowMeasurementBundle) issues.push({path:'report.narrative',message:'叙述报告规则需要 V2 作者评分契约',severity:'error'})
 
   const sceneKeys = new Set<string>()
   const sceneSortOrders = new Set<number>()
@@ -312,6 +332,8 @@ export const validateSituationDefinition = (
       issues.push({ path: `scenes.${sceneIndex}.sortOrder`, message: `场景 sortOrder 不能重复：${scene.sortOrder}`, severity: 'error' })
     }
     sceneSortOrders.add(scene.sortOrder)
+    if (scene.measurementBundle && !options.allowMeasurementBundle) issues.push({ path: `scenes.${sceneIndex}.measurementBundle`, message: 'Measurement bundles require V2', severity: 'error' })
+    if (!scene.measurementBundle && scene.channels.length > 3) issues.push({ path: `scenes.${sceneIndex}.channels`, message: '超过三个响应需要 measurementBundle', severity: 'error' })
     const declaredConstructs = new Set([scene.primaryConstruct, ...scene.secondaryConstructs])
     const channelKeys = new Set<string>()
     scene.channels.forEach((channel, channelIndex) => {
@@ -332,10 +354,16 @@ export const validateSituationDefinition = (
           optionKeys.add(option.optionKey)
         })
       }
+      if (channel.responseType === 'SINGLE_CHOICE') for (const option of channel.options) {
+        if (option.evidence?.opportunities.some(o => o.constructKey === channel.scoredConstruct && o.role === 'FORBIDDEN_INFERENCE')) issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.options`, message: 'Scalar scoring contradicts forbidden inference', severity: 'error' })
+      }
       if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })
       }
-      if (!declaredConstructs.has(channel.scoredConstruct)) {
+      if (channel.responseType === 'FREE_TEXT' || channel.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.nonanswerReason)) {
+        if (!options.allowMeasurementBundle) issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}`, message: 'Text and explicit nonanswers require V2', severity: 'error' })
+      }
+      if (!channel.scoredConstruct || !declaredConstructs.has(channel.scoredConstruct)) {
         issues.push({
           path: `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
           message: `计分构念 ${channel.scoredConstruct} 未在场景的 primary/secondary constructs 中声明`,
@@ -495,7 +523,7 @@ export const validateSituationDefinition = (
     }
   })
   definition.scoring.publishedMetrics.forEach((metric) => {
-    if (!interpretationKeys.has(metric.key)) {
+    if (!definition.report.narrative && !interpretationKeys.has(metric.key)) {
       issues.push({ path: 'report.interpretations', message: `报告缺少 metric 解释：${metric.key}`, severity: 'error' })
     }
   })
@@ -554,7 +582,7 @@ export const runnerSituationDefinition = (definition: SituationDefinitionV1) => 
       prompt: channel.prompt,
       ...(channel.responseType === 'SINGLE_CHOICE'
         ? { options: channel.options.map(({ optionKey, label }) => ({ optionKey, label })) }
-        : { range: channel.range }),
+        : channel.responseType === 'CONTINUOUS' ? { range: channel.range } : { maxLength: channel.maxLength }),
     })),
   })),
 })

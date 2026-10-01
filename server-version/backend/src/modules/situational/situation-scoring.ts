@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   situationDefinitionSchema,
-  situationalSceneSchema,
+  situationalMeasurementSceneSchema,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -20,6 +20,9 @@ export interface SituationalResponse {
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string
+  responseRevision?: number
+  historyIdentity?: string
+  stageConfirmed?: boolean
 }
 
 export type SituationalMetricStatus = 'calculated' | 'limited' | 'not_calculable'
@@ -37,6 +40,11 @@ export interface SituationalMetricValue {
   expectedResponses: string[]
   answeredResponses: string[]
   status: SituationalMetricStatus
+  estimate?: number | null
+  precision?: { status: 'NOT_ESTIMATED' | 'ESTIMATED'; standardError: number | null; interval: { lower: number; upper: number; level: number; kind: 'CONFIDENCE' | 'CREDIBLE' } | null }
+  coverage?: { numberOfOpportunities: number; numberOfAnsweredOpportunities: number; numberOfIndependentScenes: number }
+  contributions?: Array<{ responseKey: string; contribution: number | null }>
+  maturity?: 'PROVISIONAL' | 'CALIBRATED'
 }
 
 export type SituationalQualityStatus = 'interpretable' | 'limited' | 'invalid'
@@ -47,8 +55,10 @@ export interface SituationalQuality {
 }
 
 export interface SituationalResultV1 {
+  narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
   metrics: SituationalMetricValue[]
   quality: SituationalQuality
+  model?: { modelKey: string; modelVersion: string; scoringVersion: string; parameterSetHash?: string }
 }
 
 export interface SituationalScoringOptions {
@@ -85,11 +95,11 @@ export interface SituationalGoldenCase {
  * A published definition must declare at least one scene, but a valid V2
  * trajectory may project to zero score-eligible scenes when it reaches an
  * early terminal through routing-only decisions. The scorer still validates
- * the complete definition shape and relaxes only this internal scene-count
- * constraint; publication validation remains unchanged.
+ * the complete definition shape and accepts bounded V2 bundle projections
+ * and internally empty scoring surfaces; publication validation remains unchanged.
  */
 const projectedSituationDefinitionSchema = situationDefinitionSchema.extend({
-  scenes: z.array(situationalSceneSchema),
+  scenes: z.array(situationalMeasurementSceneSchema),
 })
 
 const finite = (value: number): number => {
@@ -121,6 +131,7 @@ type SituationalResponseValidationPair = {
   responseType: string
   optionKeys: Set<string>
   range: { min: number; max: number } | null
+  maxLength?: number
 }
 
 type SituationalResponseValidationIndex = ReadonlyMap<string, SituationalResponseValidationPair>
@@ -134,6 +145,7 @@ const buildSituationalResponseValidationIndex = (
       pairByKey.set(responseKey(scene.sceneKey, channel.channelKey), {
         responseType: channel.responseType,
         optionKeys: new Set(channel.responseType === 'SINGLE_CHOICE' ? channel.options.map((option) => option.optionKey) : []),
+        ...(channel.responseType === 'FREE_TEXT' ? { maxLength: channel.maxLength } : {}),
         range: channel.responseType === 'CONTINUOUS' ? channel.range : null,
       })
     })
@@ -170,6 +182,8 @@ const validateResponsesWithIndex = (
         issues.push({ path: `${path}.responseValue`, message: `选择通道的回答必须是该通道的选项：${pairKey}` })
         return
       }
+    } else if (pair.responseType === 'FREE_TEXT') {
+      if (typeof response.responseValue !== 'string' || response.responseValue.length > (pair.maxLength ?? 0)) { issues.push({ path: `${path}.responseValue`, message: '补充文字为空或超过长度限制' }); return }
     } else if (
       typeof response.responseValue !== 'number'
       || !Number.isFinite(response.responseValue)
@@ -226,6 +240,7 @@ const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min
   const channel = scene?.channels.find((candidate) => responseKey(scene.sceneKey, candidate.channelKey) === pairKey)
   if (!scene || !channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
   if (channel.responseType === 'CONTINUOUS') return { ...channel.range }
+  if (channel.responseType === 'FREE_TEXT') return { min: 0, max: 0 }
   const pairContributions = definition.scoring.choiceScores
     .filter((entry) => responseKey(entry.sceneKey, entry.channelKey) === pairKey)
     .map((entry) => entry.contribution)
@@ -252,7 +267,7 @@ export const scoreSituational = (
   // Frozen definitions are trusted runtime input: publication/compile gates
   // own cross-field validation. Keep structural parsing here. Only the
   // internally projected zero-scene case uses the relaxed scoring-view schema.
-  const parsedDefinition = definitionInput.scenes.length === 0
+  const parsedDefinition = definitionInput.scenes.length === 0 || definitionInput.scenes.some(s => s.measurementBundle)
     ? projectedSituationDefinitionSchema.parse(definitionInput)
     : situationDefinitionSchema.parse(definitionInput)
   const definition = parsedDefinition as SituationDefinitionV1

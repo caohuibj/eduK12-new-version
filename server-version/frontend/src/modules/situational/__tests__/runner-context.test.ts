@@ -64,3 +64,9 @@ describe('situational runner route context', () => {
     })
   })
 })
+
+it('keeps an owned teacher resume attempt on the standalone API surface',()=>{
+  const context=resolveSituationalRunnerRouteContext({pathname:'/teacher/situational/attempts/owned-attempt',searchParams:new URLSearchParams(),attemptId:'owned-attempt'})
+  expect(context.embedded).toBe(false)
+  expect(context.completionPath).toBe('')
+})

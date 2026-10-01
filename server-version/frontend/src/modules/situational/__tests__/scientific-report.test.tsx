@@ -11,3 +11,9 @@ it('marks missing historical scientific snapshots explicitly', () => {
   render(<SituationalReportCard report={{ itemId: 'test', type: 'SITUATIONAL', kind: 'situational', label: 'SJT', metrics: [] }} />)
   expect(screen.getByText('测评时科研等级：PILOT（历史科研快照缺失）')).toBeInTheDocument()
 })
+
+it('renders the saved SJT narrative without disclosing contribution scores',()=>{
+  render(<SituationalReportCard report={{itemId:'sjt',type:'SITUATIONAL',kind:'situational',label:'SJT',metrics:[{key:'V',value:4,label:'隐藏评分'}],narrative:{version:'sjt-narrative-v1',paragraphs:['先收集信息，再组织讨论。','作者暂定规则，仅用于反思。']}}} />)
+  expect(screen.getByText('先收集信息，再组织讨论。')).toBeInTheDocument()
+  expect(screen.queryByText('隐藏评分')).not.toBeInTheDocument()
+})

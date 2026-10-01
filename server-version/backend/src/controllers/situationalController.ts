@@ -1,3 +1,5 @@
+import { availableSjtPackages, projectSjtReleaseStatus } from '../modules/situational/authoring/service'
+import { exportSituationalResearchAttempt } from '../modules/situational/situation-research-export'
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
 import { assessmentSubmitBusy, completionBusy, error, instrumentError, success } from '../utils/response'
@@ -35,9 +37,18 @@ const handleSituationalError = (res: Response, errorValue: unknown, operation: s
 }
 
 export const situationalController = {
-  async listInstruments(_req: Request, res: Response) {
+  async researchExport(req: Request, res: Response) {
     try {
-      return success(res, { list: listSituationalInstruments() })
+      const artifact = await exportSituationalResearchAttempt(req.params.attemptId, req.user!.userId)
+      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Content-Disposition', 'attachment; filename="situational-research.json"')
+      return success(res, artifact)
+    } catch (errorValue) { return handleSituationalError(res, errorValue, '情境研究导出失败') }
+  },
+
+  async listInstruments(req: Request, res: Response) {
+    try {
+      return success(res, { list: listSituationalInstruments((await availableSjtPackages()).filter(p => req.baseUrl.startsWith('/api/teacher/') ? p.definition.respondentType === 'teacher_self_report' : p.definition.respondentType !== 'teacher_self_report')) })
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化题包列表失败')
     }
@@ -46,7 +57,7 @@ export const situationalController = {
   async getInstrument(req: Request, res: Response) {
     try {
       const version = typeof req.query.version === 'string' ? req.query.version : undefined
-      return success(res, getSituationalInstrument(req.params.instrumentKey, version))
+      return success(res, getSituationalInstrument(req.params.instrumentKey, version, (await availableSjtPackages()).filter(p => req.baseUrl.startsWith('/api/teacher/') ? p.definition.respondentType === 'teacher_self_report' : p.definition.respondentType !== 'teacher_self_report')))
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化题包详情失败')
     }
@@ -57,7 +68,7 @@ export const situationalController = {
       const parsed = situationalStartSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstZodMessage(parsed.error))
       const data = await startSituationalAttempt(req.user!.userId, parsed.data)
-      return success(res, data, '情境化测评已开始')
+      return success(res, await projectSjtReleaseStatus(data), '情境化测评已开始')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '开始情境化测评失败')
     }
@@ -75,7 +86,7 @@ export const situationalController = {
       })
       if (!parsed.success) return error(res, firstZodMessage(parsed.error))
       const data = await startSituationalAttempt(req.user!.userId, parsed.data)
-      return success(res, data, '情境化测评已开始')
+      return success(res, await projectSjtReleaseStatus(data), '情境化测评已开始')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '开始情境化测评失败')
     }
@@ -84,7 +95,7 @@ export const situationalController = {
   async resume(req: Request, res: Response) {
     try {
       const data = await resumeSituationalAttempt(req.params.attemptId, req.user!.userId)
-      return success(res, data, data.attempt.status === 'COMPLETED' ? '情境化测评已完成' : '继续情境化测评')
+      return success(res, await projectSjtReleaseStatus(data), data.attempt.status === 'COMPLETED' ? '情境化测评已完成' : '继续情境化测评')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '恢复情境化测评失败')
     }
@@ -93,7 +104,7 @@ export const situationalController = {
   async result(req: Request, res: Response) {
     try {
       const data = await getSituationalAttemptResult(req.params.attemptId, req.user!.userId)
-      return success(res, data)
+      return success(res, await projectSjtReleaseStatus(data))
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化测评结果失败')
     }
@@ -123,7 +134,7 @@ export const situationalController = {
         ...parsed.data,
       })
       const responseData = await projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
-      return success(res, responseData, data.replayed ? '情境化测评提交已确认' : '情境化测评提交成功')
+      return success(res, responseData && typeof responseData === 'object' && 'instrument' in responseData ? await projectSjtReleaseStatus(responseData as typeof data) : responseData, data.replayed ? '情境化测评提交已确认' : '情境化测评提交成功')
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '最终提交情境化测评失败')
     }
@@ -131,7 +142,8 @@ export const situationalController = {
 
   async history(req: Request, res: Response) {
     try {
-      return success(res, await listSituationalHistory(req.user!.userId))
+      const data=await listSituationalHistory(req.user!.userId)
+      return success(res,{...data,list:await Promise.all(data.list.map(row=>projectSjtReleaseStatus(row)))})
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化测评历史失败')
     }

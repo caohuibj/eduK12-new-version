@@ -23,11 +23,6 @@ on:
       - 'server-version/e2e/cognitive-video-*'
       - 'server-version/e2e/helpers/session-auth.cjs'
   workflow_dispatch:
-    inputs:
-      hosted_runner:
-        description: 'Pilot on an isolated GitHub-hosted runner (consumes hosted minutes)'
-        type: boolean
-        default: false
 
 
 concurrency:
@@ -38,11 +33,7 @@ jobs:
   cognitive-video-and-cross-runtime:
     name: Cognitive VIDEO auth/public + media boundary acceptance
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    # Windows has the larger memory budget and is the dedicated frontend/media lane.
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       NODE_ENV: test

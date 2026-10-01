@@ -1,11 +1,15 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import SituationalRunner from '../pages/SituationalRunner'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
 import { ensureSituationalDraft, situationalDraftKey } from '../draft'
 import type { SituationalAttemptResponse } from '../types'
 import { embeddedSituationalApi, situationalApi } from '../api'
+import { appendResearchEvents, type SituationalResearchEvent } from '../research'
+import { situationalHistoryIdentities } from '../history'
+
+afterEach(() => vi.restoreAllMocks())
 
 vi.mock('../api', () => ({
   situationalApi: {
@@ -324,4 +328,126 @@ describe('Situational text runner', () => {
     expect(situationalApi.start).toHaveBeenCalledTimes(1)
     expect(vi.mocked(situationalApi.submit).mock.calls[0]?.[1].responses).toHaveLength(sceneCount)
   }, 10_000)
+})
+
+const stagedStartData = (): SituationalAttemptResponse => {
+  const source = startData()
+  source.instrument.definition = {
+    schemaVersion: 2, respondentType: 'synthetic', sampling: { strategy: 'BRANCH_REACHABLE' }, scenes: [source.instrument.definition.scenes[0]!],
+    flow: { strategy: 'BRANCHING_DAG_V1', entryNodeKey: 'node', nodes: [
+    { nodeType: 'SCENE', nodeKey: 'node', sceneKey: 'S1', motherSceneKey: 'M', roundKey: 'R', stepKey: 'S', responseStages: [{ stageKey: 'choice', kind: 'CHOICE', channelKeys: ['choice'] }, { stageKey: 'probe', kind: 'POST_CHOICE_PROBE', channelKeys: ['continuous'] }], transition: { type: 'NEXT', nextNodeKey: 'terminal' } },
+    { nodeType: 'TERMINAL', nodeKey: 'terminal' },
+    ] },
+  }
+  source.instrument.assignment = { assignmentVersion: 'all-administered-v1', assignmentIdentity: 'c'.repeat(64), seedIdentity: 'd'.repeat(64), selections: [] }
+  return source
+}
+
+describe('Situational staged scientific presentation', () => {
+  it('hides probe prompts before choice confirmation, locks the choice and submits one bounded capture', async () => {
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source = stagedStartData()
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
+    vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData(source) })
+    vi.mocked(situationalApi.submit).mockClear()
+    renderRunner()
+    expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
+    expect(screen.queryByText('你有多确定？')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
+    expect(screen.getByLabelText('选择 B')).toBeDisabled()
+    const slider = screen.getByRole('slider')
+    fireEvent.change(slider, { target: { value: '80' } })
+    fireEvent.change(slider, { target: { value: '90' } })
+    fireEvent.blur(slider)
+    await waitFor(() => expect(screen.getByText('90')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: '确认本阶段作答' }))
+    await waitFor(() => expect(screen.queryByRole('button', { name: '确认本阶段作答' })).not.toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: '提交测评' }))
+    await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
+    const payload = vi.mocked(situationalApi.submit).mock.calls[0]![1]
+    expect(payload.responses).toHaveLength(2)
+    expect(payload.researchCapture!.events.filter(e => e.channelKey === 'continuous' && e.type === 'RESPONSE_FIRST_COMMITTED')).toHaveLength(1)
+    expect(payload.researchCapture!.events.some(e => e.type === 'PROBE_EXPOSED')).toBe(true)
+  })
+})
+
+
+describe('Situational journal failure recovery', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source = stagedStartData()
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
+    vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData(source) })
+    vi.mocked(situationalApi.result).mockRejectedValue(new Error('not completed'))
+  })
+
+  it('keeps the next edit revision consistent after the journal succeeds but the answer cache fails', async () => {
+    renderRunner()
+    await screen.findByLabelText('选择 A')
+    vi.spyOn(finalDraftStore, 'putAnswer').mockRejectedValueOnce(new Error('synthetic cache failure'))
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await screen.findAllByText('synthetic cache failure')
+    fireEvent.click(screen.getByLabelText('选择 B'))
+    await waitFor(() => expect(screen.getByLabelText('选择 B')).toBeChecked())
+    const events = (await finalDraftStore.listTrials('situational:ui-attempt')).flatMap(t => {
+      const payload = t.payload as { events?: SituationalResearchEvent[] }
+      return payload.events ?? [t.payload as SituationalResearchEvent]
+    }).filter(e => e.channelKey === 'choice')
+    expect(events.map(e => [e.type, e.responseRevision])).toEqual([['RESPONSE_FIRST_COMMITTED', 1], ['RESPONSE_CHANGED', 2]])
+  })
+
+  it('keeps a durably confirmed stage locked when its answer-cache write fails', async () => {
+    renderRunner()
+    await screen.findByLabelText('选择 A')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    vi.spyOn(finalDraftStore, 'putAnswer').mockRejectedValueOnce(new Error('synthetic confirmation cache failure'))
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
+    expect(screen.getByLabelText('选择 B')).toBeDisabled()
+  })
+
+  it('seals recovered journal answers even if the answer cache was never written', async () => {
+    const source = stagedStartData()
+    if (source.instrument.definition.schemaVersion !== 2) throw new Error('fixture')
+    source.instrument.definition.scenes[0]!.channels = [source.instrument.definition.scenes[0]!.channels[0]!]
+    const node = source.instrument.definition.flow.nodes[0]!
+    if (node.nodeType !== 'SCENE') throw new Error('fixture')
+    delete node.responseStages
+    await ensureSituationalDraft(source.attempt)
+    const historyIdentity = situationalHistoryIdentities(source.instrument.definition, {})['S1']!
+    await appendResearchEvents(source, [], [
+      { type: 'NODE_EXPOSED', nodeKey: 'node', historyIdentity, relativeTimeMs: 0 },
+      { type: 'RESPONSE_FIRST_COMMITTED', nodeKey: 'node', channelKey: 'choice', responseValue: 'A', responseRevision: 1, historyIdentity, relativeTimeMs: 1 },
+    ])
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
+    renderRunner()
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    fireEvent.click(screen.getByRole('button', { name: '提交测评' }))
+    await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(situationalApi.submit).mock.calls[0]![1].responses).toEqual([expect.objectContaining({ responseValue: 'A', responseRevision: 1 })])
+  })
+
+  it('persists a logical multi-event operation wholly or not at all', async () => {
+    const source = stagedStartData()
+    await ensureSituationalDraft(source.attempt)
+    const events: SituationalResearchEvent[] = [
+      { type: 'STAGE_CONFIRMED', nodeKey: 'node', stageKey: 'probe', historyIdentity: 'a'.repeat(64), relativeTimeMs: 0 },
+      { type: 'NODE_CONFIRMED', nodeKey: 'node', historyIdentity: 'a'.repeat(64), relativeTimeMs: 0 },
+    ]
+    const original = finalDraftStore.putTrial.bind(finalDraftStore)
+    let writes = 0
+    vi.spyOn(finalDraftStore, 'putTrial').mockImplementation(async trial => {
+      if (++writes === 2) throw new Error('synthetic second write failure')
+      await original(trial)
+    })
+    const outcome = await appendResearchEvents(source, [], events).then(() => 'saved', () => 'failed')
+    const trials = await finalDraftStore.listTrials('situational:ui-attempt')
+    const saved = trials.flatMap(t => (t.payload as { events?: SituationalResearchEvent[] }).events ?? [t.payload])
+    expect(saved).toHaveLength(outcome === 'saved' ? 2 : 0)
+  })
 })

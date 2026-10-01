@@ -20,10 +20,7 @@ jobs:
   video-core-browser:
     name: native video range + caption browser acceptance
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     env:
       NODE_ENV: test
       PORT: '3000'

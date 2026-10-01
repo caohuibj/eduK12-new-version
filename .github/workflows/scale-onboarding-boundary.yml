@@ -41,10 +41,7 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     env:
       CI: 'true'
       NODE_ENV: test

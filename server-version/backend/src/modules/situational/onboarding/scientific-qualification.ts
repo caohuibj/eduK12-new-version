@@ -17,10 +17,14 @@ export function evaluateScopedSituationalQualification(pkg: SituationPackage, va
   const declaration = scientificSchema.parse(value)
   const executionRef = situationalExecutionRef(pkg)
   const scopeHash = declaration.claimScope ? canonicalHash(declaration.claimScope) : undefined
-  const applicable = declaration.evidence.filter(evidence => (
+  const scoped = declaration.evidence.filter(evidence => (
     canonicalHash(evidence.executionRef) === canonicalHash(executionRef)
+    && (!evidence.modelEvidence || (evidence.modelEvidence.modelKey === (pkg.definition.scoring.model?.modelKey ?? 'PROVISIONAL_SCALAR') && evidence.modelEvidence.modelVersion === (pkg.definition.scoring.model?.modelVersion ?? '1') && evidence.modelEvidence.parameterSetHash === pkg.definition.scoring.model?.parameterSet?.hash && evidence.modelEvidence.metricKeys.every(k => pkg.definition.scoring.publishedMetrics.some(m => m.key === k))))
     && scopeHash !== undefined && canonicalHash(evidence.scope) === scopeHash
   ))
+  // Metric-specific artifacts cannot expand whole-instrument eligibility by themselves.
+  const applicable = scoped.filter(e => !e.modelEvidence || pkg.definition.scoring.publishedMetrics.every(m => e.modelEvidence!.metricKeys.includes(m.key)))
+  const metricEvidenceIds = Object.fromEntries(pkg.definition.scoring.publishedMetrics.map(m => [m.key, scoped.filter(e => !e.modelEvidence || e.modelEvidence.metricKeys.includes(m.key)).map(e => e.id)]))
   const has = (kind: SituationalScientificDeclarationV1['evidence'][number]['kind']) => applicable.some(e => e.kind === kind)
   const definitionProvenance = Boolean(
     (pkg.definition.source.title?.trim() || pkg.definition.source.citation?.trim())
@@ -39,6 +43,7 @@ export function evaluateScopedSituationalQualification(pkg: SituationPackage, va
     scope: declaration.claimScope,
     executionRef,
     applicableEvidenceIds: applicable.map(e => e.id),
+    metricEvidenceIds,
     excludedEvidenceIds: declaration.evidence.filter(e => !applicable.includes(e)).map(e => e.id),
   }
 }

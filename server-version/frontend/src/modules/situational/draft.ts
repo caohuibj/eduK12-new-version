@@ -1,3 +1,4 @@
+import { invalidateChangedSituationalHistory } from './history'
 import {
   createFinalDraftMeta,
   finalDraftStore,
@@ -73,8 +74,10 @@ export const pruneUnreachableSituationalResponses = (
   if (definition.schemaVersion === 1) return { responses, staleKeys: [] }
   // Optional diagnostics are still legitimate raw evidence when answered, so
   // pruning uses every reachable response surface rather than only required keys.
+  const bound = invalidateChangedSituationalHistory(definition, responses, responses)
+  responses = bound.responses
   const reachableKeys = new Set(allReachableResponseKeys(definition, responses))
-  const staleKeys = Object.keys(responses).filter((key) => !reachableKeys.has(key))
+  const staleKeys = [...new Set([...bound.staleKeys, ...Object.keys(responses).filter((key) => !reachableKeys.has(key))])]
   if (staleKeys.length === 0) return { responses, staleKeys }
   const next = { ...responses }
   staleKeys.forEach((key) => { delete next[key] })
@@ -85,8 +88,11 @@ export const pruneSituationalDraftResponses = async (
   attempt: SituationalAttempt,
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
+  previousResponses: Record<string, SituationalDraftAnswer> = responses,
 ): Promise<Record<string, SituationalDraftAnswer>> => {
-  const pruned = pruneUnreachableSituationalResponses(definition, responses)
+  const history = invalidateChangedSituationalHistory(definition, previousResponses, responses)
+  const reachable = pruneUnreachableSituationalResponses(definition, history.responses)
+  const pruned = { responses: reachable.responses, staleKeys: [...history.staleKeys, ...reachable.staleKeys] }
   if (pruned.staleKeys.length > 0) {
     await finalDraftStore.deleteAnswers(situationalDraftKey(attempt.id), pruned.staleKeys)
   }
@@ -105,6 +111,9 @@ export const situationalResponsesFromDraft = (
     responseValue: answer.responseValue,
     ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
     ...(answer.answeredAt === undefined ? {} : { answeredAt: answer.answeredAt }),
+    ...(answer.responseRevision === undefined ? {} : { responseRevision: answer.responseRevision }),
+    ...(answer.historyIdentity === undefined ? {} : { historyIdentity: answer.historyIdentity }),
+    ...(answer.stageConfirmed === undefined ? {} : { stageConfirmed: answer.stageConfirmed }),
   }]
 }))
 
@@ -163,6 +172,9 @@ export const readSituationalDraft = async (
       responseValue: value.responseValue,
       ...(typeof value.responseTimeMs === 'number' ? { responseTimeMs: value.responseTimeMs } : {}),
       ...(typeof value.answeredAt === 'string' ? { answeredAt: value.answeredAt } : {}),
+      ...(typeof value.responseRevision === 'number' ? { responseRevision: value.responseRevision } : {}),
+      ...(typeof value.historyIdentity === 'string' ? { historyIdentity: value.historyIdentity } : {}),
+      ...(typeof value.stageConfirmed === 'boolean' ? { stageConfirmed: value.stageConfirmed } : {}),
     }
   })
   return result

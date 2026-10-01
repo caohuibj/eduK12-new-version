@@ -34,3 +34,23 @@ it('exports frozen governance and uses a marked legacy baseline without borrowin
   expect(buildSituationalCsv(historical)).toContain('RESEARCH_READY')
   expect(buildSituationalCsv(historical)).not.toContain('RESEARCH_GRADE')
 })
+
+
+it('preserves explicit uncertainty and opportunity coverage without exporting raw research evidence', () => {
+  const next = structuredClone(result)
+  next.result!.model = { modelKey: 'EXPERT_KEY', modelVersion: '1', scoringVersion: 'expert-1' }
+  Object.assign(next.result!.metrics[0]!, { estimate: 0, precision: { status: 'NOT_ESTIMATED', standardError: null, interval: null }, coverage: { numberOfOpportunities: 3, numberOfAnsweredOpportunities: 3, numberOfIndependentScenes: 1 }, maturity: 'PROVISIONAL' })
+  expect(buildSituationalExportPayload(next)).toHaveProperty('model.modelVersion', '1')
+  expect(buildSituationalCsv(next)).toContain('independentScenes')
+  expect(buildSituationalCsv(next)).toContain('NOT_ESTIMATED')
+  expect(JSON.stringify(buildSituationalExportPayload(next))).not.toMatch(/rawResponses|historyIdentity|RESPONSE_FIRST_COMMITTED/)
+})
+
+it('exports SJT narrative and scope without converting author sums into a participant score report',()=>{
+  const next=structuredClone(result)
+  next.result!.narrative={version:'sjt-narrative-v1',paragraphs:['情境选择描述','=1+1']}
+  expect(buildSituationalExportPayload(next)).toMatchObject({metrics:[],narrative:{paragraphs:['情境选择描述','=1+1']}})
+  const csv=buildSituationalCsv(next)
+  expect(csv).toContain('情境选择描述');expect(csv).not.toContain('metricKey')
+  expect(csv).toContain("'=1+1")
+})

@@ -14,10 +14,7 @@ permissions:
 jobs:
   browser-debug:
     name: seeded Situational Bundle browser debug
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
       NODE_ENV: test
