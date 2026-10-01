@@ -1,0 +1,778 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "academic_self_efficacy_chinese_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "学科学习自我效能｜语文",
+      "abbreviation": "ASE-5",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学科学习自我效能；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "academic_self_efficacy",
+        "chinese",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "学科替换 PILOT；没有 exact-version 本地经验验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "subject-adaptation-pilot",
+        "evidenceType": "CONTENT_VALIDITY",
+        "studyDesign": "Explicit subject substitution; content audit only, no empirical validation.",
+        "population": "Chinese secondary school students; adapted subject form",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "rating": "UNKNOWN",
+        "citation": "Huisurvey first-wave subject adaptation; canonical chemistry wording with explicit subject substitution",
+        "notes": "No exact-version empirical validation. PUBLISHED + PILOT with theoretical provisional bands only."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Project-authored subject adaptation of verified canonical Chinese chemistry items",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "subject-adaptation-pilot"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "chinese",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "学科学习自我效能／语文／项目中文版本",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "一般",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "我肯定能够学会下学期语文课的内容",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "我确信自己能够完成最困难的语文学习任务",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "只要我不放弃，我可以完成几乎全部课堂中的语文问题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-04",
+          "content": "即使语文课程很难，我也能够学会",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-05",
+          "content": "如果我尝试，我可以完成语文课程中最困难的问题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-05",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "academic_self_efficacy",
+            "type": "total",
+            "label": "学科学习自我效能",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 4
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-05",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "academic_self_efficacy"
+        ],
+        "scoreOrder": [
+          "academic_self_efficacy"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_efficacy",
+            "headline": "我有多相信自己能完成任务",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对语文学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "面对语文任务，你可能暂时很难相信自己能完成",
+                "summary": "想到接下来的语文内容或较难的任务，你可能很没有把握。还没开始，就担心即使尝试也做不出来；这种预期可能让动手变得更难。\n\n这个结果没有测出你的能力，也没有说未来一定会失败。它记录的是你现在对“我能不能完成”的预期。预期可能受最近的困难和获得帮助的情况影响。先把一个任务拆小，比要求自己立刻相信“整章都能完成”更容易。你可以先确定一个可做的起点，也可以把暂时需要提示的步骤明确说出来。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "让你最没把握的是开始、中间某一步，还是坚持做完？有没有一步你其实知道怎样做？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一道任务，只给自己一个五分钟目标：读清条件、写出已知或完成第一步。做后标出独立完成的部分，再请人帮助下一步。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你对完成语文难题还不太有把握",
+                "summary": "遇到较难的语文任务，你可能愿意试，但不太确定自己能坚持做到最后。有时看过讲解会觉得懂了，独立再做又没底；也可能因为之前几次卡住，开始前就先降低期待。\n\n这里测的是完成任务的信心，不是你的实际能力认证。可以把“能不能完成”分成几步，看看哪些能独立做，哪些要提示。一次有帮助的小成功，往往比反复提醒自己“要自信”更具体。你也不必等到完全有把握，才允许自己开始。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "最近一道没完成的题，哪一步让你停下来了？是在知识上卡住，还是因为觉得后面肯定不会？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "挑一题中等难度任务，做前估计能完成几步，做后对照。把需要的提示写清，再独立做一道同类新题，留下一个可检查的完成记录。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你对语文任务的信心可能随难度而变化",
+                "summary": "你可能觉得一些语文任务能完成，但遇到最难的问题或新内容时，会担心自己做不到。熟悉任务和陌生任务带来的把握不同，并不意味着你必须给自己一个统一的“行或不行”。\n\n这个分数记录的是现在对完成任务的预期，没有判断实际掌握程度。可以观察信心与表现是否相符：有时预计很难，却完成了不少；有时预计没问题，却在一个小步骤卡住。这些差别可以帮助你选合适难度、安排练习和及时求助。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你最有把握和最没把握的任务各是什么？两者具体差在哪一步？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "这周选简单、中等、稍难三道题，分别在做前写预计完成程度，做后写实际情况。只挑差距最大的一道，找出需要调整的准备或办法。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "你通常愿意相信自己能完成语文任务",
+                "summary": "面对语文内容，你可能比较相信自己能学会，也愿意在有难度时继续尝试。过去的一些完成经历，可能已经给你积累了“可以往下做”的把握。\n\n这样的预期有助于开始，但分数高不表示所有任务都能独立完成，也不意味着求助就是失败。可以继续试稍有挑战的内容，同时检查哪些步骤真正掌握了。把“只要我尝试就能完成”落实为准备、策略和反馈，会让这份信心更有依据，也方便你在新内容变难时及时调整。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你的把握来自哪些实际完成经历？遇到新题时，你会怎样检查自己的准备够不够？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一道略高于熟悉难度的题，先写准备和步骤，卡住时记录所需提示。完成后隔一天不看答案再做，检查哪些部分已经能独立完成。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你现在很相信自己能应对语文的学习任务",
+                "summary": "你可能相信，即使语文内容比较难，只要继续尝试也能完成不少任务。这份预期可能让你敢于开始，也愿意面对挑战。\n\n但它不是对实际表现的保证。新的任务可能需要不同的知识、更多反馈或更合理的时间安排；只靠坚持，并不一定总是够。你可以保留这份把握，同时愿意检验它：先预测能完成什么，再看独立完成了什么。出现差距时，调整办法和请求帮助都能成为学习的一部分，无需为了维护信心而掩盖困难。\n\n比如读一篇文章时，是没读懂关键句、找不到支持答案的原文，还是有想法却表达不清？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "有没有一次预计很快完成，却用了很久？当时是缺知识、方法不合适，还是没留出检查时间？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个新任务，先写预计时间和可完成步骤。完成后对照实际，记录一个预测准确的地方和一个需要调整的地方，再安排下一次挑战。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次语文课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "academic_self_efficacy",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "theoretical_range"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "academic_self_efficacy_chinese_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "academic_self_efficacy",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "语文／初中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "chinese",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chinese-junior_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 5
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "完成任务的把握较少",
+                  "lower": 1,
+                  "upper": 1.8
+                },
+                {
+                  "key": "low",
+                  "label": "不太有把握完成任务",
+                  "lower": 1.8,
+                  "upper": 2.6
+                },
+                {
+                  "key": "middle",
+                  "label": "部分任务有把握",
+                  "lower": 2.6,
+                  "upper": 3.4
+                },
+                {
+                  "key": "high",
+                  "label": "比较有把握完成任务",
+                  "lower": 3.4,
+                  "upper": 4.2
+                },
+                {
+                  "key": "very_high",
+                  "label": "很有把握完成任务",
+                  "lower": 4.2,
+                  "upper": 5
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "academic_self_efficacy_chinese_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "bcf1b2a45103ab0b42a8a791a8e99a1e537673c384791cfda1a7d0e7feb8cbfd"
+            }
+          },
+          {
+            "scoreKey": "academic_self_efficacy",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "语文／高中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "chinese",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chinese-upper_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 5
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "完成任务的把握较少",
+                  "lower": 1,
+                  "upper": 1.8
+                },
+                {
+                  "key": "low",
+                  "label": "不太有把握完成任务",
+                  "lower": 1.8,
+                  "upper": 2.6
+                },
+                {
+                  "key": "middle",
+                  "label": "部分任务有把握",
+                  "lower": 2.6,
+                  "upper": 3.4
+                },
+                {
+                  "key": "high",
+                  "label": "比较有把握完成任务",
+                  "lower": 3.4,
+                  "upper": 4.2
+                },
+                {
+                  "key": "very_high",
+                  "label": "很有把握完成任务",
+                  "lower": 4.2,
+                  "upper": 5
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "academic_self_efficacy_chinese_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "bcf1b2a45103ab0b42a8a791a8e99a1e537673c384791cfda1a7d0e7feb8cbfd"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-05",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "academic_self_efficacy": 1
+          },
+          "totalScoreKeys": [
+            "academic_self_efficacy"
+          ]
+        }
+      },
+      {
+        "name": "all-5",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-05",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "academic_self_efficacy": 5
+          },
+          "totalScoreKeys": [
+            "academic_self_efficacy"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-04",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "academic_self_efficacy": 2
+          },
+          "totalScoreKeys": [
+            "academic_self_efficacy"
+          ]
+        }
+      }
+    ]
+  }
+}

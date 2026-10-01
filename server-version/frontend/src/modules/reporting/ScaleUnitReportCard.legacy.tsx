@@ -36,6 +36,7 @@ const formatNumber = (value: number | null | undefined, precision = 2): string =
 )
 
 const kindLabel = (kind: ScaleReferenceValue['referenceKind']): string => {
+  if (kind === 'theoretical_range') return '量尺范围描述（暂定）'
   if (kind === 'criterion_threshold') return '来源定义阈值'
   if (kind === 'descriptive_sample') return '文献描述性样本'
   return '参考分布'
@@ -208,7 +209,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
                     <h4>{interpretation.headline}</h4>
                     {interpretation.label && <span className="text-sm font-normal text-gray-500">{interpretation.label}</span>}
                   </div>
-                  <p>{interpretation.interpretation}</p>
+                  <p className="whitespace-pre-line leading-relaxed">{interpretation.interpretation}</p>
                   {interpretation.guidance.length > 0 && (
                     <ul>
                       {interpretation.guidance.map((entry, index) => (

@@ -1,7 +1,8 @@
+import { validateAudienceReport } from '../library/audience-report-gate'
 import { validateReferenceSetDefinition } from '../../assessment-reference/reference'
 import { parseScaleCatalogManifest } from '../library/catalog-manifest'
 import { parseLocalizationManifest } from '../library/localization-manifest'
-import { validateScaleDefinition } from '../scale-definition'
+import { hashScaleDefinition, validateScaleDefinition } from '../scale-definition'
 import { getScaleCustomScorerKeys, scoreScale } from '../scale-scoring'
 import type { ScaleInstrumentSourceV1 } from './types'
 
@@ -93,6 +94,7 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
     severity: issue.severity,
   }))
 
+  issues.push(...validateAudienceReport(source.executable.definition))
   const scoreKeys = new Set(source.executable.definition.scoring.scores.map((score) => score.key))
   const referenceVersions = new Set<string>()
   source.executable.references.forEach((reference, referenceIndex) => {
@@ -104,8 +106,14 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
     if (referenceVersions.has(reference.referenceVersion)) issues.push({ path: `${path}.referenceVersion`, message: 'referenceVersion 不能重复', severity: 'error' })
     referenceVersions.add(reference.referenceVersion)
     reference.entries.forEach((entry, entryIndex) => {
+      const axes=source.executable?.definition.versionAxes
+      if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale || entry.governance.measurementHash!==hashScaleDefinition(source.executable!.definition))) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
       if (entry.instrumentVersion !== source.identity.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 与 source identity 不一致', severity: 'error' })
       if (entry.scoringVersion !== source.executable?.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 与 definition 不一致', severity: 'error' })
+      if (axes && entry.governance) {
+        const interpretation=source.executable!.definition.report.interpretations.find(x=>x.scoreKey===entry.scoreKey)
+        if (!interpretation || entry.governance.bands.some(b=>!interpretation.bands.some(x=>x.key===b.key))) issues.push({path:`${path}.entries.${entryIndex}.governance.bands`,message:'REPORT_REFERENCE_BAND_COVERAGE_REQUIRED',severity:'error'})
+      }
       if (!scoreKeys.has(entry.scoreKey)) issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference scoreKey 不存在：${entry.scoreKey}`, severity: 'error' })
     })
   })

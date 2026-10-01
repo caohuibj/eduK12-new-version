@@ -1,0 +1,903 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "teacher_subject_liking_chemistry_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "RESEARCH_READY",
+    "identity": {
+      "canonicalName": "学生感知的教师学科喜爱｜化学",
+      "abbreviation": "TSL-3",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学生感知的教师学科喜爱；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "teacher_subject_liking",
+        "chemistry",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "精确历史版本，科研用途限已确认项目范围；非全国常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "teacher_subject_liking-junior_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "化学 junior_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=366; complete-case alpha=0.9132, alpha N=359; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'1': ['d1_tealike1', 'd1_tealike2', 'd1_tealike3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      },
+      {
+        "evidenceId": "teacher_subject_liking-upper_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "化学 upper_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=560; complete-case alpha=0.9172, alpha N=558; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'1': ['d1_tealike1', 'd1_tealike2', 'd1_tealike3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Verified canonical exact Chinese questionnaire",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "COMPLETED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "teacher_subject_liking-junior_secondary-exact-audit",
+      "teacher_subject_liking-upper_secondary-exact-audit"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "chemistry",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "学生感知的教师学科喜爱／化学／项目中文版本",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有点同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "比较同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "老师发自内心地喜欢化学这个学科",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "老师认为化学学科的知识非常有趣",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "老师觉得学习化学学科内容是充满乐趣的",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "teacher_subject_liking",
+            "type": "total",
+            "label": "学生感知的教师学科兴趣",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 2
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "teacher_subject_liking"
+        ],
+        "scoreOrder": [
+          "teacher_subject_liking"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "headline": "我从课堂里感受到的学科兴趣",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对化学学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "你目前较少从课堂里感受到老师对化学的兴趣",
+                "summary": "回想化学课，你可能很少感觉到老师发自内心地喜欢这门课，或觉得内容有趣。有时课堂主要围绕作业、步骤和考试，也可能让你不容易看见老师对学科的兴趣。\n\n这个结果测的是你的感受，没有读到老师心里，也不是对老师专业能力的评分。表达方式、近期内容和你当时的体验，都可能影响判断。如果你希望课堂里多一点“为什么值得了解”，可以从一个具体问题开始，看看老师怎样解释。你的感受值得被听见，也不需要被当成对老师动机的结论。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你较少感受到兴趣，是因为老师没表达、内容太赶，还是有一个让你印象特别深的课堂经历？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个你真正想知道的“为什么”，课后用具体问题请教老师。记录得到的回应和自己的感受；先观察这一次，不替老师下长期结论。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你从老师那里感受到的化学兴趣暂时不算明显",
+                "summary": "你可能偶尔看到老师对化学某些内容感兴趣，但整体印象还不太鲜明。也许老师表达比较平实，或者最近课堂更多在赶进度和练题。\n\n这份结果只反映你观察到的样子，没有证明老师真正喜不喜欢这门课，更不能拿来给老师排好坏。你可以把具体行为和自己的感受分开：老师举了什么例子、怎样回答问题，你当时又怎样理解。这样既能认真看待自己的体验，也能给判断留一点空间。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "有没有一次老师讲得特别投入？那时的话题或例子，与你平时感受到的有什么不同？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "这一周留意一个具体例子或回答，把老师做了什么和你感受到什么分别记一句。如果仍希望得到更多说明，可以提出一个具体的课堂问题。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你有时能感受到老师对化学的兴趣",
+                "summary": "在一些化学课上，你可能能感觉到老师觉得内容有趣；在另一些课上，这种感觉就没那么明显。不同章节、课堂节奏和表达方式，可能让你的体验有所变化。\n\n这个结果并没有说老师的兴趣“一半高一半低”，也不是对教学能力作评价。它记录的是你目前的观察。可以看看哪些具体行为让你产生兴趣感，例如多讲一个现象、认真追问原因或愿意回答新问题，再想想这些部分有没有帮助你理解和参与。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "哪一种课堂行为最让你觉得老师对内容有兴趣？它也会让你更愿意提问或学习吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选两节课，各记一个具体片段，写下它怎样影响自己的理解。挑一个还没懂的问题继续问，把感受到的兴趣连接到一个学习行动。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "你比较能从课堂里感受到老师对化学的兴趣",
+                "summary": "上化学课时，你可能比较常感觉老师喜欢这门课，或者觉得这些知识有趣。一个投入的讲解、一个额外的例子，都可能让你觉得内容值得了解。\n\n这份结果记录的是你的感受，不是在认证老师的真实内心或教学水平。老师表现出的兴趣，也不代表你必须喜欢同样的内容。可以看看哪些讲解真正帮助了你，再为自己的疑问留出位置：欣赏课堂，也可以指出哪里需要更清楚的说明。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "老师的哪些例子让你印象深？你只是觉得讲得热闹，还是也能解释那个问题了？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "挑一个老师讲得投入的例子，自己用两三句话解释它。再提出一个延伸问题或没听懂的地方，看看课堂兴趣能不能变成自己的理解。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你很明显地感受到老师对化学的热情",
+                "summary": "你可能常常觉得老师发自内心地喜欢化学，讲到知识时也显得有兴趣和乐趣。这样的课堂体验可能让你愿意听下去，或者产生新的好奇。\n\n不过，这个分数测的是学生感受到的热情，没有直接测老师的真实态度，也不等于教学效果一定很好。你仍然可以有没听懂、节奏跟不上或需要其它讲解的地方。可以把这份好的体验用在一个具体行动上，同时保留对自己学习需要的判断，不必因为老师很投入就不好意思说“这一步我还没懂”。\n\n回想最近一节化学课：老师说了哪句话、举了哪个例子，让你产生这样的感受？先记下看见和听见的事。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你感受到的热情有没有带来一个自己想追问的问题？遇到没懂的地方，你还愿意说出来吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个由课堂引发的好奇问题，做一次小查找或小练习。把发现带回课堂，也带上一个需要说明的卡点，让兴趣和实际理解一起往前走。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次化学课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。",
+          "这里测的是学生感受到的学科兴趣，不是老师真实内心或教学质量，不能用于教师排名与问责。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "normative_distribution"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "teacher_subject_liking_chemistry_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "化学／初中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 366
+            },
+            "statistics": {
+              "mean": 4.62386157,
+              "sd": 1.38011145,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 0.95628415
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 2.18579235
+                },
+                {
+                  "score": 1.66666667,
+                  "percentile": 3.41530055
+                },
+                {
+                  "score": 2,
+                  "percentile": 5.87431694
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 9.01639344
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 11.20218579
+                },
+                {
+                  "score": 3,
+                  "percentile": 14.48087432
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 19.26229508
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 23.63387978
+                },
+                {
+                  "score": 4,
+                  "percentile": 30.6010929
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 37.97814208
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 43.16939891
+                },
+                {
+                  "score": 5,
+                  "percentile": 51.50273224
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 59.9726776
+                },
+                {
+                  "score": 5.66666667,
+                  "percentile": 65.43715847
+                },
+                {
+                  "score": 6,
+                  "percentile": 84.15300546
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "chemistry",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chemistry-junior_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少感受到课堂学科兴趣",
+                  "lower": 1,
+                  "upper": 3.5,
+                  "sampleN": 78
+                },
+                {
+                  "key": "low",
+                  "label": "感受到的兴趣不明显",
+                  "lower": 3.5,
+                  "upper": 4.83333333,
+                  "sampleN": 89
+                },
+                {
+                  "key": "high",
+                  "label": "比较能感受到学科兴趣",
+                  "lower": 4.83333333,
+                  "upper": 5.83333333,
+                  "sampleN": 83
+                },
+                {
+                  "key": "very_high",
+                  "label": "明显感受到学科兴趣",
+                  "lower": 5.83333333,
+                  "upper": 6,
+                  "sampleN": 116
+                }
+              ],
+              "sampleN": 366,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0.21794872,
+                "floor": 0.01912568,
+                "ceiling": 0.31693989,
+                "skew": -0.79477363,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "f932aa07de3bbcda2b700d2fe288f91d38966b216f9a01fdb4e711ee9cace3e2"
+            }
+          },
+          {
+            "scoreKey": "teacher_subject_liking",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "化学／高中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 560
+            },
+            "statistics": {
+              "mean": 4.71696429,
+              "sd": 1.09873344,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 0.35714286
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 1.07142857
+                },
+                {
+                  "score": 2,
+                  "percentile": 2.41071429
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 3.66071429
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 4.375
+                },
+                {
+                  "score": 3,
+                  "percentile": 6.875
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 10.89285714
+                },
+                {
+                  "score": 3.5,
+                  "percentile": 12.94642857
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 15.53571429
+                },
+                {
+                  "score": 4,
+                  "percentile": 25
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 35.35714286
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 42.85714286
+                },
+                {
+                  "score": 5,
+                  "percentile": 55.35714286
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 67.58928571
+                },
+                {
+                  "score": 5.66666667,
+                  "percentile": 73.92857143
+                },
+                {
+                  "score": 6,
+                  "percentile": 88.21428571
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "chemistry",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chemistry-upper_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少感受到课堂学科兴趣",
+                  "lower": 1,
+                  "upper": 3.83333333,
+                  "sampleN": 101
+                },
+                {
+                  "key": "low",
+                  "label": "感受到的兴趣不明显",
+                  "lower": 3.83333333,
+                  "upper": 4.83333333,
+                  "sampleN": 162
+                },
+                {
+                  "key": "high",
+                  "label": "比较能感受到学科兴趣",
+                  "lower": 4.83333333,
+                  "upper": 5.83333333,
+                  "sampleN": 165
+                },
+                {
+                  "key": "very_high",
+                  "label": "明显感受到学科兴趣",
+                  "lower": 5.83333333,
+                  "upper": 6,
+                  "sampleN": 132
+                }
+              ],
+              "sampleN": 560,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0.00178253,
+                "floor": 0.00714286,
+                "ceiling": 0.23571429,
+                "skew": -0.79371311,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "f932aa07de3bbcda2b700d2fe288f91d38966b216f9a01fdb4e711ee9cace3e2"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_subject_liking": 1
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      },
+      {
+        "name": "all-6",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_subject_liking": 6
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "teacher_subject_liking": 2
+          },
+          "totalScoreKeys": [
+            "teacher_subject_liking"
+          ]
+        }
+      }
+    ]
+  },
+  "scientificReview": {
+    "schemaVersion": 1,
+    "reviewer": "Project owner — confirmed exact-version Wave1 RESEARCH_READY policy",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "approvedMaturity": "RESEARCH_READY",
+    "territory": "CN",
+    "intendedUses": [
+      "RESEARCH"
+    ],
+    "evidenceIds": [
+      "teacher_subject_liking-junior_secondary-exact-audit",
+      "teacher_subject_liking-upper_secondary-exact-audit"
+    ],
+    "scopeHash": "a2f51bf2965d55ab415740176ce40259c19c104c18997554b7a4de9f6951a29d"
+  }
+}

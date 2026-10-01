@@ -189,7 +189,8 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
 
   it('keeps Series discovery query count constant as Waves accumulate', async () => {
     const first=await buildReportingFixture(db,3)
-    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+    // Current authority fixture is explicitly already effective, independent of container clock skew.
+    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN',validFrom:new Date('2020-01-01')}})
     const resource=(await db.$queryRaw<Array<{family:string;key:string}>>`
       SELECT resource_family AS family, resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0]
     const series=await createReportingSeries({organizationId:first.organizationId,seriesKey:key('discovery-budget'),
@@ -224,7 +225,8 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
 
   it('keeps batch authority and exact artifact reads bounded through fifty Waves', async () => {
     const first=await buildReportingFixture(db,3)
-    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+    // Current authority fixture is explicitly already effective, independent of container clock skew.
+    await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN',validFrom:new Date('2020-01-01')}})
     const resource=(await db.$queryRaw<Array<{family:string;key:string}>>`
       SELECT resource_family AS family, resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0]
     const series=await createReportingSeries({

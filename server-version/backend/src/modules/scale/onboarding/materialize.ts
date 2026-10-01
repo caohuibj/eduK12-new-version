@@ -1,3 +1,4 @@
+import { allowsScaleAxisRevision, freezeScaleAxisSnapshot } from './axis-snapshots'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
@@ -49,12 +50,14 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
   } else {
     if (scale.instrumentClass !== 'STANDARD') throw new Error('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
     if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('DEPLOYMENT_VERSION_CONFLICT')
-    if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(executable.definition)) throw new Error('SCALE_DEFINITION_CONFLICT')
+    if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(executable.definition) && !allowsScaleAxisRevision(scale.definition,executable.definition)) throw new Error('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== definitionHash) throw new Error('SCALE_DEFINITION_CONFLICT')
-    if (!scale.definitionHash || !scale.definition) {
+    const revision=scale.definition && canonicalHash(scale.definition)!==canonicalHash(executable.definition)
+    if (!scale.definitionHash || !scale.definition || revision) {
       scale = await db.scale.update({
         where: { id: scale.id },
         data: {
+          ...(revision ? {status:'DRAFT' as const} : {}),
           definition: executable.definition as unknown as Prisma.InputJsonValue,
           definitionHash,
           itemCount: definitionCounts.itemCount,
@@ -65,6 +68,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
     }
   }
 
+  await freezeScaleAxisSnapshot(db,scale.id,source)
   const referenceCreates: string[] = []
   const referenceUnchanged: string[] = []
   for (const reference of executable.references) {

@@ -1,0 +1,925 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tutoring_necessity_chemistry_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "RESEARCH_READY",
+    "identity": {
+      "canonicalName": "补习必要性信念｜化学",
+      "abbreviation": "TN-3",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "补习必要性信念；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "tutoring_necessity",
+        "chemistry",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "精确历史版本，科研用途限已确认项目范围；非全国常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "SUPPORTED"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "tutoring_necessity-junior_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "化学 junior_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=736; complete-case alpha=0.8099, alpha N=732; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'2': ['d2_shaedu1', 'd2_shaedu2', 'd2_shaedu3'], '3': ['d3_shaedu1', 'd3_shaedu2', 'd3_shaedu3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      },
+      {
+        "evidenceId": "tutoring_necessity-upper_secondary-exact-audit",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "化学 upper_secondary; latest valid compatible canonical observations",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "studyDesign": "Exact historical questionnaire wording, response anchors and scoring audit; stage-specific aggregate calibration.",
+        "rating": "SUFFICIENT",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED (project historical evidence)",
+        "notes": "N=702; complete-case alpha=0.8704, alpha N=702; source SHA256=473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd; columns={'2': ['d2_shaedu1', 'd2_shaedu2', 'd2_shaedu3'], '3': ['d3_shaedu1', 'd3_shaedu2', 'd3_shaedu3']}; min_valid=2. Research readiness is project-scoped, not a norm or invariance claim."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Verified canonical exact Chinese questionnaire",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "COMPLETED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "tutoring_necessity-junior_secondary-exact-audit",
+      "tutoring_necessity-upper_secondary-exact-audit"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "chemistry",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "补习必要性信念／化学／项目自编 T2/T3 版本（self-developed）；Bray 仅为概念背景，不是题目来源",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "有点同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "同意",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "参加课外补习，对化学成绩提升的帮助很大",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "为了学好化学，我需要课外补习",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "补习是化学取得好成绩的基础",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "tutoring_necessity",
+            "type": "total",
+            "label": "补习必要性信念",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 2
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "tutoring_necessity"
+        ],
+        "scoreOrder": [
+          "tutoring_necessity"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "tutoring_necessity",
+            "headline": "我怎样看课外补习",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对化学学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "你目前较少觉得补习是学好化学的必要条件",
+                "summary": "你可能比较相信，靠课堂、自己的练习和学校里的帮助，也能把化学学下去。你不太觉得只有参加课外补习，才有机会取得好成绩。\n\n这个结果不是在建议你停止已有补习，也没有证明你现在不需要任何帮助。这里问的是你认为补习有没有必要，并没有比较参加与不参加的实际效果。更有用的是确认：你遇到具体困难时，能不能及时找到合适支持。课堂提问、同学讨论或老师的一次针对性讲解，也可能是有效的帮助来源。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "遇到不会的内容，你通常找谁、用什么办法解决？这些支持是否真的能帮到具体卡点？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一个近期问题，先试学校里能获得的帮助。记录获得了什么提示、之后能不能独立完成，再判断是否还需要其它支持。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你不太把补习当作学好化学的必经之路",
+                "summary": "你可能觉得课外补习有时有用，但不太认为每个想学好化学的人都必须参加。你或许更愿意先靠课堂和自己的安排，看哪里还需要帮助。\n\n这份作答没有判断补习好或不好，也没有替你的家庭作选择。支持有没有价值，要看它解决了什么问题，以及时间和负担是否合适。可以先明确一个具体需求：需要重新讲知识、练习反馈，还是有人帮你安排计划。这样更容易比较不同的帮助方式。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "如果现在需要帮助，你最需要的是哪一种？它一定要通过课外补习才能获得吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "写下一个具体学习需求，列两种可获得的支持方式。先试其中一种，做一道新题检查是否解决了问题；不要只比较花了多少时间。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你对补习是不是必要，可能会看情况来判断",
+                "summary": "有些时候你可能觉得补习能帮化学，有些时候又觉得课堂和自己的练习已经够用。不同内容、不同阶段，可能让你有不同判断。\n\n这份结果记录的是你现在的看法，不是对补习效果的评估。一次成绩变化，也不能单独说明是哪种帮助造成的。可以把问题缩小：你希望额外支持帮你改变哪一步？有没有其它可行办法？同时看看这种安排是否挤压休息和其它学习，才能作更贴近自己情况的判断。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "最近认为需要补习，是因为一个明确卡点，还是担心别人都在参加？你希望它具体改变什么？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "为一个学习问题订一个两周内能观察的目标。与老师或家长讨论支持方式，并约定怎样检查效果和时间负担，再决定是否继续调整。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "你比较相信补习能帮助自己学好化学",
+                "summary": "你可能觉得参加课外补习能帮助化学成绩，也较容易认为自己需要这类额外支持。这样的看法可能来自曾经得到帮助的经历，也可能来自看到别人参加补习后的变化。\n\n不过，这个分数没有证明补习对你一定有效，更不是购买建议。效果需要落在一个具体问题上：你是否更能独立完成、是否理解得更清楚？可以保留对支持的期待，同时把课堂、自己的练习和额外帮助各自起的作用说清楚，避免只用“参加了就会好”来判断。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "最近一次得到课外帮助后，你能独立做哪一类新题了？还是主要感觉有人陪着，暂时更安心？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "与老师或家长选一个具体目标，记录接受帮助前和两周后的独立表现，同时记录时间负担。如果没有达到目标，先讨论帮助方式，不急着加课。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你可能很担心“不补习就学不好化学”",
+                "summary": "你可能很认同，学好化学需要课外补习，甚至觉得没有这类帮助就很难取得好成绩。想到别人已经在补、自己还没补时，也可能觉得落后或没有把握。\n\n这份作答反映的是你认为补习有多必要，没有证明“不参加就会失败”，也不提供购买建议。需要支持与必须选择某一种付费形式，是两件事。可以先找到一个明确的困难，与老师或家长一起比较能够获得的帮助，再观察实际效果和负担。你的学习还有课堂、练习和反馈等多个部分。\n\n把最近一个化学学习困难写清楚，再看看课堂提问、同学讨论和课外帮助各能解决哪一部分。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你最担心的是一个具体知识点没懂，还是别人参加而自己没有？哪些困难已经通过别的帮助解决过？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "把最担心的两处困难带给老师或家长，列出校内和课外可获得的支持。选一个先试，约定观察独立表现和时间负担，不用只按“补没补”作判断。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次化学课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。",
+          "这里只测你认为补习是否必要，不证明补习有效，也不是购买建议。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "tutoring_necessity",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "normative_distribution"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "tutoring_necessity_chemistry_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "tutoring_necessity",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "化学／初中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 736
+            },
+            "statistics": {
+              "mean": 3.55638587,
+              "sd": 1.23474454,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 2.44565217
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 5.97826087
+                },
+                {
+                  "score": 1.5,
+                  "percentile": 7.20108696
+                },
+                {
+                  "score": 1.66666667,
+                  "percentile": 8.42391304
+                },
+                {
+                  "score": 2,
+                  "percentile": 12.22826087
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 16.7798913
+                },
+                {
+                  "score": 2.5,
+                  "percentile": 18.68206522
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 22.55434783
+                },
+                {
+                  "score": 3,
+                  "percentile": 31.31793478
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 41.30434783
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 51.83423913
+                },
+                {
+                  "score": 4,
+                  "percentile": 63.38315217
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 73.16576087
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 80.36684783
+                },
+                {
+                  "score": 5,
+                  "percentile": 87.5
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 92.52717391
+                },
+                {
+                  "score": 5.66666667,
+                  "percentile": 95.10869565
+                },
+                {
+                  "score": 6,
+                  "percentile": 98.16576087
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "chemistry",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chemistry-junior_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少认为补习必要",
+                  "lower": 1,
+                  "upper": 1.83333333,
+                  "sampleN": 70
+                },
+                {
+                  "key": "low",
+                  "label": "不太认为补习必要",
+                  "lower": 1.83333333,
+                  "upper": 2.83333333,
+                  "sampleN": 124
+                },
+                {
+                  "key": "middle",
+                  "label": "对补习必要性看情况",
+                  "lower": 2.83333333,
+                  "upper": 4.16666667,
+                  "sampleN": 317
+                },
+                {
+                  "key": "high",
+                  "label": "比较认为补习必要",
+                  "lower": 4.16666667,
+                  "upper": 5.16666667,
+                  "sampleN": 160
+                },
+                {
+                  "key": "very_high",
+                  "label": "很认为补习必要",
+                  "lower": 5.16666667,
+                  "upper": 6,
+                  "sampleN": 65
+                }
+              ],
+              "sampleN": 736,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0.00135685,
+                "floor": 0.04891304,
+                "ceiling": 0.03668478,
+                "skew": -0.15554251,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "b818912688e513dcb8ffe30ab12492cf47b2dc849940e7bc0e546c9b1e2f3cd7"
+            }
+          },
+          {
+            "scoreKey": "tutoring_necessity",
+            "referenceKind": "normative_distribution",
+            "evidenceLevel": "local_pilot",
+            "provenanceType": "local_observed",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "化学／高中；历史便利样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit",
+              "sampleSize": 702
+            },
+            "statistics": {
+              "mean": 2.78822412,
+              "sd": 1.24789529,
+              "percentileTable": [
+                {
+                  "score": 1,
+                  "percentile": 9.97150997
+                },
+                {
+                  "score": 1.33333333,
+                  "percentile": 20.7977208
+                },
+                {
+                  "score": 1.66666667,
+                  "percentile": 23.00569801
+                },
+                {
+                  "score": 2,
+                  "percentile": 29.98575499
+                },
+                {
+                  "score": 2.33333333,
+                  "percentile": 37.96296296
+                },
+                {
+                  "score": 2.66666667,
+                  "percentile": 43.51851852
+                },
+                {
+                  "score": 3,
+                  "percentile": 52.84900285
+                },
+                {
+                  "score": 3.33333333,
+                  "percentile": 63.17663818
+                },
+                {
+                  "score": 3.66666667,
+                  "percentile": 72.22222222
+                },
+                {
+                  "score": 4,
+                  "percentile": 81.98005698
+                },
+                {
+                  "score": 4.33333333,
+                  "percentile": 89.52991453
+                },
+                {
+                  "score": 4.66666667,
+                  "percentile": 93.8034188
+                },
+                {
+                  "score": 5,
+                  "percentile": 97.00854701
+                },
+                {
+                  "score": 5.33333333,
+                  "percentile": 98.86039886
+                },
+                {
+                  "score": 5.66666667,
+                  "percentile": 99.21652422
+                },
+                {
+                  "score": 6,
+                  "percentile": 99.64387464
+                }
+              ],
+              "percentileInterpolation": "linear"
+            },
+            "limitations": [
+              "历史便利样本；未建立总体常模或跨学段等值性。"
+            ],
+            "disclaimer": "这是同学科、同学段历史学生的参考分布，帮助理解位置，不代表全国常模，也不等于能力或成绩。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "LOCAL_REFERENCE",
+              "subjectKey": "chemistry",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "chemistry-upper_secondary-historical-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 6
+              },
+              "bandSource": "EMPIRICAL_DISTRIBUTION",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "较少认为补习必要",
+                  "lower": 1,
+                  "upper": 1.16666667,
+                  "sampleN": 140
+                },
+                {
+                  "key": "low",
+                  "label": "不太认为补习必要",
+                  "lower": 1.16666667,
+                  "upper": 2.16666667,
+                  "sampleN": 110
+                },
+                {
+                  "key": "middle",
+                  "label": "对补习必要性看情况",
+                  "lower": 2.16666667,
+                  "upper": 3.5,
+                  "sampleN": 223
+                },
+                {
+                  "key": "high",
+                  "label": "比较认为补习必要",
+                  "lower": 3.5,
+                  "upper": 4.5,
+                  "sampleN": 174
+                },
+                {
+                  "key": "very_high",
+                  "label": "很认为补习必要",
+                  "lower": 4.5,
+                  "upper": 6,
+                  "sampleN": 55
+                }
+              ],
+              "sampleN": 702,
+              "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+              "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+              "crossStageReReferenceAllowed": false,
+              "calibration": {
+                "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+                "missingness": 0,
+                "floor": 0.1994302,
+                "ceiling": 0.00712251,
+                "skew": 0.0406601,
+                "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+              },
+              "measurementHash": "b818912688e513dcb8ffe30ab12492cf47b2dc849940e7bc0e546c9b1e2f3cd7"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "tutoring_necessity": 1
+          },
+          "totalScoreKeys": [
+            "tutoring_necessity"
+          ]
+        }
+      },
+      {
+        "name": "all-6",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "tutoring_necessity": 6
+          },
+          "totalScoreKeys": [
+            "tutoring_necessity"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "tutoring_necessity": 2
+          },
+          "totalScoreKeys": [
+            "tutoring_necessity"
+          ]
+        }
+      }
+    ]
+  },
+  "scientificReview": {
+    "schemaVersion": 1,
+    "reviewer": "Project owner — confirmed exact-version Wave1 RESEARCH_READY policy",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "approvedMaturity": "RESEARCH_READY",
+    "territory": "CN",
+    "intendedUses": [
+      "RESEARCH"
+    ],
+    "evidenceIds": [
+      "tutoring_necessity-junior_secondary-exact-audit",
+      "tutoring_necessity-upper_secondary-exact-audit"
+    ],
+    "scopeHash": "d01d17ba709be169d50f7d9d899a0eeb158e42ec913ccf25db8186281c992b27"
+  }
+}
