@@ -47,25 +47,31 @@ export const scaleSelfDeliveryAdapter: AssessmentDeliveryCatalogAdapter = {
   async listForRespondent(userId) {
     const scales = await prisma.scale.findMany({ where: { status: 'PUBLISHED' },
       select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, status: true, visibility: true } })
+    // Each published identity still gets its own current access/deployment
+    // decision. Limit concurrency so a larger library does not make the inbox
+    // wait for every independent database round trip in series.
     const result: AssessmentDeliveryCatalogEntry[] = []
-    for (const scale of scales) {
-      if (!await canStudentAccessScale(scale, userId)) continue
-      const deployment = await resolveScaleStartDeployment({ db: prisma, scale, requestedMode: 'STANDALONE' })
-      if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts) continue
-      const source = deployment.runtimePolicy
-      const respondent = source.disclosure.audiences.respondent
-      if (!source.applicability.respondentTypes.includes('SELF') || !respondent) continue
-      const journey: AssessmentJourneyPolicyV1 = {
-        schemaVersion: 1, resource: { family: 'SCALE', key: scale.code, version: scale.instrumentVersion },
-        subjectRoles: ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'],
-        respondentRoles: ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'],
-        relationshipKinds: ['SELF'], perspectives: ['SELF_REPORT'], analysisMode: 'INDIVIDUAL_ONLY',
-        visibilityPolicyKey: source.disclosure.policyVersion, minimumRespondents: null,
-        initiationModes: ['RESPONDENT_SELF_START'], sourcePolicyHash: source.runtimePolicyHash,
-      }
-      result.push({ title: scale.name, journey, launchTarget: `/student/scales/${encodeURIComponent(scale.id)}`,
-        disclosure: disclosureFromScaleCapabilities({ audience: 'respondent', capabilities: respondent, policyKey: source.disclosure.policyVersion }),
-        applicabilityHash: canonicalHash(source.applicability), policyHash: canonicalHash(journey) })
+    for (let offset = 0; offset < scales.length; offset += 4) {
+      const batch = await Promise.all(scales.slice(offset, offset + 4).map(async (scale): Promise<AssessmentDeliveryCatalogEntry | null> => {
+        if (!await canStudentAccessScale(scale, userId)) return null
+        const deployment = await resolveScaleStartDeployment({ db: prisma, scale, requestedMode: 'STANDALONE' })
+        if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts) return null
+        const source = deployment.runtimePolicy
+        const respondent = source.disclosure.audiences.respondent
+        if (!source.applicability.respondentTypes.includes('SELF') || !respondent) return null
+        const journey: AssessmentJourneyPolicyV1 = {
+          schemaVersion: 1, resource: { family: 'SCALE', key: scale.code, version: scale.instrumentVersion },
+          subjectRoles: ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'],
+          respondentRoles: ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'],
+          relationshipKinds: ['SELF'], perspectives: ['SELF_REPORT'], analysisMode: 'INDIVIDUAL_ONLY',
+          visibilityPolicyKey: source.disclosure.policyVersion, minimumRespondents: null,
+          initiationModes: ['RESPONDENT_SELF_START'], sourcePolicyHash: source.runtimePolicyHash,
+        }
+        return { title: scale.name, journey, launchTarget: `/student/scales/${encodeURIComponent(scale.id)}`,
+          disclosure: disclosureFromScaleCapabilities({ audience: 'respondent', capabilities: respondent, policyKey: source.disclosure.policyVersion }),
+          applicabilityHash: canonicalHash(source.applicability), policyHash: canonicalHash(journey) }
+      }))
+      result.push(...batch.filter((entry): entry is AssessmentDeliveryCatalogEntry => entry !== null))
     }
     return result
   },

@@ -101,9 +101,11 @@ async function complete(name, r) {
   const card = page.locator('section').filter({ has: page.getByRole('heading', { name: r.name, exact: true }) })
   await card.waitFor()
   if (task.consentRequired) await card.getByRole('checkbox').check()
-  const started = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/executions/${task.executionId}/start`))
+  const started = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith(`/executions/${task.executionId}/start`), { timeout: 45_000 })
   await card.getByRole('button', { name: '开始测评', exact: true }).click()
-  const start = await (await started).json()
+  const startResponse = await started
+  const start = await startResponse.json()
+  assert.equal(startResponse.ok(), true, `START HTTP ${startResponse.status()}: ${JSON.stringify(start)}`)
   assert.equal(start.code, 0, JSON.stringify(start))
   const attemptId = start.data.runtimeBindingRef
   assert.ok(attemptId)

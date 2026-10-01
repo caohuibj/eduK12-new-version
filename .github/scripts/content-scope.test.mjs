@@ -23,6 +23,7 @@ test('empty, core, executable additions and mixed changes require full checks', 
 
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
+  assert.ok(requiredChecks({ scope: { outputs: { content: 'false', presentation: 'false' } } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [
     ['true', 'false', false],
     ['true', 'false', true],
