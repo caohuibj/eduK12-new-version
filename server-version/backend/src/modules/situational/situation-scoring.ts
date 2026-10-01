@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   situationDefinitionSchema,
-  situationalSceneSchema,
+  situationalMeasurementSceneSchema,
   type SituationalChannelDefinition,
   type SituationDefinitionV1,
   type SituationalResponseValue,
@@ -20,6 +20,9 @@ export interface SituationalResponse {
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string
+  responseRevision?: number
+  historyIdentity?: string
+  stageConfirmed?: boolean
 }
 
 export type SituationalMetricStatus = 'calculated' | 'limited' | 'not_calculable'
@@ -37,6 +40,10 @@ export interface SituationalMetricValue {
   expectedResponses: string[]
   answeredResponses: string[]
   status: SituationalMetricStatus
+  estimate?: number | null
+  precision?: { status: 'NOT_ESTIMATED' | 'ESTIMATED'; standardError: number | null; interval: { lower: number; upper: number; level: number; kind: 'CONFIDENCE' | 'CREDIBLE' } | null }
+  coverage?: { numberOfOpportunities: number; numberOfAnsweredOpportunities: number; numberOfIndependentScenes: number }
+  maturity?: 'PROVISIONAL' | 'CALIBRATED'
 }
 
 export type SituationalQualityStatus = 'interpretable' | 'limited' | 'invalid'
@@ -49,6 +56,7 @@ export interface SituationalQuality {
 export interface SituationalResultV1 {
   metrics: SituationalMetricValue[]
   quality: SituationalQuality
+  model?: { modelKey: string; modelVersion: string; scoringVersion: string; parameterSetHash?: string }
 }
 
 export interface SituationalScoringOptions {
@@ -85,11 +93,11 @@ export interface SituationalGoldenCase {
  * A published definition must declare at least one scene, but a valid V2
  * trajectory may project to zero score-eligible scenes when it reaches an
  * early terminal through routing-only decisions. The scorer still validates
- * the complete definition shape and relaxes only this internal scene-count
- * constraint; publication validation remains unchanged.
+ * the complete definition shape and accepts bounded V2 bundle projections
+ * and internally empty scoring surfaces; publication validation remains unchanged.
  */
 const projectedSituationDefinitionSchema = situationDefinitionSchema.extend({
-  scenes: z.array(situationalSceneSchema),
+  scenes: z.array(situationalMeasurementSceneSchema),
 })
 
 const finite = (value: number): number => {
@@ -252,7 +260,7 @@ export const scoreSituational = (
   // Frozen definitions are trusted runtime input: publication/compile gates
   // own cross-field validation. Keep structural parsing here. Only the
   // internally projected zero-scene case uses the relaxed scoring-view schema.
-  const parsedDefinition = definitionInput.scenes.length === 0
+  const parsedDefinition = definitionInput.scenes.length === 0 || definitionInput.scenes.some(s => s.measurementBundle)
     ? projectedSituationDefinitionSchema.parse(definitionInput)
     : situationDefinitionSchema.parse(definitionInput)
   const definition = parsedDefinition as SituationDefinitionV1
