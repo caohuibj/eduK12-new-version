@@ -4,24 +4,27 @@ import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { STANDARDIZED_SITUATIONAL_E2E_PACKAGE } from '../../modules/situational/fixtures/standardized-e2e-fixture'
 import { captureFixture } from './vnext-capture-fixture'
+import { hashRecoveryToken } from '../../services/anonymousAccess'
+import { compositeItemSlotKey } from '../../modules/assessment-runtime/slot-set'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 
 const url = integrationDatabaseUrl('SITUATIONAL_VNEXT_INTEGRATION_DATABASE_URL', 'V32_3_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
 suite('Situational VNext actual PostgreSQL FINAL and research authority', () => {
-  let db: PrismaClient, runtime: typeof import('../../modules/situational/situational-runtime.service'), final: typeof import('../../modules/situational/situational-final-submit.service'), research: typeof import('../../modules/situational/situation-research-export')
-  const users: string[] = [], attempts: string[] = []
+  let db: PrismaClient, runtime: typeof import('../../modules/situational/situational-runtime.service'), final: typeof import('../../modules/situational/situational-final-submit.service'), research: typeof import('../../modules/situational/situation-research-export'), composite: typeof import('../../modules/composite/composite.service')
+  const users: string[] = [], attempts: string[] = [], courses: string[] = [], composites: string[] = []
   beforeAll(async () => {
     process.env.DATABASE_URL = url!; process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64); process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     db = new PrismaClient({ datasources: { db: { url: url! } } }); await db.$connect()
+    console.info('Synthetic VNext PostgreSQL connected; loading shared services')
     vi.doMock('../../config/database', () => ({ prisma: db }))
     vi.doMock('../../modules/situational/situation-package.registry', async () => ({ ...(await vi.importActual<object>('../../modules/situational/situation-package.registry')), listSituationPackages: () => [STANDARDIZED_SITUATIONAL_E2E_PACKAGE], getSituationPackage: () => STANDARDIZED_SITUATIONAL_E2E_PACKAGE }))
-    runtime = await import('../../modules/situational/situational-runtime.service'); final = await import('../../modules/situational/situational-final-submit.service'); research = await import('../../modules/situational/situation-research-export')
-  }, 30000)
+    runtime = await import('../../modules/situational/situational-runtime.service'); final = await import('../../modules/situational/situational-final-submit.service'); research = await import('../../modules/situational/situation-research-export'); composite = await import('../../modules/composite/composite.service'); console.info('Synthetic VNext shared services ready')
+  }, 120000)
   afterAll(async () => {
     delete process.env.SITUATIONAL_RESEARCH_EXPORT_GRANTS
-    if (db) { await db.situationalAttempt.deleteMany({ where: { id: { in: attempts } } }); await db.user.deleteMany({ where: { id: { in: users } } }); await db.$disconnect() }
-  })
+    if (db) { await db.situationalAttempt.deleteMany({ where: { id: { in: attempts } } }); await db.compositeAssessment.deleteMany({ where: { id: { in: composites } } }); await db.course.deleteMany({ where: { id: { in: courses } } }); await db.user.deleteMany({ where: { id: { in: users } } }); await db.$disconnect() }
+  }, 60000)
   async function user() {
     const id = randomUUID(); await db.user.create({ data: { id, username: `synthetic-vnext-${id}`, passwordHash: 'synthetic-not-login' } }); users.push(id); return id
   }
@@ -72,4 +75,28 @@ suite('Situational VNext actual PostgreSQL FINAL and research authority', () => 
     await expect(research.exportSituationalResearchAttempt(f.result.attemptId, researcher)).rejects.toMatchObject({ statusCode: 403 })
     delete process.env.SITUATIONAL_RESEARCH_EXPORT_GRANTS
   })
+  it('preserves anonymous embedded recovery, one FINAL and closed parent research authority', async () => {
+    const owner = await user()
+    await db.user.update({ where: { id: owner }, data: { role: 'TEACHER', teacherApproved: true } })
+    const course = await db.course.create({ data: { title: 'Synthetic public VNext', courseCode: randomUUID(), status: 'PUBLISHED', creatorId: owner } }); courses.push(course.id)
+    const parent = await db.compositeAssessment.create({ data: { code: randomUUID(), name: 'Synthetic public VNext', status: 'PUBLISHED', publicEnabled: true, publishedAt: new Date(), courseId: course.id, createdBy: owner } }); composites.push(parent.id)
+    const item = await db.compositeAssessmentItem.create({ data: { compositeAssessmentId: parent.id, type: 'SITUATIONAL', position: 0, required: true, situationalInstrumentKey: STANDARDIZED_SITUATIONAL_E2E_PACKAGE.key, situationalInstrumentVersion: '1.0.0' } })
+    const token = await composite.createAccessTokenForComposite(owner, 'TEACHER', parent.id, new Date(Date.now() + 86400000).toISOString(), 1)
+    const started = await composite.startPublicAttempt(token.token)
+    const child = await db.situationalAttempt.findFirstOrThrow({ where: { compositeAttemptId: started.attempt.id, compositeItemId: item.id } }); attempts.push(child.id)
+    expect(child.userId).toBeNull()
+    const binding = { compositeAttemptId: started.attempt.id, compositeItemId: item.id, compositeSlotKey: compositeItemSlotKey(item.id, 'SITUATIONAL'), recoveryTokenHash: hashRecoveryToken(started.recoveryToken!) }
+    await expect(runtime.loadEmbeddedSituationalAttemptRuntime(child.id, { ...binding, recoveryTokenHash: hashRecoveryToken('wrong-synthetic-recovery') })).rejects.toMatchObject({ statusCode: 403 })
+    const resumed = await runtime.loadEmbeddedSituationalAttemptRuntime(child.id, binding)
+    expect(runtime.situationalAttemptForResponse(resumed.row, resumed.snapshot).instrument.assignment).toBeDefined()
+    const f = captureFixture(STANDARDIZED_SITUATIONAL_E2E_PACKAGE.definition, child.id)
+    const payload = { attemptId: child.id, submissionId: randomUUID(), attemptEpoch: child.attemptEpoch, definitionHash: child.definitionHash, responses: f.responses, researchCapture: f.capture, embedded: binding }
+    expect((await final.submitSituationalAttemptFinal(payload)).replayed).toBe(false)
+    expect((await final.submitSituationalAttemptFinal(payload)).replayed).toBe(true)
+    expect(await db.situationalRawSubmission.count({ where: { attemptId: child.id } })).toBe(1)
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: started.attempt.id } })).status).toBe('COMPLETED')
+    process.env.SITUATIONAL_RESEARCH_EXPORT_GRANTS = JSON.stringify([{ grantId: 'synthetic-parent-denied', researcherUserId: owner, attemptIds: [child.id], definitionHash: child.definitionHash, expiresAt: '2100-01-01T00:00:00Z', approvalReference: 'synthetic-test-only', projection: 'PSEUDONYMOUS_RAW_V1' }])
+    await expect(research.exportSituationalResearchAttempt(child.id, owner)).rejects.toMatchObject({ statusCode: 403 })
+  })
+
 })
