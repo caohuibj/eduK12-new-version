@@ -369,4 +369,7 @@ async function main() {
     fs.writeFileSync(path.join(output, 'qa.json'), JSON.stringify({ results }, null, 2))
   } finally { await browser.close() }
 }
-main().catch(error => { console.error(error); process.exitCode = 1 })
+main().catch(error => {
+  reportVisualFailure({ engine: process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium', width: 'setup-or-final', url: base, output, script: __filename }, error)
+  console.error(error); process.exitCode = 1
+})

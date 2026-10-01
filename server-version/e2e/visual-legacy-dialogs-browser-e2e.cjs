@@ -190,5 +190,8 @@ async function main() {
   } finally { await browser.close(); fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify(results, null, 2)) }
   console.log(`${engine}: ${results.length} legacy dialog scenarios passed`)
 }
-if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1 })
+if (require.main === module) main().catch(error => {
+  reportVisualFailure({ engine, width: 'setup-or-final', url: base, output, script: __filename }, error)
+  console.error(error); process.exitCode = 1
+})
 module.exports = { installLegacyFixture }
