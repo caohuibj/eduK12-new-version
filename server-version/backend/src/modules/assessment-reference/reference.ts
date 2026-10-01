@@ -176,8 +176,7 @@ export const validateReferenceSetDefinition = (
     if (!candidate.population || typeof candidate.population !== 'object') {
       issues.push({ path: `${path}.population`, message: '必须提供 population 描述', severity: 'error' })
     } else {
-      validateReferenceGovernance(candidate).forEach(message => issues.push({ path: path + '.governance', message, severity: 'error' }))
-    const population = candidate.population as ReferencePopulation
+      const population = candidate.population as ReferencePopulation
       ;(['description', 'ageBand', 'sexScope', 'language', 'countryOrRegion'] as const).forEach((field) => {
         const fieldValue = population[field]
         if (fieldValue !== undefined && fieldValue !== null && typeof fieldValue !== 'string') {
@@ -486,6 +485,7 @@ export const resolveAssessmentReference = (input: {
   scoringVersion: string
   score: AssessmentReferenceScoreLike
   context?: ReferenceContext
+  measurementHash?:string
 }): ResolvedScaleReference[] => {
   const context = input.context ?? {}
   return input.selections
@@ -507,6 +507,7 @@ export const resolveAssessmentReference = (input: {
       }
       if (matches.length > 1) return unavailable(selection, 'ambiguous_population', 'reference 定义存在重叠的人群范围，未自动选择。')
       const entry = matches[0]
+      if(entry.governance && input.measurementHash && entry.governance.measurementHash!==input.measurementHash)return unavailable(selection,'measurement_mismatch')
       if (input.score.value === null || input.score.status === 'not_calculable') return unavailable(selection, 'insufficient_data', '分数不可计算，因此隐藏 reference。')
 
       const value = input.score.value
@@ -577,6 +578,7 @@ export const resolveScaleReference = (input: {
   scoringVersion: string
   score: ScaleScoreValue
   context?: ReferenceContext
+  measurementHash?:string
 }): ResolvedScaleReference[] => {
   if (input.policy.type === 'none') return []
   return resolveAssessmentReference({
@@ -588,5 +590,6 @@ export const resolveScaleReference = (input: {
     scoringVersion: input.scoringVersion,
     score: input.score,
     context: input.context,
+    ...(input.measurementHash?{measurementHash:input.measurementHash}:{}),
   })
 }
