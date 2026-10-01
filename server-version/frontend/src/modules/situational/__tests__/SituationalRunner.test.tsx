@@ -325,3 +325,42 @@ describe('Situational text runner', () => {
     expect(vi.mocked(situationalApi.submit).mock.calls[0]?.[1].responses).toHaveLength(sceneCount)
   }, 10_000)
 })
+
+describe('Situational staged scientific presentation', () => {
+  it('hides probe prompts before choice confirmation, locks the choice and submits one bounded capture', async () => {
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source = startData()
+    source.instrument.definition = {
+      schemaVersion: 2, respondentType: 'synthetic', sampling: { strategy: 'BRANCH_REACHABLE' }, scenes: [source.instrument.definition.scenes[0]!],
+      flow: { strategy: 'BRANCHING_DAG_V1', entryNodeKey: 'node', nodes: [
+        { nodeType: 'SCENE', nodeKey: 'node', sceneKey: 'S1', motherSceneKey: 'M', roundKey: 'R', stepKey: 'S', responseStages: [{ stageKey: 'choice', kind: 'CHOICE', channelKeys: ['choice'] }, { stageKey: 'probe', kind: 'POST_CHOICE_PROBE', channelKeys: ['continuous'] }], transition: { type: 'NEXT', nextNodeKey: 'terminal' } },
+        { nodeType: 'TERMINAL', nodeKey: 'terminal' },
+      ] },
+    }
+    source.instrument.assignment = { assignmentVersion: 'all-administered-v1', assignmentIdentity: 'c'.repeat(64), seedIdentity: 'd'.repeat(64), selections: [] }
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
+    vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData(source) })
+    vi.mocked(situationalApi.submit).mockClear()
+    renderRunner()
+    expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
+    expect(screen.queryByText('你有多确定？')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
+    expect(screen.getByLabelText('选择 B')).toBeDisabled()
+    const slider = screen.getByRole('slider')
+    fireEvent.change(slider, { target: { value: '80' } })
+    fireEvent.change(slider, { target: { value: '90' } })
+    fireEvent.blur(slider)
+    await waitFor(() => expect(screen.getByText('90')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: '确认本阶段作答' }))
+    await waitFor(() => expect(screen.queryByRole('button', { name: '确认本阶段作答' })).not.toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: '提交测评' }))
+    await waitFor(() => expect(situationalApi.submit).toHaveBeenCalledTimes(1))
+    const payload = vi.mocked(situationalApi.submit).mock.calls[0]![1]
+    expect(payload.responses).toHaveLength(2)
+    expect(payload.researchCapture!.events.filter(e => e.channelKey === 'continuous' && e.type === 'RESPONSE_FIRST_COMMITTED')).toHaveLength(1)
+    expect(payload.researchCapture!.events.some(e => e.type === 'PROBE_EXPOSED')).toBe(true)
+  })
+})
