@@ -621,6 +621,7 @@ enum AssessmentReferenceInstrumentType {
 enum AssessmentReferenceStatus {
   DRAFT
   ACTIVE
+  SUPERSEDED
   RETIRED
 }
 
