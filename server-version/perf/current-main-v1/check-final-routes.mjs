@@ -50,5 +50,5 @@ const stale = [...expected].filter(([route, source]) => actual.get(route) !== so
 if (missing.length || stale.length) {
   throw new Error(`FINAL route inventory mismatch\nNew or remapped: ${JSON.stringify(missing)}\nStale: ${JSON.stringify(stale)}`)
 }
-if (expected.size !== 14) throw new Error(`Expected 14 reviewed FINAL routes, found ${expected.size}`)
+if (expected.size !== 15) throw new Error(`Expected 15 reviewed FINAL routes, found ${expected.size}`)
 process.stdout.write(`FINAL route inventory: ${actual.size} registered templates matched\n`)

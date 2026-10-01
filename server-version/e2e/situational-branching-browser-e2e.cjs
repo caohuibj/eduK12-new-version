@@ -142,8 +142,9 @@ const standaloneAttemptId = (url) => {
 const startStandalone = async (page) => {
   await page.goto(`${BASE_URL}/student/situational`, { waitUntil: 'domcontentloaded' })
   await page.getByText('情境化测评', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-  const card = page.locator('a').filter({ hasText: fixture.branching.reportHeadline }).first()
+  const card = page.locator(`a[href="/student/situational/${encodeURIComponent(fixture.item.instrumentKey)}"]`)
   await card.waitFor({ state: 'visible', timeout: 30000 })
+  assert.ok((await card.textContent()).includes(fixture.branching.instrumentTitle), 'published entry does not show the instrument title')
   record('authenticated-standalone-published-entry')
   await card.click()
   await waitScene(page, fixture.branching.scenes.entry)
