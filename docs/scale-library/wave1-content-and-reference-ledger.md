@@ -52,3 +52,8 @@ LATEST_VALID_COMPATIBLE_WAVE_PER_CANONICAL_PERSON_AND_SCORE
 自动验收覆盖全包 golden、缺失作答门限、跨学科/年级错配、伪经验声明、缺少受众 QC、版本不升档、冻结哈希及快照不可更新/删除、权限拒绝、36 个内容安装/发布/重复安装、纵向 v1/v2/v3 冻结与显式重生成。
 
 前端验收覆盖可读段落、得分位置和服务端冻结趋势。自动字数/关键词不能证明学生读懂，仍需后续学生试读。
+
+## Revision audit (2026-10-01)
+Calibration now records eligibleN and attributes each person's missingness denominator to the selected valid wave's stage (or the latest eligible stage if no valid score exists). Recomputed all 24 references from the read-only canonical inputs: N, bands and missingness values were unchanged; three synthetic generator contracts cover the cross-stage fallback and unsupported distributions.
+
+Student report examples now follow each construct: subject understanding for self-concept/efficacy, observed classroom behaviour for teacher interest, and separate value, time-cost and support-choice situations. Student-facing Value/Cost jargon was replaced with Chinese wording. Refreshed the 35-band review document from registered source content.
