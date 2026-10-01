@@ -1,10 +1,11 @@
+import { validateReferenceGovernance, type ReferenceGovernanceV1 } from './governance'
 import type { ScaleReferencePolicy } from '../scale/scale-definition'
 import type { ScaleScoreValue } from '../scale/scale-scoring'
 import type { AssessmentContextValues } from '../assessment-context'
 
-export type ReferenceEvidenceLevel = 'none' | 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm'
-export type ReferenceKind = 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample'
-export type ReferenceProvenance = 'literature_reported' | 'literature_derived_estimate' | 'local_observed'
+export type ReferenceEvidenceLevel = 'none' | 'theoretical' | 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm'
+export type ReferenceKind = 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample' | 'theoretical_range'
+export type ReferenceProvenance = 'literature_reported' | 'literature_derived_estimate' | 'local_observed' | 'theoretical_score_range'
 
 export interface ReferencePopulationMatch {
   minAgeMonthsInclusive?: number
@@ -61,6 +62,7 @@ export interface ReferenceDerivation {
 }
 
 export interface AssessmentReferenceEntry {
+  governance?: ReferenceGovernanceV1
   scoreKey: string
   referenceKind: ReferenceKind
   evidenceLevel: Exclude<ReferenceEvidenceLevel, 'none'>
@@ -80,7 +82,7 @@ export interface AssessmentReferenceSetDefinition {
   instrumentType: 'scale' | 'cognitive'
   instrumentKey: string
   referenceVersion: string
-  status: 'DRAFT' | 'ACTIVE' | 'RETIRED'
+  status: 'DRAFT' | 'ACTIVE' | 'SUPERSEDED' | 'RETIRED'
   entries: AssessmentReferenceEntry[]
 }
 
@@ -138,6 +140,7 @@ export const validateReferenceSetDefinition = (
       return
     }
     const candidate = entry as Partial<AssessmentReferenceEntry>
+    validateReferenceGovernance(candidate).forEach(message => issues.push({ path: path + '.governance', message, severity: 'error' }))
     const population = candidate.population as ReferencePopulation | undefined
     const uniqueKey = `${candidate.scoreKey}:${candidate.referenceKind}:${JSON.stringify(population?.match ?? population ?? {})}`
     if (seen.has(uniqueKey)) issues.push({ path, message: '同一 reference set 中 scoreKey/referenceKind 不能重复', severity: 'error' })
@@ -158,9 +161,9 @@ export const validateReferenceSetDefinition = (
       entriesByScoreAndKind.set(groupKey, previous)
     }
     if (typeof candidate.scoreKey !== 'string' || candidate.scoreKey.length === 0) issues.push({ path: `${path}.scoreKey`, message: 'scoreKey 不能为空', severity: 'error' })
-    if (!['normative_distribution', 'criterion_threshold', 'descriptive_sample'].includes(candidate.referenceKind ?? '')) issues.push({ path: `${path}.referenceKind`, message: 'referenceKind 不合法', severity: 'error' })
-    if (!['literature_beta', 'local_pilot', 'local_norm', 'validated_norm'].includes(candidate.evidenceLevel ?? '')) issues.push({ path: `${path}.evidenceLevel`, message: 'evidenceLevel 不合法', severity: 'error' })
-    if (!['literature_reported', 'literature_derived_estimate', 'local_observed'].includes(candidate.provenanceType ?? '')) issues.push({ path: `${path}.provenanceType`, message: 'provenanceType 不合法', severity: 'error' })
+    if (!['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range'].includes(candidate.referenceKind ?? '')) issues.push({ path: `${path}.referenceKind`, message: 'referenceKind 不合法', severity: 'error' })
+    if (!['theoretical', 'literature_beta', 'local_pilot', 'local_norm', 'validated_norm'].includes(candidate.evidenceLevel ?? '')) issues.push({ path: `${path}.evidenceLevel`, message: 'evidenceLevel 不合法', severity: 'error' })
+    if (!['literature_reported', 'literature_derived_estimate', 'local_observed', 'theoretical_score_range'].includes(candidate.provenanceType ?? '')) issues.push({ path: `${path}.provenanceType`, message: 'provenanceType 不合法', severity: 'error' })
     if (typeof candidate.instrumentVersion !== 'string' || candidate.instrumentVersion.length === 0) issues.push({ path: `${path}.instrumentVersion`, message: 'instrumentVersion 不能为空', severity: 'error' })
     if (typeof candidate.scoringVersion !== 'string' || candidate.scoringVersion.length === 0) issues.push({ path: `${path}.scoringVersion`, message: 'scoringVersion 不能为空', severity: 'error' })
     if (!candidate.source || typeof candidate.source.citation !== 'string' || candidate.source.citation.length === 0) issues.push({ path: `${path}.source.citation`, message: '必须提供 citation', severity: 'error' })
@@ -173,7 +176,8 @@ export const validateReferenceSetDefinition = (
     if (!candidate.population || typeof candidate.population !== 'object') {
       issues.push({ path: `${path}.population`, message: '必须提供 population 描述', severity: 'error' })
     } else {
-      const population = candidate.population as ReferencePopulation
+      validateReferenceGovernance(candidate).forEach(message => issues.push({ path: path + '.governance', message, severity: 'error' }))
+    const population = candidate.population as ReferencePopulation
       ;(['description', 'ageBand', 'sexScope', 'language', 'countryOrRegion'] as const).forEach((field) => {
         const fieldValue = population[field]
         if (fieldValue !== undefined && fieldValue !== null && typeof fieldValue !== 'string') {
@@ -322,6 +326,7 @@ export interface ResolvedScaleReference {
   t: number | null
   percentile: { value: number; estimated: boolean } | null
   criterionBand: { key: string; label: string; minInclusive: number | null; maxInclusive: number | null } | null
+  bandProvenance?: ReferenceGovernanceV1
   meanDifference: number | null
   source: ReferenceSource | null
   population: ReferencePopulation | null
@@ -451,7 +456,7 @@ const criterionBandFor = (value: number, thresholds: ReferenceThreshold[]): Reso
 }
 
 const fixedLabel = (entry: AssessmentReferenceEntry): string => (
-  entry.evidenceLevel === 'literature_beta' ? '文献 Beta 参考' : entry.referenceKind === 'criterion_threshold' ? '来源定义阈值' : entry.referenceKind === 'descriptive_sample' ? '文献描述性样本' : '群体参考分布'
+  entry.referenceKind === 'theoretical_range' ? '按答题范围描述，暂未和其他同学比较' : entry.governance?.kind === 'LOCAL_REFERENCE' ? '同学科、同学段历史参考' : entry.evidenceLevel === 'literature_beta' ? '文献 Beta 参考' : entry.referenceKind === 'criterion_threshold' ? '来源定义阈值' : entry.referenceKind === 'descriptive_sample' ? '文献描述性样本' : '群体参考分布'
 )
 
 export interface AssessmentReferenceSelection {
@@ -525,10 +530,16 @@ export const resolveAssessmentReference = (input: {
         }
       } else if (entry.referenceKind === 'criterion_threshold') {
         criterionBand = criterionBandFor(value, statistics.thresholds ?? [])
-      } else {
+      } else if (entry.referenceKind !== 'theoretical_range') {
         meanDifference = mean === null ? null : value - mean
       }
 
+      if (entry.governance) {
+        const g = entry.governance
+        if (value < g.scoreRange.min || value > g.scoreRange.max) return unavailable(selection, 'measurement_mismatch')
+        const band = g.bands.find((b, i) => (i === 0 ? value >= b.lower : value > b.lower) && value <= b.upper)
+        criterionBand = band ? { key: band.key, label: band.label, minInclusive: band.lower, maxInclusive: band.upper } : null
+      }
       const disclaimer = entry.evidenceLevel === 'literature_beta'
         ? '文献 Beta 参考仅用于研究性、描述性比较，不代表本地正式人口常模。'
         : entry.disclaimer ?? '该参考不构成诊断或个体化医疗结论。'
@@ -546,6 +557,7 @@ export const resolveAssessmentReference = (input: {
         t,
         percentile,
         criterionBand,
+        ...(entry.governance ? { bandProvenance: entry.governance } : {}),
         meanDifference,
         source: entry.source,
         population: entry.population,

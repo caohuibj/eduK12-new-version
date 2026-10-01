@@ -112,7 +112,7 @@ const interpretationSchema = z.object({
   headline: z.string().min(1),
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('score_only') }),
-    z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample']) }),
+    z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']) }),
   ]).default({ type: 'score_only' }),
   summary: z.string().min(1),
   bands: z.array(z.object({
@@ -142,7 +142,7 @@ export const scaleReferencePolicySchema = z.discriminatedUnion('type', [
     selections: z.array(z.object({
       scoreKey: z.string().min(1),
       referenceVersion: z.string().min(1),
-      referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample']),
+      referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']),
     })).default([]),
   }),
 ])
@@ -150,6 +150,7 @@ export type ScaleReferencePolicy = z.infer<typeof scaleReferencePolicySchema>
 
 export const scaleDefinitionSchema = z.object({
   schemaVersion: z.literal(2),
+  versionAxes: z.object({ schemaVersion: z.literal(1), subjectKey: z.string().min(1), locale: z.string().min(1), localizationVersion: z.string().min(1) }).strict().optional(),
   respondentType: z.string().min(1),
   source: z.object({
     title: z.string().optional(),
@@ -450,7 +451,7 @@ const stableValue = (value: unknown): unknown => {
 }
 
 export const hashScaleDefinition = (definition: ScaleDefinitionV2): string => (
-  createHash('sha256').update(JSON.stringify(stableValue(definition))).digest('hex')
+  createHash('sha256').update(JSON.stringify(stableValue(definition.versionAxes ? { schemaVersion: definition.schemaVersion, versionAxes: definition.versionAxes, respondentType: definition.respondentType, display: definition.display, responseSets: definition.responseSets, items: definition.items, scoring: definition.scoring } : definition))).digest('hex')
 )
 
 export const createCustomScaleDefinition = (): ScaleDefinitionV2 => ({
