@@ -1,3 +1,4 @@
+import { validateAudienceReport } from './library/audience-report-gate'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
@@ -216,6 +217,7 @@ export const validateScaleDefinition = (
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
   if (options.forPublish) {
+    issues.push(...validateAudienceReport(definition))
     if (definition.display.randomizeItems) {
       issues.push({ path: 'display.randomizeItems', message: 'PR25 暂不支持发布题目随机化，请关闭该选项', severity: 'error' })
     }

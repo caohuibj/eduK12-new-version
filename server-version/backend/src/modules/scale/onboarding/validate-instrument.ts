@@ -110,6 +110,10 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
       if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale || entry.governance.measurementHash!==hashScaleDefinition(source.executable!.definition))) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
       if (entry.instrumentVersion !== source.identity.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 与 source identity 不一致', severity: 'error' })
       if (entry.scoringVersion !== source.executable?.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 与 definition 不一致', severity: 'error' })
+      if (axes && entry.governance) {
+        const interpretation=source.executable!.definition.report.interpretations.find(x=>x.scoreKey===entry.scoreKey)
+        if (!interpretation || entry.governance.bands.some(b=>!interpretation.bands.some(x=>x.key===b.key))) issues.push({path:`${path}.entries.${entryIndex}.governance.bands`,message:'REPORT_REFERENCE_BAND_COVERAGE_REQUIRED',severity:'error'})
+      }
       if (!scoreKeys.has(entry.scoreKey)) issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference scoreKey 不存在：${entry.scoreKey}`, severity: 'error' })
     })
   })
