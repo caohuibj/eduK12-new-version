@@ -146,3 +146,28 @@ test('mixed A-B ordering is stable across independent BASE and HEAD fixture seed
   assert.match(text, /const mixKey = \(fixtureId: string\) => createHash\('sha256'\)\.update\(fixtureId\)/);
   assert.doesNotMatch(text, /update\(.*runId.*fixtureId/);
 });
+
+
+test('browser build restore retries retain exact-run authority and fail closed', () => {
+  const browser = job(source('ci'), 'browser');
+  for (const kind of ['frontend', 'backend']) {
+    const names = [`restore tested ${kind} build`, `retry tested ${kind} build download`, `final tested ${kind} build download`];
+    const steps = browser.split('      - name: ');
+    const downloads = names.map(name => steps.find(step => step.startsWith(`${name}\n`)));
+    for (const step of downloads) {
+      assert.ok(step);
+      assert.match(step, /uses: actions\/download-artifact@v4/);
+      assert.ok(step.includes(`name: ${kind}-dist-` + '${{ github.sha }}'));
+      // Omitting run-id/repository/token keeps downloads scoped to the current run.
+      assert.doesNotMatch(step, /\n          (run-id|repository|github-token):/);
+    }
+    assert.match(downloads[0], /continue-on-error: true/);
+    assert.match(downloads[1], new RegExp(`steps\\.${kind}-build-download\\.outcome == 'failure'`));
+    assert.match(downloads[2], new RegExp(`steps\\.${kind}-build-download-retry\\.outcome == 'failure'`));
+    assert.doesNotMatch(downloads[2], /continue-on-error:/);
+    const guard = steps.find(step => step.startsWith(`verify restored ${kind} entry point\n`));
+    assert.ok(guard);
+    assert.doesNotMatch(guard, /continue-on-error:|\n        if:/);
+    assert.ok(guard.includes(`run: test -s ${kind}/dist/index.`));
+  }
+});

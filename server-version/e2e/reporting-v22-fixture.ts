@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto'
+import assert from 'node:assert/strict'
 import { writeFile } from 'node:fs/promises'
 import bcrypt from '../backend/node_modules/bcryptjs'
 import { PrismaClient } from '../backend/node_modules/@prisma/client'
 import { buildReportingFixture } from '../backend/src/__tests__/integration/reporting-fixture'
+import { grantCapability } from '../backend/src/modules/organization/service'
+import { assertIndividualLongitudinalAccess } from '../backend/src/modules/reporting/individualAuthorization'
 import { createPlatformReportingSpec, reviewPlatformReportingSpec, publishPlatformReportingSpec } from '../backend/src/modules/reporting/spec'
 async function main(){
  if(process.env.NODE_ENV!=='test'||process.env.REPORTING_BROWSER_ISOLATED_DB!=='1'||!process.env.REPORTING_BROWSER_TEST_DATABASE_URL||process.env.REPORTING_BROWSER_TEST_DATABASE_URL!==process.env.DATABASE_URL)throw new Error('Isolated test database required')
@@ -10,7 +13,12 @@ async function main(){
  const first=await buildReportingFixture(db,6)
  const password='ReportingBrowserSynthetic2026'
  await db.user.update({where:{id:first.ownerId},data:{passwordHash:await bcrypt.hash(password,10),teacherApproved:true,mustChangePassword:false}})
- await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+ const manager=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
+ const individualAccess={principal:{userId:first.ownerId,platformRole:'STANDARD' as const},organizationId:first.organizationId,subjectUserId:first.members[0].userId}
+ // Governance alone cannot read individuals; the positive scenario uses an explicit audited capability.
+ await assert.rejects(assertIndividualLongitudinalAccess(individualAccess),{statusCode:404})
+ await grantCapability({organizationId:first.organizationId,membershipId:manager.id,capability:'PSYCHOLOGY_STAFF',meta:{actorUserId:first.ownerId,commandKey:randomUUID()}})
+ await assertIndividualLongitudinalAccess(individualAccess)
  const resource=(await db.$queryRaw<Array<{key:string}>>`SELECT resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0].key
  for(const at of [new Date('2026-09-20'),new Date('2026-09-21')])await buildReportingFixture(db,6,false,{ownerId:first.ownerId,organizationId:first.organizationId,members:first.members,resourceKey:resource,at,resourceVersion:'1.1.0'})
  const dimension=randomUUID(),label=randomUUID(),grade=randomUUID(),cls=randomUUID(),nextClass=randomUUID()

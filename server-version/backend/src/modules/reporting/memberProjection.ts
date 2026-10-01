@@ -1,3 +1,4 @@
+import { governedArtifactMetrics } from './governedDisclosure'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
@@ -25,6 +26,7 @@ export const readOrganizationMemberProjection = async (input: {
     || context.explicitDenies.some((deny) => ['*', 'REPORT_READ', 'REPORT_MEMBER_READ'].includes(deny))) {
     return reportingFail('EXPORT_NOT_ALLOWED', 'member report access denied', 403)
   }
+  const allowedMetrics = await governedArtifactMetrics({artifact,principal:input.principal,individual:true})
   const cohort = await readReportingCohort(artifact.cohortSnapshotId)
   const users = [...new Set(cohort.members.map((member) => member.userId))]
   const allowed = await prisma.$queryRaw<Array<{ userId: string }>>`
@@ -65,6 +67,7 @@ export const readOrganizationMemberProjection = async (input: {
   const rows = batch.resolved.filter((row) => frozenIds.has(row.executionId)).map((row) => {
     const metrics: Record<string, number> = {}
     if (projection.state === 'present') for (const rule of spec.definition.metricRules) {
+      if (allowedMetrics && !allowedMetrics.includes(rule.metricId)) continue
       if (projection.metrics?.[rule.metricId]?.state !== 'present') continue
       const metric = row.metrics.find((value) => value.key === rule.sourceMetricKey)
       if (!metric || !rule.acceptedResultQuality.includes(metric.resultQuality)) continue

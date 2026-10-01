@@ -1,3 +1,4 @@
+import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
 import { describe, expect, it } from 'vitest'
 import {
   RunResourceAuthorityRegistry,
@@ -32,6 +33,7 @@ const cohortPolicy = {
 }
 
 const publishedRegistry = createRelationalProductRegistry([{
+  resultDisclosure: testDisclosure(5),
   title: 'Demo',
   initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN'],
   description: null,

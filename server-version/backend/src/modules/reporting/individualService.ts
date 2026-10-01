@@ -1,3 +1,4 @@
+import { governedArtifactMetrics, narrowGovernedProjection } from './governedDisclosure'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -113,5 +114,6 @@ export async function generateIndividualLongitudinal(input: IndividualScopeInput
   const artifact = await createOrReuseIndividualReportingArtifact({organizationId:input.organizationId,seriesId:series.id,specId:spec.id,analysisIdentityHash,
     artifactPayload:payload,snapshotHash:canonicalHash(payload),waveBindings,generatedByUserId:input.principal.userId,generatedAt})
   await assertIndividualLongitudinalAccess(input)
-  return {artifactId:artifact.id,generatedAt:artifact.generatedAt.toISOString(),projection:artifact.artifactPayload.projection}
+  const allowedMetrics = await governedArtifactMetrics({artifact,principal:input.principal})
+  return {artifactId:artifact.id,generatedAt:artifact.generatedAt.toISOString(),projection:narrowGovernedProjection(artifact.artifactPayload.projection,allowedMetrics)}
 }

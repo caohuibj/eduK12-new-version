@@ -1,9 +1,12 @@
+import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
+import { relationalProductRegistry } from '../../modules/assessment-relational/product-registry'
+import { readParticipantLongitudinal, listParticipantLongitudinal } from '../../modules/reporting/participantService'
 import { createOrganizationUnit } from '../../modules/organization/structure'
 import { assignStudentToClass, assignStaffToClass, endStaffClassAssignment } from '../../modules/organization/classRelationships'
 import { createCounselorClientRelationship, endCounselorClientRelationship } from '../../modules/organization/classificationRelations'
 import { assertIndividualLongitudinalAccess } from '../../modules/reporting/individualAuthorization'
 import { randomUUID } from 'node:crypto'
-import { beforeAll, afterAll, describe, it, expect } from 'vitest'
+import { beforeAll, afterAll, describe, it, expect, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import { buildReportingFixture } from './reporting-fixture'
@@ -24,17 +27,20 @@ beforeAll(() => { process.env.DATABASE_URL=url; db=new PrismaClient({datasources
 afterAll(async()=>{await db.$disconnect()})
 describe('individual longitudinal PostgreSQL',()=>{
   it('isolates one stable user, preserves evidence, reuses artifacts and revokes reads/exports',async()=>{
-    const first=await buildReportingFixture(db,3)
+    const contract = testDisclosure(); contract.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['score'],longitudinalMetricKeys:['score']}; contract.audiences.PROFESSIONAL={...contract.audiences.RESPONDENT}
+    const first=await buildReportingFixture(db,3,false,undefined,contract)
     const manager=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:first.organizationId,userId:first.ownerId,orgRole:'ORG_ADMIN'}})
     const principal={userId:first.ownerId,platformRole:'STANDARD' as const}
     const scope={principal,organizationId:first.organizationId}
     const subject=first.members[0]
     const meta=()=>({actorUserId:first.ownerId,commandKey:randomUUID()})
+    await expect(assertIndividualLongitudinalAccess({...scope,subjectUserId:subject.userId})).rejects.toMatchObject({statusCode:404})
+    await grantCapability({organizationId:first.organizationId,membershipId:manager.id,capability:'PSYCHOLOGY_STAFF',meta:meta()})
     await endMembership({organizationId:first.organizationId,membershipId:subject.membershipId,meta:meta()})
     const episode=await createMembership({organizationId:first.organizationId,userId:subject.userId,meta:meta()})
     const resource=(await db.$queryRaw<Array<{key:string}>>`SELECT resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0].key
     const second=await buildReportingFixture(db,3,false,{ownerId:first.ownerId,organizationId:first.organizationId,
-      members:first.members.map((m,i)=>({userId:m.userId,membershipId:i===0?episode.id:m.membershipId})),resourceKey:resource,at:new Date('2026-10-01')})
+      members:first.members.map((m,i)=>({userId:m.userId,membershipId:i===0?episode.id:m.membershipId})),resourceKey:resource,at:new Date('2026-10-01')},contract)
     const actor={userId:first.ownerId,platformRole:'SYSTEM_ADMIN' as const}
     const definition:ReportingIndividualLongitudinalSpecV1={schemaVersion:1,analysisKind:'INDIVIDUAL_LONGITUDINAL',engineKey:'ORG_INDIVIDUAL_LONGITUDINAL_V1',engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',reportEvidenceCeiling:'PILOT',
       metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:resource,valueType:'NUMBER',longitudinalMetricKey:'score',acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',missingnessRule:'EXCLUDE',observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],
@@ -49,10 +55,24 @@ describe('individual longitudinal PostgreSQL',()=>{
     expect(named.list.find(m=>m.userId===subject.userId)?.membershipIds.sort()).toEqual([subject.membershipId,episode.id].sort())
     expect((await listCohortMembers({...scope,search:'no-such-member',page:1,pageSize:1})).list).toEqual([])
     const input={...scope,subjectUserId:subject.userId,specId:spec.id,sources:[second,first].map(({runId,trackId})=>({runId,trackId}))}
+    const released = vi.spyOn(relationalProductRegistry, 'findExact').mockReturnValue({releaseStatus:'PUBLISHED',resultDisclosure:contract} as any)
     const result=await generateIndividualLongitudinal(input)
     expect(result.projection.waves.map(w=>w.metrics.score)).toEqual([{state:'present',value:1},{state:'present',value:1}])
     expect(result.projection.comparisons[0].metrics.score.delta).toBe(0)
     expect((await Promise.all([generateIndividualLongitudinal(input),generateIndividualLongitudinal({...input,sources:[...input.sources].reverse()})])).map(a=>a.artifactId)).toEqual([result.artifactId,result.artifactId])
+
+    try {
+      const participant = await readParticipantLongitudinal(subject.userId, result.artifactId)
+      expect(participant.waves.map(w=>w.metrics.score)).toEqual([{state:'present',value:1},{state:'present',value:1}])
+      expect(participant.comparisons[0].metrics.score.delta).toBe(0)
+      expect(JSON.stringify(participant)).not.toMatch(/canonicalResultHash|snapshotHash|generatedByUserId|subjectUserId|waveId|evidenceHash|evidenceRef/)
+      expect((await listParticipantLongitudinal(subject.userId)).list.map(r=>r.id)).toContain(result.artifactId)
+      await expect(readParticipantLongitudinal(first.members[1].userId,result.artifactId)).rejects.toMatchObject({statusCode:404})
+      await expect(readParticipantLongitudinal(first.ownerId,result.artifactId)).rejects.toMatchObject({statusCode:404})
+      released.mockReturnValue(null)
+      await expect(readParticipantLongitudinal(subject.userId,result.artifactId)).rejects.toMatchObject({statusCode:404})
+      released.mockReturnValue({releaseStatus:'PUBLISHED',resultDisclosure:contract} as any)
+    } finally { /* keep release available for subsequent staff reads/exports */ }
     const stored=await readReportingArtifactRecord(result.artifactId)
     if(stored.analysisKind!=='INDIVIDUAL_LONGITUDINAL') throw new Error('wrong artifact')
     const waves=await Promise.all(stored.artifactPayload.waveBindings.map(w=>readReportingSeriesWave({organizationId:first.organizationId,seriesId:stored.seriesId,waveKey:w.waveKey})))
@@ -80,6 +100,7 @@ describe('individual longitudinal PostgreSQL',()=>{
     await endMembership({organizationId:first.organizationId,membershipId:manager.id,meta:meta()})
     await expect(readOrganizationReportingArtifact({...scope,artifactId:result.artifactId})).rejects.toMatchObject({statusCode:404})
     await expect(downloadReportingExport({...scope,exportId:ticket.exportId})).rejects.toMatchObject({statusCode:404})
+    released.mockRestore()
   },60000)
   it('requires current teacher/class or counselor/client scope and honors individual-policy denies', async()=>{
     const f=await buildReportingFixture(db,3)

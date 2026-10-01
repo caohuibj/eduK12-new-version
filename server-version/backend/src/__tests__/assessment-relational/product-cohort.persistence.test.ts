@@ -1,3 +1,4 @@
+import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
 import { randomUUID } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
@@ -47,6 +48,7 @@ const policy: RelationalCohortAnalysisPolicyV1 = {
 }
 
 const registry = createRelationalProductRegistry([{
+  resultDisclosure: { ...testDisclosure(3), audiences: { ...testDisclosure(3).audiences, SUBJECT: { mode: 'AGGREGATE_ONLY', metricKeys: ['total'], longitudinalMetricKeys: [] } } },
   subjectReportMode: 'AGGREGATE_ONLY',
   title: 'RA-02 classroom experience cohort fixture',
   description: null,

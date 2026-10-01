@@ -43,10 +43,21 @@ const aggregateOnlyCompositeAttempt = async (
 
   const assignment = await createSqlRelationalAssignmentRepository(db as any).findById(attempt.assignmentRef)
     ?? relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime attempt references a missing assignment')
+  if (assignment.perspective === 'RELATIONAL_EXPERIENCE' || assignment.analysisMode === 'COHORT_AGGREGATE') return true
+  // Declared Run disclosure uses its summary, including protection against
+  // native child result routes that would otherwise disclose additional fields.
+  if (assignment.policyDomain === 'ORGANIZATION_RUN') {
+    const governed = await db.$queryRawUnsafe(
+      `SELECT e.id FROM assessment_run_executions e JOIN assessment_run_tracks t
+        ON t.organization_id=e.organization_id AND t.run_id=e.run_id AND t.id=e.track_id
+       WHERE e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=$1
+         AND t.frozen_resource_policy ? 'resultDisclosure' LIMIT 1`, input.attemptId)
+    if (governed.length) return true
+  }
   if (input.userId && assignment.respondentUserId !== input.userId) {
     relationalFail('RELATIONAL_RUNTIME_BINDING', 'relational runtime respondent does not match the signed-in participant')
   }
-  return assignment.perspective === 'RELATIONAL_EXPERIENCE' || assignment.analysisMode === 'COHORT_AGGREGATE'
+  return false
 }
 
 export const createRelationalProductReportService = (
@@ -186,7 +197,11 @@ export const createRelationalProductReportService = (
     }
     const entry = registry.findExact(input.product)
       ?? relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released')
-    if (entry.subjectReportMode !== 'AGGREGATE_ONLY') relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'This content does not disclose a report to the teacher subject')
+    const subjectRule = entry.resultDisclosure?.audiences.SUBJECT
+    if (!subjectRule || !['AGGREGATE_ONLY', 'DELAYED_AGGREGATE'].includes(subjectRule.mode)) return relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'This content does not disclose a cohort report to the teacher subject')
+    // Legacy course episodes have no authoritative collection-close event. They
+    // cannot satisfy delayed release; only closed Run reporting can do so.
+    if (subjectRule.mode === 'DELAYED_AGGREGATE') relationalFail('RELATIONAL_REPORT_NOT_READY', 'Delayed feedback requires a closed collection window')
     const applicability = entry.applicability
     if (
       entry.releaseStatus !== 'PUBLISHED'
@@ -286,11 +301,13 @@ export const createRelationalProductReportService = (
     ) {
       relationalFail('RELATIONAL_COHORT_SCOPE', 'stored cohort snapshot does not match the frozen assignment privacy contract')
     }
+    const safeSnapshot = projectRelationalCohortForSubject({ snapshot, viewerUserId: input.userId })
     return {
       ...base,
       state: 'READY' as const,
       respondentCount,
-      snapshot: projectRelationalCohortForSubject({ snapshot, viewerUserId: input.userId }),
+      snapshot: { ...safeSnapshot,
+        metrics: Object.fromEntries(Object.entries(safeSnapshot.metrics).filter(([key]) => subjectRule!.metricKeys.includes(key))) },
     }
   },
 })

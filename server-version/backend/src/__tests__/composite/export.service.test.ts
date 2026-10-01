@@ -5,6 +5,7 @@ process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    $queryRaw: vi.fn(),
     compositeAssessment: { findUnique: vi.fn() },
     compositeAssessmentAttempt: { count: vi.fn() },
     cognitiveTrial: { count: vi.fn() },
@@ -302,12 +303,18 @@ const makeMixedTemplate = () => ({
 })
 
 beforeEach(() => {
+  mockPrisma.$queryRaw.mockResolvedValue([])
   vi.clearAllMocks()
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
   mockPrisma.cognitiveTrial.count.mockResolvedValue(0)
 })
 
 describe('composite export service', () => {
+  it('rejects governed Run data before generic bulk export materialization', async () => {
+    mockPrisma.$queryRaw.mockResolvedValue([{id:'governed-execution'}])
+    await expect(compositeExportService.getExportData('composite-mixed')).rejects.toMatchObject({statusCode:403})
+    expect(mockPrisma.compositeAssessmentAttempt.count).not.toHaveBeenCalled()
+  })
   it('rejects an oversized attempt scope before loading the composite graph', async () => {
     mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(10_001)
 

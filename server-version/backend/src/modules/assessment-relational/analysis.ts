@@ -265,8 +265,11 @@ export const projectRelationalCohortForSubject = (input: {
   if (input.snapshot.subjectUserId !== input.viewerUserId) {
     relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'cohort subject projection is only available to the subject')
   }
-  const { inputResultHashes: _privateHashes, ...projection } = input.snapshot
-  return projection
+  return { schemaVersion: 1 as const, kind: 'COHORT_AGGREGATE' as const,
+    respondentCount: input.snapshot.respondentCount, minimumRespondents: input.snapshot.minimumRespondents,
+    metrics: Object.fromEntries(Object.entries(input.snapshot.metrics).map(([key, metric]) => [key,
+      metric.state === 'present' ? { state: 'present' as const, mean: metric.mean, validN: metric.validN, missingN: metric.missingN } : { state: 'insufficient' as const }])),
+  }
 }
 
 export const projectIndividualRelationalResult = (input: {

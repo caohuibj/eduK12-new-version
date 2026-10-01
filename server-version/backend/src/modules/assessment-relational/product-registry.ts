@@ -1,3 +1,4 @@
+import { validateResultDisclosureContract, type ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode } from '../assessment-policy/target'
 import { validateRelationalCohortPolicy, type RelationalCohortAnalysisPolicyV1 } from './analysis'
@@ -14,7 +15,8 @@ export interface RelationalCompositeLaunchTargetV1 {
 }
 
 export interface RelationalProductEntryV1 {
-  subjectReportMode?: 'NONE' | 'AGGREGATE_ONLY'
+  resultDisclosure?: ResultDisclosureContractV1
+  subjectReportMode?: 'NONE' | 'INDIVIDUAL_SUMMARY' | 'AGGREGATE_ONLY' | 'DELAYED_AGGREGATE'
   initiationModes?: readonly AssessmentInitiationModeV1[]
   allowedTargetModes?: readonly EvaluationTargetMode[]
   title: string
@@ -32,6 +34,13 @@ const identity = (input: Pick<RelationalApplicabilityV1, 'resourceKind' | 'resou
 
 const validateEntry = (entry: RelationalProductEntryV1): RelationalProductEntryV1 => {
   const applicability = validateRelationalApplicability(entry.applicability)
+  const resultDisclosure = entry.resultDisclosure ? validateResultDisclosureContract(entry.resultDisclosure) : undefined
+  if (entry.releaseStatus === 'PUBLISHED' && !resultDisclosure) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'published content must declare every result audience and longitudinal policy')
+  if (resultDisclosure) {
+    if (resultDisclosure.minimumRespondents !== applicability.minimumRespondents) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'disclosure minimum-N must equal applicability')
+    if (entry.subjectReportMode && resultDisclosure.audiences.SUBJECT.mode !== entry.subjectReportMode) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'subject report mode must match content disclosure')
+    if (applicability.analysisMode === 'COHORT_AGGREGATE' && Object.values(resultDisclosure.audiences).some(rule => rule.mode === 'INDIVIDUAL_SUMMARY')) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'cohort-only content cannot disclose individual summaries')
+  }
   if (!entry.title.trim()) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'product title is required')
   if (entry.releaseStatus !== 'DRAFT' && entry.releaseStatus !== 'PUBLISHED') {
     relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'unsupported product release status')
@@ -58,7 +67,7 @@ const validateEntry = (entry: RelationalProductEntryV1): RelationalProductEntryV
   } else if (cohortAnalysisPolicy) {
     relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'individual relational product cannot declare a cohort analysis policy')
   }
-  return { ...entry, applicability, cohortAnalysisPolicy }
+  return { ...entry, applicability, cohortAnalysisPolicy, resultDisclosure }
 }
 
 export interface RelationalProductRegistryV1 {
