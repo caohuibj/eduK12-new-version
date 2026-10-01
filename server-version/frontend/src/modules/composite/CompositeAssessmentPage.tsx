@@ -341,7 +341,7 @@ const CompositeAssessmentPage: React.FC = () => {
         submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
         submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
         onReload={() => loadAttempt(state.id, recoveryToken)}
-        onExit={() => navigate(publicMode ? '/' : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')}
+        onExit={() => void saveAndExit()}
         onCompleted={() => goReport(state.id)}
         onEnterCognitive={enterChild}
         onEnterSituational={enterChild}
