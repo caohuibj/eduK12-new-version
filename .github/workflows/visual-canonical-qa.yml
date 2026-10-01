@@ -73,6 +73,8 @@ concurrency:
 
 jobs:
   canonical-visual-qa:
+    # Wave1 stacked drafts are validated only after aligning the next PR to main.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || !startsWith(github.head_ref, 'feat/scale-wave1-')
     name: canonical 390 / 768 / 1440 screenshot matrix
     runs-on:
       - self-hosted
