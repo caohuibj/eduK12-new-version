@@ -1,3 +1,6 @@
+import { deriveSituationalAssignment, assignedSituationalDefinition } from './situation-assignment'
+import { situationalResponseHistoryIdentities, validateSituationalResearchCapture } from './situation-research-capture'
+import { scoreSituationalModel } from './situation-model-resolver'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -29,7 +32,6 @@ import {
 } from './situational-raw-submission'
 import {
   createSituationalResponseValidator,
-  scoreSituational,
   SituationalResponseValidationError,
   type SituationalResponse,
 } from './situation-scoring'
@@ -76,6 +78,9 @@ const normalizedResponse = (response: SituationalResponse): SituationalResponse 
   responseValue: response.responseValue,
   ...(response.responseTimeMs === undefined ? {} : { responseTimeMs: response.responseTimeMs }),
   ...(response.answeredAt === undefined ? {} : { answeredAt: response.answeredAt }),
+  ...(response.responseRevision === undefined ? {} : { responseRevision: response.responseRevision }),
+  ...(response.historyIdentity === undefined ? {} : { historyIdentity: response.historyIdentity }),
+  ...(response.stageConfirmed === undefined ? {} : { stageConfirmed: response.stageConfirmed }),
 })
 
 const normalizeSituationalSubmission = (
@@ -122,6 +127,8 @@ const normalizeSituationalSubmission = (
     )
   }
 
+  const histories = situationalResponseHistoryIdentities(definition, [...byPair.values()])
+  for (const response of byPair.values()) if (response.historyIdentity !== undefined && response.historyIdentity !== histories.get(response.sceneKey)) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '回答属于旧的测量历史', 400)
   const reachableKeys = reachableSituationalResponseKeys(definition, trajectory)
   const reachableSet = new Set(reachableKeys)
   const offPath = [...byPair.keys()].filter((pairKey) => !reachableSet.has(pairKey))
@@ -229,9 +236,14 @@ const persistSituationalAttemptFinal = async (
   assertFinalSubmitStatus(row.status, '情境化测评')
   assertRequestRuntimeIdentity(row, input)
 
-  const normalized = normalizeSituationalSubmission(snapshot.definition, input.responses)
+  const assignment = deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)
+  const assignedDefinition = assignedSituationalDefinition(snapshot.definition, assignment)
+  const normalized = normalizeSituationalSubmission(assignedDefinition, input.responses)
+  let researchCapture: typeof input.researchCapture
+  try { researchCapture = validateSituationalResearchCapture({ definition: assignedDefinition, definitionHash: snapshot.definitionHash, assignment, responses: normalized.responses, capture: input.researchCapture }) }
+  catch (error) { throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', String(error), 400) }
   const responses = normalized.responses
-  const canonical = prepareCanonicalSubmission({ responses })
+  const canonical = prepareCanonicalSubmission({ responses, ...(researchCapture ? { researchCapture } : {}) })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.situational, '情境化测评提交数据')
   const payloadHash = canonical.hash
 
@@ -249,10 +261,10 @@ const persistSituationalAttemptFinal = async (
   // response validation have already completed, so the existing pure scorer
   // receives only the reachable scientific plane.
   const scoringDefinition = projectReachableSituationDefinitionForScoring(
-    snapshot.definition,
+    assignedDefinition,
     normalized.trajectory,
   )
-  const result = scoreSituational(scoringDefinition, responses, { responsesValidated: true })
+  const result = scoreSituationalModel(scoringDefinition, responses, { responsesValidated: true, ...(assignedDefinition.schemaVersion === 2 ? { independentSceneKeyBySceneKey: Object.fromEntries(assignedDefinition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey, n.motherSceneKey]] : [])) } : {}) })
   const canonicalCore = projectSituationCanonicalUnitResult({
     result,
     runtime: snapshot.compiledRuntime,
@@ -272,6 +284,7 @@ const persistSituationalAttemptFinal = async (
   const rawPayload = createSituationalRawSubmissionPayload({
     attemptEpoch: row.attemptEpoch,
     responses,
+    ...(researchCapture ? { researchCapture } : {}),
   })
   const encryptedRawPayload = encryptUnifiedRuntimePayload(rawPayload)
   const encryptedResult = encryptUnifiedRuntimePayload(result)
