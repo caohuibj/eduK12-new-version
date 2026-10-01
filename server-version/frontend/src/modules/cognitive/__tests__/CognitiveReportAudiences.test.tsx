@@ -35,6 +35,39 @@ describe('popular and professional report voices', () => {
     expect(screen.getByText('未触发')).toBeInTheDocument()
     expect(screen.queryByText('快，是看清之后的回应。')).not.toBeInTheDocument()
   })
+  it('retains anonymous record context and omits absent or invalid dates', () => {
+    const view = render(<CognitiveV2ReportCard report={report} anonymousCode="DEMO-2026-0001" attemptNo={2} finishedAt="2026-10-01T08:30:00Z" />)
+    const record = screen.getByText('匿名编号').closest('dl')!
+    expect(record).toHaveTextContent('DEMO-2026-0001')
+    expect(record.querySelector('time')).toHaveAttribute('datetime', '2026-10-01T08:30:00Z')
+    expect(screen.getByText(/第 2 次/)).toBeInTheDocument()
+    view.rerender(<CognitiveV2ReportCard report={report} finishedAt="bad-date" />)
+    expect(screen.queryByText('匿名编号')).not.toBeInTheDocument()
+    expect(screen.queryByText('完成时间')).not.toBeInTheDocument()
+  })
+  it('offers frozen detail metrics in a closed plain-language layer and excludes withdrawn keys', () => {
+    const detailed = structuredClone(report)
+    detailed.detail.push({ ...metric, key: 'accuracyByRuleFamily', label: '各规则族正确率', participantLabel: '按规律类别看看', formatted: '递进：100%', value: { progression: 1 }, explanation: '不同规律分开统计' })
+    detailed.detail.push({ ...metric, key: 'withdrawn', label: '不可读取的数值', formatted: '999 毫秒' })
+    detailed.reading!.interpretation.withheldMetricKeys = ['withdrawn']
+    render(<CognitiveV2ReportCard report={detailed} references={[{ metricKey: 'withdrawn', label: '不可读取的参考' }, { metricKey: 'accuracyByRuleFamily', label: '参考暂不可用', unavailableReason: '没有可比样本' }]} />)
+    const summary = screen.getByText('进一步看这次记录')
+    expect(summary.closest('details')).not.toHaveAttribute('open')
+    fireEvent.click(summary)
+    expect(screen.getByText('按规律类别看看')).toBeInTheDocument()
+    expect(screen.getByText('递进：100%')).toBeInTheDocument()
+    expect(screen.getByText(/没有可比样本/)).toBeInTheDocument()
+    expect(screen.queryByText(/999/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/不可读取的参考/)).not.toBeInTheDocument()
+    expect(screen.getAllByText('310 毫秒')).toHaveLength(1)
+  })
+  it('puts assignment and stable record context inside the professional report', () => {
+    render(<CognitiveProfessionalReport report={report} assignmentTitle="任务A" reportId="CR-DEMO1" finishedAt="2026-10-01T08:30:00Z" />)
+    const article = screen.getByRole('article')
+    expect(article).toHaveTextContent('任务A')
+    expect(article).toHaveTextContent('CR-DEMO1')
+    expect(article.querySelector('time')).toHaveAttribute('datetime', '2026-10-01T08:30:00Z')
+  })
   it('does not put withdrawn numeric estimates back into professional summaries', () => {
     const limited = structuredClone(report)
     limited.headline = []; limited.detail = []

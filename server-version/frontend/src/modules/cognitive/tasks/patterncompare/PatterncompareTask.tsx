@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -222,13 +223,7 @@ export const PatterncompareTask: React.FC<CognitiveTaskProps> = ({ taskContext, 
 
   if (phase === 'instruction') {
     return (
-      <div className="mx-auto max-w-2xl p-4 text-center sm:p-8">
-        <h2 className="mb-3 text-xl font-semibold">图形模式比较</h2>
-        <p className="mb-2 text-gray-700">判断左右两个图形是否完全相同。请比较形状、填充、标记和方向；只要有一项不同，就选择“不同”。</p>
-        <p className="mb-2 text-sm text-gray-600">正式阶段约 {durationSec} 秒，请在保证准确的前提下尽快作答。键盘可使用 ← 表示相同、→ 表示不同，也可使用触控或鼠标。</p>
-        <p className="mb-6 text-xs leading-relaxed text-gray-500">先完成 4 题不计分练习，至少答对 3 题才能进入正式测验。本任务需要直接辨认图形细节；如果屏幕上的图形无法清楚辨认，请不要进入正式测验，并告知测验组织者。</p>
-        <button className="btn-primary min-h-12 px-6" onClick={startPractice}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="图形模式比较" description={<p>判断左右两个图形是否完全相同。请比较形状、填充、标记和方向；只要有一项不同，就选择“不同”。</p>} hint={<><p>正式阶段约 {durationSec} 秒，请在保证准确的前提下尽快作答。键盘可使用 ← 表示相同、→ 表示不同，也可使用触控或鼠标。</p><p>先完成 4 题不计分练习，至少答对 3 题才能进入正式测验。本任务需要直接辨认图形细节；如果屏幕上的图形无法清楚辨认，请不要进入正式测验，并告知测验组织者。</p></>} onAction={startPractice} />
     )
   }
 

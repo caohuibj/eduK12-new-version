@@ -125,7 +125,7 @@ export function CognitiveTaskIntro({
 }) {
   return (
     <CognitiveTaskPanel ariaLabel={`${title}说明`} className="cognitive-task-panel--intro">
-      <p className="cognitive-task-eyebrow">Practice first</p>
+      <p className="cognitive-task-eyebrow">先熟悉，再开始</p>
       <h2 className="cognitive-task-title">{title}</h2>
       <div className="cognitive-task-description">{description}</div>
       {hint ? <div className="cognitive-task-hint">{hint}</div> : null}
@@ -159,7 +159,7 @@ export function CognitivePracticeResult({
 }) {
   return (
     <CognitiveTaskPanel ariaLabel="练习结果" className="cognitive-task-panel--result">
-      <p className="cognitive-task-eyebrow">Practice result</p>
+      <p className="cognitive-task-eyebrow">练习反馈</p>
       <h2 className="cognitive-task-title">{title}</h2>
       <p className="cognitive-task-result-score">练习正确 <strong>{correct}</strong> / {total}</p>
       {detail ? <div className="cognitive-task-result-detail">{detail}</div> : null}
@@ -190,7 +190,7 @@ export function CognitiveTaskTransition({
 }) {
   return (
     <CognitiveTaskPanel ariaLabel={title} className="cognitive-task-panel--transition">
-      <p className="cognitive-task-eyebrow">Task transition</p>
+      <p className="cognitive-task-eyebrow">准备下一步</p>
       <h2 className="cognitive-task-title">{title}</h2>
       {meta ? <div className="cognitive-task-transition-meta">{meta}</div> : null}
       <div className="cognitive-task-description">{description}</div>
@@ -204,7 +204,7 @@ export function CognitiveTaskTransition({
 export function CognitiveTaskCompletionNotice({ children }: { children?: ReactNode }) {
   return (
     <CognitiveTaskPanel ariaLabel="正式试次完成" className="cognitive-task-panel--completion">
-      <p className="cognitive-task-eyebrow">Task complete</p>
+      <p className="cognitive-task-eyebrow">作答完成</p>
       <h2 className="cognitive-task-title">正式试次已完成</h2>
       <div className="cognitive-task-description">{children || '请完成本次测评。'}</div>
     </CognitiveTaskPanel>

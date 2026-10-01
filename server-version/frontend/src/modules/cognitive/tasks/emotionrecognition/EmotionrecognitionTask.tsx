@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { EMOTIONS, emotionRecognitionSequence, type EmotionCategory, type EmotionStimulus } from '../shared/pr13Stimuli'
@@ -187,12 +188,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 text-center">
-        <h1 className="mb-4 text-2xl font-bold text-gray-800">六类情绪面孔分类</h1>
-        <p className="mb-3 text-gray-600">请根据当前合成面孔选择最符合的情绪类别。可以点击按钮，也可以按 1–6 使用键盘操作。</p>
-        <p className="mb-6 text-xs text-gray-400">使用内部版本化的合成面孔刺激；结果只描述本次分类响应，不推断情绪能力、共情、人格或文化能力。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="六类情绪面孔分类" description={<p>请根据当前合成面孔选择最符合的情绪类别。可以点击按钮，也可以按 1–6 使用键盘操作。</p>} hint={<><p>使用内部版本化的合成面孔刺激；结果只描述本次分类响应，不推断情绪能力、共情、人格或文化能力。</p></>} onAction={startPractice} />
     )
   }
 

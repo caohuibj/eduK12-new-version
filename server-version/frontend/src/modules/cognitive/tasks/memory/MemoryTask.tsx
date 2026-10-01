@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { MemoryConfig, MemoryTrialPayload } from '../../types'
@@ -262,12 +263,7 @@ export const MemoryTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="card p-8 max-w-2xl text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">数字序列短时记忆</h1>
-        <p className="text-gray-600 mb-3">数字会依次出现，请按原顺序输入。每个长度会完成两题，至少答对一题才进入下一长度。</p>
-        <p className="text-gray-400 text-xs mb-6">先完成两道不计分练习；至少答对一道才开始正式测评。正式测验输入后不会回显具体数字，也不能退格修改。</p>
-        <button type="button" onClick={startPractice} className="btn-primary">开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="数字序列短时记忆" description={<p>数字会依次出现，请按原顺序输入。每个长度会完成两题，至少答对一题才进入下一长度。</p>} hint={<><p>先完成两道不计分练习；至少答对一道才开始正式测评。正式测验输入后不会回显具体数字，也不能退格修改。</p></>} onAction={startPractice} />
     )
   }
 

@@ -4,6 +4,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const browsers = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 const { installApiFixture, sampleCourse } = require('./visual-canonical-browser-e2e.cjs')
+const { reportVisualFailure } = require('./visual-failure-diagnostics.cjs')
 const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', 'interaction-states')
 const widths = [360, 390, 768, 1440]
@@ -64,6 +65,7 @@ async function main() {
       assert.deepEqual(errors, [])
       assert.equal(requests.some(request => request.method !== 'GET'), false, 'no business writes')
     } catch (error) {
+      reportVisualFailure({ engine: process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium', width, url: page.url(), output, script: __filename }, error)
       await page.screenshot({ path: path.join(output, `failure-${width}.png`), fullPage: true })
       console.error((await page.locator('body').innerText()).slice(-2500))
       throw error
@@ -367,4 +369,7 @@ async function main() {
     fs.writeFileSync(path.join(output, 'qa.json'), JSON.stringify({ results }, null, 2))
   } finally { await browser.close() }
 }
-main().catch(error => { console.error(error); process.exitCode = 1 })
+main().catch(error => {
+  reportVisualFailure({ engine: process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium', width: 'setup-or-final', url: base, output, script: __filename }, error)
+  console.error(error); process.exitCode = 1
+})

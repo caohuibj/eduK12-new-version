@@ -43,7 +43,7 @@ const loadSessionAsset = async (
 export const cognitiveApi = {
   professionalReports: (id: string, offset = 0) => apiClient.get<{
     assignmentId: string; assignmentTitle: string; total: number; offset: number; nextOffset: number | null
-    records: Array<{ label: string; report: CognitiveV2Report | null; references: Array<Record<string, unknown>>; unavailableReason: string | null }>
+    records: Array<{ label: string; reportId: string; finishedAt: string | null; report: CognitiveV2Report | null; references: Array<Record<string, unknown>>; unavailableReason: string | null }>
   }>(`/cognitive/assignments/${encodeURIComponent(id)}/reports?offset=${offset}`),
   listTests: () =>
     apiClient.get<{ list: Array<{

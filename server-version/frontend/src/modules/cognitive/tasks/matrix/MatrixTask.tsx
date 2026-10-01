@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import './matrix-layout.css'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { matrixSequence, type MatrixItemSpec } from '../shared/prng'
 import {
@@ -25,7 +26,7 @@ const Glyph: React.FC<{ value: number }> = ({ value }) => {
 
 const ItemView: React.FC<{ item: MatrixItemSpec; choose: (index: number) => void; disabled?: boolean }> = ({ item, choose, disabled }) => (
   <>
-    <div className="mx-auto mb-6 grid w-fit grid-cols-3 gap-2 rounded-xl bg-slate-200 p-2" aria-label="矩阵图形题">
+    <div className="cognitive-matrix-grid mb-6 grid gap-2 rounded-xl bg-slate-200 p-2" aria-label="矩阵图形题">
       {item.panels.map((value, index) => <div key={`${value}-${index}`} className="flex h-20 w-24 items-center justify-center rounded-lg bg-white"><Glyph value={value} /></div>)}
       <div className="flex h-20 w-24 items-center justify-center rounded-lg bg-white text-3xl font-bold text-slate-400">?</div>
     </div>

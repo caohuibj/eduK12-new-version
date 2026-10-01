@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
@@ -232,13 +233,7 @@ export const NbackTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <div className="text-center p-8">
-        <h2 className="text-xl font-semibold mb-3">N-Back</h2>
-        <p className="text-gray-600 mb-2">字母与 N 个之前相同时尽快按下，否则不要按。</p>
-        <p className="text-gray-600 mb-4">如果正式测验升级到 2-back 或 3-back，会先完成对应的不计分练习，再进入该难度。</p>
-        <p className="text-xs text-gray-400 mb-6">电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩。</p>
-        <button className="btn-primary" onClick={() => startPractice(firstNLevel, false)}>开始练习</button>
-      </div>
+      <CognitiveTaskIntro title="N-Back" description={<p>字母与 N 个之前相同时尽快按下，否则不要按。</p>} hint={<><p>如果正式测验升级到 2-back 或 3-back，会先完成对应的不计分练习，再进入该难度。</p><p>电脑可按空格或 Enter；触屏可点击中央作答区。练习不计入正式成绩。</p></>} onAction={() => startPractice(firstNLevel, false)} />
     )
   }
 

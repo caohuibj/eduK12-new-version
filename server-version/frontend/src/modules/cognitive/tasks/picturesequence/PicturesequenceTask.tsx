@@ -1,3 +1,4 @@
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { pictureSequenceItems, seededRandom, shuffleInPlace } from '../shared/prng'
@@ -152,7 +153,7 @@ export const PicturesequenceTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     } finally { submittingRef.current = false }
   }
 
-  if (phase === 'instruction') return <div className="text-center p-8"><h2 className="text-xl font-semibold mb-3">图片序列学习</h2><p className="mb-2 text-gray-600">记住日常场景出现的顺序，再按顺序点击还原。</p><p className="mb-6 text-xs text-gray-400">刺激为内部自制；练习至少答对 3 / 4。</p><button className="btn-primary" onClick={startPractice}>开始练习</button></div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="图片序列学习" description={<p>记住日常场景出现的顺序，再按顺序点击还原。</p>} hint={<><p>刺激为内部自制；练习至少答对 3 / 4。</p></>} onAction={startPractice} />
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="text-center p-8"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="text-center p-8"><p className="mb-4">上一题：{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
   if (phase === 'delayed-wait') return <div className="text-center p-8"><h3 className="text-lg font-semibold mb-3">短延迟回忆准备</h3><p className="text-gray-600">请保持当前页面，短暂等待后将在不重复呈现图片的情况下再次排序。</p></div>

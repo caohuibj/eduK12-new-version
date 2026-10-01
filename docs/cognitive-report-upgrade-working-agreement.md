@@ -4,14 +4,18 @@
 
 ## 当前状态
 
-2026-10-01（Asia/Tokyo）：用户已告知 GitHub 开发完成合入，要求 push 全部本地成果并触发 CI。原发布暂停条件已解除。最新远端 main `9dd4b301` 已无冲突合入实现分支；之后执行本文件中 clean 信号后的流程，CI 与仓库门槛仍必须通过。
+2026-10-01：用户明确要求“推送，触发 CI”，解除本轮 R1–R7 的推送与 CI 暂停。先对齐最新 main、检测差异与冲突、完成必要验证，再推送修复分支并通过 PR 触发 CI；核查结果，不绕过质量门槛。
+
+2026-10-01：用户要求在本地修复 review R1–R7，并再次明确“先不 push，不触发 CI”。本轮只允许本地实现、验证和交付；此前 PR #217 的发布授权不适用于本轮新改动。发布配置和历史冻结结果不作批量变更。
+
+此前发布记录：用户曾授权 push 上一轮成果并触发 CI，该轮已通过 PR #217 合入。本轮 R1–R7 是合入后的新增修复，以上历史授权不解除本轮的发布暂停。
 
 ## 当前允许的工作
 
 - 在专用本地工作区制定方案、修改代码、生成样稿、执行验证、保存本地 Git 提交。
-- 保留基线 `f70078adcd7c1220f205559e34cd3d719b3b6ce4` 与 review 证据；必要的远端只读查询允许。
+- 本轮基线是已合入的 main `54500a89739fcde54c73264197be0d352234fb7b`，保留原 review 证据；必要的远端只读查询允许。
 - 主工作区 `/workspace/eduK12-new-version` 不用于本轮实现；专用工作区 `/workspace/eduK12-cognitive-report-upgrade`。
-- 方案保存在 `design/cognitive-report-upgrade-plan`；本轮实现保存在 `feat/cognitive-report-upgrade-local`，继续遵循本约定。
+- 原方案保存在 `design/cognitive-report-upgrade-plan`；本轮 R1–R7 修复使用 `feat/cognitive-review-fixes-local` 分支。最新用户授权允许推送并触发 CI。交付与验证见 [本轮修复说明](cognitive-review-fixes-implementation.md)。
 - 用户确认本轮仅完善已有权限内的分层解读，不新增科研专用指标入口。实施及验证见 [本地交付说明](cognitive-report-upgrade-implementation.md)。
 - 用户进一步要求个体科普版与后台专业版分别优化，并选择成熟简洁的科普杂志风格。本轮增加同一归属权限内的冻结报告阅读入口，不开放科研专用指标；新样稿与验证见 [两版交付说明](cognitive-report-audiences-implementation.md)。
 
@@ -23,7 +27,7 @@
 
 ## clean 信号到来后
 
-用户已经给出条件授权：对齐最新 main、检查内容与冲突、运行必要验证、push 工作分支、创建 PR 触发 CI、全部当前门槛通过后 merge。无需为已经满足条件的常规步骤再次询问。
+本轮需要用户再次明确解除“先不 push，不触发 CI”的暂停后，才执行相应授权范围内的远端操作。对齐最新 main、检查内容与冲突、运行必要验证后再发布；不从上一轮的 clean 信号推断本轮已获授权。
 
 未通过测试/CI、实际存在未解决冲突、或保护分支要求尚未满足时先完成修复与核查，不绕过门槛。预计冲突少不能替代对质量门控、冻结语义、披露权限和共用样式的兼容性检查。
 

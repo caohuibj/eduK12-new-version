@@ -18,7 +18,7 @@ beforeEach(() => {
   vi.clearAllMocks(); process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   mocks.assignment.mockResolvedValue({ id: 'a1', title: '任务', listedStandalone: true })
   mocks.count.mockResolvedValue(1); mocks.cohort.mockResolvedValue(false)
-  mocks.findMany.mockResolvedValue([{ attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: snapshot() }])
+  mocks.findMany.mockResolvedValue([{ id: 'random-session-one', finishedAt: new Date('2026-10-01T08:30:00Z'), attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: snapshot() }])
 })
 describe('professional frozen report reading', () => {
   it('checks the existing teacher/admin assignment authority before querying records', async () => {
@@ -28,14 +28,28 @@ describe('professional frozen report reading', () => {
     await listProfessionalReports(input)
     expect(mocks.assignment).toHaveBeenLastCalledWith('owner-teacher', UserRole.TEACHER, 'a1')
   })
-  it('returns the exact persisted report, filters references and never queries identities or raw submissions', async () => {
+  it('returns the exact persisted report, filters references and never queries participant identities or raw submissions', async () => {
     const result = await listProfessionalReports(input)
     expect(result.records[0].report).toEqual(report)
     expect(result.records[0].references).toEqual([{ metricKey: 'validTrialCount' }])
     expect(JSON.stringify(result)).not.toContain('305')
     const query = mocks.findMany.mock.calls[0][0]
     expect(query.take).toBe(10)
-    expect(query.select).toEqual({ attemptNo: true, compositeAttemptId: true, resultSnapshotEncrypted: true })
+    expect(query.select).toEqual({ id: true, finishedAt: true, attemptNo: true, compositeAttemptId: true, resultSnapshotEncrypted: true })
+    expect(result.records[0].reportId).toMatch(/^CR-[A-F0-9]{24}$/)
+    expect(JSON.stringify(result)).not.toContain('random-session-one')
+  })
+  it('keeps record references stable when new records change their page position', async () => {
+    const first = (await listProfessionalReports(input)).records[0]
+    mocks.findMany.mockResolvedValueOnce([
+      { id: 'random-session-two', finishedAt: new Date(), attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: snapshot() },
+      { id: 'random-session-one', finishedAt: new Date(), attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: snapshot() },
+    ])
+    const second = await listProfessionalReports({ ...input, offset: 10 })
+    expect(second.records[1].reportId).toBe(first.reportId)
+    expect(second.records[1].label).toBe(first.label)
+    expect(second.records[0].reportId).not.toBe(first.reportId)
+    expect(first.finishedAt).toBeDefined()
   })
   it('rejects composite wrappers and excludes cohort-only attempts before decryption', async () => {
     mocks.assignment.mockResolvedValueOnce({ id: 'a1', listedStandalone: false })
@@ -45,7 +59,7 @@ describe('professional frozen report reading', () => {
     expect((await listProfessionalReports(input)).records).toEqual([])
   })
   it('preserves legacy/unreadable outcomes and bounds pagination without an endless empty-page cursor', async () => {
-    mocks.findMany.mockResolvedValueOnce([{ attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: null }])
+    mocks.findMany.mockResolvedValueOnce([{ id: 'random-session-one', finishedAt: null, attemptNo: 1, compositeAttemptId: null, resultSnapshotEncrypted: null }])
     expect((await listProfessionalReports(input)).records[0].report).toBeNull()
     mocks.count.mockResolvedValueOnce(50); mocks.findMany.mockResolvedValueOnce([])
     expect((await listProfessionalReports(input)).nextOffset).toBeNull()
