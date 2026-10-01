@@ -4,6 +4,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const browsers = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 const { installApiFixture, sampleCourse } = require('./visual-canonical-browser-e2e.cjs')
+const { reportVisualFailure } = require('./visual-failure-diagnostics.cjs')
 const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const engine = process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', `legacy-dialogs-${engine}`)
@@ -155,6 +156,7 @@ async function main() {
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true)
         await page.screenshot({ path: path.join(output, `legacy-${width}.png`), fullPage: true })
       } catch (error) {
+        reportVisualFailure({ engine, width, url: page.url(), output, script: __filename }, error)
         await page.screenshot({ path: path.join(output, `failure-${width}.png`), fullPage: true })
         throw error
       } finally { await context.close() }
