@@ -52,8 +52,16 @@ const loginStudent = async (page) => {
 }
 
 const waitScene = async (page, title) => {
-  await page.locator('[data-assessment-shell-header]').waitFor({ state: 'visible', timeout: 30000 })
-  await page.getByRole('heading', { name: title, exact: true, level: 1 }).waitFor({ state: 'visible', timeout: 30000 })
+  try {
+    await page.locator('[data-assessment-shell-header]').waitFor({ state: 'visible', timeout: 30000 })
+    await page.getByRole('heading', { name: title, exact: true, level: 1 }).waitFor({ state: 'visible', timeout: 30000 })
+  } catch (error) {
+    // Capture the visible recovery/error state before closing the test context.
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/failed-scene.png`, fullPage: true }).catch(() => undefined)
+    const visible = await page.locator('body').innerText({ timeout: 5000 }).catch(() => 'Page body unavailable')
+    fs.writeFileSync(`${SCREENSHOT_DIR}/failed-scene.txt`, visible)
+    throw error
+  }
 }
 
 const chooseOption = async (page, optionKey) => {
@@ -179,6 +187,7 @@ const assertStandaloneDurable = async (attemptId, label) => {
 const runStandaloneLongPath = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true })
   const page = await context.newPage()
+  page.on('pageerror', error => console.error('[browser-page-error]', error.stack || error.message))
   let submitCount = 0
   let finalPayload = null
   const onRequest = (request) => {
@@ -256,7 +265,9 @@ const runStandaloneLongPath = async (browser) => {
     await page.getByRole('link', { name: '测评历史' }).first().click()
     await page.waitForURL(/\/student\/situational\/history(?:\?|$)/, { timeout: 30000 })
     await page.getByText('情境测评历史', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
-    await page.getByText(fixture.branching.reportHeadline, { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 })
+    const completedCard = page.locator(`a[href="/student/situational/attempts/${attemptId}/result"]`)
+    await completedCard.waitFor({ state: 'visible', timeout: 30000 })
+    assert.ok((await completedCard.textContent()).includes(fixture.branching.instrumentTitle), 'history entry does not show the instrument title')
     await page.getByText('已完成', { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 })
     record('standalone-history')
     await assertStandaloneDurable(attemptId, 'standalone-long-path')
@@ -269,6 +280,7 @@ const runStandaloneLongPath = async (browser) => {
 const runStandalonePruneAndEarlyTerminal = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
+  page.on('pageerror', error => console.error('[browser-page-error]', error.stack || error.message))
   let finalPayload = null
   const onRequest = (request) => {
     if (request.method() !== 'POST' || !/\/api\/situational\/attempts\/[^/]+\/submit(?:\?|$)/.test(request.url())) return
@@ -395,6 +407,7 @@ const assertEmbeddedDurable = async (parentId, childId, label) => {
 const runAuthenticatedBundle = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
+  page.on('pageerror', error => console.error('[browser-page-error]', error.stack || error.message))
   try {
     await loginStudent(page)
     const parentId = await startAuthenticatedParent(page)
@@ -446,6 +459,7 @@ const runAuthenticatedBundle = async (browser) => {
 const runPublicBundle = async (browser) => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
+  page.on('pageerror', error => console.error('[browser-page-error]', error.stack || error.message))
   try {
     const token = encodeURIComponent(fixture.publicToken)
     await page.goto(`${BASE_URL}/public/composite/${token}`, { waitUntil: 'domcontentloaded' })

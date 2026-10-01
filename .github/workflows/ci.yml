@@ -11,17 +11,15 @@
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
-# 编排（两台 self-hosted + GitHub-hosted 回归，三条 lane）：
-#   Router:       任意 self-hosted Linux，仅运行 scope / merge-gate 秒级调度任务
-#   Mac lane:     backend build + hardware-sensitive SLA → main browser
-#   Windows lane: frontend → codeql → docker
-#   GitHub lane:  backend functional regression on an independent PostgreSQL/Redis VM
-#   browser consumes exact-head artifacts after backend/frontend finish;
-#   merge-gate waits for all three lanes, including hosted regression.
+# 编排（全部 GitHub-hosted Ubuntu，job 间使用独立临时环境）：
+#   Router:       changed-scope classification
+#   Parallel:     backend build/performance, functional regression, frontend, CodeQL, Docker
+#   Browser:      consumes backend/frontend artifacts from this exact run
+#   Merge gate:   requires every selected check to succeed; no runner affinity
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + 200-completion SLA
-#   backend-regression: independent DB + full regression except Mac-only hardware SLA file
+#   backend-regression: independent DB + full regression except the separately gated performance SLA file
 #   frontend      : npm ci + lint + typecheck + full regression + vite build
 #   browser       : isolated PostgreSQL/Redis + seeded Bundle + real Playwright acceptance flow
 #   docker        : baseline + monitoring compose config + backend/frontend production image build
@@ -57,9 +55,7 @@ concurrency:
 jobs:
   scope:
     name: classify changed content
-    runs-on:
-      - self-hosted
-      - linux
+    runs-on: ubuntu-24.04
     outputs:
       content: ${{ steps.scope.outputs.content }}
       presentation: ${{ steps.scope.outputs.presentation }}
@@ -101,10 +97,7 @@ jobs:
     needs: scope
     name: presentation / frontend lint + typecheck + build
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -133,10 +126,7 @@ jobs:
     needs: scope
     name: PR light / backend compile
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: server-version/backend
@@ -180,10 +170,7 @@ jobs:
     needs: scope
     name: PR light / frontend lint + typecheck
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -209,10 +196,7 @@ jobs:
     needs: scope
     name: main / post-merge compile smoke
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     steps:
@@ -254,10 +238,7 @@ jobs:
     needs: scope
     name: backend (migrate + build + performance gate)
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -420,7 +401,7 @@ jobs:
       - name: Wave1 calibration generator contracts
         run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
       - name: 200-completion performance and report integrity gate
-        # Keep the <10s burst on the same self-hosted lane and durable PostgreSQL.
+        # Keep the <10s burst on its own hosted VM and durable PostgreSQL.
         run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-performance-vitest.json
       - name: capture CI environment snapshot
         if: always()
@@ -533,7 +514,7 @@ jobs:
         run: npm ci --ignore-scripts
       - name: full functional regression
         # Real-PG suites remain serial. The single hardware-sensitive burst is
-        # covered by the Mac job and excluded here; every other file runs here.
+        # covered by the isolated backend job and excluded here; every other file runs here.
         run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
       - name: capture hosted runner resources
         if: always()
@@ -608,13 +589,8 @@ jobs:
   frontend:
     needs: scope
     name: frontend (lint + typecheck + full tests + build)
-    # Windows lane 的首个 job：不依赖 backend，从 workflow 开始即可启动。
-    # 它与 Mac lane 的 backend 使用不同物理主机，避免跨 lane 资源竞争。
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -668,14 +644,9 @@ jobs:
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance executes after both production lanes have passed.
-    # At that point the Mac backend lane is free, so browser reuses Mac while
-    # Windows continues CodeQL/Docker in parallel.
     needs: [scope, backend, frontend]
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -996,14 +967,11 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Windows has one heavy lane: frontend -> CodeQL -> Docker.
+    # Production images are built on a separate hosted VM.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
-    needs: [scope, codeql]
+    needs: [scope]
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
@@ -1093,14 +1061,10 @@ jobs:
 
   codeql:
     name: codeql (javascript/typescript SAST)
-    # Windows lane 的第二个 job：仅在 frontend 成功后启动；同一 dedicated
-    # runner 负责物理串行化 Frontend → CodeQL。backend 不再作为前置条件。
-    needs: [scope, frontend]
+    # Static analysis runs independently; the aggregate gate still requires frontend.
+    needs: [scope]
     if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-win-ci
+    runs-on: ubuntu-24.04
     permissions:
       actions: read
       contents: read
@@ -1114,13 +1078,9 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
-          # Runner unit cgroup caps memory at MemoryMax=5G; without an explicit
-          # cap the CodeQL JVM grows to "most of system memory" and gets
-          # OOM-killed mid-analysis.
+          # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
-          # 保持当前已验证的 CodeQL 资源参数；本次只调整 lane 调度，不做
-          # CodeQL 性能调优。
-          threads: 8
+          threads: 2
       - name: analyze with CodeQL
         uses: github/codeql-action/analyze@v3
         with:
@@ -1134,9 +1094,7 @@ jobs:
     name: merge gate / ready PR
     needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
-    runs-on:
-      - self-hosted
-      - linux
+    runs-on: ubuntu-24.04
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
