@@ -17,12 +17,19 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
     ids: string[] = [],
     attempts: string[] = []
   beforeAll(async () => {
-    if (
-      !url?.startsWith('postgresql://situational_test:') ||
-      !url.includes('@127.0.0.1:55473/situational_vnext')
-    )
+    const localSyntheticDatabase =
+      url?.startsWith('postgresql://situational_test:') &&
+      url.includes('@127.0.0.1:55473/situational_vnext')
+    // The hosted regression job owns an ephemeral PostgreSQL service. Keep
+    // developer and production databases excluded when running locally.
+    const hostedSyntheticDatabase =
+      process.env.GITHUB_ACTIONS === 'true' &&
+      process.env.RUNNER_ENVIRONMENT === 'github-hosted' &&
+      process.env.NODE_ENV === 'test' &&
+      url === 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public'
+    if (!localSyntheticDatabase && !hostedSyntheticDatabase)
       throw new Error('Dedicated synthetic database required')
-    process.env.DATABASE_URL = url
+    process.env.DATABASE_URL = url!
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     db = new PrismaClient({ datasources: { db: { url } } })
