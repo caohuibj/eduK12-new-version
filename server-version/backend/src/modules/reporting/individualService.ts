@@ -117,7 +117,7 @@ export async function generateIndividualLongitudinal(input: IndividualScopeInput
       const points = waves.flatMap((wave,i)=>{
         const metric=wave.inputManifest.resolved[0]?.metrics.find(m=>m.key===rule.sourceMetricKey)
         const projected=projection.waves[i].metrics[rule.metricId]
-        return metric?.scaleReference && projected.state==='present' ? [{resultVersion:wave.inputManifest.resolved[0].canonicalResultHash,at:prepared[i].source.at.toISOString(),value:projected.value,identity:metric.scaleReference}] : []
+        return metric?.scaleReference && projected.state==='present' ? [{resultVersion:wave.inputManifest.resolved[0].canonicalResultHash,at:prepared[i].source.at.toISOString(),ordinal:wave.ordinal,value:projected.value,identity:metric.scaleReference}] : []
       })
       if(points.length>=2) {
         try { trajectories[rule.metricId]=buildLongitudinalReferenceSnapshot({points,references,mode:input.referenceResolutionMode,explicitLatest:input.regenerateWithLatestReference,generatedAt:new Date().toISOString()}) }

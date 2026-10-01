@@ -492,7 +492,13 @@ const canonicalUnitResultCoreSchema = z.object({
     profileKey: z.string().nullable().optional(),
     resolvedConfigHash: z.string().regex(/^[0-9a-f]{64}$/).nullable().optional(),
   }).strict(),
-}).strict()
+}).strict().superRefine((core,ctx)=>{
+ core.metrics.forEach((metric,i)=>{
+  const id=metric.scaleReference
+  if(!id)return
+  if(core.unitType!=='SCALE' || id.instrumentKey!==core.instrumentKey || id.instrumentVersion!==core.instrumentVersion || id.scoringVersion!==core.scorerVersion || id.measurementHash!==core.sourceDefinitionHash || id.scoreKey!==metric.key || !core.references.some(r=>r.scoreKey===metric.key && r.referenceVersion===id.originalReferenceVersion && r.referenceHash===id.originalReferenceHash))ctx.addIssue({code:z.ZodIssueCode.custom,path:['metrics',i,'scaleReference'],message:'SCALE_REFERENCE_IDENTITY_MISMATCH'})
+ })
+})
 
 const canonicalBundleBridgeSchema = z.object({
   sourceResultHash: z.string().regex(/^[0-9a-f]{64}$/),

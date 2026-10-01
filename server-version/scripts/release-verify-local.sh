@@ -250,6 +250,8 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts \
     src/__tests__/bundle-onboarding/content.postgres.integration.test.ts \
     src/__tests__/cognitive/concurrency.integration.test.ts \
+    src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts \
+    src/__tests__/assessment-reference/scale-wave1-reporting.postgres.integration.test.ts \
     src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts \
     src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts \
     src/__tests__/questionnaire/form-answer.postgres.integration.test.ts \

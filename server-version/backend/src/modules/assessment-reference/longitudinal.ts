@@ -9,14 +9,14 @@ export interface ScaleReferenceIdentityV1 {
  direction:string; range:{min:number;max:number}; reportVersion:string
  originalReferenceVersion:string; originalReferenceHash:string
 }
-export interface LongitudinalReferencePoint { resultVersion:string; at:string; value:number|null; identity:ScaleReferenceIdentityV1 }
+export interface LongitudinalReferencePoint { resultVersion:string; at:string; ordinal?:number; value:number|null; identity:ScaleReferenceIdentityV1 }
 export interface LongitudinalReferenceSnapshotV1 {
  schemaVersion:1; resolutionMode:ReferenceResolutionMode; selectedReferenceVersions:string[]; sourceResultVersions:string[]
- generatedAt:string; compatibilityDecision:string; explicitLatest:boolean
- points:Array<{resultVersion:string;rawValue:number|null;reference:ResolvedScaleReference|null}>
+ generatedAt:string; sourceReportVersions:string[]; compatibilityDecision:string; explicitLatest:boolean
+ points:Array<{resultVersion:string;ordinal?:number;rawValue:number|null;reference:ResolvedScaleReference|null}>
  snapshotHash:string
 }
-const entryFor=(set:AssessmentReferenceSetDefinition,id:ScaleReferenceIdentityV1)=>set.instrumentType==='scale' && set.instrumentKey===id.instrumentKey ? set.entries.find(e=>e.scoreKey===id.scoreKey && e.instrumentVersion===id.instrumentVersion && e.scoringVersion===id.scoringVersion && e.governance?.subjectKey===id.subjectKey && e.governance.locale===id.locale && (e.governance.schoolStage===id.schoolStage || e.governance.crossStageReReferenceAllowed) && e.governance.scoreRange.min===id.range.min && e.governance.scoreRange.max===id.range.max) : undefined
+const entryFor=(set:AssessmentReferenceSetDefinition,id:ScaleReferenceIdentityV1)=>set.instrumentType==='scale' && set.instrumentKey===id.instrumentKey ? set.entries.find(e=>e.scoreKey===id.scoreKey && e.instrumentVersion===id.instrumentVersion && e.scoringVersion===id.scoringVersion && e.governance?.measurementHash===id.measurementHash && e.governance.subjectKey===id.subjectKey && e.governance.locale===id.locale && (e.governance.schoolStage===id.schoolStage || e.governance.crossStageReReferenceAllowed) && e.governance.scoreRange.min===id.range.min && e.governance.scoreRange.max===id.range.max) : undefined
 const compatible=(a:ScaleReferenceIdentityV1,b:ScaleReferenceIdentityV1)=>a.instrumentKey===b.instrumentKey && a.instrumentVersion===b.instrumentVersion && a.scoringVersion===b.scoringVersion && a.measurementHash===b.measurementHash && a.subjectKey===b.subjectKey && a.locale===b.locale && a.scoreKey===b.scoreKey && a.direction===b.direction && a.range.min===b.range.min && a.range.max===b.range.max
 export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalReferencePoint[];references:AssessmentReferenceSetDefinition[];mode?:ReferenceResolutionMode;explicitLatest?:boolean;generatedAt:string}):LongitudinalReferenceSnapshotV1 {
  if(input.points.length<2 || input.points.some(p=>!Number.isFinite(Date.parse(p.at))) || new Set(input.points.map(p=>p.resultVersion)).size!==input.points.length || !Number.isFinite(Date.parse(input.generatedAt))) throw new Error('LONGITUDINAL_SOURCE_INVALID')
@@ -28,7 +28,7 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
   return r
  }
  points.forEach(original)
- const candidates=input.explicitLatest ? input.references.filter(r=>r.status==='ACTIVE' && Date.parse(r.entries[0]?.governance?.effectiveFrom??'')<=Date.parse(input.generatedAt)).sort((a,b)=>Date.parse(b.entries[0]?.governance?.effectiveFrom??'')-Date.parse(a.entries[0]?.governance?.effectiveFrom??'')) : [...points].reverse().map(original)
+ const candidates=input.explicitLatest ? input.references.filter(r=>r.status==='ACTIVE' && Date.parse(r.entries[0]?.governance?.effectiveFrom??'')<=Date.parse(input.generatedAt)).sort((a,b)=>Date.parse(b.entries[0]?.governance?.effectiveFrom??'')-Date.parse(a.entries[0]?.governance?.effectiveFrom??'')) : [...points].reverse().map(original).sort((a,b)=>Date.parse(entryFor(b,points[points.length-1].identity)?.governance?.effectiveFrom??'')-Date.parse(entryFor(a,points[points.length-1].identity)?.governance?.effectiveFrom??''))
  const later=mode==='LATER_REFERENCE' ? candidates.find(r=>points.every(p=>compatible(p.identity,points[points.length-1].identity) && !!entryFor(r,p.identity))) : undefined
  const project=(p:LongitudinalReferencePoint,r:AssessmentReferenceSetDefinition):ResolvedScaleReference|null=>{
   const e=entryFor(r,p.identity)
@@ -37,10 +37,13 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
  }
  const projected=points.map(p=>{
   const timeMatched=mode==='TIME_MATCHED' || (mode==='LATER_REFERENCE' && !later) ? input.references.filter(r=>r.status!=='DRAFT' && Date.parse(r.entries[0]?.governance?.effectiveFrom??'')<=Date.parse(p.at) && !!entryFor(r,p.identity)).sort((a,b)=>Date.parse(b.entries[0].governance!.effectiveFrom)-Date.parse(a.entries[0].governance!.effectiveFrom))[0] : undefined
-  return {resultVersion:p.resultVersion,rawValue:p.value,reference:project(p,later??timeMatched??original(p))}
+  return {resultVersion:p.resultVersion,...(p.ordinal!==undefined?{ordinal:p.ordinal}:{}),rawValue:p.value,reference:project(p,later??timeMatched??original(p))}
  })
- const payload={schemaVersion:1 as const,resolutionMode:mode,selectedReferenceVersions:[...new Set(projected.flatMap(p=>p.reference?[p.reference.referenceVersion]:[]))],sourceResultVersions:points.map(p=>p.resultVersion),generatedAt:input.generatedAt,compatibilityDecision:mode==='LATER_REFERENCE'?(later?'COMPATIBLE_LATER_REFERENCE':'FALLBACK_TIME_MATCHED'):mode,explicitLatest:input.explicitLatest===true,points:projected}
- return {...payload,snapshotHash:canonicalHash(payload)}
+ const payload={schemaVersion:1 as const,resolutionMode:mode,selectedReferenceVersions:[...new Set(projected.flatMap(p=>p.reference?[p.reference.referenceVersion]:[]))],sourceResultVersions:points.map(p=>p.resultVersion),generatedAt:input.generatedAt,sourceReportVersions:[...new Set(points.map(p=>p.identity.reportVersion))],compatibilityDecision:mode==='LATER_REFERENCE'?(later?'COMPATIBLE_LATER_REFERENCE':'FALLBACK_TIME_MATCHED'):mode,explicitLatest:input.explicitLatest===true,points:projected}
+ // Quantize the display projection before JSONB persistence; source result hash retains exact scoring bytes.
+ const stable=(v:any):any=>typeof v==='number'?Number(v.toFixed(8)):Array.isArray(v)?v.map(stable):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,stable(x)])):v
+ const frozen=stable(payload) as typeof payload
+ return {...frozen,snapshotHash:canonicalHash(frozen)}
 }
 
 export const scaleReferenceIdentitySchema = z.object({

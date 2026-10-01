@@ -25,7 +25,7 @@ suite('governed reference lifecycle (real PostgreSQL)',()=>{
   // Immutable test records intentionally remain in the disposable verification DB.
  })
  it('legacy ungoverned rows can still be deleted',async()=>{
-  const legacy=testReference();delete legacy.entries[0].governance;legacy.entries[0].referenceKind='descriptive_sample';legacy.entries[0].evidenceLevel='local_pilot';legacy.entries[0].provenanceType='local_sample_reference';legacy.instrumentKey='test_legacy_'+randomUUID()
+  const legacy=testReference();delete legacy.entries[0].governance;legacy.entries[0].referenceKind='descriptive_sample';legacy.entries[0].evidenceLevel='local_pilot';legacy.entries[0].provenanceType='local_observed';legacy.instrumentKey='test_legacy_'+randomUUID()
   const row=await db.assessmentReferenceSet.create({data:{instrumentType:'SCALE',instrumentKey:legacy.instrumentKey,referenceVersion:'v1',status:'DRAFT',definition:legacy as unknown as Prisma.InputJsonValue}})
   await db.assessmentReferenceSet.delete({where:{id:row.id}});expect(await db.assessmentReferenceSet.findUnique({where:{id:row.id}})).toBeNull()
  })

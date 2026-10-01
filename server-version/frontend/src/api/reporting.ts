@@ -146,7 +146,7 @@ export interface ProtectedProjection {
 export interface IndividualProjection {
   schemaVersion: 1
   kind: 'INDIVIDUAL_LONGITUDINAL'
-  referenceTrajectories?: {metrics:Record<string,{resolutionMode:'ORIGINAL'|'TIME_MATCHED'|'LATER_REFERENCE';compatibilityDecision:string;selectedReferenceVersions:string[];explicitLatest:boolean;points:Array<{resultVersion:string;rawValue:number|null;reference:ScaleReferenceValue|null}>}>}
+  referenceTrajectories?: {metrics:Record<string,{resolutionMode:'ORIGINAL'|'TIME_MATCHED'|'LATER_REFERENCE';compatibilityDecision:string;selectedReferenceVersions:string[];explicitLatest:boolean;points:Array<{resultVersion:string;ordinal?:number;rawValue:number|null;reference:ScaleReferenceValue|null}>}>}
   state: 'present'
   waves: Array<{ waveId: string; waveKey: string; ordinal: number; evidence: ReportingEvidenceProjection;
     metrics: Record<string, { state: 'present'; value: number } | { state: 'missing'; reason: string }> }>

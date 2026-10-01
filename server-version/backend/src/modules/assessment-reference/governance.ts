@@ -3,6 +3,7 @@ import type { AssessmentReferenceEntry } from './reference'
 export interface ReferenceGovernanceV1 {
   schemaVersion: 1
   kind: 'THEORETICAL_RANGE' | 'LOCAL_PILOT' | 'LOCAL_REFERENCE' | 'MULTISITE_REFERENCE' | 'VALIDATED_NORM' | 'CRITERION'
+  measurementHash: string
   subjectKey: string
   schoolStage: 'junior_secondary' | 'upper_secondary'
   locale: string
@@ -24,6 +25,9 @@ export function validateReferenceGovernance(entry: Partial<AssessmentReferenceEn
   if (!g) return entry.referenceKind === 'theoretical_range' ? ['THEORETICAL_GOVERNANCE_REQUIRED'] : []
   if (typeof g!=='object' || !Array.isArray(g.bands) || g.bands.some(b=>!b || typeof b!=='object')) return ['REFERENCE_GOVERNANCE_INVALID']
   const errors: string[] = []
+  const stableNumbers=(v:unknown):boolean=>typeof v==='number' ? Number.isFinite(v) && v===Number(v.toFixed(8)) : Array.isArray(v)?v.every(stableNumbers):v && typeof v==='object'?Object.values(v).every(stableNumbers):true
+  if(!stableNumbers(entry.statistics) || !stableNumbers(g)) errors.push('REFERENCE_SNAPSHOT_NUMERIC_PRECISION_REQUIRED')
+  if(!/^[a-f0-9]{64}$/.test(g.measurementHash??''))errors.push('REFERENCE_MEASUREMENT_HASH_REQUIRED')
   if (g.schemaVersion !== 1 || !['THEORETICAL_RANGE','LOCAL_PILOT','LOCAL_REFERENCE','MULTISITE_REFERENCE','VALIDATED_NORM','CRITERION'].includes(g.kind)) errors.push('REFERENCE_KIND_INVALID')
   if (!g.subjectKey || !g.locale || !g.populationKey || !g.sourceDataset || !g.sourceSnapshot || !Number.isFinite(Date.parse(g.effectiveFrom))) errors.push('REFERENCE_PROVENANCE_REQUIRED')
   if(typeof g.crossStageReReferenceAllowed!=='boolean') errors.push('REFERENCE_CROSS_STAGE_DECISION_REQUIRED')
@@ -40,10 +44,12 @@ export function validateReferenceGovernance(entry: Partial<AssessmentReferenceEn
   if (g.kind === 'THEORETICAL_RANGE') {
     if (entry.referenceKind !== 'theoretical_range' || entry.evidenceLevel !== 'theoretical' || entry.provenanceType !== 'theoretical_score_range' || g.bandSource !== 'THEORETICAL_SCORE_RANGE' || g.sampleN !== null || entry.source?.sampleSize !== undefined || Object.keys(entry.statistics ?? {}).length || g.calibration || bands.some(b => b.sampleN !== undefined)) errors.push('THEORETICAL_EMPIRICAL_CLAIM_FORBIDDEN')
   } else if (g.bandSource === 'EMPIRICAL_DISTRIBUTION') {
+    if(entry.provenanceType!=='local_observed' || entry.evidenceLevel==='theoretical' || !['normative_distribution','descriptive_sample'].includes(entry.referenceKind??'') || g.kind==='CRITERION')errors.push('REFERENCE_KIND_SOURCE_MISMATCH')
     if (!Number.isInteger(g.sampleN) || (g.sampleN ?? 0) < 100 || !g.calibration || !g.calibration.subgroupReview || !/^[a-f0-9]{64}$/.test(g.sourceSnapshot)) errors.push('EMPIRICAL_REVIEW_REQUIRED')
     if (bands.some(b => !Number.isInteger(b.sampleN) || (b.sampleN ?? 0) < 20) || bands.reduce((n,b) => n+(b.sampleN ?? 0),0) !== g.sampleN) errors.push('EMPIRICAL_BAND_ALLOCATION_INVALID')
     if (g.calibration && [g.calibration.missingness,g.calibration.floor,g.calibration.ceiling].some(x => !Number.isFinite(x) || x < 0 || x > 1)) errors.push('EMPIRICAL_QC_INVALID')
     if (entry.source?.sampleSize !== g.sampleN) errors.push('EMPIRICAL_SAMPLE_MISMATCH')
   }
+  if(g.kind!=='THEORETICAL_RANGE' && g.bandSource!=='EMPIRICAL_DISTRIBUTION' && !(g.kind==='CRITERION' && g.bandSource==='CRITERION' && entry.referenceKind==='criterion_threshold'))errors.push('REFERENCE_KIND_SOURCE_MISMATCH')
   return [...new Set(errors)]
 }

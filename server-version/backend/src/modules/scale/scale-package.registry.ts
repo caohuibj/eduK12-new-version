@@ -86,7 +86,7 @@ export const validateScalePackage = (scalePackage: ScalePackageV2): ScalePackage
     referenceVersions.add(reference.referenceVersion)
     reference.entries.forEach((entry, entryIndex) => {
       const axes=scalePackage.definition.versionAxes
-      if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale)) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
+      if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale || entry.governance.measurementHash!==hashScaleDefinition(scalePackage.definition))) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
       if (!scoreKeys.has(entry.scoreKey)) issues.push({ path: `${path}.entries.${entryIndex}.scoreKey`, message: `reference 引用了不存在的 score：${entry.scoreKey}`, severity: 'error' })
       if (entry.instrumentVersion !== scalePackage.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 必须与 package 一致', severity: 'error' })
       if (entry.scoringVersion !== scalePackage.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 必须与 definition 一致', severity: 'error' })

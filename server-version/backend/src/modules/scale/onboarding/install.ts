@@ -1,3 +1,4 @@
+import { allowsScaleAxisRevision } from './axis-snapshots'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
 import { scaleLocalizationReasons } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
@@ -73,7 +74,7 @@ const resolvePlan = async (
   if (scale) {
     if (scale.instrumentClass !== 'STANDARD') blockers.push('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
     if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('DEPLOYMENT_VERSION_CONFLICT')
-    if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
+    if (scale.definition && canonicalHash(scale.definition) !== canonicalHash(source.executable.definition) && !allowsScaleAxisRevision(scale.definition,source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.definitionHash && scale.definitionHash !== hashScaleDefinition(source.executable.definition)) blockers.push('SCALE_DEFINITION_CONFLICT')
     if (scale.status === 'DEPRECATED' || scale.status === 'ARCHIVED') blockers.push('SCALE_LIFECYCLE_BLOCKS_REACTIVATION')
   }
