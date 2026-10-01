@@ -59,6 +59,7 @@ router.post('/assignments/:id/public-tokens/:tokenId/reveal', authenticate, requ
 router.delete('/assignments/:id/public-tokens/:tokenId', authenticate, requireTeacher, cognitiveController.disablePublicToken)
 
 // 教师端数据导出（下载路径携带 assignmentId，控制器会再次校验归属）
+router.get('/assignments/:id/reports', authenticate, requireTeacher, cognitiveController.professionalReports)
 router.get('/assignments/:id/export/artifacts/:artifactId/status', authenticate, requireTeacher, assessmentExportHttp('COGNITIVE', true))
 router.get('/assignments/:id/export/artifacts/:artifactId', authenticate, requireTeacher, assessmentExportHttp('COGNITIVE', false))
 router.get('/assignments/:id/export/files/:fileName', authenticate, requireTeacher, cognitiveController.downloadExportFile)

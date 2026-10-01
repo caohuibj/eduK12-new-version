@@ -136,12 +136,28 @@ describe('versioned participant report interpretation', () => {
       families.add(entry.testType)
       const policy = resolveParticipantPresentation(entry)!.reportReading!
       expect(policy).toBeDefined()
+      expect(policy.popular?.frames).toHaveLength(3)
+      expect(policy.professional?.procedure.length).toBeGreaterThan(20)
+      expect([...policy.summary.template.matchAll(/\{(\w+)\}/g)].map(match => match[1]).every(key => policy.summary.metricKeys.includes(key))).toBe(true)
       const definition = getCognitiveV2TaskDefinition(entry.testType, entry.engineVersion, entry.scoringVersion)!
       for (const key of [...policy.summary.metricKeys, ...policy.studentMetricKeys, ...policy.processMetricKeys, ...(policy.chart?.metricKeys ?? [])]) expect(definition.metrics[key], `${entry.testType}/${key}`).toBeDefined()
       const metrics = Object.fromEntries(Object.keys(definition.metrics).map(key => [key, 1]))
       const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research')
       expect([...report.headline, ...report.user, ...report.detail].some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      expect(report.reading!.professional!.metrics.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      expect(report.reading!.professional!.withheld.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
     }
     expect(families.size).toBe(24)
+  })
+  it('keeps specialist explanations separate from the popular voice and withholds professional numeric estimates too', () => {
+    const input = reactionInput(5)
+    const scored = getCognitiveV2TaskDefinition('reaction', '1.0.0', '1.1.0')!.scorer(input as never)
+    const reading = project('reaction', '1.1.0', scored.metrics, scored, 'standard', input).reading!
+    expect(reading.popular!.concept).toContain('千分之一秒')
+    expect(reading.popular!.example).toContain('不能预测驾驶安全')
+    expect(reading.professional!.metrics.some(metric => metric.key === 'medianRtMs')).toBe(false)
+    expect(reading.professional!.withheld.find(metric => metric.key === 'medianRtMs')!.reasons.length).toBeGreaterThan(0)
+    expect(reading.professional!.quality.find(flag => flag.key === 'insufficientValidTrials')!.active).toBe(true)
+    expect(JSON.stringify(reading.professional)).not.toContain('305')
   })
 })

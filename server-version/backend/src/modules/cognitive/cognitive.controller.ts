@@ -25,6 +25,7 @@ import {
   completeSessionSchema,
   cognitiveExportQuerySchema,
   cognitiveExportRequestSchema,
+  cognitiveProfessionalReportsQuerySchema,
   cognitivePublicTokenSchema,
   cognitivePublicStartSchema,
   cognitivePublicTrialSchema,
@@ -327,6 +328,18 @@ export const cognitiveController = {
   },
 
   // Cognitive export
+  async professionalReports(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const query = cognitiveProfessionalReportsQuerySchema.parse(req.query)
+      const { listProfessionalReports } = await import('./professional-report.service')
+      return success(res, await listProfessionalReports({ userId: req.user.userId, role: req.user.role,
+        assignmentId: req.params.id, offset: query.offset }))
+    } catch (err) {
+      return handleError(res, err)
+    }
+  },
+
   async getExportPreview(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)

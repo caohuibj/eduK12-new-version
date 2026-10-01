@@ -2,6 +2,8 @@
 
 日期：2026-10-01（Asia/Tokyo）。状态：本轮本地实现及验证已完成，等待用户明确确认远端 main clean。实施结果、范围调整与截图见 [本地交付说明](cognitive-report-upgrade-implementation.md)。
 
+后续反馈已实现：个体版采用成熟简洁的科普杂志语言与图解，后台独立专业版保留正式计算口径和质量依据；两版样稿、已有权限内的读取入口及验证见 [两版交付说明](cognitive-report-audiences-implementation.md)。
+
 基线：`main@f70078adcd7c1220f205559e34cd3d719b3b6ce4`。方案分支：`design/cognitive-report-upgrade-plan`；实现分支：`feat/cognitive-report-upgrade-local`。本方案承接对 24 个真实测验家族、28 个真实精确注册身份（注册表共 29 项，另含 fake）的 review，以及学生/家长、教师同等重要的分层报告反馈。
 
 **发布约定：全部产物先在本地保存。用户明确告知远端 main 已 clean 前，不 push、不创建远端 PR、不启动远端 CI、不 merge。** 完整约定见 [working agreement](cognitive-report-upgrade-working-agreement.md)。本地开发、提交与验证可以继续。

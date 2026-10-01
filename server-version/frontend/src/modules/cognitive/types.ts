@@ -85,6 +85,20 @@ export interface CognitiveReportReading {
   feedback: { summary: string; evidenceMetricKeys: string[]; nextStep: string }
   caveats: string[]
   methodCaveats?: string[]
+  popular?: {
+    conceptTitle: string; concept: string; takeaway: string; exampleTitle: string; example: string
+    scene: 'signal' | 'sequence' | 'stop' | 'rules'
+    frames: Array<{ title: string; text: string }>
+    boundary: string
+    metricHelp: Record<string, { label: string; explanation: string }>
+  }
+  professional?: {
+    construct: string; procedure: string; interpretation: string; confounders: string[]
+    parameters: Array<{ label: string; value: string }>
+    metrics: Array<{ key: string; label: string; formatted: string; unit: string; definition: string; readingHint: string }>
+    quality: Array<{ key: string; label: string; active: boolean; description: string; effect: string }>
+    withheld: Array<{ key: string; label: string; reasons: string[] }>
+  }
   visuals: Array<{
     kind: 'reaction_trials' | 'memory_lengths' | 'metrics'
     title: string

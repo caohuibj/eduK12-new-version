@@ -21,6 +21,17 @@ export interface ReportReading {
   caveats: string[]
   methodCaveats?: string[]
   visuals: ReportVisual[]
+  popular?: CognitiveReportReadingPolicy['popular']
+  professional?: {
+    construct: string
+    procedure: string
+    interpretation: string
+    confounders: string[]
+    parameters: Array<{ label: string; value: string }>
+    metrics: Array<{ key: string; label: string; formatted: string; unit: string; definition: string; readingHint: string }>
+    quality: Array<{ key: string; label: string; active: boolean; description: string; effect: string }>
+    withheld: Array<{ key: string; label: string; reasons: string[] }>
+  }
 }
 
 export const finiteMetric = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)

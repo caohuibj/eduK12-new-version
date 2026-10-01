@@ -339,6 +339,42 @@ export const projectThreeLayerReport = (input: {
     feedback: { summary, evidenceMetricKeys: summaryAvailable ? [...summaryPolicy.metricKeys] : [],
       nextStep: state === 'withheld' ? '先确认看清信号、理解操作和作答条件；如需重测，遵循教师指导，不必反复刷分。' : policy.nextStep },
     caveats, methodCaveats,
+    ...(policy.popular ? { popular: policy.popular } : {}),
+    ...(policy.professional ? { professional: {
+      construct: policy.professional.construct,
+      procedure: policy.professional.procedure,
+      interpretation: state === 'withheld'
+        ? '当前关键指标未满足解释条件。仅保留允许的过程记录；不得对撤下的指标补值、排序或形成个体能力结论。'
+        : policy.professional.interpretation,
+      confounders: policy.professional.confounders,
+      parameters: policy.professional.configFields.flatMap(({ key, label }) => {
+        const value = input.config?.[key]
+        if (typeof value === 'boolean') return [{ label, value: value ? '是' : '否' }]
+        if (finiteMetric(value)) return [{ label, value: String(value) }]
+        if (Array.isArray(value) && value.every(finiteMetric)) return [{ label, value: value.join(' / ') }]
+        return []
+      }),
+      metrics: report.detail.map(metric => ({
+        key: metric.key, label: input.metricDefinitions[metric.key].label, formatted: metric.formatted,
+        unit: input.metricDefinitions[metric.key].unit,
+        definition: policy.professional!.metricNotes[metric.key]?.definition ?? input.metricDefinitions[metric.key].description,
+        readingHint: policy.professional!.metricNotes[metric.key]?.readingHint ?? '按当前冻结定义与质量限制阅读。',
+      })),
+      quality: qualityEntries.map(item => ({ ...item, description: input.qualityDefinitions[item.key]?.description ?? '按当前冻结质量规则记录。' })),
+      withheld: withheldMetricKeys.filter(key => {
+        const definition = input.metricDefinitions[key]
+        return definition.role !== 'research_only' && definition.visibility !== 'research_only' && definition.visibility !== 'hidden'
+          && participantMetricAllowed(input.testType, key, input.participantPresentation)
+          && visibleForProfile(definition, input.profile)
+      }).map(key => ({ key, label: input.metricDefinitions[key].label,
+        reasons: policy.hiddenByProfile?.[input.profile ?? 'standard']?.includes(key)
+          ? ['当前协议不提供此指标的个体解释']
+          : [...new Set([...(globalWithheld ? reasons : []),
+            ...(policy.metricGates[key] ?? []).filter(flag => input.score.quality.flags[flag]).map(flag => input.qualityDefinitions[flag]?.label ?? flag),
+            ...(input.metricDefinitions[key].requiresQualityFlags ?? []).filter(flag => input.score.quality.flags[flag]).map(flag => input.qualityDefinitions[flag]?.label ?? flag),
+            ...(input.metrics[key] == null ? ['本次缺失或未测量'] : [])])],
+      })),
+    } } : {}),
     visuals: buildReadingVisual({ policy, metrics: input.metrics, allowedKeys: allowed, trials: input.trials, config: input.config,
       labels: Object.fromEntries(Object.keys(input.metricDefinitions).map(key => [key, input.participantPresentation?.metrics[key]?.label ?? input.metricDefinitions[key].label])),
       units: Object.fromEntries(Object.entries(input.metricDefinitions).map(([key, value]) => [key, value.unit])) }),

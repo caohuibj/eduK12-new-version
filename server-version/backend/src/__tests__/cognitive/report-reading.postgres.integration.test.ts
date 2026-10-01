@@ -6,11 +6,13 @@ import { freezeAssignmentProfile } from '../../modules/cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
 import { decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
+import { UserRole } from '../../types'
 
 const url = integrationDatabaseUrl('COGNITIVE_INTEGRATION_DB_URL')
 const suite = url ? describe : describe.skip
 let db: PrismaClient
 let userId: string
+let teacherId: string
 let courseId: string
 const assignments: string[] = []
 let createSession: typeof import('../../modules/cognitive/session.service')['createSession']
@@ -29,7 +31,8 @@ suite('report reading on real final submission and persisted results', () => {
     submit = (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal
     const user = await db.user.create({ data: { username: `report-reading-${randomUUID()}`, passwordHash: 'integration-unused', role: 'STUDENT' } })
     userId = user.id
-    const course = await db.course.create({ data: { title: 'Report reading integration', courseCode: `RR-${randomUUID()}`, creatorId: userId } })
+    teacherId = (await db.user.create({ data: { username: `report-teacher-${randomUUID()}`, passwordHash: 'integration-unused', role: 'TEACHER' } })).id
+    const course = await db.course.create({ data: { title: 'Report reading integration', courseCode: `RR-${randomUUID()}`, creatorId: teacherId } })
     courseId = course.id
     await db.courseStudent.create({ data: { courseId, studentId: userId, status: 'ACTIVE' } })
   })
@@ -42,6 +45,7 @@ suite('report reading on real final submission and persisted results', () => {
     await db.cognitiveAssignment.deleteMany({ where: { id: { in: assignments } } })
     if (courseId) { await db.courseStudent.deleteMany({ where: { courseId } }); await db.course.delete({ where: { id: courseId } }) }
     if (userId) await db.user.delete({ where: { id: userId } })
+    if (teacherId) await db.user.delete({ where: { id: teacherId } })
     await db.$disconnect()
   })
   it.each([18, 5])('freezes the %i/20 response report, replays it and enforces ownership', async valid => {
@@ -49,7 +53,7 @@ suite('report reading on real final submission and persisted results', () => {
     const entry = requireCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')
     const frozen = freezeAssignmentProfile({ entry, baseConfig: config.config, profile: 'standard' })
     const { resolvedConfig: _resolvedConfig, ...frozenColumns } = frozen
-    const assignment = await db.cognitiveAssignment.create({ data: { courseId, configId: config.id, createdBy: userId, title: 'Report reading fixture', status: 'PUBLISHED', publishedAt: new Date(), ...frozenColumns } })
+    const assignment = await db.cognitiveAssignment.create({ data: { courseId, configId: config.id, createdBy: teacherId, title: 'Report reading fixture', status: 'PUBLISHED', publishedAt: new Date(), ...frozenColumns } })
     assignments.push(assignment.id)
     const runner = await createSession(userId, assignment.id)
     const session = await db.cognitiveSession.findUniqueOrThrow({ where: { id: runner.sessionId } })
@@ -69,5 +73,11 @@ suite('report reading on real final submission and persisted results', () => {
     const history = await getSession(userId, session.id)
     expect(history.result!.report).toEqual(report)
     await expect(getSession('someone-else', session.id)).rejects.toMatchObject({ statusCode: 403 })
+    const { listProfessionalReports } = await import('../../modules/cognitive/professional-report.service')
+    const staff = await listProfessionalReports({ userId: teacherId, role: UserRole.TEACHER, assignmentId: assignment.id, offset: 0 })
+    expect(staff.records[0].report).toEqual(report)
+    expect(JSON.stringify(staff)).not.toContain(userId)
+    await expect(listProfessionalReports({ userId: userId, role: UserRole.TEACHER, assignmentId: assignment.id, offset: 0 })).rejects.toMatchObject({ statusCode: 403 })
+    await expect(listProfessionalReports({ userId, role: UserRole.STUDENT, assignmentId: assignment.id, offset: 0 })).rejects.toMatchObject({ statusCode: 403 })
   })
 })

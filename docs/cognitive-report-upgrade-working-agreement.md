@@ -9,6 +9,7 @@
 - 主工作区 `/workspace/eduK12-new-version` 不用于本轮实现；专用工作区 `/workspace/eduK12-cognitive-report-upgrade`。
 - 方案保存在 `design/cognitive-report-upgrade-plan`；本轮实现保存在 `feat/cognitive-report-upgrade-local`，继续遵循本约定。
 - 用户确认本轮仅完善已有权限内的分层解读，不新增科研专用指标入口。实施及验证见 [本地交付说明](cognitive-report-upgrade-implementation.md)。
+- 用户进一步要求个体科普版与后台专业版分别优化，并选择成熟简洁的科普杂志风格。本轮增加同一归属权限内的冻结报告阅读入口，不开放科研专用指标；新样稿与验证见 [两版交付说明](cognitive-report-audiences-implementation.md)。
 
 ## 用户 clean 信号到来前
 

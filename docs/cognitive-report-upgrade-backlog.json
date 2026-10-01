@@ -230,5 +230,15 @@
     }
   ],
   "implementationBranch": "feat/cognitive-report-upgrade-local",
-  "implementationEvidence": "docs/cognitive-report-upgrade-implementation.md"
+  "implementationEvidence": "docs/cognitive-report-upgrade-implementation.md",
+  "audienceFollowup": {
+    "status": "completed_local_verified_awaiting_main_clean",
+    "participantStyle": "mature_popular_science_magazine",
+    "professionalScope": "frozen_reports_with_existing_assignment_owner_or_admin_authority",
+    "presentationVersion": "1.2.0",
+    "reportRuleVersion": "1.1.0",
+    "historicalRewrite": false,
+    "researchPermissionExpanded": false,
+    "evidence": "docs/cognitive-report-audiences-implementation.md"
+  }
 }

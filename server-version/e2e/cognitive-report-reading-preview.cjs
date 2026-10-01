@@ -5,6 +5,10 @@ const { chromium } = require('../backend/node_modules/playwright-core')
 const html = process.argv[2]
 const output = process.argv[3]
 if (!html || !output) throw new Error('Usage: node cognitive-report-reading-preview.cjs <preview.html> <evidence-directory>')
+if (fs.readFileSync(html, 'utf8').includes('"popular":')) {
+  const result = require('node:child_process').spawnSync(process.execPath, [path.join(__dirname, 'cognitive-report-audiences-preview.cjs'), html, output], { stdio: 'inherit' })
+  process.exit(result.status ?? 1)
+}
 fs.mkdirSync(output, { recursive: true })
 ;(async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH || (fs.existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined), args: ['--no-sandbox', '--disable-dev-shm-usage'] })

@@ -3,7 +3,7 @@ import type { CognitiveParticipantPresentationV1 } from '../../participant-prese
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.1.0",
+    "presentationVersion": "1.2.0",
     "testType": "bart",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.0.0",
@@ -42,11 +42,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "singleHiddenMetrics": [],
     "disclaimer": "结果只描述本次虚拟 balloon 任务中的泵压、爆破和现金化行为，不是风险偏好、冲动性、人格或临床判断。",
     "reportReading": {
-      "version": "1.0.0",
-      "title": "继续加压，还是及时兑现？",
-      "introduction": "分别阅读完成、兑现与爆炸的记录。",
+      "version": "1.1.0",
+      "title": "继续一步，还是收下已有的成果？",
+      "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
-        "template": "本次已兑现轮次的平均加压数为 {adjustedPumps}，兑现次数为 {cashoutCount}，爆炸次数为 {explosionCount}。",
+        "template": "这次收取了 {cashoutCount} 个气球，爆掉了 {explosionCount} 个；在成功收取的气球中，平均充气 {adjustedPumps} 次。",
         "metricKeys": [
           "adjustedPumps",
           "cashoutCount",
@@ -76,7 +76,16 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "体验版": "短程协议",
         "研究版": "科研协议",
         "科研版": "科研协议",
-        "科研档": "科研协议"
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
       },
       "illustration": "rules",
       "chart": {
@@ -85,12 +94,111 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           "cashoutCount",
           "explosionCount"
         ]
+      },
+      "popular": {
+        "conceptTitle": "先弄懂，这个任务在看什么",
+        "concept": "气球每多充一次会增加收益，也可能爆掉。任务把充气、收取和爆裂记录分开，让你回顾这一次怎样作选择。",
+        "takeaway": "继续与收取，是两种选择。",
+        "exampleTitle": "走出任务：生活与工作中的一个例子",
+        "example": "有些现实决策也要在继续尝试和保留已有结果之间权衡，但这里的奖励与风险是任务设置。本记录不判断冒险性格、理财能力或现实风险偏好。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "确认目标",
+            "text": "先弄清当前要观察什么。"
+          },
+          {
+            "title": "按规则判断",
+            "text": "比较线索，选择合适的响应。"
+          },
+          {
+            "title": "回看过程",
+            "text": "用实际记录理解本次表现。"
+          }
+        ],
+        "boundary": "这是理解概念的场景示例，不是职业资格、职业适合度或同龄人排名。",
+        "metricHelp": {
+          "adjustedPumps": {
+            "label": "收取成功时，平均充了多少次",
+            "explanation": "只看成功收取的气球，所以也要看收取和爆裂数量。"
+          },
+          "explosionCount": {
+            "label": "爆掉了多少个气球",
+            "explanation": "本次发生爆裂的气球数量；不是性格标签。"
+          },
+          "cashoutCount": {
+            "label": "收取了多少个气球",
+            "explanation": "本次选择收下已有收益的气球数量。"
+          },
+          "omissionRate": {
+            "label": "需要回应时，没有留下回应",
+            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "气球模拟任务中的收益—风险选择过程",
+        "procedure": "按冻结气球阈值重建爆裂与收取结果；分别统计已完成气球、收取/爆裂数量与充气记录，核对具体评分版本。",
+        "interpretation": "联合阅读完成与收取比例；adjustedPumps 仅基于成功收取的气球，不能忽略选择性。旧1.0与1.1的质量门槛差异不得混用。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。"
+        ],
+        "metricNotes": {
+          "adjustedPumps": {
+            "definition": "成功收取气球的充气次数均值。",
+            "readingHint": "这是选择性条件均值；应与成功收取数量及爆裂、完成比例一起阅读。"
+          },
+          "explosionCount": {
+            "definition": "按本次冻结任务定义记录“爆破次数”。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutCount": {
+            "definition": "按本次冻结任务定义记录“现金化次数”。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "meanPumpsAllCompleted": {
+            "definition": "按本次冻结任务定义记录“已完成 balloon 平均泵压”。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutRate": {
+            "definition": "按本次冻结任务定义记录“现金化比例”。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "completedBalloonCount": {
+            "definition": "按本次冻结任务定义记录“完成 balloon 数”。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "响应时限（毫秒）"
+          },
+          {
+            "key": "blockCount",
+            "label": "区组数"
+          },
+          {
+            "key": "balloonCount",
+            "label": "气球数量"
+          }
+        ]
       }
     }
   },
   {
     "schemaVersion": 1,
-    "presentationVersion": "1.1.0",
+    "presentationVersion": "1.2.0",
     "testType": "bart",
     "engineVersion": "1.0.0",
     "scoringVersion": "1.1.0",
@@ -172,11 +280,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "singleHiddenMetrics": [],
     "disclaimer": "结果只描述本次虚拟气球任务中的充气、爆破和收取行为，不是风险偏好、冲动性、人格或临床判断。",
     "reportReading": {
-      "version": "1.0.0",
-      "title": "继续加压，还是及时兑现？",
-      "introduction": "分别阅读完成、兑现与爆炸的记录。",
+      "version": "1.1.0",
+      "title": "继续一步，还是收下已有的成果？",
+      "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
-        "template": "本次已兑现轮次的平均加压数为 {adjustedPumps}，兑现次数为 {cashoutCount}，爆炸次数为 {explosionCount}。",
+        "template": "这次收取了 {cashoutCount} 个气球，爆掉了 {explosionCount} 个；在成功收取的气球中，平均充气 {adjustedPumps} 次。",
         "metricKeys": [
           "adjustedPumps",
           "cashoutCount",
@@ -206,7 +314,16 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "体验版": "短程协议",
         "研究版": "科研协议",
         "科研版": "科研协议",
-        "科研档": "科研协议"
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
       },
       "illustration": "rules",
       "chart": {
@@ -214,6 +331,105 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "metricKeys": [
           "cashoutCount",
           "explosionCount"
+        ]
+      },
+      "popular": {
+        "conceptTitle": "先弄懂，这个任务在看什么",
+        "concept": "气球每多充一次会增加收益，也可能爆掉。任务把充气、收取和爆裂记录分开，让你回顾这一次怎样作选择。",
+        "takeaway": "继续与收取，是两种选择。",
+        "exampleTitle": "走出任务：生活与工作中的一个例子",
+        "example": "有些现实决策也要在继续尝试和保留已有结果之间权衡，但这里的奖励与风险是任务设置。本记录不判断冒险性格、理财能力或现实风险偏好。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "确认目标",
+            "text": "先弄清当前要观察什么。"
+          },
+          {
+            "title": "按规则判断",
+            "text": "比较线索，选择合适的响应。"
+          },
+          {
+            "title": "回看过程",
+            "text": "用实际记录理解本次表现。"
+          }
+        ],
+        "boundary": "这是理解概念的场景示例，不是职业资格、职业适合度或同龄人排名。",
+        "metricHelp": {
+          "adjustedPumps": {
+            "label": "收取成功时，平均充了多少次",
+            "explanation": "只看成功收取的气球，所以也要看收取和爆裂数量。"
+          },
+          "explosionCount": {
+            "label": "爆掉了多少个气球",
+            "explanation": "本次发生爆裂的气球数量；不是性格标签。"
+          },
+          "cashoutCount": {
+            "label": "收取了多少个气球",
+            "explanation": "本次选择收下已有收益的气球数量。"
+          },
+          "omissionRate": {
+            "label": "需要回应时，没有留下回应",
+            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "气球模拟任务中的收益—风险选择过程",
+        "procedure": "按冻结气球阈值重建爆裂与收取结果；分别统计已完成气球、收取/爆裂数量与充气记录，核对具体评分版本。",
+        "interpretation": "联合阅读完成与收取比例；adjustedPumps 仅基于成功收取的气球，不能忽略选择性。旧1.0与1.1的质量门槛差异不得混用。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。"
+        ],
+        "metricNotes": {
+          "adjustedPumps": {
+            "definition": "成功收取气球的充气次数均值。",
+            "readingHint": "这是选择性条件均值；应与成功收取数量及爆裂、完成比例一起阅读。"
+          },
+          "explosionCount": {
+            "definition": "本次充气达到爆破阈值的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutCount": {
+            "definition": "主动结束充气并收取虚拟积分的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "meanPumpsAllCompleted": {
+            "definition": "所有已完成气球的平均充气次数，包含爆破气球。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutRate": {
+            "definition": "已完成气球中主动收取积分的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "completedBalloonCount": {
+            "definition": "通过收取积分或爆破结束的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "响应时限（毫秒）"
+          },
+          {
+            "key": "blockCount",
+            "label": "区组数"
+          },
+          {
+            "key": "balloonCount",
+            "label": "气球数量"
+          }
         ]
       }
     }

@@ -1,5 +1,7 @@
 # Cognitive 报告升级：本地交付与验证
 
+后续文案与视觉反馈已完成：见 [个体科普版与后台专业版交付](cognitive-report-audiences-implementation.md)。新策略为呈现 1.2.0、报告规则 1.1.0；下文保留上一轮实现和验证记录。
+
 日期：2026-10-01 UTC。实现分支：`feat/cognitive-report-upgrade-local`。
 代码基线：`main@f70078adcd7c1220f205559e34cd3d719b3b6ce4`；方案提交：`f26223b5`。
 

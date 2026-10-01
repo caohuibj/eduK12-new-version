@@ -14,6 +14,25 @@ export interface CognitiveReportReadingPolicy {
   metricGates: Record<string, string[]>
   hiddenByProfile?: Partial<Record<CognitiveProfile, string[]>>
   nextStep: string
+  popular?: {
+    conceptTitle: string
+    concept: string
+    takeaway: string
+    exampleTitle: string
+    example: string
+    scene: 'signal' | 'sequence' | 'stop' | 'rules'
+    frames: Array<{ title: string; text: string }>
+    boundary: string
+    metricHelp: Record<string, { label: string; explanation: string }>
+  }
+  professional?: {
+    construct: string
+    procedure: string
+    interpretation: string
+    confounders: string[]
+    metricNotes: Record<string, { definition: string; readingHint: string }>
+    configFields: Array<{ key: string; label: string }>
+  }
   illustration?: 'signal' | 'sequence' | 'stop' | 'rules'
   caveatTerms?: Record<string, string>
   qualityLabels?: Record<string, string>
