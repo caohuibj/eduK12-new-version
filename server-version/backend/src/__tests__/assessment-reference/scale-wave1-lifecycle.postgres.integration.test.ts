@@ -34,6 +34,15 @@ suite('governed reference lifecycle (real PostgreSQL)',()=>{
   const backdated=structuredClone(first);backdated.referenceVersion='backdated'
   await expect(activateReviewedReference(db,backdated)).rejects.toThrow('REFERENCE_EFFECTIVE_DATE_NOT_LATER')
  })
+ it('compares effective dates within the exact stage even when population labels are shared',async()=>{
+  const first=testReference();first.instrumentKey='test_dates_'+randomUUID();first.status='DRAFT'
+  first.entries[0].governance!.effectiveFrom='2026-01-01T00:00:00Z'
+  const senior=structuredClone(first.entries[0]);senior.population.match!.gradeLevels=['10','11','12'];senior.governance!.schoolStage='upper_secondary';senior.governance!.effectiveFrom='2026-03-01T00:00:00Z';first.entries.push(senior)
+  await activateReviewedReference(db,first)
+  const next=structuredClone(first);next.referenceVersion='v2'
+  next.entries[0].governance!.effectiveFrom='2026-02-01T00:00:00Z';next.entries[1].governance!.effectiveFrom='2026-04-01T00:00:00Z'
+  expect((await activateReviewedReference(db,next)).status).toBe('ACTIVE')
+ })
  it('legacy ungoverned rows can still be deleted',async()=>{
   const legacy=testReference();delete legacy.entries[0].governance;legacy.entries[0].referenceKind='descriptive_sample';legacy.entries[0].evidenceLevel='local_pilot';legacy.entries[0].provenanceType='local_observed';legacy.instrumentKey='test_legacy_'+randomUUID()
   const row=await db.assessmentReferenceSet.create({data:{instrumentType:'SCALE',instrumentKey:legacy.instrumentKey,referenceVersion:'v1',status:'DRAFT',definition:legacy as unknown as Prisma.InputJsonValue}})
