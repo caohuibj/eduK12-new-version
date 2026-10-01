@@ -18,6 +18,7 @@ const org = vi.hoisted(() => ({
   active: {
     organization: { id: 'org-1', name: '测试组织', status: 'ACTIVE' },
     access: { canGovern: true },
+    allowedActions: ['ASSESSMENT_DELIVERY'],
   } as any,
   activeLoading: false,
   activeError: null,

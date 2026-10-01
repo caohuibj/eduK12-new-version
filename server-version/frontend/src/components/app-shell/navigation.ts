@@ -10,7 +10,7 @@ export const navigationSections: Array<{ id: NavigationSection; label: string }>
 ]
 const student: NavigationItem[] = [
   { path: '/student', label: '课程', aliases: ['/student/courses', '/student/assignments', '/student/checkins', '/student/classroom'] },
-  { path: '/student/scales', label: '我的测评', aliases: ['/student/questionnaires', '/student/composite'] },
+  { path: '/student/scales', label: '课程测评', aliases: ['/student/questionnaires', '/student/composite'] },
   { path: '/relational/tasks', label: '课堂体验', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
   { path: '/student/situational', label: '情境测评' }, { path: '/scale-library', label: '量表库' },
 ]
@@ -43,17 +43,17 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
     { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
+  if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
   return items
 }
 export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
   const items: NavigationItem[] = [
     { path: '/organizations', label: '组织空间', section: 'organization' },
-    { path: '/organization-tasks', label: '组织测评任务', section: 'organization' },
   ]
   if (organizationId) {
     const root = `/organizations/${encodeURIComponent(organizationId)}`
     items.push({ path: root, label: '组织概览', section: 'organization' })
-    if (allowedActions.includes('RUNS')) items.push({ path: `${root}/runs`, label: '测评批次', section: 'organization' })
+    if ((allowedActions.includes('RUNS') || allowedActions.includes('ASSESSMENT_DELIVERY'))) items.push({ path: `${root}/runs`, label: '测评批次', section: 'organization' })
     if (allowedActions.includes('REPORTING')) items.push({ path: `${root}/reporting`, label: '报告分析', section: 'organization' })
     if (allowedActions.includes('DELIVERY')) items.push({ path: `${root}/delivery`, label: '安全事项与导出', section: 'organization' })
   }

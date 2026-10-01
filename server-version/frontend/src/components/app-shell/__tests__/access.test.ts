@@ -12,12 +12,12 @@ describe('safe access and return context', () => {
   it('rejects role escalation and authentication loops', () => {
     expect(returnAfterLogin('/users', 'TEACHER')).toBe('/dashboard')
     expect(returnAfterLogin('/dashboard', 'STUDENT')).toBe('/student')
-    expect(returnAfterLogin('/student/scales/1', 'ADMIN')).toBe('/dashboard')
+    expect(returnAfterLogin('/student/scales/1', 'ADMIN')).toBe('/student/scales/1')
     expect(returnAfterLogin('/student/login?returnTo=/users', 'STUDENT')).toBe('/student')
     expect(returnAfterLogin('/scale-library/key/1', 'STUDENT')).toBe('/scale-library/key/1')
     expect(returnAfterLogin('/dashboard', 'PARENT')).toBe('/parent')
     expect(returnAfterLogin('/relational/tasks', 'PARENT')).toBe('/relational/tasks')
-    expect(returnAfterLogin('/student/scales/1', 'PARENT')).toBe('/parent')
+    expect(returnAfterLogin('/student/scales/1', 'PARENT')).toBe('/student/scales/1')
     expect(returnAfterLogin('/organizations/org-1/reporting?wave=2', 'TEACHER')).toBe('/organizations/org-1/reporting?wave=2')
     expect(returnAfterLogin('/organization-tasks', 'STUDENT')).toBe('/organization-tasks')
     expect(returnAfterLogin('/organizations/org-1/reporting?tab=group', 'TEACHER')).toBe('/organizations/org-1/reporting?tab=group')
@@ -53,7 +53,7 @@ describe('role navigation', () => {
   })
   it('keeps parent navigation isolated from staff and student surfaces', () => {
     const items = navigationFor('PARENT', true)
-    expect(items.map((item) => item.path)).toEqual(['/parent', '/relational/tasks'])
+    expect(items.map((item) => item.path)).toEqual(['/my-assessments', '/parent', '/relational/tasks'])
     expect(activeNavigation(items, '/relational/attempts/attempt-1')?.path).toBe('/relational/tasks')
   })
   it('keeps admin and disabled capability items out of other menus', () => {

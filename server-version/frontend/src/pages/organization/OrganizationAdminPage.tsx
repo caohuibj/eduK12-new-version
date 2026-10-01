@@ -1,6 +1,7 @@
+import DeliveryPolicySettings from './DeliveryPolicySettings'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { organizationApi, type CapabilityGrantHistory, type MembershipAccessHistory, type OrganizationCapability, type OrganizationMembership, type OrganizationPersona, type OrganizationRole, type OrganizationUnit, type PersonaGrantHistory, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
+import { organizationApi, type AssessmentDeliveryGrant, type CapabilityGrantHistory, type MembershipAccessHistory, type OrganizationCapability, type OrganizationMembership, type OrganizationPersona, type OrganizationRole, type OrganizationUnit, type PersonaGrantHistory, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationClassificationPanel from './OrganizationClassificationPanel'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
@@ -26,6 +27,7 @@ export default function OrganizationAdminPage() {
   const [units, setUnits] = useState<OrganizationUnit[]>([])
   const [studentAssignments, setStudentAssignments] = useState<StudentClassAssignment[]>([])
   const [staffAssignments, setStaffAssignments] = useState<StaffClassAssignment[]>([])
+  const [deliveryGrants, setDeliveryGrants] = useState<AssessmentDeliveryGrant[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [mutationError, setMutationError] = useState<string | null>(null)
@@ -66,16 +68,18 @@ export default function OrganizationAdminPage() {
     setLoading(true)
     setLoadError(null)
     try {
-      const [membershipPage, structure, students, staff] = await Promise.all([
+      const [membershipPage, structure, students, staff, grants] = await Promise.all([
         organizationApi.listMemberships(organizationId),
         organizationApi.listUnits(organizationId),
         organizationApi.listStudentAssignments(organizationId, false),
         organizationApi.listStaffAssignments(organizationId, false),
+        organizationApi.listAssessmentDeliveryGrants(organizationId),
       ])
       setMemberships(membershipPage.list)
       setUnits(structure)
       setStudentAssignments(students.list)
       setStaffAssignments(staff.list)
+      setDeliveryGrants(grants.list)
     } catch (err) {
       setLoadError(errorText(err, '无法加载组织治理数据'))
     } finally {
@@ -210,6 +214,7 @@ export default function OrganizationAdminPage() {
 
   return (
     <ProductPage width="management">
+      {canGovern && organizationId && <DeliveryPolicySettings key={organizationId} organizationId={organizationId} />}
       <PageHeader
         title={context.organization.name}
         description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}
@@ -279,12 +284,15 @@ export default function OrganizationAdminPage() {
           </section>
 
           <section aria-labelledby="org-class-rel-heading" className="space-y-4">
-            <div><h2 id="org-class-rel-heading" className="text-xl font-semibold text-slate-900">班级关系</h2><p className="mt-1 text-sm text-slate-600">创建关系时服务器会重新检查当前 Membership 与 Persona。下方保留已结束的历史 episode。</p></div>
+            <div><h2 id="org-class-rel-heading" className="text-xl font-semibold text-slate-900">班级关系</h2><p className="mt-1 text-sm text-slate-600">班主任（HOMEROOM）默认拥有本班测评投放权；任课教师（TEACHING）默认没有，只有机构管理员对“教师 × 班级”显式开放后才能投放。教学关系与测评投放权限相互独立。</p></div>
             <div className="grid gap-4 lg:grid-cols-2">
               <form className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4" onSubmit={assignStudent}><h3 className="font-medium">学生 → 班级</h3><select aria-label="学生成员关系" className="min-h-11 rounded-lg border border-slate-300 px-3" value={studentMembershipId} onChange={(event) => setStudentMembershipId(event.target.value)}><option value="">选择 Membership</option>{memberships.filter((membership) => membership.validUntil === null).map((membership) => <option key={membership.id} value={membership.id}>{membership.userId} · {membership.orgRole}</option>)}</select><select aria-label="学生班级" className="min-h-11 rounded-lg border border-slate-300 px-3" value={studentClassId} onChange={(event) => setStudentClassId(event.target.value)}><option value="">选择班级</option>{classes.map((classroom) => <option key={classroom.id} value={classroom.id}>{classroom.name}</option>)}</select><ProductButton type="submit" variant="primary" disabled={busyKey !== null || !studentMembershipId || !studentClassId}>分配主要班级</ProductButton></form>
               <form className="grid gap-2 rounded-xl border border-slate-200 bg-white p-4" onSubmit={assignStaff}><h3 className="font-medium">教师 → 班级</h3><select aria-label="教师成员关系" className="min-h-11 rounded-lg border border-slate-300 px-3" value={staffMembershipId} onChange={(event) => setStaffMembershipId(event.target.value)}><option value="">选择 Membership</option>{memberships.filter((membership) => membership.validUntil === null).map((membership) => <option key={membership.id} value={membership.id}>{membership.userId} · {membership.orgRole}</option>)}</select><select aria-label="教师班级" className="min-h-11 rounded-lg border border-slate-300 px-3" value={staffClassId} onChange={(event) => setStaffClassId(event.target.value)}><option value="">选择班级</option>{classes.map((classroom) => <option key={classroom.id} value={classroom.id}>{classroom.name}</option>)}</select><select aria-label="教师班级角色" className="min-h-11 rounded-lg border border-slate-300 px-3" value={staffRole} onChange={(event) => setStaffRole(event.target.value as StaffClassRole)}>{STAFF_ROLES.map((role) => <option key={role} value={role}>{role}</option>)}</select><ProductButton type="submit" variant="primary" disabled={busyKey !== null || !staffMembershipId || !staffClassId}>分配教师</ProductButton></form>
             </div>
-            <div className="grid gap-4 lg:grid-cols-2"><div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-medium">学生关系历史</h3><ul className="mt-3 space-y-2 text-sm">{studentAssignments.map((assignment) => <li key={assignment.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2"><span className="font-mono text-xs">{assignment.membershipId} → {classes.find((item) => item.id === assignment.classUnitId)?.name || assignment.classUnitId} · {assignment.isPrimary ? 'PRIMARY' : 'SECONDARY'} · {formatTime(assignment.validFrom)} → {formatTime(assignment.validUntil)}</span>{assignment.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`student-end-${assignment.id}`, '学生班级关系已结束', () => organizationApi.endStudentAssignment(organizationId, assignment.id))}>结束</ProductButton>}</li>)}</ul></div><div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-medium">教师关系历史</h3><ul className="mt-3 space-y-2 text-sm">{staffAssignments.map((assignment) => <li key={assignment.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2"><span className="font-mono text-xs">{assignment.membershipId} → {classes.find((item) => item.id === assignment.classUnitId)?.name || assignment.classUnitId} · {assignment.staffRole} · {formatTime(assignment.validFrom)} → {formatTime(assignment.validUntil)}</span>{assignment.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`staff-end-${assignment.id}`, '教师班级关系已结束', () => organizationApi.endStaffAssignment(organizationId, assignment.id))}>结束</ProductButton>}</li>)}</ul></div></div>
+            <div className="grid gap-4 lg:grid-cols-2"><div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-medium">学生关系历史</h3><ul className="mt-3 space-y-2 text-sm">{studentAssignments.map((assignment) => <li key={assignment.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2"><span className="font-mono text-xs">{assignment.membershipId} → {classes.find((item) => item.id === assignment.classUnitId)?.name || assignment.classUnitId} · {assignment.isPrimary ? 'PRIMARY' : 'SECONDARY'} · {formatTime(assignment.validFrom)} → {formatTime(assignment.validUntil)}</span>{assignment.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`student-end-${assignment.id}`, '学生班级关系已结束', () => organizationApi.endStudentAssignment(organizationId, assignment.id))}>结束</ProductButton>}</li>)}</ul></div><div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="font-medium">教师关系历史</h3><ul className="mt-3 space-y-2 text-sm">{staffAssignments.map((assignment) => {
+  const grant = deliveryGrants.find((item) => item.teacherMembershipId === assignment.membershipId && item.classUnitId === assignment.classUnitId && item.revokedAt === null)
+  return <li key={assignment.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2"><span className="font-mono text-xs">{assignment.membershipId} → {classes.find((item) => item.id === assignment.classUnitId)?.name || assignment.classUnitId} · {assignment.staffRole} · 测评投放：{assignment.staffRole === 'HOMEROOM' ? '默认开放' : grant ? '管理员已开放' : '关闭'} · {formatTime(assignment.validFrom)} → {formatTime(assignment.validUntil)}</span><div className="flex flex-wrap gap-2">{assignment.validUntil === null && (grant ? <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`delivery-revoke-${grant.id}`, '任课教师测评投放权限已撤销', () => organizationApi.revokeAssessmentDelivery(organizationId, grant.id))}>撤销测评投放</ProductButton> : <ProductButton disabled={busyKey !== null} onClick={() => void runMutation(`delivery-grant-${assignment.id}`, '任课教师测评投放权限已开放', () => organizationApi.grantAssessmentDelivery(organizationId, assignment.membershipId, assignment.classUnitId))}>开放测评投放</ProductButton>)}{assignment.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`staff-end-${assignment.id}`, '教师班级关系已结束', () => organizationApi.endStaffAssignment(organizationId, assignment.id))}>结束</ProductButton>}</div></li>
+})}</ul></div></div>
           </section>
         </div>
       )}

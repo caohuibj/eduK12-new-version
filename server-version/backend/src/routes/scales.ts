@@ -5,7 +5,7 @@ import { scaleQualificationController } from '../controllers/scaleQualificationC
 import { scaleVideoController } from '../controllers/scaleVideoController'
 import { startStandaloneScaleAssessment } from '../modules/scale/scale-start.controller'
 import { restartStandaloneScaleAssessmentWithPolicyController } from '../modules/scale/scale-restart.controller'
-import { authenticate, requireStudent, requireTeacher } from '../middleware/auth'
+import { authenticate, requireTeacher } from '../middleware/auth'
 import { legacyWriteDisabled } from '../middleware/instrumentFinalOnly'
 
 const router = Router()
@@ -30,25 +30,25 @@ router.get('/tags', authenticate, scaleController.getTags)
 // ==================== 测评流程（学生） ====================
 
 // 开始测评：Scale Assessment v2 是唯一运行入口。
-router.post('/:scaleId/assessments', authenticate, requireStudent, startStandaloneScaleAssessment)
+router.post('/:scaleId/assessments', authenticate, startStandaloneScaleAssessment)
 
 // 提交答案
-router.post('/assessments/:assessmentId/submit', authenticate, requireStudent, scaleController.submitFinalAssessment)
-router.post('/assessments/:assessmentId/restart', authenticate, requireStudent, restartStandaloneScaleAssessmentWithPolicyController)
-router.patch('/assessments/:assessmentId/answers/batch', authenticate, requireStudent, legacyWriteDisabled)
-router.patch('/assessments/:assessmentId/answers', authenticate, requireStudent, legacyWriteDisabled)
+router.post('/assessments/:assessmentId/submit', authenticate, scaleController.submitFinalAssessment)
+router.post('/assessments/:assessmentId/restart', authenticate, restartStandaloneScaleAssessmentWithPolicyController)
+router.patch('/assessments/:assessmentId/answers/batch', authenticate, legacyWriteDisabled)
+router.patch('/assessments/:assessmentId/answers', authenticate, legacyWriteDisabled)
 
 // Frozen image delivery. Authorization is attempt-scoped; the adapter resolves
 // only immutable identities present in the encrypted Scale runtime snapshot.
-router.get('/assessments/:assessmentId/assets/:assetId', authenticate, requireStudent, scaleImageController.serveAssessmentImage)
+router.get('/assessments/:assessmentId/assets/:assetId', authenticate, scaleImageController.serveAssessmentImage)
 // Native video URLs are issued only after the same frozen-attempt authorization.
-router.post('/assessments/:assessmentId/items/:itemCode/video-capability', authenticate, requireStudent, scaleVideoController.issueAssessmentVideo)
+router.post('/assessments/:assessmentId/items/:itemCode/video-capability', authenticate, scaleVideoController.issueAssessmentVideo)
 
 // 完成测评
-router.post('/assessments/:assessmentId/complete', authenticate, requireStudent, legacyWriteDisabled)
+router.post('/assessments/:assessmentId/complete', authenticate, legacyWriteDisabled)
 
 // 获取测评结果
-router.get('/assessments/:assessmentId', authenticate, requireStudent, scaleController.getAssessmentV2)
+router.get('/assessments/:assessmentId', authenticate, scaleController.getAssessmentV2)
 
 // 获取量表详情（所有登录用户可访问）
 // Keep this after the two-segment assessment routes so /assessments/:id

@@ -1,3 +1,4 @@
+import { currentClassDeliverySql } from './deliveryPolicy'
 import { NextFunction, Request, Response } from 'express'
 import { prisma } from '../../config/database'
 import { AuthenticatedPrincipal } from '../../types'
@@ -153,8 +154,28 @@ export async function resolveAssessmentDeliveryAuthority(input: {
 
   const deliveryScopes: AssessmentDeliveryScope[] = []
   if (context.orgRole === 'ORG_ADMIN') deliveryScopes.push('ORGANIZATION')
-  if (context.personas.includes('TEACHER')) deliveryScopes.push('CLASS')
-  if (context.personas.includes('COUNSELOR')) deliveryScopes.push('PROFESSIONAL')
+  if (context.personas.includes('TEACHER')) {
+    const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1 FROM "organization_staff_class_assignments" sa
+        WHERE sa."organization_id" = ${input.organizationId}
+          AND sa."membership_id" = ${context.membershipId}
+          AND ${currentClassDeliverySql}
+      ) AS "allowed"
+    `
+    if (rows[0]?.allowed) deliveryScopes.push('CLASS')
+  }
+  if (context.personas.includes('COUNSELOR')) {
+    const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+      SELECT EXISTS (
+        SELECT 1 FROM "organization_counselor_client_relationships" r
+        WHERE r."organization_id" = ${input.organizationId}
+          AND r."counselor_membership_id" = ${context.membershipId}
+          AND r."valid_until" IS NULL
+      ) AS "allowed"
+    `
+    if (rows[0]?.allowed) deliveryScopes.push('PROFESSIONAL')
+  }
   if (deliveryScopes.length === 0) return null
   return { ...context, deliveryScopes }
 }

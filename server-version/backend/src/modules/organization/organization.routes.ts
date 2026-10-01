@@ -34,6 +34,8 @@ router.get('/:organizationId/context', authenticate, organizationController.read
 // and legacy User.role never grant create/suspend/resume authority.
 router.post('/', authenticate, organizationController.create)
 
+router.get('/:organizationId/delivery-policy', authenticate, requireOrganizationGovernance, organizationAdminController.readDeliveryPolicy)
+router.put('/:organizationId/delivery-policy', authenticate, requireOrganizationGovernance, organizationAdminController.updateDeliveryPolicy)
 router.get('/:organizationId/memberships', authenticate, requireOrganizationGovernance, organizationController.listMemberships)
 router.get('/:organizationId/memberships/:membershipId/access-history', authenticate, requireOrganizationGovernance, organizationAdminController.membershipAccessHistory)
 router.post('/:organizationId/suspend', authenticate, requireOrganizationGovernance, organizationController.suspend)
@@ -66,6 +68,9 @@ router.post('/:organizationId/student-class-assignments/:assignmentId/end', auth
 router.get('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.listStaffClassAssignments)
 router.post('/:organizationId/staff-class-assignments', authenticate, requireOrganizationGovernance, organizationAdminController.assignStaff)
 router.post('/:organizationId/staff-class-assignments/:assignmentId/end', authenticate, requireOrganizationGovernance, organizationAdminController.endStaffAssignment)
+router.get('/:organizationId/assessment-delivery-grants', authenticate, requireOrganizationGovernance, organizationAdminController.listAssessmentDeliveryGrants)
+router.post('/:organizationId/assessment-delivery-grants', authenticate, requireOrganizationGovernance, organizationAdminController.grantAssessmentDelivery)
+router.post('/:organizationId/assessment-delivery-grants/:grantId/revoke', authenticate, requireOrganizationGovernance, organizationAdminController.revokeAssessmentDelivery)
 
 // Organization Run delivery is intentionally separate from Organization
 // governance. ORG_ADMIN gets organization scope; TEACHER/COUNSELOR personas get

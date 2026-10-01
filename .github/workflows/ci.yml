@@ -773,6 +773,11 @@ jobs:
           done
           if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
           node e2e/bundle-products-browser-e2e.cjs
+      - name: multi-role respondent inbox responsive acceptance
+        env:
+          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
+          INBOX_E2E_OUTPUT: /tmp/eduk12-inbox-e2e
+        run: node e2e/multi-role-inbox-browser-e2e.cjs
       - name: Reporting V2.2 final product scenarios
         env:
           REPORTING_BROWSER_ISOLATED_DB: '1'

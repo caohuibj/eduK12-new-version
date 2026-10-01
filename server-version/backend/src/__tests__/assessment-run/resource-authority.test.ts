@@ -33,6 +33,7 @@ const cohortPolicy = {
 
 const publishedRegistry = createRelationalProductRegistry([{
   title: 'Demo',
+  initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN'],
   description: null,
   releaseStatus: 'PUBLISHED',
   scienceMaturity: 'PILOT',

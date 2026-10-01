@@ -47,6 +47,7 @@ const policy: RelationalCohortAnalysisPolicyV1 = {
 }
 
 const registry = createRelationalProductRegistry([{
+  subjectReportMode: 'AGGREGATE_ONLY',
   title: 'RA-02 classroom experience cohort fixture',
   description: null,
   releaseStatus: 'PUBLISHED',

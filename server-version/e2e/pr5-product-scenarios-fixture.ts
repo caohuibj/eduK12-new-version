@@ -25,7 +25,10 @@ async function main() {
   const entries: RelationalProductEntryV1[] = []
   function resource(key: string, subject: any, respondent: any, relationship: any, protectedFeedback = false) {
     entries.push({ title: `PR5 ${key}`, description: 'Isolated acceptance fixture, not released scientific content',
-      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: composite.id },
+      releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', subjectReportMode: protectedFeedback ? 'AGGREGATE_ONLY' : 'NONE',
+      initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN', 'PROFESSIONAL_ASSIGN', 'RELATED_OBSERVER_ASSIGN'],
+      ...(subject === 'TEACHER' && respondent === 'STUDENT' ? { allowedTargetModes: [relationship === 'COURSE_TEACHER_STUDENT' ? 'COURSE_TEACHER' as const : 'HOMEROOM_TEACHER' as const] } : {}),
+      launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: composite.id },
       applicability: { schemaVersion: 1, resourceKind: 'BUNDLE', resourceKey: `pr5-${key}-${suffix}`, resourceVersion: '1.0.0',
         subjectRoles: [subject], respondentRoles: [respondent], relationshipKinds: [relationship],
         perspectives: [protectedFeedback ? 'RELATIONAL_EXPERIENCE' : relationship === 'SELF' ? 'SELF_REPORT' : 'OBSERVER_REPORT'],

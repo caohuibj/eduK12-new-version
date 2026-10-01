@@ -50,7 +50,7 @@ async function openNav(page, method = 'pointer') {
   return page.getByRole('navigation', { name: '主要导航' })
 }
 async function activateAssessmentLink(page, nav, mode) {
-  const target = nav.getByRole('link', { name: '我的测评' })
+  const target = nav.getByRole('link', { name: '课程测评' })
   if (mode === 'keyboard' || mode === 'hybrid') {
     await target.focus()
     await page.keyboard.press('Enter')
@@ -140,7 +140,7 @@ async function main() {
     {
       const { context, page } = await setup(browser, { cognitive: false })
       await gotoRoute(page, `${base}/student/cognitive/history`)
-      await page.getByText('找不到此页面', { exact: true }).waitFor()
+      await page.getByText('认知测评暂不可用', { exact: true }).waitFor()
       assert.equal(await (await openNav(page)).getByRole('link', { name: '认知测评', exact: true }).count(), 0)
       cases.push({ disabledCapability: true, passed: true }); await context.close()
     }
@@ -151,7 +151,7 @@ async function main() {
       // Sentinel models existing browser data; FE-02 must not delete storage on 401.
       await page.evaluate(() => localStorage.setItem('fe02-draft-sentinel', 'keep'))
       state.expires = true
-      await (await openNav(page)).getByRole('link', { name: '我的测评' }).click()
+      await (await openNav(page)).getByRole('link', { name: '课程测评' }).click()
       await page.getByRole('heading', { name: '学生登录', exact: true }).waitFor()
       assert.equal(new URL(page.url()).searchParams.get('returnTo'), '/student/scales')
       state.expires = false

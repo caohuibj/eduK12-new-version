@@ -19,7 +19,7 @@ export default function OrganizationRunListPage() {
   const navigate = useNavigate()
   const { active, activeLoading, activeError, selectOrganization } = useOrganization()
   const context = active?.organization.id === organizationId ? active : null
-  const canGovern = context?.access.canGovern === true
+  const canGovern = context?.allowedActions.some(action => action === 'ASSESSMENT_DELIVERY' || action === 'RUNS') === true
   const [runs, setRuns] = useState<AssessmentRunListItem[]>([])
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState<AssessmentRunStatus | ''>('')

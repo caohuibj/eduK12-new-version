@@ -1,3 +1,4 @@
+import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
 import { createRedisRateLimiter } from './middleware/redisRateLimit'
 import { cleanupStaleUploadDirectories } from './utils/uploadTemp'
@@ -219,6 +220,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/organizations', organizationRoutes)
+app.use('/api/my-assessments', assessmentInboxRoutes)
 app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)
 app.use('/api/admin/instrument-authorizations', authenticate, requireAdmin, instrumentAuthorizationRoutes)
 app.use('/api/courses', courseRoutes)

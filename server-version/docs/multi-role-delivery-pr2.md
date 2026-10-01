@@ -1,0 +1,27 @@
+# Multi-role delivery and respondent inbox — PR2
+
+Baseline: PR1 merged as `03af4d17`; PR2 continuation starts at `1c9c2c2a`.
+
+The Mac continuation preserves the original Windows worktree and restores reviewed file edits from its tool history. No synced project reference files were changed.
+
+Implemented: source-owned delivery catalog adapters for Scale, Cognitive, Situational, Bundle and released relational products; one authenticated respondent inbox; multi-role governed Scale SELF; external-parent SELF without organization membership; current class grants and their validity windows; organization homeroom delivery switch; teacher/counselor delivery navigation; content-owned teacher evaluation target selection. The owning runtime still authorizes every start, resume and report.
+
+Validation: Node 24.21.0; all 88 migrations apply to a fresh isolated PostgreSQL 14 database. Frontend typecheck, production build and lint (zero errors, 112 existing warnings) pass. Full frontend regression passes: 163 files, 653 tests. Affected backend regression passes serially: 18 files, 61 tests, including real PostgreSQL Run publish/start/recovery/consent/lifecycle, external-parent SELF, teacher delivery windows, relational minimum-N and publication fences. The supplemental consent and closed-run checks also pass. Browser acceptance covers 12 role/width combinations at 390/768/1440; screenshots inspected. Remote CI remains authoritative for the complete seeded regression.
+
+Supplemental review fixes: course-teacher publishing uses the same current class scope as homeroom delivery; cancelled/closed/deadline-expired runs produce non-actionable inbox states; redundant navigation is removed; exact Parent SELF consent behavior is tested; responsive inbox acceptance is included in CI.
+
+## Publication hold
+
+Production relational registry remains empty. Parent→Student, Teacher→Student, Student→Teacher, Counselor→Client and Client→Counselor content require source-owned applicability, initiation, disclosure, rights and human scientific release evidence. This change does not publish test fixtures or invent approved scientific content. Consequently the ten production Journeys are not claimed end-to-end accepted. Organization Run resource selection remains empty until approved registry entries with supported runtime adapters are registered.
+
+Scoring, canonical FINAL, report calculations and scientific snapshots are unchanged. The added database migration affects delivery controls only.
+
+## 最终复查补正
+
+投放渠道与同一 persona 的范围绑定，双 TEACHER/COUNSELOR 身份不能交叉拼接内容权限。Parent SELF 的 CLASS_UNITS 选择器按当前批准关联的学生班级定位，不要求家长成为组织成员。真实 PostgreSQL 回归覆盖两种渠道各自的正反例和同班/跨班家长；机构切换会清空策略界面。
+
+## Review 收口
+
+任务发现与 START 最后检查共用当前账号、成员、persona、外部家长和关系条件；撤权后隐藏任务及冻结对象名。关闭/过期不会单独移除仍有当前权限的历史任务。Parent 保留 source-filtered catalog 卡片，隐藏其无权进入的旧量表库入口。新流程回到 /my-assessments，旧任务 URL 兼容重定向。
+
+Standalone Scale 的 creator / UserRole.ADMIN 管理与导出是明确保留的 legacy policy，仅限 standalone 记录；不能推导为 SYSTEM_ADMIN 或 ORG_ADMIN 的通用个体报告权限。迁移此历史政策需要独立兼容方案，本次保持既有权限范围。

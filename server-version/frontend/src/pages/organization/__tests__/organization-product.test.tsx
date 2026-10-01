@@ -11,6 +11,9 @@ const api = vi.hoisted(() => ({
   listUnits: vi.fn(),
   listStudentAssignments: vi.fn(),
   listStaffAssignments: vi.fn(),
+  listAssessmentDeliveryGrants: vi.fn(),
+  grantAssessmentDelivery: vi.fn(),
+  revokeAssessmentDelivery: vi.fn(),
   membershipAccessHistory: vi.fn(),
   createMembership: vi.fn(),
   endMembership: vi.fn(),
@@ -95,6 +98,7 @@ beforeEach(() => {
   api.listUnits.mockResolvedValue([])
   api.listStudentAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
   api.listStaffAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
+  api.listAssessmentDeliveryGrants.mockResolvedValue({ list: [], total: 0 })
 })
 
 describe('Organization product authority boundary', () => {

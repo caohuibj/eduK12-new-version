@@ -1,3 +1,4 @@
+import { validDeliveryWindow } from './deliveryPolicy'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -181,6 +182,96 @@ export async function endStaffClassAssignment(input: {
       "valid_from" AS "validFrom", "valid_until" AS "validUntil"
   `
   if (!rows[0]) throw new OrganizationDomainError('STAFF_ASSIGNMENT_NOT_CURRENT', '当前教师班级关系不存在', 404)
+  return rows[0]
+}
+
+export interface AssessmentDeliveryGrantRecord {
+  validFrom: Date
+  validUntil: Date | null
+  id: string
+  organizationId: string
+  teacherMembershipId: string
+  classUnitId: string
+  permission: 'CLASS_ASSESSMENT_DELIVERY'
+  grantedByUserId: string
+  grantedAt: Date
+  revokedByUserId: string | null
+  revokedAt: Date | null
+}
+
+export async function grantTeachingAssessmentDelivery(input: {
+  organizationId: string
+  teacherMembershipId: string
+  classUnitId: string
+  grantedByUserId: string
+  validFrom?: Date
+  validUntil?: Date | null
+}): Promise<AssessmentDeliveryGrantRecord> {
+  const validFrom = input.validFrom ?? new Date()
+  const validUntil = input.validUntil ?? null
+  if (!validDeliveryWindow(validFrom, validUntil)) throw new OrganizationDomainError("DELIVERY_WINDOW_INVALID", "Invalid grant validity window", 400)
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await assertCurrentMembershipPersona(tx, {
+        organizationId: input.organizationId,
+        membershipId: input.teacherMembershipId,
+        persona: 'TEACHER',
+      })
+      await assertClassUnit(tx, input.organizationId, input.classUnitId)
+      const teaching = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "organization_staff_class_assignments"
+        WHERE "organization_id" = ${input.organizationId}
+          AND "membership_id" = ${input.teacherMembershipId}
+          AND "class_unit_id" = ${input.classUnitId}
+          AND "staff_role" IN ('HOMEROOM', 'TEACHING')
+            AND "valid_from" <= statement_timestamp()
+          AND "valid_until" IS NULL
+        LIMIT 1 FOR SHARE
+      `
+      if (!teaching[0]) throw new OrganizationDomainError(
+        'TEACHING_ASSIGNMENT_REQUIRED',
+        '只有当前任课教师关系可以由管理员额外开放测评投放权限',
+        409,
+      )
+      const id = randomUUID()
+      const rows = await tx.$queryRaw<AssessmentDeliveryGrantRecord[]>`
+        INSERT INTO "organization_assessment_delivery_grants" (
+          "id","organization_id","teacher_membership_id","class_unit_id","permission","granted_by_user_id","valid_from","valid_until"
+        ) VALUES (
+          ${id},${input.organizationId},${input.teacherMembershipId},${input.classUnitId},
+          'CLASS_ASSESSMENT_DELIVERY',${input.grantedByUserId},${validFrom},${validUntil}
+        )
+        RETURNING "id","organization_id" AS "organizationId",
+          "teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
+          "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
+          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
+      `
+      return rows[0]
+    })
+  } catch (err: any) {
+    return mapConstraintError(err, 'ASSESSMENT_DELIVERY_GRANT_CONFLICT')
+  }
+}
+
+export async function revokeTeachingAssessmentDelivery(input: {
+  organizationId: string
+  grantId: string
+  revokedByUserId: string
+}): Promise<AssessmentDeliveryGrantRecord> {
+  const rows = await prisma.$queryRaw<AssessmentDeliveryGrantRecord[]>`
+    UPDATE "organization_assessment_delivery_grants"
+    SET "revoked_by_user_id" = ${input.revokedByUserId}, "revoked_at" = transaction_timestamp()
+    WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.grantId} AND "revoked_at" IS NULL
+    RETURNING "id","organization_id" AS "organizationId",
+      "teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
+      "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
+      "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
+  `
+  if (!rows[0]) throw new OrganizationDomainError(
+    'ASSESSMENT_DELIVERY_GRANT_NOT_CURRENT',
+    '当前测评投放授权不存在',
+    404,
+  )
   return rows[0]
 }
 

@@ -186,6 +186,7 @@ export const createRelationalProductReportService = (
     }
     const entry = registry.findExact(input.product)
       ?? relationalFail('RELATIONAL_PRODUCT_UNAVAILABLE', 'relational product is not released')
+    if (entry.subjectReportMode !== 'AGGREGATE_ONLY') relationalFail('RELATIONAL_ANALYSIS_ACCESS', 'This content does not disclose a report to the teacher subject')
     const applicability = entry.applicability
     if (
       entry.releaseStatus !== 'PUBLISHED'

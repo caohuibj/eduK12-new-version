@@ -2,7 +2,12 @@ import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, notFound, success, unauthorized, forbidden } from '../../utils/response'
-import { resolveOrganizationAccessContext, type OrganizationAccessContext } from './access'
+import {
+  resolveAssessmentDeliveryAuthority,
+  resolveOrganizationAccessContext,
+  type AssessmentDeliveryScope,
+  type OrganizationAccessContext,
+} from './access'
 import {
   createMembership,
   createOrganization,
@@ -20,7 +25,10 @@ import {
 import { OrganizationDomainError } from './types'
 
 // Navigation hints are server-owned. Exact resources still authorize every request.
-export function organizationProductActions(context: OrganizationAccessContext): string[] {
+export function organizationProductActions(
+  context: OrganizationAccessContext,
+  deliveryScopes: readonly AssessmentDeliveryScope[] = [],
+): string[] {
   const denied = (...permissions: string[]) => context.explicitDenies.some(value => value === '*' || permissions.includes(value))
   const active = context.organizationStatus === 'ACTIVE'
   const member = context.membershipId !== null
@@ -33,7 +41,7 @@ export function organizationProductActions(context: OrganizationAccessContext): 
     member
     && active
     && !denied('ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
-    && (context.orgRole === 'ORG_ADMIN' || professional)
+    && deliveryScopes.length > 0
   ) actions.push('ASSESSMENT_DELIVERY')
   if (context.platformRole === 'SYSTEM_ADMIN' || context.canGovern) actions.push('MANAGE_DENIES')
   if (context.platformRole === 'SYSTEM_ADMIN' && !denied('ORGANIZATION_GOVERNANCE')) actions.push(active ? 'SUSPEND' : 'RESUME')
@@ -203,10 +211,14 @@ export const organizationController = {
       const organization = organizations[0]
       if (!organization) return notFound(res, '组织不存在')
 
+      const delivery = await resolveAssessmentDeliveryAuthority({
+        principal: req.user,
+        organizationId,
+      })
       return success(res, {
         organization,
         access,
-        allowedActions: organizationProductActions(access),
+        allowedActions: organizationProductActions(access, delivery?.deliveryScopes ?? []),
       })
     } catch (err) {
       return sendDomainError(res, err)

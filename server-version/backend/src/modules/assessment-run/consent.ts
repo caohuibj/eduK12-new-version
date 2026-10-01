@@ -15,10 +15,11 @@ const scopes: Record<string, string> = {
 }
 
 export const createRunPendingConsent = async (tx: Tx, input: {
-  subjectUserId: string; respondentUserId: string; respondentRole: string; createdByUserId: string
+  subjectUserId: string; respondentUserId: string; respondentRole: string; createdByUserId: string; perspective?: string
   visibilityPolicyKey: string; resourceKind: string; resourceKey: string; resourceVersion: string
 }): Promise<string | null> => {
   const scope = scopes[input.visibilityPolicyKey]
+  if (!scope && input.perspective === 'SELF_REPORT' && input.subjectUserId === input.respondentUserId) return null
   if (!scope && input.respondentRole !== 'PARENT') return null
   if (!scope || !['PARENT', 'TEACHER'].includes(input.respondentRole)) {
     throw new RunStartAdmissionError('RUN_CONSENT_POLICY_UNSUPPORTED', 'Run observer consent policy is unsupported')

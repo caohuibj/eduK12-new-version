@@ -42,7 +42,7 @@ const journeysFor = (entry: RelationalProductEntryV1): RelationalProductJourneyV
     && a.analysisMode === 'COHORT_AGGREGATE'
   ) {
     journeys.push('STUDENT_EXPERIENCE')
-    journeys.push('TEACHER_COHORT_REPORT')
+    if (entry.subjectReportMode === 'AGGREGATE_ONLY') journeys.push('TEACHER_COHORT_REPORT')
   }
   return journeys
 }

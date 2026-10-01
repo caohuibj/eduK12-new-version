@@ -653,17 +653,13 @@ function AppRoutes() {
           <Route
             path="/student/scales/:scaleId"
             element={
-              <StudentProtectedRoute>
-                <ScaleAssessment />
-              </StudentProtectedRoute>
+              <RouteAccess><ScaleAssessment /></RouteAccess>
             }
           />
           <Route
             path="/student/scales/result/:assessmentId"
             element={
-              <StudentProtectedRoute>
-                <ScaleResult />
-              </StudentProtectedRoute>
+              <RouteAccess><ScaleResult /></RouteAccess>
             }
           />
           <Route

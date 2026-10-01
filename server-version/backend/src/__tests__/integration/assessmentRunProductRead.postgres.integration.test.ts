@@ -1,3 +1,6 @@
+import { closeAssessmentRun } from '../../modules/assessment-run/lifecycle'
+import { createOrganizationUnit } from '../../modules/organization/structure'
+import { assignStaffToClass } from '../../modules/organization/classRelationships'
 import { randomUUID } from 'node:crypto'
 import { createServer, type Server } from 'node:http'
 import express from 'express'
@@ -185,6 +188,11 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     const denied = await jsonRequest(`/api/organizations/${created.organization.id}/runs`, outsider)
     expect(denied.status).toBe(403)
 
+    // A persona alone is not delivery scope. Resolve a current class relationship.
+    expect((await jsonPost(`/api/organizations/${created.organization.id}/runs`, scopedTeacher, { name: 'no class scope' })).status).toBe(403)
+    const grade = await createOrganizationUnit({ organizationId: created.organization.id, unitKind: 'GRADE', name: 'Delivery grade' })
+    const cls = await createOrganizationUnit({ organizationId: created.organization.id, unitKind: 'CLASS', name: 'Delivery class', parentUnitId: grade.id })
+    await assignStaffToClass({ organizationId: created.organization.id, membershipId: scopedTeacherMembership.id, classUnitId: cls.id, staffRole: 'HOMEROOM' })
     const scopedCreate = await jsonPost(
       `/api/organizations/${created.organization.id}/runs`,
       scopedTeacher,
@@ -228,7 +236,8 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     expect(tasks.body.data.list.some((task: any) => task.runId === run.id)).toBe(true)
     const foreignTasks = await jsonRequest('/api/organizations/assigned-tasks', outsider)
     expect(foreignTasks.body.data.list.some((task: any) => task.runId === run.id)).toBe(false)
-    expect(JSON.stringify(tasks.body.data)).not.toContain('subjectUserId')
+    expect(tasks.body.data.list.every((task: any) => task.subjectUserId === student.id && task.respondentRole === 'STUDENT')).toBe(true)
+    expect(JSON.stringify(tasks.body.data)).not.toContain('rawAnswers')
 
     // Exact Run binding admits an assigned ADMIN respondent, never other ADMINs.
     const task = tasks.body.data.list.find((item: any) => item.runId === run.id)
@@ -239,6 +248,9 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, student)).status).toBe(200)
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, outsider)).status).toBe(403)
     expect((await jsonRequest(`/api/runtime-probe/${randomUUID()}`, student)).status).toBe(403)
+    await closeAssessmentRun({ organizationId: created.organization.id, runId: run.id, actorUserId: owner.id })
+    const closedTasks = await jsonRequest('/api/organizations/assigned-tasks', student)
+    expect(closedTasks.body.data.list.find((item: any) => item.runId === run.id).status).toBe('EXPIRED')
 
   })
 })

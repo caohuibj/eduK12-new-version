@@ -15,7 +15,9 @@ export type RunPopulationSelector =
   | { kind: 'LABELS'; labelIds: string[]; match: 'ANY' | 'ALL' }
   | { kind: 'RELATED_PARENT' }
 
+export type EvaluationTargetMode = 'SELF' | 'HOMEROOM_TEACHER' | 'ALL_CLASS_TEACHERS' | 'SELECTED_CLASS_TEACHERS' | 'COURSE_TEACHER'
 export interface RunRequestedPolicy {
+  targetPolicy?: { mode: EvaluationTargetMode; teacherMembershipIds?: string[]; courseId?: string }
   subjectRoles: string[]
   respondentRoles: string[]
   relationshipKinds: string[]
@@ -107,6 +109,7 @@ export interface RunPreview {
   tracks: Array<{ trackId: string; executionCount: number; subjectCount: number; respondentCount: number }>
 }
 export interface RunResourceChoice extends RunRequestedPolicy {
+  allowedTargetModes?: EvaluationTargetMode[]
   title: string; family: RunResourceFamily; key: string; version: string;
 }
 export const runApi = {

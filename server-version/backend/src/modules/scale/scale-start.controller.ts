@@ -133,6 +133,9 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表不存在', 404)
         }
         const deployment = await resolveScaleStartDeployment({ db: tx, scale: currentScale, requestedMode: 'STANDALONE' })
+        if (req.user?.role !== 'STUDENT' && (deployment.kind !== 'MANAGED_V2' || !deployment.runtimePolicy.applicability.respondentTypes.includes('SELF'))) {
+          throw new InstrumentFinalSubmitError('STALE_ATTEMPT', 'This content does not authorize governed self-report starts', 403)
+        }
         if (!deployment.allowNewStarts) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', deployment.reasons.join(','), 409)
         const requiredContextKeys = deployment.kind === 'MANAGED_V2'
           ? requiredScaleContextKeys(deployment.runtimePolicy.applicability) : []
