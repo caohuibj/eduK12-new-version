@@ -3,7 +3,7 @@ export function requiredChecks(needs, draft) {
   return ['scope', ...(needs.scope?.outputs?.content === 'true' ? ['content']
     : needs.scope?.outputs?.presentation === 'true' ? ['visual']
       : draft ? ['pr-light-backend', 'pr-light-frontend']
-        : ['backend', 'frontend', 'browser', 'docker', 'codeql'])];
+        : ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql'])];
 }
 export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');

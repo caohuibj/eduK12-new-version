@@ -67,7 +67,7 @@ test('Bundle validation is mandatory on content and platform routes with stable 
 
 test('force-full override schedules full jobs and uses a full aggregate even for drafts/main', () => {
   const ci = source('ci');
-  for (const name of ['backend', 'frontend', 'browser', 'docker', 'codeql', 'merge-gate'])
+  for (const name of ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql', 'merge-gate'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL == 'true'/, name);
   for (const name of ['pr-light-backend', 'pr-light-frontend', 'post-merge-smoke'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL != 'true'/, name);
@@ -101,9 +101,10 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('full CI preserves two physical self-hosted lanes', () => {
+test('full CI preserves both self-hosted lanes, Windows CodeQL and hosted regression', () => {
   const ci = source('ci');
   const backend = job(ci, 'backend');
+  const hostedRegression = job(ci, 'backend-regression');
   const frontend = job(ci, 'frontend');
   const browser = job(ci, 'browser');
   const codeql = job(ci, 'codeql');
@@ -113,6 +114,13 @@ test('full CI preserves two physical self-hosted lanes', () => {
   assert.match(backend, /eduk12-mac-ci/);
   assert.match(browser, /eduk12-mac-ci/);
   for (const text of [frontend, codeql, docker]) assert.match(text, /eduk12-win-ci/);
+  assert.match(hostedRegression, /runs-on: ubuntu-24\.04/);
+  assert.match(hostedRegression, /--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(backend, /run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(browser, /needs: \[scope, backend, frontend\]/);
+  assert.match(codeql, /needs: \[scope, frontend\]/);
+  assert.match(docker, /needs: \[scope, codeql\]/);
+  assert.match(merge, /backend-regression/);
   for (const text of [scope, merge]) {
     assert.match(text, /self-hosted/);
     assert.match(text, /- linux/);
