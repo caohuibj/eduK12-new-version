@@ -89,3 +89,27 @@ it('carries exact offline calibration without enabling an unavailable scorer, an
   d.scoring.model.parameterSet!.references[0]!.constructKey = 'unknown'
   expect(errors(d).some(e => /lacks declared/.test(e.message))).toBe(true)
 })
+
+
+it('rejects expert SCORED channels that have no explicit evidence in any published metric', () => {
+  const d = scientificFixture()
+  const node = d.flow.nodes[0]!
+  if (node.nodeType !== 'SCENE') throw new Error('fixture')
+  node.channelPolicies!.find(p => p.channelKey === 'probe1')!.measurementRole = 'SCORED'
+  expect(errors(d).some(e => /expert.*evidence|expert.*key/i.test(e.message))).toBe(true)
+})
+
+it('rejects V1 expert models rather than bypassing the V2 scientific cross-field contract', () => {
+  const d = structuredClone(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition)
+  d.scoring.model = { contractVersion: 'situational-model-v1', modelKey: 'EXPERT_KEY', modelVersion: '1', expertKey: [] }
+  expect(errors(d).some(e => e.path === 'scoring.model')).toBe(true)
+})
+
+
+it('rejects scalar scoring that contradicts an explicit forbidden inference', () => {
+  const d = structuredClone(SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE.definition)
+  const channel = d.scenes[0]!.channels.find(c => c.responseType === 'SINGLE_CHOICE')!
+  if (channel.responseType !== 'SINGLE_CHOICE') throw new Error('fixture')
+  channel.options[0]!.evidence = { semanticVersion: '1', observable: {}, opportunities: [{ constructKey: channel.scoredConstruct!, role: 'FORBIDDEN_INFERENCE', rationale: 'Synthetic prohibited interpretation' }] }
+  expect(errors(d).some(e => /forbidden inference/i.test(e.message))).toBe(true)
+})

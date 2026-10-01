@@ -309,6 +309,12 @@ export const validateSituationDefinition = (
 
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
+  // V2 calls this validator on an internal scalar projection, then owns model validation.
+  if (!options.allowMeasurementBundle && definition.scoring.model) {
+    const model = definition.scoring.model
+    if (model.modelKey !== 'PROVISIONAL_SCALAR') issues.push({ path: 'scoring.model', message: 'Non-scalar scoring models require the V2 scientific contract', severity: 'error' })
+    if (model.parameterSet || model.expertKey) issues.push({ path: 'scoring.model', message: 'V1 scalar scoring cannot claim calibration parameters or expert keys', severity: 'error' })
+  }
 
   const sceneKeys = new Set<string>()
   const sceneSortOrders = new Set<number>()
@@ -342,6 +348,9 @@ export const validateSituationDefinition = (
           }
           optionKeys.add(option.optionKey)
         })
+      }
+      if (channel.responseType === 'SINGLE_CHOICE') for (const option of channel.options) {
+        if (option.evidence?.opportunities.some(o => o.constructKey === channel.scoredConstruct && o.role === 'FORBIDDEN_INFERENCE')) issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.options`, message: 'Scalar scoring contradicts forbidden inference', severity: 'error' })
       }
       if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })

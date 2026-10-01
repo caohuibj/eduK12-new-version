@@ -89,6 +89,10 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
       const metric = definition.scoring.publishedMetrics.find(m => m.key === entry.metricKey)
       if (channel?.responseType === 'SINGLE_CHOICE' && metric && channel.options.find(o => o.optionKey === entry.optionKey)?.evidence?.opportunities.some(o => o.constructKey === metric.construct && o.role === 'FORBIDDEN_INFERENCE')) fail('scoring.model.expertKey', 'Expert key contradicts forbidden inference')
     }
+    const backedPairs = new Set((model.expertKey ?? []).map(e => `${e.sceneKey}:${e.channelKey}`))
+    for (const node of nodes) for (const channel of definition.scenes.find(s => s.sceneKey === node.sceneKey)?.channels ?? []) {
+      if ((node.channelPolicies?.find(p => p.channelKey === channel.channelKey)?.measurementRole ?? 'SCORED') === 'SCORED' && !backedPairs.has(`${node.sceneKey}:${channel.channelKey}`)) fail('scoring.model.expertKey', 'Every SCORED channel needs explicit expert evidence; use RAW_ONLY/DESCRIPTIVE for unscored probes')
+    }
     for (const metric of definition.scoring.publishedMetrics) {
       const backed = new Set((model.expertKey ?? []).filter(e => e.metricKey === metric.key).map(e => `${e.sceneKey}:${e.channelKey}`))
       if (!backed.size) fail('scoring.model.expertKey', 'Every published metric needs explicit expert evidence')
