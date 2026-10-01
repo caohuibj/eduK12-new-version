@@ -46,8 +46,8 @@ async function completeFour(page, label) {
     if(await finish.isVisible()) await finish.click()
     await page.waitForTimeout(75)
   }
-  const reportButton=page.getByRole('button',{name:'查看个人报告',exact:true})
-  if(await reportButton.isVisible()) await reportButton.click()
+  // Completed parent state redirects automatically; the transient button may unmount before a click.
+  // Wait for the actual report route, then verify report contents and authority below.
   await page.waitForURL(url=>url.pathname.endsWith('/report'),{timeout:30000})
   await page.screenshot({path:output+'/'+label+'-report.png',fullPage:true})
   await page.getByRole('region',{name:'Bundle 综合报告'}).waitFor()
