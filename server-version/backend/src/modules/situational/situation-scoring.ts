@@ -43,6 +43,7 @@ export interface SituationalMetricValue {
   estimate?: number | null
   precision?: { status: 'NOT_ESTIMATED' | 'ESTIMATED'; standardError: number | null; interval: { lower: number; upper: number; level: number; kind: 'CONFIDENCE' | 'CREDIBLE' } | null }
   coverage?: { numberOfOpportunities: number; numberOfAnsweredOpportunities: number; numberOfIndependentScenes: number }
+  contributions?: Array<{ responseKey: string; contribution: number | null }>
   maturity?: 'PROVISIONAL' | 'CALIBRATED'
 }
 
@@ -54,6 +55,7 @@ export interface SituationalQuality {
 }
 
 export interface SituationalResultV1 {
+  narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
   metrics: SituationalMetricValue[]
   quality: SituationalQuality
   model?: { modelKey: string; modelVersion: string; scoringVersion: string; parameterSetHash?: string }
@@ -129,6 +131,7 @@ type SituationalResponseValidationPair = {
   responseType: string
   optionKeys: Set<string>
   range: { min: number; max: number } | null
+  maxLength?: number
 }
 
 type SituationalResponseValidationIndex = ReadonlyMap<string, SituationalResponseValidationPair>
@@ -142,6 +145,7 @@ const buildSituationalResponseValidationIndex = (
       pairByKey.set(responseKey(scene.sceneKey, channel.channelKey), {
         responseType: channel.responseType,
         optionKeys: new Set(channel.responseType === 'SINGLE_CHOICE' ? channel.options.map((option) => option.optionKey) : []),
+        ...(channel.responseType === 'FREE_TEXT' ? { maxLength: channel.maxLength } : {}),
         range: channel.responseType === 'CONTINUOUS' ? channel.range : null,
       })
     })
@@ -178,6 +182,8 @@ const validateResponsesWithIndex = (
         issues.push({ path: `${path}.responseValue`, message: `选择通道的回答必须是该通道的选项：${pairKey}` })
         return
       }
+    } else if (pair.responseType === 'FREE_TEXT') {
+      if (typeof response.responseValue !== 'string' || response.responseValue.length > (pair.maxLength ?? 0)) { issues.push({ path: `${path}.responseValue`, message: '补充文字为空或超过长度限制' }); return }
     } else if (
       typeof response.responseValue !== 'number'
       || !Number.isFinite(response.responseValue)
@@ -234,6 +240,7 @@ const rangeForPair = (definition: SituationDefinitionV1, pairKey: string): { min
   const channel = scene?.channels.find((candidate) => responseKey(scene.sceneKey, candidate.channelKey) === pairKey)
   if (!scene || !channel) throw new Error(`metric 期望响应不存在：${pairKey}`)
   if (channel.responseType === 'CONTINUOUS') return { ...channel.range }
+  if (channel.responseType === 'FREE_TEXT') return { min: 0, max: 0 }
   const pairContributions = definition.scoring.choiceScores
     .filter((entry) => responseKey(entry.sceneKey, entry.channelKey) === pairKey)
     .map((entry) => entry.contribution)

@@ -1,6 +1,7 @@
 import type { SituationalAttemptResponse, SituationalScientificContext } from './types'
 
 export interface SituationalExportPayload {
+  narrative?: NonNullable<SituationalAttemptResponse['result']>['narrative']
   model?: NonNullable<SituationalAttemptResponse['result']>['model']
   scientificContext: SituationalScientificContext
   instrumentKey: string
@@ -30,7 +31,8 @@ export const buildSituationalExportPayload = (data: SituationalAttemptResponse):
   scoringVersion: data.attempt.scoringVersion,
   completedAt: data.attempt.completedAt,
   quality: data.result?.quality ?? { status: 'invalid', flags: ['missing_result'] },
-  metrics: (data.result?.metrics ?? []).map((metric) => ({
+  ...(data.result?.narrative ? {narrative:data.result.narrative} : {}),
+  metrics: (data.result?.narrative ? [] : data.result?.metrics ?? []).map((metric) => ({
     key: metric.key,
     construct: metric.construct,
     channelKey: metric.channelKey,
@@ -47,7 +49,8 @@ export const buildSituationalExportPayload = (data: SituationalAttemptResponse):
 })
 
 const csvCell = (value: unknown): string => {
-  const text = value === null || value === undefined ? '' : String(value)
+  const raw = value === null || value === undefined ? '' : String(value)
+  const text = typeof value==='string' && /^[=+@\-\t\r]/.test(raw) ? `'${raw}` : raw
   return `"${text.replace(/"/g, '""')}"`
 }
 
@@ -69,8 +72,10 @@ export const buildSituationalCsv = (data: SituationalAttemptResponse): string =>
     ['referencePolicy', payload.referencePolicy],
     ['disclaimer', payload.disclaimer],
     [],
+    ...(payload.narrative ? [['paragraph'], ...payload.narrative.paragraphs.map(p=>[p])] : [
     ['metricKey', 'construct', 'channelKey', 'value', 'status', ...(rich ? ['precisionStatus', 'standardError', 'interval', 'opportunities', 'answeredOpportunities', 'independentScenes', 'maturity'] : [])],
     ...payload.metrics.map((metric) => [metric.key, metric.construct, metric.channelKey, metric.value ?? '', metric.status, ...(rich ? [metric.precision?.status ?? '', metric.precision?.standardError ?? '', metric.precision?.interval ? JSON.stringify(metric.precision.interval) : '', metric.coverage?.numberOfOpportunities ?? '', metric.coverage?.numberOfAnsweredOpportunities ?? '', metric.coverage?.numberOfIndependentScenes ?? '', metric.maturity ?? ''] : [])]),
+    ]),
   ]
   return `\ufeff${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}\r\n`
 }

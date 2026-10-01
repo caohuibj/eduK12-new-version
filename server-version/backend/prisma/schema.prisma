@@ -2365,3 +2365,51 @@ model BundlePackageRelease {
   @@unique([bundleKey, bundleVersion])
   @@map("bundle_package_releases")
 }
+
+// Author uploads stay separate from the code-owned registry and frozen attempts.
+model SjtAuthorDraft {
+  id            String   @id @default(uuid())
+  ownerId       String   @map("owner_id")
+  revision      Int      @default(1)
+  status        String   @default("DRAFT")
+  contentDigest String   @map("content_digest")
+  template      Json
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  audits        SjtAuthorAudit[]
+  release       SjtAuthorRelease?
+  @@index([ownerId, updatedAt])
+  @@map("sjt_author_drafts")
+}
+
+model SjtAuthorAudit {
+  id            String   @id @default(uuid())
+  draftId       String   @map("draft_id")
+  draft         SjtAuthorDraft @relation(fields: [draftId], references: [id], onDelete: Restrict)
+  actorId       String   @map("actor_id")
+  revision      Int
+  action        String
+  contentDigest String   @map("content_digest")
+  template      Json?
+  note          String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  @@index([draftId, createdAt])
+  @@map("sjt_author_audits")
+}
+
+model SjtAuthorRelease {
+  id                String   @id @default(uuid())
+  instrumentKey     String   @map("instrument_key")
+  instrumentVersion String   @map("instrument_version")
+  sourceDraftId     String   @unique @map("source_draft_id")
+  sourceDraft       SjtAuthorDraft @relation(fields: [sourceDraftId], references: [id], onDelete: Restrict)
+  contentDigest     String   @map("content_digest")
+  definitionHash    String   @map("definition_hash")
+  package           Json
+  authorId          String   @map("author_id")
+  reviewerId        String   @map("reviewer_id")
+  status            String   @default("PUBLISHED")
+  createdAt         DateTime @default(now()) @map("created_at")
+  @@unique([instrumentKey, instrumentVersion])
+  @@map("sjt_author_releases")
+}

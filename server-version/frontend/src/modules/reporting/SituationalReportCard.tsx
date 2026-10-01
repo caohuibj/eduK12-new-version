@@ -34,6 +34,7 @@ export interface SituationalReportInterpretationView {
 
 export interface SituationalReportView extends Record<string, unknown> {
   scientificContext?: SituationalScientificContext
+  narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
   itemId: string
   type: 'SITUATIONAL'
   kind: 'situational'
@@ -73,6 +74,8 @@ const SituationalReportCard: React.FC<{ report: SituationalReportView }> = ({ re
   if (report.decryptError) {
     return <p className="text-amber-700">该情境测评结果无法解密，指标未展示。</p>
   }
+
+  if (report.narrative) return <div data-testid={`situational-report-${report.itemId}`} className="space-y-4"><ReportSection title="本次情境中的选择与反思" eyebrow="行为轨迹">{report.narrative.paragraphs.map((text, index) => <p key={index} className="text-sm leading-7 text-gray-700">{text}</p>)}</ReportSection><ReportDetails title="科学依据与方法"><p>测评时科研等级：{report.scientificContext?.scientificMaturity ?? 'PILOT'}{!report.scientificContext || report.scientificContext.provenance === 'LEGACY_MISSING' ? '（历史科研快照缺失）' : ` · 治理修订 ${report.scientificContext.governanceRevision}`}</p>{report.scientificContext?.scope ? <p>证据适用范围：{[report.scientificContext.scope.language,report.scientificContext.scope.population,report.scientificContext.scope.use,report.scientificContext.scope.claim].join(' · ')}</p> : null}</ReportDetails></div>
 
   const metrics = orderedMetricsOf(report)
   const interpretations = new Map((report.interpretations || []).map((item) => [item.metricKey, item]))

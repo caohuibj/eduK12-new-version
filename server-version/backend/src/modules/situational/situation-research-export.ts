@@ -1,3 +1,5 @@
+import { scoreSituationalModel } from './situation-model-resolver'
+import { projectReachableSituationDefinitionForScoring } from './situation-trajectory'
 import { createHmac } from 'node:crypto'
 import { z } from 'zod'
 import { inactiveAccountMessage } from '../../utils/accountStatus'
@@ -52,20 +54,25 @@ export function buildSituationalResearchArtifact(input: {
   const definition = assignedSituationalDefinition(snapshot.definition, assignment)
   const trajectory = deriveAuthoritativeSituationalTrajectory(definition, raw.responses)
   const reached = new Set(trajectory.sceneKeys), answered = new Map(raw.responses.map(r => [`${r.sceneKey}:${r.channelKey}`, r]))
-  const rawResponses = raw.responses.map(r => ({ sceneKey: r.sceneKey, channelKey: r.channelKey, responseValue: r.responseValue, ...(r.responseTimeMs === undefined ? {} : { responseTimeMs: r.responseTimeMs }), ...(r.historyIdentity ? { historyIdentity: r.historyIdentity } : {}), ...(r.responseRevision ? { responseRevision: r.responseRevision } : {}) }))
+  const freePairs = new Set(snapshot.definition.scenes.flatMap(s => s.channels.filter(c => c.responseType === 'FREE_TEXT').map(c => `${s.sceneKey}:${c.channelKey}`)))
+  const freeNodePairs = new Set(snapshot.definition.schemaVersion === 2 ? snapshot.definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? snapshot.definition.scenes.find(s => s.sceneKey === n.sceneKey)?.channels.filter(c => c.responseType === 'FREE_TEXT').map(c => `${n.nodeKey}:${c.channelKey}`) ?? [] : []) : [])
+  const rawResponses = raw.responses.filter(r => !freePairs.has(`${r.sceneKey}:${r.channelKey}`)).map(r => ({ sceneKey: r.sceneKey, channelKey: r.channelKey, responseValue: r.responseValue, ...(r.responseTimeMs === undefined ? {} : { responseTimeMs: r.responseTimeMs }), ...(r.historyIdentity ? { historyIdentity: r.historyIdentity } : {}), ...(r.responseRevision ? { responseRevision: r.responseRevision } : {}) }))
   const histories = situationalResponseHistoryIdentities(definition, raw.responses)
   const opportunities = snapshot.definition.scenes.flatMap(scene => scene.channels.map(channel => {
     const node = snapshot.definition.schemaVersion === 2 ? snapshot.definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
     const pair = `${scene.sceneKey}:${channel.channelKey}`, value = answered.get(pair)
+    const freeTextExcluded = channel.responseType === 'FREE_TEXT'
+    const nonanswer = channel.responseType === 'SINGLE_CHOICE' ? channel.options.find(o => o.optionKey === value?.responseValue)?.nonanswerReason : undefined
     const planned = node && assignment.selections.some(s => s.nodeKey === node.nodeKey && s.omittedChannelKeys.includes(channel.channelKey))
     const events = raw.researchCapture?.events.filter(e => e.nodeKey === node?.nodeKey && e.channelKey === channel.channelKey && (e.type === 'RESPONSE_FIRST_COMMITTED' || e.type === 'RESPONSE_CHANGED')) ?? []
     const firstCurrent = events.find(e => e.historyIdentity === histories.get(scene.sceneKey))
     const invalidated = raw.researchCapture?.events.filter(e => e.nodeKey === node?.nodeKey && e.channelKey === channel.channelKey && e.type === 'RESPONSE_INVALIDATED') ?? []
     const historicalOnly = events.length > 0 && !firstCurrent
     return { sceneKey: scene.sceneKey, nodeKey: node?.nodeKey ?? null, channelKey: channel.channelKey,
-      finalResponse: value?.responseValue ?? null, firstEverResponse: events[0]?.responseValue ?? null, firstResponse: firstCurrent?.responseValue ?? null,
+      finalResponse: freeTextExcluded ? null : value?.responseValue ?? null, firstEverResponse: freeTextExcluded ? null : events[0]?.responseValue ?? null, firstResponse: freeTextExcluded ? null : firstCurrent?.responseValue ?? null,
+      ...(freeTextExcluded ? { freeTextExcluded: true } : {}),
       firstResponseStatus: raw.researchCapture ? firstCurrent ? 'RECORDED' : 'NOT_ANSWERED' : 'LEGACY_NOT_CAPTURED',
-      missingness: value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? (historicalOnly || invalidated.length ? 'INVALIDATED_BY_HISTORY_CHANGE' : 'PARTICIPANT_SKIPPED'),
+      missingness: nonanswer ?? (value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? (historicalOnly || invalidated.length ? 'INVALIDATED_BY_HISTORY_CHANGE' : 'PARTICIPANT_SKIPPED')),
       invalidatedHistoricalResponses: invalidated.length,
       eligibility: reached.has(scene.sceneKey) && !planned,
     }
@@ -75,7 +82,9 @@ export function buildSituationalResearchArtifact(input: {
     attemptIdentity: createHmac('sha256', Buffer.from(input.pseudonymKey, 'hex')).update(`situational-research:${input.attemptId}`).digest('hex'),
     instrument: { key: snapshot.instrumentKey, version: snapshot.instrumentVersion, definitionHash: snapshot.definitionHash, compiledRuntimeHash: snapshot.compiledRuntimeHash, snapshotHash: snapshot.snapshotHash, scoringVersion: snapshot.scoringVersion, scorerKey: snapshot.scorerKey, model: snapshot.definition.scoring.model ?? { modelKey: 'PROVISIONAL_SCALAR', modelVersion: '1' }, modelHash: canonicalHash(snapshot.definition.scoring.model ?? { modelKey: 'PROVISIONAL_SCALAR', modelVersion: '1', scoringVersion: snapshot.scoringVersion, choiceScores: snapshot.definition.scoring.choiceScores }) },
     scientificContext: snapshot.scientificContext ?? null,
-    assignment, trajectory, rawResponses, opportunities, events: raw.researchCapture?.events ?? [],
+    assignment, trajectory, rawResponses, opportunities, events: (raw.researchCapture?.events ?? []).filter(e => !freeNodePairs.has(`${e.nodeKey}:${e.channelKey}`)),
+    ...(freePairs.size ? { freeTextProjection: 'EXCLUDED' } : {}),
+    ...(snapshot.definition.scoring.model?.modelKey === 'AUTHOR_KEY_SUM' ? { derivedScores: scoreSituationalModel(projectReachableSituationDefinitionForScoring(definition, trajectory), raw.responses, { responsesValidated: true, independentSceneKeyBySceneKey: definition.schemaVersion === 2 ? Object.fromEntries(definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey,n.motherSceneKey]] : [])) : {} }) } : {}),
     optionSemantics: snapshot.definition.scenes.flatMap(s => s.channels.flatMap(c => c.responseType === 'SINGLE_CHOICE' ? c.options.filter(o => o.evidence).map(o => ({ sceneKey: s.sceneKey, channelKey: c.channelKey, optionKey: o.optionKey, evidence: o.evidence })) : [])),
     missingnessTaxonomy: MISSINGNESS_REASONS,
     limitations: ['Client-reported exposure history is consistency-validated, not independently observed.', 'Technical failure cannot be inferred from absence; abandoned attempts are excluded.', 'Historical first responses are unavailable when capture was not enabled.'],

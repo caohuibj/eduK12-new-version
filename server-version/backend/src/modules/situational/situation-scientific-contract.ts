@@ -32,7 +32,7 @@ export const optionEvidenceSchema = z.object({
 
 export const scoringModelSchema = z.object({
   contractVersion: z.literal('situational-model-v1'),
-  modelKey: z.enum(['PROVISIONAL_SCALAR', 'EXPERT_KEY', 'CONSENSUS_KEY', 'CRITERION_KEY', 'NOMINAL_UNIDIMENSIONAL', 'NOMINAL_MULTIDIMENSIONAL']),
+  modelKey: z.enum(['PROVISIONAL_SCALAR', 'EXPERT_KEY', 'AUTHOR_KEY_SUM', 'CONSENSUS_KEY', 'CRITERION_KEY', 'NOMINAL_UNIDIMENSIONAL', 'NOMINAL_MULTIDIMENSIONAL']),
   modelVersion: text,
   // Calibration is a content-addressed offline artifact, never executable code.
   parameterSet: z.object({
@@ -65,12 +65,12 @@ export const researchAssignmentSchema = z.object({
   }).strict()).min(1).max(120),
 }).strict()
 
-export const MISSINGNESS_REASONS = ['STRUCTURAL_NOT_REACHED', 'PLANNED_NOT_ADMINISTERED', 'PARTICIPANT_SKIPPED', 'TECHNICAL_FAILURE', 'INVALIDATED_BY_HISTORY_CHANGE'] as const
+export const MISSINGNESS_REASONS = ['STRUCTURAL_NOT_REACHED', 'PLANNED_NOT_ADMINISTERED', 'PARTICIPANT_SKIPPED', 'TECHNICAL_FAILURE', 'INVALIDATED_BY_HISTORY_CHANGE', 'UNABLE_TO_JUDGE', 'DECLINED', 'UNAVAILABLE_OR_DECLINED'] as const
 export const researchEventSchema = z.object({
   type: z.enum(['NODE_EXPOSED', 'RESPONSE_FIRST_COMMITTED', 'RESPONSE_CHANGED', 'PROBE_EXPOSED', 'STAGE_CONFIRMED', 'NODE_CONFIRMED', 'RESPONSE_INVALIDATED']),
   nodeKey: key,
   channelKey: key.optional(),
-  responseValue: z.union([z.string().max(160), z.number().finite()]).optional(),
+  responseValue: z.union([z.string().max(2000), z.number().finite()]).optional(),
   responseRevision: z.number().int().positive().max(4096).optional(),
   relativeTimeMs: z.number().int().nonnegative().max(2592000000),
   historyIdentity: z.string().regex(/^[a-f0-9]{64}$/),

@@ -1,3 +1,4 @@
+import { situationalBasePath } from '../paths'
 import React, { useEffect, useState } from 'react'
 import { Download } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -33,7 +34,7 @@ const SituationalResult: React.FC = () => {
       .then((response) => {
         if (response.code !== 0) throw Object.assign(new Error(response.message), { code: response.code })
         if (!response.data.result) {
-          navigate(`/student/situational/${encodeURIComponent(response.data.attempt.instrumentKey)}`, { replace: true })
+          navigate(`${situationalBasePath()}/${encodeURIComponent(response.data.attempt.instrumentKey)}`, { replace: true })
           return
         }
         if (!cancelled) setData(response.data)
@@ -56,7 +57,7 @@ const SituationalResult: React.FC = () => {
         title="情境化测评报告"
         description="无法读取当前权威结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '结果暂时无法读取' }}
-        actions={<button type="button" onClick={() => navigate('/student/situational/history')} className="btn-secondary">查看历史</button>}
+        actions={<button type="button" onClick={() => navigate(`${situationalBasePath()}/history`)} className="btn-secondary">查看历史</button>}
       />
     )
   }
@@ -72,6 +73,7 @@ const SituationalResult: React.FC = () => {
     instrumentVersion: data.attempt.instrumentVersion,
     scoringVersion: data.attempt.scoringVersion,
     metrics: result.metrics,
+    narrative: result.narrative,
     metricOrder: data.instrument.report.metricOrder,
     interpretations: data.instrument.report.interpretations,
     disclaimer: data.instrument.report.disclaimer,
@@ -90,23 +92,23 @@ const SituationalResult: React.FC = () => {
   return (
     <ReportShell
       title="情境化测评报告"
-      description="以下内容来自本次已完成 attempt 的冻结工具与权威结果。"
+      description={result.narrative ? '以下报告根据本次已完成的情境选择生成。' : '以下内容来自本次已完成 attempt 的冻结工具与权威结果。'}
       facts={facts}
       status={{
         kind: 'success',
         title: '测评已完成',
-        description: <><span>已提交</span> · 数据质量：{result.quality.status}</>,
+        description: result.narrative ? (result.quality.status==='invalid'?'存在非回答，报告按已回答内容描述。':'已保存本次作答与报告。') : <><span>已提交</span> · 数据质量：{result.quality.status}</>,
       }}
-      backAction={<Link to="/student/situational/history" aria-label="测评历史" className="btn-secondary">返回测评历史</Link>}
+      backAction={<Link to={`${situationalBasePath()}/history`} aria-label="测评历史" className="btn-secondary">返回测评历史</Link>}
       limitations={[
         ...data.instrument.report.limitations,
-        '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
+        result.narrative ? '类别变化只用于描述本次回答，不代表能力变化或因果改善。' : '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
       ]}
       actions={
         <>
           <button type="button" aria-label="JSON" onClick={() => downloadSituationalExport(data, 'json')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 JSON</button>
           <button type="button" aria-label="CSV" onClick={() => downloadSituationalExport(data, 'csv')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 CSV</button>
-          <Link to="/student/situational" className="btn-primary">返回题包</Link>
+          <Link to={situationalBasePath()} className="btn-primary">返回题包</Link>
         </>
       }
     >

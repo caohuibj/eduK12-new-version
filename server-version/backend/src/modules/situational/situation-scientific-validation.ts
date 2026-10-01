@@ -20,6 +20,8 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
     } else if (scene.channels.length > 3) fail(`flow.${node.nodeKey}`, 'More than three channels requires an explicit measurement bundle')
     for (const channel of scene.channels) {
       const role = policy(channel.channelKey)?.measurementRole ?? 'SCORED'
+      if (channel.responseType === 'FREE_TEXT' && (role !== 'RAW_ONLY' || policy(channel.channelKey)?.required !== false)) fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Free text must be optional RAW_ONLY')
+      if (channel.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.nonanswerReason) && role === 'SCORED' && definition.scoring.model?.modelKey !== 'AUTHOR_KEY_SUM') fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Scored nonanswers require AUTHOR_KEY_SUM')
       if (role === 'SCORED' && !channel.scoredConstruct && (!definition.scoring.model || definition.scoring.model.modelKey === 'PROVISIONAL_SCALAR')) fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Scalar SCORED channels require a scoredConstruct')
       if (node.transition.type === 'DECISION' && node.transition.channelKey === channel.channelKey && policy(channel.channelKey)?.interactionRole === 'DIAGNOSTIC') fail(`flow.${node.nodeKey}`, 'Diagnostic channels cannot route')
       if (channel.responseType === 'SINGLE_CHOICE') for (const option of channel.options) {
@@ -73,16 +75,34 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
       if (variant.stimulusVariantKey && !node.stimulusVariants?.some(v => v.variantKey === variant.stimulusVariantKey)) fail('researchAssignment', 'Unknown compatible consequence variant')
     }
   }
+  const narrative = definition.report.narrative
+  if (narrative) {
+    if (definition.scoring.model?.modelKey !== 'AUTHOR_KEY_SUM') fail('report.narrative','叙述报告规则需要 AUTHOR_KEY_SUM')
+    const seen = new Set<string>()
+    for (const [i,f] of narrative.fragments.entries()) {
+      const channel = pairs.get(`${f.sceneKey}:${f.channelKey}`), node = nodes.find(n=>n.sceneKey===f.sceneKey)
+      const role = node?.channelPolicies?.find(p=>p.channelKey===f.channelKey)?.measurementRole
+      const id = `${f.sceneKey}:${f.channelKey}:${f.optionKey}:${f.kind}`
+      if (seen.has(id) || channel?.responseType !== 'SINGLE_CHOICE' || !channel.options.some(o=>o.optionKey===f.optionKey) || (f.kind==='PROBE' ? role!=='RAW_ONLY' : role!=='SCORED')) fail(`report.narrative.fragments.${i}`,'报告片段引用或类型不合法')
+      seen.add(id)
+    }
+    for (const [i,c] of narrative.comparisons.entries()) {
+      const channels = [c.firstChannelKey,c.secondChannelKey].map(key=>nodes.filter(n=>n.motherSceneKey===c.motherSceneKey).map(n=>pairs.get(`${n.sceneKey}:${key}`)).filter(ch=>ch!==undefined))
+      const a=channels[0]?.[0],b=channels[1]?.[0]
+      const anchors=(ch:typeof a)=>ch?.responseType==='SINGLE_CHOICE'?ch.options.filter(o=>!o.nonanswerReason).map(o=>({key:o.optionKey,label:o.label})):[]
+      if (!a || !b || c.firstChannelKey===c.secondChannelKey || a.prompt!==b.prompt || anchors(a).length!==5 || JSON.stringify(anchors(a))!==JSON.stringify(anchors(b)) || JSON.stringify(anchors(a).map(o=>o.key))!==JSON.stringify(c.categories) || channels.some(list=>list.some(ch=>ch.responseType!=='SINGLE_CHOICE' || JSON.stringify(anchors(ch))!==JSON.stringify(anchors(a))))) fail(`report.narrative.comparisons.${i}`,'重复题比较需同母场景、相同五级锚点')
+    }
+  }
   const model = definition.scoring.model
   if (!model) return issues
-  if (model.modelKey === 'EXPERT_KEY') {
+  if (model.modelKey === 'EXPERT_KEY' || model.modelKey === 'AUTHOR_KEY_SUM') {
     if (!model.expertKey?.length || model.parameterSet) fail('scoring.model', 'Expert scorer requires an explicit provisional key, without latent parameter set')
     const seen = new Set<string>(), metrics = new Set(definition.scoring.publishedMetrics.map(m => m.key))
     for (const entry of model.expertKey ?? []) {
       const pair = `${entry.sceneKey}:${entry.channelKey}`
       const channel = pairs.get(pair), node = nodes.find(n => n.sceneKey === entry.sceneKey)
       const policy = node?.channelPolicies?.find(p => p.channelKey === entry.channelKey)
-      if (!metrics.has(entry.metricKey) || channel?.responseType !== 'SINGLE_CHOICE' || !channel.options.some(o => o.optionKey === entry.optionKey) || (policy?.measurementRole ?? 'SCORED') !== 'SCORED') fail('scoring.model.expertKey', 'Expert contribution references an unknown/non-scored option or metric')
+      if (!metrics.has(entry.metricKey) || channel?.responseType !== 'SINGLE_CHOICE' || !channel.options.some(o => o.optionKey === entry.optionKey && !o.nonanswerReason) || (policy?.measurementRole ?? 'SCORED') !== 'SCORED') fail('scoring.model.expertKey', 'Expert contribution references an unknown/non-scored option or metric')
       const identity = `${pair}:${entry.optionKey}:${entry.metricKey}`
       if (seen.has(identity)) fail('scoring.model.expertKey', 'Duplicate expert contribution')
       seen.add(identity)
@@ -98,7 +118,7 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
       if (!backed.size) fail('scoring.model.expertKey', 'Every published metric needs explicit expert evidence')
       for (const pair of backed) {
         const channel = pairs.get(pair)
-        if (channel?.responseType === 'SINGLE_CHOICE') for (const option of channel.options) if (!seen.has(`${pair}:${option.optionKey}:${metric.key}`)) fail('scoring.model.expertKey', 'Every expert-backed option requires explicit contribution; no hidden zero')
+        if (channel?.responseType === 'SINGLE_CHOICE') for (const option of channel.options) if (!option.nonanswerReason && !seen.has(`${pair}:${option.optionKey}:${metric.key}`)) fail('scoring.model.expertKey', 'Every expert-backed option requires explicit contribution; no hidden zero')
       }
     }
   } else if (model.expertKey) fail('scoring.model', 'Expert key is exclusive to EXPERT_KEY')

@@ -45,3 +45,12 @@ it('preserves explicit uncertainty and opportunity coverage without exporting ra
   expect(buildSituationalCsv(next)).toContain('NOT_ESTIMATED')
   expect(JSON.stringify(buildSituationalExportPayload(next))).not.toMatch(/rawResponses|historyIdentity|RESPONSE_FIRST_COMMITTED/)
 })
+
+it('exports SJT narrative and scope without converting author sums into a participant score report',()=>{
+  const next=structuredClone(result)
+  next.result!.narrative={version:'sjt-narrative-v1',paragraphs:['情境选择描述','=1+1']}
+  expect(buildSituationalExportPayload(next)).toMatchObject({metrics:[],narrative:{paragraphs:['情境选择描述','=1+1']}})
+  const csv=buildSituationalCsv(next)
+  expect(csv).toContain('情境选择描述');expect(csv).not.toContain('metricKey')
+  expect(csv).toContain("'=1+1")
+})

@@ -1,3 +1,4 @@
+import { situationalBasePath } from '../paths'
 import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
 import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -173,7 +174,7 @@ const SituationalRunner: React.FC = () => {
         const next = apiDataOrThrow(response)
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
-          navigate(embeddedCompletionPath || `/student/situational/attempts/${next.attempt.id}/result`, { replace: true })
+          navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
           return
         }
         const meta = await ensureSituationalDraft(next.attempt)
@@ -461,7 +462,7 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       if (next.attempt.status !== 'COMPLETED') return false
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id)).catch(() => undefined)
-      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       return true
     } catch {
       return false
@@ -544,7 +545,7 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
-      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
       if (String((reason as { code?: unknown })?.code ?? '') === TERMINAL_RECOVERED_CODE) return
@@ -566,7 +567,7 @@ const SituationalRunner: React.FC = () => {
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
@@ -684,7 +685,7 @@ const SituationalRunner: React.FC = () => {
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={channel.channelKey} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
+              <fieldset key={fieldName} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
@@ -692,6 +693,7 @@ const SituationalRunner: React.FC = () => {
                     <span className="text-sm leading-6 text-gray-700">{option.label}</span>
                   </label>
                 ))}
+                {channel.responseType === 'FREE_TEXT' ? <textarea aria-label={channel.prompt} maxLength={channel.maxLength} defaultValue={typeof answer?.responseValue === 'string' ? answer.responseValue : ''} onBlur={event => { void persistAnswer(currentScene, channel, event.currentTarget.value) }} className="min-h-24 w-full rounded-lg border p-3" /> : null}
                 {channel.responseType === 'CONTINUOUS' && channel.range ? (
                   <div className="rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between text-sm text-gray-600"><span>当前值</span><strong className="text-indigo-700">{typeof answer?.responseValue === 'number' ? answer.responseValue : '未选择'}</strong></div>

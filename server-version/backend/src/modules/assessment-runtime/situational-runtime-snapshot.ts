@@ -42,6 +42,7 @@ export interface FrozenSituationalRuntimeSnapshotV1 {
 }
 
 const runnerChannelSchema = z.union([
+  z.object({ channelKey: situationalOpaqueKeySchema, responseType: z.literal('FREE_TEXT'), prompt: z.string().min(1), required: z.literal(false).optional(), maxLength: z.number().int().min(1).max(2000) }).strict(),
   z.object({
     channelKey: situationalOpaqueKeySchema,
     responseType: z.literal('SINGLE_CHOICE'),

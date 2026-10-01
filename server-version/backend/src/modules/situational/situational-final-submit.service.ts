@@ -1,3 +1,4 @@
+import { buildSjtNarrative } from './authoring/narrative'
 import { deriveSituationalAssignment, assignedSituationalDefinition } from './situation-assignment'
 import { situationalResponseHistoryIdentities, validateSituationalResearchCapture } from './situation-research-capture'
 import { scoreSituationalModel } from './situation-model-resolver'
@@ -265,6 +266,8 @@ const persistSituationalAttemptFinal = async (
     normalized.trajectory,
   )
   const result = scoreSituationalModel(scoringDefinition, responses, { responsesValidated: true, ...(assignedDefinition.schemaVersion === 2 ? { independentSceneKeyBySceneKey: Object.fromEntries(assignedDefinition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey, n.motherSceneKey]] : [])) } : {}) })
+  const narrative = buildSjtNarrative(assignedDefinition, responses)
+  if (narrative) result.narrative = narrative
   const canonicalCore = projectSituationCanonicalUnitResult({
     result,
     runtime: snapshot.compiledRuntime,

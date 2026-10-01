@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 110 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 116 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -66,6 +66,12 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /student/checkins | StudentCheckins | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/checkins/:checkinId | CheckinSubmit | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/profile | StudentProfile | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /sjt-authoring | SjtAuthoring | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher/situational | SituationalHome | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /teacher/situational/history | SituationalHistory | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /teacher/situational/:instrumentKey | SituationalRunner | TEACHER | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /teacher/situational/attempts/:attemptId | SituationalRunner | TEACHER | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /teacher/situational/attempts/:attemptId/result | SituationalResult | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /student/situational | SituationalHome | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /student/situational/history | SituationalHistory | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /student/situational/:instrumentKey | SituationalRunner | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |

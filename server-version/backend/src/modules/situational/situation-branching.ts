@@ -255,7 +255,7 @@ export const validateBranchingSituationDefinition = (
           }
           optionKeys.add(option.optionKey)
         })
-      } else if (channel.range.min >= channel.range.max) {
+      } else if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push(issue(`scenes.${sceneIndex}.channels.${channelIndex}.range`, 'CONTINUOUS 通道的 range.min 必须小于 range.max'))
       }
     })

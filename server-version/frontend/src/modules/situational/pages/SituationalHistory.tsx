@@ -1,3 +1,4 @@
+import { situationalBasePath } from '../paths'
 import React, { useEffect, useState } from 'react'
 import { CheckCircle2, Clock3, History, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -37,7 +38,7 @@ const SituationalHistory: React.FC = () => {
         title="情境测评历史"
         description="历史结果读取服务器保存的终态记录，不会用当前题包重新评分。当前接口返回服务器提供的历史范围，不在前端切片伪造分页。"
         actions={(
-          <Link to="/student/situational" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+          <Link to={situationalBasePath()} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             选择测评
           </Link>
@@ -59,13 +60,13 @@ const SituationalHistory: React.FC = () => {
             {rows.map((row) => {
               const completed = row.attempt.status === 'COMPLETED'
               const metric = row.result?.metrics.find((item) => item.role === 'primary')
-              const title = row.instrument.report.interpretations[0]?.headline || row.attempt.instrumentKey
+              const title = row.instrument.title || row.instrument.report.interpretations[0]?.headline || row.attempt.instrumentKey
               return (
                 <DiscoveryCard
                   key={row.attemptId}
                   to={completed
-                    ? `/student/situational/attempts/${row.attemptId}/result`
-                    : `/student/situational/${encodeURIComponent(row.attempt.instrumentKey)}`}
+                    ? `${situationalBasePath()}/attempts/${row.attemptId}/result`
+                    : situationalBasePath().startsWith('/teacher/') ? `${situationalBasePath()}/attempts/${row.attemptId}` : `${situationalBasePath()}/${encodeURIComponent(row.attempt.instrumentKey)}`}
                   title={title}
                   ariaLabel={completed ? `${title}，查看已完成结果` : `${title}，继续进行中的测评`}
                   leading={(
@@ -78,7 +79,7 @@ const SituationalHistory: React.FC = () => {
                       {completed ? '已完成' : '进行中'}
                     </span>
                   )}
-                  description={completed && metric
+                  description={completed && row.result?.narrative ? '查看本次情境中的选择与反思。' : completed && metric
                     ? `${metric.label}：${metric.value === null ? '暂不可计算' : metric.value.toFixed(metric.displayPrecision)}`
                     : undefined}
                   meta={(

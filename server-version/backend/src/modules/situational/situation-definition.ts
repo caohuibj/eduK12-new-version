@@ -78,7 +78,7 @@ export type SituationalPurpose = z.infer<typeof situationalPurposeSchema>
  * Response primitive: how the participant answers and how the scorer treats
  * the raw value. Deliberately orthogonal to `purpose`.
  */
-export const situationalResponseTypeSchema = z.enum(['SINGLE_CHOICE', 'CONTINUOUS'])
+export const situationalResponseTypeSchema = z.enum(['SINGLE_CHOICE', 'CONTINUOUS', 'FREE_TEXT'])
 export type SituationalResponseType = z.infer<typeof situationalResponseTypeSchema>
 
 /**
@@ -137,6 +137,7 @@ const choiceOptionSchema = z.object({
   optionKey: situationalOpaqueKeySchema,
   label: z.string().min(1),
   evidence: optionEvidenceSchema.optional(),
+  nonanswerReason: z.enum(['UNABLE_TO_JUDGE', 'DECLINED', 'UNAVAILABLE_OR_DECLINED']).optional(),
 })
 export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
 
@@ -151,6 +152,7 @@ export type SituationalChoiceOption = z.infer<typeof choiceOptionSchema>
  * in `scoring.choiceScores` keyed by scoringVersion.
  */
 export const situationalChannelSchema = z.discriminatedUnion('responseType', [
+  z.object({ channelKey: situationalOpaqueKeySchema, purpose: situationalPurposeSchema, responseType: z.literal('FREE_TEXT'), prompt: z.string().min(1), maxLength: z.number().int().min(1).max(2000), scoredConstruct: z.string().min(1).optional() }),
   z.object({
     channelKey: situationalOpaqueKeySchema,
     purpose: situationalPurposeSchema,
@@ -269,6 +271,7 @@ export const situationDefinitionSchema = z.object({
     publishedMetrics: z.array(situationalMetricDefinitionSchema).min(1),
   }),
   report: z.object({
+    narrative: z.object({ version: z.literal('sjt-narrative-v1'), fragments: z.array(z.object({ sceneKey: situationalOpaqueKeySchema, channelKey: situationalOpaqueKeySchema, optionKey: situationalOpaqueKeySchema, text: z.string().min(1).max(2000), kind: z.enum(['ACTION', 'PROBE', 'GUIDANCE']) }).strict()).max(4000), comparisons: z.array(z.object({ firstChannelKey: situationalOpaqueKeySchema, secondChannelKey: situationalOpaqueKeySchema, motherSceneKey: situationalOpaqueKeySchema, label: z.string().min(1).max(200), categories: z.array(situationalOpaqueKeySchema).min(2).max(10) }).strict()).max(20) }).strict().optional(),
     reportVersion: z.string().min(1),
     primaryMetricKeys: z.array(z.string().min(1)).min(1),
     metricOrder: z.array(z.string().min(1)).min(1),
@@ -316,6 +319,8 @@ export const validateSituationDefinition = (
     if (model.parameterSet || model.expertKey) issues.push({ path: 'scoring.model', message: 'V1 scalar scoring cannot claim calibration parameters or expert keys', severity: 'error' })
   }
 
+  if (definition.report.narrative && !options.allowMeasurementBundle) issues.push({path:'report.narrative',message:'叙述报告规则需要 V2 作者评分契约',severity:'error'})
+
   const sceneKeys = new Set<string>()
   const sceneSortOrders = new Set<number>()
   definition.scenes.forEach((scene, sceneIndex) => {
@@ -354,6 +359,9 @@ export const validateSituationDefinition = (
       }
       if (channel.responseType === 'CONTINUOUS' && channel.range.min >= channel.range.max) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}.range`, message: 'CONTINUOUS 通道的 range.min 必须小于 range.max', severity: 'error' })
+      }
+      if (channel.responseType === 'FREE_TEXT' || channel.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.nonanswerReason)) {
+        if (!options.allowMeasurementBundle) issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}`, message: 'Text and explicit nonanswers require V2', severity: 'error' })
       }
       if (!channel.scoredConstruct || !declaredConstructs.has(channel.scoredConstruct)) {
         issues.push({
@@ -515,7 +523,7 @@ export const validateSituationDefinition = (
     }
   })
   definition.scoring.publishedMetrics.forEach((metric) => {
-    if (!interpretationKeys.has(metric.key)) {
+    if (!definition.report.narrative && !interpretationKeys.has(metric.key)) {
       issues.push({ path: 'report.interpretations', message: `报告缺少 metric 解释：${metric.key}`, severity: 'error' })
     }
   })
@@ -574,7 +582,7 @@ export const runnerSituationDefinition = (definition: SituationDefinitionV1) => 
       prompt: channel.prompt,
       ...(channel.responseType === 'SINGLE_CHOICE'
         ? { options: channel.options.map(({ optionKey, label }) => ({ optionKey, label })) }
-        : { range: channel.range }),
+        : channel.responseType === 'CONTINUOUS' ? { range: channel.range } : { maxLength: channel.maxLength }),
     })),
   })),
 })
