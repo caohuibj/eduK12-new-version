@@ -6,7 +6,6 @@ CI validates committed aggregates and fixtures without requiring private inputs.
 """
 import argparse,bisect,csv,hashlib,json,math,statistics
 from pathlib import Path
-import openpyxl
 FAMILIES={
  'academic_self_concept':('concept',4,3,5,[2,3]),
  'domain_fixed_mindset':('minddom',3,2,6,[2,3]),
@@ -40,7 +39,13 @@ def alpha(matrix):
  k=len(matrix[0]);total=statistics.variance([sum(r) for r in matrix])
  return k/(k-1)*(1-sum(statistics.variance(c) for c in zip(*matrix))/total) if total else None
 
+def select_observation(candidates, minimum):
+ # Attribute both numerator and denominator to the selected valid wave's stage.
+ # If every wave is incomplete, attribute the missing observation to the latest stage.
+ return next((candidate for candidate in candidates if sum(v is not None for v in candidate[1]) >= minimum), candidates[0] if candidates else None)
+
 def main():
+ import openpyxl
  parser=argparse.ArgumentParser();parser.add_argument('--source-dir',type=Path,required=True);parser.add_argument('--output',type=Path,default=Path('src/modules/scale/instruments/learning-motivation-wave1-data.json'));args=parser.parse_args()
  source=args.source_dir;data=list(csv.DictReader((source/'Final_edition.csv').open(encoding='utf-8-sig')))
  workbook=openpyxl.load_workbook(source/'Canonical_Data_Package_FINAL_SYNCED.xlsx',read_only=True,data_only=True);sheet=iter(workbook['Item_Map'].values);header=next(sheet);itemmap={d['final_variable']:d for r in sheet if (d:=dict(zip(header,r))).get('final_variable')}
@@ -71,19 +76,19 @@ def main():
        try:v=float(person[col]);vals.append(v if v.is_integer() and 1<=v<=maximum else None)
        except ValueError:vals.append(None)
       if any(v is not None for v in vals):candidates.append((stage,vals))
-     if candidates:eligible[candidates[0][0]]+=1
-     for stage,vals in candidates:
+     selected=select_observation(candidates,minvalid)
+     if selected:
+      stage,vals=selected;eligible[stage]+=1
       observed=[v for v in vals if v is not None]
       if len(observed)>=minvalid:
        pooled[stage].append(statistics.mean(observed))
        if len(observed)==len(vals):complete[stage].append(observed)
-       break
     for stage,values in pooled.items():
      values.sort();n=len(values)
      if n<100:raise ValueError(f'{family}/{subject}/{stage} below N gate')
      mean=statistics.mean(values);sd=statistics.stdev(values);skew=statistics.mean([(x-mean)**3 for x in values])/(sd**3) if sd else 0
      table=[{'score':v,'percentile':100*(bisect.bisect_left(values,v)+bisect.bisect_right(values,v))/(2*n)} for v in sorted(set(values))]
-     output['references'][f'{family}/{subject}/{score}/{stage}']={'N':n,'mean':mean,'sd':sd,'median':statistics.median(values),'alphaCompleteCase':alpha(complete[stage]),'alphaN':len(complete[stage]),'bands':bands(values,maximum),'percentileTable':table,'columns':mappings,'minimumValidItems':minvalid,'calibration':{'method':'Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20','missingness':max(0,1-n/max(n,eligible[stage])),'floor':values.count(1)/n,'ceiling':values.count(maximum)/n,'skew':skew,'subgroupReview':'Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap.'}}
+     output['references'][f'{family}/{subject}/{score}/{stage}']={'N':n,'eligibleN':eligible[stage],'mean':mean,'sd':sd,'median':statistics.median(values),'alphaCompleteCase':alpha(complete[stage]),'alphaN':len(complete[stage]),'bands':bands(values,maximum),'percentileTable':table,'columns':mappings,'minimumValidItems':minvalid,'calibration':{'method':'Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20','missingness':1-n/eligible[stage],'floor':values.count(1)/n,'ceiling':values.count(maximum)/n,'skew':skew,'subgroupReview':'Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap.'}}
  def stable(value):
   if isinstance(value,float):return round(value,8)
   if isinstance(value,list):return [stable(v) for v in value]

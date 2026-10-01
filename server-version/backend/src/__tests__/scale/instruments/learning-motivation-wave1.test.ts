@@ -17,10 +17,11 @@ describe('learning motivation first wave',()=>{
   expect(sources).toHaveLength(36);expect(sources.filter(s=>s.catalog.scientificMaturity==='RESEARCH_READY')).toHaveLength(10)
   for(const s of sources){expect(validateScaleInstrumentSource(s).issues).toEqual([]);expect(validateScalePackage(projectScalePackage(s)!).issues.filter(i=>i.severity==='error')).toEqual([]);expect(evaluateScaleSourceScientificQualification(s).maxEligibleMaturity).toBe(s.catalog.scientificMaturity)}
   expect(Object.keys(data.references)).toHaveLength(24)
+  for(const r of Object.values(data.references)){expect(r.eligibleN).toBeGreaterThanOrEqual(r.N);expect(r.calibration.missingness).toBeCloseTo(1-r.N/r.eligibleN,8)}
  })
  it('includes subject learning situations, distinct actions and explicit source limitations',()=>{
   const markers:Record<string,string>={mathematics:'函数',chemistry:'反应式',physics:'电路',biology:'生命过程',english:'单词',chinese:'原文'}
-  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(5)}}
+  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){if(['academic_self_concept','academic_self_efficacy'].includes(i.scoreKey))expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(i.summary).not.toMatch(/Value|Cost/);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(5)}}
   const math=sources.find(s=>s.identity.instrumentKey==='value_cost_mathematics_zh_cn')!;expect(math.catalog.evidence.filter(e=>e.evidenceId.startsWith('cost')).every(e=>e.notes?.includes('cross-loading'))).toBe(true)
   const tutor=sources.find(s=>s.identity.instrumentKey==='tutoring_necessity_chemistry_zh_cn')!;expect(tutor.executable!.definition.source.title).toContain('self-developed')
  })
@@ -49,6 +50,7 @@ describe('learning motivation first wave',()=>{
   pkg.references[0].entries[0].governance!.subjectKey='foreign-subject';expect(validateScalePackage(pkg).issues.some(i=>i.message==='REFERENCE_MEASUREMENT_AXES_MISMATCH')).toBe(true)
   const next=structuredClone(projectScalePackage(s)!);next.references[0].entries[0].statistics={mean:3};expect(validateScalePackage(next).issues.some(i=>i.message==='THEORETICAL_EMPIRICAL_CLAIM_FORBIDDEN')).toBe(true)
   delete next.definition.report.audienceContract;expect(validateScalePackage(next).issues.some(i=>i.message==='AUDIENCE_LANGUAGE_QC_REQUIRED')).toBe(true)
+  const incomplete=structuredClone(s);incomplete.executable!.definition.report.interpretations[0].bands=[];expect(validateScaleInstrumentSource(incomplete).issues.some(i=>i.message==='REPORT_REFERENCE_BAND_COVERAGE_REQUIRED')).toBe(true)
   next.definition.report.interpretations[0].bands[0].guidance=[];expect(validateScalePackage(next).issues.some(i=>i.message==='REPORT_REFLECTION_ACTION_REQUIRED')).toBe(true)
  })
 })

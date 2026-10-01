@@ -92,6 +92,7 @@
   "references": {
     "academic_self_concept/chemistry/academic_self_concept/junior_secondary": {
       "N": 736,
+      "eligibleN": 737,
       "mean": 2.79211957,
       "sd": 1.04847538,
       "median": 2.75,
@@ -238,6 +239,7 @@
     },
     "academic_self_concept/chemistry/academic_self_concept/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 1.93696581,
       "sd": 0.96184205,
       "median": 1.75,
@@ -353,7 +355,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.33618234,
         "ceiling": 0.01709402,
         "skew": 0.98129937,
@@ -362,6 +364,7 @@
     },
     "academic_self_concept/mathematics/academic_self_concept/junior_secondary": {
       "N": 735,
+      "eligibleN": 735,
       "mean": 3.01088435,
       "sd": 1.10588155,
       "median": 3.0,
@@ -491,7 +494,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.06938776,
         "ceiling": 0.07619048,
         "skew": -0.02172264,
@@ -500,6 +503,7 @@
     },
     "academic_self_concept/mathematics/academic_self_concept/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 2.44551282,
       "sd": 1.05592775,
       "median": 2.25,
@@ -629,7 +633,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.15242165,
         "ceiling": 0.04558405,
         "skew": 0.54600065,
@@ -638,6 +642,7 @@
     },
     "domain_fixed_mindset/chemistry/domain_fixed_mindset/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 2.63478064,
       "sd": 1.16037421,
       "median": 2.66666667,
@@ -773,7 +778,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.1275441,
         "ceiling": 0.01763908,
         "skew": 0.60718363,
@@ -782,6 +787,7 @@
     },
     "domain_fixed_mindset/chemistry/domain_fixed_mindset/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 2.68091168,
       "sd": 1.24472053,
       "median": 2.66666667,
@@ -905,7 +911,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.18660969,
         "ceiling": 0.02421652,
         "skew": 0.48261549,
@@ -914,6 +920,7 @@
     },
     "domain_fixed_mindset/mathematics/domain_fixed_mindset/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 2.86341022,
       "sd": 1.36185802,
       "median": 2.66666667,
@@ -1041,7 +1048,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.15061058,
         "ceiling": 0.05427408,
         "skew": 0.55438304,
@@ -1050,6 +1057,7 @@
     },
     "domain_fixed_mindset/mathematics/domain_fixed_mindset/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 3.0954416,
       "sd": 1.34901905,
       "median": 3.0,
@@ -1173,7 +1181,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.12678063,
         "ceiling": 0.05270655,
         "skew": 0.23300453,
@@ -1182,6 +1190,7 @@
     },
     "value_cost/chemistry/value/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 4.75056536,
       "sd": 1.07603172,
       "median": 5.0,
@@ -1321,7 +1330,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.01492537,
         "ceiling": 0.21573948,
         "skew": -1.05974222,
@@ -1330,6 +1339,7 @@
     },
     "value_cost/chemistry/value/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 3.58404558,
       "sd": 1.49192744,
       "median": 3.66666667,
@@ -1453,7 +1463,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.13960114,
         "ceiling": 0.08974359,
         "skew": -0.28901259,
@@ -1462,6 +1472,7 @@
     },
     "value_cost/chemistry/cost/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 2.68294889,
       "sd": 1.07709614,
       "median": 2.5,
@@ -1627,7 +1638,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.07734057,
         "ceiling": 0.01221167,
         "skew": 0.67465523,
@@ -1636,6 +1647,7 @@
     },
     "value_cost/chemistry/cost/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 3.18910256,
       "sd": 1.24228526,
       "median": 3.25,
@@ -1781,7 +1793,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.10826211,
         "ceiling": 0.02421652,
         "skew": -0.07346253,
@@ -1790,6 +1802,7 @@
     },
     "value_cost/mathematics/value/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 5.05495251,
       "sd": 1.07055732,
       "median": 5.0,
@@ -1907,7 +1920,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.01356852,
         "ceiling": 0.385346,
         "skew": -1.37007999,
@@ -1916,6 +1929,7 @@
     },
     "value_cost/mathematics/value/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 4.71320038,
       "sd": 1.25281861,
       "median": 5.0,
@@ -2032,7 +2046,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.02564103,
         "ceiling": 0.3005698,
         "skew": -0.95563556,
@@ -2041,6 +2055,7 @@
     },
     "value_cost/mathematics/cost/junior_secondary": {
       "N": 737,
+      "eligibleN": 737,
       "mean": 2.81772953,
       "sd": 1.12319602,
       "median": 2.75,
@@ -2206,7 +2221,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.07734057,
         "ceiling": 0.02035278,
         "skew": 0.5520689,
@@ -2215,6 +2230,7 @@
     },
     "value_cost/mathematics/cost/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 3.67094017,
       "sd": 1.18605315,
       "median": 3.75,
@@ -2360,7 +2376,7 @@
       "minimumValidItems": 3,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.02849003,
         "ceiling": 0.05698006,
         "skew": -0.01468945,
@@ -2369,6 +2385,7 @@
     },
     "tutoring_necessity/chemistry/tutoring_necessity/junior_secondary": {
       "N": 736,
+      "eligibleN": 737,
       "mean": 3.55638587,
       "sd": 1.23474454,
       "median": 3.66666667,
@@ -2509,6 +2526,7 @@
     },
     "tutoring_necessity/chemistry/tutoring_necessity/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 2.78822412,
       "sd": 1.24789529,
       "median": 3.0,
@@ -2632,7 +2650,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.1994302,
         "ceiling": 0.00712251,
         "skew": 0.0406601,
@@ -2641,6 +2659,7 @@
     },
     "tutoring_necessity/mathematics/tutoring_necessity/junior_secondary": {
       "N": 736,
+      "eligibleN": 737,
       "mean": 3.61594203,
       "sd": 1.30018061,
       "median": 3.66666667,
@@ -2781,6 +2800,7 @@
     },
     "tutoring_necessity/mathematics/tutoring_necessity/upper_secondary": {
       "N": 702,
+      "eligibleN": 702,
       "mean": 3.40598291,
       "sd": 1.30714012,
       "median": 3.66666667,
@@ -2904,7 +2924,7 @@
       "minimumValidItems": 2,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.08547009,
         "ceiling": 0.04558405,
         "skew": -0.14023725,
@@ -2913,6 +2933,7 @@
     },
     "academic_self_efficacy/chemistry/academic_self_efficacy/junior_secondary": {
       "N": 480,
+      "eligibleN": 480,
       "mean": 3.4590625,
       "sd": 0.95361424,
       "median": 3.4,
@@ -3057,7 +3078,7 @@
       "minimumValidItems": 4,
       "calibration": {
         "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
-        "missingness": 0,
+        "missingness": 0.0,
         "floor": 0.02083333,
         "ceiling": 0.09583333,
         "skew": -0.25798292,
@@ -3066,6 +3087,7 @@
     },
     "academic_self_efficacy/chemistry/academic_self_efficacy/upper_secondary": {
       "N": 571,
+      "eligibleN": 572,
       "mean": 3.09220665,
       "sd": 1.03709938,
       "median": 3.0,
@@ -3223,6 +3245,7 @@
     },
     "teacher_subject_liking/chemistry/teacher_subject_liking/junior_secondary": {
       "N": 366,
+      "eligibleN": 468,
       "mean": 4.62386157,
       "sd": 1.38011145,
       "median": 5.0,
@@ -3343,6 +3366,7 @@
     },
     "teacher_subject_liking/chemistry/teacher_subject_liking/upper_secondary": {
       "N": 560,
+      "eligibleN": 561,
       "mean": 4.71696429,
       "sd": 1.09873344,
       "median": 5.0,
