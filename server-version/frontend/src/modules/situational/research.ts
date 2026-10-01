@@ -1,5 +1,5 @@
 import type { SituationalAttemptResponse, SituationalDraftAnswer, SituationalRunnerBranchSceneNode } from './types'
-import { finalDraftStore } from '../../services/persistence/finalDraftStore'
+import { finalDraftStore, type FinalDraftTrial } from '../../services/persistence/finalDraftStore'
 
 export interface SituationalResearchEvent {
   type: 'NODE_EXPOSED' | 'RESPONSE_FIRST_COMMITTED' | 'RESPONSE_CHANGED' | 'PROBE_EXPOSED' | 'STAGE_CONFIRMED' | 'NODE_CONFIRMED' | 'RESPONSE_INVALIDATED'
@@ -30,8 +30,28 @@ export async function appendResearchEvents(data: SituationalAttemptResponse, eve
   if (new TextEncoder().encode(JSON.stringify(researchCapture(data, [...events, ...additions]))).byteLength > 400 * 1024) throw new Error('本次研究记录已达到提交体积上限，请保存后联系研究负责人。')
   if (events.length + additions.length > RESEARCH_EVENT_LIMIT) throw new Error('本次研究交互记录已达到上限，请保存后联系研究负责人。')
   const draftKey = `situational:${data.attempt.id}`
-  for (let i = 0; i < additions.length; i++) await finalDraftStore.putTrial({ draftKey, trialIndex: events.length + i, payload: additions[i], createdAt: Date.now() })
+  // One immutable store write makes a logical operation atomic without changing the shared store.
+  await finalDraftStore.putTrial({ draftKey, trialIndex: events.length, payload: { journalVersion: 'situational-event-batch-v1', events: additions }, createdAt: Date.now() })
   return [...events, ...additions]
+}
+
+/** Accept old single-event rows and the atomic batches written by this runner. */
+export function researchEventsFromTrials(trials: FinalDraftTrial[]): SituationalResearchEvent[] {
+  return trials.flatMap(trial => {
+    const payload = trial.payload as { journalVersion?: string; events?: SituationalResearchEvent[] }
+    return payload.journalVersion === 'situational-event-batch-v1' && Array.isArray(payload.events)
+      ? payload.events : [trial.payload as SituationalResearchEvent]
+  })
+}
+
+/** A failed presentation write must not leave the following response without exposure evidence. */
+export function missingResearchExposureEvents(data: SituationalAttemptResponse, node: SituationalRunnerBranchSceneNode, historyIdentity: string, events: SituationalResearchEvent[]): SituationalResearchEvent[] {
+  const additions: SituationalResearchEvent[] = []
+  const relativeTimeMs = eventTime(data, events)
+  if (!events.some(e => e.type === 'NODE_EXPOSED' && e.nodeKey === node.nodeKey && e.historyIdentity === historyIdentity)) additions.push({ type: 'NODE_EXPOSED', nodeKey: node.nodeKey, historyIdentity, relativeTimeMs })
+  const stage = currentResponseStage(node, historyIdentity, events)
+  if (stage && stage.kind !== 'CHOICE' && !events.some(e => e.type === 'PROBE_EXPOSED' && e.nodeKey === node.nodeKey && e.historyIdentity === historyIdentity && e.stageKey === stage.stageKey)) additions.push({ type: 'PROBE_EXPOSED', nodeKey: node.nodeKey, stageKey: stage.stageKey, historyIdentity, relativeTimeMs })
+  return additions
 }
 
 export function currentResponseStage(node: SituationalRunnerBranchSceneNode | null, historyIdentity: string, events: SituationalResearchEvent[]) {
@@ -45,11 +65,20 @@ export function restoreResearchAnswers(data: SituationalAttemptResponse, stored:
   const answers: Record<string, SituationalDraftAnswer> = {}
   for (const event of events) {
     const node: SituationalRunnerBranchSceneNode | undefined = data.instrument.definition.flow.nodes.find((n): n is SituationalRunnerBranchSceneNode => n.nodeType === 'SCENE' && n.nodeKey === event.nodeKey)
-    if (node?.nodeType !== 'SCENE' || !event.channelKey) continue
+    if (node?.nodeType !== 'SCENE') continue
+    if (event.type === 'STAGE_CONFIRMED') {
+      for (const key of node.responseStages?.find(s => s.stageKey === event.stageKey)?.channelKeys ?? []) {
+        const pair = `${node.sceneKey}:${key}`
+        if (answers[pair]?.historyIdentity === event.historyIdentity) answers[pair] = { ...answers[pair]!, stageConfirmed: true }
+      }
+    }
+    if (!event.channelKey) continue
     const pair = `${node.sceneKey}:${event.channelKey}`
     if (event.type === 'RESPONSE_INVALIDATED') delete answers[pair]
     if ((event.type === 'RESPONSE_FIRST_COMMITTED' || event.type === 'RESPONSE_CHANGED') && event.responseValue !== undefined) answers[pair] = {
-      ...stored[pair], responseValue: event.responseValue, historyIdentity: event.historyIdentity, responseRevision: event.responseRevision,
+      // Cache timing belongs only to the same committed revision, never to an older answer.
+      ...(stored[pair]?.responseValue === event.responseValue && stored[pair]?.historyIdentity === event.historyIdentity && stored[pair]?.responseRevision === event.responseRevision ? stored[pair] : {}),
+      responseValue: event.responseValue, historyIdentity: event.historyIdentity, responseRevision: event.responseRevision,
     }
   }
   return answers

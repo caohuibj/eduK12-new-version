@@ -1,5 +1,5 @@
 import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
-import { appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
+import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -16,6 +16,7 @@ import {
   ensureSituationalDraft,
   firstMissingSceneIndex,
   pruneSituationalDraftResponses,
+  pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
   sceneIsComplete,
@@ -177,7 +178,7 @@ const SituationalRunner: React.FC = () => {
         }
         const meta = await ensureSituationalDraft(next.attempt)
         const storedResponses = await readSituationalDraft(next.attempt)
-        const restoredEvents = researchEnabled(next) ? (await finalDraftStore.listTrials(situationalDraftKey(next.attempt.id))).map(t => t.payload as SituationalResearchEvent) : []
+        const restoredEvents = researchEnabled(next) ? researchEventsFromTrials(await finalDraftStore.listTrials(situationalDraftKey(next.attempt.id))) : []
         const restoredResponses = restoreResearchAnswers(next, storedResponses, restoredEvents)
         researchEventsRef.current = restoredEvents
         setResearchEvents(restoredEvents)
@@ -280,10 +281,11 @@ const SituationalRunner: React.FC = () => {
   const mediaBusy = visualBusy || videoBusy
 
   useEffect(() => {
-    if (!data || !currentScene || !currentFlowNode || !researchEnabled(data) || mediaBusy || submissionLocked) return
+    if (!data || !currentScene || !currentFlowNode || !researchEnabled(data) || mediaBusy || submissionLocked || submittingRef.current) return
     const operation = saveQueueRef.current.catch(() => undefined).then(async () => {
       const events = researchEventsRef.current
-      const historyIdentity = situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[currentScene.sceneKey] ?? '[]'
+      const historyIdentity = situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[currentScene.sceneKey]
+      if (!historyIdentity) return // A queued presentation can become unreachable after an upstream edit.
       const additions: SituationalResearchEvent[] = []
       const exposure = `${currentFlowNode.nodeKey}:${historyIdentity}`
       if (lastExposureRef.current !== exposure) additions.push({ type: 'NODE_EXPOSED', nodeKey: currentFlowNode.nodeKey, historyIdentity, relativeTimeMs: eventTime(data, events) })
@@ -379,14 +381,19 @@ const SituationalRunner: React.FC = () => {
         setContinuousInputs(current => { const updated = { ...current }; invalidated.staleKeys.forEach(k => delete updated[k]); return updated })
         if (researchEnabled(currentData) && node?.nodeType === 'SCENE') {
           const time = eventTime(currentData, researchEventsRef.current)
-          const additions: SituationalResearchEvent[] = invalidated.staleKeys.flatMap(staleKey => {
+          const additions: SituationalResearchEvent[] = [...missingResearchExposureEvents(currentData, node, historyIdentity, researchEventsRef.current), ...invalidated.staleKeys.flatMap(staleKey => {
             const old = previous[staleKey], staleScene = staleKey.slice(0, staleKey.indexOf(':'))
             const staleNode = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === staleScene) : undefined
             return old && staleNode ? [{ type: 'RESPONSE_INVALIDATED' as const, nodeKey: staleNode.nodeKey, channelKey: staleKey.slice(staleKey.indexOf(':') + 1), historyIdentity: old.historyIdentity ?? '[]', relativeTimeMs: time }] : []
-          })
+          })]
           additions.push({ type: previous[key] ? 'RESPONSE_CHANGED' : 'RESPONSE_FIRST_COMMITTED', nodeKey: node.nodeKey, channelKey: channel.channelKey, responseValue, responseRevision: answer.responseRevision, historyIdentity, relativeTimeMs: time, ...(stage ? { stageKey: stage.stageKey } : {}) })
           const events = await appendResearchEvents(currentData, researchEventsRef.current, additions)
           researchEventsRef.current = events; setResearchEvents(events)
+          // The durable journal is authoritative even if the answer-cache write below fails.
+          responsesRef.current = invalidated.responses
+          setResponses(invalidated.responses)
+          const nextScenes = reachableSituationalScenes(definition, invalidated.responses)
+          setCurrentIndex(index => Math.min(index, Math.max(0, nextScenes.length - 1)))
         }
         await finalDraftStore.putAnswer({
           draftKey: situationalDraftKey(currentData.attempt.id),
@@ -432,16 +439,16 @@ const SituationalRunner: React.FC = () => {
     if (responseStage.channelKeys.some(key => currentScene.channels.find(c => c.channelKey === key)?.required !== false && !responsesRef.current[responseKey(currentScene.sceneKey, key)])) { setNotice('请完成当前阶段的必答问题。'); return }
     setSaving(true)
     const operation = saveQueueRef.current.catch(() => undefined).then(async () => {
-      const additions: SituationalResearchEvent[] = [{ type: 'STAGE_CONFIRMED', nodeKey: currentFlowNode.nodeKey, stageKey: responseStage.stageKey, historyIdentity: currentHistory, relativeTimeMs: eventTime(data, researchEventsRef.current) }]
+      const additions: SituationalResearchEvent[] = [...missingResearchExposureEvents(data, currentFlowNode, currentHistory, researchEventsRef.current), { type: 'STAGE_CONFIRMED', nodeKey: currentFlowNode.nodeKey, stageKey: responseStage.stageKey, historyIdentity: currentHistory, relativeTimeMs: eventTime(data, researchEventsRef.current) }]
       if (currentFlowNode.responseStages?.[currentFlowNode.responseStages.length - 1]?.stageKey === responseStage.stageKey) additions.push({ type: 'NODE_CONFIRMED', nodeKey: currentFlowNode.nodeKey, historyIdentity: currentHistory, relativeTimeMs: eventTime(data, researchEventsRef.current) })
       const updated = await appendResearchEvents(data, researchEventsRef.current, additions)
-      const next = { ...responsesRef.current }
-      for (const channelKey of responseStage.channelKeys) {
-        const key = responseKey(currentScene.sceneKey, channelKey)
-        if (next[key]) { next[key] = { ...next[key], stageConfirmed: true }; await finalDraftStore.putAnswer({ draftKey: situationalDraftKey(data.attempt.id), itemKey: key, value: next[key], updatedAt: Date.now() }) }
-      }
+      const next = pruneUnreachableSituationalResponses(data.instrument.definition, restoreResearchAnswers(data, responsesRef.current, updated)).responses
       researchEventsRef.current = updated; setResearchEvents(updated)
       responsesRef.current = next; setResponses(next); setNotice(null)
+      for (const channelKey of responseStage.channelKeys) {
+        const key = responseKey(currentScene.sceneKey, channelKey)
+        if (next[key]) { await finalDraftStore.putAnswer({ draftKey: situationalDraftKey(data.attempt.id), itemKey: key, value: next[key], updatedAt: Date.now() }) }
+      }
     })
     saveQueueRef.current = operation.catch(reason => setNotice(situationalErrorMessage(reason))).finally(() => setSaving(false))
     await saveQueueRef.current
@@ -482,6 +489,8 @@ const SituationalRunner: React.FC = () => {
     setNotice(null)
     const draftKey = situationalDraftKey(data.attempt.id)
     try {
+      // Include presentation writes already queued before sealing the immutable FINAL.
+      await saveQueueRef.current
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const sealedResponses: Record<string, SituationalDraftAnswer> = {}
         snapshot.answers.forEach((answer) => {
@@ -497,7 +506,13 @@ const SituationalRunner: React.FC = () => {
             ...(typeof value.stageConfirmed === 'boolean' ? { stageConfirmed: value.stageConfirmed } : {}),
           }
         })
-        if (!situationalReadyToSubmit(data.instrument.definition, sealedResponses)) {
+        const events = researchEnabled(data) ? researchEventsFromTrials(snapshot.trials) : []
+        const finalResponses = pruneUnreachableSituationalResponses(data.instrument.definition, restoreResearchAnswers(data, sealedResponses, events)).responses
+        if (data.instrument.definition.schemaVersion === 2) {
+          const histories = situationalHistoryIdentities(data.instrument.definition, finalResponses)
+          for (const node of data.instrument.definition.flow.nodes) if (node.nodeType === 'SCENE' && histories[node.sceneKey] && currentResponseStage(node, histories[node.sceneKey]!, events)) throw new Error('本地阶段确认记录尚未完成，请返回并确认作答。')
+        }
+        if (!situationalReadyToSubmit(data.instrument.definition, finalResponses)) {
           throw new Error('本地持久化的情境作答尚未达到可提交终点，请确认最后一次作答已经保存')
         }
         return {
@@ -507,8 +522,8 @@ const SituationalRunner: React.FC = () => {
           instrumentVersion: data.attempt.instrumentVersion,
           compiledRuntimeHash: data.attempt.compiledRuntimeHash,
           scoringVersion: data.attempt.scoringVersion,
-          ...(researchEnabled(data) ? { researchCapture: researchCapture(data, snapshot.trials.map(t => t.payload as SituationalResearchEvent)) } : {}),
-          responses: situationalResponsesFromDraft(data.instrument.definition, sealedResponses),
+          ...(researchEnabled(data) ? { researchCapture: researchCapture(data, events) } : {}),
+          responses: situationalResponsesFromDraft(data.instrument.definition, finalResponses),
         }
       })
       if (!sealed) throw new Error('本地作答草稿不存在，请返回后重新进入测评。')
