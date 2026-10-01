@@ -158,3 +158,26 @@ it('classifies governance-only changes without granting them executable-content 
   expect(classifySituationalChange(root + 'instrument.json')).toBe('EXECUTABLE_CONTENT')
   expect(classifySituationalChange(root + 'test.ts')).toBe('SHARED_CORE')
 })
+
+
+it('binds metric/model provenance and never expands whole-instrument eligibility from one metric', () => {
+  const s = withEvidence(), pkg = projectSituationPackage(s)
+  const metricKeys = pkg.definition.scoring.publishedMetrics.map(m => m.key)
+  for (const evidence of s.scientific.evidence) evidence.modelEvidence = { metricKeys, modelKey: 'PROVISIONAL_SCALAR', modelVersion: '1', artifactHash: 'a'.repeat(64), kind: 'HOLDOUT' }
+  const q = evaluateScopedSituationalQualification(pkg, s.scientific)
+  expect(q.applicableEvidenceIds).toHaveLength(4)
+  expect(q.declaredMaturity).toBe('PILOT')
+  const digest = scientificEvidenceDigest(s.scientific)
+  s.scientific.evidence[0]!.modelEvidence!.artifactHash = 'b'.repeat(64)
+  expect(scientificEvidenceDigest(s.scientific)).not.toBe(digest)
+  for (const evidence of s.scientific.evidence) evidence.modelEvidence!.metricKeys = metricKeys.slice(0, 1)
+  if (metricKeys.length > 1) {
+    const scoped = evaluateScopedSituationalQualification(pkg, s.scientific)
+    expect(scoped.applicableEvidenceIds).toEqual([])
+    expect(scoped.metricEvidenceIds[metricKeys[0]!]).toHaveLength(4)
+  }
+  for (const evidence of s.scientific.evidence) evidence.modelEvidence!.modelVersion = 'wrong'
+  expect(evaluateScopedSituationalQualification(pkg, s.scientific).applicableEvidenceIds).toEqual([])
+  for (const evidence of s.scientific.evidence) { evidence.modelEvidence!.modelVersion = '1'; evidence.modelEvidence!.parameterSetHash = 'c'.repeat(64) }
+  expect(evaluateScopedSituationalQualification(pkg, s.scientific).applicableEvidenceIds).toEqual([])
+})
