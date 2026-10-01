@@ -6,7 +6,7 @@ Development branch: `feat/situational-standardized-vnext`. Isolated worktree `/U
 
 ## Baseline and integration dependencies
 
-Latest baseline contains #210 journey/delivery/disclosure, #211 inbox, #212 result authority, #213 anonymous study waves. New raw/trial RESEARCH permission remains deferred there. Do not restore an implicit admin/teacher access path. Reconcile incoming Scale/main work before opening the planned 2–3 PRs.
+Latest baseline contains #210 journey/delivery/disclosure, #211 inbox, #212 result authority, #213 anonymous study waves. New raw/trial RESEARCH permission remains deferred there. Do not restore an implicit admin/teacher access path. Reconcile incoming Scale/main work before opening one integration PR. The user explicitly requested one future PR during the local review; the earlier 2–3 PR split is superseded.
 
 Source review confirmed: V1/V2 scenes limited to three channels; channels bound one scoredConstruct; V2 frozen channel policy already separates requiredness and routing; DAG deterministic; FINAL writes one encrypted raw payload. Runner renders all channels together. Reachability-only pruning retained common-node responses after changing an upstream decision.
 
@@ -30,7 +30,7 @@ Optional `evidence` carries a semanticVersion, a closed observable coding vocabu
 
 ## Scoring models
 
-Legacy packages omit `scoring.model` and retain exact scalar output. Explicit `PROVISIONAL_SCALAR@1` and `EXPERT_KEY@1` run online. Expert contributions explicitly map scene × channel × option × metric; one response remains one raw observation even when several metrics use its evidence. Every supported option needs an explicit key; no hidden zero contribution.
+Legacy packages omit `scoring.model` and retain exact scalar output. Explicit `PROVISIONAL_SCALAR@1` and `EXPERT_KEY@1` run online. Expert contributions explicitly map scene × channel × option × metric; one response remains one raw observation even when several metrics use its evidence. Every SCORED channel must back at least one published expert metric, and every option of each backed channel needs an explicit key; no hidden zero contribution. Unscored expert probes require RAW_ONLY/DESCRIPTIVE policy. Non-scalar models require V2; V1 preserves legacy scalar semantics and cannot claim latent parameters or expert keys. Both scalar and expert mappings reject an explicit forbidden inference.
 
 Nominal uni/multidimensional, consensus and criterion model identifiers are contract-only. Unsupported model/version fails closed, never falls back to scalar; publication rejects unavailable scorers. Parameter sets carry id/version/hash, calibration artifact/hash/method/population/date, option × construct references and optional uncertainty artifact. Offline artifact loading/training and future statistical scorers remain future work.
 
@@ -46,7 +46,7 @@ Planned missingness only removes optional non-scored diagnostic channels. Timing
 
 Frozen stages partition channels exactly once: optional pre-probe stages, exactly one choice stage, post-probe stages. Runner displays current and already-confirmed stages, never future probe prompts. Confirmation locks the stage. Back navigation is view-only for confirmed stages; changing a core choice after probe disclosure requires a new attempt.
 
-Meaningful events are persisted in the existing local final draft journal. Interrupted local answer writes recover from journal. The sealed FINAL preserves events, assignment identity and answers; retries replay identical content. Existing unstaged packages retain editing behavior with downstream history invalidation.
+Meaningful events are persisted in the existing local final draft journal. Each logical interaction is one immutable event-batch write; old single-event journal rows remain readable. Interrupted local answer-cache writes recover values, revisions and stage confirmation from the journal. Cache timing is reused only for the exact same revision. Durable confirmations remain locked even when the cache write fails; FINAL waits for queued writes and reconstructs answers/stages from the sealed journal snapshot. The sealed FINAL preserves events, assignment identity and answers; retries replay identical content. Existing unstaged packages retain editing behavior with downstream history invalidation.
 
 ## Research events and history binding
 
@@ -56,7 +56,7 @@ History identity includes ordered ancestors and upstream response revisions. Sam
 
 ## Missingness / opportunities
 
-Structural not reached and planned not administered are derived server-side. Participant skipped is restricted to administered optional surfaces. Technical failure must be explicitly recorded; it cannot be inferred from absence. Invalidated old answers stay in historical event evidence and do not count as current observations. Unreached implementation opportunity never becomes zero score. Legacy first/exposure data is unavailable, not fabricated.
+Structural not reached and planned not administered are derived server-side. Participant skipped is restricted to administered optional surfaces. Technical failure must be explicitly recorded; it cannot be inferred from absence. Invalidated old answers stay in historical event evidence and do not count as current observations. Export distinguishes first-ever response from first response in the final measurement history. Historical-only evidence cannot mark the final history as answered; an eligible optional answer lost to an upstream change is INVALIDATED_BY_HISTORY_CHANGE unless the final history has an explicit omission/failure reason. Unreached implementation opportunity never becomes zero score. Legacy first/exposure data is unavailable, not fabricated.
 
 ## Research export
 
@@ -76,11 +76,18 @@ Old package schema/version/model omission preserves hashes and execution. Existi
 
 Future authors define mother scenes, graph, bounded bundles, safe prompt stages and response roles first; then independently code observable options/candidate hypotheses. Select an explicit provisional key only where justified. Declare randomization and missingness before data collection. Frozen versions require fresh release review on change. Empirical parameter sets require exact provenance and an implemented scorer before publication. Never duplicate an answer to simulate independent constructs or treat coverage as validity.
 
-## Planned integration / commits
+## Single-PR integration / commits
 
-1. Scientific contract, scoring and frozen assignment foundation: commits 1–6.
-2. Participant stages, capture and history invalidation: commits 7–10.
-3. Research export, governance, acceptance and runbook: commits 11–16. These are future review units; no PR is open.
+Target: one feature branch and one PR to main after preceding main work merges. Keep semantic commits for review; do not create stacked PRs or rewrite the already-published commits during this local review.
+
+Read the single PR in this order:
+
+1. Scientific contract, scoring and frozen assignment foundation: initial commits 1–6.
+2. Participant stages, capture and history invalidation: initial commits 7–10.
+3. Research export, governance, acceptance and runbook: initial commits 11–16.
+4. Local review corrections and regression evidence follow these commits.
+
+These are sections inside one PR, not separate delivery branches. Frozen assignment, stage capture, server validation and runner disclosure must be reviewed together: enabling one side without the other can produce an unusable response surface or a rejected FINAL. The entire scope remains one Situational upgrade; there are no new database migrations, no production content changes and no new shared runtime/FINAL contracts. Default-denied research export is part of the same bounded feature, not a permission rollout.
 
 No PR created. CI not requested or triggered. Implementation acceptance head: `28105bba71f57f1ed85e82bee6b2e342fe552b63` (the documentation-only tip follows it). Rechecked remote main before publishing the isolated branch: still `f70078adcd7c1220f205559e34cd3d719b3b6ce4`. No incoming main changes were integrated. Re-fetch main and compare permissions/frozen runtime dependencies after preceding main work merges; integrate without rewriting prior shared runtime changes.
 
@@ -107,6 +114,32 @@ These are local acceptance checks, not a claim that CI or a production release g
 
 Required later: full current-head CI after integration, production resource envelope measurement, real screen-reader acceptance, calibrated statistical scorers and research permission for embedded/public attempts. No common norms, content maturity promotion or batch teacher content production. Framework success alone is not approval to publish Research Ready/Research Grade content.
 
+
+## Local review and corrections (2026-10-01, no push)
+
+Review baseline: published feature head `d76e5e70f55a9ec88c0c787a677564ccf6624e11`; compare against main baseline `f70078adcd7c1220f205559e34cd3d719b3b6ce4`. Review corrections stay local; no PR creation, branch push, workflow dispatch, real participant export or production grant configuration.
+
+| Finding | Reproduction and correction |
+| --- | --- |
+| P1: partial journal operations and answer-cache failures can corrupt revision/stage/FINAL consistency | Sequential event writes can leave half an invalidation or confirmation; after a durable journal commit, cache failure leaves in-memory revisions behind or a confirmed stage editable. Resume displays recovered answers but the old seal uses cache rows only. Four injected-failure regressions reproduced these paths. Logical operations now use one immutable local batch, UI follows durable evidence, and sealing replays the journal. Shared finalDraftStore is unchanged. |
+| P2: expert/scalar publication contract gaps | A V1 expert model bypasses V2 checks; an expert SCORED probe without a key is silently excluded; scalar scoring can contradict an option's explicit FORBIDDEN_INFERENCE. Three synthetic definition regressions reproduced the gaps. Non-scalar V1 models fail validation, every expert SCORED channel needs a published-metric key, and scalar forbidden-inference checks now apply. Production legacy definitions omit these fields and keep their hashes/outputs. |
+| P2: historical-only optional responses misclassified in export | A → common optional answer → B → common without re-answer reports RECORDED/PARTICIPANT_SKIPPED despite an invalidated history. The regression validates the complete synthetic journal before export. Export now derives first-response status from the final history and distinguishes history invalidation. Default denial, embedded denial, exact resource/hash/expiry and principal rechecks are retained. |
+
+Local correction commits (not pushed):
+
+- `b2bf5cf7` fix(situational): recover atomic research journals across cache failures
+- `fad37421` fix(situational): require complete and coherent scoring model evidence
+- `37ba439e` fix(situational): distinguish invalidated histories in research exports
+
+Review validation:
+
+- Backend: 24 files / 180 tests passed, including definition/model/capture/export/governance/legacy media and 10/30/60-scene performance checks. The 20 PostgreSQL opt-in tests in five files were skipped in this review run; earlier integration acceptance is recorded above and is not represented as a new database run.
+- Frontend: 13 files / 61 tests passed, including the full Situational module and shared finalDraftStore regression. Four new fault-injection tests cover revision recovery, confirmation locking, journal-only sealing and atomic multi-event operations.
+- Backend and frontend Node 24.21.0 type checks passed; diff whitespace check passed.
+- Real Chromium with real IndexedDB: injected answer-cache failure during choice and confirmation, stage-lock reload, deleted answer cache, and journal-derived FINAL passed. The actual browser-generated FINAL also passed the backend authoritative capture validator. This browser check used a synthetic local runner harness/API stub and did not claim a new PostgreSQL or authentication end-to-end run.
+- Temporary harness/evidence lives in ignored local directories and `/tmp/eduk12-situational-vnext-evidence`; no synthetic credentials, production grants or test-only browser routes are shipped.
+
+The local review found no additional unresolved blocker in the inspected change after these corrections. It does not replace integration conflict review, full current-main CI, PostgreSQL/browser release gates, production capacity checks or scientific approval. Before the one PR is opened, re-fetch main after the preceding work merges, reconcile permissions and frozen runtime interfaces, and rerun the full release checks on the integrated head.
 
 ## Semantic commit ledger
 
@@ -135,6 +168,6 @@ Required later: full current-head CI after integration, production resource enve
 - PostgreSQL suites accept `V32_3_INTEGRATION_DATABASE_URL` (and the new suite also `SITUATIONAL_VNEXT_INTEGRATION_DATABASE_URL`). Include `COGNITIVE_MODULE_ENABLED=true` for mixed Bundle regressions; use serial local workers on constrained hosts. Main anonymous suite uses `RELEASE_INTEGRATION_DATABASE_URL`.
 - Research export is `GET /api/situational/attempts/:attemptId/research-export`. `SITUATIONAL_RESEARCH_EXPORT_GRANTS` is empty by default. Grant schema has exact researcher user, attempt IDs, frozen definition hash, expiry, approval reference and fixed projection `PSEUDONYMOUS_RAW_V1`. Never install a production grant as part of this change. Review actual consent/resource authority before a later approved rollout; embedded/public resources remain denied.
 - Local artifacts are saved under ignored `server-version/tmp/situational-vnext-acceptance/` (allowlisted logs, synthetic screenshots and browser summaries; no keys/credentials). Synthetic infrastructure is stopped after acceptance.
-- After the preceding main development merges, fetch main, review conflicts in Situational snapshot/FINAL/routes, disclosure/journey/anonymous authority and shared report surfaces, then integrate the three units above. Run the repository's full current-head gate and browser/PostgreSQL suites before making any PR ready. This task creates no PR and dispatches no workflow.
+- After the preceding main development merges, fetch main, review conflicts in Situational snapshot/FINAL/routes, disclosure/journey/anonymous authority and shared report surfaces, then integrate the whole feature in one PR, using the sections above as the review order. Run the repository's full current-head gate and browser/PostgreSQL suites before making any PR ready. This task creates no PR and dispatches no workflow.
 
 Framework is ready for synthetic/pilot authoring against the contract after integration review. Batch formal teacher content production and Research Ready/Grade claims still require a separate content task, implemented calibrated scorer where needed, empirical artifacts and human scientific review. New statistical training, nominal/consensus/criterion computation, media consequence randomization and embedded research raw permissions are intentionally deferred.
