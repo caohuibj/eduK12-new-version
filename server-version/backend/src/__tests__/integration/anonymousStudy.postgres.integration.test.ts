@@ -8,6 +8,8 @@ import * as composite from '../../modules/composite/composite.service'
 import {ensureCompositeFormSections,submitCompositeFormSectionFinal} from '../../modules/composite/final-submit.service'
 import {hashRecoveryToken} from '../../services/anonymousAccess'
 import {publicAnonymousStudyRouter} from '../../modules/anonymous-study/routes'
+import {csrfProtection} from '../../middleware/csrf'
+import {publicAssessmentRateLimiters} from '../../middleware/publicAssessmentRateLimit'
 const suite=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')?describe:describe.skip
 suite('anonymous research identity and exact-wave PostgreSQL',()=>{
  let owner:string,other:string,cid:string,itemId:string
@@ -58,15 +60,21 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await study.closeStudy(owner,s.id)
   await expect(study.startStudyWave(s.id,w2.id,p2.credential)).rejects.toMatchObject({statusCode:403})
   expect(await study.recoverStudyWave(s.id,w1.id,p.credential)).toEqual({...a,state:'COMPLETED'})
-  const app=express();app.use(express.json());app.use('/api/public/anonymous-studies',publicAnonymousStudyRouter)
+  const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/public/anonymous-studies',...publicAssessmentRateLimiters,publicAnonymousStudyRouter)
   const server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve))
   const port=(server.address() as {port:number}).port,url=`http://127.0.0.1:${port}/api/public/anonymous-studies/${s.id}`
   try {
    expect((await fetch(url,{headers:{Cookie:`identity=${p.credential}`}})).status).toBe(404)
    const http=await fetch(url,{headers:{Authorization:`Bearer ${p.credential}`}})
    expect(http.status).toBe(200);expect(http.headers.get('cache-control')).toBe('no-store');expect(JSON.stringify(await http.json())).not.toContain(p.credential)
+   const ownHeaders={Authorization:`Bearer ${p.credential}`,'Content-Type':'application/json'}
+   const recovered=await fetch(`${url}/waves/${w1.id}/recover`,{method:'POST',headers:ownHeaders,body:'{}'})
+   expect(recovered.status).toBe(200);expect((await recovered.json()).data).toEqual({...a,state:'COMPLETED'})
+   const closed=await fetch(`${url}/waves/${w2.id}/start`,{method:'POST',headers:ownHeaders,body:'{}'})
+   expect(closed.status).toBe(403);expect((await closed.json()).message).toBe('本波次暂不接受新作答')
+   const revoked=await fetch(`${url}/revoke`,{method:'POST',headers:ownHeaders,body:'{}'})
+   expect(revoked.status).toBe(200);expect((await revoked.json()).data).toEqual({status:'REVOKED'})
   } finally {await new Promise<void>((resolve,reject)=>server.close(err=>err?reject(err):resolve()))}
-  await study.revokeStudyIdentity(s.id,p.credential)
   await expect(study.participantHome(s.id,p.credential)).rejects.toMatchObject({statusCode:404})
   await expect(study.recoverStudyWave(s.id,w1.id,p.credential)).rejects.toMatchObject({statusCode:404})
   await expect(composite.getAttemptState(a.attemptId,{recoveryTokenHash:hashRecoveryToken(a.recoveryToken)})).rejects.toMatchObject({statusCode:403})
