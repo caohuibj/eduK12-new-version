@@ -161,6 +161,7 @@ const main = async () => {
       instrumentVersion,
     },
     branching: {
+      instrumentTitle: SJT_BRANCHING_E2E_PACKAGE.definition.source.title,
       reportHeadline: SJT_BRANCHING_E2E_PACKAGE.definition.report.interpretations[0]?.headline,
       scenes: {
         entry: '第一轮：发现数据被误读，你会怎么做？',

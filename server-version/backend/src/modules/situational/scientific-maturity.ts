@@ -1,3 +1,4 @@
+import { canonicalHash } from '../assessment-runtime/canonical'
 import { legacySituationalScientificContext } from './onboarding/scientific-schema'
 import { situationalExecutionRef } from './onboarding/scientific-qualification'
 import { scientificEvidenceDigest } from './onboarding/scientific-governance'
@@ -20,6 +21,13 @@ export const resolveSituationalScientificMaturity = (
 
 export const resolveSituationalScientificContext = (pkg: import('./situation-package').SituationPackage) => {
   const declaration = getSituationalScientificDeclaration(pkg.key, pkg.instrumentVersion)
+  if (!declaration && !getSituationPackage(pkg.key,pkg.instrumentVersion) && pkg.definition.scoring.model?.modelKey==='AUTHOR_KEY_SUM') {
+    const executionRef=situationalExecutionRef(pkg)
+    // Administrative release does not qualify as scientific validation.
+    return {schemaVersion:1 as const,scientificMaturity:'PILOT' as const,governanceRevision:1,
+      scope:{language:'zh-CN',population:pkg.definition.respondentType==='teacher_self_report'?'教师试点参与者':'学生试点参与者',use:'低风险反思试点',claim:'作者暂定贡献和情境选择描述；未完成独立专家验证或实证校准'},
+      executionRef,evidenceDigest:canonicalHash({policy:'sjt-upload-pilot-v1',executionRef,source:pkg.definition.source,license:pkg.definition.license,limitations:pkg.definition.report.limitations})}
+  }
   if (!declaration) return undefined // explicit fixtures; historical legacy is never backfilled
   return {
     schemaVersion: 1 as const,

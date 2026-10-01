@@ -16,7 +16,7 @@ concurrency:
 jobs:
   runtime-recovery:
     if: github.event_name == 'workflow_dispatch' || (github.head_ref == 'fix/ops-supported-runtime-bounded-workers' && github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: [self-hosted, linux, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       NODE_ENV: test

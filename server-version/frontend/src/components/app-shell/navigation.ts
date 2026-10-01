@@ -24,6 +24,7 @@ const staff: NavigationItem[] = [
   { path: '/assignments', label: '作业管理', section: 'teaching' },
   { path: '/checkins', label: '打卡管理', section: 'teaching' },
   { path: '/teacher/classrooms', label: '课堂互动', section: 'teaching' },
+  { path: '/sjt-authoring', label: 'SJT 题包管理', section: 'assessment' },
   { path: '/scales', label: '心理量表', section: 'assessment' },
   { path: '/scale-library', label: '量表库', section: 'assessment' },
   { path: '/questionnaires', label: '聚合问卷', aliases: ['/questionnaire-products'], section: 'assessment' },
@@ -37,6 +38,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
   if (!role) return []
   const items = [...(role === 'STUDENT' ? student : role === 'PARENT' ? parent : staff)]
   if (cognitive && role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/cognitive' : '/cognitive-assignments', label: role === 'STUDENT' ? '认知测评' : '认知任务', section: 'assessment' })
+  if (role === 'TEACHER') items.push({ path: '/teacher/situational', label: '情境测评', section: 'assessment' })
   if (role === 'TEACHER') items.push({ path: '/relational/tasks', label: '关系测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'], section: 'assessment' })
   if (role === 'ADMIN') items.push(
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },

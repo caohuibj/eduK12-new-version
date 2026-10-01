@@ -1,3 +1,4 @@
+import { situationalBasePath } from '../paths'
 import React, { useEffect, useState } from 'react'
 import { Clock3, History, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -7,7 +8,7 @@ import type { SituationalInstrument } from '../types'
 import { situationalErrorMessage } from '../draft'
 
 const instrumentTitle = (instrument: SituationalInstrument): string => (
-  instrument.report.interpretations[0]?.headline
+  instrument.title || instrument.report.interpretations[0]?.headline
   || instrument.key.replace(/[-_]/g, ' ')
 )
 
@@ -39,7 +40,7 @@ const SituationalHome: React.FC = () => {
         title="情境化测评"
         description="通过文字情境记录具体任务中的反应选择。试点结果用于描述当前反应模式，不是诊断或常模比较。"
         actions={(
-          <Link to="/student/situational/history" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
+          <Link to={`${situationalBasePath()}/history`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
             <History className="h-4 w-4" aria-hidden="true" />
             测评历史
           </Link>
@@ -59,7 +60,7 @@ const SituationalHome: React.FC = () => {
           {instruments.map((instrument) => (
             <DiscoveryCard
               key={`${instrument.key}:${instrument.version}`}
-              to={`/student/situational/${encodeURIComponent(instrument.key)}`}
+              to={`${situationalBasePath()}/${encodeURIComponent(instrument.key)}`}
               title={instrumentTitle(instrument)}
               ariaLabel={`${instrumentTitle(instrument)}，开始或继续情境化测评`}
               eyebrow="Situational"
@@ -73,7 +74,7 @@ const SituationalHome: React.FC = () => {
               meta={(
                 <>
                   <span>版本 {instrument.version}</span>
-                  <span>{instrument.definition.scenes.length} 个情境</span>
+                  <span>{instrument.definition.schemaVersion === 2 ? new Set(instrument.definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [n.motherSceneKey] : [])).size : instrument.definition.scenes.length} 组情境</span>
                   <span className="inline-flex items-center gap-1.5"><Clock3 className="h-4 w-4" aria-hidden="true" />文字版</span>
                 </>
               )}

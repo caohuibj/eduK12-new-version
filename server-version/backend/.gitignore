@@ -1,1 +1,4 @@
 exports/
+
+# Local workbook renders and downloadable working copies
+outputs/

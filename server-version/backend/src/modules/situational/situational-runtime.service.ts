@@ -1,3 +1,5 @@
+import { availableSjtPackages } from './authoring/service'
+import { deriveSituationalAssignment, assignedSituationalRunnerDefinition } from './situation-assignment'
 import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -129,9 +131,15 @@ export type SituationalAttemptRuntime = {
  * state and scientific maturity are governance projections for the same exact
  * instrument identity; changing either does not alter the frozen runner/scorer.
  */
+const participantReport = (report: SituationPackage['definition']['report']) => {
+  const { narrative: _serverOnly, ...visible } = report
+  return visible
+}
+
 const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
   const governance = getSituationPackage(snapshot.instrumentKey, snapshot.instrumentVersion)
   return {
+    title: snapshot.definition.source.title,
     key: snapshot.instrumentKey,
     version: snapshot.instrumentVersion,
     definitionHash: snapshot.definitionHash,
@@ -142,7 +150,7 @@ const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
     releaseStatus: governance?.releaseStatus ?? 'RETIRED' as const,
     sampling: snapshot.runnerDefinition.sampling,
     definition: snapshot.runnerDefinition,
-    report: snapshot.definition.report,
+    report: participantReport(snapshot.definition.report),
     referencePolicy: snapshot.definition.referencePolicy,
     scienceMaturity: frozenSituationalScientificProjection(snapshot.scientificContext).scientificMaturity,
     scientificContext: frozenSituationalScientificProjection(snapshot.scientificContext),
@@ -311,17 +319,20 @@ export const situationalAttemptForResponse = (
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     },
-    instrument: instrumentResponse(snapshot),
-    ...(stored ? { result: stored.result, canonicalResult: stored.canonicalResult } : {}),
+    instrument: { ...instrumentResponse(snapshot),
+      ...(snapshot.definition.schemaVersion === 2 && (snapshot.definition.researchAssignment || snapshot.definition.flow.nodes.some(n => n.nodeType === 'SCENE' && n.responseStages)) ? {
+        assignment: deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash),
+        definition: assignedSituationalRunnerDefinition(snapshot.definition, deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)),
+      } : {}),
+    },
+    ...(stored ? { result: stored.result.model?.modelKey === 'AUTHOR_KEY_SUM' ? { ...stored.result, metrics: stored.result.metrics.map(({ contributions: _researchOnly, ...metric }) => metric) } : stored.result, canonicalResult: stored.canonicalResult } : {}),
     ...(options.replayed === undefined ? {} : { replayed: options.replayed }),
   }
 })
 
-const publishedPackage = (instrumentKey: string, instrumentVersion?: string): SituationPackage => {
+const publishedPackage = (instrumentKey: string, instrumentVersion?: string, available: SituationPackage[] = listSituationPackages()): SituationPackage => {
   const situationPackage = selectPublishedSituationPackage(
-    instrumentVersion
-      ? [getSituationPackage(instrumentKey, instrumentVersion)].filter((candidate): candidate is SituationPackage => candidate !== undefined)
-      : listSituationPackages(),
+    available,
     instrumentKey,
     instrumentVersion,
   )
@@ -335,7 +346,7 @@ const publishedPackage = (instrumentKey: string, instrumentVersion?: string): Si
   return situationPackage
 }
 
-export const listSituationalInstruments = () => listSituationPackages()
+export const listSituationalInstruments = (available: SituationPackage[] = listSituationPackages()) => available
   .filter((situationPackage) => situationPackage.releaseStatus === 'PUBLISHED')
   .map((situationPackage) => {
     const validation = validateSituationPackage(situationPackage)
@@ -348,6 +359,7 @@ export const listSituationalInstruments = () => listSituationPackages()
     })
     const runnerDefinition = runnerSituationRuntimeDefinition(situationPackage.definition)
     return {
+      title: situationPackage.definition.source.title,
       key: situationPackage.key,
       version: situationPackage.instrumentVersion,
       releaseStatus: situationPackage.releaseStatus,
@@ -357,9 +369,9 @@ export const listSituationalInstruments = () => listSituationPackages()
       scoringVersion: runtime.scorerVersion,
       sampling: runnerDefinition.sampling,
       definition: runnerDefinition,
-      report: situationPackage.definition.report,
+      report: participantReport(situationPackage.definition.report),
       referencePolicy: situationPackage.definition.referencePolicy,
-      scienceMaturity: resolveSituationalScientificMaturity(
+      scienceMaturity: resolveSituationalScientificContext(situationPackage)?.scientificMaturity ?? resolveSituationalScientificMaturity(
         situationPackage.key,
         situationPackage.instrumentVersion,
       ),
@@ -369,8 +381,8 @@ export const listSituationalInstruments = () => listSituationPackages()
   })
   .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
 
-export const getSituationalInstrument = (instrumentKey: string, instrumentVersion?: string) => {
-  const situationPackage = publishedPackage(instrumentKey, instrumentVersion)
+export const getSituationalInstrument = (instrumentKey: string, instrumentVersion?: string, available?: SituationPackage[]) => {
+  const situationPackage = publishedPackage(instrumentKey, instrumentVersion, available)
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
@@ -380,6 +392,7 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
   })
   return {
     ...instrumentResponse(snapshot),
+    releaseStatus: situationPackage.releaseStatus,
     scientificContext: currentSituationalScientificProjection(situationPackage),
   }
 }
@@ -411,7 +424,12 @@ export const startSituationalAttempt = async (userId: string, input: {
   instrumentKey: string
   instrumentVersion?: string
 }) => {
-  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion)
+  const uploaded = !listSituationPackages().some(p => p.key === input.instrumentKey)
+  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion, uploaded ? await availableSjtPackages() : listSituationPackages())
+  if (situationPackage.definition.respondentType === 'teacher_self_report') {
+    const participant = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
+    if (participant?.role !== 'TEACHER') throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '该题包仅面向教师参与者', 403)
+  }
   await assertSituationalAssetReferencesReady(situationPackage.definition)
   const participantKey = getParticipantKey(userId)
   const frozenAt = new Date()
@@ -455,6 +473,18 @@ export const startSituationalAttempt = async (userId: string, input: {
     const attemptNo = (latest?.attemptNo ?? 0) + 1
     try {
       const created = await prisma.$transaction(async (db) => {
+        if (uploaded) {
+          // Serialize new admission with retirement; a prior catalog read is not authority.
+          const releases = await db.$queryRaw<Array<{ status: string }>>`
+            SELECT "status" FROM "sjt_author_releases"
+            WHERE "instrument_key" = ${situationPackage.key}
+              AND "instrument_version" = ${situationPackage.instrumentVersion}
+            FOR SHARE
+          `
+          if (releases[0]?.status !== 'PUBLISHED') {
+            throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化测评题包不存在或已停用', 404)
+          }
+        }
         const row = await db.situationalAttempt.create({
           data: {
             userId,

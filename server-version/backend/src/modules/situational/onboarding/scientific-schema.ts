@@ -23,6 +23,7 @@ export const situationalScientificEvidenceSchema = z.object({
   executionRef: situationalExecutionRefSchema,
   scope: situationalScientificScopeSchema,
   reviewReference: text,
+  modelEvidence: z.object({ metricKeys: z.array(text).min(1).max(100), modelKey: text, modelVersion: text, parameterSetHash: digest.optional(), artifactHash: digest, kind: z.enum(['CALIBRATION', 'EXTERNAL_VALIDITY', 'INVARIANCE', 'SUBGROUP', 'HOLDOUT', 'PARAMETER_PROVENANCE']) }).strict().optional(),
 }).strict()
 export const scientificReviewSchema = z.object({
   reviewUrl: z.string().regex(/^https:\/\/github\.com\/caohuibj\/eduK12-new-version\/pull\/\d+#pullrequestreview-\d+$/),

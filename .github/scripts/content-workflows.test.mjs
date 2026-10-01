@@ -67,7 +67,7 @@ test('Bundle validation is mandatory on content and platform routes with stable 
 
 test('force-full override schedules full jobs and uses a full aggregate even for drafts/main', () => {
   const ci = source('ci');
-  for (const name of ['backend', 'frontend', 'browser', 'docker', 'codeql', 'merge-gate'])
+  for (const name of ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql', 'merge-gate'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL == 'true'/, name);
   for (const name of ['pr-light-backend', 'pr-light-frontend', 'post-merge-smoke'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL != 'true'/, name);
@@ -101,25 +101,26 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('full CI preserves two physical self-hosted lanes', () => {
+test('all CI jobs use isolated GitHub-hosted Ubuntu runners and preserve full gates', () => {
+  const directory = new URL('../workflows/', import.meta.url);
+  for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.yml'))) {
+    const text = fs.readFileSync(new URL(name, directory), 'utf8');
+    const runners = [...text.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
+    assert.ok(runners.length, `${name}: no executable jobs found`);
+    for (const runner of runners) assert.equal(runner, 'ubuntu-24.04', name);
+    assert.doesNotMatch(text, /self-hosted|eduk12-(mac|win)-ci|hosted_runner/, name);
+    assert.doesNotMatch(text, /^    runs-on:\s*$/m, name);
+  }
   const ci = source('ci');
   const backend = job(ci, 'backend');
-  const frontend = job(ci, 'frontend');
-  const browser = job(ci, 'browser');
-  const codeql = job(ci, 'codeql');
-  const docker = job(ci, 'docker');
-  const scope = job(ci, 'scope');
-  const merge = job(ci, 'merge-gate');
-  assert.match(backend, /eduk12-mac-ci/);
-  assert.match(browser, /eduk12-mac-ci/);
-  for (const text of [frontend, codeql, docker]) assert.match(text, /eduk12-win-ci/);
-  for (const text of [scope, merge]) {
-    assert.match(text, /self-hosted/);
-    assert.match(text, /- linux/);
-    assert.doesNotMatch(text, /eduk12-(mac|win)-ci|ubuntu-/);
-  }
-  assert.match(source('scale-onboarding-boundary'), /eduk12-win-ci/);
+  const regression = job(ci, 'backend-regression');
+  assert.match(regression, /--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(backend, /run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(job(ci, 'browser'), /needs: \[scope, backend, frontend\]/);
+  for (const name of ['codeql', 'docker']) assert.match(job(ci, name), /needs: \[scope\]/);
+  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql\]/);
 });
+
 
 
 test('Phase 0 closure is manual targeted evidence and never competes with PR CI', () => {

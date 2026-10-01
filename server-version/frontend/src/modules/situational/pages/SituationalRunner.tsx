@@ -1,3 +1,6 @@
+import { situationalBasePath } from '../paths'
+import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
+import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -14,6 +17,7 @@ import {
   ensureSituationalDraft,
   firstMissingSceneIndex,
   pruneSituationalDraftResponses,
+  pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
   sceneIsComplete,
@@ -114,8 +118,11 @@ const SituationalRunner: React.FC = () => {
   }, [compositeAttemptId, compositeItemId, embedded, publicMode, recoveryToken])
 
   const [data, setData] = useState<SituationalAttemptResponse | null>(null)
+  const [continuousInputs, setContinuousInputs] = useState<Record<string, number>>({})
   const [responses, setResponses] = useState<Record<string, SituationalDraftAnswer>>({})
   const responsesRef = useRef<Record<string, SituationalDraftAnswer>>({})
+  const [researchEvents, setResearchEvents] = useState<SituationalResearchEvent[]>([])
+  const researchEventsRef = useRef<SituationalResearchEvent[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -126,6 +133,9 @@ const SituationalRunner: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<AssessmentSaveStatus>({ state: 'idle' })
   const [recoveryState, setRecoveryState] = useState<AssessmentRecoveryState>({ state: 'none' })
   const [videoGate, setVideoGate] = useState<VideoGateState | null>(null)
+  const lastExposureRef = useRef<string | null>(null)
+  const stageInputsRef = useRef<HTMLDivElement>(null)
+  const focusedStageRef = useRef<string | null>(null)
   const sceneStartedAt = useRef(Date.now())
   const submittingRef = useRef(false)
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
@@ -164,11 +174,15 @@ const SituationalRunner: React.FC = () => {
         const next = apiDataOrThrow(response)
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
-          navigate(embeddedCompletionPath || `/student/situational/attempts/${next.attempt.id}/result`, { replace: true })
+          navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
           return
         }
         const meta = await ensureSituationalDraft(next.attempt)
-        const restoredResponses = await readSituationalDraft(next.attempt)
+        const storedResponses = await readSituationalDraft(next.attempt)
+        const restoredEvents = researchEnabled(next) ? researchEventsFromTrials(await finalDraftStore.listTrials(situationalDraftKey(next.attempt.id))) : []
+        const restoredResponses = restoreResearchAnswers(next, storedResponses, restoredEvents)
+        researchEventsRef.current = restoredEvents
+        setResearchEvents(restoredEvents)
         const locked = meta.status !== 'DRAFT' || Boolean(meta.sealedSubmission)
         const localResponses = !locked
           ? await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
@@ -192,9 +206,16 @@ const SituationalRunner: React.FC = () => {
         }
         const reachableScenes = reachableSituationalScenes(next.instrument.definition, localResponses)
         const missingIndex = firstMissingSceneIndex(next.instrument.definition, localResponses)
+        const histories = situationalHistoryIdentities(next.instrument.definition, localResponses)
+        const pendingStageIndex = next.instrument.definition.schemaVersion === 2 ? reachableScenes.findIndex(scene => {
+          const node = next.instrument.definition.schemaVersion === 2 ? next.instrument.definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
+          return node?.nodeType === 'SCENE' && Boolean(currentResponseStage(node, histories[scene.sceneKey] ?? '[]', restoredEvents))
+        }) : -1
         setCurrentIndex(
-          missingIndex >= 0
-            ? missingIndex
+          pendingStageIndex >= 0
+            ? pendingStageIndex
+            : missingIndex >= 0
+              ? missingIndex
             : next.instrument.definition.schemaVersion === 1
               ? 0
               : Math.max(0, reachableScenes.length - 1),
@@ -216,13 +237,17 @@ const SituationalRunner: React.FC = () => {
     data ? deriveReachableTrajectory(data.instrument.definition, responses) : { nodeKeys: [], sceneKeys: [], terminalNodeKey: null }
   ), [data, responses])
   const currentScene = scenes[currentIndex]
-  const currentSceneComplete = Boolean(data && currentScene && sceneIsComplete(data.instrument.definition, currentIndex, responses))
+  const responseSceneComplete = Boolean(data && currentScene && sceneIsComplete(data.instrument.definition, currentIndex, responses))
   const currentFlowNode = useMemo(() => {
     if (!data || data.instrument.definition.schemaVersion !== 2) return null
     const nodeKey = trajectory.nodeKeys[currentIndex]
     const node = data.instrument.definition.flow.nodes.find((candidate) => candidate.nodeKey === nodeKey)
     return node?.nodeType === 'SCENE' ? node : null
   }, [currentIndex, data, trajectory.nodeKeys])
+  const currentHistory = data && currentScene ? situationalHistoryIdentities(data.instrument.definition, responses)[currentScene.sceneKey] ?? '[]' : '[]'
+  const responseStage = currentResponseStage(currentFlowNode, currentHistory, researchEvents)
+  const currentSceneComplete = responseSceneComplete && (!currentFlowNode?.responseStages || !responseStage)
+  const visibleChannels = currentScene?.channels.filter(channel => !currentFlowNode?.responseStages || currentFlowNode.responseStages.some(stage => stage.channelKeys.includes(channel.channelKey) && (stage.stageKey === responseStage?.stageKey || researchEvents.some(e => e.type === 'STAGE_CONFIRMED' && e.nodeKey === currentFlowNode.nodeKey && e.stageKey === stage.stageKey && e.historyIdentity === currentHistory)))) ?? []
   const videoSceneKey = currentScene?.stimulus.type === 'VIDEO' ? currentScene.sceneKey : ''
   const videoSlotKey = currentScene?.stimulus.type === 'VIDEO'
     ? (currentFlowNode?.nodeKey || currentScene.sceneKey)
@@ -255,6 +280,33 @@ const SituationalRunner: React.FC = () => {
   const currentVideoGate = videoRequired && videoGate?.sceneKey === currentScene.sceneKey ? videoGate : null
   const videoBusy = Boolean(videoRequired && currentVideoGate?.status !== 'ready')
   const mediaBusy = visualBusy || videoBusy
+
+  useEffect(() => {
+    if (!data || !currentScene || !currentFlowNode || !researchEnabled(data) || mediaBusy || submissionLocked || submittingRef.current) return
+    const operation = saveQueueRef.current.catch(() => undefined).then(async () => {
+      const events = researchEventsRef.current
+      const historyIdentity = situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[currentScene.sceneKey]
+      if (!historyIdentity) return // A queued presentation can become unreachable after an upstream edit.
+      const additions: SituationalResearchEvent[] = []
+      const exposure = `${currentFlowNode.nodeKey}:${historyIdentity}`
+      if (lastExposureRef.current !== exposure) additions.push({ type: 'NODE_EXPOSED', nodeKey: currentFlowNode.nodeKey, historyIdentity, relativeTimeMs: eventTime(data, events) })
+      const stage = currentResponseStage(currentFlowNode, historyIdentity, events)
+      if (stage && stage.kind !== 'CHOICE' && !events.some(e => e.type === 'PROBE_EXPOSED' && e.nodeKey === currentFlowNode.nodeKey && e.historyIdentity === historyIdentity && e.stageKey === stage.stageKey)) additions.push({ type: 'PROBE_EXPOSED', nodeKey: currentFlowNode.nodeKey, historyIdentity, stageKey: stage.stageKey, relativeTimeMs: eventTime(data, events) })
+      const updated = await appendResearchEvents(data, events, additions)
+      researchEventsRef.current = updated
+      lastExposureRef.current = exposure
+      if (additions.length) setResearchEvents(updated)
+    })
+    saveQueueRef.current = operation.catch(reason => { setNotice(situationalErrorMessage(reason)); setSaveStatus({ state: 'error', message: situationalErrorMessage(reason) }) })
+  }, [data, currentScene, currentFlowNode, currentHistory, responseStage?.stageKey, mediaBusy, submissionLocked])
+
+  useEffect(() => {
+    if (!responseStage || mediaBusy || submissionLocked || saving) return
+    const identity = `${currentFlowNode?.nodeKey}:${currentHistory}:${responseStage.stageKey}`
+    if (focusedStageRef.current === identity) return
+    const input = stageInputsRef.current?.querySelector<HTMLInputElement>('input:not(:disabled)')
+    if (input) { input.focus(); focusedStageRef.current = identity }
+  }, [currentFlowNode?.nodeKey, currentHistory, responseStage?.stageKey, mediaBusy, submissionLocked, saving])
 
   const interactionReadiness = useMemo<AssessmentInteractionReadiness>(() => {
     if (visualRequired && visualState.status === 'error') {
@@ -305,11 +357,8 @@ const SituationalRunner: React.FC = () => {
     if (!data || submitting || submissionLocked) return Promise.resolve()
     const currentData = data
     const key = responseKey(scene.sceneKey, channel.channelKey)
-    const answer: SituationalDraftAnswer = {
-      responseValue,
-      responseTimeMs: Math.max(0, Date.now() - sceneStartedAt.current),
-      answeredAt: new Date().toISOString(),
-    }
+    const answeredAt = new Date().toISOString()
+    const responseTimeMs = Math.max(0, Date.now() - sceneStartedAt.current)
 
     pendingSavesRef.current += 1
     setSaving(true)
@@ -318,6 +367,35 @@ const SituationalRunner: React.FC = () => {
     const operation = saveQueueRef.current
       .catch(() => undefined)
       .then(async () => {
+        const previous = responsesRef.current
+        if (previous[key]?.responseValue === responseValue) return
+        const definition = currentData.instrument.definition
+        const node = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
+        const historyIdentity = situationalHistoryIdentities(definition, previous)[scene.sceneKey] ?? '[]'
+        const stage = node?.nodeType === 'SCENE' ? currentResponseStage(node, historyIdentity, researchEventsRef.current) : null
+        if (node?.nodeType === 'SCENE' && node.responseStages && !stage?.channelKeys.includes(channel.channelKey)) throw new Error('已确认的作答不能在后续信息披露后修改。')
+        const answer: SituationalDraftAnswer = {
+          responseValue, responseTimeMs, answeredAt,
+          ...(definition.schemaVersion === 2 ? { historyIdentity, responseRevision: (previous[key]?.responseRevision ?? 0) + 1 } : {}),
+        }
+        const invalidated = invalidateChangedSituationalHistory(definition, previous, { ...previous, [key]: answer })
+        setContinuousInputs(current => { const updated = { ...current }; invalidated.staleKeys.forEach(k => delete updated[k]); return updated })
+        if (researchEnabled(currentData) && node?.nodeType === 'SCENE') {
+          const time = eventTime(currentData, researchEventsRef.current)
+          const additions: SituationalResearchEvent[] = [...missingResearchExposureEvents(currentData, node, historyIdentity, researchEventsRef.current), ...invalidated.staleKeys.flatMap(staleKey => {
+            const old = previous[staleKey], staleScene = staleKey.slice(0, staleKey.indexOf(':'))
+            const staleNode = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === staleScene) : undefined
+            return old && staleNode ? [{ type: 'RESPONSE_INVALIDATED' as const, nodeKey: staleNode.nodeKey, channelKey: staleKey.slice(staleKey.indexOf(':') + 1), historyIdentity: old.historyIdentity ?? '[]', relativeTimeMs: time }] : []
+          })]
+          additions.push({ type: previous[key] ? 'RESPONSE_CHANGED' : 'RESPONSE_FIRST_COMMITTED', nodeKey: node.nodeKey, channelKey: channel.channelKey, responseValue, responseRevision: answer.responseRevision, historyIdentity, relativeTimeMs: time, ...(stage ? { stageKey: stage.stageKey } : {}) })
+          const events = await appendResearchEvents(currentData, researchEventsRef.current, additions)
+          researchEventsRef.current = events; setResearchEvents(events)
+          // The durable journal is authoritative even if the answer-cache write below fails.
+          responsesRef.current = invalidated.responses
+          setResponses(invalidated.responses)
+          const nextScenes = reachableSituationalScenes(definition, invalidated.responses)
+          setCurrentIndex(index => Math.min(index, Math.max(0, nextScenes.length - 1)))
+        }
         await finalDraftStore.putAnswer({
           draftKey: situationalDraftKey(currentData.attempt.id),
           itemKey: key,
@@ -327,7 +405,8 @@ const SituationalRunner: React.FC = () => {
         const nextResponses = await pruneSituationalDraftResponses(
           currentData.attempt,
           currentData.instrument.definition,
-          { ...responsesRef.current, [key]: answer },
+          { ...previous, [key]: answer },
+          previous,
         )
         responsesRef.current = nextResponses
         const nextScenes = reachableSituationalScenes(currentData.instrument.definition, nextResponses)
@@ -356,6 +435,26 @@ const SituationalRunner: React.FC = () => {
     return tracked
   }
 
+  const confirmStage = async () => {
+    if (!data || !currentScene || !currentFlowNode || !responseStage || pendingSavesRef.current > 0 || saving || submitting || submissionLocked || mediaBusy) return
+    if (responseStage.channelKeys.some(key => currentScene.channels.find(c => c.channelKey === key)?.required !== false && !responsesRef.current[responseKey(currentScene.sceneKey, key)])) { setNotice('请完成当前阶段的必答问题。'); return }
+    setSaving(true)
+    const operation = saveQueueRef.current.catch(() => undefined).then(async () => {
+      const additions: SituationalResearchEvent[] = [...missingResearchExposureEvents(data, currentFlowNode, currentHistory, researchEventsRef.current), { type: 'STAGE_CONFIRMED', nodeKey: currentFlowNode.nodeKey, stageKey: responseStage.stageKey, historyIdentity: currentHistory, relativeTimeMs: eventTime(data, researchEventsRef.current) }]
+      if (currentFlowNode.responseStages?.[currentFlowNode.responseStages.length - 1]?.stageKey === responseStage.stageKey) additions.push({ type: 'NODE_CONFIRMED', nodeKey: currentFlowNode.nodeKey, historyIdentity: currentHistory, relativeTimeMs: eventTime(data, researchEventsRef.current) })
+      const updated = await appendResearchEvents(data, researchEventsRef.current, additions)
+      const next = pruneUnreachableSituationalResponses(data.instrument.definition, restoreResearchAnswers(data, responsesRef.current, updated)).responses
+      researchEventsRef.current = updated; setResearchEvents(updated)
+      responsesRef.current = next; setResponses(next); setNotice(null)
+      for (const channelKey of responseStage.channelKeys) {
+        const key = responseKey(currentScene.sceneKey, channelKey)
+        if (next[key]) { await finalDraftStore.putAnswer({ draftKey: situationalDraftKey(data.attempt.id), itemKey: key, value: next[key], updatedAt: Date.now() }) }
+      }
+    })
+    saveQueueRef.current = operation.catch(reason => setNotice(situationalErrorMessage(reason))).finally(() => setSaving(false))
+    await saveQueueRef.current
+  }
+
   const recoverTerminalResult = async (): Promise<boolean> => {
     if (!data || !client) return false
     try {
@@ -363,7 +462,7 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       if (next.attempt.status !== 'COMPLETED') return false
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id)).catch(() => undefined)
-      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       return true
     } catch {
       return false
@@ -381,6 +480,7 @@ const SituationalRunner: React.FC = () => {
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
+    if (!submissionLocked && data.instrument.definition.schemaVersion === 2 && data.instrument.definition.flow.nodes.some(node => node.nodeType === 'SCENE' && node.responseStages && trajectory.nodeKeys.includes(node.nodeKey) && currentResponseStage(node, situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[node.sceneKey] ?? '[]', researchEventsRef.current))) { setNotice('请先确认当前阶段的作答。'); return }
     if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responsesRef.current)) {
       setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
@@ -390,6 +490,8 @@ const SituationalRunner: React.FC = () => {
     setNotice(null)
     const draftKey = situationalDraftKey(data.attempt.id)
     try {
+      // Include presentation writes already queued before sealing the immutable FINAL.
+      await saveQueueRef.current
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const sealedResponses: Record<string, SituationalDraftAnswer> = {}
         snapshot.answers.forEach((answer) => {
@@ -400,9 +502,18 @@ const SituationalRunner: React.FC = () => {
             responseValue: value.responseValue,
             ...(typeof value.responseTimeMs === 'number' ? { responseTimeMs: value.responseTimeMs } : {}),
             ...(typeof value.answeredAt === 'string' ? { answeredAt: value.answeredAt } : {}),
+            ...(typeof value.historyIdentity === 'string' ? { historyIdentity: value.historyIdentity } : {}),
+            ...(typeof value.responseRevision === 'number' ? { responseRevision: value.responseRevision } : {}),
+            ...(typeof value.stageConfirmed === 'boolean' ? { stageConfirmed: value.stageConfirmed } : {}),
           }
         })
-        if (!situationalReadyToSubmit(data.instrument.definition, sealedResponses)) {
+        const events = researchEnabled(data) ? researchEventsFromTrials(snapshot.trials) : []
+        const finalResponses = pruneUnreachableSituationalResponses(data.instrument.definition, restoreResearchAnswers(data, sealedResponses, events)).responses
+        if (data.instrument.definition.schemaVersion === 2) {
+          const histories = situationalHistoryIdentities(data.instrument.definition, finalResponses)
+          for (const node of data.instrument.definition.flow.nodes) if (node.nodeType === 'SCENE' && histories[node.sceneKey] && currentResponseStage(node, histories[node.sceneKey]!, events)) throw new Error('本地阶段确认记录尚未完成，请返回并确认作答。')
+        }
+        if (!situationalReadyToSubmit(data.instrument.definition, finalResponses)) {
           throw new Error('本地持久化的情境作答尚未达到可提交终点，请确认最后一次作答已经保存')
         }
         return {
@@ -412,7 +523,8 @@ const SituationalRunner: React.FC = () => {
           instrumentVersion: data.attempt.instrumentVersion,
           compiledRuntimeHash: data.attempt.compiledRuntimeHash,
           scoringVersion: data.attempt.scoringVersion,
-          responses: situationalResponsesFromDraft(data.instrument.definition, sealedResponses),
+          ...(researchEnabled(data) ? { researchCapture: researchCapture(data, events) } : {}),
+          responses: situationalResponsesFromDraft(data.instrument.definition, finalResponses),
         }
       })
       if (!sealed) throw new Error('本地作答草稿不存在，请返回后重新进入测评。')
@@ -433,7 +545,7 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
-      navigate(embeddedCompletionPath || `/student/situational/attempts/${data.attempt.id}/result`, { replace: true })
+      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
       if (String((reason as { code?: unknown })?.code ?? '') === TERMINAL_RECOVERED_CODE) return
@@ -455,7 +567,7 @@ const SituationalRunner: React.FC = () => {
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : '/student/situational'))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
@@ -532,7 +644,7 @@ const SituationalRunner: React.FC = () => {
             key={`${scene.sceneKey}:${index}`}
             type="button"
             onClick={() => setCurrentIndex(index)}
-            disabled={saving || submitting}
+            disabled={saving || submitting || (Boolean(responseStage) && index > currentIndex)}
             aria-label={`情境 ${index + 1}${sceneIsComplete(data.instrument.definition, index, responses) ? '，已完成' : '，未完成'}`}
             aria-current={currentIndex === index ? 'step' : undefined}
             className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneIsComplete(data.instrument.definition, index, responses) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
@@ -567,12 +679,13 @@ const SituationalRunner: React.FC = () => {
         <h2 id="situational-scene-content-title" className="text-base font-semibold text-gray-900">情境内容</h2>
         {renderStimulus()}
 
-        <div className="mt-7 space-y-7">
-          {currentScene.channels.map((channel) => {
+        {responseStage ? <p role="status" className="mt-5 text-sm text-gray-600">{responseStage.kind === 'CHOICE' ? '确认行动选择后，将展示后续问题。确认后的行动选择将锁定。' : '请根据已看到的信息回答本阶段问题。'}</p> : null}
+        <div ref={stageInputsRef} className="mt-7 space-y-7">
+          {visibleChannels.map((channel) => {
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={channel.channelKey} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked}>
+              <fieldset key={fieldName} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
@@ -580,10 +693,11 @@ const SituationalRunner: React.FC = () => {
                     <span className="text-sm leading-6 text-gray-700">{option.label}</span>
                   </label>
                 ))}
+                {channel.responseType === 'FREE_TEXT' ? <textarea aria-label={channel.prompt} maxLength={channel.maxLength} defaultValue={typeof answer?.responseValue === 'string' ? answer.responseValue : ''} onBlur={event => { void persistAnswer(currentScene, channel, event.currentTarget.value) }} className="min-h-24 w-full rounded-lg border p-3" /> : null}
                 {channel.responseType === 'CONTINUOUS' && channel.range ? (
                   <div className="rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between text-sm text-gray-600"><span>当前值</span><strong className="text-indigo-700">{typeof answer?.responseValue === 'number' ? answer.responseValue : '未选择'}</strong></div>
-                    <input type="range" min={channel.range.min} max={channel.range.max} step="any" value={typeof answer?.responseValue === 'number' ? answer.responseValue : channel.range.min} onChange={(event) => void persistAnswer(currentScene, channel, Number(event.target.value))} className="mt-4 min-h-11 w-full accent-indigo-600" aria-label={`${channel.prompt}，范围 ${channel.range.min} 到 ${channel.range.max}`} />
+                    <input type="range" min={channel.range.min} max={channel.range.max} step="any" value={researchEnabled(data) ? continuousInputs[fieldName] ?? (typeof answer?.responseValue === 'number' ? answer.responseValue : channel.range.min) : typeof answer?.responseValue === 'number' ? answer.responseValue : channel.range.min} onChange={(event) => { const value = Number(event.target.value); if (researchEnabled(data)) setContinuousInputs(current => ({ ...current, [fieldName]: value })); else void persistAnswer(currentScene, channel, value) }} onPointerUp={(event) => { if (researchEnabled(data)) void persistAnswer(currentScene, channel, Number(event.currentTarget.value)) }} onBlur={(event) => { if (researchEnabled(data) && continuousInputs[fieldName] !== undefined) void persistAnswer(currentScene, channel, Number(event.currentTarget.value)) }} onKeyUp={(event) => { if (researchEnabled(data) && event.key === 'Enter') void persistAnswer(currentScene, channel, Number(event.currentTarget.value)) }} className="mt-4 min-h-11 w-full accent-indigo-600" aria-label={`${channel.prompt}，范围 ${channel.range.min} 到 ${channel.range.max}`} />
                     <div className="mt-2 flex justify-between text-xs text-gray-500"><span>最小值 {channel.range.min}</span><span>最大值 {channel.range.max}</span></div>
                   </div>
                 ) : null}
@@ -591,6 +705,7 @@ const SituationalRunner: React.FC = () => {
             )
           })}
         </div>
+        {responseStage ? <button type="button" onClick={() => void confirmStage()} disabled={saving || submitting || mediaBusy || submissionLocked} className="mt-6 min-h-11 rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">{responseStage.kind === 'CHOICE' ? '确认行动选择' : '确认本阶段作答'}</button> : null}
       </section>
     </AssessmentShell>
   )

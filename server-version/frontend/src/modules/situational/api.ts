@@ -1,3 +1,4 @@
+import type { SituationalResearchCapture } from './research'
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
 import type {
@@ -12,12 +13,16 @@ export interface SituationalFinalSubmitPayload {
   instrumentVersion: string
   compiledRuntimeHash: string
   scoringVersion: string
+  researchCapture?: SituationalResearchCapture
   responses: Array<{
     sceneKey: string
     channelKey: string
     responseValue: string | number
     responseTimeMs?: number
     answeredAt?: string
+    historyIdentity?: string
+    responseRevision?: number
+    stageConfirmed?: boolean
   }>
 }
 
@@ -58,29 +63,32 @@ const embeddedClient = (parentAttemptId: string, itemId: string, recoveryToken?:
   }
 }
 
+import { situationalBasePath } from './paths'
+const apiBase = () => situationalBasePath().startsWith('/teacher/') ? '/teacher/situational' : '/situational'
+
 export const situationalApi = {
-  listInstruments: () => apiClient.get<{ list: SituationalInstrument[] }>('/situational/instruments'),
+  listInstruments: () => apiClient.get<{ list: SituationalInstrument[] }>(`${apiBase()}/instruments`),
   getInstrument: (instrumentKey: string, instrumentVersion?: string) => apiClient.get<SituationalInstrument>(
-    `/situational/instruments/${encodeURIComponent(instrumentKey)}${instrumentVersion ? `?version=${encodeURIComponent(instrumentVersion)}` : ''}`,
+    `${apiBase()}/instruments/${encodeURIComponent(instrumentKey)}${instrumentVersion ? `?version=${encodeURIComponent(instrumentVersion)}` : ''}`,
   ),
   start: (input: { instrumentKey: string; instrumentVersion?: string }) => (
-    apiClient.post<SituationalAttemptResponse>('/situational/attempts', input)
+    apiClient.post<SituationalAttemptResponse>(`${apiBase()}/attempts`, input)
   ),
-  resume: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}`),
-  resumePost: (attemptId: string) => apiClient.post<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/resume`, {}),
-  result: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/result`),
+  resume: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`${apiBase()}/attempts/${encodeURIComponent(attemptId)}`),
+  resumePost: (attemptId: string) => apiClient.post<SituationalAttemptResponse>(`${apiBase()}/attempts/${encodeURIComponent(attemptId)}/resume`, {}),
+  result: (attemptId: string) => apiClient.get<SituationalAttemptResponse>(`${apiBase()}/attempts/${encodeURIComponent(attemptId)}/result`),
   loadAsset: async (attemptId: string, assetId: string) => {
-    const response = await sessionFetch(`/api/situational/attempts/${encodeURIComponent(attemptId)}/assets/${encodeURIComponent(assetId)}/content`)
+    const response = await sessionFetch(`/api${apiBase()}/attempts/${encodeURIComponent(attemptId)}/assets/${encodeURIComponent(assetId)}/content`)
     if (!response.ok) throw Object.assign(new Error('视觉内容加载失败'), { status: response.status })
     return response.blob()
   },
   loadVideoSources: (attemptId: string, sceneKey: string) => apiClient.get<AssessmentVideoCapabilitySources>(
-    `/situational/attempts/${encodeURIComponent(attemptId)}/scenes/${encodeURIComponent(sceneKey)}/video-sources`,
+    `${apiBase()}/attempts/${encodeURIComponent(attemptId)}/scenes/${encodeURIComponent(sceneKey)}/video-sources`,
   ),
   submit: (attemptId: string, payload: SituationalFinalSubmitPayload) => (
-    apiClient.post<SituationalAttemptResponse>(`/situational/attempts/${encodeURIComponent(attemptId)}/submit`, payload)
+    apiClient.post<SituationalAttemptResponse>(`${apiBase()}/attempts/${encodeURIComponent(attemptId)}/submit`, payload)
   ),
-  history: () => apiClient.get<{ list: SituationalAttemptResponse[]; total: number }>('/situational/history'),
+  history: () => apiClient.get<{ list: SituationalAttemptResponse[]; total: number }>(`${apiBase()}/history`),
 }
 
 export const embeddedSituationalApi = (parentAttemptId: string, itemId: string): SituationalRunnerClient => (

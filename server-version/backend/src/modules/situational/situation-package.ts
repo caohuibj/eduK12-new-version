@@ -1,3 +1,4 @@
+import { scoreSituationalModel, assertSituationalScorerAvailable } from './situation-model-resolver'
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
 import {
@@ -50,7 +51,7 @@ const scoreGoldenCase = (
   definition: SituationRuntimeDefinition,
   fixture: SituationalGoldenCase,
 ) => {
-  if (definition.schemaVersion === 1) return scoreSituational(definition, fixture.responses)
+  if (definition.schemaVersion === 1) return scoreSituationalModel(definition, fixture.responses)
 
   const linear = asLinearSituationDefinition(definition)
   fixture.responses.forEach((response) => validateSituationalResponse(linear, response))
@@ -67,7 +68,7 @@ const scoreGoldenCase = (
     scene.channels.map((channel) => `${scene.sceneKey}:${channel.channelKey}`)
   )))
   const scoredResponses = fixture.responses.filter((response) => scoredKeys.has(`${response.sceneKey}:${response.channelKey}`))
-  return scoreSituational(reachableDefinition, scoredResponses, { responsesValidated: true })
+  return scoreSituationalModel(reachableDefinition, scoredResponses, { responsesValidated: true })
 }
 
 /**
@@ -84,6 +85,7 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
     forPublish: false,
   })
   const issues = [...identityIssues, ...validation.issues]
+  try { assertSituationalScorerAvailable(asLinearSituationDefinition(situationPackage.definition)) } catch (error) { issues.push({ path: 'scoring.model', message: String(error), severity: 'error' }) }
 
   // Product presentation contract: non-text stimuli require a textual fallback
   // so a declared PUBLISHED package never reaches a renderer-only dead end.

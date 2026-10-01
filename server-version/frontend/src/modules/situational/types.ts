@@ -5,7 +5,7 @@ import type {
 
 export type SituationalResponseValue = string | number
 
-export type SituationalResponseType = 'SINGLE_CHOICE' | 'CONTINUOUS'
+export type SituationalResponseType = 'SINGLE_CHOICE' | 'CONTINUOUS' | 'FREE_TEXT'
 
 export interface SituationalOption {
   optionKey: string
@@ -19,6 +19,7 @@ export interface SituationalRunnerChannel {
   /** Omitted means required; only explicit false is projected by V2. */
   required?: false
   options?: SituationalOption[]
+  maxLength?: number
   range?: { min: number; max: number }
 }
 
@@ -67,6 +68,7 @@ export interface SituationalRunnerBranchSceneNode {
   roundKey: string
   stepKey: string
   interactionRole?: 'DECISION' | 'DIAGNOSTIC'
+  responseStages?: Array<{ stageKey: string; kind: 'PRE_CHOICE_PROBE' | 'CHOICE' | 'POST_CHOICE_PROBE'; channelKeys: string[] }>
   transition: SituationalRunnerNextTransition | SituationalRunnerDecisionTransition
 }
 
@@ -129,6 +131,8 @@ export interface SituationalScientificContext {
 }
 
 export interface SituationalInstrument {
+  title?: string
+  assignment?: { assignmentVersion: string; assignmentIdentity: string; seedIdentity: string; selections: Array<{ groupKey: string; nodeKey: string; eligibleSet: string[]; assignedVariant: string; probability: number; omittedChannelKeys: string[]; probeTiming: 'DEFINED' | 'PRE_CHOICE' | 'POST_CHOICE'; stimulusVariantKey?: string }> }
   scientificContext?: SituationalScientificContext
   key: string
   version: string
@@ -182,6 +186,9 @@ export interface SituationalResponse {
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string
+  responseRevision?: number
+  historyIdentity?: string
+  stageConfirmed?: boolean
 }
 
 export interface SituationalMetric {
@@ -196,10 +203,16 @@ export interface SituationalMetric {
   range: { min: number; max: number } | null
   expectedResponses: string[]
   answeredResponses: string[]
+  estimate?: number | null
+  precision?: { status: 'NOT_ESTIMATED' | 'ESTIMATED'; standardError: number | null; interval: { lower: number; upper: number; level: number; kind: 'CONFIDENCE' | 'CREDIBLE' } | null }
+  coverage?: { numberOfOpportunities: number; numberOfAnsweredOpportunities: number; numberOfIndependentScenes: number }
+  maturity?: 'PROVISIONAL' | 'CALIBRATED'
   status: 'calculated' | 'limited' | 'not_calculable'
 }
 
 export interface SituationalResult {
+  narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
+  model?: { modelKey: string; modelVersion: string; scoringVersion: string; parameterSetHash?: string }
   metrics: SituationalMetric[]
   quality: {
     status: 'interpretable' | 'limited' | 'invalid'
@@ -242,4 +255,7 @@ export type SituationalDraftAnswer = {
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string
+  responseRevision?: number
+  historyIdentity?: string
+  stageConfirmed?: boolean
 }

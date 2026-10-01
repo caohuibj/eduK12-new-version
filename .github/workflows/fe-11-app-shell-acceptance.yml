@@ -18,10 +18,7 @@ jobs:
   app-shell-device-accessibility:
     name: AppShell viewport/input/accessibility browser matrix
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     env:
       APP_SHELL_BASE_URL: http://127.0.0.1:5173
       APP_SHELL_EVIDENCE_DIR: /tmp/eduk12-fe-11-app-shell

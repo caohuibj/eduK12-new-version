@@ -44,10 +44,7 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     services:
       postgres:
@@ -191,10 +188,7 @@ jobs:
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
     if: inputs.scope == 'full'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -283,10 +277,7 @@ jobs:
   lost-response:
     name: committed response loss + retry/replay recovery
     if: inputs.scope == 'full'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     services:
       postgres:
@@ -366,10 +357,7 @@ jobs:
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
     if: inputs.scope == 'full'
-    runs-on:
-      - self-hosted
-      - linux
-      - eduk12-mac-ci
+    runs-on: ubuntu-24.04
     timeout-minutes: 50
     services:
       postgres:

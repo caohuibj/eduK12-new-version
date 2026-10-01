@@ -46,6 +46,7 @@ COPY scripts/scale-onboarding-boundaries.json ./scripts/scale-onboarding-boundar
 COPY scripts/check-scale-source-qualification.ts ./scripts/check-scale-source-qualification.ts
 COPY scripts/generate-situational-instruments.mjs ./scripts/generate-situational-instruments.mjs
 COPY src ./src
+COPY assets ./assets
 RUN npm run build
 
 # Prune development-only tooling before transferring dependencies into the
@@ -76,6 +77,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # 复用 build 阶段已编译好的 node_modules（同源 ABI，native 二进制可直接用）
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/assets ./assets
 COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY package*.json ./
 

@@ -70,6 +70,16 @@ const beforeDeadline = async <T>(promise: Promise<T>, timeoutMs: number): Promis
 }
 
 describe('START authority fence barriers (real PostgreSQL)', () => {
+  it('allows a slow but valid admission to pass the former 5-second transaction limit', async () => {
+    const [execution] = await fixture(true)
+    const slowRegistry = new RunResourceAuthorityRegistry([{ ...adapter, async resolveExact(ref) {
+      await new Promise((resolve) => setTimeout(resolve, 5_500))
+      return adapter.resolveExact(ref)
+    } }])
+    const decision = await acquireRunExecutionStartClaim({ ...execution, resourceRegistry: slowRegistry })
+    expect(decision.kind).toBe('ACQUIRED')
+  }, 30_000)
+
   it.each([true, false])('holds two unrelated START transactions open together (same Run=%s)', async (sameRun) => {
     const executions = await fixture(sameRun)
     expect(executions).toHaveLength(2)
