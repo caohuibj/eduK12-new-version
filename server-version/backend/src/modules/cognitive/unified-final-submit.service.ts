@@ -31,7 +31,7 @@ import {
   runPreparedAuthoritativeScorer,
 } from './v2/authoritative-scorer'
 import { resolveCognitiveMetricReferences } from './v2/reference-adapter'
-import { projectThreeLayerReport } from './v2/report'
+import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot, TrialEnvelope } from './v2/types'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
@@ -366,6 +366,23 @@ export const submitUnifiedCognitiveSessionFinal = async (
           quality: scored.quality,
           measurement: freeze,
         })
+  const report = projectThreeLayerReport({
+    testType: prepared.snapshot.testType,
+    configVersion: prepared.snapshot.configVersion,
+    protocolSignature: prepared.snapshot.protocolSignature,
+    engineVersion: prepared.snapshot.engineVersion,
+    scoringVersion: prepared.snapshot.scoringVersion,
+    profile: freeze.profile,
+    participantPresentation: freeze.frozenReport?.participantPresentation,
+    reportCaveats: freeze.frozenReport?.reportCaveats,
+    trials: prepared.trials,
+    config: prepared.validatedConfig as Record<string, unknown>,
+    definition: freeze.frozenReport?.v2ReportDefinition ?? prepared.definition.report,
+    metrics: scored.metrics,
+    score: scored,
+    metricDefinitions: freeze.frozenReport?.v2MetricDefinitions ?? prepared.definition.metrics,
+    qualityDefinitions: freeze.frozenReport?.v2QualityDefinitions ?? prepared.definition.quality,
+  })
   const resultSnapshot = parseCognitiveResultSnapshot({
     schemaVersion: 1,
     completedAt: new Date().toISOString(),
@@ -377,21 +394,8 @@ export const submitUnifiedCognitiveSessionFinal = async (
     profile: freeze.profile,
     metrics: scored.metrics,
     quality: scored.quality,
-    references: resolvedReferences as unknown as Array<Record<string, unknown>>,
-    report: projectThreeLayerReport({
-      testType: prepared.snapshot.testType,
-      configVersion: prepared.snapshot.configVersion,
-      protocolSignature: prepared.snapshot.protocolSignature,
-      engineVersion: prepared.snapshot.engineVersion,
-      scoringVersion: prepared.snapshot.scoringVersion,
-      profile: freeze.profile,
-      participantPresentation: freeze.frozenReport?.participantPresentation,
-      definition: freeze.frozenReport?.v2ReportDefinition ?? prepared.definition.report,
-      metrics: scored.metrics,
-      score: scored,
-      metricDefinitions: freeze.frozenReport?.v2MetricDefinitions ?? prepared.definition.metrics,
-      qualityDefinitions: freeze.frozenReport?.v2QualityDefinitions ?? prepared.definition.quality,
-    }) as unknown as Record<string, unknown>,
+    references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
+    report: report as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,
   })
 

@@ -51,6 +51,7 @@ describe('CognitiveAssignmentEdit wrapper', () => {
     expect(await screen.findByText('综合测评用')).toBeInTheDocument()
     expect(screen.queryByText('公开匿名链接')).not.toBeInTheDocument()
     expect(screen.queryByText('导出摘要')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '阅读专业报告' })).not.toBeInTheDocument()
     expect(screen.queryByText('发布')).not.toBeInTheDocument()
     expect(mockCognitiveApi.listPublicTokens).not.toHaveBeenCalled()
 

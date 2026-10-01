@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-01",
+  "timezone": "UTC",
+  "baseline": "f70078adcd7c1220f205559e34cd3d719b3b6ce4",
+  "branch": "feat/cognitive-report-upgrade-local",
+  "versions": {
+    "schemaVersion": 2,
+    "reportVersion": "1.0.0",
+    "presentationVersion": "1.1.0"
+  },
+  "coverage": {
+    "realTaskFamilies": 24,
+    "realRegistryIdentities": 28,
+    "syntheticPreviews": 36
+  },
+  "checks": {
+    "backendCognitive": {
+      "passed": 647,
+      "skipped": 8,
+      "passedFiles": 83,
+      "maxWorkers": 1
+    },
+    "reportFreezeAndPostgres": {
+      "passed": 16,
+      "includesPostgresTests": 2,
+      "overlapsBackendSuite": true
+    },
+    "frontendCognitiveAndReporting": {
+      "passed": 252,
+      "passedFiles": 55
+    },
+    "frontendCardFinalFocused": {
+      "passed": 4,
+      "overlapsFrontendSuite": true
+    },
+    "backendBuild": true,
+    "frontendTypecheck": true,
+    "frontendBuild": true,
+    "cognitiveContracts": true,
+    "frontendLint": {
+      "errors": 0,
+      "existingWarnings": 112,
+      "newComponentsWarnings": 0
+    },
+    "browserValidation": "browser-validation.json",
+    "diffWhitespace": true
+  },
+  "boundaries": {
+    "newResearchAccess": false,
+    "rawTrialDataInReports": false,
+    "historicalReportsRewritten": false,
+    "publicSharingImplemented": false,
+    "scoringMathChanged": false,
+    "databaseSchemaChanged": false,
+    "deploymentPublicationInventoryVerified": false
+  },
+  "publicationHold": {
+    "status": "waiting_for_user_main_clean_signal",
+    "remoteWritesPerformed": false,
+    "remoteCIDispatched": false,
+    "merged": false
+  }
+}

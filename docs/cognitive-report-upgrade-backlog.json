@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "baseline": "f70078adcd7c1220f205559e34cd3d719b3b6ce4",
+  "createdDate": "2026-10-01",
+  "timezone": "Asia/Tokyo",
+  "state": "main_clean_authorized_sync_and_publication_in_progress",
+  "publicationHold": {
+    "status": "user_main_clean_signal_received_2026-10-01",
+    "remoteWritesAllowed": true,
+    "ciDispatchAllowed": true,
+    "mergeAllowed": true,
+    "mergeCondition": "current_head_ci_and_repository_requirements_pass"
+  },
+  "tasks": [
+    {
+      "id": "CR-01",
+      "batch": "A",
+      "title": "版本化报告契约与冻结的解释策略",
+      "status": "completed_local",
+      "dependsOn": [],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/participant-presentation.types.ts",
+        "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+        "server-version/backend/src/modules/cognitive/v2/types.ts",
+        "server-version/backend/src/modules/cognitive/v2/report.ts",
+        "server-version/frontend/src/modules/cognitive/types.ts"
+      ],
+      "acceptanceCriteria": [
+        "采用报告契约版本2，旧报告适配兼容",
+        "解释策略随assignment冻结",
+        "quality与interpretation分别表达",
+        "呈现修改不改变计时、评分或runtime hash"
+      ],
+      "implementationNotes": "报告 schemaVersion=2、规则1.0.0、呈现1.1.0。新策略由现有 assignment 冻结机制保存；旧冻结对象无 reportReading 时继续旧投影。runtime hash 回归通过。"
+    },
+    {
+      "id": "CR-02",
+      "batch": "A",
+      "title": "接通caveats、完成持久化与历史兼容",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-01"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/completion.service.ts",
+        "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts",
+        "server-version/backend/src/modules/cognitive/session.service.ts",
+        "server-version/backend/src/modules/cognitive/history.service.ts",
+        "server-version/backend/src/__tests__/cognitive/participant-presentation-freeze.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "新报告读取冻结的协议限制",
+        "重复完成返回相同快照",
+        "新旧解析和已发布未完成assignment兼容",
+        "旧报告保持原冻结版本；历史阅读提醒保留设计，不静默改写旧报告"
+      ],
+      "implementationNotes": "三条完成路径传入冻结 caveats/config/trials；沿用已有加密结果持久化。真实数据库验证 reaction 18/20 与5/20、重复提交及历史回读。历史阅读提醒仅保留设计，未附加或改写旧结果。"
+    },
+    {
+      "id": "CR-03",
+      "batch": "A",
+      "title": "图表受控投影与已有权限内的详细解读",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-01",
+        "CR-02"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/completion.service.ts",
+        "server-version/backend/src/modules/cognitive/session.service.ts",
+        "server-version/backend/src/modules/cognitive/cognitive.controller.ts"
+      ],
+      "acceptanceCriteria": [
+        "图表数据完成时生成和冻结",
+        "权限不足响应不含research与原始trials",
+        "cohort-only与匿名任务限制维持",
+        "本轮不新增科研专用指标权限入口，按用户确认保留现有披露边界"
+      ],
+      "implementationNotes": "按用户最新确认，范围为已有权限内解读及最小图表投影；不增加科研读取接口、不返回 research_only 或原始 trials。现有归属/cohort 限制保持。"
+    },
+    {
+      "id": "CR-04",
+      "batch": "B",
+      "title": "双读者报告壳、状态与视觉标准",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-02",
+        "CR-03"
+      ],
+      "expectedPaths": [
+        "server-version/frontend/src/modules/cognitive/CognitiveV2ReportCard.tsx",
+        "server-version/frontend/src/modules/cognitive/CognitiveSingleTaskReportCard.tsx",
+        "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx",
+        "server-version/frontend/src/modules/reporting/report-ui.css"
+      ],
+      "acceptanceCriteria": [
+        "分层视图仅渲染服务端允许字段",
+        "质量提醒首屏可见",
+        "缺失不是0",
+        "手机、键盘、文字图解和基础打印可读",
+        "共用样式相关报告回归"
+      ],
+      "implementationNotes": "独立 scoped CSS 与可选新版卡片；双阅读层、首屏限制、缺失单独标记、键盘操作、移动端和打印已验证。旧卡片及共用 reporting CSS 未修改。"
+    },
+    {
+      "id": "CR-05",
+      "batch": "B",
+      "title": "reaction与memory样板",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-04"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/reaction/participant-presentation.ts",
+        "server-version/backend/src/modules/cognitive/tasks/memory/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks/reaction",
+        "server-version/frontend/src/modules/cognitive/tasks/memory"
+      ],
+      "acceptanceCriteria": [
+        "18/20有效显示310ms、5/20与0/20撤下速度主结论",
+        "中断限定比较性解释",
+        "早按计数与试次计数分开",
+        "记忆跨度与协议上限区分",
+        "核查suppressTips，不无条件开启旧建议"
+      ],
+      "implementationNotes": "实际评分器合成样例覆盖18/20、5/20、0/20、中断和数字记忆；5/20不再突出速度。记忆长度图保留分母，协议上限有提醒。原 suppressTips 机制保持，新 nextStep 仅为操作/条件指导。"
+    },
+    {
+      "id": "CR-06",
+      "batch": "B",
+      "title": "SST样板与局部解释门控",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-04"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/sst/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks/sst"
+      ],
+      "acceptanceCriteria": [
+        "短程不输出个人抑制能力结论",
+        "SSRT门控与其他允许过程指标独立",
+        "停止响应概率不按越低越好展示",
+        "协议与估计限制可见",
+        "三种协议实际评分器样例与质量门控检查；数据库提交链路以reaction验证"
+      ],
+      "implementationNotes": "SST短程/标准/科研三种真实配置的实际评分器预览完成，单元测试覆盖局部门控。短程隐藏SSRT，pRespondStop不作能力高低解释。SST数据库全提交场景本轮未另增测试。"
+    },
+    {
+      "id": "CR-07",
+      "batch": "C",
+      "title": "第一轮其余六个家族及并存身份覆盖",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-05",
+        "CR-06"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks/{stroop,gonogo,cpt,nback,corsi,taskswitch}/participant-presentation.ts",
+        "server-version/frontend/src/modules/cognitive/tasks"
+      ],
+      "acceptanceCriteria": [
+        "按条件和难度呈现，分母准确",
+        "不遗漏reaction/memory/stroop并存身份",
+        "每个反馈句绑定evidence keys",
+        "旧冻结报告兼容"
+      ],
+      "implementationNotes": "stroop/gonogo/cpt/nback/corsi/taskswitch及并存身份纳入28项注册身份验证；Nback按难度展示实际d′并保留负值。 集合指标采用冻结单位；矩阵按规则类别显示，配对学习及图片顺序按轮次显示，缺失保留为—。"
+    },
+    {
+      "id": "CR-08",
+      "batch": "C",
+      "title": "第二轮十五个家族分组扩展",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-07"
+      ],
+      "expectedPaths": [
+        "server-version/backend/src/modules/cognitive/tasks",
+        "server-version/frontend/src/modules/cognitive/tasks"
+      ],
+      "acceptanceCriteria": [
+        "按方案四组覆盖十五项",
+        "BART1.1优先与1.0兼容分开",
+        "只展示实际测量阶段",
+        "合成面孔不解释为共情或人格",
+        "最终24家族逐身份核对且不夹带scoring数学修改"
+      ],
+      "implementationNotes": "其余十五家族全部增加任务自有策略，28个真实身份覆盖；图表只基于已有实际指标或正式试次。评分器、任务刺激、配置和发布状态未改。"
+    },
+    {
+      "id": "CR-09",
+      "batch": "D",
+      "title": "打印、导出与受控分享设计",
+      "status": "completed_local",
+      "dependsOn": [
+        "CR-08"
+      ],
+      "expectedPaths": [
+        "server-version/frontend/src/modules/cognitive",
+        "server-version/frontend/src/modules/reporting/report-ui.css"
+      ],
+      "acceptanceCriteria": [
+        "打印保留质量限制、单位和版本",
+        "导出不扩大现有权限",
+        "本轮未实施公开分享卡，不生成公开链接",
+        "无身份或未经验证的排名标签"
+      ],
+      "implementationNotes": "产品卡片原生打印，可由浏览器保存PDF；打印自动展开详细依据并保留限制/版本。公开分享卡与独立服务端PDF入口不在本轮实现范围。"
+    },
+    {
+      "id": "CR-10",
+      "batch": "D",
+      "title": "本地交付验收与main clean后的合入",
+      "status": "local_complete_waiting_for_user_main_clean",
+      "dependsOn": [
+        "CR-09"
+      ],
+      "expectedPaths": [
+        "docs/cognitive-report-upgrade-plan.md",
+        "docs/cognitive-report-upgrade-working-agreement.md"
+      ],
+      "acceptanceCriteria": [
+        "提交、差异、版本、测试与截图交付清单完整",
+        "clean信号前零远端写入",
+        "信号后先对齐main并检查语义兼容",
+        "最终SHA满足当前CI与保护要求后merge",
+        "确认post-merge smoke"
+      ],
+      "implementationNotes": "本地源代码、离线实际组件预览、截图、PDF、回归证据已交付。同步最新远端main/冲突检测/远端CI/PR/merge仍等待用户明确main clean信号。"
+    }
+  ],
+  "implementationBranch": "feat/cognitive-report-upgrade-local",
+  "implementationEvidence": "docs/cognitive-report-upgrade-implementation.md",
+  "audienceFollowup": {
+    "status": "completed_local_verified_awaiting_main_clean",
+    "participantStyle": "mature_popular_science_magazine",
+    "professionalScope": "frozen_reports_with_existing_assignment_owner_or_admin_authority",
+    "presentationVersion": "1.2.0",
+    "reportRuleVersion": "1.1.0",
+    "historicalRewrite": false,
+    "researchPermissionExpanded": false,
+    "evidence": "docs/cognitive-report-audiences-implementation.md"
+  },
+  "publicationProgress": {
+    "syncedMain": "9dd4b301",
+    "syncCommit": "6a35be40",
+    "conflictingFiles": [],
+    "apiAccess": "blocked_pending_cloud_network_settings",
+    "remotePush": "prepared_after_validation",
+    "remoteCi": "not_triggered_yet",
+    "merge": "not_performed",
+    "localVerification": {
+      "backendPassed": 761,
+      "backendSkipped": 29,
+      "postgresPassed": 2,
+      "frontendPassed": 258,
+      "browserCombinations": 216,
+      "ciRoutingTests": 24,
+      "lintErrors": 0,
+      "lintWarnings": 112
+    },
+    "evidence": "docs/cognitive-report-upgrade-publication.md"
+  }
+}

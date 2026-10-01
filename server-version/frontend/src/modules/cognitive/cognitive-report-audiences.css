@@ -1,0 +1,132 @@
+.cognitive-magazine,.cognitive-professional{--cog-accent:#168b83;border-radius:8px;background:#fff}
+.cognitive-magazine h1,.cognitive-magazine h2,.cognitive-professional h1,.cognitive-professional h2{letter-spacing:-.025em}
+.cognitive-magazine__masthead,.cognitive-professional__masthead{padding:22px 36px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--cog-line);font-size:12px;color:var(--cog-muted)}
+.cognitive-magazine__masthead strong,.cognitive-professional__masthead strong{color:var(--cog-ink);font-size:16px;white-space:nowrap}
+.cognitive-magazine__masthead strong span{font-size:10px;letter-spacing:.14em;font-weight:400;margin-left:12px}
+.cognitive-magazine__body{padding:36px 44px 24px;display:grid;gap:30px}
+.cognitive-magazine__eyebrow{font-size:11px;font-weight:700;color:var(--cog-accent);letter-spacing:.09em;margin-bottom:8px!important}
+.cognitive-magazine__cover{position:relative;padding:4px 0 24px;border-bottom:2px solid var(--cog-ink)}
+.cognitive-magazine__cover h1{font-size:38px;line-height:1.35;font-weight:700;max-width:740px;margin-bottom:12px}
+.cognitive-magazine__cover>p:last-of-type{font-size:19px;color:var(--cog-muted)}
+.cognitive-magazine button,.cognitive-professional button{background:#fff;border:1px solid var(--cog-line);border-radius:5px;padding:8px 12px;color:var(--cog-ink);font:inherit;cursor:pointer;min-height:42px}
+.cognitive-magazine button:focus-visible,.cognitive-professional button:focus-visible,.cognitive-magazine summary:focus-visible{outline:3px solid #4f78b7;outline-offset:3px}
+.cognitive-magazine__cover button{margin-top:18px;font-size:12px}
+.cognitive-magazine__result{border-left:3px solid var(--cog-accent);padding:18px 22px;background:#f3f9f8}
+.cognitive-magazine__result h2{font-size:22px;line-height:1.6;font-weight:600}
+.cognitive-magazine__result>p:last-child{font-size:13px;margin-top:10px}
+.cognitive-magazine__result--withheld,.cognitive-magazine__result--qualified{background:#fff9ee;border-color:#b88632}
+.cognitive-magazine__scope{font-size:12px;color:var(--cog-muted);margin-top:-14px!important}
+.cognitive-magazine__metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;border-bottom:1px solid var(--cog-line);padding-bottom:24px}
+.cognitive-magazine__metrics>div{padding-right:12px}
+.cognitive-magazine__metrics>div+div{border-left:1px solid var(--cog-line);padding-left:20px}
+.cognitive-magazine__metrics p:first-child{font-size:13px}
+.cognitive-magazine__metrics strong{font-size:31px;display:block;line-height:1.4;margin:8px 0;color:var(--cog-accent);overflow-wrap:anywhere}
+.cognitive-magazine__metrics p:last-child{font-size:12px;color:var(--cog-muted)}
+.cognitive-magazine__concept h2,.cognitive-magazine__example h2,.cognitive-magazine__closing h2{font-size:21px;line-height:1.5;margin-bottom:12px;font-weight:650}
+.cognitive-magazine__concept>p:not(.cognitive-magazine__eyebrow){font-size:15px;line-height:1.9;max-width:850px}
+.cognitive-magazine__story{padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0 8px}
+.cognitive-magazine__story li{border:1px solid var(--cog-line);background:#fafcfb;border-radius:5px;min-width:0}
+.cognitive-magazine__story svg{width:100%;height:auto;display:block}
+.cognitive-magazine__story li>div{padding:0 18px 16px}
+.cognitive-magazine__story span{color:var(--cog-accent);font-size:11px;font-weight:700}
+.cognitive-magazine__story h3{font-size:16px;margin:4px 0}
+.cognitive-magazine__story p{font-size:12px;color:var(--cog-muted);line-height:1.8}
+.cognitive-magazine__diagram-note{font-size:11px!important;color:var(--cog-muted)}
+.cognitive-magazine__example{background:#f7f4ed;border-top:2px solid #c79b50;padding:24px 28px}
+.cognitive-magazine__example>p:not(.cognitive-magazine__eyebrow){font-size:15px;line-height:1.9}
+.cognitive-magazine__example small{display:block;margin-top:14px;color:var(--cog-muted);font-size:11px}
+.cognitive-magazine__closing{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;border-top:1px solid var(--cog-line);padding-top:24px}
+.cognitive-magazine__closing blockquote{font-size:25px;font-weight:600;line-height:1.5;margin:0 0 12px}
+.cognitive-magazine__closing p{font-size:13px;color:var(--cog-muted)}
+.cognitive-magazine__notes{font-size:12px;color:var(--cog-muted);border-top:1px solid var(--cog-line);padding-top:16px}
+.cognitive-magazine__notes summary{cursor:pointer;color:var(--cog-ink);padding:8px 0}
+.cognitive-magazine__notes p{margin:8px 0}
+.cognitive-magazine__print-notes{display:none}
+.cognitive-magazine__footer{padding:18px 44px;border-top:1px solid var(--cog-line);font-size:11px;color:var(--cog-muted)}
+.cognitive-professional__body{padding:30px 36px;font-size:13px;display:grid;gap:24px}
+.cognitive-professional__eyebrow{font-size:11px;color:var(--cog-accent);font-weight:600}
+.cognitive-professional h1{font-size:27px;font-weight:700;line-height:1.4}
+.cognitive-professional h2{font-size:17px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--cog-line)}
+.cognitive-professional h3{font-size:14px;font-weight:600;margin:6px 0}
+.cognitive-professional p+p{margin-top:8px}
+.cognitive-professional__summary{background:#f4f8fb;padding:18px 20px;border-left:3px solid var(--cog-accent)}
+.cognitive-professional__summary--withheld,.cognitive-professional__summary--qualified{border-color:#b88632;background:#fff9ee}
+.cognitive-professional__summary dl,.cognitive-professional__parameters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:12px 0}
+.cognitive-professional dt{color:var(--cog-muted);font-size:11px}
+.cognitive-professional dd{margin:0;font-weight:500}
+.cognitive-professional__method{display:grid;gap:12px;margin:0}
+.cognitive-professional__parameters{background:#f8fafc;padding:14px 16px}
+.cognitive-professional__table-scroll{overflow:auto}
+.cognitive-professional table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.cognitive-professional th,.cognitive-professional td{padding:12px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--cog-line);overflow-wrap:anywhere;font-weight:400}
+.cognitive-professional thead th{font-size:11px;color:var(--cog-muted);background:#f8fafc}
+.cognitive-professional th:first-child{width:23%;font-weight:600}
+.cognitive-professional th:nth-child(2){width:18%}
+.cognitive-professional th small{display:block;font-weight:400;color:var(--cog-muted);font-size:10px;margin-top:5px}
+.cognitive-professional__hint{font-size:11px;color:var(--cog-muted)}
+.cognitive-professional__quality{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cognitive-professional__quality>div{border:1px solid var(--cog-line);padding:12px 14px;border-radius:4px}
+.cognitive-professional__quality>div.is-active{background:#fff9ee;border-color:#e7cca0}
+.cognitive-professional__quality strong{font-size:12px;display:flex;justify-content:space-between;gap:12px}
+.cognitive-professional__quality span{font-size:10px;color:var(--cog-muted);white-space:nowrap}
+.cognitive-professional__quality p{font-size:11px;margin:6px 0}
+.cognitive-professional__quality small{font-size:10px;color:var(--cog-muted);overflow-wrap:anywhere}
+.cognitive-professional__notice{background:#fff9ee;padding:14px 18px;border-left:2px solid #b88632;margin-top:14px!important}
+.cognitive-professional ul{padding-left:20px;margin:10px 0}
+.cognitive-professional__provenance{background:#f8fafc;padding:16px 18px;font-size:11px;color:var(--cog-muted);overflow-wrap:anywhere}
+.cognitive-professional__provenance h2{font-size:13px;color:var(--cog-ink)}
+@media(max-width:640px){
+  .cognitive-magazine__masthead,.cognitive-professional__masthead{padding:16px 20px;align-items:flex-start;flex-direction:column;gap:8px}
+  .cognitive-magazine__body{padding:24px 20px;gap:24px}
+  .cognitive-magazine__cover h1{font-size:29px}
+  .cognitive-magazine__cover>p:last-of-type{font-size:16px}
+  .cognitive-magazine__result{padding:16px}
+  .cognitive-magazine__result h2{font-size:19px}
+  .cognitive-magazine__metrics{grid-template-columns:1fr;gap:18px}
+  .cognitive-magazine__metrics>div+div{border-left:0;border-top:1px solid var(--cog-line);padding:16px 0 0}
+  .cognitive-magazine__metrics strong{font-size:29px}
+  .cognitive-magazine__story{grid-template-columns:1fr;gap:12px}
+  .cognitive-magazine__story li{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:center}
+  .cognitive-magazine__story li>div{padding:12px 12px 12px 0}
+  .cognitive-magazine__story h3{font-size:14px}
+  .cognitive-magazine__example{padding:20px}
+  .cognitive-magazine__closing{grid-template-columns:1fr;gap:24px}
+  .cognitive-magazine__footer{padding:16px 20px}
+  .cognitive-professional__body{padding:24px 18px;gap:20px}
+  .cognitive-professional h1{font-size:23px}
+  .cognitive-professional__summary{padding:16px}
+  .cognitive-professional__summary dl,.cognitive-professional__parameters{grid-template-columns:1fr 1fr}
+  .cognitive-professional__quality{grid-template-columns:1fr}
+  .cognitive-professional__table-scroll{overflow:visible}
+  .cognitive-professional table,.cognitive-professional tbody{display:block}
+  .cognitive-professional thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .cognitive-professional tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.75fr);gap:8px;padding:14px 0;border-bottom:1px solid var(--cog-line)}
+  .cognitive-professional th,.cognitive-professional td{width:auto!important;padding:0;border:0}
+  .cognitive-professional td:nth-child(2){text-align:right}
+  .cognitive-professional td:nth-child(3){grid-column:1/-1}
+}
+@media print{
+  .cognitive-staff-report-open>:not([data-cognitive-report-reader]){display:none!important}
+  .cognitive-staff-report-open [data-report-screen-only]{display:none!important}
+  .cognitive-magazine,.cognitive-professional{max-width:none;border:0}
+  .cognitive-magazine__body,.cognitive-professional__body{padding:14px 8px;gap:16px}
+  .cognitive-magazine__masthead,.cognitive-professional__masthead{padding:10px 8px}
+  .cognitive-magazine__cover{padding-bottom:14px}
+  .cognitive-magazine__cover h1{font-size:29px}
+  .cognitive-magazine [data-report-screen-only],.cognitive-professional [data-report-screen-only]{display:none}
+  .cognitive-magazine__result,.cognitive-magazine__metrics,.cognitive-magazine__example,.cognitive-magazine__story,.cognitive-professional tr,.cognitive-professional__quality>div,.cognitive-professional__provenance{break-inside:avoid}
+  .cognitive-magazine__notes{display:none}
+  .cognitive-magazine__print-notes{display:block;font-size:11px;color:var(--cog-muted);border-top:1px solid var(--cog-line);padding-top:12px}
+  .cognitive-magazine__print-notes h2{font-size:13px;margin-bottom:8px}
+  .cognitive-magazine__story{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cognitive-magazine__closing blockquote{font-size:20px}
+  .cognitive-professional__table-scroll{overflow:visible}
+  .cognitive-professional__body{font-size:12px;line-height:1.55;gap:14px}
+  .cognitive-professional h1{font-size:23px}
+  .cognitive-professional h2{font-size:15px;margin-bottom:8px;padding-bottom:6px}
+  .cognitive-professional table{font-size:11px}
+  .cognitive-professional th,.cognitive-professional td{padding:8px 8px}
+  .cognitive-professional__quality>div{padding:9px 12px}
+  .cognitive-professional .cognitive-reading__chart svg{max-height:230px}
+  .cognitive-professional h2{break-after:avoid}
+}

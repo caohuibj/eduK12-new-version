@@ -15,7 +15,7 @@ import { runAuthoritativeScorer } from './v2/authoritative-scorer'
 import { readCognitiveSessionConfig } from './session.service'
 import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
 import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
-import { projectThreeLayerReport } from './v2/report'
+import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from './v2/result-snapshot'
 import type { CognitiveResultSnapshot } from './v2/types'
 
@@ -179,6 +179,9 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     scoringVersion: session.scoringVersion,
     profile: freeze.profile,
     participantPresentation: freeze.frozenReport?.participantPresentation,
+    reportCaveats: freeze.frozenReport?.reportCaveats,
+    trials: storedTrials,
+    config: snapshot.config as Record<string, unknown>,
     definition: freeze.frozenReport?.v2ReportDefinition ?? definition.report,
     metrics: scored.metrics,
     score: scored,
@@ -196,7 +199,7 @@ const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typ
     profile: report.method.profile,
     metrics: scored.metrics,
     quality: scored.quality,
-    references: resolvedReferences as unknown as Array<Record<string, unknown>>,
+    references: referencesForReportReading(report, resolvedReferences) as unknown as Array<Record<string, unknown>>,
     report: report as unknown as Record<string, unknown>,
     assessmentContext: contextState.reference,
   })

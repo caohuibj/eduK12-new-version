@@ -52,6 +52,9 @@ export interface CognitiveV2ReportMetricView extends CognitiveReportMetricView {
 }
 
 export interface CognitiveV2Report {
+  schemaVersion?: 2
+  reading?: CognitiveReportReading
+  profileLabel?: string | null
   title: string
   qualityState: 'interpretable' | 'limited' | 'invalid'
   conclusion: string
@@ -69,6 +72,40 @@ export interface CognitiveV2Report {
   }
   disclaimer: string
   practicalTips: string[]
+}
+
+export interface CognitiveReportReading {
+  schemaVersion: 2
+  reportVersion: string
+  presentationVersion: string
+  title: string
+  introduction: string
+  illustration?: 'signal' | 'sequence' | 'stop' | 'rules'
+  interpretation: { state: 'available' | 'qualified' | 'withheld'; reasons: string[]; withheldMetricKeys: string[] }
+  feedback: { summary: string; evidenceMetricKeys: string[]; nextStep: string }
+  caveats: string[]
+  methodCaveats?: string[]
+  popular?: {
+    conceptTitle: string; concept: string; takeaway: string; exampleTitle: string; example: string
+    scene: 'signal' | 'sequence' | 'stop' | 'rules'
+    frames: Array<{ title: string; text: string }>
+    boundary: string
+    metricHelp: Record<string, { label: string; explanation: string }>
+  }
+  professional?: {
+    construct: string; procedure: string; interpretation: string; confounders: string[]
+    parameters: Array<{ label: string; value: string }>
+    metrics: Array<{ key: string; label: string; formatted: string; unit: string; definition: string; readingHint: string }>
+    quality: Array<{ key: string; label: string; active: boolean; description: string; effect: string }>
+    withheld: Array<{ key: string; label: string; reasons: string[] }>
+  }
+  visuals: Array<{
+    kind: 'reaction_trials' | 'memory_lengths' | 'metrics'
+    title: string
+    unit: string
+    points: Array<{ label: string; value: number | null; status?: 'recorded' | 'missing' }>
+    caption: string
+  }>
 }
 
 export interface CognitiveSingleTaskReport {
