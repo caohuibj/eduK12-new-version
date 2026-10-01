@@ -36,6 +36,7 @@ const assertPublishedGroupSpec = async (page) => {
   // instead: selectOption waits for the discovered option to exist and proves
   // that the published spec is usable by the product surface.
   const specSelect = page.getByLabel('报告方案（单次）')
+  await specSelect.locator(`option[value="${fixture.publishedSpec.id}"]`).waitFor({ state: 'attached' })
   await specSelect.selectOption(fixture.publishedSpec.id)
   assert.equal(
     await specSelect.inputValue(),
@@ -74,7 +75,10 @@ const ownerJourney = async (browser) => {
     await page.getByRole('button', { name: '结束标签分配', exact: true }).waitFor()
     await page.getByLabel('咨询师成员', { exact: true }).selectOption(fixture.counselorMembershipId)
     await page.getByLabel('来访者成员', { exact: true }).selectOption(fixture.clientMembershipId)
+    const relationshipCreated = page.waitForResponse(response => response.request().method() === 'POST'
+      && response.url().endsWith(`/api/organizations/${fixture.organizationId}/classification`), { timeout: 45_000 })
     await page.getByRole('button', { name: '建立咨询关系', exact: true }).click()
+    await assertEnvelope(await relationshipCreated, 'create counselor-client relationship')
     await page.getByRole('button', { name: '结束咨询关系', exact: true }).click()
     await page.getByRole('button', { name: '结束咨询关系', exact: true }).waitFor({ state: 'detached' })
     const classification = await assertEnvelope(await context.request.get(`${baseUrl}/api/organizations/${fixture.organizationId}/classification`), 'classification history')

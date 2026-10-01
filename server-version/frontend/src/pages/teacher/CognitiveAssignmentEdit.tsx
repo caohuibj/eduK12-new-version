@@ -6,6 +6,7 @@ import { ArrowLeft, Download, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import { sessionFetch } from '../../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
+import CognitiveProfessionalReports from '../../modules/cognitive/CognitiveProfessionalReports'
 
 const statusLabel: Record<string, string> = {
   DRAFT: '草稿',
@@ -24,6 +25,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const [saving, setSaving] = useState(false)
   const [exporting, setExporting] = useState<CognitiveExportKind | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [readingReports, setReadingReports] = useState(false)
 
   const isWrapper = detail?.listedStandalone === false
   const isPackageLocked = isWrapper && Boolean(detail?.reportPackageLocked)
@@ -110,7 +112,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const canArchive = detail.status === 'DRAFT' || detail.status === 'PUBLISHED'
 
   return (
-    <ProductPage width="management" className="staff-editor-page">
+    <ProductPage width="management" className={`staff-editor-page${readingReports ? ' cognitive-staff-report-open' : ''}`}>
       <PageHeader
         title={detail.title}
         description={(
@@ -127,11 +129,13 @@ const CognitiveAssignmentEdit: React.FC = () => {
             {isDraft && !isWrapper && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
             {canArchive && !isPackageLocked && <button onClick={() => void archive()} className="hui-button hui-button--secondary"><Archive className="w-4 h-4" aria-hidden="true" />归档</button>}
             {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50"><Download className="w-4 h-4" aria-hidden="true" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}</button>}
+            {!isWrapper && <button type="button" onClick={() => setReadingReports(value => !value)} aria-expanded={readingReports} className="hui-button hui-button--secondary">{readingReports ? '收起专业报告' : '阅读专业报告'}</button>}
             {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('full-csv', 'full')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'full-csv' ? '导出完整数据中...' : '导出完整数据'}</button>}
           </div>
         )}
       />
       {error && <p role="alert" className="text-red-500 mb-4">{error}</p>}
+      {readingReports && !isWrapper && <CognitiveProfessionalReports key={id} assignmentId={id} />}
       {isWrapper ? (
         <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-2">任务信息</h2>

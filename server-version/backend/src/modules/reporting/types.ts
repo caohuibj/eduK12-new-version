@@ -1,3 +1,4 @@
+import type { ScaleReferenceIdentityV1, LongitudinalReferenceSnapshotV1 } from '../assessment-reference/longitudinal'
 export type ReportingSpecStatus = 'DRAFT' | 'REVIEWED' | 'PUBLISHED' | 'RETIRED'
 export type ReportingAggregation = 'MEAN' | 'MEDIAN' | 'SD_POPULATION' | 'SD_SAMPLE' | 'MIN_MAX' | 'QUARTILES' | 'DISTRIBUTION'
 export type ReportingMaturity = 'PILOT' | 'RESEARCH_READY' | 'RESEARCH_GRADE'
@@ -199,6 +200,7 @@ export interface ReportingSeriesRecordV1 {
 }
 
 export interface ReportingResolvedMetricV1 {
+  scaleReference?: ScaleReferenceIdentityV1
   key: string
   value: unknown
   resultQuality: ReportingResultQuality
@@ -537,6 +539,7 @@ export interface ReportingIndividualLongitudinalSpecV1 {
 export interface ReportingIndividualProjectionV1 {
   schemaVersion: 1
   kind: 'INDIVIDUAL_LONGITUDINAL'
+  referenceTrajectories?: { metrics: Record<string, LongitudinalReferenceSnapshotV1> }
   state: 'present'
   waves: Array<{
     waveId: string

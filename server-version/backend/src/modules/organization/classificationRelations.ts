@@ -129,7 +129,7 @@ export async function assignOrganizationLabel(input: {
         )
       `
       return { id, dimensionId: label.dimensionId, cardinality: label.cardinality }
-    })
+    }, { timeout: 30_000 })
   } catch (err: any) {
     const code = err?.meta?.code ?? err?.code
     const message = String(err?.meta?.message ?? err?.message ?? '')
@@ -187,7 +187,7 @@ export async function createCounselorClientRelationship(input: {
           "valid_from" AS "validFrom", "valid_until" AS "validUntil"
       `
       return rows[0]
-    })
+    }, { timeout: 30_000 })
   } catch (err: any) {
     const code = err?.meta?.code ?? err?.code
     if (code === '23505') throw new OrganizationDomainError('PROFESSIONAL_RELATION_CONFLICT', '当前咨询关系已存在', 409)

@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "actualReactComponents": true,
+  "corpusChecked": 36,
+  "audienceVariants": 2,
+  "viewportWidths": [
+    1280,
+    390,
+    320
+  ],
+  "screenshots": [
+    "reaction-magazine-desktop",
+    "reaction-professional-desktop",
+    "reaction-valid-participant-mobile",
+    "reaction-valid-professional-mobile",
+    "reaction-insufficient-participant-mobile",
+    "reaction-insufficient-professional-mobile",
+    "memory-standard-participant-mobile",
+    "memory-standard-professional-mobile",
+    "sst-experience-participant-mobile",
+    "sst-experience-professional-mobile",
+    "sst-standard-participant-mobile",
+    "sst-standard-professional-mobile",
+    "memory-magazine-desktop",
+    "sst-magazine-desktop",
+    "sst-professional-desktop"
+  ],
+  "checks": [
+    "216 report/width/audience combinations without page or chart overflow",
+    "professional formulas and frozen method",
+    "insufficient and empty values withheld in both versions",
+    "SST short estimate withheld",
+    "occupational example scope",
+    "keyboard explanation expansion",
+    "separate print PDFs",
+    "closed explanatory notes retained in print",
+    "staff editing controls excluded from report print",
+    "no runtime errors"
+  ]
+}

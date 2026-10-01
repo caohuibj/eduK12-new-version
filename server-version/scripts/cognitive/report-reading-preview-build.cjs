@@ -1,0 +1,16 @@
+/** Build an offline interactive preview using actual frontend modules. */
+const fs = require('node:fs')
+const path = require('node:path')
+const { execFileSync } = require('node:child_process')
+const server = path.resolve(__dirname, '../..')
+const output = process.argv[2]
+if (!output) throw new Error('Usage: node report-reading-preview-build.cjs <output-directory>')
+fs.mkdirSync(output, { recursive: true })
+execFileSync(path.join(server, 'backend/node_modules/.bin/tsx'), [path.join(__dirname, 'report-reading-preview.ts'), output], { stdio: 'inherit' })
+const esbuild = require(path.join(server, 'frontend/node_modules/esbuild'))
+esbuild.buildSync({ entryPoints: [path.join(__dirname, 'report-reading-preview-ui.tsx')], outfile: path.join(output, 'preview-ui.js'), bundle: true, jsx: 'automatic', minify: true, nodePaths: [path.join(server, 'frontend/node_modules')], define: { 'process.env.NODE_ENV': '"production"' } })
+const corpus = fs.readFileSync(path.join(output, 'preview-corpus.json'), 'utf8').replace(/</g, '\\u003c')
+const js = fs.readFileSync(path.join(output, 'preview-ui.js'), 'utf8').replace(/<\/script/gi, '<\\/script')
+const css = fs.readFileSync(path.join(output, 'preview-ui.css'), 'utf8')
+fs.writeFileSync(path.join(output, 'report-preview.html'), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cognitive 报告本地开发验收</title><style>${css}\nbody{margin:0;background:#f1f5f9;font:15px/1.7 "Noto Sans CJK SC","Microsoft YaHei",sans-serif;padding:20px}button,select{font:inherit}.preview-toolbar{max-width:1048px;margin:0 auto 16px;color:#61758a;font-size:13px;display:flex;justify-content:space-between;gap:12px;align-items:center}.preview-toolbar select,.preview-toolbar button{margin-left:12px;max-width:100%;border:1px solid #dde7f0;border-radius:8px;background:white;padding:6px 10px;color:#14304a}.preview-footer{max-width:1048px;margin:16px auto;color:#61758a;font-size:12px}@media(max-width:640px){body{padding:10px}.preview-toolbar,.preview-toolbar label{display:flex;flex-direction:column;align-items:stretch;gap:8px}.preview-toolbar select,.preview-toolbar button{margin:0;max-width:100%}}@media print{body{padding:0;background:white}.preview-toolbar,.preview-footer{display:none}}</style></head><body><div id="root"></div><script type="application/json" id="preview-data">${corpus}</script><script>${js}</script></body></html>`)
+console.log('Built offline report-preview.html from actual runtime components')

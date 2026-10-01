@@ -115,6 +115,49 @@ suite('Organization classification and professional relations (real PostgreSQL)'
     expect(history[0]?.id).toBe(relationship.id)
   })
 
+  it('retains a valid relationship command across a lock wait longer than the old transaction limit', async () => {
+    const owner = await createUser('slow-relation-owner')
+    const counselor = await createUser('slow-counselor')
+    const client = await createUser('slow-client')
+    const org = await createOrganization({ name: `slow professional ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('slow-relation-org') } })
+    const counselorMembership = await createMembership({ organizationId: org.organization.id, userId: counselor.id, meta: { actorUserId: owner.id, commandKey: key('slow-counselor-member') } })
+    const clientMembership = await createMembership({ organizationId: org.organization.id, userId: client.id, meta: { actorUserId: owner.id, commandKey: key('slow-client-member') } })
+    await grantPersona({ organizationId: org.organization.id, membershipId: counselorMembership.id, persona: 'COUNSELOR', meta: { actorUserId: owner.id, commandKey: key('slow-counselor-persona') } })
+    await grantPersona({ organizationId: org.organization.id, membershipId: clientMembership.id, persona: 'CLIENT', meta: { actorUserId: owner.id, commandKey: key('slow-client-persona') } })
+
+    let locked!: () => void
+    let unlock!: () => void
+    let holderPid = 0
+    const acquired = new Promise<void>((resolve) => { locked = resolve })
+    const release = new Promise<void>((resolve) => { unlock = resolve })
+    const holder = db.$transaction(async (tx) => {
+      holderPid = (await tx.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`)[0].pid
+      await tx.$queryRaw`SELECT id FROM organizations WHERE id=${org.organization.id} FOR UPDATE`
+      locked()
+      await release
+    }, { timeout: 15_000 })
+    await acquired
+    const relationship = createCounselorClientRelationship({ organizationId: org.organization.id,
+      counselorMembershipId: counselorMembership.id, clientMembershipId: clientMembership.id })
+      .then((value) => ({ ok: true as const, value }), (error: unknown) => ({ ok: false as const, error }))
+    try {
+      let blocked = false
+      for (let attempt = 0; attempt < 200; attempt += 1) {
+        const rows = await db.$queryRaw<Array<{ blocked: boolean }>>`
+          SELECT EXISTS (SELECT 1 FROM pg_stat_activity a WHERE ${holderPid}=ANY(pg_blocking_pids(a.pid))) AS blocked
+        `
+        if (rows[0].blocked) { blocked = true; break }
+        await new Promise((resolve) => setTimeout(resolve, 20))
+      }
+      expect(blocked).toBe(true)
+      await new Promise((resolve) => setTimeout(resolve, 5_500))
+    } finally { unlock() }
+    await holder
+    const result = await relationship
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.value.organizationId).toBe(org.organization.id)
+  }, 30_000)
+
   it('rejects cross-tenant COUNSELOR_CLIENT relation directly in PostgreSQL', async () => {
     const ownerA = await createUser('professional-a')
     const ownerB = await createUser('professional-b')

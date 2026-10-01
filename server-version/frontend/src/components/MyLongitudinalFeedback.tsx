@@ -4,6 +4,7 @@ import { ProductButton, ProductStatus } from './product-ui'
 
 interface OwnProjection {
   kind: 'MY_LONGITUDINAL'
+  referenceTrajectories?:{metrics:Record<string,{unified:boolean;points:Array<{ordinal:number;value:number|null;bandLabel:string|null;referenceVersion:string|null}>}>}
   waves: Array<{ ordinal: number; evidenceLevel: string; metrics: Record<string, { state: string; value?: number }> }>
   comparisons: Array<{ fromOrdinal: number; toOrdinal: number; metrics: Record<string, { comparability: string; delta?: number }> }>
   limitations: string[]
@@ -36,6 +37,7 @@ export function MyLongitudinalFeedback() {
         <h3>多次测评反馈 {reportIndex + 1}</h3><p>报告生成于 {new Date(report.generatedAt).toLocaleDateString()}</p>
         {report.projection.waves.some(w => w.evidenceLevel === 'PILOT') && <p>部分测评处于试点阶段，请结合单次反馈谨慎理解。</p>}
         {metrics.map((metric, index) => <div key={metric} className="space-y-1"><p className="font-medium">指标 {index + 1}</p>
+          {report.projection.referenceTrajectories?.metrics[metric] && <div><p>{report.projection.referenceTrajectories.metrics[metric].unified?'这几次按同一个参考范围说明，方便看自己的变化。':'这几次按各自适用的参考范围说明，区间名称不能直接当成进步或退步。'}</p>{report.projection.referenceTrajectories.metrics[metric].points.map(p=><p key={p.ordinal}>第 {p.ordinal} 次的位置：{p.bandLabel??'暂无匹配参考'}</p>)}</div>}
           {report.projection.waves.map(w => <p key={w.ordinal}>第 {w.ordinal} 次：{w.metrics[metric]?.state === 'present' ? w.metrics[metric].value : '暂无可用结果'}</p>)}
           {report.projection.comparisons.map(pair => <p key={`${pair.fromOrdinal}-${pair.toOrdinal}`}>第 {pair.fromOrdinal} 次 → 第 {pair.toOrdinal} 次：{pair.metrics[metric]?.delta !== undefined ? `变化 ${pair.metrics[metric].delta}` : '不展示变化值，请结合单次反馈理解。'}</p>)}
         </div>)}

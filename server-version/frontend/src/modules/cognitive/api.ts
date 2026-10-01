@@ -1,6 +1,6 @@
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
-import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession } from './types'
+import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession, CognitiveV2Report } from './types'
 import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
@@ -41,6 +41,10 @@ const loadSessionAsset = async (
  * 禁止为了 Fake UI 新增 backend endpoint（v1.1 §15）。
  */
 export const cognitiveApi = {
+  professionalReports: (id: string, offset = 0) => apiClient.get<{
+    assignmentId: string; assignmentTitle: string; total: number; offset: number; nextOffset: number | null
+    records: Array<{ label: string; report: CognitiveV2Report | null; references: Array<Record<string, unknown>>; unavailableReason: string | null }>
+  }>(`/cognitive/assignments/${encodeURIComponent(id)}/reports?offset=${offset}`),
   listTests: () =>
     apiClient.get<{ list: Array<{
       testType: string

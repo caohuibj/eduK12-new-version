@@ -12,6 +12,7 @@ export function projectParticipantLongitudinal(projection: ReportingIndividualPr
         metric.state === 'present' && Number.isFinite(metric.value) ? { state: 'present', value: metric.value } : { state: 'missing' }])),
       evidenceLevel: w.evidence.level,
     })),
+    ...(projection.referenceTrajectories ? {referenceTrajectories:{metrics:Object.fromEntries(Object.entries(projection.referenceTrajectories.metrics).filter(([key])=>allowed.has(key)).map(([key,snapshot])=>[key,{unified:snapshot.compatibilityDecision==='COMPATIBLE_LATER_REFERENCE',points:snapshot.points.map((p,i)=>({ordinal:p.ordinal??i+1,value:p.rawValue,bandLabel:p.reference?.status==='available'?p.reference.criterionBand?.label??null:null,referenceVersion:p.reference?.referenceVersion??null}))}]))}} : {}),
     comparisons: projection.comparisons.map(pair => ({
       fromOrdinal: ordinals.get(pair.fromWaveId), toOrdinal: ordinals.get(pair.toWaveId),
       metrics: Object.fromEntries(Object.entries(pair.metrics).filter(([key]) => allowed.has(key)).map(([key, metric]) => [key, {

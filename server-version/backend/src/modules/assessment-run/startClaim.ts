@@ -191,7 +191,7 @@ export const acquireRunExecutionStartClaim = async (input: {
     return claimed.state === 'CLAIMED'
       ? { kind: 'ACQUIRED' as const, claim: claimed, admission }
       : { kind: 'RECOVER' as const, claim: claimed, admission }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, timeout: 30_000 })
 }
 
 export const markRunStartDispatchIntent = async (input: {

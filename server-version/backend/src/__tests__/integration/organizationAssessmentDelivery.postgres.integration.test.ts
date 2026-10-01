@@ -47,7 +47,9 @@ suite('Organization class-scoped assessment delivery grants', () => {
     const expiredGrant = await grantTeachingAssessmentDelivery({organizationId:org.organization.id,teacherMembershipId:teachingMember.id,classUnitId:cls.id,grantedByUserId:owner.id,validFrom:new Date(Date.now()-120000),validUntil:new Date(Date.now()-60000)})
     expect(await resolveAssessmentDeliveryAuthority({principal:principal(teaching.id),organizationId:org.organization.id})).toBeNull()
     await revokeTeachingAssessmentDelivery({organizationId:org.organization.id,grantId:expiredGrant.id,revokedByUserId:owner.id})
-    const grant=await grantTeachingAssessmentDelivery({organizationId:org.organization.id,teacherMembershipId:teachingMember.id,classUnitId:cls.id,grantedByUserId:owner.id})
+    // Explicit current test window uses the authority database clock; host/container clocks can differ.
+    const [{at}]=await db.$queryRaw<Array<{at:Date}>>`SELECT statement_timestamp() - interval '1 second' AS at`
+    const grant=await grantTeachingAssessmentDelivery({organizationId:org.organization.id,teacherMembershipId:teachingMember.id,classUnitId:cls.id,grantedByUserId:owner.id,validFrom:at})
     expect((await resolveAssessmentDeliveryAuthority({principal:principal(teaching.id),organizationId:org.organization.id}))?.deliveryScopes).toContain('CLASS')
     await revokeTeachingAssessmentDelivery({organizationId:org.organization.id,grantId:grant.id,revokedByUserId:owner.id})
     expect(await resolveAssessmentDeliveryAuthority({principal:principal(teaching.id),organizationId:org.organization.id})).toBeNull()

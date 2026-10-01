@@ -1,3 +1,4 @@
+import { validateAudienceReport } from './library/audience-report-gate'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
@@ -112,7 +113,8 @@ const interpretationSchema = z.object({
   headline: z.string().min(1),
   source: z.discriminatedUnion('type', [
     z.object({ type: z.literal('score_only') }),
-    z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample']) }),
+    z.object({ type: z.literal('reference_context') }),
+    z.object({ type: z.literal('reference'), referenceVersion: z.string().min(1), referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']) }),
   ]).default({ type: 'score_only' }),
   summary: z.string().min(1),
   bands: z.array(z.object({
@@ -126,6 +128,7 @@ const interpretationSchema = z.object({
 export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
+  audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict() }).strict().optional(),
   reportVersion: z.string().min(1),
   primaryScoreKeys: z.array(z.string().min(1)).min(1),
   scoreOrder: z.array(z.string().min(1)).min(1),
@@ -142,7 +145,7 @@ export const scaleReferencePolicySchema = z.discriminatedUnion('type', [
     selections: z.array(z.object({
       scoreKey: z.string().min(1),
       referenceVersion: z.string().min(1),
-      referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample']),
+      referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']),
     })).default([]),
   }),
 ])
@@ -150,6 +153,7 @@ export type ScaleReferencePolicy = z.infer<typeof scaleReferencePolicySchema>
 
 export const scaleDefinitionSchema = z.object({
   schemaVersion: z.literal(2),
+  versionAxes: z.object({ schemaVersion: z.literal(1), subjectKey: z.string().min(1), locale: z.string().min(1), localizationVersion: z.string().min(1) }).strict().optional(),
   respondentType: z.string().min(1),
   source: z.object({
     title: z.string().optional(),
@@ -213,6 +217,7 @@ export const validateScaleDefinition = (
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
   if (options.forPublish) {
+    issues.push(...validateAudienceReport(definition))
     if (definition.display.randomizeItems) {
       issues.push({ path: 'display.randomizeItems', message: 'PR25 暂不支持发布题目随机化，请关闭该选项', severity: 'error' })
     }
@@ -450,7 +455,7 @@ const stableValue = (value: unknown): unknown => {
 }
 
 export const hashScaleDefinition = (definition: ScaleDefinitionV2): string => (
-  createHash('sha256').update(JSON.stringify(stableValue(definition))).digest('hex')
+  createHash('sha256').update(JSON.stringify(stableValue(definition.versionAxes ? { schemaVersion: definition.schemaVersion, versionAxes: definition.versionAxes, respondentType: definition.respondentType, display: definition.display, responseSets: definition.responseSets, items: definition.items, scoring: definition.scoring } : definition))).digest('hex')
 )
 
 export const createCustomScaleDefinition = (): ScaleDefinitionV2 => ({

@@ -9,6 +9,8 @@ import {
   ReportSection,
 } from '../reporting/ReportPrimitives'
 import type { CognitiveV2Report, CognitiveV2ReportMetricView } from './types'
+import CognitiveReportReadingCard from './CognitiveReportReadingCard'
+import CognitiveMagazineReport from './CognitiveMagazineReport'
 
 const profileLabel = (profile: CognitiveV2Report['method']['profile']): string => {
   if (profile === 'experience') return '体验版'
@@ -43,6 +45,12 @@ const CognitiveV2ReportCard: React.FC<{
   finishedAt?: string | null
   anonymousCode?: string | null
 }> = ({ report, references = [], attemptNo, finishedAt, anonymousCode }) => {
+  if (report.schemaVersion === 2 && report.reading?.popular && report.reading?.professional) {
+    return <CognitiveMagazineReport report={report} attemptNo={attemptNo} finishedAt={finishedAt} />
+  }
+  if (report.schemaVersion === 2 && report.reading?.schemaVersion === 2) {
+    return <CognitiveReportReadingCard report={report} references={references} attemptNo={attemptNo} finishedAt={finishedAt} anonymousCode={anonymousCode} />
+  }
   const activeQuality = report.quality.filter((item) => item.active)
   const reviewedProfileLabel = (report as CognitiveV2Report & { profileLabel?: string | null }).profileLabel
   const profileText = reviewedProfileLabel || profileLabel(report.method.profile)

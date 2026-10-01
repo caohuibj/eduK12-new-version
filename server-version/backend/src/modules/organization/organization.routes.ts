@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authenticate } from '../../middleware/auth'
+import { asyncHandler } from '../../middleware/asyncHandler'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
 import { reportingDiscoveryController } from '../reporting/discovery.controller'
@@ -14,7 +15,6 @@ import { organizationController } from './organization.controller'
 
 const router = Router()
 router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
-
 // Platform-governed ReportingAnalysisSpec lifecycle. These handlers enforce
 // current PlatformRole=SYSTEM_ADMIN themselves; Organization admins cannot
 // fork or weaken the platform spec contract.
@@ -26,7 +26,7 @@ router.post('/reporting-specs/:specId/retire', authenticate, reportingController
 // Organization product discovery is a read-only authority projection. It is
 // deliberately separate from legacy User.role and does not grant authority:
 // every downstream Organization operation re-authorizes current DB facts.
-router.get('/assigned-tasks', authenticate, assessmentRunController.assignedTasks)
+router.get('/assigned-tasks', authenticate, asyncHandler(assessmentRunController.assignedTasks))
 router.get('/', authenticate, organizationController.listAccessible)
 router.get('/:organizationId/context', authenticate, organizationController.readContext)
 
@@ -76,18 +76,18 @@ router.post('/:organizationId/assessment-delivery-grants/:grantId/revoke', authe
 // governance. ORG_ADMIN gets organization scope; TEACHER/COUNSELOR personas get
 // relationship-scoped delivery. Exact Run ownership and every resolved actor
 // pair are re-authorized in the domain layer.
-router.get('/:organizationId/run-resources', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.resources)
-router.get('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.list)
-router.get('/:organizationId/runs/:runId', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.detail)
-router.post('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.create)
-router.post('/:organizationId/runs/:runId/tracks', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.addTrack)
-router.post('/:organizationId/runs/:runId/preview', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.preview)
-router.post('/:organizationId/runs/:runId/publish', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.publish)
-router.get('/:organizationId/runs/:runId/progress', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.progress)
-router.post('/:organizationId/runs/:runId/close', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.close)
-router.post('/:organizationId/runs/:runId/cancel', authenticate, requireAssessmentDeliveryAuthority, assessmentRunController.cancel)
-router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, assessmentRunController.acceptConsent)
-router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, assessmentRunController.startExecution)
+router.get('/:organizationId/run-resources', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.resources))
+router.get('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.list))
+router.get('/:organizationId/runs/:runId', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.detail))
+router.post('/:organizationId/runs', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.create))
+router.post('/:organizationId/runs/:runId/tracks', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.addTrack))
+router.post('/:organizationId/runs/:runId/preview', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.preview))
+router.post('/:organizationId/runs/:runId/publish', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.publish))
+router.get('/:organizationId/runs/:runId/progress', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.progress))
+router.post('/:organizationId/runs/:runId/close', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.close))
+router.post('/:organizationId/runs/:runId/cancel', authenticate, requireAssessmentDeliveryAuthority, asyncHandler(assessmentRunController.cancel))
+router.post('/:organizationId/runs/:runId/executions/:executionId/consent/accept', authenticate, asyncHandler(assessmentRunController.acceptConsent))
+router.post('/:organizationId/runs/:runId/executions/:executionId/start', authenticate, asyncHandler(assessmentRunController.startExecution))
 
 // Reporting keeps one analysis/artifact authority. Product discovery is a
 // bounded, server-authorized summary over published Specs, eligible frozen

@@ -1,6 +1,44 @@
 import type { CognitiveProfile } from './cognitive.types'
 import type { CognitiveProtocolPresentationV1 } from './protocol-presentation.types'
 
+/** Display policy, frozen with the presentation. Never used by a scorer/compiler. */
+export interface CognitiveReportReadingPolicy {
+  version: string
+  title: string
+  introduction: string
+  summary: { template: string; metricKeys: string[] }
+  summaryByProfile?: Partial<Record<CognitiveProfile, { template: string; metricKeys: string[] }>>
+  studentMetricKeys: string[]
+  processMetricKeys: string[]
+  withholdFlags: string[]
+  metricGates: Record<string, string[]>
+  hiddenByProfile?: Partial<Record<CognitiveProfile, string[]>>
+  nextStep: string
+  popular?: {
+    conceptTitle: string
+    concept: string
+    takeaway: string
+    exampleTitle: string
+    example: string
+    scene: 'signal' | 'sequence' | 'stop' | 'rules'
+    frames: Array<{ title: string; text: string }>
+    boundary: string
+    metricHelp: Record<string, { label: string; explanation: string }>
+  }
+  professional?: {
+    construct: string
+    procedure: string
+    interpretation: string
+    confounders: string[]
+    metricNotes: Record<string, { definition: string; readingHint: string }>
+    configFields: Array<{ key: string; label: string }>
+  }
+  illustration?: 'signal' | 'sequence' | 'stop' | 'rules'
+  caveatTerms?: Record<string, string>
+  qualityLabels?: Record<string, string>
+  chart?: { kind: 'reaction_trials' | 'memory_lengths' | 'metrics'; metricKeys: string[]; pointUnit?: 'd-prime' | 'ratio' | 'ms' }
+}
+
 /** Display-only sidecar, deliberately absent from compiler/runtime definitions. */
 export interface CognitiveParticipantPresentationV1 {
   schemaVersion: 1
@@ -9,7 +47,7 @@ export interface CognitiveParticipantPresentationV1 {
   engineVersion: string
   scoringVersion: string
   title: string
-  metrics: Record<string, { label: string; explanation?: string; singleExplanation?: string }>
+  metrics: Record<string, { label: string; explanation?: string; singleExplanation?: string; displayUnit?: string; valueUnit?: 'ratio' | 'count' | 'ms'; valueLabels?: Record<string, string> }>
   experienceHeadline?: string
   hiddenMetrics: string[]
   singleHiddenMetrics: string[]
@@ -17,4 +55,5 @@ export interface CognitiveParticipantPresentationV1 {
   suppressTips: boolean
   practicalTips: string[]
   protocols: Partial<Record<CognitiveProfile, CognitiveProtocolPresentationV1>>
+  reportReading?: CognitiveReportReadingPolicy
 }

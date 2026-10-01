@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-01",
+  "timezone": "Asia/Tokyo",
+  "baseline": "f70078adcd7c1220f205559e34cd3d719b3b6ce4",
+  "previousLocalImplementation": "48567293",
+  "branch": "feat/cognitive-report-upgrade-local",
+  "remoteWritesPerformed": false,
+  "remoteCiTriggered": false,
+  "merged": false,
+  "remotePublicationState": "waiting_for_user_main_clean_signal",
+  "taskFamilies": 24,
+  "realExactTaskIdentities": 28,
+  "presentationVersion": "1.2.0",
+  "reportRuleVersion": "1.1.0",
+  "reportSchemaVersion": 2,
+  "historicalResultsRewritten": false,
+  "researchPermissionsExpanded": false,
+  "checks": {
+    "backendCognitive": {
+      "passed": 652,
+      "skipped": 8,
+      "passedFiles": 84,
+      "skippedFiles": 3
+    },
+    "backendFocused": {
+      "passed": 21,
+      "overlapsBroadSuite": true,
+      "realPostgresTests": 2
+    },
+    "finalPostgresRecheck": {
+      "passed": 2,
+      "sameScenariosAsFocused": true
+    },
+    "frontendRegression": {
+      "passed": 258,
+      "files": 57,
+      "includesTeacherAssignmentEdit": true
+    },
+    "frontendFinalFocused": {
+      "passed": 10,
+      "overlapsRegression": true
+    },
+    "backendBuild": "passed",
+    "frontendTypecheck": "passed",
+    "frontendBuild": "passed",
+    "cognitiveContracts": "passed",
+    "frontendLint": {
+      "errors": 0,
+      "existingWarnings": 112
+    },
+    "browser": {
+      "passed": true,
+      "synthetic": true,
+      "actualReactComponents": true,
+      "apiConnected": false,
+      "samples": 36,
+      "audiences": 2,
+      "widths": [
+        1280,
+        390,
+        320
+      ],
+      "combinations": 216,
+      "screenshots": 15,
+      "pdfs": 2,
+      "printVersionsPreserved": true,
+      "staffEditorControlsHiddenInPrint": true
+    }
+  },
+  "limitations": [
+    "No production deployment or scientific/normative validation",
+    "Browser preview uses actual components but no live API; permissions verified by service and real database tests",
+    "Legacy assignments remain on their frozen presentation; republishing or migration is separate",
+    "Eight opt-in integration tests skipped in broad suite; only designated report PostgreSQL scenarios enabled"
+  ]
+}
