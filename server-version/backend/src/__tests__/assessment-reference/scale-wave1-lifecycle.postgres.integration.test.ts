@@ -24,6 +24,16 @@ suite('governed reference lifecycle (real PostgreSQL)',()=>{
   expect(replay[0].status).toBe('ACTIVE')
   // Immutable test records intentionally remain in the disposable verification DB.
  })
+ it('does not supersede a different exact measurement identity',async()=>{
+  const first=testReference();first.instrumentKey='test_scope_'+randomUUID();first.status='DRAFT'
+  await activateReviewedReference(db,first)
+  const different=structuredClone(first);different.referenceVersion='other-measurement'
+  different.entries[0].governance!.measurementHash='b'.repeat(64)
+  await activateReviewedReference(db,different)
+  expect(await db.assessmentReferenceSet.count({where:{instrumentKey:first.instrumentKey,status:'ACTIVE'}})).toBe(2)
+  const backdated=structuredClone(first);backdated.referenceVersion='backdated'
+  await expect(activateReviewedReference(db,backdated)).rejects.toThrow('REFERENCE_EFFECTIVE_DATE_NOT_LATER')
+ })
  it('legacy ungoverned rows can still be deleted',async()=>{
   const legacy=testReference();delete legacy.entries[0].governance;legacy.entries[0].referenceKind='descriptive_sample';legacy.entries[0].evidenceLevel='local_pilot';legacy.entries[0].provenanceType='local_observed';legacy.instrumentKey='test_legacy_'+randomUUID()
   const row=await db.assessmentReferenceSet.create({data:{instrumentType:'SCALE',instrumentKey:legacy.instrumentKey,referenceVersion:'v1',status:'DRAFT',definition:legacy as unknown as Prisma.InputJsonValue}})

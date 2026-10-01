@@ -15,7 +15,7 @@ export async function activateReviewedReference(db: PrismaClient, candidate: Ass
     if (existing?.status === 'ACTIVE') return existing
     if (existing && existing.status !== 'DRAFT') throw new Error('REFERENCE_LIFECYCLE_INVALID')
     // Only replace references for the exact same measurement/population scope.
-    const scope = (d: AssessmentReferenceSetDefinition) => JSON.stringify(d.entries.map(e => [e.scoreKey,e.instrumentVersion,e.scoringVersion,e.governance?.subjectKey,e.governance?.schoolStage,e.governance?.locale,e.governance?.populationKey]).sort())
+    const scope = (d: AssessmentReferenceSetDefinition) => JSON.stringify(d.entries.map(e => [e.scoreKey,e.instrumentVersion,e.scoringVersion,e.governance?.measurementHash,e.governance?.subjectKey,e.governance?.schoolStage,e.governance?.locale,e.governance?.populationKey]).sort())
     const active = await tx.assessmentReferenceSet.findMany({ where: { instrumentType, instrumentKey: candidate.instrumentKey, status: 'ACTIVE' } })
     for (const row of active) if (scope(row.definition as unknown as AssessmentReferenceSetDefinition) === scope(candidate)) {
       const old=row.definition as unknown as AssessmentReferenceSetDefinition
