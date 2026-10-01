@@ -31,6 +31,8 @@ export interface ScaleResultV2 {
     instrumentVersion: string
     scoringVersion: string
     reportVersion: string
+    reportAudience?: 'student' | 'parent' | 'teacher'
+    localizationVersion?: string
     definitionHash: string
     referenceVersions: string[]
     assessmentContext: {
@@ -236,11 +238,12 @@ const interpretationFor = (
     return candidate.referenceVersion === configured.source.referenceVersion
       && candidate.referenceKind === configured.source.referenceKind
   })
+  let headline=configured.headline
   let label: string | null = null
   let interpretation = configured.summary
   let guidance = configured.guidance
   let referenceVersion: string | null = null
-  if (configured.source.type === 'reference') {
+  if (configured.source.type === 'reference' || configured.source.type === 'reference_context') {
     if (!reference) return {
       scoreKey: score.key,
       headline: configured.headline,
@@ -256,15 +259,16 @@ const interpretationFor = (
       ? configured.bands.find((band) => band.key === reference.criterionBand?.key)
       : undefined
     if (configuredBand) {
-      label = configuredBand.label
+      if(definition.versionAxes) headline=configuredBand.label
+      else label = configuredBand.label
       interpretation = configuredBand.summary
-      guidance = [...configuredBand.guidance, ...configured.guidance]
+      guidance = definition.versionAxes ? configuredBand.guidance : [...configuredBand.guidance, ...configured.guidance]
     }
   }
 
   return {
     scoreKey: score.key,
-    headline: configured.headline,
+    headline,
     label,
     interpretation,
     guidance,
@@ -310,7 +314,9 @@ export const buildScaleResult = (input: {
       instrumentVersion: input.instrumentVersion,
       scoringVersion: input.definition.scoring.scoringVersion,
       score,
-      context: input.participantContext,
+      ...(input.definition.versionAxes?{measurementHash:hashScaleDefinition(input.definition)}:{}),
+      // Governed language identifies the administered form, not a student's home language.
+      context: input.definition.versionAxes ? {...input.participantContext,language:input.definition.versionAxes.locale} : input.participantContext,
     }))
   const interpretations = scoring.quality.status === 'invalid'
     ? []
@@ -336,6 +342,8 @@ export const buildScaleResult = (input: {
       instrumentVersion: input.instrumentVersion,
       scoringVersion: input.definition.scoring.scoringVersion,
       reportVersion: input.definition.report.reportVersion,
+      ...(input.definition.report.audienceContract ? { reportAudience: input.definition.report.audienceContract.audience } : {}),
+      ...(input.definition.versionAxes ? { localizationVersion: input.definition.versionAxes.localizationVersion } : {}),
       definitionHash: hashScaleDefinition(input.definition),
       referenceVersions,
       assessmentContext: input.participantContextHash

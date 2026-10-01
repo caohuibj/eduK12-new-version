@@ -44,8 +44,8 @@ export interface ExternalScaleScoreValue {
 export interface ScaleReferenceValue {
   scoreKey: string
   referenceVersion: string
-  referenceKind: 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample'
-  evidenceLevel: 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm' | null
+  referenceKind: 'normative_distribution' | 'criterion_threshold' | 'descriptive_sample' | 'theoretical_range'
+  evidenceLevel: 'literature_beta' | 'local_pilot' | 'local_norm' | 'validated_norm' | 'theoretical' | null
   status: 'available' | 'unavailable'
   unavailableReason?: 'not_requested' | 'not_found' | 'inactive' | 'version_mismatch' | 'missing_context' | 'no_population_match' | 'ambiguous_population' | 'insufficient_data' | 'quality_limited'
   label: string

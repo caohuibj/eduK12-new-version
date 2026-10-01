@@ -423,6 +423,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: prelaunch load and resource contract self-tests
         run: node --test ../scripts/load/prelaunch-mixed-load.test.mjs ../scripts/prelaunch-resource-preflight.test.mjs
+      - name: Wave1 calibration generator contracts
+        run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
       - name: full regression
         # 与 release-verify-local.sh 对齐：real-PG 集成测试文件串行执行；
         # 文件并行会让多个 worker / Prisma client 争抢同一 PG + CPU + IO，
@@ -444,6 +446,8 @@ jobs:
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/scale/pr3-managed.postgres.integration.test.ts
           src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts
+          src/__tests__/assessment-reference/scale-wave1-reporting.postgres.integration.test.ts
+          src/__tests__/scale/instruments/learning-motivation-wave1.postgres.integration.test.ts
           src/__tests__/situational/situational-standalone.postgres.integration.test.ts
           src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
           src/__tests__/bundle-product/product.postgres.integration.test.ts

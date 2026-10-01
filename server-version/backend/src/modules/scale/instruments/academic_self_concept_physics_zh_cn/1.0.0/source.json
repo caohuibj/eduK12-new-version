@@ -1,0 +1,747 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "academic_self_concept_physics_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "REVIEWED",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "学科自我概念｜物理",
+      "abbreviation": "ASC-4",
+      "instrumentFamily": "Learning Motivation / Wave1"
+    },
+    "construct": {
+      "primaryDomain": "MOTIVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学科自我概念；学生自评，描述当前信念或感受。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "academic_self_concept",
+        "physics",
+        "student_self_report"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "populationNotes": "学科替换 PILOT；没有 exact-version 本地经验验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "当前学科信念／课堂感受；自我效能保留下学期题干",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持题干、顺序、作答锚点和原计分方向。",
+        "禁止固定心态反向拼成成长总分；Value/Cost 不合成。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "subject-adaptation-pilot",
+        "evidenceType": "CONTENT_VALIDITY",
+        "studyDesign": "Explicit subject substitution; content audit only, no empirical validation.",
+        "population": "Chinese secondary school students; adapted subject form",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "rating": "UNKNOWN",
+        "citation": "Huisurvey first-wave subject adaptation; canonical chemistry wording with explicit subject substitution",
+        "notes": "No exact-version empirical validation. PUBLISHED + PILOT with theoretical provisional bands only."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Project-authored subject adaptation of verified canonical Chinese chemistry items",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "subject-adaptation-pilot"
+    ],
+    "reviewStatus": "APPROVED",
+    "reviewedAt": "2026-10-01T00:00:00Z",
+    "notes": "Content/identity audit approval for deployment; not a claim of new subject psychometric equivalence. Student readability should continue to be piloted."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "grades": [
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "requiredContextKeys": [
+      "gradeLevel"
+    ]
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": true,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": true,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wave1-student-v1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "真实部署必须另有有效授权凭据；测试授权不构成生产授权。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "physics",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "学科自我概念／物理／项目中文版本",
+        "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; Huisurvey confirmed Wave1 scope",
+        "url": "https://app.notion.com/p/3e5d27635a3881e2a904cbc9dcf39bf8"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "allowed",
+        "note": "项目部署授权需由 InstrumentAuthorization 的真实记录确认；此内容声明不替代授权凭据。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "agreement",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "中性",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "LM-01",
+          "content": "我的物理成绩很好",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-02",
+          "content": "物理是我学得最好的科目之一",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-03",
+          "content": "我学习物理的速度很快",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "LM-04",
+          "content": "在物理课上，我理解最难的问题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "LM-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "LM-04",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "academic_self_concept",
+            "type": "total",
+            "label": "学科自我概念",
+            "description": "题目平均分；分数只描述认同程度，没有统一的好坏方向。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 3
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "LM-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "LM-04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "Codex editorial construction under project-owner approved student-language standard",
+            "reviewedAt": "2026-10-01T00:00:00Z",
+            "basis": "User-approved low self-concept example; scenario, reflection, concrete action and construct boundaries checked for each band. Structural CI is not a substitute for later student readability review."
+          }
+        },
+        "primaryScoreKeys": [
+          "academic_self_concept"
+        ],
+        "scoreOrder": [
+          "academic_self_concept"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "academic_self_concept",
+            "headline": "我怎样看自己的学习能力",
+            "source": {
+              "type": "reference_context"
+            },
+            "summary": "这份结果记录了你最近对物理学习的看法。它没有替你测出智力、成绩或未来一定会怎样。你可以先想一件最近真实发生的课堂或做题经历，再对照自己的回答：哪些地方符合，哪些地方并不符合？如果目前没有匹配的年级参考范围，这里就不替你分档，也不提供百分位。一次作答只是一个起点，接下来可以用一个小尝试观察自己的变化。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+            "bands": [
+              {
+                "key": "very_low",
+                "label": "你可能已经很少给自己留下“我也会”的空间",
+                "summary": "最近学物理时，你可能连开始都有点没底。看到难题，脑子里先出现的可能不是“试哪一步”，而是“这门课我大概就是不行”。这种感觉很累，尤其是已经努力过，却还是没看到想要的结果。\n\n这份作答只说明你现在怎样看自己，并没有替你测出能力。如果最近总卡在同一类题上，需要的是找出那一步；如果不少题能做，只是每次都先否定自己，也值得把那些已经会的地方记录下来。你不用一下子相信“我全会了”，先给一个小地方留出机会就好。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "最近一次觉得“整门课都不行”时，发生了什么？是一个具体知识点，还是和别人的速度作了比较？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一道你以前做对过的题，不看答案重新做。圈出独立完成的步骤；卡住时只问老师或同学那个具体步骤。先留下一个“这一步我会”的证据。"
+                  }
+                ]
+              },
+              {
+                "key": "low",
+                "label": "你好像还不太相信自己能学好物理",
+                "summary": "做物理题的时候，你可能比较容易注意到自己不会的地方。\n\n一道题卡住了、一次考试没考好，或者看到别人比自己做得快，你可能很快就会冒出这样的想法：“我是不是不太擅长这门课？”有时候，即使前面已经做对了不少题，只要碰到一道特别难的题，这种感觉还是会一下子回来。\n\n但这个分数不是在说“你能力不行”。它更像是在告诉你：你现在对自己的物理能力，还没有那么有把握。“我觉得自己会不会”和“我实际上会不会”，并不是完全一回事。\n\n有些人其实已经掌握了不少东西，只是很容易被一次失败影响；也有人确实有几个知识点没弄懂，于是慢慢觉得“整门课都不行”。这两种情况，看起来很像，但解决办法完全不同。\n\n这份结果测的不是你的智力，也不是“有没有物理天赋”。它只是在记录：现在的你，有多相信自己能够学好这门课。这个想法不是固定的。当你慢慢积累一些“原来我真的能搞懂”的经历，它也会跟着变。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "下次又觉得“我果然不行”时，问一句“我到底是哪一步不会？”是题目没看懂、公式想不起来、会做但慢，还是只卡在最后一道难题？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "这周挑三道有点难、但不是完全不会的题。做前猜“我大概能做到哪一步”；做完对照实际做到哪里。把“我不会物理”写成“这一类题的第二步我还不会”，再找一个具体帮助。"
+                  }
+                ]
+              },
+              {
+                "key": "middle",
+                "label": "你的把握可能会随着题目和经历来回变化",
+                "summary": "学物理时，你可能有些地方挺有把握，也有些地方一碰到就犹豫。顺利做出一题，会觉得自己还不错；换一类题，又可能马上觉得没底。这种来回不一定奇怪，熟悉和不熟悉的内容本来就不同。\n\n这个结果并没有说你处在一个固定的“中等能力”位置。它记录的是现在对自己的看法。有时，把不同内容分开看，比给整门课一个评价更有帮助。你可以先找出哪些把握来自自己真的掌握了，哪些来自题目刚好熟悉，也看看哪些困难只是还没练过。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "上课能听懂、独立做题、向别人解释，这三件事里，哪一件你最有把握？哪一件还需要帮助？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "把最近一章列成“能独立做／提示后能做／还没懂”三栏。各放一个例子。这周只选中间一栏的一题，练到能够不看提示说出为什么。"
+                  }
+                ]
+              },
+              {
+                "key": "high",
+                "label": "你已经比较愿意相信自己能学好物理",
+                "summary": "碰到物理题，你可能通常愿意先试一试。一次卡住，不一定让你马上怀疑整门课都不行；你也可能已经有一些“我以前搞懂过”的经历，能帮你继续往下做。\n\n有这样的把握会让开始变得容易，但这个分数并不是对实际掌握程度的认证。熟悉题做得顺，和换一种问法仍能讲清楚，是两种不同的检验。你可以保留这份信心，同时给自己找一点新证据：不仅能做出来，还能说清楚为什么，或者知道哪里需要查资料和求助。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你最近一次觉得“这个我会”，是因为认出了熟悉题型，还是能讲清楚每一步？换个条件还会吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "选一道会做的题，改一个条件，再试一次；然后用两分钟讲给同学听。讲不清的那一步，就是下一次练习的目标，求助不会抵消你的把握。"
+                  }
+                ]
+              },
+              {
+                "key": "very_high",
+                "label": "你现在对自己的物理学习很有把握",
+                "summary": "你可能常常觉得自己能较快理解物理内容，也愿意处理难一点的问题。这份把握可能来自不少成功经历，它能给你开始尝试的动力。\n\n不过，分数高不表示你每个知识点都懂了，也不意味着遇到困难时就不该问人。最熟悉的内容，反而容易让我们跳过检查。可以把“我应该会”变成可检验的判断：先说明思路，再做一道没见过的题。发现漏掉的条件或步骤，是让掌握更扎实的机会，不需要把它理解成信心突然失效。\n\n比如做受力或电路题时，是画不出图、选不出关系式，还是计算卡住了？把这几件事分开看。",
+                "guidance": [
+                  {
+                    "category": "reflection",
+                    "text": "你有没有因为“这类我很熟”而漏看题目条件？遇到没见过的问题时，你还能耐心检查吗？"
+                  },
+                  {
+                    "category": "strategy",
+                    "text": "找一道没有做过的综合题，先写出两个可能的思路，再完成并检查。对照你做前预测和实际表现，留一个仍需学习的问题。"
+                  }
+                ]
+              }
+            ],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一次物理课或做题经历最影响你？记下发生的事和当时的想法，看看两者是不是完全一回事。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个这周能试的小步骤，做前写下预计情况，做后记下实际发生了什么；需要帮助时，把具体卡点说清楚。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果记录你现在的想法或课堂感受，不测智力、实际成绩或天赋，也不预测未来一定怎样。",
+          "一次作答可能受近期章节、考试和心情影响；请结合具体经历理解。",
+          "区间名称是描述，不是给你贴标签；其它学科或不同参考范围的区间不能直接比较。"
+        ],
+        "disclaimer": "这是一份帮助你理解最近学习体验的记录。它不是诊断、能力鉴定或排名，也不用于升学分流或替你决定是否购买补习。"
+      },
+      "referencePolicy": {
+        "type": "declared",
+        "selections": [
+          {
+            "scoreKey": "academic_self_concept",
+            "referenceVersion": "wave1-20261001-v1",
+            "referenceKind": "theoretical_range"
+          }
+        ]
+      }
+    },
+    "references": [
+      {
+        "schemaVersion": 1,
+        "instrumentType": "scale",
+        "instrumentKey": "academic_self_concept_physics_zh_cn",
+        "referenceVersion": "wave1-20261001-v1",
+        "status": "ACTIVE",
+        "entries": [
+          {
+            "scoreKey": "academic_self_concept",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "物理／初中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "7",
+                  "8",
+                  "9"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "physics",
+              "schoolStage": "junior_secondary",
+              "locale": "zh-CN",
+              "populationKey": "physics-junior_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 5
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "当前把握较少",
+                  "lower": 1,
+                  "upper": 1.8
+                },
+                {
+                  "key": "low",
+                  "label": "当前不太有把握",
+                  "lower": 1.8,
+                  "upper": 2.6
+                },
+                {
+                  "key": "middle",
+                  "label": "有些地方有把握",
+                  "lower": 2.6,
+                  "upper": 3.4
+                },
+                {
+                  "key": "high",
+                  "label": "当前比较有把握",
+                  "lower": 3.4,
+                  "upper": 4.2
+                },
+                {
+                  "key": "very_high",
+                  "label": "当前很有把握",
+                  "lower": 4.2,
+                  "upper": 5
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "academic_self_concept_physics_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "02f8ac857a992dbb6eadcb2f7c6ebef94e99fa384eb891ee5ce118cd18807022"
+            }
+          },
+          {
+            "scoreKey": "academic_self_concept",
+            "referenceKind": "theoretical_range",
+            "evidenceLevel": "theoretical",
+            "provenanceType": "theoretical_score_range",
+            "instrumentVersion": "1.0.0",
+            "scoringVersion": "1.0.0",
+            "population": {
+              "description": "物理／高中；量尺范围描述，无经验样本",
+              "language": "zh-CN",
+              "match": {
+                "gradeLevels": [
+                  "10",
+                  "11",
+                  "12"
+                ]
+              }
+            },
+            "source": {
+              "citation": "Learning Motivation Canonical Data Package FINAL_SYNCED; exact questionnaire/scoring audit"
+            },
+            "statistics": {},
+            "limitations": [
+              "描述区间暂定；没有该学科 exact-version 经验参考。"
+            ],
+            "disclaimer": "这是按题目可选分数范围形成的暂定描述，暂不提供样本排名或百分位。",
+            "governance": {
+              "schemaVersion": 1,
+              "kind": "THEORETICAL_RANGE",
+              "subjectKey": "physics",
+              "schoolStage": "upper_secondary",
+              "locale": "zh-CN",
+              "populationKey": "physics-upper_secondary-students",
+              "effectiveFrom": "2026-10-01T00:00:00Z",
+              "scoreRange": {
+                "min": 1,
+                "max": 5
+              },
+              "bandSource": "THEORETICAL_SCORE_RANGE",
+              "bands": [
+                {
+                  "key": "very_low",
+                  "label": "当前把握较少",
+                  "lower": 1,
+                  "upper": 1.8
+                },
+                {
+                  "key": "low",
+                  "label": "当前不太有把握",
+                  "lower": 1.8,
+                  "upper": 2.6
+                },
+                {
+                  "key": "middle",
+                  "label": "有些地方有把握",
+                  "lower": 2.6,
+                  "upper": 3.4
+                },
+                {
+                  "key": "high",
+                  "label": "当前比较有把握",
+                  "lower": 3.4,
+                  "upper": 4.2
+                },
+                {
+                  "key": "very_high",
+                  "label": "当前很有把握",
+                  "lower": 4.2,
+                  "upper": 5
+                }
+              ],
+              "sampleN": null,
+              "sourceDataset": "THEORETICAL_RANGE / authored scale anchors",
+              "sourceSnapshot": "academic_self_concept_physics_zh_cn@1.0.0/range-v1",
+              "crossStageReReferenceAllowed": false,
+              "measurementHash": "02f8ac857a992dbb6eadcb2f7c6ebef94e99fa384eb891ee5ce118cd18807022"
+            }
+          }
+        ]
+      }
+    ],
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "LM-04",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "academic_self_concept": 1
+          },
+          "totalScoreKeys": [
+            "academic_self_concept"
+          ]
+        }
+      },
+      {
+        "name": "all-5",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "LM-04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "academic_self_concept": 5
+          },
+          "totalScoreKeys": [
+            "academic_self_concept"
+          ]
+        }
+      },
+      {
+        "name": "minimum-valid-prorated",
+        "answers": [
+          {
+            "itemCode": "LM-01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "LM-03",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "academic_self_concept": 2
+          },
+          "totalScoreKeys": [
+            "academic_self_concept"
+          ]
+        }
+      }
+    ]
+  }
+}

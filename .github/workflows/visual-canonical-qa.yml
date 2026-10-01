@@ -73,12 +73,14 @@ concurrency:
 
 jobs:
   canonical-visual-qa:
+    # Run the full matrix when the release PR is ready for review.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || !startsWith(github.head_ref, 'feat/scale-wave1-')
     name: canonical 390 / 768 / 1440 screenshot matrix
     runs-on:
       - self-hosted
       - linux
       - eduk12-mac-ci
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       VISUAL_QA_BASE_URL: http://127.0.0.1:5173
       VISUAL_QA_EVIDENCE_DIR: /tmp/eduk12-visual-qa

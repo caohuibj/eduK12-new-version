@@ -1,3 +1,4 @@
+import { ScaleReferenceTrajectory } from '../../modules/reporting/ScaleReferenceTrajectory'
 import {
   aggregationLabel,
   limitationLabel,
@@ -337,6 +338,7 @@ export function ProjectionPanel({ artifact }: { artifact: ReportingArtifactProje
 
         {projection.kind === 'INDIVIDUAL_LONGITUDINAL' && (
           <>
+            <ScaleReferenceTrajectory projection={projection} audience="teacher" />
             <ReportCoreSummary label="个人纵向说明">
               <p>以下内容用于描述同一被试在多次测量中的结果变化，不用于诊断，也不能据此推断变化原因。</p>
             </ReportCoreSummary>

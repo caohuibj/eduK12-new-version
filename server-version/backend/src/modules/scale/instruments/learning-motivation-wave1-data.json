@@ -1,0 +1,3489 @@
+{
+  "schemaVersion": 1,
+  "sourceDataset": "Learning Motivation / Final_edition (canonical synced)",
+  "sourceSnapshot": "473c7b0c7ac4c8778405e388cbad90d4cf13ef223b49c7b22fd78ef29c480dbd",
+  "itemMapSnapshot": "b4657775dca655b7f8f01234a6e5047cb5f0f3af710f1df41a21f37fa95cc182",
+  "selectionMethod": "LATEST_VALID_COMPATIBLE_WAVE_PER_CANONICAL_PERSON_AND_SCORE",
+  "families": {
+    "academic_self_concept": {
+      "items": [
+        "我的化学成绩很好",
+        "化学是我学得最好的科目之一",
+        "我学习化学的速度很快",
+        "在化学课上，我理解最难的问题"
+      ],
+      "max": 5,
+      "minimum": 3,
+      "waves": [
+        2,
+        3
+      ]
+    },
+    "domain_fixed_mindset": {
+      "items": [
+        "每个人的化学学习天赋是大致确定的，很难改变",
+        "每个人的化学学习天赋不可能改变很多",
+        "每个人都能够学会新的化学知识，但是不能改变本来的化学学习天赋"
+      ],
+      "max": 6,
+      "minimum": 2,
+      "waves": [
+        2,
+        3
+      ]
+    },
+    "value_cost": {
+      "items": [
+        "我认为化学很重要",
+        "我重视化学",
+        "我认为化学很有用",
+        "化学功课需要占用太多时间",
+        "我没法投入足够的时间来学好化学",
+        "我需要（在其他领域）舍弃非常多，才能在化学课上取得好成绩",
+        "由于我有其它事情要做，我没有足够的时间学习化学"
+      ],
+      "max": 6,
+      "minimum": null,
+      "waves": [
+        2,
+        3
+      ]
+    },
+    "tutoring_necessity": {
+      "items": [
+        "参加课外补习，对化学成绩提升的帮助很大",
+        "为了学好化学，我需要课外补习",
+        "补习是化学取得好成绩的基础"
+      ],
+      "max": 6,
+      "minimum": 2,
+      "waves": [
+        2,
+        3
+      ]
+    },
+    "academic_self_efficacy": {
+      "items": [
+        "我肯定能够学会下学期化学课的内容",
+        "我确信自己能够完成最困难的化学学习任务",
+        "只要我不放弃，我可以完成几乎全部课堂中的化学问题",
+        "即使化学课程很难，我也能够学会",
+        "如果我尝试，我可以完成化学课程中最困难的问题"
+      ],
+      "max": 5,
+      "minimum": 4,
+      "waves": [
+        1
+      ]
+    },
+    "teacher_subject_liking": {
+      "items": [
+        "老师发自内心地喜欢化学这个学科",
+        "老师认为化学学科的知识非常有趣",
+        "老师觉得学习化学学科内容是充满乐趣的"
+      ],
+      "max": 6,
+      "minimum": 2,
+      "waves": [
+        1
+      ]
+    }
+  },
+  "references": {
+    "academic_self_concept/chemistry/academic_self_concept/junior_secondary": {
+      "N": 736,
+      "eligibleN": 737,
+      "mean": 2.79211957,
+      "sd": 1.04847538,
+      "median": 2.75,
+      "alphaCompleteCase": 0.90987033,
+      "alphaN": 732,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.125,
+          "sampleN": 66
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.125,
+          "upper": 2.125,
+          "sampleN": 136
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.125,
+          "upper": 3.375,
+          "sampleN": 331
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.375,
+          "upper": 4.125,
+          "sampleN": 131
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.125,
+          "upper": 5,
+          "sampleN": 72
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 4.48369565
+        },
+        {
+          "score": 1.25,
+          "percentile": 10.32608696
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 11.75271739
+        },
+        {
+          "score": 1.5,
+          "percentile": 13.38315217
+        },
+        {
+          "score": 1.75,
+          "percentile": 16.71195652
+        },
+        {
+          "score": 2.0,
+          "percentile": 22.96195652
+        },
+        {
+          "score": 2.25,
+          "percentile": 30.97826087
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 34.64673913
+        },
+        {
+          "score": 2.5,
+          "percentile": 38.92663043
+        },
+        {
+          "score": 2.75,
+          "percentile": 47.41847826
+        },
+        {
+          "score": 3.0,
+          "percentile": 59.10326087
+        },
+        {
+          "score": 3.25,
+          "percentile": 69.42934783
+        },
+        {
+          "score": 3.5,
+          "percentile": 74.86413043
+        },
+        {
+          "score": 3.75,
+          "percentile": 80.43478261
+        },
+        {
+          "score": 4.0,
+          "percentile": 86.88858696
+        },
+        {
+          "score": 4.25,
+          "percentile": 91.50815217
+        },
+        {
+          "score": 4.5,
+          "percentile": 93.3423913
+        },
+        {
+          "score": 4.75,
+          "percentile": 94.63315217
+        },
+        {
+          "score": 5.0,
+          "percentile": 97.69021739
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_concept1",
+          "d2_concept2",
+          "d2_concept3",
+          "d2_concept4"
+        ],
+        "3": [
+          "d3_concept1",
+          "d3_concept2",
+          "d3_concept3",
+          "d3_concept4"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.00135685,
+        "floor": 0.08967391,
+        "ceiling": 0.04619565,
+        "skew": 0.13412965,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "academic_self_concept/chemistry/academic_self_concept/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 1.93696581,
+      "sd": 0.96184205,
+      "median": 1.75,
+      "alphaCompleteCase": 0.91310455,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1,
+          "upper": 1.125,
+          "sampleN": 236
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 1.125,
+          "upper": 2.375,
+          "sampleN": 258
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 2.375,
+          "upper": 5,
+          "sampleN": 208
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 16.80911681
+        },
+        {
+          "score": 1.25,
+          "percentile": 36.3960114
+        },
+        {
+          "score": 1.5,
+          "percentile": 42.02279202
+        },
+        {
+          "score": 1.75,
+          "percentile": 48.43304843
+        },
+        {
+          "score": 2.0,
+          "percentile": 58.4045584
+        },
+        {
+          "score": 2.25,
+          "percentile": 67.59259259
+        },
+        {
+          "score": 2.5,
+          "percentile": 73.29059829
+        },
+        {
+          "score": 2.75,
+          "percentile": 78.27635328
+        },
+        {
+          "score": 3.0,
+          "percentile": 85.11396011
+        },
+        {
+          "score": 3.25,
+          "percentile": 91.38176638
+        },
+        {
+          "score": 3.5,
+          "percentile": 93.58974359
+        },
+        {
+          "score": 3.75,
+          "percentile": 95.22792023
+        },
+        {
+          "score": 4.0,
+          "percentile": 96.72364672
+        },
+        {
+          "score": 4.25,
+          "percentile": 97.36467236
+        },
+        {
+          "score": 4.5,
+          "percentile": 97.50712251
+        },
+        {
+          "score": 4.75,
+          "percentile": 97.93447293
+        },
+        {
+          "score": 5.0,
+          "percentile": 99.14529915
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_concept1",
+          "d2_concept2",
+          "d2_concept3",
+          "d2_concept4"
+        ],
+        "3": [
+          "d3_concept1",
+          "d3_concept2",
+          "d3_concept3",
+          "d3_concept4"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.33618234,
+        "ceiling": 0.01709402,
+        "skew": 0.98129937,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "academic_self_concept/mathematics/academic_self_concept/junior_secondary": {
+      "N": 735,
+      "eligibleN": 735,
+      "mean": 3.01088435,
+      "sd": 1.10588155,
+      "median": 3.0,
+      "alphaCompleteCase": 0.92866548,
+      "alphaN": 735,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.375,
+          "sampleN": 74
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.375,
+          "upper": 2.375,
+          "sampleN": 138
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.375,
+          "upper": 3.625,
+          "sampleN": 300
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.625,
+          "upper": 4.625,
+          "sampleN": 151
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.625,
+          "upper": 5,
+          "sampleN": 72
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 3.46938776
+        },
+        {
+          "score": 1.25,
+          "percentile": 8.50340136
+        },
+        {
+          "score": 1.5,
+          "percentile": 11.2244898
+        },
+        {
+          "score": 1.75,
+          "percentile": 14.21768707
+        },
+        {
+          "score": 2.0,
+          "percentile": 20.0
+        },
+        {
+          "score": 2.25,
+          "percentile": 26.39455782
+        },
+        {
+          "score": 2.5,
+          "percentile": 31.36054422
+        },
+        {
+          "score": 2.75,
+          "percentile": 37.41496599
+        },
+        {
+          "score": 3.0,
+          "percentile": 49.45578231
+        },
+        {
+          "score": 3.25,
+          "percentile": 61.02040816
+        },
+        {
+          "score": 3.5,
+          "percentile": 66.8707483
+        },
+        {
+          "score": 3.75,
+          "percentile": 72.78911565
+        },
+        {
+          "score": 4.0,
+          "percentile": 80.13605442
+        },
+        {
+          "score": 4.25,
+          "percentile": 86.19047619
+        },
+        {
+          "score": 4.5,
+          "percentile": 89.11564626
+        },
+        {
+          "score": 4.75,
+          "percentile": 91.29251701
+        },
+        {
+          "score": 5.0,
+          "percentile": 96.19047619
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mconcept1",
+          "d2_mconcept2",
+          "d2_mconcept3",
+          "d2_mconcept4"
+        ],
+        "3": [
+          "d3_mconcept1",
+          "d3_mconcept2",
+          "d3_mconcept3",
+          "d3_mconcept4"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.06938776,
+        "ceiling": 0.07619048,
+        "skew": -0.02172264,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "academic_self_concept/mathematics/academic_self_concept/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 2.44551282,
+      "sd": 1.05592775,
+      "median": 2.25,
+      "alphaCompleteCase": 0.92444295,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.125,
+          "sampleN": 107
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.125,
+          "upper": 1.875,
+          "sampleN": 98
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 1.875,
+          "upper": 2.875,
+          "sampleN": 249
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 2.875,
+          "upper": 3.875,
+          "sampleN": 172
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 3.875,
+          "upper": 5,
+          "sampleN": 76
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 7.62108262
+        },
+        {
+          "score": 1.25,
+          "percentile": 17.37891738
+        },
+        {
+          "score": 1.5,
+          "percentile": 21.36752137
+        },
+        {
+          "score": 1.75,
+          "percentile": 26.21082621
+        },
+        {
+          "score": 2.0,
+          "percentile": 36.53846154
+        },
+        {
+          "score": 2.25,
+          "percentile": 47.29344729
+        },
+        {
+          "score": 2.5,
+          "percentile": 54.34472934
+        },
+        {
+          "score": 2.75,
+          "percentile": 61.32478632
+        },
+        {
+          "score": 3.0,
+          "percentile": 72.36467236
+        },
+        {
+          "score": 3.25,
+          "percentile": 82.05128205
+        },
+        {
+          "score": 3.5,
+          "percentile": 85.3988604
+        },
+        {
+          "score": 3.75,
+          "percentile": 87.96296296
+        },
+        {
+          "score": 4.0,
+          "percentile": 91.0968661
+        },
+        {
+          "score": 4.25,
+          "percentile": 93.51851852
+        },
+        {
+          "score": 4.5,
+          "percentile": 94.44444444
+        },
+        {
+          "score": 4.75,
+          "percentile": 95.15669516
+        },
+        {
+          "score": 5.0,
+          "percentile": 97.72079772
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mconcept1",
+          "d2_mconcept2",
+          "d2_mconcept3",
+          "d2_mconcept4"
+        ],
+        "3": [
+          "d3_mconcept1",
+          "d3_mconcept2",
+          "d3_mconcept3",
+          "d3_mconcept4"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.15242165,
+        "ceiling": 0.04558405,
+        "skew": 0.54600065,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "domain_fixed_mindset/chemistry/domain_fixed_mindset/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 2.63478064,
+      "sd": 1.16037421,
+      "median": 2.66666667,
+      "alphaCompleteCase": 0.81045835,
+      "alphaN": 723,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 94
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 1.83333333,
+          "sampleN": 76
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 1.83333333,
+          "upper": 3.16666667,
+          "sampleN": 368
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.16666667,
+          "upper": 4.16666667,
+          "sampleN": 129
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.16666667,
+          "upper": 6,
+          "sampleN": 70
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 6.37720488
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 15.33242877
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 20.48846676
+        },
+        {
+          "score": 2.0,
+          "percentile": 32.56445047
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 45.72591588
+        },
+        {
+          "score": 2.5,
+          "percentile": 49.52510176
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 53.39213026
+        },
+        {
+          "score": 3.0,
+          "percentile": 65.06105834
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 75.50881954
+        },
+        {
+          "score": 3.5,
+          "percentile": 78.22252374
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 81.13975577
+        },
+        {
+          "score": 4.0,
+          "percentile": 87.17774763
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 91.72320217
+        },
+        {
+          "score": 4.5,
+          "percentile": 93.08005427
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 93.82632293
+        },
+        {
+          "score": 5.0,
+          "percentile": 96.0651289
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 97.89687924
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 98.16824966
+        },
+        {
+          "score": 6.0,
+          "percentile": 99.11804613
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_minddom1",
+          "d2_minddom2",
+          "d2_minddom3"
+        ],
+        "3": [
+          "d3_minddom1",
+          "d3_minddom2",
+          "d3_minddom3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.1275441,
+        "ceiling": 0.01763908,
+        "skew": 0.60718363,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "domain_fixed_mindset/chemistry/domain_fixed_mindset/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 2.68091168,
+      "sd": 1.24472053,
+      "median": 2.66666667,
+      "alphaCompleteCase": 0.8651864,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 131
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 1.83333333,
+          "sampleN": 38
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 1.83333333,
+          "upper": 3.16666667,
+          "sampleN": 322
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.16666667,
+          "upper": 4.16666667,
+          "sampleN": 145
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.16666667,
+          "upper": 6,
+          "sampleN": 66
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 9.33048433
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 19.72934473
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 22.43589744
+        },
+        {
+          "score": 2.0,
+          "percentile": 31.62393162
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 42.73504274
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 49.85754986
+        },
+        {
+          "score": 3.0,
+          "percentile": 61.68091168
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 72.29344729
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 77.70655271
+        },
+        {
+          "score": 4.0,
+          "percentile": 85.68376068
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 91.52421652
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 93.01994302
+        },
+        {
+          "score": 5.0,
+          "percentile": 95.08547009
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 96.86609687
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 97.36467236
+        },
+        {
+          "score": 6.0,
+          "percentile": 98.78917379
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_minddom1",
+          "d2_minddom2",
+          "d2_minddom3"
+        ],
+        "3": [
+          "d3_minddom1",
+          "d3_minddom2",
+          "d3_minddom3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.18660969,
+        "ceiling": 0.02421652,
+        "skew": 0.48261549,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "domain_fixed_mindset/mathematics/domain_fixed_mindset/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 2.86341022,
+      "sd": 1.36185802,
+      "median": 2.66666667,
+      "alphaCompleteCase": 0.89998481,
+      "alphaN": 730,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 111
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 2.16666667,
+          "sampleN": 176
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.16666667,
+          "upper": 3.41666667,
+          "sampleN": 239
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.41666667,
+          "upper": 4.83333333,
+          "sampleN": 129
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.83333333,
+          "upper": 6,
+          "sampleN": 82
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 7.53052917
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 16.14654003
+        },
+        {
+          "score": 1.5,
+          "percentile": 17.36770692
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 18.79240163
+        },
+        {
+          "score": 2.0,
+          "percentile": 29.51153324
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 41.04477612
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 46.81139756
+        },
+        {
+          "score": 3.0,
+          "percentile": 57.9375848
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 68.385346
+        },
+        {
+          "score": 3.5,
+          "percentile": 71.50610583
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 74.08412483
+        },
+        {
+          "score": 4.0,
+          "percentile": 80.18995929
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 85.41383989
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 87.92401628
+        },
+        {
+          "score": 5.0,
+          "percentile": 91.24830393
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 94.09769335
+        },
+        {
+          "score": 6.0,
+          "percentile": 97.28629579
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mminddom1",
+          "d2_mminddom2",
+          "d2_mminddom3"
+        ],
+        "3": [
+          "d3_mminddom1",
+          "d3_mminddom2",
+          "d3_mminddom3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.15061058,
+        "ceiling": 0.05427408,
+        "skew": 0.55438304,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "domain_fixed_mindset/mathematics/domain_fixed_mindset/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 3.0954416,
+      "sd": 1.34901905,
+      "median": 3.0,
+      "alphaCompleteCase": 0.92514495,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 89
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 2.16666667,
+          "sampleN": 108
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.16666667,
+          "upper": 3.83333333,
+          "sampleN": 292
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.83333333,
+          "upper": 4.83333333,
+          "sampleN": 124
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.83333333,
+          "upper": 6,
+          "sampleN": 89
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 6.33903134
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 13.96011396
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 16.66666667
+        },
+        {
+          "score": 2.0,
+          "percentile": 23.07692308
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 30.62678063
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 35.8974359
+        },
+        {
+          "score": 3.0,
+          "percentile": 46.93732194
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 59.25925926
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 66.45299145
+        },
+        {
+          "score": 4.0,
+          "percentile": 75.78347578
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 83.68945869
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 86.3960114
+        },
+        {
+          "score": 5.0,
+          "percentile": 90.45584046
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 93.94586895
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 94.51566952
+        },
+        {
+          "score": 6.0,
+          "percentile": 97.36467236
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mminddom1",
+          "d2_mminddom2",
+          "d2_mminddom3"
+        ],
+        "3": [
+          "d3_mminddom1",
+          "d3_mminddom2",
+          "d3_mminddom3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.12678063,
+        "ceiling": 0.05270655,
+        "skew": 0.23300453,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/chemistry/value/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 4.75056536,
+      "sd": 1.07603172,
+      "median": 5.0,
+      "alphaCompleteCase": 0.89815001,
+      "alphaN": 732,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 3.16666667,
+          "sampleN": 66
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 3.16666667,
+          "upper": 4.16666667,
+          "sampleN": 130
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 4.16666667,
+          "upper": 5.16666667,
+          "sampleN": 300
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 5.16666667,
+          "upper": 5.83333333,
+          "sampleN": 82
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.83333333,
+          "upper": 6,
+          "sampleN": 159
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 0.74626866
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 1.62822252
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 1.83175034
+        },
+        {
+          "score": 2.0,
+          "percentile": 2.44233379
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 3.45997286
+        },
+        {
+          "score": 2.5,
+          "percentile": 4.0027137
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 4.47761194
+        },
+        {
+          "score": 3.0,
+          "percentile": 6.91994573
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 10.31207598
+        },
+        {
+          "score": 3.5,
+          "percentile": 11.8046133
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 14.24694708
+        },
+        {
+          "score": 4.0,
+          "percentile": 21.57394844
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 30.46132972
+        },
+        {
+          "score": 4.5,
+          "percentile": 34.39620081
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 37.10990502
+        },
+        {
+          "score": 5.0,
+          "percentile": 53.52781547
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 70.62415197
+        },
+        {
+          "score": 5.5,
+          "percentile": 74.01628223
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 76.2550882
+        },
+        {
+          "score": 6.0,
+          "percentile": 89.21302578
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_evc1",
+          "d2_evc2",
+          "d2_evc3"
+        ],
+        "3": [
+          "d3_evc1",
+          "d3_evc2",
+          "d3_evc3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.01492537,
+        "ceiling": 0.21573948,
+        "skew": -1.05974222,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/chemistry/value/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 3.58404558,
+      "sd": 1.49192744,
+      "median": 3.66666667,
+      "alphaCompleteCase": 0.93105819,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 98
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 2.83333333,
+          "sampleN": 93
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.83333333,
+          "upper": 4.5,
+          "sampleN": 312
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.5,
+          "upper": 5.5,
+          "sampleN": 128
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.5,
+          "upper": 6,
+          "sampleN": 71
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 6.98005698
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 14.31623932
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 15.24216524
+        },
+        {
+          "score": 2.0,
+          "percentile": 18.16239316
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 22.22222222
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 25.56980057
+        },
+        {
+          "score": 3.0,
+          "percentile": 30.91168091
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 38.03418803
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 45.86894587
+        },
+        {
+          "score": 4.0,
+          "percentile": 58.04843305
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 68.73219373
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 74.002849
+        },
+        {
+          "score": 5.0,
+          "percentile": 81.98005698
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 88.74643875
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 90.45584046
+        },
+        {
+          "score": 6.0,
+          "percentile": 95.51282051
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_evc1",
+          "d2_evc2",
+          "d2_evc3"
+        ],
+        "3": [
+          "d3_evc1",
+          "d3_evc2",
+          "d3_evc3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.13960114,
+        "ceiling": 0.08974359,
+        "skew": -0.28901259,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/chemistry/cost/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 2.68294889,
+      "sd": 1.07709614,
+      "median": 2.5,
+      "alphaCompleteCase": 0.82978058,
+      "alphaN": 725,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.375,
+          "sampleN": 80
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.375,
+          "upper": 2.125,
+          "sampleN": 178
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.125,
+          "upper": 3.125,
+          "sampleN": 260
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.125,
+          "upper": 4.125,
+          "sampleN": 145
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.125,
+          "upper": 6,
+          "sampleN": 74
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 3.86702849
+        },
+        {
+          "score": 1.25,
+          "percentile": 9.29443691
+        },
+        {
+          "score": 1.5,
+          "percentile": 12.82225237
+        },
+        {
+          "score": 1.75,
+          "percentile": 17.0963365
+        },
+        {
+          "score": 2.0,
+          "percentile": 27.20488467
+        },
+        {
+          "score": 2.25,
+          "percentile": 39.07734057
+        },
+        {
+          "score": 2.5,
+          "percentile": 48.10040706
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 53.25644505
+        },
+        {
+          "score": 2.75,
+          "percentile": 57.32700136
+        },
+        {
+          "score": 3.0,
+          "percentile": 65.7394844
+        },
+        {
+          "score": 3.25,
+          "percentile": 74.01628223
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 77.95115332
+        },
+        {
+          "score": 3.5,
+          "percentile": 80.39348711
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 82.70013569
+        },
+        {
+          "score": 3.75,
+          "percentile": 84.192673
+        },
+        {
+          "score": 4.0,
+          "percentile": 87.78833107
+        },
+        {
+          "score": 4.25,
+          "percentile": 91.11261872
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 92.33378562
+        },
+        {
+          "score": 4.5,
+          "percentile": 93.08005427
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 93.89416554
+        },
+        {
+          "score": 4.75,
+          "percentile": 95.04748982
+        },
+        {
+          "score": 5.0,
+          "percentile": 96.81139756
+        },
+        {
+          "score": 5.25,
+          "percentile": 97.76119403
+        },
+        {
+          "score": 5.5,
+          "percentile": 98.16824966
+        },
+        {
+          "score": 5.75,
+          "percentile": 98.57530529
+        },
+        {
+          "score": 6.0,
+          "percentile": 99.38941655
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_evc4",
+          "d2_evc5",
+          "d2_evc6",
+          "d2_evc7"
+        ],
+        "3": [
+          "d3_evc4",
+          "d3_evc5",
+          "d3_evc6",
+          "d3_evc7"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.07734057,
+        "ceiling": 0.01221167,
+        "skew": 0.67465523,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/chemistry/cost/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 3.18910256,
+      "sd": 1.24228526,
+      "median": 3.25,
+      "alphaCompleteCase": 0.82770165,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.125,
+          "sampleN": 76
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.125,
+          "upper": 2.625,
+          "sampleN": 139
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.625,
+          "upper": 3.875,
+          "sampleN": 270
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.875,
+          "upper": 4.875,
+          "sampleN": 157
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.875,
+          "upper": 6,
+          "sampleN": 60
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 5.41310541
+        },
+        {
+          "score": 1.25,
+          "percentile": 11.25356125
+        },
+        {
+          "score": 1.5,
+          "percentile": 12.46438746
+        },
+        {
+          "score": 1.75,
+          "percentile": 14.38746439
+        },
+        {
+          "score": 2.0,
+          "percentile": 18.94586895
+        },
+        {
+          "score": 2.25,
+          "percentile": 24.14529915
+        },
+        {
+          "score": 2.5,
+          "percentile": 28.27635328
+        },
+        {
+          "score": 2.75,
+          "percentile": 33.33333333
+        },
+        {
+          "score": 3.0,
+          "percentile": 40.5982906
+        },
+        {
+          "score": 3.25,
+          "percentile": 48.71794872
+        },
+        {
+          "score": 3.5,
+          "percentile": 57.05128205
+        },
+        {
+          "score": 3.75,
+          "percentile": 65.45584046
+        },
+        {
+          "score": 4.0,
+          "percentile": 74.64387464
+        },
+        {
+          "score": 4.25,
+          "percentile": 81.90883191
+        },
+        {
+          "score": 4.5,
+          "percentile": 85.75498575
+        },
+        {
+          "score": 4.75,
+          "percentile": 89.67236467
+        },
+        {
+          "score": 5.0,
+          "percentile": 93.3048433
+        },
+        {
+          "score": 5.25,
+          "percentile": 95.86894587
+        },
+        {
+          "score": 5.5,
+          "percentile": 96.93732194
+        },
+        {
+          "score": 5.75,
+          "percentile": 97.43589744
+        },
+        {
+          "score": 6.0,
+          "percentile": 98.78917379
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_evc4",
+          "d2_evc5",
+          "d2_evc6",
+          "d2_evc7"
+        ],
+        "3": [
+          "d3_evc4",
+          "d3_evc5",
+          "d3_evc6",
+          "d3_evc7"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.10826211,
+        "ceiling": 0.02421652,
+        "skew": -0.07346253,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/mathematics/value/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 5.05495251,
+      "sd": 1.07055732,
+      "median": 5.0,
+      "alphaCompleteCase": 0.91372786,
+      "alphaN": 728,
+      "bands": [
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1,
+          "upper": 4.83333333,
+          "sampleN": 205
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 4.83333333,
+          "upper": 5.83333333,
+          "sampleN": 248
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 5.83333333,
+          "upper": 6,
+          "sampleN": 284
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 0.67842605
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 1.42469471
+        },
+        {
+          "score": 2.0,
+          "percentile": 1.83175034
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 2.37449118
+        },
+        {
+          "score": 2.5,
+          "percentile": 2.6458616
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 3.32428765
+        },
+        {
+          "score": 3.0,
+          "percentile": 5.90230665
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 8.68385346
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 10.5834464
+        },
+        {
+          "score": 4.0,
+          "percentile": 15.7394844
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 21.43826323
+        },
+        {
+          "score": 4.5,
+          "percentile": 23.13432836
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 25.50881954
+        },
+        {
+          "score": 5.0,
+          "percentile": 39.4843962
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 54.61329715
+        },
+        {
+          "score": 5.5,
+          "percentile": 58.14111262
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 59.83717775
+        },
+        {
+          "score": 6.0,
+          "percentile": 80.73270014
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mevc1",
+          "d2_mevc2",
+          "d2_mevc3"
+        ],
+        "3": [
+          "d3_mevc1",
+          "d3_mevc2",
+          "d3_mevc3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.01356852,
+        "ceiling": 0.385346,
+        "skew": -1.37007999,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/mathematics/value/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 4.71320038,
+      "sd": 1.25281861,
+      "median": 5.0,
+      "alphaCompleteCase": 0.93114163,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 3.83333333,
+          "sampleN": 139
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 3.83333333,
+          "upper": 4.83333333,
+          "sampleN": 163
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.83333333,
+          "upper": 5.83333333,
+          "sampleN": 189
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.83333333,
+          "upper": 6,
+          "sampleN": 211
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 1.28205128
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 2.70655271
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 3.20512821
+        },
+        {
+          "score": 2.0,
+          "percentile": 4.13105413
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 5.12820513
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 6.33903134
+        },
+        {
+          "score": 3.0,
+          "percentile": 9.9002849
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 14.52991453
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 18.09116809
+        },
+        {
+          "score": 4.0,
+          "percentile": 26.85185185
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 35.75498575
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 40.31339031
+        },
+        {
+          "score": 5.0,
+          "percentile": 51.56695157
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 63.17663818
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 68.09116809
+        },
+        {
+          "score": 6.0,
+          "percentile": 84.97150997
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mevc1",
+          "d2_mevc2",
+          "d2_mevc3"
+        ],
+        "3": [
+          "d3_mevc1",
+          "d3_mevc2",
+          "d3_mevc3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.02564103,
+        "ceiling": 0.3005698,
+        "skew": -0.95563556,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/mathematics/cost/junior_secondary": {
+      "N": 737,
+      "eligibleN": 737,
+      "mean": 2.81772953,
+      "sd": 1.12319602,
+      "median": 2.75,
+      "alphaCompleteCase": 0.7975299,
+      "alphaN": 728,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.41666667,
+          "sampleN": 74
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.41666667,
+          "upper": 2.125,
+          "sampleN": 142
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.125,
+          "upper": 3.375,
+          "sampleN": 326
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.375,
+          "upper": 4.375,
+          "sampleN": 129
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.375,
+          "upper": 6,
+          "sampleN": 66
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 3.86702849
+        },
+        {
+          "score": 1.25,
+          "percentile": 8.81953867
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 9.97286296
+        },
+        {
+          "score": 1.5,
+          "percentile": 11.39755767
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 12.82225237
+        },
+        {
+          "score": 1.75,
+          "percentile": 16.21438263
+        },
+        {
+          "score": 2.0,
+          "percentile": 24.42333786
+        },
+        {
+          "score": 2.25,
+          "percentile": 33.31071913
+        },
+        {
+          "score": 2.5,
+          "percentile": 41.38398915
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 45.59023066
+        },
+        {
+          "score": 2.75,
+          "percentile": 50.06784261
+        },
+        {
+          "score": 3.0,
+          "percentile": 59.76933514
+        },
+        {
+          "score": 3.25,
+          "percentile": 69.33514247
+        },
+        {
+          "score": 3.5,
+          "percentile": 76.05156038
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 78.62957938
+        },
+        {
+          "score": 3.75,
+          "percentile": 80.46132972
+        },
+        {
+          "score": 4.0,
+          "percentile": 85.27815468
+        },
+        {
+          "score": 4.25,
+          "percentile": 89.68792402
+        },
+        {
+          "score": 4.5,
+          "percentile": 91.99457259
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 93.01221167
+        },
+        {
+          "score": 4.75,
+          "percentile": 94.16553596
+        },
+        {
+          "score": 5.0,
+          "percentile": 95.86160109
+        },
+        {
+          "score": 5.25,
+          "percentile": 96.81139756
+        },
+        {
+          "score": 5.5,
+          "percentile": 97.3541384
+        },
+        {
+          "score": 5.75,
+          "percentile": 97.76119403
+        },
+        {
+          "score": 6.0,
+          "percentile": 98.98236092
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mevc4",
+          "d2_mevc5",
+          "d2_mevc6",
+          "d2_mevc7"
+        ],
+        "3": [
+          "d3_mevc4",
+          "d3_mevc5",
+          "d3_mevc6",
+          "d3_mevc7"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.07734057,
+        "ceiling": 0.02035278,
+        "skew": 0.5520689,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "value_cost/mathematics/cost/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 3.67094017,
+      "sd": 1.18605315,
+      "median": 3.75,
+      "alphaCompleteCase": 0.78806945,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 2.125,
+          "sampleN": 72
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 2.125,
+          "upper": 3.125,
+          "sampleN": 165
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 3.125,
+          "upper": 4.125,
+          "sampleN": 235
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.125,
+          "upper": 5.375,
+          "sampleN": 166
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.375,
+          "upper": 6,
+          "sampleN": 64
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 1.42450142
+        },
+        {
+          "score": 1.25,
+          "percentile": 3.06267806
+        },
+        {
+          "score": 1.5,
+          "percentile": 4.05982906
+        },
+        {
+          "score": 1.75,
+          "percentile": 5.6980057
+        },
+        {
+          "score": 2.0,
+          "percentile": 8.4045584
+        },
+        {
+          "score": 2.25,
+          "percentile": 12.10826211
+        },
+        {
+          "score": 2.5,
+          "percentile": 15.81196581
+        },
+        {
+          "score": 2.75,
+          "percentile": 20.2991453
+        },
+        {
+          "score": 3.0,
+          "percentile": 28.34757835
+        },
+        {
+          "score": 3.25,
+          "percentile": 36.60968661
+        },
+        {
+          "score": 3.5,
+          "percentile": 44.3019943
+        },
+        {
+          "score": 3.75,
+          "percentile": 52.70655271
+        },
+        {
+          "score": 4.0,
+          "percentile": 61.75213675
+        },
+        {
+          "score": 4.25,
+          "percentile": 70.37037037
+        },
+        {
+          "score": 4.5,
+          "percentile": 76.4957265
+        },
+        {
+          "score": 4.75,
+          "percentile": 81.83760684
+        },
+        {
+          "score": 5.0,
+          "percentile": 86.11111111
+        },
+        {
+          "score": 5.25,
+          "percentile": 89.45868946
+        },
+        {
+          "score": 5.5,
+          "percentile": 91.95156695
+        },
+        {
+          "score": 5.75,
+          "percentile": 93.66096866
+        },
+        {
+          "score": 6.0,
+          "percentile": 97.15099715
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mevc4",
+          "d2_mevc5",
+          "d2_mevc6",
+          "d2_mevc7"
+        ],
+        "3": [
+          "d3_mevc4",
+          "d3_mevc5",
+          "d3_mevc6",
+          "d3_mevc7"
+        ]
+      },
+      "minimumValidItems": 3,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.02849003,
+        "ceiling": 0.05698006,
+        "skew": -0.01468945,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "tutoring_necessity/chemistry/tutoring_necessity/junior_secondary": {
+      "N": 736,
+      "eligibleN": 737,
+      "mean": 3.55638587,
+      "sd": 1.23474454,
+      "median": 3.66666667,
+      "alphaCompleteCase": 0.8099234,
+      "alphaN": 732,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.83333333,
+          "sampleN": 70
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.83333333,
+          "upper": 2.83333333,
+          "sampleN": 124
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.83333333,
+          "upper": 4.16666667,
+          "sampleN": 317
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.16666667,
+          "upper": 5.16666667,
+          "sampleN": 160
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.16666667,
+          "upper": 6,
+          "sampleN": 65
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 2.44565217
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 5.97826087
+        },
+        {
+          "score": 1.5,
+          "percentile": 7.20108696
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 8.42391304
+        },
+        {
+          "score": 2.0,
+          "percentile": 12.22826087
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 16.7798913
+        },
+        {
+          "score": 2.5,
+          "percentile": 18.68206522
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 22.55434783
+        },
+        {
+          "score": 3.0,
+          "percentile": 31.31793478
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 41.30434783
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 51.83423913
+        },
+        {
+          "score": 4.0,
+          "percentile": 63.38315217
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 73.16576087
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 80.36684783
+        },
+        {
+          "score": 5.0,
+          "percentile": 87.5
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 92.52717391
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 95.10869565
+        },
+        {
+          "score": 6.0,
+          "percentile": 98.16576087
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_shaedu1",
+          "d2_shaedu2",
+          "d2_shaedu3"
+        ],
+        "3": [
+          "d3_shaedu1",
+          "d3_shaedu2",
+          "d3_shaedu3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.00135685,
+        "floor": 0.04891304,
+        "ceiling": 0.03668478,
+        "skew": -0.15554251,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "tutoring_necessity/chemistry/tutoring_necessity/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 2.78822412,
+      "sd": 1.24789529,
+      "median": 3.0,
+      "alphaCompleteCase": 0.87041105,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.16666667,
+          "sampleN": 140
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.16666667,
+          "upper": 2.16666667,
+          "sampleN": 110
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.16666667,
+          "upper": 3.5,
+          "sampleN": 223
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.5,
+          "upper": 4.5,
+          "sampleN": 174
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.5,
+          "upper": 6,
+          "sampleN": 55
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 9.97150997
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 20.7977208
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 23.00569801
+        },
+        {
+          "score": 2.0,
+          "percentile": 29.98575499
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 37.96296296
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 43.51851852
+        },
+        {
+          "score": 3.0,
+          "percentile": 52.84900285
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 63.17663818
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 72.22222222
+        },
+        {
+          "score": 4.0,
+          "percentile": 81.98005698
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 89.52991453
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 93.8034188
+        },
+        {
+          "score": 5.0,
+          "percentile": 97.00854701
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 98.86039886
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 99.21652422
+        },
+        {
+          "score": 6.0,
+          "percentile": 99.64387464
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_shaedu1",
+          "d2_shaedu2",
+          "d2_shaedu3"
+        ],
+        "3": [
+          "d3_shaedu1",
+          "d3_shaedu2",
+          "d3_shaedu3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.1994302,
+        "ceiling": 0.00712251,
+        "skew": 0.0406601,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "tutoring_necessity/mathematics/tutoring_necessity/junior_secondary": {
+      "N": 736,
+      "eligibleN": 737,
+      "mean": 3.61594203,
+      "sd": 1.30018061,
+      "median": 3.66666667,
+      "alphaCompleteCase": 0.87208564,
+      "alphaN": 732,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.83333333,
+          "sampleN": 72
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.83333333,
+          "upper": 2.83333333,
+          "sampleN": 125
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.83333333,
+          "upper": 4.5,
+          "sampleN": 336
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.5,
+          "upper": 5.16666667,
+          "sampleN": 132
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.16666667,
+          "upper": 6,
+          "sampleN": 71
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 2.85326087
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 6.25
+        },
+        {
+          "score": 1.5,
+          "percentile": 6.86141304
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 8.35597826
+        },
+        {
+          "score": 2.0,
+          "percentile": 12.77173913
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 17.73097826
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 23.23369565
+        },
+        {
+          "score": 3.0,
+          "percentile": 31.31793478
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 40.42119565
+        },
+        {
+          "score": 3.5,
+          "percentile": 45.04076087
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 49.93206522
+        },
+        {
+          "score": 4.0,
+          "percentile": 60.12228261
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 68.95380435
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 76.35869565
+        },
+        {
+          "score": 5.0,
+          "percentile": 85.32608696
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 91.44021739
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 93.20652174
+        },
+        {
+          "score": 6.0,
+          "percentile": 96.94293478
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mshaedu1",
+          "d2_mshaedu2",
+          "d2_mshaedu3"
+        ],
+        "3": [
+          "d3_mshaedu1",
+          "d3_mshaedu2",
+          "d3_mshaedu13"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.00135685,
+        "floor": 0.05706522,
+        "ceiling": 0.0611413,
+        "skew": -0.1586676,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "tutoring_necessity/mathematics/tutoring_necessity/upper_secondary": {
+      "N": 702,
+      "eligibleN": 702,
+      "mean": 3.40598291,
+      "sd": 1.30714012,
+      "median": 3.66666667,
+      "alphaCompleteCase": 0.87989997,
+      "alphaN": 702,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.5,
+          "sampleN": 72
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.5,
+          "upper": 2.83333333,
+          "sampleN": 129
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.83333333,
+          "upper": 4.16666667,
+          "sampleN": 323
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.16666667,
+          "upper": 5.16666667,
+          "sampleN": 129
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.16666667,
+          "upper": 6,
+          "sampleN": 49
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 4.27350427
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 9.4017094
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 11.96581197
+        },
+        {
+          "score": 2.0,
+          "percentile": 18.01994302
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 23.43304843
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 26.56695157
+        },
+        {
+          "score": 3.0,
+          "percentile": 34.25925926
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 43.94586895
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 53.7037037
+        },
+        {
+          "score": 4.0,
+          "percentile": 67.02279202
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 77.20797721
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 82.62108262
+        },
+        {
+          "score": 5.0,
+          "percentile": 89.24501425
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 93.8034188
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 95.01424501
+        },
+        {
+          "score": 6.0,
+          "percentile": 97.72079772
+        }
+      ],
+      "columns": {
+        "2": [
+          "d2_mshaedu1",
+          "d2_mshaedu2",
+          "d2_mshaedu3"
+        ],
+        "3": [
+          "d3_mshaedu1",
+          "d3_mshaedu2",
+          "d3_mshaedu13"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.08547009,
+        "ceiling": 0.04558405,
+        "skew": -0.14023725,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "academic_self_efficacy/chemistry/academic_self_efficacy/junior_secondary": {
+      "N": 480,
+      "eligibleN": 480,
+      "mean": 3.4590625,
+      "sd": 0.95361424,
+      "median": 3.4,
+      "alphaCompleteCase": 0.86806553,
+      "alphaN": 474,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 2.3,
+          "sampleN": 57
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 2.3,
+          "upper": 2.9,
+          "sampleN": 70
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.9,
+          "upper": 3.9,
+          "sampleN": 188
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.9,
+          "upper": 4.9,
+          "sampleN": 119
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.9,
+          "upper": 5,
+          "sampleN": 46
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 1.04166667
+        },
+        {
+          "score": 1.2,
+          "percentile": 2.1875
+        },
+        {
+          "score": 1.4,
+          "percentile": 2.5
+        },
+        {
+          "score": 1.6,
+          "percentile": 3.33333333
+        },
+        {
+          "score": 1.8,
+          "percentile": 4.58333333
+        },
+        {
+          "score": 2.0,
+          "percentile": 6.5625
+        },
+        {
+          "score": 2.2,
+          "percentile": 9.89583333
+        },
+        {
+          "score": 2.4,
+          "percentile": 13.75
+        },
+        {
+          "score": 2.6,
+          "percentile": 17.8125
+        },
+        {
+          "score": 2.8,
+          "percentile": 23.22916667
+        },
+        {
+          "score": 3.0,
+          "percentile": 31.35416667
+        },
+        {
+          "score": 3.2,
+          "percentile": 39.89583333
+        },
+        {
+          "score": 3.25,
+          "percentile": 43.85416667
+        },
+        {
+          "score": 3.4,
+          "percentile": 47.5
+        },
+        {
+          "score": 3.6,
+          "percentile": 54.6875
+        },
+        {
+          "score": 3.8,
+          "percentile": 62.08333333
+        },
+        {
+          "score": 4.0,
+          "percentile": 70.625
+        },
+        {
+          "score": 4.2,
+          "percentile": 78.02083333
+        },
+        {
+          "score": 4.4,
+          "percentile": 82.08333333
+        },
+        {
+          "score": 4.6,
+          "percentile": 85.3125
+        },
+        {
+          "score": 4.8,
+          "percentile": 88.64583333
+        },
+        {
+          "score": 5.0,
+          "percentile": 95.20833333
+        }
+      ],
+      "columns": {
+        "1": [
+          "d1_effi1",
+          "d1_effi2",
+          "d1_effi3",
+          "d1_effi4",
+          "d1_effi5"
+        ]
+      },
+      "minimumValidItems": 4,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.0,
+        "floor": 0.02083333,
+        "ceiling": 0.09583333,
+        "skew": -0.25798292,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "academic_self_efficacy/chemistry/academic_self_efficacy/upper_secondary": {
+      "N": 571,
+      "eligibleN": 572,
+      "mean": 3.09220665,
+      "sd": 1.03709938,
+      "median": 3.0,
+      "alphaCompleteCase": 0.88893178,
+      "alphaN": 569,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 1.775,
+          "sampleN": 56
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 1.775,
+          "upper": 2.5,
+          "sampleN": 112
+        },
+        {
+          "key": "middle",
+          "label": "目前有时认同",
+          "lower": 2.5,
+          "upper": 3.7,
+          "sampleN": 234
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 3.7,
+          "upper": 4.7,
+          "sampleN": 120
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 4.7,
+          "upper": 5,
+          "sampleN": 49
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 1.22591944
+        },
+        {
+          "score": 1.2,
+          "percentile": 3.76532399
+        },
+        {
+          "score": 1.4,
+          "percentile": 5.95446585
+        },
+        {
+          "score": 1.6,
+          "percentile": 8.23117338
+        },
+        {
+          "score": 1.75,
+          "percentile": 9.71978984
+        },
+        {
+          "score": 1.8,
+          "percentile": 11.38353765
+        },
+        {
+          "score": 2.0,
+          "percentile": 15.67425569
+        },
+        {
+          "score": 2.2,
+          "percentile": 21.01576182
+        },
+        {
+          "score": 2.4,
+          "percentile": 26.5323993
+        },
+        {
+          "score": 2.6,
+          "percentile": 33.01225919
+        },
+        {
+          "score": 2.8,
+          "percentile": 40.45534151
+        },
+        {
+          "score": 3.0,
+          "percentile": 48.51138354
+        },
+        {
+          "score": 3.2,
+          "percentile": 55.4290718
+        },
+        {
+          "score": 3.4,
+          "percentile": 61.47110333
+        },
+        {
+          "score": 3.5,
+          "percentile": 64.88616462
+        },
+        {
+          "score": 3.6,
+          "percentile": 67.6882662
+        },
+        {
+          "score": 3.8,
+          "percentile": 72.85464098
+        },
+        {
+          "score": 4.0,
+          "percentile": 78.63397548
+        },
+        {
+          "score": 4.2,
+          "percentile": 84.15061296
+        },
+        {
+          "score": 4.4,
+          "percentile": 87.39054291
+        },
+        {
+          "score": 4.6,
+          "percentile": 89.92994746
+        },
+        {
+          "score": 4.8,
+          "percentile": 93.16987741
+        },
+        {
+          "score": 5.0,
+          "percentile": 97.46059545
+        }
+      ],
+      "columns": {
+        "1": [
+          "d1_effi1",
+          "d1_effi2",
+          "d1_effi3",
+          "d1_effi4",
+          "d1_effi5"
+        ]
+      },
+      "minimumValidItems": 4,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.00174825,
+        "floor": 0.02451839,
+        "ceiling": 0.05078809,
+        "skew": 0.01936558,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "teacher_subject_liking/chemistry/teacher_subject_liking/junior_secondary": {
+      "N": 366,
+      "eligibleN": 468,
+      "mean": 4.62386157,
+      "sd": 1.38011145,
+      "median": 5.0,
+      "alphaCompleteCase": 0.91318118,
+      "alphaN": 359,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 3.5,
+          "sampleN": 78
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 3.5,
+          "upper": 4.83333333,
+          "sampleN": 89
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.83333333,
+          "upper": 5.83333333,
+          "sampleN": 83
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.83333333,
+          "upper": 6,
+          "sampleN": 116
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 0.95628415
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 2.18579235
+        },
+        {
+          "score": 1.66666667,
+          "percentile": 3.41530055
+        },
+        {
+          "score": 2.0,
+          "percentile": 5.87431694
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 9.01639344
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 11.20218579
+        },
+        {
+          "score": 3.0,
+          "percentile": 14.48087432
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 19.26229508
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 23.63387978
+        },
+        {
+          "score": 4.0,
+          "percentile": 30.6010929
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 37.97814208
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 43.16939891
+        },
+        {
+          "score": 5.0,
+          "percentile": 51.50273224
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 59.9726776
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 65.43715847
+        },
+        {
+          "score": 6.0,
+          "percentile": 84.15300546
+        }
+      ],
+      "columns": {
+        "1": [
+          "d1_tealike1",
+          "d1_tealike2",
+          "d1_tealike3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.21794872,
+        "floor": 0.01912568,
+        "ceiling": 0.31693989,
+        "skew": -0.79477363,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    },
+    "teacher_subject_liking/chemistry/teacher_subject_liking/upper_secondary": {
+      "N": 560,
+      "eligibleN": 561,
+      "mean": 4.71696429,
+      "sd": 1.09873344,
+      "median": 5.0,
+      "alphaCompleteCase": 0.9172158,
+      "alphaN": 558,
+      "bands": [
+        {
+          "key": "very_low",
+          "label": "目前较少认同",
+          "lower": 1,
+          "upper": 3.83333333,
+          "sampleN": 101
+        },
+        {
+          "key": "low",
+          "label": "目前不太认同",
+          "lower": 3.83333333,
+          "upper": 4.83333333,
+          "sampleN": 162
+        },
+        {
+          "key": "high",
+          "label": "目前比较认同",
+          "lower": 4.83333333,
+          "upper": 5.83333333,
+          "sampleN": 165
+        },
+        {
+          "key": "very_high",
+          "label": "目前很认同",
+          "lower": 5.83333333,
+          "upper": 6,
+          "sampleN": 132
+        }
+      ],
+      "percentileTable": [
+        {
+          "score": 1.0,
+          "percentile": 0.35714286
+        },
+        {
+          "score": 1.33333333,
+          "percentile": 1.07142857
+        },
+        {
+          "score": 2.0,
+          "percentile": 2.41071429
+        },
+        {
+          "score": 2.33333333,
+          "percentile": 3.66071429
+        },
+        {
+          "score": 2.66666667,
+          "percentile": 4.375
+        },
+        {
+          "score": 3.0,
+          "percentile": 6.875
+        },
+        {
+          "score": 3.33333333,
+          "percentile": 10.89285714
+        },
+        {
+          "score": 3.5,
+          "percentile": 12.94642857
+        },
+        {
+          "score": 3.66666667,
+          "percentile": 15.53571429
+        },
+        {
+          "score": 4.0,
+          "percentile": 25.0
+        },
+        {
+          "score": 4.33333333,
+          "percentile": 35.35714286
+        },
+        {
+          "score": 4.66666667,
+          "percentile": 42.85714286
+        },
+        {
+          "score": 5.0,
+          "percentile": 55.35714286
+        },
+        {
+          "score": 5.33333333,
+          "percentile": 67.58928571
+        },
+        {
+          "score": 5.66666667,
+          "percentile": 73.92857143
+        },
+        {
+          "score": 6.0,
+          "percentile": 88.21428571
+        }
+      ],
+      "columns": {
+        "1": [
+          "d1_tealike1",
+          "d1_tealike2",
+          "d1_tealike3"
+        ]
+      },
+      "minimumValidItems": 2,
+      "calibration": {
+        "method": "Nearest ECDF midpoints; 5/4/3 bands, target deviation <= .12, each band N >= 20",
+        "missingness": 0.00178253,
+        "floor": 0.00714286,
+        "ceiling": 0.23571429,
+        "skew": -0.79371311,
+        "subgroupReview": "Subject × stage reviewed separately; convenience historical cohort, no population norm or cross-stage invariance claim. Mathematics Cost is provisional due time-cost overlap."
+      }
+    }
+  }
+}

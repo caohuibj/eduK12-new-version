@@ -1,3 +1,4 @@
+import type { ScaleReferenceIdentityV1 } from '../../modules/assessment-reference/longitudinal'
 import type { ResultDisclosureContractV1 } from '../../modules/assessment-policy/result-disclosure'
 import { randomUUID } from 'node:crypto'
 import {
@@ -35,7 +36,7 @@ type PopulationFixture = {
 
 export const buildReportingFixture = async (prisma: PrismaClient, population: number, protectedSubject = false, repeated?: {
   ownerId: string; organizationId: string; members: Array<{ userId: string; membershipId: string }>; resourceKey: string; at: Date; resourceVersion?: string
-}, resultDisclosure?: ResultDisclosureContractV1): Promise<PopulationFixture> => {
+}, resultDisclosure?: ResultDisclosureContractV1, scalePoint?:{identity:ScaleReferenceIdentityV1;value:number}): Promise<PopulationFixture> => {
   const prefix = `reporting-qb-${population}-${randomUUID().slice(0, 8)}`
   const ownerId = repeated?.ownerId ?? randomUUID()
   const organizationId = repeated?.organizationId ?? randomUUID()
@@ -222,8 +223,8 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
     })),
   })
 
-  const instrumentKey = `${prefix}-instrument`
-  const sourceDefinitionHash = canonicalHash({ prefix, definition: 1 })
+  const instrumentKey = scalePoint?.identity.instrumentKey ?? `${prefix}-instrument`
+  const sourceDefinitionHash = scalePoint?.identity.measurementHash ?? canonicalHash({ prefix, definition: 1 })
   const compiledRuntimeHash = canonicalHash({ prefix, runtime: 1 })
   const envelope = createCanonicalUnitResultEnvelope({
     core: {
@@ -237,9 +238,9 @@ export const buildReportingFixture = async (prisma: PrismaClient, population: nu
       scorerKey: 'reporting-query-budget-test',
       scorerVersion: '1.0.0',
       quality: { status: 'interpretable', flags: [] },
-      metrics: [{ key: 'score', value: 1, unit: 'score', quality: 'calculated' }],
+      metrics: [{ key: 'score', value: scalePoint?.value??1, unit: 'score', quality: 'calculated',...(scalePoint?{scaleReference:scalePoint.identity}:{}) }],
       facts: [],
-      references: [],
+      references: scalePoint?[{key:`score:${scalePoint.identity.originalReferenceVersion}:theoretical_range`,referenceVersion:scalePoint.identity.originalReferenceVersion,referenceHash:scalePoint.identity.originalReferenceHash,classification:'theoretical_range',scoreKey:'score',status:'available',value:scalePoint.value,z:null,percentile:null}]:[],
       contextHash: null,
       scientificProvenance: { instrumentKey, instrumentVersion: '1.0.0' },
     },

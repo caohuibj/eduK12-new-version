@@ -1,3 +1,4 @@
+import type { ScaleReferenceValue } from '../modules/reporting/types'
 import apiClient from './client'
 
 export type ReportingAnalysisKind = 'GROUP' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL' | 'PROTECTED_FEEDBACK' | 'INDIVIDUAL_LONGITUDINAL'
@@ -145,6 +146,7 @@ export interface ProtectedProjection {
 export interface IndividualProjection {
   schemaVersion: 1
   kind: 'INDIVIDUAL_LONGITUDINAL'
+  referenceTrajectories?: {metrics:Record<string,{resolutionMode:'ORIGINAL'|'TIME_MATCHED'|'LATER_REFERENCE';compatibilityDecision:string;selectedReferenceVersions:string[];explicitLatest:boolean;points:Array<{resultVersion:string;ordinal?:number;rawValue:number|null;reference:ScaleReferenceValue|null}>}>}
   state: 'present'
   waves: Array<{ waveId: string; waveKey: string; ordinal: number; evidence: ReportingEvidenceProjection;
     metrics: Record<string, { state: 'present'; value: number } | { state: 'missing'; reason: string }> }>
@@ -193,7 +195,7 @@ export const reportingApi = {
   async individualSources(organizationId: string, subjectUserId: string, page = 1) {
     return requireData(await apiClient.get<{ list: ReportingSourceSummary[]; nextPage: number | null }>(`${base(organizationId)}/individual-sources`, { params: { subjectUserId, page, pageSize: 100 } }))
   },
-  async analyzeIndividual(organizationId: string, input: { subjectUserId: string; specId: string; sources: Array<{runId: string; trackId: string}> }) {
+  async analyzeIndividual(organizationId: string, input: { subjectUserId: string; specId: string; sources: Array<{runId: string; trackId: string}>;referenceResolutionMode?:'ORIGINAL'|'TIME_MATCHED'|'LATER_REFERENCE';regenerateWithLatestReference?:boolean }) {
     return requireData(await apiClient.post<ReportingArtifactProjection>(`${base(organizationId)}/analyses`, { analysisKind: 'INDIVIDUAL_LONGITUDINAL', ...input }))
   },
   async cohortOptions(organizationId: string) {

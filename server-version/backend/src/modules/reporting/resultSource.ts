@@ -347,7 +347,7 @@ const materializePreparedTrack = (prepared: PreparedTrack): ReportingObservation
       for (const metric of envelope.core.metrics) {
         if (seen.has(metric.key)) reportingFail('AMBIGUOUS_OBSERVATION', `metric ${metric.key} appears in more than one canonical unit`, 409)
         seen.add(metric.key)
-        metrics.push({ key: metric.key, value: metric.value, resultQuality, metricQuality: metric.quality ?? null })
+        metrics.push({ key: metric.key, value: metric.scaleReference && typeof metric.value==='number' ? Number(metric.value.toFixed(8)) : metric.value, resultQuality, metricQuality: metric.quality ?? null, ...(metric.scaleReference ? {scaleReference:metric.scaleReference} : {}) })
       }
     }
     return {

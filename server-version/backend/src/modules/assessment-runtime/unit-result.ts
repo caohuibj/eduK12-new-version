@@ -1,3 +1,4 @@
+import { scaleReferenceIdentitySchema, type ScaleReferenceIdentityV1 } from '../assessment-reference/longitudinal'
 import type { ScaleResultV2 } from '../scale/scale-result'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import type { SituationalResultV1 } from '../situational/situation-scoring'
@@ -14,6 +15,7 @@ export interface MetricFactV1 {
   value: JsonValue
   unit?: string
   quality?: string
+  scaleReference?: ScaleReferenceIdentityV1
 }
 
 export interface MachineFactV1 {
@@ -251,12 +253,22 @@ export const projectScaleCanonicalUnitResult = (input: {
   }
   const metrics = input.result.scores
     .filter((score) => allowed.has(score.key))
-    .map((score) => ({
+    .map((score) => {
+      const ref = input.result.references.find(r => r.scoreKey===score.key && r.status==='available' && r.bandProvenance)
+      const g = ref?.bandProvenance
+      const binding = input.referenceBindings?.find(b => b.referenceVersion===ref?.referenceVersion)
+      const scaleReference: ScaleReferenceIdentityV1 | undefined = g && ref && binding ? {
+        instrumentKey:input.runtime.instrumentKey,instrumentVersion:input.runtime.instrumentVersion,scoringVersion:input.result.method.scoringVersion,measurementHash:input.runtime.sourceDefinitionHash,
+        subjectKey:g.subjectKey,locale:g.locale,schoolStage:g.schoolStage,scoreKey:score.key,direction:score.direction,range:g.scoreRange,reportVersion:input.result.method.reportVersion,
+        originalReferenceVersion:ref.referenceVersion,originalReferenceHash:binding.referenceHash
+      } : undefined
+      return {
       key: score.key,
       value: assertJsonValue(score.value),
       unit: 'score',
       quality: score.status,
-    }))
+      ...(scaleReference ? {scaleReference} : {}),
+    }} )
     .sort((left, right) => left.key < right.key ? -1 : left.key > right.key ? 1 : 0)
   const quality = {
     status: input.result.quality.status,
@@ -435,6 +447,7 @@ const metricFactSchema = z.object({
   value: jsonValueSchema,
   unit: z.string().optional(),
   quality: z.string().optional(),
+  scaleReference:scaleReferenceIdentitySchema.optional(),
 }).strict()
 
 const machineFactSchema = z.object({
@@ -479,7 +492,13 @@ const canonicalUnitResultCoreSchema = z.object({
     profileKey: z.string().nullable().optional(),
     resolvedConfigHash: z.string().regex(/^[0-9a-f]{64}$/).nullable().optional(),
   }).strict(),
-}).strict()
+}).strict().superRefine((core,ctx)=>{
+ core.metrics.forEach((metric,i)=>{
+  const id=metric.scaleReference
+  if(!id)return
+  if(core.unitType!=='SCALE' || id.instrumentKey!==core.instrumentKey || id.instrumentVersion!==core.instrumentVersion || id.scoringVersion!==core.scorerVersion || id.measurementHash!==core.sourceDefinitionHash || id.scoreKey!==metric.key || !core.references.some(r=>r.scoreKey===metric.key && r.referenceVersion===id.originalReferenceVersion && r.referenceHash===id.originalReferenceHash))ctx.addIssue({code:z.ZodIssueCode.custom,path:['metrics',i,'scaleReference'],message:'SCALE_REFERENCE_IDENTITY_MISMATCH'})
+ })
+})
 
 const canonicalBundleBridgeSchema = z.object({
   sourceResultHash: z.string().regex(/^[0-9a-f]{64}$/),

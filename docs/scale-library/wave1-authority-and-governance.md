@@ -13,3 +13,18 @@ DRAFT→ACTIVE→SUPERSEDED→RETIRED. Reviewed reference activation is Serializ
 Report publication/QC binds respondent, audience, locale and reportVersion. Required: overview, understandable explanation, situated reflection, concrete action, limitations. Student language addresses middle-school experience; Parent language addresses family support; Teacher language addresses classroom practice. An absent audience version must fail closed, never reuse student copy for an adult audience. Existing restricted-report policies remain effective.
 
 Notion principle updated and verified in Scale Library, Scientific Maturity Governance and Bundle Report Design on 2026-10-01.
+
+## Report publication gate
+New governed packages require a respondent/audience/locale contract and recorded editorial review. CI checks explanation coverage, reflection, actionable steps and boundaries for every score and band. Student copy is blocked from teacher/researcher interpretations unless a matching authored audience version is supplied. Automatic structural checks complement editorial review; length and keyword checks do not establish readability alone.
+
+Canonical Scale metrics carry the exact original reference hash, measurement identity, subject, stage, locale, direction and range. Individual longitudinal generation defaults to the later reference attached to selected measurements. It freezes the resolution decision and references into the artifact; normal reads never look up a newer version. Explicit regeneration may select the latest compatible ACTIVE reference. Cross-stage or incompatible measurements use time-matched positions without claiming numeric equivalence.
+
+## Independent axis revisions
+Installation records append-only `scale_axis_snapshots` with instrument/scoring/report/reference/localization/catalog versions and the exact source hash. Report-only changes must increase reportVersion and retain the exact measurement hash. Reference-only changes require new reference identities. A changed current definition returns to DRAFT until the normal publication gate passes; old completed reports and frozen unified runtimes retain their content. An existing axis identity cannot acquire different source bytes. Measurement or localization changes require a new exact instrument identity; the installer deliberately refuses in-place measurement replacement.
+
+References now bind the exact measurement hash, not only an author-declared version number. Calibration statistics and display projections use eight decimal places before JSONB persistence to keep hashes stable across database round trips. Exact encrypted canonical scoring bytes and canonicalResultHash remain the audit source. This is display/snapshot precision, not a change to scoring.
+
+## Revision audit (2026-10-01)
+PR1 now owns its exact-measurement provenance validation and required PostgreSQL lifecycle tests. PR2 validates audience language at direct publication, checks report/reference band coverage, and keeps ordinary longitudinal fallback closed over references already attached to selected measurements. Reference effective dates come from the matching metric entry; raw Scale facts supply reference positions.
+
+Wave1 PRs are separate stacked branches, not one branch. CI is activated sequentially after retargeting and aligning each next PR with merged main; intermediate stacked base branches do not trigger the main CI workflow.
