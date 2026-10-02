@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible } from './product-eligibility'
 import { prisma } from '../../config/database'
 import { assertConfigStatusTransition } from './config-immutability'
 import { BAD_REQUEST, CONFLICT, NOT_FOUND } from './cognitive.errors'
@@ -30,6 +31,7 @@ const readinessBlockerMessage = (blockers: Array<{ stage: string; code: string; 
 export const publishCognitiveConfig = async (configId: string) => {
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  assertCognitiveProductEligible(config.testType)
 
   try {
     assertConfigStatusTransition(config.status, 'PUBLISHED')

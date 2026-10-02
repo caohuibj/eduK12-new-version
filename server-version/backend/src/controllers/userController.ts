@@ -1,12 +1,12 @@
+import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
-import { hashPassword, comparePassword, generateTempPassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
+import { hashPassword, generateTempPassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { z } from 'zod'
-import { clearSessionCookie } from '../utils/authCookies'
 import path from 'node:path'
 import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
 import { setUserActiveState, UserLifecycleError } from '../services/userLifecycleService'
@@ -324,52 +324,7 @@ export const userController = {
   },
 
   // 修改自己的密码
-  async changePassword(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const { oldPassword, newPassword } = req.body
-
-      if (typeof oldPassword !== 'string' || !oldPassword || oldPassword.length > 128 || !newPassword) {
-        return error(res, '请输入原密码和新密码')
-      }
-
-      if (typeof newPassword !== 'string' || !isValidPassword(newPassword)) {
-        return error(res, '密码必须包含字母和数字，长度为8-128个字符')
-      }
-
-      const user = await prisma.user.findUnique({
-        where: { id: userId }
-      })
-
-      if (!user) {
-        return notFound(res, '用户不存在')
-      }
-
-      // 验证原密码
-      const isValid = await comparePassword(oldPassword, user.passwordHash)
-      if (!isValid) {
-        return error(res, '原密码错误')
-      }
-
-      // 更新密码
-      const hashedPassword = await hashPassword(newPassword)
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          passwordHash: hashedPassword,
-          tokenVersion: { increment: 1 },
-          mustChangePassword: false,
-        }
-      })
-
-      clearSessionCookie(req, res)
-
-      return success(res, null, '密码修改成功')
-    } catch (err) {
-      logger.error('修改密码错误', err)
-      return error(res, Messages.USER.PASSWORD_CHANGED)
-    }
-  },
+  changePassword: changePasswordHandler,
 
   // 获取当前用户信息
   async me(req: Request, res: Response) {

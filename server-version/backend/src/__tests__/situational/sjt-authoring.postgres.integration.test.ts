@@ -19,7 +19,7 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
   beforeAll(async () => {
     const localSyntheticDatabase =
       url?.startsWith('postgresql://situational_test:') &&
-      url.includes('@127.0.0.1:55473/situational_vnext')
+      url.includes('@127.0.0.1:' + (process.env.SJT_UPLOAD_TEST_PORT || '55473') + '/situational_vnext')
     // The hosted regression job owns an ephemeral PostgreSQL service. Keep
     // developer and production databases excluded when running locally.
     const hostedSyntheticDatabase =

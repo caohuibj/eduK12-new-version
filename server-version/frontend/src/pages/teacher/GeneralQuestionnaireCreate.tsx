@@ -53,8 +53,8 @@ const GeneralQuestionnaireCreate: React.FC = () => {
     <ProductPage width="management" className="staff-editor-page space-y-6">
       {feedback}
       <PageHeader
-        title="创建泛化问卷"
-        description="设置问卷基本信息；创建后继续编排量表与表单内容。"
+        title="创建历史泛化问卷"
+        description="历史编制入口：仅在需要新版暂未覆盖的能力时使用。新问卷优先使用新版聚合问卷。"
         actions={(
           <ProductButton onClick={() => navigate('/general-questionnaires')}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回问卷列表

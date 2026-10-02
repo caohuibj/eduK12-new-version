@@ -1,3 +1,5 @@
+> **历史归档 / DO NOT USE**：仅供追溯，禁止用于当前 release。当前唯一生产入口：[DEPLOYMENT-CHECKLIST](../../../server-version/DEPLOYMENT-CHECKLIST.md)。
+
 # eduK12 Production Candidate Deployment Checklist
 
 > **DEPRECATED / DO NOT USE**
@@ -5,7 +7,7 @@
 > This historical checklist is retained for traceability only. Its deployment
 > sequence and check-in-only token wording are no longer valid and must not be
 > used for production. The current Compose release checklist is
-> [`server-version/DEPLOYMENT-CHECKLIST.md`](./server-version/DEPLOYMENT-CHECKLIST.md),
+> [`server-version/DEPLOYMENT-CHECKLIST.md`](../../../server-version/DEPLOYMENT-CHECKLIST.md),
 > which requires draining/stopping old writers before migration, backfilling
 > questionnaire/check-in/composite/cognitive tokens, validating all eight
 > constraints, and completing the public-workflow smoke checks.

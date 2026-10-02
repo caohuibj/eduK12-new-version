@@ -31,5 +31,5 @@ export const fakeRegistryMeta = {
     secondaryMetrics: ['meanRtMs', 'correctCount', 'trialCount'],
     disclaimer: 'Fake 任务仅用于验证框架，不反映真实能力。',
   } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: true,
+  recommendedForCreate: false,
 }

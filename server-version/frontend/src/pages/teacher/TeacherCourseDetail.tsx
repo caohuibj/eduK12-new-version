@@ -6,16 +6,6 @@ import type { Course, Assignment, Checkin } from '../../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 
-// 心理量表类型
-interface Scale {
-  id: string
-  code: string
-  name: string
-  description: string | null
-  estimatedTime: number | null
-  itemCount: number
-}
-
 // 问卷类型
 interface Questionnaire {
   id: string
@@ -46,7 +36,6 @@ const TeacherCourseDetail: React.FC = () => {
   const [course, setCourse] = useState<Course | null>(null)
   const [assignments, setAssignments] = useState<AssignmentWithStats[]>([])
   const [checkins, setCheckins] = useState<CheckinWithStats[]>([])
-  const [scales, setScales] = useState<Scale[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -100,17 +89,6 @@ const TeacherCourseDetail: React.FC = () => {
       }
     } catch (error) {
       console.error('获取打卡列表失败:', error)
-    }
-  }
-
-  const fetchScales = async () => {
-    try {
-      const response = await apiClient.get(`/scales/available?courseId=${courseId}`)
-      if (response.code === 0) {
-        setScales(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取心理测评列表失败:', error)
     }
   }
 

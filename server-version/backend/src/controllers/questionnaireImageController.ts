@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { prisma } from '../config/database'
+import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { validateContextFormItems } from '../modules/assessment-context'
 import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'

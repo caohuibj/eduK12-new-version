@@ -40,6 +40,7 @@ let createSession: (userId: string, assignmentId: string) => Promise<any>
 
 // 每个场景独立 fixture，避免残留状态互相干扰
 let userId: string
+let testConfigId: string
 let createdAssignmentIds: string[] = []
 
 const ok = async (p: Promise<any>) => {
@@ -55,7 +56,7 @@ const trialsOf = async (sessionId: string) =>
 
 const freshPublishedAssignment = async (maxAttempts = 10) => {
   const config = await prisma.cognitiveTestConfig.findFirst({
-    where: { testType: 'fake', configVersion: '1.0.0' },
+    where: { id: testConfigId },
   })
   if (!config) throw new Error('fake config 1.0.0 not found (run seed first)')
   const course = await prisma.course.create({
@@ -119,6 +120,10 @@ suite('cognitive concurrency integration (real DB)', () => {
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     const db = await import('../../config/database')
     prisma = db.prisma
+    // Explicit test-owned fixture; the ordinary production seed remains DRAFT.
+    const { COGNITIVE_SEEDS } = await import('../../../prisma/seeds/cognitive')
+    const seed = COGNITIVE_SEEDS.find(entry => entry.testType === 'fake')!
+    testConfigId = (await prisma.cognitiveTestConfig.create({ data: { ...seed, config: seed.config as any, status: 'PUBLISHED', configVersion: 'concurrency-fixture-' + Date.now() } })).id
     const trialMod = await import('../../modules/cognitive/trial.service')
     appendTrial = trialMod.appendTrial
     const compMod = await import('../../modules/cognitive/completion.service')
@@ -153,6 +158,7 @@ suite('cognitive concurrency integration (real DB)', () => {
     } catch {
       // 清理失败不阻塞断言结论
     }
+    if (testConfigId) await prisma.cognitiveTestConfig.delete({ where: { id: testConfigId } })
     await prisma.$disconnect()
   })
 

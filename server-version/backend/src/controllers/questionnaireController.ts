@@ -1,6 +1,6 @@
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
 import { Request, Response } from 'express'
-import { prisma } from '../config/database'
+import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError, unauthorized } from '../utils/response'
 import { UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'

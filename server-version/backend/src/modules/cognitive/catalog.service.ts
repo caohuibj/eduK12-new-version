@@ -1,3 +1,4 @@
+import { isCognitiveProductEligible } from './product-eligibility'
 import { BAD_REQUEST, NOT_FOUND } from './cognitive.errors'
 import {
   getCognitiveRegistryEntry,
@@ -31,7 +32,7 @@ export const listCognitiveTestsCatalog = (testType?: string) => {
   const entries = testType
     ? listCognitiveRegistryEntriesForType(testType)
     : listCognitiveRegistryEntries()
-  return { list: entries.map((entry) => toCatalogRow(entry as RegistryEntry<unknown, unknown>)) }
+  return { list: entries.filter(entry => isCognitiveProductEligible(entry.testType)).map((entry) => toCatalogRow(entry as RegistryEntry<unknown, unknown>)) }
 }
 
 export const getCognitiveTestCatalog = (
@@ -39,6 +40,7 @@ export const getCognitiveTestCatalog = (
   engineVersion?: string,
   scoringVersion?: string,
 ) => {
+  if (!isCognitiveProductEligible(testType)) throw NOT_FOUND('Cognitive task is not available as a product')
   if (Boolean(engineVersion) !== Boolean(scoringVersion)) {
     throw BAD_REQUEST('engineVersion 与 scoringVersion 必须同时提供')
   }

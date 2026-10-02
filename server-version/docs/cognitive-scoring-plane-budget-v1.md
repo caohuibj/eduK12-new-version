@@ -56,7 +56,7 @@ R 不是自动等于“可以删除”：只有在服务端能用相同历史版
 - Runner：server-version/frontend/src/modules/cognitive/tasks/<task>/
 - trial schema：server-version/backend/src/modules/cognitive/schemas/<task>.trial.ts
 - scorer：server-version/backend/src/modules/cognitive/scoring/<task>.v1.ts；reaction、memory、stroop 的 published 1.1 另有对应 v1_1 实现
-- 注册与版本桥接：server-version/backend/src/modules/cognitive/cognitive.registry.ts、registry-definitions.ts、v2/registry.ts
+- 注册与版本桥接：server-version/backend/src/modules/cognitive/cognitive.registry.ts、tasks/*/definitions.ts、v2/registry.ts
 
 表中“candidate”只表示后续阶段的研究对象；本 Commit 不删除任何字段。
 
@@ -93,7 +93,7 @@ fake 不是 24 个真实测量 task。其 schema 只有 correct、rtMs，Runner 
 
 ## 5. 计数、配置上限与全局 FINAL 上限
 
-标准与研究 profile 来自 registry-definitions.ts 的 profile patch；seed identity 来自 prisma/seeds/cognitive.ts。标准→研究是当前 Runner 在 profile 正常完成时的 intended trial count，patterncompare 是明确标注的测量场景，不是固定 runtime count。
+标准与研究 profile 来自 tasks/*/definitions.ts 的 profile patch；seed identity 来自 prisma/seeds/cognitive.ts。标准→研究是当前 Runner 在 profile 正常完成时的 intended trial count，patterncompare 是明确标注的测量场景，不是固定 runtime count。
 
 | task | configVersion / 标准→研究 intended count | task/config 可推导上限 | 当前 FINAL absolute ceiling |
 |---|---|---:|---:|

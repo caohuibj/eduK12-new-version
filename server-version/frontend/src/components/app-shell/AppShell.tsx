@@ -1,3 +1,4 @@
+import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
@@ -19,6 +20,7 @@ import '../assessment-ui/assessment-ui.css'
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const cognitive = useCognitiveEnabled()
+  const relational = useRelationalAvailability()
   const { organizations, total: organizationTotal, platformRole, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
@@ -33,7 +35,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const staffMode=mode==='standard'&&(user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
-  const items=[...navigationFor(user?.role,cognitive),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole):[])]
+  const items=[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole):[])]
   const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
   const mainRef=useRef<HTMLElement>(null), toggleRef=useRef<HTMLButtonElement>(null), previousPath=useRef(location.pathname)
   const [openPath,setOpenPath]=useState<string|null>(null),[loggingOut,setLoggingOut]=useState(false),menuOpen=openPath===location.pathname
@@ -49,6 +51,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         {user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}
         {user&&mode==='standard'&&(organizationError||organizationListError)&&<button type="button" className="hui-context-retry" onClick={()=>{if(routeOrganizationId&&routeOrganizationId!=='new')void selectOrganization(routeOrganizationId);else void refreshOrganizations()}}>组织连接失败，重试</button>}
+        {user&&mode==='standard'&&relational.status==='error'&&<button type="button" className="hui-context-retry" onClick={relational.retry}>测评入口加载失败，重试</button>}
         {user&&mode==='standard'&&<ProductButton disabled={loggingOut} onClick={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}><LogOut size={16} aria-hidden="true"/>{loggingOut?'正在退出…':'退出登录'}</ProductButton>}
       </div>
     </header>}
@@ -59,4 +62,4 @@ function AppShellContent({ children }: { children: ReactNode }) {
     </div>{!entryMode&&mode!=='focused'&&<Footer variant="light"/>}
   </div>
 }
-export default function AppShell({children}:{children:ReactNode}){return <OrganizationProvider><AppShellContent>{children}</AppShellContent></OrganizationProvider>}
+export default function AppShell({children}:{children:ReactNode}){return <OrganizationProvider><RelationalAvailabilityProvider><AppShellContent>{children}</AppShellContent></RelationalAvailabilityProvider></OrganizationProvider>}

@@ -56,15 +56,15 @@ echo ""
 echo "3. 检查处理状态 (最多检查 20 次，每次 3 秒)..."
 for i in {1..20}; do
   sleep 3
-  
+
   status_response=$(curl -s "$API_URL/api/videos/$video_id/status" \
     -H "Authorization: Bearer $token")
-  
+
   status=$(echo "$status_response" | grep -o '"status":"[^"]*' | cut -d'"' -f4)
   progress=$(echo "$status_response" | grep -o '"progress":[0-9]*' | cut -d':' -f2)
-  
+
   echo "  检查 #$i: 状态=$status, 进度=$progress%"
-  
+
   if [ "$status" = "COMPLETED" ]; then
     echo ""
     echo "✅ 视频处理完成！"
@@ -73,7 +73,7 @@ for i in {1..20}; do
     echo "$status_response" | python3 -m json.tool 2>/dev/null || echo "$status_response"
     break
   fi
-  
+
   if [ "$status" = "FAILED" ]; then
     echo ""
     echo "❌ 视频处理失败"

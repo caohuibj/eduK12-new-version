@@ -4,7 +4,7 @@
 - 基线：main @ `8a05036`
 - 性质：documentation only。本文是 Pilot Cognitive Library 的权威盘点（inventory v2），复用 Stage 0 源码事实，不引入新的 taxonomy / truth。
 - 数据来源（全部为代码内权威源，本文不另立第二真值）：
-  - Registry / metric / quality / report / profiles：`backend/src/modules/cognitive/cognitive.registry.ts` + `registry-definitions.ts`
+  - Registry / metric / quality / report / profiles：`backend/src/modules/cognitive/cognitive.registry.ts` + `tasks/*/definitions.ts`
   - v2 publication：`modules/cognitive/v2/registry.ts`（`defaultStatus`：非 fake 且 `recommendedForCreate=true` → PUBLISHED）
   - DB config status：`prisma/seeds/cognitive.ts`（13 PUBLISHED / 15 DRAFT，含 fake=PUBLISHED 的有意分层）
   - Domain / facet：`modules/cognitive-analysis/evidence-mapping.registry.ts` v1.0.0（唯一权威映射）+ `domain.registry.ts` v1.0.0（10 domain）

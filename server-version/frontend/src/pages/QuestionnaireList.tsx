@@ -235,9 +235,9 @@ const QuestionnaireList: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader
-        title="聚合问卷管理"
+        title="历史问卷"
         actions={(
-          <Link to="/questionnaires/new" className="btn-primary inline-flex items-center gap-2">
+          <Link to="/questionnaire-products/new" className="btn-primary inline-flex items-center gap-2">
             <Plus className="h-4 w-4" aria-hidden="true" />
             创建问卷
           </Link>
@@ -259,7 +259,7 @@ const QuestionnaireList: React.FC = () => {
         <div className="rounded-lg bg-white py-12 text-center shadow">
           <Layers className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
           <p className="mb-4 text-gray-500">暂无问卷</p>
-          <Link to="/questionnaires/new" className="text-action hover:text-action/80">创建第一个问卷</Link>
+          <Link to="/questionnaire-products/new" className="text-action hover:text-action/80">创建第一个问卷</Link>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
