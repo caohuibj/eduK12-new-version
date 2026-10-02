@@ -11,7 +11,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:177",
+      "source": "server-version/frontend/src/App.tsx:178",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -30,7 +30,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:187",
+      "source": "server-version/frontend/src/App.tsx:188",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -49,7 +49,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:193",
+      "source": "server-version/frontend/src/App.tsx:194",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -68,7 +68,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:197",
+      "source": "server-version/frontend/src/App.tsx:198",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -87,7 +87,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:201",
+      "source": "server-version/frontend/src/App.tsx:202",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -106,7 +106,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:205",
+      "source": "server-version/frontend/src/App.tsx:206",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -125,7 +125,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:208",
+      "source": "server-version/frontend/src/App.tsx:209",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -144,7 +144,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:212",
+      "source": "server-version/frontend/src/App.tsx:213",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -163,7 +163,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:216",
+      "source": "server-version/frontend/src/App.tsx:217",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/auth/login/index",
       "capability": null,
@@ -182,7 +182,7 @@
       "roles": [
         "PARENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:221",
+      "source": "server-version/frontend/src/App.tsx:222",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/home/index",
       "capability": "canReadChildren",
@@ -202,7 +202,7 @@
         "PARENT",
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:227",
+      "source": "server-version/frontend/src/App.tsx:228",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -223,7 +223,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:231",
+      "source": "server-version/frontend/src/App.tsx:232",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -244,7 +244,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:235",
+      "source": "server-version/frontend/src/App.tsx:236",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -260,7 +260,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:239",
+      "source": "server-version/frontend/src/App.tsx:240",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -281,7 +281,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:245",
+      "source": "server-version/frontend/src/App.tsx:246",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/home/index",
       "capability": "canReadCourses",
@@ -302,7 +302,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:253",
+      "source": "server-version/frontend/src/App.tsx:254",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=courses",
       "capability": "canReadCourses",
@@ -323,7 +323,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:261",
+      "source": "server-version/frontend/src/App.tsx:262",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=students",
       "capability": "canReadStudents",
@@ -341,7 +341,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:269",
+      "source": "server-version/frontend/src/App.tsx:270",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=courses",
       "capability": "canReadCourses",
@@ -362,7 +362,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:277",
+      "source": "server-version/frontend/src/App.tsx:278",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=students",
       "capability": "canReadStudents",
@@ -380,7 +380,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:285",
+      "source": "server-version/frontend/src/App.tsx:286",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assignments",
       "capability": "canReadAssignments",
@@ -400,7 +400,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:293",
+      "source": "server-version/frontend/src/App.tsx:294",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=checkins",
       "capability": "canReadCheckins",
@@ -420,7 +420,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:301",
+      "source": "server-version/frontend/src/App.tsx:302",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -436,7 +436,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:309",
+      "source": "server-version/frontend/src/App.tsx:310",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -452,7 +452,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:317",
+      "source": "server-version/frontend/src/App.tsx:318",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -468,7 +468,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:325",
+      "source": "server-version/frontend/src/App.tsx:326",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -484,7 +484,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:326",
+      "source": "server-version/frontend/src/App.tsx:327",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -500,7 +500,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:327",
+      "source": "server-version/frontend/src/App.tsx:328",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -516,7 +516,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:335",
+      "source": "server-version/frontend/src/App.tsx:336",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -532,7 +532,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:343",
+      "source": "server-version/frontend/src/App.tsx:344",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -548,7 +548,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:351",
+      "source": "server-version/frontend/src/App.tsx:352",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -564,7 +564,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:359",
+      "source": "server-version/frontend/src/App.tsx:360",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -580,7 +580,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:360",
+      "source": "server-version/frontend/src/App.tsx:361",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -596,7 +596,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:361",
+      "source": "server-version/frontend/src/App.tsx:362",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -612,7 +612,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:369",
+      "source": "server-version/frontend/src/App.tsx:370",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -628,7 +628,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:377",
+      "source": "server-version/frontend/src/App.tsx:378",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -644,7 +644,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:385",
+      "source": "server-version/frontend/src/App.tsx:386",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -660,7 +660,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:395",
+      "source": "server-version/frontend/src/App.tsx:396",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assignments",
       "capability": "canReadAssignments",
@@ -680,7 +680,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:403",
+      "source": "server-version/frontend/src/App.tsx:404",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assignments",
       "capability": "canReadAssignments",
@@ -700,7 +700,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:413",
+      "source": "server-version/frontend/src/App.tsx:414",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -720,7 +720,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:421",
+      "source": "server-version/frontend/src/App.tsx:422",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -740,7 +740,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:429",
+      "source": "server-version/frontend/src/App.tsx:430",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -760,7 +760,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:437",
+      "source": "server-version/frontend/src/App.tsx:438",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -780,7 +780,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:445",
+      "source": "server-version/frontend/src/App.tsx:446",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -800,7 +800,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:453",
+      "source": "server-version/frontend/src/App.tsx:454",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=classrooms",
       "capability": "canReadClassrooms",
@@ -820,7 +820,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:461",
+      "source": "server-version/frontend/src/App.tsx:462",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -836,7 +836,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:469",
+      "source": "server-version/frontend/src/App.tsx:470",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -852,7 +852,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:477",
+      "source": "server-version/frontend/src/App.tsx:478",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -867,7 +867,7 @@
       "roles": [
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:485",
+      "source": "server-version/frontend/src/App.tsx:486",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=users",
       "capability": "canReadUsers",
@@ -885,7 +885,7 @@
       "roles": [
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:493",
+      "source": "server-version/frontend/src/App.tsx:494",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=teacherCodes",
       "capability": "canReadTeacherCodes",
@@ -899,11 +899,49 @@
       "limitation": "Account lifecycle additionally requires current SYSTEM_ADMIN; no implicit parent-child authority."
     },
     {
+      "webRoute": "/admin/legacy-archive",
+      "roles": [
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/App.tsx:502",
+      "implementationType": "PENDING_PARITY_REVIEW",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [
+        "/admin/legacy-archive/overview",
+        "/admin/legacy-archive/:kind",
+        "/admin/legacy-archive/:kind/:id"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "legacy-archive",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Latest main adds a read-only historical Web archive. Native parity remains pending; no mini authorization or web-view adapter is introduced."
+    },
+    {
+      "webRoute": "/admin/legacy-archive/:kind/:id",
+      "roles": [
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/App.tsx:503",
+      "implementationType": "PENDING_PARITY_REVIEW",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [
+        "/admin/legacy-archive/overview",
+        "/admin/legacy-archive/:kind",
+        "/admin/legacy-archive/:kind/:id"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "legacy-archive",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Latest main adds a read-only historical Web archive. Native parity remains pending; no mini authorization or web-view adapter is introduced."
+    },
+    {
       "webRoute": "/admin/material-grants",
       "roles": [
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:501",
+      "source": "server-version/frontend/src/App.tsx:504",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -918,7 +956,7 @@
       "roles": [
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:509",
+      "source": "server-version/frontend/src/App.tsx:512",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -934,7 +972,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:517",
+      "source": "server-version/frontend/src/App.tsx:520",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/profile/index",
       "capability": "canReadProfile",
@@ -954,7 +992,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:525",
+      "source": "server-version/frontend/src/App.tsx:528",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=catalog",
       "capability": "canReadCatalog",
@@ -974,7 +1012,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:533",
+      "source": "server-version/frontend/src/App.tsx:536",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=catalog",
       "capability": "canReadCatalog",
@@ -992,7 +1030,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:543",
+      "source": "server-version/frontend/src/App.tsx:546",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/home/index",
       "capability": "canReadCourses",
@@ -1012,7 +1050,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:551",
+      "source": "server-version/frontend/src/App.tsx:554",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/classroom/index",
       "capability": "canJoinClassroom",
@@ -1031,7 +1069,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:559",
+      "source": "server-version/frontend/src/App.tsx:562",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=courses",
       "capability": "canReadCourses",
@@ -1051,7 +1089,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:567",
+      "source": "server-version/frontend/src/App.tsx:570",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assignments",
       "capability": "canReadAssignments",
@@ -1070,7 +1108,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:575",
+      "source": "server-version/frontend/src/App.tsx:578",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assignments",
       "capability": "canReadAssignments",
@@ -1089,7 +1127,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:583",
+      "source": "server-version/frontend/src/App.tsx:586",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=checkins",
       "capability": "canReadCheckins",
@@ -1108,7 +1146,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:591",
+      "source": "server-version/frontend/src/App.tsx:594",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=checkins",
       "capability": "canReadCheckins",
@@ -1127,7 +1165,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:599",
+      "source": "server-version/frontend/src/App.tsx:602",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/profile/index",
       "capability": "canReadProfile",
@@ -1146,7 +1184,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:607",
+      "source": "server-version/frontend/src/App.tsx:610",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -1161,7 +1199,7 @@
       "roles": [
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:608",
+      "source": "server-version/frontend/src/App.tsx:611",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1181,7 +1219,7 @@
       "roles": [
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:609",
+      "source": "server-version/frontend/src/App.tsx:612",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1201,7 +1239,7 @@
       "roles": [
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:610",
+      "source": "server-version/frontend/src/App.tsx:613",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1221,7 +1259,7 @@
       "roles": [
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:611",
+      "source": "server-version/frontend/src/App.tsx:614",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1241,7 +1279,7 @@
       "roles": [
         "TEACHER"
       ],
-      "source": "server-version/frontend/src/App.tsx:612",
+      "source": "server-version/frontend/src/App.tsx:615",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1256,7 +1294,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:613",
+      "source": "server-version/frontend/src/App.tsx:616",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1276,7 +1314,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:621",
+      "source": "server-version/frontend/src/App.tsx:624",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1296,7 +1334,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:629",
+      "source": "server-version/frontend/src/App.tsx:632",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1316,7 +1354,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:637",
+      "source": "server-version/frontend/src/App.tsx:640",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1331,7 +1369,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:645",
+      "source": "server-version/frontend/src/App.tsx:648",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1351,7 +1389,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:653",
+      "source": "server-version/frontend/src/App.tsx:656",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1371,7 +1409,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:661",
+      "source": "server-version/frontend/src/App.tsx:664",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1391,7 +1429,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:667",
+      "source": "server-version/frontend/src/App.tsx:670",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/report/index",
       "capability": "canReadOwnAssessments",
@@ -1410,7 +1448,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:673",
+      "source": "server-version/frontend/src/App.tsx:676",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1430,7 +1468,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:681",
+      "source": "server-version/frontend/src/App.tsx:684",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1450,7 +1488,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:689",
+      "source": "server-version/frontend/src/App.tsx:692",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/report/index",
       "capability": "canReadOwnAssessments",
@@ -1469,7 +1507,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:697",
+      "source": "server-version/frontend/src/App.tsx:700",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/classroom/index",
       "capability": "canJoinClassroom",
@@ -1488,7 +1526,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:705",
+      "source": "server-version/frontend/src/App.tsx:708",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/classroom/index",
       "capability": "canJoinClassroom",
@@ -1507,7 +1545,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:715",
+      "source": "server-version/frontend/src/App.tsx:718",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1527,7 +1565,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:719",
+      "source": "server-version/frontend/src/App.tsx:722",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1547,7 +1585,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:723",
+      "source": "server-version/frontend/src/App.tsx:726",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/report/index",
       "capability": "canReadOwnAssessments",
@@ -1566,7 +1604,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:731",
+      "source": "server-version/frontend/src/App.tsx:734",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1586,7 +1624,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:739",
+      "source": "server-version/frontend/src/App.tsx:742",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1606,7 +1644,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:747",
+      "source": "server-version/frontend/src/App.tsx:750",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -1626,7 +1664,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:755",
+      "source": "server-version/frontend/src/App.tsx:758",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1646,7 +1684,7 @@
       "roles": [
         "STUDENT"
       ],
-      "source": "server-version/frontend/src/App.tsx:763",
+      "source": "server-version/frontend/src/App.tsx:766",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1662,7 +1700,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/App.tsx:771",
+      "source": "server-version/frontend/src/App.tsx:774",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1682,7 +1720,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:775",
+      "source": "server-version/frontend/src/App.tsx:778",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1702,7 +1740,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:776",
+      "source": "server-version/frontend/src/App.tsx:779",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1722,7 +1760,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:777",
+      "source": "server-version/frontend/src/App.tsx:780",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1734,66 +1772,6 @@
     },
     {
       "webRoute": "/public/composite/situational/:attemptId",
-      "roles": [
-        "PUBLIC"
-      ],
-      "source": "server-version/frontend/src/App.tsx:782",
-      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
-      "miniDestination": "/pages/assessment-entry/index",
-      "capability": "canUseAssessmentRuntime",
-      "apiDependency": [
-        "/mobile/assessment-runtime/scales/:id",
-        "/questionnaires/assessments/:id",
-        "/composite-assessments/attempts/:id",
-        "/situational/attempts/:id"
-      ],
-      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
-      "domain": "assessments",
-      "status": "LOCAL_PR3_IMPLEMENTED",
-      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
-    },
-    {
-      "webRoute": "/public/studies/waves/:waveId/:token",
-      "roles": [
-        "PUBLIC"
-      ],
-      "source": "server-version/frontend/src/App.tsx:783",
-      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
-      "miniDestination": "/pages/assessment-entry/index",
-      "capability": "canUseAssessmentRuntime",
-      "apiDependency": [
-        "/mobile/assessment-runtime/scales/:id",
-        "/questionnaires/assessments/:id",
-        "/composite-assessments/attempts/:id",
-        "/situational/attempts/:id"
-      ],
-      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
-      "domain": "assessments",
-      "status": "LOCAL_PR3_IMPLEMENTED",
-      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
-    },
-    {
-      "webRoute": "/public/studies/:studyId",
-      "roles": [
-        "PUBLIC"
-      ],
-      "source": "server-version/frontend/src/App.tsx:784",
-      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
-      "miniDestination": "/pages/assessment-entry/index",
-      "capability": "canUseAssessmentRuntime",
-      "apiDependency": [
-        "/mobile/assessment-runtime/scales/:id",
-        "/questionnaires/assessments/:id",
-        "/composite-assessments/attempts/:id",
-        "/situational/attempts/:id"
-      ],
-      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
-      "domain": "assessments",
-      "status": "LOCAL_PR3_IMPLEMENTED",
-      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
-    },
-    {
-      "webRoute": "/public/composite/:token",
       "roles": [
         "PUBLIC"
       ],
@@ -1813,7 +1791,7 @@
       "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
-      "webRoute": "/public/composite/attempts/:attemptId",
+      "webRoute": "/public/studies/waves/:waveId/:token",
       "roles": [
         "PUBLIC"
       ],
@@ -1833,11 +1811,71 @@
       "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
-      "webRoute": "/public/composite/attempts/:attemptId/report",
+      "webRoute": "/public/studies/:studyId",
       "roles": [
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:787",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
+    },
+    {
+      "webRoute": "/public/composite/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "source": "server-version/frontend/src/App.tsx:788",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
+    },
+    {
+      "webRoute": "/public/composite/attempts/:attemptId",
+      "roles": [
+        "PUBLIC"
+      ],
+      "source": "server-version/frontend/src/App.tsx:789",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
+    },
+    {
+      "webRoute": "/public/composite/attempts/:attemptId/report",
+      "roles": [
+        "PUBLIC"
+      ],
+      "source": "server-version/frontend/src/App.tsx:790",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1852,7 +1890,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:790",
+      "source": "server-version/frontend/src/App.tsx:793",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1872,7 +1910,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:794",
+      "source": "server-version/frontend/src/App.tsx:797",
       "implementationType": "NATIVE_WITH_WEB_ADAPTER",
       "miniDestination": "/pages/assessment-entry/index",
       "capability": "canUseAssessmentRuntime",
@@ -1892,7 +1930,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:798",
+      "source": "server-version/frontend/src/App.tsx:801",
       "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
@@ -1907,7 +1945,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:804",
+      "source": "server-version/frontend/src/App.tsx:807",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/public-checkin/index",
       "capability": "PUBLIC_CHECKIN_SESSION",
@@ -1925,7 +1963,7 @@
       "roles": [
         "PUBLIC"
       ],
-      "source": "server-version/frontend/src/App.tsx:810",
+      "source": "server-version/frontend/src/App.tsx:813",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -1940,7 +1978,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:816",
+      "source": "server-version/frontend/src/App.tsx:819",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
@@ -1955,7 +1993,7 @@
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "source": "server-version/frontend/src/App.tsx:820",
+      "source": "server-version/frontend/src/App.tsx:823",
       "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,

@@ -15,4 +15,4 @@
 
 家长功能：后端 PARENT_PORTAL_ENABLED 默认 false。隔离验收环境开启后显示关联、孩子与报告入口；实际读取逐请求核对关系、同意及披露授权。现有正式报告不自动转换为家长报告，详见 ../../docs/miniprogram-v2/parent-implementation.md。
 
-本轮角色日常操作、共享课堂与工具披露设置的范围及87/94项本地证据：../../docs/miniprogram-v2/local-acceptance-20261002.md。MINI_CLASSROOM_ENABLED默认false；组织成员权限补充待确认，测评Runtime和完整报告保持未接入状态。
+角色日常操作、共享课堂、统一 FINAL Runtime 与批准的家长发布链实施状态见 ../../docs/miniprogram-v2/implementation-status.md；PR3及两轮审查证据分别见 pr3-local-acceptance-20261002.md、pr123-review-fixes-20261002.md。三个功能flag默认false；组织成员权限补充待确认，完整业务对等、逐工具家长内容和微信设备验收仍有缺口。

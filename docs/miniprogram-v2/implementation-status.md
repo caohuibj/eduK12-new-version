@@ -1,6 +1,6 @@
 # Huisurvey 小程序 v2 实施状态
 
-更新：2026-10-02（日本时间）。Web 基线 `main@1ff0e8ef`，PR1 `b2ee1682`，PR2 `ef5b2747`；当前本地分支 `codex/miniprogram-v2-runtime`。新端位于 `server-version/miniprogram-v2`。仅本地实现，不推送、不创建远程 PR、不部署，不操作生产数据库。
+更新：2026-10-02（日本时间）。Web 基线 `main@1ff0e8ef`，PR1 `b2ee1682`，PR2 `ef5b2747`；当前本地分支 `codex/miniprogram-v2-runtime`。新端位于 `server-version/miniprogram-v2`。按用户追加授权，将三个阶段及审查修订作为单一 GitHub PR 推送并触发完整 CI；未合并、部署或操作生产数据库。此前各阶段验收记录保留当时仅本地开发的事实。
 
 ## 当前结论
 
@@ -29,6 +29,10 @@ R1 封存提交与编辑答案分离：同轮原载荷重试、服务器已提�
 
 ## 验证与剩余工作
 
-历史 PR2 验证保留在 `local-acceptance-20261002.md`；当前证据见 `pr3-local-acceptance-20261002.md` 与 `verification-evidence-20261002.json`。功能矩阵和116条 Web 路由清单保留实际待对等项。新增迁移仅在隔离测试库验证，三项功能 flag 默认关闭。
+历史 PR2 验证保留在 `local-acceptance-20261002.md`；当前证据见 `pr3-local-acceptance-20261002.md` 与 `verification-evidence-20261002.json`。功能矩阵和118条 Web 路由清单保留实际待对等项。新增迁移仅在隔离测试库验证，三项功能 flag 默认关闭。
 
 后续顺序：逐工具家长教育模板和正式源兼容；剩余内容创作/媒体库/治理的业务对等；正式微信测试配置与编译、iOS/Android 四角色/弱网/扫码/前后台/测验设备验收；完整发布门禁。未批准的组织权限写界面另行确认，不通过原有身份名称推导权限。
+
+## GitHub CI 提交准备
+
+2026-10-02：同步 `origin/main@040281cd`，保留既有审查提交；新增历史档案两条 Web 路由在清单中明确标为未对等。同步后原生137项、静态检查及118条路由清单、CI路由/工作流26项契约复验通过。创建普通 PR 以触发仓库完整 CI；GitHub CI 状态以 PR 检查为准，不把本地定向验证当作 Full Gate 通过。
