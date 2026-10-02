@@ -141,6 +141,8 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
       - name: content routing boundary tests
@@ -210,6 +212,8 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
@@ -304,6 +308,8 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
       - name: dependency audit (high and critical)
@@ -496,6 +502,8 @@ jobs:
           cache-dependency-path: server-version/backend/package-lock.json
       - name: check hosted runner disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: npm ci
         run: npm ci
       - name: prisma generate and guarded migration
@@ -731,6 +739,8 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci

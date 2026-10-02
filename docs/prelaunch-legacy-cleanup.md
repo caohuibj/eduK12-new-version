@@ -60,3 +60,5 @@
 - Compose config、12 项现有资源/负载/session 工具契约、8 个停用脚本的语法/exit 1、归档链接及 diff whitespace 检查通过。
 - 本机 Docker daemon 不可用，未构建或启动 Docker 镜像、未执行 staging 或生产 smoke；这些仍由发布门禁确认。
 - CI 首轮发现匿名 START 浏览器测试依赖生产 fake seed 的 PUBLISHED 状态；现改为创建并清理独立测试配置，browser job 显式 opt-in，仅 test 环境允许。修复后本地实际浏览器的 8 个匿名 START/storage 场景、relational 四角色验收及 8 项生产 fixture 限制测试通过。
+
+- CI 第二轮 MEDIA-2 在 npm ci 阶段出现 canvas 预编译包下载超时，回退源码编译时缺 pixman-1。相关 Ubuntu lanes 在 npm ci 前统一补齐 native 编译库；MEDIA-2 强制 rebuild canvas 并加载 PNG 编码验证回退路径。Workflow YAML、脚本语法与 26 项 CI 分流/门禁契约本地通过；Linux 实际编译及完整验收以最新 CI 为准。
