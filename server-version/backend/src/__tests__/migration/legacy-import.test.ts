@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client'
 import { createImportPlanner, validateMappedData, contentEqual, importPlanHash, verifyImportPlan, applyImportPlan, type ImportAction } from '../../scripts/migration/import-plan'
 import { applyRewrites, buildRewriteMap } from '../../scripts/migration/url-rewrite'
 import { encryptToken } from '../../services/checkinTokenCrypto'
-import { convertLegacyScaleDefinition } from '../../scripts/migration/legacy-scale-converter'
 
 const rowAction = (): ImportAction => ({ model: 'classroomQuestion', operation: 'upsert',
   args: { where: { id: 'q1' }, create: { id: 'q1', classroomId: 'c1', questionIndex: 0, questionContent: { question: 'Synthetic' } } },
@@ -67,15 +66,5 @@ describe('legacy import safeguards', () => {
     const client: any = { $transaction: (callback: any) => callback(tx) }
     await expect(applyImportPlan(client, [rowAction()], 'b1', 50)).rejects.toThrow('conflicts')
     expect(tx.classroomQuestion.upsert).not.toHaveBeenCalled()
-  })
-  it('retains linked dimension content without claiming publication rights', () => {
-    const result: any = convertLegacyScaleDefinition({
-      scale: { id: 's1', code: 'SYN', name: 'Synthetic', description: null, config: { labels: [{ value: 0, label: 'No' }, { value: 1, label: 'Yes' }] }, estimated_time: null, instruction: null, tags: [] },
-      items: [{ item_code: 'Q1', content: 'Synthetic item', type: 'single', reverse: true, required: true, weight: 1, sort_order: 0, options: null, randomize_options: false }],
-      dimensions: [{ id: 'd1', code: 'D1', name: 'Synthetic dimension', description: null, scoring_method: 'sum', weight: 1 }],
-      itemDimensions: [{ item_id: 'i1', item_code: 'Q1', dimension_id: 'd1', weight: 2, reverse: false }],
-    })
-    expect(result.license.status).toBe('unknown')
-    expect(result.scoring.scores[1].source.items).toEqual([{ itemCode: 'Q1', weight: 2 }])
   })
 })

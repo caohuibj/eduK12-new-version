@@ -225,7 +225,7 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
     }
     if (hadSource || !optional) {
       issue(action, field, 'missing-source')
-      if (!optional) throw new Error('Referenced active legacy asset has no verified source')
+      if (!optional) throw new Error('Referenced active legacy asset has no verified source: ' + action.model + '.' + field + ' record=' + digestText(action.args.where.id).slice(0, 16))
     }
     return null
   }

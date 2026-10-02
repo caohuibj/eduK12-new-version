@@ -30,14 +30,14 @@ teacher_codes 5、course_scales 0、course_shares 0、questionnaire_access_token
 
 ### 3.1 直接复制（字段全同，逐行 INSERT，保留主键/时间戳）
 Assignment、Checkin、Classroom、ClassroomAnswer、ClassroomQuestion、ClassroomSession、
-CourseQuestionnaire、CourseScale、CourseShare、CourseStudent、QuestionnaireScale、
+CourseQuestionnaire、CourseShare、CourseStudent、
 SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期）。
 
 ### 3.2 需转换的表
 | 表 | 转换 |
 |---|---|
 | User | 共有字段直拷；新增：`platformRole=STANDARD`（默认），`teacherApproved=true`（全部旧教师已启用），`mustChangePassword=false`，`tokenVersion=0`；`isActive` 语义不变；密码哈希原样。2 名 ADMIN 的 platformRole 见 §10-1 |
-| Scale | 旧 `config:Json + ScaleItem[] + Dimension[]` → 新 `definition:Json(schemaVersion 2)`（items/responseSets/scoring.scores/report），`instrumentClass='CUSTOM_DESCRIPTIVE'`，definitionHash 用 `hashScaleDefinition`；保存后走既有 validate 端点逻辑校验。旧 items/dimensions 结构进 definition，不再有独立表 |
+| Scale / ScaleItem / Dimension / ItemDimension / CourseScale / QuestionnaireScale | 用户于 2026-10-02 明确选择仅保留历史归档，暂不导入量表内容；不生成新 Scale 或运行时绑定。如果最终快照出现问卷量表绑定，导入停止并核对整份问卷的处理，避免静默删除测评单元 |
 | Questionnaire | 共有字段直拷；新 `formSections` 由 `ensureQuestionnaireFormSections` 按旧 form item 顺序物化（旧无 section 概念 → 单默认 section 映射，`status` 语义映射见 §3.4） |
 | QuestionnaireFormItem | 直拷 + `sectionId/sectionPosition`（由 §3.4 的 section 物化回填），`contextKey` 可空 |
 | Video / Document | 共有字段直拷；`assetId/…AssetId` 经资产迁移（ASSET-MIGRATION.md 流程）注册 StoredAsset/AssetReference 后回填；**6 条失效本地视频 URL 按 missing-file-references.json 的替代文件映射改写**；软删除字段原样 |
@@ -49,21 +49,20 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 - 旧 `Assessment`（128 条量表测评，含加密 answers/scores/feedback）、`QuestionnaireAssessment`（21 条）、
   `QuestionnaireFormAnswer`（108 条，`value` 若为密文则同样保留密文）：**整体留在 ptool_legacy 归档库**，
   原样可追溯；由 §5 只读模块展示。
-- 旧 `Dimension / ScaleItem / ItemDimension`：随 Scale.definition 转换保留其内容（definition JSON 内），
-  归档库同时保留原始行。
+- 旧 `Scale / Dimension / ScaleItem / ItemDimension / CourseScale / QuestionnaireScale`：仅在归档库保留原始行，不转换为新运行时量表。
 - 理由：新 Assessment/QuestionnaireAssessment 是 FINAL_ONLY v2 运行时（attemptEpoch/runtimeGeneration/
   result 等），旧数据塞入需伪造运行时字段，违反"不伪装 ScaleResultV2"。
 - 加密处理：归档密文保留旧钥加密（不重加密、不存明文副本）；只读适配器**仅在展示时**用
   `LEGACY_DATA_ENCRYPTION_KEY` 受限解密限定字段（answers/scores/feedback），不落盘、不入日志。
 
 ### 3.4 状态语义映射（旧 → 新）
-- QuestionnaireFormItem/QuestionnaireAssessment 留在归档库原样，因此 status 映射仅在只读展示层标注
+- QuestionnaireAssessment/QuestionnaireFormAnswer 留在归档库原样，因此 status 映射仅在只读展示层标注
   （旧 status 原样展示 + "历史归档"标签）。新表不引入旧测评行。
 - Questionnaire（内容表）`status`：DRAFT→DRAFT、PUBLISHED→PUBLISHED、其他旧值→原样保留并在导入报告列出。
 
 ### 3.5 不导入 / 无数据
 - 新系统 55 张新表（Cognitive/Composite/SJT/Bundle/Organization/Parent/SafetyCase/…）与旧系统无对应，不迁移、不构造。
-- 旧 `questionnaire_access_tokens=0`、`course_scales=0`、`course_shares=0`：结构支持但无数据。
+- 旧 `questionnaire_access_tokens=0`、`course_shares=0`：结构支持但无数据；`course_scales=0` 仅归档。
 
 ## 4. 访问令牌与资产
 - 令牌转换复用 `src/services/checkinTokenCrypto.ts` 的 `hashToken/encryptToken`（新钥），确保与
@@ -76,8 +75,7 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 ## 5. 历史只读查询模块（本 PR 的第二部分）
 - 后端：`/api/admin/legacy-archive/*`（authenticate + requireAdmin + platformRole 校验）：
   - `GET /overview`：归档统计（各表计数、时间范围）；
-  - `GET /assessments?studentId=&scaleId=&status=&page=`：旧量表测评列表（原样字段 + 解密后的
-    answers/scores/feedback 摘要，标注"历史归档（旧系统原样，未重算）"）；
+  - `GET /assessments?studentId=&scaleId=&status=&page=`：旧量表测评列表（仅元数据，不含答案、分数或反馈，标注"历史归档（旧系统原样，未重算）"）；
   - `GET /assessments/:id`：单条详情（含原分数、反馈、来源，密文字段服务端解密后返回，不缓存）；
   - `GET /questionnaire-assessments…`：同构；
   - 全部只读：连接使用 `DATABASE_URL_LEGACY`（只读 Postgres 角色，仅 SELECT 权限），代码层无任何写操作。
@@ -95,7 +93,7 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
   submission_histories → checkins → checkin_submissions → checkin_access_tokens →
   questionnaires/form items → course_questionnaires → videos/documents（资产关联后）→
   classrooms/teacher_codes → 对账。
-- 幂等：每行按 `_legacy_import_id_map` upsert；重跑只补缺失/不一致行。
+- 幂等：每行按 `_legacy_import_id_map` upsert；重跑只补缺失行；已存在的内容不一致时停止，避免覆盖新写入。
 - 批次：默认每表一个批次可配 `--batch-size`；每批事务内写 id_map + 批次记录。
 - 对账（`verify` 子命令）：逐表计数对比（old、new、expected 差异列）、抽样内容哈希比对
   （assignment/checkin/submission 内容字段）、外键完整性（无孤儿）、令牌验证（hash 可匹配原文）。
@@ -107,7 +105,7 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 - 业务钥沿用新库 `.env`。
 
 ## 8. 测试
-- 单测：scale definition 转换（旧 config/items/dimensions → V2）、token 转换、状态语义、URL 改写映射；
+- 单测：字段约束、token 转换、状态语义、URL 改写及资产校验；
 - 集成：以小型合成 legacy fixture（建临时 legacy schema）跑 dry-run+apply+重跑+对账；
 - 演练：验收环境对 9/30 快照（ptool_legacy）完整 dry-run + apply + 对账，报告留 evidence。
 
@@ -132,10 +130,10 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 - 分批事务同时提交业务行及 ID 映射；已存在且不属于导入器的行、内容冲突会阻止重跑，不覆盖用户的新写入。
 - verify 按每个预期 ID 比较所有映射字段及 ID 映射；令牌随机密文按同一令牌内容比较，不用“大于等于旧数量”替代对账。
 - 源库使用独立 SELECT-only 角色与 REPEATABLE READ READ ONLY 快照。导入 CLI 不使用运行时 Prisma 日志，异常不打印记录、连接串或密码哈希。
-- 六个旧量表全部导入为 DRAFT，授权状态 unknown；旧 config、题目、维度和关联保存在 definition.legacyContent 与原归档库。不推断发布权或科学计分等价性。缺少标签的旧定义保持待审阅，不捏造选项；定义问题数量记录在报告。
+- 六个旧量表及其题目、维度、关联仅保留在原归档库（用户 2026-10-02 明确确认）。不导入运行时量表内容，不推断发布权或科学计分等价性。
 - 历史 API 仅接受当前数据库 principal 的 ADMIN + SYSTEM_ADMIN，固定 SELECT 查询及参数绑定，25 条分页；列表不含答案、分数或反馈。详情使用独立 LEGACY_DATA_ENCRYPTION_KEY 受限解密，no-store，异常统一 503。
 - 9/30 的旧模型库是演练底座；已有失败 apply 的验收库不能作为正式业务库。使用独立演练目标，正式切换重新停写并恢复最终快照。
-- course_shares、questionnaire_scales 与 questionnaire_access_tokens 已补齐映射（9/30 与当前只读计数均为 0），问卷令牌同样转为 hash + encrypted。
+- course_shares 与 questionnaire_access_tokens 已补齐映射（9/30 与当前只读计数均为 0），问卷令牌同样转为 hash + encrypted。questionnaire_scales 仅归档；若最终快照非零则停止导入，核对问卷内容语义。
 - dry-run 仅写导入批次记录；apply 需 --confirm-apply、--admin-users admin,caohui 和 --approve-legacy-teachers。资产尚未完成时不能设置 ASSET_MIGRATION_COMPLETE=true。
 
 

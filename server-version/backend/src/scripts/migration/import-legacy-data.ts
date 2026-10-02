@@ -3,10 +3,8 @@ import { planLegacyAssets } from './legacy-assets'
 import { applyImportPlan, inspectImportPlan, createImportPlanner, importPlanHash, verifyImportPlan, type ImportAction } from './import-plan'
 // Migration errors must not emit private Prisma payloads or runtime health timers.
 const prisma = new PrismaClient({ log: [] })
-import { validateScaleDefinition, hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { encryptToken, hashToken } from '../../services/checkinTokenCrypto'
 import { LegacyClient, legacyNumber } from './legacy-client'
-import { convertLegacyScaleDefinition, type LegacyDimensionRow, type LegacyItemDimensionRow, type LegacyScaleItemRow } from './legacy-scale-converter'
 import { applyRewrites, buildRewriteMap, type LoadedRewrite } from './url-rewrite'
 
 /**
@@ -22,7 +20,7 @@ import { applyRewrites, buildRewriteMap, type LoadedRewrite } from './url-rewrit
  *  - verify:  per-table count reconciliation (legacy vs new with expected
  *    differences), orphan checks and token-hash spot checks.
  *
- * Scale/questionnaire ASSESSMENTS are intentionally NOT imported: they stay in
+ * Legacy scale CONTENT and scale/questionnaire ASSESSMENTS are intentionally NOT imported: they stay in
  * the legacy archive database verbatim (see docs/migration/legacy-import-mapping.md).
  * All enums were verified identical between old @2b9a11d9 and new @69235a74.
  */
@@ -492,108 +490,14 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
       ctx.tally('course_questionnaires', rows.length, rows.length)
     }],
 
-    ['scales', async (ctx) => {
-      const scaleRows = await legacy.query<Record<string, unknown>>('SELECT * FROM scales ORDER BY created_at')
-      const itemRows = await legacy.query<Record<string, unknown>>('SELECT * FROM scale_items ORDER BY scale_id, sort_order')
-      const dimensionRows = await legacy.query<Record<string, unknown>>('SELECT * FROM dimensions')
-      const linkRows = await legacy.query<Record<string, unknown>>(`
-        SELECT id.item_id, id.dimension_id, id.weight, id.reverse, si.item_code, si.scale_id
-        FROM item_dimensions id JOIN scale_items si ON si.id = id.item_id`)
-      for (const row of scaleRows) {
-        const scaleId = String(row.id)
-        const items = itemRows
-          .filter((item) => String(item.scale_id) === scaleId)
-          .map((item) => ({
-            item_code: String(item.item_code),
-            content: String(item.content),
-            type: String(item.type ?? 'single'),
-            reverse: Boolean(item.reverse),
-            required: Boolean(item.required),
-            weight: (item.weight as string | number) ?? 1,
-            sort_order: legacyNumber(item.sort_order) ?? 0,
-            options: (item.options as LegacyScaleItemRow['options']) ?? null,
-            randomize_options: Boolean(item.randomize_options),
-          })) as LegacyScaleItemRow[]
-        const dimensions = dimensionRows
-          .filter((dimension) => String(dimension.scale_id) === scaleId)
-          .map((dimension) => ({
-            id: String(dimension.id),
-            code: String(dimension.code),
-            name: String(dimension.name),
-            description: (dimension.description as string | null),
-            scoring_method: (dimension.scoring_method as string | null),
-            weight: (dimension.weight as string | number) ?? 1,
-          })) as LegacyDimensionRow[]
-        const itemDimensions = linkRows
-          .filter((link) => String(link.scale_id) === scaleId)
-          .map((link) => ({
-            item_id: String(link.item_id),
-            dimension_id: String(link.dimension_id),
-            weight: (link.weight as string | number) ?? 1,
-            reverse: Boolean(link.reverse),
-            item_code: String(link.item_code),
-          })) as (LegacyItemDimensionRow & { item_code: string })[]
-        const definition = convertLegacyScaleDefinition({
-          scale: {
-            id: scaleId,
-            code: String(row.code),
-            name: String(row.name),
-            description: (row.description as string | null),
-            config: (row.config as Record<string, unknown> | null),
-            estimated_time: legacyNumber(row.estimated_time),
-            instruction: (row.instruction as string | null),
-            tags: (row.tags as string[] | null),
-          },
-          items,
-          dimensions,
-          itemDimensions,
-        })
-        const validation = validateScaleDefinition(definition, { instrumentClass: 'CUSTOM_DESCRIPTIVE', forPublish: false })
-        ctx.note('scale ' + scaleId + ': imported as DRAFT; definition review issues=' + validation.issues.filter(issue => issue.severity === 'error').length)
-        const data = {
-          id: scaleId,
-          code: String(row.code),
-          name: String(row.name),
-          description: (row.description as string | null) ?? null,
-          status: 'DRAFT' as const, // Legacy scoring and publication rights require separate review.
-          visibility: String(row.visibility) as 'HIDDEN' | 'COURSE' | 'PUBLIC',
-          instrumentClass: 'CUSTOM_DESCRIPTIVE' as const,
-          instrumentVersion: '2.0.0',
-          definition: asJson(definition),
-          definitionHash: hashScaleDefinition(definition as never),
-          itemCount: items.length,
-          dimensionCount: dimensions.length,
-          estimatedTime: legacyNumber(row.estimated_time),
-          instruction: (row.instruction as string | null) ?? null,
-          creatorId: String(row.creator_id),
-          createdAt: asDateRequired(row.created_at),
-          updatedAt: asDateRequired(row.updated_at),
-          tags: (row.tags as string[] | null) ?? [],
-        }
-        if (write) {
-          await db.scale.upsert({ where: { id: data.id }, update: {}, create: data })
-          await track('scale', data.id, data.id)
-        }
+    ['archived-scales', async (ctx) => {
+      // Explicit owner decision: old instrument content stays in the raw archive.
+      // Never invent scoring equivalence or reactivate old course bindings.
+      for (const table of ['scales', 'scale_items', 'dimensions', 'item_dimensions', 'course_scales'] as const) {
+        const rows = await legacy.query<{ count: string }>('SELECT count(*)::text AS count FROM ' + table)
+        ctx.tally(table, Number(rows[0].count), 0)
       }
-      ctx.note(`scales: definitions converted to V2 (${itemRows.length} items, ${dimensionRows.length} dimensions across ${scaleRows.length} scales). Historical assessment results stay in the legacy archive and are never re-scored.`)
-      ctx.tally('scales', scaleRows.length, scaleRows.length)
-    }],
-
-    ['course-scales', async (ctx) => {
-      const rows = await legacy.query<Record<string, unknown>>('SELECT * FROM course_scales ORDER BY created_at')
-      for (const row of rows) {
-        const data = {
-          id: String(row.id),
-          courseId: String(row.course_id),
-          scaleId: String(row.scale_id),
-          createdAt: asDateRequired(row.created_at),
-        }
-        if (write) {
-          await db.courseScale.upsert({ where: { id: data.id }, update: {}, create: data })
-          await track('course_scale', data.id, data.id)
-        }
-      }
-      ctx.tally('course_scales', rows.length, rows.length)
+      ctx.note('Legacy scale content and bindings are archive-only; no runtime Scale rows are imported.')
     }],
 
     ['videos', async (ctx) => {
@@ -742,12 +646,9 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
     }
     ctx.tally('course_shares', shares.length, shares.length)
     const links = await legacy.query<Record<string, unknown>>('SELECT * FROM questionnaire_scales ORDER BY questionnaire_id, position, id')
-    for (const row of links) {
-      const data = { id: String(row.id), questionnaireId: String(row.questionnaire_id), scaleId: String(row.scale_id), position: legacyNumber(row.position) ?? 0 }
-      await db.questionnaireScale.upsert({ where: { id: data.id }, update: {}, create: data })
-      await track('questionnaire_scale', data.id, data.id)
-    }
-    ctx.tally('questionnaire_scales', links.length, links.length)
+    // Dropping a scale unit from a published questionnaire would change its meaning.
+    if (links.length) throw new Error('Legacy questionnaire scale bindings require explicit archive-only questionnaire handling')
+    ctx.tally('questionnaire_scales', links.length, 0)
     const tokens = await legacy.query<Record<string, unknown>>('SELECT * FROM questionnaire_access_tokens ORDER BY created_at')
     for (const row of tokens) {
       if (typeof row.token !== 'string' || !row.token) throw new Error('Legacy questionnaire token is invalid')
