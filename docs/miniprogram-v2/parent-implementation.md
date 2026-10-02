@@ -1,0 +1,47 @@
+# 家长授权实施与验证记录
+
+实现提交：5c00b20c；本地分支 codex/miniprogram-v2-parent-authorization，基于 Foundation@1a2867bb。
+
+用户已确认 parent-authorization-proposal.md；本轮只保留本地代码，不推送、不创建 PR、不部署。
+
+## 已落地
+
+- 复用现有 ParentInviteCode 与 ParentStudentRelationship：学生在有效课程内生成15分钟、一次性邀请码；家长认领进入 PENDING；学生核对服务端同意文本后确认 ACTIVE；双方可以解绑。
+- 新增 exact-artifact consent、disclosure grant 与不可变 audit；同意默认30天，学生可撤回，组织披露人员必须持有显式 PARENT_REPORT_DISCLOSURE。ADMIN、SYSTEM_ADMIN 和 ORG_ADMIN 身份本身不获得孩子报告权限。
+- 服务端核对当前关系、双方当前角色和账号、孩子当前组织资格、组织状态、已有报告成员/策略 deny、冻结来源 hash、家长投影 hash、同意版本及有效期。列表与详情共用 SQL 授权范围。解绑撤销该关系的全部报告同意与 grant。
+- 两个增量迁移新增证据表及关系/家长/孩子/同意/来源复合外键，不创建披露数据、不回填关系、不修改原冻结报告。仅在任务专属本机测试数据库迁移；业务数据库未修改。
+- Web 与小程序可复用同一组 /api/parent-links、/api/parents API。mutation 保留既有 Cookie/CSRF，生产按用户限流；read no-store；错误不输出正文或邀请码；可恢复并发冲突返回409，客户端不自动重放写请求。
+- 原生 Parent Domain：孩子列表与切换、课程概况、获准报告列表/正文、撤回；学生/家长 profile 的关联申请、确认与解绑；逐报告同意预览页面。页面无裸请求、角色判权、原始答案或评分逻辑。
+- Parent 首页开启时仅2个并行业务请求：本人测评与已确认孩子列表，无逐孩子/报告请求。关闭时保持1个本人测评请求。
+- 邀请码只在当前页面内存中显示；离开/退出清除，仅在用户点击时复制。报告不写本地存储；退出、身份变化或重新授权失败清除旧页面数据。
+
+## 尚未完成的产品闭环
+
+1. **正式家长报告内容未发布**。当前报告源 adapter 仅接受共享 immutable reader 验证后、冻结来源内显式 PUBLISHED/PARENT 投影；现有教师/研究/学生报告不会自动转换。没有家长投影时返回404。数据库报告测试使用合成的已验证来源输入，不能证明正式报告包兼容。
+2. 逐份 consent 的 API 与原生预览页已实现；从 canonical 学生报告详情进入预览、披露负责人的原生审批入口属于 PR2/PR3 后续集成，当前不能把接口存在视为完整业务可用。
+3. 学生个人自助、无 organization 的报告源尚无可验证家长披露契约，当前拒绝。需要后续正式源 adapter；未通过组织 staff 权限替代学生同意。
+4. Web 家长界面尚未接入新增 API。多端共用后端授权已建立，Web UI 对等仍需后续实施。
+5. 旧模型对 parent/student pair 全局唯一；已撤销关系不能自动重绑或恢复旧 grant。重绑须另行设计关系历史流程，当前明确拒绝。
+6. 微信开发者工具编译、iOS/Android 登录/键盘/扫码/前后台/报告操作，以及认知测验 timing 尚未验收。FINAL_ONLY runner、完整四角色动作对等、其余正式报告 renderer 和 full regression 尚未完成。
+
+## 当前验证
+
+运行时 Node 24.21.0；测试数据均为本轮生成的合成数据。
+
+| 验证 | 结果 | 证据范围 |
+|---|---|---|
+| 小程序静态检查 | 43 JS 模块、9 route 通过 | route/component、WXML 基本结构、tokens、请求与存储边界、retired contracts；不等于微信编译 |
+| 小程序 runtime/page fixtures | 67项通过 | 四角色页面生命周期、加密存储调用、CSRF/错误/退出、关联确认、重复点击、孩子切换、同意重试、旧报告清理 |
+| 目标后端回归 | 92项通过 | 66 unit/HTTP-router contract +20 PostgreSQL authority +6 real HTTP/runtime contract |
+| 实际小程序请求层 → 本机 API → PostgreSQL | 6项通过，计入上行92 | 四角色真实 Cookie/CSRF 登录；完整关联/解绑；当前账号冻结失效。平台 transport/storage 是测试 adapter，不是微信真机 |
+| 数据库授权 | 20项通过，计入92 | 并发认领、无 consent/grant、跨家长/孩子、deny/角色/组织/成员/冻结变化、解绑与读竞争、精确外键、不可变记录 |
+| 后端 TypeScript | 通过 | 当前后端集成，无输出构建 |
+| CI 范围/工作流 | 26项通过并新增家长门禁 | Draft 目标 unit；Full/本地完整验证要求两个 PostgreSQL 套件不得跳过 |
+
+真实报告读取 E2E、Full Gate、微信开发者工具与真机证据仍缺失，不得宣称正式上线可用。
+
+## 后续开放条件
+
+PARENT_PORTAL_ENABLED 默认 false；/auth/me.mobile 仅提供导航发现。完成正式 PARENT 内容/政策发布、披露产品入口、报告源契约验证和设备验收后，才在隔离验收环境显式开启。生产开放另行执行发布门禁。
+
+批准规则未改变。低风险调整：确认关联按 relationship + consentVersion 幂等，而非新增客户端 commandKey；逐 artifact 同意/grant 使用稳定 commandKey。并发状态变化只返回409，不盲目重试。关联来源课程尚未建立 organization 模型，概况仅返回当前课程名称，组织报告另行核对当前组织资格。

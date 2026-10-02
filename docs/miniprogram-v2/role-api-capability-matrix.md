@@ -1,6 +1,6 @@
-# Role × Feature × API × Capability（Foundation）
+# Role × Feature × API × Capability（Foundation + Parent 基础）
 
-以下仅为当前阶段已经接入的发现/读取能力；不会据此开放 mutation、孩子报告或 Organization governance。
+以下仅为当前阶段已经接入的发现/读取能力；新增家长入口默认关闭；导航发现不授予实际孩子报告或 Organization governance 权限。
 
 | Feature | Roles | API | Server discovery | Mini destination | Read | Create/Update/Complete/Report |
 |---|---|---|---|---|---|---|
@@ -11,7 +11,9 @@
 | Respondent inbox | 四角色 | /my-assessments | canReadOwnAssessments | list?domain=assessments | 已实现状态列表 | PR3 未实现 |
 | Organization list/context | 四角色（Admin navigation） | /organizations；/:id/context | canDiscoverOrganizations；对象 allowedActions | list/detail?domain=organizations | 已实现基础字段 | PR2 未实现；不从 Admin 推导 |
 | User list/detail | Admin | /users；/:id | canReadUsers（现有 requireAdmin） | list/detail?domain=users | 已实现基础字段 | PR2 未实现 |
-| Child links/reports | Parent/Student | 新增设计已获确认 | 默认关闭 | 独立 Parent Domain | 实施中 | 逐关系、逐 artifact 授权 |
+| Parent links | Parent/Student | /parent-links | canManageParentLinks，默认关闭 | parents?view=links | 已实现自身关系 | 邀请/认领/学生确认/解绑已实现 |
+| Children/overview | Parent | /parents/me/children；/:id/overview | canReadChildren，精确关系由 API 核对 | parents?view=children/child | 已实现最小概况 | — |
+| Parent reports | Parent/Student/披露负责人 | /parents/me/children/:id/reports；/parent-links/:id/reports/:artifactId | canReadChildReports；精确 consent/grant + published PARENT | parents?view=reports/report/consent | 基础已实现，正式内容源未开放 | consent/grant/revoke API 已实现，披露产品入口后续集成 |
 
 完整 Web 路由证据见 web-feature-inventory.json。roles=CONTRACT_REVIEW_REQUIRED 的路由仍需人工核对包装器与 API；不能因生成清单便标记 parity 通过。
 
