@@ -86,7 +86,7 @@ function createOperations(api,session) {
    if(domain==='courses'){add('title','课程名称',{required:true});add('description','课程介绍',{multiline:true,maxlength:5000})}
    if(domain==='assignments'||domain==='checkins') {
     if(action==='create')add('courseId','课程',{required:true,selector:'courses'})
-    add('title',domain==='assignments'?'作业名称':'打卡名称',{required:true});add('description','说明',{multiline:true,maxlength:5000});add('content','内容',{multiline:true,maxlength:20000});add(domain==='assignments'?'deadline':'endTime','截止时间',{dateTime:true})
+    add('title',domain==='assignments'?'作业名称':'打卡名称',{required:true});add('description','说明',{multiline:true,maxlength:5000});add('content','内容',{multiline:true,maxlength:20000});add(domain==='assignments'?'deadline':'endTime','截止时间',{dateTime:true,clearWithNull:domain==='checkins'})
     if(domain==='assignments')add('questions','作业题目',{type:'questions',value:entity.questions||[]})
     if(domain==='checkins')add('allowViewOthers','允许学生查看同学打卡',{type:'boolean',value:entity.allowViewOthers===true})
    }
@@ -112,11 +112,11 @@ function createOperations(api,session) {
   const confirmations={rotateCode:'旧课程码将立即失效。已加入的学生保留课程关系。',end:'结束后将停止课程招募。请确认当前课程已完成。',approveTeacher:'确认批准这个教师账户？',deactivate:'账户停用后无法继续使用。服务器会检查组织管理员保留条件。',resetPassword:'重置后原登录失效。临时密码保存在服务器受保护的交接文件中，需要通过现有交接流程提供给用户。',delete:'此操作会删除该邀请码，确认后无法恢复。',anonymous:'启用匿名打卡将允许持有效公开链接的人提交，请确认用途和有效期。'}
   return {title:ACTIONS[action],fields,images:Array.isArray(entity.images)?entity.images:[],canUploadImages:['assignments','checkins'].includes(domain)&&['create','edit'].includes(action),commandKey:c.commandKey,entity,confirmation:confirmations[action]||'请核对内容后提交。'}
  }
- function payload(fields,values) {
+ function payload(fields,values,editing=false) {
   const body={}
   for(const f of fields){let value=values[f.key]===undefined?f.value:values[f.key]
    if(f.required&&(value===''||value==null||(Array.isArray(value)&&!value.length)))throw new ApiError('invalidRequest','请填写'+f.label)
-   if(f.dateTime){if(!value)continue;const date=new Date(value);if(!Number.isFinite(date.getTime()))throw new ApiError('invalidRequest',f.label+'格式无效');value=date.toISOString()}
+   if(f.dateTime){if(value===''||value==null){if(f.value!==''&&f.value!=null){if(f.clearWithNull){body[f.key]=null;continue}throw new ApiError('invalidRequest','当前接口不支持清除已有'+f.label+'，请保留原时间或设置新时间。原时间：'+f.value)}continue}const date=new Date(value);if(!Number.isFinite(date.getTime()))throw new ApiError('invalidRequest',f.label+'格式无效');if(editing&&f.value&&date.getTime()===new Date(f.value).getTime())continue;value=date.toISOString()}
    else if(f.type==='questions'){if(!Array.isArray(value)||value.length>100)throw new ApiError('invalidRequest','作业题目数量无效');for(const q of value){if(!q.id||!q.question.trim()||!['text','single_choice','multiple_choice'].includes(q.type))throw new ApiError('invalidRequest','请填写题目并选择题型');if(q.type!=='text'){if(!Array.isArray(q.options)||q.options.length<2||new Set(q.options.map(o=>o.key)).size!==q.options.length||q.options.some(o=>!o.text.trim()||!Number.isFinite(o.points)))throw new ApiError('invalidRequest','选择题须有至少两个不同选项及有效分值')}}}
    else if(f.type==='number'){value=Number(value);if(!Number.isSafeInteger(value)||value<0)throw new ApiError('invalidRequest',f.label+'必须为非负整数')}
    if(!f.key.startsWith('answer:'))body[f.key]=value
@@ -127,7 +127,7 @@ function createOperations(api,session) {
   spec(domain)
   // Require the prepared server-owned action; never accept an arbitrary path.
   if(!form||form.domain!==domain||form.resourceId!==resourceId||form.action!==action||typeof form.commandKey!=='string')throw new ApiError('invalidRequest','请重新打开操作')
-  let method='POST',path=resourceId?resourcePath(domain,resourceId):spec(domain).path,body=payload(form.fields,values)
+  let method='POST',path=resourceId?resourcePath(domain,resourceId):spec(domain).path,body=payload(form.fields,values,action==='edit')
   if(form.canUploadImages&&action!=='submit')body.images=extras.images||form.images||[]
   if(action==='edit')method='PUT'
   else if(action==='join')path+='/join'

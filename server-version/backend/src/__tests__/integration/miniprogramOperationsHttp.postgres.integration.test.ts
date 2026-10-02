@@ -195,6 +195,42 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   await expect(s.runtime.api.post('/mobile/classrooms/'+classroom.id+'/submit',{questionId:question.id,startedAt:state.question.startedAt,answer:'A'})).rejects.toMatchObject({kind:'notFound'})
   await s.runtime.classrooms.join(classroom.code);expect((await s.runtime.classrooms.state(classroom.id)).classroom.id).toBe(classroom.id)
  })
+ it('R2: authorized image URLs are available to the teacher and permitted classmates; refresh checks current list authority',async()=>{
+  const t=await logged(teacher),s=await logged(student),x=await logged(stranger)
+  const teacherList=await t.runtime.operations.list('checkins',{parent:checkin.id,view:'submissions'})
+  const row=teacherList.list.find((r:any)=>r.value.studentId===student.id)
+  expect(row.value.images).toHaveLength(1);expect(typeof row.value.images[0]).toBe('string')
+  const image=await t.runtime.api.downloadAsset(row.value.images[0]);expect((await readFile(image)).length).toBeGreaterThan(0);t.runtime.api.discardFile(image)
+  await expect(s.runtime.operations.list('checkins',{parent:checkin.id,view:'others'})).rejects.toMatchObject({kind:'forbidden'})
+  await prisma.courseStudent.create({data:{courseId:course.id,studentId:stranger.id,status:'ACTIVE'}})
+  await prisma.checkin.update({where:{id:checkin.id},data:{allowViewOthers:true}})
+  const classmates=await x.runtime.operations.list('checkins',{parent:checkin.id,view:'others'}),peer=classmates.list.find((r:any)=>r.value.studentId===student.id)
+  expect(peer.value.images).toHaveLength(1);const peerImage=await x.runtime.api.downloadAsset(peer.value.images[0]);expect((await readFile(peerImage)).length).toBeGreaterThan(0);x.runtime.api.discardFile(peerImage)
+  const expired=new URL(peer.value.images[0],'https://mini-operations-fixture.example');expired.searchParams.set('expires','1')
+  await expect(x.runtime.api.downloadAsset(expired.pathname+expired.search)).rejects.toMatchObject({kind:'unavailable'})
+  const refreshed=await x.runtime.operations.list('checkins',{parent:checkin.id,view:'others'}),fresh=refreshed.list.find((r:any)=>r.value.studentId===student.id),freshImage=await x.runtime.api.downloadAsset(fresh.value.images[0]);x.runtime.api.discardFile(freshImage)
+  await prisma.checkin.update({where:{id:checkin.id},data:{allowViewOthers:false}})
+  await expect(x.runtime.operations.list('checkins',{parent:checkin.id,view:'others'})).rejects.toMatchObject({kind:'forbidden'})
+  // Existing private signed URLs remain capabilities until their bounded expiry.
+  // The record refresh must reauthorize via the list and clears the old local files.
+  await prisma.courseStudent.delete({where:{courseId_studentId:{courseId:course.id,studentId:stranger.id}}})
+ })
+ it('R3: deadline clearing is rejected before HTTP, normal update persists, and checkin null clearing is supported',async()=>{
+  const t=await logged(teacher),old='2030-01-01T00:00:00.000Z',next='2030-02-01T00:00:00.000Z'
+  await prisma.assignment.update({where:{id:assignment.id},data:{deadline:new Date(old)}})
+  let form=await t.runtime.operations.prepare('assignments',assignment.id,'edit');const before=t.calls.length
+  await expect(t.runtime.operations.execute('assignments',assignment.id,'edit',form,{deadline:''})).rejects.toMatchObject({kind:'invalidRequest'})
+  expect(t.calls.length).toBe(before);expect((await t.runtime.operations.detail('assignments',assignment.id)).entity.deadline).toBe(old)
+  await t.runtime.operations.execute('assignments',assignment.id,'edit',form,{title:'Deadline unchanged'});expect((await t.runtime.operations.detail('assignments',assignment.id)).entity.deadline).toBe(old)
+  form=await t.runtime.operations.prepare('assignments',assignment.id,'edit');await t.runtime.operations.execute('assignments',assignment.id,'edit',form,{deadline:next});expect((await t.runtime.operations.detail('assignments',assignment.id)).entity.deadline).toBe(next)
+  // Editing text on an expired assignment must not resend its unchanged date
+  // through the backend's 'new deadline must be in the future' validator.
+  const past='2025-01-01T00:00:00.000Z';await prisma.assignment.update({where:{id:assignment.id},data:{deadline:new Date(past)}})
+  form=await t.runtime.operations.prepare('assignments',assignment.id,'edit');await t.runtime.operations.execute('assignments',assignment.id,'edit',form,{title:'Expired task edited'});expect((await t.runtime.operations.detail('assignments',assignment.id)).entity.deadline).toBe(past);expect(t.calls.filter(c=>c.method==='PUT'&&c.url.includes('/assignments/')).at(-1).data).not.toHaveProperty('deadline')
+  const created=await t.runtime.operations.execute('assignments',undefined,'create',await t.runtime.operations.prepare('assignments',undefined,'create'),{courseId:course.id,title:'Without deadline',deadline:''});expect((await t.runtime.operations.detail('assignments',created.id)).entity.deadline).toBeNull()
+  await prisma.checkin.update({where:{id:checkin.id},data:{endTime:new Date(old)}})
+  const checkinForm=await t.runtime.operations.prepare('checkins',checkin.id,'edit');await t.runtime.operations.execute('checkins',checkin.id,'edit',checkinForm,{endTime:''});expect((await t.runtime.operations.detail('checkins',checkin.id)).entity.endTime).toBeNull()
+ })
  it('deadline commits termination and refuses answer; closed classroom cannot be rejoined',async()=>{
   await prisma.classroomQuestion.update({where:{id:question.id},data:{startedAt:new Date(Date.now()-120000),timeLimit:1}})
   const session=await prisma.classroomSession.findUniqueOrThrow({where:{classroomId_studentId:{classroomId:classroom.id,studentId:student.id}}})
