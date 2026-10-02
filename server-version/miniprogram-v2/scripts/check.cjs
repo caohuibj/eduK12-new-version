@@ -23,12 +23,13 @@ for(const file of files(root)) {
   new vm.Script(source,{filename:file});count++
   assert.ok(!/Authorization.{0,30}Bearer|connectSocket|formatScore|calculateScore|rawScore\s*[*/]/.test(source),'legacy/scoring reference '+rel)
   for(const pattern of retired) assert.ok(!pattern.test(source),'retired mutation '+rel)
-  if(rel!=='core/api/client.js')assert.ok(!/\b(?:wx|platform)\.request\s*\(/.test(source),'transport outside API client '+rel)
+  if(rel!=='core/api/client.js')assert.ok(!/\b(?:wx|platform)\.(?:request|uploadFile|downloadFile)\s*\(/.test(source),'transport outside API client '+rel)
   if(rel.startsWith('pages/'))assert.ok(!/\.(?:role|activeRole)\s*(?:===|!==)|\bapi\.(?:get|post|put|patch|delete|request)\(/.test(source),'page authorization/transport leak '+rel)
   if(!rel.startsWith('core/'))assert.ok(!/\b(?:wx|platform)\.(?:getStorage|setStorage|removeStorage)/.test(source),'storage outside core '+rel)
  }
  if(rel.startsWith('pages/')&&file.endsWith('.wxss'))assert.ok(!/(?:font-size|padding|border-radius|#[0-9a-f]{3,8})/.test(source),'page style bypasses tokens '+rel)
  if(file.endsWith('.wxml')) {
+  assert.ok(!/wx:(?:if|elif|for)="(?!\{\{)/.test(source),'static WXML binding '+rel)
   const stack=[]
   for(const [,closing,tag,attrs] of source.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9-]*)([^>]*?)>/g)) {
    if(closing)assert.equal(stack.pop(),tag,'unbalanced WXML '+rel)

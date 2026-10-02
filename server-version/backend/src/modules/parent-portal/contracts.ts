@@ -12,13 +12,16 @@ export const REPORT_CONSENT_TEXT = '我同意将预览中这一份报告提供�
 const hash = z.string().regex(/^[0-9a-f]{64}$/)
 const text = z.string().max(10000)
 const parentPolicy = z.object({ key:z.string().min(1).max(128), version:z.string().min(1).max(128), audience:z.literal('PARENT'), mode:z.enum(['COMPLETION_ONLY','EDUCATIONAL_SUMMARY']), rawAnswers:z.literal(false), itemLevel:z.literal(false), researchExport:z.literal(false) }).strict()
+export const parentToolRefSchema=z.object({family:z.enum(['SCALE','FORM','BUNDLE','COGNITIVE','SITUATIONAL']),key:z.string().regex(/^[A-Za-z0-9_-]{1,128}$/),version:z.string().regex(/^[A-Za-z0-9_.-]{1,128}$/)}).strict()
 export const parentProjectionSchema = z.object({
   schemaVersion:z.literal(1), audience:z.literal('PARENT'), artifactId:z.string().min(1), subjectUserId:z.string().min(1),
   title:z.string().min(1).max(200), publicationStatus:z.literal('PUBLISHED'), policy:parentPolicy, policyHash:hash,
+  toolRef:parentToolRefSchema.optional(),disclosedMetricKeys:z.array(z.string().min(1)).max(100).optional(),disclosedLongitudinalMetricKeys:z.array(z.string().min(1)).max(100).optional(),
   summary:text, blocks:z.array(z.object({title:z.string().max(200),text}).strict()).max(30),
 }).strict().superRefine((value,ctx)=>{
+  if((value.disclosedLongitudinalMetricKeys||[]).some(key=>!value.disclosedMetricKeys?.includes(key)))ctx.addIssue({code:z.ZodIssueCode.custom,message:'longitudinal metrics require declared metric provenance'})
   if(canonicalHash(value.policy)!==value.policyHash)ctx.addIssue({code:z.ZodIssueCode.custom,message:'parent policy hash mismatch'})
-  if(value.policy.mode==='COMPLETION_ONLY'&&(value.summary!==''||value.blocks.length))ctx.addIssue({code:z.ZodIssueCode.custom,message:'completion-only projection cannot carry interpretation'})
+  if(value.policy.mode==='COMPLETION_ONLY'&&(value.summary!==''||value.blocks.length||value.disclosedMetricKeys?.length||value.disclosedLongitudinalMetricKeys?.length))ctx.addIssue({code:z.ZodIssueCode.custom,message:'completion-only projection cannot carry interpretation'})
 })
 export type ParentProjection = z.infer<typeof parentProjectionSchema>
 export interface ParentReportSource { artifactId:string; subjectUserId:string; organizationId:string|null; policyDomain:string; sourceHash:string; projection:ParentProjection }

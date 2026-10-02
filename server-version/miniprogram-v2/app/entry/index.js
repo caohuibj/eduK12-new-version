@@ -12,6 +12,8 @@ function parseEntry(input, origin) {
         const parts = raw.slice(origin.length).split('?')
         const canonicalCourse = parts[0].match(/^\/student\/courses\/([a-zA-Z0-9_-]{1,128})$/)
         if (canonicalCourse && !parts[1]) return {kind:'course',id:canonicalCourse[1],requiresAuth:true}
+        const canonicalClassroom=parts[0]==='/student/classroom/enter'&&parts[1]&&parts[1].match(/^code=(\d{6})$/)
+        if(canonicalClassroom)return {kind:'classroom',id:canonicalClassroom[1],requiresAuth:true}
         const canonicalPublic = parts[0].match(/^\/public\/(questionnaire|composite|checkin)\/([a-zA-Z0-9_-]{16,512})$/)
         if (canonicalPublic && !parts[1]) return {kind:'public',token:canonicalPublic[2],resourceFamily:canonicalPublic[1],requiresAuth:false}
         if (!['/mini/entry','/pages/entry/index'].includes(parts[0])) throw new Error()
@@ -39,12 +41,16 @@ function parseEntry(input, origin) {
 }
 async function resolveEntry(entry, session, domains) {
   if (!entry) return {status:'home', destination:'/pages/home/index'}
+  if(entry.kind==='public'&&entry.resourceFamily==='checkin')return {status:'ready',destination:'/pages/public-checkin/index?token='+encodeURIComponent(entry.token)}
   if (entry.requiresAuth && !session.user) return {status:'login',destination:'/pages/auth/login/index'}
   if (session.user && session.user.mustChangePassword) return {status:'password', destination:'/pages/auth/password/index'}
   if (entry.kind === 'course') {
     await domains.detail('courses',entry.id)
     return {status:'ready', destination:'/pages/detail/index?domain=courses&id='+encodeURIComponent(entry.id)}
   }
+  if(entry.kind==='checkin'){await domains.operations.detail('checkins',entry.id);return {status:'ready',destination:'/pages/detail/index?domain=checkins&id='+encodeURIComponent(entry.id)}}
+  if(entry.kind==='classroom'&&/^\d{6}$/.test(entry.id)){if(!session.capabilities.canJoinClassroom)throw new ApiError('forbidden','课堂入口未开放');return {status:'ready',destination:'/pages/classroom/index?code='+encodeURIComponent(entry.id)}}
+  if(['assessment','questionnaire','composite','cognitive','situational'].includes(entry.kind)&&domains.assessmentEntry){const taskId=await domains.assessmentEntry(entry.kind,entry.id);return {status:'ready',destination:'/pages/assessment-entry/index?id='+encodeURIComponent(taskId)}}
   // All kinds are recognized centrally. Unsupported adapters never fabricate authorization/publication or open arbitrary Web URLs.
   return {status:'unavailable', message:'此入口的小程序适配尚未开放，请使用当前 Web 客户端。'}
 }

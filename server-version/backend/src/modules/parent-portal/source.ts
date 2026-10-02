@@ -11,5 +11,7 @@ export async function readParentReportSource(artifactId:string):Promise<ParentRe
   const subjectUserId=typeof payload.subjectUserId==='string'?payload.subjectUserId:source?.subjectUserId
   if(!subjectUserId)return fail()
   const projection=parseParentProjection(payload.parentAudience,artifactId,subjectUserId)
+  if(record.analysisKind==='INDIVIDUAL_LONGITUDINAL'&&projection.policy.mode==='EDUCATIONAL_SUMMARY'&&projection.disclosedLongitudinalMetricKeys===undefined)return fail('PARENT_LONGITUDINAL_PROVENANCE_UNAVAILABLE')
+  if(!projection.toolRef)return fail('PARENT_TOOL_PROVENANCE_UNAVAILABLE')
   return {artifactId,subjectUserId,organizationId:record.organizationId,policyDomain:record.policyDomain,sourceHash:record.snapshotHash,projection}
 }

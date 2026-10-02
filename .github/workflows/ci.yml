@@ -476,6 +476,7 @@ jobs:
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
       COGNITIVE_MODULE_ENABLED: 'true'
       REDIS_URL: redis://localhost:6379
+      MINI_OPERATIONS_TEST_REDIS_URL: redis://localhost:6379
     services:
       postgres:
         image: postgres:16.15-bookworm
@@ -595,6 +596,7 @@ jobs:
           src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
           src/__tests__/integration/parentPortal.postgres.integration.test.ts
           src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

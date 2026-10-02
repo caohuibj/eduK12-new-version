@@ -112,10 +112,12 @@ export const assessmentRunController = {
         runId: req.params.runId,
         actorUserId: req.user.userId,
       })
-      return success(res, await readAssessmentRunProduct(
-        req.params.organizationId,
-        req.params.runId,
-      ))
+      const detail = await readAssessmentRunProduct(req.params.organizationId, req.params.runId)
+      // Exact manager boundary above is authoritative; the client does not
+      // recreate Run lifecycle eligibility from local dates or legacy roles.
+      return success(res, { ...detail, availableActions: detail.run.status === 'DRAFT'
+        ? ['ADD_TRACK', 'PREVIEW_PUBLISH'] : detail.run.status === 'PUBLISHED'
+          ? ['PROGRESS', 'CLOSE', 'CANCEL'] : ['PROGRESS'] })
     } catch (err) { return fail(res, err) }
   },
 

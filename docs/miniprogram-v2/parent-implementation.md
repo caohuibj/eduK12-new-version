@@ -45,3 +45,11 @@
 PARENT_PORTAL_ENABLED 默认 false；/auth/me.mobile 仅提供导航发现。完成正式 PARENT 内容/政策发布、披露产品入口、报告源契约验证和设备验收后，才在隔离验收环境显式开启。生产开放另行执行发布门禁。
 
 批准规则未改变。低风险调整：确认关联按 relationship + consentVersion 幂等，而非新增客户端 commandKey；逐 artifact 同意/grant 使用稳定 commandKey。并发状态变化只返回409，不盲目重试。关联来源课程尚未建立 organization 模型，概况仅返回当前课程名称，组织报告另行核对当前组织资格。
+
+## 2026-10-02 本轮补充
+
+在原有授权链上增加精确工具版本披露上限（迁移 20261002140000_parent_tool_disclosure_ceiling）：当前 SYSTEM_ADMIN 设置不披露/完成情况/个人摘要；指标与纵向指标分别限制；默认不披露。Web 量表目录和小程序目录共用设置 API，稳定命令、版本冲突和不可变审计已验证。收紧阻止旧报告的后续读取，放宽不改写冻结同意。新版正式源还须包含 toolRef；纵向摘要须明确声明纵向指标，缺失时拒绝。
+
+上文“正式家长报告内容未发布”是代码接入缺口，不是对生产发布状态的核查结论。本轮没有生产数据库访问。逐份同意/grant API 与基础预览存在，正式 PARENT producer、学生报告到授权入口、披露人员审批工作台、Web 新增关联/报告 UI 仍未完成，不能宣称孩子报告业务闭环已经可用。
+
+最新本地验证见 local-acceptance-20261002.md；上面的67/92测试和9route是历史记录，不代表本轮最新状态。新增组织成员角色/Persona/报告能力界面待 organization-membership-actions-proposal.md 明确确认；当前未执行任何真实组织权限变更。

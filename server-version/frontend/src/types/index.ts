@@ -1,5 +1,6 @@
 export interface User {
   id: string
+  mobile?: { capabilities: { canManageParentToolDisclosure?: boolean } }
   username: string
   role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT'
   nickname?: string

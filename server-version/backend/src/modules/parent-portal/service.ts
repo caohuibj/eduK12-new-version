@@ -1,3 +1,4 @@
+import { assertParentToolCeiling, parentToolVisibleSql } from './tool-policy'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -70,6 +71,7 @@ function reportScope(actor:string,child:string) {
     AND p.role='PARENT' AND u.role='STUDENT'
     AND p.is_active=true AND p.is_frozen=false AND (p.expires_at IS NULL OR p.expires_at>statement_timestamp())
     AND u.is_active=true AND u.is_frozen=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+    AND (${parentToolVisibleSql})
     AND g.revoked_at IS NULL AND g.valid_from<=statement_timestamp() AND g.valid_until>statement_timestamp()
     AND consent.revoked_at IS NULL AND consent.valid_until>statement_timestamp()
     AND consent.student_user_id=g.student_user_id AND consent.parent_user_id=g.parent_user_id
@@ -180,7 +182,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
       return run(async tx=>{
         const row=await lockLink(tx,relationshipId);await assertLiveLink(tx,row)
         if(row.studentUserId!==actor.userId||source.subjectUserId!==row.studentUserId||!source.organizationId)return fail()
-        await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain)
+        await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain);await assertParentToolCeiling(tx,source.projection)
         const parent=await tx.user.findUnique({where:{id:row.parentUserId},select:{nickname:true,username:true}})??fail()
         return {relationshipId,artifactId,parentName:parent.nickname??parent.username,projection:source.projection,
           consentVersion:REPORT_CONSENT_VERSION,consentText:REPORT_CONSENT_TEXT,commandKey:randomUUID(),canConsent:true}
@@ -194,7 +196,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
         const row=await lockLink(tx,relationshipId);await assertLiveLink(tx,row)
         if(row.studentUserId!==actor.userId||source.subjectUserId!==row.studentUserId)return fail()
         if(!source.organizationId)return fail('PARENT_SOURCE_UNSUPPORTED',409)
-        await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain)
+        await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain);await assertParentToolCeiling(tx,source.projection)
         const existing=await tx.$queryRaw<Array<{id:string;relationshipId:string;artifactId:string;sourceHash:string}>>`SELECT id,relationship_id AS "relationshipId",source_artifact_id AS "artifactId",source_hash AS "sourceHash" FROM parent_report_consents WHERE student_user_id=${actor.userId} AND command_key=${commandKey}`
         if(existing.length) {
           if(existing[0].relationshipId!==relationshipId||existing[0].artifactId!==artifactId||existing[0].sourceHash!==source.sourceHash)return fail('PARENT_COMMAND_CONFLICT',409)
@@ -211,7 +213,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
       return run(async tx=>{
         const row=await lockLink(tx,relationshipId);await assertLiveLink(tx,row)
         if(source.subjectUserId!==row.studentUserId||!source.organizationId)return fail()
-        await assertDisclosureOfficer(tx,actor,source.organizationId);await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain)
+        await assertDisclosureOfficer(tx,actor,source.organizationId);await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain);await assertParentToolCeiling(tx,source.projection)
         const consents=await tx.$queryRaw<Array<{id:string;consentVersion:string;consentHash:string;sourceHash:string}>>`SELECT id,consent_version AS "consentVersion",consent_hash AS "consentHash",source_hash AS "sourceHash" FROM parent_report_consents WHERE id=${consentId} AND relationship_id=${relationshipId} AND source_artifact_id=${artifactId} AND student_user_id=${row.studentUserId} AND parent_user_id=${row.parentUserId} AND revoked_at IS NULL AND valid_until>statement_timestamp() FOR SHARE`
         const consent=consents[0];if(!consent||consent.sourceHash!==source.sourceHash)return fail()
         const previous=await tx.$queryRaw<Array<{id:string;relationshipId:string;sourceArtifactId:string;parentUserId:string;studentUserId:string;consentId:string;revokedAt:Date|null}>>`SELECT id,relationship_id AS "relationshipId",source_artifact_id AS "sourceArtifactId",parent_user_id AS "parentUserId",student_user_id AS "studentUserId",consent_id AS "consentId",revoked_at AS "revokedAt" FROM parent_report_disclosure_grants WHERE approved_by_user_id=${actor.userId} AND command_key=${commandKey}`
@@ -243,7 +245,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
       return run(async tx=>{
         const rows=await tx.$queryRaw<ReportRow[]>(Prisma.sql`SELECT ${reportColumns} FROM ${reportJoins} WHERE (${reportScope(actor.userId,childId)}) AND g.source_artifact_id=${artifactId} ORDER BY g.valid_from DESC LIMIT 1 FOR SHARE OF r,g,consent,o,p,u`)
         if(!rows.length)return fail()
-        const projection=verifiedProjection(rows[0]);await audit(tx,actor.userId,'REPORT_READ',rows[0].relationshipId,artifactId)
+        const projection=verifiedProjection(rows[0]);await assertParentToolCeiling(tx,projection);await audit(tx,actor.userId,'REPORT_READ',rows[0].relationshipId,artifactId)
         return {schemaVersion:1,artifactId,relationshipId:rows[0].relationshipId,canRevoke:true,audience:'PARENT',mode:projection.policy.mode,title:projection.title,summary:projection.summary,blocks:projection.blocks}
       })
     },

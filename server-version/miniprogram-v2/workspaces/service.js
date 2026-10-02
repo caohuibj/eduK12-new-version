@@ -5,7 +5,7 @@ function createWorkspaceService(domains, session, parents) {
       const spec = specs[session.get().activeRole]
       if (!spec) throw new Error('身份不可用')
       const jobs = spec.domains.map(async domain => {
-        const result = await domains.list(domain)
+        const result = await (domain==='courses'&&domains.operations?domains.operations.list('courses'):domains.list(domain))
         return {domain, title:result.title, total:result.total, list:result.list.slice(0,3), truncated:result.truncated}
       })
       if(session.get().capabilities.canReadChildren) {

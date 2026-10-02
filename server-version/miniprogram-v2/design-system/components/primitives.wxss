@@ -27,3 +27,6 @@
 .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
 .overlay { background: var(--color-surface); border-radius: var(--radius-card); padding: var(--space-lg); margin: var(--space-lg); }
 .sheet { align-self: flex-end; width: 100%; padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom)); }
+
+.textarea { min-height: calc(var(--size-control) * 3); padding-top: var(--space-md); }
+.media { width: 100%; margin-top: var(--space-md); border-radius: var(--radius-control); }

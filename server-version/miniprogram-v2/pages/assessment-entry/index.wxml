@@ -1,0 +1,1 @@
+<hui-page title="{{title}}" description="{{description}}" status="{{status}}" error-message="{{errorMessage}}" nav-items="{{navItems}}" bindretry="retry" bindnavigate="navigate"><hui-card><hui-feedback message="{{notice}}"/></hui-card></hui-page>

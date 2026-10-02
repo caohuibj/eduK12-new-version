@@ -1,3 +1,6 @@
+import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
+import { classroomRuntimeRouter } from './modules/mobile/classroom.routes'
+import { mobileRouter } from './modules/mobile/routes'
 import { parentLinksRouter, parentsRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
@@ -224,6 +227,9 @@ app.use('/api/capabilities', capabilitiesRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)
+app.use('/api/mobile/classrooms', classroomRuntimeRouter)
+app.use('/api/mobile', mobileRouter)
+app.use('/api/parent-tool-policies', parentToolPolicyRouter)
 app.use('/api/users', userRoutes)
 app.use('/api/organizations', organizationRoutes)
 app.use('/api/my-assessments', assessmentInboxRoutes)

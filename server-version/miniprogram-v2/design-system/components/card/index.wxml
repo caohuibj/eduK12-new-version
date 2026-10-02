@@ -1,1 +1,1 @@
-<view class="card"><text wx:if="title" class="heading">{{title}}</text><text wx:if="subtitle" class="muted">{{subtitle}}</text><slot></slot></view>
+<view class="card"><text wx:if="{{title}}" class="heading">{{title}}</text><text wx:if="{{subtitle}}" class="muted">{{subtitle}}</text><slot></slot></view>

@@ -1,1 +1,1 @@
-<view wx:if="open" class="backdrop" bindtap="dismiss"><view class="overlay {{sheet ? 'sheet' : ''}}" catchtap="stop"><text class="heading">{{title}}</text><slot></slot><button class="button secondary" bindtap="dismiss">关闭</button></view></view>
+<view wx:if="{{open}}" class="backdrop" bindtap="dismiss"><view class="overlay {{sheet ? 'sheet' : ''}}" catchtap="stop"><text class="heading">{{title}}</text><slot></slot><button class="button secondary" bindtap="dismiss">关闭</button></view></view>

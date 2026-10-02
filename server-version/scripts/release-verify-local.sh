@@ -200,6 +200,7 @@ export V32_1_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_2_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_3_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export REDIS_URL="redis://127.0.0.1:${REDIS_PORT}"
+export MINI_OPERATIONS_TEST_REDIS_URL="$REDIS_URL"
 export JWT_SECRET='release-verify-jwt-secret-123456789012345678901234'
 export DATA_ENCRYPTION_KEY='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 export DATA_PSEUDONYM_KEY='fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'
@@ -271,7 +272,8 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
     src/__tests__/hotpath/query-budget.postgres.integration.test.ts \
     src/__tests__/integration/parentPortal.postgres.integration.test.ts \
-    src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
+    src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts \
+    src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
 
   run_logged miniprogram-static.log node "$SERVER_DIR/miniprogram-v2/scripts/check.cjs"
   run_logged miniprogram-inventory.log node "$SERVER_DIR/miniprogram-v2/scripts/feature-inventory.cjs" --check

@@ -1,31 +1,45 @@
 # Huisurvey 小程序 v2 实施状态
 
-基线：main@1ff0e8ef（#221 之后）。新版位于 server-version/miniprogram-v2，旧 server-version/miniprogram 已由主线标为 unsupported，保留参考，不复活其契约。新版使用独立 touristappid 开发配置；发布 AppID/备案域名/合法 request domain 必须在微信控制台确认。
+更新：2026-10-02。Web 基线 main@1ff0e8ef；本地分支 codex/miniprogram-v2-role-parity 从 Foundation/Parent@b2ee1682 继续。新端位于 server-version/miniprogram-v2，旧端保持 unsupported。遵照用户指示：仅本地代码，不推送、不创建 PR、不部署，不修改生产数据库。
 
-## 执行中的低风险调整
+## 当前结论
 
-- 保留旧源码原位置，增加独立 v2 项目；避免移动现有参考文件或误切已发布小程序。
-- 当前 backend capabilities 是运行时特性开关，不是角色/资源授权。/auth/me 增加版本化 mobile discovery 字段，后端从当前数据库 user.role 生成导航能力；所有 API 仍走原 resource authorization。Organization allowedActions 单独读取，不从 ADMIN 角色推导。
-- bootstrap 使用 /auth/me 与 /capabilities 并行（2 个 core requests）；首次 mutation 才请求 /auth/csrf（最多第 3 个）。首页 student/teacher/admin 各 2 个 business requests、parent 开关关闭时1个、开启后2个并行；不逐课程拼任务。
-- 注册仅使用现有 /auth/student-register 与 /auth/teacher-register；不复活返回 410 的 /auth/register，也不增加家长自助注册。
-- 扫码/Deep Link 先校验 origin、输入、类型和标识。course 由后端授权后打开详情；其他类型只识别并明确未开放，不伪造 resource publication 或运行权限。
-- 静态检测按精确 retired mutation 契约与 transport 使用位置检查，不能按 /complete 后缀禁用仍合法的接口。
-- 原生 cookie jar 仅保存 session/csrf allowlist，同一 origin，微信异步 encrypted storage；不明文降级。native JavaScript 必须处理 session cookie，不能声称具有浏览器 HttpOnly 隔离；需要微信真机验证与发布前安全验收。
-- 状态、导航、共享 services 与视觉 primitive 集中实现；页面不发裸 request、不自行 role/capability 判权、不计分。
+PR1 的本地地基和 PR2 的主要日常业务操作已实现并接受本地回归。**目前不能把 PR1/PR2 的全部验收、完整 Web 业务对等或正式发布标记为完成**：微信开发者工具和设备验收缺失；内容创作、独立媒体库、部分组织治理及正式家长报告产品闭环仍有明确缺口。测评 Runtime/完整报告属于 PR3，保持关闭。
 
-## 阶段边界
-
-| 项目 | 当前实现 | 尚需验证/实施 |
+| 范围 | 本地已实现 | 剩余条件/缺口 |
 |---|---|---|
-| PR1 地基 | core/session/router、设计 primitive、四角色真实数据首页、course entry adapter | 微信开发者工具编译；微信设备认证 smoke（本机真实 HTTP 四角色登录已验证）；其他 entry resource adapters |
-| PR2 能力对等 | 共享 tasks/courses/assessment inbox/organization/user 只读列表，课程/组织/用户详情基础 | 完整作业/打卡/发布/批量/课堂/内容管理；动作权限；家长披露审批及 Web 接入 |
-| PR3 Runtime/报告 | 不开放作答；家长报告读取/撤回基础 renderer 已实现但缺正式 PARENT 内容 | FINAL_ONLY shell/renderer/recovery、canonical report adapters、scientific timing |
-| 家长孩子与报告 | 关联/学生确认/解绑、exact consent/grant、孩子概况及原生展示基础已实现；默认关闭 | 正式 PARENT 内容、source 与产品闭环、设备验收，见 parent-implementation.md |
+| PR1 地基 | Cookie/CSRF、加密存储、当前身份发现、四角色首页/导航、共享状态/请求/设计组件、集中扫码与深链 | 微信原生编译、真实域名/AppID、iOS/Android 四角色验收 |
+| 学生日常业务 | 课程/任务/作业/打卡列表详情；课程码加入；按服务器版本提交、稳定提交凭据；打卡图片；获准同学打卡；个人资料 | 正式测评/历史报告为 PR3；视频/文档附件的完整原生交互未实现 |
+| 教师日常业务 | 课程创建/编辑/封面/复制/码轮换/招募/结束；课程学生冻结/解冻/移除/密码交接；作业发布/题目编辑/提交查看/评语；打卡发布/匿名开关/公开链接创建复制撤销 | 课程分享按现有规则仅 ADMIN；科学测量工具的完整创作/发布界面仍未对等；文件导出、独立媒体库管理缺失 |
+| 课堂 | 列表、创建/编辑/复制、六位课堂码；题目新建、文字/时限修改、删除、历史统计；共享服务下开始/结束/关闭、学生加入/单次作答、轮次证明、服务器统计 | MINI_CLASSROOM_ENABLED 默认 false；二维码图像、匿名课堂原生恢复、大屏/导出、多设备 Web/小程序事件传输端到端验收缺失 |
+| 管理员 | 用户创建（含 PARENT）、编辑、教师批准/续期；超级管理员账户启停/密码交接；教师邀请码创建查看删除；工具目录与状态；精确工具家长披露设置 | 工具目录不等于所有类型内容管理；组织成员角色/Persona/报告能力操作待单独确认；运营监控完整工作区缺失 |
+| 组织/测评投放 | 当前资格下组织列表/上下文/创建/暂停恢复；成员列表/添加；Run 草稿、正式资源选择、范围/标签/策略、版本预览后发布、执行进度、关闭/取消；报告方案/处置列表入口 | 完整班级关系、分类、投放授权、拒绝规则等治理界面未对等；逐成员权限操作见待确认方案；正式报告展示/导出 PR3 |
+| 家长 | 本人测评入口；孩子关联/学生确认/解绑、孩子切换和有限课程概况；逐份报告读取/撤回基础；每工具版本披露上限，Web/小程序同一 API | PARENT_PORTAL_ENABLED 默认 false；正式 PARENT 内容生成、学生报告到同意页面的入口、披露负责人审批界面、Web 新增关联/报告 UI 缺失 |
 
-已增加小程序请求层连接真实本机 API 的 Cookie/CSRF 四角色与家长关联测试；测试 adapter 仍不等于微信编译/真机验收，合成报告源不等于正式报告包兼容。开发 PR 必须保持 Draft；未经完整 gates、真机验收不能宣称发布可用。
+## 本轮低风险修正
 
-## 请求预算及风险
+操作发现严格对齐原有控制器：课程分享仅 ADMIN；打卡公开链接/匿名开关仅课程创建者；关闭匿名时不提供创建链接入口。用户列表与组织治理不从 ADMIN 名称推导平台/组织权力。新增 PARENT 账户不会自动关联孩子。
 
-客户端固定首页请求数不证明 backend 每个列表无 N+1。现有 courses list 会逐课程 resolve signed cover assets；若扩大视图内容，应单独量测后端 DB/签名成本。my-assessments 无客户端分页且可能 truncated，新端保留 truncated 提示，不称完整历史。
+普通列表单个有界请求、默认每页20、最多50；列表不加载媒体正文。详情通常2个请求（资源+当前动作）。学生名单跨课程用有界查询，避免逐课程请求；新版首页课程摘要使用轻量列表，避免逐课程封面签名。原有未分页的提交/题目接口明确作为完整列表，不伪造“加载更多”。复杂投放表单与动态课堂轮询单独记录，不能当作普通详情预算。
 
-Cognitive 默认不启用原生 task；是否使用 Web Runtime 必须先验证 timing 及认证/公开 capability 的安全移交，不能直接拼含 session 的 web-view URL。真机/域名配置属于后续发布门禁，不能由 Node smoke 替代。
+Mutation 不自动重放。学生作业/打卡依原有 Idempotency-Key 与 expectedRevision；网络失败保留同一份提交，冲突必须刷新。无稳定收据的创建操作结果未知时提示核对列表。公开打卡沿用既有匿名会话防重，不声明新的幂等成功收据；丢失响应仍需核实服务器结果。
+
+上传/下载只从集中请求层发送：公开打卡上传字段为 file，登录态图片字段为 image，封面字段为 cover。公开请求无登录 Cookie/CSRF，带精确会话 capability。上传不自动重试，公开暂存图在提交后停止公开读取；外部资源地址和陈旧登录下载被拒绝，临时文件清理。
+
+## 共享课堂方案
+
+用户已明确批准 classroom-shared-runtime-proposal.md。Web 保留 Socket.IO 事件适配，小程序新增 Cookie/CSRF HTTP 适配，两端调用同一生命周期服务。事务锁定课堂，统一开始/结束/关闭/作答；同题并发开始不重置时间；重复相同答案不产生重复记录；旧轮次作答/结束请求和过期计时器不影响新轮次。新版 Web 提交及结束请求包含 startedAt，兼容旧 Web 消息。原有匿名恢复和服务器绑定会话规则保留；小程序显式离开后必须重新加入。
+
+小程序学生状态不返回正确答案或其他学生答案。教师统计沿用服务器统计；“未离开会话数”不标作当前在线人数。原生隐藏页面停止轮询并清空当前题目草稿。HTTP/真实 handler 竞争测试并不等于完整双端 Socket 传输 E2E。
+
+## 家长工具披露
+
+超级管理员对 family/key/version 设置 NONE、COMPLETION_ONLY 或 INDIVIDUAL_SUMMARY 上限；指标和纵向指标分别列入允许范围。默认为 NONE，无来源工具/纵向证明的旧投影拒绝。版本校验、稳定命令与不可变审计已实现；收紧立即限制后续读取，放宽不改写学生已同意的冻结报告。学生关联确认、逐报告同意、独立披露授权与撤回规则继续生效，原始作答/单题/研究导出保持关闭。
+
+“正式家长报告内容未发布”在此指**代码尚缺正式 PARENT 投影生产和发布适配**，不是声称已检查生产数据库且所有报告均未发布。家长看到的应是已发布、落在工具上限内、学生对该份同意并独立获准披露的家长版内容；不能直接展示教师/研究/学生完整报告。
+
+## 验证与发布门禁
+
+本轮验证记录、复验命令与局限见 local-acceptance-20261002.md。功能映射见 role-api-capability-matrix.md 与 web-feature-inventory.json；所有 LOCAL 状态仅指本地实现，不表示设备/生产通过。新增设置迁移只在本轮隔离数据库验证；业务数据库未变更。
+
+仍需：完成剩余 PR2 对等功能和待确认治理入口；PR3 接通 FINAL_ONLY 与 canonical 报告/家长发布；微信编译和 iOS/Android 对照验收；最后执行完整发布门禁。不得用 Node fixtures 替代微信编译、设备时序或正式报告包兼容。

@@ -19,6 +19,7 @@ function workspacePage(spec) {
         const session = getApp().runtime.session.get()
         if (!session.user || session.user.mustChangePassword) {wx.reLaunch({url:destination(session)}); return}
         this.setData({navItems:navigationFor(session)})
+        if (spec.keepOnShow && spec.keepOnShow.call(this)) return
         await this.load()
       } catch(error) {this.setData(pageState('error',{errorMessage:error.message}))}
     },

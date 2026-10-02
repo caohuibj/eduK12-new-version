@@ -1,3 +1,8 @@
+const { createToolPolicyService } = require('./domains/parents/tool-policy')
+const { createPublicCheckinService } = require('./domains/public-checkin/service')
+const { createClassroomService } = require('./domains/classrooms/service')
+const { createOrganizationService } = require('./domains/organizations/service')
+const { createOperations } = require('./domains/operations/service')
 const { createRuntime } = require('./app/bootstrap/index')
 const { origin } = require('./core/config/environment')
 const { createDomainService } = require('./domains/shared/service')
@@ -8,6 +13,12 @@ App({
   onLaunch(options) {
     this.runtime = createRuntime(wx,origin)
     this.runtime.domains = createDomainService(this.runtime.api,this.runtime.session)
+    this.runtime.organizations = createOrganizationService(this.runtime.api,this.runtime.session)
+    this.runtime.publicCheckins = createPublicCheckinService(this.runtime.api)
+    this.runtime.classrooms = createClassroomService(this.runtime.api,this.runtime.session)
+    this.runtime.operations = createOperations(this.runtime.api,this.runtime.session)
+    this.runtime.domains.operations = this.runtime.operations
+    this.runtime.toolPolicies = createToolPolicyService(this.runtime.api,this.runtime.session)
     this.runtime.parents = createParentService(this.runtime.api,this.runtime.session)
     this.runtime.workspaces = createWorkspaceService(this.runtime.domains,this.runtime.session,this.runtime.parents)
     this.pendingEntry = null

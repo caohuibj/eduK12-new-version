@@ -1,3 +1,4 @@
+import { createParentToolPolicyService } from '../../modules/parent-portal/tool-policy'
 import { randomUUID } from 'node:crypto'
 import { afterAll,beforeAll,describe,it,expect } from 'vitest'
 import { PrismaClient,UserRole } from '@prisma/client'
@@ -30,11 +31,14 @@ async function fixture(){
  const link=await service.claim(parent,invite.inviteCode)
  return {child,parent,otherParent,officer,admin,org,childMembership,officerMembership,course,invite,link,service}
 }
-async function reportFixture(){
+async function reportFixture(longitudinal=false){
  const f=await fixture();await f.service.approve(f.child,f.link.id,LINK_CONSENT_VERSION)
  const artifactId=randomUUID(),specId=randomUUID(),seriesId=randomUUID()
  const policy={key:'synthetic-parent-policy',version:'1',audience:'PARENT' as const,mode:'EDUCATIONAL_SUMMARY' as const,rawAnswers:false as const,itemLevel:false as const,researchExport:false as const}
- const projection:ParentProjection={schemaVersion:1,audience:'PARENT',artifactId,subjectUserId:f.child.userId,title:'Synthetic approved parent summary',publicationStatus:'PUBLISHED',policy,policyHash:canonicalHash(policy),summary:'服务端已批准的家长说明',blocks:[]}
+ const toolRef={family:'SCALE' as const,key:'synthetic-'+randomUUID(),version:'1'}
+ const root=await actor(UserRole.ADMIN);await db.user.update({where:{id:root.userId},data:{platformRole:'SYSTEM_ADMIN'}})
+ const ceiling=createParentToolPolicyService(db);await ceiling.update(root.userId,toolRef,{policy:{mode:'INDIVIDUAL_SUMMARY',metricKeys:['educational'],longitudinalMetricKeys:longitudinal?['educational']:[]},expectedVersion:0,commandKey:randomUUID()})
+ const projection:ParentProjection={schemaVersion:1,toolRef,disclosedMetricKeys:['educational'],disclosedLongitudinalMetricKeys:longitudinal?['educational']:[],audience:'PARENT',artifactId,subjectUserId:f.child.userId,title:'Synthetic approved parent summary',publicationStatus:'PUBLISHED',policy,policyHash:canonicalHash(policy),summary:'服务端已批准的家长说明',blocks:[]}
  const payload={artifactId,organizationId:f.org.id,subjectUserId:f.child.userId,parentAudience:projection,PRIVATE_STAFF_DATA:'MUST_NEVER_LEAK'}
  const sourceHash=canonicalHash(payload);const identity=canonicalHash({artifactId});const scope={schemaVersion:1,resourceFamily:'SCALE',resourceKey:'synthetic'}
  await db.$executeRaw`INSERT INTO reporting_analysis_specs (id,spec_key,version,definition,spec_hash,created_by_user_id) VALUES (${specId},${specId},1,'{}'::jsonb,${identity},${f.officer.userId})`
@@ -44,7 +48,7 @@ async function reportFixture(){
  // Real artifact-reader and canonical package compatibility are separate release gates.
  const source:ParentReportSource={artifactId,organizationId:f.org.id,subjectUserId:f.child.userId,policyDomain:'ORG_INDIVIDUAL_REPORT_V1',sourceHash,projection}
  const service=createParentPortalService(db,async id=>{if(id!==artifactId)throw new Error('source missing');return source})
- return {...f,service,artifactId,sourceHash,projection}
+ return {...f,service,artifactId,sourceHash,projection,toolRef,root,ceiling}
 }
 suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)',()=>{
  beforeAll(async()=>{db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()})
@@ -96,6 +100,38 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
   await expect(f.service.readReport(f.otherParent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
   await expect(f.service.readReport(f.parent,randomUUID(),f.artifactId)).rejects.toMatchObject({status:404})
  })
+ it('only current SYSTEM_ADMIN may change per-tool ceilings; retries audit once and stale versions conflict',async()=>{
+  const f=await reportFixture();await expect(f.ceiling.read(f.admin.userId,f.toolRef)).rejects.toMatchObject({status:403})
+  const body={policy:{mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]},expectedVersion:1,commandKey:randomUUID()}
+  expect((await f.ceiling.update(f.root.userId,f.toolRef,body)).version).toBe(2)
+  expect((await f.ceiling.update(f.root.userId,f.toolRef,body)).version).toBe(2)
+  await expect(f.ceiling.update(f.root.userId,f.toolRef,{...body,commandKey:randomUUID()})).rejects.toMatchObject({status:409})
+  const audit=await db.$queryRaw<Array<{count:number}>>`SELECT COUNT(*)::int AS count FROM parent_tool_disclosure_policy_events WHERE actor_user_id=${f.root.userId}`;expect(audit[0].count).toBe(2)
+  await db.user.update({where:{id:f.root.userId},data:{platformRole:'STANDARD'}});await expect(f.ceiling.read(f.root.userId,f.toolRef)).rejects.toMatchObject({status:403})
+ })
+ it('tightening the exact tool immediately hides old grants; widening preserves the consented frozen projection',async()=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  await f.ceiling.update(f.root.userId,f.toolRef,{policy:{mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]},expectedVersion:1,commandKey:randomUUID()})
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+  await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.reportConsentPreview(f.child,f.link.id,f.artifactId)).rejects.toMatchObject({status:404})
+  await f.ceiling.update(f.root.userId,f.toolRef,{policy:{mode:'INDIVIDUAL_SUMMARY',metricKeys:['educational','extra'],longitudinalMetricKeys:[]},expectedVersion:2,commandKey:randomUUID()})
+  expect((await f.service.readReport(f.parent,f.child.userId,f.artifactId)).summary).toBe(f.projection.summary)
+  const persisted=await db.$queryRaw<Array<{projection:unknown}>>`SELECT projection_payload AS projection FROM parent_report_disclosure_grants WHERE source_artifact_id=${f.artifactId}`;expect(persisted[0].projection).toEqual(f.projection)
+  await f.ceiling.update(f.root.userId,f.toolRef,{policy:{mode:'INDIVIDUAL_SUMMARY',metricKeys:['extra'],longitudinalMetricKeys:[]},expectedVersion:3,commandKey:randomUUID()})
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+ })
+ it('longitudinal indicators require their own tool ceiling on consent, grant and later reads',async()=>{
+  const f=await reportFixture(true),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toHaveLength(1)
+  await f.ceiling.update(f.root.userId,f.toolRef,{policy:{mode:'INDIVIDUAL_SUMMARY',metricKeys:['educational'],longitudinalMetricKeys:[]},expectedVersion:1,commandKey:randomUUID()})
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+  await expect(f.service.reportConsentPreview(f.child,f.link.id,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+  await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
+ })
  it('multiple valid disclosure grants present one report per frozen artifact',async()=>{
   const f=await reportFixture();const c=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,'consent-'+randomUUID(),REPORT_CONSENT_VERSION)
   await f.service.grantReport(f.officer,f.link.id,f.artifactId,c.consentId,'grant-'+randomUUID());await f.service.grantReport(f.officer,f.link.id,f.artifactId,c.consentId,'grant-'+randomUUID())
@@ -141,7 +177,7 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
    for(let n=0;n<30&&!blocked;n++){
     const waiting=await tx.$queryRaw<Array<{blocked:boolean}>>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND cardinality(pg_blocking_pids(pid))>0 AND query LIKE '%parent_report_disclosure_grants%') AS blocked`
     blocked=waiting[0].blocked
-    if(!blocked)await tx.$queryRaw`SELECT pg_sleep(0.01)`
+    if(!blocked)await tx.$executeRaw`SELECT pg_sleep(0.01)`
    }
    expect(blocked).toBe(true)
    await tx.parentStudentRelationship.update({where:{id:f.link.id},data:{status:'REVOKED',revokedAt:new Date(),revokedByUserId:f.parent.userId,revokeReason:'concurrency fixture'}})

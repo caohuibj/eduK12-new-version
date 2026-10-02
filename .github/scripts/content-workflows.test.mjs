@@ -177,7 +177,11 @@ test('parent authority has draft unit coverage and non-skipping full integration
   const ci = source('ci');
   assert.match(job(ci, 'pr-light-backend'), /vitest run src\/__tests__\/parent-portal/);
   const regression = job(ci, 'backend-regression');
-  for (const file of ['parentPortal', 'miniprogramParentHttp']) {
+  assert.match(regression, /MINI_OPERATIONS_TEST_REDIS_URL: redis:\/\/localhost:6379/);
+  const release = fs.readFileSync(new URL('../../server-version/scripts/release-verify-local.sh', import.meta.url), 'utf8');
+  assert.ok(release.includes('export MINI_OPERATIONS_TEST_REDIS_URL="$REDIS_URL"'));
+  assert.ok(release.includes('src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts'));
+  for (const file of ['parentPortal', 'miniprogramParentHttp', 'miniprogramOperationsHttp']) {
     assert.ok(regression.includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
   }
 });

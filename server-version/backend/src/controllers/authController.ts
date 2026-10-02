@@ -372,7 +372,7 @@ export const authController = {
         phone: user.phone,
         expiresAt: user.expiresAt,
         mustChangePassword: user.mustChangePassword,
-        mobile: mobileDiscovery(user.role, user.mustChangePassword, config.parentPortalEnabled),
+        mobile: mobileDiscovery(user.role, user.mustChangePassword, config.parentPortalEnabled, config.miniClassroomEnabled, user.platformRole),
       })
     } catch (err) {
       logger.error('获取用户信息错误', err)

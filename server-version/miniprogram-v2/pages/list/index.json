@@ -8,7 +8,9 @@
     "hui-status": "/design-system/components/status/index",
     "hui-tabs": "/design-system/components/tabs/index",
     "hui-feedback": "/design-system/components/feedback/index",
-    "hui-overlay": "/design-system/components/overlay/index"
+    "hui-overlay": "/design-system/components/overlay/index",
+    "hui-choice": "/design-system/components/choice/index",
+    "hui-content": "/design-system/components/content/index"
   },
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": false
 }

@@ -1,147 +1,199 @@
 {
   "baseline": "1ff0e8ef",
-  "generatedFrom": "server-version/frontend/src/App.tsx",
-  "note": "Route evidence inventory; CONTRACT_REVIEW_REQUIRED roles require manual authority review. Foundation lists do not imply action/runner/report parity.",
+  "generatedFrom": [
+    "server-version/frontend/src/App.tsx",
+    "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx"
+  ],
+  "note": "Route evidence does not prove complete parity. LOCAL means local implementation/tests only; all native compile/device gates pending. Pending authoring/media/governance are retained explicitly.",
   "features": [
     {
       "webRoute": "/",
       "roles": [
-        "CONTRACT_REVIEW_REQUIRED"
+        "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:177",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/admin/login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:187",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/teacher/login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:193",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/teacher/register",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:197",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/teacher/account-login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:201",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/parent/login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:205",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/student/login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:208",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/student/course-login",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:212",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/student/register",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:216",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
+      "miniDestination": "/pages/auth/login/index",
       "capability": null,
-      "apiDependency": [],
-      "test": null
+      "apiDependency": [
+        "/auth/login",
+        "/auth/student-register",
+        "/auth/teacher-register"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED",
+      "limitation": "Uses current account login; old course-login flow is not restored."
     },
     {
       "webRoute": "/parent",
       "roles": [
         "PARENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:221",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/home/index",
+      "capability": "canReadChildren",
+      "apiDependency": [
+        "/parent-links",
+        "/parents/me/children"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "parents",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Default disabled; formal report producer and source integration pending PR3."
     },
     {
       "webRoute": "/relational/tasks",
@@ -150,14 +202,17 @@
         "PARENT",
         "TEACHER"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:227",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/relational/attempts/:attemptId",
@@ -165,14 +220,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:231",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/relational/attempts/:attemptId/report",
@@ -180,14 +236,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:235",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/relational/composite/situational/:attemptId",
@@ -195,14 +252,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:239",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/dashboard",
@@ -210,16 +268,20 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "courses",
       "source": "server-version/frontend/src/App.tsx:245",
       "implementationType": "NATIVE",
-      "status": "FOUNDATION_READ_ONLY",
-      "miniDestination": "/pages/list/index?domain=courses",
+      "miniDestination": "/pages/home/index",
       "capability": "canReadCourses",
       "apiDependency": [
-        "/courses"
+        "/mobile/lists/courses",
+        "/courses",
+        "/courses/:id",
+        "/mobile/context/courses"
       ],
-      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "courses",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Server-native daily management; no per-row cover signing in mobile lists."
     },
     {
       "webRoute": "/courses",
@@ -227,14 +289,20 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "courses",
       "source": "server-version/frontend/src/App.tsx:253",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=courses",
+      "capability": "canReadCourses",
+      "apiDependency": [
+        "/mobile/lists/courses",
+        "/courses",
+        "/courses/:id",
+        "/mobile/context/courses"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "courses",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Server-native daily management; no per-row cover signing in mobile lists."
     },
     {
       "webRoute": "/courses/:courseId/students",
@@ -242,14 +310,17 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "courses",
       "source": "server-version/frontend/src/App.tsx:261",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=students",
+      "capability": "canReadStudents",
+      "apiDependency": [
+        "/mobile/students",
+        "/courses/:id/students"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "students",
+      "status": "LOCAL_CORE_IMPLEMENTED"
     },
     {
       "webRoute": "/courses/:courseId/detail",
@@ -257,14 +328,20 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "courses",
       "source": "server-version/frontend/src/App.tsx:269",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=courses",
+      "capability": "canReadCourses",
+      "apiDependency": [
+        "/mobile/lists/courses",
+        "/courses",
+        "/courses/:id",
+        "/mobile/context/courses"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "courses",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Server-native daily management; no per-row cover signing in mobile lists."
     },
     {
       "webRoute": "/students",
@@ -272,14 +349,17 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:277",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=students",
+      "capability": "canReadStudents",
+      "apiDependency": [
+        "/mobile/students",
+        "/courses/:id/students"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "students",
+      "status": "LOCAL_CORE_IMPLEMENTED"
     },
     {
       "webRoute": "/assignments",
@@ -287,14 +367,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:285",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assignments",
+      "capability": "canReadAssignments",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assignments",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/checkins",
@@ -302,14 +387,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:293",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=checkins",
+      "capability": "canReadCheckins",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "checkins",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/scales",
@@ -317,14 +407,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:301",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/scales/:id",
@@ -332,14 +423,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:309",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/questionnaires",
@@ -347,14 +439,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:317",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/questionnaires/legacy",
@@ -362,14 +455,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:325",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/questionnaire-products/:id",
@@ -377,14 +471,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:326",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "other",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Bigscreen/development lab/fallback require applicability review."
     },
     {
       "webRoute": "/questionnaires/:id",
@@ -392,14 +487,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:327",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/general-questionnaires",
@@ -407,14 +503,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:335",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/general-questionnaires/create",
@@ -422,14 +519,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:343",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/general-questionnaires/:id/edit",
@@ -437,14 +535,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:351",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/bundle-products",
@@ -452,14 +551,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:359",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/bundle-products/:id",
@@ -467,14 +567,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:360",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/composite-assessments",
@@ -482,14 +583,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:361",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/composite-assessments/:id/results",
@@ -497,14 +599,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:369",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/composite-assessments/:id/attempts/:attemptId/report",
@@ -512,14 +615,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:377",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/composite-assessments/:id",
@@ -527,14 +631,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:385",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/cognitive-assignments",
@@ -542,14 +647,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:395",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assignments",
+      "capability": "canReadAssignments",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assignments",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/cognitive-assignments/:id",
@@ -557,14 +667,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:403",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assignments",
+      "capability": "canReadAssignments",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assignments",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/teacher/classrooms",
@@ -572,14 +687,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:413",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/teacher/classrooms/create",
@@ -587,14 +707,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:421",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/teacher/classrooms/:id/control",
@@ -602,14 +727,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:429",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/teacher/classrooms/:id/edit",
@@ -617,14 +747,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:437",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/teacher/classrooms/:id/qrcode",
@@ -632,14 +767,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:445",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/teacher/classrooms/:id/questions",
@@ -647,14 +787,19 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:453",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=classrooms",
+      "capability": "canReadClassrooms",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/videos",
@@ -662,14 +807,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:461",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "media-library",
+      "status": "PENDING_PR2",
+      "limitation": "Image uploads exist within course/task flows; standalone media library management not implemented."
     },
     {
       "webRoute": "/images",
@@ -677,14 +823,15 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:469",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "media-library",
+      "status": "PENDING_PR2",
+      "limitation": "Image uploads exist within course/task flows; standalone media library management not implemented."
     },
     {
       "webRoute": "/documents",
@@ -692,72 +839,81 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:477",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "media-library",
+      "status": "PENDING_PR2",
+      "limitation": "Image uploads exist within course/task flows; standalone media library management not implemented."
     },
     {
       "webRoute": "/users",
       "roles": [
         "ADMIN"
       ],
-      "domain": "administration",
       "source": "server-version/frontend/src/App.tsx:485",
       "implementationType": "NATIVE",
-      "status": "FOUNDATION_READ_ONLY",
       "miniDestination": "/pages/list/index?domain=users",
       "capability": "canReadUsers",
       "apiDependency": [
-        "/users"
+        "/users",
+        "/mobile/context/:domain"
       ],
-      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "administration",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Account lifecycle additionally requires current SYSTEM_ADMIN; no implicit parent-child authority."
     },
     {
       "webRoute": "/teacher-codes",
       "roles": [
         "ADMIN"
       ],
-      "domain": "administration",
       "source": "server-version/frontend/src/App.tsx:493",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=teacherCodes",
+      "capability": "canReadTeacherCodes",
+      "apiDependency": [
+        "/teacher-codes",
+        "/mobile/context/:domain"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "administration",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Account lifecycle additionally requires current SYSTEM_ADMIN; no implicit parent-child authority."
     },
     {
       "webRoute": "/admin/material-grants",
       "roles": [
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:501",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/admin/instrument-authorizations",
       "roles": [
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:509",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/profile",
@@ -765,14 +921,18 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:517",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/profile/index",
+      "capability": "canReadProfile",
+      "apiDependency": [
+        "/users/:id",
+        "/auth/change-password",
+        "/auth/logout"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED"
     },
     {
       "webRoute": "/scale-library",
@@ -781,14 +941,18 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:525",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=catalog",
+      "capability": "canReadCatalog",
+      "apiDependency": [
+        "/scale-library",
+        "/parent-tool-policies/SCALE/:key/:version"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "catalog",
+      "status": "LOCAL_CATALOG_IMPLEMENTED",
+      "limitation": "Tool ceiling settings require current SYSTEM_ADMIN; setting a ceiling does not publish content."
     },
     {
       "webRoute": "/scale-library/:instrumentKey/:instrumentVersion",
@@ -797,128 +961,171 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:533",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=catalog",
+      "capability": "canReadCatalog",
+      "apiDependency": [
+        "/scale-library",
+        "/parent-tool-policies/SCALE/:key/:version"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "catalog",
+      "status": "LOCAL_CATALOG_IMPLEMENTED",
+      "limitation": "Tool ceiling settings require current SYSTEM_ADMIN; setting a ceiling does not publish content."
     },
     {
       "webRoute": "/student",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:543",
       "implementationType": "NATIVE",
-      "status": "FOUNDATION_READ_ONLY",
-      "miniDestination": "/pages/list/index?domain=courses",
+      "miniDestination": "/pages/home/index",
       "capability": "canReadCourses",
       "apiDependency": [
-        "/courses/my"
+        "/mobile/lists/courses",
+        "/courses",
+        "/courses/:id",
+        "/mobile/context/courses"
       ],
-      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "courses",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Server-native daily management; no per-row cover signing in mobile lists."
     },
     {
       "webRoute": "/student/classroom/enter",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:551",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/classroom/index",
+      "capability": "canJoinClassroom",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/student/courses/:courseId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "courses",
       "source": "server-version/frontend/src/App.tsx:559",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=courses",
+      "capability": "canReadCourses",
+      "apiDependency": [
+        "/mobile/lists/courses",
+        "/courses",
+        "/courses/:id",
+        "/mobile/context/courses"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "courses",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Server-native daily management; no per-row cover signing in mobile lists."
     },
     {
       "webRoute": "/student/assignments/:assignmentId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:567",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assignments",
+      "capability": "canReadAssignments",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assignments",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/student/assignments",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:575",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assignments",
+      "capability": "canReadAssignments",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assignments",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/student/checkins",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:583",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=checkins",
+      "capability": "canReadCheckins",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "checkins",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/student/checkins/:checkinId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:591",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=checkins",
+      "capability": "canReadCheckins",
+      "apiDependency": [
+        "/mobile/lists/:domain",
+        "/:domain/:id",
+        "/:domain/:id/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "checkins",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Canonical create/edit/submit/revision/grade/image flows; no client scoring."
     },
     {
       "webRoute": "/student/profile",
       "roles": [
         "STUDENT"
       ],
-      "domain": "account",
       "source": "server-version/frontend/src/App.tsx:599",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/profile/index",
+      "capability": "canReadProfile",
+      "apiDependency": [
+        "/users/:id",
+        "/auth/change-password",
+        "/auth/logout"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "account",
+      "status": "LOCAL_PR1_IMPLEMENTED"
     },
     {
       "webRoute": "/sjt-authoring",
@@ -926,378 +1133,429 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:607",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "content-management",
+      "status": "PENDING_PARITY_REVIEW",
+      "limitation": "Scientific authoring/lifecycle is not equivalent to native catalog or Run delivery; retained as explicit unmet Web parity, not silently marked PR3."
     },
     {
       "webRoute": "/teacher/situational",
       "roles": [
         "TEACHER"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:608",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/teacher/situational/history",
       "roles": [
         "TEACHER"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:609",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/teacher/situational/:instrumentKey",
       "roles": [
         "TEACHER"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:610",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/teacher/situational/attempts/:attemptId",
       "roles": [
         "TEACHER"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:611",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/teacher/situational/attempts/:attemptId/result",
       "roles": [
         "TEACHER"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:612",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/student/situational",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:613",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/situational/history",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:621",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/situational/:instrumentKey",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:629",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/situational/attempts/:attemptId/result",
       "roles": [
         "STUDENT"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:637",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/student/composite/situational/:attemptId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:645",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/scales",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:653",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/scales/:scaleId",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:661",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/scales/result/:assessmentId",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:667",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/student/questionnaires",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:673",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/questionnaires/:questionnaireId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:681",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/questionnaires/result/:assessmentId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:689",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/student/classroom/join/:code",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:697",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/classroom/index",
+      "capability": "canJoinClassroom",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/student/classroom/answer/:classroomId",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:705",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/classroom/index",
+      "capability": "canJoinClassroom",
+      "apiDependency": [
+        "/classrooms",
+        "/mobile/classrooms/:id/state",
+        "/mobile/classrooms/:id/:command"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "classroom",
+      "status": "LOCAL_CORE_IMPLEMENTED",
+      "limitation": "Native live flag disabled; joins use six-digit code; QR image and full classroom export/bigscreen are not native."
     },
     {
       "webRoute": "/student/composite/:assessmentId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:715",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/composite/attempts/:attemptId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:719",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/composite/attempts/:attemptId/report",
       "roles": [
         "STUDENT"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:723",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/student/cognitive",
       "roles": [
         "STUDENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:731",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/cognitive/assignments/:assignmentId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:739",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/cognitive/history",
       "roles": [
         "STUDENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:747",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     },
     {
       "webRoute": "/student/cognitive/sessions/:sessionId",
       "roles": [
         "STUDENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:755",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/student/cognitive/sessions/:sessionId/result",
       "roles": [
         "STUDENT"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:763",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/relational/cognitive/sessions/:sessionId",
@@ -1305,238 +1563,470 @@
         "TEACHER",
         "ADMIN"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:771",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/cognitive/assignments/:token",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:775",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/cognitive/sessions/:sessionId",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:776",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/cognitive/sessions/:sessionId/result",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:777",
-      "implementationType": "WEB_RUNTIME",
-      "status": "PLANNED_PR3",
+      "implementationType": "NATIVE",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/public/composite/situational/:attemptId",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:782",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/studies/waves/:waveId/:token",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:783",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/studies/:studyId",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:784",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/composite/:token",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:785",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/composite/attempts/:attemptId",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:786",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/composite/attempts/:attemptId/report",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:787",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/public/questionnaire/:token",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:790",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/questionnaire/:token/assessment",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:794",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "PLANNED_PR3",
+      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
     },
     {
       "webRoute": "/public/questionnaire/:token/result",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "reports",
       "source": "server-version/frontend/src/App.tsx:798",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
     },
     {
       "webRoute": "/public/checkin/:token",
       "roles": [
         "PUBLIC"
       ],
-      "domain": "tasks",
       "source": "server-version/frontend/src/App.tsx:804",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": null
+      "miniDestination": "/pages/public-checkin/index",
+      "capability": "PUBLIC_CHECKIN_SESSION",
+      "apiDependency": [
+        "/checkins/public/:token",
+        "/checkins/public/:token/upload",
+        "/checkins/public/:token/submit"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "checkins",
+      "status": "LOCAL_CORE_IMPLEMENTED"
     },
     {
       "webRoute": "/bigscreen/:classroomId",
       "roles": [
-        "CONTRACT_REVIEW_REQUIRED"
+        "PUBLIC"
       ],
-      "domain": "classroom",
       "source": "server-version/frontend/src/App.tsx:810",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR2",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "other",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Bigscreen/development lab/fallback require applicability review."
     },
     {
       "webRoute": "/__ui-lab",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:816",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "other",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Bigscreen/development lab/fallback require applicability review."
     },
     {
       "webRoute": "*",
       "roles": [
         "CONTRACT_REVIEW_REQUIRED"
       ],
-      "domain": "assessments",
       "source": "server-version/frontend/src/App.tsx:820",
       "implementationType": "NATIVE",
-      "status": "PLANNED_PR3",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
-      "test": null
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "other",
+      "status": "WEB_REFERENCE_ONLY",
+      "limitation": "Bigscreen/development lab/fallback require applicability review."
+    },
+    {
+      "webRoute": "/organizations/:organizationId",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations/:organizationId/runs",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations/:organizationId/runs/:runId",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations/:organizationId/reporting",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "reports",
+      "status": "PLANNED_PR3",
+      "limitation": "Canonical report rendering and formal PARENT producer pending."
+    },
+    {
+      "webRoute": "/organizations/:organizationId/delivery",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations/:organizationId/*",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/organizations/new",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/organizations/index",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations",
+        "/organizations/:id/context",
+        "/organizations/:id/runs"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "organizations",
+      "status": "PARTIAL_PR2",
+      "limitation": "Create/add-member and Run delivery implemented. Member role/capability changes await explicit approval; structure and advanced governance remain Web-only."
+    },
+    {
+      "webRoute": "/my-assessments",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+    },
+    {
+      "webRoute": "/organization-tasks",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "implementationType": "NATIVE",
+      "miniDestination": "/pages/list/index?domain=assessments",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/my-assessments"
+      ],
+      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "domain": "assessments",
+      "status": "ENTRY_ONLY_PR3",
+      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
     }
   ]
 }

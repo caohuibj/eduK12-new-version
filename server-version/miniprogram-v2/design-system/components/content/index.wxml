@@ -1,0 +1,1 @@
+<view><rich-text wx:if="{{text}}" nodes="{{text}}"/><view wx:for="{{facts}}" wx:key="label" class="row"><text class="label">{{item.label}}</text><text class="body">{{item.value}}</text></view><image wx:for="{{images}}" wx:key="url" class="media" src="{{item.url}}" mode="widthFix"/></view>

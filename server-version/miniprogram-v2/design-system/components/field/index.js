@@ -1,1 +1,1 @@
-Component({properties:{label:String,value:String,type:{type:String,value:'text'},password:Boolean,placeholder:String,maxlength:{type:Number,value:128},disabled:Boolean,hint:String},methods:{change(event){this.triggerEvent('change',{value:event.detail.value})}}})
+Component({properties:{label:String,value:String,type:{type:String,value:'text'},password:Boolean,placeholder:String,maxlength:{type:Number,value:128},disabled:Boolean,hint:String,multiline:Boolean},methods:{change(event){this.triggerEvent('change',{value:event.detail.value})}}})

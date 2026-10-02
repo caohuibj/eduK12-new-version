@@ -8,7 +8,15 @@
     "pages/list/index",
     "pages/detail/index",
     "pages/profile/index",
-    "pages/parents/index"
+    "pages/parents/index",
+    "pages/operation/index",
+    "pages/select/index",
+    "pages/record/index",
+    "pages/assessment-entry/index",
+    "pages/classroom/index",
+    "pages/organizations/index",
+    "pages/public-checkin/index",
+    "pages/tool-policy/index"
   ],
   "window": {
     "navigationBarTitleText": "Huisurvey",
