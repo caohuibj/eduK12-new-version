@@ -1,0 +1,1 @@
+<view class="field"><text class="label">{{label}}</text><input class="input" value="{{value}}" type="{{type}}" password="{{password}}" placeholder="{{placeholder}}" maxlength="{{maxlength}}" disabled="{{disabled}}" bindinput="change"/><text wx:if="hint" class="muted">{{hint}}</text></view>

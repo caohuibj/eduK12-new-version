@@ -1,0 +1,1 @@
+Component({properties:{title:String,description:String,status:String,errorMessage:String,navItems:{type:Array,value:[]}},methods:{retry(){this.triggerEvent('retry')},navigate(event){this.triggerEvent('navigate',{key:event.currentTarget.dataset.key})}}})

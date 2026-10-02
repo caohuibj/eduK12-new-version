@@ -1,0 +1,24 @@
+/* Generated from index.json; run node scripts/check.cjs --generate. */
+page, :host {
+  --color-background: #f4f7f6;
+  --color-surface: #ffffff;
+  --color-text: #173c37;
+  --color-muted: #60756f;
+  --color-primary: #247c68;
+  --color-border: #dce7e2;
+  --color-error: #a63939;
+  --color-soft: #e9f4ef;
+  --space-xs: 8rpx;
+  --space-sm: 16rpx;
+  --space-md: 24rpx;
+  --space-lg: 32rpx;
+  --space-xl: 48rpx;
+  --radius-card: 24rpx;
+  --radius-control: 16rpx;
+  --type-title: 44rpx;
+  --type-heading: 34rpx;
+  --type-body: 30rpx;
+  --type-small: 26rpx;
+  --size-control: 88rpx;
+  --size-nav: 120rpx;
+}

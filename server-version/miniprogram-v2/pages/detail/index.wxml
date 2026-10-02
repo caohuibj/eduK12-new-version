@@ -1,0 +1,1 @@
+<hui-page title="{{title}}" description="{{description}}" status="{{status}}" error-message="{{errorMessage}}" nav-items="{{navItems}}" bindretry="retry" bindnavigate="navigate"><hui-card><hui-status wx:if="resourceStatus" label="{{resourceStatus}}"/></hui-card></hui-page>

@@ -118,7 +118,7 @@ test('all CI jobs use isolated GitHub-hosted Ubuntu runners and preserve full ga
   assert.match(backend, /run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   assert.match(job(ci, 'browser'), /needs: \[scope, backend, frontend\]/);
   for (const name of ['codeql', 'docker']) assert.match(job(ci, name), /needs: \[scope\]/);
-  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql\]/);
+  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram\]/);
 });
 
 

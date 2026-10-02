@@ -1103,9 +1103,26 @@ jobs:
           upload: never
           upload-database: false
 
+  miniprogram:
+    name: mini program / foundation contract and page smoke
+    needs: scope
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: mini static and fixture smoke gates
+        working-directory: server-version/miniprogram-v2
+        run: npm run verify
+      - name: verify Web feature inventory
+        run: node server-version/miniprogram-v2/scripts/feature-inventory.cjs --check
+
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql]
+    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-24.04
     env:
