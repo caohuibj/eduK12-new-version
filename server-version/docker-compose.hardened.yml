@@ -1,0 +1,21 @@
+# Production-only overlay: operations keep DATABASE_URL, API/Worker use a non-owner role.
+services:
+  backend:
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    environment:
+      DATABASE_URL: ${DATABASE_URL_RUNTIME:?provision and verify the runtime role first}
+      PARENT_PORTAL_ENABLED: ${PARENT_PORTAL_ENABLED:-false}
+      MINI_CLASSROOM_ENABLED: ${MINI_CLASSROOM_ENABLED:-false}
+      MINI_ASSESSMENT_ENABLED: ${MINI_ASSESSMENT_ENABLED:-false}
+  worker:
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    environment:
+      DATABASE_URL: ${DATABASE_URL_RUNTIME:?provision and verify the runtime role first}

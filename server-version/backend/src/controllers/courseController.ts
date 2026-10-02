@@ -275,18 +275,6 @@ export const courseController = {
               username: true,
             }
           },
-          students: {
-            include: {
-              student: {
-                select: {
-                  id: true,
-                  nickname: true,
-                  username: true,
-                  avatarUrl: true,
-                }
-              }
-            }
-          },
           shares: {
             select: { sharedTo: true },
           },
@@ -322,13 +310,19 @@ export const courseController = {
       }
 
       const canViewRoster = canAccessCourseRoster(course, req.user?.userId, req.user?.role)
-      const { _count, students, shares: _shares, courseCode, ...courseFields } = course
+      // Fetch identity rows only after authorization, for an owner/admin who
+      // receives them. Student/shared reads need the count, never the full roster.
+      const roster = canViewRoster ? await prisma.courseStudent.findMany({
+        where: { courseId: id },
+        include: { student: { select: { id: true, nickname: true, username: true, avatarUrl: true } } },
+      }) : undefined
+      const { _count, students: _students, shares: _shares, courseCode, ...courseFields } = course as typeof course & { students?: unknown }
       const coverUrl = course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl
 
       return success(res, {
         ...courseFields,
         coverUrl,
-        ...(canViewRoster ? { courseCode, students } : {}),
+        ...(canViewRoster ? { courseCode, students: roster } : {}),
         studentCount: _count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
