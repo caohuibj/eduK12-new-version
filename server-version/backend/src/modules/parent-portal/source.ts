@@ -1,3 +1,4 @@
+import { readParentPublication } from './publication'
 import { readReportingArtifactRecord } from '../reporting/artifact'
 import { fail, parseParentProjection, type ParentReportSource } from './contracts'
 
@@ -10,6 +11,8 @@ export async function readParentReportSource(artifactId:string):Promise<ParentRe
   const source=payload.source as {subjectUserId?:string}|undefined
   const subjectUserId=typeof payload.subjectUserId==='string'?payload.subjectUserId:source?.subjectUserId
   if(!subjectUserId)return fail()
+  const publication=await readParentPublication(record,subjectUserId)
+  if(publication)return publication
   const projection=parseParentProjection(payload.parentAudience,artifactId,subjectUserId)
   if(record.analysisKind==='INDIVIDUAL_LONGITUDINAL'&&projection.policy.mode==='EDUCATIONAL_SUMMARY'&&projection.disclosedLongitudinalMetricKeys===undefined)return fail('PARENT_LONGITUDINAL_PROVENANCE_UNAVAILABLE')
   if(!projection.toolRef)return fail('PARENT_TOOL_PROVENANCE_UNAVAILABLE')

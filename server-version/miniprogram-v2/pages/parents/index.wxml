@@ -11,12 +11,12 @@
     <hui-feedback wx:if="{{invitation}}" message="{{'有效期截止：' + invitation.expiresAt}}"/>
     <hui-card wx:for="{{links}}" wx:key="id" title="{{item.title}}" subtitle="{{item.status}}">
       <hui-button wx:if="{{item.canApprove}}" data-id="{{item.id}}" data-action="approve" disabled="{{status === 'submitting'}}" bindpress="confirmLink">核对并确认关联</hui-button>
-      <hui-button wx:if="{{item.canRevoke}}" data-id="{{item.id}}" data-action="revoke" disabled="{{status === 'submitting'}}" secondary bindpress="confirmLink">解除关联</hui-button>
+      <hui-button wx:if="{{item.canConsentReports}}" data-id="{{item.id}}" secondary bindpress="reportOptions">选择报告，核对后同意披露</hui-button><hui-button wx:if="{{item.canRevoke}}" data-id="{{item.id}}" data-action="revoke" disabled="{{status === 'submitting'}}" secondary bindpress="confirmLink">解除关联</hui-button>
     </hui-card>
     <hui-feedback wx:if="{{!links.length}}" message="暂无关联申请"/>
     <hui-feedback wx:if="{{truncated}}" message="仅展示最近100条关联记录"/>
   </hui-card>
-  <hui-card wx:if="{{view === 'children' || view === 'reports'}}">
+  <hui-card wx:if="{{view === 'children' || view === 'reports' || view === 'reportOptions'}}">
     <hui-list items="{{list}}" bindselect="select"/>
     <hui-feedback wx:if="{{!list.length}}" message="{{description}}"/>
     <hui-button wx:if="{{hasMore}}" secondary loading="{{status === 'submitting'}}" bindpress="more">加载更多</hui-button>

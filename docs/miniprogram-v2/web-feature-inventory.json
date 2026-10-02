@@ -193,7 +193,7 @@
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "parents",
       "status": "LOCAL_CORE_IMPLEMENTED",
-      "limitation": "Default disabled; formal report producer and source integration pending PR3."
+      "limitation": "Default disabled; Independent PARENT publication, exact student consent and officer grant implemented locally; generic availability template only, educational content and device approval pending."
     },
     {
       "webRoute": "/relational/tasks",
@@ -207,12 +207,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/relational/attempts/:attemptId",
@@ -221,14 +224,19 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:231",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/relational/attempts/:attemptId/report",
@@ -237,14 +245,14 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:235",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/relational/composite/situational/:attemptId",
@@ -253,14 +261,19 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:239",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/dashboard",
@@ -408,7 +421,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:301",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -424,7 +437,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:309",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -440,7 +453,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:317",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -456,7 +469,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:325",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -472,7 +485,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:326",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -488,7 +501,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:327",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -504,7 +517,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:335",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -520,7 +533,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:343",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -536,7 +549,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:351",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -552,7 +565,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:359",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -568,7 +581,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:360",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -584,7 +597,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:361",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -600,14 +613,14 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:369",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/composite-assessments/:id/attempts/:attemptId/report",
@@ -616,14 +629,14 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:377",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/composite-assessments/:id",
@@ -632,7 +645,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:385",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -808,7 +821,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:461",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -824,7 +837,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:469",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -840,7 +853,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:477",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -891,7 +904,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:501",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -906,7 +919,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:509",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -1134,7 +1147,7 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:607",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -1153,12 +1166,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/teacher/situational/history",
@@ -1170,12 +1186,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/teacher/situational/:instrumentKey",
@@ -1183,14 +1202,19 @@
         "TEACHER"
       ],
       "source": "server-version/frontend/src/App.tsx:610",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/teacher/situational/attempts/:attemptId",
@@ -1198,14 +1222,19 @@
         "TEACHER"
       ],
       "source": "server-version/frontend/src/App.tsx:611",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/teacher/situational/attempts/:attemptId/result",
@@ -1213,14 +1242,14 @@
         "TEACHER"
       ],
       "source": "server-version/frontend/src/App.tsx:612",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/student/situational",
@@ -1232,12 +1261,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/situational/history",
@@ -1249,12 +1281,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/situational/:instrumentKey",
@@ -1262,14 +1297,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:629",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/situational/attempts/:attemptId/result",
@@ -1277,14 +1317,14 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:637",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/student/composite/situational/:attemptId",
@@ -1292,14 +1332,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:645",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/scales",
@@ -1311,12 +1356,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/scales/:scaleId",
@@ -1324,14 +1372,19 @@
         "CONTRACT_REVIEW_REQUIRED"
       ],
       "source": "server-version/frontend/src/App.tsx:661",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/scales/result/:assessmentId",
@@ -1339,14 +1392,18 @@
         "CONTRACT_REVIEW_REQUIRED"
       ],
       "source": "server-version/frontend/src/App.tsx:667",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/report/index",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/scales/assessments/:id",
+        "/questionnaires/assessments/:id/report",
+        "/composite-assessments/attempts/:id/report"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Canonical Scale/collection rendering; package and other unit reports use verified Web targets. No client scoring."
     },
     {
       "webRoute": "/student/questionnaires",
@@ -1358,12 +1415,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/questionnaires/:questionnaireId",
@@ -1371,14 +1431,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:681",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/questionnaires/result/:assessmentId",
@@ -1386,14 +1451,18 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:689",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/report/index",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/scales/assessments/:id",
+        "/questionnaires/assessments/:id/report",
+        "/composite-assessments/attempts/:id/report"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Canonical Scale/collection rendering; package and other unit reports use verified Web targets. No client scoring."
     },
     {
       "webRoute": "/student/classroom/join/:code",
@@ -1439,14 +1508,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:715",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/composite/attempts/:attemptId",
@@ -1454,14 +1528,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:719",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/composite/attempts/:attemptId/report",
@@ -1469,14 +1548,18 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:723",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/report/index",
+      "capability": "canReadOwnAssessments",
+      "apiDependency": [
+        "/scales/assessments/:id",
+        "/questionnaires/assessments/:id/report",
+        "/composite-assessments/attempts/:id/report"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Canonical Scale/collection rendering; package and other unit reports use verified Web targets. No client scoring."
     },
     {
       "webRoute": "/student/cognitive",
@@ -1488,12 +1571,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/cognitive/assignments/:assignmentId",
@@ -1501,14 +1587,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:739",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/cognitive/history",
@@ -1520,12 +1611,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/student/cognitive/sessions/:sessionId",
@@ -1533,14 +1627,19 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:755",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/student/cognitive/sessions/:sessionId/result",
@@ -1548,14 +1647,14 @@
         "STUDENT"
       ],
       "source": "server-version/frontend/src/App.tsx:763",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/relational/cognitive/sessions/:sessionId",
@@ -1564,14 +1663,19 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/App.tsx:771",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/cognitive/assignments/:token",
@@ -1579,14 +1683,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:775",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/cognitive/sessions/:sessionId",
@@ -1594,14 +1703,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:776",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/cognitive/sessions/:sessionId/result",
@@ -1609,14 +1723,14 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:777",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/public/composite/situational/:attemptId",
@@ -1624,14 +1738,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:782",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/studies/waves/:waveId/:token",
@@ -1639,14 +1758,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:783",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/studies/:studyId",
@@ -1654,14 +1778,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:784",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/composite/:token",
@@ -1669,14 +1798,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:785",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/composite/attempts/:attemptId",
@@ -1684,14 +1818,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:786",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/composite/attempts/:attemptId/report",
@@ -1699,14 +1838,14 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:787",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/public/questionnaire/:token",
@@ -1714,14 +1853,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:790",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/questionnaire/:token/assessment",
@@ -1729,14 +1873,19 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:794",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "implementationType": "NATIVE_WITH_WEB_ADAPTER",
+      "miniDestination": "/pages/assessment-entry/index",
+      "capability": "canUseAssessmentRuntime",
+      "apiDependency": [
+        "/mobile/assessment-runtime/scales/:id",
+        "/questionnaires/assessments/:id",
+        "/composite-assessments/attempts/:id",
+        "/situational/attempts/:id"
+      ],
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "PLANNED_PR3",
-      "limitation": "FINAL_ONLY renderer/recovery/timing not implemented."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Native frozen Scale/Form/current-unit FINAL and text SJT V1; unsupported media/research/branching and Cognitive use canonical Web. Public/anonymous use Web-only session. Timing/device gates pending."
     },
     {
       "webRoute": "/public/questionnaire/:token/result",
@@ -1744,14 +1893,14 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:798",
-      "implementationType": "NATIVE",
+      "implementationType": "WEB_ADAPTER_OR_PENDING",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "PARTIAL_PR3",
+      "limitation": "SJT/Cognitive/relational and teacher Composite result targets have formal Web adapters; other management result routes still need explicit parity mapping."
     },
     {
       "webRoute": "/public/checkin/:token",
@@ -1777,7 +1926,7 @@
         "PUBLIC"
       ],
       "source": "server-version/frontend/src/App.tsx:810",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -1792,7 +1941,7 @@
         "CONTRACT_REVIEW_REQUIRED"
       ],
       "source": "server-version/frontend/src/App.tsx:816",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -1807,7 +1956,7 @@
         "CONTRACT_REVIEW_REQUIRED"
       ],
       "source": "server-version/frontend/src/App.tsx:820",
-      "implementationType": "NATIVE",
+      "implementationType": "PENDING_PARITY_REVIEW",
       "miniDestination": null,
       "capability": null,
       "apiDependency": [],
@@ -1891,14 +2040,16 @@
         "ADMIN"
       ],
       "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
-      "implementationType": "NATIVE",
-      "miniDestination": null,
-      "capability": null,
-      "apiDependency": [],
+      "implementationType": "WEB_ADAPTER",
+      "miniDestination": "/pages/organizations/index?view=reporting",
+      "capability": "canDiscoverOrganizations",
+      "apiDependency": [
+        "/organizations/:id/reporting/specs"
+      ],
       "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "reports",
-      "status": "PLANNED_PR3",
-      "limitation": "Canonical report rendering and formal PARENT producer pending."
+      "status": "LOCAL_WEB_ADAPTER",
+      "limitation": "Known same-origin formal workspace; independent Web session. Native organization report authoring/export remains pending parity."
     },
     {
       "webRoute": "/organizations/:organizationId/delivery",
@@ -2001,12 +2152,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     },
     {
       "webRoute": "/organization-tasks",
@@ -2021,12 +2175,15 @@
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
       "apiDependency": [
-        "/my-assessments"
+        "/my-assessments",
+        "/my-assessments/catalog",
+        "/mobile/reports/longitudinal",
+        "/my-assessments/longitudinal/:id"
       ],
-      "test": "tests/operations.test.cjs + backend miniprogramOperationsHttp.postgres.integration.test.ts; WeChat device pending",
+      "test": "assessment-runtime.test.cjs + miniprogramRuntimeHttp.postgres.integration.test.ts; WeChat device pending",
       "domain": "assessments",
-      "status": "ENTRY_ONLY_PR3",
-      "limitation": "Inbox preserves server eligibility/truncated state; runners remain closed."
+      "status": "LOCAL_PR3_IMPLEMENTED",
+      "limitation": "Inbox and launch targets preserve server scope; native flag defaults off. Native longitudinal list uses metadata-only batch queries; detail uses the canonical participant reader."
     }
   ]
 }

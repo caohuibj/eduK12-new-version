@@ -4,12 +4,12 @@ import { resolveOrganizationAccessContext } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { reportingFail } from './types'
 
-export type IndividualScopeInput = { principal: ReportingPrincipal; organizationId: string }
+export type IndividualScopeInput = { principal: ReportingPrincipal; organizationId: string; tx?: Prisma.TransactionClient }
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
 
 /** Shared SQL scope for discovery and access; aliases m (membership), never client-supplied. */
 export async function individualSubjectScope(input: IndividualScopeInput): Promise<Prisma.Sql> {
-  const context = await resolveOrganizationAccessContext(input)
+  const context = await resolveOrganizationAccessContext(input,input.tx)
   if (!context?.membershipId || context.explicitDenies.some(d => ['*', 'REPORT_READ', 'REPORT_MEMBER_READ', 'ORG_INDIVIDUAL_REPORT_V1'].includes(d))) return hidden()
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   const manager = context.capabilities.includes('PSYCHOLOGY_STAFF')
@@ -35,7 +35,7 @@ export async function individualSubjectScope(input: IndividualScopeInput): Promi
 
 export async function assertIndividualLongitudinalAccess(input: IndividualScopeInput & { subjectUserId: string }) {
   const scope = await individualSubjectScope(input)
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+  const rows = await (input.tx??prisma).$queryRaw<Array<{ id: string }>>(Prisma.sql`
     SELECT m.id FROM organization_memberships m
     WHERE m.organization_id=${input.organizationId} AND m.user_id=${input.subjectUserId} AND (${scope}) LIMIT 1
   `)

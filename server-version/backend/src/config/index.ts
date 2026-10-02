@@ -45,6 +45,7 @@ const configSchema = z.object({
   cognitiveModuleEnabled: z.boolean(),
   parentPortalEnabled: z.boolean(),
   miniClassroomEnabled: z.boolean(),
+  miniAssessmentEnabled: z.boolean(),
   // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
   materialGrantsEnabled: z.boolean(),
   // Consume video/image/export Bull jobs in this process. Default on except NODE_ENV=test.
@@ -210,6 +211,7 @@ const rawConfig = {
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   parentPortalEnabled: parseBooleanEnv('PARENT_PORTAL_ENABLED', false),
   miniClassroomEnabled: parseBooleanEnv('MINI_CLASSROOM_ENABLED', false),
+  miniAssessmentEnabled: parseBooleanEnv('MINI_ASSESSMENT_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
   backgroundWorkersEnabled: resolveBackgroundWorkersEnabled(),
   // Socket.IO room broadcasts are not safe to run in a multi-process

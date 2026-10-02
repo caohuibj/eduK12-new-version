@@ -273,7 +273,9 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/hotpath/query-budget.postgres.integration.test.ts \
     src/__tests__/integration/parentPortal.postgres.integration.test.ts \
     src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts \
-    src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
+    src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts \
+    src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts \
+    src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts
 
   run_logged miniprogram-static.log node "$SERVER_DIR/miniprogram-v2/scripts/check.cjs"
   run_logged miniprogram-inventory.log node "$SERVER_DIR/miniprogram-v2/scripts/feature-inventory.cjs" --check

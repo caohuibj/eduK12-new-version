@@ -24,7 +24,7 @@ export const parentProjectionSchema = z.object({
   if(value.policy.mode==='COMPLETION_ONLY'&&(value.summary!==''||value.blocks.length||value.disclosedMetricKeys?.length||value.disclosedLongitudinalMetricKeys?.length))ctx.addIssue({code:z.ZodIssueCode.custom,message:'completion-only projection cannot carry interpretation'})
 })
 export type ParentProjection = z.infer<typeof parentProjectionSchema>
-export interface ParentReportSource { artifactId:string; subjectUserId:string; organizationId:string|null; policyDomain:string; sourceHash:string; projection:ParentProjection }
+export interface ParentReportSource { artifactId:string; subjectUserId:string; organizationId:string|null; policyDomain:string; sourceHash:string; publicationId?:string; publicationHash?:string; projection:ParentProjection }
 export function parseParentProjection(value:unknown, artifactId:string, subjectUserId:string):ParentProjection {
   const result=parentProjectionSchema.safeParse(value)
   if(!result.success||result.data.artifactId!==artifactId||result.data.subjectUserId!==subjectUserId) return fail('PARENT_PROJECTION_UNAVAILABLE')

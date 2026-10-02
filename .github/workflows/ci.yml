@@ -597,6 +597,8 @@ jobs:
           src/__tests__/integration/parentPortal.postgres.integration.test.ts
           src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
           src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

@@ -31,7 +31,7 @@ function createDomainService(api, session) {
     return spec
   }
   return {
-    async assessmentEntry(kind,resourceId){authorize('assessments');const families={assessment:'SCALE',questionnaire:'FORM',composite:'BUNDLE',cognitive:'COGNITIVE',situational:'SITUATIONAL'};const data=await api.get('/my-assessments');const matches=data.list.filter(t=>t.resourceFamily===families[kind]&&t.sourceId===resourceId);if(matches.length!==1)throw new ApiError('notFound','测评不存在或当前无权查看');return matches[0].taskId},
+    async assessmentEntry(kind,resourceId){authorize('assessments');const families={assessment:'SCALE',questionnaire:'QUESTIONNAIRE',composite:'COMPOSITE',cognitive:'COGNITIVE',situational:'SITUATIONAL'};const data=await api.get('/my-assessments');const matches=data.list.filter(t=>t.resourceFamily===families[kind]&&(t.sourceId===resourceId||t.launchTarget===({assessment:'/student/scales/',questionnaire:'/student/questionnaires/',composite:'/student/composite/',cognitive:'/student/cognitive/assignments/',situational:'/student/situational/'}[kind]+resourceId)));if(matches.length!==1)throw new ApiError('notFound','测评不存在或当前无权查看');return matches[0].taskId},
     async list(domain, page = 1) {
       const spec = authorize(domain)
       const path = domain === 'courses' && session.get().capabilities.canReadStudentTasks ? spec.studentPath : spec.path

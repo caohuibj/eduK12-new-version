@@ -1,4 +1,6 @@
-# 小程序 v2 本地验收记录（2026-10-02）
+# 小程序 v2 本地验收记录（2026-10-02，PR2 历史）
+
+此文件保留 PR2 当时的真实证据。当前 PR3 和三项审查修订见 `pr3-local-acceptance-20261002.md`；下列尚未完成项与计数不能用于判断最新实现。
 
 范围：本地分支 codex/miniprogram-v2-role-parity，基于 b2ee1682。仅本地实现和验证，没有推送、GitHub PR、部署或生产数据库操作。范围和缺口以 implementation-status.md、role-api-capability-matrix.md 为准。
 

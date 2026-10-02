@@ -59,7 +59,9 @@ Page(workspacePage({
       if(!this.data.preview||this.data.notice)return
       return this.act(async service=>{await service.accept(this.data.preview);return {notice:'已记录本份报告的同意。还需报告披露授权后，家长才可查看。'}})
     },
+    reportOptions(e){const row=this.data.links?.find(r=>r.id===e.currentTarget.dataset.id);if(row?.canConsentReports)wx.navigateTo({url:'/pages/parents/index?view=reportOptions&relationshipId='+encodeURIComponent(row.id)})},
     select(event) {
+      if(this.viewOptions.view==='reportOptions'){const row=this.data.list.find(r=>r.id===event.detail.id);if(row?.canOpen)wx.navigateTo({url:'/pages/parents/index?view=consent&relationshipId='+encodeURIComponent(this.viewOptions.relationshipId)+'&artifactId='+encodeURIComponent(row.id)});return}
       const id=event.detail.id
       const view=this.viewOptions.view==='children'?(this.viewOptions.next==='reports'?'reports':'child'):'report'
       const query=view==='report'?'&childId='+encodeURIComponent(this.viewOptions.childId)+'&artifactId='+encodeURIComponent(id):'&childId='+encodeURIComponent(id)

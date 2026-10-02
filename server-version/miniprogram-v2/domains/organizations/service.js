@@ -1,6 +1,6 @@
 const { ApiError } = require('../../core/errors/index')
 const segment=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(value))throw new ApiError('invalidRequest','内容标识无效');return encodeURIComponent(value)}
-const LABELS={CREATE_ORGANIZATION:'新建组织',GOVERN:'成员管理',ASSESSMENT_DELIVERY:'测评投放',RUNS:'测评批次',SUSPEND:'暂停组织',RESUME:'恢复组织',REPORTING:'报告入口',SAFETY:'处置事项'}
+const LABELS={PARENT_REPORT_PUBLICATION:'家长报告发布与授权',CREATE_ORGANIZATION:'新建组织',GOVERN:'成员管理',ASSESSMENT_DELIVERY:'测评投放',RUNS:'测评批次',SUSPEND:'暂停组织',RESUME:'恢复组织',REPORTING:'报告入口',SAFETY:'处置事项'}
 function trackFields(resources,index){
  const resource=resources[Number(index)]
  const fields=[{key:'resourceIndex',label:'测评项目',value:index,required:true,choices:resources.map((r,i)=>({value:String(i),label:r.title+' · '+r.version}))}]
@@ -24,7 +24,7 @@ function createOrganizationService(api,session){
   if(kind==='runs'){const c=await context(organizationId);if(!c.allowedActions.includes('ASSESSMENT_DELIVERY'))throw new ApiError('forbidden','没有测评投放权限');const data=await api.get(root(organizationId)+'/runs?page='+page+'&pageSize=20');return {title:'测评批次',list:data.list.map(r=>({id:r.id,title:r.name,status:r.status,detail:'测评项目 '+r.trackCount+' · 执行记录 '+r.executionCount,canOpen:true})),hasMore:page*20<data.total,actions:[{key:'CREATE_RUN',label:'新建测评批次'}]}}
   if(kind==='run'){const data=await api.get(root(organizationId)+'/runs/'+segment(runId));return {title:data.run.name,description:data.run.status,version:data.run.version,tracks:data.tracks.map(t=>({id:t.id,title:t.resourceKey,detail:'版本 '+t.resourceVersion,status:t.resourceFamily,canOpen:false})),actions:data.availableActions.map(key=>({key,label:{ADD_TRACK:'添加测评项目',PREVIEW_PUBLISH:'发布前预览',PROGRESS:'执行进度',CLOSE:'关闭批次',CANCEL:'取消批次'}[key]})),list:[]}}
   if(kind==='progress'){const p=await api.get(root(organizationId)+'/runs/'+segment(runId)+'/progress');return {title:'测评执行进度',list:Object.entries(p.counts).map(([state,count])=>({id:state,title:state,status:String(count),canOpen:false})),actions:[]}}
-  if(kind==='reporting'){const data=await api.get(root(organizationId)+'/reporting/specs?page='+page+'&pageSize=20');return {title:'正式报告入口',notice:'完整报告展示将在报告 Runtime 阶段接入。这里只显示服务器可发现的报告方案。',list:(data.list||[]).map(s=>({id:s.id||s.specId,title:s.name||s.specKey||'报告方案',status:s.analysisKind||'',canOpen:false})),hasMore:page*20<data.total,actions:[]}}
+  if(kind==='reporting'){const data=await api.get(root(organizationId)+'/reporting/specs?page='+page+'&pageSize=20');return {title:'正式报告入口',notice:'已发布报告方案由服务器提供；报告生成、分析与完整展示使用正式网页工作区。',webTarget:'/organizations/'+organizationId+'/reporting',list:(data.list||[]).map(s=>({id:s.id||s.specId,title:s.name||s.specKey||'报告方案',status:s.analysisKind||'',canOpen:false})),hasMore:page*20<data.total,actions:[]}}
   if(kind==='safety'){const data=await api.get(root(organizationId)+'/safety/cases');return {title:'当前获准的处置事项',list:data.list.map(s=>({id:s.caseId,title:'处置事项',status:s.status,detail:'投影：'+s.projection,canOpen:false})),actions:[],truncated:data.truncated}}
   throw new ApiError('invalidRequest','组织页面无效')
  }

@@ -1,3 +1,4 @@
+import { listParticipantLongitudinalMetadata } from '../reporting/participantMetadata'
 import { config } from '../../config'
 import { randomUUID } from 'node:crypto'
 import { Router } from 'express'
@@ -15,6 +16,7 @@ import { UserRole } from '../../types'
 // current principal, ownership, lifecycle invariants and submission revisions.
 export const mobileRouter = Router()
 mobileRouter.use(authenticate, (_req, res, next) => { res.set('Cache-Control', 'no-store'); next() })
+mobileRouter.get('/reports/longitudinal',asyncHandler(async(req,res)=>success(res,await listParticipantLongitudinalMetadata(req.user!.userId))))
 const idSchema = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/)
 const domains = z.enum(['courses','assignments','checkins','classrooms','users','teacherCodes','profile'])
 function collectionActions(domain: string, role: UserRole) {

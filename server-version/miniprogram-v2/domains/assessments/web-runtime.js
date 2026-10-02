@@ -1,0 +1,6 @@
+const { ApiError } = require('../../core/errors/index')
+const segment='[A-Za-z0-9_-]{1,128}',token='[A-Za-z0-9_-]{16,512}'
+const paths=[new RegExp('^/student/scales/(?:result/)?'+segment+'$'),new RegExp('^/student/questionnaires/(?:result/)?'+segment+'$'),new RegExp('^/student/composite/'+segment+'$'),new RegExp('^/student/composite/attempts/'+segment+'(?:/report)?$'),new RegExp('^/(?:student|teacher)/situational/'+segment+'$'),new RegExp('^/(?:student|teacher)/situational/attempts/'+segment+'(?:/result)?$'),new RegExp('^/student/cognitive/(?:assignments|sessions)/'+segment+'(?:/result)?$'),/^\/relational\/tasks$/,new RegExp('^/relational/attempts/'+segment+'(?:/report)?$'),/^\/organization-tasks$/,new RegExp('^/organizations/'+segment+'/reporting$'),new RegExp('^/composite-assessments/'+segment+'/attempts/'+segment+'/report$'),new RegExp('^/public/(?:questionnaire|composite)/'+token+'$'),new RegExp('^/public/cognitive/assignments/'+token+'$'),new RegExp('^/public/studies/'+segment+'$'),new RegExp('^/public/studies/waves/'+segment+'/'+token+'$')]
+function path(value){if(typeof value!=='string'||value.includes('..')||/[?#%\\\r\n]/.test(value)||!paths.some(p=>p.test(value)))throw new ApiError('invalidEntry','网页测评地址无效');return value}
+function url(config,target){return config.origin+path(target)}
+module.exports={path,url}

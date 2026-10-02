@@ -318,7 +318,8 @@ export const createOrReuseProtectedReportingArtifact = async (input: {
   return existing as ReportingProtectedArtifactRecord
 }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
 
-export const readReportingArtifactRecord = async (artifactId: string): Promise<ReportingArtifactRecord> => prisma.$transaction(async (tx) => {
+export const readReportingArtifactRecord = async (artifactId: string, transaction?: Tx): Promise<ReportingArtifactRecord> => {
+ const read=async(tx:Tx)=>{
   const rows = await tx.$queryRaw<ArtifactRow[]>`
     SELECT "id", "organization_id" AS "organizationId", "analysis_kind" AS "analysisKind", "policy_domain" AS "policyDomain", "subject_user_id" AS "subjectUserId",
       "cohort_snapshot_id" AS "cohortSnapshotId", "series_id" AS "seriesId", "source_run_id" AS "sourceRunId",
@@ -329,7 +330,9 @@ export const readReportingArtifactRecord = async (artifactId: string): Promise<R
     FROM "reporting_analysis_artifacts" WHERE "id"=${artifactId} LIMIT 1
   `
   return verifyStored(tx, rows[0] ?? reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404))
-})
+}
+ return transaction?read(transaction):prisma.$transaction(read)
+}
 
 export const createOrReuseIndividualReportingArtifact = async (input: {
   organizationId: string

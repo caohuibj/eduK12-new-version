@@ -1,3 +1,6 @@
+const { createParentPublicationService } = require('./domains/parents/publication')
+const { createReportService } = require('./domains/assessments/reports')
+const { createAssessmentService } = require('./domains/assessments/service')
 const { createToolPolicyService } = require('./domains/parents/tool-policy')
 const { createPublicCheckinService } = require('./domains/public-checkin/service')
 const { createClassroomService } = require('./domains/classrooms/service')
@@ -12,6 +15,8 @@ const { parseEntry } = require('./app/entry/index')
 App({
   onLaunch(options) {
     this.runtime = createRuntime(wx,origin)
+    this.runtime.reports = createReportService(this.runtime.api,this.runtime.session)
+    this.runtime.assessments = createAssessmentService(this.runtime.api,this.runtime.session,this.runtime.drafts,this.runtime.config)
     this.runtime.domains = createDomainService(this.runtime.api,this.runtime.session)
     this.runtime.organizations = createOrganizationService(this.runtime.api,this.runtime.session)
     this.runtime.publicCheckins = createPublicCheckinService(this.runtime.api)
@@ -19,6 +24,7 @@ App({
     this.runtime.operations = createOperations(this.runtime.api,this.runtime.session)
     this.runtime.domains.operations = this.runtime.operations
     this.runtime.toolPolicies = createToolPolicyService(this.runtime.api,this.runtime.session)
+    this.runtime.parentPublications = createParentPublicationService(this.runtime.api,this.runtime.session)
     this.runtime.parents = createParentService(this.runtime.api,this.runtime.session)
     this.runtime.workspaces = createWorkspaceService(this.runtime.domains,this.runtime.session,this.runtime.parents)
     this.pendingEntry = null

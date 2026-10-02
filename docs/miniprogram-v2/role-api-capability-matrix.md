@@ -16,12 +16,15 @@
 | Users/teacher codes | ADMIN；启停/密码交接额外SYSTEM_ADMIN | /users, /auth/extend-account, /teacher-codes, /mobile/context | list/detail/operation | LOCAL：用户创建/编辑、教师批准续期、邀请码管理；创建PARENT不授予孩子权限 |
 | Organizations/membership | 当前 Membership/SYSTEM_ADMIN discovery；治理API另验 | /organizations, /:id/context, /mobile/organizations/:id/memberships, 原有create/member/suspend/resume | organizations | PARTIAL：创建/添加成员/状态；逐成员角色/Persona/能力动作待确认；完整治理尚缺 |
 | Assessment delivery | 当前组织/班级/专业投放资格，精确Run授权 | /organizations/:id/run-resources, /runs, /tracks, /preview,/publish,/progress,/close,/cancel | organizations | LOCAL：正式资源、收窄策略/范围/标签、当前版本预览再发布；非草稿运行器 |
-| Own assessment/history | 四角色当前respondent授权 | /my-assessments | list/assessment-entry | ENTRY_ONLY_PR3：保留canStart/canContinue/resultAvailability/truncated；作答与完整报告关闭 |
-| Reporting/safety entries | 当前组织报表/处置权限 | /organizations/:id/reporting/specs, /safety/cases | organizations | ENTRY_ONLY：服务器发现摘要；完整分析、正文/导出为PR3 |
+| Own assessment/history | 四角色当前respondent授权 | /my-assessments | list/assessment-entry | LOCAL_PR3：保留服务器动作/披露状态；统一原生 FINAL Runtime 与 canonical 报告，不能支持的正式测量/报告进入同源 Web；默认 runtime flag 关闭 |
+| Reporting/safety entries | 当前组织报表/处置权限 | /organizations/:id/reporting/specs, /safety/cases | organizations | LOCAL_WEB_ADAPTER：组织发现与正式 Web 报表入口；完整组织分析/导出未原生化 |
 | Catalog | canReadCatalog | /scale-library, /:key/:version | list/detail | LOCAL目录/状态；不等于全部测量工具创作管理 |
 | Parent tool ceiling | 当前SYSTEM_ADMIN，API独立复核 | /parent-tool-policies/:family/:key/:version | catalog→tool-policy；Web ScaleLibrary设置 | LOCAL：精确版本、指标/纵向上限、审计；UI目前从SCALE目录进入；API支持其余family预配置，不发布报告 |
 | Parent relationship/children | 默认flag关闭；Parent/Student自身关系 | /parent-links, /parents/me/children, /:id/overview | parents/profile | LOCAL：学生邀请确认、家长认领、切换、课程名概况、解绑；无原始作答 |
-| Exact parent report | 当前关系+学生同意+独立officer grant+正式PARENT+工具上限 | /parent-links/:id/reports/:artifactId/consent,/grants,/revoke；/parents/me/children/:id/reports | parents consent/report | PARTIAL：API和基础renderer；正式producer、学生入口、审批工作台、Web新增关联/报告UI仍缺 |
+| Exact parent report | 当前关系+学生同意+独立officer grant+正式PARENT+工具上限 | /parent-links/:id/reports/:artifactId/consent,/grants,/revoke；/parents/me/children/:id/reports | parents consent/report | LOCAL_PR3：独立不可变发布、精确学生同意、负责人授权和家长读取；当前通用完成情况模板；每工具教育内容、Web新增UI与设备验收仍缺 |
+| Native FINAL assessment | 当前本人授权与 canUseAssessmentRuntime；后台逐次核对 | 既有 scales/questionnaires/composite/situational start/resume/FINAL；/mobile/assessment-runtime/scales/:id 仅冻结读取 | assessment-entry/runner | LOCAL_PR3：量表/表单编排/文本 SJT V1；账号隔离加密草稿；研究/媒体/随机/复杂单元使用正式 Web |
+| Own canonical reporting | 当前本人 respondent 披露策略 | 原有本人报告、/my-assessments/results/:id、/mobile/reports/longitudinal（元数据）、/my-assessments/longitudinal/:id（正文） | report/series-chart/web-runtime | LOCAL_PR3：只呈现服务器结果/参考/变化；移动纵向列表3次批量查询；情境/认知及复杂报告正式 Web |
+| Formal PARENT publication | 当前源读权限与显式 PARENT_REPORT_DISCLOSURE，受工具上限限制 | /parent-report-publications?organizationId=:id；/parent-report-publications/:artifactId/preview,/publish,/consents；原 grants API | organizations→parent-publication，parents→consent | LOCAL_PR3：完整本地链；独立模板/发布内容，不改原报告；生产仅通用完成情况模板 |
 | Scientific authoring/media libraries | 原有Web管理权限 | 原有scales/forms/bundle/cognitive/SJT/media APIs | 尚未完成 | PENDING：不能用目录、图片上传或Run投放代替完整创作与媒体库能力 |
 
 完整116条路由证据见 web-feature-inventory.json。PENDING_PARITY_REVIEW/PENDING_PR2 是实际缺口；不自动改为PR3或“不适用”。角色包装器未明确者保留 CONTRACT_REVIEW_REQUIRED。全部审批和修改仍由现有服务逐次检查权限，不依赖页面按钮。

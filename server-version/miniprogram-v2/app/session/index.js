@@ -1,6 +1,6 @@
 const { resolveRole } = require('../router/index')
 const { resolveCapabilities } = require('../capabilities/index')
-function createSession({account, jar, telemetry}) {
+function createSession({account, jar, telemetry, clearPrivateData = async () => {}}) {
   let state = {status: 'idle', user: null, capabilities: {}, runtime: {}}
   let flight = null; const listeners = new Set()
   const publish = value => { state = value; listeners.forEach(listener => listener(state)) }
@@ -35,7 +35,7 @@ function createSession({account, jar, telemetry}) {
     async restore() {await jar.restore(); return refresh()},
     async login(values) {await expire(); await account.login(values); return refresh()},
     async logout() {
-      try { await account.logout() } finally { await expire() }
+      try { await account.logout() } finally { try { await expire() } finally { await clearPrivateData() } }
     },
     async changePassword(values) {await account.changePassword(values); return refresh()},
   }

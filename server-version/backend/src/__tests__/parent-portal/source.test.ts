@@ -2,6 +2,7 @@ import { beforeEach,describe,it,expect,vi } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 const {read}=vi.hoisted(()=>({read:vi.fn()}))
 vi.mock('../../modules/reporting/artifact',()=>({readReportingArtifactRecord:read}))
+vi.mock('../../modules/parent-portal/publication',()=>({readParentPublication:async()=>null}))
 import { readParentReportSource } from '../../modules/parent-portal/source'
 const policy={key:'test-approved',version:'1',audience:'PARENT',mode:'EDUCATIONAL_SUMMARY',rawAnswers:false,itemLevel:false,researchExport:false}
 function record(){return {analysisKind:'INDIVIDUAL_LONGITUDINAL',policyDomain:'ORG_INDIVIDUAL_REPORT_V1',organizationId:'org-1',snapshotHash:'a'.repeat(64),artifactPayload:{subjectUserId:'child-1',parentAudience:{schemaVersion:1,toolRef:{family:'SCALE',key:'synthetic',version:'1'},disclosedMetricKeys:[],disclosedLongitudinalMetricKeys:[],audience:'PARENT',artifactId:'artifact-1',subjectUserId:'child-1',title:'Approved summary',publicationStatus:'PUBLISHED',policy,policyHash:canonicalHash(policy),summary:'Published text',blocks:[]}}}}

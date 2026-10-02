@@ -23,10 +23,11 @@ function createParentService(api, session) {
         authorize('canManageParentLinks')
         const [data,consent]=await Promise.all([api.get('/parent-links'),api.get('/parent-links/consent')])
         if (typeof consent.text!=='string'||typeof consent.version!=='string') throw new ApiError('invalidResponse','同意内容无效')
-        return {title:'家长关联',links:list(data).map(row=>({id:row.id,title:row.title,status:statusLabels[row.status]||row.status,canApprove:row.canApprove===true,canRevoke:row.canRevoke===true})),
+        return {title:'家长关联',links:list(data).map(row=>({id:row.id,title:row.title,status:statusLabels[row.status]||row.status,canApprove:row.canApprove===true,canRevoke:row.canRevoke===true,canConsentReports:row.canConsentReports===true})),
           canInvite:data.canInvite===true,canClaim:data.canClaim===true,consent,truncated:data.truncated===true,
           description:'关联需要学生确认。每份孩子报告还需单独授权。'}
       }
+      if(view==='reportOptions'){authorize('canManageParentLinks');const data=await api.get(linkPath(options.relationshipId)+'/report-options');return {title:'选择向家长披露的报告',list:list(data).map(r=>({id:r.id,title:r.title,canOpen:r.canConsent===true})),truncated:data.truncated===true,description:'这里只展示正式发布的家长专用内容。每份报告可分别决定是否同意。'}}
       if (view==='children') {
         authorize('canReadChildren')
         const data=await api.get('/parents/me/children?page='+page+'&pageSize=20')
@@ -75,7 +76,7 @@ function createParentService(api, session) {
     revoke(id) {authorize('canManageParentLinks');return api.post(linkPath(id)+'/revoke',{reason:'用户确认解除关联'})},
     accept(preview) {
       authorize('canManageParentLinks')
-      return api.post(linkPath(preview.relationshipId,preview.artifactId)+'/consent',{commandKey:preview.commandKey,consentVersion:preview.consentVersion})
+      return api.post(linkPath(preview.relationshipId,preview.artifactId)+'/consent',{commandKey:preview.commandKey,consentVersion:preview.consentVersion,...(preview.publicationHash?{publicationHash:preview.publicationHash}:{})})
     },
     withdraw(id,artifactId) {authorize('canManageParentLinks');return api.post(linkPath(id,artifactId)+'/revoke',{reason:'用户确认撤回报告授权'})},
   }

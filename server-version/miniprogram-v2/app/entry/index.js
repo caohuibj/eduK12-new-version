@@ -16,6 +16,10 @@ function parseEntry(input, origin) {
         if(canonicalClassroom)return {kind:'classroom',id:canonicalClassroom[1],requiresAuth:true}
         const canonicalPublic = parts[0].match(/^\/public\/(questionnaire|composite|checkin)\/([a-zA-Z0-9_-]{16,512})$/)
         if (canonicalPublic && !parts[1]) return {kind:'public',token:canonicalPublic[2],resourceFamily:canonicalPublic[1],requiresAuth:false}
+        const study=parts[0].match(/^\/public\/studies\/([A-Za-z0-9_-]{1,128})$/),wave=parts[0].match(/^\/public\/studies\/waves\/([A-Za-z0-9_-]{1,128})\/([A-Za-z0-9_-]{16,512})$/)
+        if(!parts[1]&&(study||wave))return {kind:'anonymous',webTarget:parts[0],requiresAuth:false}
+        const cognitivePublic=parts[0].match(/^\/public\/cognitive\/assignments\/([A-Za-z0-9_-]{16,512})$/)
+        if(cognitivePublic&&!parts[1])return {kind:'public',webTarget:parts[0],requiresAuth:false}
         if (!['/mini/entry','/pages/entry/index'].includes(parts[0])) throw new Error()
         raw = parts[1] || ''
       }
@@ -40,7 +44,9 @@ function parseEntry(input, origin) {
   } catch (_) { throw new ApiError('invalidEntry','链接或二维码无效，请重新获取') }
 }
 async function resolveEntry(entry, session, domains) {
+  if(entry&&['anonymous','public'].includes(entry.kind)&&entry.webTarget){require('../../domains/assessments/web-runtime').path(entry.webTarget);return {status:'ready',destination:'/pages/web-runtime/index?path='+encodeURIComponent(entry.webTarget)}}
   if (!entry) return {status:'home', destination:'/pages/home/index'}
+  if(entry.kind==='public'&&['questionnaire','composite'].includes(entry.resourceFamily))return {status:'ready',destination:'/pages/web-runtime/index?path='+encodeURIComponent('/public/'+entry.resourceFamily+'/'+entry.token)}
   if(entry.kind==='public'&&entry.resourceFamily==='checkin')return {status:'ready',destination:'/pages/public-checkin/index?token='+encodeURIComponent(entry.token)}
   if (entry.requiresAuth && !session.user) return {status:'login',destination:'/pages/auth/login/index'}
   if (session.user && session.user.mustChangePassword) return {status:'password', destination:'/pages/auth/password/index'}
