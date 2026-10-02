@@ -12,6 +12,12 @@ describe('mobile navigation discovery preserves authorization boundaries', () =>
     expect(mobile.capabilities.canReadChildReports).toBe(false)
     expect(mobile.capabilities).not.toHaveProperty('canGovernOrganization')
   })
+  it('enabled parent portal offers discovery without granting disclosure authority',()=>{
+    expect(mobileDiscovery(UserRole.PARENT,false,true).capabilities).toMatchObject({canManageParentLinks:true,canReadChildren:true,canReadChildReports:true})
+    expect(mobileDiscovery(UserRole.STUDENT,false,true).capabilities).toMatchObject({canManageParentLinks:true,canReadChildren:false,canReadChildReports:false})
+    expect(mobileDiscovery(UserRole.ADMIN,false,true).capabilities).toMatchObject({canManageParentLinks:false,canReadChildren:false,canReadChildReports:false})
+    expect(mobileDiscovery(UserRole.PARENT,true,true).capabilities.canReadChildReports).toBe(false)
+  })
   it('student tasks and legacy user list capabilities match existing route role guards', () => {
     expect(mobileDiscovery(UserRole.STUDENT, false).capabilities.canReadStudentTasks).toBe(true)
     expect(mobileDiscovery(UserRole.PARENT, false).capabilities.canReadCourses).toBe(false)

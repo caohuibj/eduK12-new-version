@@ -1,3 +1,4 @@
+import { parentLinksRouter, parentsRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
@@ -221,6 +222,8 @@ app.use('/api/capabilities', capabilitiesRoutes)
 
 // API 路由
 app.use('/api/auth', authRoutes)
+app.use('/api/parent-links', parentLinksRouter)
+app.use('/api/parents', parentsRouter)
 app.use('/api/users', userRoutes)
 app.use('/api/organizations', organizationRoutes)
 app.use('/api/my-assessments', assessmentInboxRoutes)

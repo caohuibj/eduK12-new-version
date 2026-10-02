@@ -269,7 +269,13 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/classroom/classroom-start.postgres.integration.test.ts \
     src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts \
     src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
-    src/__tests__/hotpath/query-budget.postgres.integration.test.ts
+    src/__tests__/hotpath/query-budget.postgres.integration.test.ts \
+    src/__tests__/integration/parentPortal.postgres.integration.test.ts \
+    src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
+
+  run_logged miniprogram-static.log node "$SERVER_DIR/miniprogram-v2/scripts/check.cjs"
+  run_logged miniprogram-inventory.log node "$SERVER_DIR/miniprogram-v2/scripts/feature-inventory.cjs" --check
+  run_logged miniprogram-tests.log npm --prefix "$SERVER_DIR/miniprogram-v2" test
 
   run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
   run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint

@@ -6,8 +6,10 @@ function workspacePage(spec) {
     data: pageState('idle',{navItems:[],title:'Huisurvey',description:''}),
     onLoad(options) {
       this.options = options || {}; this.sequence = 0; this.resultKeys = []
+      const initial = getApp().runtime.session.get(); this.identityKey = initial.user ? initial.user.id + ":" + initial.activeRole : null
       this.unsubscribe = getApp().runtime.session.subscribe(state => {
-        if (!state.user) {this.sequence += 1; const cleared = Object.fromEntries(this.resultKeys.map(key => [key, Array.isArray(this.data[key]) ? [] : null])); this.setData(Object.assign(cleared, pageState('loading', {navItems:[],title:'Huisurvey',description:''}))); wx.reLaunch({url:destination(state)})}
+        const identityKey = state.user ? state.user.id + ":" + state.activeRole : null
+        if (!state.user || identityKey !== this.identityKey) {if(spec.reset) spec.reset.call(this); this.sequence += 1; const cleared = Object.fromEntries(this.resultKeys.map(key => [key, Array.isArray(this.data[key]) ? [] : null])); this.setData(Object.assign(cleared, pageState('loading', {navItems:[],title:'Huisurvey',description:''}))); wx.reLaunch({url:destination(state)})}
       })
       if (spec.setup) spec.setup.call(this,options || {})
     },
@@ -22,7 +24,8 @@ function workspacePage(spec) {
     },
     async load(refresh = false) {
       const sequence = ++this.sequence
-      this.setData(pageState(refresh ? 'refreshing' : 'loading'))
+      const cleared = Object.fromEntries(this.resultKeys.map(key => [key, Array.isArray(this.data[key]) ? [] : null]))
+      this.setData(Object.assign(cleared, pageState(refresh ? 'refreshing' : 'loading')))
       try {
         const result = await spec.fetch.call(this,getApp().runtime)
         if (sequence !== this.sequence) return
@@ -34,7 +37,7 @@ function workspacePage(spec) {
     onPullDownRefresh() {return this.load(true)},
     retry() {return this.load()},
     navigate(event) {navigate(wx,getApp().runtime.session.get(),event.detail.key)},
-    onUnload() {this.sequence += 1; if(this.unsubscribe) this.unsubscribe()},
+    onUnload() {if(spec.reset) spec.reset.call(this); this.sequence += 1; if(this.unsubscribe) this.unsubscribe()},
   },spec.methods || {})
 }
 module.exports = { workspacePage }

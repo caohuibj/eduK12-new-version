@@ -1,3 +1,4 @@
+import { config } from '../config'
 import { mobileDiscovery } from '../modules/mobile/discovery'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
@@ -371,7 +372,7 @@ export const authController = {
         phone: user.phone,
         expiresAt: user.expiresAt,
         mustChangePassword: user.mustChangePassword,
-        mobile: mobileDiscovery(user.role, user.mustChangePassword),
+        mobile: mobileDiscovery(user.role, user.mustChangePassword, config.parentPortalEnabled),
       })
     } catch (err) {
       logger.error('获取用户信息错误', err)

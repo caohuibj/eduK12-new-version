@@ -6,9 +6,11 @@ const FEATURES = {
   courses: {label: '课程', capability: 'canReadCourses', path: '/pages/list/index?domain=courses'},
   organizations: {label: '组织', capability: 'canDiscoverOrganizations', path: '/pages/list/index?domain=organizations'},
   users: {label: '用户', capability: 'canReadUsers', path: '/pages/list/index?domain=users'},
+  children: {label: '孩子', capability: 'canReadChildren', path: '/pages/parents/index?view=children'},
+  childReports: {label: '报告', capability: 'canReadChildReports', path: '/pages/parents/index?view=children&next=reports'},
   profile: {label: '我的', capability: 'canReadProfile', path: '/pages/profile/index'},
 }
-const ROLE_ITEMS = {STUDENT: ['home','tasks','courses','assessments','profile'], PARENT: ['home','assessments','profile'], TEACHER: ['home','courses','assessments','profile'], ADMIN: ['home','organizations','users','assessments','profile']}
+const ROLE_ITEMS = {STUDENT: ['home','tasks','courses','assessments','profile'], PARENT: ['home','children','childReports','assessments','profile'], TEACHER: ['home','courses','assessments','profile'], ADMIN: ['home','organizations','users','assessments','profile']}
 function navigationFor(session) {
   return (ROLE_ITEMS[session.activeRole] || []).filter(key => !FEATURES[key].capability || session.capabilities[FEATURES[key].capability]).map(key => Object.assign({key}, FEATURES[key]))
 }

@@ -62,7 +62,7 @@ const roleSchema = z.object({ orgRole: z.enum(['MEMBER', 'ORG_ADMIN']) })
 const endSchema = z.object({ reason: z.string().trim().max(500).optional() })
 const personaSchema = z.object({ persona: z.enum(['TEACHER', 'STUDENT', 'COUNSELOR', 'CLIENT']) })
 const capabilitySchema = z.object({
-  capability: z.enum(['PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT']),
+  capability: z.enum(['PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT', 'PARENT_REPORT_DISCLOSURE']),
 })
 const denySchema = z.object({
   userId: z.string().min(1),

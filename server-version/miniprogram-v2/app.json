@@ -7,7 +7,8 @@
     "pages/home/index",
     "pages/list/index",
     "pages/detail/index",
-    "pages/profile/index"
+    "pages/profile/index",
+    "pages/parents/index"
   ],
   "window": {
     "navigationBarTitleText": "Huisurvey",

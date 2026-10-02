@@ -172,3 +172,12 @@ test('browser build restore retries retain exact-run authority and fail closed',
     assert.ok(guard.includes(`run: test -s ${kind}/dist/index.`));
   }
 });
+
+test('parent authority has draft unit coverage and non-skipping full integration gates', () => {
+  const ci = source('ci');
+  assert.match(job(ci, 'pr-light-backend'), /vitest run src\/__tests__\/parent-portal/);
+  const regression = job(ci, 'backend-regression');
+  for (const file of ['parentPortal', 'miniprogramParentHttp']) {
+    assert.ok(regression.includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
+  }
+});

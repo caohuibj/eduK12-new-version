@@ -167,6 +167,15 @@ jobs:
         run: npx tsx scripts/bundle-content-check.ts
       - name: build (tsc)
         run: npm run build
+      - name: Mini identity and parent authorization unit contracts
+        run: >-
+          npx vitest run src/__tests__/parent-portal
+          src/__tests__/mobile/discovery.test.ts
+          src/__tests__/assessment-identity/episode-parent-invite.test.ts
+          src/__tests__/middleware/auth.test.ts
+          src/__tests__/middleware/csrf.test.ts
+          src/__tests__/utils/authCookies.test.ts
+          src/__tests__/controllers/authLibrary.test.ts
 
   pr-light-frontend:
     needs: scope
@@ -584,6 +593,8 @@ jobs:
           src/__tests__/integration/anonymousStudy.postgres.integration.test.ts
           src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts
           src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
+          src/__tests__/integration/parentPortal.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

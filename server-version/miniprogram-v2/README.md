@@ -12,3 +12,5 @@
 文档：../../docs/miniprogram-v2/implementation-status.md 与 parent-authorization-proposal.md。
 
 微信官方 API 证据： https://github.com/wechat-miniprogram/api-typings/blob/master/types/wx/lib.wx.api.d.ts （wx.request cookies；wx.setStorage/getStorage encrypt，自 2.21.3 支持异步加密）。加密本地保存不意味着浏览器 HttpOnly 的脚本隔离。
+
+家长功能：后端 PARENT_PORTAL_ENABLED 默认 false。隔离验收环境开启后显示关联、孩子与报告入口；实际读取逐请求核对关系、同意及披露授权。现有正式报告不自动转换为家长报告，详见 ../../docs/miniprogram-v2/parent-implementation.md。

@@ -1,0 +1,40 @@
+<hui-page title="{{title}}" description="{{description}}" status="{{status}}" error-message="{{errorMessage}}" nav-items="{{navItems}}" bindretry="retry" bindnavigate="navigate">
+  <hui-feedback wx:if="actionError" kind="error" message="{{actionError}}"/>
+  <hui-feedback wx:if="notice" message="{{notice}}"/>
+  <hui-card wx:if="view === 'links'" title="关联申请">
+    <hui-field wx:if="canClaim" label="学生提供的邀请码" value="{{inviteInput}}" maxlength="24" bindchange="input"/>
+    <hui-button wx:if="canClaim" loading="{{status === 'submitting'}}" bindpress="claim">提交申请，等待学生确认</hui-button>
+    <hui-button wx:if="canInvite" loading="{{status === 'submitting'}}" bindpress="chooseCourse">选择课程，生成邀请码</hui-button>
+    <hui-button wx:for="{{inviteCourses}}" wx:key="id" data-id="{{item.id}}" disabled="{{status === 'submitting'}}" secondary bindpress="invite">{{item.title}}</hui-button>
+    <hui-field wx:if="invitation" label="仅向需要关联的家长提供" value="{{invitation.inviteCode}}" disabled/>
+    <hui-button wx:if="invitation" secondary bindpress="copyInvite">复制邀请码</hui-button>
+    <hui-feedback wx:if="invitation" message="{{'有效期截止：' + invitation.expiresAt}}"/>
+    <hui-card wx:for="{{links}}" wx:key="id" title="{{item.title}}" subtitle="{{item.status}}">
+      <hui-button wx:if="item.canApprove" data-id="{{item.id}}" data-action="approve" disabled="{{status === 'submitting'}}" bindpress="confirmLink">核对并确认关联</hui-button>
+      <hui-button wx:if="item.canRevoke" data-id="{{item.id}}" data-action="revoke" disabled="{{status === 'submitting'}}" secondary bindpress="confirmLink">解除关联</hui-button>
+    </hui-card>
+    <hui-feedback wx:if="!links.length" message="暂无关联申请"/>
+    <hui-feedback wx:if="truncated" message="仅展示最近100条关联记录"/>
+  </hui-card>
+  <hui-card wx:if="view === 'children' || view === 'reports'">
+    <hui-list items="{{list}}" bindselect="select"/>
+    <hui-feedback wx:if="!list.length" message="{{description}}"/>
+    <hui-button wx:if="hasMore" secondary loading="{{status === 'submitting'}}" bindpress="more">加载更多</hui-button>
+  </hui-card>
+  <hui-card wx:if="view === 'child'" title="课程与活动">
+    <hui-card wx:for="{{courses}}" wx:key="id" title="{{item.title}}"/>
+    <hui-feedback wx:if="!courses.length" message="暂无可展示的课程"/>
+    <hui-button wx:if="canReadReports" bindpress="reports">查看获准报告</hui-button>
+  </hui-card>
+  <hui-card wx:if="report" title="{{report.title}}" subtitle="{{report.summary}}">
+    <hui-card wx:for="{{reportBlocks}}" wx:key="key" title="{{item.title}}" subtitle="{{item.text}}"/>
+    <hui-button wx:if="report.canRevoke" secondary bindpress="confirmReport">撤回本份报告授权</hui-button>
+  </hui-card>
+  <hui-card wx:if="preview" title="{{'接收家长：' + preview.parentName}}" subtitle="{{preview.consentText}}">
+    <hui-button disabled="{{!!notice}}" loading="{{status === 'submitting'}}" bindpress="accept">同意提供预览中的这一份报告</hui-button>
+  </hui-card>
+  <hui-overlay open="{{!!confirmation}}" title="{{confirmation.title}}" binddismiss="dismiss">
+    <hui-feedback message="{{confirmation.text}}"/>
+    <hui-button loading="{{status === 'submitting'}}" bindpress="confirm">确认</hui-button>
+  </hui-overlay>
+</hui-page>
