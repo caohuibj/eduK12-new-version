@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { canReadLegacyContent } from '../utils/legacyContentRoles'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole, AssignmentStatus, SubmissionStatus, CourseStudentStatus, Question } from '../types'
@@ -162,6 +163,7 @@ export const assignmentController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧作业列表')
       const { courseId, tags } = req.query
       const pagination = getPaginationParams(req)
 
@@ -1220,6 +1222,8 @@ export const assignmentController = {
   async getTags(req: Request, res: Response) {
     try {
       const { userId, role: userRole } = req.user!
+
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧内容标签')
 
       let where: any = {}
 

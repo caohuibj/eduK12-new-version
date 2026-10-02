@@ -6,8 +6,8 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
-import { promisify } from 'util';
-import { pipeline, Transform } from 'stream';
+import { pipeline as streamPipeline } from 'node:stream/promises';
+import { Transform, Readable } from 'stream';
 import { promises as dns } from 'dns';
 import http from 'http';
 import https from 'https';
@@ -24,7 +24,15 @@ const ipaddr = require('ipaddr.js') as {
   };
 };
 
-const streamPipeline = promisify(pipeline);
+const awaitWithAbort = <T>(operation: Promise<T>, signal?: AbortSignal): Promise<T> => {
+  if (!signal) return operation;
+  signal.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    const aborted = () => { signal.removeEventListener('abort', aborted); reject(signal.reason); };
+    signal.addEventListener('abort', aborted, { once: true });
+    operation.then(resolve, reject).finally(() => signal.removeEventListener('abort', aborted));
+  });
+};
 
 export interface DownloadOptions {
   maxFileSize?: number;        // 最大文件大小 (字节)
@@ -65,11 +73,11 @@ export function isPublicAddress(address: string): boolean {
   }
 }
 
-async function resolvePublicAddresses(hostname: string): Promise<ResolvedAddress[]> {
-  const addresses = await dns.lookup(normalizeHostname(hostname), {
+async function resolvePublicAddresses(hostname: string, signal?: AbortSignal): Promise<ResolvedAddress[]> {
+  const addresses = await awaitWithAbort(dns.lookup(normalizeHostname(hostname), {
     all: true,
     verbatim: true,
-  });
+  }), signal);
 
   if (addresses.length === 0 || addresses.some(({ address }) => !isPublicAddress(address))) {
     throw new Error('视频链接解析到了非公网地址');
@@ -82,7 +90,7 @@ async function resolvePublicAddresses(hostname: string): Promise<ResolvedAddress
 }
 
 /** Validate a user-supplied URL before it is persisted or queued. */
-export async function validateRemoteUrl(rawUrl: string): Promise<URL> {
+export async function validateRemoteUrl(rawUrl: string, signal?: AbortSignal): Promise<URL> {
   let parsed: URL;
   try {
     parsed = new URL(rawUrl);
@@ -100,7 +108,7 @@ export async function validateRemoteUrl(rawUrl: string): Promise<URL> {
     throw new Error('视频链接端口不受支持');
   }
 
-  await resolvePublicAddresses(parsed.hostname);
+  await resolvePublicAddresses(parsed.hostname, signal);
   return parsed;
 }
 
@@ -116,16 +124,21 @@ const createPinnedAgent = (parsed: URL, addresses: ResolvedAddress[]) => {
     : { httpAgent: new http.Agent(options), httpsAgent: new https.Agent(options) };
 };
 
-async function requestWithSafeRedirects(rawUrl: string, timeout: number): Promise<{ response: any }> {
+async function requestWithSafeRedirects(rawUrl: string, deadline: number, signal: AbortSignal, ownedAgents: Set<http.Agent>): Promise<{ response: any }> {
   let currentUrl = rawUrl;
 
   for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
-    const parsed = await validateRemoteUrl(currentUrl);
-    const addresses = await resolvePublicAddresses(parsed.hostname);
+    signal.throwIfAborted();
+    const parsed = await validateRemoteUrl(currentUrl, signal);
+    const addresses = await resolvePublicAddresses(parsed.hostname, signal);
     const agents = createPinnedAgent(parsed, addresses);
+    ownedAgents.add(agents.httpAgent);
+    ownedAgents.add(agents.httpsAgent);
+    signal.throwIfAborted();
     const response = await axios.get(currentUrl, {
       responseType: 'stream',
-      timeout,
+      timeout: Math.max(1, deadline - Date.now()),
+      signal,
       maxRedirects: 0,
       proxy: false,
       validateStatus: (status) => status >= 200 && status < 400,
@@ -173,20 +186,29 @@ export async function downloadVideo(
   options: DownloadOptions = {}
 ): Promise<DownloadResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  if (!Number.isSafeInteger(opts.timeout) || opts.timeout! <= 0) return { success: false, error: '视频下载时间配置无效' };
+  const controller = new AbortController();
+  const deadline = Date.now() + opts.timeout!;
+  const timer = setTimeout(() => controller.abort(new Error('视频下载超时')), opts.timeout!);
+  const ownedAgents = new Set<http.Agent>();
+  let responseStream: Readable | undefined;
+  let writer: fs.WriteStream | undefined;
   
+  const fileName = `download_${Date.now()}_${Math.random().toString(36).substring(7)}.mp4`;
+  const localPath = path.join(opts.tempDir!, fileName);
+
+  try {
   // 确保临时目录存在
   if (!fs.existsSync(opts.tempDir!)) {
     fs.mkdirSync(opts.tempDir!, { recursive: true });
   }
 
-  const fileName = `download_${Date.now()}_${Math.random().toString(36).substring(7)}.mp4`;
-  const localPath = path.join(opts.tempDir!, fileName);
-
-  try {
     const parsedUrl = new URL(videoUrl);
     logger.info('[下载] 开始下载视频', { hostname: parsedUrl.hostname });
 
-    const { response } = await requestWithSafeRedirects(videoUrl, opts.timeout!);
+    const { response } = await requestWithSafeRedirects(videoUrl, deadline, controller.signal, ownedAgents);
+    responseStream = response.data;
+    controller.signal.throwIfAborted();
     const contentLength = parseInt(response.headers['content-length'] || '0', 10);
     const contentType = response.headers['content-type'] || 'video/mp4';
 
@@ -200,8 +222,8 @@ export async function downloadVideo(
 
     // Chunked responses may omit Content-Length, so enforce the limit while
     // streaming as well to prevent unbounded disk consumption.
-    const writer = fs.createWriteStream(localPath);
-    await streamPipeline(response.data, new ByteLimitTransform(opts.maxFileSize!), writer);
+    writer = fs.createWriteStream(localPath);
+    await streamPipeline(response.data, new ByteLimitTransform(opts.maxFileSize!), writer, { signal: controller.signal });
 
     // 获取下载后的文件信息
     const stats = fs.statSync(localPath);
@@ -226,8 +248,13 @@ export async function downloadVideo(
     
     return {
       success: false,
-      error: `下载失败: ${error.message}`
+      error: controller.signal.aborted ? '视频下载超时' : `下载失败: ${error.message}`
     };
+  } finally {
+    clearTimeout(timer);
+    responseStream?.destroy();
+    writer?.destroy();
+    for (const agent of ownedAgents) agent.destroy();
   }
 }
 

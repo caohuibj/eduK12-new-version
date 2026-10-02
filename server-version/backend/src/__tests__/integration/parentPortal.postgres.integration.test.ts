@@ -33,6 +33,7 @@ async function fixture(){
 }
 async function reportFixture(longitudinal=false){
  const f=await fixture();await f.service.approve(f.child,f.link.id,LINK_CONSENT_VERSION)
+ await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:f.org.id,membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:f.admin.userId}})
  const artifactId=randomUUID(),specId=randomUUID(),seriesId=randomUUID()
  const policy={key:'synthetic-parent-policy',version:'1',audience:'PARENT' as const,mode:'EDUCATIONAL_SUMMARY' as const,rawAnswers:false as const,itemLevel:false as const,researchExport:false as const}
  const toolRef={family:'SCALE' as const,key:'synthetic-'+randomUUID(),version:'1'}
@@ -199,4 +200,58 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
   await expect(db.$executeRaw`DELETE FROM parent_report_disclosure_grants WHERE id=${g.grantId}`).rejects.toThrow()
   await expect(db.$executeRaw`DELETE FROM parent_portal_audit WHERE relationship_id=${f.link.id}`).rejects.toThrow()
  })
+ it('disclosure capability alone cannot enumerate consents or grant a report',async()=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await db.organizationCapabilityGrant.updateMany({where:{membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF'},data:{revokedAt:new Date()}})
+  await expect(f.service.disclosureConsents(f.officer,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+  expect(await db.$queryRaw<Array<{count:number}>>`SELECT COUNT(*)::int AS count FROM parent_report_disclosure_grants WHERE source_artifact_id=${f.artifactId}`).toEqual([{count:0}])
+ })
+ it.each(['source-capability','member-deny','policy-deny'])('officer %s withdrawal hides existing disclosures and forbids new ones',async condition=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  if(condition==='source-capability')await db.organizationCapabilityGrant.updateMany({where:{membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF'},data:{revokedAt:new Date()}})
+  else await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.org.id,userId:f.officer.userId,permission:condition==='member-deny'?'REPORT_MEMBER_READ':'ORG_INDIVIDUAL_REPORT_V1',reason:'synthetic withdrawal',deniedByUserId:f.admin.userId}})
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+  await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.disclosureConsents(f.officer,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+ })
+ it('ORG_ADMIN without individual source authority cannot issue disclosure',async()=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await db.organizationMembership.update({where:{id:f.officerMembership.id},data:{orgRole:'ORG_ADMIN'}})
+  await db.organizationCapabilityGrant.updateMany({where:{membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF'},data:{revokedAt:new Date()}})
+  await expect(f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+ })
+ it('an alternative currently authorized approver keeps the report visible before pagination',async()=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  const second=await actor(UserRole.TEACHER),m=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:f.org.id,userId:second.userId}})
+  for(const capability of ['PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE'])await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:f.org.id,membershipId:m.id,capability,grantedByUserId:f.admin.userId}})
+  await f.service.grantReport(second,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  await db.organizationCapabilityGrant.updateMany({where:{membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF'},data:{revokedAt:new Date()}})
+  const page=await f.service.reports(f.parent,f.child.userId,1,1)
+  expect(page.list).toHaveLength(1)
+  expect((await f.service.readReport(f.parent,f.child.userId,f.artifactId)).summary).toBe(f.projection.summary)
+ })
+ it.each(['teacher','counselor'])('current %s relationship grants source access and its withdrawal hides the old report',async persona=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await db.organizationCapabilityGrant.updateMany({where:{membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF'},data:{revokedAt:new Date()}})
+  for(const [membershipId,kind] of [[f.officerMembership.id,persona==='teacher'?'TEACHER':'COUNSELOR'],[f.childMembership.id,persona==='teacher'?'STUDENT':'CLIENT']])await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:f.org.id,membershipId,persona:kind,grantedByUserId:f.admin.userId}})
+  const relationId=randomUUID()
+  if(persona==='teacher'){
+   const grade=randomUUID(),klass=randomUUID()
+   await db.$executeRaw`INSERT INTO organization_units(id,organization_id,unit_kind,name) VALUES(${grade},${f.org.id},'GRADE','Synthetic grade')`
+   await db.$executeRaw`INSERT INTO organization_units(id,organization_id,unit_kind,name,parent_unit_id) VALUES(${klass},${f.org.id},'CLASS','Synthetic class',${grade})`
+   await db.$executeRaw`INSERT INTO organization_student_class_assignments(id,organization_id,membership_id,class_unit_id) VALUES(${randomUUID()},${f.org.id},${f.childMembership.id},${klass})`
+   await db.$executeRaw`INSERT INTO organization_staff_class_assignments(id,organization_id,membership_id,class_unit_id,staff_role) VALUES(${relationId},${f.org.id},${f.officerMembership.id},${klass},'TEACHING')`
+  }else await db.$executeRaw`INSERT INTO organization_counselor_client_relationships(id,organization_id,counselor_membership_id,client_membership_id) VALUES(${relationId},${f.org.id},${f.officerMembership.id},${f.childMembership.id})`
+  await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toHaveLength(1)
+  if(persona==='teacher')await db.$executeRaw`UPDATE organization_staff_class_assignments SET valid_until=statement_timestamp() WHERE id=${relationId}`
+  else await db.$executeRaw`UPDATE organization_counselor_client_relationships SET valid_until=statement_timestamp() WHERE id=${relationId}`
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+  await expect(f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+ })
+
 })

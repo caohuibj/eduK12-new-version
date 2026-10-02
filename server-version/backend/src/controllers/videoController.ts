@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { assertRemoteVideoCapacity, reserveRemoteVideoBudget, RemoteVideoAdmissionError, REMOTE_VIDEO_MAX_BYTES, REMOTE_VIDEO_TIMEOUT_MS } from '../services/remoteVideoAdmission'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
@@ -8,7 +9,7 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
 import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, storeAssetFromFile } from '../services/assetStorage'
-import { markVideoFailed } from '../services/videoProcessingState'
+import { randomUUID } from 'node:crypto'
 import { retryVideo, VideoRetryError } from '../services/videoRetry'
 
 const updateVideoSchema = z.object({
@@ -47,6 +48,7 @@ export const videoController = {
     try {
       return success(res, await retryVideo(req.params.id, req.user), '已重新加入转码队列')
     } catch (err) {
+      if (err instanceof RemoteVideoAdmissionError) { res.setHeader('Retry-After', String(err.retryAfterSeconds)); return error(res, err.message, -1, err.status) }
       if (err instanceof VideoRetryError) return error(res, err.message, -1, err.status)
       logger.error('重新转码入队失败', err)
       return error(res, '暂时无法启动转码，请刷新处理状态后重试', -1, 503)
@@ -278,7 +280,7 @@ export const videoController = {
       }
 
       try {
-        await validateRemoteUrl(urlResult.data)
+        await validateRemoteUrl(urlResult.data, AbortSignal.timeout(5000))
       } catch {
         return error(res, '视频链接必须指向可访问的公网 HTTP(S) 地址')
       }
@@ -286,8 +288,12 @@ export const videoController = {
       const parsedVideoUrl = new URL(urlResult.data)
       logger.info(`用户 ${userId} 提交视频链接`, { host: parsedVideoUrl.hostname })
 
-      // 创建数据库记录
-      const video = await prisma.video.create({
+      await reserveRemoteVideoBudget(userId)
+      // The durable reservation and Video creation share a globally serialized transaction.
+      const jobId = 'video-url-'+randomUUID()
+      const video = await prisma.$transaction(async tx => {
+        await assertRemoteVideoCapacity(tx, userId)
+        return tx.video.create({
         data: {
           title,
           filePath: 'pending_download', // 占位符，下载后会更新
@@ -297,6 +303,7 @@ export const videoController = {
           teacherId: userId,
           originalUrl: urlResult.data,
           status: 'PENDING',
+          processingJobId: jobId,
         },
         include: {
           teacher: {
@@ -309,18 +316,21 @@ export const videoController = {
         }
       })
 
+      })
+
       // The worker consumes the named transcode job and detects URL mode from videoUrl.
       try {
-        const job = await videoQueue.add('transcode', {
+        await videoQueue.add('transcode', {
           videoId: video.id,
           videoUrl: urlResult.data, // 视频链接
           teacherId: userId,
           watermarkText: watermarkText || '慧育空间教学专属视频',
           downloadOptions: {
-            maxFileSize: 2 * 1024 * 1024 * 1024,  // 2GB
-            timeout: 15 * 60 * 1000,              // 15分钟
+            maxFileSize: REMOTE_VIDEO_MAX_BYTES,  // Fits StoredAsset's signed integer byte count
+            timeout: REMOTE_VIDEO_TIMEOUT_MS,
           }
         }, {
+          jobId,
           delay: 1000,
           priority: 1,
           attempts: 3,
@@ -329,10 +339,17 @@ export const videoController = {
             delay: 10000,
           },
         })
-        await associateProcessingJob(video.id, String(job.id))
       } catch (queueError) {
-        await markVideoFailed(video.id).catch(() => undefined)
-        throw queueError
+        // A lost acknowledgement may already have started work. Only a proven
+        // absent job and an unclaimed generation may release this reservation.
+        const accepted = await videoQueue.getJob(jobId).catch(() => undefined)
+        if (accepted === null) await prisma.video.updateMany({
+          where: { id: video.id, status: 'PENDING', processingJobId: jobId, processingGeneration: video.processingGeneration },
+          data: { status: 'FAILED', processingJobId: null, errorMessage: '视频处理失败，请稍后重试或联系管理员' },
+        }).catch(() => undefined)
+        const retained = await prisma.video.findUnique({ where: { id: video.id }, select: { status: true } }).catch(() => null)
+        logger.error('视频链接已保存，入队确认失败', { videoId: video.id })
+        return success(res, { id: video.id, title: video.title, status: retained?.status ?? 'PENDING' }, '视频链接已保存，请查看处理状态；失败后可重新转码')
       }
 
       logger.info(`视频链接已加入处理队列: ${video.id}`)
@@ -345,6 +362,10 @@ export const videoController = {
         message: '视频链接已提交，正在后台下载并处理中...',
       }, '视频链接提交成功，下载处理中')
     } catch (err) {
+      if (err instanceof RemoteVideoAdmissionError) {
+        res.setHeader('Retry-After', String(err.retryAfterSeconds))
+        return error(res, err.message, -1, err.status)
+      }
       logger.error('提交视频链接错误', err)
       return error(res, '提交视频链接失败')
     }

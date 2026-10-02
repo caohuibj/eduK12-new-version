@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { canReadLegacyContent } from '../utils/legacyContentRoles'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole, CourseStatus, CourseStudentStatus } from '../types'
@@ -109,6 +110,7 @@ export const courseController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧课程列表')
       const { status = 'all' } = req.query
       const { page, pageSize, skip } = getPaginationParams(req)
 

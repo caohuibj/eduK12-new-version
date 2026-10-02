@@ -1,4 +1,5 @@
 import { prisma } from '../config/database'
+import { assertRemoteVideoCapacity, RemoteVideoAdmissionError, REMOTE_VIDEO_MAX_BYTES, REMOTE_VIDEO_TIMEOUT_MS } from './remoteVideoAdmission'
 import { videoQueue } from '../config/queue'
 import { runtimeResourceConfig } from '../config/runtimeResources'
 import { logger } from '../utils/logger'
@@ -47,7 +48,7 @@ export const recoveryPayload = (row: { id: string; originalUrl: string | null; f
       videoUrl: row.originalUrl,
       teacherId: row.teacherId,
       watermarkText: '慧育空间教学专属视频',
-      downloadOptions: { maxFileSize: 2 * 1024 * 1024 * 1024, timeout: 15 * 60 * 1000 },
+      downloadOptions: { maxFileSize: REMOTE_VIDEO_MAX_BYTES, timeout: REMOTE_VIDEO_TIMEOUT_MS },
     }
   }
   return {
@@ -83,6 +84,10 @@ const ensurePendingVideoJob = async (row: {
     }
   }
   if (!job) {
+    if (row.originalUrl && /^https?:\/\//i.test(row.originalUrl)) {
+      try { await prisma.$transaction(tx => assertRemoteVideoCapacity(tx, row.teacherId, row.id)) }
+      catch (error) { if (error instanceof RemoteVideoAdmissionError) return false; throw error }
+    }
     job = await videoQueue.add('transcode', recoveryPayload(row), {
       jobId,
       attempts: 3,

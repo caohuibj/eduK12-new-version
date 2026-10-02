@@ -6,11 +6,12 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { readReportingArtifactRecord } from '../reporting/artifact'
 import { getPublishedReportingSpec } from '../reporting/spec'
-import { assertProtectedFeedbackManagerAccess,protectedFeedbackSubjectScope } from '../reporting/protectedFeedback'
-import { assertIndividualLongitudinalAccess,individualSubjectScope } from '../reporting/individualAuthorization'
+import { protectedFeedbackSubjectScope } from '../reporting/protectedFeedback'
+import { individualSubjectScope } from '../reporting/individualAuthorization'
 import { governedArtifactMetrics } from '../reporting/governedDisclosure'
 import type { ReportingArtifactRecord } from '../reporting/types'
 import { assertDisclosureOfficer } from './authorization'
+import { assertDisclosureSourceAccess } from './source-authorization'
 import { assertParentToolCeiling } from './tool-policy'
 import { fail,parentToolRefSchema } from './contracts'
 import { buildParentProjection,parentTemplateRegistry } from './templates'
@@ -31,9 +32,7 @@ export function createParentPublisher(db=prisma,registry=parentTemplateRegistry)
   const record=await readReportingArtifactRecord(artifactId,tx)
   if(!['PROTECTED_FEEDBACK','INDIVIDUAL_LONGITUDINAL'].includes(record.analysisKind))fail('PARENT_SOURCE_UNSUPPORTED')
   const subjectUserId=record.analysisKind==='PROTECTED_FEEDBACK'?record.artifactPayload.source.subjectUserId:record.analysisKind==='INDIVIDUAL_LONGITUDINAL'?record.subjectUserId:fail()
-  await assertDisclosureOfficer(tx,actor,record.organizationId)
-  if(record.analysisKind==='PROTECTED_FEEDBACK')await assertProtectedFeedbackManagerAccess({principal:actor,organizationId:record.organizationId,subjectUserId,tx})
-  else await assertIndividualLongitudinalAccess({principal:actor,organizationId:record.organizationId,subjectUserId,tx})
+  await assertDisclosureSourceAccess(tx,actor,{artifactId,organizationId:record.organizationId,subjectUserId,policyDomain:record.policyDomain})
   const subjects=await tx.$queryRaw<Array<{id:string}>>`SELECT u.id FROM users u JOIN organization_memberships m ON m.user_id=u.id JOIN organizations o ON o.id=m.organization_id WHERE u.id=${subjectUserId} AND u.role='STUDENT' AND u.is_active=true AND u.is_frozen=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()) AND m.organization_id=${record.organizationId} AND o.status='ACTIVE' AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp()) AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=m.organization_id AND d.user_id=u.id AND d.lifted_at IS NULL AND (d.permission IN ('*','REPORT_READ','PARENT_REPORT_READ') OR d.permission=${record.policyDomain})) LIMIT 1 FOR SHARE OF u,m,o`
   if(!subjects.length)fail()
   const spec=await getPublishedReportingSpec(record.specId,tx)

@@ -12,7 +12,7 @@ export async function assertDisclosureOfficer(tx:Tx,actor:Principal,organization
       AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())
       AND c.capability='PARENT_REPORT_DISCLOSURE' AND c.revoked_at IS NULL
       AND u.is_active=true AND u.is_frozen=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
-      AND NOT EXISTS (SELECT 1 FROM organization_access_denies d WHERE d.organization_id=m.organization_id AND d.user_id=m.user_id AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','PARENT_REPORT_DISCLOSURE'))
+      AND NOT EXISTS (SELECT 1 FROM organization_access_denies d WHERE d.organization_id=m.organization_id AND d.user_id=m.user_id AND d.lifted_at IS NULL AND d.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_DISCLOSURE'))
     LIMIT 1 FOR SHARE OF m,c,u,o
   `
   if(!rows.length)fail()

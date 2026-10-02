@@ -1,6 +1,7 @@
 import { readTemporaryUpload, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { Request, Response } from 'express'
+import { canReadLegacyContent } from '../utils/legacyContentRoles'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound, unauthorized } from '../utils/response'
 import { UserRole, CourseStudentStatus } from '../types'
@@ -407,6 +408,7 @@ export const checkinController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧打卡列表')
       const { courseId, tags } = req.query
       const pagination = getPaginationParams(req)
 
@@ -1509,6 +1511,8 @@ export const checkinController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧内容标签')
 
       let where: any = {}
 

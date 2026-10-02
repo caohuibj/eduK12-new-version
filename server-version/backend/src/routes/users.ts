@@ -1,5 +1,6 @@
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../middleware/passwordChangeAdmission'
 import { Router } from 'express'
+import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 import { userController } from '../controllers/userController'
 import { userLifecycleController } from '../controllers/userLifecycleController'
 import { platformAccountController } from '../controllers/platformAccountController'
@@ -21,7 +22,8 @@ router.delete('/:id', authenticate, userLifecycleController.deactivate)
 // Forced credential invalidation is a platform lifecycle mutation. The service
 // re-checks current DB platform_role and Organization usable-admin invariants;
 // legacy User.role=ADMIN is intentionally insufficient.
-router.post('/:id/reset-password', authenticate, platformAccountController.resetPassword)
+const platformResetRateLimit = createRedisRateLimiter({ name: 'platform_password_reset', limit: 10, windowSeconds: 900, key: req => req.user!.userId })
+router.post('/:id/reset-password', authenticate, platformResetRateLimit, platformAccountController.resetPassword)
 router.post('/:id/approve-teacher', authenticate, requireAdmin, userController.approveTeacher)
 
 export default router

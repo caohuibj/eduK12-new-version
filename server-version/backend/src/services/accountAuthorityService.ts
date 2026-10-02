@@ -30,6 +30,8 @@ export async function assertCurrentSystemAdmin(tx: Tx, actorUserId: string): Pro
     SELECT "platform_role"::text AS "platformRole"
     FROM "users"
     WHERE "id" = ${actorUserId}
+      AND "is_active" = true AND "is_frozen" = false
+      AND ("expires_at" IS NULL OR "expires_at" > statement_timestamp())
     LIMIT 1
   `
   if (actors[0]?.platformRole !== PlatformRole.SYSTEM_ADMIN) {
