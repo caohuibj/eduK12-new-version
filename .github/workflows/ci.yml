@@ -520,6 +520,31 @@ jobs:
         run: |
           npx prisma generate
           npm run db:migrate:guarded
+      - name: configure independent regression database timezone
+        run: |
+          node <<'NODE'
+          const { PrismaClient } = require('@prisma/client');
+          const target = new URL(process.env.DATABASE_URL);
+          if (process.env.CI !== 'true' || !['localhost', '127.0.0.1'].includes(target.hostname) || target.pathname !== '/ptool') {
+            throw new Error('UTC setup requires the isolated CI database');
+          }
+          async function withClient(action) {
+            const client = new PrismaClient({ datasources: { db: { url: target.href } } });
+            try { await client.$connect(); return await action(client); }
+            finally { await client.$disconnect(); }
+          }
+          (async () => {
+            const before = await withClient(async client => {
+              const result = await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`;
+              await client.$executeRaw`ALTER DATABASE ptool SET timezone TO 'UTC'`;
+              return result[0].zone;
+            });
+            // A new connection verifies the default used by subsequent Prisma pools.
+            const after = await withClient(async client => (await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`)[0].zone);
+            console.log(JSON.stringify({ databaseTimezoneBefore: before, databaseTimezoneAfter: after }));
+            if (after !== 'UTC') throw new Error('CI database UTC configuration did not persist');
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+          NODE
       - name: seed reference and configuration data
         run: npm run db:seed
         env:
