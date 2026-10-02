@@ -1,6 +1,6 @@
 # 旧系统（ptool）数据导入映射与设计
 
-> 状态：设计文档（feat/legacy-import 分支）。实现前需确认 §10 的待确认项。
+> 状态：实现与演练中（feat/legacy-import）。权限及历史 UI 方案已由用户于 2026-10-02 明确确认；准备与验收通过后可切换。
 > 源基线：ptool @ 2b9a11d9；快照 20260930T100128Z（最终停写快照将在切换日重新导出并复核）。
 > 目标基线：main @ 69235a74（本分支基于此）。
 
@@ -115,9 +115,25 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 - ptool_legacy 已在验收库恢复（31 表，计数与基线一致）；
 - 导入器实现后先在验收环境 dry-run，再 apply 演练，最终切换日对最终快照重跑。
 
-## 10. 待确认项（阻塞 apply，不阻塞开发）
+## 10. 已确认的权限与展示方案
+
+用户已明确确认：admin、caohui 均映射为 SYSTEM_ADMIN，8 名旧教师 teacherApproved=true；实现管理端只读列表与详情，标识“旧系统原样，未重新计分”。以下保留原设计问题以记录决策来源。
 1. **管理员 platformRole 映射**：旧 2 名管理员 `admin`（初始管理员，2026-02-08）与 `caohui`（曹慧，
    2026-02-21）在新系统的 `platformRole`（SYSTEM_ADMIN / STANDARD）各是什么？默认建议：两者均为
    SYSTEM_ADMIN（与旧系统平台管理员语义一致），需你确认或指定。
 2. 旧教师全部 `teacherApproved=true`（8 名均已在职使用）是否符合预期？
 3. 历史只读模块是否需要在前端管理界面加入口（本设计含最小页面），还是仅 API 即可？
+
+
+## 11. 接手后的修正与执行边界
+
+- 旧课堂题目列名为未映射的 questionContent；dry-run 使用 Prisma DMMF 校验真实映射载荷，缺失字段、未知字段、错误枚举和日期在写业务表之前失败。
+- 用户与教师码的循环外键分两遍恢复，第二遍显式保留 updatedAt。
+- 分批事务同时提交业务行及 ID 映射；已存在且不属于导入器的行、内容冲突会阻止重跑，不覆盖用户的新写入。
+- verify 按每个预期 ID 比较所有映射字段及 ID 映射；令牌随机密文按同一令牌内容比较，不用“大于等于旧数量”替代对账。
+- 源库使用独立 SELECT-only 角色与 REPEATABLE READ READ ONLY 快照。导入 CLI 不使用运行时 Prisma 日志，异常不打印记录、连接串或密码哈希。
+- 六个旧量表全部导入为 DRAFT，授权状态 unknown；旧 config、题目、维度和关联保存在 definition.legacyContent 与原归档库。不推断发布权或科学计分等价性。缺少标签的旧定义保持待审阅，不捏造选项；定义问题数量记录在报告。
+- 历史 API 仅接受当前数据库 principal 的 ADMIN + SYSTEM_ADMIN，固定 SELECT 查询及参数绑定，25 条分页；列表不含答案、分数或反馈。详情使用独立 LEGACY_DATA_ENCRYPTION_KEY 受限解密，no-store，异常统一 503。
+- 9/30 的旧模型库是演练底座；已有失败 apply 的验收库不能作为正式业务库。使用独立演练目标，正式切换重新停写并恢复最终快照。
+- 当前非空但未映射的 course_shares / questionnaire_scales / questionnaire_access_tokens 会阻止导入，不能静默丢弃；最终快照若有新增行必须补齐映射后继续。
+- dry-run 仅写导入批次记录；apply 需 --confirm-apply、--admin-users admin,caohui 和 --approve-legacy-teachers。资产尚未完成时不能设置 ASSET_MIGRATION_COMPLETE=true。

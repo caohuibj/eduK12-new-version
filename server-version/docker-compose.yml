@@ -156,6 +156,8 @@ services:
     container_name: ptool-backend
     environment:
       <<: *app-environment
+      DATABASE_URL_LEGACY: ${DATABASE_URL_LEGACY:-}
+      LEGACY_DATA_ENCRYPTION_KEY: ${LEGACY_DATA_ENCRYPTION_KEY:-}
       NODE_OPTIONS: --max-old-space-size=${BACKEND_NODE_HEAP_MB:-640}
       BACKGROUND_WORKERS_ENABLED: ${BACKGROUND_WORKERS_ENABLED:-false}
     volumes:
