@@ -185,6 +185,15 @@ PG_PORT="$(docker inspect -f '{{(index (index .NetworkSettings.Ports "5432/tcp")
 REDIS_PORT="$(docker inspect -f '{{(index (index .NetworkSettings.Ports "6379/tcp") 0).HostPort}}' "$REDIS_NAME")"
 DATABASE_URL="postgresql://${TEST_DB_USER}:${TEST_DB_PASSWORD}@127.0.0.1:${PG_PORT}/${TEST_DB_NAME}?schema=public"
 
+# The SJT upload integration suite asserts a dedicated synthetic database:
+# login role situational_test and database situational_vnext (see
+# sjt-authoring.postgres.integration.test.ts). Create both here; the schema is
+# applied by the guarded migration right after backend dependencies install.
+docker exec "$PG_NAME" psql -v ON_ERROR_STOP=1 -U "$TEST_DB_USER" -d "$TEST_DB_NAME" \
+  -c "CREATE ROLE situational_test LOGIN PASSWORD 'situational_test_password'" \
+  -c 'CREATE DATABASE situational_vnext OWNER situational_test' \
+  >"$REPORT_DIR/sjt-database-create.log" 2>&1
+
 export RELEASE_VERIFY_LOCAL=true
 export NODE_ENV=test
 export DATABASE_URL
@@ -199,6 +208,10 @@ export RELEASE_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_1_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_2_INTEGRATION_DATABASE_URL="$DATABASE_URL"
 export V32_3_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+export SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL="$DATABASE_URL"
+export QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL="$DATABASE_URL"
+export SJT_UPLOAD_INTEGRATION_DATABASE_URL="postgresql://situational_test:situational_test_password@127.0.0.1:${PG_PORT}/situational_vnext?schema=public"
+export SJT_UPLOAD_TEST_PORT="$PG_PORT"
 export REDIS_URL="redis://127.0.0.1:${REDIS_PORT}"
 export JWT_SECRET='release-verify-jwt-secret-123456789012345678901234'
 export DATA_ENCRYPTION_KEY='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
@@ -221,6 +234,8 @@ run_logged() {
 # preflight operators. Frontend dependencies are only needed in explicit full
 # mode; the production Docker build installs its own exact dependencies.
 run_logged backend-npm-ci.log npm --prefix "$BACKEND_DIR" ci
+DATABASE_URL="postgresql://situational_test:situational_test_password@127.0.0.1:${PG_PORT}/situational_vnext?schema=public" \
+  run_logged sjt-migrate.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
 run_logged backend-migrate.log npm --prefix "$BACKEND_DIR" run db:migrate:guarded
 ADMIN_USERNAME='release_verify_admin' ADMIN_PASSWORD='release_verify_admin_password_2026' \
   run_logged backend-seed.log npm --prefix "$BACKEND_DIR" run db:seed
@@ -242,6 +257,11 @@ fi
 if [ "$RUN_CODE_GATES" = 'true' ]; then
   run_logged backend-build.log npm --prefix "$BACKEND_DIR" run build
   run_logged backend-audit.log npm --prefix "$BACKEND_DIR" audit --audit-level=high --registry=https://registry.npmjs.org
+
+  # Backend tests import frontend test fixtures (Cognitive unknown-runner) and
+  # resolve bare imports such as react from frontend/node_modules, so frontend
+  # dependencies must exist before backend vitest runs.
+  run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
 
   BACKEND_TEST_REPORT="$REPORT_DIR/backend-vitest.json"
   run_logged backend-test.log npm --prefix "$BACKEND_DIR" test -- --no-file-parallelism --reporter=default --reporter=json --outputFile="$BACKEND_TEST_REPORT"
@@ -271,7 +291,6 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts \
     src/__tests__/hotpath/query-budget.postgres.integration.test.ts
 
-  run_logged frontend-npm-ci.log npm --prefix "$FRONTEND_DIR" ci
   run_logged frontend-lint.log npm --prefix "$FRONTEND_DIR" run lint
   run_logged frontend-typecheck.log npm --prefix "$FRONTEND_DIR" run typecheck
   run_logged frontend-test.log npm --prefix "$FRONTEND_DIR" test
