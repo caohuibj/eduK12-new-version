@@ -68,6 +68,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
   ['/organizations/new', '创建组织'], ['/organization-tasks', '组织测评任务'],
   ['/organizations/:organizationId/runs/:runId', '测评批次详情'], ['/organizations/:organizationId/runs', '测评批次'],
   ['/organizations/:organizationId/reporting', '报告分析'], ['/organizations/:organizationId/delivery', '安全事项与导出'],
@@ -120,6 +121,6 @@ export function isStaffWorkspacePath(pathname: string): boolean {
   if (pathname.endsWith('/report')) return false
   return ['/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
-    '/users','/teacher-codes','/admin/material-grants','/admin/instrument-authorizations','/profile','/organizations','/organization-tasks']
+    '/users','/teacher-codes','/admin/legacy-archive','/admin/material-grants','/admin/instrument-authorizations','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))
 }

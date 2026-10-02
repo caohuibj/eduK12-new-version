@@ -1,5 +1,7 @@
 declare module 'cos-nodejs-sdk-v5' {
   interface COSOptions {
+    Timeout?: number
+    ChunkRetryTimes?: number
     SecretId?: string
     SecretKey?: string
     getAuthorization?: (options: any, callback: (data: any) => void) => void
@@ -39,6 +41,9 @@ declare module 'cos-nodejs-sdk-v5' {
 
   class COS {
     constructor(options: COSOptions)
+    headObject(params: Record<string, unknown>, callback: (error: (Error & { statusCode?: number; code?: string }) | null, data: any) => void): void
+    getObject(params: Record<string, unknown>, callback: (error: (Error & { statusCode?: number; code?: string }) | null, data: any) => void): void
+    putObjectCopy(params: Record<string, unknown>, callback: (error: (Error & { statusCode?: number; code?: string }) | null, data: any) => void): void
     putObject(options: PutObjectOptions, callback: (err: any, data: any) => void): void
     deleteObject(options: DeleteObjectOptions, callback: (err: any) => void): void
     getTempKeys(options: GetTempKeysOptions, callback: (err: any, data: TempKeysResult) => void): void
