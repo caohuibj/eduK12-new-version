@@ -1,3 +1,4 @@
+import { mobileDiscovery } from '../modules/mobile/discovery'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
@@ -370,6 +371,7 @@ export const authController = {
         phone: user.phone,
         expiresAt: user.expiresAt,
         mustChangePassword: user.mustChangePassword,
+        mobile: mobileDiscovery(user.role, user.mustChangePassword),
       })
     } catch (err) {
       logger.error('获取用户信息错误', err)
