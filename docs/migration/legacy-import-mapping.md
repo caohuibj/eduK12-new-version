@@ -135,5 +135,15 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 - 六个旧量表全部导入为 DRAFT，授权状态 unknown；旧 config、题目、维度和关联保存在 definition.legacyContent 与原归档库。不推断发布权或科学计分等价性。缺少标签的旧定义保持待审阅，不捏造选项；定义问题数量记录在报告。
 - 历史 API 仅接受当前数据库 principal 的 ADMIN + SYSTEM_ADMIN，固定 SELECT 查询及参数绑定，25 条分页；列表不含答案、分数或反馈。详情使用独立 LEGACY_DATA_ENCRYPTION_KEY 受限解密，no-store，异常统一 503。
 - 9/30 的旧模型库是演练底座；已有失败 apply 的验收库不能作为正式业务库。使用独立演练目标，正式切换重新停写并恢复最终快照。
-- 当前非空但未映射的 course_shares / questionnaire_scales / questionnaire_access_tokens 会阻止导入，不能静默丢弃；最终快照若有新增行必须补齐映射后继续。
+- course_shares、questionnaire_scales 与 questionnaire_access_tokens 已补齐映射（9/30 与当前只读计数均为 0），问卷令牌同样转为 hash + encrypted。
 - dry-run 仅写导入批次记录；apply 需 --confirm-apply、--admin-users admin,caohui 和 --approve-legacy-teachers。资产尚未完成时不能设置 ASSET_MIGRATION_COMPLETE=true。
+
+
+## 12. 完整资产计划
+
+--with-assets 把 StoredAsset / AssetReference 与媒体字段转换纳入同一导入计划、分批事务和逐行 verify，后续重跑不会把媒体关系覆盖回旧 URL。
+源 COS 逐个串行流式 SHA-256 校验；ETag 仅用于缓存新鲜度和复制条件。apply 创建 assets/legacy/ 下的私有副本，并再次核对副本实际字节；不改写或删除原对象，backups/ 不参与。
+本地上传从独立原始备份目录读取，复制到新上传卷 assets/ 下并校验。dry-run 不复制内容或写业务表；verify 只检查已存在的副本。
+资产身份包含内容摘要、所有者和权限域；课程附件保持 COURSE，教师库保持 PRIVATE，匿名打卡答案保持 PUBLIC_CHECKIN 并绑定相应记录引用。
+7 个 Bilibili 外部链接保留，非托管文件；缺失的软删除文件保留记录与问题清单，源字段仍完整保存在原归档库。任一活跃附件没有可校验来源会阻止迁移。
+运行需要 LEGACY_UPLOAD_DIR / UPLOAD_DIR / LEGACY_ASSET_DIGEST_CACHE 及服务器受限 COS 配置；摘要缓存权限 0600，不包含密钥，不提交 Git。

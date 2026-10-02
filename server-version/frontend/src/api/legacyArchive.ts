@@ -1,7 +1,7 @@
 import apiClient from './client'
 export type ArchiveKind = 'assessments' | 'questionnaire-assessments'
 export interface ArchiveRow {
-  id: string; studentId: string; username: string; nickname: string | null
+  id: string; studentId: string | null; username: string; nickname: string | null
   instrumentId: string; instrumentName: string; status: string; progress: number
   startedAt: string; completedAt: string | null; totalTime: number | null
 }

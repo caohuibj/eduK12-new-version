@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client'
+import { planLegacyAssets } from './legacy-assets'
 import { applyImportPlan, inspectImportPlan, createImportPlanner, importPlanHash, verifyImportPlan, type ImportAction } from './import-plan'
 // Migration errors must not emit private Prisma payloads or runtime health timers.
 const prisma = new PrismaClient({ log: [] })
@@ -38,6 +39,7 @@ interface Args {
   approvedAdmins: Set<string>
   approveTeachers: boolean
   confirmApply: boolean
+  withAssets: boolean
 }
 
 const parseArgs = (): Args => {
@@ -59,6 +61,7 @@ const parseArgs = (): Args => {
     approvedAdmins: list('admin-users'),
     approveTeachers: argv.includes('--approve-legacy-teachers'),
     confirmApply: argv.includes('--confirm-apply'),
+    withAssets: argv.includes('--with-assets'),
   }
 }
 
@@ -508,7 +511,7 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
             required: Boolean(item.required),
             weight: (item.weight as string | number) ?? 1,
             sort_order: legacyNumber(item.sort_order) ?? 0,
-            options: asJson(item.options),
+            options: (item.options as LegacyScaleItemRow['options']) ?? null,
             randomize_options: Boolean(item.randomize_options),
           })) as LegacyScaleItemRow[]
         const dimensions = dimensionRows
@@ -730,6 +733,33 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
       ctx.tally('classrooms(+questions/answers/sessions)', classroomRows.length + questionRows.length + answerRows.length + sessionRows.length, classroomRows.length + questionRows.length + answerRows.length + sessionRows.length)
     }],
   ]
+  importers.push(['additional-relations', async ctx => {
+    const shares = await legacy.query<Record<string, unknown>>('SELECT * FROM course_shares ORDER BY id')
+    for (const row of shares) {
+      const data = { id: String(row.id), courseId: String(row.course_id), sharedBy: String(row.shared_by), sharedTo: String(row.shared_to), createdAt: asDateRequired(row.created_at) }
+      await db.courseShare.upsert({ where: { id: data.id }, update: {}, create: data })
+      await track('course_share', data.id, data.id)
+    }
+    ctx.tally('course_shares', shares.length, shares.length)
+    const links = await legacy.query<Record<string, unknown>>('SELECT * FROM questionnaire_scales ORDER BY questionnaire_id, position, id')
+    for (const row of links) {
+      const data = { id: String(row.id), questionnaireId: String(row.questionnaire_id), scaleId: String(row.scale_id), position: legacyNumber(row.position) ?? 0 }
+      await db.questionnaireScale.upsert({ where: { id: data.id }, update: {}, create: data })
+      await track('questionnaire_scale', data.id, data.id)
+    }
+    ctx.tally('questionnaire_scales', links.length, links.length)
+    const tokens = await legacy.query<Record<string, unknown>>('SELECT * FROM questionnaire_access_tokens ORDER BY created_at')
+    for (const row of tokens) {
+      if (typeof row.token !== 'string' || !row.token) throw new Error('Legacy questionnaire token is invalid')
+      const data = { id: String(row.id), questionnaireId: String(row.questionnaire_id), token: null,
+        tokenHash: hashToken(row.token), tokenEncrypted: encryptToken(row.token), createdBy: String(row.created_by),
+        expiresAt: asDateRequired(row.expires_at), maxUses: legacyNumber(row.max_uses) ?? 0,
+        usedCount: legacyNumber(row.used_count) ?? 0, isActive: Boolean(row.is_active), createdAt: asDateRequired(row.created_at) }
+      await db.questionnaireAccessToken.upsert({ where: { id: data.id }, update: {}, create: data })
+      await track('questionnaire_access_token', data.id, data.id)
+    }
+    ctx.tally('questionnaire_access_tokens', tokens.length, tokens.length)
+  }])
   return importers
 }
 
@@ -754,16 +784,23 @@ export async function runLegacyImport(): Promise<void> {
       if (args.skip.has(name)) continue
       await importer(report)
     }
-    for (const table of ['course_shares', 'questionnaire_scales', 'questionnaire_access_tokens']) {
-      const rows = await legacy.query<{ count: string }>('SELECT count(*)::text AS count FROM ' + table)
-      if (Number(rows[0].count) !== 0) throw new Error('Unmapped nonempty legacy table: ' + table)
-    }
     const loaded = loadRewrites(args)
     const rewritten = Object.values(report.counts).reduce((sum, value) => sum + value.rewritten, 0)
     if (loaded.plan.length !== rewritten) throw new Error('Not all audited URL rewrites were applied')
+    let assetSummary: Awaited<ReturnType<typeof planLegacyAssets>> | undefined
+    if (args.withAssets) {
+      if (args.only.size || args.skip.size) throw new Error('--with-assets requires the complete import plan')
+      const legacyUploadDir = process.env.LEGACY_UPLOAD_DIR, uploadDir = process.env.UPLOAD_DIR, cacheFile = process.env.LEGACY_ASSET_DIGEST_CACHE
+      if (!legacyUploadDir || !uploadDir || !cacheFile) throw new Error('Legacy asset source, destination and digest cache are required')
+      assetSummary = await planLegacyAssets(actions, { mode: args.mode, legacyUploadDir, uploadDir, cacheFile,
+        cosDomain: args.legacyCosDomain, legacySiteHosts: ['eduk12.top', 'www.eduk12.top'], externalHosts: ['www.bilibili.com'] })
+      report.tally('stored_assets', assetSummary.assets, assetSummary.assets)
+      report.tally('asset_references', assetSummary.references, assetSummary.references)
+      report.note('Asset SHA-256 content verification complete; external/retained problems=' + assetSummary.problems.length)
+    } else report.note('Assets were not included; this batch cannot certify full migration completion.')
     const preview = await inspectImportPlan(prisma, actions)
     const sourceHash = importPlanHash(actions)
-    const batch = await prisma.legacyImportBatch.create({ data: { mode: args.mode, status: 'RUNNING', summary: { sourceHash, preview, planned: actions.length } } })
+    const batch = await prisma.legacyImportBatch.create({ data: { mode: args.mode, status: 'RUNNING', summary: { sourceHash, preview, assetSummary, planned: actions.length } } })
     batchId = batch.id
     let verification: { checked: number; mappingCount: number } | undefined
     if (args.mode === 'apply') {
@@ -772,8 +809,8 @@ export async function runLegacyImport(): Promise<void> {
     } else if (args.mode === 'verify') {
       verification = await verifyImportPlan(prisma, actions)
     }
-    await prisma.legacyImportBatch.update({ where: { id: batch.id }, data: { status: 'DONE', finishedAt: new Date(), counts: report.counts as never, summary: { sourceHash, preview, planned: actions.length, verification, notes: report.notes } as never } })
-    process.stdout.write(JSON.stringify({ mode: args.mode, batchId: batch.id, sourceHash, preview, counts: report.counts, verification, notes: report.notes }, null, 2) + '\n')
+    await prisma.legacyImportBatch.update({ where: { id: batch.id }, data: { status: 'DONE', finishedAt: new Date(), counts: report.counts as never, summary: { sourceHash, preview, assetSummary, planned: actions.length, verification, notes: report.notes } as never } })
+    process.stdout.write(JSON.stringify({ mode: args.mode, batchId: batch.id, sourceHash, preview, assetSummary, counts: report.counts, verification, notes: report.notes }, null, 2) + '\n')
   } catch (error) {
     if (batchId) await prisma.legacyImportBatch.update({ where: { id: batchId }, data: { status: 'FAILED', finishedAt: new Date(), error: 'Legacy import failed; inspect restricted operator evidence', counts: report.counts as never } })
     throw error

@@ -10,7 +10,7 @@ const specs = {
   assessments: { table: 'assessments', instrument: 'scales', column: 'scale_id' },
   'questionnaire-assessments': { table: 'questionnaire_assessments', instrument: 'questionnaires', column: 'questionnaire_id' },
 } as const
-const metadata = (column: string) => `a.id, a.user_id AS "studentId", u.username, u.nickname,
+const metadata = (column: string) => `a.id, a.user_id AS "studentId", COALESCE(u.username,'匿名历史记录') AS username, u.nickname,
  a.${column} AS "instrumentId", i.name AS "instrumentName", a.status::text AS status,
  a.progress, a.started_at AT TIME ZONE 'UTC' AS "startedAt", a.completed_at AT TIME ZONE 'UTC' AS "completedAt", a.total_time AS "totalTime"`
 
@@ -36,7 +36,7 @@ export function createArchiveService(query: ArchiveQuery) {
       // List queries deliberately exclude answers, scores, feedback and tokens.
       const count = await query('SELECT count(*)::int AS total FROM ' + spec.table + ' a' + where, values)
       const rows = await query(`SELECT ${metadata(spec.column)} FROM ${spec.table} a
-        JOIN users u ON u.id=a.user_id JOIN ${spec.instrument} i ON i.id=a.${spec.column}
+        LEFT JOIN users u ON u.id=a.user_id JOIN ${spec.instrument} i ON i.id=a.${spec.column}
         ${where} ORDER BY a.started_at DESC, a.id DESC LIMIT 25 OFFSET $${values.length + 1}`,
         [...values, (filter.page - 1) * 25])
       return { list: rows.rows, total: count.rows[0].total, page: filter.page, pageSize: 25, provenance }
@@ -47,7 +47,7 @@ export function createArchiveService(query: ArchiveQuery) {
         ? 'a.answers, a.scores, a.feedback, a.questionnaire_assessment_id AS "questionnaireAssessmentId"'
         : 'a.aggregate_report AS "aggregateReport", a.completed_scales AS "completedScales", a.completed_forms AS "completedForms"'
       const result = await query(`SELECT ${metadata(spec.column)}, ${fields}
-        FROM ${spec.table} a JOIN users u ON u.id=a.user_id JOIN ${spec.instrument} i ON i.id=a.${spec.column} WHERE a.id=$1`, [id])
+        FROM ${spec.table} a LEFT JOIN users u ON u.id=a.user_id JOIN ${spec.instrument} i ON i.id=a.${spec.column} WHERE a.id=$1`, [id])
       const row = result.rows[0]
       if (!row) return null
       if (kind === 'assessments') {
