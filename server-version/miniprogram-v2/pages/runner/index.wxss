@@ -1,1 +1,2 @@
 @import "../../design-system/components/primitives.wxss";
+.instructions { white-space: pre-wrap; margin-bottom: var(--space-md); }

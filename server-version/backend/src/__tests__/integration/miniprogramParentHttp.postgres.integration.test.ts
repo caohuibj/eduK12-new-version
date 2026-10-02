@@ -32,7 +32,7 @@ function client(){
   },
   getNetworkType(o:any){o.success({networkType:'wifi'})},onNetworkStatusChange(){},
   setStorage(o:any){expect(o.encrypt).toBe(true);stored.set(o.key,structuredClone(o.data));o.success({})},
-  getStorage(o:any){expect(o.encrypt).toBe(true);if(stored.has(o.key))o.success({data:structuredClone(stored.get(o.key))});else o.fail({})},
+  getStorage(o:any){expect(o.encrypt).toBe(true);if(stored.has(o.key))o.success({data:structuredClone(stored.get(o.key))});else o.fail({errMsg:'getStorage:fail data not found'})},
   removeStorage(o:any){stored.delete(o.key);o.success({})},
  }
  // HTTPS configuration stays enforced; only this test platform maps transport to its loopback listener.

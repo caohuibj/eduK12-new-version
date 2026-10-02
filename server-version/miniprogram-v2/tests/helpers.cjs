@@ -10,7 +10,7 @@ function platform(handler) {
  const p={calls,stored,navigation,canIUse:()=>true,
  request(options){calls.push(options);Promise.resolve().then(()=>handler(options)).then(options.success,options.fail)},
  setStorage(options){assert.equal(options.encrypt,true);stored.set(options.key,structuredClone(options.data));queueMicrotask(()=>options.success({}))},
- getStorage(options){assert.equal(options.encrypt,true);queueMicrotask(()=>stored.has(options.key)?options.success({data:structuredClone(stored.get(options.key))}):options.fail({}))},
+ getStorage(options){assert.equal(options.encrypt,true);queueMicrotask(()=>stored.has(options.key)?options.success({data:structuredClone(stored.get(options.key))}):options.fail({errMsg:'getStorage:fail data not found'}))},
  removeStorage(options){stored.delete(options.key);queueMicrotask(()=>options.success({}))},
  getNetworkType(options){options.success({networkType:'wifi'})},onNetworkStatusChange(listener){p.networkChange=listener},
  reLaunch(value){navigation.push(value.url)},navigateTo(value){navigation.push(value.url)},stopPullDownRefresh(){},showToast(){},scanCode(){},

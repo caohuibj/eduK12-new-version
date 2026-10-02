@@ -55,8 +55,8 @@ test('child switcher opens the selected child report list without inheriting ano
  assert.equal(platform.navigation.at(-1),'/pages/parents/index?view=reports&childId=child-2');p.onUnload()
 })
 test('failed consent retains one command key, never auto-replays, and explains independent disclosure',async t=>{
- let writes=0;const preview={relationshipId:'link-1',artifactId:'artifact-1',commandKey:'server-command',consentVersion:'report-v1'}
- const service={view:async()=>({title:'预览',preview,report:{title:'已发布内容',blocks:[]}}),accept:async value=>{writes++;assert.equal(value.commandKey,'server-command');if(writes===1)throw new Error('网络暂不可用')}}
+ let writes=0;let accepted=false;const preview={relationshipId:'link-1',artifactId:'artifact-1',commandKey:'server-command',consentVersion:'report-v1',canConsent:true}
+ const service={view:async()=>({title:'预览',preview:{...preview,canConsent:!accepted},report:{title:'已发布内容',blocks:[]}}),accept:async value=>{writes++;assert.equal(value.commandKey,'server-command');if(writes===1)throw new Error('网络暂不可用');accepted=true}}
  const {instance:p}=page(service,session(),t,{view:'consent'});await p.onShow();await p.accept();assert.equal(writes,1);assert.equal(p.data.actionError,'网络暂不可用');assert.equal(p.data.status,'ready')
  await p.accept();assert.equal(writes,2);assert.match(p.data.notice,/还需报告披露授权/);await p.accept();assert.equal(writes,2);p.onUnload();assert.equal(p.data.preview,null)
 })
@@ -76,4 +76,32 @@ test('failed reauthorization discards the previously loaded report from page mem
  let permitted=true;const service={view:async()=>{if(!permitted)throw new Error('内容不存在或无权访问');return {title:'报告',report:{summary:'私密已授权内容',blocks:[]}}}}
  const {instance:p}=page(service,session(),t,{view:'report',childId:'child-1',artifactId:'artifact-1'});await p.onShow();assert.ok(p.data.report)
  permitted=false;await p.retry();assert.equal(p.data.status,'error');assert.equal(p.data.report,null);p.onUnload()
+})
+
+function consentDTO(accepted=true){return {relationshipId:'link-1',artifactId:'artifact-1',parentName:'获准家长',commandKey:'preview-command',consentVersion:'report-v1',consentText:'服务器说明',consentStatus:accepted?'ACCEPTED':'NOT_ACCEPTED',canConsent:!accepted,canRevoke:accepted,projection:{schemaVersion:1,audience:'PARENT',artifactId:'artifact-1',title:'家长版',summary:'摘要',blocks:[]}}}
+test('student preview exposes server consent state and permits individual withdrawal before or after disclosure',async t=>{
+ for(const granted of [false,true]){
+  let accepted=true;const writes=[],api={get:async()=>({...consentDTO(accepted),granted}),post:async(path,body)=>{writes.push({path,body});accepted=false;return {revoked:true}}},service=createParentService(api,session())
+  const {instance:p}=page(service,session(),t,{view:'consent',relationshipId:'link-1',artifactId:'artifact-1'});await p.onShow()
+  assert.equal(p.data.preview.canConsent,false);assert.equal(p.data.report.canRevoke,true);p.confirmReport();assert.equal(p.data.confirmation.artifactId,'artifact-1');assert.match(p.data.confirmation.text,/其他报告授权保留/)
+  await p.confirm();assert.equal(writes.length,1);assert.equal(writes[0].path,'/parent-links/link-1/reports/artifact-1/revoke')
+  assert.equal(p.data.preview.canConsent,true);assert.equal(p.data.report.canRevoke,false);assert.match(p.data.notice,/家长关联和其他报告授权保留/);p.onUnload()
+ }
+})
+test('successful student consent rereads server state and offers withdrawal without reopening the link',async t=>{
+ let accepted=false,writes=0;const s=session(),service=createParentService({get:async()=>consentDTO(accepted),post:async()=>{accepted=true;writes++;return {consentId:'consent-1'}}},s)
+ const {instance:p}=page(service,s,t,{view:'consent',relationshipId:'link-1',artifactId:'artifact-1'});await p.onShow();assert.equal(p.data.report.canRevoke,false)
+ await p.accept();assert.equal(p.data.preview.consentStatus,'ACCEPTED');assert.equal(p.data.report.canRevoke,true);await p.accept();assert.equal(writes,1);p.confirmReport();assert.equal(p.data.confirmation.action,'withdraw');p.onUnload()
+})
+test('preview cannot invent a withdrawal action or change its relationship/artifact binding',async t=>{
+ const dto=consentDTO(false),service=createParentService({get:async()=>dto},session()),{instance:p}=page(service,session(),t,{view:'consent',relationshipId:'link-1',artifactId:'artifact-1'})
+ await p.onShow();p.confirmReport();assert.equal(p.data.confirmation,null);p.onUnload()
+ for(const field of ['relationshipId','artifactId']){const service=createParentService({get:async()=>({...consentDTO(),[field]:'other-id'})},session());await assert.rejects(service.view({view:'consent',relationshipId:'link-1',artifactId:'artifact-1'}),{kind:'invalidResponse'})}
+})
+test('hide or logout during withdrawal does not restore private report or reopen stale confirmation',async t=>{
+ for(const transition of ['hide','logout','unload']){
+  let release;const s=session(),service=createParentService({get:async()=>consentDTO(),post:async()=>new Promise(resolve=>{release=()=>resolve({revoked:true})})},s),{instance:p}=page(service,s,t,{view:'consent',relationshipId:'link-1',artifactId:'artifact-1'})
+  await p.onShow();p.confirmReport();const pending=p.confirm();if(transition==='hide')p.onHide();else if(transition==='unload')p.onUnload();else s.logout();release();await pending
+  assert.equal(p.data.confirmation,null);assert.equal(p.data.report,null);assert.equal(p.data.preview,null);assert.equal(p.data.reportBlocks.length,0);p.onUnload()
+ }
 })

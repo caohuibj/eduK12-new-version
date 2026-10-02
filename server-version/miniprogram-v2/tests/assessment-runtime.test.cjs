@@ -46,3 +46,98 @@ test('longitudinal report preserves missing waves, exact server delta and refere
 test('run summary uses native authorized API and withholds injected metrics',async()=>{assert.equal(reportTarget('/my-assessments/results/execution-1').family,'RUN_SUMMARY');assert.throws(()=>web.path('/my-assessments/results/execution-1'),{kind:'invalidEntry'});const s=createReportService({get:async path=>{assert.equal(path,'/my-assessments/results/execution-1');return {schemaVersion:1,mode:'NONE',state:'WITHHELD',metrics:{SECRET:99}}}},{get:()=>({user:{id:'u'},capabilities:{canReadOwnAssessments:true}})});assert.ok(!JSON.stringify(await s.read('RUN_SUMMARY','execution-1')).includes('SECRET'))})
 test('restart cannot discard an unconfirmed completed receipt',async()=>{const app=await setup((o,route)=>route.endsWith('/submit')?Promise.reject(new Error('lost')):undefined),unit=await filled(app);await assert.rejects(app.runtime.assessments.submit(unit));app.setRaw(scale(1,'COMPLETED'));await assert.rejects(app.runtime.assessments.restart(unit),{kind:'conflict'});assert.equal(app.p.calls.filter(c=>c.url.endsWith('/restart')).length,0)})
 test('actual report clears blocks on hide and suppresses late read',async t=>{const app=await setup();let release;app.runtime.reports.read=()=>new Promise(resolve=>{release=()=>resolve({title:'private',blocks:[{text:'SECRET'}]})});const page=loadPage('report',app,t);page.onLoad({family:'SCALE',id:'attempt-1'});const pending=page.onShow();await new Promise(resolve=>setImmediate(resolve));page.onHide();release();await pending;assert.equal(page.data.blocks.length,0);page.onUnload()})
+
+const draftKeyIn = app => [...app.p.stored.keys()].find(key=>key.includes(':draft:'))
+const indexKeyIn = app => [...app.p.stored.keys()].find(key=>key.endsWith(':draft-index'))
+test('body quota failure after index reservation repairs on process rebuild and permits new answers',async()=>{
+ const app=await setup(),unit=await app.runtime.assessments.resume(handle),set=app.p.setStorage
+ app.p.setStorage=o=>o.key.includes(':draft:')?queueMicrotask(()=>o.fail({errMsg:'quota exceeded'})):set(o)
+ await assert.rejects(app.runtime.assessments.change(unit,'I1','0'),{kind:'storageUnavailable'})
+ const index=indexKeyIn(app);assert.equal(app.p.stored.get(index).length,1);assert.equal(draftKeyIn(app),undefined)
+ app.p.setStorage=set;const rebuilt=app.create();await rebuilt.session.restore();const restored=await rebuilt.assessments.resume(handle)
+ assert.equal(restored.state,'draft');assert.deepEqual(app.p.stored.get(index),[])
+ await rebuilt.assessments.change(restored,'I1','1');assert.equal(restored.draft.values.I1,'1')
+ assert.equal(app.p.calls.filter(c=>c.url.endsWith('/submit')).length,0)
+})
+test('interrupted reserved index is repaired without changing another valid sealed submission',async()=>{
+ const posts=[],app=await setup((o,route)=>route.endsWith('/submit')?(posts.push(structuredClone(o.data)),Promise.reject(new Error('lost'))):undefined),unit=await filled(app)
+ await assert.rejects(app.runtime.assessments.submit(unit));const full=draftKeyIn(app),index=indexKeyIn(app),sealed=structuredClone(app.p.stored.get(full))
+ app.p.stored.set(index,[...app.p.stored.get(index),full.replace(/attempt-1:/,'attempt-1:missing-')])
+ const rebuilt=app.create();await rebuilt.session.restore();const restored=await rebuilt.assessments.resume(handle)
+ assert.deepEqual(restored.draft.payload,posts[0]);assert.equal(restored.draft.commandId,sealed.commandId)
+ assert.deepEqual(app.p.stored.get(full),sealed);assert.deepEqual(app.p.stored.get(index),[full]);await assert.rejects(rebuilt.assessments.submit(restored));assert.deepEqual(posts[1],posts[0])
+})
+test('a sealed body committed before an interrupted callback restores the exact command',async()=>{
+ const app=await setup(),unit=await filled(app),set=app.p.setStorage
+ app.p.setStorage=o=>{if(o.data?.state==='sealed'){app.p.stored.set(o.key,structuredClone(o.data));queueMicrotask(()=>o.fail({errMsg:'interrupted callback'}))}else set(o)}
+ await assert.rejects(app.runtime.assessments.submit(unit),{kind:'storageUnavailable'});assert.equal(app.p.calls.filter(c=>c.url.endsWith('/submit')).length,0)
+ const persisted=structuredClone(app.p.stored.get(draftKeyIn(app)));app.p.setStorage=set;await assert.rejects(app.runtime.assessments.change(unit,'I1','1'),{kind:'sealed'});assert.deepEqual(app.p.stored.get(draftKeyIn(app)),persisted);const rebuilt=app.create();await rebuilt.session.restore()
+ const restored=await rebuilt.assessments.resume(handle);assert.equal(restored.draft.state,'sealed');assert.deepEqual(restored.draft,persisted)
+ await assert.rejects(rebuilt.assessments.change(restored,'I1','1'),{kind:'sealed'})
+})
+test('body deleted before failed directory update recovers server completion instead of draftConflict',async()=>{
+ const app=await setup((o,route)=>route.endsWith('/submit')?response({status:'COMPLETED'}):undefined),unit=await filled(app),set=app.p.setStorage
+ app.p.setStorage=o=>o.key.endsWith(':draft-index')&&o.data.length===0?queueMicrotask(()=>o.fail({errMsg:'quota exceeded'})):set(o)
+ await assert.rejects(app.runtime.assessments.submit(unit),{kind:'storageUnavailable'});const index=indexKeyIn(app)
+ assert.equal(draftKeyIn(app),undefined);assert.equal(app.p.stored.get(index).length,1)
+ app.p.setStorage=set;app.setRaw(scale(1,'COMPLETED'));const rebuilt=app.create();await rebuilt.session.restore()
+ assert.equal((await rebuilt.assessments.resume(handle)).state,'submitted');assert.deepEqual(app.p.stored.get(index),[])
+})
+test('failed body deletion keeps sealed content recoverable and explicit repeated deletion is safe',async()=>{
+ const app=await setup((o,route)=>route.endsWith('/submit')?Promise.reject(new Error('lost')):undefined),unit=await filled(app)
+ await assert.rejects(app.runtime.assessments.submit(unit));const full=draftKeyIn(app),sealed=structuredClone(app.p.stored.get(full)),remove=app.p.removeStorage
+ app.p.removeStorage=o=>queueMicrotask(()=>o.fail({errMsg:'disk unavailable'}))
+ await assert.rejects(app.runtime.drafts.remove(unit.meta),{kind:'storageUnavailable'});assert.deepEqual(app.p.stored.get(full),sealed)
+ app.p.removeStorage=remove;const rebuilt=app.create();await rebuilt.session.restore();assert.deepEqual((await rebuilt.assessments.resume(handle)).draft,sealed)
+ await rebuilt.drafts.remove(unit.meta);await rebuilt.drafts.remove(unit.meta);assert.deepEqual(await rebuilt.drafts.pending(unit.meta.ownerId,'SCALE','attempt-1'),null)
+})
+test('damaged bodies and unknown read failures are never treated as missing or silently pruned',async()=>{
+ const app=await setup(),unit=await filled(app),full=draftKeyIn(app),index=indexKeyIn(app),original=structuredClone(app.p.stored.get(full))
+ for(const damaged of [null,false,{schemaVersion:99}]){app.p.stored.set(full,damaged);await assert.rejects(app.runtime.assessments.resume(handle),{kind:'draftConflict'});assert.deepEqual(app.p.stored.get(index),[full]);assert.deepEqual(app.p.stored.get(full),damaged)}
+ app.p.stored.set(full,original);const get=app.p.getStorage;app.p.getStorage=o=>o.key===full?queueMicrotask(()=>o.fail({errMsg:'decryption key not found'})):get(o)
+ await assert.rejects(app.runtime.assessments.resume(handle),{kind:'storageUnavailable'});assert.deepEqual(app.p.stored.get(index),[full]);assert.deepEqual(app.p.stored.get(full),original)
+ app.p.getStorage=get;assert.deepEqual((await app.runtime.assessments.resume(handle)).draft.values,original.values)
+})
+test('directory repair failure can retry after space recovery without deleting a sealed body',async()=>{
+ const app=await setup((o,route)=>route.endsWith('/submit')?Promise.reject(new Error('lost')):undefined),unit=await filled(app)
+ await assert.rejects(app.runtime.assessments.submit(unit));const full=draftKeyIn(app),index=indexKeyIn(app),sealed=structuredClone(app.p.stored.get(full)),set=app.p.setStorage
+ app.p.stored.set(index,[full,full+'missing']);app.p.setStorage=o=>queueMicrotask(()=>o.fail({errMsg:'quota exceeded'}))
+ await assert.rejects(app.runtime.assessments.resume(handle),{kind:'storageUnavailable'});assert.deepEqual(app.p.stored.get(full),sealed)
+ app.p.setStorage=set;assert.deepEqual((await app.runtime.assessments.resume(handle)).draft,sealed);assert.deepEqual(app.p.stored.get(index),[full])
+})
+test('a concurrent pending read waits for body write instead of pruning its reservation',async()=>{
+ const app=await setup(),unit=await app.runtime.assessments.resume(handle),set=app.p.setStorage;let release
+ app.p.setStorage=o=>o.key.includes(':draft:')?release=()=>set(o):set(o)
+ const change=app.runtime.assessments.change(unit,'I1','0');await new Promise(resolve=>setImmediate(resolve));assert.equal(typeof release,'function')
+ let finished=false;const pending=app.runtime.drafts.pending(unit.meta.ownerId,'SCALE','attempt-1').then(value=>{finished=true;return value})
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(finished,false);release();await change;assert.equal(await pending,null)
+ assert.equal((await app.runtime.assessments.resume(handle)).draft.values.I1,1)
+})
+function scaleQuestionnaire(unitId='scale-1',instruction='请仅回顾过去两周。\n逐项作答。'){
+ return {questionnaireAssessment:{id:'attempt-1',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1},questionnaire:{name:'整体问卷',instruction:'整体说明：请独立填写。'},currentScale:{name:'单元 '+unitId,instruction,scaleAssessmentId:unitId,definitionHash:hash,definition}}
+}
+test('runner preserves overall and current Scale instructions across unit advance and resumed answers',async t=>{
+ const app=await setup((o,route)=>route.endsWith('/submit')?(app.setRaw(scaleQuestionnaire('scale-2','请回顾过去七天。')),response({status:'IN_PROGRESS'})):undefined)
+ app.setRaw(scaleQuestionnaire());const page=loadPage('runner',app,t);page.onLoad({family:'QUESTIONNAIRE',rootId:'attempt-1',resourceId:'questionnaire-1'});await page.onShow()
+ assert.equal(page.data.instruction,'整体说明：请独立填写。');assert.equal(page.data.unitTitle,'单元 scale-1');assert.equal(page.data.unitInstruction,'请仅回顾过去两周。\n逐项作答。')
+ await page.change({detail:{value:'0'}});page.onHide();assert.equal(page.data.unitInstruction,'');await page.onShow();assert.equal(page.data.unitInstruction,'请仅回顾过去两周。\n逐项作答。');assert.equal(page.unit.draft.values.I1,1)
+ page.next();await page.change({detail:{value:'0'}});await page.submit();assert.equal(page.data.unitTitle,'单元 scale-2');assert.equal(page.data.unitInstruction,'请回顾过去七天。');assert.equal(page.data.instruction,'整体说明：请独立填写。');page.onUnload()
+})
+test('Questionnaire and Composite form sections preserve canonical title and description, with both Composite shapes',()=>{
+ const section={...questionnaire().currentFormSection,title:'背景区段',description:'仅填写本学期情况。\n保持原文。'}
+ const q=normalize('QUESTIONNAIRE',{...questionnaire(),questionnaire:{name:'问卷',instruction:'整体问卷说明'},currentFormSection:section},'u','r')
+ assert.equal(q.instruction,'整体问卷说明');assert.equal(q.unitTitle,section.title);assert.equal(q.unitInstruction,section.description)
+ for(const currentItem of [{type:'FORM_SECTION',...section,items:undefined,answers:section.items},{type:'FORM_SECTION',formSection:section}]){
+  const c=normalize('COMPOSITE',{id:'attempt-1',name:'综合',instruction:'综合说明',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1,currentItem},'u','r')
+  assert.equal(c.instruction,'综合说明');assert.equal(c.unitTitle,section.title);assert.equal(c.unitInstruction,section.description)
+ }
+ const c=normalize('COMPOSITE',{id:'attempt-1',name:'综合',status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1,currentItem:{type:'SCALE',id:'unit-1',definitionHash:hash,scale:{name:'子量表',instruction:'仅回顾昨天。',definition}}},'u','r')
+ assert.equal(c.unitTitle,'子量表');assert.equal(c.unitInstruction,'仅回顾昨天。')
+})
+test('runner renders restored form instructions and removes prior instructions when the next unit has none',async t=>{
+ const app=await setup();app.setRaw({...questionnaire(),questionnaire:{name:'问卷',instruction:'整体要求'},currentFormSection:{...questionnaire().currentFormSection,title:'本学期',description:'请仅回顾本学期。'}})
+ const page=loadPage('runner',app,t);page.onLoad({family:'QUESTIONNAIRE',rootId:'attempt-1',resourceId:'questionnaire-1'});await page.onShow();await page.change({detail:{value:['0']}});page.onHide();await page.onShow()
+ assert.equal(page.data.unitTitle,'本学期');assert.equal(page.data.unitInstruction,'请仅回顾本学期。');assert.deepEqual(page.unit.draft.values['form-1'],['a'])
+ app.setRaw(questionnaire('section-2'));await page.retry();assert.equal(page.data.unitInstruction,'');assert.equal(page.data.unitTitle,'');assert.equal(page.data.instruction,'');page.onUnload()
+ const wxml=fs.readFileSync(path.resolve(__dirname,'../pages/runner/index.wxml'),'utf8');assert.match(wxml,/\{\{instruction\}\}/);assert.match(wxml,/\{\{unitInstruction\}\}/);assert.match(wxml,/title="\{\{unitTitle\}\}"/)
+})

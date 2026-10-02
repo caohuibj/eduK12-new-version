@@ -5,9 +5,10 @@ Page(workspacePage({
     this.page=1
     this.setData({view:this.viewOptions.view,inviteInput:'',invitation:null,inviteCourses:[],confirmation:null,actionError:'',notice:''})
   },
-  reset() {this.setData({inviteInput:'',invitation:null,inviteCourses:[],confirmation:null,preview:null,actionError:'',notice:''})},
+  reset() {this.setData({inviteInput:'',invitation:null,inviteCourses:[],confirmation:null,preview:null,report:null,reportBlocks:[],actionError:'',notice:''})},
   async fetch(runtime) {this.page=1;this.setData({confirmation:null});return runtime.parents.view(this.viewOptions)},
   methods:{
+    onHide(){this.sequence+=1;this.setData({confirmation:null,preview:null,report:null,reportBlocks:[],notice:'',actionError:''})},
     input(event) {this.setData({inviteInput:event.detail.value})},
     async act(operation,refresh=false) {
       if(this.data.status==='submitting')return
@@ -42,7 +43,7 @@ Page(workspacePage({
       this.setData({confirmation:{id,action,title:action==='approve'?'确认关联家长':'解除关联',text:action==='approve'?this.data.consent.text:'解除后停止新的孩子概况与报告访问。历史授权记录保留。'}})
     },
     confirmReport() {
-      if(this.data.report?.canRevoke&&this.data.status!=='submitting')this.setData({confirmation:{id:this.data.report.relationshipId,artifactId:this.data.report.artifactId,action:'withdraw',title:'撤回报告授权',text:'撤回后停止这份报告的新访问。'}})
+      if(this.data.report?.canRevoke&&this.data.status!=='submitting')this.setData({confirmation:{id:this.data.report.relationshipId,artifactId:this.data.report.artifactId,action:'withdraw',title:'撤回报告授权',text:'撤回这份报告的既有同意与披露授权后，停止新的访问。家长关联和其他报告授权保留。'}})
     },
     dismiss() {if(this.data.status!=='submitting')this.setData({confirmation:null})},
     confirm() {
@@ -52,12 +53,12 @@ Page(workspacePage({
         if(c.action==='approve')await service.approve(c.id,this.data.consent.version)
         else if(c.action==='withdraw')await service.withdraw(c.id,c.artifactId)
         else await service.revoke(c.id)
-        return {confirmation:null,report:null,notice:c.action==='withdraw'?'已撤回报告授权':''}
-      },c.action!=='withdraw')
+        return {confirmation:null,report:null,notice:c.action==='withdraw'?'已撤回本份报告授权，家长关联和其他报告授权保留。':''}
+      },c.action!=='withdraw'||this.viewOptions.view==='consent')
     },
     accept() {
-      if(!this.data.preview||this.data.notice)return
-      return this.act(async service=>{await service.accept(this.data.preview);return {notice:'已记录本份报告的同意。还需报告披露授权后，家长才可查看。'}})
+      if(!this.data.preview||this.data.preview.canConsent!==true)return
+      return this.act(async service=>{await service.accept(this.data.preview);return {notice:'已记录本份报告的同意。还需报告披露授权后，家长才可查看。'}},true)
     },
     reportOptions(e){const row=this.data.links?.find(r=>r.id===e.currentTarget.dataset.id);if(row?.canConsentReports)wx.navigateTo({url:'/pages/parents/index?view=reportOptions&relationshipId='+encodeURIComponent(row.id)})},
     select(event) {

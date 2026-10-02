@@ -193,8 +193,22 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
         if(row.studentUserId!==actor.userId||source.subjectUserId!==row.studentUserId||!source.organizationId)return fail()
         await assertCurrentChildOrganization(tx,row,source.organizationId,source.policyDomain);await assertParentToolCeiling(tx,source.projection)
         const parent=await tx.user.findUnique({where:{id:row.parentUserId},select:{nickname:true,username:true}})??fail()
+        const [state]=await tx.$queryRaw<Array<{accepted:boolean;withdrawable:boolean}>>`
+          SELECT EXISTS(SELECT 1 FROM parent_report_consents
+            WHERE relationship_id=${relationshipId} AND source_artifact_id=${artifactId}
+              AND student_user_id=${row.studentUserId} AND parent_user_id=${row.parentUserId}
+              AND source_hash=${source.sourceHash} AND consent_version=${REPORT_CONSENT_VERSION}
+              AND publication_id IS NOT DISTINCT FROM ${source.publicationId??null}
+              AND publication_hash IS NOT DISTINCT FROM ${source.publicationHash??null}
+              AND revoked_at IS NULL AND valid_until>statement_timestamp()) AS accepted,
+            (EXISTS(SELECT 1 FROM parent_report_consents WHERE relationship_id=${relationshipId}
+              AND source_artifact_id=${artifactId} AND revoked_at IS NULL)
+             OR EXISTS(SELECT 1 FROM parent_report_disclosure_grants WHERE relationship_id=${relationshipId}
+              AND source_artifact_id=${artifactId} AND revoked_at IS NULL)) AS withdrawable
+        `
         return {relationshipId,artifactId,parentName:parent.nickname??parent.username,projection:source.projection,
-          publicationHash:source.publicationHash,consentVersion:REPORT_CONSENT_VERSION,consentText:REPORT_CONSENT_TEXT,commandKey:randomUUID(),canConsent:true}
+          publicationHash:source.publicationHash,consentVersion:REPORT_CONSENT_VERSION,consentText:REPORT_CONSENT_TEXT,commandKey:randomUUID(),
+          consentStatus:state.accepted?'ACCEPTED':'NOT_ACCEPTED',canConsent:!state.accepted,canRevoke:state.withdrawable}
       })
     },
     async acceptReportConsent(actor:Principal,relationshipId:string,artifactId:string,commandKey:string,consentVersion:string,publicationHash?:string) {

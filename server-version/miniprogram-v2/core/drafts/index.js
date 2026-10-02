@@ -34,7 +34,7 @@ function createDraftStore(storage,session,epoch) {
     async open(meta) {
       const exact=identity(meta), start=epoch(), check=guard(meta,start);check()
       const saved=await storage.readDraft(key(meta));check()
-      if (saved) {validate(saved);if (saved.identity !== exact) throw new ApiError('draftConflict','本机草稿对应旧轮次或其他定义，请先核对服务器状态');return clone(saved)}
+      if (saved !== null) {validate(saved);if (saved.identity !== exact) throw new ApiError('draftConflict','本机草稿对应旧轮次或其他定义，请先核对服务器状态');return clone(saved)}
       return {schemaVersion:1,identity:exact,meta:clone(meta),state:'draft',values:{},payload:null,commandId:commandId(),updatedAt:new Date().toISOString()}
     },
     async pending(ownerId,family,attemptId) {
@@ -53,7 +53,11 @@ function createDraftStore(storage,session,epoch) {
     async save(meta,draft) {
       if (draft.identity!==identity(meta)) throw new ApiError('draftConflict','草稿身份已变化')
       const value=clone(draft);value.updatedAt=new Date().toISOString();validate(value)
-      await storage.writeDraft(key(meta),value,guard(meta,epoch()));return value
+      await storage.writeDraft(key(meta),value,guard(meta,epoch()),saved=>{
+        validate(saved)
+        if(saved.identity!==value.identity||saved.commandId!==value.commandId) throw new ApiError('draftConflict','本机草稿已变化，请重新打开核对')
+        if(saved.state==='sealed'&&(value.state!=='sealed'||JSON.stringify(saved.payload)!==JSON.stringify(value.payload)||JSON.stringify(saved.values)!==JSON.stringify(value.values))) throw new ApiError('sealed','本机已封存答案，请重新打开以恢复原提交')
+      });return value
     },
     async change(meta,draft,itemKey,value) {
       if (draft.state!=='draft') throw new ApiError('sealed','答案已封存，只能重试同一提交')
@@ -65,7 +69,7 @@ function createDraftStore(storage,session,epoch) {
       if (payload.submissionId!==draft.commandId) throw new ApiError('invalidRequest','提交标识无效')
       const next=clone(draft);next.state='sealed';next.payload=clone(payload);return this.save(meta,next)
     },
-    async discardStale(meta){const start=epoch(),check=guard(meta,start);check();const saved=await storage.readDraft(key(meta));check();if(!saved)return;validate(saved);if(saved.identity===identity(meta))throw new ApiError('conflict','当前草稿身份仍有效，不能清理');await storage.removeDraft(key(meta),check)},
+    async discardStale(meta){const start=epoch(),check=guard(meta,start);check();const saved=await storage.readDraft(key(meta));check();if(saved===null)return;validate(saved);if(saved.identity===identity(meta))throw new ApiError('conflict','当前草稿身份仍有效，不能清理');await storage.removeDraft(key(meta),check)},
     async remove(meta) {identity(meta);await storage.removeDraft(key(meta),guard(meta,epoch()))},
   }
 }

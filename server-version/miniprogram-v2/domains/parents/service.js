@@ -27,7 +27,7 @@ function createParentService(api, session) {
           canInvite:data.canInvite===true,canClaim:data.canClaim===true,consent,truncated:data.truncated===true,
           description:'关联需要学生确认。每份孩子报告还需单独授权。'}
       }
-      if(view==='reportOptions'){authorize('canManageParentLinks');const data=await api.get(linkPath(options.relationshipId)+'/report-options');return {title:'选择向家长披露的报告',list:list(data).map(r=>({id:r.id,title:r.title,canOpen:r.canConsent===true})),truncated:data.truncated===true,description:'这里只展示正式发布的家长专用内容。每份报告可分别决定是否同意。'}}
+      if(view==='reportOptions'){authorize('canManageParentLinks');const data=await api.get(linkPath(options.relationshipId)+'/report-options');return {title:'管理每份报告的家长授权',list:list(data).map(r=>({id:r.id,title:r.title,canOpen:r.canConsent===true})),truncated:data.truncated===true,description:'这里只展示正式发布的家长专用内容。可逐份核对、同意或撤回报告授权。'}}
       if (view==='children') {
         authorize('canReadChildren')
         const data=await api.get('/parents/me/children?page='+page+'&pageSize=20')
@@ -56,8 +56,8 @@ function createParentService(api, session) {
       if (view==='consent') {
         authorize('canManageParentLinks')
         const data=await api.get(linkPath(options.relationshipId,options.artifactId)+'/consent')
-        if(data.canConsent!==true||!data.projection||data.projection.audience!=='PARENT'||!Array.isArray(data.projection.blocks)||typeof data.consentText!=='string'||typeof data.commandKey!=='string') throw new ApiError('invalidResponse','授权预览无效')
-        return {title:'报告授权预览',preview:data,report:data.projection,reportBlocks:data.projection.blocks.map((block,index)=>Object.assign({key:String(index)},block)),description:'请核对家长与本次报告内容后决定是否同意。'}
+        if(typeof data.canConsent!=='boolean'||typeof data.canRevoke!=='boolean'||!['ACCEPTED','NOT_ACCEPTED'].includes(data.consentStatus)||data.relationshipId!==options.relationshipId||data.artifactId!==options.artifactId||!data.projection||data.projection.audience!=='PARENT'||!Array.isArray(data.projection.blocks)||typeof data.consentText!=='string'||typeof data.commandKey!=='string') throw new ApiError('invalidResponse','授权预览无效')
+        return {title:'报告授权预览',preview:data,report:{...data.projection,relationshipId:data.relationshipId,artifactId:data.artifactId,canRevoke:data.canRevoke===true},reportBlocks:data.projection.blocks.map((block,index)=>Object.assign({key:String(index)},block)),description:data.consentStatus==='ACCEPTED'?'已同意当前版本，可单独撤回本份报告。':'请核对家长与本次报告内容后决定是否同意。'}
       }
       throw new ApiError('notFound','入口不存在')
     },
@@ -76,6 +76,7 @@ function createParentService(api, session) {
     revoke(id) {authorize('canManageParentLinks');return api.post(linkPath(id)+'/revoke',{reason:'用户确认解除关联'})},
     accept(preview) {
       authorize('canManageParentLinks')
+      if(preview.canConsent!==true)throw new ApiError('invalidRequest','当前预览不能再次同意，请刷新核对授权状态')
       return api.post(linkPath(preview.relationshipId,preview.artifactId)+'/consent',{commandKey:preview.commandKey,consentVersion:preview.consentVersion,...(preview.publicationHash?{publicationHash:preview.publicationHash}:{})})
     },
     withdraw(id,artifactId) {authorize('canManageParentLinks');return api.post(linkPath(id,artifactId)+'/revoke',{reason:'用户确认撤回报告授权'})},
