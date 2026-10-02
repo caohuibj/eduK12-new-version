@@ -323,8 +323,15 @@ run_logged compose-config.log docker compose --project-name "eduk12-release-veri
 run_logged compose-monitoring-config.log docker compose --project-name "eduk12-release-verify-$RUN_ID" --env-file "$COMPOSE_ENV" -f "$SERVER_DIR/docker-compose.yml" -f "$SERVER_DIR/docker-compose.monitoring.yml" config
 
 log 'building temporary production runtime images'
-run_logged backend-image-build.log docker build --target runtime --tag "$BACKEND_IMAGE" "$BACKEND_DIR"
-run_logged frontend-image-build.log docker build --tag "$FRONTEND_IMAGE" "$FRONTEND_DIR"
+BUILD_ARGS=()
+if [ -n "${RELEASE_VERIFY_DEBIAN_MIRROR:-}" ]; then
+  BUILD_ARGS+=(--build-arg "DEBIAN_MIRROR=$RELEASE_VERIFY_DEBIAN_MIRROR")
+fi
+if [ -n "${RELEASE_VERIFY_NPM_REGISTRY:-}" ]; then
+  BUILD_ARGS+=(--build-arg "NPM_REGISTRY=$RELEASE_VERIFY_NPM_REGISTRY")
+fi
+run_logged backend-image-build.log docker build --target runtime --tag "$BACKEND_IMAGE" "${BUILD_ARGS[@]}" "$BACKEND_DIR"
+run_logged frontend-image-build.log docker build --tag "$FRONTEND_IMAGE" "${BUILD_ARGS[@]}" "$FRONTEND_DIR"
 run_logged backend-runtime-smoke.log docker run --rm --user node --entrypoint sh "$BACKEND_IMAGE" -ec '
 set -eu
 test "$(id -u)" -ne 0
