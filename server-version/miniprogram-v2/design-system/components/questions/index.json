@@ -1,0 +1,9 @@
+{
+  "component": true,
+  "usingComponents": {
+    "hui-card": "/design-system/components/card/index",
+    "hui-field": "/design-system/components/field/index",
+    "hui-choice": "/design-system/components/choice/index",
+    "hui-button": "/design-system/components/button/index"
+  }
+}

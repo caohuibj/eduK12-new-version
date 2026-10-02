@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { currentClassDeliverySql } from './deliveryPolicy'
 import { NextFunction, Request, Response } from 'express'
 import { prisma } from '../../config/database'
@@ -37,8 +38,9 @@ type DenyRow = { permission: string }
 export async function resolveOrganizationAccessContext(input: {
   principal: Pick<AuthenticatedPrincipal, 'userId' | 'platformRole'>
   organizationId: string
-}): Promise<OrganizationAccessContext | null> {
-  const organizations = await prisma.$queryRaw<OrgRow[]>`
+}, tx?: Prisma.TransactionClient): Promise<OrganizationAccessContext | null> {
+  const db=tx??prisma
+  const organizations = await db.$queryRaw<OrgRow[]>`
     SELECT "id", "status"
     FROM "organizations"
     WHERE "id" = ${input.organizationId}
@@ -48,7 +50,7 @@ export async function resolveOrganizationAccessContext(input: {
   if (!organization) return null
 
   const [memberships, denyRows] = await Promise.all([
-    prisma.$queryRaw<MembershipRow[]>`
+    db.$queryRaw<MembershipRow[]>`
       SELECT "id", "org_role" AS "orgRole"
       FROM "organization_memberships"
       WHERE "organization_id" = ${input.organizationId}
@@ -58,7 +60,7 @@ export async function resolveOrganizationAccessContext(input: {
       ORDER BY "valid_from" DESC
       LIMIT 1
     `,
-    prisma.$queryRaw<DenyRow[]>`
+    db.$queryRaw<DenyRow[]>`
       SELECT "permission"
       FROM "organization_access_denies"
       WHERE "organization_id" = ${input.organizationId}
@@ -70,14 +72,14 @@ export async function resolveOrganizationAccessContext(input: {
   const membership = memberships[0] ?? null
   const [personaRows, capabilityRows] = membership
     ? await Promise.all([
-        prisma.$queryRaw<PersonaRow[]>`
+        db.$queryRaw<PersonaRow[]>`
           SELECT "persona"
           FROM "organization_persona_grants"
           WHERE "organization_id" = ${input.organizationId}
             AND "membership_id" = ${membership.id}
             AND "revoked_at" IS NULL
         `,
-        prisma.$queryRaw<CapabilityRow[]>`
+        db.$queryRaw<CapabilityRow[]>`
           SELECT "capability"
           FROM "organization_capability_grants"
           WHERE "organization_id" = ${input.organizationId}

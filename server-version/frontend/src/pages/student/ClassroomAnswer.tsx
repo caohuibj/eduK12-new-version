@@ -9,6 +9,7 @@ interface Question {
   questionContent: any
   timeLimit: number | null
   questionIndex: number
+  startedAt: string
 }
 
 const ClassroomAnswer: React.FC = () => {
@@ -136,6 +137,7 @@ const ClassroomAnswer: React.FC = () => {
       if (!answer) return
       emit('student:submit', {
         questionId: currentQuestion.questionId,
+        startedAt: currentQuestion.startedAt,
         answer,
       })
     }
@@ -144,6 +146,7 @@ const ClassroomAnswer: React.FC = () => {
       if (multiAnswers.length === 0) return
       emit('student:submit', {
         questionId: currentQuestion.questionId,
+        startedAt: currentQuestion.startedAt,
         answer: multiAnswers.join(','), // 用逗号分隔多个选项
       })
     }
@@ -152,6 +155,7 @@ const ClassroomAnswer: React.FC = () => {
       if (!answer) return
       emit('student:submit', {
         questionId: currentQuestion.questionId,
+        startedAt: currentQuestion.startedAt,
         answer,
       })
     }

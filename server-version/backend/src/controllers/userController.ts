@@ -14,7 +14,7 @@ import { setUserActiveState, UserLifecycleError } from '../services/userLifecycl
 const createUserSchema = z.object({
   username: z.string().min(3, '用户名至少3个字符'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
-  role: z.enum(['STUDENT', 'TEACHER', 'ADMIN']),
+  role: z.enum(['STUDENT', 'TEACHER', 'ADMIN', 'PARENT']),
   nickname: z.string().optional(),
 })
 

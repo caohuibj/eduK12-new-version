@@ -1,0 +1,13 @@
+{
+  "usingComponents": {
+    "hui-page": "/design-system/components/page/index",
+    "hui-card": "/design-system/components/card/index",
+    "hui-button": "/design-system/components/button/index",
+    "hui-feedback": "/design-system/components/feedback/index",
+    "hui-field": "/design-system/components/field/index",
+    "hui-choice": "/design-system/components/choice/index",
+    "hui-content": "/design-system/components/content/index",
+    "hui-status": "/design-system/components/status/index"
+  },
+  "enablePullDownRefresh": false
+}

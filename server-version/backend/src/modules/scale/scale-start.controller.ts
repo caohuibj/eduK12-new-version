@@ -218,3 +218,5 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     return error(res, err instanceof Error ? err.message : '开始测评失败')
   }
 }
+
+export { responseEnvelope as scaleRunnerResponse }

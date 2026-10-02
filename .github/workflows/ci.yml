@@ -167,6 +167,15 @@ jobs:
         run: npx tsx scripts/bundle-content-check.ts
       - name: build (tsc)
         run: npm run build
+      - name: Mini identity and parent authorization unit contracts
+        run: >-
+          npx vitest run src/__tests__/parent-portal
+          src/__tests__/mobile/discovery.test.ts
+          src/__tests__/assessment-identity/episode-parent-invite.test.ts
+          src/__tests__/middleware/auth.test.ts
+          src/__tests__/middleware/csrf.test.ts
+          src/__tests__/utils/authCookies.test.ts
+          src/__tests__/controllers/authLibrary.test.ts
 
   pr-light-frontend:
     needs: scope
@@ -467,6 +476,7 @@ jobs:
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
       COGNITIVE_MODULE_ENABLED: 'true'
       REDIS_URL: redis://localhost:6379
+      MINI_OPERATIONS_TEST_REDIS_URL: redis://localhost:6379
     services:
       postgres:
         image: postgres:16.15-bookworm
@@ -510,6 +520,31 @@ jobs:
         run: |
           npx prisma generate
           npm run db:migrate:guarded
+      - name: configure independent regression database timezone
+        run: |
+          node <<'NODE'
+          const { PrismaClient } = require('@prisma/client');
+          const target = new URL(process.env.DATABASE_URL);
+          if (process.env.CI !== 'true' || !['localhost', '127.0.0.1'].includes(target.hostname) || target.pathname !== '/ptool') {
+            throw new Error('UTC setup requires the isolated CI database');
+          }
+          async function withClient(action) {
+            const client = new PrismaClient({ datasources: { db: { url: target.href } } });
+            try { await client.$connect(); return await action(client); }
+            finally { await client.$disconnect(); }
+          }
+          (async () => {
+            const before = await withClient(async client => {
+              const result = await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`;
+              await client.$executeRaw`ALTER DATABASE ptool SET timezone TO 'UTC'`;
+              return result[0].zone;
+            });
+            // A new connection verifies the default used by subsequent Prisma pools.
+            const after = await withClient(async client => (await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`)[0].zone);
+            console.log(JSON.stringify({ databaseTimezoneBefore: before, databaseTimezoneAfter: after }));
+            if (after !== 'UTC') throw new Error('CI database UTC configuration did not persist');
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+          NODE
       - name: seed reference and configuration data
         run: npm run db:seed
         env:
@@ -586,6 +621,11 @@ jobs:
           src/__tests__/integration/anonymousStudy.postgres.integration.test.ts
           src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts
           src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
+          src/__tests__/integration/parentPortal.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true
@@ -1105,9 +1145,26 @@ jobs:
           upload: never
           upload-database: false
 
+  miniprogram:
+    name: mini program / foundation contract and page smoke
+    needs: scope
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: mini static and fixture smoke gates
+        working-directory: server-version/miniprogram-v2
+        run: npm run verify
+      - name: verify Web feature inventory
+        run: node server-version/miniprogram-v2/scripts/feature-inventory.cjs --check
+
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql]
+    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-24.04
     env:

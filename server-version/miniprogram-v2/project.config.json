@@ -1,0 +1,6 @@
+{
+  "appid": "touristappid", "projectname": "Huisurvey-v2", "description": "Huisurvey 四角色客户端 v2（开发验收）",
+  "compileType": "miniprogram", "miniprogramRoot": "./", "libVersion": "3.7.12",
+  "setting": {"urlCheck": true, "es6": true, "enhance": true, "minified": true},
+  "packOptions": {"ignore": [{"type": "folder", "value": "tests"}, {"type": "folder", "value": "scripts"}]}
+}

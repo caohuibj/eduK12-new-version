@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import { reportingAggregations } from './statistics'
@@ -31,12 +32,12 @@ export const assertProtectedSubjectNotViewer = (viewerUserId: string, subjectUse
   if (viewerUserId === subjectUserId) reportingFail('SUBJECT_EXCLUDED', 'protected feedback is not readable by its subject', 403)
 }
 
-const hasTeacherSubjectScope = async (input: {
+const teacherSubjectQuery = (input: {
   organizationId: string
+  tx?: Prisma.TransactionClient
   teacherMembershipId: string
-  subjectUserId: string
-}): Promise<boolean> => {
-  const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+  subjectUserId: string | Prisma.Sql
+}) => Prisma.sql`
     SELECT EXISTS (
       SELECT 1
       FROM "organization_staff_class_assignments" staff
@@ -59,15 +60,20 @@ const hasTeacherSubjectScope = async (input: {
         AND staff."valid_until" IS NULL
     ) AS "allowed"
   `
-  return rows[0]?.allowed === true
-}
 
-const hasCounselorSubjectScope = async (input: {
+const hasTeacherSubjectScope = (input: {
   organizationId: string
-  counselorMembershipId: string
+  tx?: Prisma.TransactionClient
+  teacherMembershipId: string
   subjectUserId: string
-}): Promise<boolean> => {
-  const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
+}): Promise<boolean> => (input.tx??prisma).$queryRaw<Array<{allowed:boolean}>>(teacherSubjectQuery(input)).then(rows=>rows[0]?.allowed===true)
+
+const counselorSubjectQuery = (input: {
+  organizationId: string
+  tx?: Prisma.TransactionClient
+  counselorMembershipId: string
+  subjectUserId: string | Prisma.Sql
+}) => Prisma.sql`
     SELECT EXISTS (
       SELECT 1
       FROM "organization_counselor_client_relationships" relation
@@ -86,17 +92,23 @@ const hasCounselorSubjectScope = async (input: {
         AND relation."valid_until" IS NULL
     ) AS "allowed"
   `
-  return rows[0]?.allowed === true
-}
+
+const hasCounselorSubjectScope = (input: {
+  organizationId: string
+  tx?: Prisma.TransactionClient
+  counselorMembershipId: string
+  subjectUserId: string
+}): Promise<boolean> => (input.tx??prisma).$queryRaw<Array<{allowed:boolean}>>(counselorSubjectQuery(input)).then(rows=>rows[0]?.allowed===true)
 
 export const resolveProtectedFeedbackManagerContext = async (input: {
   principal: ReportingPrincipal
   organizationId: string
+  tx?: Prisma.TransactionClient
 }): Promise<CurrentProtectedContext> => {
   const context = requireCurrentProtectedContext(await resolveOrganizationAccessContext({
     principal: input.principal,
     organizationId: input.organizationId,
-  }))
+  },input.tx))
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   if (
     context.explicitDenies.includes('*')
@@ -112,9 +124,16 @@ export const resolveProtectedFeedbackManagerContext = async (input: {
   return context
 }
 
+/** One canonical subject predicate shared by discovery and current source access helpers. */
+export async function protectedFeedbackSubjectScope(input:{principal:ReportingPrincipal;organizationId:string;tx?:Prisma.TransactionClient}){
+ const context=await resolveProtectedFeedbackManagerContext(input),subject=Prisma.sql`m.user_id`
+ return Prisma.sql`m.user_id<>${input.principal.userId} AND (${context.orgRole==='ORG_ADMIN'||context.capabilities.includes('PSYCHOLOGY_STAFF')} OR (${context.personas.includes('TEACHER')} AND (${teacherSubjectQuery({organizationId:input.organizationId,teacherMembershipId:context.membershipId,subjectUserId:subject})})) OR (${context.personas.includes('COUNSELOR')} AND (${counselorSubjectQuery({organizationId:input.organizationId,counselorMembershipId:context.membershipId,subjectUserId:subject})})))`
+}
+
 export const assertProtectedFeedbackManagerAccess = async (input: {
   principal: ReportingPrincipal
   organizationId: string
+  tx?: Prisma.TransactionClient
   subjectUserId: string
 }): Promise<void> => {
   assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
@@ -125,6 +144,7 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
       organizationId: input.organizationId,
       teacherMembershipId: context.membershipId,
       subjectUserId: input.subjectUserId,
+      tx: input.tx,
     })) return
   }
   if (context.personas.includes('COUNSELOR')) {
@@ -132,6 +152,7 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
       organizationId: input.organizationId,
       counselorMembershipId: context.membershipId,
       subjectUserId: input.subjectUserId,
+      tx: input.tx,
     })) return
   }
   hidden()

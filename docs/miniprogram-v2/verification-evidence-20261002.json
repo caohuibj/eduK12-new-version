@@ -1,0 +1,438 @@
+{
+  "date": "2026-10-02 Asia/Tokyo",
+  "scope": "local only; synthetic isolated PostgreSQL/Redis; no push or production operations",
+  "backend": {
+    "aggregation": "latest passing result per file; unique tests, not sum of repeated runs",
+    "files": [
+      {
+        "path": "server-version/backend/src/__tests__/classroom/classroom-start.postgres.integration.test.ts",
+        "passed": 1,
+        "tests": [
+          "classroom teacher:start concurrency (real PostgreSQL) returns one authoritative active question for twenty concurrent starts"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/mobile/discovery.test.ts",
+        "passed": 10,
+        "tests": [
+          "mobile navigation discovery preserves authorization boundaries resolves STUDENT without disclosing child data or organization grants",
+          "mobile navigation discovery preserves authorization boundaries resolves PARENT without disclosing child data or organization grants",
+          "mobile navigation discovery preserves authorization boundaries resolves TEACHER without disclosing child data or organization grants",
+          "mobile navigation discovery preserves authorization boundaries resolves ADMIN without disclosing child data or organization grants",
+          "mobile navigation discovery preserves authorization boundaries enabled parent portal offers discovery without granting disclosure authority",
+          "mobile navigation discovery preserves authorization boundaries student tasks and legacy user list capabilities match existing route role guards",
+          "mobile navigation discovery preserves authorization boundaries password change blocks business discovery for STUDENT",
+          "mobile navigation discovery preserves authorization boundaries password change blocks business discovery for PARENT",
+          "mobile navigation discovery preserves authorization boundaries password change blocks business discovery for TEACHER",
+          "mobile navigation discovery preserves authorization boundaries password change blocks business discovery for ADMIN"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts",
+        "passed": 17,
+        "tests": [
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis bounds lists and distinguishes current student membership, owner and unrelated teacher",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native assignment retry retains command receipt and revision; stale update conflicts",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native checkin submission binds revision and cannot impersonate another student",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis teacher grading and course freeze use canonical controllers and refresh current membership",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis current legacy ADMIN manages invitations and creates parents without child authority; platform lifecycle needs SYSTEM_ADMIN",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis tool policy editor uses real Cookie/CSRF, current platform discovery, sealed command and optimistic version",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native owner/admin action discovery matches canonical sharing and token restrictions",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis actual native multipart private/public uploads bind assets, capabilities, revision and revoke",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis default disabled runtime hides capability and rejects transport even for a valid account",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis joins through actual Redis lookup, binds own session, and never discloses answer keys",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis HTTP and Web handler race returns one winner, one persisted start and no timer reset",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis repeat answer is idempotent; different answer, forged identity, and old round are rejected",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis late native and Web end commands cannot terminate a restarted round",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native explicit leave rejects old participant state until a new join",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis R2: authorized image URLs are available to the teacher and permitted classmates; refresh checks current list authority",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis R3: deadline clearing is rejected before HTTP, normal update persists, and checkin null clearing is supported",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis deadline commits termination and refuses answer; closed classroom cannot be rejoined"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts",
+        "passed": 6,
+        "tests": [
+          "Mini runtime against actual parent HTTP and database contracts STUDENT logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts PARENT logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts TEACHER logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts ADMIN logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts student invite → parent claim → student confirms → scoped overview → unlink",
+          "Mini runtime against actual parent HTTP and database contracts current database account freeze invalidates Mini session and encrypted credentials"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts",
+        "passed": 1,
+        "tests": [
+          "PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and PostgreSQL publishes immutable content; requires exact student consent and explicit officer capability; superseding, capability loss, tool withholding and unlink deny access"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts",
+        "passed": 4,
+        "tests": [
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL starts through canonical admission, reads frozen Scale despite source edits, persists one FINAL receipt and rejects foreign/embedded/legacy reads",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL native text SJT V1 submits exact frozen scene/channel values through canonical HTTP",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL QUESTIONNAIRE delivers exact form section identities and advances via canonical FINAL contracts",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL COMPOSITE delivers exact form section identities and advances via canonical FINAL contracts"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/parentPortal.postgres.integration.test.ts",
+        "passed": 23,
+        "tests": [
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) student must confirm before parent can discover child; stranger cannot approve or view",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) one-time invite is idempotent only for consuming parent; another parent cannot replay",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) concurrent claim has one winner and one persisted relationship",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) expired invite and removed course membership fail closed",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) association does not disclose report; consent and independent officer grant are both required",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) only current SYSTEM_ADMIN may change per-tool ceilings; retries audit once and stale versions conflict",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) tightening the exact tool immediately hides old grants; widening preserves the consented frozen projection",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) longitudinal indicators require their own tool ceiling on consent, grant and later reads",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) multiple valid disclosure grants present one report per frozen artifact",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) same command cannot be reused for another artifact, and revoked grants cannot reactivate",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) unlink stops children and all new report access while preserving evidence and frozen source",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current member-deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current policy-deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current membership-ended invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current organization-suspended invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current child-frozen invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current parent-frozen invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current parent-role-changed invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current child-role-changed invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) a report read blocked behind a committed unlink never returns its old snapshot",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) database bindings independently reject cross-parent consent and grant inserts",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) consent and grant bindings cannot be edited or deleted"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/reportingDelivery.postgres.integration.test.ts",
+        "passed": 2,
+        "tests": [
+          "PR4 delivery, Safety and CSV authority gate (real PostgreSQL/HTTP) requires read plus explicit export grant, reauthorizes download, and limits Safety to current responsibility",
+          "PR4 delivery, Safety and CSV authority gate (real PostgreSQL/HTTP) persists protected feedback, denies even administrator subjects and excludes respondent identities from exports"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts",
+        "passed": 1,
+        "tests": [
+          "PR5 reporting product discovery (real PostgreSQL) discovers only current-authorized product identities without leaking suppressed population counts"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/reportingIndividualLongitudinal.postgres.integration.test.ts",
+        "passed": 2,
+        "tests": [
+          "individual longitudinal PostgreSQL isolates one stable user, preserves evidence, reuses artifacts and revokes reads/exports",
+          "individual longitudinal PostgreSQL requires current teacher/class or counselor/client scope and honors individual-policy denies"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts",
+        "passed": 6,
+        "tests": [
+          "PR3 reporting result-source query budget (real PostgreSQL) A-08 fixes the same batch-call shape and linear returned-row budget for 100 and 500 SUBJECT observations",
+          "PR3 reporting result-source query budget (real PostgreSQL) pushes canonical payload work down to selected cohort members while keeping Track metadata validation full-width",
+          "PR3 reporting result-source query budget (real PostgreSQL) keeps non-completed executions diagnostic and out of the resolved contribution set",
+          "PR3 reporting result-source query budget (real PostgreSQL) rejects COMPLETED executions whose authoritative runtime result is missing",
+          "PR3 reporting result-source query budget (real PostgreSQL) rejects authoritative results whose frozen subject/respondent identity belongs to another execution",
+          "PR3 reporting result-source query budget (real PostgreSQL) rejects COMPLETED runtime attempts that have no canonical UNIT_RESULT snapshot"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/reportingSeries.postgres.integration.test.ts",
+        "passed": 1,
+        "tests": [
+          "PR4 Reporting Series/Wave gate (real PostgreSQL) freezes scoped Waves and persists immutable longitudinal artifact bindings"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/contracts.test.ts",
+        "passed": 12,
+        "tests": [
+          "parent canonical disclosure contract accepts only explicit published parent audience and exact subject/artifact",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"audience\":\"TEACHER\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"publicationStatus\":\"DRAFT\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"rawAnswers\":[\"secret\"]}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"policyHash\":\"0000000000000000000000000000000000000000000000000000000000000000\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"blocks\":[{\"title\":\"raw\",\"text\":\"value\",\"itemAnswers\":[\"secret\"]}]}",
+          "parent canonical disclosure contract completion-only never carries scientific interpretations",
+          "parent canonical disclosure contract student confirmation is a distinct flow, never implicit teacher/admin approval",
+          "parent canonical disclosure contract exact report grant cannot substitute parentUserId",
+          "parent canonical disclosure contract exact report grant cannot substitute studentUserId",
+          "parent canonical disclosure contract exact report grant cannot substitute relationshipId",
+          "parent canonical disclosure contract exact report grant cannot substitute sourceArtifactId"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/publication.test.ts",
+        "passed": 5,
+        "tests": [
+          "Independent PARENT publication content and integrity registers completion only by default and never manufactures educational content",
+          "Independent PARENT publication content and integrity requires an exact reviewed template and prevents mutation of registered content",
+          "Independent PARENT publication content and integrity requires fixed population proof and omits suppressed values, identities and counts",
+          "Independent PARENT publication content and integrity renders missing waves and only server-authorized deltas, without calculating change",
+          "Independent PARENT publication content and integrity binds publication, source, subject, organization, projection, policy and template"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/routes.test.ts",
+        "passed": 9,
+        "tests": [
+          "parent API routing and CSRF boundaries disabled entry returns 404/no-store before querying child data",
+          "parent API routing and CSRF boundaries requires authenticated principal before list access",
+          "parent API routing and CSRF boundaries mutation without a matching CSRF token never reaches the parent service",
+          "parent API routing and CSRF boundaries rejects caller-supplied parent identity rather than trusting request data",
+          "parent API routing and CSRF boundaries passes server principal and explicit consent version to confirmation",
+          "parent API routing and CSRF boundaries source preview uses scoped relation and artifact, not a caller subject",
+          "parent API routing and CSRF boundaries denied report access stays a generic 404 without report fields",
+          "parent API routing and CSRF boundaries raw SQL serialization conflict returns recoverable 409 without replay",
+          "parent API routing and CSRF boundaries concurrent mutation conflict returns 409 and is not replayed"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/source.test.ts",
+        "passed": 9,
+        "tests": [
+          "parent source adapter requires the shared verified reader and retains exact source identity",
+          "parent source adapter propagates integrity failures without creating a projection",
+          "parent source adapter does not reinterpret legacy content as a parent report",
+          "parent source adapter does not reinterpret draft content as a parent report",
+          "parent source adapter does not reinterpret teacher content as a parent report",
+          "parent source adapter does not reinterpret different-subject content as a parent report",
+          "parent source adapter does not reinterpret group content as a parent report",
+          "parent source adapter does not reinterpret tool-missing content as a parent report",
+          "parent source adapter does not reinterpret longitudinal-missing content as a parent report"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/fixed-population-privacy.test.ts",
+        "passed": 9,
+        "tests": [
+          "ordinary fixed-population numerical disclosure preserves a complete aggregate without changing its numbers or object",
+          "ordinary fixed-population numerical disclosure checks actual metric contributors rather than completed or eligible counts",
+          "ordinary fixed-population numerical disclosure never exposes a 3-person partial mean followed by the 4-person complete mean",
+          "ordinary fixed-population numerical disclosure permits a genuinely suppressed metric but not a renamed incomplete metric",
+          "ordinary fixed-population numerical disclosure checks every independent repeated-cohort Wave against its own full population",
+          "ordinary fixed-population numerical disclosure does not let PAIRWISE intersect away one person",
+          "ordinary fixed-population numerical disclosure does not let FULL_CASE intersect away one person",
+          "ordinary fixed-population numerical disclosure fails closed for an unmatched Wave binding or malformed projection",
+          "ordinary fixed-population numerical disclosure requires every numeric protected metric to include the complete fixed respondent set"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/participant-metadata.test.ts",
+        "passed": 7,
+        "tests": [
+          "participant metadata batch list uses three queries for 1 reports and returns metadata without projections",
+          "participant metadata batch list uses three queries for 20 reports and returns metadata without projections",
+          "participant metadata batch list empty list needs one query; current denial removes previously eligible metadata",
+          "participant metadata batch list does not list wrong-owner wave",
+          "participant metadata batch list does not list ambiguous-execution wave",
+          "participant metadata batch list does not list cancelled-run wave",
+          "participant metadata batch list does not list policy-changed wave"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-comparability.test.ts",
+        "passed": 7,
+        "tests": [
+          "reporting comparability governance fails closed without reviewed comparability evidence",
+          "reporting comparability governance EXACT evidence permits numeric delta",
+          "reporting comparability governance COMPATIBLE evidence permits numeric delta",
+          "reporting comparability governance LINKED evidence permits numeric delta",
+          "reporting comparability governance LIMITED evidence permits descriptive trend but not numeric delta",
+          "reporting comparability governance does not apply evidence to a different metric or resource identity",
+          "reporting comparability governance requires explicit evidence identity and hash for every positive rule"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-core.test.ts",
+        "passed": 14,
+        "tests": [
+          "PR3 deterministic reporting primitives uses Hyndman-Fan Type 7 quartiles and defined SD/null semantics",
+          "PR3 deterministic reporting primitives keeps projections and hashes identical when floating-point observations are reordered",
+          "PR3 deterministic reporting primitives rejects PR4 analysis kinds at the PR3 spec boundary",
+          "PR3 deterministic reporting primitives A-01 never coerces string/object/non-finite values into numeric observations",
+          "PR3 deterministic reporting primitives A-01 excludes non-finite and disallowed-quality observations",
+          "PR3 deterministic reporting primitives never lowers the resource floor for either contributors or metric values",
+          "PR3 deterministic reporting primitives A-02 rejects duplicate subject observations instead of inflating N",
+          "PR3 deterministic reporting primitives A-03 suppresses the whole projection when contributor floor is not met",
+          "PR3 deterministic reporting primitives A-04 keeps a sufficiently populated metric and suppresses a sparse one",
+          "PR3 deterministic reporting primitives suppresses exact-value distribution cells below the effective metric floor",
+          "PR3 deterministic reporting primitives A-05 changes analysis identity when the exact cohort identity changes at the same N",
+          "PR3 deterministic reporting primitives A-07 hashes result-to-execution associations rather than separately sorted hash sets",
+          "PR3 deterministic reporting primitives M-02 reports the weakest frozen maturity for mixed inputs",
+          "PR3 deterministic reporting primitives M-03 caps legacy-unfrozen evidence at PILOT with an explicit limitation"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-heavy-entrypoints.test.ts",
+        "passed": 9,
+        "tests": [
+          "all heavy Reporting HTTP entrypoints share one execution bound createExport cannot bypass an active analysis after its client disconnects",
+          "all heavy Reporting HTTP entrypoints share one execution bound downloadExport cannot bypass an active analysis after its client disconnects",
+          "all heavy Reporting HTTP entrypoints share one execution bound bindWave cannot bypass an active analysis after its client disconnects",
+          "all heavy Reporting HTTP entrypoints share one execution bound readArtifact cannot bypass an active analysis after its client disconnects",
+          "all heavy Reporting HTTP entrypoints share one execution bound createExport releases its own permit on an operation exception",
+          "all heavy Reporting HTTP entrypoints share one execution bound downloadExport releases its own permit on an operation exception",
+          "all heavy Reporting HTTP entrypoints share one execution bound bindWave releases its own permit on an operation exception",
+          "all heavy Reporting HTTP entrypoints share one execution bound readArtifact releases its own permit on an operation exception",
+          "all heavy Reporting HTTP entrypoints share one execution bound retains the permit through JSON serialization, not just through the last DB read"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-matched.test.ts",
+        "passed": 4,
+        "tests": [
+          "matched longitudinal reporting uses stable user identity across membership episodes and the same complete pair for both means and delta",
+          "matched longitudinal reporting reapplies privacy to the paired set even when both Wave populations are large enough",
+          "matched longitudinal reporting distinguishes two-Wave pairwise selection from a three-Wave full complete case",
+          "matched longitudinal reporting rejects duplicate stable-user observations inside a single Wave instead of selecting a membership implicitly"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-multi-rater.test.ts",
+        "passed": 3,
+        "tests": [
+          "separated multi-rater reporting keeps SELF, teacher and Parent observations separated without averaging them",
+          "separated multi-rater reporting drops sources not admitted by the caller policy instead of treating them as missing data",
+          "separated multi-rater reporting rejects duplicate Track/relationship/perspective/respondent tuples rather than combining them"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-privacy-identity.test.ts",
+        "passed": 1,
+        "tests": [
+          "PR3 effective privacy floor identity prevents reuse across different effective floors and suppresses when the stricter floor is unmet"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-protected-feedback.test.ts",
+        "passed": 4,
+        "tests": [
+          "protected Organization feedback denies subject access before any administrator allow basis can matter",
+          "protected Organization feedback counts distinct respondents, ignores replay of the same authoritative execution, and exposes no respondent identities",
+          "protected Organization feedback suppresses the whole projection when the respondent contributor floor is not met",
+          "protected Organization feedback rejects two different authoritative observations from the same respondent under one fixed source"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-repeated.test.ts",
+        "passed": 2,
+        "tests": [
+          "repeated cohort reporting keeps Wave populations independent and reports descriptive limitations",
+          "repeated cohort reporting suppresses a Wave without leaking its exact counts when the contributor floor fails"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-runtime-execution.test.ts",
+        "passed": 3,
+        "tests": [
+          "reporting execution admission lifetime does not bind the Redis concurrency lease to HTTP finish/close",
+          "reporting execution admission lifetime holds the process-local permit until the heavy operation promise actually settles",
+          "reporting execution admission lifetime releases the process-local permit on operation failure"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-runtime-limit.test.ts",
+        "passed": 3,
+        "tests": [
+          "reporting runtime cost budget weights group/protected requests as one unit",
+          "reporting runtime cost budget weights automatic and individual longitudinal work by selected source count",
+          "reporting runtime cost budget weights manual longitudinal work by selected Wave count and clamps malformed overlarge input"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-series.test.ts",
+        "passed": 3,
+        "tests": [
+          "reporting Series/Wave identity normalizes Series scope without widening the resource domain",
+          "reporting Series/Wave identity freezes deterministic result associations independent of resolver order",
+          "reporting Series/Wave identity changes Wave identity when execution-to-result association changes"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-spec-pr4.test.ts",
+        "passed": 5,
+        "tests": [
+          "PR4 governed reporting specs keeps the legacy GROUP hash envelope unchanged",
+          "PR4 governed reporting specs accepts governed repeated and matched longitudinal contracts with evidence-bound comparability",
+          "PR4 governed reporting specs requires RESPONDENT observation semantics for protected feedback",
+          "PR4 governed reporting specs rejects mismatched engines and comparability evidence outside the frozen metric resource identity",
+          "PR4 governed reporting specs rejects duplicate longitudinal metric identities so one scientific metric cannot be ambiguously selected"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/reporting-statistics-overflow.test.ts",
+        "passed": 3,
+        "tests": [
+          "PR3 reporting statistic overflow safety fails closed when finite inputs overflow mean accumulation",
+          "PR3 reporting statistic overflow safety fails closed when Type-7 interpolation overflows",
+          "PR3 reporting statistic overflow safety fails closed when variance arithmetic overflows"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/reporting/scale-unit-report.test.ts",
+        "passed": 3,
+        "tests": [
+          "Scale unit report contract keeps the internal v2 report complete without inventing collection interpretation",
+          "Scale unit report contract decrypts only the frozen v2 result and keeps malformed ciphertext local to the unit",
+          "Scale unit report contract re-projects authenticated/public stored reports through the same respondent disclosure boundary"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/services/classroomSocketHandler.security.test.ts",
+        "passed": 9,
+        "tests": [
+          "classroom socket authorization boundary rejects an unauthenticated teacher action without a database write or broadcast",
+          "classroom socket authorization boundary rejects a forged student session before writing an answer",
+          "classroom socket authorization boundary issues one resume token for an anonymous session and restores it",
+          "classroom socket authorization boundary rejects an invalid anonymous resume token without creating a new session",
+          "classroom socket authorization boundary refreshes the account before each manager action",
+          "classroom socket authorization boundary rejects a forged session before expired-question side effects",
+          "classroom socket authorization boundary revalidates manager rooms before broadcasting answer statistics",
+          "classroom socket authorization boundary does not require leftAt to be null for a server-bound student submit",
+          "classroom socket authorization boundary uses compare-and-set and returns the winning question for a same-question race"
+        ]
+      }
+    ],
+    "passed": 198,
+    "failed": 0,
+    "skipped": 0
+  },
+  "native": {
+    "passed": 122,
+    "failed": 0,
+    "skipped": 0,
+    "jsModules": 73,
+    "routes": 21
+  },
+  "web": {
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "other": {
+    "typescript": [
+      "backend",
+      "web app",
+      "web cognitive"
+    ],
+    "webBuild": "passed; existing large chunk notices",
+    "ciContractTests": 26,
+    "inventoryRoutes": 116,
+    "releaseScriptSyntax": "passed"
+  },
+  "notExecuted": [
+    "WeChat developer tools compile",
+    "iOS/Android device acceptance",
+    "full browser transport E2E",
+    "full release gate",
+    "production content publication"
+  ]
+}

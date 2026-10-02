@@ -1,3 +1,4 @@
+import { ParentToolDisclosureSettings } from '../components/ParentToolDisclosureSettings'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpen, CheckCircle, Clock, ExternalLink, FileText, Filter, Lock, Play, ShieldAlert } from 'lucide-react'
@@ -328,6 +329,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
         </Section>
       </div>
 
+      <ParentToolDisclosureSettings instrumentKey={entry.identity.instrumentKey} instrumentVersion={entry.identity.instrumentVersion} />
       {user?.role === 'ADMIN' && entry.governance && (
         <div className="mt-6 rounded-xl border border-purple-200 bg-purple-50 p-5">
           <h2 className="text-base font-semibold text-purple-900">治理详情（管理员）</h2>

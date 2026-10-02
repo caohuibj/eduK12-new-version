@@ -1,0 +1,1 @@
+<hui-page title="{{title}}" description="{{description}}" status="{{status}}" error-message="{{errorMessage}}" bindretry="retry"><hui-feedback message="{{message}}"/><hui-button bindpress="home">返回首页</hui-button></hui-page>

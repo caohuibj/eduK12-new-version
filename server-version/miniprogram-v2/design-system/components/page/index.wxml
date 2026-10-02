@@ -1,0 +1,6 @@
+<view class="page"><view class="heading"><text class="title">{{title}}</text><text class="muted">{{description}}</text></view>
+<view wx:if="{{status === 'loading' || status === 'idle'}}" class="feedback"><view class="skeleton"></view><view class="skeleton"></view><text>正在加载</text></view>
+<view wx:elif="{{status === 'error'}}" class="feedback"><text class="error">{{errorMessage || '暂时无法加载，请重试'}}</text><button class="button" bindtap="retry">重试</button></view>
+<view wx:elif="{{status === 'empty'}}" class="feedback"><text>暂无内容</text><slot></slot></view>
+<view wx:else><text wx:if="{{status === 'refreshing'}}" class="muted">正在刷新</text><slot></slot></view>
+<view wx:if="{{navItems.length}}" class="navigation"><button wx:for="{{navItems}}" wx:key="key" class="nav-button" data-key="{{item.key}}" bindtap="navigate">{{item.label}}</button></view></view>

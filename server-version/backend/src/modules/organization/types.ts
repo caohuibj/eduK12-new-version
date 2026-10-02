@@ -1,7 +1,7 @@
 export type OrganizationStatus = 'ACTIVE' | 'SUSPENDED'
 export type OrganizationRole = 'MEMBER' | 'ORG_ADMIN'
 export type OrganizationPersona = 'TEACHER' | 'STUDENT' | 'COUNSELOR' | 'CLIENT'
-export type OrganizationCapability = 'PSYCHOLOGY_STAFF' | 'REPORT_EXPORT' | 'REPORT_MEMBER_EXPORT'
+export type OrganizationCapability = 'PSYCHOLOGY_STAFF' | 'REPORT_EXPORT' | 'REPORT_MEMBER_EXPORT' | 'PARENT_REPORT_DISCLOSURE'
 
 export interface OrganizationRecord {
   id: string
