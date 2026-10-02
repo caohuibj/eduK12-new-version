@@ -6,7 +6,7 @@ import COS from 'cos-nodejs-sdk-v5'
 import { Prisma } from '@prisma/client'
 import { validateMappedData, type ImportAction } from './import-plan'
 
-type AssetSource = { provider: 'local'; file: string } | { provider: 'cos'; key: string }
+type AssetSource = { provider: 'local'; file: string; fallbackCosKey?: string } | { provider: 'cos'; key: string }
 type Identity = { ownerId: string | null; accessScope: 'PRIVATE' | 'COURSE' | 'PUBLIC_CHECKIN'; scopeId: string | null }
 type Digest = { sha256: string; sizeBytes: number; mimeType: string; fingerprint: string }
 export type AssetProblem = { model: string; id: string; field: string; reason: string }
@@ -41,6 +41,7 @@ export function resolveLegacyAssetSource(value: string, options: AssetOptions, e
     if (url.hostname === domain.hostname || (bucket && region && url.hostname === bucket + '.cos.' + region + '.myqcloud.com')) {
       return { provider: 'cos', key: safeKey(decodeURIComponent(url.pathname)) }
     }
+    if (options.legacySiteHosts.includes(url.hostname) && /^\/videos\/(processed|thumbnails)\//.test(url.pathname)) return { provider: 'cos', key: safeKey(decodeURIComponent(url.pathname)) }
     if (options.legacySiteHosts.includes(url.hostname) && url.pathname.startsWith('/uploads/')) raw = url.pathname
     else if (options.externalHosts.includes(url.hostname)) return 'external'
     else throw new Error('Unapproved legacy media hostname')
@@ -50,7 +51,7 @@ export function resolveLegacyAssetSource(value: string, options: AssetOptions, e
   if (!relative || relative.includes('\\') || relative.split('/').some(part => part === '..' || part === '.')) throw new Error('Invalid legacy local path')
   const file = path.resolve(options.legacyUploadDir, relative), root = path.resolve(options.legacyUploadDir)
   if (!file.startsWith(root + path.sep)) throw new Error('Legacy local path escaped source root')
-  return { provider: 'local', file }
+  return { provider: 'local', file, ...(/^(documents|images|covers)\//.test(relative) ? { fallbackCosKey: safeKey(relative) } : {}) }
 }
 
 /** Sequential, bounded-memory hashing; ETag identifies cache freshness, never content SHA-256. */
@@ -189,14 +190,21 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
     for (const candidate of candidates) {
       if (typeof candidate.value !== 'string' || !candidate.value) continue
       hadSource = true
-      const source = resolveLegacyAssetSource(candidate.value, options, candidate.explicitKey)
+      let source = resolveLegacyAssetSource(candidate.value, options, candidate.explicitKey)
       if (source === 'external') { issue(action, field, 'external-link-preserved'); return null }
       if (!source) continue
       let metadata: Digest
       try { metadata = await reader.digest(source) }
       catch (error: any) {
-        if (error.code === 'ENOENT' || error.statusCode === 404 || error.code === 'NoSuchKey') continue
-        throw new Error('Legacy asset content verification failed')
+        if (error.code === 'ENOENT' && source.provider === 'local' && source.fallbackCosKey) {
+          source = { provider: 'cos', key: source.fallbackCosKey }
+          try { metadata = await reader.digest(source) }
+          catch (fallbackError: any) {
+            if (fallbackError.statusCode === 404 || fallbackError.code === 'NoSuchKey') continue
+            throw new Error('Legacy COS fallback verification failed')
+          }
+        } else if (error.code === 'ENOENT' || error.statusCode === 404 || error.code === 'NoSuchKey') continue
+        else throw new Error('Legacy asset content verification failed')
       }
       const identityHash = digestText(JSON.stringify(identity)).slice(0, 24)
       const assetId = 'legacy-asset-' + metadata.sha256 + '-' + identityHash
@@ -213,7 +221,7 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
       references.set(refId, { model: 'assetReference', operation: 'upsert',
         args: { where: { id: refId }, create: { id: refId, assetId, entityType, entityId: action.args.where.id, field }, update: {} } as ImportAction['args'],
         mapping: { entity: 'asset_reference', legacyId: refId, newId: refId } })
-      return { id: assetId, objectKey: String(assets.get(assetId)!.args.create!.objectKey), provider: source.provider }
+      return { id: assetId, objectKey: String(assets.get(assetId)!.args.create!.objectKey), provider: String(assets.get(assetId)!.args.create!.provider) }
     }
     if (hadSource || !optional) {
       issue(action, field, 'missing-source')

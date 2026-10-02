@@ -28,6 +28,8 @@ describe('legacy asset content and isolation', () => {
     expect(() => resolveLegacyAssetSource('backups/db.sql', options, true)).toThrow()
     expect(() => resolveLegacyAssetSource('https://127.0.0.1/private', options)).toThrow()
     expect(resolveLegacyAssetSource('https://www.bilibili.com/video/example', options)).toBe('external')
+    expect(resolveLegacyAssetSource('https://old.example.test/videos/processed/source.mp4', options)).toEqual({ provider: 'cos', key: 'videos/processed/source.mp4' })
+    expect(resolveLegacyAssetSource('https://old.example.test/uploads/images/image.jpg', options)).toMatchObject({ provider: 'local', fallbackCosKey: 'images/image.jpg' })
     expect(resolveLegacyAssetSource('https://cdn.example.test/videos/source.mp4', options)).toEqual({ provider: 'cos', key: 'videos/source.mp4' })
   })
   it('dry-run hashes actual bytes and catalogs scope without copying or writing business data', async () => {
