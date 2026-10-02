@@ -60,5 +60,5 @@ if (process.env.NODE_ENV === 'production') {
     } catch (err) {
       logger.error('[Prisma] 连接池健康检查失败', err)
     }
-  }, 30000) // 每30秒检查一次
+  }, 30000).unref() // Keep monitoring live services without keeping completed operator CLIs alive.
 }
