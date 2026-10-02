@@ -80,9 +80,14 @@ function canonical(value: unknown): unknown {
 }
 export const contentEqual = (actual: unknown, expected: unknown): boolean => JSON.stringify(canonical(actual)) === JSON.stringify(canonical(expected))
 const expectedData = (action: ImportAction): Record<string, unknown> => action.args.create ?? action.args.data ?? {}
+function tokenContent(value: unknown): string {
+  const decoded = typeof value === 'string' ? decryptToken(value) : null
+  if (!decoded) throw new Error('Invalid imported token ciphertext')
+  return decoded
+}
 function differingFields(row: Record<string, unknown>, data: Record<string, unknown>): string[] {
   return Object.keys(data).filter(key => key === 'tokenEncrypted'
-    ? typeof row[key] !== 'string' || decryptToken(row[key] as string) !== decryptToken(data[key] as string)
+    ? tokenContent(row[key]) !== tokenContent(data[key])
     : !contentEqual(row[key], data[key]))
 }
 type Delegate = {
@@ -95,7 +100,7 @@ const delegate = (client: PrismaClient | Prisma.TransactionClient, model: string
 export function importPlanHash(actions: ImportAction[]): string {
   const rows = actions.map(action => ({
     model: action.model, operation: action.operation, mapping: action.mapping,
-    data: Object.fromEntries(Object.entries(expectedData(action)).map(([key, value]) => [key, key === 'tokenEncrypted' ? decryptToken(String(value)) : value])),
+    data: Object.fromEntries(Object.entries(expectedData(action)).map(([key, value]) => [key, key === 'tokenEncrypted' ? tokenContent(value) : value])),
   }))
   return createHash('sha256').update(JSON.stringify(canonical(rows))).digest('hex')
 }
@@ -118,6 +123,22 @@ export async function verifyImportPlan(client: PrismaClient, actions: ImportActi
   return { checked: actions.length, mappingCount }
 }
 
+async function inspectOwnedUpdate(client: PrismaClient | Prisma.TransactionClient, action: ImportAction, actions: ImportAction[], row: Record<string, unknown> | null) {
+  if (!row || !action.mapping) throw new Error('Import update requires an existing mapped row')
+  const own = await client.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } } })
+  if (own) {
+    if (own.newId !== action.mapping.newId || differingFields(row, expectedData(action)).length) throw new Error('Existing update conflicts with legacy import in ' + action.model)
+    return
+  }
+  const base = actions.find(value => value.operation === 'upsert' && value.model === action.model && value.args.where.id === action.args.where.id)
+  if (!base?.mapping) throw new Error('Import update has no mapped predecessor')
+  const owner = await client.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: base.mapping.entity, legacyId: base.mapping.legacyId } } })
+  if (!owner || owner.newId !== action.args.where.id || differingFields(row, expectedData(base)).length) throw new Error('Existing update conflicts with legacy import in ' + action.model)
+  for (const [key, value] of Object.entries(expectedData(action))) {
+    if (!contentEqual(row[key], value) && !contentEqual(row[key], expectedData(base)[key] ?? null)) throw new Error('Existing update conflicts with legacy import in ' + action.model)
+  }
+}
+
 /** Row and ID mapping share one transaction; failed chunks roll back together. */
 export async function applyImportPlan(client: PrismaClient, actions: ImportAction[], batchId: string, batchSize: number): Promise<number> {
   let completed = 0
@@ -129,8 +150,9 @@ export async function applyImportPlan(client: PrismaClient, actions: ImportActio
         const row = await delegate(tx, action.model).findUnique({ where: action.args.where })
         if (row && action.operation === 'upsert') {
           const owned = await tx.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } } })
-          if (!owned || differingFields(row, data).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
+          if (!owned || owned.newId !== action.mapping.newId || differingFields(row, data).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
         }
+        if (action.operation === 'update') await inspectOwnedUpdate(tx, action, actions, row)
         await delegate(tx, action.model)[action.operation](action.args)
         await tx.legacyImportIdMap.upsert({
           where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } },
@@ -149,7 +171,13 @@ export async function inspectImportPlan(client: PrismaClient, actions: ImportAct
   let inserts = 0, existing = 0, updates = 0
   for (const action of actions) {
     if (!action.mapping) throw new Error('Import row is missing its ID mapping')
-    if (action.operation === 'update') { updates += 1; continue }
+    if (action.operation === 'update') {
+      const row = await delegate(client, action.model).findUnique({ where: action.args.where })
+      // A not-yet-inserted predecessor is legal in the dry-run plan.
+      if (row) await inspectOwnedUpdate(client, action, actions, row)
+      else if (!actions.some(value => value.operation === 'upsert' && value.model === action.model && value.args.where.id === action.args.where.id)) throw new Error('Import update has no planned predecessor')
+      updates += 1; continue
+    }
     const data = expectedData(action)
     const model = models.get(action.model)!
     const current = await delegate(client, action.model).findUnique({ where: action.args.where })

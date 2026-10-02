@@ -63,6 +63,19 @@ describe('legacy asset content and isolation', () => {
     expect(result.problems).toContainEqual({ model: 'video', id: 'v1', field: 'original', reason: 'missing-source' })
     expect(deleted.args.create).toMatchObject({ isDeleted: true, filePath: '' })
   })
+  it('keeps a verified completed rendition without pretending it is the missing original', async () => {
+    const row = action()
+    row.args.create!.filePath = '/uploads/videos/missing-original.mp4'
+    row.args.create!.processedUrl = '/uploads/videos/source.mp4'
+    const result = await planLegacyAssets([row], options)
+    expect(row.args.create).toMatchObject({ filePath: '', processedAssetId: expect.any(String) })
+    expect(row.args.create!.originalAssetId).toBeUndefined()
+    expect(result.problems).toContainEqual({ model: 'video', id: 'v1', field: 'original', reason: 'original-missing-verified-processed-preserved' })
+    const broken = action()
+    broken.args.create!.filePath = '/uploads/videos/missing-original.mp4'
+    broken.args.create!.processedUrl = '/uploads/videos/missing-processed.mp4'
+    await expect(planLegacyAssets([broken], options)).rejects.toThrow('no verified source')
+  })
   it('deduplicates identical bytes within one owner and separates different owners', async () => {
     const a = action(), b = action(), c = action()
     b.args.where.id = 'v2'; b.args.create!.id = 'v2'; b.mapping = { entity: 'video', legacyId: 'v2', newId: 'v2' }

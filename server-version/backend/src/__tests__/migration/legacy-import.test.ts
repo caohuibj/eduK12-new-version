@@ -67,4 +67,15 @@ describe('legacy import safeguards', () => {
     await expect(applyImportPlan(client, [rowAction()], 'b1', 50)).rejects.toThrow('conflicts')
     expect(tx.classroomQuestion.upsert).not.toHaveBeenCalled()
   })
+  it('rejects a changed second-pass link rather than overwriting it on replay', async () => {
+    const base: ImportAction = { model: 'user', operation: 'upsert', args: { where: { id: 'u1' }, create: { id: 'u1' } },
+      mapping: { entity: 'user', legacyId: 'u1', newId: 'u1' } }
+    const link: ImportAction = { model: 'user', operation: 'update', args: { where: { id: 'u1' }, data: { teacherCodeId: 'expected' } },
+      mapping: { entity: 'user_teacher_code_link', legacyId: 'u1', newId: 'u1' } }
+    const tx: any = { user: { findUnique: async () => ({ id: 'u1', teacherCodeId: 'changed' }), upsert: vi.fn(), update: vi.fn() },
+      legacyImportIdMap: { findUnique: async () => ({ newId: 'u1' }), upsert: vi.fn() } }
+    const client: any = { $transaction: (callback: any) => callback(tx) }
+    await expect(applyImportPlan(client, [base, link], 'b1', 50)).rejects.toThrow('conflicts')
+    expect(tx.user.update).not.toHaveBeenCalled()
+  })
 })

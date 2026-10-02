@@ -261,11 +261,15 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
       const optional = row.isDeleted === true
       const original = await ensure(action, 'original', [
         { value: row.originalCosKey, explicitKey: true }, { value: row.originalCosUrl }, { value: row.originalUrl }, { value: row.filePath },
-      ], identity, optional)
+      ], identity, optional || (row.status === 'COMPLETED' && Boolean(row.processedUrl)))
       if (original) { row.originalAssetId = original.id; row.filePath = original.objectKey; row.originalCosKey = original.provider === 'cos' ? original.objectKey : null }
-      else if (optional) { row.filePath = ''; row.originalCosKey = null }
+      else { row.filePath = ''; row.originalCosKey = null }
       const processed = await ensure(action, 'processed', [{ value: row.processedUrl }], identity, optional || !row.processedUrl)
       if (processed) row.processedAssetId = processed.id
+      if (!optional && !original) {
+        if (!processed || row.status !== 'COMPLETED') throw new Error('Active legacy video has no verified playable source')
+        issue(action, 'original', 'original-missing-verified-processed-preserved')
+      }
       const thumbnail = await ensure(action, 'thumbnail', [{ value: row.thumbnailUrl }], identity, optional || !row.thumbnailUrl)
       if (thumbnail) row.thumbnailAssetId = thumbnail.id
       // Originals remain complete in the raw archive; runtime uses private catalog URLs.

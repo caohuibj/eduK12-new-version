@@ -145,3 +145,5 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 资产身份包含内容摘要、所有者和权限域；课程附件保持 COURSE，教师库保持 PRIVATE，匿名打卡答案保持 PUBLIC_CHECKIN 并绑定相应记录引用。
 7 个 Bilibili 外部链接保留，非托管文件；缺失的软删除文件保留记录与问题清单，源字段仍完整保存在原归档库。任一活跃附件没有可校验来源会阻止迁移。
 运行需要 LEGACY_UPLOAD_DIR / UPLOAD_DIR / LEGACY_ASSET_DIGEST_CACHE 及服务器受限 COS 配置；摘要缓存权限 0600，不包含密钥，不提交 Git。
+
+已完成的视频如果旧原始文件缺失而转码文件经实际 SHA-256 校验可读，仅注册 processedAssetId，originalAssetId 保持空并记录原始文件缺失；不把转码文件伪装为原始文件。转码文件也不可验证时停止导入。

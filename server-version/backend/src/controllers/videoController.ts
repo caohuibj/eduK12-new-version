@@ -116,7 +116,7 @@ export const videoController = {
           : (video.processedUrl && !video.processedUrl.startsWith('file://') ? video.processedUrl : null)
         const originalUrl = video.originalAssetId
           ? urls.get(video.originalAssetId)
-          : `/uploads/videos/${video.fileName}`
+          : (video.filePath ? `/uploads/videos/${video.fileName}` : null)
         const thumbnailUrl = video.thumbnailAssetId
           ? urls.get(video.thumbnailAssetId)
           : video.thumbnailUrl
