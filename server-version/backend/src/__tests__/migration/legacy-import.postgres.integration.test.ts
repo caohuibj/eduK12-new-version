@@ -16,7 +16,10 @@ const action: ImportAction = { model: 'user', operation: 'upsert', args: { where
   mapping: { entity, legacyId: id, newId: id } }
 suite('legacy importer transactions (isolated synthetic PostgreSQL)', () => {
   beforeAll(async () => {
-    if (!url || !/(test|rehearsal|acc)/i.test(new URL(url).pathname) || /\/ptool(?:_legacy)?$/i.test(new URL(url).pathname)) throw new Error('Explicit isolated test database required')
+    const parsed = url ? new URL(url) : null
+    // The repository's disposable GitHub Actions PostgreSQL service uses /ptool.
+    const disposableCi = process.env.CI === 'true' && parsed && ['localhost', '127.0.0.1', '::1'].includes(parsed.hostname) && parsed.pathname === '/ptool'
+    if (!parsed || (!disposableCi && (!/(test|rehearsal|acc)/i.test(parsed.pathname) || /\/ptool(?:_legacy)?$/i.test(parsed.pathname)))) throw new Error('Explicit isolated test database required')
     db = new PrismaClient({ datasources: { db: { url } }, log: [] })
     await db.$connect()
   })
