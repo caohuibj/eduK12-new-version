@@ -178,6 +178,8 @@ describe('course isLibrary', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body.data).not.toHaveProperty('courseCode')
     expect(res.body.data).not.toHaveProperty('students')
+    expect(mockPrisma.course.findUnique.mock.calls[0][0].include).not.toHaveProperty('students')
+    expect(mockPrisma.courseStudent.findMany).not.toHaveBeenCalled()
   })
 
   it('does not return the course code or roster to a shared teacher', async () => {
@@ -202,6 +204,8 @@ describe('course isLibrary', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body.data).not.toHaveProperty('courseCode')
     expect(res.body.data).not.toHaveProperty('students')
+    expect(mockPrisma.course.findUnique.mock.calls[0][0].include).not.toHaveProperty('students')
+    expect(mockPrisma.courseStudent.findMany).not.toHaveBeenCalled()
   })
 
   it('does not return the original course code in a shared-course listing', async () => {
@@ -271,4 +275,15 @@ describe('course isLibrary', () => {
     expect(mockPrisma.course.delete).toHaveBeenCalledWith({ where: { id: 'course-1' } })
     expect(res.statusCode).toBe(200)
   })
+  it.each([UserRole.ADMIN,UserRole.TEACHER])('preserves the authorized owner roster for %s',async role=>{
+    mockPrisma.course.findUnique.mockResolvedValue({id:'course-1',creatorId:'owner-1',title:'Course',courseCode:'OWN-CODE',_count:{students:1}})
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{student:{id:'student-1',username:'synthetic'}}])
+    const res=makeRes()
+    await courseController.detail(makeReq({user:{userId:'owner-1',role},params:{id:'course-1'}}) as any,res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.students).toEqual([{student:{id:'student-1',username:'synthetic'}}])
+    expect(res.body.data.studentCount).toBe(1)
+    expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{courseId:'course-1'}}))
+  })
+
 })
