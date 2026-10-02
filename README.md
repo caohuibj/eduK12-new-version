@@ -37,10 +37,10 @@ backend 和 frontend 继续位于 server-version 下，以保持现有部署拓�
 - 公共 classroom code 的最小响应、Redis 限流和 fail-closed 行为；
 - 生产日志脱敏，不记录答案、题目内容、广播 payload 或 Redis 凭据；
 - backend、frontend、Docker 检查，及 staging 登录和课堂闭环验证；
-- Cognitive Round 2 保持 DRAFT、recommendedForCreate=false、feature flag 关闭。
+- Cognitive 内容按当前 DB lifecycle、产品资格与 exact-SHA 门禁发布；fake 仅供框架测试。
 
 具体验收项见 docs/classroom-security-gate.md 和
-deployment-checklist-v1.md。
+[server-version/DEPLOYMENT-CHECKLIST.md](server-version/DEPLOYMENT-CHECKLIST.md)。
 
 ## 历史基线来源
 

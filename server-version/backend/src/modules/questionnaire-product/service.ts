@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible, isCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
@@ -240,7 +241,7 @@ export async function resources(actor: Actor) {
   const usable = []
   for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, code: row.code, version: row.instrumentVersion })
   return {
-    scales: usable, cognitive: cognitive.map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
+    scales: usable, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.definition.source.title || v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),
     courses: courseRows,
   }
@@ -271,6 +272,16 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.questionnaireCourses.map(v => v.courseId)
     await courses(tx, actor, sourceCourses, questionnaireType)
+    if (legacy?.formItems.some(form => !form.required && !form.contextKey)) {
+      throw compositeConflict('新版问卷暂不支持普通非必填字段；请继续维护历史问卷，不会自动改为必填')
+    }
+    for (const item of composite?.items ?? []) {
+      if (item.cognitiveAssignment) {
+        const config = await tx.cognitiveTestConfig.findUnique({ where: { id: item.cognitiveAssignment.configId } })
+        if (!config) throw compositeBadRequest('来源认知任务配置不存在')
+        assertCognitiveProductEligible(config.testType)
+      }
+    }
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,

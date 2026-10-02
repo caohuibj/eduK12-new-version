@@ -1,3 +1,4 @@
+vi.mock('../../../api/relational', () => ({ relationalApi: { catalog: async () => [], tasks: async () => [] } }))
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'

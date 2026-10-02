@@ -109,9 +109,16 @@ jobs:
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
       - name: backend npm ci
         working-directory: server-version/backend
         run: npm ci
+      - name: verify canvas source-build fallback
+        working-directory: server-version/backend
+        run: |
+          npm rebuild canvas --build-from-source
+          node -e "const { createCanvas } = require('canvas'); const image = createCanvas(2, 2).toBuffer('image/png'); if (image.length < 8) process.exit(1)"
       - name: prepare Chromium
         working-directory: server-version/backend
         run: |

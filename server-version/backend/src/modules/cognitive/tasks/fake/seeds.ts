@@ -20,7 +20,7 @@ export const seeds: CognitiveSeed[] = [
     testType: 'fake',
     configVersion: '1.0.0',
     name: 'Fake Cognitive Test v1.0.0',
-    status: 'PUBLISHED',
+    status: 'DRAFT',
     engineVersion: '1.0.0',
     scoringVersion: '1.0.0',
     config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },

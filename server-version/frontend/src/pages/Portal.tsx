@@ -6,7 +6,7 @@ import '../components/auth/auth-shell.css'
 const roles = [
   { key: 'student', title: '学生入口', description: '参加课程，完成测评和学习任务', path: '/student/login', Icon: GraduationCap },
   { key: 'teacher', title: '教师入口', description: '管理课程与测评，查看学习情况', path: '/teacher/account-login', Icon: BookOpenCheck },
-  { key: 'parent', title: '家长入口', description: '完成观察测评并查看自己的结果', path: '/parent/login', Icon: HeartHandshake },
+  { key: 'parent', title: '家长入口', description: '参与已分配的测评并查看自己的结果', path: '/parent/login', Icon: HeartHandshake },
   { key: 'admin', title: '管理员入口', description: '管理账户、内容与平台授权', path: '/admin/login', Icon: ShieldCheck },
 ] as const
 

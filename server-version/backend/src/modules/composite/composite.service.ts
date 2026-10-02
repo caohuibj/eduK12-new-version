@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
@@ -450,6 +451,7 @@ export const materializeReportPackage = async (
 
 const validateCognitiveConfig = (config: any, requirePublication = false) => {
   try {
+    assertCognitiveProductEligible(config.testType)
     const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
     const parsed = entry.configSchema.safeParse(config.config)
     if (!parsed.success) throw compositeBadRequest('认知任务配置不符合当前版本规范')

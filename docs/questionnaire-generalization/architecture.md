@@ -7,4 +7,4 @@ Questionnaire authoring uses a dedicated transaction-aware service: row lock + e
 
 Management uses a bounded SQL UNION of legacy Questionnaire and tagged Composite rows, stable createdAt/id order and database pagination. Response links are server-generated. Legacy URLs remain intact; copying to new creates a new ID without converting attempts.
 
-SCALE/COGNITIVE/SITUATIONAL are required. Forms use existing sections/context validation. New questionnaires advertise Web only; native miniprogram legacy endpoints remain unchanged. Published edits are rejected. New creation can be disabled without disabling existing reads/completions.
+SCALE/COGNITIVE/SITUATIONAL are required. Forms use existing sections/context validation. New questionnaires advertise Web only; the historical native miniprogram is unsupported for this release (see server-version/miniprogram/README.md). Published edits are rejected. New creation can be disabled without disabling existing reads/completions.

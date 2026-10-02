@@ -1,3 +1,4 @@
+import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { generateToken } from '../utils/jwt'
@@ -377,53 +378,7 @@ export const authController = {
   },
 
   // 修改密码
-  async changePassword(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      if (!userId) {
-        return unauthorized(res)
-      }
-
-      const { oldPassword, newPassword } = req.body
-      if (typeof oldPassword !== 'string' || !oldPassword || oldPassword.length > 128 || !newPassword) {
-        return error(res, '请提供旧密码和新密码')
-      }
-
-      if (typeof newPassword !== 'string' || !isValidPassword(newPassword)) {
-        return error(res, '密码必须包含字母和数字，长度为8-128个字符')
-      }
-
-      const user = await prisma.user.findUnique({
-        where: { id: userId }
-      })
-
-      if (!user) {
-        return unauthorized(res)
-      }
-
-      const isValid = await comparePassword(oldPassword, user.passwordHash)
-      if (!isValid) {
-        return error(res, '旧密码错误')
-      }
-
-      const hashedPassword = await hashPassword(newPassword)
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          passwordHash: hashedPassword,
-          tokenVersion: { increment: 1 },
-          mustChangePassword: false,
-        }
-      })
-
-      clearSessionCookie(req, res)
-
-      return success(res, null, '密码修改成功')
-    } catch (err) {
-      logger.error('修改密码错误', err)
-      return error(res, Messages.COMMON.FAILED)
-    }
-  },
+  changePassword: changePasswordHandler,
 
   async logout(req: Request, res: Response) {
     clearSessionCookie(req, res)

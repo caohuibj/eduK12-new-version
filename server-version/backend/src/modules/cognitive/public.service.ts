@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible } from './product-eligibility'
 import { randomBytes } from 'crypto'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -346,6 +347,9 @@ export const createAccessTokenForAssignment = async (userId: string, role: UserR
   if (role !== UserRole.ADMIN && (role !== UserRole.TEACHER || assignment.createdBy !== userId)) throw FORBIDDEN('Not the creator of this assignment')
   if (assignment.status !== 'PUBLISHED') throw BAD_REQUEST('Only published assignments can create public links')
   if (isCompositeWrapper(assignment) || assignment.course?.isLibrary) throw BAD_REQUEST('此认知任务仅用于综合测评，不能单独作答或公开分发')
+  const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: assignment.configId } })
+  if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  assertCognitiveProductEligible(config.testType)
   const expiry = new Date(expiresAt)
   if (!publicAccessExpiryWithinPolicy(expiry)) throw BAD_REQUEST('expiresAt must be in the future and within one year')
   const rawToken = createAccessToken()

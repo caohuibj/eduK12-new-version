@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible } from './product-eligibility'
 import { randomBytes } from 'crypto'
 import { CourseStudentStatus, CognitiveSessionStatus } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -78,6 +79,7 @@ export const createCognitiveSessionConfigSnapshot = (input: {
   scoringVersion: string
   config: unknown
 }): string => {
+  assertCognitiveProductEligible(input.testType)
   const definition = getCognitiveV2TaskDefinition(
     input.testType,
     input.engineVersion,
@@ -106,6 +108,7 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
   config: unknown
   db?: ExactReferenceDb & AssetDatabase
 }): Promise<{ encrypted: string; compiledRuntime: ReturnType<typeof compileCognitiveRuntime> }> => {
+  assertCognitiveProductEligible(input.testType)
   const definition = getCognitiveV2TaskDefinition(
     input.testType,
     input.engineVersion,

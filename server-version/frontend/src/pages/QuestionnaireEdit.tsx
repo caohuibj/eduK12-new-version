@@ -442,7 +442,7 @@ const QuestionnaireEdit: React.FC = () => {
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">
-            {isNew ? '创建问卷' : '编辑问卷'}
+            {isNew ? '创建历史问卷' : '编辑历史问卷'}
           </h1>
           <span
             className={`px-2 py-1 text-xs rounded-full ${

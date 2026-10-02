@@ -30,11 +30,11 @@ const staff: NavigationItem[] = [
   { path: '/questionnaires', label: '聚合问卷', aliases: ['/questionnaire-products'], section: 'assessment' },
   { path: '/composite-assessments', label: '综合测评', section: 'assessment' },
   { path: '/bundle-products', label: '综合测评包', section: 'assessment' },
-  { path: '/general-questionnaires', label: '泛化问卷', section: 'assessment' },
+  { path: '/general-questionnaires', label: '历史泛化问卷', section: 'assessment' },
   { path: '/videos', label: '视频库', section: 'content' }, { path: '/images', label: '图片库', section: 'content' },
   { path: '/documents', label: '文档库', section: 'content' },
 ]
-export function navigationFor(role: Role | undefined, cognitive: boolean): NavigationItem[] {
+export function navigationFor(role: Role | undefined, cognitive: boolean, relationalAvailable = false): NavigationItem[] {
   if (!role) return []
   const items = [...(role === 'STUDENT' ? student : role === 'PARENT' ? parent : staff)]
   if (cognitive && role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/cognitive' : '/cognitive-assignments', label: role === 'STUDENT' ? '认知测评' : '认知任务', section: 'assessment' })
@@ -46,7 +46,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean): Navig
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
-  return items
+  return relationalAvailable ? items : items.filter(item => item.path !== '/relational/tasks')
 }
 export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
   const items: NavigationItem[] = [

@@ -10,7 +10,6 @@ import { listCognitiveRegistryEntries } from '../../modules/cognitive/cognitive.
  * change instead of silently bypassing publishCognitiveConfig/Product Readiness.
  */
 const APPROVED_PUBLISHED_SEED_BASELINE = new Set([
-  'fake/1.0.0',
   'reaction/1.0.1',
   'memory/1.0.1',
   'stroop/1.0.1',

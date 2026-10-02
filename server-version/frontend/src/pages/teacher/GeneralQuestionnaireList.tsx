@@ -90,8 +90,8 @@ const GeneralQuestionnaireList: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader
-        title="泛化问卷管理"
-        description="创建和发布问卷，管理公开参与链接并导出作答数据。"
+        title="历史泛化问卷"
+        description="维护历史问卷、公开参与链接和导出。普通非必填字段等能力尚需此入口；新问卷优先使用聚合问卷中的新版通用问卷。"
         actions={(
           <ProductButton variant="primary" onClick={() => navigate('/general-questionnaires/create')}>
             <Plus className="h-4 w-4" aria-hidden="true" />创建问卷

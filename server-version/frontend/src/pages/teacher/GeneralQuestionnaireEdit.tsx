@@ -369,7 +369,7 @@ const GeneralQuestionnaireEdit: React.FC = () => {
           <Link to="/general-questionnaires" className="text-gray-500 hover:text-gray-700">
             <ChevronLeft className="w-5 h-5" />
           </Link>
-          <h1>编辑泛化问卷</h1>
+          <h1>编辑历史泛化问卷</h1>
           <span
             className={`px-2 py-1 text-xs rounded-full ${
               questionnaire.status === 'PUBLISHED'

@@ -1,3 +1,4 @@
+import { assertCognitiveProductEligible } from './product-eligibility'
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
@@ -38,6 +39,7 @@ const validateConfigForAssignment = async (courseId: string, configId: string, r
 
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  assertCognitiveProductEligible(config.testType)
   if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
 
   const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
@@ -69,6 +71,7 @@ type CognitiveConfigIdentity = {
  * this helper must never maintain or consult a second lifecycle state.
  */
 const requireReadyCognitiveV2Definition = (config: CognitiveConfigIdentity) => {
+  assertCognitiveProductEligible(config.testType)
   const definition = getCognitiveV2TaskDefinition(
     config.testType,
     config.engineVersion,
@@ -530,6 +533,7 @@ export const ensureTeacherPublishedAssignment = async (
 ) => {
   const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  assertCognitiveProductEligible(config.testType)
   if (config.status !== 'PUBLISHED') throw BAD_REQUEST('CognitiveTestConfig must be PUBLISHED')
 
   const entry = getCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)

@@ -51,7 +51,7 @@ broadcast; frozen, expired, deactivated or downgraded accounts are disconnected.
 Attach the exact main SHA, reviewer, operator, timestamp and environment to the PR. Run
 backend and frontend checks from clean working trees, run the production and monitoring
 compose config checks, build both images, and execute the staging flow in
-deployment-checklist-v1.md. Do not describe the SHA as release-gate passed until this
+[server-version/DEPLOYMENT-CHECKLIST.md](../server-version/DEPLOYMENT-CHECKLIST.md). Do not describe the SHA as release-gate passed until this
 evidence is attached and approved.
 
 ## Supported client boundary

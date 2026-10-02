@@ -100,7 +100,7 @@ const TeacherProfile: React.FC = () => {
     try {
       setSaving(true)
       setMessage(null)
-      const response = await apiClient.post('/users/change-password', { oldPassword, newPassword })
+      const response = await apiClient.post('/auth/change-password', { oldPassword, newPassword })
       if (response.code === 0) {
         setMessage({ type: 'success', text: '密码修改成功' })
         setOldPassword('')

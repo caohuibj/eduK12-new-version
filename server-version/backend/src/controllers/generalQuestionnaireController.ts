@@ -9,7 +9,7 @@
  */
 
 import { Request, Response } from 'express'
-import { prisma } from '../config/database'
+import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { success, error, forbidden, notFound, instrumentError } from '../utils/response'
 import { serializeQuestionnaireAccessToken, tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
@@ -506,6 +506,8 @@ export const generalQuestionnaireController = {
         return forbidden(res, '无权限操作此问卷')
       }
 
+      if (questionnaire.status !== 'DRAFT') return error(res, '仅草稿问卷可以修改')
+
       // 检查量表是否存在
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
@@ -575,6 +577,8 @@ export const generalQuestionnaireController = {
       if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限操作此问卷')
       }
+
+      if (questionnaire.status !== 'DRAFT') return error(res, '仅草稿问卷可以修改')
 
       // 删除关联
       await prisma.questionnaireScale.delete({
@@ -1359,6 +1363,8 @@ export const generalQuestionnaireController = {
       if (!(await canManageGeneral(req, questionnaire))) {
         return forbidden(res, '无权限修改此问卷')
       }
+
+      if (questionnaire.status !== 'DRAFT') return error(res, '仅草稿问卷可以修改')
 
       const updated = await prisma.questionnaire.update({
         where: { id },
