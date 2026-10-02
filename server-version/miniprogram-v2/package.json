@@ -1,0 +1,5 @@
+{
+  "name": "huisurvey-miniprogram-v2", "version": "2.0.0", "private": true,
+  "scripts": {"test": "node --test tests/*.test.cjs", "check": "node scripts/check.cjs", "verify": "npm run check && npm test"},
+  "engines": {"node": "24.21.0"}
+}

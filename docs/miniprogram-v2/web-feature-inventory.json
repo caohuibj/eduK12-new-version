@@ -1,0 +1,1542 @@
+{
+  "baseline": "1ff0e8ef",
+  "generatedFrom": "server-version/frontend/src/App.tsx",
+  "note": "Route evidence inventory; CONTRACT_REVIEW_REQUIRED roles require manual authority review. Foundation lists do not imply action/runner/report parity.",
+  "features": [
+    {
+      "webRoute": "/",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:177",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/admin/login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:187",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:193",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/register",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:197",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/account-login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:201",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/parent/login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:205",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:208",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/course-login",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:212",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/register",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:216",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/parent",
+      "roles": [
+        "PARENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:221",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/relational/tasks",
+      "roles": [
+        "STUDENT",
+        "PARENT",
+        "TEACHER"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:227",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/relational/attempts/:attemptId",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:231",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/relational/attempts/:attemptId/report",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:235",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/relational/composite/situational/:attemptId",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:239",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/dashboard",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "courses",
+      "source": "server-version/frontend/src/App.tsx:245",
+      "implementationType": "NATIVE",
+      "status": "FOUNDATION_READ_ONLY",
+      "miniDestination": "/pages/list/index?domain=courses",
+      "capability": "canReadCourses",
+      "apiDependency": [
+        "/courses"
+      ],
+      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+    },
+    {
+      "webRoute": "/courses",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "courses",
+      "source": "server-version/frontend/src/App.tsx:253",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/courses/:courseId/students",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "courses",
+      "source": "server-version/frontend/src/App.tsx:261",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/courses/:courseId/detail",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "courses",
+      "source": "server-version/frontend/src/App.tsx:269",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/students",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:277",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/assignments",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:285",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/checkins",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:293",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/scales",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:301",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/scales/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:309",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/questionnaires",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:317",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/questionnaires/legacy",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:325",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/questionnaire-products/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:326",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/questionnaires/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:327",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/general-questionnaires",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:335",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/general-questionnaires/create",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:343",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/general-questionnaires/:id/edit",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:351",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/bundle-products",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:359",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/bundle-products/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:360",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/composite-assessments",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:361",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/composite-assessments/:id/results",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:369",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/composite-assessments/:id/attempts/:attemptId/report",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:377",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/composite-assessments/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:385",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/cognitive-assignments",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:395",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/cognitive-assignments/:id",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:403",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:413",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms/create",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:421",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms/:id/control",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:429",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms/:id/edit",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:437",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms/:id/qrcode",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:445",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/classrooms/:id/questions",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:453",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/videos",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:461",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/images",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:469",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/documents",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:477",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/users",
+      "roles": [
+        "ADMIN"
+      ],
+      "domain": "administration",
+      "source": "server-version/frontend/src/App.tsx:485",
+      "implementationType": "NATIVE",
+      "status": "FOUNDATION_READ_ONLY",
+      "miniDestination": "/pages/list/index?domain=users",
+      "capability": "canReadUsers",
+      "apiDependency": [
+        "/users"
+      ],
+      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+    },
+    {
+      "webRoute": "/teacher-codes",
+      "roles": [
+        "ADMIN"
+      ],
+      "domain": "administration",
+      "source": "server-version/frontend/src/App.tsx:493",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/admin/material-grants",
+      "roles": [
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:501",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/admin/instrument-authorizations",
+      "roles": [
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:509",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/profile",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:517",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/scale-library",
+      "roles": [
+        "STUDENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:525",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/scale-library/:instrumentKey/:instrumentVersion",
+      "roles": [
+        "STUDENT",
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:533",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:543",
+      "implementationType": "NATIVE",
+      "status": "FOUNDATION_READ_ONLY",
+      "miniDestination": "/pages/list/index?domain=courses",
+      "capability": "canReadCourses",
+      "apiDependency": [
+        "/courses/my"
+      ],
+      "test": "tests/pages.test.cjs + tests/runtime.test.cjs (fixture; real-device pending)"
+    },
+    {
+      "webRoute": "/student/classroom/enter",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:551",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/courses/:courseId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "courses",
+      "source": "server-version/frontend/src/App.tsx:559",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/assignments/:assignmentId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:567",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/assignments",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:575",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/checkins",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:583",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/checkins/:checkinId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:591",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/profile",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "account",
+      "source": "server-version/frontend/src/App.tsx:599",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/sjt-authoring",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:607",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/situational",
+      "roles": [
+        "TEACHER"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:608",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/situational/history",
+      "roles": [
+        "TEACHER"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:609",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/situational/:instrumentKey",
+      "roles": [
+        "TEACHER"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:610",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/situational/attempts/:attemptId",
+      "roles": [
+        "TEACHER"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:611",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/teacher/situational/attempts/:attemptId/result",
+      "roles": [
+        "TEACHER"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:612",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/situational",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:613",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/situational/history",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:621",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/situational/:instrumentKey",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:629",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/situational/attempts/:attemptId/result",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:637",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/composite/situational/:attemptId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:645",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/scales",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:653",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/scales/:scaleId",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:661",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/scales/result/:assessmentId",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:667",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/questionnaires",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:673",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/questionnaires/:questionnaireId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:681",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/questionnaires/result/:assessmentId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:689",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/classroom/join/:code",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:697",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/classroom/answer/:classroomId",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:705",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/composite/:assessmentId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:715",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/composite/attempts/:attemptId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:719",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/composite/attempts/:attemptId/report",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:723",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/cognitive",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:731",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/cognitive/assignments/:assignmentId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:739",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/cognitive/history",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:747",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/cognitive/sessions/:sessionId",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:755",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/student/cognitive/sessions/:sessionId/result",
+      "roles": [
+        "STUDENT"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:763",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/relational/cognitive/sessions/:sessionId",
+      "roles": [
+        "TEACHER",
+        "ADMIN"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:771",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/cognitive/assignments/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:775",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/cognitive/sessions/:sessionId",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:776",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/cognitive/sessions/:sessionId/result",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:777",
+      "implementationType": "WEB_RUNTIME",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/composite/situational/:attemptId",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:782",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/studies/waves/:waveId/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:783",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/studies/:studyId",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:784",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/composite/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:785",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/composite/attempts/:attemptId",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:786",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/composite/attempts/:attemptId/report",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:787",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/questionnaire/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:790",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/questionnaire/:token/assessment",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:794",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/questionnaire/:token/result",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "reports",
+      "source": "server-version/frontend/src/App.tsx:798",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/public/checkin/:token",
+      "roles": [
+        "PUBLIC"
+      ],
+      "domain": "tasks",
+      "source": "server-version/frontend/src/App.tsx:804",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/bigscreen/:classroomId",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "classroom",
+      "source": "server-version/frontend/src/App.tsx:810",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR2",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "/__ui-lab",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:816",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    },
+    {
+      "webRoute": "*",
+      "roles": [
+        "CONTRACT_REVIEW_REQUIRED"
+      ],
+      "domain": "assessments",
+      "source": "server-version/frontend/src/App.tsx:820",
+      "implementationType": "NATIVE",
+      "status": "PLANNED_PR3",
+      "miniDestination": null,
+      "capability": null,
+      "apiDependency": [],
+      "test": null
+    }
+  ]
+}

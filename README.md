@@ -55,3 +55,5 @@ backend 和 frontend 继续位于 server-version 下，以保持现有部署拓�
 | Imported scope | server-version/ |
 | Historical import branch | import/server-version |
 | Historical tags | upstream-eduk12-server-v1, local-baseline-v1 |
+
+小程序 v2 独立重建已开始，当前属于开发验收客户端。实现边界、功能清单及设备门禁见 [v2 状态记录](docs/miniprogram-v2/implementation-status.md)。历史 `server-version/miniprogram` 保持 unsupported；v2 尚未获准发布。
