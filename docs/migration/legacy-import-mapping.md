@@ -147,3 +147,5 @@ SubmissionHistory、TeacherCode（历史码仅保留为记录，默认置过期�
 运行需要 LEGACY_UPLOAD_DIR / UPLOAD_DIR / LEGACY_ASSET_DIGEST_CACHE 及服务器受限 COS 配置；摘要缓存权限 0600，不包含密钥，不提交 Git。
 
 已完成的视频如果旧原始文件缺失而转码文件经实际 SHA-256 校验可读，仅注册 processedAssetId，originalAssetId 保持空并记录原始文件缺失；不把转码文件伪装为原始文件。转码文件也不可验证时停止导入。
+
+资产 ID 使用 96 字符的确定性标识以满足现有附件接口 100 字符上限；dry-run 同时验证附件的真实编辑契约。旧文档 allowDownload 布尔设置保留，学生 PDF 查看器据此显示下载按钮。

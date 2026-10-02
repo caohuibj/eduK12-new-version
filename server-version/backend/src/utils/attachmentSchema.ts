@@ -39,6 +39,7 @@ const attachmentMetadata = {
   fileName: z.string().max(255).optional(),
   thumbnail: urlSchema.optional(),
   source: z.string().max(100).optional(),
+  allowDownload: z.boolean().optional(),
 }
 
 const assetReferenceSchema = z.object({

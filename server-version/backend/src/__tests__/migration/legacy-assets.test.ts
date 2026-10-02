@@ -4,6 +4,7 @@ import path from 'node:path'
 import { createHash } from 'node:crypto'
 import { beforeEach, afterEach, describe, it, expect } from 'vitest'
 import { planLegacyAssets, resolveLegacyAssetSource, type AssetOptions } from '../../scripts/migration/legacy-assets'
+import { createAttachmentSchema } from '../../utils/attachmentSchema'
 import { type ImportAction } from '../../scripts/migration/import-plan'
 let folder: string, options: AssetOptions
 const bytes = Buffer.from('synthetic media content')
@@ -37,6 +38,8 @@ describe('legacy asset content and isolation', () => {
     const result = await planLegacyAssets(rows, options)
     expect(result).toMatchObject({ assets: 1, references: 1, hashedObjects: 1, hashedBytes: bytes.length, problems: [] })
     const asset = rows.find(row => row.model === 'storedAsset')!
+    expect(asset.args.where.id.length).toBeLessThanOrEqual(100)
+    expect(createAttachmentSchema(false).safeParse({ assetId: asset.args.where.id }).success).toBe(true)
     expect(asset.args.create).toMatchObject({ sha256: createHash('sha256').update(bytes).digest('hex'), ownerId: 'teacher1', accessScope: 'PRIVATE', provider: 'local' })
     await expect(fs.stat(options.uploadDir)).rejects.toThrow()
     expect((await fs.stat(options.cacheFile)).mode & 0o777).toBe(0o600)
@@ -75,6 +78,15 @@ describe('legacy asset content and isolation', () => {
     broken.args.create!.filePath = '/uploads/videos/missing-original.mp4'
     broken.args.create!.processedUrl = '/uploads/videos/missing-processed.mp4'
     await expect(planLegacyAssets([broken], options)).rejects.toThrow('no verified source')
+  })
+  it('keeps the old download option in an editable current attachment', async () => {
+    const row: ImportAction = { model: 'checkin', operation: 'upsert', args: { where: { id: 'checkin1' }, create: {
+      id: 'checkin1', title: 'Synthetic', creatorId: 'teacher1', courseId: 'course1',
+      documents: [{ id: 'doc1', title: 'Synthetic document', type: 'library', url: '/uploads/videos/source.mp4', allowDownload: false }],
+    } }, mapping: { entity: 'checkin', legacyId: 'checkin1', newId: 'checkin1' } }
+    await planLegacyAssets([row], options)
+    const attachment = (row.args.create!.documents as any[])[0]
+    expect(createAttachmentSchema(false).parse(attachment)).toMatchObject({ allowDownload: false, assetId: expect.any(String) })
   })
   it('deduplicates identical bytes within one owner and separates different owners', async () => {
     const a = action(), b = action(), c = action()

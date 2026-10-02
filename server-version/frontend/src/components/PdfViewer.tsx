@@ -12,9 +12,10 @@ interface PdfViewerProps {
   onClose: () => void
   url: string
   title?: string
+  allowDownload?: boolean
 }
 
-const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) => {
+const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title, allowDownload = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null)
@@ -193,8 +194,8 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
 
           <div className="w-px h-6 bg-gray-600"></div>
 
-          {/* 下载按钮 */}
-          <a
+          {/* Preserve the author's attachment download-button setting. */}
+          {allowDownload && <a
             href={url}
             download
             target="_blank"
@@ -203,7 +204,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title }) =>
             title="下载文档"
           >
             <Download className="w-5 h-5" />
-          </a>
+          </a>}
         </div>
       </div>
 

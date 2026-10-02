@@ -4,6 +4,7 @@ import path from 'node:path'
 import { PassThrough } from 'node:stream'
 import COS from 'cos-nodejs-sdk-v5'
 import { Prisma } from '@prisma/client'
+import { createAttachmentSchema } from '../../utils/attachmentSchema'
 import { validateMappedData, type ImportAction } from './import-plan'
 
 type AssetSource = { provider: 'local'; file: string; fallbackCosKey?: string } | { provider: 'cos'; key: string }
@@ -207,7 +208,7 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
         else throw new Error('Legacy asset content verification failed')
       }
       const identityHash = digestText(JSON.stringify(identity)).slice(0, 24)
-      const assetId = 'legacy-asset-' + metadata.sha256 + '-' + identityHash
+      const assetId = 'legacy-' + metadata.sha256 + '-' + identityHash
       const objectKey = 'assets/legacy/' + metadata.sha256 + '-' + identityHash + path.extname(candidate.value.split('?')[0]).toLowerCase().replace(/[^.a-z0-9]/g, '')
       await reader.materialize(source, objectKey, metadata)
       if (!assets.has(assetId)) assets.set(assetId, {
@@ -287,7 +288,12 @@ export async function planLegacyAssets(actions: ImportAction[], options: AssetOp
       const ownerId = action.model === 'assignment' ? String(courses.get(String(row.courseId))?.creatorId) : String(row.creatorId)
       if (!ownerId || ownerId === 'undefined') throw new Error('Legacy attachment owner is missing')
       const identity: Identity = { ownerId, accessScope: 'COURSE', scopeId: String(row.courseId) }
-      for (const field of ['images', 'documents', 'videos']) row[field] = await walk(action, row[field], field, identity)
+      for (const field of ['images', 'documents', 'videos']) {
+        row[field] = await walk(action, row[field], field, identity)
+        if (Array.isArray(row[field]) && !(row[field] as unknown[]).every(value => createAttachmentSchema(false).safeParse(value).success)) {
+          throw new Error('Mapped legacy attachment violates runtime contract: ' + action.model + '.' + field)
+        }
+      }
     } else if (action.model === 'checkinSubmission') {
       const identity: Identity = row.isAnonymous ? { ownerId: row.studentId as string | null, accessScope: 'PUBLIC_CHECKIN', scopeId: String(row.checkinId) }
         : { ownerId: row.studentId as string | null, accessScope: 'COURSE', scopeId: String(checkins.get(String(row.checkinId))?.courseId) }
