@@ -8,6 +8,7 @@ const { chromium } = require('../backend/node_modules/playwright-core')
 const { transformSync } = require('../frontend/node_modules/esbuild')
 const { prisma } = require('../backend/src/config/database')
 const { createAccessTokenForAssignment } = require('../backend/src/modules/cognitive/public.service')
+const { seeds: fakeSeeds } = require('../backend/src/modules/cognitive/tasks/fake/seeds')
 
 const BASE = (process.env.SITUATIONAL_BUNDLE_E2E_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
 const out = process.env.SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR || '/tmp/eduk12-situational-bundle-e2e'
@@ -69,17 +70,24 @@ async function nativeStorage(browser) {
 
 async function main() {
   assert.equal(process.env.NODE_ENV, 'test', 'browser fault gate is test-only')
+  assert.equal(process.env.COGNITIVE_TEST_FIXTURES_ENABLED, 'true', 'browser fixture opt-in is required for both this gate and the backend')
   assert.ok(process.env.DATABASE_URL && process.env.RELEASE_INTEGRATION_DATABASE_URL, 'isolated browser integration URLs are required')
   assert.ok(['localhost', '127.0.0.1', '::1'].includes(new URL(process.env.DATABASE_URL).hostname), 'only the loopback CI database is allowed')
   assert.ok(executablePath, 'Chromium must be installed; this gate must not skip')
   const browser = await chromium.launch({ headless: true, executablePath })
   let ownerId
   let assignmentId
+  let configId
   const tokenIds = []
   try {
     await nativeStorage(browser)
-    const config = await prisma.cognitiveTestConfig.findFirst({ where: { testType: 'fake', status: 'PUBLISHED' }, orderBy: { createdAt: 'asc' } })
-    assert.ok(config, 'seeded published fake Cognitive config required')
+    // Own the published test fixture; ordinary production seeds stay DRAFT.
+    const seed = fakeSeeds.find((entry) => entry.testType === 'fake')
+    assert.ok(seed, 'registered fake Cognitive fixture required')
+    const config = await prisma.cognitiveTestConfig.create({ data: {
+      ...seed, status: 'PUBLISHED', configVersion: `start-intent-e2e-${randomUUID()}`,
+    } })
+    configId = config.id
     const owner = await prisma.user.create({ data: { username: `prelaunch-start-${randomUUID()}`, passwordHash: 'test-only-not-a-login', role: 'TEACHER', teacherApproved: true } })
     ownerId = owner.id
     const assignment = await prisma.cognitiveAssignment.create({ data: {
@@ -159,6 +167,7 @@ async function main() {
       await prisma.cognitiveAccessToken.deleteMany({ where: { id: { in: tokenIds } } })
     }
     if (assignmentId) await prisma.cognitiveAssignment.delete({ where: { id: assignmentId } })
+    if (configId) await prisma.cognitiveTestConfig.delete({ where: { id: configId } })
     if (ownerId) await prisma.user.delete({ where: { id: ownerId } })
     await prisma.$disconnect()
   }

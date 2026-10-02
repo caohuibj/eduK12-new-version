@@ -58,4 +58,5 @@
 - 新增真实 PostgreSQL 生命周期/并发/回滚/复制测试 8 项通过；关键 integration suites 未跳过门禁通过。
 - Backend 完整 build、Cognitive manifests/dependency guard、前端 product route inventory 和 Cookie/CSRF browser helper 契约通过。
 - Compose config、12 项现有资源/负载/session 工具契约、8 个停用脚本的语法/exit 1、归档链接及 diff whitespace 检查通过。
-- 本机 Docker daemon 不可用，未构建或启动 Docker 镜像、未执行 staging/browser E2E 或生产 smoke；这些仍由发布门禁确认。
+- 本机 Docker daemon 不可用，未构建或启动 Docker 镜像、未执行 staging 或生产 smoke；这些仍由发布门禁确认。
+- CI 首轮发现匿名 START 浏览器测试依赖生产 fake seed 的 PUBLISHED 状态；现改为创建并清理独立测试配置，browser job 显式 opt-in，仅 test 环境允许。修复后本地实际浏览器的 8 个匿名 START/storage 场景、relational 四角色验收及 8 项生产 fixture 限制测试通过。

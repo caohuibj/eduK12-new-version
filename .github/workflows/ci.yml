@@ -664,6 +664,8 @@ jobs:
       REDIS_URL: redis://localhost:6379
       SOCKET_REDIS_REQUIRED: 'true'
       COGNITIVE_MODULE_ENABLED: 'true'
+      # Browser START acceptance owns a fake fixture; production never opts in.
+      COGNITIVE_TEST_FIXTURES_ENABLED: 'true'
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       BACKGROUND_WORKERS_ENABLED: 'false'
       TRUST_PROXY_HOPS: '0'
