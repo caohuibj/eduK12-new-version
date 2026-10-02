@@ -326,9 +326,12 @@ async function main() {
         const uploadTab = dialog.getByRole('button', { name: '上传', exact: true })
         await uploadTab.focus()
         await page.keyboard.press('Enter')
-        await dialog.getByRole('button', { name: '选择文件', exact: true }).focus()
+        const filePicker = dialog.getByRole('button', { name: '选择文件', exact: true })
+        await filePicker.waitFor({ state: 'visible' })
         const chooserPromise = page.waitForEvent('filechooser')
-        await page.keyboard.press('Space')
+        // Bind keyboard activation to the rendered control instead of assuming
+        // page-global focus survived the upload-tab transition.
+        await filePicker.press('Space')
         await (await chooserPromise).setFiles(selectedFile)
         const reselect = dialog.getByRole('button', { name: '重新选择' })
         // Exercise actual keyboard modality after the native picker closes.
