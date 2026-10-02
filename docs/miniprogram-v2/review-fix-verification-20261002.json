@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-02",
+  "timezone": "Asia/Tokyo",
+  "baseline": "275c5bf3",
+  "scope": "Second PR1/PR2/PR3 review repairs; local only",
+  "native": {
+    "passed": 137,
+    "failed": 0,
+    "skipped": 0,
+    "added": 15,
+    "newTests": [
+      "body quota failure after index reservation repairs on process rebuild and permits new answers",
+      "interrupted reserved index is repaired without changing another valid sealed submission",
+      "a sealed body committed before an interrupted callback restores the exact command",
+      "body deleted before failed directory update recovers server completion instead of draftConflict",
+      "failed body deletion keeps sealed content recoverable and explicit repeated deletion is safe",
+      "damaged bodies and unknown read failures are never treated as missing or silently pruned",
+      "directory repair failure can retry after space recovery without deleting a sealed body",
+      "a concurrent pending read waits for body write instead of pruning its reservation",
+      "runner preserves overall and current Scale instructions across unit advance and resumed answers",
+      "Questionnaire and Composite form sections preserve canonical title and description, with both Composite shapes",
+      "runner renders restored form instructions and removes prior instructions when the next unit has none",
+      "student preview exposes server consent state and permits individual withdrawal before or after disclosure",
+      "successful student consent rereads server state and offers withdrawal without reopening the link",
+      "preview cannot invent a withdrawal action or change its relationship/artifact binding",
+      "hide or logout during withdrawal does not restore private report or reopen stale confirmation"
+    ],
+    "report": "/tmp/huisurvey-mini-pr123-review-native.tap"
+  },
+  "backend": {
+    "passed": 86,
+    "failed": 0,
+    "skipped": 0,
+    "aggregation": "Single final serial run; 9 files",
+    "files": [
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts",
+        "passed": 17,
+        "tests": [
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis bounds lists and distinguishes current student membership, owner and unrelated teacher",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native assignment retry retains command receipt and revision; stale update conflicts",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native checkin submission binds revision and cannot impersonate another student",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis teacher grading and course freeze use canonical controllers and refresh current membership",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis current legacy ADMIN manages invitations and creates parents without child authority; platform lifecycle needs SYSTEM_ADMIN",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis tool policy editor uses real Cookie/CSRF, current platform discovery, sealed command and optimistic version",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native owner/admin action discovery matches canonical sharing and token restrictions",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis actual native multipart private/public uploads bind assets, capabilities, revision and revoke",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis default disabled runtime hides capability and rejects transport even for a valid account",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis joins through actual Redis lookup, binds own session, and never discloses answer keys",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis HTTP and Web handler race returns one winner, one persisted start and no timer reset",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis repeat answer is idempotent; different answer, forged identity, and old round are rejected",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis late native and Web end commands cannot terminate a restarted round",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis native explicit leave rejects old participant state until a new join",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis R2: authorized image URLs are available to the teacher and permitted classmates; refresh checks current list authority",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis R3: deadline clearing is rejected before HTTP, normal update persists, and checkin null clearing is supported",
+          "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis deadline commits termination and refuses answer; closed classroom cannot be rejoined"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts",
+        "passed": 6,
+        "tests": [
+          "Mini runtime against actual parent HTTP and database contracts STUDENT logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts PARENT logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts TEACHER logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts ADMIN logs in through real Cookie/CSRF and current DB discovery, then clears local session",
+          "Mini runtime against actual parent HTTP and database contracts student invite → parent claim → student confirms → scoped overview → unlink",
+          "Mini runtime against actual parent HTTP and database contracts current database account freeze invalidates Mini session and encrypted credentials"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts",
+        "passed": 1,
+        "tests": [
+          "PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and PostgreSQL publishes immutable content; requires exact student consent and explicit officer capability; superseding, capability loss, tool withholding and unlink deny access"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts",
+        "passed": 4,
+        "tests": [
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL starts through canonical admission, reads frozen Scale despite source edits, persists one FINAL receipt and rejects foreign/embedded/legacy reads",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL native text SJT V1 submits exact frozen scene/channel values through canonical HTTP",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL QUESTIONNAIRE delivers exact form section identities and advances via canonical FINAL contracts",
+          "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL COMPOSITE delivers exact form section identities and advances via canonical FINAL contracts"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/integration/parentPortal.postgres.integration.test.ts",
+        "passed": 23,
+        "tests": [
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) student must confirm before parent can discover child; stranger cannot approve or view",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) one-time invite is idempotent only for consuming parent; another parent cannot replay",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) concurrent claim has one winner and one persisted relationship",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) expired invite and removed course membership fail closed",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) association does not disclose report; consent and independent officer grant are both required",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) only current SYSTEM_ADMIN may change per-tool ceilings; retries audit once and stale versions conflict",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) tightening the exact tool immediately hides old grants; widening preserves the consented frozen projection",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) longitudinal indicators require their own tool ceiling on consent, grant and later reads",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) multiple valid disclosure grants present one report per frozen artifact",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) same command cannot be reused for another artifact, and revoked grants cannot reactivate",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) unlink stops children and all new report access while preserving evidence and frozen source",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current member-deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current policy-deny invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current membership-ended invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current organization-suspended invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current child-frozen invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current parent-frozen invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current parent-role-changed invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) current child-role-changed invalidates an already granted parent report",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) a report read blocked behind a committed unlink never returns its old snapshot",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) database bindings independently reject cross-parent consent and grant inserts",
+          "Parent portal authority and evidence (real PostgreSQL, synthetic sources) consent and grant bindings cannot be edited or deleted"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/contracts.test.ts",
+        "passed": 12,
+        "tests": [
+          "parent canonical disclosure contract accepts only explicit published parent audience and exact subject/artifact",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"audience\":\"TEACHER\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"publicationStatus\":\"DRAFT\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"rawAnswers\":[\"secret\"]}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"policyHash\":\"0000000000000000000000000000000000000000000000000000000000000000\"}",
+          "parent canonical disclosure contract rejects nonparent or extra raw fields {\"blocks\":[{\"title\":\"raw\",\"text\":\"value\",\"itemAnswers\":[\"secret\"]}]}",
+          "parent canonical disclosure contract completion-only never carries scientific interpretations",
+          "parent canonical disclosure contract student confirmation is a distinct flow, never implicit teacher/admin approval",
+          "parent canonical disclosure contract exact report grant cannot substitute parentUserId",
+          "parent canonical disclosure contract exact report grant cannot substitute studentUserId",
+          "parent canonical disclosure contract exact report grant cannot substitute relationshipId",
+          "parent canonical disclosure contract exact report grant cannot substitute sourceArtifactId"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/publication.test.ts",
+        "passed": 5,
+        "tests": [
+          "Independent PARENT publication content and integrity registers completion only by default and never manufactures educational content",
+          "Independent PARENT publication content and integrity requires an exact reviewed template and prevents mutation of registered content",
+          "Independent PARENT publication content and integrity requires fixed population proof and omits suppressed values, identities and counts",
+          "Independent PARENT publication content and integrity renders missing waves and only server-authorized deltas, without calculating change",
+          "Independent PARENT publication content and integrity binds publication, source, subject, organization, projection, policy and template"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/routes.test.ts",
+        "passed": 9,
+        "tests": [
+          "parent API routing and CSRF boundaries disabled entry returns 404/no-store before querying child data",
+          "parent API routing and CSRF boundaries requires authenticated principal before list access",
+          "parent API routing and CSRF boundaries mutation without a matching CSRF token never reaches the parent service",
+          "parent API routing and CSRF boundaries rejects caller-supplied parent identity rather than trusting request data",
+          "parent API routing and CSRF boundaries passes server principal and explicit consent version to confirmation",
+          "parent API routing and CSRF boundaries source preview uses scoped relation and artifact, not a caller subject",
+          "parent API routing and CSRF boundaries denied report access stays a generic 404 without report fields",
+          "parent API routing and CSRF boundaries raw SQL serialization conflict returns recoverable 409 without replay",
+          "parent API routing and CSRF boundaries concurrent mutation conflict returns 409 and is not replayed"
+        ]
+      },
+      {
+        "path": "server-version/backend/src/__tests__/parent-portal/source.test.ts",
+        "passed": 9,
+        "tests": [
+          "parent source adapter requires the shared verified reader and retains exact source identity",
+          "parent source adapter propagates integrity failures without creating a projection",
+          "parent source adapter does not reinterpret legacy content as a parent report",
+          "parent source adapter does not reinterpret draft content as a parent report",
+          "parent source adapter does not reinterpret teacher content as a parent report",
+          "parent source adapter does not reinterpret different-subject content as a parent report",
+          "parent source adapter does not reinterpret group content as a parent report",
+          "parent source adapter does not reinterpret tool-missing content as a parent report",
+          "parent source adapter does not reinterpret longitudinal-missing content as a parent report"
+        ]
+      }
+    ],
+    "report": "/tmp/huisurvey-mini-pr123-review-fixes-final.json"
+  },
+  "checks": {
+    "backendTypeScript": "passed --noEmit --incremental false",
+    "nativeStatic": "passed: 73 JS modules / 21 routes",
+    "webRouteInventory": "passed: 116 routes",
+    "diffWhitespace": "passed"
+  },
+  "environment": {
+    "database": "owned isolated loopback test database; UTC; 96 preexisting migrations; synthetic fixtures only",
+    "redis": "owned loopback temporary instance; persistence disabled"
+  },
+  "notRun": [
+    "WeChat DevTools compilation",
+    "iOS/Android device acceptance",
+    "Full repository or release gate",
+    "Web build/browser E2E"
+  ]
+}

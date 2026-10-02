@@ -20,9 +20,10 @@ const {
   mockPrisma: {
     classroom: { findUnique: vi.fn(), update: vi.fn() },
     classroomQuestion: { findFirst: vi.fn(), findUnique: vi.fn(), updateMany: vi.fn() },
-    classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
+    classroomSession: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), upsert: vi.fn(), update: vi.fn(), updateMany: vi.fn(), count: vi.fn() },
     classroomAnswer: { findUnique: vi.fn(), create: vi.fn(), count: vi.fn(), findMany: vi.fn(), deleteMany: vi.fn() },
     $transaction: vi.fn(),
+    $executeRaw: vi.fn().mockResolvedValue(1),
   },
   mockFindClassroomAccess: vi.fn(),
   mockCanManageClassroom: vi.fn(),
@@ -75,6 +76,7 @@ const getHandlers = (socket: any) =>
 describe('classroom socket authorization boundary', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockPrisma.$transaction.mockImplementation(async callback=>callback(mockPrisma))
     mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
     mockSocketService.revalidateManagerSockets.mockResolvedValue(true)
     mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(true)
@@ -170,7 +172,7 @@ describe('classroom socket authorization boundary', () => {
       status: 'ACTIVE',
     })
     mockPrisma.classroomSession.findUnique.mockResolvedValue(null)
-    mockPrisma.classroomSession.create.mockResolvedValue(session)
+    mockPrisma.classroomSession.upsert.mockResolvedValue(session)
     mockPrisma.classroomQuestion.findFirst.mockResolvedValue(null)
 
     await firstHandlers.get('student:join')!({ code: '123456' })
@@ -180,7 +182,7 @@ describe('classroom socket authorization boundary', () => {
     )
     const resumeToken = joinedCall?.[1]?.resumeToken
     expect(typeof resumeToken).toBe('string')
-    expect(mockPrisma.classroomSession.create).toHaveBeenCalledOnce()
+    expect(mockPrisma.classroomSession.upsert).toHaveBeenCalledOnce()
 
     vi.clearAllMocks()
     mockSocketService.getClassroomNamespace.mockReturnValue(mockNamespace)
@@ -394,7 +396,8 @@ describe('classroom socket authorization boundary', () => {
         findUnique: vi.fn().mockResolvedValue(winner),
         updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
-      classroom: { update: vi.fn() },
+      $executeRaw: vi.fn().mockResolvedValue(1),
+      classroom: { findUnique: vi.fn().mockResolvedValue({status:'PREPARING'}), update: vi.fn() },
       classroomAnswer: { deleteMany: vi.fn() },
     }
     tx.classroomQuestion.findFirst.mockResolvedValueOnce(candidate)

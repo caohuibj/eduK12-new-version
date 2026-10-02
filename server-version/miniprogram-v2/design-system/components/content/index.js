@@ -1,0 +1,1 @@
+Component({properties:{text:String,facts:Array,images:Array},data:{renderImages:[]},observers:{images(value){this.setData({renderImages:(value||[]).map((image,index)=>Object.assign({},image,{index}))})}},methods:{imageError(e){this.triggerEvent('imageerror',{index:Number(e.currentTarget.dataset.index)})}}})

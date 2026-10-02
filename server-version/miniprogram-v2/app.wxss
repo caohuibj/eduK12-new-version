@@ -1,0 +1,2 @@
+@import "design-system/tokens/index.wxss";
+page { background: var(--color-background); color: var(--color-text); font-size: var(--type-body); }

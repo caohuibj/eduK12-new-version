@@ -186,3 +186,12 @@ test('manual dispatch forces platform checks even with no base SHA', () => {
   });
   assert.equal(JSON.parse(output).content, false);
 });
+
+test('platform mini gate cannot be skipped for draft or ready PR', () => {
+  for (const draft of [true, false]) {
+    const needs = { scope: { outputs: { content: 'false', presentation: 'false' }, result: 'success' } };
+    assert.ok(requiredChecks(needs, draft).includes('miniprogram'));
+    for (const name of requiredChecks(needs, draft)) needs[name] = { ...needs[name], result: 'success' };
+    assert.ok(failedChecks({ ...needs, miniprogram: { result: 'skipped' } }, draft).includes('miniprogram'));
+  }
+});

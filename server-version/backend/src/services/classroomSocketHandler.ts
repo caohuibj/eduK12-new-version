@@ -1,3 +1,4 @@
+import { startClassroomQuestion, endClassroomQuestion, closeClassroom, submitClassroomAnswer, joinClassroomStudent, leaveClassroomStudent, ClassroomLifecycleError } from './classroomLifecycleService'
 /**
  * 课堂 Socket.IO 事件处理器
  *
@@ -405,53 +406,14 @@ export class ClassroomSocketHandler {
         return
       }
 
-      let session
+      let resumeSessionId: string | undefined
       if (isTemporary && resumeToken) {
         const resume = verifyClassroomResumeToken(resumeToken, classroom.id)
-        if (!resume) {
-          this.emitError(socket, '学生会话无效')
-          return
-        }
-
-        session = await prisma.classroomSession.findFirst({
-          where: {
-            id: resume.sessionId,
-            classroomId: classroom.id,
-            isTemporary: true,
-          },
-        })
-        if (!session) {
-          this.emitError(socket, '学生会话无效')
-          return
-        }
-        actualStudentId = session.studentId
-      } else {
-        session = await prisma.classroomSession.findUnique({
-          where: {
-            classroomId_studentId: {
-              classroomId: classroom.id,
-              studentId: actualStudentId,
-            },
-          },
-        })
-
-        if (!session) {
-          session = await prisma.classroomSession.create({
-            data: {
-              classroomId: classroom.id,
-              studentId: actualStudentId,
-              isTemporary,
-            },
-          })
-        }
+        if (!resume) { this.emitError(socket, '学生会话无效'); return }
+        resumeSessionId = resume.sessionId
       }
-
-      if (session.leftAt) {
-        session = await prisma.classroomSession.update({
-          where: { id: session.id },
-          data: { leftAt: null },
-        })
-      }
+      const session = await joinClassroomStudent({classroomId:classroom.id,studentId:actualStudentId,isTemporary,resumeSessionId})
+      actualStudentId = session.studentId
 
       const issuedResumeToken = isTemporary
         ? resumeToken || generateClassroomResumeToken(classroom.id, session.id)
@@ -502,6 +464,7 @@ export class ClassroomSocketHandler {
           questionContent: activeQuestion.questionContent,
           timeLimit: activeQuestion.timeLimit,
           questionIndex: activeQuestion.questionIndex,
+          startedAt: activeQuestion.startedAt?.toISOString(),
           remainingTime: Math.max(0, remainingTime),
         })
       }
@@ -627,93 +590,7 @@ export class ClassroomSocketHandler {
 
       let outcome: StartOutcome
       try {
-        outcome = await prisma.$transaction(async (tx): Promise<StartOutcome> => {
-          const active = await tx.classroomQuestion.findFirst({
-            where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
-            select: {
-              id: true,
-              questionContent: true,
-              timeLimit: true,
-              questionIndex: true,
-              startedAt: true,
-              endedAt: true,
-            },
-          })
-          if (active && active.id !== questionId) return { kind: 'conflict', question: active }
-
-          const candidate = await tx.classroomQuestion.findFirst({
-            where: { id: questionId, classroomId: classroom.id },
-            select: {
-              id: true,
-              classroomId: true,
-              questionContent: true,
-              timeLimit: true,
-              questionIndex: true,
-              startedAt: true,
-              endedAt: true,
-            },
-          })
-          if (!candidate) return { kind: 'question-not-found' }
-          if (candidate.startedAt && !candidate.endedAt) return { kind: 'already-active', question: candidate }
-          const timeLimit = Math.max(1, Math.min(3600, Math.floor(requestedTimeLimit ?? candidate.timeLimit ?? 60)))
-          const startedAt = new Date()
-          // Compare-and-set on both lifecycle timestamps. This makes two
-          // same-question starts idempotent instead of resetting the winner's
-          // start time or timer.
-          const updated = await tx.classroomQuestion.updateMany({
-            where: {
-              id: candidate.id,
-              classroomId: classroom.id,
-              startedAt: candidate.startedAt,
-              endedAt: candidate.endedAt,
-            },
-            data: { startedAt, endedAt: null, timeLimit },
-          })
-          if (updated.count !== 1) {
-            const current = await tx.classroomQuestion.findUnique({
-              where: { id: candidate.id },
-              select: {
-                id: true,
-                questionContent: true,
-                timeLimit: true,
-                questionIndex: true,
-                startedAt: true,
-                endedAt: true,
-              },
-            })
-            if (current?.startedAt && !current.endedAt) return { kind: 'already-active', question: current }
-            const currentActive = await tx.classroomQuestion.findFirst({
-              where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
-              select: {
-                id: true,
-                questionContent: true,
-                timeLimit: true,
-                questionIndex: true,
-                startedAt: true,
-                endedAt: true,
-              },
-            })
-            return currentActive
-              ? { kind: 'conflict', question: currentActive }
-              : { kind: 'race-lost' }
-          }
-          if (candidate.endedAt) {
-            await tx.classroomAnswer.deleteMany({ where: { classroomId: classroom.id, questionId: candidate.id } })
-          }
-          await tx.classroom.update({ where: { id: classroom.id }, data: { status: 'ACTIVE', startedAt } })
-          const persisted = await tx.classroomQuestion.findUnique({
-            where: { id: candidate.id },
-            select: {
-              id: true,
-              questionContent: true,
-              timeLimit: true,
-              questionIndex: true,
-              startedAt: true,
-              endedAt: true,
-            },
-          })
-          return persisted ? { kind: 'started', question: persisted } : { kind: 'race-lost' }
-        })
+        outcome = await startClassroomQuestion(classroom, questionId, requestedTimeLimit)
       } catch (startError: any) {
         if (startError?.code === 'P2002') {
           const authoritative = await prisma.classroomQuestion.findFirst({
@@ -783,7 +660,8 @@ export class ClassroomSocketHandler {
       this.scheduleQuestionTimer(
         classroom.id,
         question.id,
-        question.timeLimit || requestedTimeLimit || 60
+        question.timeLimit || requestedTimeLimit || 60,
+        question.startedAt
       )
 
       logger.info('教师开始答题', {
@@ -802,7 +680,8 @@ export class ClassroomSocketHandler {
   private scheduleQuestionTimer(
     classroomId: string,
     questionId: string,
-    timeLimit: number
+    timeLimit: number,
+    expectedStartedAt?: Date
   ): void {
     const timerKey = classroomId + ':' + questionId
     const previousTimer = this.activeTimers.get(timerKey)
@@ -811,7 +690,7 @@ export class ClassroomSocketHandler {
     }
 
     const timer = setTimeout(() => {
-      void this.autoEndQuestion(classroomId, questionId)
+      void this.autoEndQuestion(classroomId, questionId, expectedStartedAt)
     }, Math.max(1, timeLimit) * 1000)
 
     this.activeTimers.set(timerKey, timer)
@@ -819,22 +698,12 @@ export class ClassroomSocketHandler {
 
   private async autoEndQuestion(
     classroomId: string,
-    questionId: string
+    questionId: string,
+    expectedStartedAt?: Date
   ): Promise<void> {
     try {
-      const result = await prisma.classroomQuestion.updateMany({
-        where: {
-          id: questionId,
-          classroomId,
-          endedAt: null,
-        },
-        data: { endedAt: new Date() },
-      })
-
-      if (result.count === 0) {
-        return
-      }
-
+      const result = await endClassroomQuestion(classroomId,questionId,{automatic:true,expectedStartedAt})
+      if (!result.changed) return
       this.activeTimers.delete(classroomId + ':' + questionId)
       socketService.broadcastToRoom(
         'classroom:' + classroomId,
@@ -872,89 +741,15 @@ export class ClassroomSocketHandler {
         return
       }
 
-      const serializedAnswer = JSON.stringify(answer)
-      if (!serializedAnswer || serializedAnswer.length > 10000) {
-        this.emitError(socket, '答案内容过大')
-        return
-      }
-
-      const classroom = await prisma.classroom.findUnique({
-        where: { id: classroomId },
-        select: { status: true },
-      })
-      if (!classroom || classroom.status !== 'ACTIVE') {
-        this.emitError(socket, '课堂当前不可提交答案')
-        return
-      }
-
-      const question = await prisma.classroomQuestion.findFirst({
-        where: {
-          id: questionId,
-          classroomId,
-        },
-        select: {
-          id: true,
-          startedAt: true,
-          endedAt: true,
-          timeLimit: true,
-        },
-      })
-
-      if (!question) {
-        this.emitError(socket, '题目不存在或不属于当前课堂')
-        return
-      }
-
-      if (!question.startedAt || question.endedAt) {
+      const startedAt=readString(data,'startedAt')
+      if(startedAt&&!Number.isFinite(Date.parse(startedAt))){this.emitError(socket,'题目开始时间无效');return}
+      const result = await submitClassroomAnswer({classroomId,sessionId,studentId,questionId,answer,...(startedAt?{expectedStartedAt:new Date(startedAt)}:{})})
+      if (result.expired) {
+        await this.notifyQuestionEnded(classroomId, questionId)
         this.emitError(socket, '答题已结束，无法提交答案')
         return
       }
-
-      const session = await prisma.classroomSession.findFirst({
-        where: {
-          id: sessionId,
-          classroomId,
-          studentId,
-        },
-        select: { id: true },
-      })
-      if (!session) {
-        this.emitError(socket, '课堂会话无效')
-        return
-      }
-
-      if (
-        question.timeLimit &&
-        Date.now() >= question.startedAt.getTime() + question.timeLimit * 1000
-      ) {
-        const expired = await prisma.classroomQuestion.updateMany({
-          where: {
-            id: question.id,
-            classroomId,
-            endedAt: null,
-          },
-          data: { endedAt: new Date() },
-        })
-        if (expired.count > 0) {
-          socketService.broadcastToRoom(
-            'classroom:' + classroomId,
-            'broadcast:finished',
-            { questionId: question.id }
-          )
-          await this.flushQuestionStatsAuthoritatively(classroomId, question.id)
-        }
-        this.emitError(socket, '答题已结束，无法提交答案')
-        return
-      }
-
-      await prisma.classroomAnswer.create({
-        data: {
-          classroomId,
-          questionId: question.id,
-          sessionId: session.id,
-          answer: answer as any,
-        },
-      })
+      const question = {id:questionId}
 
       logger.info('学生提交答案', {
         classroomId,
@@ -971,7 +766,7 @@ export class ClassroomSocketHandler {
         return
       }
       logger.error('处理学生提交答案错误')
-      this.emitError(socket, '提交答案失败')
+      this.emitError(socket, error instanceof ClassroomLifecycleError ? error.message : '提交答案失败')
     }
   }
 
@@ -993,52 +788,21 @@ export class ClassroomSocketHandler {
         return
       }
 
-      const question = await prisma.classroomQuestion.findFirst({
-        where: {
-          id: questionId,
-          classroomId: classroom.id,
-        },
-        select: { id: true, startedAt: true, endedAt: true },
-      })
-      if (!question) {
-        this.emitError(socket, '题目不存在或不属于当前课堂')
+      const startedAtValue = readString(data, 'startedAt')
+      if (startedAtValue && !Number.isFinite(Date.parse(startedAtValue))) {
+        this.emitError(socket, '题目轮次无效')
         return
       }
-
-      if (!question.startedAt || question.endedAt) {
-        this.emitError(socket, '题目当前不可结束')
+      const result = await endClassroomQuestion(classroom.id,questionId,startedAtValue ? {expectedStartedAt:new Date(startedAtValue)} : {})
+      if (result.staleRound) {
+        this.emitError(socket, '题目已重新开始，请刷新后操作')
         return
       }
-
-      const timerKey = classroom.id + ':' + question.id
-      const timer = this.activeTimers.get(timerKey)
-      if (timer) {
-        clearTimeout(timer)
-        this.activeTimers.delete(timerKey)
-      }
-
-      const result = await prisma.classroomQuestion.updateMany({
-        where: {
-          id: question.id,
-          classroomId: classroom.id,
-          startedAt: { not: null },
-          endedAt: null,
-        },
-        data: { endedAt: new Date() },
-      })
-
-      if (result.count > 0) {
-        socketService.broadcastToRoom(
-          'classroom:' + classroom.id,
-          'broadcast:finished',
-          { questionId: question.id }
-        )
-        await this.flushQuestionStatsAuthoritatively(classroom.id, question.id)
-      }
+      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId)
 
       logger.info('教师结束答题', {
         classroomId: classroom.id,
-        questionId: question.id,
+        questionId,
       })
     } catch {
       logger.error('处理教师结束答题错误')
@@ -1064,52 +828,12 @@ export class ClassroomSocketHandler {
         return
       }
 
-      const question = await prisma.classroomQuestion.findFirst({
-        where: {
-          id: questionId,
-          classroomId: classroom.id,
-        },
-        select: { id: true, startedAt: true, endedAt: true },
-      })
-      if (!question) {
-        this.emitError(socket, '题目不存在或不属于当前课堂')
-        return
-      }
-
-      if (!question.startedAt || question.endedAt) {
-        this.emitError(socket, '题目当前不可结束')
-        return
-      }
-
-      const timerKey = classroom.id + ':' + question.id
-      const timer = this.activeTimers.get(timerKey)
-      if (timer) {
-        clearTimeout(timer)
-        this.activeTimers.delete(timerKey)
-      }
-
-      const result = await prisma.classroomQuestion.updateMany({
-        where: {
-          id: question.id,
-          classroomId: classroom.id,
-          startedAt: { not: null },
-          endedAt: null,
-        },
-        data: { endedAt: new Date() },
-      })
-
-      if (result.count > 0) {
-        socketService.broadcastToRoom(
-          'classroom:' + classroom.id,
-          'broadcast:finished',
-          { questionId: question.id }
-        )
-        await this.flushQuestionStatsAuthoritatively(classroom.id, question.id)
-      }
+      const result = await endClassroomQuestion(classroom.id,questionId)
+      if (result.changed) await this.notifyQuestionEnded(classroom.id, questionId)
 
       logger.info('大屏结束答题', {
         classroomId: classroom.id,
-        questionId: question.id,
+        questionId,
       })
     } catch {
       logger.error('处理大屏关闭错误')
@@ -1176,14 +900,7 @@ export class ClassroomSocketHandler {
         }
       }
 
-      await prisma.$transaction(async (tx) => {
-        const endedAt = new Date()
-        await tx.classroomQuestion.updateMany({
-          where: { classroomId: classroom.id, startedAt: { not: null }, endedAt: null },
-          data: { endedAt },
-        })
-        await tx.classroom.update({ where: { id: classroom.id }, data: { status: 'ENDED', endedAt } })
-      })
+      await closeClassroom(classroom.id)
 
       ack?.({ ok: true, classroomId: classroom.id })
       socketService.broadcastToRoom(
@@ -1211,15 +928,7 @@ export class ClassroomSocketHandler {
       }
 
       const classroomId = socket.data.classroomId
-      const result = await prisma.classroomSession.updateMany({
-        where: {
-          id: socket.data.sessionId,
-          classroomId,
-          studentId: socket.data.studentId,
-          leftAt: null,
-        },
-        data: { leftAt: new Date() },
-      })
+      const result = await leaveClassroomStudent({classroomId,sessionId:socket.data.sessionId,studentId:socket.data.studentId})
 
       socket.leave('classroom:' + classroomId)
       socket.leave('classroom:' + classroomId + ':students')
@@ -1273,6 +982,9 @@ export class ClassroomSocketHandler {
       logger.error('处理课堂 Socket 断开错误')
     }
   }
+
+  // Caller must authorize current classroom management before reading stats.
+  async readQuestionStats(classroomId:string,questionId:string){return this.buildStats(classroomId,questionId)}
 
   private async buildStats(
     classroomId: string,
@@ -1450,6 +1162,21 @@ export class ClassroomSocketHandler {
     }
   }
 
+
+  notifyQuestionStarted(classroomId:string,question:any):void {
+    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:question',{...classroomQuestionPayload(question)})
+    this.scheduleQuestionTimer(classroomId,question.id,question.timeLimit||60,question.startedAt)
+  }
+  async notifyQuestionEnded(classroomId:string,questionId:string):Promise<void>{
+    const timerKey=classroomId+':'+questionId;const timer=this.activeTimers.get(timerKey);if(timer)clearTimeout(timer);this.activeTimers.delete(timerKey)
+    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:finished',{questionId})
+    await this.flushQuestionStatsAuthoritatively(classroomId,questionId)
+  }
+  notifyClassroomClosed(classroomId:string):void{
+    for(const [key,timer] of this.activeTimers)if(key.startsWith(classroomId+':')){clearTimeout(timer);this.activeTimers.delete(key)}
+    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:closed',{classroomId})
+  }
+  notifyAnswerSubmitted(classroomId:string,questionId:string):void {this.statsScheduler.schedule(classroomId,questionId)}
   private async broadcastOnlineCount(classroomId: string): Promise<void> {
     const onlineCount = await socketService.getRoomConnectionCount(
       'classroom:' + classroomId + ':students'

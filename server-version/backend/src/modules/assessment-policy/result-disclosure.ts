@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const resultAudiences = ['RESPONDENT', 'SUBJECT', 'TEACHER', 'PARENT', 'PROFESSIONAL', 'ORGANIZATION', 'RESEARCH'] as const
 export type ResultAudience = typeof resultAudiences[number]
-const audiencePolicy = z.object({
+export const resultAudiencePolicySchema = z.object({
   mode: z.enum(['NONE', 'COMPLETION_ONLY', 'INDIVIDUAL_SUMMARY', 'CLASS_AGGREGATE', 'ORGANIZATION_AGGREGATE', 'AGGREGATE_ONLY', 'DELAYED_AGGREGATE', 'RESEARCH_PROJECTION']),
   metricKeys: z.array(z.string().trim().min(1)).max(100),
   longitudinalMetricKeys: z.array(z.string().trim().min(1)).max(100),
@@ -11,8 +11,8 @@ const audiencePolicy = z.object({
 const contractSchema = z.object({
   schemaVersion: z.literal(1), policyKey: z.string().trim().min(1),
   minimumRespondents: z.number().int().min(3).nullable(),
-  audiences: z.object({ RESPONDENT: audiencePolicy, SUBJECT: audiencePolicy, TEACHER: audiencePolicy,
-    PARENT: audiencePolicy, PROFESSIONAL: audiencePolicy, ORGANIZATION: audiencePolicy, RESEARCH: audiencePolicy }).strict(),
+  audiences: z.object({ RESPONDENT: resultAudiencePolicySchema, SUBJECT: resultAudiencePolicySchema, TEACHER: resultAudiencePolicySchema,
+    PARENT: resultAudiencePolicySchema, PROFESSIONAL: resultAudiencePolicySchema, ORGANIZATION: resultAudiencePolicySchema, RESEARCH: resultAudiencePolicySchema }).strict(),
 }).strict()
 export type ResultDisclosureContractV1 = z.infer<typeof contractSchema>
 

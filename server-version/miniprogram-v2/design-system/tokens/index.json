@@ -1,0 +1,33 @@
+{
+  "color": {
+    "background": "#f4f7f6",
+    "surface": "#ffffff",
+    "text": "#173c37",
+    "muted": "#60756f",
+    "primary": "#247c68",
+    "border": "#dce7e2",
+    "error": "#a63939",
+    "soft": "#e9f4ef"
+  },
+  "space": {
+    "xs": "8rpx",
+    "sm": "16rpx",
+    "md": "24rpx",
+    "lg": "32rpx",
+    "xl": "48rpx"
+  },
+  "radius": {
+    "card": "24rpx",
+    "control": "16rpx"
+  },
+  "type": {
+    "title": "44rpx",
+    "heading": "34rpx",
+    "body": "30rpx",
+    "small": "26rpx"
+  },
+  "size": {
+    "control": "88rpx",
+    "nav": "120rpx"
+  }
+}

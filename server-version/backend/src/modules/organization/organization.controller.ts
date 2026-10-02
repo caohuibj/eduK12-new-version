@@ -45,6 +45,7 @@ export function organizationProductActions(
   ) actions.push('ASSESSMENT_DELIVERY')
   if (context.platformRole === 'SYSTEM_ADMIN' || context.canGovern) actions.push('MANAGE_DENIES')
   if (context.platformRole === 'SYSTEM_ADMIN' && !denied('ORGANIZATION_GOVERNANCE')) actions.push(active ? 'SUSPEND' : 'RESUME')
+  if(member&&active&&!denied('REPORT_READ','PARENT_REPORT_DISCLOSURE')&&context.capabilities.includes('PARENT_REPORT_DISCLOSURE'))actions.push('PARENT_REPORT_PUBLICATION')
   if (member && active && !denied('REPORT_READ', 'ORG_GROUP_REPORT_V1') && (context.orgRole === 'ORG_ADMIN' || psychology || professional)) actions.push('REPORTING')
   if (member && !denied('REPORT_READ', 'SAFETY_READ') && ((active && context.orgRole === 'ORG_ADMIN') || psychology || professional)) actions.push('SAFETY')
   if (member && active && !denied('REPORT_READ', 'REPORT_EXPORT') && context.capabilities.includes('REPORT_EXPORT')) actions.push('EXPORT_AGGREGATE')
@@ -62,7 +63,7 @@ const roleSchema = z.object({ orgRole: z.enum(['MEMBER', 'ORG_ADMIN']) })
 const endSchema = z.object({ reason: z.string().trim().max(500).optional() })
 const personaSchema = z.object({ persona: z.enum(['TEACHER', 'STUDENT', 'COUNSELOR', 'CLIENT']) })
 const capabilitySchema = z.object({
-  capability: z.enum(['PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT']),
+  capability: z.enum(['PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT', 'PARENT_REPORT_DISCLOSURE']),
 })
 const denySchema = z.object({
   userId: z.string().min(1),

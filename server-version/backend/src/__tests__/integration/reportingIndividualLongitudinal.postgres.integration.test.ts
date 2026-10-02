@@ -1,3 +1,5 @@
+import { listParticipantLongitudinalMetadata } from '../../modules/reporting/participantMetadata'
+import { prisma as sharedDb } from '../../config/database'
 import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
 import { relationalProductRegistry } from '../../modules/assessment-relational/product-registry'
 import { readParticipantLongitudinal, listParticipantLongitudinal } from '../../modules/reporting/participantService'
@@ -67,9 +69,15 @@ describe('individual longitudinal PostgreSQL',()=>{
       expect(participant.comparisons[0].metrics.score.delta).toBe(0)
       expect(JSON.stringify(participant)).not.toMatch(/canonicalResultHash|snapshotHash|generatedByUserId|subjectUserId|waveId|evidenceHash|evidenceRef/)
       expect((await listParticipantLongitudinal(subject.userId)).list.map(r=>r.id)).toContain(result.artifactId)
+      const budget=vi.spyOn(sharedDb,'$queryRaw')
+      const metadata=await listParticipantLongitudinalMetadata(subject.userId)
+      expect(metadata.list.map(r=>r.id)).toContain(result.artifactId);expect(metadata.list[0]).not.toHaveProperty('projection');expect(budget).toHaveBeenCalledTimes(3);budget.mockRestore()
+      expect((await listParticipantLongitudinalMetadata(first.members[1].userId)).list.map(r=>r.id)).not.toContain(result.artifactId)
+
       await expect(readParticipantLongitudinal(first.members[1].userId,result.artifactId)).rejects.toMatchObject({statusCode:404})
       await expect(readParticipantLongitudinal(first.ownerId,result.artifactId)).rejects.toMatchObject({statusCode:404})
       released.mockReturnValue(null)
+      expect((await listParticipantLongitudinalMetadata(subject.userId)).list).toEqual([])
       await expect(readParticipantLongitudinal(subject.userId,result.artifactId)).rejects.toMatchObject({statusCode:404})
       released.mockReturnValue({releaseStatus:'PUBLISHED',resultDisclosure:contract} as any)
     } finally { /* keep release available for subsequent staff reads/exports */ }

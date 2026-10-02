@@ -2,8 +2,8 @@ import { pathToFileURL } from 'node:url';
 export function requiredChecks(needs, draft) {
   return ['scope', ...(needs.scope?.outputs?.content === 'true' ? ['content']
     : needs.scope?.outputs?.presentation === 'true' ? ['visual']
-      : draft ? ['pr-light-backend', 'pr-light-frontend']
-        : ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql'])];
+      : draft ? ['pr-light-backend', 'pr-light-frontend', 'miniprogram']
+        : ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql', 'miniprogram'])];
 }
 export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');

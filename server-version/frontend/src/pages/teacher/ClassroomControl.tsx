@@ -237,6 +237,7 @@ const ClassroomControl: React.FC = () => {
 
     emit('teacher:end', {
       questionId: currentQuestion.id,
+      startedAt: currentQuestion.startedAt,
     })
   }
 

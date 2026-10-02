@@ -43,6 +43,9 @@ const configSchema = z.object({
   dataEncryptionKey: z.string().optional(),
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
   cognitiveModuleEnabled: z.boolean(),
+  parentPortalEnabled: z.boolean(),
+  miniClassroomEnabled: z.boolean(),
+  miniAssessmentEnabled: z.boolean(),
   // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
   materialGrantsEnabled: z.boolean(),
   // Consume video/image/export Bull jobs in this process. Default on except NODE_ENV=test.
@@ -206,6 +209,9 @@ const rawConfig = {
   dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY,
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
+  parentPortalEnabled: parseBooleanEnv('PARENT_PORTAL_ENABLED', false),
+  miniClassroomEnabled: parseBooleanEnv('MINI_CLASSROOM_ENABLED', false),
+  miniAssessmentEnabled: parseBooleanEnv('MINI_ASSESSMENT_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),
   backgroundWorkersEnabled: resolveBackgroundWorkersEnabled(),
   // Socket.IO room broadcasts are not safe to run in a multi-process

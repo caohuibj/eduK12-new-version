@@ -395,12 +395,13 @@ export const readExactReportingSeriesWavesBatch = async (input: {
     inputIdentityHash: string
     snapshotHash: string
   }>
-}): Promise<ReportingSeriesWaveRecordV1[]> => {
+},tx?: Prisma.TransactionClient): Promise<ReportingSeriesWaveRecordV1[]> => {
+  const db=tx??prisma
   const ids = [...new Set(input.bindings.map((binding) => binding.waveId))]
   if (!ids.length || ids.length !== input.bindings.length) {
     reportingFail('REPORT_WAVE_INTEGRITY', 'artifact Wave bindings must be non-empty and distinct', 500)
   }
-  const rows = await prisma.$queryRaw<WaveRow[]>(Prisma.sql`
+  const rows = await db.$queryRaw<WaveRow[]>(Prisma.sql`
     SELECT "id", "organization_id" AS "organizationId", "series_id" AS "seriesId", "wave_key" AS "waveKey", "ordinal",
       "cohort_snapshot_id" AS "cohortSnapshotId", "source_run_id" AS "sourceRunId", "source_track_id" AS "sourceTrackId",
       "input_manifest" AS "inputManifest", "input_identity_hash" AS "inputIdentityHash", "snapshot_hash" AS "snapshotHash",

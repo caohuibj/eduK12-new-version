@@ -1,3 +1,8 @@
+import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
+import { classroomRuntimeRouter } from './modules/mobile/classroom.routes'
+import { assessmentRuntimeRouter } from './modules/mobile/assessment.routes'
+import { mobileRouter } from './modules/mobile/routes'
+import { parentLinksRouter, parentsRouter, parentPublicationRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
@@ -223,6 +228,13 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/parent-links', parentLinksRouter)
+app.use('/api/parents', parentsRouter)
+app.use('/api/parent-report-publications',parentPublicationRouter)
+app.use('/api/mobile/classrooms', classroomRuntimeRouter)
+app.use('/api/mobile/assessment-runtime', assessmentRuntimeRouter)
+app.use('/api/mobile', mobileRouter)
+app.use('/api/parent-tool-policies', parentToolPolicyRouter)
 app.use('/api/users', userRoutes)
 app.use('/api/organizations', organizationRoutes)
 app.use('/api/my-assessments', assessmentInboxRoutes)

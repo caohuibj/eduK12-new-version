@@ -1,0 +1,17 @@
+{
+  "usingComponents": {
+    "hui-page": "/design-system/components/page/index",
+    "hui-card": "/design-system/components/card/index",
+    "hui-button": "/design-system/components/button/index",
+    "hui-field": "/design-system/components/field/index",
+    "hui-list": "/design-system/components/list/index",
+    "hui-status": "/design-system/components/status/index",
+    "hui-tabs": "/design-system/components/tabs/index",
+    "hui-feedback": "/design-system/components/feedback/index",
+    "hui-overlay": "/design-system/components/overlay/index",
+    "hui-choice": "/design-system/components/choice/index",
+    "hui-content": "/design-system/components/content/index",
+    "hui-series-chart": "/design-system/components/series-chart/index"
+  },
+  "enablePullDownRefresh": false
+}

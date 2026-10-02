@@ -118,7 +118,7 @@ test('all CI jobs use isolated GitHub-hosted Ubuntu runners and preserve full ga
   assert.match(backend, /run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   assert.match(job(ci, 'browser'), /needs: \[scope, backend, frontend\]/);
   for (const name of ['codeql', 'docker']) assert.match(job(ci, name), /needs: \[scope\]/);
-  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql\]/);
+  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram\]/);
 });
 
 
@@ -170,5 +170,18 @@ test('browser build restore retries retain exact-run authority and fail closed',
     assert.ok(guard);
     assert.doesNotMatch(guard, /continue-on-error:|\n        if:/);
     assert.ok(guard.includes(`run: test -s ${kind}/dist/index.`));
+  }
+});
+
+test('parent authority has draft unit coverage and non-skipping full integration gates', () => {
+  const ci = source('ci');
+  assert.match(job(ci, 'pr-light-backend'), /vitest run src\/__tests__\/parent-portal/);
+  const regression = job(ci, 'backend-regression');
+  assert.match(regression, /MINI_OPERATIONS_TEST_REDIS_URL: redis:\/\/localhost:6379/);
+  const release = fs.readFileSync(new URL('../../server-version/scripts/release-verify-local.sh', import.meta.url), 'utf8');
+  assert.ok(release.includes('export MINI_OPERATIONS_TEST_REDIS_URL="$REDIS_URL"'));
+  assert.ok(release.includes('src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts'));
+  for (const file of ['parentPortal', 'miniprogramParentHttp', 'miniprogramOperationsHttp']) {
+    assert.ok(regression.includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
   }
 });

@@ -1,0 +1,1 @@
+<view class="chart"><text>{{title}}</text><canvas canvas-id="series" style="width:280px;height:160px"/><text class="note">各点为服务器测量值；缺失波次留空。完整数值与可比性说明见下方。</text></view>
