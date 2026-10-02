@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { randomInt } from 'node:crypto'
+import { passwordVerificationPool } from '../services/passwordVerificationPool'
 
 export const PASSWORD_MIN_LENGTH = 8
 export const PASSWORD_MAX_LENGTH = 128
@@ -16,7 +17,8 @@ export const hashPassword = async (password: string): Promise<string> => {
 }
 
 export const comparePassword = async (password: string, hash: string): Promise<boolean> => {
-  return bcrypt.compare(password, hash)
+  const pool = passwordVerificationPool()
+  return pool ? pool.compare(password, hash) : bcrypt.compare(password, hash)
 }
 
 /**
