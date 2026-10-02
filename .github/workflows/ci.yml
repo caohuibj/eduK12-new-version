@@ -989,6 +989,10 @@ jobs:
         run: |
           backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
           node e2e/questionnaire-products-browser-e2e.cjs
+      - name: enforced production CSP browser acceptance
+        run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          node e2e/production-csp-browser.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
