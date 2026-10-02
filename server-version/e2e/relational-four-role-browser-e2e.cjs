@@ -140,7 +140,10 @@ const relationalAcceptance = async () => {
 
       if (role === 'PARENT') {
         await page.getByRole('heading', { name: '观察测评', exact: true }).waitFor()
-        assert.equal(await page.getByRole('button', { name: '同意并继续' }).count(), 1)
+        // The heading renders before asynchronous task loading completes.
+        const consentButton = page.getByRole('button', { name: '同意并继续', exact: true })
+        await consentButton.waitFor({ state: 'visible' })
+        assert.equal(await consentButton.count(), 1)
       } else if (role === 'STUDENT') {
         await page.getByRole('heading', { name: '课堂与关系体验', exact: true }).waitFor()
         await page.getByText('此类体验测评不提供个人结果页').waitFor()
