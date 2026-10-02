@@ -16,6 +16,7 @@ try {
 
 import { videoQueue, RESOURCE_LIMITS } from '../config/queue'
 import { runtimeResourceConfig } from '../config/runtimeResources'
+import { config } from '../config'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
@@ -115,7 +116,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       throw new Error('FFmpeg 未安装')
     }
     const safeJobId = String(job.id).replace(/[^A-Za-z0-9_-]/g, '_')
-    tempDir = path.join('/tmp', `video-${videoId}-${safeJobId}-g${generation}`)
+    tempDir = path.join(config.uploadDir, '.processing', `video-${videoId}-${safeJobId}-g${generation}`)
     if (isUrlMode) {
       const updated = await prisma.video.updateMany({
         where: {
@@ -166,31 +167,6 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       const stat = await fs.stat(inputPath)
       originalFileSize = stat.size
       logger.info(`[${videoId}] 文件大小: ${(originalFileSize / 1024 / 1024).toFixed(2)}MB`)
-    }
-
-    // URL imports do not have a database asset until the download succeeds.
-    // Store the downloaded original before producing derivatives.
-    if (isUrlMode) {
-      const originalAsset = await storeAssetFromFile({
-        filePath: inputPath,
-        originalName: `${videoId}-original${path.extname(inputPath) || '.mp4'}`,
-        mimeType: 'video/mp4',
-        ownerId: teacherId,
-      })
-      derivativeAssets.push(originalAsset)
-      await prisma.$transaction(async (tx) => {
-        const updated = await tx.video.updateMany({
-          where: {
-            id: videoId,
-            status: 'PROCESSING',
-            processingJobId: String(job.id),
-            processingGeneration: generation,
-          },
-          data: { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null },
-        })
-        if (updated.count !== 1) throw new Error('视频处理任务已失效')
-        await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' }, tx)
-      })
     }
 
     await job.progress(10)
@@ -278,6 +254,12 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
     const duration = await getVideoDuration(outputPath)
     const fileSize = (await fs.stat(outputPath)).size
 
+    // URL originals are staged after all processing, and published only in the fenced final transaction.
+    const originalAsset = isUrlMode ? await storeAssetFromFile({
+      filePath: inputPath, originalName: `${videoId}-original.mp4`, mimeType: 'video/mp4', ownerId: teacherId,
+    }) : null
+    if (originalAsset) derivativeAssets.push(originalAsset)
+
     // Update the video and attach both derivatives atomically.
     await prisma.$transaction(async (tx) => {
       const updated = await tx.video.updateMany({
@@ -291,6 +273,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
           status: 'COMPLETED',
           processedUrl: null,
           thumbnailUrl: null,
+          ...(originalAsset ? { originalAssetId: originalAsset.id, filePath: originalAsset.objectKey, originalUrl: null } : {}),
           processedAssetId: processedAsset.id,
           thumbnailAssetId: thumbnailAsset.id,
           resolution: PROCESSING_CONFIG.resolution,
@@ -303,6 +286,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         },
       })
       if (updated.count !== 1) throw new Error('视频处理任务已失效')
+      if (originalAsset) await attachAssetReference({ assetId: originalAsset.id, entityType: 'Video', entityId: videoId, field: 'original' }, tx)
       await attachAssetReference({ assetId: processedAsset.id, entityType: 'Video', entityId: videoId, field: 'processed' }, tx)
       await attachAssetReference({ assetId: thumbnailAsset.id, entityType: 'Video', entityId: videoId, field: 'thumbnail' }, tx)
     })

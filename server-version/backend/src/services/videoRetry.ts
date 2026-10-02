@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { assertRemoteVideoCapacity, reserveRemoteVideoBudget } from './remoteVideoAdmission'
 import { access } from 'node:fs/promises'
 import { prisma } from '../config/database'
 import { videoQueue } from '../config/queue'
@@ -29,10 +30,15 @@ export async function retryVideo(id: string, actor: { userId: string; role: stri
   const jobId = `video-manual-retry-${randomUUID()}`
   // Reserve the job identity before enqueueing: an old worker generation can
   // neither claim nor publish over this retry, and concurrent requests lose CAS.
-  const claimed = await prisma.video.updateMany({
+  const isRemote = !!source.originalUrl && /^https?:\/\//i.test(source.originalUrl)
+  if (isRemote) await reserveRemoteVideoBudget(row.teacherId)
+  const claim = (db: Pick<typeof prisma, 'video'>) => db.video.updateMany({
     where: { id, isDeleted: false, status: 'FAILED', processingGeneration: row.processingGeneration, teacherId: row.teacherId },
     data: { status: 'PENDING', processingJobId: jobId, processingStartedAt: null, errorMessage: null },
   })
+  const claimed = isRemote
+    ? await prisma.$transaction(async tx => { await assertRemoteVideoCapacity(tx, row.teacherId, id); return claim(tx) })
+    : await claim(prisma)
   if (claimed.count !== 1) throw new VideoRetryError('视频状态已改变，请刷新后重试', 409)
   try {
     await videoQueue.add('transcode', recoveryPayload(source), { jobId, attempts: 3, backoff: { type: 'exponential', delay: 5000 } })
