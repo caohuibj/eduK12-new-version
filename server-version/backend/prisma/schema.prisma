@@ -2414,3 +2414,33 @@ model SjtAuthorRelease {
   @@unique([instrumentKey, instrumentVersion])
   @@map("sjt_author_releases")
 }
+
+/// 旧系统（ptool）导入簿记：仅迁移工具读写，运行时代码不使用。
+model LegacyImportBatch {
+  id         String    @id @default(uuid())
+  mode       String
+  status     String    @default("RUNNING")
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+  counts     Json?
+  summary    Json?
+  error      String?
+  idMaps     LegacyImportIdMap[]
+
+  @@map("_legacy_import_batches")
+}
+
+/// 旧系统 ID → 新系统 ID 对应（旧 ID 原样保留的表也记录以供追溯）。
+model LegacyImportIdMap {
+  id        String            @id @default(uuid())
+  entity    String
+  legacyId  String            @map("legacy_id")
+  newId     String            @map("new_id")
+  batchId   String            @map("batch_id")
+  createdAt DateTime          @default(now()) @map("created_at")
+  batch     LegacyImportBatch @relation(fields: [batchId], references: [id])
+
+  @@unique([entity, legacyId])
+  @@index([batchId])
+  @@map("_legacy_import_id_map")
+}

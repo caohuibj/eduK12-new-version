@@ -46,6 +46,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const handleAuthExpired = (event: Event) => {
+      // An anonymous initial /me 401 is not expiry of a signed-in session.
+      // It must not invalidate a login that is already in flight.
+      if (!userRef.current) return
       const requestStartedAt = Number((event as CustomEvent<{ requestStartedAt?: number }>).detail?.requestStartedAt || 0)
       // A protected request that started before a newer login must not sign
       // that newer session out when its late 401 finally arrives.

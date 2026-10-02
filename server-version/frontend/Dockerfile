@@ -9,8 +9,11 @@
 
 FROM node:24.21.0-bookworm-slim AS build
 WORKDIR /app
+# Optional regional npm mirror; the default keeps the official registry so
+# hosted CI builds are unchanged.
+ARG NPM_REGISTRY=https://registry.npmjs.org
 COPY package*.json ./
-RUN npm ci
+RUN npm config set registry "$NPM_REGISTRY" && npm ci
 COPY . .
 # Release v1：构建期 Feature Flag（Vite 静态替换，值固化进产物）
 ARG VITE_COGNITIVE_MODULE_ENABLED

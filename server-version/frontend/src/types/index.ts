@@ -53,6 +53,7 @@ export interface MediaItem {
 }
 
 export interface DocumentItem {
+  allowDownload?: boolean
   id: string
   assetId?: string
   url: string

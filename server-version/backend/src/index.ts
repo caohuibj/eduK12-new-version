@@ -38,6 +38,7 @@ import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
 import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 
 // 导入路由
+import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/users'
 import courseRoutes from './routes/courses'
@@ -225,6 +226,7 @@ app.get('/metrics', async (_req, res) => {
 app.use('/api/capabilities', capabilitiesRoutes)
 
 // API 路由
+app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)

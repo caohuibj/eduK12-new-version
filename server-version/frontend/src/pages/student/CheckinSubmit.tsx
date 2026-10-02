@@ -322,7 +322,7 @@ const CheckinSubmit: React.FC = () => {
               ))}
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              提示：点击可在线预览文档，也可下载保存
+              {checkin.documents.some(doc => doc.allowDownload !== false) ? '提示：点击可在线预览文档，也可下载保存' : '提示：点击可在线预览文档'}
             </p>
           </div>
         )}
@@ -570,6 +570,7 @@ const CheckinSubmit: React.FC = () => {
           }}
           url={selectedDocument.url}
           title={selectedDocument.title}
+          allowDownload={selectedDocument.allowDownload}
         />
       )}
 

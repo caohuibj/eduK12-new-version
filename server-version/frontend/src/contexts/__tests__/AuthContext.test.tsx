@@ -114,4 +114,34 @@ describe('AuthContext session expiry handling', () => {
 
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('signed-in:teacher-2'))
   })
+  it('keeps a pending login when the anonymous initial session returns 401', async () => {
+    let resolveMe: ((value: unknown) => void) | undefined
+    let resolveLogin: ((value: unknown) => void) | undefined
+    mockMe.mockReturnValue(new Promise((resolve) => { resolveMe = resolve }))
+    mockLogin.mockReturnValue(new Promise((resolve) => { resolveLogin = resolve }))
+    const LoginProbe = () => {
+      const { user, login } = useAuth()
+      return <>
+        <output>{user ? `signed-in:${user.username}` : 'signed-out'}</output>
+        <button onClick={() => void login('teacher-2', 'password')}>login</button>
+      </>
+    }
+    render(<AuthProvider><LoginProbe /></AuthProvider>)
+    act(() => screen.getByRole('button', { name: 'login' }).click())
+    await waitFor(() => expect(mockLogin).toHaveBeenCalled())
+    await act(async () => {
+      window.dispatchEvent(new CustomEvent('auth:expired', {
+        detail: { requestStartedAt: Date.now() - 1000 },
+      }))
+      resolveMe?.({ code: -1, message: 'unauthorized' })
+    })
+    await act(async () => resolveLogin?.({
+      code: 0,
+      message: 'ok',
+      data: { user: { id: 'user-2', username: 'teacher-2', role: 'TEACHER' } },
+    }))
+    expect(screen.getByRole('status')).toHaveTextContent('signed-in:teacher-2')
+    expect(sessionStorage.getItem('huisurvey:reauth-return')).toBeNull()
+  })
+
 })

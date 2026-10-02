@@ -15,8 +15,19 @@ WORKDIR /app
 ARG npm_config_jobs
 ENV npm_config_jobs=${npm_config_jobs:-}
 
+# Optional regional mirrors for deployment hosts far from the default
+# endpoints. Empty/official defaults keep hosted CI builds unchanged;
+# release-verify-local.sh forwards them from RELEASE_VERIFY_* env vars.
+ARG DEBIAN_MIRROR=
+ARG NPM_REGISTRY=https://registry.npmjs.org
+
 # 编译期系统依赖（canvas 等 native module 需要）
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN if [ -n "$DEBIAN_MIRROR" ]; then \
+      for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
+        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|http://$DEBIAN_MIRROR|g" "$f"; fi; \
+      done; \
+    fi \
+    && apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     python3 \
     pkg-config \
@@ -29,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm ci
+RUN npm config set registry "$NPM_REGISTRY" && npm ci
 
 # ---------- Stage 2: build ----------
 FROM deps AS build
@@ -60,8 +71,15 @@ FROM node:24.21.0-bookworm-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 
+ARG DEBIAN_MIRROR=
+
 # 运行时系统库（无编译器）；ffmpeg 由 fluent-ffmpeg 直接调用
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN if [ -n "$DEBIAN_MIRROR" ]; then \
+      for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
+        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|http://$DEBIAN_MIRROR|g" "$f"; fi; \
+      done; \
+    fi \
+    && apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libcairo2 \
     libpango-1.0-0 \
