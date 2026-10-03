@@ -633,7 +633,7 @@ const QuestionnaireAssessment: React.FC = () => {
               onChange={(e) => setFormAnswer(e.target.value)}
               disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-action focus:border-action"
             />
           )}
 
@@ -644,7 +644,7 @@ const QuestionnaireAssessment: React.FC = () => {
               disabled={runnerBusy}
               placeholder={formItem.placeholder || '请输入'}
               rows={5}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-action focus:border-action"
             />
           )}
 
@@ -654,7 +654,7 @@ const QuestionnaireAssessment: React.FC = () => {
               value={typeof formAnswer === 'string' ? formAnswer : ''}
               onChange={(e) => setFormAnswer(e.target.value)}
               disabled={runnerBusy}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-action focus:border-action"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-hidden focus:ring-action focus:border-action"
             />
           )}
 

@@ -35,6 +35,7 @@ async function pageFor(name, mobile = false) {
   const page = await context.newPage()
   if (user.role === 'PARENT') {
     await page.goto(`${base}/parent/login`)
+    assert.equal((await ok(page, '/capabilities')).parentPortal, true, 'Isolated parent scenario requires PARENT_PORTAL_ENABLED=true')
     await page.getByLabel('用户名', { exact: true }).fill(user.username)
     await page.getByLabel('密码', { exact: true }).fill(user.password)
     const response = page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith('/api/auth/login'))

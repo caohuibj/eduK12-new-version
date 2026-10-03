@@ -248,7 +248,7 @@ const ImageLibrary: React.FC = () => {
                   draggable={false}
                 />
               </div>
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 space-x-3">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-opacity rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 space-x-3">
                 <button
                   onClick={() => setPreviewImage(image)}
                   className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
@@ -283,7 +283,7 @@ const ImageLibrary: React.FC = () => {
       {/* Preview Modal - 防下载保护 */}
       {!listError && hasMore && <ProductButton disabled={loading} onClick={() => void fetchImages(page + 1)}>加载更多图片</ProductButton>}
       {previewImage && (
-        <ModalSurface open onClose={() => setPreviewImage(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" dismissOnBackdrop>
+        <ModalSurface open onClose={() => setPreviewImage(null)} className="fixed inset-0 bg-black/90 flex items-center justify-center z-50" dismissOnBackdrop>
           <div className="relative max-w-[90vw] max-h-[90vh]" onContextMenu={preventContextMenu} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>
             <button
               onClick={() => setPreviewImage(null)}
@@ -308,7 +308,7 @@ const ImageLibrary: React.FC = () => {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"上传图片"}><fieldset disabled={uploadGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">上传图片</h3>
@@ -393,7 +393,7 @@ const ImageLibrary: React.FC = () => {
 
       {/* Edit Image Modal */}
       {editingImage && (
-        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"重命名图片"}>{renameGuard.error}<fieldset disabled={renameGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">重命名图片</h3>

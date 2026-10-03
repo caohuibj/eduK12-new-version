@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('../../config', () => ({
-  config: { cognitiveModuleEnabled: true },
+  config: { cognitiveModuleEnabled: true, parentPortalEnabled: false },
 }))
 
 import { capabilityController } from '../../controllers/capabilityController'
@@ -19,6 +19,7 @@ describe('runtime capability API', () => {
       message: '操作成功',
       data: {
         cognitive: true,
+        parentPortal: false,
         situational: {
           standalone: true,
           supported: true,

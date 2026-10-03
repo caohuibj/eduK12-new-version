@@ -159,7 +159,7 @@ const FilterPanel: React.FC<{
             value={filters.keyword ?? ''}
             onChange={(event) => update('keyword', event.target.value)}
             placeholder="名称、缩写或构念"
-            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-action focus:ring-1 focus:ring-action"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 outline-hidden focus:border-action focus:ring-1 focus:ring-action"
           />
         </label>
         <label className="text-sm text-gray-700">

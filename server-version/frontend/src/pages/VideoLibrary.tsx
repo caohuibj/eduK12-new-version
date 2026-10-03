@@ -566,7 +566,7 @@ const VideoLibrary: React.FC = () => {
                   <button
                     onClick={() => setPlayingVideo(video)}
                     aria-label={`预览 ${video.title}`}
-                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all focus-visible:bg-black/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                    className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/50 transition-all focus-visible:bg-black/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
                   >
                     <span className="text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center">
                       <Play className="w-6 h-6 mr-2" />
@@ -599,7 +599,9 @@ const VideoLibrary: React.FC = () => {
                 {(isAdmin || video.teacherId === user?.id) && (
                   <button
                     onClick={() => handleDelete(video)}
-                    className="p-1 text-red-400 hover:text-red-600"
+                    aria-label={`删除视频 ${video.title}`}
+                    title={`删除视频 ${video.title}`}
+                    className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md text-red-400 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -662,7 +664,7 @@ const VideoLibrary: React.FC = () => {
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <ModalSurface open onClose={uploadGuard.close} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"批量上传视频"}><fieldset disabled={uploadGuard.busy} className="contents">
             <div className="p-4 border-b flex items-center justify-between">
               <h2 className="text-xl font-semibold">
@@ -819,7 +821,7 @@ const VideoLibrary: React.FC = () => {
 
       {/* Video Player Modal */}
       {playingVideo && (
-        <ModalSurface open onClose={() => setPlayingVideo(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+        <ModalSurface open onClose={() => setPlayingVideo(null)} className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
           <div className="bg-black rounded-lg overflow-hidden max-w-5xl w-full" tabIndex={-1} role="dialog" aria-modal="true" aria-label={playingVideo.title + "预览"}>
             <div className="flex items-center justify-between p-4 border-b border-gray-800">
               <h3 className="text-white font-medium truncate flex-1 mr-4">
@@ -847,7 +849,7 @@ const VideoLibrary: React.FC = () => {
 
       {/* Edit Video Modal */}
       {editingVideo && (
-        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <ModalSurface open onClose={renameGuard.close} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" tabIndex={-1} role="dialog" aria-modal="true" aria-label={"编辑视频标题"}>{renameGuard.error}<fieldset disabled={renameGuard.busy} className="contents">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold">编辑视频标题</h3>

@@ -71,12 +71,12 @@ const installMocks = async (page, role) => {
       }))
     }
 
-    if (path === '/api/relational/catalog') {
+    if (path === '/api/relational-assessments/catalog') {
       if (role === 'TEACHER') return json(route, envelope({ list: [{ ...product, journeys: ['TEACHER_COHORT_REPORT'] }] }))
       if (role === 'STUDENT') return json(route, envelope({ list: [product] }))
       return json(route, envelope({ list: [] }))
     }
-    if (path === '/api/relational/tasks') {
+    if (path === '/api/relational-assessments/tasks') {
       if (role === 'STUDENT') return json(route, envelope({ list: [{ ...taskBase, status: 'COMPLETED' }] }))
       if (role === 'PARENT') {
         return json(route, envelope({ list: [{
@@ -98,8 +98,8 @@ const installMocks = async (page, role) => {
       }
       return json(route, envelope({ list: [] }))
     }
-    if (path === '/api/relational/context/parent-children') return json(route, envelope({ list: [] }))
-    if (path === '/api/relational/context/student-courses') {
+    if (path === '/api/relational-assessments/context/parent-children') return json(route, envelope({ list: [] }))
+    if (path === '/api/relational-assessments/context/student-courses') {
       return json(route, envelope({ list: [{
         courseId: 'course-browser',
         title: '浏览器验收课程',
@@ -109,10 +109,10 @@ const installMocks = async (page, role) => {
     if (path === '/api/courses') {
       return json(route, envelope({ list: [{ id: 'course-browser', title: '浏览器验收课程' }] }))
     }
-    if (path === '/api/relational/context/courses/course-browser/roster') {
+    if (path === '/api/relational-assessments/context/courses/course-browser/roster') {
       return json(route, envelope({ courseId: 'course-browser', title: '浏览器验收课程', roster: [] }))
     }
-    if (path === '/api/relational/reports/cohort') {
+    if (path === '/api/relational-assessments/reports/cohort') {
       return json(route, envelope({
         courseId: 'course-browser',
         resourceKind: product.resourceKind,

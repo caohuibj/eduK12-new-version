@@ -341,7 +341,7 @@ const QuestionnaireList: React.FC = () => {
       )}
 
       {showExportModal && exportPreview && (
-        <ModalSurface open onClose={exportGuard.close} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <ModalSurface open onClose={exportGuard.close} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div tabIndex={-1}
             role="dialog"
             aria-modal="true"

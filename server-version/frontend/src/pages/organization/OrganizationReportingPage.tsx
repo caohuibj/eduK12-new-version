@@ -640,10 +640,10 @@ function ReportingWorkspace() {
     setArtifact(await reportingApi.readArtifact(organizationId, artifactId.trim()))
   })
 
-  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入报告分析" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (loading && specs.length === 0 && !loadError) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载 报告工作区">正在读取报告方案和可用测量。</ProductStatus></ProductPage>
-  if (loadError && specs.length === 0) return <ProductPage width="management"><ProductStatus kind="warning" title="报告工作区 不可用" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>{loadError}</ProductStatus><IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} /></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="error" title="无法进入报告分析" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (loading && specs.length === 0 && !loadError) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在加载 报告工作区">正在读取报告方案和可用测量。</ProductStatus></ProductPage>
+  if (loadError && specs.length === 0) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="warning" title="报告工作区 不可用" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>{loadError}</ProductStatus><IndividualLongitudinalBuilder key={organizationId + JSON.stringify(context.access)} organizationId={organizationId} /></ProductPage>
 
   return (
     <ProductPage width="management" className="organization-reporting-workspace">

@@ -503,7 +503,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.code}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, code: e.target.value })}
                 disabled={!isNew}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action disabled:bg-gray-100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action disabled:bg-gray-100"
                 placeholder="如: mental-health-composite"
               />
             </div>
@@ -515,7 +515,7 @@ const QuestionnaireEdit: React.FC = () => {
                 type="text"
                 value={questionnaire.name}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action"
                 placeholder="如: 心理健康综合评估"
               />
             </div>
@@ -527,7 +527,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.description || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action"
                 placeholder="简要描述问卷的用途和特点"
               />
             </div>
@@ -541,7 +541,7 @@ const QuestionnaireEdit: React.FC = () => {
                 onChange={(e) =>
                   setQuestionnaire({ ...questionnaire, estimatedTime: parseInt(e.target.value) || null })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action"
               />
             </div>
             <div>
@@ -551,7 +551,7 @@ const QuestionnaireEdit: React.FC = () => {
               <select id="QuestionnaireEdit-field-105"
                 value={questionnaire.visibility}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, visibility: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action"
               >
                 <option value="HIDDEN">未关联不可见</option>
                 <option value="COURSE">关联课程后可见</option>
@@ -571,7 +571,7 @@ const QuestionnaireEdit: React.FC = () => {
                 value={questionnaire.instruction || ''}
                 onChange={(e) => setQuestionnaire({ ...questionnaire, instruction: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-action focus:border-action"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-action focus:border-action"
                 placeholder="指导用户如何作答..."
               />
             </div>

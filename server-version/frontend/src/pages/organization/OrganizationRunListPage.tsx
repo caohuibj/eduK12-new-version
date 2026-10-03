@@ -74,12 +74,12 @@ export default function OrganizationRunListPage() {
     }
   }
 
-  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入 Run 管理" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无 Run 治理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>Run 创建、编辑和管理入口只在服务器投影 `canGovern=true` 时开放；发布动作仍会在服务端执行更细的 publisher boundary 检查。</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="error" title="无法进入 Run 管理" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (!canGovern) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="warning" title="无 Run 治理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>Run 创建、编辑和管理入口只在服务器投影 `canGovern=true` 时开放；发布动作仍会在服务端执行更细的 publisher boundary 检查。</ProductStatus></ProductPage>
 
   return (
-    <ProductPage width="management">
+    <ProductPage width="management" className="hui-organization-page">
       <PageHeader
         title="测评批次"
         description={`${context.organization.name} · ${total} 个测评批次。状态、冻结事实和执行进度均来自服务器。`}

@@ -1,3 +1,4 @@
+import { useCapabilities } from '../contexts/CapabilitiesContext'
 import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck } from 'lucide-react'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
@@ -12,6 +13,8 @@ const roles = [
 
 export default function Portal() {
   const authLink = useAuthLinks()
+  const { parentPortalEnabled, isLoading } = useCapabilities()
+  const displayRoles = parentPortalEnabled ? roles : [roles[0], roles[1], roles[3], roles[2]]
   return <div className="hui-entry-page">
     <section className="hui-entry-hero" aria-labelledby="hui-entry-title">
       <div className="hui-auth-brand" aria-label="Huisurvey">
@@ -36,7 +39,11 @@ export default function Portal() {
         <p>请选择您的身份入口。登录后可继续课程、测评与已保存的任务。</p>
       </header>
       <nav aria-label="身份入口" className="hui-entry-roles">
-        {roles.map(({ key, title, description, path, Icon }) => <Link key={key} to={authLink(path)} className={`hui-entry-role hui-entry-role--${key}`}>
+        {displayRoles.map(({ key, title, description, path, Icon }) => key === 'parent' && !parentPortalEnabled ? <div key={key} className="hui-entry-role hui-entry-role--parent hui-entry-role--unavailable">
+          <span className="hui-entry-role__top"><span className="hui-entry-role__icon" aria-hidden="true"><Icon size={19} /></span><strong>{title}</strong></span>
+          <p>{isLoading ? '正在确认入口状态…' : '家长入口尚未开放，请以学校通知为准。'}</p>
+          <span className="hui-entry-role__action">{isLoading ? '正在确认' : '尚未开放'}</span>
+        </div> : <Link key={key} to={authLink(path)} className={`hui-entry-role hui-entry-role--${key}`}>
           <span className="hui-entry-role__top">
             <span className="hui-entry-role__icon" aria-hidden="true"><Icon size={19} /></span>
             <strong>{title}</strong>

@@ -174,9 +174,14 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
   await db.$transaction(async tx=>{
    await tx.$queryRaw`SELECT id FROM parent_student_relationships WHERE id=${f.link.id} FOR UPDATE`
    pending=f.service.readReport(f.parent,f.child.userId,f.artifactId).then(value=>({value}),error=>({error}))
+   const holderPid=(await tx.$queryRaw<Array<{pid:number}>>`SELECT pg_backend_pid() AS pid`)[0].pid
    let blocked=false
-   for(let n=0;n<30&&!blocked;n++){
-    const waiting=await tx.$queryRaw<Array<{blocked:boolean}>>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND cardinality(pg_blocking_pids(pid))>0 AND query LIKE '%parent_report_disclosure_grants%') AS blocked`
+   const deadline=Date.now()+2000
+   while(!blocked&&Date.now()<deadline){
+    // pg_stat_activity is cached within this transaction. Refresh it before
+    // polling and match our lock holder, rather than unrelated CI activity.
+    await tx.$executeRaw`SELECT pg_stat_clear_snapshot()`
+    const waiting=await tx.$queryRaw<Array<{blocked:boolean}>>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND ${holderPid}=ANY(pg_blocking_pids(pid))) AS blocked`
     blocked=waiting[0].blocked
     if(!blocked)await tx.$executeRaw`SELECT pg_sleep(0.01)`
    }
@@ -185,7 +190,10 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
    await tx.$executeRaw`UPDATE parent_report_disclosure_grants SET revoked_at=statement_timestamp(),revoked_by_user_id=${f.parent.userId},revoke_reason='CONCURRENT_UNLINK' WHERE relationship_id=${f.link.id}`
    await tx.$executeRaw`UPDATE parent_report_consents SET revoked_at=statement_timestamp() WHERE relationship_id=${f.link.id}`
   })
-  const result=await pending!;expect(result.value).toBeUndefined();expect(result.error).toBeTruthy()
+  const result=await pending!;expect(result.value).toBeUndefined()
+  // The waiting SERIALIZABLE read must abort (HTTP maps this to 409),
+  // and a fresh read after unlink must be denied with 404 below.
+  expect(result.error).toMatchObject({code:'P2010',meta:{code:'40001'}})
   await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
  })
  it('database bindings independently reject cross-parent consent and grant inserts',async()=>{

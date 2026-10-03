@@ -148,11 +148,11 @@ export default function OrganizationDeliveryPage() {
     }
   })
 
-  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入 Delivery" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="error" title="无法进入 Delivery" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
 
   return (
-    <ProductPage width="management">
+    <ProductPage width="management" className="hui-organization-page">
       <PageHeader
         title="安全事项与数据导出"
         description="Safety audience、export capability、底层报告访问、ticket 有效期与下载权限都由服务器实时判断；浏览器不重建 CSV，也不扩大 Safety audience。"

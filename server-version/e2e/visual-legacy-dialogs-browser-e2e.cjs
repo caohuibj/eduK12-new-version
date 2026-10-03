@@ -9,17 +9,39 @@ const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const engine = process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', `legacy-dialogs-${engine}`)
 const questionnaire = { id: 'legacy', name: '弹窗验收问卷', code: 'LEGACY', status: 'DRAFT', type: 'COURSE', visibility: 'COURSE', createdAt: '2026-09-01', tags: [], courseQuestionnaires: [], scaleCount: 0, totalItems: 0, creator: { id: 'admin-visual-user', username: 'admin' }, _count: { assessments: 1 } }
+// A real same-origin PDF exercises canvas loading without about:blank's WebKit access error.
+const pdfStream = 'BT /F1 12 Tf 20 200 Td (Synthetic UI QA document) Tj ET'
+const pdfObjects = [
+  '<< /Type /Catalog /Pages 2 0 R >>',
+  '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+  '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 320 240] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>',
+  `<< /Length ${Buffer.byteLength(pdfStream)} >>\nstream\n${pdfStream}\nendstream`,
+  '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+]
+let pdfText = '%PDF-1.4\n'
+const pdfOffsets = [0]
+for (const [index, object] of pdfObjects.entries()) {
+  pdfOffsets.push(Buffer.byteLength(pdfText))
+  pdfText += `${index + 1} 0 obj\n${object}\nendobj\n`
+}
+const pdfXrefOffset = Buffer.byteLength(pdfText)
+pdfText += `xref\n0 ${pdfOffsets.length}\n0000000000 65535 f \n`
+pdfText += pdfOffsets.slice(1).map(offset => `${String(offset).padStart(10, '0')} 00000 n \n`).join('')
+pdfText += `trailer\n<< /Size ${pdfOffsets.length} /Root 1 0 R >>\nstartxref\n${pdfXrefOffset}\n%%EOF\n`
+const visualPdf = Buffer.from(pdfText)
+
 const fulfill = (route, data, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ code: status === 200 ? 0 : status, message: status === 200 ? 'ok' : '验收模拟失败', data }) })
 
 async function installLegacyFixture(page) {
   const requests = await installApiFixture(page, 'ADMIN')
+  await page.route('**/visual-fixtures/preview.pdf', route => route.fulfill({ status: 200, contentType: 'application/pdf', body: visualPdf }))
   await page.route('**/api/**', route => {
     const url = new URL(route.request().url())
     const p = url.pathname
     if (route.request().method() !== 'GET') return route.fallback()
     if (p === '/api/questionnaires' || p === '/api/scales') return fulfill(route, { list: [questionnaire], total: 1 })
     if (p.endsWith('/tags')) return fulfill(route, { tags: [] })
-    if (p === '/api/documents' || p === '/api/videos') return fulfill(route, { list: [{ id: 'media', title: '预览验收素材', fileName: 'fixture', fileSize: 128, createdAt: '2026-09-01', teacherId: 'admin-visual-user', usageCount: 0, url: 'about:blank' }], total: 1 })
+    if (p === '/api/documents' || p === '/api/videos') return fulfill(route, { list: [{ id: 'media', title: '预览验收素材', fileName: 'fixture', fileSize: 128, createdAt: '2026-09-01', teacherId: 'admin-visual-user', usageCount: 0, url: p === '/api/documents' ? '/visual-fixtures/preview.pdf' : 'about:blank' }], total: 1 })
     if (p === '/api/uploads/images') return fulfill(route, { list: [{ id: 'media', name: '预览验收图片.png', size: 128, createdAt: '2026-09-01', url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jQ1kAAAAASUVORK5CYII=' }] })
     if (p === '/api/questionnaires/legacy-item' || p === '/api/general-questionnaires/legacy') return fulfill(route, questionnaire)
     if (p.endsWith('/export/preview')) return fulfill(route, { fields: [], totalRecords: 0, completedRecords: 0 })
@@ -75,7 +97,7 @@ async function main() {
           assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
           results.push({ engine, width, scenario: label, passed: true })
         }
-        for (const [route, name, label] of [['/documents', '预览', '预览验收素材预览'], ['/images', '预览', '预览验收图片.png预览'], ['/videos', '预览 预览验收素材', '预览验收素材预览']]) {
+        for (const [route, name, label, closeName = '关闭'] of [['/documents', '预览', '预览验收素材', '关闭PDF预览'], ['/images', '预览', '预览验收图片.png预览'], ['/videos', '预览 预览验收素材', '预览验收素材预览']]) {
           await page.goto(base + route)
           const trigger = page.getByRole('button', { name, exact: true })
           await trigger.click()
@@ -88,7 +110,7 @@ async function main() {
             assert.equal(await panel.locator('video').evaluate(element => element === document.activeElement), true, 'video controls have a keyboard entry')
           }
           // Embedded PDF documents have their own keyboard event scope.
-          await panel.getByRole('button', { name: '关闭', exact: true }).focus()
+          await panel.getByRole('button', { name: closeName, exact: true }).first().focus()
           await page.keyboard.press('Escape')
           assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
           results.push({ engine, width, scenario: `${route} preview`, passed: true })

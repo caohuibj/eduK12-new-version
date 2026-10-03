@@ -178,14 +178,14 @@ export default function OrganizationRunDetailPage() {
   const totalFrozenActors = useMemo(() => detail?.frozenPopulation.actors.reduce((sum, item) => sum + item.count, 0) ?? 0, [detail])
   const totalFrozenRelationships = useMemo(() => detail?.frozenPopulation.relationships.reduce((sum, item) => sum + item.count, 0) ?? 0, [detail])
 
-  if (activeLoading && !context) return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
-  if (!context) return <ProductPage width="management"><ProductStatus kind="error" title="无法进入测评批次" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
-  if (!canGovern) return <ProductPage width="management"><ProductStatus kind="warning" title="无测评批次管理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器未授予测评投放权限。</ProductStatus></ProductPage>
-  if (loading && !detail) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载测评批次">正在读取 Run graph 的服务器投影。</ProductStatus></ProductPage>
-  if (!detail) return <ProductPage width="management"><ProductStatus kind="error" title="测评批次无法加载" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>返回测评批次</Link>}>{loadError || '测评批次不存在或当前不可访问。'}</ProductStatus></ProductPage>
+  if (activeLoading && !context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+  if (!context) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="error" title="无法进入测评批次" actions={<Link to="/">返回首页</Link>}>{activeError || '当前账户没有此组织的有效访问上下文。'}</ProductStatus></ProductPage>
+  if (!canGovern) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="warning" title="无测评批次管理权限" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}`}>返回组织空间</Link>}>当前服务器未授予测评投放权限。</ProductStatus></ProductPage>
+  if (loading && !detail) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在加载测评批次">正在读取 Run graph 的服务器投影。</ProductStatus></ProductPage>
+  if (!detail) return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="error" title="测评批次无法加载" actions={<Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>返回测评批次</Link>}>{loadError || '测评批次不存在或当前不可访问。'}</ProductStatus></ProductPage>
 
   return (
-    <ProductPage width="management">
+    <ProductPage width="management" className="hui-organization-page">
       <PageHeader
         title={detail.run.name}
         description={`状态：${detail.run.status} · 版本 ${detail.run.version} · 测评项目 ${detail.run.trackCount} · 执行记录 ${detail.run.executionCount}`}

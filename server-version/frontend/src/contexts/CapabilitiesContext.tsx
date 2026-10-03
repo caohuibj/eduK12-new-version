@@ -3,16 +3,19 @@ import { capabilitiesApi } from '../api/capabilities'
 import { cognitiveBuildEnabled } from '../modules/cognitive/feature'
 
 interface CapabilitiesContextType {
+  parentPortalEnabled: boolean
   cognitiveEnabled: boolean
   isLoading: boolean
 }
 
 const CapabilitiesContext = createContext<CapabilitiesContextType>({
+  parentPortalEnabled: false,
   cognitiveEnabled: false,
   isLoading: false,
 })
 
 export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [parentPortalEnabled, setParentPortalEnabled] = useState(false)
   const [cognitiveEnabled, setCognitiveEnabled] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -28,6 +31,7 @@ export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ childr
           ])
           if (controller.signal.aborted) return
           if (response.code !== 0 || typeof response.data?.cognitive !== 'boolean') throw new Error('Invalid capabilities')
+          setParentPortalEnabled(response.data.parentPortal === true)
           setCognitiveEnabled(cognitiveBuildEnabled && response.data.cognitive)
           setIsLoading(false)
           return
@@ -41,7 +45,7 @@ export const CapabilitiesProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [])
 
   return (
-    <CapabilitiesContext.Provider value={{ cognitiveEnabled, isLoading }}>
+    <CapabilitiesContext.Provider value={{ cognitiveEnabled, parentPortalEnabled, isLoading }}>
       {children}
     </CapabilitiesContext.Provider>
   )

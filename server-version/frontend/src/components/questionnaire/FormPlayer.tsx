@@ -166,7 +166,7 @@ export function FormPlayer({
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={describedBy}
             onChange={handleTextChange}
-            className="min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
+            className="min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
           />
         </div>
       ) : null}
@@ -182,7 +182,7 @@ export function FormPlayer({
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={describedBy}
             onChange={handleTextChange}
-            className="min-h-32 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
+            className="min-h-32 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
           />
         </div>
       ) : null}

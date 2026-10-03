@@ -282,7 +282,7 @@ const ClassroomAnswer: React.FC = () => {
               onChange={(e) => setAnswer(e.target.value)}
               disabled={submitted}
               placeholder="请输入答案"
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-none disabled:opacity-50 classroom-answer-input"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 classroom-answer-input"
             />
           </div>
         )
@@ -299,7 +299,7 @@ const ClassroomAnswer: React.FC = () => {
               disabled={submitted}
               placeholder="请输入答案"
               rows={5}
-              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-none disabled:opacity-50 resize-none classroom-answer-input"
+              className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 resize-none classroom-answer-input"
             />
           </div>
         )

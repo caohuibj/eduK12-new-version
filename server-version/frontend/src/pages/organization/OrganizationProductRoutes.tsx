@@ -1,3 +1,4 @@
+import './organization-ui.css'
 import { useEffect, useState } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'

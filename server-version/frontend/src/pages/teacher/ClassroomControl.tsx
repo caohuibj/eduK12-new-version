@@ -523,7 +523,10 @@ const ClassroomControl: React.FC = () => {
               ) : (
                 <div className="classroom-control-question-list">
                   {classroom.questions.map((question, index) => (
-                    <div
+                    <button
+                      type="button"
+                      aria-label={`${question.endedAt ? '重新开始' : '开始'}题目 ${index + 1}：${question.questionContent.question || '课堂题目'}`}
+                      disabled={classroom.status === 'ENDED' || Boolean(question.startedAt && !question.endedAt)}
                       key={question.id}
                       className={`classroom-control-question ${
                         currentQuestion?.id === question.id
@@ -557,7 +560,7 @@ const ClassroomControl: React.FC = () => {
                       </div>
                       {!question.startedAt && <Play className="w-4 h-4" aria-hidden="true" />}
                       {question.startedAt && <CheckCircle className="w-4 h-4" aria-hidden="true" />}
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}

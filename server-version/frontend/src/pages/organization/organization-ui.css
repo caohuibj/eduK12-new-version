@@ -1,0 +1,69 @@
+/* Shared Organization workspace polish. Authority and commands remain server-owned. */
+.hui-product.hui-organization-page {
+  font-size: 15px;
+  line-height: 1.7;
+}
+.hui-organization-page :where(h2) { font-size: 20px; line-height: 1.4; letter-spacing: -.2px; }
+.hui-organization-page :where(h3) { font-size: 16px; line-height: 1.5; }
+.hui-organization-page :where(h4) { font-size: 14px; line-height: 1.5; }
+.hui-organization-page :where(form, form > *, .grid > *, .flex > *) { min-width: 0; }
+.hui-organization-page :where(form) { align-items: end; }
+.hui-organization-page :where(label) { font-size: 14px; line-height: 1.5; color: var(--hui-color-text); }
+.hui-organization-page :where(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  min-height: var(--hui-target);
+  padding: 10px 12px;
+  border: 1px solid var(--hui-color-border);
+  border-radius: var(--hui-radius);
+  background: var(--hui-color-surface);
+  color: var(--hui-color-text);
+  font: inherit;
+  line-height: 1.5;
+}
+.hui-organization-page :where(input[type="checkbox"], input[type="radio"]) {
+  width: 20px;
+  min-height: 20px;
+  padding: 0;
+  flex-shrink: 0;
+}
+.hui-product.hui-organization-page .hui-button {
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: var(--hui-target);
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+.hui-organization-page :where(form > .hui-button) { align-self: end; }
+.hui-organization-page :where(section) { scroll-margin-top: 24px; }
+.hui-organization-page :where(p) { color: var(--hui-color-muted); }
+.hui-organization-page :where(th, td) { line-height: 1.6; vertical-align: top; }
+.hui-organization-page :where(td .hui-button) { padding-inline: 12px; }
+.hui-organization-page :where(.font-mono) { font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.hui-organization-page .hui-organization-policy {
+  margin-block: 0 24px;
+  border-color: var(--hui-color-border);
+  background: var(--hui-ds-color-surface);
+  padding: 20px;
+}
+@media (max-width: 639px) {
+  .hui-product.hui-organization-page { font-size: 15px; padding-inline: 16px; }
+  .hui-organization-page :where(form.flex) { flex-wrap: wrap; }
+  .hui-organization-page :where(form.flex > input) { flex-basis: 100%; }
+  .hui-organization-page :where(form.flex > .hui-button) { width: 100%; }
+  .hui-organization-page :where(input, select, textarea) { font-size: 16px; }
+  .hui-organization-page :where(.flex > span, .flex > strong) { overflow-wrap: anywhere; }
+  .hui-organization-page .hui-organization-policy { padding: 16px; }
+}
+
+@media (max-width: 639px) {
+  .hui-organization-page .hui-organization-members { min-width: 0; display: block; }
+  .hui-organization-members thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .hui-organization-members tbody { display: block; }
+  .hui-organization-members tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 8px; }
+  .hui-organization-members td { display: block; min-width: 0; padding: 8px; }
+  .hui-organization-members td:first-child, .hui-organization-members td:last-child { grid-column: 1 / -1; }
+  .hui-organization-members td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 6px; color: var(--hui-color-muted); font: 12px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .hui-organization-members td:last-child .hui-button { flex: 1; }
+}

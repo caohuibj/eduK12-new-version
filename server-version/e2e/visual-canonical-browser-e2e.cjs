@@ -6,6 +6,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
+const { verifyTailwindCompatibility } = require('./tailwind-compatibility.cjs')
 const { chromium } = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/node_modules/playwright-core')
 
 const baseUrl = (process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '')
@@ -551,6 +552,7 @@ async function main() {
           await spec.ready(page)
           await page.locator('#hui-main').waitFor({ state: 'visible' })
           await page.evaluate(() => document.fonts?.ready)
+          const tailwindCompatibility = spec.id === 'portal' ? await verifyTailwindCompatibility(page) : undefined
           const metrics = await metricsFor(page)
           assert.ok(metrics.document.scrollWidth <= viewport.width + 1,
             `${spec.id}/${viewport.name}: page-level horizontal overflow ${metrics.document.scrollWidth} > ${viewport.width}`)
@@ -581,6 +583,7 @@ async function main() {
             role: spec.role || 'GUEST',
             viewport,
             metrics,
+            tailwindCompatibility,
             pageErrors,
             passed: true,
           })

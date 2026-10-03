@@ -45,6 +45,7 @@ const questionnaireDestination = (questionnaire: Questionnaire) => (
 
 interface CompositeAssessment {
   id: string
+  productKind?: string
   name: string
   description: string | null
   instruction: string | null
@@ -168,7 +169,29 @@ const CourseDetail: React.FC = () => {
     try {
       const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available')
       if (response.code !== 0) throw new Error(response.message || '获取综合测评列表失败')
-      setComposites((response.data?.list || []).filter((item) => item.course?.id === courseId))
+      const available = response.data?.list || []
+      const deliveredIds = new Set<string>()
+      // Modern course questionnaires use a many-to-many delivery relation, so
+      // their legacy `course` field is null. The student task feed projects only
+      // the caller's approved memberships; never infer access from visibility.
+      if (available.some((item) => item.productKind === 'QUESTIONNAIRE' && !item.course)) {
+        const pageSize = 100
+        let page = 1
+        let total = 0
+        do {
+          const tasks = await apiClient.get<{
+            list: Array<{ id: string; kind: string; courses: Array<{ id: string }> }>
+            total: number
+          }>(`/courses/my/tasks?page=${page}&pageSize=${pageSize}`)
+          if (tasks.code !== 0) throw new Error(tasks.message || '获取课程测评任务失败')
+          for (const task of tasks.data?.list || []) {
+            if (task.kind === 'COMPOSITE' && task.courses.some((linked) => linked.id === courseId)) deliveredIds.add(task.id)
+          }
+          total = tasks.data?.total || 0
+          page += 1
+        } while ((page - 1) * pageSize < total)
+      }
+      setComposites(available.filter((item) => item.course?.id === courseId || deliveredIds.has(item.id)))
     } catch (reason) {
       console.error('获取综合测评列表失败:', reason)
       setSectionErrors((current) => ({ ...current, composites: getErrorMessage(reason, '获取综合测评列表失败') }))
@@ -289,7 +312,7 @@ const CourseDetail: React.FC = () => {
                 <Users className="w-4 h-4" />
                 <span>{course.studentCount || 0} 名学员</span>
               </div>
-              <div>课程号: {course.courseCode}</div>
+              {course.courseCode && <div>课程号: {course.courseCode}</div>}
             </div>
           </div>
         </div>

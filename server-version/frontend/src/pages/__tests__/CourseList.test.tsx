@@ -83,13 +83,13 @@ describe('CourseList library marking', () => {
 
     const peerCard = screen.getByText('同事管理员课').closest('.staff-course-card') as HTMLElement
     await user.click(within(peerCard).getByLabelText('同事管理员课 的更多操作'))
-    await user.click(within(peerCard).getByRole('button', { name: '编辑课程' }))
+    await user.click(within(screen.getByRole('group', { name: '同事管理员课 的更多操作菜单' })).getByRole('button', { name: '编辑课程' }))
     expect(screen.getByText('标记为库课程')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '取消' }))
 
     const teacherCard = screen.getByText('教师课').closest('.staff-course-card') as HTMLElement
     await user.click(within(teacherCard).getByLabelText('教师课 的更多操作'))
-    await user.click(within(teacherCard).getByRole('button', { name: '编辑课程' }))
+    await user.click(within(screen.getByRole('group', { name: '教师课 的更多操作菜单' })).getByRole('button', { name: '编辑课程' }))
     expect(screen.queryByText('标记为库课程')).not.toBeInTheDocument()
   })
 })

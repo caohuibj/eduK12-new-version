@@ -407,7 +407,7 @@ const CheckinSubmit: React.FC = () => {
 
       {/* 图片预览弹窗 */}
       {previewImage && (
-        <ModalSurface open initialFocusRef={previewCloseRef} onClose={closePreviewImage} className="student-submit-preview fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+        <ModalSurface open initialFocusRef={previewCloseRef} onClose={closePreviewImage} className="student-submit-preview fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
           <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(event) => event.stopPropagation()} tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewImage.name + "预览"}>
             <button
               ref={previewCloseRef}

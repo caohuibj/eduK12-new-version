@@ -2011,7 +2011,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2033,7 +2033,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2055,7 +2055,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2077,7 +2077,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "WEB_ADAPTER",
       "miniDestination": "/pages/organizations/index?view=reporting",
       "capability": "canDiscoverOrganizations",
@@ -2097,7 +2097,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2119,7 +2119,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:16",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2141,7 +2141,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:18",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2163,7 +2163,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:18",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/organizations/index",
       "capability": "canDiscoverOrganizations",
@@ -2185,7 +2185,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:18",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",
@@ -2208,7 +2208,7 @@
         "TEACHER",
         "ADMIN"
       ],
-      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:17",
+      "source": "server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx:18",
       "implementationType": "NATIVE",
       "miniDestination": "/pages/list/index?domain=assessments",
       "capability": "canReadOwnAssessments",

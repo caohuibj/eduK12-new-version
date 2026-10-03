@@ -22,7 +22,7 @@ export default function DeliveryPolicySettings({ organizationId }: { organizatio
     catch { setMessage('更新失败，原策略未变更。') }
     finally { setBusy(false) }
   }
-  return <section className="my-4 space-y-3 rounded-xl border bg-white p-4">
+  return <section className="hui-organization-policy space-y-3 rounded-xl border bg-white p-4">
     <h2 className="font-semibold">教师测评投放策略</h2>
     <p>班主任默认投放：{enabled === null ? '加载中' : enabled ? '允许本班' : '关闭'}。任课教师须按班授权。关闭默认后，班主任也须取得显式授权。</p>
     <ProductButton disabled={busy || enabled === null} onClick={() => void save()}>{enabled ? '关闭班主任默认投放' : '允许班主任默认投放'}</ProductButton>

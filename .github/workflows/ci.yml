@@ -917,6 +917,9 @@ jobs:
       - name: start isolated PR5 scenario resource server
         env:
           PR5_SCENARIOS_ENABLED: 'true'
+          # This loopback-only synthetic scenario explicitly includes parents.
+          # The production default and the preceding closed-entry checks stay off.
+          PARENT_PORTAL_ENABLED: 'true'
         run: |
           kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
           for attempt in $(seq 1 30); do
