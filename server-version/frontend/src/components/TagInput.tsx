@@ -88,7 +88,7 @@ const TagInput: React.FC<TagInputProps> = ({
             onKeyDown={handleKeyDown}
             onBlur={addTag}
             placeholder={value.length === 0 ? placeholder : ''}
-            className="flex-1 min-w-[120px] outline-none text-sm"
+            className="flex-1 min-w-[120px] outline-hidden text-sm"
             maxLength={maxLength}
           />
         )}

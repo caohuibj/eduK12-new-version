@@ -42,7 +42,7 @@ const Board: React.FC<{
             onAttempt?.(item, 'keyboard')
           }
         }}
-        className="absolute flex h-7 w-7 sm:h-12 sm:w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-sky-300 bg-white text-xs sm:text-base font-semibold text-sky-800 shadow-sm hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:cursor-default"
+        className="absolute flex h-7 w-7 sm:h-12 sm:w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-sky-300 bg-white text-xs sm:text-base font-semibold text-sky-800 shadow-sm hover:bg-sky-50 focus:outline-hidden focus:ring-2 focus:ring-sky-500 disabled:cursor-default"
         style={{ left: `${8 + (item.x / 7) * 84}%`, top: `${8 + (item.y / 5) * 84}%` }}
       >
         {item.label}

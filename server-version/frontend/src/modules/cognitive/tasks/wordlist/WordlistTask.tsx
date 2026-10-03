@@ -280,7 +280,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
           onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addResponse() } }}
           disabled={submitting || submittedRef.current}
           aria-label="输入回忆词"
-          className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none"
+          className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-hidden"
           autoFocus
         />
         <button type="button" onClick={addResponse} disabled={!draft.trim() || submitting || submittedRef.current} className="btn-secondary">加入</button>

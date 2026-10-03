@@ -191,7 +191,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
               type="button"
               disabled={phase === 'formal' ? submitting || respondedRef.current : false}
               onClick={() => phase === 'practice' ? handlePracticeChoice(choice) : handleFormalChoice(choice)}
-              className="rounded-2xl border-2 border-sky-200 bg-white px-8 py-8 text-5xl text-sky-700 shadow-sm hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-50"
+              className="rounded-2xl border-2 border-sky-200 bg-white px-8 py-8 text-5xl text-sky-700 shadow-sm hover:bg-sky-50 focus:outline-hidden focus:ring-2 focus:ring-sky-500 disabled:opacity-50"
               aria-label={responseLabel(choice)}
             >
               {symbol === 'A' ? '○' : '△'}

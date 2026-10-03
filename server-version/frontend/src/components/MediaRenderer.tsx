@@ -374,7 +374,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
   onClose
 }) => {
   return (
-    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
       <div className="relative max-w-[90vw] max-h-[90vh]" tabIndex={-1} role="dialog" aria-modal="true" aria-label={imageName + "预览"}>
         {/* 关闭按钮 */}
         <button
@@ -421,7 +421,7 @@ const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
   const videoUrl = normalizeVideoUrl(item.url)
   
   return (
-    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
       <div 
         className="bg-black rounded-lg overflow-hidden max-w-5xl w-full"
         onClick={e => e.stopPropagation()}

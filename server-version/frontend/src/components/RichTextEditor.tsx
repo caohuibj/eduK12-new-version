@@ -121,7 +121,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onInput={handleInput}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="p-3 outline-none min-h-[200px] prose prose-sm max-w-none"
+        className="p-3 outline-hidden min-h-[200px] prose prose-sm max-w-none"
         style={{ minHeight: height }}
         data-placeholder={placeholder}
         suppressContentEditableWarning

@@ -113,7 +113,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ isOpen, onClose, url, title, allo
   if (!isOpen) return null
 
   return (
-    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
+    <ModalSurface open onClose={onClose} className="fixed inset-0 bg-black/90 z-50 flex flex-col">
     <div onKeyDown={handleKeyDown} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title || "PDF \u6587\u6863"} className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-900 text-white">
