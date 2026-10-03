@@ -2,6 +2,8 @@
 @config "../tailwind.config.js";
 @source "../index.html";
 @source "./";
+/* Existing media-card actions use tap-triggered hover on touch browsers. */
+@custom-variant hover (&:hover);
 
 /* Preserve v3's invisible outline in normal mode and forced-color visibility. */
 @utility outline-hidden {
