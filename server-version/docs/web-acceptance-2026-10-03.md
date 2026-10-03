@@ -23,7 +23,7 @@ The homepage comparison uses the immediately preceding local portal state (inclu
 
 - P1: relational frontend APIs used the wrong `/relational/` prefix; use the registered `/relational-assessments/` routes without changing authority.
 - P1: table overflow clipped shared action menus; render the menu outside its clipping ancestor with viewport placement, dismissal and focus restoration. A subsequent 360px canonical CI scenario exposed automatic focus scrolling that dismissed the new menu; opening focus now uses `preventScroll`, and outside wheel/touch intent dismisses the menu while automatic table `scrollIntoView` keeps it open. Real desktop and 360px synthetic-assignment edit actions were retested, with an additional regression test.
-- P1: document-library iframe previews were blocked by the existing resource framing headers; reuse the local PDF.js canvas viewer, with cancellation and failure/retry handling. CSP and resource permissions remain unchanged.
+- P1: document-library iframe previews were blocked by the existing resource framing headers; reuse the local PDF.js canvas viewer, with cancellation and failure/retry handling. The legacy browser-dialog scenario now targets the viewer’s document-title label and named PDF close control, retaining modal/focus/keyboard assertions. CSP and resource permissions remain unchanged.
 - P1: modern multi-course questionnaires have a null legacy `course` field and disappeared from student course detail. Match the authorized, paginated student-task projection to the current course; preserve other-course exclusion and retry on lookup failure.
 - P2: closed parent entry now reflects the public capability flag. A missing flag stays closed until explicitly enabled.
 

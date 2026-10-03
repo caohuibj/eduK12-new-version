@@ -75,7 +75,7 @@ async function main() {
           assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
           results.push({ engine, width, scenario: label, passed: true })
         }
-        for (const [route, name, label] of [['/documents', '预览', '预览验收素材预览'], ['/images', '预览', '预览验收图片.png预览'], ['/videos', '预览 预览验收素材', '预览验收素材预览']]) {
+        for (const [route, name, label, closeName = '关闭'] of [['/documents', '预览', '预览验收素材', '关闭PDF预览'], ['/images', '预览', '预览验收图片.png预览'], ['/videos', '预览 预览验收素材', '预览验收素材预览']]) {
           await page.goto(base + route)
           const trigger = page.getByRole('button', { name, exact: true })
           await trigger.click()
@@ -88,7 +88,7 @@ async function main() {
             assert.equal(await panel.locator('video').evaluate(element => element === document.activeElement), true, 'video controls have a keyboard entry')
           }
           // Embedded PDF documents have their own keyboard event scope.
-          await panel.getByRole('button', { name: '关闭', exact: true }).focus()
+          await panel.getByRole('button', { name: closeName, exact: true }).first().focus()
           await page.keyboard.press('Escape')
           assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
           results.push({ engine, width, scenario: `${route} preview`, passed: true })
