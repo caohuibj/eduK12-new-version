@@ -22,7 +22,7 @@ export default function MoreActions({ label = '更多操作', children, align = 
     setPosition(window.innerWidth < 640
       ? { position: 'fixed', inset: 'auto 12px 12px', maxHeight: 'calc(100dvh - 24px)' }
       : { position: 'fixed', inset: 'auto', top, left, width, maxHeight: 'calc(100dvh - 24px)' })
-    menu.current.querySelector<HTMLElement>('button:not(:disabled), a[href]')?.focus()
+    menu.current.querySelector<HTMLElement>('button:not(:disabled), a[href]')?.focus({ preventScroll: true })
   }, [open, align])
   useEffect(() => {
     if (!open) return

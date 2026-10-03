@@ -15,6 +15,14 @@ describe('more actions outside clipping ancestors', () => {
     expect(trigger).toHaveFocus()
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
   })
+  it('focuses the opening action without scrolling the page and dismissing the menu', () => {
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    render(<MoreActions><button>令牌管理</button></MoreActions>)
+    fireEvent.click(screen.getByRole('button', { name: '更多操作' }))
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true })
+    expect(screen.getByRole('button', { name: '令牌管理' })).toHaveFocus()
+    focus.mockRestore()
+  })
   it('runs an action once and closes; outside clicks also dismiss', () => {
     const edit = vi.fn()
     render(<><MoreActions><button onClick={edit}>编辑</button></MoreActions><button>其他操作</button></>)
