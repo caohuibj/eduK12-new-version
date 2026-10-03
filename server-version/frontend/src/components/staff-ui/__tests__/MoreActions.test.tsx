@@ -34,12 +34,19 @@ describe('more actions outside clipping ancestors', () => {
     fireEvent.pointerDown(screen.getByRole('button', { name: '其他操作' }))
     expect(screen.queryByRole('group')).toBeNull()
   })
-  it('keeps menu scrolling usable but dismisses when the underlying page moves', () => {
+  it('ignores automatic table scroll but dismisses on outside wheel or touch intent', () => {
     render(<MoreActions><button>编辑</button></MoreActions>)
     fireEvent.click(screen.getByRole('button', { name: '更多操作' }))
     fireEvent.scroll(screen.getByRole('group'))
     expect(screen.getByRole('group')).toBeInTheDocument()
     fireEvent.scroll(window)
+    expect(screen.getByRole('group')).toBeInTheDocument()
+    fireEvent.wheel(screen.getByRole('group'))
+    expect(screen.getByRole('group')).toBeInTheDocument()
+    fireEvent.wheel(window)
+    expect(screen.queryByRole('group')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '更多操作' }))
+    fireEvent.touchMove(window)
     expect(screen.queryByRole('group')).toBeNull()
   })
 

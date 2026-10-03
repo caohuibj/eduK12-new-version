@@ -33,16 +33,19 @@ export default function MoreActions({ label = '更多操作', children, align = 
       if (event.key === 'Escape') { event.preventDefault(); setOpen(false); trigger.current?.focus() }
     }
     const resize = () => setOpen(false)
-    const scroll = (event: Event) => { if (!(event.target instanceof Node && menu.current?.contains(event.target))) setOpen(false) }
+    // Automatic scrollIntoView for the trigger must not dismiss its newly opened menu.
+    const scrollIntent = (event: Event) => { if (!(event.target instanceof Node && menu.current?.contains(event.target))) setOpen(false) }
     document.addEventListener('pointerdown', dismiss)
     document.addEventListener('keydown', escape)
     window.addEventListener('resize', resize)
-    window.addEventListener('scroll', scroll, true)
+    window.addEventListener('wheel', scrollIntent, true)
+    window.addEventListener('touchmove', scrollIntent, true)
     return () => {
       document.removeEventListener('pointerdown', dismiss)
       document.removeEventListener('keydown', escape)
       window.removeEventListener('resize', resize)
-      window.removeEventListener('scroll', scroll, true)
+      window.removeEventListener('wheel', scrollIntent, true)
+      window.removeEventListener('touchmove', scrollIntent, true)
     }
   }, [open])
   return <div className={`staff-more-actions staff-more-actions--${align}`}>
