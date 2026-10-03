@@ -8,7 +8,16 @@ The Codex in-app browser was used against the real production APIs. Synthetic st
 
 The complete private inventory has 118 routes including aliases, containers and fallback: 61 observed representative states, 5 limited read-only/catalog checks, 1 shared implementation without separate navigation, 3 disabled routes, 19 blocked by synthetic content/identity prerequisites and 29 not individually tested. These counts are not a claim that every operation or business state passed. Parent and mini-program switches stayed off; Web classroom is enabled.
 
-The local evidence directory contains the full route matrix, 11 issue records, screen-size metadata, before/after screenshots, retests and test-data disposition. Screenshots and raw browser records are not uploaded to GitHub because existing historical/administrator data must remain private.
+The local evidence directory contains the full route matrix, 11 issue records, screen-size metadata, before/after screenshots, retests and test-data disposition. Only the four reviewed anonymous-homepage images below are committed; they contain no accounts, credentials or business data. Organization/user/report screenshots and raw browser records remain private.
+
+## Anonymous homepage comparison
+
+| Viewport | Before | After |
+|---|---|---|
+| 1280×800 | [Before](web-acceptance-2026-10-03/portal-before-1280x800.jpg) | [After](web-acceptance-2026-10-03/portal-after-1280x800.jpg) |
+| 360×800 | [Before](web-acceptance-2026-10-03/portal-before-360x800.jpg) | [After](web-acceptance-2026-10-03/portal-after-360x800.jpg) |
+
+The homepage comparison uses the immediately preceding local portal state (including the closed parent notice) and the current candidate. The additional five-viewport organization/PDF comparisons stay in the controlled local evidence directory.
 
 ## Functional repairs
 
@@ -36,7 +45,7 @@ Organization overflow at 1280 (1312px content versus 1265px available) and phone
 
 ## Validation and remaining limits
 
-Frontend lint has zero errors and existing warnings; app/cognitive typechecks and production build with the cognitive flag pass. Full frontend regression and the new portal order test are recorded in the private report. Backend public-capability regression/build are recorded there; the complete isolated database/browser/container/security gate is left to the exact-head CI result, not inferred from local tests.
+Frontend lint has zero errors and existing warnings; app/cognitive typechecks and production build with the cognitive flag pass. Full frontend regression passes 177 test files / 718 tests, including the new portal order test. Local lint has 107 existing warnings. The host Node is 25.2.1, so local Vitest used `--no-experimental-webstorage`; the repository CI remains on supported Node 24.21.0. Backend public-capability regression/build are recorded there; the complete isolated database/browser/container/security gate is left to the exact-head CI result, not inferred from local tests.
 
 Still untested: some public/anonymous study flows, scientific runners without approved synthetic prerequisites, historical answer/details, every failure/expired-session combination and actual 200% browser zoom. COUNSELOR/CLIENT additions and final account/organization cleanup await the user's action-time confirmation after an automatic approval-review rejection. No existing account password or active state was changed. The earlier controlled custody membership for the existing manually signed-in platform administrator is recorded privately; it is not an automatic entitlement to others' reports.
 
