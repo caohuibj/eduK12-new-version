@@ -196,12 +196,12 @@ export default function OrganizationAdminPage() {
   }
 
   if (activeLoading && !context) {
-    return <ProductPage width="management"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+    return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
   }
 
   if (!context) {
     return (
-      <ProductPage width="management">
+      <ProductPage width="management" className="hui-organization-page">
         <ProductStatus kind="error" title="无法进入组织空间" actions={<Link to="/">返回首页</Link>}>
           {activeError || '当前账户没有此组织的有效访问上下文。'}
         </ProductStatus>
@@ -213,8 +213,7 @@ export default function OrganizationAdminPage() {
   const currentCapabilities = new Set(accessHistory?.capabilities.filter(grantCurrent).map((grant) => grant.capability) ?? [])
 
   return (
-    <ProductPage width="management">
-      {canGovern && organizationId && <DeliveryPolicySettings key={organizationId} organizationId={organizationId} />}
+    <ProductPage width="management" className="hui-organization-page">
       <PageHeader
         title={context.organization.name}
         description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}
@@ -224,6 +223,8 @@ export default function OrganizationAdminPage() {
             : <ProductButton variant="primary" disabled={busyKey !== null} onClick={() => void runMutation('org-resume', '组织已恢复', () => organizationApi.resume(organizationId))}>恢复组织</ProductButton>
         ) : undefined}
       />
+
+      {canGovern && organizationId && <DeliveryPolicySettings key={organizationId} organizationId={organizationId} />}
 
       {context.access.explicitDenies.length > 0 && (
         <ProductStatus kind="warning" title="当前存在显式拒绝规则">
@@ -252,10 +253,10 @@ export default function OrganizationAdminPage() {
               <ProductButton variant="primary" type="submit" disabled={busyKey !== null || !newMemberUserId.trim()}>新增成员</ProductButton>
             </form>
             <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <table className="w-full min-w-[760px] text-left text-sm">
+              <table aria-label="成员关系" className="hui-organization-members w-full min-w-[760px] text-left text-sm">
                 <thead className="bg-slate-50 text-slate-700"><tr><th className="p-3">用户</th><th className="p-3">角色</th><th className="p-3">开始</th><th className="p-3">结束</th><th className="p-3">操作</th></tr></thead>
                 <tbody>
-                  {memberships.map((membership) => <tr key={membership.id} className="border-t border-slate-200 align-top"><td className="p-3 font-mono text-xs">{membership.userId}</td><td className="p-3"><select aria-label={`成员 ${membership.userId} 角色`} disabled={membership.validUntil !== null || busyKey !== null} value={membership.orgRole} onChange={(event) => void runMutation(`role-${membership.id}`, '成员角色已更新', () => organizationApi.setMembershipRole(organizationId, membership.id, event.target.value as OrganizationRole))}><option value="MEMBER">MEMBER</option><option value="ORG_ADMIN">ORG_ADMIN</option></select></td><td className="p-3">{formatTime(membership.validFrom)}</td><td className="p-3">{formatTime(membership.validUntil)}</td><td className="p-3"><div className="flex flex-wrap gap-2"><ProductButton onClick={() => void openMembershipHistory(membership.id)}>授权历史</ProductButton>{membership.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`end-${membership.id}`, '成员关系已结束', () => organizationApi.endMembership(organizationId, membership.id, '由组织管理界面结束'))}>结束关系</ProductButton>}</div></td></tr>)}
+                  {memberships.map((membership) => <tr key={membership.id} className="border-t border-slate-200 align-top"><td data-label="用户" className="p-3 font-mono text-xs">{membership.userId}</td><td data-label="角色" className="p-3"><select aria-label={`成员 ${membership.userId} 角色`} disabled={membership.validUntil !== null || busyKey !== null} value={membership.orgRole} onChange={(event) => void runMutation(`role-${membership.id}`, '成员角色已更新', () => organizationApi.setMembershipRole(organizationId, membership.id, event.target.value as OrganizationRole))}><option value="MEMBER">MEMBER</option><option value="ORG_ADMIN">ORG_ADMIN</option></select></td><td data-label="开始" className="p-3">{formatTime(membership.validFrom)}</td><td data-label="结束" className="p-3">{formatTime(membership.validUntil)}</td><td data-label="操作" className="p-3"><div className="flex flex-wrap gap-2"><ProductButton onClick={() => void openMembershipHistory(membership.id)}>授权历史</ProductButton>{membership.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`end-${membership.id}`, '成员关系已结束', () => organizationApi.endMembership(organizationId, membership.id, '由组织管理界面结束'))}>结束关系</ProductButton>}</div></td></tr>)}
                   {memberships.length === 0 && <tr><td colSpan={5} className="p-4 text-slate-500">暂无成员关系。</td></tr>}
                 </tbody>
               </table>

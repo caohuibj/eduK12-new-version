@@ -71,7 +71,7 @@ const ClassroomEnter: React.FC = () => {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-gray-50">
+    <section className="flex min-h-screen flex-col bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="mx-auto max-w-md px-4 py-6 text-center">
           <h1 className="text-2xl font-bold text-gray-900">加入课堂</h1>
@@ -172,7 +172,7 @@ const ClassroomEnter: React.FC = () => {
           </button>
         </form>
       </div>
-    </main>
+    </section>
   )
 }
 

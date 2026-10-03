@@ -1,5 +1,6 @@
+import './question-editor.css'
 import React, { useState } from 'react'
-import { Plus, Trash2, GripVertical, CheckCircle2, Circle, AlignLeft, ListTodo, CheckSquare } from 'lucide-react'
+import { Trash2, GripVertical, AlignLeft, ListTodo, CheckSquare } from 'lucide-react'
 
 export interface Question {
   id: string
@@ -102,7 +103,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
   }
 
   return (
-    <div className="space-y-4">
+    <div className="hui-question-editor space-y-4">
       {/* Add Question Buttons */}
       <div className="flex flex-wrap gap-3">
         <button
@@ -144,28 +145,32 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
               className={`border rounded-lg p-4 ${editingQuestion === question.id ? 'border-blue-300 bg-blue-50/30' : 'border-gray-200'}`}
             >
               {/* Question Header */}
-              <div className="flex items-start space-x-3">
-                <div className="flex flex-col items-center space-y-1 pt-1">
+              <div className="hui-question-layout">
+                <div className="hui-question-order">
                   <button
                     type="button"
+                    aria-label={`上移题目 ${index + 1}`}
+                    title={`上移题目 ${index + 1}`}
                     onClick={() => moveQuestion(index, 'up')}
                     disabled={index === 0}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    className="hui-question-icon"
                   >
                     ▲
                   </button>
                   <GripVertical className="w-4 h-4 text-gray-400" />
                   <button
                     type="button"
+                    aria-label={`下移题目 ${index + 1}`}
+                    title={`下移题目 ${index + 1}`}
                     onClick={() => moveQuestion(index, 'down')}
                     disabled={index === questions.length - 1}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    className="hui-question-icon"
                   >
                     ▼
                   </button>
                 </div>
 
-                <div className="flex-1">
+                <div className="hui-question-body">
                   {/* Question Title */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -182,8 +187,10 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
                     </div>
                     <button
                       type="button"
+                      aria-label={`删除题目 ${index + 1}`}
+                      title={`删除题目 ${index + 1}`}
                       onClick={() => deleteQuestion(question.id)}
-                      className="text-red-400 hover:text-red-600 p-1"
+                      className="hui-question-icon hui-question-icon--danger"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -191,6 +198,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
 
                   {/* Question Text */}
                   <textarea
+                    aria-label={`题目 ${index + 1} 内容`}
                     value={question.question}
                     onChange={(e) => updateQuestion(question.id, { question: e.target.value })}
                     placeholder="请输入题目内容..."
@@ -200,21 +208,23 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
 
                   {/* Options for Single Choice */}
                   {question.type === 'single_choice' && question.options && (
-                    <div className="space-y-2 ml-4">
+                    <div className="space-y-2 hui-question-options">
                       {question.options.map((option) => (
-                        <div key={option.key} className="flex items-center space-x-3">
+                        <div key={option.key} className="hui-question-option">
                           <span className="font-medium text-gray-600 w-6">{option.key}.</span>
                           <input
                             type="text"
+                            aria-label={`题目 ${index + 1} 选项 ${option.key}`}
                             value={option.text}
                             onChange={(e) => updateOption(question.id, option.key, { text: e.target.value })}
-                            className="input flex-1"
+                            className="input hui-question-option__text"
                             placeholder={`选项 ${option.key}`}
                           />
-                          <div className="flex items-center space-x-2">
+                          <div className="hui-question-option__score">
                             <span className="text-sm text-gray-500">分值:</span>
                             <input
                               type="number"
+                              aria-label={`题目 ${index + 1} 选项 ${option.key} 分值`}
                               value={option.points || 0}
                               onChange={(e) => updateOption(question.id, option.key, { points: parseInt(e.target.value) || 0 })}
                               className="input w-16 text-center"
@@ -225,8 +235,10 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
                           {question.options!.length > 2 && (
                             <button
                               type="button"
+                              aria-label={`删除题目 ${index + 1} 选项 ${option.key}`}
+                              title={`删除选项 ${option.key}`}
                               onClick={() => deleteOption(question.id, option.key)}
-                              className="text-red-400 hover:text-red-600"
+                              className="hui-question-icon hui-question-icon--danger"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -248,23 +260,26 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ questions, onChange }) 
 
                   {/* Options for Multiple Choice */}
                   {question.type === 'multiple_choice' && question.options && (
-                    <div className="space-y-2 ml-4">
+                    <div className="space-y-2 hui-question-options">
                       {question.options.map((option) => (
-                        <div key={option.key} className="flex items-center space-x-3">
-                          <CheckSquare className="w-5 h-5 text-purple-400" />
+                        <div key={option.key} className="hui-question-option">
+                          <CheckSquare className="hui-question-option__type w-5 h-5 text-purple-400" aria-hidden="true" />
                           <span className="font-medium text-gray-600 w-6">{option.key}.</span>
                           <input
                             type="text"
+                            aria-label={`题目 ${index + 1} 选项 ${option.key}`}
                             value={option.text}
                             onChange={(e) => updateOption(question.id, option.key, { text: e.target.value })}
-                            className="input flex-1"
+                            className="input hui-question-option__text"
                             placeholder={`选项 ${option.key}`}
                           />
                           {question.options!.length > 2 && (
                             <button
                               type="button"
+                              aria-label={`删除题目 ${index + 1} 选项 ${option.key}`}
+                              title={`删除选项 ${option.key}`}
                               onClick={() => deleteOption(question.id, option.key)}
-                              className="text-red-400 hover:text-red-600"
+                              className="hui-question-icon hui-question-icon--danger"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

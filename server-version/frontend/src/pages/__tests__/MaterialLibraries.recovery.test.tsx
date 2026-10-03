@@ -5,6 +5,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), upload: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: { get: mocks.get, post: mocks.post }, sessionAxios: { post: mocks.upload }, ensureCsrfToken: async () => 'token' }))
 vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner', role: 'TEACHER' } }) }))
+vi.mock('../../components/PdfViewer', () => ({ default: ({ url, title, onClose }: { url: string; title: string; onClose: () => void }) => <section aria-label={`${title}预览`}><span>{url}</span><button onClick={onClose}>关闭合成预览</button></section> }))
 vi.mock('../../components/SecureVideoPlayer', () => ({ default: () => <div>video</div> }))
 import DocumentLibrary from '../DocumentLibrary'
 import ImageLibrary from '../ImageLibrary'
@@ -17,6 +18,16 @@ const video = (title: string, status = 'COMPLETED') => ({ id: title, title, stat
 describe('material lists and upload recovery', () => {
   beforeEach(() => { vi.resetAllMocks(); mocks.get.mockResolvedValue(result()) })
   afterEach(() => vi.useRealTimers())
+  it('opens an authorized document in the shared PDF viewer instead of an iframe', async () => {
+    mocks.get.mockResolvedValue(result([{ ...document('synthetic'), url: '/api/assets/synthetic/content' }]))
+    const user = userEvent.setup()
+    const { container } = render(<DocumentLibrary />)
+    await user.click(await screen.findByRole('button', { name: '预览' }))
+    expect(screen.getByRole('region', { name: 'synthetic预览' })).toHaveTextContent('/api/assets/synthetic/content')
+    expect(container.querySelector('iframe')).toBeNull()
+    await user.click(screen.getByRole('button', { name: '关闭合成预览' }))
+    expect(screen.queryByRole('region', { name: 'synthetic预览' })).toBeNull()
+  })
   it.each([[DocumentLibrary, '文档'], [ImageLibrary, '图片'], [VideoLibrary, '视频']] as const)('shows a read error, never a fake empty state, and retries %s', async (Page, noun) => {
     mocks.get.mockRejectedValueOnce({ message: 'offline' }).mockResolvedValue(result())
     const user = userEvent.setup()

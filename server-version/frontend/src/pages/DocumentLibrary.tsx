@@ -1,3 +1,4 @@
+import PdfViewer from '../components/PdfViewer'
 import { useLatestRequest } from '../components/shared-ui/useLatestRequest'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
@@ -336,31 +337,13 @@ const DocumentLibrary: React.FC = () => {
         </ModalSurface>
       )}
 
-      {/* Preview Modal */}
-      {previewDocument && (
-        <ModalSurface open onClose={() => setPreviewDocument(null)} className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" dismissOnBackdrop>
-          <div className="bg-white rounded-lg overflow-hidden max-w-5xl w-full h-[90vh] flex flex-col" tabIndex={-1} role="dialog" aria-modal="true" aria-label={previewDocument.title + "预览"}>
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-medium truncate flex-1 mr-4">{previewDocument.title}</h3>
-              <a href={previewDocument.url || `/uploads/documents/${previewDocument.fileName}`} target="_blank" rel="noopener noreferrer" className="mr-4 rounded px-2 py-2 text-sm text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" aria-label={`单独打开 ${previewDocument.title}`}>单独打开文档</a>
-              <button
-                onClick={() => setPreviewDocument(null)}
-                className="text-gray-400 hover:text-gray-600" aria-label="关闭"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <iframe
-                tabIndex={-1}
-                src={previewDocument.url || `/uploads/documents/${previewDocument.fileName}`}
-                className="w-full h-full"
-                title={previewDocument.title}
-              />
-            </div>
-          </div>
-        </ModalSurface>
-      )}
+      {/* Render the authorized PDF directly; security headers forbid iframe embedding. */}
+      {previewDocument && <PdfViewer
+        isOpen
+        onClose={() => setPreviewDocument(null)}
+        url={previewDocument.url || `/uploads/documents/${previewDocument.fileName}`}
+        title={previewDocument.title}
+      />}
       {uploadGuard.confirmation}
     </ProductPage>
   )

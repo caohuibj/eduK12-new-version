@@ -66,15 +66,15 @@ const ClassroomJoin: React.FC = () => {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50" role="status" aria-live="polite">
+      <section className="flex min-h-screen items-center justify-center bg-gray-50" role="status" aria-live="polite">
         <div className="text-gray-500">正在加载课堂信息...</div>
-      </main>
+      </section>
     )
   }
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <section className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
         <div role="alert" className="w-full max-w-md rounded-lg bg-white p-6 text-center shadow-sm">
           <AlertCircle className="mx-auto mb-4 h-16 w-16 text-red-500" aria-hidden="true" />
           <h1 className="mb-2 text-xl font-semibold text-gray-900">无法进入课堂</h1>
@@ -84,7 +84,7 @@ const ClassroomJoin: React.FC = () => {
             <Link to="/student/classroom/enter" className="btn-secondary text-center">重新输入课堂码</Link>
           </div>
         </div>
-      </main>
+      </section>
     )
   }
 
@@ -93,7 +93,7 @@ const ClassroomJoin: React.FC = () => {
   const ended = classroom.status === 'ENDED'
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+    <section className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
         <header className="mb-6 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-action/10">
@@ -134,7 +134,7 @@ const ClassroomJoin: React.FC = () => {
           </button>
         )}
       </div>
-    </main>
+    </section>
   )
 }
 

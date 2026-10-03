@@ -82,6 +82,63 @@ beforeEach(() => {
 })
 
 describe('CourseDetail composite availability', () => {
+  it('does not render an empty enrollment-code label when the server redacts it', async () => {
+    mockGet.mockImplementation((path: string) => Promise.resolve({ code: 0, data: path === '/courses/course-1'
+      ? { ...course, courseCode: undefined }
+      : { list: [] } }))
+    render(<MemoryRouter initialEntries={['/student/courses/course-1']}>
+      <Routes><Route path="/student/courses/:courseId" element={<CourseDetail />} /></Routes>
+    </MemoryRouter>)
+    await screen.findByText('语文课程')
+    expect(screen.queryByText(/课程号:/)).not.toBeInTheDocument()
+    expect(screen.getByText('1 名学员')).toBeInTheDocument()
+  })
+
+  it('finds modern questionnaires through all authorized task pages without mixing other courses', async () => {
+    const user = userEvent.setup()
+    const baseGet = mockGet.getMockImplementation()!
+    const questionnaire = (id: string) => ({ id, productKind: 'QUESTIONNAIRE', name: id, course: null,
+      estimatedModules: 1, items: [], attempt: null, latestCompletedAttempt: null,
+      canStartNewAttempt: true, canContinue: false, availability: 'OPEN', maxAttempts: 1, attemptsUsed: 0 })
+    mockGet.mockImplementation((path: string) => {
+      if (path === '/composite-assessments/available') return Promise.resolve({ code: 0,
+        data: { list: [questionnaire('my-questionnaire'), questionnaire('other-course-questionnaire')] } })
+      if (path === '/courses/my/tasks?page=1&pageSize=100') return Promise.resolve({ code: 0,
+        data: { total: 101, list: [{ id: 'other-course-questionnaire', kind: 'COMPOSITE', courses: [{ id: 'course-2' }] }] } })
+      if (path === '/courses/my/tasks?page=2&pageSize=100') return Promise.resolve({ code: 0,
+        data: { total: 101, list: [{ id: 'my-questionnaire', kind: 'COMPOSITE', courses: [{ id: 'course-1' }] }] } })
+      return baseGet(path)
+    })
+    render(<MemoryRouter initialEntries={['/student/courses/course-1']}>
+      <Routes><Route path="/student/courses/:courseId" element={<CourseDetail />} /></Routes>
+    </MemoryRouter>)
+    await screen.findByText('语文课程')
+    await user.click(screen.getByRole('button', { name: /综合测评/ }))
+    await screen.findByText('my-questionnaire')
+    expect(screen.queryByText('other-course-questionnaire')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '开始测评' }))
+    expect(mockNavigate).toHaveBeenCalledWith('/student/composite/my-questionnaire')
+  })
+
+  it('shows a retry instead of silently claiming an empty list when delivery lookup fails', async () => {
+    const user = userEvent.setup()
+    const baseGet = mockGet.getMockImplementation()!
+    mockGet.mockImplementation((path: string) => {
+      if (path === '/composite-assessments/available') return Promise.resolve({ code: 0,
+        data: { list: [{ id: 'modern', productKind: 'QUESTIONNAIRE', course: null }] } })
+      if (path.startsWith('/courses/my/tasks?')) return Promise.resolve({ code: -1, message: '任务加载失败' })
+      return baseGet(path)
+    })
+    render(<MemoryRouter initialEntries={['/student/courses/course-1']}>
+      <Routes><Route path="/student/courses/:courseId" element={<CourseDetail />} /></Routes>
+    </MemoryRouter>)
+    await screen.findByText('语文课程')
+    await user.click(screen.getByRole('button', { name: /综合测评/ }))
+    await screen.findByText('任务加载失败')
+    expect(screen.getByRole('button', { name: '重试' })).toBeEnabled()
+    expect(screen.queryByText('暂无综合测评')).not.toBeInTheDocument()
+  })
+
   it('exposes repeat, upcoming, and exhausted actions without hiding completed reports', async () => {
     const user = userEvent.setup()
     render(

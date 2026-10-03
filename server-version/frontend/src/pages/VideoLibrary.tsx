@@ -599,7 +599,9 @@ const VideoLibrary: React.FC = () => {
                 {(isAdmin || video.teacherId === user?.id) && (
                   <button
                     onClick={() => handleDelete(video)}
-                    className="p-1 text-red-400 hover:text-red-600"
+                    aria-label={`删除视频 ${video.title}`}
+                    title={`删除视频 ${video.title}`}
+                    className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md text-red-400 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

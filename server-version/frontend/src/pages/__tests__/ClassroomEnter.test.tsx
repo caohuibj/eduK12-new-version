@@ -20,6 +20,12 @@ describe('ClassroomEnter input capability', () => {
     vi.clearAllMocks()
   })
 
+  it('does not create a nested main landmark inside the application shell', () => {
+    render(<main><ClassroomEnter /></main>)
+    expect(screen.getAllByRole('main')).toHaveLength(1)
+    expect(screen.getByRole('heading', { name: '加入课堂' })).toBeInTheDocument()
+  })
+
   it('allows physical-keyboard entry without removing the touch keypad', async () => {
     const user = userEvent.setup()
     render(<ClassroomEnter />)

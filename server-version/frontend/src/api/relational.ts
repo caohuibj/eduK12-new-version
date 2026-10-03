@@ -94,29 +94,29 @@ const productPayload = (product: RelationalProductRef) => ({ ...product })
 
 export const relationalApi = {
   async catalog(): Promise<RelationalProduct[]> {
-    const response = await apiClient.get<{ list: RelationalProduct[] }>('/relational/catalog')
+    const response = await apiClient.get<{ list: RelationalProduct[] }>('/relational-assessments/catalog')
     return response.data.list
   },
   async tasks(): Promise<RelationalTask[]> {
-    const response = await apiClient.get<{ list: RelationalTask[] }>('/relational/tasks')
+    const response = await apiClient.get<{ list: RelationalTask[] }>('/relational-assessments/tasks')
     return response.data.list
   },
   async cohortReport(courseId: string, product: RelationalProductRef): Promise<RelationalCohortReport> {
-    const response = await apiClient.get<RelationalCohortReport>('/relational/reports/cohort', {
+    const response = await apiClient.get<RelationalCohortReport>('/relational-assessments/reports/cohort', {
       params: { courseId, ...productPayload(product) },
     })
     return response.data
   },
   async parentChildren(): Promise<ParentChild[]> {
-    const response = await apiClient.get<{ list: ParentChild[] }>('/relational/context/parent-children')
+    const response = await apiClient.get<{ list: ParentChild[] }>('/relational-assessments/context/parent-children')
     return response.data.list
   },
   async teacherRoster(courseId: string): Promise<TeacherRoster> {
-    const response = await apiClient.get<TeacherRoster>(`/relational/context/courses/${encodeURIComponent(courseId)}/roster`)
+    const response = await apiClient.get<TeacherRoster>(`/relational-assessments/context/courses/${encodeURIComponent(courseId)}/roster`)
     return response.data
   },
   async studentCourses(): Promise<StudentCourseContext[]> {
-    const response = await apiClient.get<{ list: StudentCourseContext[] }>('/relational/context/student-courses')
+    const response = await apiClient.get<{ list: StudentCourseContext[] }>('/relational-assessments/context/student-courses')
     return response.data.list
   },
   async issueTeacherParent(input: {
@@ -125,7 +125,7 @@ export const relationalApi = {
     parentUserId: string
     product: RelationalProductRef
   }): Promise<RelationalTask> {
-    const response = await apiClient.post<RelationalTask>('/relational/assignments/teacher-parent', {
+    const response = await apiClient.post<RelationalTask>('/relational-assessments/assignments/teacher-parent', {
       courseId: input.courseId,
       studentUserId: input.studentUserId,
       parentUserId: input.parentUserId,
@@ -138,7 +138,7 @@ export const relationalApi = {
     studentUserId: string
     product: RelationalProductRef
   }): Promise<RelationalTask> {
-    const response = await apiClient.post<RelationalTask>('/relational/assignments/teacher-observer', {
+    const response = await apiClient.post<RelationalTask>('/relational-assessments/assignments/teacher-observer', {
       courseId: input.courseId,
       studentUserId: input.studentUserId,
       ...productPayload(input.product),
@@ -149,7 +149,7 @@ export const relationalApi = {
     studentUserId: string
     product: RelationalProductRef
   }): Promise<RelationalTask> {
-    const response = await apiClient.post<RelationalTask>('/relational/assignments/parent-self-serve', {
+    const response = await apiClient.post<RelationalTask>('/relational-assessments/assignments/parent-self-serve', {
       studentUserId: input.studentUserId,
       ...productPayload(input.product),
     })
@@ -159,7 +159,7 @@ export const relationalApi = {
     courseId: string
     product: RelationalProductRef
   }): Promise<RelationalTask> {
-    const response = await apiClient.post<RelationalTask>('/relational/assignments/student-experience', {
+    const response = await apiClient.post<RelationalTask>('/relational-assessments/assignments/student-experience', {
       courseId: input.courseId,
       ...productPayload(input.product),
     })
@@ -167,13 +167,13 @@ export const relationalApi = {
   },
   async acceptConsent(assignmentId: string): Promise<{ accepted: boolean; replayed: boolean }> {
     const response = await apiClient.post<{ accepted: boolean; replayed: boolean }>(
-      `/relational/assignments/${encodeURIComponent(assignmentId)}/consent/accept`,
+      `/relational-assessments/assignments/${encodeURIComponent(assignmentId)}/consent/accept`,
     )
     return response.data
   },
   async reportTarget(assignmentId: string): Promise<{ attemptId: string }> {
     const response = await apiClient.get<{ attemptId: string }>(
-      `/relational/assignments/${encodeURIComponent(assignmentId)}/report-target`,
+      `/relational-assessments/assignments/${encodeURIComponent(assignmentId)}/report-target`,
     )
     return response.data
   },
@@ -186,7 +186,7 @@ export const relationalApi = {
       assignment: RelationalTask
       attempt: CompositeAttemptState
       replayed: boolean
-    }>(`/relational/assignments/${encodeURIComponent(assignmentId)}/start`)
+    }>(`/relational-assessments/assignments/${encodeURIComponent(assignmentId)}/start`)
     return response.data
   },
 }

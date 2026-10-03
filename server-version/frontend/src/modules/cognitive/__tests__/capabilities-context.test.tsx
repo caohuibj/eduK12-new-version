@@ -19,8 +19,8 @@ vi.mock('../feature', () => ({
 import { CapabilitiesProvider, useCapabilities } from '../../../contexts/CapabilitiesContext'
 
 const Probe = () => {
-  const { cognitiveEnabled, isLoading } = useCapabilities()
-  return <div>{`cognitive:${String(cognitiveEnabled)} loading:${String(isLoading)}`}</div>
+  const { cognitiveEnabled, parentPortalEnabled, isLoading } = useCapabilities()
+  return <div>{`cognitive:${String(cognitiveEnabled)} loading:${String(isLoading)}`}<span>{`parent:${String(parentPortalEnabled)}`}</span></div>
 }
 
 describe('CapabilitiesProvider', () => {
@@ -81,4 +81,10 @@ it('bounds an indefinitely hanging capability request while unrelated children r
   expect(screen.getByText('cognitive:false loading:false')).toBeVisible()
   expect(mockGet).toHaveBeenCalledTimes(2)
   view.unmount(); vi.useRealTimers()
+})
+
+it.each([true, false, undefined])('uses only an explicit backend parent portal flag (%s)', async flag => {
+  mockGet.mockResolvedValue({ code: 0, data: { cognitive: true, parentPortal: flag } })
+  render(<CapabilitiesProvider><Probe /></CapabilitiesProvider>)
+  await waitFor(() => expect(screen.getByText(`parent:${String(flag === true)}`)).toBeVisible())
 })

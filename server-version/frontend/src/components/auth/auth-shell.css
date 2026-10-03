@@ -463,18 +463,26 @@
   }
   .hui-entry-hero .hui-auth-brand { margin-bottom: 0; }
   .hui-entry-hero__body { margin-block: 0; gap: .65rem; }
-  .hui-entry-hero h1 { max-width: none; font-size: 1.7rem; }
+  .hui-entry-hero h1 { max-width: none; font-size: 1.5rem; line-height: 1.3; }
   .hui-entry-hero p { font-size: .84rem; line-height: 1.65; }
   .hui-entry-features { display: none; }
   .hui-entry-panel { min-height: 0; padding: 1rem; box-shadow: none; }
   .hui-entry-panel__header { margin-bottom: .85rem; }
   .hui-entry-panel__header h2 { font-size: 1.35rem; }
-  .hui-entry-roles { grid-template-columns: 1fr; gap: .7rem; }
-  .hui-entry-role { min-height: 98px; padding: .9rem; }
-  .hui-entry-role__action { display: none; }
+  .hui-entry-roles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+  .hui-entry-role { min-height: 132px; padding: .75rem; }
+  .hui-entry-role__top { gap: .45rem; }
+  .hui-entry-role__icon { width: 1.8rem; height: 1.8rem; flex-basis: 1.8rem; border-radius: .6rem; }
+  .hui-entry-role strong { font-size: .875rem; line-height: 1.4; }
+  .hui-entry-role p { font-size: .8125rem; line-height: 1.55; overflow-wrap: anywhere; }
+  .hui-entry-role__action { display: inline-flex; }
   .hui-entry-tagline { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hui-entry-role { transition: none; }
 }
+
+/* Closed entries remain discoverable without inviting an unusable login. */
+.hui-entry-role--unavailable { background: #f8fafc; border-style: dashed; }
+.hui-entry-role--unavailable .hui-entry-role__action { color: #526477; }

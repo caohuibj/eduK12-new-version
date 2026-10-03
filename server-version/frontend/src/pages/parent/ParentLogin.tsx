@@ -1,3 +1,4 @@
+import { useCapabilities } from '../../contexts/CapabilitiesContext'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import LoginRecoveryNotice from '../../components/app-shell/LoginRecoveryNotice'
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext'
 
 export default function ParentLogin() {
   const completeLogin = useLoginReturn()
+  const { parentPortalEnabled, isLoading } = useCapabilities()
   const { login } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -22,6 +24,7 @@ export default function ParentLogin() {
 
   return <AuthShell tone="parent" title="家长登录" description="使用学校为您建立的家长账号">
     <LoginRecoveryNotice />
+    {!parentPortalEnabled ? <div role="status" className="hui-auth-note">{isLoading ? '正在确认家长入口状态…' : '家长入口尚未开放，请以学校通知为准。您可以返回入口使用其他已开放的身份。'}</div> : <>
     {error && <div role="alert" id="parent-auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>}
     <form onSubmit={submit} className="space-y-4">
       <div>
@@ -39,5 +42,6 @@ export default function ParentLogin() {
     <div className="hui-auth-note">
       学校建立的家长账号用于观察测评与家长反馈；具体可见内容以当前学校任务为准。
     </div>
+    </>}
   </AuthShell>
 }

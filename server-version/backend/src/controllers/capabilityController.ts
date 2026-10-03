@@ -10,6 +10,7 @@ export const capabilityController = {
   getCapabilities(_req: Request, res: Response) {
     return success(res, {
       cognitive: config.cognitiveModuleEnabled,
+      parentPortal: config.parentPortalEnabled,
       situational: {
         standalone: true,
         supported: true,

@@ -13,7 +13,7 @@
 .staff-dialog__header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:20px 22px;border-bottom:1px solid #e5ebf2}.staff-dialog__header h2{margin:0;color:#182b42;font-size:20px;line-height:1.35}.staff-dialog__description{margin-top:5px;color:#66788d;font-size:13px;line-height:1.6}
 .staff-dialog__body{min-height:0;overflow:auto;padding:22px}.staff-dialog__actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid #e5ebf2;background:#f8fafc;border-radius:0 0 14px 14px}
 .staff-icon-button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:0;border-radius:8px;background:transparent;color:#5d6f84;cursor:pointer}.staff-icon-button:hover{background:#eef3f8;color:#233d59}
-.staff-more-actions{position:relative}.staff-more-actions>summary{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #d9e2ec;border-radius:8px;background:#fff;color:#40566f;cursor:pointer;list-style:none}.staff-more-actions>summary::-webkit-details-marker{display:none}.staff-more-actions[open]>summary{border-color:#9cb0c7;background:#f7f9fc}
+.staff-more-actions{position:relative}.staff-more-actions>:is(summary,.staff-more-actions__trigger){display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #d9e2ec;border-radius:8px;background:#fff;color:#40566f;cursor:pointer;list-style:none}.staff-more-actions>:is(summary,.staff-more-actions__trigger)::-webkit-details-marker{display:none}.staff-more-actions__trigger[aria-expanded="true"]{border-color:#9cb0c7;background:#f7f9fc}
 .staff-more-actions__menu{position:absolute;z-index:25;top:calc(100% + 6px);min-width:180px;padding:6px;border:1px solid #d9e2ec;border-radius:10px;background:#fff;box-shadow:0 14px 40px #18324c24}.staff-more-actions--right .staff-more-actions__menu{right:0}.staff-more-actions--left .staff-more-actions__menu{left:0}.staff-more-actions__menu :where(button,a){width:100%;display:flex;align-items:center;gap:8px;min-height:40px;padding:8px 10px;border:0;border-radius:7px;background:transparent;color:#31465e;text-align:left;text-decoration:none;cursor:pointer}.staff-more-actions__menu :where(button,a):hover{background:#f1f5f9}.staff-more-actions__menu .staff-danger-action{color:#b42318}
 .staff-section-nav{position:sticky;top:84px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;padding:8px 10px;border:1px solid #dde5ee;border-radius:10px;background:#fffffff2;backdrop-filter:blur(8px)}.staff-section-nav nav{display:flex;flex-wrap:wrap;gap:4px}.staff-section-nav a{display:inline-flex;align-items:center;min-height:36px;padding:6px 10px;border-radius:7px;color:#425b74;font-size:13px;text-decoration:none}.staff-section-nav a:hover{background:#edf2f7;color:#203a55}
 .staff-feedback{margin-bottom:16px}.staff-text-button{border:0;background:transparent;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
@@ -884,7 +884,7 @@
   align-items: stretch;
 }
 .staff-course-actions :where(.staff-primary-link,.staff-secondary-link),
-.staff-course-actions .staff-more-actions > summary {
+.staff-course-actions .staff-more-actions > :is(summary,.staff-more-actions__trigger) {
   min-height: 44px;
 }
 .staff-course-actions :where(.staff-primary-link,.staff-secondary-link) {
@@ -1084,3 +1084,11 @@
   .staff-record-table .staff-table-actions { justify-content:space-between; border-top:1px solid #edf1f5; padding-top:12px; }
   .staff-record-table .staff-text-action { min-height:44px; }
 }
+
+/* Portal menus escape table scroll/clip ancestors without changing table overflow. */
+.staff-more-actions__menu { z-index: 90; overflow-y: auto; font-size: 14px; line-height: 1.6; }
+.staff-more-actions__menu :where(button,a) { min-height: 44px; }
+.staff-more-actions__menu :where(button,a):focus-visible { outline: 3px solid var(--hui-ds-color-focus, #2563eb); outline-offset: -3px; }
+
+button.classroom-control-question { width: 100%; text-align: left; font: inherit; }
+button.classroom-control-question:focus-visible { outline: 3px solid var(--hui-ds-color-focus, #2563eb); outline-offset: 2px; }
