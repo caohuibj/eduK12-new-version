@@ -1096,6 +1096,8 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
         run: docker compose build backend worker frontend
+      - name: verify production Nginx static asset MIME and security headers
+        run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
       - name: scan backend image (high and critical)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
