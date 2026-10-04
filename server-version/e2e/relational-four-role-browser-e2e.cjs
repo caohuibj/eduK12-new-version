@@ -55,7 +55,7 @@ const installMocks = async (page, role) => {
       mustChangePassword: false,
     }
     if (path === '/api/auth/me') return json(route, envelope(user))
-    if (path === '/api/capabilities') return json(route, envelope({ cognitive: true }))
+    if (path === '/api/capabilities') return json(route, envelope({ cognitive: true, parentPortal: false }))
     // RA-02 is a route-mocked frontend acceptance and does not establish a real
     // cookie session. AppShell now performs Organization discovery for signed-in
     // identities, so keep that shell request inside the same mocked authority

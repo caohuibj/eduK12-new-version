@@ -333,7 +333,7 @@ async function installApiFixture(page, role) {
     let status = 200
     let data = { list: [], total: 0, totalPages: 1, hasMore: false }
 
-    if (pathname === '/api/capabilities') data = { cognitive: true }
+    if (pathname === '/api/capabilities') data = { cognitive: true, parentPortal: false }
     else if (pathname === '/api/auth/me' || pathname === '/api/users/me') {
       if (user) data = user
       else { status = 401; data = null }

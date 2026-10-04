@@ -100,8 +100,12 @@ suite(
     beforeAll(async () => {
       const selected = new URL(url!),
         actual = new URL(process.env.DATABASE_URL ?? '')
+      const loopback = ['localhost', '127.0.0.1'].includes(selected.hostname)
+      const isolatedName = /test|ci/i.test(selected.pathname)
+      const hostedCiDatabase = process.env.CI === 'true' && selected.pathname === '/ptool'
       if (
-        !/test|ci/i.test(selected.pathname) ||
+        !loopback ||
+        !(isolatedName || hostedCiDatabase) ||
         selected.host !== actual.host ||
         selected.pathname !== actual.pathname
       )

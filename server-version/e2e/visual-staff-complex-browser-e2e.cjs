@@ -75,7 +75,7 @@ async function installApiFixture(page) {
     let status = 200
     let data = { list: [], total: 0, totalPages: 1, hasMore: false }
 
-    if (pathname === '/api/capabilities') data = { cognitive: true }
+    if (pathname === '/api/capabilities') data = { cognitive: true, parentPortal: false }
     else if (pathname === '/api/auth/me' || pathname === '/api/users/me') data = teacher
     else if (pathname === '/api/auth/csrf') data = { csrfToken: 'staff-visual-csrf' }
     else if (pathname === '/api/courses') data = { list: [course], total: 1 }

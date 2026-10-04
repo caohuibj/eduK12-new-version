@@ -117,9 +117,11 @@ const ownerJourney = async (browser) => {
     // backup ORG_ADMIN preserves the last-admin invariant.
     await page.goto(`${baseUrl}${organizationPath}`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: fixture.organizationName, exact: true }).waitFor()
-    const ownerRow = page.getByRole('row').filter({ hasText: fixture.ownerUserId })
+    const ownerRow = page.getByRole('region', { name: '成员关系', exact: true })
+      .locator('div.rounded-xl').filter({ has: page.getByText(`用户 ID：${fixture.ownerUserId}`, { exact: true }) })
     await ownerRow.waitFor()
-    await ownerRow.getByRole('button', { name: '结束关系' }).click()
+    page.once('dialog', dialog => dialog.accept())
+    await ownerRow.getByRole('button', { name: '结束关系', exact: true }).click()
     await page.getByText('无法进入组织空间', { exact: true }).waitFor()
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.getByText('无法进入组织空间', { exact: true }).waitFor()

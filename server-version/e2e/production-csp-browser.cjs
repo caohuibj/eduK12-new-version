@@ -73,7 +73,7 @@ async function main(){
   if(pathname==='/negative.js')return send('text/javascript',negative)
   if(pathname==='/api/security/csp-report'){req.resume();res.writeHead(204);return res.end()}
   if(pathname==='/api/auth/csrf')return send('application/json',JSON.stringify({data:{csrfToken:'synthetic-csp-probe'}}))
-  if(pathname==='/api/capabilities')return send('application/json',JSON.stringify({data:{parentPortalEnabled:false,miniClassroomEnabled:false,miniAssessmentEnabled:false}}))
+  if(pathname==='/api/capabilities')return send('application/json',JSON.stringify({code:0,data:{cognitive:true,parentPortal:false}}))
   if(pathname.startsWith('/api/'))return send('application/json','{"error":"unauthenticated"}',401)
   const compat={
    '/compat/pdf.mjs':path.join(frontend,'node_modules/pdfjs-dist/build/pdf.mjs'),

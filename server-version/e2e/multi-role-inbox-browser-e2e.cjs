@@ -19,7 +19,7 @@ const output = process.env.INBOX_E2E_OUTPUT || '/tmp/huisurvey-inbox-evidence'
         let data = { list: [], total: 0, page: 1, totalPages: 1 }
         if (url.pathname === '/api/auth/me' || url.pathname === '/api/users/me') data = { id: 'own-respondent', role, username: '试点参与者', mustChangePassword: false }
         if (url.pathname === '/api/auth/csrf') data = { csrfToken: 'test-only' }
-        if (url.pathname === '/api/capabilities') data = { cognitive: true }
+        if (url.pathname === '/api/capabilities') data = { cognitive: true, parentPortal: false }
         if (url.pathname === '/api/my-assessments') data = { pendingCount: 1, truncated: false, list: [
           { taskId: 'self:1', sourceType: 'SELF_SERVICE', sourceId: '1', title: '本人的测评', state: 'IN_PROGRESS', consentState: 'NOT_REQUIRED', launchTarget: '/student/scales/own-scale', reportTarget: null, resultAvailability: 'PENDING', deadline: null },
           { taskId: 'receipt:1', sourceType: 'RELATIONAL', sourceId: '2', title: '课堂体验反馈', state: 'COMPLETED', consentState: 'NOT_REQUIRED', launchTarget: null, reportTarget: null, resultAvailability: 'COMPLETION_ONLY', deadline: null, feedback: { title: '感谢你分享本次体验', message: '本次回答已保存，不向你展示被评价者的个人得分或排名。' } },

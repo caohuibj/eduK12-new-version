@@ -14,7 +14,7 @@ const credential='x'.repeat(43),sid='11111111-1111-4111-8111-111111111111'
   let denied=false,started=false;page.on('pageerror',e=>errors.push(e.message))
   await page.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url());let data={list:[]},status=200
-   if(url.pathname==='/api/capabilities')data={cognitive:true}
+   if(url.pathname==='/api/capabilities')data={cognitive:true,parentPortal:false}
    if(url.pathname.endsWith('/info'))data={studyId:sid,studyTitle:'研究身份恢复测试',title:'第一波',accepting:true}
    if(url.pathname.endsWith('/join')){assert.equal(req.postDataJSON().consent,true);data={studyId:sid,credential,displayCode:'P-TEST'}}
    if(url.pathname===`/api/public/anonymous-studies/${sid}`){assert.equal(req.headers().authorization,`Bearer ${credential}`);if(denied)status=404;else data={studyId:sid,title:'研究身份恢复测试',displayCode:'P-TEST',waves:[{id:'wave',title:'第一波',ordinal:1,attemptId:'own',state:'COMPLETED',completedAt:'2026-10-01',accepting:true},{id:'wave-two',title:'第二波',ordinal:2,attemptId:started?'own-two':null,state:started?'IN_PROGRESS':null,completedAt:null,accepting:true}],limitations:['历史报告不等于可比较的长期变化']}}
