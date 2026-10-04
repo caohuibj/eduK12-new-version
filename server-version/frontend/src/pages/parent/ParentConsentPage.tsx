@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { parentsApi, type ConsentPreview } from '../../api/parents'
 import { useAuth } from '../../contexts/AuthContext'
@@ -57,7 +57,9 @@ function Content({
       setBusy(false)
     }
   }
-  useEffect(() => setChecked(false), [data])
+  // Reset before the refreshed preview becomes interactive; a passive effect
+  // could otherwise clear a checkbox the student has just selected.
+  useLayoutEffect(() => setChecked(false), [data])
   if (loading)
     return (
       <ProductStatus kind="pending" title="正在加载授权内容">

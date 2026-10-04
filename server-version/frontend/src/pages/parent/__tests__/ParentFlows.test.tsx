@@ -95,6 +95,21 @@ describe('parent operation boundaries', () => {
       expect(state.parents.acceptConsent).toHaveBeenCalledWith(preview),
     )
   })
+  it('requires fresh consent when focus refresh replaces the displayed publication', async () => {
+    consent()
+    await screen.findByText('确认家长')
+    fireEvent.click(screen.getByRole('checkbox'))
+    expect(screen.getByRole('button', { name: '同意这份报告' })).toBeEnabled()
+    const next = { ...preview, parentName: '刷新后家长', publicationHash: 'a'.repeat(64), commandKey: 'new-exact-command' }
+    state.parents.previewConsent.mockResolvedValue(next)
+    fireEvent(window, new Event('focus'))
+    await screen.findByText('刷新后家长')
+    expect(screen.getByRole('checkbox')).not.toBeChecked()
+    expect(screen.getByRole('button', { name: '同意这份报告' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('button', { name: '同意这份报告' }))
+    await waitFor(() => expect(state.parents.acceptConsent).toHaveBeenCalledWith(next))
+  })
   it('normal parent password change clears session and requires login again', async () => {
     passwordApi.changePassword.mockResolvedValue({ code: 0 })
     render(
