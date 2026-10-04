@@ -368,8 +368,12 @@ async function installApiFixture(page, role) {
     else if (pathname.startsWith('/api/organizations')) data = {
       allowedActions: role === 'ADMIN' ? ['CREATE_ORGANIZATION'] : [],
       platformRole: role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD',
-      list: [],
-      total: 0,
+      // The reporting context above is accessible to this fixture administrator.
+      // Discovery must describe the same authority, including on focus refresh.
+      list: role === 'ADMIN' ? [{ ...visualOrganizationContext.organization,
+        membershipId: 'visual-membership', orgRole: 'ORG_ADMIN',
+        scopeBasis: 'MEMBERSHIP', createdAt: '2026-09-01T00:00:00.000Z' }] : [],
+      total: role === 'ADMIN' ? 1 : 0,
       page: 1,
       pageSize: 24,
     }
