@@ -48,7 +48,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const authEpochRef = useRef(0)
   const lastAuthTransitionAtRef = useRef(0)
   const sessionChannel = useRef<BroadcastChannel | null>(null)
-  const localLoginPending = useRef(false)
+  const localLoginPending = useRef<number | null>(null)
+  const renderEpoch = authEpochRef.current
   const notifySessionChanged = () => {
     // Only a change nonce is shared: never credentials, identity or tokens.
     sessionChannel.current?.postMessage(AUTH_SESSION_SIGNAL)
@@ -79,6 +80,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     // Profile reads cannot restore a departed account or change auth authority.
     // Login/registration and /me are the identity-changing paths.
     if (nextUser && (!current || current.id !== nextUser.id)) return
+    // A departed page may still hold a password/profile completion callback.
+    if (
+      !nextUser &&
+      (!current ||
+        current.id !== user?.id ||
+        renderEpoch !== authEpochRef.current)
+    )
+      return
     authEpochRef.current += 1
     lastAuthTransitionAtRef.current = Date.now()
     replaceIdentity(
@@ -221,9 +230,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const login = async (username: string, password: string) => {
     const requestEpoch = ++authEpochRef.current
-    localLoginPending.current = true
+    localLoginPending.current = requestEpoch
     try {
       await authApi.csrf()
+      if (requestEpoch !== authEpochRef.current) return
       const response = await authApi.login({ username, password })
       if (requestEpoch !== authEpochRef.current) return
       if (response.code === 0 && response.data) {
@@ -235,7 +245,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         throw new Error(response.message || '登录失败')
       }
     } finally {
-      localLoginPending.current = false
+      if (localLoginPending.current === requestEpoch)
+        localLoginPending.current = null
     }
   }
 
@@ -248,14 +259,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   const logout = async () => {
-    authEpochRef.current += 1
+    if (
+      user?.id !== userRef.current?.id ||
+      renderEpoch !== authEpochRef.current
+    )
+      return
+    const requestEpoch = ++authEpochRef.current
     lastAuthTransitionAtRef.current = Date.now()
     try {
       await authApi.csrf()
+      if (requestEpoch !== authEpochRef.current) return
       await authApi.logout()
     } catch {
       // Clearing local state is still safe if the session has already expired.
     }
+    if (requestEpoch !== authEpochRef.current) return
     replaceIdentity(null)
     setIsLoading(false)
     notifySessionChanged()

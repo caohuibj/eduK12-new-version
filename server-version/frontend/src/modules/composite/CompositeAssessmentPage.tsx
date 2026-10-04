@@ -1,27 +1,55 @@
+import { usePageSignal } from '../../hooks/usePageSignal'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 'lucide-react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import {
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Save,
+  Play,
+  LockKeyhole,
+} from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
-import type { CompositeAttemptState, CompositeCurrentItem, CompositePublicInfo } from './types'
+import type {
+  CompositeAttemptState,
+  CompositeCurrentItem,
+  CompositePublicInfo,
+} from './types'
 import { resolveCompositeChildRouteContext } from './child-route-context'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
-import { ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import {
+  ProductButton,
+  ProductPage,
+  ProductStatus,
+} from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
-const attemptKey = (attemptId: string) => `composite:recovery:attempt:${attemptId}`
+const attemptKey = (attemptId: string) =>
+  `composite:recovery:attempt:${attemptId}`
 
-const readStored = (key: string) => (typeof window === 'undefined' ? '' : window.sessionStorage.getItem(key) || '')
+const readStored = (key: string) =>
+  typeof window === 'undefined' ? '' : window.sessionStorage.getItem(key) || ''
 const store = (key: string, value: string) => {
-  if (typeof window !== 'undefined' && value) window.sessionStorage.setItem(key, value)
+  if (typeof window !== 'undefined' && value)
+    window.sessionStorage.setItem(key, value)
 }
 
-const CompositeAssessmentPage: React.FC = () => {
-  const params = useParams<{ assessmentId?: string; token?: string; attemptId?: string }>()
+const CompositeAssessmentContent: React.FC = () => {
+  const pageSignal = usePageSignal()
+  const params = useParams<{
+    assessmentId?: string
+    token?: string
+    attemptId?: string
+  }>()
   const navigate = useNavigate()
   const publicMode = window.location.pathname.startsWith('/public/composite')
   const relationalMode = window.location.pathname.startsWith('/relational/')
-  const organizationTask = relationalMode && ['/organization-tasks', '/my-assessments'].includes(new URLSearchParams(window.location.search).get('returnTo') ?? '')
+  const organizationTask =
+    relationalMode &&
+    ['/organization-tasks', '/my-assessments'].includes(
+      new URLSearchParams(window.location.search).get('returnTo') ?? '',
+    )
   const token = params.token || ''
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -32,7 +60,9 @@ const CompositeAssessmentPage: React.FC = () => {
   const [recoveryToken, setRecoveryToken] = useState('')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [newRecoveryToken, setNewRecoveryToken] = useState<string | null>(null)
-  const [scaleAnswers, setScaleAnswers] = useState<Record<string, string | number>>({})
+  const [scaleAnswers, setScaleAnswers] = useState<
+    Record<string, string | number>
+  >({})
   const [scaleIndex, setScaleIndex] = useState(0)
   const [formValue, setFormValue] = useState('')
   const scaleItemStartTimeRef = useRef<number>(Date.now())
@@ -44,29 +74,50 @@ const CompositeAssessmentPage: React.FC = () => {
   const attemptId = params.attemptId || state?.id || ''
   const api = useMemo(
     () => (publicMode ? publicCompositeApi(recoveryToken) : compositeApi),
-    [publicMode, recoveryToken]
+    [publicMode, recoveryToken],
   )
 
-  const freezeBeforeMeasurement = async (next: CompositeAttemptState, credential = recoveryToken): Promise<CompositeAttemptState> => {
+  const freezeBeforeMeasurement = async (
+    next: CompositeAttemptState,
+    credential = recoveryToken,
+  ): Promise<CompositeAttemptState> => {
     // Final-only attempts freeze context only when their first context section
     // is submitted. Loading or starting one must not resurrect the legacy
     // "freeze before the first measurement" write.
-    if (next.deliveryMode === 'FINAL_ONLY' || next.status === 'COMPLETED' || !next.currentItem || next.currentItem.type === 'FORM' || next.currentItem.type === 'FORM_SECTION' || next.context?.status === 'frozen') return next
+    if (
+      next.deliveryMode === 'FINAL_ONLY' ||
+      next.status === 'COMPLETED' ||
+      !next.currentItem ||
+      next.currentItem.type === 'FORM' ||
+      next.currentItem.type === 'FORM_SECTION' ||
+      next.context?.status === 'frozen'
+    )
+      return next
     const client = publicMode ? publicCompositeApi(credential) : compositeApi
     const frozen = await client.freezeContext(next.id)
-    if (frozen.code !== 0 || !frozen.data) throw new Error(frozen.message || '人口学上下文冻结失败')
-    return { ...next, context: { status: 'frozen', frozenAt: frozen.data.frozenAt } }
+    if (frozen.code !== 0 || !frozen.data)
+      throw new Error(frozen.message || '人口学上下文冻结失败')
+    return {
+      ...next,
+      context: { status: 'frozen', frozenAt: frozen.data.frozenAt },
+    }
   }
 
   const goReport = (id: string) => {
+    if (pageSignal().aborted) return
     if (relationalMode) {
       navigate(organizationTask ? '/my-assessments' : '/relational/tasks')
       return
     }
-    navigate(publicMode ? `/public/composite/attempts/${id}/report` : `/student/composite/attempts/${id}/report`)
+    navigate(
+      publicMode
+        ? `/public/composite/attempts/${id}/report`
+        : `/student/composite/attempts/${id}/report`,
+    )
   }
 
   const applyState = (next: CompositeAttemptState) => {
+    if (pageSignal().aborted) return
     setState(next)
     if (next.status === 'COMPLETED') {
       goReport(next.id)
@@ -75,7 +126,10 @@ const CompositeAssessmentPage: React.FC = () => {
     const item = next.currentItem
     if (item?.type === 'SCALE') {
       const nextAnswers: Record<string, string | number> = {}
-      ;(item.answers || []).forEach((answer) => { if (answer.itemCode && answer.responseValue !== undefined) nextAnswers[answer.itemCode] = answer.responseValue })
+      ;(item.answers || []).forEach((answer) => {
+        if (answer.itemCode && answer.responseValue !== undefined)
+          nextAnswers[answer.itemCode] = answer.responseValue
+      })
       setScaleAnswers(nextAnswers)
       setScaleIndex(0)
     } else if (item?.type === 'FORM') {
@@ -84,14 +138,20 @@ const CompositeAssessmentPage: React.FC = () => {
   }
 
   const loadAttempt = async (id: string, credential = recoveryToken) => {
+    const signal = pageSignal()
+    if (signal.aborted) return
     if (publicMode && !credential) {
       setLoading(false)
       setError('请输入保存时获得的恢复凭证，才能继续这次匿名测评')
       return
     }
     try {
-      const response = await (publicMode ? publicCompositeApi(credential).getAttempt(id) : compositeApi.getAttempt(id))
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '综合测评记录不存在')
+      const response = await (publicMode
+        ? publicCompositeApi(credential).getAttempt(id)
+        : compositeApi.getAttempt(id))
+      if (signal.aborted) return
+      if (response.code !== 0 || !response.data)
+        throw new Error(response.message || '综合测评记录不存在')
       if (publicMode) store(attemptKey(id), credential)
       applyState(await freezeBeforeMeasurement(response.data, credential))
     } catch (err) {
@@ -102,38 +162,72 @@ const CompositeAssessmentPage: React.FC = () => {
   }
 
   const start = async (resumeToken?: string) => {
+    const signal = pageSignal()
+    if (signal.aborted) return
     try {
       setSubmitting(true)
       setError(null)
+      setExistingReportId(null)
       if (publicMode) {
-        const credential = resumeToken || recoveryInput || (token ? readStored(tokenKey(token)) : '')
-        const response = await publicCompositeApi(credential).start(token, credential || undefined)
-        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法开始匿名综合测评')
+        const credential =
+          resumeToken ||
+          recoveryInput ||
+          (token ? readStored(tokenKey(token)) : '')
+        const response = await publicCompositeApi(credential).start(
+          token,
+          credential || undefined,
+        )
+        if (signal.aborted) return
+        if (response.code !== 0 || !response.data)
+          throw new Error(response.message || '无法开始匿名综合测评')
         const returnedCredential = response.data.recoveryToken || credential
         if (returnedCredential) {
           setRecoveryToken(returnedCredential)
           store(tokenKey(token), returnedCredential)
           store(attemptKey(response.data.attempt.id), returnedCredential)
         }
-        if (response.data.attempt.status === 'COMPLETED') goReport(response.data.attempt.id)
-        else applyState(await freezeBeforeMeasurement(response.data.attempt, returnedCredential))
-        if (response.data.recoveryToken) setNewRecoveryToken(response.data.recoveryToken)
+        if (response.data.attempt.status === 'COMPLETED')
+          goReport(response.data.attempt.id)
+        else
+          applyState(
+            await freezeBeforeMeasurement(
+              response.data.attempt,
+              returnedCredential,
+            ),
+          )
+        if (response.data.recoveryToken)
+          setNewRecoveryToken(response.data.recoveryToken)
       } else {
         const response = await compositeApi.start(params.assessmentId || '')
-        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法开始综合测评')
-        if (response.data.attempt.status === 'COMPLETED') goReport(response.data.attempt.id)
+        if (signal.aborted) return
+        if (response.code !== 0 || !response.data)
+          throw new Error(response.message || '无法开始综合测评')
+        if (response.data.attempt.status === 'COMPLETED')
+          goReport(response.data.attempt.id)
         else applyState(await freezeBeforeMeasurement(response.data.attempt))
       }
     } catch (err) {
-      const message = (err as { message?: string }).message || '无法开始综合测评'
+      if (signal.aborted) return
+      const message =
+        (err as { message?: string }).message || '无法开始综合测评'
       setError(message)
       if (!publicMode && !relationalMode && message.includes('最大次数')) {
         try {
           const available = await compositeApi.listAvailable()
-          const assessment = available.code === 0 ? available.data?.list.find(item => item.id === params.assessmentId) : undefined
-          const completed = assessment?.latestCompletedAttempt as { id?: string } | undefined
-          if (typeof completed?.id === 'string') setExistingReportId(completed.id)
-        } catch { /* The course list remains available if report discovery fails. */ }
+          const assessment =
+            available.code === 0
+              ? available.data?.list.find(
+                  (item) => item.id === params.assessmentId,
+                )
+              : undefined
+          const completed = assessment?.latestCompletedAttempt as
+            | { id?: string }
+            | undefined
+          if (!signal.aborted && typeof completed?.id === 'string')
+            setExistingReportId(completed.id)
+        } catch {
+          /* The course list remains available if report discovery fails. */
+        }
       }
     } finally {
       setSubmitting(false)
@@ -142,9 +236,12 @@ const CompositeAssessmentPage: React.FC = () => {
   }
 
   const restartLegacyAttempt = async () => {
-    if (!state) return
+    const signal = pageSignal()
+    if (!state || signal.aborted) return
     if (relationalMode) {
-      setError('关系测评旧版记录不能从通用重启入口迁移，请返回任务列表重新发起。')
+      setError(
+        '关系测评旧版记录不能从通用重启入口迁移，请返回任务列表重新发起。',
+      )
       return
     }
     try {
@@ -153,7 +250,9 @@ const CompositeAssessmentPage: React.FC = () => {
       const response = publicMode
         ? await publicCompositeApi(recoveryToken).restart(state.id)
         : await compositeApi.restart(state.id)
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '重启综合测评失败')
+      if (signal.aborted) return
+      if (response.code !== 0 || !response.data)
+        throw new Error(response.message || '重启综合测评失败')
       const nextId = response.data.attempt.id
       if (publicMode) {
         const nextCredential = response.data.recoveryToken || recoveryToken
@@ -179,13 +278,22 @@ const CompositeAssessmentPage: React.FC = () => {
         if (token) {
           try {
             const infoResponse = await publicCompositeApi('').info(token)
-            if (!cancelled && infoResponse.code === 0 && infoResponse.data) setPublicInfo(infoResponse.data)
+            if (!cancelled && infoResponse.code === 0 && infoResponse.data)
+              setPublicInfo(infoResponse.data)
           } catch (err) {
-            if (!cancelled) setError((err as { message?: string }).message || '公开链接不可用')
+            if (!cancelled)
+              setError(
+                (err as { message?: string }).message || '公开链接不可用',
+              )
           }
         }
+        if (cancelled) return
         const id = params.attemptId
-        const saved = id ? readStored(attemptKey(id)) : token ? readStored(tokenKey(token)) : ''
+        const saved = id
+          ? readStored(attemptKey(id))
+          : token
+            ? readStored(tokenKey(token))
+            : ''
         if (saved) {
           setRecoveryToken(saved)
           if (id) await loadAttempt(id, saved)
@@ -205,21 +313,39 @@ const CompositeAssessmentPage: React.FC = () => {
       }
     }
     void initialise()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [publicMode, token, params.attemptId, params.assessmentId])
 
   const saveAndExit = async () => {
-    if (!attemptId) return
+    const signal = pageSignal()
+    if (!attemptId || signal.aborted) return
     if (state?.deliveryMode === 'FINAL_ONLY') {
-      const studyReturn=sessionStorage.getItem(`composite:study:return:${attemptId}`)
-      navigate(publicMode ? (studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:'/') : relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student')
+      const studyReturn = sessionStorage.getItem(
+        `composite:study:return:${attemptId}`,
+      )
+      navigate(
+        publicMode
+          ? studyReturn &&
+            /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)
+            ? studyReturn
+            : '/'
+          : relationalMode
+            ? organizationTask
+              ? '/my-assessments'
+              : '/relational/tasks'
+            : '/student',
+      )
       return
     }
     try {
-      const draft = state?.currentItem?.type === 'FORM'
-        ? { itemId: state.currentItem.id, value: formValue }
-        : undefined
+      const draft =
+        state?.currentItem?.type === 'FORM'
+          ? { itemId: state.currentItem.id, value: formValue }
+          : undefined
       await api.save(attemptId, draft)
+      if (signal.aborted) return
       navigate(publicMode ? '/' : '/student')
     } catch (err) {
       setError((err as { message?: string }).message || '保存失败，请稍后重试')
@@ -238,7 +364,8 @@ const CompositeAssessmentPage: React.FC = () => {
         responseValue: value,
         responseTimeMs: Math.max(0, Date.now() - scaleItemStartTimeRef.current),
       })
-      if (response.code !== 0) throw new Error(response.message || '答案保存失败')
+      if (response.code !== 0)
+        throw new Error(response.message || '答案保存失败')
       if (scaleIndex < items.length - 1) setScaleIndex((index) => index + 1)
     } catch (err) {
       setError((err as { message?: string }).message || '答案保存失败')
@@ -250,7 +377,8 @@ const CompositeAssessmentPage: React.FC = () => {
     try {
       setSubmitting(true)
       const response = await api.completeScale(state.id, state.currentItem.id)
-      if (response.code !== 0) throw new Error(response.message || '量表提交失败')
+      if (response.code !== 0)
+        throw new Error(response.message || '量表提交失败')
       await loadAttempt(state.id)
     } catch (err) {
       setError((err as { message?: string }).message || '量表提交失败')
@@ -263,8 +391,13 @@ const CompositeAssessmentPage: React.FC = () => {
     if (!state?.currentItem) return
     try {
       setSubmitting(true)
-      const response = await api.formAnswer(state.id, state.currentItem.id, formValue)
-      if (response.code !== 0) throw new Error(response.message || '表单提交失败')
+      const response = await api.formAnswer(
+        state.id,
+        state.currentItem.id,
+        formValue,
+      )
+      if (response.code !== 0)
+        throw new Error(response.message || '表单提交失败')
       // The write endpoint returns an ACK. Reload once at the module boundary
       // so navigation uses authoritative parent and child state.
       await loadAttempt(state.id)
@@ -289,7 +422,10 @@ const CompositeAssessmentPage: React.FC = () => {
     }
     setError(null)
     if (result.context.kind === 'COGNITIVE' && publicMode && recoveryToken) {
-      saveCognitiveRecoveryCredential(result.context.childAttemptId, recoveryToken)
+      saveCognitiveRecoveryCredential(
+        result.context.childAttemptId,
+        recoveryToken,
+      )
     }
     navigate(result.context.target)
   }
@@ -401,4 +537,12 @@ const CompositeAssessmentPage: React.FC = () => {
   )
 }
 
+const CompositeAssessmentPage: React.FC = () => {
+  const location = useLocation()
+  return (
+    <CompositeAssessmentContent
+      key={`${location.pathname}:${location.search}`}
+    />
+  )
+}
 export default CompositeAssessmentPage

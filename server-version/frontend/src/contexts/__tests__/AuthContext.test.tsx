@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockMe, mockLogin, mockCsrf } = vi.hoisted(() => ({
+const { mockMe, mockLogin, mockCsrf, mockLogout } = vi.hoisted(() => ({
   mockMe: vi.fn(),
   mockLogin: vi.fn(),
   mockCsrf: vi.fn(),
+  mockLogout: vi.fn(),
 }))
 
 vi.mock('../../api/auth', () => ({
@@ -13,7 +14,7 @@ vi.mock('../../api/auth', () => ({
     me: mockMe,
     csrf: mockCsrf,
     login: mockLogin,
-    logout: vi.fn(),
+    logout: mockLogout,
     changePassword: vi.fn(),
   },
 }))
@@ -48,6 +49,7 @@ describe('AuthContext session expiry handling', () => {
       message: 'ok',
       data: { csrfToken: 'csrf' },
     })
+    mockLogout.mockResolvedValue({ code: 0 })
     mockLogin.mockResolvedValue({
       code: 0,
       message: 'ok',
@@ -454,4 +456,120 @@ describe('AuthContext session expiry handling', () => {
     act(() => screen.getByRole('button', { name: 'profile' }).click())
     expect(screen.getByRole('status')).toHaveTextContent('out')
   })
+})
+
+describe('late local session actions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCsrf.mockResolvedValue({ code: 0 })
+    mockLogout.mockResolvedValue({ code: 0 })
+    window.history.replaceState(null, '', '/')
+  })
+  it('does not let an old logout completion clear a newer authenticated account', async () => {
+    let resolve: (v: unknown) => void = () => {}
+    mockMe.mockResolvedValue({
+      code: 0,
+      data: { id: 'old', username: 'old', role: 'TEACHER' },
+    })
+    mockCsrf.mockResolvedValue({ code: 0 })
+    mockLogout.mockReturnValueOnce(
+      new Promise((r) => {
+        resolve = r
+      }),
+    )
+    const Actions = () => {
+      const { user, logout, setAuthenticatedUser } = useAuth()
+      return (
+        <>
+          <output>{user?.id ?? 'out'}</output>
+          <button onClick={() => void logout()}>exit</button>
+          <button
+            onClick={() =>
+              setAuthenticatedUser({
+                id: 'new',
+                username: 'new',
+                role: 'STUDENT',
+              } as any)
+            }
+          >
+            switch
+          </button>
+        </>
+      )
+    }
+    render(
+      <AuthProvider>
+        <Actions />
+      </AuthProvider>,
+    )
+    await screen.findByText('old')
+    act(() => screen.getByRole('button', { name: 'exit' }).click())
+    await waitFor(() => expect(mockLogout).toHaveBeenCalled())
+    act(() => screen.getByRole('button', { name: 'switch' }).click())
+    await screen.findByText('new')
+    await act(async () => resolve({ code: 0 }))
+    expect(screen.getByRole('status')).toHaveTextContent('new')
+  })
+
+  it('rejects a departed profile callback clearing another account', async () => {
+    mockMe.mockResolvedValue({
+      code: 0,
+      data: { id: 'old', username: 'old', role: 'TEACHER' },
+    })
+    let departedClear: () => void = () => {}
+    const Actions = () => {
+      const { user, setUser, setAuthenticatedUser } = useAuth()
+      return (
+        <>
+          <output>{user?.id ?? 'out'}</output>
+          <button
+            onClick={() => {
+              departedClear = () => setUser(null)
+            }}
+          >
+            retain
+          </button>
+          <button
+            onClick={() =>
+              setAuthenticatedUser({
+                id: 'new',
+                username: 'new',
+                role: 'STUDENT',
+              } as any)
+            }
+          >
+            switch
+          </button>
+        </>
+      )
+    }
+    render(
+      <AuthProvider>
+        <Actions />
+      </AuthProvider>,
+    )
+    await screen.findByText('old')
+    act(() => screen.getByRole('button', { name: 'retain' }).click())
+    act(() => screen.getByRole('button', { name: 'switch' }).click())
+    await screen.findByText('new')
+    act(departedClear)
+    expect(screen.getByRole('status')).toHaveTextContent('new')
+  })
+  it('does not issue a superseded login after CSRF finishes loading', async () => {
+    let resolve: (v: unknown) => void = () => {}
+    mockMe.mockResolvedValue({ code: 0, data: { id: 'old', username: 'old', role: 'TEACHER' } })
+    mockCsrf.mockReturnValueOnce(new Promise(r => { resolve = r }))
+    const Actions = () => {
+      const { user, login, setAuthenticatedUser } = useAuth()
+      return <><output>{user?.id ?? 'out'}</output><button onClick={() => void login('pending', 'password')}>login</button><button onClick={() => setAuthenticatedUser({ id: 'new', username: 'new', role: 'STUDENT' } as any)}>switch</button></>
+    }
+    render(<AuthProvider><Actions /></AuthProvider>)
+    await screen.findByText('old')
+    act(() => screen.getByRole('button', { name: 'login' }).click())
+    act(() => screen.getByRole('button', { name: 'switch' }).click())
+    await act(async () => resolve({ code: 0 }))
+    expect(mockLogin).not.toHaveBeenCalled()
+    expect(screen.getByRole('status')).toHaveTextContent('new')
+  })
+
 })

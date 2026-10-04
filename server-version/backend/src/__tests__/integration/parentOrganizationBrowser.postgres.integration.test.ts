@@ -630,15 +630,68 @@ suite(
                 () => document.documentElement.scrollWidth <= window.innerWidth,
               ),
           ).toBe(true)
-          await student
-            .getByRole('button', { name: '撤回本份报告授权' })
-            .click()
-          await student.getByText('本份报告授权已撤回').waitFor()
-          await parent.evaluate(() => window.dispatchEvent(new Event('focus')))
-          await parent.getByText('报告暂时不可查看', { exact: true }).waitFor()
-          expect(
-            await parent.getByRole('article', { name: '家长版报告' }).count(),
-          ).toBe(0)
+          if (width === 390) {
+            await parent
+              .getByRole('button', { name: '停止查看本份报告', exact: true })
+              .click()
+            await parent
+              .getByRole('dialog', { name: '停止查看本份报告' })
+              .waitFor()
+            expect(
+              await parent
+                .locator('body')
+                .evaluate(
+                  () =>
+                    document.documentElement.scrollWidth <= window.innerWidth,
+                ),
+            ).toBe(true)
+            await parent
+              .getByRole('button', { name: '确认停止查看', exact: true })
+              .click()
+            await parent
+              .getByText('本份报告授权已撤回', { exact: true })
+              .waitFor()
+            expect(
+              await parent.getByRole('article', { name: '家长版报告' }).count(),
+            ).toBe(0)
+            expect(
+              (
+                await prisma.parentStudentRelationship.findUniqueOrThrow({
+                  where: { id: link.id },
+                })
+              ).status,
+            ).toBe('ACTIVE')
+            expect(
+              (
+                await (
+                  await p.request.get(
+                    origin +
+                      '/api/parents/me/children/' +
+                      f.child.id +
+                      '/reports',
+                  )
+                ).json()
+              ).data.list,
+            ).toEqual([])
+            await parent.reload()
+            await parent
+              .getByText('报告暂时不可查看', { exact: true })
+              .waitFor()
+          } else {
+            await student
+              .getByRole('button', { name: '撤回本份报告授权' })
+              .click()
+            await student.getByText('本份报告授权已撤回').waitFor()
+            await parent.evaluate(() =>
+              window.dispatchEvent(new Event('focus')),
+            )
+            await parent
+              .getByText('报告暂时不可查看', { exact: true })
+              .waitFor()
+            expect(
+              await parent.getByRole('article', { name: '家长版报告' }).count(),
+            ).toBe(0)
+          }
           expect(errors).toEqual([])
         } catch (e) {
           await admin.screenshot({

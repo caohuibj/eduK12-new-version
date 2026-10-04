@@ -20,6 +20,10 @@ import {
 import organizationRoutes from '../../modules/organization/organization.routes'
 import {
   createMembership,
+  createOrganization,
+  setMembershipRole,
+  denyOrganizationAccess,
+  liftOrganizationAccessDeny,
   endMembership,
 } from '../../modules/organization/service'
 import { createParentPortalService } from '../../modules/parent-portal/service'
@@ -413,6 +417,198 @@ suite(
         ).body.data.total,
       ).toBe(1)
     })
+    it('paginates all delivery grant history beyond the former 200-row cut-off', async () => {
+      const f = await fixture(),
+        teacher = await user('TEACHER'),
+        grade = randomUUID(),
+        classroom = randomUUID(),
+        prefix = randomUUID()
+      const membership = await createMembership({
+        organizationId: f.org.id,
+        userId: teacher.id,
+        persona: 'TEACHER',
+        meta: meta(f.admin.id),
+      })
+      await prisma.$executeRaw`INSERT INTO organization_units (id,organization_id,unit_kind,name,parent_unit_id) VALUES (${grade},${f.org.id},'GRADE','Synthetic grade',NULL),(${classroom},${f.org.id},'CLASS','Synthetic class',${grade})`
+      await prisma.$executeRaw`INSERT INTO organization_assessment_delivery_grants (id,organization_id,teacher_membership_id,class_unit_id,granted_by_user_id,revoked_by_user_id,revoked_at) SELECT ${prefix}||'-'||i::text,${f.org.id},${membership.id},${classroom},${f.admin.id},${f.admin.id},statement_timestamp() FROM generate_series(1,201) i`
+      const legacy = await request(
+        f.admin,
+        '/organizations/' + f.org.id + '/assessment-delivery-grants',
+      )
+      expect(legacy.body.data).toMatchObject({
+        total: 201,
+        page: 1,
+        pageSize: 200,
+      })
+      expect(legacy.body.data.list).toHaveLength(200)
+      const rows: Array<{ id: string }> = []
+      for (let page = 1; page <= 3; page++) {
+        const res = await request(
+          f.admin,
+          '/organizations/' +
+            f.org.id +
+            '/assessment-delivery-grants?page=' +
+            page +
+            '&pageSize=100',
+        )
+        expect(res.status).toBe(200)
+        expect(res.body.data).toMatchObject({ total: 201, page, pageSize: 100 })
+        expect(res.body.data.list).toHaveLength(page === 3 ? 1 : 100)
+        rows.push(...res.body.data.list)
+      }
+      expect(new Set(rows.map((row) => row.id)).size).toBe(201)
+    })
+    it.each(['password', 'approval', 'frozen', 'inactive', 'expired'])(
+      'does not create an organization whose initial administrator is unusable: %s',
+      async (condition) => {
+        const root = await user('ADMIN', true),
+          candidate = await user('TEACHER')
+        await prisma.user.update({
+          where: { id: candidate.id },
+          data: {
+            ...(condition === 'password' ? { mustChangePassword: true } : {}),
+            ...(condition === 'approval' ? { teacherApproved: false } : {}),
+            ...(condition === 'frozen' ? { isFrozen: true } : {}),
+            ...(condition === 'inactive' ? { isActive: false } : {}),
+            ...(condition === 'expired'
+              ? { expiresAt: new Date(Date.now() - 60000) }
+              : {}),
+          },
+        })
+        const name = 'Unusable synthetic ' + randomUUID()
+        await expect(
+          createOrganization({
+            name,
+            firstAdminUserId: candidate.id,
+            meta: meta(root.id),
+          }),
+        ).rejects.toMatchObject({ code: 'INITIAL_ADMIN_UNAVAILABLE' })
+        expect(await prisma.organization.count({ where: { name } })).toBe(0)
+      },
+    )
+    it('creates an organization with an approved teacher as its usable initial administrator', async () => {
+      const root = await user('ADMIN', true),
+        candidate = await user('TEACHER')
+      const result = await createOrganization({
+        name: 'Usable synthetic ' + randomUUID(),
+        firstAdminUserId: candidate.id,
+        meta: meta(root.id),
+      })
+      expect(result.membership).toMatchObject({
+        userId: candidate.id,
+        orgRole: 'ORG_ADMIN',
+        validUntil: null,
+      })
+    })
+    it.each(['*', 'ORGANIZATION_GOVERNANCE'])(
+      'a %s-denied administrator cannot replace the last governable administrator',
+      async (permission) => {
+        const f = await fixture(),
+          second = await user('TEACHER')
+        const m = await createMembership({
+          organizationId: f.org.id,
+          userId: second.id,
+          orgRole: 'ORG_ADMIN',
+          meta: meta(f.admin.id),
+        })
+        const first = await prisma.organizationMembership.findFirstOrThrow({
+          where: {
+            organizationId: f.org.id,
+            userId: f.admin.id,
+            validUntil: null,
+          },
+        })
+        await denyOrganizationAccess({
+          organizationId: f.org.id,
+          userId: second.id,
+          permission,
+          reason: 'synthetic deny',
+          meta: meta(f.admin.id),
+        })
+        await expect(
+          endMembership({
+            organizationId: f.org.id,
+            membershipId: first.id,
+            meta: meta(f.admin.id),
+          }),
+        ).rejects.toMatchObject({ code: 'LAST_ORG_ADMIN' })
+        await expect(
+          setMembershipRole({
+            organizationId: f.org.id,
+            membershipId: first.id,
+            orgRole: 'MEMBER',
+            meta: meta(f.admin.id),
+          }),
+        ).rejects.toMatchObject({ code: 'LAST_ORG_ADMIN' })
+        expect(
+          await prisma.organizationMembership.findUniqueOrThrow({
+            where: { id: first.id },
+          }),
+        ).toMatchObject({ orgRole: 'ORG_ADMIN', validUntil: null })
+        await liftOrganizationAccessDeny({
+          organizationId: f.org.id,
+          userId: second.id,
+          permission,
+          reason: 'synthetic restore',
+          meta: meta(f.admin.id),
+        })
+        await endMembership({
+          organizationId: f.org.id,
+          membershipId: first.id,
+          meta: meta(f.admin.id),
+        })
+        expect(
+          (
+            await prisma.organizationMembership.findUniqueOrThrow({
+              where: { id: m.id },
+            })
+          ).validUntil,
+        ).toBeNull()
+      },
+    )
+    it.each(['*', 'ORGANIZATION_GOVERNANCE'])(
+      'a %s-denied account cannot be added or promoted as organization administrator',
+      async (permission) => {
+        const f = await fixture(),
+          target = await user('TEACHER')
+        await denyOrganizationAccess({
+          organizationId: f.org.id,
+          userId: target.id,
+          permission,
+          reason: 'synthetic deny',
+          meta: meta(f.admin.id),
+        })
+        await expect(
+          createMembership({
+            organizationId: f.org.id,
+            userId: target.id,
+            orgRole: 'ORG_ADMIN',
+            meta: meta(f.admin.id),
+          }),
+        ).rejects.toMatchObject({ code: 'ORG_ADMIN_UNAVAILABLE' })
+        const member = await createMembership({
+          organizationId: f.org.id,
+          userId: target.id,
+          orgRole: 'MEMBER',
+          meta: meta(f.admin.id),
+        })
+        await expect(
+          setMembershipRole({
+            organizationId: f.org.id,
+            membershipId: member.id,
+            orgRole: 'ORG_ADMIN',
+            meta: meta(f.admin.id),
+          }),
+        ).rejects.toMatchObject({ code: 'ORG_ADMIN_UNAVAILABLE' })
+        expect(
+          (
+            await prisma.organizationMembership.findUniqueOrThrow({
+              where: { id: member.id },
+            })
+          ).orgRole,
+        ).toBe('MEMBER')
+      },
+    )
     it('organization-only students can invite parents; ended and rejoined membership does not validate old invitation', async () => {
       const f = await fixture(),
         parent = await user('PARENT'),

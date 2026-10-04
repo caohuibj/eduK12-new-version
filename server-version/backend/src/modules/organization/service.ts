@@ -1,7 +1,10 @@
 import { Prisma } from '@prisma/client'
 import { createHash, randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
-import { assertAlternativeUsableOrgAdmin } from './adminInvariant'
+import {
+  assertAlternativeUsableOrgAdmin,
+  lockOrgAdminCandidate,
+} from './adminInvariant'
 import {
   MembershipRecord,
   OrganizationCapability,
@@ -234,22 +237,38 @@ export async function createOrganization(input: {
   firstAdminUserId?: string
   name: string
   meta: CommandMeta
-}): Promise<{ organization: OrganizationRecord; membership: MembershipRecord }> {
+}): Promise<{
+  organization: OrganizationRecord
+  membership: MembershipRecord
+}> {
   const organizationId = randomUUID()
   const membershipId = randomUUID()
   return executeCommand({
     organizationId: null,
     meta: input.meta,
-    payload: { name: input.name, ...(input.firstAdminUserId ? { firstAdminUserId: input.firstAdminUserId } : {}) },
+    payload: {
+      name: input.name,
+      ...(input.firstAdminUserId
+        ? { firstAdminUserId: input.firstAdminUserId }
+        : {}),
+    },
     work: async (tx, domainEventId) => {
-      if (input.firstAdminUserId) {
-        const admins = await tx.$queryRaw<Array<{ id: string }>>`
-          SELECT "id" FROM "users" WHERE "id" = ${input.firstAdminUserId}
-            AND "is_active" AND NOT "is_frozen"
-            AND ("expires_at" IS NULL OR "expires_at" > statement_timestamp()) FOR SHARE
-        `
-        if (!admins[0]) throw new OrganizationDomainError('INITIAL_ADMIN_UNAVAILABLE', '首位管理员账户不存在或不可用', 404)
-      }
+      const initial = await lockOrgAdminCandidate(
+        tx,
+        input.firstAdminUserId ?? input.meta.actorUserId,
+      )
+      if (!initial)
+        throw new OrganizationDomainError(
+          'INITIAL_ADMIN_UNAVAILABLE',
+          '首位管理员账户不存在',
+          404,
+        )
+      if (!initial.usable)
+        throw new OrganizationDomainError(
+          'INITIAL_ADMIN_UNAVAILABLE',
+          '首位管理员账户不可用，请先完成改密和教师审批，并确认账户未停用、冻结或过期',
+          409,
+        )
       const organizations = await tx.$queryRaw<OrganizationRecord[]>`
         INSERT INTO "organizations" ("id", "name", "status", "created_by_user_id")
         VALUES (${organizationId}, ${input.name}, 'ACTIVE', ${input.meta.actorUserId})
@@ -355,13 +374,28 @@ export async function createMembership(input: {
   return executeCommand({
     organizationId: input.organizationId,
     meta: input.meta,
-    payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER', ...(input.persona?{persona:input.persona}:{}) },
+    payload: {
+      userId: input.userId,
+      orgRole: input.orgRole ?? 'MEMBER',
+      ...(input.persona ? { persona: input.persona } : {}),
+    },
     work: async (tx, domainEventId) => {
       const organization = await lockOrganization(tx, input.organizationId)
-      if (organization.status !== 'ACTIVE') throw new OrganizationDomainError('ORG_SUSPENDED', '组织已暂停', 409)
-      const [target]=await tx.$queryRaw<Array<{id:string;usable:boolean}>>`SELECT id,(is_active=true AND is_frozen=false AND must_change_password=false AND (expires_at IS NULL OR expires_at>statement_timestamp()) AND (role<>'TEACHER' OR teacher_approved=true)) AS usable FROM users WHERE id=${input.userId} FOR SHARE`
-      if(!target)throw new OrganizationDomainError('USER_NOT_FOUND','用户不存在',404)
-      if(input.orgRole==='ORG_ADMIN'&&!target.usable)throw new OrganizationDomainError('ORG_ADMIN_UNAVAILABLE','组织管理员必须先完成改密和审批，且账号处于可用状态',409)
+      if (organization.status !== 'ACTIVE')
+        throw new OrganizationDomainError('ORG_SUSPENDED', '组织已暂停', 409)
+      const target = await lockOrgAdminCandidate(
+        tx,
+        input.userId,
+        input.organizationId,
+      )
+      if (!target)
+        throw new OrganizationDomainError('USER_NOT_FOUND', '用户不存在', 404)
+      if (input.orgRole === 'ORG_ADMIN' && !target.usable)
+        throw new OrganizationDomainError(
+          'ORG_ADMIN_UNAVAILABLE',
+          '组织管理员必须完成改密和审批、账户可用，且未被禁止组织治理',
+          409,
+        )
       const rows = await tx.$queryRaw<MembershipRecord[]>`
         INSERT INTO "organization_memberships" ("id", "organization_id", "user_id", "org_role")
         VALUES (${membershipId}, ${input.organizationId}, ${input.userId}, ${input.orgRole ?? 'MEMBER'})
@@ -369,7 +403,8 @@ export async function createMembership(input: {
           "org_role" AS "orgRole", "valid_from" AS "validFrom", "valid_until" AS "validUntil",
           "ended_by_user_id" AS "endedByUserId", "end_reason" AS "endReason"
       `
-      if(input.persona)await tx.$executeRaw`INSERT INTO organization_persona_grants(id,organization_id,membership_id,persona,granted_by_user_id) VALUES(${randomUUID()},${input.organizationId},${membershipId},${input.persona},${input.meta.actorUserId})`
+      if (input.persona)
+        await tx.$executeRaw`INSERT INTO organization_persona_grants(id,organization_id,membership_id,persona,granted_by_user_id) VALUES(${randomUUID()},${input.organizationId},${membershipId},${input.persona},${input.meta.actorUserId})`
       await appendAudit(tx, {
         organizationId: input.organizationId,
         actorUserId: input.meta.actorUserId,
@@ -377,7 +412,11 @@ export async function createMembership(input: {
         targetType: 'MEMBERSHIP',
         targetId: membershipId,
         domainEventId,
-        payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER', ...(input.persona?{persona:input.persona}:{}) },
+        payload: {
+          userId: input.userId,
+          orgRole: input.orgRole ?? 'MEMBER',
+          ...(input.persona ? { persona: input.persona } : {}),
+        },
       })
       return rows[0]
     },
@@ -443,7 +482,11 @@ export async function setMembershipRole(input: {
     payload: { membershipId: input.membershipId, orgRole: input.orgRole },
     work: async (tx, domainEventId) => {
       await lockOrganization(tx, input.organizationId)
-      const membership = await lockCurrentMembership(tx, input.organizationId, input.membershipId)
+      const membership = await lockCurrentMembership(
+        tx,
+        input.organizationId,
+        input.membershipId,
+      )
       if (membership.orgRole === input.orgRole) {
         await appendAudit(tx, {
           organizationId: input.organizationId,
@@ -456,12 +499,25 @@ export async function setMembershipRole(input: {
         })
         return membership
       }
-      if(input.orgRole==='ORG_ADMIN'){
-        const [target]=await tx.$queryRaw<Array<{usable:boolean}>>`SELECT (is_active=true AND is_frozen=false AND must_change_password=false AND (expires_at IS NULL OR expires_at>statement_timestamp()) AND (role<>'TEACHER' OR teacher_approved=true)) AS usable FROM users WHERE id=${membership.userId} FOR SHARE`
-        if(!target?.usable)throw new OrganizationDomainError('ORG_ADMIN_UNAVAILABLE','组织管理员必须先完成改密和审批，且账号处于可用状态',409)
+      if (input.orgRole === 'ORG_ADMIN') {
+        const target = await lockOrgAdminCandidate(
+          tx,
+          membership.userId,
+          input.organizationId,
+        )
+        if (!target?.usable)
+          throw new OrganizationDomainError(
+            'ORG_ADMIN_UNAVAILABLE',
+            '组织管理员必须完成改密和审批、账户可用，且未被禁止组织治理',
+            409,
+          )
       }
       if (membership.orgRole === 'ORG_ADMIN' && input.orgRole !== 'ORG_ADMIN') {
-        await assertAlternativeUsableOrgAdmin(tx, input.organizationId, membership.userId)
+        await assertAlternativeUsableOrgAdmin(
+          tx,
+          input.organizationId,
+          membership.userId,
+        )
       }
       const rows = await tx.$queryRaw<MembershipRecord[]>`
         UPDATE "organization_memberships"

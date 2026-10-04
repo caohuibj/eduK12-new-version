@@ -1,20 +1,46 @@
+import { loadGovernancePages } from './loadGovernancePages'
+import { usePageSignal } from '../../hooks/usePageSignal'
 import OrganizationMembersPanel from './OrganizationMembersPanel'
 import OrganizationInvitationsPanel from './OrganizationInvitationsPanel'
 import DeliveryPolicySettings from './DeliveryPolicySettings'
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { organizationApi, type AssessmentDeliveryGrant, type OrganizationMembership, type OrganizationUnit, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
+import {
+  organizationApi,
+  type AssessmentDeliveryGrant,
+  type OrganizationMembership,
+  type OrganizationUnit,
+  type StaffClassAssignment,
+  type StaffClassRole,
+  type StudentClassAssignment,
+} from '../../api/organizations'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationClassificationPanel from './OrganizationClassificationPanel'
-import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
+import {
+  PageHeader,
+  ProductButton,
+  ProductPage,
+  ProductStatus,
+} from '../../components/product-ui'
 
 const STAFF_ROLES: StaffClassRole[] = ['HOMEROOM', 'TEACHING']
 
-const formatTime = (value: string | null | undefined) => value ? new Date(value).toLocaleString() : '当前'
-const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
+const formatTime = (value: string | null | undefined) =>
+  value ? new Date(value).toLocaleString() : '当前'
+const errorText = (value: unknown, fallback: string) =>
+  value instanceof Error && value.message ? value.message : fallback
 
-export default function OrganizationAdminPage() {
-  const { organizationId = '' } = useParams<{ organizationId: string }>()
+function Content({ organizationId }: { organizationId: string }) {
+  const pageSignal = usePageSignal()
+  const loadSequence = useRef(0)
+  const mutationLock = useRef(false)
   const {
     active,
     activeLoading,
@@ -24,10 +50,16 @@ export default function OrganizationAdminPage() {
   } = useOrganization()
   const [memberships, setMemberships] = useState<OrganizationMembership[]>([])
   const [units, setUnits] = useState<OrganizationUnit[]>([])
-  const [studentAssignments, setStudentAssignments] = useState<StudentClassAssignment[]>([])
-  const [staffAssignments, setStaffAssignments] = useState<StaffClassAssignment[]>([])
-  const [deliveryGrants, setDeliveryGrants] = useState<AssessmentDeliveryGrant[]>([])
-  const [_loading, setLoading] = useState(false)
+  const [studentAssignments, setStudentAssignments] = useState<
+    StudentClassAssignment[]
+  >([])
+  const [staffAssignments, setStaffAssignments] = useState<
+    StaffClassAssignment[]
+  >([])
+  const [deliveryGrants, setDeliveryGrants] = useState<
+    AssessmentDeliveryGrant[]
+  >([])
+  const [governanceLoading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [mutationError, setMutationError] = useState<string | null>(null)
   const [mutationNotice, setMutationNotice] = useState<string | null>(null)
@@ -42,14 +74,23 @@ export default function OrganizationAdminPage() {
   const [staffClassId, setStaffClassId] = useState('')
   const [staffRole, setStaffRole] = useState<StaffClassRole>('TEACHING')
   const [denyUserId, setDenyUserId] = useState('')
-  const [denyPermission, setDenyPermission] = useState('ORGANIZATION_GOVERNANCE')
+  const [denyPermission, setDenyPermission] = useState(
+    'ORGANIZATION_GOVERNANCE',
+  )
   const [denyReason, setDenyReason] = useState('')
 
   const context = active?.organization.id === organizationId ? active : null
   const canGovern = context?.access.canGovern === true
-  const canManageDenies = context?.allowedActions?.includes('MANAGE_DENIES') === true
-  const grades = useMemo(() => units.filter((unit) => unit.unitKind === 'GRADE'), [units])
-  const classes = useMemo(() => units.filter((unit) => unit.unitKind === 'CLASS'), [units])
+  const canManageDenies =
+    context?.allowedActions?.includes('MANAGE_DENIES') === true
+  const grades = useMemo(
+    () => units.filter((unit) => unit.unitKind === 'GRADE'),
+    [units],
+  )
+  const classes = useMemo(
+    () => units.filter((unit) => unit.unitKind === 'CLASS'),
+    [units],
+  )
 
   useEffect(() => {
     if (!organizationId || context || activeLoading) return
@@ -58,61 +99,129 @@ export default function OrganizationAdminPage() {
 
   const loadGovernanceData = useCallback(async () => {
     if (!organizationId || !canGovern) return
+    const signal = pageSignal()
+    const sequence = ++loadSequence.current
+    const current = () => !signal.aborted && sequence === loadSequence.current
     setLoading(true)
     setLoadError(null)
     try {
-      const [membershipPage, structure, students, staff, grants] = await Promise.all([
-        organizationApi.listMemberships(organizationId),
-        organizationApi.listUnits(organizationId),
-        organizationApi.listStudentAssignments(organizationId, false),
-        organizationApi.listStaffAssignments(organizationId, false),
-        organizationApi.listAssessmentDeliveryGrants(organizationId),
-      ])
-      setMemberships(membershipPage.list)
+      const [membershipPage, structure, students, staff, grants] =
+        await Promise.all([
+          loadGovernancePages(
+            (page) =>
+              organizationApi.listMemberships(
+                organizationId,
+                page,
+                100,
+                { state: 'CURRENT' },
+                signal,
+              ),
+            signal,
+          ),
+          organizationApi.listUnits(organizationId),
+          loadGovernancePages(
+            (page) =>
+              organizationApi.listStudentAssignments(
+                organizationId,
+                false,
+                page,
+                100,
+                signal,
+              ),
+            signal,
+          ),
+          loadGovernancePages(
+            (page) =>
+              organizationApi.listStaffAssignments(
+                organizationId,
+                false,
+                page,
+                100,
+                signal,
+              ),
+            signal,
+          ),
+          loadGovernancePages(
+            (page) =>
+              organizationApi.listAssessmentDeliveryGrants(
+                organizationId,
+                page,
+                100,
+                signal,
+              ),
+            signal,
+          ),
+        ])
+      if (!current()) return
+      setMemberships(membershipPage)
       setUnits(structure)
-      setStudentAssignments(students.list)
-      setStaffAssignments(staff.list)
-      setDeliveryGrants(grants.list)
+      setStudentAssignments(students)
+      setStaffAssignments(staff)
+      setDeliveryGrants(grants)
     } catch (err) {
-      setLoadError(errorText(err, '无法加载组织治理数据'))
+      if (current()) setLoadError(errorText(err, '无法加载组织治理数据'))
     } finally {
-      setLoading(false)
+      if (current()) setLoading(false)
     }
-  }, [organizationId, canGovern])
+  }, [organizationId, canGovern, pageSignal])
 
+  const invalidateGovernanceLoad = useCallback(() => {
+    loadSequence.current++
+  }, [])
   useEffect(() => {
     void loadGovernanceData()
-  }, [loadGovernanceData])
+    return invalidateGovernanceLoad
+  }, [loadGovernanceData, invalidateGovernanceLoad])
 
   const reloadContextAndData = useCallback(async () => {
+    const signal = pageSignal()
+    if (signal.aborted) return
     await refreshOrganizations()
+    if (signal.aborted) return
     await selectOrganization(organizationId)
+    if (signal.aborted) return
     await loadGovernanceData()
-  }, [refreshOrganizations, selectOrganization, organizationId, loadGovernanceData])
+  }, [
+    refreshOrganizations,
+    selectOrganization,
+    organizationId,
+    loadGovernanceData,
+    pageSignal,
+  ])
 
-  const runMutation = useCallback(async (key: string, notice: string, action: () => Promise<unknown>) => {
-    if (busyKey) return
-    setBusyKey(key)
-    setMutationError(null)
-    setMutationNotice(null)
-    try {
-      await action()
-      setMutationNotice(notice)
-      await reloadContextAndData()
-
-    } catch (err) {
-      setMutationError(errorText(err, '组织治理操作失败'))
-    } finally {
-      setBusyKey(null)
-    }
-  }, [busyKey, reloadContextAndData])
+  const runMutation = useCallback(
+    async (key: string, notice: string, action: () => Promise<unknown>) => {
+      if (mutationLock.current) return
+      mutationLock.current = true
+      const signal = pageSignal()
+      setBusyKey(key)
+      setMutationError(null)
+      setMutationNotice(null)
+      try {
+        await action()
+        if (signal.aborted) return
+        setMutationNotice(notice)
+        await reloadContextAndData()
+      } catch (err) {
+        if (!signal.aborted)
+          setMutationError(errorText(err, '组织治理操作失败'))
+      } finally {
+        mutationLock.current = false
+        if (!signal.aborted) setBusyKey(null)
+      }
+    },
+    [reloadContextAndData, pageSignal],
+  )
 
   const createGrade = async (event: FormEvent) => {
     event.preventDefault()
     const name = newGradeName.trim()
     if (!name) return
     await runMutation('grade-create', '年级已创建', async () => {
-      await organizationApi.createUnit(organizationId, { unitKind: 'GRADE', name })
+      await organizationApi.createUnit(organizationId, {
+        unitKind: 'GRADE',
+        name,
+      })
       setNewGradeName('')
     })
   }
@@ -122,7 +231,11 @@ export default function OrganizationAdminPage() {
     const name = newClassName.trim()
     if (!name || !newClassGradeId) return
     await runMutation('class-create', '班级已创建', async () => {
-      await organizationApi.createUnit(organizationId, { unitKind: 'CLASS', name, parentUnitId: newClassGradeId })
+      await organizationApi.createUnit(organizationId, {
+        unitKind: 'CLASS',
+        name,
+        parentUnitId: newClassGradeId,
+      })
       setNewClassName('')
     })
   }
@@ -130,32 +243,39 @@ export default function OrganizationAdminPage() {
   const assignStudent = async (event: FormEvent) => {
     event.preventDefault()
     if (!studentMembershipId || !studentClassId) return
-    await runMutation('student-assign', '学生班级关系已创建', () => organizationApi.assignStudent(organizationId, {
-      membershipId: studentMembershipId,
-      classUnitId: studentClassId,
-      isPrimary: true,
-    }))
+    await runMutation('student-assign', '学生班级关系已创建', () =>
+      organizationApi.assignStudent(organizationId, {
+        membershipId: studentMembershipId,
+        classUnitId: studentClassId,
+        isPrimary: true,
+      }),
+    )
   }
 
   const assignStaff = async (event: FormEvent) => {
     event.preventDefault()
     if (!staffMembershipId || !staffClassId) return
-    await runMutation('staff-assign', '教师班级关系已创建', () => organizationApi.assignStaff(organizationId, {
-      membershipId: staffMembershipId,
-      classUnitId: staffClassId,
-      staffRole,
-    }))
+    await runMutation('staff-assign', '教师班级关系已创建', () =>
+      organizationApi.assignStaff(organizationId, {
+        membershipId: staffMembershipId,
+        classUnitId: staffClassId,
+        staffRole,
+      }),
+    )
   }
 
   const createDeny = async (event: FormEvent) => {
     event.preventDefault()
-    if (!denyUserId.trim() || !denyPermission.trim() || !denyReason.trim()) return
-    await runMutation('deny-create', '拒绝规则已创建', () => organizationApi.deny(
-      organizationId,
-      denyUserId.trim(),
-      denyPermission.trim(),
-      denyReason.trim(),
-    ))
+    if (!denyUserId.trim() || !denyPermission.trim() || !denyReason.trim())
+      return
+    await runMutation('deny-create', '拒绝规则已创建', () =>
+      organizationApi.deny(
+        organizationId,
+        denyUserId.trim(),
+        denyPermission.trim(),
+        denyReason.trim(),
+      ),
+    )
   }
 
   if (activeLoading && !context) {
@@ -199,7 +319,7 @@ export default function OrganizationAdminPage() {
       {canGovern && (
         <div className="space-y-8">
           <OrganizationClassificationPanel organizationId={organizationId} memberships={memberships} />
-          {loadError&&<ProductStatus kind="error" title="治理数据加载失败">{loadError}</ProductStatus>}
+          {loadError&&<ProductStatus kind="error" title="治理数据加载失败" actions={<ProductButton disabled={governanceLoading} onClick={() => void loadGovernanceData()}>重新加载治理数据</ProductButton>}>{loadError}</ProductStatus>}
           <OrganizationMembersPanel key={organizationId} organizationId={organizationId} platformAdmin={context.access.platformRole==='SYSTEM_ADMIN'} onChanged={reloadContextAndData}/>
           <OrganizationInvitationsPanel key={`invites:${organizationId}`} organizationId={organizationId}/>
 
@@ -240,4 +360,9 @@ export default function OrganizationAdminPage() {
       )}
     </ProductPage>
   )
+}
+
+export default function OrganizationAdminPage() {
+  const { organizationId = '' } = useParams<{ organizationId: string }>()
+  return <Content key={organizationId} organizationId={organizationId} />
 }

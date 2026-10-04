@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { usePageSignal } from '../../hooks/usePageSignal'
 import { Link, useNavigate } from 'react-router-dom'
 import { organizationInvitationsApi } from '../../api/organizationInvitations'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12,6 +13,7 @@ import {
 import { resourceError } from '../../hooks/useSessionResource'
 type Preview = Awaited<ReturnType<typeof organizationInvitationsApi.preview>>
 function Content() {
+  const pageSignal = usePageSignal()
   const [code, setCode] = useState(''),
     [preview, setPreview] = useState<Preview | null>(null),
     [busy, setBusy] = useState(false),
@@ -31,13 +33,18 @@ function Content() {
           setBusy(true)
           setError('')
           setPreview(null)
+          const signal = pageSignal()
           try {
-            setPreview(await organizationInvitationsApi.preview(code.trim()))
+            const result = await organizationInvitationsApi.preview(
+              code.trim(),
+              signal,
+            )
+            if (!signal.aborted) setPreview(result)
           } catch (err) {
-            setError(resourceError(err))
+            if (!signal.aborted) setError(resourceError(err))
           } finally {
             lock.current = false
-            setBusy(false)
+            if (!signal.aborted) setBusy(false)
           }
         }}
       >
@@ -95,23 +102,28 @@ function Content() {
                 lock.current = true
                 setBusy(true)
                 setError('')
+                const signal = pageSignal()
                 try {
                   const result = await organizationInvitationsApi.accept(
                     code.trim(),
                     command.current,
+                    signal,
                   )
+                  if (signal.aborted) return
                   await refresh()
+                  if (signal.aborted) return
                   navigate(
                     `/organizations/${encodeURIComponent(result.organizationId)}`,
                   )
                 } catch (err) {
+                  if (signal.aborted) return
                   setError(
                     resourceError(err, '加入结果未确认，请核对组织列表后重试'),
                   )
                   setPreview(null)
                 } finally {
                   lock.current = false
-                  setBusy(false)
+                  if (!signal.aborted) setBusy(false)
                 }
               }}
             >

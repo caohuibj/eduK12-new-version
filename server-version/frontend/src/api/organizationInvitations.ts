@@ -41,7 +41,7 @@ export const organizationInvitationsApi = {
         {},
       ),
     ),
-  preview: async (inviteCode: string) =>
+  preview: async (inviteCode: string, signal?: AbortSignal) =>
     data(
       await apiClient.post<{
         organization: { id: string; name: string }
@@ -49,13 +49,18 @@ export const organizationInvitationsApi = {
         persona: OrganizationPersona | null
         expiresAt: string
         alreadyMember: boolean
-      }>('/organization-invitations/preview', { inviteCode }),
+      }>('/organization-invitations/preview', { inviteCode }, { signal }),
     ),
-  accept: async (inviteCode: string, commandKey: string) =>
+  accept: async (
+    inviteCode: string,
+    commandKey: string,
+    signal?: AbortSignal,
+  ) =>
     data(
       await apiClient.post<{ organizationId: string; membershipId: string }>(
         '/organization-invitations/accept',
         { inviteCode, commandKey },
+        { signal },
       ),
     ),
 }

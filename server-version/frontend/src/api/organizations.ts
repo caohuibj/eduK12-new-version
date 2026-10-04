@@ -160,8 +160,18 @@ export interface ClassificationProjection {
 }
 
 export const organizationApi = {
-  async create(name: string, firstAdminUserId: string): Promise<{ organization: { id: string } }> {
-    return requireData(await apiClient.post('/organizations', { name, firstAdminUserId, commandKey: commandKey('org-create') }))
+  async create(
+    name: string,
+    firstAdminUserId: string,
+    signal?: AbortSignal,
+  ): Promise<{ organization: { id: string } }> {
+    return requireData(
+      await apiClient.post(
+        '/organizations',
+        { name, firstAdminUserId, commandKey: commandKey('org-create') },
+        { signal },
+      ),
+    )
   },
   async classification(organizationId: string): Promise<ClassificationProjection> {
     return requireData(await apiClient.get<ClassificationProjection>(`${orgPath(organizationId)}/classification`))
@@ -184,10 +194,26 @@ export const organizationApi = {
     ))
   },
 
-  async listMemberships(organizationId: string, page = 1, pageSize = 100, filters: {keyword?:string;state?:'ALL'|'CURRENT'|'ENDED';orgRole?:'ALL'|'MEMBER'|'ORG_ADMIN'} = {}): Promise<Paged<OrganizationMembership>> {
-    return requireData(await apiClient.get<Paged<OrganizationMembership>>(`${orgPath(organizationId)}/memberships`, {
-      params: { page, pageSize, ...filters },
-    }))
+  async listMemberships(
+    organizationId: string,
+    page = 1,
+    pageSize = 100,
+    filters: {
+      keyword?: string
+      state?: 'ALL' | 'CURRENT' | 'ENDED'
+      orgRole?: 'ALL' | 'MEMBER' | 'ORG_ADMIN'
+    } = {},
+    signal?: AbortSignal,
+  ): Promise<Paged<OrganizationMembership>> {
+    return requireData(
+      await apiClient.get<Paged<OrganizationMembership>>(
+        `${orgPath(organizationId)}/memberships`,
+        {
+          params: { page, pageSize, ...filters },
+          signal,
+        },
+      ),
+    )
   },
 
   async createMembership(organizationId: string, userId: string, orgRole: OrganizationRole = 'MEMBER', persona?:OrganizationPersona): Promise<OrganizationMembership> {
@@ -268,10 +294,22 @@ export const organizationApi = {
     await apiClient.delete(`${orgPath(organizationId)}/units/${encodeURIComponent(unitId)}`)
   },
 
-  async listStudentAssignments(organizationId: string, currentOnly = false): Promise<Paged<StudentClassAssignment>> {
-    return requireData(await apiClient.get<Paged<StudentClassAssignment>>(`${orgPath(organizationId)}/student-class-assignments`, {
-      params: { page: 1, pageSize: 100, currentOnly },
-    }))
+  async listStudentAssignments(
+    organizationId: string,
+    currentOnly = false,
+    page = 1,
+    pageSize = 100,
+    signal?: AbortSignal,
+  ): Promise<Paged<StudentClassAssignment>> {
+    return requireData(
+      await apiClient.get<Paged<StudentClassAssignment>>(
+        `${orgPath(organizationId)}/student-class-assignments`,
+        {
+          params: { page, pageSize, currentOnly },
+          signal,
+        },
+      ),
+    )
   },
 
   async assignStudent(organizationId: string, input: { membershipId: string; classUnitId: string; isPrimary?: boolean }): Promise<StudentClassAssignment> {
@@ -282,10 +320,22 @@ export const organizationApi = {
     return requireData(await apiClient.post<StudentClassAssignment>(`${orgPath(organizationId)}/student-class-assignments/${encodeURIComponent(assignmentId)}/end`))
   },
 
-  async listStaffAssignments(organizationId: string, currentOnly = false): Promise<Paged<StaffClassAssignment>> {
-    return requireData(await apiClient.get<Paged<StaffClassAssignment>>(`${orgPath(organizationId)}/staff-class-assignments`, {
-      params: { page: 1, pageSize: 100, currentOnly },
-    }))
+  async listStaffAssignments(
+    organizationId: string,
+    currentOnly = false,
+    page = 1,
+    pageSize = 100,
+    signal?: AbortSignal,
+  ): Promise<Paged<StaffClassAssignment>> {
+    return requireData(
+      await apiClient.get<Paged<StaffClassAssignment>>(
+        `${orgPath(organizationId)}/staff-class-assignments`,
+        {
+          params: { page, pageSize, currentOnly },
+          signal,
+        },
+      ),
+    )
   },
 
   async assignStaff(organizationId: string, input: { membershipId: string; classUnitId: string; staffRole: StaffClassRole }): Promise<StaffClassAssignment> {
@@ -301,8 +351,18 @@ export const organizationApi = {
   async updateDeliveryPolicy(organizationId: string, homeroomDeliveryEnabled: boolean): Promise<{ homeroomDeliveryEnabled: boolean }> {
     return requireData(await apiClient.put(`${orgPath(organizationId)}/delivery-policy`, { homeroomDeliveryEnabled }))
   },
-  async listAssessmentDeliveryGrants(organizationId: string): Promise<{ list: AssessmentDeliveryGrant[]; total: number }> {
-    return requireData(await apiClient.get(`${orgPath(organizationId)}/assessment-delivery-grants`))
+  async listAssessmentDeliveryGrants(
+    organizationId: string,
+    page = 1,
+    pageSize = 100,
+    signal?: AbortSignal,
+  ): Promise<Paged<AssessmentDeliveryGrant>> {
+    return requireData(
+      await apiClient.get(
+        `${orgPath(organizationId)}/assessment-delivery-grants`,
+        { params: { page, pageSize }, signal },
+      ),
+    )
   },
 
   async grantAssessmentDelivery(organizationId: string, teacherMembershipId: string, classUnitId: string, validity?: { validFrom?: string; validUntil?: string | null }): Promise<AssessmentDeliveryGrant> {

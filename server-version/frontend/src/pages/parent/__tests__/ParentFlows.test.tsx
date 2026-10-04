@@ -17,6 +17,7 @@ const state = vi.hoisted(() => ({
     previewConsent: vi.fn(),
     acceptConsent: vi.fn(),
     withdraw: vi.fn(),
+    report: vi.fn(),
   },
   accounts: { list: vi.fn() },
 }))
@@ -35,6 +36,7 @@ vi.mock('../../../api/parentAccounts', () => ({
 }))
 import ParentConsentPage from '../ParentConsentPage'
 import ParentProfile from '../ParentProfile'
+import ParentChildReportPage from '../ParentChildReportPage'
 import ParentAccountsPage from '../ParentAccountsPage'
 import ParentReportView from '../ParentReportView'
 const preview = {
@@ -173,4 +175,44 @@ describe('parent operation boundaries', () => {
     )
     expect(screen.getByText('报告格式暂不支持')).toBeTruthy()
   })
+})
+
+it('lets a parent withdraw the exact displayed report after confirmation while keeping the relationship', async () => {
+  vi.clearAllMocks()
+  state.cap.status = 'ready'
+  state.cap.parentPortalEnabled = true
+  state.auth.user = { id: 'parent', role: 'PARENT', platformRole: 'STANDARD' }
+  state.parents.report.mockResolvedValue({
+    ...preview.projection,
+    schemaVersion: 1,
+    artifactId: 'exact-artifact',
+    relationshipId: 'exact-link',
+    mode: 'COMPLETION_ONLY',
+    canRevoke: true,
+  })
+  state.parents.withdraw.mockResolvedValue({ revoked: true })
+  render(
+    <MemoryRouter
+      initialEntries={['/parent/children/child/reports/exact-artifact']}
+    >
+      <Routes>
+        <Route
+          path="/parent/children/:childId/reports/:artifactId"
+          element={<ParentChildReportPage />}
+        />
+      </Routes>
+    </MemoryRouter>,
+  )
+  await screen.findByText('家长专用摘要')
+  fireEvent.click(screen.getByRole('button', { name: '停止查看本份报告' }))
+  expect(state.parents.withdraw).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: '确认停止查看' }))
+  await waitFor(() =>
+    expect(state.parents.withdraw).toHaveBeenCalledWith(
+      'exact-link',
+      'exact-artifact',
+    ),
+  )
+  expect(await screen.findByText('本份报告授权已撤回')).toBeInTheDocument()
+  expect(screen.queryByText('家长专用摘要')).toBeNull()
 })

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import OrganizationAdminPage from '../OrganizationAdminPage'
 import OrganizationProductRoutes from '../OrganizationProductRoutes'
@@ -35,7 +35,12 @@ const api = vi.hoisted(() => ({
 }))
 
 const auth = vi.hoisted(() => ({
-  user: { id: 'user-1', username: 'user-1', role: 'STUDENT', mustChangePassword: false } as any,
+  user: {
+    id: 'user-1',
+    username: 'user-1',
+    role: 'STUDENT',
+    mustChangePassword: false,
+  } as any,
   isLoading: false,
   isAuthenticated: true,
 }))
@@ -50,7 +55,9 @@ const org = vi.hoisted(() => ({
 
 vi.mock('../../../api/organizations', () => ({ organizationApi: api }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
-vi.mock('../../../contexts/OrganizationContext', () => ({ useOrganization: () => org }))
+vi.mock('../../../contexts/OrganizationContext', () => ({
+  useOrganization: () => org,
+}))
 
 const baseAccess = {
   organizationId: 'org-1',
@@ -69,7 +76,12 @@ const baseAccess = {
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/organizations/org-1']}>
-      <Routes><Route path="/organizations/:organizationId" element={<OrganizationAdminPage />} /></Routes>
+      <Routes>
+        <Route
+          path="/organizations/:organizationId"
+          element={<OrganizationAdminPage />}
+        />
+      </Routes>
     </MemoryRouter>,
   )
 }
@@ -84,7 +96,12 @@ function renderProductRoutes(path = '/organizations/org-1') {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  auth.user = { id: 'user-1', username: 'user-1', role: 'STUDENT', mustChangePassword: false }
+  auth.user = {
+    id: 'user-1',
+    username: 'user-1',
+    role: 'STUDENT',
+    mustChangePassword: false,
+  }
   auth.isLoading = false
   auth.isAuthenticated = true
   org.active = null
@@ -92,13 +109,39 @@ beforeEach(() => {
   org.activeError = null
   org.selectOrganization.mockResolvedValue(null)
   org.refresh.mockResolvedValue(undefined)
-  api.listMemberships.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
-  api.classification.mockResolvedValue({ dimensions: [], labels: [], assignments: [], relationships: [], historyLimit: 100 })
+  api.listMemberships.mockResolvedValue({
+    list: [],
+    total: 0,
+    page: 1,
+    pageSize: 100,
+  })
+  api.classification.mockResolvedValue({
+    dimensions: [],
+    labels: [],
+    assignments: [],
+    relationships: [],
+    historyLimit: 100,
+  })
   api.audit.mockResolvedValue({ list: [] })
   api.listUnits.mockResolvedValue([])
-  api.listStudentAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
-  api.listStaffAssignments.mockResolvedValue({ list: [], total: 0, page: 1, pageSize: 100 })
-  api.listAssessmentDeliveryGrants.mockResolvedValue({ list: [], total: 0 })
+  api.listStudentAssignments.mockResolvedValue({
+    list: [],
+    total: 0,
+    page: 1,
+    pageSize: 100,
+  })
+  api.listStaffAssignments.mockResolvedValue({
+    list: [],
+    total: 0,
+    page: 1,
+    pageSize: 100,
+  })
+  api.listAssessmentDeliveryGrants.mockResolvedValue({
+    list: [],
+    total: 0,
+    page: 1,
+    pageSize: 100,
+  })
 })
 
 describe('Organization product authority boundary', () => {
@@ -108,8 +151,14 @@ describe('Organization product authority boundary', () => {
 
     renderProductRoutes('/organizations/org-hidden')
 
-    await waitFor(() => expect(screen.getByText('无法进入组织空间')).toBeInTheDocument())
-    expect(screen.getByText('组织不存在，或当前账户没有访问权限。请返回组织列表选择可访问的组织。')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByText('无法进入组织空间')).toBeInTheDocument(),
+    )
+    expect(
+      screen.getByText(
+        '组织不存在，或当前账户没有访问权限。请返回组织列表选择可访问的组织。',
+      ),
+    ).toBeInTheDocument()
     expect(org.selectOrganization).toHaveBeenCalledTimes(1)
     expect(org.selectOrganization).toHaveBeenCalledWith('org-hidden')
 
@@ -155,9 +204,13 @@ describe('Organization product authority boundary', () => {
     }
     renderPage()
     expect(screen.getByText('当前存在显式拒绝规则')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '显式拒绝规则' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: '显式拒绝规则' }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '解除拒绝' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: '成员关系' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: '成员关系' }),
+    ).not.toBeInTheDocument()
   })
 
   it('loads administration projections only after server context grants governance', async () => {
@@ -171,10 +224,83 @@ describe('Organization product authority boundary', () => {
       },
     }
     renderPage()
-    await waitFor(() => expect(api.listMemberships).toHaveBeenCalledWith('org-1'))
+    await waitFor(() =>
+      expect(api.listMemberships).toHaveBeenCalledWith(
+        'org-1',
+        1,
+        100,
+        { state: 'CURRENT' },
+        expect.any(AbortSignal),
+      ),
+    )
     expect(api.listUnits).toHaveBeenCalledWith('org-1')
-    expect(api.listStudentAssignments).toHaveBeenCalledWith('org-1', false)
-    expect(api.listStaffAssignments).toHaveBeenCalledWith('org-1', false)
-    expect(screen.getByRole('heading', { name: '成员关系' })).toBeInTheDocument()
+    expect(api.listStudentAssignments).toHaveBeenCalledWith(
+      'org-1',
+      false,
+      1,
+      100,
+      expect.any(AbortSignal),
+    )
+    expect(api.listStaffAssignments).toHaveBeenCalledWith(
+      'org-1',
+      false,
+      1,
+      100,
+      expect.any(AbortSignal),
+    )
+    expect(
+      screen.getByRole('heading', { name: '成员关系' }),
+    ).toBeInTheDocument()
   })
+})
+
+it('offers current members beyond the first membership page in governance selectors', async () => {
+  org.active = {
+    organization: { id: 'org-1', name: '大组织', status: 'ACTIVE' },
+    access: { ...baseAccess, canGovern: true, orgRole: 'ORG_ADMIN' },
+  }
+  const members = Array.from({ length: 101 }, (_, i) => ({
+    id: 'm' + i,
+    organizationId: 'org-1',
+    userId: 'u' + i,
+    displayName: '成员' + i,
+    orgRole: 'MEMBER',
+    validUntil: null,
+  }))
+  api.listMemberships.mockImplementation(
+    async (_id: string, page = 1, pageSize = 100) => ({
+      list: members.slice((page - 1) * pageSize, page * pageSize),
+      total: members.length,
+      page,
+      pageSize,
+    }),
+  )
+  renderPage()
+  await waitFor(() =>
+    expect(
+      screen
+        .getByRole('combobox', { name: '学生成员关系' })
+        .querySelector('option[value="m100"]'),
+    ).not.toBeNull(),
+  )
+  expect(
+    screen
+      .getByRole('combobox', { name: '教师成员关系' })
+      .querySelector('option[value="m100"]'),
+  ).not.toBeNull()
+})
+
+it('lets the administrator retry an incomplete governance projection without leaving the page', async () => {
+  org.active = { organization: { id: 'org-1', name: '重试组织', status: 'ACTIVE' }, access: { ...baseAccess, canGovern: true, orgRole: 'ORG_ADMIN' } }
+  let failed = false
+  api.listMemberships.mockImplementation(async (_id: string, page = 1, pageSize = 100) => {
+    if (pageSize === 20) return { list: [], total: 0, page, pageSize }
+    if (!failed) { failed = true; throw new Error('暂时无法读取成员') }
+    return { list: [{ id: 'retry-member', userId: 'retry-user', orgRole: 'MEMBER', validUntil: null }], total: 1, page, pageSize }
+  })
+  renderPage()
+  await screen.findByText('治理数据加载失败')
+  fireEvent.click(screen.getByRole('button', { name: '重新加载治理数据' }))
+  await waitFor(() => expect(screen.getByRole('combobox', { name: '学生成员关系' }).querySelector('option[value="retry-member"]')).not.toBeNull())
+  expect(screen.queryByText('治理数据加载失败')).toBeNull()
 })

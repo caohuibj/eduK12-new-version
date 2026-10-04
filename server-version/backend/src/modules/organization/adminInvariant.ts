@@ -27,13 +27,35 @@ export async function lockOrganizationsForCurrentOrgAdmin(
   return rows.map((row) => row.organizationId)
 }
 
+/** Call under the organization lock when selecting an administrator there. */
+export async function lockOrgAdminCandidate(
+  tx: Tx,
+  userId: string,
+  organizationId?: string,
+): Promise<{ id: string; usable: boolean } | null> {
+  const rows = await tx.$queryRaw<Array<{ id: string; usable: boolean }>>`
+    SELECT u."id", (
+      u."is_active" = TRUE AND u."is_frozen" = FALSE AND u."must_change_password" = FALSE
+      AND (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp())
+      AND (u."role" <> 'TEACHER' OR u."teacher_approved" = TRUE)
+      AND NOT EXISTS (
+        SELECT 1 FROM "organization_access_denies" d
+        WHERE d."organization_id" = ${organizationId ?? null} AND d."user_id" = u."id"
+          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'ORGANIZATION_GOVERNANCE')
+      )
+    ) AS "usable" FROM "users" u WHERE u."id" = ${userId} FOR SHARE OF u
+  `
+  return rows[0] ?? null
+}
+
 /**
  * A usable ORG_ADMIN is both a current admin membership and an account that
  * can pass the shared account-status authority checks. Legacy User.role only
  * participates here in the existing TEACHER approval lifecycle; it never
  * grants Organization authority. Forced-password state is also unusable for
  * Organization governance until the user completes the required password
- * change.
+ * change. A current governance deny also makes this member unusable as an
+ * alternative administrator; unrelated permission denies do not.
  */
 export async function countUsableCurrentOrgAdmins(
   tx: Tx,
@@ -54,6 +76,11 @@ export async function countUsableCurrentOrgAdmins(
       AND u."must_change_password" = FALSE
       AND (u."expires_at" IS NULL OR u."expires_at" > statement_timestamp())
       AND (u."role" <> 'TEACHER' OR u."teacher_approved" = TRUE)
+      AND NOT EXISTS (
+        SELECT 1 FROM "organization_access_denies" d
+        WHERE d."organization_id" = m."organization_id" AND d."user_id" = m."user_id"
+          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'ORGANIZATION_GOVERNANCE')
+      )
   `
   return rows[0]?.count ?? 0
 }
@@ -69,7 +96,11 @@ export async function assertAlternativeUsableOrgAdmin(
   organizationId: string,
   removedUserId: string,
 ): Promise<void> {
-  const alternatives = await countUsableCurrentOrgAdmins(tx, organizationId, removedUserId)
+  const alternatives = await countUsableCurrentOrgAdmins(
+    tx,
+    organizationId,
+    removedUserId,
+  )
   if (alternatives === 0) {
     throw new OrganizationDomainError(
       'LAST_ORG_ADMIN',
