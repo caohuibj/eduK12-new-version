@@ -22,8 +22,10 @@ function parseTimestamp(value,label) {
 function answerRows(questions,answers) {
   const list=Array.isArray(questions)?questions:[],used=new Set()
   const rows=list.map((q,index)=>{
-    const key=String(q.id||index),value=answers?.[key]
-    used.add(key)
+    const key=String(q.id||index),indexKey=String(index)
+    // Web submissions use index keys; native submissions use question IDs.
+    const value=answers?.[indexKey]??answers?.[key]
+    used.add(indexKey);used.add(key)
     let shown=value==null||value===''?'未作答':String(value)
     if (['single_choice','multiple_choice'].includes(q.type)&&value!=null&&value!=='') {
       let values=Array.isArray(value)?value:null

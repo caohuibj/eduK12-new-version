@@ -112,3 +112,13 @@ test('late native privacy callback cannot reopen consent after the page has left
  await tick();valid=false;finish();assert.equal(open,false)
  await assert.rejects(pending,e=>['cancelled','privacyDenied'].includes(e.kind));assert.equal(p.calls.length,0)
 })
+
+test('Web index and native ID submissions produce the same complete answer review',()=>{
+ const questions=[{id:'q-color',type:'single_choice',question:'color',options:[{key:'B',text:'Green'}]},{id:'q-multi',type:'multiple_choice',question:'multiple',options:[{key:'red',text:'Red'},{key:'blue',text:'Blue'}]},{id:'q-text',type:'text',question:'text'}]
+ const native=answerRows(questions,{'q-color':'B','q-multi':['red','blue'],'q-text':'Answer'})
+ const web=answerRows(questions,{'0':'B','1':'["red","blue"]','2':'Answer'})
+ assert.deepEqual(web,native);assert.equal(web.length,3)
+ assert.equal(web[0].value,'Green');assert.equal(web[2].value,'Answer')
+ const mixed=answerRows(questions,{'0':'B','q-color':'A','q-multi':'red,blue','2':'Answer','orphan':'Historical'})
+ assert.equal(mixed.length,4);assert.equal(mixed[0].value,'Green');assert.equal(mixed[3].value,'Historical')
+})
