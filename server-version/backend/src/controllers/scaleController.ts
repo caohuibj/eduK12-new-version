@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
+import { scaleExportScope } from '../services/scaleExportScope'
 import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
@@ -1404,7 +1405,7 @@ export const scaleController = {
       }
 
       const anonymize = userRole === UserRole.ADMIN ? requestAnonymize : true
-      const countWhere: any = { scaleId, compositeAttemptId: null, progress: { gte: minProgress } }
+      const countWhere: any = { ...scaleExportScope(scaleId, { userId: userId! }), progress: { gte: minProgress } }
       if (!includeProgress) countWhere.status = 'COMPLETED'
       const countDateFilter = utcHalfOpenDateFilter(dateRange)
       if (countDateFilter) countWhere.completedAt = countDateFilter
@@ -1449,7 +1450,7 @@ export const scaleController = {
         where: { id: scaleId },
         include: {
           _count: {
-            select: { assessments: { where: { status: 'COMPLETED', compositeAttemptId: null } } },
+            select: { assessments: { where: { ...scaleExportScope(scaleId, { userId: userId! }), status: 'COMPLETED' } } },
           },
         },
       })
@@ -1467,6 +1468,7 @@ export const scaleController = {
 
       // 获取字段预览
       const previewData = await exportService.getScaleExportData(scaleId, {
+        actor: { userId: userId! },
         anonymize: true,
         minProgress: 100,
         recordLimit: 5,

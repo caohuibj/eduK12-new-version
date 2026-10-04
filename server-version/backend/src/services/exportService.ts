@@ -15,6 +15,7 @@ export {
 } from './exportService.legacy'
 
 export interface ExportOptions {
+  actor?: { userId: string }
   anonymize?: boolean
   includeProgress?: boolean
   minProgress?: number

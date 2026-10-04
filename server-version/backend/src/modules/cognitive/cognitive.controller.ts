@@ -328,13 +328,22 @@ export const cognitiveController = {
   },
 
   // Cognitive export
+  async collections(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      const { listCognitiveCollections } = await import('./collection-data.service')
+      return success(res, await listCognitiveCollections({ userId: req.user.userId, role: req.user.role, assignmentId: req.params.id }))
+    } catch (err) { return handleError(res, err) }
+  },
+
   async professionalReports(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
       const query = cognitiveProfessionalReportsQuerySchema.parse(req.query)
       const { listProfessionalReports } = await import('./professional-report.service')
       return success(res, await listProfessionalReports({ userId: req.user.userId, role: req.user.role,
-        assignmentId: req.params.id, offset: query.offset }))
+        assignmentId: req.params.id, offset: query.offset,
+        collectionId: query.collectionId }))
     } catch (err) {
       return handleError(res, err)
     }

@@ -140,7 +140,7 @@ const CognitiveAssignmentList: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       <PageHeader
         title="认知任务"
-        description="创建和管理认知任务；任务类型、版本、Profile 与访问策略仍由 Cognitive domain contract 决定。"
+        description="创建、发布和管理认知任务，按任务要求选择测验档位与参与方式。"
         actions={
           <button
             type="button"

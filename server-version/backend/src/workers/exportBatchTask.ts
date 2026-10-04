@@ -63,7 +63,7 @@ export const runExportBatch = async (job: any) => {
       const assessment = claim.resourceType === 'COGNITIVE' || claim.resourceType === 'COMPOSITE'
         ? await prepareAssessmentExport(claim) : null
       const data = assessment?.data ?? (claim.resourceType === 'SCALE'
-        ? await getScaleExportData(claim.resourceId, claim.options)
+        ? await getScaleExportData(claim.resourceId, { ...claim.options, actor: { userId: claim.createdBy } })
         : await getQuestionnaireExportData(claim.resourceId, claim.options))
       assertExportLimits({ records: data.rows.length, fields: data.fields.length })
 

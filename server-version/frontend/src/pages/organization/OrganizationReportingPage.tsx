@@ -649,6 +649,8 @@ function ReportingWorkspace() {
   return (
     <ProductPage width="management" className="organization-reporting-workspace">
       <PageHeader title="群体与纵向报告" description="选择分析人群与测量时间，查看单次群体表现或多次测量变化。" actions={<div className="organization-reporting-header-actions"><Link to={`/organizations/${encodeURIComponent(organizationId)}`}>组织管理</Link>{context.access.canGovern && <Link to={`/organizations/${encodeURIComponent(organizationId)}/runs`}>测评批次</Link>}</div>} />
+      {!loading && !loadError && sources.length === 0 && <ProductStatus kind="info" title="当前没有可分析的组织测量">此页面读取组织测评批次中的测量。普通问卷与独立工具的作答数据请从对应问卷或工具导出；不会因加入组织而自动纳入群体报告。</ProductStatus>}
+      {!loading && !loadError && specs.length === 0 && <p role="status">当前没有已发布且适用于此组织的报告方案，请由平台管理员审核配置。</p>}
       {loadError && <ProductStatus kind="warning" title="部分测量列表刷新失败">{loadError}</ProductStatus>}
       {actionError && <ProductStatus kind="error" title="报告分析操作失败" announce="assertive">{actionError}</ProductStatus>}
       {notice && <ProductStatus kind="success" title="报告分析已更新" announce="polite">{notice}</ProductStatus>}

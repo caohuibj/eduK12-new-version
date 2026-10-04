@@ -588,6 +588,7 @@ jobs:
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
           src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+          src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts
           src/__tests__/migration/legacy-import.postgres.integration.test.ts
           src/__tests__/migration/public-token-backfill.cli.integration.test.ts
           src/__tests__/questionnaire/legacy-authoring.postgres.integration.test.ts

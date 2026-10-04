@@ -10,7 +10,7 @@ import TagFilter from '../components/TagFilter'
 import MaterialGrantModal from '../components/MaterialGrantModal'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
-import { createExportRequestKey, ExportJobFailedError, waitForExportArtifacts, type ExportArtifactRef } from '../utils/exportJobs'
+import { createExportRequestKey, ExportJobFailedError, waitForExportArtifacts, triggerExportDownload, type ExportArtifactRef } from '../utils/exportJobs'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 interface Scale {
@@ -219,18 +219,13 @@ const ScaleList: React.FC = () => {
         const downloadResponse = await sessionFetch(artifact.downloadUrl)
         if (!downloadResponse.ok) throw new Error('导出文件下载失败')
         const blob = await downloadResponse.blob()
-        const url = window.URL.createObjectURL(blob)
-        const anchor = document.createElement('a')
-        anchor.href = url
-        anchor.download = artifact.fileName
-        anchor.click()
-        window.URL.revokeObjectURL(url)
+        triggerExportDownload(blob, artifact.fileName)
       }
 
       exportRequestRef.current = null
       const formatLabel = exportOptions.format === 'sav' ? 'SAV' : exportOptions.format === 'spss' ? 'CSV+SPS' : 'CSV'
       const fieldCount = response.data.fieldCount ?? exportPreview?.fields?.length ?? '-'
-      showMessage(`导出成功！\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${fieldCount}\n\n文件已开始下载...`)
+      showMessage(`已请求下载导出文件。\n格式: ${formatLabel}\n记录数: ${response.data.recordCount}\n字段数: ${fieldCount}\n\n请查看浏览器下载列表；若被拦截，请允许本站下载。`)
       setShowExportModal(false)
     } catch (operationError: any) {
       if (operationError instanceof ExportJobFailedError) exportRequestRef.current = null

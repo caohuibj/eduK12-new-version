@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const cognitiveProfessionalReportsQuerySchema = z.object({ offset: z.coerce.number().int().min(0).max(100000).default(0) }).strict()
+export const cognitiveProfessionalReportsQuerySchema = z.object({ offset: z.coerce.number().int().min(0).max(100000).default(0), collectionId: z.string().uuid().optional() }).strict()
 import { MAX_TOKEN_USES } from '../../constants'
 import { administrationProvenanceV1Schema } from './administration-provenance'
 
