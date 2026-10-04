@@ -1,0 +1,176 @@
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+const state = vi.hoisted(() => ({
+  auth: {
+    setUser: vi.fn(),
+    user: { id: 'student', role: 'STUDENT', platformRole: 'STANDARD' },
+  },
+  cap: {
+    status: 'ready',
+    isLoading: false,
+    parentPortalEnabled: true,
+    retry: vi.fn(),
+  },
+  organization: { active: null, platformRole: 'STANDARD' },
+  parents: {
+    previewConsent: vi.fn(),
+    acceptConsent: vi.fn(),
+    withdraw: vi.fn(),
+  },
+  accounts: { list: vi.fn() },
+}))
+const passwordApi = vi.hoisted(() => ({ changePassword: vi.fn() }))
+vi.mock('../../../api/auth', () => ({ authApi: passwordApi }))
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => state.auth }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({
+  useCapabilities: () => state.cap,
+}))
+vi.mock('../../../contexts/OrganizationContext', () => ({
+  useOrganization: () => state.organization,
+}))
+vi.mock('../../../api/parents', () => ({ parentsApi: state.parents }))
+vi.mock('../../../api/parentAccounts', () => ({
+  parentAccountsApi: state.accounts,
+}))
+import ParentConsentPage from '../ParentConsentPage'
+import ParentProfile from '../ParentProfile'
+import ParentAccountsPage from '../ParentAccountsPage'
+import ParentReportView from '../ParentReportView'
+const preview = {
+  relationshipId: 'link',
+  artifactId: 'report',
+  parentName: '确认家长',
+  projection: {
+    audience: 'PARENT',
+    title: '家长专用摘要',
+    summary: '本次可披露内容',
+    blocks: [],
+  },
+  publicationHash: 'f'.repeat(64),
+  consentVersion: 'exact-v1',
+  consentText: '同意本份内容',
+  commandKey: 'exact-command',
+  canConsent: true,
+  canRevoke: false,
+  consentStatus: 'NOT_ACCEPTED',
+}
+const consent = () =>
+  render(
+    <MemoryRouter
+      initialEntries={['/student/parent-links/link/reports/report']}
+    >
+      <Routes>
+        <Route
+          path="/student/parent-links/:relationshipId/reports/:artifactId"
+          element={<ParentConsentPage />}
+        />
+      </Routes>
+    </MemoryRouter>,
+  )
+describe('parent operation boundaries', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    state.auth.user = {
+      id: 'student',
+      role: 'STUDENT',
+      platformRole: 'STANDARD',
+    }
+    state.organization.platformRole = 'STANDARD'
+    state.cap.status = 'ready'
+    state.cap.parentPortalEnabled = true
+    state.parents.previewConsent.mockResolvedValue(preview)
+    state.parents.acceptConsent.mockResolvedValue({})
+  })
+  it('requires explicit checkbox and submits the exact displayed publication and command', async () => {
+    consent()
+    await screen.findByText('确认家长')
+    const button = screen.getByRole('button', { name: /同意/ })
+    expect(button).toBeDisabled()
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(button)
+    await waitFor(() =>
+      expect(state.parents.acceptConsent).toHaveBeenCalledWith(preview),
+    )
+  })
+  it('normal parent password change clears session and requires login again', async () => {
+    passwordApi.changePassword.mockResolvedValue({ code: 0 })
+    render(
+      <MemoryRouter initialEntries={['/parent/profile']}>
+        <Routes>
+          <Route path="/parent/profile" element={<ParentProfile />} />
+          <Route path="/parent/login" element={<p>家长重新登录</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    fireEvent.change(screen.getByLabelText('当前密码'), {
+      target: { value: 'OldPassword123' },
+    })
+    fireEvent.change(screen.getByLabelText('新密码'), {
+      target: { value: 'NewPassword456' },
+    })
+    fireEvent.change(screen.getByLabelText('再次输入新密码'), {
+      target: { value: 'NewPassword456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }))
+    await screen.findByText('家长重新登录')
+    expect(state.auth.setUser).toHaveBeenCalledWith(null)
+  })
+  it('late password response after leaving cannot clear a newer session', async () => {
+    let resolve: (v: { code: number }) => void = () => {}
+    passwordApi.changePassword.mockImplementationOnce(
+      () =>
+        new Promise<{ code: number }>((r) => {
+          resolve = r
+        }),
+    )
+    const { unmount } = render(
+      <MemoryRouter>
+        <ParentProfile />
+      </MemoryRouter>,
+    )
+    fireEvent.change(screen.getByLabelText('当前密码'), {
+      target: { value: 'OldPassword123' },
+    })
+    fireEvent.change(screen.getByLabelText('新密码'), {
+      target: { value: 'NewPassword456' },
+    })
+    fireEvent.change(screen.getByLabelText('再次输入新密码'), {
+      target: { value: 'NewPassword456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }))
+    unmount()
+    await act(async () => resolve({ code: 0 }))
+    expect(state.auth.setUser).not.toHaveBeenCalled()
+  })
+  it('closed entry never loads report contents', () => {
+    state.cap.parentPortalEnabled = false
+    consent()
+    expect(screen.getByText('家长入口尚未开放')).toBeTruthy()
+    expect(state.parents.previewConsent).not.toHaveBeenCalled()
+  })
+  it('legacy administrator cannot load parent account directory', () => {
+    state.auth.user = { id: 'legacy', role: 'ADMIN', platformRole: 'STANDARD' }
+    render(
+      <MemoryRouter>
+        <ParentAccountsPage />
+      </MemoryRouter>,
+    )
+    expect(state.accounts.list).not.toHaveBeenCalled()
+    expect(screen.getByText(/平台管理员权限/)).toBeTruthy()
+  })
+  it('refuses staff audience or malformed blocks without rendering report contents', () => {
+    const { rerender } = render(
+      <ParentReportView
+        report={{ ...preview.projection, audience: 'STAFF' } as any}
+      />,
+    )
+    expect(screen.queryByText('本次可披露内容')).toBeNull()
+    rerender(
+      <ParentReportView
+        report={{ ...preview.projection, blocks: null } as any}
+      />,
+    )
+    expect(screen.getByText('报告格式暂不支持')).toBeTruthy()
+  })
+})

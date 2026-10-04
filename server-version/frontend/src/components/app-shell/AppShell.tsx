@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, PanelLeft } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
-import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
+import { useCapabilities } from '../../contexts/CapabilitiesContext'
 import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationProductRoutes from '../../pages/organization/OrganizationProductRoutes'
 import Footer from '../Footer'
@@ -19,7 +19,7 @@ import '../assessment-ui/assessment-ui.css'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
-  const cognitive = useCognitiveEnabled()
+  const { cognitiveEnabled: cognitive, parentPortalEnabled } = useCapabilities()
   const relational = useRelationalAvailability()
   const { organizations, total: organizationTotal, platformRole, allowedActions: directoryActions, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
@@ -37,6 +37,10 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
   const items=[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
   if(user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
+  if(parentPortalEnabled&&user?.role==='PARENT')items.push({path:'/parent/children',label:'我的孩子'},{path:'/parent/links',label:'家长关联'})
+  if(parentPortalEnabled&&user?.role==='STUDENT')items.push({path:'/student/parent-links',label:'家长关联',section:'account'})
+  if((platformRole??user?.platformRole)==='SYSTEM_ADMIN')items.push({path:'/parent-accounts',label:'家长账号管理',section:'system'})
+  if(parentPortalEnabled&&displayOrganization?.allowedActions.includes('PARENT_REPORT_PUBLICATION'))items.push({path:`/organizations/${encodeURIComponent(displayOrganization.organization.id)}/parent-reports`,label:'家长报告',section:'organization'})
   const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
   const mainRef=useRef<HTMLElement>(null), toggleRef=useRef<HTMLButtonElement>(null), previousPath=useRef(location.pathname)
   const [openPath,setOpenPath]=useState<string|null>(null),[loggingOut,setLoggingOut]=useState(false),menuOpen=openPath===location.pathname
@@ -48,7 +52,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
     {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>Huisurvey</Link>}
       {mode==='standard'&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
-      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {{STUDENT:'学生',TEACHER:'教师',ADMIN:'管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
+      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {{STUDENT:'学生',TEACHER:'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'平台管理员':'旧版管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
         {user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}
         {user&&mode==='standard'&&(organizationError||organizationListError)&&<button type="button" className="hui-context-retry" onClick={()=>{if(routeOrganizationId&&routeOrganizationId!=='new')void selectOrganization(routeOrganizationId);else void refreshOrganizations()}}>组织连接失败，重试</button>}

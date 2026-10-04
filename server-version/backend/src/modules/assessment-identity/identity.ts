@@ -116,7 +116,7 @@ export const createParentInviteCode = (input: {
 }
 
 export const assertInviteCodeConsumable = (input: {
-  record: ParentInviteCodeRecordV1
+  record: Pick<ParentInviteCodeRecordV1, 'codeHash' | 'status' | 'expiresAt'>
   plaintext: string
   now?: string
 }): void => {
@@ -138,12 +138,12 @@ export const assertInviteCodeConsumable = (input: {
   }
 }
 
-export const consumeParentInviteCode = (input: {
-  record: ParentInviteCodeRecordV1
+export const consumeParentInviteCode = <T extends Pick<ParentInviteCodeRecordV1, 'codeHash' | 'status' | 'expiresAt'>>(input: {
+  record: T
   plaintext: string
   parentUserId: string
   now?: string
-}): ParentInviteCodeRecordV1 => {
+}): T & { status: 'CONSUMED'; consumedAt: string; consumedByParentUserId: string } => {
   assertInviteCodeConsumable(input)
   const now = input.now ?? new Date().toISOString()
   return {

@@ -1,18 +1,17 @@
+import OrganizationMembersPanel from './OrganizationMembersPanel'
+import OrganizationInvitationsPanel from './OrganizationInvitationsPanel'
 import DeliveryPolicySettings from './DeliveryPolicySettings'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { organizationApi, type AssessmentDeliveryGrant, type CapabilityGrantHistory, type MembershipAccessHistory, type OrganizationCapability, type OrganizationMembership, type OrganizationPersona, type OrganizationRole, type OrganizationUnit, type PersonaGrantHistory, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
+import { organizationApi, type AssessmentDeliveryGrant, type OrganizationMembership, type OrganizationUnit, type StaffClassAssignment, type StaffClassRole, type StudentClassAssignment } from '../../api/organizations'
 import { useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationClassificationPanel from './OrganizationClassificationPanel'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
-const PERSONAS: OrganizationPersona[] = ['TEACHER', 'STUDENT', 'COUNSELOR', 'CLIENT']
-const CAPABILITIES: OrganizationCapability[] = ['PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT']
 const STAFF_ROLES: StaffClassRole[] = ['HOMEROOM', 'TEACHING']
 
 const formatTime = (value: string | null | undefined) => value ? new Date(value).toLocaleString() : '当前'
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
-const grantCurrent = (grant: PersonaGrantHistory | CapabilityGrantHistory) => grant.revokedAt === null
 
 export default function OrganizationAdminPage() {
   const { organizationId = '' } = useParams<{ organizationId: string }>()
@@ -28,14 +27,12 @@ export default function OrganizationAdminPage() {
   const [studentAssignments, setStudentAssignments] = useState<StudentClassAssignment[]>([])
   const [staffAssignments, setStaffAssignments] = useState<StaffClassAssignment[]>([])
   const [deliveryGrants, setDeliveryGrants] = useState<AssessmentDeliveryGrant[]>([])
-  const [loading, setLoading] = useState(false)
+  const [_loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [mutationError, setMutationError] = useState<string | null>(null)
   const [mutationNotice, setMutationNotice] = useState<string | null>(null)
   const [busyKey, setBusyKey] = useState<string | null>(null)
 
-  const [newMemberUserId, setNewMemberUserId] = useState('')
-  const [newMemberRole, setNewMemberRole] = useState<OrganizationRole>('MEMBER')
   const [newGradeName, setNewGradeName] = useState('')
   const [newClassName, setNewClassName] = useState('')
   const [newClassGradeId, setNewClassGradeId] = useState('')
@@ -47,10 +44,6 @@ export default function OrganizationAdminPage() {
   const [denyUserId, setDenyUserId] = useState('')
   const [denyPermission, setDenyPermission] = useState('ORGANIZATION_GOVERNANCE')
   const [denyReason, setDenyReason] = useState('')
-  const [selectedMembershipId, setSelectedMembershipId] = useState<string | null>(null)
-  const [accessHistory, setAccessHistory] = useState<MembershipAccessHistory | null>(null)
-  const [historyLoading, setHistoryLoading] = useState(false)
-  const [historyError, setHistoryError] = useState<string | null>(null)
 
   const context = active?.organization.id === organizationId ? active : null
   const canGovern = context?.access.canGovern === true
@@ -106,43 +99,13 @@ export default function OrganizationAdminPage() {
       await action()
       setMutationNotice(notice)
       await reloadContextAndData()
-      if (selectedMembershipId) {
-        try {
-          setAccessHistory(await organizationApi.membershipAccessHistory(organizationId, selectedMembershipId))
-        } catch {
-          setAccessHistory(null)
-        }
-      }
+
     } catch (err) {
       setMutationError(errorText(err, '组织治理操作失败'))
     } finally {
       setBusyKey(null)
     }
-  }, [busyKey, reloadContextAndData, selectedMembershipId, organizationId])
-
-  const openMembershipHistory = async (membershipId: string) => {
-    setSelectedMembershipId(membershipId)
-    setHistoryLoading(true)
-    setHistoryError(null)
-    try {
-      setAccessHistory(await organizationApi.membershipAccessHistory(organizationId, membershipId))
-    } catch (err) {
-      setAccessHistory(null)
-      setHistoryError(errorText(err, '无法加载成员授权历史'))
-    } finally {
-      setHistoryLoading(false)
-    }
-  }
-
-  const createMember = async (event: FormEvent) => {
-    event.preventDefault()
-    const userId = newMemberUserId.trim()
-    if (!userId) return
-    await runMutation('member-create', '成员关系已创建', async () => {
-      await organizationApi.createMembership(organizationId, userId, newMemberRole)
-      setNewMemberUserId('')
-    })
-  }
+  }, [busyKey, reloadContextAndData])
 
   const createGrade = async (event: FormEvent) => {
     event.preventDefault()
@@ -196,7 +159,7 @@ export default function OrganizationAdminPage() {
   }
 
   if (activeLoading && !context) {
-    return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">服务器正在重新确认当前 Organization authority。</ProductStatus></ProductPage>
+    return <ProductPage width="management" className="hui-organization-page"><ProductStatus kind="pending" title="正在验证组织上下文">正在重新确认您在此组织中的访问权限。</ProductStatus></ProductPage>
   }
 
   if (!context) {
@@ -209,14 +172,12 @@ export default function OrganizationAdminPage() {
     )
   }
 
-  const currentPersonas = new Set(accessHistory?.personas.filter(grantCurrent).map((grant) => grant.persona) ?? [])
-  const currentCapabilities = new Set(accessHistory?.capabilities.filter(grantCurrent).map((grant) => grant.capability) ?? [])
 
   return (
     <ProductPage width="management" className="hui-organization-page">
       <PageHeader
         title={context.organization.name}
-        description={<>Organization 产品空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.join(' / ') || '无'}</>}
+        description={<>组织空间 · 状态：{context.organization.status === 'ACTIVE' ? '运行中' : '已暂停'} · 当前依据：{context.access.basis.map(b=>({SYSTEM_ADMIN:'平台管理员',ORG_ADMIN:'组织管理员',MEMBERSHIP:'有效成员',CAPABILITY:'专项授权'}[b])).join(' / ') || '无'}</>}
         actions={context.allowedActions?.some(action => action === 'SUSPEND' || action === 'RESUME') ? (
           context.organization.status === 'ACTIVE'
             ? <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation('org-suspend', '组织已暂停', () => organizationApi.suspend(organizationId))}>暂停组织</ProductButton>
@@ -231,49 +192,16 @@ export default function OrganizationAdminPage() {
           {context.access.explicitDenies.join('、')}。拒绝规则优先于平台或组织角色；普通治理操作仍会由服务器拒绝。
         </ProductStatus>
       )}
-      {!canGovern && <ProductStatus kind="info" title="只读组织上下文">当前服务器投影未授予 Organization governance。页面不会尝试加载治理数据。</ProductStatus>}
+      {!canGovern && <ProductStatus kind="info" title="只读组织上下文">您可以查看组织基本信息。管理成员和组织结构需要组织管理员权限。</ProductStatus>}
       {mutationError && <ProductStatus kind="error" title="操作失败" announce="assertive">{mutationError}</ProductStatus>}
       {mutationNotice && <ProductStatus kind="success" title="操作完成" announce="polite">{mutationNotice}</ProductStatus>}
 
       {canGovern && (
         <div className="space-y-8">
           <OrganizationClassificationPanel organizationId={organizationId} memberships={memberships} />
-          <section aria-labelledby="org-memberships-heading" className="space-y-4">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h2 id="org-memberships-heading" className="text-xl font-semibold text-slate-900">成员关系</h2>
-                <p className="mt-1 text-sm text-slate-600">成员关系、Persona 与 Capability 都保留时间区间；结束或撤销不会删除历史。</p>
-              </div>
-              <ProductButton disabled={loading} onClick={() => void loadGovernanceData()}>{loading ? '正在刷新…' : '刷新'}</ProductButton>
-            </div>
-            {loadError && <ProductStatus kind="error" title="治理数据加载失败">{loadError}</ProductStatus>}
-            <form className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[1fr_auto_auto]" onSubmit={createMember}>
-              <label className="grid gap-1 text-sm font-medium text-slate-700">用户 ID<input className="min-h-11 rounded-lg border border-slate-300 px-3" value={newMemberUserId} onChange={(event) => setNewMemberUserId(event.target.value)} /></label>
-              <label className="grid gap-1 text-sm font-medium text-slate-700">组织角色<select className="min-h-11 rounded-lg border border-slate-300 px-3" value={newMemberRole} onChange={(event) => setNewMemberRole(event.target.value as OrganizationRole)}><option value="MEMBER">MEMBER</option><option value="ORG_ADMIN">ORG_ADMIN</option></select></label>
-              <ProductButton variant="primary" type="submit" disabled={busyKey !== null || !newMemberUserId.trim()}>新增成员</ProductButton>
-            </form>
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <table aria-label="成员关系" className="hui-organization-members w-full min-w-[760px] text-left text-sm">
-                <thead className="bg-slate-50 text-slate-700"><tr><th className="p-3">用户</th><th className="p-3">角色</th><th className="p-3">开始</th><th className="p-3">结束</th><th className="p-3">操作</th></tr></thead>
-                <tbody>
-                  {memberships.map((membership) => <tr key={membership.id} className="border-t border-slate-200 align-top"><td data-label="用户" className="p-3 font-mono text-xs">{membership.userId}</td><td data-label="角色" className="p-3"><select aria-label={`成员 ${membership.userId} 角色`} disabled={membership.validUntil !== null || busyKey !== null} value={membership.orgRole} onChange={(event) => void runMutation(`role-${membership.id}`, '成员角色已更新', () => organizationApi.setMembershipRole(organizationId, membership.id, event.target.value as OrganizationRole))}><option value="MEMBER">MEMBER</option><option value="ORG_ADMIN">ORG_ADMIN</option></select></td><td data-label="开始" className="p-3">{formatTime(membership.validFrom)}</td><td data-label="结束" className="p-3">{formatTime(membership.validUntil)}</td><td data-label="操作" className="p-3"><div className="flex flex-wrap gap-2"><ProductButton onClick={() => void openMembershipHistory(membership.id)}>授权历史</ProductButton>{membership.validUntil === null && <ProductButton variant="danger" disabled={busyKey !== null} onClick={() => void runMutation(`end-${membership.id}`, '成员关系已结束', () => organizationApi.endMembership(organizationId, membership.id, '由组织管理界面结束'))}>结束关系</ProductButton>}</div></td></tr>)}
-                  {memberships.length === 0 && <tr><td colSpan={5} className="p-4 text-slate-500">暂无成员关系。</td></tr>}
-                </tbody>
-              </table>
-            </div>
-
-            {selectedMembershipId && (
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <h3 className="font-semibold text-slate-900">成员授权历史</h3>
-                {historyLoading && <p className="mt-2 text-sm text-slate-600">正在加载…</p>}
-                {historyError && <ProductStatus kind="error" title="授权历史加载失败">{historyError}</ProductStatus>}
-                {accessHistory && <div className="mt-4 grid gap-5 lg:grid-cols-2">
-                  <div><h4 className="font-medium text-slate-800">Persona</h4><div className="mt-2 flex flex-wrap gap-2">{PERSONAS.map((persona) => <ProductButton key={persona} disabled={busyKey !== null} variant={currentPersonas.has(persona) ? 'danger' : 'secondary'} onClick={() => void runMutation(`persona-${persona}`, currentPersonas.has(persona) ? `${persona} 已撤销` : `${persona} 已授予`, () => currentPersonas.has(persona) ? organizationApi.revokePersona(organizationId, selectedMembershipId, persona) : organizationApi.grantPersona(organizationId, selectedMembershipId, persona))}>{currentPersonas.has(persona) ? `撤销 ${persona}` : `授予 ${persona}`}</ProductButton>)}</div><ul className="mt-3 space-y-1 text-sm text-slate-600">{accessHistory.personas.map((grant) => <li key={grant.id}>{grant.persona} · {formatTime(grant.grantedAt)} → {formatTime(grant.revokedAt)}</li>)}</ul></div>
-                  <div><h4 className="font-medium text-slate-800">Capability</h4><div className="mt-2 flex flex-wrap gap-2">{CAPABILITIES.map((capability) => <ProductButton key={capability} disabled={busyKey !== null} variant={currentCapabilities.has(capability) ? 'danger' : 'secondary'} onClick={() => void runMutation(`capability-${capability}`, currentCapabilities.has(capability) ? `${capability} 已撤销` : `${capability} 已授予`, () => currentCapabilities.has(capability) ? organizationApi.revokeCapability(organizationId, selectedMembershipId, capability) : organizationApi.grantCapability(organizationId, selectedMembershipId, capability))}>{currentCapabilities.has(capability) ? `撤销 ${capability}` : `授予 ${capability}`}</ProductButton>)}</div><ul className="mt-3 space-y-1 text-sm text-slate-600">{accessHistory.capabilities.map((grant) => <li key={grant.id}>{grant.capability} · {formatTime(grant.grantedAt)} → {formatTime(grant.revokedAt)}</li>)}</ul></div>
-                </div>}
-              </div>
-            )}
-          </section>
+          {loadError&&<ProductStatus kind="error" title="治理数据加载失败">{loadError}</ProductStatus>}
+          <OrganizationMembersPanel key={organizationId} organizationId={organizationId} platformAdmin={context.access.platformRole==='SYSTEM_ADMIN'} onChanged={reloadContextAndData}/>
+          <OrganizationInvitationsPanel key={`invites:${organizationId}`} organizationId={organizationId}/>
 
           <section aria-labelledby="org-structure-heading" className="space-y-4">
             <div><h2 id="org-structure-heading" className="text-xl font-semibold text-slate-900">年级与班级结构</h2><p className="mt-1 text-sm text-slate-600">班级必须属于年级；被子级或历史关系引用的结构单元由数据库约束阻止删除。</p></div>

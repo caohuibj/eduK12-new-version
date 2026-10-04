@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
+import { Prisma } from '@prisma/client'
 import { error, notFound, success, unauthorized, forbidden } from '../../utils/response'
 import {
   resolveAssessmentDeliveryAuthority,
@@ -58,6 +59,7 @@ const createOrganizationSchema = z.object({ name: z.string().trim().min(1).max(2
 const membershipSchema = z.object({
   userId: z.string().min(1),
   orgRole: z.enum(['MEMBER', 'ORG_ADMIN']).optional(),
+  persona: z.enum(['TEACHER','STUDENT','COUNSELOR','CLIENT']).optional(),
 })
 const roleSchema = z.object({ orgRole: z.enum(['MEMBER', 'ORG_ADMIN']) })
 const endSchema = z.object({ reason: z.string().trim().max(500).optional() })
@@ -92,6 +94,7 @@ function commandMeta(req: Request) {
 }
 
 function sendDomainError(res: Response, err: unknown) {
+  if (err instanceof z.ZodError) return error(res, err.errors[0].message, -1, 400)
   if (err instanceof OrganizationDomainError) {
     return res.status(err.statusCode).json({ code: err.code, message: err.message, data: null })
   }
@@ -259,26 +262,15 @@ export const organizationController = {
     try {
       const { page, pageSize, offset } = parsePage(req)
       const organizationId = req.params.organizationId
-      const [rows, totals] = await Promise.all([
-        prisma.$queryRaw<Array<Record<string, unknown>>>`
-          SELECT
-            "id",
-            "user_id" AS "userId",
-            "org_role" AS "orgRole",
-            "valid_from" AS "validFrom",
-            "valid_until" AS "validUntil",
-            "ended_by_user_id" AS "endedByUserId",
-            "end_reason" AS "endReason"
-          FROM "organization_memberships"
-          WHERE "organization_id" = ${organizationId}
-          ORDER BY "valid_from" DESC, "id" DESC
-          LIMIT ${pageSize} OFFSET ${offset}
-        `,
-        prisma.$queryRaw<Array<{ count: number }>>`
-          SELECT COUNT(*)::int AS "count"
-          FROM "organization_memberships"
-          WHERE "organization_id" = ${organizationId}
-        `,
+      const { keyword, state, orgRole } = z.object({ keyword:z.string().trim().max(100).default(''),state:z.enum(['ALL','CURRENT','ENDED']).default('ALL'),orgRole:z.enum(['ALL','MEMBER','ORG_ADMIN']).default('ALL') }).parse(req.query)
+      const current=Prisma.sql`m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())`
+      const scope=Prisma.sql`m.organization_id=${organizationId}
+        AND (${keyword}='' OR strpos(lower(u.username),lower(${keyword}))>0 OR strpos(lower(COALESCE(u.nickname,'')),lower(${keyword}))>0 OR m.user_id=${keyword})
+        AND (${state}='ALL' OR (${state}='CURRENT' AND (${current})) OR (${state}='ENDED' AND NOT (${current})))
+        AND (${orgRole}='ALL' OR m.org_role=${orgRole})`
+      const [rows,totals]=await Promise.all([
+        prisma.$queryRaw(Prisma.sql`SELECT m.id,m.user_id AS "userId",m.org_role AS "orgRole",m.valid_from AS "validFrom",m.valid_until AS "validUntil",m.ended_by_user_id AS "endedByUserId",m.end_reason AS "endReason",u.username,COALESCE(u.nickname,u.username) AS "displayName",u.role AS "userRole",(${current}) AS "isCurrent",(u.is_active=true AND u.is_frozen=false AND u.must_change_password=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()) AND (u.role<>'TEACHER' OR u.teacher_approved=true)) AS "accountUsable" FROM organization_memberships m JOIN users u ON u.id=m.user_id WHERE (${scope}) ORDER BY m.valid_from DESC,m.id DESC LIMIT ${pageSize} OFFSET ${offset}`),
+        prisma.$queryRaw<Array<{count:number}>>(Prisma.sql`SELECT COUNT(*)::int AS count FROM organization_memberships m JOIN users u ON u.id=m.user_id WHERE (${scope})`),
       ])
       return success(res, { list: rows, total: totals[0]?.count ?? 0, page, pageSize })
     } catch (err) {

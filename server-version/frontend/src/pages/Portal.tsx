@@ -1,3 +1,4 @@
+import { ProductButton } from '../components/product-ui'
 import { useCapabilities } from '../contexts/CapabilitiesContext'
 import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck } from 'lucide-react'
@@ -7,13 +8,13 @@ import '../components/auth/auth-shell.css'
 const roles = [
   { key: 'student', title: '学生入口', description: '参加课程，完成测评和学习任务', path: '/student/login', Icon: GraduationCap },
   { key: 'teacher', title: '教师入口', description: '管理课程与测评，查看学习情况', path: '/teacher/account-login', Icon: BookOpenCheck },
-  { key: 'parent', title: '家长入口', description: '参与已分配的测评并查看自己的结果', path: '/parent/login', Icon: HeartHandshake },
+  { key: 'parent', title: '家长入口', description: '关联孩子，查看获准报告并参与已分配测评', path: '/parent/login', Icon: HeartHandshake },
   { key: 'admin', title: '管理员入口', description: '管理账户、内容与平台授权', path: '/admin/login', Icon: ShieldCheck },
 ] as const
 
 export default function Portal() {
   const authLink = useAuthLinks()
-  const { parentPortalEnabled, isLoading } = useCapabilities()
+  const { parentPortalEnabled, isLoading, status, retry } = useCapabilities()
   const displayRoles = parentPortalEnabled ? roles : [roles[0], roles[1], roles[3], roles[2]]
   return <div className="hui-entry-page">
     <section className="hui-entry-hero" aria-labelledby="hui-entry-title">
@@ -41,8 +42,8 @@ export default function Portal() {
       <nav aria-label="身份入口" className="hui-entry-roles">
         {displayRoles.map(({ key, title, description, path, Icon }) => key === 'parent' && !parentPortalEnabled ? <div key={key} className="hui-entry-role hui-entry-role--parent hui-entry-role--unavailable">
           <span className="hui-entry-role__top"><span className="hui-entry-role__icon" aria-hidden="true"><Icon size={19} /></span><strong>{title}</strong></span>
-          <p>{isLoading ? '正在确认入口状态…' : '家长入口尚未开放，请以学校通知为准。'}</p>
-          <span className="hui-entry-role__action">{isLoading ? '正在确认' : '尚未开放'}</span>
+          <p>{status==='error'?'家长入口状态读取失败，请重试。':isLoading ? '正在确认入口状态…' : '家长入口尚未开放，请以学校通知为准。'}</p>
+          {status==='error'?<ProductButton onClick={retry}>重试</ProductButton>:<span className="hui-entry-role__action">{isLoading ? '正在确认' : '尚未开放'}</span>}
         </div> : <Link key={key} to={authLink(path)} className={`hui-entry-role hui-entry-role--${key}`}>
           <span className="hui-entry-role__top">
             <span className="hui-entry-role__icon" aria-hidden="true"><Icon size={19} /></span>

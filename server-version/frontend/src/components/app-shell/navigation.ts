@@ -16,6 +16,7 @@ const student: NavigationItem[] = [
 ]
 const parent: NavigationItem[] = [
   { path: '/parent', label: '家长首页' },
+  { path: '/parent/profile', label: '账户设置', section:'account' },
   { path: '/relational/tasks', label: '观察测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
 ]
 const staff: NavigationItem[] = [
@@ -70,6 +71,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
 const staffTitles: Array<[string, string]> = [
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
   ['/organizations/new', '创建组织'], ['/organization-tasks', '组织测评任务'],
+  ['/parent-tool-policies','家长工具披露设置'], ['/parent-accounts','家长账号管理'], ['/parent/links','家长关联'], ['/parent/children/:childId/reports/:artifactId','孩子报告'], ['/parent/children/:childId','孩子概况'], ['/parent/children','我的孩子'], ['/parent/profile','家长账户设置'], ['/student/parent-links/:relationshipId/reports/:artifactId','报告授权预览'], ['/student/parent-links/:relationshipId/reports','管理报告授权'], ['/student/parent-links','家长关联'], ['/organization-invitations','加入组织'], ['/organizations/:organizationId/parent-reports','家长报告'],
   ['/organizations/:organizationId/runs/:runId', '测评批次详情'], ['/organizations/:organizationId/runs', '测评批次'],
   ['/organizations/:organizationId/reporting', '报告分析'], ['/organizations/:organizationId/delivery', '安全事项与导出'],
   ['/organizations/:organizationId', '组织概览'], ['/organizations', '组织空间'],

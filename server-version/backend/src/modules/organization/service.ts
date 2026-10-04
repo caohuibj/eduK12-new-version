@@ -56,7 +56,7 @@ async function findReceipt(
   return rows[0] ?? null
 }
 
-async function appendAudit(tx: Tx, input: {
+export async function appendAudit(tx: Tx, input: {
   organizationId: string | null
   actorUserId: string
   action: string
@@ -78,7 +78,7 @@ async function appendAudit(tx: Tx, input: {
   `
 }
 
-async function executeCommand<T>(input: {
+export async function executeCommand<T>(input: {
   organizationId: string | null
   meta: CommandMeta
   payload: unknown
@@ -348,16 +348,20 @@ export async function createMembership(input: {
   organizationId: string
   userId: string
   orgRole?: OrganizationRole
+  persona?: OrganizationPersona
   meta: CommandMeta
 }): Promise<MembershipRecord> {
   const membershipId = randomUUID()
   return executeCommand({
     organizationId: input.organizationId,
     meta: input.meta,
-    payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER' },
+    payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER', ...(input.persona?{persona:input.persona}:{}) },
     work: async (tx, domainEventId) => {
       const organization = await lockOrganization(tx, input.organizationId)
       if (organization.status !== 'ACTIVE') throw new OrganizationDomainError('ORG_SUSPENDED', '组织已暂停', 409)
+      const [target]=await tx.$queryRaw<Array<{id:string;usable:boolean}>>`SELECT id,(is_active=true AND is_frozen=false AND must_change_password=false AND (expires_at IS NULL OR expires_at>statement_timestamp()) AND (role<>'TEACHER' OR teacher_approved=true)) AS usable FROM users WHERE id=${input.userId} FOR SHARE`
+      if(!target)throw new OrganizationDomainError('USER_NOT_FOUND','用户不存在',404)
+      if(input.orgRole==='ORG_ADMIN'&&!target.usable)throw new OrganizationDomainError('ORG_ADMIN_UNAVAILABLE','组织管理员必须先完成改密和审批，且账号处于可用状态',409)
       const rows = await tx.$queryRaw<MembershipRecord[]>`
         INSERT INTO "organization_memberships" ("id", "organization_id", "user_id", "org_role")
         VALUES (${membershipId}, ${input.organizationId}, ${input.userId}, ${input.orgRole ?? 'MEMBER'})
@@ -365,6 +369,7 @@ export async function createMembership(input: {
           "org_role" AS "orgRole", "valid_from" AS "validFrom", "valid_until" AS "validUntil",
           "ended_by_user_id" AS "endedByUserId", "end_reason" AS "endReason"
       `
+      if(input.persona)await tx.$executeRaw`INSERT INTO organization_persona_grants(id,organization_id,membership_id,persona,granted_by_user_id) VALUES(${randomUUID()},${input.organizationId},${membershipId},${input.persona},${input.meta.actorUserId})`
       await appendAudit(tx, {
         organizationId: input.organizationId,
         actorUserId: input.meta.actorUserId,
@@ -372,7 +377,7 @@ export async function createMembership(input: {
         targetType: 'MEMBERSHIP',
         targetId: membershipId,
         domainEventId,
-        payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER' },
+        payload: { userId: input.userId, orgRole: input.orgRole ?? 'MEMBER', ...(input.persona?{persona:input.persona}:{}) },
       })
       return rows[0]
     },
@@ -450,6 +455,10 @@ export async function setMembershipRole(input: {
           payload: { role: membership.orgRole },
         })
         return membership
+      }
+      if(input.orgRole==='ORG_ADMIN'){
+        const [target]=await tx.$queryRaw<Array<{usable:boolean}>>`SELECT (is_active=true AND is_frozen=false AND must_change_password=false AND (expires_at IS NULL OR expires_at>statement_timestamp()) AND (role<>'TEACHER' OR teacher_approved=true)) AS usable FROM users WHERE id=${membership.userId} FOR SHARE`
+        if(!target?.usable)throw new OrganizationDomainError('ORG_ADMIN_UNAVAILABLE','组织管理员必须先完成改密和审批，且账号处于可用状态',409)
       }
       if (membership.orgRole === 'ORG_ADMIN' && input.orgRole !== 'ORG_ADMIN') {
         await assertAlternativeUsableOrgAdmin(tx, input.organizationId, membership.userId)

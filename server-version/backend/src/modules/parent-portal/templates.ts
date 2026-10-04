@@ -1,3 +1,4 @@
+import { reviewedParentTemplates } from './reviewed-templates'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { fail,parentProjectionSchema,parentToolRefSchema,type ParentProjection } from './contracts'
@@ -22,11 +23,11 @@ export function createParentTemplateRegistry(templates:ParentTemplate[]=[complet
     new Set(template.metrics.map(m=>m.metricId)).size!==template.metrics.length)fail('PARENT_TEMPLATE_INVALID',409)
   entries.set(template.key+':'+template.version,structuredClone(template))
  }
- return {resolve(key:string,version:string,toolRef:ParentToolRef){const original=entries.get(key+':'+version)??fail('PARENT_TEMPLATE_NOT_PUBLISHED');if(original.toolRef&&canonicalHash(original.toolRef)!==canonicalHash(toolRef))fail('PARENT_TEMPLATE_TOOL_MISMATCH');return {...structuredClone(original),toolRef}}}
+ return {list(ref:ParentToolRef){return [...entries.values()].filter(t=>!t.toolRef||canonicalHash(t.toolRef)===canonicalHash(ref)).map(t=>({key:t.key,version:t.version,title:t.title,mode:t.mode}))},resolve(key:string,version:string,toolRef:ParentToolRef){const original=entries.get(key+':'+version)??fail('PARENT_TEMPLATE_NOT_PUBLISHED');if(original.toolRef&&canonicalHash(original.toolRef)!==canonicalHash(toolRef))fail('PARENT_TEMPLATE_TOOL_MISMATCH');return {...structuredClone(original),toolRef}}}
 }
 // Completion is a reviewed generic PARENT availability template, bound to the exact tool at production.
 // Educational content is registered per tool only through a separate reviewed content change.
-export const parentTemplateRegistry=createParentTemplateRegistry()
+export const parentTemplateRegistry=createParentTemplateRegistry([completion,...reviewedParentTemplates])
 export function buildParentProjection(record:ReportingArtifactRecord,subjectUserId:string,template:ParentTemplate):ParentProjection{
  const policy={key:template.key,version:template.version,audience:'PARENT' as const,mode:template.mode,rawAnswers:false as const,itemLevel:false as const,researchExport:false as const}
  const blocks:Array<{title:string;text:string}>=[],disclosedMetricKeys:string[]=[],disclosedLongitudinalMetricKeys:string[]=[]

@@ -2001,18 +2001,21 @@ model ParentStudentRelationship {
   student    User             @relation("ParentRelationshipStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
   inviteCode ParentInviteCode? @relation(fields: [inviteCodeId], references: [id], onDelete: Restrict)
 
-  @@unique([parentUserId, studentUserId])
+  // Current-pair uniqueness is a partial index; revoked episodes remain historical.
+  @@index([parentUserId, studentUserId, createdAt(sort: Desc)], map: "parent_relationship_pair_history_idx")
   @@index([studentUserId, status])
   @@index([parentUserId, status])
   @@map("parent_student_relationships")
 }
 
-/// Single-use, time-limited invite hashed at rest. Bound to a student-selected course.
+/// Single-use invite bound to an exact course or current student membership.
 model ParentInviteCode {
   id                String                 @id @default(uuid())
   codeHash          String                 @unique @map("code_hash")
   studentUserId     String                 @map("student_user_id")
-  courseId          String                 @map("course_id")
+  courseId          String?                @map("course_id")
+  organizationId    String?                @map("organization_id")
+  membershipId      String?                @map("membership_id")
   createdByUserId   String                 @map("created_by_user_id")
   status            ParentInviteCodeStatus @default(ACTIVE)
   expiresAt         DateTime               @map("expires_at")

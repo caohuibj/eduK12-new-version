@@ -30,7 +30,7 @@ const organization = vi.hoisted(() => ({
   selectOrganization: vi.fn(),
 }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
-vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true, useCapabilities: () => ({cognitiveEnabled:true,parentPortalEnabled:false}) }))
 vi.mock('../../../contexts/OrganizationContext', () => ({
   OrganizationProvider: ({ children }: { children: React.ReactNode }) => children,
   useOrganization: () => organization,

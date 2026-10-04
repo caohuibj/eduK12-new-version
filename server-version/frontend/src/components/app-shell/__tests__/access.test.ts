@@ -53,7 +53,7 @@ describe('role navigation', () => {
   })
   it('keeps parent navigation isolated from staff and student surfaces', () => {
     const items = navigationFor('PARENT', true, true)
-    expect(items.map((item) => item.path)).toEqual(['/my-assessments', '/parent', '/relational/tasks'])
+    expect(items.map((item) => item.path)).toEqual(['/my-assessments', '/parent', '/parent/profile', '/relational/tasks'])
     expect(activeNavigation(items, '/relational/attempts/attempt-1')?.path).toBe('/relational/tasks')
   })
   it('keeps admin and disabled capability items out of other menus', () => {

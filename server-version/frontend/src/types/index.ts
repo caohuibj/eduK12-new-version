@@ -1,6 +1,7 @@
 export interface User {
   id: string
   mobile?: { capabilities: { canManageParentToolDisclosure?: boolean } }
+  platformRole?: 'SYSTEM_ADMIN' | 'STANDARD'
   username: string
   role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT'
   nickname?: string

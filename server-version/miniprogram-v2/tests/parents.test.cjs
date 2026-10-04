@@ -45,8 +45,8 @@ test('actions absent from server response cannot be confirmed',async t=>{
 })
 test('invitation is not restored by an in-flight response after logout',async t=>{
  let release;const service={view:async()=>links,invite:async()=>new Promise(resolve=>{release=resolve})}
- const s=session(),{instance:p}=page(service,s,t);await p.onShow();p.setData({inviteInput:'private-input'})
- const pending=p.invite({currentTarget:{dataset:{id:'course-1'}}});s.logout();release({inviteCode:'a'.repeat(24),expiresAt:'future'});await pending
+ const s=session(),{instance:p}=page(service,s,t);await p.onShow();p.setData({inviteInput:'private-input',inviteSources:[{id:'course-1',kind:'COURSE',title:'课程'}]})
+ const pending=p.invite({currentTarget:{dataset:{id:'course-1',kind:'COURSE'}}});s.logout();release({inviteCode:'a'.repeat(24),expiresAt:'future'});await pending
  assert.equal(p.data.invitation,null);assert.equal(p.data.inviteInput,'');assert.equal(p.data.links.length,0);p.onUnload()
 })
 test('child switcher opens the selected child report list without inheriting another child',async t=>{
@@ -105,3 +105,5 @@ test('hide or logout during withdrawal does not restore private report or reopen
   assert.equal(p.data.confirmation,null);assert.equal(p.data.report,null);assert.equal(p.data.preview,null);assert.equal(p.data.reportBlocks.length,0);p.onUnload()
  }
 })
+
+test('organization student invitation uses server-scoped source without a legacy course',async()=>{const calls=[];const service=createParentService({async get(path){assert.equal(path,'/parent-links/invitation-sources');return {list:[{kind:'ORGANIZATION',id:'org-1',title:'验收学校'}],truncated:false}},async post(path,body){calls.push({path,body});return {inviteCode:'a'.repeat(24)}}},session());const sources=await service.inviteSources();await service.invite(sources.list[0]);assert.deepEqual(calls,[{path:'/parent-links/invitations',body:{organizationId:'org-1'}}]);assert.throws(()=>service.invite({kind:'ORGANIZATION',id:'../other'}))})

@@ -29,7 +29,7 @@ async function setup(browser, role, width, timezoneId = 'Asia/Shanghai') {
       if (pathname === '/api/assignments/assignment-1' && req.method() === 'PUT') data = assignment
       else if (pathname === '/api/composite-assessments/c1/attempts') { status = 409; code = 409; message = '已达到综合测评最大次数'; data = null }
       else { status = 405; code = 405; message = 'fixture does not accept this write'; data = null }
-    } else if (pathname === '/api/capabilities') data = { cognitive: true }
+    } else if (pathname === '/api/capabilities') data = { cognitive: true, parentPortal: false }
     else if (pathname === '/api/auth/me' || pathname === '/api/users/me') data = { id: `${role.toLowerCase()}-1`, role, username: 'dotqa', nickname: '验收用户', mustChangePassword: false }
     else if (pathname === '/api/auth/csrf') data = { csrfToken: 'fixture-csrf' }
     else if (pathname === '/api/organizations') data = { ...data, allowedActions: [], platformRole: role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD' }

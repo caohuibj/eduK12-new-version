@@ -4,7 +4,7 @@ export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
 export type OrganizationStatus = 'ACTIVE' | 'SUSPENDED'
 export type OrganizationRole = 'MEMBER' | 'ORG_ADMIN'
 export type OrganizationPersona = 'TEACHER' | 'STUDENT' | 'COUNSELOR' | 'CLIENT'
-export type OrganizationCapability = 'PSYCHOLOGY_STAFF' | 'REPORT_EXPORT' | 'REPORT_MEMBER_EXPORT'
+export type OrganizationCapability = 'PSYCHOLOGY_STAFF' | 'REPORT_EXPORT' | 'REPORT_MEMBER_EXPORT' | 'PARENT_REPORT_DISCLOSURE'
 export type OrganizationAccessBasis = 'SYSTEM_ADMIN' | 'ORG_ADMIN' | 'MEMBERSHIP' | 'CAPABILITY'
 export type OrganizationUnitKind = 'GRADE' | 'CLASS'
 export type StaffClassRole = 'HOMEROOM' | 'TEACHING'
@@ -42,7 +42,7 @@ export interface OrganizationAccessContext {
   canGovern: boolean
 }
 
-export type OrganizationProductAction = 'ASSESSMENT_DELIVERY' | 'GOVERN' | 'RUNS' | 'MANAGE_DENIES' | 'SUSPEND' | 'RESUME' | 'REPORTING' | 'SAFETY' | 'EXPORT_AGGREGATE' | 'EXPORT_MEMBER' | 'DELIVERY'
+export type OrganizationProductAction = 'ASSESSMENT_DELIVERY' | 'GOVERN' | 'RUNS' | 'MANAGE_DENIES' | 'SUSPEND' | 'RESUME' | 'REPORTING' | 'SAFETY' | 'EXPORT_AGGREGATE' | 'EXPORT_MEMBER' | 'DELIVERY' | 'PARENT_REPORT_PUBLICATION'
 
 export interface OrganizationContextProjection {
   allowedActions: OrganizationProductAction[]
@@ -55,6 +55,11 @@ export interface OrganizationContextProjection {
 }
 
 export interface OrganizationMembership {
+  username?:string
+  displayName?:string
+  userRole?:string
+  isCurrent?:boolean
+  accountUsable?:boolean
   id: string
   userId: string
   orgRole: OrganizationRole
@@ -179,15 +184,15 @@ export const organizationApi = {
     ))
   },
 
-  async listMemberships(organizationId: string, page = 1, pageSize = 100): Promise<Paged<OrganizationMembership>> {
+  async listMemberships(organizationId: string, page = 1, pageSize = 100, filters: {keyword?:string;state?:'ALL'|'CURRENT'|'ENDED';orgRole?:'ALL'|'MEMBER'|'ORG_ADMIN'} = {}): Promise<Paged<OrganizationMembership>> {
     return requireData(await apiClient.get<Paged<OrganizationMembership>>(`${orgPath(organizationId)}/memberships`, {
-      params: { page, pageSize },
+      params: { page, pageSize, ...filters },
     }))
   },
 
-  async createMembership(organizationId: string, userId: string, orgRole: OrganizationRole = 'MEMBER'): Promise<OrganizationMembership> {
+  async createMembership(organizationId: string, userId: string, orgRole: OrganizationRole = 'MEMBER', persona?:OrganizationPersona): Promise<OrganizationMembership> {
     return requireData(await apiClient.post<OrganizationMembership>(`${orgPath(organizationId)}/memberships`, {
-      userId, orgRole, commandKey: commandKey('org-membership-create'),
+      userId, orgRole, ...(persona?{persona}:{}), commandKey: commandKey('org-membership-create'),
     }))
   },
 

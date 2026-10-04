@@ -3,9 +3,9 @@ Page(workspacePage({
   setup(options) {
     this.viewOptions={view:options.view||'children',next:options.next,childId:options.childId,artifactId:options.artifactId,relationshipId:options.relationshipId}
     this.page=1
-    this.setData({view:this.viewOptions.view,inviteInput:'',invitation:null,inviteCourses:[],confirmation:null,actionError:'',notice:''})
+    this.setData({view:this.viewOptions.view,inviteInput:'',invitation:null,inviteSources:[],sourcesTruncated:false,confirmation:null,actionError:'',notice:''})
   },
-  reset() {this.setData({inviteInput:'',invitation:null,inviteCourses:[],confirmation:null,preview:null,report:null,reportBlocks:[],actionError:'',notice:''})},
+  reset() {this.setData({inviteInput:'',invitation:null,inviteSources:[],sourcesTruncated:false,confirmation:null,preview:null,report:null,reportBlocks:[],actionError:'',notice:''})},
   async fetch(runtime) {this.page=1;this.setData({confirmation:null});return runtime.parents.view(this.viewOptions)},
   methods:{
     onHide(){this.sequence+=1;this.setData({confirmation:null,preview:null,report:null,reportBlocks:[],notice:'',actionError:''})},
@@ -21,11 +21,13 @@ Page(workspacePage({
         if(refresh)await this.load()
       } catch(error) {if(sequence===this.sequence)this.setData({status:'ready',actionError:error.message})}
     },
-    chooseCourse() {if(this.data.canInvite)return this.act(async service=>({inviteCourses:await service.inviteCourses(),invitation:null}))},
+    chooseCourse() {if(this.data.canInvite)return this.act(async service=>{const sources=await service.inviteSources();return {inviteSources:sources.list,sourcesTruncated:sources.truncated,invitation:null}})},
     invite(event) {
       if(!this.data.canInvite)return
-      const id=event.currentTarget.dataset.id
-      return this.act(async service=>({invitation:await service.invite(id),inviteCourses:[]}))
+      const {id,kind}=event.currentTarget.dataset
+      const source=(this.data.inviteSources||[]).find(row=>row.id===id&&row.kind===kind)
+      if(!source)return
+      return this.act(async service=>({invitation:await service.invite(source),inviteSources:[]}))
     },
     copyInvite() {
       if(this.data.invitation)wx.setClipboardData({data:this.data.invitation.inviteCode})

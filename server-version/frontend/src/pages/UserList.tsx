@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users } from 'lucide-react'
 import apiClient from '../api/client'
@@ -6,7 +7,7 @@ import { ProductPage } from '../components/product-ui/ProductPage'
 import type { User } from '../types'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
-type UserTab = 'TEACHER' | 'STUDENT'
+type UserTab = 'TEACHER' | 'STUDENT' | 'PARENT'
 
 const UserList: React.FC = () => {
   const { feedback, info } = useStaffFeedback()
@@ -104,13 +105,14 @@ const UserList: React.FC = () => {
 
   const teacherCount = users.filter(user => user.role === 'TEACHER').length
   const studentCount = users.filter(user => user.role === 'STUDENT').length
+  const parentCount = users.filter(user => user.role === 'PARENT').length
 
   return (
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader
         title="用户管理"
-        description="审核教师账号、查看学生账号，并维护教师账号有效期。"
+        description="审核教师、查看学生与家长账号，并维护账号状态。" actions={<Link to="/parent-accounts">家长账号管理</Link>}
       />
 
       {error && (
@@ -140,6 +142,7 @@ const UserList: React.FC = () => {
           >
             <Users className="h-4 w-4" aria-hidden="true" />学生 ({studentCount})
           </button>
+          <button type="button" onClick={()=>setActiveTab('PARENT')} aria-pressed={activeTab==='PARENT'} className="rounded-md px-4 py-2">家长 ({parentCount})</button>
         </div>
 
         <label className="block w-full md:max-w-sm">
@@ -165,7 +168,7 @@ const UserList: React.FC = () => {
       ) : filteredUsers.length === 0 ? (
         <div className="rounded-lg bg-white py-12 text-center">
           <Users className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
-          <p className="text-gray-500">{searchKeyword ? '未找到匹配的用户' : `暂无${activeTab === 'TEACHER' ? '教师' : '学生'}用户`}</p>
+          <p className="text-gray-500">{searchKeyword ? '未找到匹配的用户' : `暂无${activeTab === 'TEACHER' ? '教师' : activeTab==='PARENT'?'家长':'学生'}用户`}</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
@@ -247,7 +250,7 @@ const UserList: React.FC = () => {
 
       <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-700">
         <p className="mb-1 font-medium">用户统计</p>
-        <p>教师: {teacherCount} 人 · 学生: {studentCount} 人 · 总计: {users.length} 人</p>
+        <p>教师: {teacherCount} 人 · 学生: {studentCount} 人 · 家长: {parentCount} 人 · 总计: {users.length} 人</p>
       </div>
     </ProductPage>
   )
