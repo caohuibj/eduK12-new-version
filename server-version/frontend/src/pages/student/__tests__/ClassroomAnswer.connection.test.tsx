@@ -15,7 +15,10 @@ it.each([false, true])('captures a join snapshot arriving before the connected r
   function deliver(event: string, data?: any) { for (const fn of [...(handlers.get(event) ?? [])]) fn(data) }
   const socket = { connected: false,
     on: vi.fn((event, callback) => { if (!handlers.has(event)) handlers.set(event, new Set()); handlers.get(event)!.add(callback) }),
-    off: vi.fn((event, callback) => { callback ? handlers.get(event)?.delete(callback) : handlers.delete(event) }),
+    off: vi.fn((event, callback) => {
+      if (callback) handlers.get(event)?.delete(callback)
+      else handlers.delete(event)
+    }),
     emit: vi.fn((event) => { if (event === 'student:join') deliver('broadcast:question', snapshot) }),
     disconnect: vi.fn(), connect: vi.fn(), io: { on: vi.fn() } }
   mocks.io.mockReturnValue(socket)
