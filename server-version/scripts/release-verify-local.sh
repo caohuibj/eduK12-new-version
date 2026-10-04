@@ -294,6 +294,7 @@ if [ "$RUN_CODE_GATES" = 'true' ]; then
     src/__tests__/hotpath/query-budget.postgres.integration.test.ts \
     src/__tests__/integration/parentPortal.postgres.integration.test.ts \
     src/__tests__/integration/qaRound2.postgres.integration.test.ts \
+    src/__tests__/integration/webAcceptanceR2b.postgres.integration.test.ts \
     src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts \
     src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts \
     src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts \

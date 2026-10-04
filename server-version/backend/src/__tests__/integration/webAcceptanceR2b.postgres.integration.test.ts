@@ -3,7 +3,7 @@ import type { Server } from 'node:http'
 import express from 'express'
 import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest'
 import { prisma } from '../../config/database'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { generateToken, generateClassroomResumeToken } from '../../utils/jwt'
 import { csrfProtection } from '../../middleware/csrf'
 import documentRoutes from '../../routes/documents'
@@ -52,9 +52,7 @@ function snapshot(socket: any) { return socket.emit.mock.calls.find(([event]: an
 
 ;(DB ? describe : describe.skip)('Web acceptance fixes through HTTP/PostgreSQL and the real classroom handler', () => {
   beforeAll(async () => {
-    const selected = new URL(DB!), actual = new URL(process.env.DATABASE_URL ?? '')
-    if (!['127.0.0.1','localhost'].includes(selected.hostname) || !/test|ci/i.test(selected.pathname) ||
-        selected.host !== actual.host || selected.pathname !== actual.pathname) throw new Error('isolated loopback test DB required')
+    requireIsolatedReleaseDatabase(DB!)
     if (process.env.REDIS_URL) {
       if (!['127.0.0.1','localhost'].includes(new URL(process.env.REDIS_URL).hostname)) throw new Error('isolated Redis required')
       await cacheService.initialize()

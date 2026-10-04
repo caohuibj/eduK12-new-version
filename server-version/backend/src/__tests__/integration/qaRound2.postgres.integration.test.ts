@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import express from 'express'
 import { beforeAll, afterAll, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { authenticate, requireTeacher } from '../../middleware/auth'
 import { generateToken } from '../../utils/jwt'
 import { courseQuestionnaires } from '../../controllers/courseQuestionnairesController'
@@ -20,8 +20,7 @@ async function read(actor: any, path: string) {
 }
 ;(url ? describe : describe.skip)('round two PostgreSQL and HTTP', () => {
   beforeAll(async () => {
-    const selected = new URL(url!), actual = new URL(process.env.DATABASE_URL ?? '')
-    if (!['127.0.0.1', 'localhost'].includes(selected.hostname) || !(/test|ci/i.test(selected.pathname) || (process.env.CI === 'true' && selected.pathname === '/ptool')) || selected.host !== actual.host || selected.pathname !== actual.pathname) throw new Error('isolated test database required')
+    requireIsolatedReleaseDatabase(url!)
     owner = await user('TEACHER', '合成教师'); other = await user('TEACHER', '其他教师'); child = await user('STUDENT', '合成学生')
     course = await prisma.course.create({ data: { title: 'QA course', courseCode: randomUUID(), creatorId: owner.id } })
     const another = await prisma.course.create({ data: { title: 'Other course', courseCode: randomUUID(), creatorId: owner.id } })
