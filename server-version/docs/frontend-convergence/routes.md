@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 118 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 130 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -14,6 +14,17 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /student/course-login | StudentCourseLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /student/register | StudentRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /parent | ParentHome | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent/links | ParentLinksPage | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent/children | ParentChildrenPage | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent/children/:childId | ParentChildPage | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent/children/:childId/reports/:artifactId | ParentChildReportPage | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
+| /parent/profile | ParentProfile | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/parent-links | ParentLinksPage | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/parent-links/:relationshipId/reports | ParentConsentPage | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/parent-links/:relationshipId/reports/:artifactId | ParentConsentPage | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent-tool-policies | ParentToolPoliciesPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /parent-accounts | ParentAccountsPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /organization-invitations | OrganizationInvitationPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /relational/tasks | RelationalTasksPage | STUDENT / PARENT / TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /relational/attempts/:attemptId | CompositeAssessmentPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /relational/attempts/:attemptId/report | CompositeReportPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
@@ -119,6 +130,7 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /organizations/:organizationId | OrganizationAdminPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs | OrganizationRunListPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/runs/:runId | OrganizationRunDetailPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
+| /organizations/:organizationId/parent-reports | ParentPublicationPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/reporting | OrganizationReportingPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/delivery | OrganizationDeliveryPage | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |
 | /organizations/:organizationId/* | OrganizationNotFound | Authenticated in page; server Organization/assignment authority | — | AppShell (outside guards) | standard | FE-02 + FE-10 | Staff UI chrome; server authority retained |

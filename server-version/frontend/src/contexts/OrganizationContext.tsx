@@ -17,6 +17,7 @@ import {
 
 interface OrganizationProductContextValue {
   platformRole: PlatformRole | null
+  allowedActions: string[]
   organizations: AccessibleOrganization[]
   total: number
   isLoading: boolean
@@ -31,18 +32,20 @@ interface OrganizationProductContextValue {
 
 const OrganizationProductContext = createContext<OrganizationProductContextValue | undefined>(undefined)
 
-const errorMessage = (value: unknown, fallback: string) => value instanceof Error && value.message
-  ? value.message
-  : fallback
+const errorMessage = (value: unknown, fallback: string) => {
+  const message = (value as { message?: unknown } | null)?.message
+  return typeof message === 'string' && message.trim() ? message : fallback
+}
 
 export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const principal = isAuthenticated ? user?.id ?? null : null
   const [statePrincipal, setStatePrincipal] = useState(principal)
   const [platformRole, setPlatformRole] = useState<PlatformRole | null>(null)
+  const [allowedActions, setAllowedActions] = useState<string[]>([])
   const [organizations, setOrganizations] = useState<AccessibleOrganization[]>([])
   const [total, setTotal] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(Boolean(principal))
   const [error, setError] = useState<string | null>(null)
   const [active, setActive] = useState<OrganizationContextProjection | null>(null)
   const [activeLoading, setActiveLoading] = useState(false)
@@ -56,6 +59,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     discoveryEpochRef.current += 1
     activeEpochRef.current += 1
     setPlatformRole(null)
+    setAllowedActions([])
     setOrganizations([])
     setTotal(0)
     setError(null)
@@ -86,12 +90,18 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       const projection = await organizationApi.list(1, 100)
       if (discoveryEpoch !== discoveryEpochRef.current) return
       setPlatformRole(projection.platformRole)
+      setAllowedActions(projection.allowedActions ?? [])
       setOrganizations(projection.list)
       setTotal(projection.total)
       // Discovery is paginated and is not an authority refresh. Re-read the
       // selected exact context, including roles/grants changed on the server.
       const selected = activeRef.current
-      if (selected && activeEpochRef.current === activeEpochAtStart) {
+      if (projection.total === 0 && activeEpochRef.current === activeEpochAtStart) {
+        activeEpochRef.current += 1
+        setActive(null)
+        setActiveError(null)
+        setActiveLoading(false)
+      } else if (selected && activeEpochRef.current === activeEpochAtStart) {
         setActiveLoading(true)
         try {
           const next = await organizationApi.context(selected.organization.id)
@@ -112,6 +122,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (discoveryEpoch !== discoveryEpochRef.current) return
       setError(errorMessage(err, '无法加载组织列表'))
       setPlatformRole(null)
+      setAllowedActions([])
       setOrganizations([])
       setTotal(0)
       if (activeEpochRef.current === activeEpochAtStart) setActive(null)
@@ -124,6 +135,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!principal || !organizationId) return null
     const activeEpoch = ++activeEpochRef.current
     setActiveLoading(true)
+    setActive(null)
     setActiveError(null)
     try {
       const projection = await organizationApi.context(organizationId)
@@ -167,6 +179,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
   return (
     <OrganizationProductContext.Provider value={{
       platformRole,
+      allowedActions,
       organizations,
       total,
       isLoading,

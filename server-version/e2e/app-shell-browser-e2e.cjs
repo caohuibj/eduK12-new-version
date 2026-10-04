@@ -6,7 +6,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_CORE_PATH || '../backend/nod
 const base = process.env.APP_SHELL_BASE_URL || 'http://127.0.0.1:5180'
 const output = process.env.APP_SHELL_EVIDENCE_DIR || '/tmp/eduk12-app-shell'
 const userFor = (role, id = 'user-1') => ({ id, role, username: 'pilot', nickname: '试点用户', mustChangePassword: false })
-async function setup(browser, { role = 'STUDENT', width = 390, touch = false, cognitive = true } = {}) {
+async function setup(browser, { role = 'STUDENT', width = 390, touch = false, cognitive = true, parentPortal = false } = {}) {
   const context = await browser.newContext({ viewport: { width, height: 900 }, hasTouch: touch })
   const page = await context.newPage()
   page.setDefaultTimeout(15000)
@@ -22,7 +22,7 @@ async function setup(browser, { role = 'STUDENT', width = 390, touch = false, co
     state.requests.push({ method: request.method(), pathname })
     let status = 200
     let data = { list: [], total: 0, totalPages: 1, hasMore: false }
-    if (pathname === '/api/capabilities') data = { cognitive }
+    if (pathname === '/api/capabilities') data = { cognitive, parentPortal }
     else if (pathname === '/api/auth/me' || pathname === '/api/users/me') { data = state.user; if (!data) status = 401 }
     else if (pathname === '/api/auth/csrf') data = { csrfToken: 'fixture-csrf' }
     else if (pathname === '/api/auth/login') { state.user = state.loginUser; data = { user: state.user } }
@@ -174,8 +174,9 @@ async function main() {
       const target = new URL(page.url()).searchParams.get('returnTo')
       assert.equal(target, '/scale-library/test/v1')
       const entries = page.getByRole('navigation', { name: '身份入口' })
-      assert.equal(await entries.getByRole('link').count(), 4)
-      assert.equal(await entries.getByRole('link', { name: /家长入口/ }).count(), 1)
+      assert.equal(await entries.getByRole('link').count(), 3)
+      assert.equal(await entries.getByRole('link', { name: /家长入口/ }).count(), 0)
+      await page.getByText('家长入口尚未开放，请以学校通知为准。', { exact: true }).waitFor()
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
       await entries.getByRole('link', { name: /学生入口/ }).click()
       await page.getByRole('heading', { name: '学生登录', exact: true }).waitFor()
@@ -183,6 +184,17 @@ async function main() {
       assert.equal(await page.getByRole('main').evaluate((node) => node === document.activeElement), true)
       await page.screenshot({ path: path.join(output, '360-login.png'), fullPage: true })
       cases.push({ sharedLibraryRoleEntry: true, passed: true }); await context.close()
+    }
+    {
+      const { context, page, state } = await setup(browser, { role: null, width: 390, parentPortal: true })
+      await gotoRoute(page, `${base}/`)
+      const entries = page.getByRole('navigation', { name: '身份入口' })
+      await entries.getByRole('link', { name: /家长入口/ }).waitFor()
+      assert.equal(await entries.getByRole('link').count(), 4)
+      await entries.getByRole('link', { name: /家长入口/ }).click()
+      await page.getByRole('heading', { name: '家长登录', exact: true }).waitFor()
+      assert.deepEqual(state.errors, [])
+      cases.push({ enabledParentRoleEntry: true, passed: true }); await context.close()
     }
     fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify(cases, null, 2))
     console.log(`Passed ${cases.length} AppShell browser cases. Evidence: ${output}`)

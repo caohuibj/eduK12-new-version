@@ -4,8 +4,9 @@
   <hui-card wx:if="{{view === 'links'}}" title="关联申请">
     <hui-field wx:if="{{canClaim}}" label="学生提供的邀请码" value="{{inviteInput}}" maxlength="24" bindchange="input"/>
     <hui-button wx:if="{{canClaim}}" loading="{{status === 'submitting'}}" bindpress="claim">提交申请，等待学生确认</hui-button>
-    <hui-button wx:if="{{canInvite}}" loading="{{status === 'submitting'}}" bindpress="chooseCourse">选择课程，生成邀请码</hui-button>
-    <hui-button wx:for="{{inviteCourses}}" wx:key="id" data-id="{{item.id}}" disabled="{{status === 'submitting'}}" secondary bindpress="invite">{{item.title}}</hui-button>
+    <hui-button wx:if="{{canInvite}}" loading="{{status === 'submitting'}}" bindpress="chooseCourse">选择组织或课程，生成邀请码</hui-button>
+    <hui-button wx:for="{{inviteSources}}" wx:key="id" data-id="{{item.id}}" data-kind="{{item.kind}}" disabled="{{status === 'submitting'}}" secondary bindpress="invite">{{item.title}}</hui-button>
+    <hui-feedback wx:if="{{sourcesTruncated}}" message="邀请来源较多，仅展示部分当前组织或课程；可在网页版继续核对。"/>
     <hui-field wx:if="{{invitation}}" label="仅向需要关联的家长提供" value="{{invitation.inviteCode}}" disabled/>
     <hui-button wx:if="{{invitation}}" secondary bindpress="copyInvite">复制邀请码</hui-button>
     <hui-feedback wx:if="{{invitation}}" message="{{'有效期截止：' + invitation.expiresAt}}"/>

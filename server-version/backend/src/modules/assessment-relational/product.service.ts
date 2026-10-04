@@ -186,8 +186,9 @@ const persistConsent = async (tx: any, consent: AssessmentAttemptConsentRecordV1
 )
 
 const readParentRelationship = async (tx: any, parentUserId: string, studentUserId: string) => {
-  const relationship = await tx.parentStudentRelationship.findUnique({
-    where: { parentUserId_studentUserId: { parentUserId, studentUserId } },
+  const relationship = await tx.parentStudentRelationship.findFirst({
+    where: { parentUserId, studentUserId, status: 'ACTIVE', revokedAt: null },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
   })
   if (!relationship || relationship.status !== 'ACTIVE') {
     relationalFail('RELATIONAL_PARENT_CHILD_INACTIVE', 'an ACTIVE parent-child relationship is required')

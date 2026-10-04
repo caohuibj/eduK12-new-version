@@ -1,3 +1,4 @@
+import { checkinExportImages } from '../utils/checkinExportImages'
 import { readTemporaryUpload, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { Request, Response } from 'express'
@@ -1478,14 +1479,14 @@ export const checkinController = {
 
       // 准备导出数据
       const exportData = checkin.submissions.map((sub, index) => {
-        const images = (sub.images as string[]) || []
+        const images = checkinExportImages(sub.images)
         return {
           '序号': index + 1,
           '学生姓名': sub.student?.nickname || sub.student?.username || (sub.isAnonymous ? '匿名用户' : '未知'),
           '学号': sub.student?.username || (sub.isAnonymous ? '匿名' : ''),
           '提交内容': sub.content || '',
-          '图片数量': images.length,
-          '图片链接': images.length > 0 ? images.join('\n') : '',
+          '图片数量': images.count,
+          '图片链接': images.references,
           '提交时间': sub.createdAt ? new Date(sub.createdAt).toLocaleString('zh-CN') : '',
         }
       })

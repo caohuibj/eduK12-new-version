@@ -61,12 +61,17 @@ function createParentService(api, session) {
       }
       throw new ApiError('notFound','入口不存在')
     },
+    async inviteSources() {
+      authorize('canManageParentLinks')
+      const data=await api.get('/parent-links/invitation-sources')
+      return {list:list(data).map(row=>{if(!['COURSE','ORGANIZATION'].includes(row.kind)||typeof row.title!=='string')throw new ApiError('invalidResponse','邀请来源无效');return {kind:row.kind,id:decodeURIComponent(identifier(row.id)),title:row.title}}),truncated:data.truncated===true}
+    },
     async inviteCourses() {
       authorize('canManageParentLinks')
       const data=await api.get('/courses/my')
       return list(data).slice(0,20).map(row=>({id:row.id,title:row.title}))
     },
-    invite(courseId) {authorize('canManageParentLinks');return api.post('/parent-links/invitations',{courseId:decodeURIComponent(identifier(courseId))})},
+    invite(source) {authorize('canManageParentLinks');const body=typeof source==='string'?{courseId:decodeURIComponent(identifier(source))}:source?.kind==='ORGANIZATION'?{organizationId:decodeURIComponent(identifier(source.id))}:source?.kind==='COURSE'?{courseId:decodeURIComponent(identifier(source.id))}:null;if(!body)throw new ApiError('invalidRequest','请选择有效的邀请来源');return api.post('/parent-links/invitations',body)},
     claim(inviteCode) {
       authorize('canManageParentLinks')
       if(typeof inviteCode!=='string'||!/^[A-Za-z0-9_-]{24}$/.test(inviteCode)) throw new ApiError('invalidRequest','请填写完整的24位邀请码')

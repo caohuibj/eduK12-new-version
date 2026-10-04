@@ -89,6 +89,15 @@ const AnonymousStudyPage = React.lazy(() => import('./pages/public/AnonymousStud
 const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
 const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
 const ParentHome = React.lazy(() => import('./pages/parent/ParentHome'))
+const ParentLinksPage = React.lazy(() => import('./pages/parent/ParentLinksPage'))
+const ParentChildrenPage = React.lazy(() => import('./pages/parent/ParentChildrenPage'))
+const ParentChildPage = React.lazy(() => import('./pages/parent/ParentChildPage'))
+const ParentChildReportPage = React.lazy(() => import('./pages/parent/ParentChildReportPage'))
+const ParentConsentPage = React.lazy(() => import('./pages/parent/ParentConsentPage'))
+const ParentProfile = React.lazy(() => import('./pages/parent/ParentProfile'))
+const ParentToolPoliciesPage = React.lazy(() => import('./pages/parent/ParentToolPoliciesPage'))
+const ParentAccountsPage = React.lazy(() => import('./pages/parent/ParentAccountsPage'))
+const OrganizationInvitationPage = React.lazy(() => import('./pages/organization/OrganizationInvitationPage'))
 const RelationalTasksPage = React.lazy(() => import('./pages/relational/RelationalTasksPage'))
 
 // Cognitive 页面（Stage B：URL 以 Assignment/Session 为核心；flag=false 时不注册 → 隐藏入口）
@@ -223,6 +232,18 @@ function AppRoutes() {
             path="/parent"
             element={<ParentProtectedRoute><ParentHome /></ParentProtectedRoute>}
           />
+
+          <Route path="/parent/links" element={<ParentProtectedRoute><ParentLinksPage /></ParentProtectedRoute>} />
+          <Route path="/parent/children" element={<ParentProtectedRoute><ParentChildrenPage /></ParentProtectedRoute>} />
+          <Route path="/parent/children/:childId" element={<ParentProtectedRoute><ParentChildPage /></ParentProtectedRoute>} />
+          <Route path="/parent/children/:childId/reports/:artifactId" element={<ParentProtectedRoute><ParentChildReportPage /></ParentProtectedRoute>} />
+          <Route path="/parent/profile" element={<ParentProtectedRoute><ParentProfile /></ParentProtectedRoute>} />
+          <Route path="/student/parent-links" element={<StudentProtectedRoute><ParentLinksPage /></StudentProtectedRoute>} />
+          <Route path="/student/parent-links/:relationshipId/reports" element={<StudentProtectedRoute><ParentConsentPage /></StudentProtectedRoute>} />
+          <Route path="/student/parent-links/:relationshipId/reports/:artifactId" element={<StudentProtectedRoute><ParentConsentPage /></StudentProtectedRoute>} />
+          <Route path="/parent-tool-policies" element={<RelationalProtectedRoute><ParentToolPoliciesPage /></RelationalProtectedRoute>} />
+              <Route path="/parent-accounts" element={<RelationalProtectedRoute><ParentAccountsPage /></RelationalProtectedRoute>} />
+          <Route path="/organization-invitations" element={<RelationalProtectedRoute><OrganizationInvitationPage /></RelationalProtectedRoute>} />
 
           {/* Relational product routes reuse the same Composite/Cognitive/Situational runners. */}
           <Route

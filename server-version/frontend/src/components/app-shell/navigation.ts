@@ -16,6 +16,7 @@ const student: NavigationItem[] = [
 ]
 const parent: NavigationItem[] = [
   { path: '/parent', label: '家长首页' },
+  { path: '/parent/profile', label: '账户设置', section:'account' },
   { path: '/relational/tasks', label: '观察测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
 ]
 const staff: NavigationItem[] = [
@@ -48,7 +49,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
   return relationalAvailable ? items : items.filter(item => item.path !== '/relational/tasks')
 }
-export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
+export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null, directoryActions: readonly string[] = []): NavigationItem[] {
   const items: NavigationItem[] = [
     { path: '/organizations', label: '组织空间', section: 'organization' },
   ]
@@ -59,7 +60,7 @@ export function organizationNavigation(organizationId: string | undefined, allow
     if (allowedActions.includes('REPORTING')) items.push({ path: `${root}/reporting`, label: '报告分析', section: 'organization' })
     if (allowedActions.includes('DELIVERY')) items.push({ path: `${root}/delivery`, label: '安全事项与导出', section: 'organization' })
   }
-  if (platformRole === 'SYSTEM_ADMIN') items.push({ path: '/organizations/new', label: '创建组织', section: 'system' })
+  if (platformRole === 'SYSTEM_ADMIN' && directoryActions.includes('CREATE_ORGANIZATION')) items.push({ path: '/organizations/new', label: '创建组织', section: 'system' })
   return items
 }
 export function activeNavigation(items: NavigationItem[], pathname: string): NavigationItem | undefined {
@@ -70,6 +71,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
 const staffTitles: Array<[string, string]> = [
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
   ['/organizations/new', '创建组织'], ['/organization-tasks', '组织测评任务'],
+  ['/parent-tool-policies','家长工具披露设置'], ['/parent-accounts','家长账号管理'], ['/parent/links','家长关联'], ['/parent/children/:childId/reports/:artifactId','孩子报告'], ['/parent/children/:childId','孩子概况'], ['/parent/children','我的孩子'], ['/parent/profile','家长账户设置'], ['/student/parent-links/:relationshipId/reports/:artifactId','报告授权预览'], ['/student/parent-links/:relationshipId/reports','管理报告授权'], ['/student/parent-links','家长关联'], ['/organization-invitations','加入组织'], ['/organizations/:organizationId/parent-reports','家长报告'],
   ['/organizations/:organizationId/runs/:runId', '测评批次详情'], ['/organizations/:organizationId/runs', '测评批次'],
   ['/organizations/:organizationId/reporting', '报告分析'], ['/organizations/:organizationId/delivery', '安全事项与导出'],
   ['/organizations/:organizationId', '组织概览'], ['/organizations', '组织空间'],

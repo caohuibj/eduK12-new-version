@@ -131,7 +131,8 @@ describe('FinalCompositeAssessment Bundle shell', () => {
       />,
     )
 
-    expect(await screen.findByText('Bundle 嵌入运行：支持')).toBeInTheDocument()
+    expect(screen.queryByText('Bundle 嵌入运行：支持')).not.toBeInTheDocument()
+    expect(await screen.findByText('问卷内参与：支持')).toBeInTheDocument()
     expect(screen.getByText('当前单元：当前任务')).toBeInTheDocument()
     expect(screen.getByRole('progressbar', { name: '综合测评单元进度' })).toHaveAttribute('aria-valuenow', '3')
     await user.click(screen.getByRole('button', { name: '开始/继续文字情境测评' }))

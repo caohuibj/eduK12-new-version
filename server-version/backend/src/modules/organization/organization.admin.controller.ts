@@ -308,16 +308,34 @@ export const organizationAdminController = {
   async listAssessmentDeliveryGrants(req: Request, res: Response) {
     try {
       const organizationId = req.params.organizationId
-      const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-        SELECT "id","teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
-          "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
-          "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
-        FROM "organization_assessment_delivery_grants"
-        WHERE "organization_id" = ${organizationId}
-        ORDER BY "granted_at" DESC,"id" DESC LIMIT 200
-      `
-      return success(res, { list: rows, total: rows.length })
-    } catch (err) { return sendDomainError(res, err) }
+      // Preserve the old unpaged 200-row response during a rolling release.
+      // New clients explicitly page, and total now reflects all matching rows.
+      const { page, pageSize, offset } =
+        req.query.page === undefined && req.query.pageSize === undefined
+          ? { page: 1, pageSize: 200, offset: 0 }
+          : parsePage(req)
+      const [rows, totals] = await Promise.all([
+        prisma.$queryRaw<Array<Record<string, unknown>>>`
+          SELECT "id","teacher_membership_id" AS "teacherMembershipId","class_unit_id" AS "classUnitId","permission",
+            "granted_by_user_id" AS "grantedByUserId","granted_at" AS "grantedAt",
+            "revoked_by_user_id" AS "revokedByUserId","revoked_at" AS "revokedAt", "valid_from" AS "validFrom", "valid_until" AS "validUntil"
+          FROM "organization_assessment_delivery_grants"
+          WHERE "organization_id" = ${organizationId}
+          ORDER BY "granted_at" DESC,"id" DESC LIMIT ${pageSize} OFFSET ${offset}
+        `,
+        prisma.$queryRaw<
+          Array<{ count: number }>
+        >`SELECT COUNT(*)::int AS count FROM "organization_assessment_delivery_grants" WHERE "organization_id" = ${organizationId}`,
+      ])
+      return success(res, {
+        list: rows,
+        total: totals[0]?.count ?? 0,
+        page,
+        pageSize,
+      })
+    } catch (err) {
+      return sendDomainError(res, err)
+    }
   },
 
   async grantAssessmentDelivery(req: Request, res: Response) {

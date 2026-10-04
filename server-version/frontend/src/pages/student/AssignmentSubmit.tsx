@@ -1,3 +1,4 @@
+import { formatLocalDateTime } from '../../utils/dateTime'
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Loader2, FileText as FileIcon } from 'lucide-react'
@@ -178,7 +179,7 @@ const AssignmentSubmit: React.FC = () => {
     try {
       const date = new Date(dateString)
       if (isNaN(date.getTime())) return '无效日期'
-      return date.toLocaleString('zh-CN')
+      return formatLocalDateTime(dateString)
     } catch {
       return '无效日期'
     }

@@ -1,6 +1,20 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback, type ReactNode } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ReactNode,
+} from 'react'
 import { authApi } from '../api/auth'
-import { clearReauthReturn, readReauthReturn, rememberReauthReturn, type ReauthReturn } from '../components/app-shell/access'
+import {
+  clearReauthReturn,
+  isAuthPath,
+  readReauthReturn,
+  rememberReauthReturn,
+  type ReauthReturn,
+} from '../components/app-shell/access'
 import type { User } from '../types'
 
 interface AuthContextType {
@@ -16,26 +30,89 @@ interface AuthContextType {
   setUser: (user: User | null) => void
 }
 
+export const AUTH_SESSION_SIGNAL = 'huisurvey:session-changed'
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUserState] = useState<User | null>(null)
-  const [reauthReturn, setReauthReturn] = useState<ReauthReturn | null>(readReauthReturn)
+  const [reauthReturn, setReauthReturn] = useState<ReauthReturn | null>(
+    readReauthReturn,
+  )
   const [isLoading, setIsLoading] = useState(true)
+  const [identityGeneration, setIdentityGeneration] = useState(0)
   const userRef = useRef(user)
   userRef.current = user
   const authEpochRef = useRef(0)
   const lastAuthTransitionAtRef = useRef(0)
+  const sessionChannel = useRef<BroadcastChannel | null>(null)
+  const localLoginPending = useRef<number | null>(null)
+  const renderEpoch = authEpochRef.current
+  const notifySessionChanged = () => {
+    // Only a change nonce is shared: never credentials, identity or tokens.
+    sessionChannel.current?.postMessage(AUTH_SESSION_SIGNAL)
+    try {
+      localStorage.setItem(AUTH_SESSION_SIGNAL, crypto.randomUUID())
+    } catch {
+      /* Focus revalidation remains available. */
+    }
+  }
+
+  const replaceIdentity = useCallback((next: User | null) => {
+    // Preserve the initial login component until its navigation completes.
+    // An existing account changing or leaving must discard its workspace state.
+    // Login pages keep their completion hook through an intentional account switch.
+    if (
+      userRef.current &&
+      userRef.current.id !== next?.id &&
+      !isAuthPath(window.location.pathname)
+    ) {
+      setIdentityGeneration((generation) => generation + 1)
+    }
+    userRef.current = next
+    setUserState(next)
+  }, [])
 
   const setUser = (nextUser: User | null) => {
+    const current = userRef.current
+    // Profile reads cannot restore a departed account or change auth authority.
+    // Login/registration and /me are the identity-changing paths.
+    if (nextUser && (!current || current.id !== nextUser.id)) return
+    // A departed page may still hold a password/profile completion callback.
+    if (
+      !nextUser &&
+      (!current ||
+        current.id !== user?.id ||
+        renderEpoch !== authEpochRef.current)
+    )
+      return
     authEpochRef.current += 1
     lastAuthTransitionAtRef.current = Date.now()
-    setUserState(nextUser)
+    replaceIdentity(
+      nextUser && current
+        ? {
+            ...current,
+            ...nextUser,
+            role: current.role,
+            platformRole: current.platformRole,
+          }
+        : null,
+    )
+    setIsLoading(false)
+    // Ordinary profile refreshes must not reset another tab's draft or trigger
+    // a profile-fetch/broadcast/remount loop between same-account tabs.
+    if (!nextUser && current) notifySessionChanged()
   }
 
   const prepareReauthentication = useCallback((target: string) => {
     if (!userRef.current) return
-    setReauthReturn({ userId: userRef.current.id, role: userRef.current.role, target })
+    setReauthReturn({
+      userId: userRef.current.id,
+      role: userRef.current.role,
+      target,
+    })
     rememberReauthReturn(userRef.current, target)
   }, [])
 
@@ -49,85 +126,175 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // An anonymous initial /me 401 is not expiry of a signed-in session.
       // It must not invalidate a login that is already in flight.
       if (!userRef.current) return
-      const requestStartedAt = Number((event as CustomEvent<{ requestStartedAt?: number }>).detail?.requestStartedAt || 0)
+      const requestStartedAt = Number(
+        (event as CustomEvent<{ requestStartedAt?: number }>).detail
+          ?.requestStartedAt || 0,
+      )
       // A protected request that started before a newer login must not sign
       // that newer session out when its late 401 finally arrives.
-      if (requestStartedAt > 0 && requestStartedAt < lastAuthTransitionAtRef.current) return
-      prepareReauthentication(`${window.location.pathname}${window.location.search}${window.location.hash}`)
+      if (
+        requestStartedAt > 0 &&
+        requestStartedAt < lastAuthTransitionAtRef.current
+      )
+        return
+      prepareReauthentication(
+        `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      )
       authEpochRef.current += 1
       lastAuthTransitionAtRef.current = Date.now()
       // A 401 from login/public capability endpoints is not reported by the
       // transport as session expiry. For an authenticated API request, clear
       // the in-memory identity so ProtectedRoute can redirect normally.
-      setUserState(null)
+      replaceIdentity(null)
+      setIsLoading(false)
     }
 
     window.addEventListener('auth:expired', handleAuthExpired)
     return () => window.removeEventListener('auth:expired', handleAuthExpired)
-  }, [prepareReauthentication])
+  }, [prepareReauthentication, replaceIdentity])
 
   useEffect(() => {
-    const initAuth = async () => {
+    let alive = true
+    let validation = 0
+    const validateSession = async (changed = false, initial = false) => {
+      if (!changed && localLoginPending.current) return
+      if (changed) {
+        authEpochRef.current += 1
+        lastAuthTransitionAtRef.current = Date.now()
+        replaceIdentity(null)
+        setIsLoading(true)
+      }
       const requestEpoch = authEpochRef.current
+      const sequence = ++validation
       try {
         const response = await authApi.me()
-        if (requestEpoch === authEpochRef.current && response.code === 0 && response.data) {
-          lastAuthTransitionAtRef.current = Date.now()
-          setUserState(response.data)
+        if (
+          !alive ||
+          sequence !== validation ||
+          requestEpoch !== authEpochRef.current
+        )
+          return
+        const next = response.code === 0 && response.data ? response.data : null
+        lastAuthTransitionAtRef.current = Date.now()
+        replaceIdentity(next)
+      } catch (error) {
+        if (
+          !alive ||
+          sequence !== validation ||
+          requestEpoch !== authEpochRef.current
+        )
+          return
+        const status =
+          (error as { response?: { status?: number }; status?: number })
+            ?.response?.status ?? (error as { status?: number })?.status
+        // A transient focus request failure alone does not erase a valid draft.
+        // A notified identity change already removed the old account and form.
+        if (changed || initial || status === 401) {
+          replaceIdentity(null)
         }
-      } catch {
-        // An absent or expired HttpOnly cookie simply means signed out.
+      } finally {
+        if (alive && sequence === validation) setIsLoading(false)
       }
-      setIsLoading(false)
     }
-    initAuth()
-  }, [])
+    const changed = () => {
+      void validateSession(true)
+    }
+    const storageChanged = (event: StorageEvent) => {
+      if (event.key === AUTH_SESSION_SIGNAL) changed()
+    }
+    const focus = () => {
+      void validateSession()
+    }
+    const visible = () => {
+      if (document.visibilityState === 'visible') focus()
+    }
+    if (typeof BroadcastChannel !== 'undefined') {
+      sessionChannel.current = new BroadcastChannel(AUTH_SESSION_SIGNAL)
+      sessionChannel.current.onmessage = (event) => {
+        if (event.data === AUTH_SESSION_SIGNAL) changed()
+      }
+    }
+    window.addEventListener('storage', storageChanged)
+    window.addEventListener('focus', focus)
+    document.addEventListener('visibilitychange', visible)
+    void validateSession(false, true)
+    return () => {
+      alive = false
+      window.removeEventListener('storage', storageChanged)
+      window.removeEventListener('focus', focus)
+      document.removeEventListener('visibilitychange', visible)
+      sessionChannel.current?.close()
+      sessionChannel.current = null
+    }
+  }, [replaceIdentity])
 
   const login = async (username: string, password: string) => {
     const requestEpoch = ++authEpochRef.current
-    await authApi.csrf()
-    const response = await authApi.login({ username, password })
-    if (requestEpoch !== authEpochRef.current) return
-    if (response.code === 0 && response.data) {
-      lastAuthTransitionAtRef.current = Date.now()
-      setUserState(response.data.user)
-    } else {
-      throw new Error(response.message || '登录失败')
+    localLoginPending.current = requestEpoch
+    try {
+      await authApi.csrf()
+      if (requestEpoch !== authEpochRef.current) return
+      const response = await authApi.login({ username, password })
+      if (requestEpoch !== authEpochRef.current) return
+      if (response.code === 0 && response.data) {
+        lastAuthTransitionAtRef.current = Date.now()
+        replaceIdentity(response.data.user)
+        setIsLoading(false)
+        notifySessionChanged()
+      } else {
+        throw new Error(response.message || '登录失败')
+      }
+    } finally {
+      if (localLoginPending.current === requestEpoch)
+        localLoginPending.current = null
     }
   }
 
   const setAuthenticatedUser = (userData: User) => {
     authEpochRef.current += 1
     lastAuthTransitionAtRef.current = Date.now()
-    setUserState(userData)
+    replaceIdentity(userData)
+    setIsLoading(false)
+    notifySessionChanged()
   }
 
   const logout = async () => {
-    authEpochRef.current += 1
+    if (
+      user?.id !== userRef.current?.id ||
+      renderEpoch !== authEpochRef.current
+    )
+      return
+    const requestEpoch = ++authEpochRef.current
     lastAuthTransitionAtRef.current = Date.now()
     try {
       await authApi.csrf()
+      if (requestEpoch !== authEpochRef.current) return
       await authApi.logout()
     } catch {
       // Clearing local state is still safe if the session has already expired.
     }
-    setUserState(null)
+    if (requestEpoch !== authEpochRef.current) return
+    replaceIdentity(null)
+    setIsLoading(false)
+    notifySessionChanged()
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      reauthReturn,
-      prepareReauthentication,
-      clearReauthentication,
-      isAuthenticated: !!user,
-      isLoading,
-      login,
-      setAuthenticatedUser,
-      logout,
-      setUser,
-    }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        user,
+        reauthReturn,
+        prepareReauthentication,
+        clearReauthentication,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        setAuthenticatedUser,
+        logout,
+        setUser,
+      }}
+    >
+      <React.Fragment key={identityGeneration}>{children}</React.Fragment>
     </AuthContext.Provider>
   )
 }

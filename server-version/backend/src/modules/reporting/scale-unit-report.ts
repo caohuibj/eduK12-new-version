@@ -182,16 +182,34 @@ export interface FormBackgroundReport {
   kind: 'background'
   label: string | null
   value: string | null
+  displayValue?: string | null
 }
 
 export const buildFormBackgroundReport = (input: {
   itemId: string
   label?: string | null
   value?: string | null
+  formType?: string | null
+  options?: unknown
 }): FormBackgroundReport => ({
   itemId: input.itemId,
   type: 'FORM',
   kind: 'background',
   label: input.label ?? null,
   value: input.value ?? null,
+  ...(['single_choice', 'multiple_choice'].includes(input.formType ?? '') ? { displayValue: formatFormAnswerLabel(input.value ?? null, input.formType, input.options) } : {}),
 })
+
+/** Presentation only: canonical answers and scoring values are never changed. */
+export const formatFormAnswerLabel = (value: string | null, formType?: string | null, options?: unknown): string | null => {
+  if (value === null || !['single_choice', 'multiple_choice'].includes(formType ?? '') || !Array.isArray(options)) return value
+  const label = (selected: unknown) => {
+    const option = options.find(option => option && typeof option === 'object' && String(option.value) === String(selected))
+    return option && typeof option.label === 'string' ? option.label : String(selected)
+  }
+  if (formType === 'single_choice') return label(value)
+  try {
+    const selected = JSON.parse(value)
+    return Array.isArray(selected) ? selected.map(label).join('、') : value
+  } catch { return value }
+}

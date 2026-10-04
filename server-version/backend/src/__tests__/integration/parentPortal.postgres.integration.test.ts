@@ -31,7 +31,7 @@ async function fixture(){
  const link=await service.claim(parent,invite.inviteCode)
  return {child,parent,otherParent,officer,admin,org,childMembership,officerMembership,course,invite,link,service}
 }
-async function reportFixture(longitudinal=false){
+async function reportFixture(longitudinal=false,withSibling=false){
  const f=await fixture();await f.service.approve(f.child,f.link.id,LINK_CONSENT_VERSION)
  await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:f.org.id,membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:f.admin.userId}})
  const artifactId=randomUUID(),specId=randomUUID(),seriesId=randomUUID()
@@ -48,8 +48,17 @@ async function reportFixture(longitudinal=false){
  // This suite exercises DB authority with synthetic preverified reader input.
  // Real artifact-reader and canonical package compatibility are separate release gates.
  const source:ParentReportSource={artifactId,organizationId:f.org.id,subjectUserId:f.child.userId,policyDomain:'ORG_INDIVIDUAL_REPORT_V1',sourceHash,projection}
- const service=createParentPortalService(db,async id=>{if(id!==artifactId)throw new Error('source missing');return source})
- return {...f,service,artifactId,sourceHash,projection,toolRef,root,ceiling}
+ const siblingId=withSibling?randomUUID():null
+ const siblingProjection=siblingId?{...projection,artifactId:siblingId}:null
+ const siblingPayload=siblingId?{...payload,artifactId:siblingId,parentAudience:siblingProjection}:null
+ const siblingHash=siblingPayload?canonicalHash(siblingPayload):null
+ if(siblingId)await db.$executeRaw`INSERT INTO reporting_analysis_artifacts (id,organization_id,analysis_kind,policy_domain,subject_user_id,cohort_snapshot_id,series_id,spec_id,analysis_identity_hash,artifact_payload,snapshot_hash,generated_by_user_id) VALUES (${siblingId},${f.org.id},'INDIVIDUAL_LONGITUDINAL','ORG_INDIVIDUAL_REPORT_V1',${f.child.userId},NULL,${seriesId},${specId},${canonicalHash({artifactId:siblingId})},${JSON.stringify(siblingPayload)}::jsonb,${siblingHash},${f.officer.userId})`
+ const service=createParentPortalService(db,async id=>{
+  if(id===artifactId)return source
+  if(id===siblingId&&siblingProjection&&siblingHash)return {...source,artifactId:siblingId,sourceHash:siblingHash,projection:siblingProjection}
+  throw new Error('source missing')
+ })
+ return {...f,service,artifactId,sourceHash,projection,toolRef,root,ceiling,siblingId}
 }
 suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)',()=>{
  beforeAll(async()=>{db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()})
@@ -138,6 +147,22 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
   await f.service.grantReport(f.officer,f.link.id,f.artifactId,c.consentId,'grant-'+randomUUID());await f.service.grantReport(f.officer,f.link.id,f.artifactId,c.consentId,'grant-'+randomUUID())
   expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toHaveLength(1)
  })
+ it('parent withdrawal revokes only the selected report and keeps the relationship, another report and frozen evidence',async()=>{
+  const f=await reportFixture(false,true)
+  for(const artifactId of [f.artifactId,f.siblingId!]){
+   const c=await f.service.acceptReportConsent(f.child,f.link.id,artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+   await f.service.grantReport(f.officer,f.link.id,artifactId,c.consentId,randomUUID())
+  }
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toHaveLength(2)
+  await expect(f.service.revokeReport(f.otherParent,f.link.id,f.artifactId,'wrong parent')).rejects.toMatchObject({status:404})
+  await f.service.revokeReport(f.parent,f.link.id,f.artifactId,'parent withdraws exact report')
+  await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
+  expect((await f.service.readReport(f.parent,f.child.userId,f.siblingId!)).artifactId).toBe(f.siblingId)
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list.map(r=>r.id)).toEqual([f.siblingId])
+  expect(await db.parentStudentRelationship.findUnique({where:{id:f.link.id}})).toMatchObject({status:'ACTIVE'})
+  expect((await f.service.children(f.parent,1,20)).list).toHaveLength(1)
+  expect((await db.$queryRaw<Array<{hash:string}>>`SELECT snapshot_hash AS hash FROM reporting_analysis_artifacts WHERE id=${f.artifactId}`)[0].hash).toBe(f.sourceHash)
+ })
  it('same command cannot be reused for another artifact, and revoked grants cannot reactivate',async()=>{
   const f=await reportFixture();const command='consent-'+randomUUID();const first=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,command,REPORT_CONSENT_VERSION)
   expect((await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,command,REPORT_CONSENT_VERSION)).consentId).toBe(first.consentId)
@@ -155,6 +180,21 @@ suite('Parent portal authority and evidence (real PostgreSQL, synthetic sources)
   expect(await db.parentStudentRelationship.findUnique({where:{id:f.link.id}})).toMatchObject({status:'REVOKED'})
   const raw=await db.$queryRaw<Array<{hash:string}>>`SELECT snapshot_hash AS hash FROM reporting_analysis_artifacts WHERE id=${f.artifactId}`;expect(raw[0].hash).toBe(f.sourceHash)
   const audit=await db.$queryRaw<Array<{count:number}>>`SELECT COUNT(*)::int AS count FROM parent_portal_audit WHERE relationship_id=${f.link.id}`;expect(audit[0].count).toBeGreaterThanOrEqual(4)
+ })
+ it('fresh rebind creates an independent relationship and cannot inherit old report consents or grants',async()=>{
+  const f=await reportFixture(),consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION),grant=await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,randomUUID())
+  await f.service.revoke(f.parent,f.link.id,'episode ended')
+  const invite=await f.service.invitations(f.child,f.course.id),next=await f.service.claim(f.parent,invite.inviteCode)
+  expect(next.id).not.toBe(f.link.id);await f.service.approve(f.child,next.id,LINK_CONSENT_VERSION)
+  expect((await f.service.overview(f.parent,f.child.userId)).relationshipId).toBe(next.id)
+  expect((await f.service.reports(f.parent,f.child.userId,1,20)).list).toEqual([])
+  await expect(f.service.readReport(f.parent,f.child.userId,f.artifactId)).rejects.toMatchObject({status:404})
+  await expect(f.service.grantReport(f.officer,next.id,f.artifactId,consent.consentId,randomUUID())).rejects.toMatchObject({status:404})
+  const rows=await db.$queryRaw<Array<{relationshipId:string;revokedAt:Date}>>`SELECT relationship_id AS "relationshipId",revoked_at AS "revokedAt" FROM parent_report_disclosure_grants WHERE id=${grant.grantId}`
+  expect(rows[0].relationshipId).toBe(f.link.id);expect(rows[0].revokedAt).not.toBeNull()
+  const fresh=await f.service.acceptReportConsent(f.child,next.id,f.artifactId,randomUUID(),REPORT_CONSENT_VERSION)
+  await f.service.grantReport(f.officer,next.id,f.artifactId,fresh.consentId,randomUUID())
+  expect((await f.service.readReport(f.parent,f.child.userId,f.artifactId)).relationshipId).toBe(next.id)
  })
  it.each(['deny','member-deny','policy-deny','membership-ended','organization-suspended','child-frozen','parent-frozen','parent-role-changed','child-role-changed'])('current %s invalidates an already granted parent report',async condition=>{
   const f=await reportFixture();const consent=await f.service.acceptReportConsent(f.child,f.link.id,f.artifactId,'consent-'+randomUUID(),REPORT_CONSENT_VERSION);await f.service.grantReport(f.officer,f.link.id,f.artifactId,consent.consentId,'grant-'+randomUUID())

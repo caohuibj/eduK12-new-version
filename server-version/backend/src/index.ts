@@ -1,3 +1,5 @@
+import { organizationInvitationsRouter } from './modules/organization/invitations'
+import { parentAccountsRouter, platformUsersRouter } from './modules/parent-portal/accounts.routes'
 import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
 import { classroomRuntimeRouter } from './modules/mobile/classroom.routes'
 import { assessmentRuntimeRouter } from './modules/mobile/assessment.routes'
@@ -230,12 +232,15 @@ app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)
+app.use('/api/parent-accounts', parentAccountsRouter)
+app.use('/api/platform-users', platformUsersRouter)
 app.use('/api/parent-report-publications',parentPublicationRouter)
 app.use('/api/mobile/classrooms', classroomRuntimeRouter)
 app.use('/api/mobile/assessment-runtime', assessmentRuntimeRouter)
 app.use('/api/mobile', mobileRouter)
 app.use('/api/parent-tool-policies', parentToolPolicyRouter)
 app.use('/api/users', userRoutes)
+app.use('/api/organization-invitations', organizationInvitationsRouter)
 app.use('/api/organizations', organizationRoutes)
 app.use('/api/my-assessments', assessmentInboxRoutes)
 app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)

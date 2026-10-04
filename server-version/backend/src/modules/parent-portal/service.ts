@@ -1,3 +1,4 @@
+import { assertInviteSource, createInvite, invitationSources, type InviteSource, type InviteRecord } from './invitations'
 import { assertCurrentParentPublication,verifyParentPublication,publicationColumns,type ParentPublicationRow } from './publication'
 import { assertDisclosureOfficer } from './authorization'
 import { assertParentToolCeiling, parentToolVisibleSql,parentToolVisibleSqlFor } from './tool-policy'
@@ -5,8 +6,8 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
-import { createParentInviteCode, consumeParentInviteCode, hashParentInviteCode, createPendingParentRelationship, revokeParentRelationship } from '../assessment-identity/identity'
-import type { ParentInviteCodeRecordV1, ParentStudentRelationshipRecordV1 } from '../assessment-identity/types'
+import { consumeParentInviteCode, hashParentInviteCode, createPendingParentRelationship, revokeParentRelationship } from '../assessment-identity/identity'
+import type { ParentStudentRelationshipRecordV1 } from '../assessment-identity/types'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { LINK_CONSENT_TEXT, LINK_CONSENT_VERSION, REPORT_CONSENT_VERSION, REPORT_CONSENT_TEXT, assertStudentConfirmation, assertExactReportBinding, fail, parseParentProjection, type ParentReportSource } from './contracts'
 import { readParentReportSource } from './source'
@@ -19,8 +20,8 @@ const usable = Prisma.sql`u.is_active = true AND u.is_frozen = false AND (u.expi
 function relationshipRecord(row:Link):ParentStudentRelationshipRecordV1 {
   return {...row,relationshipId:row.id,status:row.status as ParentStudentRelationshipRecordV1['status'],approvedAt:row.approvedAt?.toISOString()??null,revokedAt:row.revokedAt?.toISOString()??null}
 }
-function inviteRecord(row:{id:string;codeHash:string;studentUserId:string;courseId:string;createdByUserId:string;status:string;expiresAt:Date;consumedAt:Date|null;consumedByParentUserId:string|null}):ParentInviteCodeRecordV1 {
-  return {...row,inviteCodeId:row.id,status:row.status as ParentInviteCodeRecordV1['status'],expiresAt:row.expiresAt.toISOString(),consumedAt:row.consumedAt?.toISOString()??null}
+function inviteRecord(row: InviteRecord) {
+  return { ...row, inviteCodeId: row.id, expiresAt: row.expiresAt.toISOString(), consumedAt: row.consumedAt?.toISOString() ?? null }
 }
 function expectRole(actor:Principal,role:string) {if(actor.role!==role)fail()}
 async function audit(tx:Tx,actor:string,action:string,relationshipId:string|null,artifactId:string|null=null) {
@@ -76,15 +77,16 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
   const run=<T>(operation:(tx:Tx)=>Promise<T>)=>db.$transaction(operation,{isolationLevel:Prisma.TransactionIsolationLevel.Serializable})
   return {
     consentText:()=>({version:LINK_CONSENT_VERSION,text:LINK_CONSENT_TEXT}),
-    async invitations(actor:Principal,courseId:string) {
+    async invitationSources(actor: Principal) {
+      expectRole(actor, 'STUDENT')
+      return run(tx=>invitationSources(tx,actor.userId))
+    },
+    async invitations(actor: Principal, source: string | InviteSource) {
       expectRole(actor,'STUDENT')
       return run(async tx=>{
-        const membership=await tx.courseStudent.findUnique({where:{courseId_studentId:{courseId,studentId:actor.userId}},include:{course:{select:{isLibrary:true}}}})
-        if(!membership||membership.course.isLibrary||!['ACTIVE','APPROVED'].includes(membership.status))return fail()
-        const invite=createParentInviteCode({studentUserId:actor.userId,createdByUserId:actor.userId,courseId,studentCourseStatus:membership.status as 'ACTIVE'|'APPROVED',ttlMs:15*60*1000})
-        await tx.parentInviteCode.create({data:{id:invite.record.inviteCodeId,codeHash:invite.record.codeHash,studentUserId:actor.userId,courseId,createdByUserId:actor.userId,status:'ACTIVE',expiresAt:new Date(invite.record.expiresAt)}})
+        const result = await createInvite(tx,actor.userId,typeof source==='string'?{courseId:source}:source)
         await audit(tx,actor.userId,'INVITE_CREATED',null)
-        return {inviteCode:invite.plaintext,expiresAt:invite.record.expiresAt}
+        return result
       })
     },
     async claim(actor:Principal,code:string) {
@@ -94,11 +96,12 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
         await tx.$queryRaw`SELECT id FROM parent_invite_codes WHERE code_hash=${hash} FOR UPDATE`
         const invite=await tx.parentInviteCode.findUnique({where:{codeHash:hash}})
         if(!invite)return fail('PARENT_INVITE_UNAVAILABLE',404,'邀请码无效或已过期')
-        const prior=await tx.parentStudentRelationship.findUnique({where:{parentUserId_studentUserId:{parentUserId:actor.userId,studentUserId:invite.studentUserId}}})
+        // Serialize the pair so two fresh codes cannot create two current episodes.
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${actor.userId+':'+invite.studentUserId},0))`
+        const prior=await tx.parentStudentRelationship.findFirst({where:{parentUserId:actor.userId,studentUserId:invite.studentUserId,status:{in:['PENDING','ACTIVE']}},orderBy:{createdAt:'desc'}})
         if(invite.status==='CONSUMED'&&invite.consumedByParentUserId===actor.userId&&prior?.inviteCodeId===invite.id)return {id:prior.id,status:prior.status}
-        if(prior)return fail('PARENT_LINK_EXISTS',409,'关联已存在；已撤销关系需要独立核验，旧报告授权不会恢复')
-        const memberships=await tx.courseStudent.findUnique({where:{courseId_studentId:{courseId:invite.courseId,studentId:invite.studentUserId}},include:{course:{select:{isLibrary:true}}}})
-        if(!memberships||memberships.course.isLibrary||!['ACTIVE','APPROVED'].includes(memberships.status))return fail()
+        if(prior)return fail('PARENT_LINK_EXISTS',409,'已有待确认或有效关联，请查看当前关联')
+        await assertInviteSource(tx,invite.studentUserId,invite)
         const child=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT u.id FROM users u WHERE u.id=${invite.studentUserId} AND (${usable})`)
         if(!child.length)return fail()
         consumeParentInviteCode({record:inviteRecord(invite),plaintext:code,parentUserId:actor.userId})
@@ -127,6 +130,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
         if(row.studentUserId!==actor.userId)return fail()
         if(row.status==='ACTIVE'&&row.approvedByUserId===actor.userId&&row.consentVersion===consentVersion)return {id:row.id,status:row.status}
         assertStudentConfirmation({actorUserId:actor.userId,studentUserId:row.studentUserId,status:row.status,consentVersion})
+        if(row.inviteCodeId){const invite=await tx.parentInviteCode.findUnique({where:{id:row.inviteCodeId}})??fail();await assertInviteSource(tx,row.studentUserId,invite)}
         const parent=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT u.id FROM users u WHERE u.id=${row.parentUserId} AND (${usable}) AND u.role='PARENT'`)
         if(!parent.length)return fail()
         const consentHash=canonicalHash({version:LINK_CONSENT_VERSION,text:LINK_CONSENT_TEXT,parentUserId:row.parentUserId,studentUserId:row.studentUserId,relationshipId:id})
@@ -160,7 +164,7 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
     async overview(actor:Principal,childId:string) {
       expectRole(actor,'PARENT')
       return run(async tx=>{
-        const row=await tx.parentStudentRelationship.findUnique({where:{parentUserId_studentUserId:{parentUserId:actor.userId,studentUserId:childId}}})??fail()
+        const row=await tx.parentStudentRelationship.findFirst({where:{parentUserId:actor.userId,studentUserId:childId,status:'ACTIVE',revokedAt:null},orderBy:{createdAt:'desc'}})??fail()
         await lockLink(tx,row.id);await assertLiveLink(tx,row)
         const child=await tx.user.findUnique({where:{id:childId},select:{nickname:true,username:true}})??fail()
         const courses=await tx.courseStudent.findMany({where:{studentId:childId,status:{in:['ACTIVE','APPROVED']},course:{isLibrary:false}},take:20,select:{course:{select:{id:true,title:true}}}})

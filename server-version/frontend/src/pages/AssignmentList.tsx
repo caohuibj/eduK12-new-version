@@ -16,6 +16,8 @@ import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAssignmentAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Assignment, Course } from '../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import { dateTimeInputValue, deadlineToIso, formatLocalDateTime, localTimeZoneLabel } from '../utils/dateTime'
+import { formatAssignmentAnswer, assignmentAnswerHeading } from '../utils/answerLabels'
 import MoreActions from '../components/staff-ui/MoreActions'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
@@ -71,7 +73,8 @@ interface Submission {
 }
 
 const AssignmentList: React.FC = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedCourseId = searchParams.get('courseId')
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -122,6 +125,15 @@ const AssignmentList: React.FC = () => {
     element.scrollIntoView({ block: 'center' })
     element.focus()
   }, [loading, focusId])
+
+  useEffect(() => {
+    if (searchParams.get('create') !== 'true' || !courses.some(course => course.id === requestedCourseId)) return
+    setFormData(current => ({ ...current, courseId: requestedCourseId! }))
+    setShowModal(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('create')
+    setSearchParams(next, { replace: true })
+  }, [courses, requestedCourseId, searchParams, setSearchParams])
 
   const fetchAssignments = async () => {
     try {
@@ -257,7 +269,7 @@ const AssignmentList: React.FC = () => {
         title: formData.title,
         description: formData.description,
         content: formData.content,
-        deadline: formData.deadline || undefined,
+        deadline: deadlineToIso(formData.deadline),
         questions: formData.questions.length > 0 ? formData.questions : undefined,
         videos: formData.videos.length > 0 ? formData.videos : undefined,
         images: formData.images.length > 0 ? formData.images : undefined,
@@ -288,7 +300,7 @@ const AssignmentList: React.FC = () => {
         title: formData.title,
         description: formData.description,
         content: formData.content,
-        deadline: formData.deadline || undefined,
+        deadline: deadlineToIso(formData.deadline),
         ...buildAssignmentAttachmentUpdateFields(formData),
         tags: formData.tags,
       }
@@ -377,7 +389,7 @@ const AssignmentList: React.FC = () => {
       title: assignment.title,
       description: assignment.description || '',
       content: assignment.content || '',
-      deadline: assignment.deadline ? new Date(assignment.deadline).toISOString().slice(0, 16) : '',
+      deadline: assignment.deadline ? dateTimeInputValue(assignment.deadline) : '',
       questions: (assignment.questions as Question[]) || [],
       videos: (assignment.videos as VideoItem[]) || [],
       images: (assignment.images as ImageItem[]) || [],
@@ -464,7 +476,7 @@ const AssignmentList: React.FC = () => {
     return (
       <span className={isOverdue ? 'text-red-500' : 'text-gray-500'}>
         <Clock className="w-3 h-3 inline mr-1" />
-        {date.toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        {formatLocalDateTime(deadline, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
         {isOverdue && ' (已截止)'}
       </span>
     )
@@ -578,6 +590,8 @@ const AssignmentList: React.FC = () => {
                 />
               </div>
 
+              <p className="staff-help">截止时间按当前设备时区输入：{localTimeZoneLabel()}。</p>
+
               {/* Tags */}
               <div>
                 <label className="label">标签</label>
@@ -615,6 +629,7 @@ const AssignmentList: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => removeVideo(index)}
+                          aria-label={`移除视频 ${video.title}`}
                           className="text-red-400 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -656,7 +671,8 @@ const AssignmentList: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label={`移除图片 ${image.name}`}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -694,6 +710,7 @@ const AssignmentList: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => removeDocument(index)}
+                          aria-label={`移除文档 ${doc.title}`}
                           className="text-red-400 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -834,11 +851,11 @@ const AssignmentList: React.FC = () => {
                       {/* 选择题答案 */}
                       {submission.answers && Object.keys(submission.answers).length > 0 && (
                         <div className="mt-3">
-                          <p className="text-sm font-medium text-gray-700 mb-2">选择题答案:</p>
+                          <p className="text-sm font-medium text-gray-700 mb-2">{assignmentAnswerHeading(selectedAssignment?.questions as Question[] | undefined)}:</p>
                           <div className="flex flex-wrap gap-2">
                             {Object.entries(submission.answers).map(([key, value]) => (
                               <span key={key} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
-                                {key}: {String(value)}
+                                {formatAssignmentAnswer(selectedAssignment?.questions as Question[] | undefined, key, value)}
                               </span>
                             ))}
                           </div>

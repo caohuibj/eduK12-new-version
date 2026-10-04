@@ -27,4 +27,11 @@ describe('AssignmentList states', () => {
     expect(await screen.findByText('暂无匹配作业')).toBeInTheDocument()
     expect(get.mock.calls.filter(([url]) => url === '/assignments')).toHaveLength(2)
   })
+  it('opens course-initiated creation with the permitted course already selected', async () => {
+    get.mockImplementation(async (url: string) => ({ code: 0, data: url === '/courses' ? { list: [{ id: 'course', title: '当前课程' }] } : url.endsWith('/tags') ? { tags: [] } : { list: [] } }))
+    render(<MemoryRouter initialEntries={['/assignments?create=true&courseId=course']}><AssignmentList /></MemoryRouter>)
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByLabelText('选择课程 *')).toHaveValue('course')
+  })
+
 })

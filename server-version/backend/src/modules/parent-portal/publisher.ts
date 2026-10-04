@@ -1,3 +1,4 @@
+import { ParentPortalError } from './contracts'
 import { readExactReportingSeriesWavesBatch } from '../reporting/series'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -48,6 +49,19 @@ export function createParentPublisher(db=prisma,registry=parentTemplateRegistry)
   return {record,proposal,previewHash:canonicalHash(proposal)}
  }
  return {
+  async templates(actor:Actor,artifactId:string){
+   return run(async tx=>{
+    const record=await readReportingArtifactRecord(artifactId,tx)
+    if(!['PROTECTED_FEEDBACK','INDIVIDUAL_LONGITUDINAL'].includes(record.analysisKind))fail('PARENT_SOURCE_UNSUPPORTED')
+    const subjectUserId=record.analysisKind==='PROTECTED_FEEDBACK'?record.artifactPayload.source.subjectUserId:record.analysisKind==='INDIVIDUAL_LONGITUDINAL'?record.subjectUserId:fail()
+    await assertDisclosureSourceAccess(tx,actor,{artifactId,organizationId:record.organizationId,subjectUserId,policyDomain:record.policyDomain})
+    const ref=await toolRef(tx,record),list=[]
+    for(const template of registry.list(ref)){
+      try{await prepare(tx,actor,artifactId,template.key,template.version);list.push(template)}catch(e){if(!(e instanceof ParentPortalError))throw e}
+    }
+    return {list}
+   })
+  },
   async preview(actor:Actor,artifactId:string,key='parent-report-availability',version='1.0.0'){
    return run(async tx=>{const prepared=await prepare(tx,actor,artifactId,key,version);const heads=await tx.$queryRaw<Array<{version:number}>>`SELECT version FROM parent_report_publication_heads WHERE source_artifact_id=${artifactId}`;return {artifactId,projection:prepared.proposal.projection,template:{key,version},previewHash:prepared.previewHash,expectedVersion:heads[0]?.version??0,commandKey:randomUUID(),allowedActions:['PUBLISH']}})
   },
@@ -67,14 +81,14 @@ export function createParentPublisher(db=prisma,registry=parentTemplateRegistry)
     return {publicationId:id,publicationHash}
    })
   },
-  async list(actor:Actor,organizationId:string){
+  async list(actor:Actor,organizationId:string,page=1,pageSize=20){
    return run(async tx=>{
     await assertDisclosureOfficer(tx,actor,organizationId)
     const input={principal:actor,organizationId,tx}
     async function scope(factory:(i:typeof input)=>Promise<Prisma.Sql>){try{return await factory(input)}catch(e){if((e as any).statusCode===404)return Prisma.sql`false`;throw e}}
     const protectedScope=await scope(protectedFeedbackSubjectScope),individualScope=await scope(individualSubjectScope)
-    const rows=await tx.$queryRaw<Array<{id:string;name:string;at:Date}>>(Prisma.sql`SELECT DISTINCT ON(a.id,a.generated_at) a.id,COALESCE(u.nickname,u.username) AS name,a.generated_at AS at FROM reporting_analysis_artifacts a JOIN users u ON u.id=COALESCE(a.subject_user_id,a.artifact_payload->'source'->>'subjectUserId') JOIN organization_memberships m ON m.user_id=u.id AND m.organization_id=a.organization_id JOIN reporting_analysis_specs spec ON spec.id=a.spec_id AND spec.status='PUBLISHED' WHERE a.organization_id=${organizationId} AND u.role='STUDENT' AND u.is_active=true AND u.is_frozen=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()) AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp()) AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=a.organization_id AND d.user_id=u.id AND d.lifted_at IS NULL AND (d.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_READ') OR d.permission=a.policy_domain)) AND ((a.analysis_kind='PROTECTED_FEEDBACK' AND (${protectedScope})) OR (a.analysis_kind='INDIVIDUAL_LONGITUDINAL' AND (${individualScope}))) ORDER BY a.generated_at DESC,a.id LIMIT 21`)
-    return {list:rows.slice(0,20).map(row=>({id:row.id,title:row.name+' · 测评报告',generatedAt:row.at.toISOString()})),truncated:rows.length>20}
+    const rows=await tx.$queryRaw<Array<{id:string;name:string;at:Date}>>(Prisma.sql`SELECT DISTINCT ON(a.id,a.generated_at) a.id,COALESCE(u.nickname,u.username) AS name,a.generated_at AS at FROM reporting_analysis_artifacts a JOIN users u ON u.id=COALESCE(a.subject_user_id,a.artifact_payload->'source'->>'subjectUserId') JOIN organization_memberships m ON m.user_id=u.id AND m.organization_id=a.organization_id JOIN reporting_analysis_specs spec ON spec.id=a.spec_id AND spec.status='PUBLISHED' WHERE a.organization_id=${organizationId} AND u.role='STUDENT' AND u.is_active=true AND u.is_frozen=false AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()) AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp()) AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=a.organization_id AND d.user_id=u.id AND d.lifted_at IS NULL AND (d.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_READ') OR d.permission=a.policy_domain)) AND ((a.analysis_kind='PROTECTED_FEEDBACK' AND (${protectedScope})) OR (a.analysis_kind='INDIVIDUAL_LONGITUDINAL' AND (${individualScope}))) ORDER BY a.generated_at DESC,a.id LIMIT ${pageSize+1} OFFSET ${(page-1)*pageSize}`)
+    return {list:rows.slice(0,pageSize).map(row=>({id:row.id,title:row.name+' · 测评报告',generatedAt:row.at.toISOString()})),page,pageSize,hasMore:rows.length>pageSize,truncated:rows.length>pageSize}
    })
   },
  }

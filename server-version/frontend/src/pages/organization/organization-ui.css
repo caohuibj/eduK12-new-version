@@ -8,6 +8,7 @@
 .hui-organization-page :where(h4) { font-size: 14px; line-height: 1.5; }
 .hui-organization-page :where(form, form > *, .grid > *, .flex > *) { min-width: 0; }
 .hui-organization-page :where(form) { align-items: end; }
+.hui-organization-page :where(.flex) { flex-wrap: wrap; }
 .hui-organization-page :where(label) { font-size: 14px; line-height: 1.5; color: var(--hui-color-text); }
 .hui-organization-page :where(input, select, textarea) {
   min-width: 0;

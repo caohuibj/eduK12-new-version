@@ -1,3 +1,4 @@
+vi.mock('../../AssessmentTaskShortcut', () => ({ default: () => null }))
 vi.mock('../../../api/relational', () => ({ relationalApi: { catalog: async () => [], tasks: async () => [] } }))
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -18,6 +19,7 @@ const auth = vi.hoisted(() => ({
 const organization = vi.hoisted(() => ({
   organizations: [] as Array<{ id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' }>,
   total: 0,
+  allowedActions: [] as string[],
   platformRole: null as string | null,
   active: null as any,
   isLoading: false,
@@ -28,7 +30,7 @@ const organization = vi.hoisted(() => ({
   selectOrganization: vi.fn(),
 }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
-vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => true, useCapabilities: () => ({cognitiveEnabled:true,parentPortalEnabled:false}) }))
 vi.mock('../../../contexts/OrganizationContext', () => ({
   OrganizationProvider: ({ children }: { children: React.ReactNode }) => children,
   useOrganization: () => organization,
@@ -43,6 +45,7 @@ beforeEach(() => {
   auth.clearReauthentication.mockImplementation(() => sessionStorage.removeItem('huisurvey:reauth-return'))
   organization.organizations = []
   organization.total = 0
+  organization.allowedActions = []
   organization.platformRole = null
   organization.active = null
   organization.isLoading = false
@@ -194,4 +197,23 @@ it('uses authentication and reauth identity without legacy-role gating for share
   auth.user = { id: 'admin-respondent', role: 'ADMIN', username: 'admin' } as User
   render(<MemoryRouter initialEntries={['/relational/attempts/run-attempt']}><RouteAccess><p>assigned runtime</p></RouteAccess></MemoryRouter>)
   expect(screen.getByText('assigned runtime')).toBeInTheDocument()
+})
+
+it('hides creation without server permission and legacy archive for a standard platform principal', () => {
+  auth.user = { ...student, role: 'ADMIN' }
+  organization.platformRole = 'STANDARD'
+  render(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
+  expect(screen.queryByRole('link', { name: '创建组织' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: '历史归档（只读）' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: '组织概览' })).not.toBeInTheDocument()
+})
+
+it('requires explicit directory creation permission even for SYSTEM_ADMIN', () => {
+  auth.user = { ...student, role: 'ADMIN' }
+  organization.platformRole = 'SYSTEM_ADMIN'
+  const view = render(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
+  expect(screen.queryByRole('link', { name: '创建组织' })).not.toBeInTheDocument()
+  organization.allowedActions = ['CREATE_ORGANIZATION']
+  view.rerender(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
+  expect(screen.getByRole('link', { name: '创建组织' })).toHaveAttribute('href', '/organizations/new')
 })

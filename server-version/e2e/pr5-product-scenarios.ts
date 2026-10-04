@@ -264,8 +264,7 @@ async function schoolMentalHealth({ platform, owner, org, members, groupSpec, sc
   const classroom = await ok(owner, `/organizations/${org}/units`, { unitKind: 'CLASS', name: '一班', parentUnitId: grade.id })
   await ok(owner, `/organizations/${org}/staff-class-assignments`, { membershipId: members.teacher0, classUnitId: classroom.id, staffRole: 'HOMEROOM' })
   for (const name of ['student0', 'student1', 'student2']) await ok(owner, `/organizations/${org}/student-class-assignments`, { membershipId: members[name], classUnitId: classroom.id, isPrimary: true })
-  const parentRelation = await prisma.parentStudentRelationship.upsert({ where: { parentUserId_studentUserId: { parentUserId: fixture.users.parent.id, studentUserId: fixture.users.student0.id } }, update: { status: 'ACTIVE', revokedAt: null, approvedAt: new Date() }, create: { parentUserId: fixture.users.parent.id, studentUserId: fixture.users.student0.id,
-    status: 'ACTIVE', approvedByUserId: fixture.users.owner.id, approvedAt: new Date() } })
+  const parentRelation = await prisma.parentStudentRelationship.findFirst({ where: { parentUserId: fixture.users.parent.id, studentUserId: fixture.users.student0.id, status: 'ACTIVE' } }) ?? await prisma.parentStudentRelationship.create({ data: { parentUserId: fixture.users.parent.id, studentUserId: fixture.users.student0.id, status: 'ACTIVE', approvedByUserId: fixture.users.owner.id, approvedAt: new Date() } })
   const self = await run(owner, org, 'student-self')
   const completed = []
   for (const name of ['student0', 'student1', 'student2']) completed.push(await complete(name, self))
