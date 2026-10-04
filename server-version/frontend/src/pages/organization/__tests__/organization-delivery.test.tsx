@@ -90,7 +90,7 @@ describe('Organization Safety and CSV delivery', () => {
 
   it('creates an immutable artifact export ticket without reconstructing CSV client-side', async () => {
     renderPage()
-    expect(await screen.findByRole('combobox', { name: '报告类型', exact: true })).toHaveValue('AGGREGATE')
+    expect(await screen.findByRole('combobox', { name: /^报告类型$/ })).toHaveValue('AGGREGATE')
     const artifactInput = await screen.findByLabelText('报告版本编号', { exact: true })
     await userEvent.type(artifactInput, 'artifact-1')
     await userEvent.click(screen.getByRole('button', { name: '准备 CSV 导出' }))
