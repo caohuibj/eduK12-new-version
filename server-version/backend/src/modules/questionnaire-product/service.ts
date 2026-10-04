@@ -24,7 +24,7 @@ const owner = (a: Actor, row: { createdBy: string | null }) => {
   if (a.role !== 'ADMIN' && row.createdBy !== a.userId) throw compositeForbidden()
 }
 const metadata = {
-  name: z.string().trim().min(1).max(200), description: z.string().max(5000).nullable().optional(),
+  name: z.string().trim().min(1, '请填写问卷名称').max(200, '问卷名称不能超过200字'), description: z.string().max(5000).nullable().optional(),
   instruction: z.string().max(10000).nullable().optional(), courseIds: z.array(z.string().min(1)).max(100).default([]),
   publicEnabled: z.boolean().default(false), opensAt: z.string().datetime().nullable().optional(), expiresAt: z.string().datetime().nullable().optional(),
 }

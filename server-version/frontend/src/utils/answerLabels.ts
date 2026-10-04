@@ -11,3 +11,10 @@ export const formatAssignmentAnswer = (questions: Question[] | undefined, key: s
   const labels = values.map(selected => question.options?.find(option => option.key === String(selected).trim())?.text || String(selected))
   return `${heading}：${labels.join('、')}`
 }
+
+export const assignmentAnswerHeading = (questions: Question[] | undefined): string => {
+  if (!questions?.length) return '题目答案'
+  if (questions.every(question => question.type === 'text')) return '主观题答案'
+  if (questions.every(question => question.type !== 'text')) return '选择题答案'
+  return '题目答案'
+}

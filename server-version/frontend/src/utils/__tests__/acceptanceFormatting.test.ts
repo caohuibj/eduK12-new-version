@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { dateTimeInputValue, deadlineToIso, formatLocalDateTime } from '../dateTime'
-import { formatAssignmentAnswer } from '../answerLabels'
+import { formatAssignmentAnswer, assignmentAnswerHeading } from '../answerLabels'
 import type { Question } from '../../components/QuestionEditor'
 describe('acceptance formatting', () => {
   it('round-trips local deadline inputs and labels display offsets', () => {
@@ -18,4 +18,14 @@ describe('acceptance formatting', () => {
     expect(formatAssignmentAnswer(questions, '2', '["A","B"]')).toBe('题目3：["A","B"]')
     expect(formatAssignmentAnswer(questions, '0', 'missing')).toBe('题目1：missing')
   })
+  it('labels subjective, choice and mixed submissions according to their question types', () => {
+    const text: Question = { id: 't', type: 'text', question: '说明' }
+    const choice: Question = { id: 'c', type: 'single_choice', question: '颜色' }
+    expect(assignmentAnswerHeading([text])).toBe('主观题答案')
+    expect(assignmentAnswerHeading([choice])).toBe('选择题答案')
+    expect(assignmentAnswerHeading([text, choice])).toBe('题目答案')
+    expect(assignmentAnswerHeading(undefined)).toBe('题目答案')
+    expect(formatAssignmentAnswer([text], '0', '合成答案')).toBe('题目1：合成答案')
+  })
+
 })

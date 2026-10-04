@@ -17,7 +17,7 @@ import { buildAssignmentAttachmentUpdateFields } from '../utils/attachmentUpdate
 import type { Assignment, Course } from '../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
 import { dateTimeInputValue, deadlineToIso, formatLocalDateTime, localTimeZoneLabel } from '../utils/dateTime'
-import { formatAssignmentAnswer } from '../utils/answerLabels'
+import { formatAssignmentAnswer, assignmentAnswerHeading } from '../utils/answerLabels'
 import MoreActions from '../components/staff-ui/MoreActions'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
@@ -73,7 +73,8 @@ interface Submission {
 }
 
 const AssignmentList: React.FC = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedCourseId = searchParams.get('courseId')
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -124,6 +125,15 @@ const AssignmentList: React.FC = () => {
     element.scrollIntoView({ block: 'center' })
     element.focus()
   }, [loading, focusId])
+
+  useEffect(() => {
+    if (searchParams.get('create') !== 'true' || !courses.some(course => course.id === requestedCourseId)) return
+    setFormData(current => ({ ...current, courseId: requestedCourseId! }))
+    setShowModal(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('create')
+    setSearchParams(next, { replace: true })
+  }, [courses, requestedCourseId, searchParams, setSearchParams])
 
   const fetchAssignments = async () => {
     try {
@@ -841,7 +851,7 @@ const AssignmentList: React.FC = () => {
                       {/* 选择题答案 */}
                       {submission.answers && Object.keys(submission.answers).length > 0 && (
                         <div className="mt-3">
-                          <p className="text-sm font-medium text-gray-700 mb-2">选择题答案:</p>
+                          <p className="text-sm font-medium text-gray-700 mb-2">{assignmentAnswerHeading(selectedAssignment?.questions as Question[] | undefined)}:</p>
                           <div className="flex flex-wrap gap-2">
                             {Object.entries(submission.answers).map(([key, value]) => (
                               <span key={key} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">

@@ -120,7 +120,7 @@ const ClassroomCreate: React.FC = () => {
             ))}
           </select>
           {errors.courseId && <span id="classroom-course-error" className="text-sm text-red-600">{errors.courseId}</span>}
-          <span id="classroom-course-hint" className="staff-field__hint">学生必须加入该课程才能参与课堂互动。</span>
+          <span id="classroom-course-hint" className="staff-field__hint">课程用于归属和管理课堂；学生凭课堂码参与，无需先加入课程。</span>
         </label>
 
         <ProductStatus kind="info" title="创建后">

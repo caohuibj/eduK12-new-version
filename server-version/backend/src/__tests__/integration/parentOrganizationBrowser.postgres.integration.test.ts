@@ -23,6 +23,7 @@ import {
 } from '../../modules/organization/service'
 import { parentToolPolicyService } from '../../modules/parent-portal/tool-policy'
 import authRoutes from '../../routes/auth'
+import questionnaireProductRoutes from '../../modules/questionnaire-product/routes'
 import relationalProductRoutes from '../../modules/assessment-relational/product.routes'
 import assessmentInboxRoutes from '../../modules/assessment-policy/inbox.routes'
 import compositeRoutes from '../../modules/composite/composite.routes'
@@ -193,6 +194,7 @@ suite(
       app.use('/api', csrfProtection)
       app.use('/api/auth', authRoutes)
       app.use('/api/users', userRoutes)
+      app.use('/api/questionnaire-products', questionnaireProductRoutes)
       app.use('/api/capabilities', capabilitiesRoutes)
       app.use('/api/organizations', organizationRoutes)
       app.use('/api/organization-invitations', organizationInvitationsRouter)
@@ -206,22 +208,18 @@ suite(
       app.use('/api/my-assessments', assessmentInboxRoutes)
       app.use('/api/composite-assessments', compositeRoutes)
       app.use('/api', (_q, r) =>
-        r
-          .status(404)
-          .json({
-            code: 404,
-            message: 'fixture route unavailable',
-            data: null,
-          }),
+        r.status(404).json({
+          code: 404,
+          message: 'fixture route unavailable',
+          data: null,
+        }),
       )
       app.use((e: any, _q: any, r: any, _n: any) =>
-        r
-          .status(500)
-          .json({
-            code: 'FIXTURE_ERROR',
-            message: String(e.message),
-            data: null,
-          }),
+        r.status(500).json({
+          code: 'FIXTURE_ERROR',
+          message: String(e.message),
+          data: null,
+        }),
       )
       const dist = path.resolve('../frontend/dist')
       app.use(express.static(dist))
@@ -244,6 +242,152 @@ suite(
       }
       await prisma.$disconnect()
     })
+    it('additional QA: questionnaire blank draft feedback and form controls with the actual API', async () => {
+      const manager = await prisma.user.create({
+        data: {
+          username: 'qa-editor-' + randomUUID(),
+          passwordHash,
+          role: 'TEACHER',
+        },
+      })
+      const context = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+      })
+      const page = await context.newPage()
+      page.setDefaultTimeout(15000)
+      try {
+        await login(context, manager.username)
+        await page.goto(origin + '/questionnaire-products/new')
+        await page.getByRole('button', { name: '创建草稿' }).click()
+        await page.getByText('请填写问卷名称', { exact: true }).waitFor()
+        await page.screenshot({
+          path: path.join(evidence, 'additional-questionnaire-empty-error.png'),
+          fullPage: true,
+        })
+        await page.getByLabel('问卷名称').fill('合成表单编排验收')
+        await page.getByRole('button', { name: '创建草稿' }).click()
+        await page.waitForURL(
+          (u) => u.pathname !== '/questionnaire-products/new',
+        )
+        await page.getByLabel('测评类型').selectOption('FORM')
+        const input = page.getByLabel('题目文字')
+        await input.fill('合成主观题，无科学评分')
+        const style = await input.evaluate((e) => ({
+          border: getComputedStyle(e).borderTopWidth,
+          height: e.getBoundingClientRect().height,
+        }))
+        expect(style.border).toBe('1px')
+        expect(style.height).toBeGreaterThanOrEqual(44)
+        const added = page.waitForResponse(
+          (response) =>
+            response.url().endsWith('/items') &&
+            response.request().method() === 'POST',
+        )
+        await page.getByRole('button', { name: '添加到问卷' }).click()
+        const addedResponse = await added
+        const result = await addedResponse.json()
+        expect(addedResponse.status()).toBe(200)
+        expect(result.data.formSections[0].items[0].formLabel).toBe(
+          '合成主观题，无科学评分',
+        )
+        await page.getByText('合成主观题，无科学评分').waitFor()
+        await page.getByRole('button', { name: '移除此题' }).waitFor()
+        await page.screenshot({
+          path: path.join(evidence, 'additional-questionnaire-controls.png'),
+          fullPage: true,
+        })
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth),
+        ).toBeLessThanOrEqual(390)
+      } finally {
+        await context.close()
+      }
+    }, 60000)
+    it('additional QA: organization reflow and shared-cookie account changes clear the old form', async () => {
+      const manager = await prisma.user.create({
+        data: {
+          username: 'qa-admin-' + randomUUID(),
+          passwordHash,
+          role: 'ADMIN',
+          platformRole: 'SYSTEM_ADMIN',
+        },
+      })
+      const child = await prisma.user.create({
+        data: {
+          username: 'qa-student-' + randomUUID(),
+          passwordHash,
+          role: 'STUDENT',
+        },
+      })
+      const org = await prisma.organization.create({
+        data: {
+          id: randomUUID(),
+          name: '超窄视口组织标题与控件重排验收组织',
+          createdByUserId: manager.id,
+        },
+      })
+      const context = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+      })
+      const page = await context.newPage()
+      page.setDefaultTimeout(15000)
+      try {
+        await login(context, manager.username)
+        await page.goto(origin + '/organizations/' + org.id)
+        await page
+          .getByRole('heading', { name: org.name, exact: true })
+          .waitFor()
+        for (const width of [360, 390, 640, 720, 1440, 250]) {
+          await page.setViewportSize({ width, height: 844 })
+          const dimensions = await page.evaluate(() => ({
+            width: innerWidth,
+            scrollWidth: document.documentElement.scrollWidth,
+            overflow: [...document.querySelectorAll('body *')]
+              .filter((e) => e.getBoundingClientRect().right > innerWidth + 1)
+              .slice(0, 10)
+              .map((e) => ({
+                tag: e.tagName,
+                class: e.className,
+                text: e.textContent?.slice(0, 50),
+              })),
+          }))
+          console.info('DOTQA_REFLOW', JSON.stringify(dimensions))
+          await page.screenshot({
+            path: path.join(evidence, `additional-org-${width}.png`),
+            fullPage: true,
+          })
+          expect(dimensions.scrollWidth).toBeLessThanOrEqual(width)
+        }
+        await page.setViewportSize({ width: 1280, height: 800 })
+        await page.getByLabel('搜索组织成员').fill('合成旧账号输入')
+        await login(context, child.username)
+        await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+        await page.getByText('无法进入组织空间', { exact: true }).waitFor()
+        expect(await page.getByLabel('搜索组织成员').count()).toBe(0)
+        await page.screenshot({
+          path: path.join(evidence, 'additional-session-focus.png'),
+          fullPage: true,
+        })
+        await login(context, manager.username)
+        await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+        await page.getByLabel('搜索组织成员').fill('另一标签登录前的旧表单')
+        const second = await context.newPage()
+        await second.goto(origin + '/student/login')
+        await second.getByLabel('用户名', { exact: true }).fill(child.username)
+        await second.getByLabel('密码', { exact: true }).fill(password)
+        await second.getByRole('button', { name: '登录', exact: true }).click()
+        await second.waitForURL((u) => u.pathname === '/student')
+        // No manual refresh or focus event: BroadcastChannel/storage invalidates the old tab.
+        await page.getByText('无法进入组织空间', { exact: true }).waitFor()
+        expect(await page.getByLabel('搜索组织成员').count()).toBe(0)
+        await page.screenshot({
+          path: path.join(evidence, 'additional-session-changed.png'),
+          fullPage: true,
+        })
+      } finally {
+        await context.close()
+      }
+    }, 90000)
     it('B1 member invitation lets a previously unaffiliated student enter only the selected organization', async () => {
       const manager = await prisma.user.create({
           data: {
@@ -303,7 +447,7 @@ suite(
           (u) => u.pathname === '/organizations/' + org.id,
         )
         await student
-          .getByRole('heading',{name:'B1 浏览器验收组织',exact:true})
+          .getByRole('heading', { name: 'B1 浏览器验收组织', exact: true })
           .waitFor()
         await student.screenshot({
           path: path.join(evidence, 'b1-member-390.png'),

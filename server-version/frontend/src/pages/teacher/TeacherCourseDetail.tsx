@@ -202,7 +202,7 @@ const TeacherCourseDetail: React.FC = () => {
             <ProductStatus
               kind="info"
               title="暂无作业"
-              actions={<ProductButton variant="primary" onClick={() => navigate('/assignments')}>去创建作业</ProductButton>}
+              actions={<ProductButton variant="primary" onClick={() => navigate(`/assignments?create=true&courseId=${encodeURIComponent(courseId || '')}`)}>去创建作业</ProductButton>}
             >
               当前课程还没有作业。
             </ProductStatus>
