@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle, ChevronLeft, ChevronRight, Save, Play, LockKeyhole } from 'lucide-react'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAttemptState, CompositeCurrentItem, CompositePublicInfo } from './types'
 import { resolveCompositeChildRouteContext } from './child-route-context'
 import { saveCognitiveRecoveryCredential } from '../cognitive/core/recovery-credential'
+import { ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
@@ -25,6 +26,7 @@ const CompositeAssessmentPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [existingReportId, setExistingReportId] = useState<string | null>(null)
   const [state, setState] = useState<CompositeAttemptState | null>(null)
   const [publicInfo, setPublicInfo] = useState<CompositePublicInfo | null>(null)
   const [recoveryToken, setRecoveryToken] = useState('')
@@ -123,7 +125,16 @@ const CompositeAssessmentPage: React.FC = () => {
         else applyState(await freezeBeforeMeasurement(response.data.attempt))
       }
     } catch (err) {
-      setError((err as { message?: string }).message || '无法开始综合测评')
+      const message = (err as { message?: string }).message || '无法开始综合测评'
+      setError(message)
+      if (!publicMode && !relationalMode && message.includes('最大次数')) {
+        try {
+          const available = await compositeApi.listAvailable()
+          const assessment = available.code === 0 ? available.data?.list.find(item => item.id === params.assessmentId) : undefined
+          const completed = assessment?.latestCompletedAttempt as { id?: string } | undefined
+          if (typeof completed?.id === 'string') setExistingReportId(completed.id)
+        } catch { /* The course list remains available if report discovery fails. */ }
+      }
     } finally {
       setSubmitting(false)
       setLoading(false)
@@ -315,7 +326,14 @@ const CompositeAssessmentPage: React.FC = () => {
     )
   }
 
-  if (!state) return <div className="text-center py-12 text-gray-500">{error || '综合测评不存在或不可访问'}</div>
+  if (!state) return <ProductPage width="reading"><ProductStatus
+    kind="warning"
+    title={error?.includes('最大次数') ? '本次测评的参与次数已用尽' : '暂时无法进入测评'}
+    actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student'}>返回任务列表</Link>
+      {existingReportId && <ProductButton variant="primary" onClick={() => goReport(existingReportId)}>查看已有结果</ProductButton>}
+      {!error?.includes('最大次数') && <ProductButton onClick={() => params.attemptId ? void loadAttempt(params.attemptId) : void start()}>重新加载</ProductButton>}
+    </>}
+  >{error || '综合测评不存在或不可访问'}{error?.includes('最大次数') && !existingReportId && <p>已有结果可从课程详情中查看。</p>}</ProductStatus></ProductPage>
 
   if (state.status === 'COMPLETED') {
     return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">{state.productKind === 'QUESTIONNAIRE' ? '问卷已完成' : '综合测评已完成'}</h1><button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>

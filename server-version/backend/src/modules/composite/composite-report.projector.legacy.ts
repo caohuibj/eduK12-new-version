@@ -559,6 +559,7 @@ const projectReportEnvelope = (
         kind: 'background' as const,
         label: typeof background.label === 'string' ? background.label : null,
         value: typeof background.value === 'string' ? background.value : null,
+        ...(typeof background.displayValue === 'string' ? { displayValue: background.displayValue } : {}),
       }))
     : [],
   unitReports: projectCompositeUnitReports(report.unitReports ?? [], audience, context),

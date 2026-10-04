@@ -128,12 +128,10 @@ const ClassroomQuestionEdit: React.FC = () => {
       return
     }
 
-    if (formData.type !== 'fill_blank' && formData.options) {
-      const hasEmptyOption = formData.options.some((opt) => !opt.label.trim())
-      if (hasEmptyOption) {
-        setError('选项内容不能为空')
-        return
-      }
+    const options = formData.options?.filter(option => option.label.trim()).map(option => ({ ...option, label: option.label.trim() }))
+    if (formData.type !== 'fill_blank' && (!options || options.length < 2)) {
+      setError('请至少填写两个选项')
+      return
     }
 
     try {
@@ -143,7 +141,7 @@ const ClassroomQuestionEdit: React.FC = () => {
       const questionContent = {
         type: formData.type,
         question: formData.question,
-        options: formData.type !== 'fill_blank' ? formData.options : undefined,
+        options: formData.type !== 'fill_blank' ? options : undefined,
         correctAnswer: formData.correctAnswer,
       }
 

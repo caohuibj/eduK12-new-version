@@ -73,7 +73,7 @@ const QuestionnaireResult: React.FC = () => {
             {result.backgroundValues.map((item) => (
               <div key={item.itemId} className="report-metric">
                 <div className="report-metric__label">{item.label || '表单项'}</div>
-                <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{item.value ?? '—'}</div>
+                <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{item.displayValue ?? item.value ?? '—'}</div>
               </div>
             ))}
           </div>

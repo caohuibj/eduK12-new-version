@@ -23,7 +23,7 @@ describe('Bundle unit requirement summary', () => {
     const summary = describeCompositeUnitRequirements(item)
     expect(summary.status).toBe('known')
     expect(summary.facts).toContain('可用输入：键盘、鼠标/指针、触控')
-    expect(summary.warnings.join(' ')).toMatch(/安全重挂/)
+    expect(summary.warnings.join(' ')).toMatch(/重新开始/)
   })
 
   it('keeps unknown Cognitive versions unknown', () => {
@@ -40,7 +40,7 @@ describe('Bundle unit requirement summary', () => {
     expect(describeCompositeUnitRequirements(item)).toEqual({
       status: 'unknown',
       facts: [],
-      warnings: ['当前冻结认知任务版本没有可展示的 readiness profile。'],
+      warnings: ['设备要求暂不可用，开始任务后请按页面提示检查设备。'],
     })
   })
 
@@ -67,7 +67,7 @@ describe('Bundle unit requirement summary', () => {
 
     expect(describeCompositeUnitRequirements(item)).toEqual({
       status: 'partial',
-      facts: ['Bundle 嵌入运行：支持', '当前 runtime 支持状态：支持'],
+      facts: ['问卷内参与：支持', '当前任务：支持'],
       warnings: [],
     })
   })

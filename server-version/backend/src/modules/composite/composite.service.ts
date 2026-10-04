@@ -4317,7 +4317,7 @@ export const buildCompositeReport = (attempt: any) => {
   const packageBased = Boolean(attempt.compositeAssessment.reportPackageKey)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: formMap.get(item.id)?.value ?? null }))
+      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
       continue
     }
     if (item.type === 'SCALE') {

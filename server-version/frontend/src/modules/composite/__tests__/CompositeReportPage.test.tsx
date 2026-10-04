@@ -364,3 +364,19 @@ describe('CompositeReportPage cognitive module', () => {
     expect(mockCompositeApi.snapshots).not.toHaveBeenCalled()
   })
 })
+it('shows failure-specific reassurance only when the report read fails and offers retry', async () => {
+  mockCompositeApi.report.mockRejectedValueOnce(new Error('加载报告失败')).mockResolvedValue({ code: 0, data: { name: '测试报告', backgroundValues: [], unitReports: [] } })
+  render(<MemoryRouter initialEntries={['/student/composite/attempts/a1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+  expect(await screen.findByText(/报告读取失败不会改变/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '重新加载报告' }))
+  expect(await screen.findByText('测试报告')).toBeInTheDocument()
+  expect(screen.queryByText(/报告读取失败不会改变/)).toBeNull()
+})
+
+it('renders presentation labels while the API retains raw stored choice values', async () => {
+  mockCompositeApi.report.mockResolvedValue({ code: 0, data: { name: '表单报告', backgroundValues: [{ itemId: 'color', label: '颜色', value: 'blue', displayValue: '蓝色' }, { itemId: 'many', label: '多选', value: '["red","green"]', displayValue: '红色、绿色' }], unitReports: [] } })
+  render(<MemoryRouter initialEntries={['/student/composite/attempts/a1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+  expect(await screen.findByText('蓝色')).toBeInTheDocument()
+  expect(screen.getByText('红色、绿色')).toBeInTheDocument()
+  expect(screen.queryByText('blue')).toBeNull()
+})

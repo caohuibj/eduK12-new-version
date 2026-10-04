@@ -134,7 +134,7 @@ const PublicQuestionnaireResult: React.FC = () => {
               {report.backgroundValues.map((item) => (
                 <div key={item.itemId}>
                   <dt>{item.label || '表单项'}</dt>
-                  <dd>{item.value ?? '—'}</dd>
+                  <dd>{item.displayValue ?? item.value ?? '—'}</dd>
                 </div>
               ))}
             </dl>

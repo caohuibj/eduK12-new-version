@@ -9,7 +9,7 @@ const { mockPublicApi, mockCompositeApi } = vi.hoisted(() => ({
     start: vi.fn(),
     getAttempt: vi.fn(),
   },
-  mockCompositeApi: {},
+  mockCompositeApi: { start: vi.fn(), listAvailable: vi.fn() },
 }))
 
 vi.mock('../api', () => ({
@@ -87,4 +87,15 @@ describe('CompositeAssessmentPage public entry', () => {
     await waitFor(() => expect(mockPublicApi.start).toHaveBeenCalledTimes(1))
     expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', undefined)
   })
+})
+
+it('offers the already completed report when authenticated participation attempts are exhausted', async () => {
+  window.history.pushState({}, '', '/student/composite/c1')
+  mockCompositeApi.start.mockRejectedValue(new Error('已达到综合测评最大次数'))
+  mockCompositeApi.listAvailable.mockResolvedValue({ code: 0, data: { list: [{ id: 'c1', latestCompletedAttempt: { id: 'completed-1' } }] } })
+  render(<MemoryRouter initialEntries={['/student/composite/c1']}><Routes><Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} /><Route path="/student/composite/attempts/:attemptId/report" element={<p>已有报告</p>} /></Routes></MemoryRouter>)
+  expect(await screen.findByText('本次测评的参与次数已用尽')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: '返回任务列表' })).toHaveAttribute('href', '/student')
+  await userEvent.click(screen.getByRole('button', { name: '查看已有结果' }))
+  expect(await screen.findByText('已有报告')).toBeInTheDocument()
 })

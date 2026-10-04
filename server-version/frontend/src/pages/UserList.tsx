@@ -71,6 +71,15 @@ const UserList: React.FC = () => {
     }
   }
 
+  const copyUserId = async (userId: string) => {
+    try {
+      await navigator.clipboard.writeText(userId)
+      showMessage('用户 ID 已复制')
+    } catch {
+      showMessage('复制失败，请选中用户 ID 手动复制')
+    }
+  }
+
   const filteredUsers = users.filter(user => {
     if (user.role !== activeTab) return false
     if (!searchKeyword) return true
@@ -166,6 +175,7 @@ const UserList: React.FC = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">用户名</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">姓名</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">用户 ID</th>
                   {activeTab === 'TEACHER' && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">有效期</th>}
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">状态</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">注册时间</th>
@@ -182,6 +192,7 @@ const UserList: React.FC = () => {
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.username}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.nickname || '-'}</td>
+                      <td className="px-6 py-4 text-sm"><code className="break-all">{user.id}</code><button type="button" className="ml-2 text-action underline" aria-label={`复制 ${displayName} 的用户 ID`} onClick={() => void copyUserId(user.id)}>复制 ID</button></td>
                       {activeTab === 'TEACHER' && (
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">

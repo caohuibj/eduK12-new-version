@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
+import ClassroomQRCode from './ClassroomQRCode'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
@@ -55,6 +56,7 @@ const ClassroomControl: React.FC = () => {
   const [stats, setStats] = useState<any>(null)
   const [closing, setClosing] = useState(false)
   const [activeTab, setActiveTab] = useState<string>('control')
+  const [showQRCode, setShowQRCode] = useState(false)
   const [connectionNotice, setConnectionNotice] = useState<string | null>(null)
   const [statsUnknown, setStatsUnknown] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -400,7 +402,7 @@ const ClassroomControl: React.FC = () => {
         </section>
       )}
 
-      {activeTab === 'qrcode' && (
+      {activeTab === 'qrcode' && (showQRCode ? <ClassroomQRCode embedded /> : (
         <section className="staff-panel staff-panel--padded">
           <ProductStatus
             kind="info"
@@ -408,7 +410,7 @@ const ClassroomControl: React.FC = () => {
             actions={
               <ProductButton
                 variant="primary"
-                onClick={() => window.open(`/teacher/classrooms/${classroom.id}/qrcode`, '_blank', 'width=600,height=700')}
+                onClick={() => setShowQRCode(true)}
               >
                 <QrCode className="w-4 h-4" aria-hidden="true" />
                 生成二维码
@@ -418,7 +420,7 @@ const ClassroomControl: React.FC = () => {
             生成课堂二维码后，学生可以扫码加入，也可以手动输入课堂码。
           </ProductStatus>
         </section>
-      )}
+      ))}
 
       {activeTab === 'control' && (
         <div className="classroom-control-grid">
@@ -429,15 +431,13 @@ const ClassroomControl: React.FC = () => {
                 <p>教师发起题目后，实时连接负责同步题目状态与提交统计。</p>
               </div>
               <span className={`staff-badge ${
-                classroom.status === 'ACTIVE'
+                currentQuestion && !currentQuestion.endedAt && classroom.status !== 'ENDED'
                   ? 'staff-badge--success'
                   : classroom.status === 'ENDED'
                   ? ''
                   : 'staff-badge--warning'
               }`}>
-                {classroom.status === 'PREPARING' && '准备中'}
-                {classroom.status === 'ACTIVE' && '答题进行中'}
-                {classroom.status === 'ENDED' && '课堂已结束'}
+                {classroom.status === 'ENDED' ? '课堂已结束' : currentQuestion && !currentQuestion.endedAt ? '答题进行中' : classroom.questions.some(question => question.endedAt) ? '答题已结束' : '准备中'}
               </span>
             </div>
 

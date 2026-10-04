@@ -48,7 +48,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
   return relationalAvailable ? items : items.filter(item => item.path !== '/relational/tasks')
 }
-export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null): NavigationItem[] {
+export function organizationNavigation(organizationId: string | undefined, allowedActions: readonly string[] = [], platformRole?: string | null, directoryActions: readonly string[] = []): NavigationItem[] {
   const items: NavigationItem[] = [
     { path: '/organizations', label: '组织空间', section: 'organization' },
   ]
@@ -59,7 +59,7 @@ export function organizationNavigation(organizationId: string | undefined, allow
     if (allowedActions.includes('REPORTING')) items.push({ path: `${root}/reporting`, label: '报告分析', section: 'organization' })
     if (allowedActions.includes('DELIVERY')) items.push({ path: `${root}/delivery`, label: '安全事项与导出', section: 'organization' })
   }
-  if (platformRole === 'SYSTEM_ADMIN') items.push({ path: '/organizations/new', label: '创建组织', section: 'system' })
+  if (platformRole === 'SYSTEM_ADMIN' && directoryActions.includes('CREATE_ORGANIZATION')) items.push({ path: '/organizations/new', label: '创建组织', section: 'system' })
   return items
 }
 export function activeNavigation(items: NavigationItem[], pathname: string): NavigationItem | undefined {

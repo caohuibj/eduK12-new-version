@@ -238,6 +238,7 @@ export interface FormBackgroundReport {
   kind: 'background'
   label: string | null
   value: string | null
+  displayValue?: string | null
 }
 
 export interface CollectionQuestionnaireResponse {

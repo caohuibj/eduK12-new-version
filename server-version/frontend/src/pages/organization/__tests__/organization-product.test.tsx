@@ -109,7 +109,7 @@ describe('Organization product authority boundary', () => {
     renderProductRoutes('/organizations/org-hidden')
 
     await waitFor(() => expect(screen.getByText('无法进入组织空间')).toBeInTheDocument())
-    expect(screen.getByText('组织不存在或不可访问')).toBeInTheDocument()
+    expect(screen.getByText('组织不存在，或当前账户没有访问权限。请返回组织列表选择可访问的组织。')).toBeInTheDocument()
     expect(org.selectOrganization).toHaveBeenCalledTimes(1)
     expect(org.selectOrganization).toHaveBeenCalledWith('org-hidden')
 

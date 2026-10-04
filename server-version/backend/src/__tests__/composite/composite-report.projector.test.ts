@@ -310,3 +310,9 @@ describe('PR9 composite report projector', () => {
     ]))
   })
 })
+
+it('preserves raw and labelled form values in the safe HTTP report envelope', () => {
+  const input = { id: 'a1', name: '表单报告', unitReports: [], backgroundValues: [{ itemId: 'color', type: 'FORM', kind: 'background', label: '颜色', value: 'blue', displayValue: '蓝色', internal: 'private' }] }
+  const output = projectCompositeCollectionReport(input, 'participant')
+  expect(output.backgroundValues).toEqual([{ itemId: 'color', type: 'FORM', kind: 'background', label: '颜色', value: 'blue', displayValue: '蓝色' }])
+})

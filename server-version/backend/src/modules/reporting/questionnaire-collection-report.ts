@@ -134,6 +134,8 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
     itemId: item.id,
     label: item.label,
     value: formAnswers.has(item.id) ? String(formAnswers.get(item.id)) : null,
+    formType: item.type,
+    options: item.options,
   }))
   return attachInternalScaleReports({
     questionnaireName: qa.questionnaire?.name || '问卷',

@@ -24,6 +24,7 @@ type LegacyCompositeModule = Record<string, unknown> & {
   type?: string
   label?: string | null
   value?: string | null
+  displayValue?: string | null
 }
 
 const CompositeReportPage: React.FC = () => {
@@ -186,8 +187,8 @@ const CompositeReportPage: React.FC = () => {
       <ReportShell
         title="综合测评报告"
         description="无法读取当前结果记录。"
-        status={{ kind: 'error', title: '报告暂时无法打开', description: error || '暂无报告' }}
-        actions={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
+        status={{ kind: 'error', title: '报告暂时无法打开', description: <><p>{error || '暂无报告'}</p><p>报告读取失败不会改变已经完成的提交状态。</p></> }}
+        actions={<><button type="button" onClick={() => void load()} className="hui-button hui-button--primary">重新加载报告</button><button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button></>}
       >
         {snapshotControls}
         {publicMode && (
@@ -212,7 +213,7 @@ const CompositeReportPage: React.FC = () => {
       title={report.name}
       description={report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
       facts={facts}
-      status={{ kind: 'success', title: '已提交', description: '报告读取失败不会改变已经完成的提交状态。' }}
+      status={{ kind: 'success', title: '已提交', description: '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
     >
       {snapshotControls}
@@ -222,7 +223,7 @@ const CompositeReportPage: React.FC = () => {
         <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '背景信息'}</div>
-            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.value ?? '—'}</div>
+            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? '—'}</div>
           </div>
         ))}</div>
       </ReportSection>}

@@ -54,13 +54,15 @@ const listProjection = {
   page: 1,
   pageSize: 100,
   platformRole: 'STANDARD',
+  allowedActions: [] as string[],
 }
 
 function Probe() {
-  const { active, isLoading, activeLoading, refresh, selectOrganization } = useOrganization()
+  const { active, isLoading, activeLoading, allowedActions, refresh, selectOrganization } = useOrganization()
   return (
     <>
       <output aria-label="active-organization">{active?.organization.id ?? 'none'}</output>
+      <output aria-label="directory-actions">{allowedActions.join(',')}</output>
       <output aria-label="actions">{active?.allowedActions?.join(',') ?? 'none'}</output>
       <output aria-label="loading-state">{String(isLoading)}:{String(activeLoading)}</output>
       <button onClick={() => void selectOrganization('org-1')}>select</button>
@@ -166,5 +168,26 @@ describe('OrganizationContext concurrency', () => {
     await act(async () => screen.getByRole('button', { name: 'refresh' }).click())
     await waitFor(() => expect(screen.getByLabelText('active-organization')).toHaveTextContent('none'))
   })
+
+it('clears stale active authority when discovery confirms zero accessible organizations', async () => {
+  render(<OrganizationProvider><Probe /></OrganizationProvider>)
+  await waitFor(() => expect(api.list).toHaveBeenCalledTimes(1))
+  await act(async () => screen.getByRole('button', { name: 'select' }).click())
+  expect(screen.getByLabelText('active-organization')).toHaveTextContent('org-1')
+  api.list.mockResolvedValue({ ...listProjection, list: [], total: 0 })
+  await act(async () => screen.getByRole('button', { name: 'refresh' }).click())
+  expect(screen.getByLabelText('active-organization')).toHaveTextContent('none')
+  expect(screen.getByLabelText('actions')).toHaveTextContent('none')
+})
+
+it('uses directory actions and clears them across principal changes', async () => {
+  api.list.mockResolvedValue({ ...listProjection, platformRole: 'SYSTEM_ADMIN', allowedActions: ['CREATE_ORGANIZATION'] })
+  const view = render(<OrganizationProvider><Probe /></OrganizationProvider>)
+  await waitFor(() => expect(screen.getByLabelText('directory-actions')).toHaveTextContent('CREATE_ORGANIZATION'))
+  api.list.mockResolvedValue({ ...listProjection, list: [], total: 0 })
+  auth.value = { ...auth.value, user: { ...auth.value.user, id: 'user-2' } }
+  view.rerender(<OrganizationProvider><Probe /></OrganizationProvider>)
+  expect(screen.getByLabelText('directory-actions')).toBeEmptyDOMElement()
+})
 
 })

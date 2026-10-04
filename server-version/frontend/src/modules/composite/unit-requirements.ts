@@ -25,9 +25,9 @@ export const describeCompositeUnitRequirements = (
 
   if (item.type === 'COGNITIVE') {
     const session = item.cognitiveSession
-    if (!session) return { status: 'unknown', facts: [], warnings: ['父级尚未返回冻结的认知任务会话信息。'] }
+    if (!session) return { status: 'unknown', facts: [], warnings: ['任务信息暂未加载，请按任务页面提示操作。'] }
     const profile = resolveCognitiveReadinessProfile(session.testType, session.engineVersion)
-    if (!profile) return { status: 'unknown', facts: [], warnings: ['当前冻结认知任务版本没有可展示的 readiness profile。'] }
+    if (!profile) return { status: 'unknown', facts: [], warnings: ['设备要求暂不可用，开始任务后请按页面提示检查设备。'] }
     return {
       status: 'known',
       facts: [
@@ -35,21 +35,21 @@ export const describeCompositeUnitRequirements = (
         '屏幕方向：不限',
       ],
       warnings: profile.resumeDisposition === 'restart-required'
-        ? ['任务中断后不能仅凭已保存试次证明可安全重挂；恢复时以认知任务页面提示为准。']
+        ? ['任务中断后可能需要重新开始，请按任务页面提示继续。']
         : [],
     }
   }
 
   if (item.type === 'SITUATIONAL') {
     const capabilities = item.instrument?.runtimeCapabilities
-    if (!capabilities) return { status: 'unknown', facts: [], warnings: ['父级未提供该情境任务的冻结 runtime capabilities。'] }
+    if (!capabilities) return { status: 'unknown', facts: [], warnings: ['任务信息暂未加载，请按任务页面提示操作。'] }
     const facts = [
-      `Bundle 嵌入运行：${capabilities.embedded ? '支持' : '未声明支持'}`,
-      `当前 runtime 支持状态：${capabilities.supported ? '支持' : '未支持'}`,
+      `问卷内参与：${capabilities.embedded ? '支持' : '未声明支持'}`,
+      `当前任务：${capabilities.supported ? '支持' : '未支持'}`,
     ]
     const warnings: string[] = []
-    if (!capabilities.embedded) warnings.push('当前冻结 runtime 未声明支持 Bundle 嵌入运行。')
-    if (!capabilities.supported) warnings.push('当前冻结 runtime 标记为未支持；进入单元前应由 runner 阻断。')
+    if (!capabilities.embedded) warnings.push('该任务暂不支持在问卷内参与，请按任务页面提示操作。')
+    if (!capabilities.supported) warnings.push('该任务暂不可参与，请联系老师。')
     return { status: 'partial', facts, warnings }
   }
 

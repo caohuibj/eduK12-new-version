@@ -21,7 +21,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const cognitive = useCognitiveEnabled()
   const relational = useRelationalAvailability()
-  const { organizations, total: organizationTotal, platformRole, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
+  const { organizations, total: organizationTotal, platformRole, allowedActions: directoryActions, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
   const organizationWorkspaceRoute=location.pathname.startsWith('/organizations/')
@@ -35,7 +35,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const staffMode=mode==='standard'&&(user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
-  const items=[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole):[])]
+  const items=[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
   if(user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
   const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
   const mainRef=useRef<HTMLElement>(null), toggleRef=useRef<HTMLButtonElement>(null), previousPath=useRef(location.pathname)
