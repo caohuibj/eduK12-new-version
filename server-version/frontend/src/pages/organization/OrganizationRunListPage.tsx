@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { runApi, type AssessmentRunListItem, type AssessmentRunStatus } from '../../api/runs'
@@ -11,7 +12,7 @@ const STATUS_LABELS: Record<AssessmentRunStatus, string> = {
   CANCELLED: '已取消',
 }
 
-const formatTime = (value: string | null) => value ? new Date(value).toLocaleString() : '—'
+const formatTime = (value: string | null) => value ? formatLocalTimestamp(value) : '—'
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
 
 export default function OrganizationRunListPage() {

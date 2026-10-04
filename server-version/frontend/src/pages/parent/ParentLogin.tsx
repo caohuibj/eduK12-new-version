@@ -30,11 +30,11 @@ export default function ParentLogin() {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label htmlFor="parent-username" className="block text-sm font-medium text-gray-700 mb-1">用户名</label>
-        <input id="parent-username" autoComplete="username" aria-describedby={error ? 'parent-auth-error' : undefined} className="input" value={username} onChange={(event) => setUsername(event.target.value)} required />
+        <input id="parent-username" placeholder="请输入用户名" autoComplete="username" aria-describedby={error ? 'parent-auth-error' : undefined} className="input" value={username} onChange={(event) => setUsername(event.target.value)} required />
       </div>
       <div>
         <label htmlFor="parent-password" className="block text-sm font-medium text-gray-700 mb-1">密码</label>
-        <input id="parent-password" type="password" autoComplete="current-password" aria-describedby={error ? 'parent-auth-error' : undefined} className="input" value={password} onChange={(event) => setPassword(event.target.value)} required />
+        <input id="parent-password" placeholder="请输入密码" type="password" autoComplete="current-password" aria-describedby={error ? 'parent-auth-error' : undefined} className="input" value={password} onChange={(event) => setPassword(event.target.value)} required />
       </div>
       <button type="submit" disabled={loading} className="w-full btn-primary flex items-center justify-center gap-2">
         {loading && <Loader2 className="w-5 h-5 animate-spin" />}{loading ? '登录中…' : '登录'}

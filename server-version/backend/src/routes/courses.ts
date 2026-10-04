@@ -1,5 +1,6 @@
 import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
 import { Router } from 'express'
+import { courseQuestionnaires } from '../controllers/courseQuestionnairesController'
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
 import { authenticate, requireTeacher, requireStudent } from '../middleware/auth'
@@ -64,6 +65,7 @@ router.post('/share/:shareId/clone', authenticate, courseController.cloneFromSha
 // 课程作业和打卡（学生可访问）
 router.get('/:id/assignments', authenticate, courseController.getAssignments)
 router.get('/:id/checkins', authenticate, courseController.getCheckins)
+router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionnaires)
 
 // 学生管理
 router.get('/:id/students', authenticate, requireTeacher, courseController.getStudents)

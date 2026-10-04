@@ -179,7 +179,7 @@ export const organizationApi = {
   async classificationCommand(organizationId: string, command: Record<string, string>): Promise<unknown> {
     return requireData(await apiClient.post(`${orgPath(organizationId)}/classification`, command))
   },
-  async audit(organizationId: string, page = 1): Promise<{ list: Array<{ id: string; action: string; actorUserId: string; targetType: string; targetId: string; createdAt: string }> }> {
+  async audit(organizationId: string, page = 1): Promise<{ list: Array<{ id: string; action: string; actorUserId: string; actorDisplayName?: string | null; targetType: string; targetId: string; targetDisplayName?: string | null; createdAt: string }> }> {
     return requireData(await apiClient.get(`${orgPath(organizationId)}/audit`, { params: { page, pageSize: 50 } }))
   },
   async list(page = 1, pageSize = 50): Promise<OrganizationListProjection> {

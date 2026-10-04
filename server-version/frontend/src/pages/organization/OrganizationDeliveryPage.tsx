@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
@@ -10,7 +11,7 @@ import { useOrganization } from '../../contexts/OrganizationContext'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
-const formatTime = (value?: string | null) => value ? new Date(value).toLocaleString() : '—'
+const formatTime = (value?: string | null) => value ? formatLocalTimestamp(value) : '—'
 
 export default function OrganizationDeliveryPage() {
   const { organizationId = '' } = useParams<{ organizationId: string }>()

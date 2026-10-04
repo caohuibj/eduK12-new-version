@@ -54,6 +54,7 @@ const org = vi.hoisted(() => ({
 }))
 
 vi.mock('../../../api/organizations', () => ({ organizationApi: api }))
+vi.mock('../../../api/organizationInvitations', () => ({ organizationInvitationsApi: { list: vi.fn().mockResolvedValue({ list: [], hasMore: false }) } }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => auth }))
 vi.mock('../../../contexts/OrganizationContext', () => ({
   useOrganization: () => org,

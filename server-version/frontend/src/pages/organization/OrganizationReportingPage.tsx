@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { ScaleReferenceTrajectory } from '../../modules/reporting/ScaleReferenceTrajectory'
 import {
   aggregationLabel,
@@ -45,7 +46,7 @@ const RESOURCE_FAMILIES: ReportingResourceFamily[] = ['BUNDLE', 'SCALE', 'COGNIT
 const LONGITUDINAL_KINDS: Array<Extract<ReportingAnalysisKind, 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL'>> = ['REPEATED_COHORT', 'MATCHED_LONGITUDINAL']
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
 const sourceKey = (source: Pick<ReportingSourceSummary, 'runId' | 'trackId'>) => `${source.runId}::${source.trackId}`
-const formatTime = (value: string | null) => value ? new Date(value).toLocaleString('zh-CN') : '—'
+const formatTime = (value: string | null) => value ? formatLocalTimestamp(value) : '—'
 const formatValue = (value: unknown) => typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
   ? String(value)
   : JSON.stringify(value)
