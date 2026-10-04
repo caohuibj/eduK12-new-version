@@ -81,7 +81,7 @@ describe('Organization Safety and CSV delivery', () => {
   it('renders only server-provided Safety inbox summaries and re-reads exact projection', async () => {
     renderPage()
     expect(await screen.findByRole('radio')).toBeChecked()
-    expect(screen.getByText('ACTION')).toBeInTheDocument()
+    expect(screen.getByText('处理事项')).toBeInTheDocument()
     expect(screen.getAllByText('case-1')).toHaveLength(2)
     await userEvent.click(screen.getByRole('button', { name: '查看安全事项详情' }))
     await waitFor(() => expect(api.readSafetyCase).toHaveBeenCalledWith('org-1', 'case-1'))
@@ -90,11 +90,11 @@ describe('Organization Safety and CSV delivery', () => {
 
   it('creates an immutable artifact export ticket without reconstructing CSV client-side', async () => {
     renderPage()
-    const artifactInput = await screen.findByPlaceholderText('artifact UUID')
+    const artifactInput = await screen.findByPlaceholderText('请输入报告版本编号')
     await userEvent.type(artifactInput, 'artifact-1')
     await userEvent.click(screen.getByRole('button', { name: '准备 CSV 导出' }))
     await waitFor(() => expect(api.createArtifactExport).toHaveBeenCalledWith('org-1', 'AGGREGATE', 'artifact-1'))
-    expect(await screen.findByText(/AGGREGATE · artifact-1/)).toBeInTheDocument()
+    expect(await screen.findByText(/汇总报告 · artifact-1/)).toBeInTheDocument()
   })
 
   it('creates Safety export tickets from the selected authorized inbox case', async () => {
@@ -102,7 +102,7 @@ describe('Organization Safety and CSV delivery', () => {
     await screen.findByRole('radio')
     await userEvent.click(screen.getByRole('button', { name: '准备安全事项 CSV' }))
     await waitFor(() => expect(api.createSafetyExport).toHaveBeenCalledWith('org-1', 'case-1'))
-    expect(await screen.findByText(/SAFETY · case-1/)).toBeInTheDocument()
+    expect(await screen.findByText(/安全事项 · case-1/)).toBeInTheDocument()
   })
 
   it('ignores stale Safety inbox responses after organization navigation', async () => {

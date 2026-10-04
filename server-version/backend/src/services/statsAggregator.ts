@@ -17,6 +17,7 @@ interface QuestionStats {
   questionType: string
   totalAnswers: number
   totalSessions: number
+  activeAnswerCount: number
   submissionRate: number
   stats: any
   unsupportedType?: boolean
@@ -60,7 +61,9 @@ export class StatsAggregator {
         : 'unknown'
       const totalAnswers = question.answers.length
       const totalSessions = question.classroom.sessions.length
-      const submissionRate = totalSessions > 0 ? (totalAnswers / totalSessions) * 100 : 0
+      const activeSessions = new Set(question.classroom.sessions.map(session => session.id))
+      const activeAnswerCount = question.answers.filter(answer => activeSessions.has(answer.sessionId)).length
+      const submissionRate = totalSessions > 0 ? (activeAnswerCount / totalSessions) * 100 : 0
 
       let stats: any = {}
 
@@ -89,6 +92,7 @@ export class StatsAggregator {
         questionType,
         totalAnswers,
         totalSessions,
+        activeAnswerCount,
         submissionRate,
         stats,
         unsupportedType: !SUPPORTED_QUESTION_TYPES.has(questionType),

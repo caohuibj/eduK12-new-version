@@ -34,7 +34,7 @@ describe('classroom answer log sanitization', () => {
       id: 'question-1',
       questionContent: { type: 'fill_blank' },
       answers: [
-        { id: 'answer-1', answer: '学生的秘密回答' },
+        { id: 'answer-1', sessionId: 'session-1', answer: '学生的秘密回答' },
       ],
       classroom: {
         sessions: [{ id: 'session-1', leftAt: null }],
@@ -62,7 +62,7 @@ describe('classroom answer log sanitization', () => {
     mockPrisma.classroomQuestion.findUnique.mockImplementation(async (args: any) => ({
       id: 'question-1',
       questionContent: { type: 'fill_blank' },
-      answers: [{ id: 'answer-1', answer: '当前学生的回答' }],
+      answers: [{ id: 'answer-1', sessionId: 'active-session', answer: '当前学生的回答' }],
       classroom: {
         sessions: args.include.classroom.include.sessions.where.leftAt === null
           ? [{ id: 'active-session', leftAt: null }]
@@ -87,4 +87,15 @@ describe('classroom answer log sanitization', () => {
       }),
     }))
   })
+  it('keeps departed answers in the aggregate while the live numerator uses active sessions', async () => {
+    mockPrisma.classroomQuestion.findUnique.mockResolvedValue({
+      id: 'question-1', questionContent: { type: 'fill_blank' },
+      answers: [{ sessionId: 'departed', answer: '历史答案' }, { sessionId: 'active', answer: '当前答案' }],
+      classroom: { sessions: [{ id: 'active', leftAt: null }, { id: 'unanswered', leftAt: null }] },
+    })
+    const stats = await new StatsAggregator().getQuestionStats('question-1')
+    expect(stats).toMatchObject({ totalAnswers: 2, totalSessions: 2, activeAnswerCount: 1, submissionRate: 50 })
+    expect(stats?.stats.answers).toEqual(['历史答案', '当前答案'])
+  })
+
 })

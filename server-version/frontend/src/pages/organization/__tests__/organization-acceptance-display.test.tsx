@@ -23,10 +23,13 @@ it('shows audit actor and member names while retaining the IDs in accessible tit
   mocks.classification.mockResolvedValue({ dimensions: [], labels: [], assignments: [], relationships: [], historyLimit: 100 })
   mocks.audit.mockResolvedValue({ list: [{ id: 'audit', action: 'MEMBER_INVITATION_ACCEPTED', actorUserId: 'student-uuid', actorDisplayName: '合成学生甲', targetType: 'MEMBERSHIP', targetId: 'membership-uuid', targetDisplayName: '合成学生甲', createdAt: '2026-10-04T07:18:44Z' }] })
   render(<MemoryRouter><OrganizationClassificationPanel organizationId="org" memberships={[]} /></MemoryRouter>)
-  const event = await screen.findByText(/MEMBER_INVITATION_ACCEPTED/)
+  const event = (await screen.findByText('接受成员邀请')).closest('li')!
+  expect(within(event).getByText('接受成员邀请')).toHaveAttribute('title', 'MEMBER_INVITATION_ACCEPTED')
   expect(within(event).getAllByText('合成学生甲')).toHaveLength(2)
   expect(event.querySelector('[title="student-uuid"]')).not.toBeNull()
   expect(event.querySelector('[title="membership-uuid"]')).not.toBeNull()
   expect(event.textContent).toContain('UTC')
-  expect(event.textContent).not.toContain('student-uuid')
+  const technical = event.querySelector('details')!
+  expect(technical).not.toHaveAttribute('open')
+  expect(technical.textContent).toContain('student-uuid')
 })

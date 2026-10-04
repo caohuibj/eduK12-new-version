@@ -219,7 +219,7 @@ const CompositeReportPage: React.FC = () => {
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
-      {backgroundValues.length > 0 && <ReportSection title="背景信息" eyebrow="Context" testId="composite-background-values">
+      {backgroundValues.length > 0 && <ReportSection title="背景信息" eyebrow="作答信息" testId="composite-background-values">
         <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '背景信息'}</div>
@@ -228,7 +228,7 @@ const CompositeReportPage: React.FC = () => {
         ))}</div>
       </ReportSection>}
       {unitReports.length > 1 && (
-        <ReportSection title="报告目录" eyebrow="Modules" description="每个模块继续保留自己的冻结报告语义。">
+        <ReportSection title="报告目录" eyebrow="测评内容" description="按测评内容查看本次完成时保存的结果。">
           <nav className="report-module-index" aria-label="综合报告模块目录">
             {unitReports.map((module, index) => (
               <a key={module.itemId} href={`#composite-report-unit-${index}`}>

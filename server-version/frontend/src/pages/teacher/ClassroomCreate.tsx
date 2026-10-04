@@ -124,7 +124,7 @@ const ClassroomCreate: React.FC = () => {
         </label>
 
         <ProductStatus kind="info" title="创建后">
-          系统会生成 6 位课堂码；该课程学生可以扫码或输入课堂码加入。创建后可继续添加题目并开始互动。
+          系统会生成 6 位课堂码；学生可以扫码或输入课堂码加入，无需先加入课程。创建后可继续添加题目并开始互动。
         </ProductStatus>
 
         <div className="staff-action-footer">

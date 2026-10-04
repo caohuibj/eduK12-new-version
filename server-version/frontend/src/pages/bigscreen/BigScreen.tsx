@@ -504,7 +504,9 @@ const BigScreen: React.FC = () => {
                   <span>{stats.answerCount} 人已答</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>提交率: {stats.submissionRate.toFixed(1)}%</span>
+                  <span title="当前在线学生中已提交本题的人数占比；答案分布保留全部历史提交。">
+                    在线学生提交率: {stats.totalSessions > 0 ? `${stats.submissionRate.toFixed(1)}%` : '—（暂无在线学生）'}
+                  </span>
                 </div>
               </>
             )}

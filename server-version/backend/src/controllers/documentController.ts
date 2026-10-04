@@ -1,3 +1,4 @@
+import { documentUsageCounts } from '../services/documentUsage'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
@@ -55,10 +56,14 @@ export const documentController = {
         prisma.document.count({ where })
       ])
 
-      const urls = await getSignedAssetUrls(documents.map(doc => doc.assetId))
+      const [urls, usage] = await Promise.all([
+        getSignedAssetUrls(documents.map(doc => doc.assetId)),
+        documentUsageCounts(documents.map(doc => doc.assetId)),
+      ])
       // 添加URL（优先使用COS URL）
       const documentsWithUrl = await Promise.all(documents.map(async doc => ({
         ...doc,
+        usageCount: doc.assetId ? (usage.get(doc.assetId) ?? 0) : doc.usageCount,
         url: doc.assetId ? urls.get(doc.assetId) : (doc.cosUrl || ''),
       })))
 
@@ -156,8 +161,10 @@ export const documentController = {
         return forbidden(res, '无权限查看此文档')
       }
 
+      const usage = await documentUsageCounts([document.assetId])
       return success(res, {
         ...document,
+        usageCount: document.assetId ? (usage.get(document.assetId) ?? 0) : document.usageCount,
         url: document.assetId ? await getSignedAssetUrl(document.assetId) : (document.cosUrl || ''),
       })
     } catch (err) {
@@ -201,8 +208,10 @@ export const documentController = {
         }
       })
 
+      const usage = await documentUsageCounts([updated.assetId])
       return success(res, {
         ...updated,
+        usageCount: updated.assetId ? (usage.get(updated.assetId) ?? 0) : updated.usageCount,
         url: updated.assetId ? await getSignedAssetUrl(updated.assetId) : (updated.cosUrl || ''),
       }, '文档更新成功')
     } catch (err) {

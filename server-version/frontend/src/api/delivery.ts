@@ -26,7 +26,7 @@ export interface ReportingExportTicket {
 
 const requireData = <T>(response: { code: number | string; message: string; data?: T }): T => {
   if (response.code !== 0 || response.data === undefined || response.data === null) {
-    throw new Error(response.message || 'Delivery 服务响应无效')
+    throw new Error(response.message || '数据导出服务响应无效')
   }
   return response.data
 }
@@ -62,7 +62,7 @@ export const deliveryApi = {
   async downloadExport(organizationId: string, exportId: string): Promise<{ blob: Blob; filename: string }> {
     const response = await sessionFetch(`/api${root(organizationId)}/reporting/exports/${encodeURIComponent(exportId)}`)
     if (!response.ok) {
-      let message = 'Export 不存在、已过期或当前权限已撤销'
+      let message = '导出文件不存在、已过期或当前权限已撤销'
       try {
         const body = await response.json() as { message?: string }
         if (body.message) message = body.message

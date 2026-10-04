@@ -10,6 +10,7 @@
  * - 删除课堂
  */
 
+import { classroomSubmissionStats } from '../services/classroomSubmissionStats'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
@@ -812,15 +813,8 @@ export const classroomController = {
         return notFound(res, '题目不存在')
       }
 
-      // 统计答案数量
-      const answerCount = await prisma.classroomAnswer.count({
-        where: { questionId },
-      })
-
-      // 获取会话总数
-      const totalSessions = await prisma.classroomSession.count({
-        where: { classroomId, leftAt: null },
-      })
+      const { answerCount, totalSessions, activeAnswerCount, submissionRate } =
+        await classroomSubmissionStats(classroomId, questionId)
 
       // 统计每个选项的选择人数（单选题/多选题）
       let optionStats = null
@@ -926,7 +920,8 @@ export const classroomController = {
         ),
         answerCount,
         totalSessions,
-        submissionRate: totalSessions > 0 ? (answerCount / totalSessions) * 100 : 0,
+        activeAnswerCount,
+        submissionRate,
         optionStats,
         textAnswers,
         wordCloud,

@@ -623,7 +623,7 @@ const AssignmentList: React.FC = () => {
                           <Video className="w-4 h-4 text-gray-400" />
                           <span className="text-sm truncate">{video.title}</span>
                           {video.source && (
-                            <span className="text-xs text-gray-500">({video.source})</span>
+                            <span className="text-xs text-gray-500">({({ library: '素材库', upload: '上传文件', external: '外部链接' } as Record<string, string>)[video.source || ''] || '视频附件'})</span>
                           )}
                         </div>
                         <button
