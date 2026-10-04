@@ -1,2 +1,5 @@
-// Configure the acceptance host before opening DevTools. Never infer a host from QR input.
-module.exports = { origin: 'https://eduk12.top' }
+// Configure isolated HTTPS acceptance services before importing into DevTools.
+// A develop/trial build cannot silently use the release service.
+module.exports = {
+  origins: {develop:'',trial:'',release:'https://eduk12.top'},
+}

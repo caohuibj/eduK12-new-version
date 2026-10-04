@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUTC": "2026-10-04T10:44:59.797859+00:00",
+  "scope": "server-version/miniprogram-v2",
+  "baseCommit": "158ed887",
+  "branch": "fix/qa-round2-course-organization",
+  "nodeVersion": "24.21.0",
+  "nativeTests": {
+    "total": 164,
+    "passed": 164,
+    "failed": 0,
+    "skipped": 0,
+    "addedThisReview": 26,
+    "log": "native-tests.log"
+  },
+  "actualHttp": {
+    "total": 30,
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "files": [
+      {
+        "name": "miniprogramOperationsHttp.postgres.integration.test.ts",
+        "passed": 19
+      },
+      {
+        "name": "miniprogramParentHttp.postgres.integration.test.ts",
+        "passed": 6
+      },
+      {
+        "name": "miniprogramPublicationHttp.postgres.integration.test.ts",
+        "passed": 1
+      },
+      {
+        "name": "miniprogramRuntimeHttp.postgres.integration.test.ts",
+        "passed": 4
+      }
+    ],
+    "log": "backend-http.log",
+    "report": "backend-http.json"
+  },
+  "static": {
+    "status": "passed",
+    "jsModules": 78,
+    "registeredPages": 21
+  },
+  "webInventory": {
+    "status": "passed",
+    "routes": 130,
+    "nativeParityImplied": false
+  },
+  "backendProductionTypecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0,
+    "excludesTests": true
+  },
+  "diffCheck": {
+    "status": "passed"
+  },
+  "releaseConfigGate": {
+    "status": "blocked-as-expected",
+    "exitCode": 1,
+    "blockers": [
+      "touristappid",
+      "develop origin missing",
+      "trial origin missing"
+    ],
+    "log": "release-config-gate.log"
+  },
+  "sourceFootprint": {
+    "files": 178,
+    "bytes": 268398,
+    "compiledWechatPackage": false
+  },
+  "isolation": {
+    "database": "qa_round2_test",
+    "postgresHost": "127.0.0.1:54358",
+    "postgresTimezone": "UTC",
+    "redisHost": "127.0.0.1:6398",
+    "syntheticFixturesOnly": true,
+    "productionMutation": false
+  },
+  "notVerified": [
+    "Wechat compilation/upload",
+    "real AppID and legal/business domains",
+    "Wechat console privacy declaration",
+    "iOS/Android devices",
+    "actual native/Web two-device event transport",
+    "capacity/performance",
+    "full native feature parity",
+    "GitHub CI"
+  ],
+  "logs": {
+    "native-tests.log": "179e6fbb0708d2a4e8e3d289ad7da99cbd970fc399c1eed189e9ab52399964ba",
+    "backend-http.log": "b44656aac5a10d563812ad15bc1e80739a1bb063041587d68cd898ffd6305948",
+    "backend-http.json": "04454f6349d51dc9a2baf6ad30335119f501791a595a262c3c3443849450bfbd",
+    "static.log": "f0310656ce775c7845f13ab2e985ebd5a2a52c07188464f1fcffccca0403ed09",
+    "feature-inventory.log": "e9a0acba285059b036bbb74a810cde2a8a1dfeec4ed97c30e79c5413e3a89af3",
+    "release-config-gate.log": "b0ec13d0bde4e2ba36527726f800023ba47bc65d044e09cd417398f7ad29be0d"
+  }
+}

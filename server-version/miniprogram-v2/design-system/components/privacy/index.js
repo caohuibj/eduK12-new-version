@@ -1,0 +1,13 @@
+Component({
+  data:{open:false,contractName:'小程序隐私保护指引',errorMessage:''},
+  lifetimes:{
+    attached(){this.privacy=getApp().runtime?.privacy;if(this.privacy)this.unsubscribe=this.privacy.subscribe(state=>this.setData(state))},
+    detached(){if(this.unsubscribe)this.unsubscribe();if(this.data.open&&this.privacy)this.privacy.cancel()},
+  },
+  methods:{
+    stop(){},
+    contract(){if(this.privacy)this.privacy.openContract().catch(()=>{})},
+    agree(){if(this.privacy)this.privacy.agree('hui-privacy-agree')},
+    decline(){if(this.privacy)this.privacy.cancel()},
+  },
+})

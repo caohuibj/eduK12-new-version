@@ -7,13 +7,15 @@ const { createClassroomService } = require('./domains/classrooms/service')
 const { createOrganizationService } = require('./domains/organizations/service')
 const { createOperations } = require('./domains/operations/service')
 const { createRuntime } = require('./app/bootstrap/index')
-const { origin } = require('./core/config/environment')
+const environment = require('./core/config/environment')
+const { resolveEnvironment } = require('./core/config/environment-resolver')
 const { createDomainService } = require('./domains/shared/service')
 const { createWorkspaceService } = require('./workspaces/service')
 const { createParentService } = require('./domains/parents/service')
 const { parseEntry } = require('./app/entry/index')
 App({
   onLaunch(options) {
+    try {const {origin}=resolveEnvironment(wx,environment)
     this.runtime = createRuntime(wx,origin)
     this.runtime.reports = createReportService(this.runtime.api,this.runtime.session)
     this.runtime.assessments = createAssessmentService(this.runtime.api,this.runtime.session,this.runtime.drafts,this.runtime.config)
@@ -30,12 +32,14 @@ App({
     this.pendingEntry = null
     this.captureEntry(options)
     this.ready = this.runtime.session.restore(); this.ready.catch(() => {})
+    } catch(error) {this.runtime=null;this.entryError=error.message;this.ready=Promise.reject(error);this.ready.catch(()=>{})}
   },
   captureEntry(options) {
-    try {const entry = parseEntry(options && options.query,origin); if(entry) this.pendingEntry = entry; this.entryError = null}
+    try {const entry = parseEntry(options && options.query,this.runtime.config.origin); if(entry) this.pendingEntry = entry; this.entryError = null}
     catch(error) {this.entryError = error.message}
   },
   onShow(options) {
+    if(!this.runtime)return
     this.captureEntry(options)
     if(this.hiddenAt && Date.now() - this.hiddenAt > 30000) {
       this.ready = this.runtime.session.refresh(); this.ready.catch(() => {})

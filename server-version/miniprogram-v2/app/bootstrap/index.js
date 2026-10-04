@@ -7,6 +7,8 @@ const { createApiClient } = require('../../core/api/client')
 const { createAccountService } = require('../../domains/account/service')
 const { createSession } = require('../session/index')
 const { createDraftStore } = require('../../core/drafts/index')
+const { createPrivacy } = require('../../core/privacy/index')
+const { createMedia } = require('../../core/media/index')
 function createRuntime(platform, origin) {
   const config = createConfig(origin); const storage = createStorage(platform, origin)
   const jar = createCookieJar(storage); const network = createNetwork(platform); const telemetry = createTelemetry()
@@ -15,6 +17,9 @@ function createRuntime(platform, origin) {
   const account = createAccountService(api)
   session = createSession({account, jar, telemetry, clearPrivateData:()=>storage.clearDrafts()})
   const drafts=createDraftStore(storage,session,()=>jar.epoch())
-  return {api, account, session, network, config, drafts}
+  const privacy=createPrivacy(platform),media=createMedia(platform,privacy)
+  let previousOwner=null
+  session.subscribe(state=>{const owner=state.user?.id||null;if(previousOwner&&previousOwner!==owner)privacy.cancel();previousOwner=owner})
+  return {api, account, session, network, config, drafts, privacy, media}
 }
 module.exports = { createRuntime }

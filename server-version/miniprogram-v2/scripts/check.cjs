@@ -23,12 +23,20 @@ for(const file of files(root)) {
   new vm.Script(source,{filename:file});count++
   assert.ok(!/Authorization.{0,30}Bearer|connectSocket|formatScore|calculateScore|rawScore\s*[*/]/.test(source),'legacy/scoring reference '+rel)
   for(const pattern of retired) assert.ok(!pattern.test(source),'retired mutation '+rel)
+  if(rel!=='core/media/index.js')assert.ok(!/\b(?:wx|platform)\.chooseMedia\s*\(/.test(source),'media selection outside privacy-aware helper '+rel)
   if(rel!=='core/api/client.js')assert.ok(!/\b(?:wx|platform)\.(?:request|uploadFile|downloadFile)\s*\(/.test(source),'transport outside API client '+rel)
   if(rel.startsWith('pages/'))assert.ok(!/\.(?:role|activeRole)\s*(?:===|!==)|\bapi\.(?:get|post|put|patch|delete|request)\(/.test(source),'page authorization/transport leak '+rel)
   if(!rel.startsWith('core/'))assert.ok(!/\b(?:wx|platform)\.(?:getStorage|setStorage|removeStorage)/.test(source),'storage outside core '+rel)
  }
  if(rel.startsWith('pages/')&&file.endsWith('.wxss'))assert.ok(!/(?:font-size|padding|border-radius|#[0-9a-f]{3,8})/.test(source),'page style bypasses tokens '+rel)
  if(file.endsWith('.wxml')) {
+  const config=JSON.parse(fs.readFileSync(file.slice(0,-5)+'.json','utf8'))
+  for(const [tag,component] of Object.entries(config.usingComponents||{})) {
+   const target=component.startsWith('/')?path.join(root,component.slice(1)):path.resolve(path.dirname(file),component)
+   assert.ok(target.startsWith(root+path.sep),'component escapes mini root '+component)
+   for(const suffix of ['.js','.json','.wxml','.wxss'])assert.ok(fs.existsSync(target+suffix),'missing nested component '+component+suffix)
+  }
+  for(const [,tag] of source.matchAll(/<(hui-[a-z-]+)\b/g))assert.ok(config.usingComponents?.[tag],'unregistered nested component '+tag+' in '+rel)
   assert.ok(!/wx:(?:if|elif|for)="(?!\{\{)/.test(source),'static WXML binding '+rel)
   const stack=[]
   for(const [,closing,tag,attrs] of source.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9-]*)([^>]*?)>/g)) {

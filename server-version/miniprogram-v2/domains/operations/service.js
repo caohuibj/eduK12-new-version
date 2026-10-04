@@ -1,4 +1,5 @@
 const { ApiError } = require('../../core/errors/index')
+const { timestamp,parseTimestamp,answerRows } = require('../../core/format/index')
 const DOMAINS = {
  courses:{title:'课程',capability:'canReadCourses',path:'/courses'},
  assignments:{title:'作业',capability:'canReadAssignments',path:'/assignments'},
@@ -72,7 +73,7 @@ function createOperations(api,session) {
   }
   const [entity,c]=await Promise.all([raw(domain,resourceId),context(domain,resourceId)])
   const facts=[]
-  for(const [key,name] of [['courseCode','课程码'],['code','邀请码'],['deadline','截止时间'],['endTime','截止时间'],['phone','电话'],['username','用户名'],['studentCount','学生人数']])if(entity[key]!==undefined&&entity[key]!==null)facts.push({label:name,value:String(entity[key])})
+  for(const [key,name] of [['courseCode','课程码'],['code','邀请码'],['deadline','截止时间'],['endTime','截止时间'],['phone','电话'],['username','用户名'],['studentCount','学生人数']])if(entity[key]!==undefined&&entity[key]!==null)facts.push({label:name,value:['deadline','endTime'].includes(key)?timestamp(entity[key]):String(entity[key])})
   return {title:entity.title||entity.name||entity.nickname||entity.username||entity.code||'详情',description:entity.description||'',content:entity.content||'',resourceStatus:label(entity.status),
    entity,actions:actionRows(c.allowedActions),commandKey:c.commandKey,fields:c.fields,facts,images:(entity.images||[]).filter(i=>i&&typeof i.url==='string').map(i=>Object.assign({},i,{url:api.assetUrl(i.url)})),attachments:[].concat(entity.documents||[],entity.videos||[]),
    notice:''}
@@ -116,7 +117,7 @@ function createOperations(api,session) {
   const body={}
   for(const f of fields){let value=values[f.key]===undefined?f.value:values[f.key]
    if(f.required&&(value===''||value==null||(Array.isArray(value)&&!value.length)))throw new ApiError('invalidRequest','请填写'+f.label)
-   if(f.dateTime){if(value===''||value==null){if(f.value!==''&&f.value!=null){if(f.clearWithNull){body[f.key]=null;continue}throw new ApiError('invalidRequest','当前接口不支持清除已有'+f.label+'，请保留原时间或设置新时间。原时间：'+f.value)}continue}const date=new Date(value);if(!Number.isFinite(date.getTime()))throw new ApiError('invalidRequest',f.label+'格式无效');if(editing&&f.value&&date.getTime()===new Date(f.value).getTime())continue;value=date.toISOString()}
+   if(f.dateTime){if(value===''||value==null){if(f.value!==''&&f.value!=null){if(f.clearWithNull){body[f.key]=null;continue}throw new ApiError('invalidRequest','当前接口不支持清除已有'+f.label+'，请保留原时间或设置新时间。原时间：'+f.value)}continue}const date=parseTimestamp(value,f.label);if(editing&&f.value&&date.getTime()===new Date(f.value).getTime())continue;value=date.toISOString()}
    else if(f.type==='questions'){if(!Array.isArray(value)||value.length>100)throw new ApiError('invalidRequest','作业题目数量无效');for(const q of value){if(!q.id||!q.question.trim()||!['text','single_choice','multiple_choice'].includes(q.type))throw new ApiError('invalidRequest','请填写题目并选择题型');if(q.type!=='text'){if(!Array.isArray(q.options)||q.options.length<2||new Set(q.options.map(o=>o.key)).size!==q.options.length||q.options.some(o=>!o.text.trim()||!Number.isFinite(o.points)))throw new ApiError('invalidRequest','选择题须有至少两个不同选项及有效分值')}}}
    else if(f.type==='number'){value=Number(value);if(!Number.isSafeInteger(value)||value<0)throw new ApiError('invalidRequest',f.label+'必须为非负整数')}
    if(!f.key.startsWith('answer:'))body[f.key]=value
@@ -148,11 +149,21 @@ function createOperations(api,session) {
   else if(action!=='create')throw new ApiError('invalidRequest','操作尚未支持')
   return api.request(method,path,body,action==='submit'?{idempotencyKey:form.commandKey}:undefined)
  }
- async function prepare(domain,resourceId,action){return Object.assign(await prepareForm(domain,resourceId,action),{domain,resourceId,action})}
+ async function prepare(domain,resourceId,action,sourceCourseId){
+  const form=Object.assign(await prepareForm(domain,resourceId,action),{domain,resourceId,action})
+  if(sourceCourseId&&action==='create'&&['assignments','checkins','classrooms'].includes(domain)){
+   const [course,scope]=await Promise.all([raw('courses',sourceCourseId),context('courses',sourceCourseId)])
+   const required={assignments:'createAssignment',checkins:'createCheckin',classrooms:'createClassroom'}[domain]
+   if(!scope.allowedActions.includes(required))throw new ApiError('forbidden','当前课程不能发布此内容')
+   const f=form.fields.find(f=>f.key==='courseId');f.value=sourceCourseId;f.selectionLabel=course.title||'当前课程'
+  }
+  return form
+ }
  return {list,detail,prepare,execute,context,actionRows,resourcePath,
   uploadCover(courseId,filePath){spec('courses');return api.upload('/courses/'+id(courseId)+'/cover',filePath)},
   uploadImage(domain,resourceId,action,filePath){spec(domain);if(domain==='checkins'&&action==='submit')return api.upload(resourcePath(domain,resourceId)+'/submission-image',filePath);if(['assignments','checkins'].includes(domain)&&['create','edit'].includes(action))return api.upload('/uploads/image',filePath);throw new ApiError('forbidden','此处不能上传图片')},
   publicLink(token){spec('checkins');return api.publicCheckinUrl(token)},
+  async assignmentAnswers(assignmentId,answers){const assignment=await raw('assignments',assignmentId);return answerRows(assignment.questions,answers)},
   revokeToken(tokenId){spec('checkins');return api.delete('/checkins/tokens/'+id(tokenId))},
   async questionContext(classroomId,questionId){spec('classrooms');return api.get('/mobile/classrooms/'+id(classroomId)+'/questions/'+id(questionId)+'/context')},
   async question(classroomId,questionId,action,body){spec('classrooms');const path='/classrooms/'+id(classroomId)+'/questions/'+id(questionId);if(action==='stats')return api.get(path+'/stats');if(action==='delete')return api.delete(path);if(action==='edit')return api.put(path,body);throw new ApiError('invalidRequest','题目操作无效')},
