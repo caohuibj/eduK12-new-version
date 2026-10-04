@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { useCallback, useRef, useState } from 'react'
 import { organizationInvitationsApi } from '../../api/organizationInvitations'
 import type { OrganizationPersona } from '../../api/organizations'
@@ -102,7 +103,7 @@ export default function OrganizationInvitationsPanel({
             邀请码：<code className="break-all">{invite.inviteCode}</code>
           </p>
           <p>
-            有效至 {new Date(invite.expiresAt).toLocaleString()}，只能使用一次。
+            有效至 {formatLocalTimestamp(invite.expiresAt)}，只能使用一次。
           </p>
           <p>请成员登录后进入“组织空间 → 使用邀请码加入”。</p>
           <ProductButton
@@ -142,7 +143,7 @@ export default function OrganizationInvitationsPanel({
                     : new Date(row.expiresAt) <= new Date()
                       ? '已过期'
                       : '待使用'}{' '}
-                · {new Date(row.expiresAt).toLocaleString()}
+                · 创建于 {formatLocalTimestamp(row.createdAt)} · 有效至 {formatLocalTimestamp(row.expiresAt)}
               </span>
               {row.status === 'ACTIVE' && (
                 <ProductButton

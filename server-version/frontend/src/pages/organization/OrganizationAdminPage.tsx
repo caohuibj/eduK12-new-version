@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { loadGovernancePages } from './loadGovernancePages'
 import { usePageSignal } from '../../hooks/usePageSignal'
 import OrganizationMembersPanel from './OrganizationMembersPanel'
@@ -33,7 +34,7 @@ import {
 const STAFF_ROLES: StaffClassRole[] = ['HOMEROOM', 'TEACHING']
 
 const formatTime = (value: string | null | undefined) =>
-  value ? new Date(value).toLocaleString() : '当前'
+  value ? formatLocalTimestamp(value) : '当前'
 const errorText = (value: unknown, fallback: string) =>
   value instanceof Error && value.message ? value.message : fallback
 

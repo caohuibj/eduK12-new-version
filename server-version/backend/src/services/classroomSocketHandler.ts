@@ -1,3 +1,4 @@
+import { classroomSubmissionStats } from './classroomSubmissionStats'
 import { startClassroomQuestion, endClassroomQuestion, closeClassroom, submitClassroomAnswer, joinClassroomStudent, leaveClassroomStudent, ClassroomLifecycleError } from './classroomLifecycleService'
 /**
  * 课堂 Socket.IO 事件处理器
@@ -450,6 +451,11 @@ export class ClassroomSocketHandler {
           timeLimit: true,
           questionIndex: true,
           startedAt: true,
+          // This is a private join snapshot, scoped to the server-bound session.
+          answers: {
+            where: { sessionId: session.id },
+            select: { answer: true, submittedAt: true },
+          },
         },
       })
 
@@ -466,6 +472,7 @@ export class ClassroomSocketHandler {
           questionIndex: activeQuestion.questionIndex,
           startedAt: activeQuestion.startedAt?.toISOString(),
           remainingTime: Math.max(0, remainingTime),
+          mySubmission: activeQuestion.answers[0] ?? null,
         })
       }
 
@@ -758,6 +765,7 @@ export class ClassroomSocketHandler {
       socket.emit('student:submitted', {
         questionId: question.id,
         success: true,
+        ...(startedAt ? { startedAt } : {}),
       })
       this.statsScheduler.schedule(classroomId, question.id)
     } catch (error: any) {
@@ -1004,17 +1012,8 @@ export class ClassroomSocketHandler {
       return null
     }
 
-    const [answerCount, totalSessions] = await Promise.all([
-      prisma.classroomAnswer.count({
-        where: {
-          classroomId,
-          questionId,
-        },
-      }),
-      prisma.classroomSession.count({
-        where: { classroomId, leftAt: null },
-      }),
-    ])
+    const { answerCount, totalSessions, activeAnswerCount, submissionRate } =
+      await classroomSubmissionStats(classroomId, questionId)
 
     const content = question.questionContent as any
     const supportedQuestionTypes = ['single_choice', 'multiple_choice', 'fill_blank', 'text_input']
@@ -1112,9 +1111,8 @@ export class ClassroomSocketHandler {
       ),
       answerCount,
       totalSessions,
-      submissionRate: totalSessions > 0
-        ? (answerCount / totalSessions) * 100
-        : 0,
+      activeAnswerCount,
+      submissionRate,
       optionStats,
       textAnswers,
       wordCloud,

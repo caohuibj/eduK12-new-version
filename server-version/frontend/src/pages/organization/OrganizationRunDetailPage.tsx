@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import ManagementDialog from '../../components/staff-ui/ManagementDialog'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -29,7 +30,7 @@ const selectorText = (selector: RunPopulationSelector) => {
   if (selector.kind === 'CLASS_UNITS') return `Class: ${selector.classUnitIds.join(', ')}`
   return `Label(${selector.match}): ${selector.labelIds.join(', ')}`
 }
-const formatTime = (value: string | null) => value ? new Date(value).toLocaleString() : '—'
+const formatTime = (value: string | null) => value ? formatLocalTimestamp(value) : '—'
 const errorText = (value: unknown, fallback: string) => value instanceof Error && value.message ? value.message : fallback
 
 export default function OrganizationRunDetailPage() {

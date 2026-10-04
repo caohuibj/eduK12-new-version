@@ -14,6 +14,7 @@ export interface OrganizationInvite {
   persona: OrganizationPersona | null
   status: string
   expiresAt: string
+  createdAt: string
   consumedByUserId: string | null
 }
 export const organizationInvitationsApi = {

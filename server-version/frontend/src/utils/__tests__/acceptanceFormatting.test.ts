@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dateTimeInputValue, deadlineToIso, formatLocalDateTime } from '../dateTime'
+import { dateTimeInputValue, deadlineToIso, formatLocalDateTime, formatLocalTimestamp } from '../dateTime'
 import { formatAssignmentAnswer, assignmentAnswerHeading } from '../answerLabels'
 import type { Question } from '../../components/QuestionEditor'
 describe('acceptance formatting', () => {
@@ -28,4 +28,14 @@ describe('acceptance formatting', () => {
     expect(formatAssignmentAnswer([text], '0', '合成答案')).toBe('题目1：合成答案')
   })
 
+})
+
+it('keeps Chinese full timestamps and explicit offsets across time zones and midnight', () => {
+  expect(formatLocalTimestamp('invalid')).toBe('无效日期')
+  for (const timeZone of ['UTC', 'Asia/Tokyo', 'America/New_York']) {
+    const text = formatLocalDateTime('2026-10-04T23:18:40Z', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
+    expect(text).toContain('UTC')
+    expect(text).not.toMatch(/AM|PM/)
+    expect(text).toContain(timeZone === 'Asia/Tokyo' ? '2026/10/05' : '2026/10/04')
+  }
 })

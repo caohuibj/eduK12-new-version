@@ -154,7 +154,7 @@ const teacherJourney = async (browser) => {
     await assertPublishedGroupSpec(page)
     await page.goto(`${baseUrl}${organizationPath}/delivery`, { waitUntil: 'domcontentloaded' })
     await page.getByRole('heading', { name: '安全事项与数据导出', exact: true }).waitFor()
-    await page.getByText('当前没有可见 Safety case。', { exact: true }).waitFor()
+    await page.getByText('当前没有可见安全事项。', { exact: true }).waitFor()
     console.log('[PASS] TEACHER persona legacy-STUDENT receives reporting/delivery without governance')
   } finally {
     await context.close()

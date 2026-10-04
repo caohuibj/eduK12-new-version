@@ -13,7 +13,10 @@ interface Questionnaire {
   name: string
   description: string | null
   estimatedTime: number | null
-  scaleCount: number
+  kind: string
+  unitCount: number
+  unitLabel: string
+  manageHref: string | null
 }
 
 // 带统计的作业类型
@@ -38,6 +41,7 @@ const TeacherCourseDetail: React.FC = () => {
   const [checkins, setCheckins] = useState<CheckinWithStats[]>([])
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([])
   const [loading, setLoading] = useState(true)
+  const [questionnaireError, setQuestionnaireError] = useState(false)
 
   useEffect(() => {
     if (!courseId) return
@@ -94,11 +98,17 @@ const TeacherCourseDetail: React.FC = () => {
 
   const fetchQuestionnaires = async () => {
     try {
-      const response = await apiClient.get(`/questionnaires/available?courseId=${courseId}`)
+      const response = await apiClient.get(`/courses/${courseId}/questionnaires`)
       if (response.code === 0) {
         setQuestionnaires(response.data.list)
+        setQuestionnaireError(false)
+      } else {
+        setQuestionnaires([])
+        setQuestionnaireError(true)
       }
     } catch (error) {
+      setQuestionnaires([])
+      setQuestionnaireError(true)
       console.error('获取问卷列表失败:', error)
     }
   }
@@ -175,7 +185,7 @@ const TeacherCourseDetail: React.FC = () => {
         </div>
         <div className="staff-stat">
           <dt>问卷</dt>
-          <dd>{questionnaires.length}</dd>
+          <dd>{questionnaireError ? '暂不可用' : questionnaires.length}</dd>
         </div>
       </dl>
 
@@ -191,7 +201,7 @@ const TeacherCourseDetail: React.FC = () => {
           </button>
           <button type="button" aria-pressed={activeTab === 'questionnaires'} onClick={() => setActiveTab('questionnaires')}>
             <ClipboardCheck className="w-4 h-4" aria-hidden="true" />
-            问卷 ({questionnaires.length})
+            问卷 ({questionnaireError ? '暂不可用' : questionnaires.length})
           </button>
         </div>
       </div>
@@ -282,33 +292,34 @@ const TeacherCourseDetail: React.FC = () => {
 
       {activeTab === 'questionnaires' && (
         <section aria-label="课程问卷">
-          {questionnaires.length === 0 ? (
+          {questionnaireError ? <ProductStatus kind="error" title="课程问卷加载失败" actions={<ProductButton onClick={() => void fetchQuestionnaires()}>重新加载问卷</ProductButton>}>无法确认投放数量，请重试。</ProductStatus> : questionnaires.length === 0 ? (
             <ProductStatus
               kind="info"
               title="暂无问卷"
               actions={<ProductButton variant="primary" onClick={() => navigate('/questionnaires')}>去创建问卷</ProductButton>}
             >
-              当前课程还没有可用问卷。
+              当前课程还没有已发布的投放问卷。
             </ProductStatus>
           ) : (
             <div className="staff-course-detail-list">
               {questionnaires.map((questionnaire) => (
                 <button
                   type="button"
-                  key={questionnaire.id}
+                  key={questionnaire.kind + ":" + questionnaire.id}
                   className="staff-panel staff-course-detail-item"
-                  onClick={() => navigate(`/questionnaires/${questionnaire.id}`)}
+                  disabled={!questionnaire.manageHref}
+                  onClick={() => questionnaire.manageHref && navigate(questionnaire.manageHref)}
                 >
                   <span className="staff-course-detail-item__main">
                     <span>
                       <strong className="staff-course-detail-item__title">{questionnaire.name}</strong>
                       {questionnaire.description && <span className="staff-course-detail-item__description">{questionnaire.description}</span>}
                     </span>
-                    <span className="staff-badge">{questionnaire.scaleCount} 个量表</span>
+                    <span className="staff-badge">{questionnaire.unitCount} {questionnaire.unitLabel}</span>
                   </span>
                   <span className="staff-detail-meta">
                     {questionnaire.estimatedTime && <span>预计 {questionnaire.estimatedTime} 分钟</span>}
-                    <span>查看问卷</span>
+                    <span>{questionnaire.manageHref ? "查看问卷" : "已投放 · 由问卷创建者管理"}</span>
                   </span>
                 </button>
               ))}

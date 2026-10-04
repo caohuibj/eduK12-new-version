@@ -58,3 +58,19 @@ describe('bounded multipart HTTP boundary', () => {
     await expect.poll(() => uploadAdmission.getStats().active).toBe(0)
   })
 })
+
+describe('UTF-8 multipart filenames', () => {
+  it.each(['中文验收资料.pdf', 'café.pdf', 'literal Â© 50%.pdf'])('preserves %s and the original file bytes', async name => {
+    const app = express()
+    app.post('/pdf', boundedUpload('document', 1024 * 1024, ['application/pdf'], async (req, res) => {
+      res.json({ name: req.file!.originalname, bytes: req.file!.buffer.toString('base64') })
+    }))
+    const server = app.listen(0, '127.0.0.1'); servers.push(server)
+    await new Promise<void>(resolve => server.once('listening', resolve))
+    const bytes = Buffer.from('%PDF-1.4\n% 合成验收资料\n%%EOF')
+    const form = new FormData(); form.append('document', new Blob([bytes], { type: 'application/pdf' }), name)
+    const response = await fetch(`http://127.0.0.1:${(server.address() as {port:number}).port}/pdf`, { method: 'POST', body: form })
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({ name, bytes: bytes.toString('base64') })
+  })
+})

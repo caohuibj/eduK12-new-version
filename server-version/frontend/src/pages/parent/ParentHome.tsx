@@ -5,7 +5,7 @@ import { useRelationalAvailability } from '../../contexts/RelationalAvailability
 
 export default function ParentHome() {
   const { status, retry } = useRelationalAvailability()
-  return <ProductPage width="reading">
+  return <ProductPage width="management" className="space-y-6">
     <PageHeader title="家长首页" description="查看孩子概况和获准报告，或完成分配给您本人的测评。" />
     <ParentFeature><div className="mb-6 flex flex-wrap gap-3"><Link className="hui-button hui-button--primary" to="/parent/children">我的孩子</Link><Link className="hui-button hui-button--secondary" to="/parent/links">关联孩子</Link></div></ParentFeature>
     <Link className="hui-button hui-button--secondary" to="/my-assessments">查看我的测评</Link>

@@ -6,6 +6,7 @@ import apiClient from '../../api/client'
 import type { Assignment, Submission, MediaItem, DocumentItem } from '../../types'
 import { VideoList, ImageList } from '../../components/MediaRenderer'
 import PdfViewer from '../../components/PdfViewer'
+import { assignmentChoiceValues, formatAssignmentAnswer, readAssignmentAnswer } from '../../utils/answerLabels'
 import { sanitizeHtml } from '../../utils/sanitize'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import {
@@ -26,6 +27,7 @@ const AssignmentSubmit: React.FC = () => {
   const [textAnswers, setTextAnswers] = useState<Record<number, string>>({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState('')
   const [playingVideo, setPlayingVideo] = useState<MediaItem | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
@@ -63,15 +65,15 @@ const AssignmentSubmit: React.FC = () => {
           
           if (assignmentRes.data?.questions) {
             assignmentRes.data.questions.forEach((q: any, idx: number) => {
-              const answer = answers[idx.toString()]
+              const answer = readAssignmentAnswer(answers, q, idx)
               if (!answer) return
               
               if (q.type === 'single_choice') {
-                optionsArray[idx] = answer
+                optionsArray[idx] = String(answer)
               } else if (q.type === 'multiple_choice') {
-                multiOptions[idx] = answer.split(',')
+                multiOptions[idx] = assignmentChoiceValues(answer)
               } else if (q.type === 'text') {
-                textAns[idx] = answer
+                textAns[idx] = String(answer)
               }
             })
           }
@@ -109,6 +111,14 @@ const AssignmentSubmit: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!assignment || submitInFlightRef.current) return
+
+    setFormError('')
+    const questions = assignment.questions ?? []
+    const missing = questions.findIndex((question, index) =>
+      question.type === 'text' ? !textAnswers[index]?.trim() :
+      question.type === 'multiple_choice' ? !multipleOptions[index]?.length : !selectedOptions[index])
+    if (missing >= 0) { setFormError(`请完成题目${missing + 1}后再提交。`); return }
+    if (!questions.length && !content.trim()) { setFormError('请填写作答内容后再提交。'); return }
 
     submitInFlightRef.current = true
     setSubmitting(true)
@@ -292,9 +302,18 @@ const AssignmentSubmit: React.FC = () => {
 
         {hasSubmitted && !isEditing ? (
           <div className="space-y-4">
-            <div className="student-submit-response">
+            {assignment.questions?.map((question, index) => (
+              <div className="student-submit-response" key={question.id || index}>
+                <h4 className="font-medium text-gray-800">{index + 1}. {question.question}</h4>
+                <p className="text-sm text-gray-500">{question.type === 'text' ? '主观题答案' : question.type === 'multiple_choice' ? '多选题答案' : '单选题答案'}</p>
+                <p className="text-gray-800 whitespace-pre-wrap">{formatAssignmentAnswer(assignment.questions, String(index),
+                  readAssignmentAnswer(submission.answers, question, index))}</p>
+              </div>
+            ))}
+            {submission.content && <div className="student-submit-response">
+              <h4 className="font-medium text-gray-800">{assignment.questions?.length ? '补充说明' : '作答内容'}</h4>
               <p className="text-gray-800 whitespace-pre-wrap">{submission.content}</p>
-            </div>
+            </div>}
             {submission.comment && (
               <div className="student-submit-feedback">
                 <h4 className="text-sm font-semibold text-blue-800 mb-2">教师评语</h4>
@@ -306,7 +325,7 @@ const AssignmentSubmit: React.FC = () => {
             </p>
             {!isOverdue && (
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={() => { setFormError(''); setIsEditing(true) }}
                 className="w-full btn-secondary flex items-center justify-center space-x-2"
               >
                 <span>修改作业</span>
@@ -318,7 +337,8 @@ const AssignmentSubmit: React.FC = () => {
             <p className="text-red-500">作业已截止，无法提交</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            {formError && <p role="alert" className="text-red-600">{formError}</p>}
             {/* Quiz Options */}
             {assignment.questions && assignment.questions.length > 0 && (
               <div className="space-y-4">
@@ -380,6 +400,7 @@ const AssignmentSubmit: React.FC = () => {
                     {question.type === 'text' && (
                       <div>
                         <textarea
+                          aria-label={`题目${index + 1}：${question.question}`}
                           value={textAnswers[index] || ''}
                           onChange={(e) => handleTextAnswerChange(index, e.target.value)}
                           className="input min-h-[120px]"
@@ -394,15 +415,18 @@ const AssignmentSubmit: React.FC = () => {
 
             {/* Text Content */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                作答内容
+              <label htmlFor="assignment-note" className="block text-sm font-medium text-gray-700 mb-2">
+                {assignment.questions?.length ? '补充说明（选填）' : '作答内容'}
               </label>
+              {assignment.questions?.length ? <p id="assignment-note-help" className="text-sm text-gray-500 mb-2">题目答案已在上方填写，可在这里补充说明，无需重复作答。</p> : null}
               <textarea
+                id="assignment-note"
+                aria-describedby={assignment.questions?.length ? 'assignment-note-help' : undefined}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="input min-h-[200px]"
-                placeholder="请输入你的答案..."
-                required
+                placeholder={assignment.questions?.length ? '可填写补充说明' : '请输入作答内容'}
+                required={!assignment.questions?.length}
               />
             </div>
 
@@ -425,6 +449,7 @@ const AssignmentSubmit: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setIsEditing(false)
+                  setFormError('')
                   if (submission) {
                     setContent(submission.content || '')
                     if (submission.answers && typeof submission.answers === 'object' && assignment) {
@@ -434,15 +459,15 @@ const AssignmentSubmit: React.FC = () => {
                       const textAns: Record<number, string> = {}
                       
                       assignment.questions?.forEach((q: any, idx: number) => {
-                        const answer = answers[idx.toString()]
+                        const answer = readAssignmentAnswer(answers, q, idx)
                         if (!answer) return
                         
                         if (q.type === 'single_choice') {
-                          optionsArray[idx] = answer
+                          optionsArray[idx] = String(answer)
                         } else if (q.type === 'multiple_choice') {
-                          multiOptions[idx] = answer.split(',')
+                          multiOptions[idx] = assignmentChoiceValues(answer)
                         } else if (q.type === 'text') {
-                          textAns[idx] = answer
+                          textAns[idx] = String(answer)
                         }
                       })
                       

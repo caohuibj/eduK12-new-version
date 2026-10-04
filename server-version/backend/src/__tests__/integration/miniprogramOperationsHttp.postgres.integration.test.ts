@@ -239,4 +239,28 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   const t=await logged(teacher),state=await t.runtime.classrooms.state(classroom.id);await t.runtime.classrooms.command(classroom.id,'CLOSE',{},state)
   await expect(joinClassroomStudent({classroomId:classroom.id,studentId:student.id,isTemporary:false})).rejects.toMatchObject({statusCode:409})
  })
+
+ it('prelaunch: course shortcuts preselect only current owners and reject unrelated teachers and students',async()=>{
+  const t=await logged(teacher),o=await logged(otherTeacher),s=await logged(student)
+  for(const domain of ['assignments','checkins','classrooms']) {
+   const form=await t.runtime.operations.prepare(domain,undefined,'create',course.id)
+   expect(form.fields.find((f:any)=>f.key==='courseId')).toMatchObject({value:course.id,selectionLabel:course.title})
+   await expect(o.runtime.operations.prepare(domain,undefined,'create',course.id)).rejects.toMatchObject({kind:'forbidden'})
+  }
+  await expect(s.runtime.operations.prepare('assignments',undefined,'create',course.id)).rejects.toMatchObject({kind:'forbidden'})
+ })
+ it('prelaunch: teacher reads canonical choice labels and subjective answers through authorized HTTP only',async()=>{
+  const t=await logged(teacher),s=await logged(student),o=await logged(otherTeacher)
+  await prisma.assignment.update({where:{id:assignment.id},data:{deadline:null,questions:[
+   {id:'mini-q1',type:'single_choice',question:'合成颜色',options:[{key:'C',text:'绿色系',points:0},{key:'D',text:'其他颜色',points:0}]},
+   {id:'mini-q2',type:'text',question:'合成说明',options:[]},
+  ]}})
+  const form=await s.runtime.operations.prepare('assignments',assignment.id,'submit')
+  await s.runtime.operations.execute('assignments',assignment.id,'submit',form,{'answer:mini-q1':'C','answer:mini-q2':'合成主观答案',content:'合成正文'})
+  const submission=await prisma.submission.findUniqueOrThrow({where:{assignmentId_studentId:{assignmentId:assignment.id,studentId:student.id}}})
+  const answers=await t.runtime.operations.assignmentAnswers(assignment.id,submission.answers)
+  expect(answers[0]).toMatchObject({label:'题目 1（单选题）：合成颜色',value:'绿色系'})
+  expect(answers[1]).toMatchObject({label:'题目 2（主观题）：合成说明',value:'合成主观答案'})
+  await expect(o.runtime.operations.assignmentAnswers(assignment.id,submission.answers)).rejects.toMatchObject({kind:'forbidden'})
+ })
 })

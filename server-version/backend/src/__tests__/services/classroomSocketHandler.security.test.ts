@@ -419,4 +419,20 @@ describe('classroom socket authorization boundary', () => {
     expect(mockSocketService.broadcastToRoom).not.toHaveBeenCalled()
   })
 
+  it('sends the joining student only their server-bound submission, never as a room broadcast', async () => {
+    const handler = new ClassroomSocketHandler(); handler.initialize()
+    const socket = makeSocket({ authenticated: true, userRole: 'STUDENT', userId: 'actual-student' })
+    mockNamespace.on.mock.calls[0][1](socket)
+    mockPrisma.classroom.findUnique.mockResolvedValue({ id: 'classroom-1', code: '123456', status: 'ACTIVE' })
+    mockPrisma.classroomSession.upsert.mockResolvedValue({ id: 'bound-session', studentId: 'actual-student', leftAt: null })
+    const submittedAt = new Date(), startedAt = new Date()
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({ id: 'question-1', questionContent: { type: 'single_choice' }, questionIndex: 1, timeLimit: 600, startedAt, answers: [{ answer: 'B', submittedAt }] })
+    await getHandlers(socket).get('student:join')!({ code: '123456', studentId: 'forged-student', sessionId: 'forged-session' })
+    expect(mockPrisma.classroomQuestion.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      select: expect.objectContaining({ answers: { where: { sessionId: 'bound-session' }, select: { answer: true, submittedAt: true } } }),
+    }))
+    expect(socket.emit).toHaveBeenCalledWith('broadcast:question', expect.objectContaining({ mySubmission: { answer: 'B', submittedAt }, startedAt: startedAt.toISOString() }))
+    expect(JSON.stringify(mockSocketService.broadcastToRoom.mock.calls)).not.toContain('mySubmission')
+  })
+
 })

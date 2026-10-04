@@ -19,3 +19,9 @@ export const formatLocalDateTime = (value: string, options: Intl.DateTimeFormatO
   if (Number.isNaN(date.getTime())) return '无效日期'
   return new Intl.DateTimeFormat('zh-CN', { ...options, timeZoneName: 'shortOffset' }).format(date).replace('GMT', 'UTC')
 }
+
+/** Full local timestamp, with an explicit offset and Chinese locale. */
+export const formatLocalTimestamp = (value: string) => formatLocalDateTime(value, {
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+})

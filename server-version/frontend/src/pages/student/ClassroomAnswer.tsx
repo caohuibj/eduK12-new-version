@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import { useAuth } from '../../contexts/AuthContext'
@@ -23,6 +23,10 @@ const ClassroomAnswer: React.FC = () => {
   const [answer, setAnswer] = useState<any>(null)
   const [multiAnswers, setMultiAnswers] = useState<string[]>([]) // 多选题答案
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const questionRef = useRef<Question | null>(null)
+  const submittedRef = useRef(false)
+  const submittingRef = useRef(false)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [isFinished, setIsFinished] = useState(false) // 答题是否已结束
   const [notice, setNotice] = useState<{ kind: 'info' | 'error'; message: string } | null>(null)
@@ -35,29 +39,62 @@ const ClassroomAnswer: React.FC = () => {
     autoConnect: !authLoading && !!classroomId && !!classroomCode,
   })
 
-  // 监听 Socket 事件
+  useEffect(() => {
+    questionRef.current = null
+    submittedRef.current = false
+    submittingRef.current = false
+    setCurrentQuestion(null)
+    setAnswer(null)
+    setMultiAnswers([])
+    setSubmitted(false)
+    setSubmitting(false)
+    setCountdown(null)
+    setIsFinished(false)
+    setNotice(null)
+  }, [classroomId, classroomCode])
+
   useEffect(() => {
     if (!isConnected) {
-      return
+      submittingRef.current = false
+      setSubmitting(false)
     }
+  }, [isConnected])
 
-
+  // Register before connect/join can return a snapshot, including after auth
+  // finishes loading. The hook creates the socket in its earlier effect.
+  useEffect(() => {
     // 接收题目
-    on('broadcast:question', (data: Question & { remainingTime?: number }) => {
+    on('broadcast:question', (data: Question & { remainingTime?: number; mySubmission?: { answer: unknown } | null }) => {
+      const previous = questionRef.current
+      // A delayed join snapshot must not roll back a restarted question.
+      if (previous && Date.parse(data.startedAt) < Date.parse(previous.startedAt)) return
+      const sameRound = previous?.questionId === data.questionId && previous?.startedAt === data.startedAt
+      questionRef.current = data
       setCurrentQuestion(data)
-      setAnswer(null)
-      setMultiAnswers([])
-      setSubmitted(false)
-      setIsFinished(false) // 重置结束状态
-      setCountdown(null) // 先清除旧倒计时，避免状态残留
-      setNotice(null)
-
-      // 启动倒计时（支持剩余时间）
-      if (data.timeLimit) {
-        // 如果有剩余时间（后加入课堂），使用剩余时间；否则使用总时间
-        const initialTime = data.remainingTime !== undefined ? data.remainingTime : data.timeLimit
-        setCountdown(initialTime)
+      if (!sameRound) {
+        setAnswer(null)
+        setMultiAnswers([])
+        submittedRef.current = false
+        submittingRef.current = false
+        setSubmitted(false)
+        setSubmitting(false)
+        setNotice(null)
       }
+      // Room broadcasts contain no personal answers. Only the joining student's
+      // snapshot may restore a committed answer; it never clears an acknowledged one.
+      if (data.mySubmission) {
+        const restored = data.mySubmission.answer
+        setAnswer(restored)
+        setMultiAnswers(Array.isArray(restored) ? restored.map(String) : String(restored ?? '').split(',').filter(Boolean))
+        submittedRef.current = true
+        submittingRef.current = false
+        setSubmitted(true)
+        setSubmitting(false)
+      }
+      const remaining = data.timeLimit ? (data.remainingTime ?? Math.max(0,
+        data.timeLimit - Math.floor((Date.now() - Date.parse(data.startedAt)) / 1000))) : null
+      setCountdown(remaining)
+      setIsFinished(remaining !== null && remaining <= 0)
     })
 
     // 答题结束
@@ -68,6 +105,10 @@ const ClassroomAnswer: React.FC = () => {
 
     // 下一题
     on('broadcast:next', () => {
+      questionRef.current = null
+      submittedRef.current = false
+      submittingRef.current = false
+      setSubmitting(false)
       setCurrentQuestion(null)
       setAnswer(null)
       setMultiAnswers([])
@@ -82,12 +123,20 @@ const ClassroomAnswer: React.FC = () => {
     })
 
     // 提交成功
-    on('student:submitted', () => {
+    on('student:submitted', (data: { questionId: string; startedAt?: string; success: boolean }) => {
+      const question = questionRef.current
+      if (!question || data.questionId !== question.questionId || !data.success ||
+          (data.startedAt && data.startedAt !== question.startedAt)) return
+      submittedRef.current = true
+      submittingRef.current = false
       setSubmitted(true)
+      setSubmitting(false)
     })
 
     // 错误处理
     const handleError = (data: { message?: string }) => {
+      submittingRef.current = false
+      setSubmitting(false)
       setNotice({ kind: 'error', message: data.message || '发生错误' })
     }
     on('error', handleError)
@@ -100,7 +149,18 @@ const ClassroomAnswer: React.FC = () => {
       off('student:submitted')
       off('error', handleError)
     }
-  }, [isConnected, on, off, navigate])
+  }, [authLoading, classroomId, classroomCode, on, off, navigate])
+
+  // A missing confirmation must not leave the submit button locked indefinitely.
+  useEffect(() => {
+    if (!submitting) return
+    const timer = setTimeout(() => {
+      submittingRef.current = false
+      setSubmitting(false)
+      setNotice({ kind: 'error', message: '尚未收到提交确认，请重试或刷新。重复提交同一答案不会新增记录。' })
+    }, 15_000)
+    return () => clearTimeout(timer)
+  }, [submitting])
 
   // 倒计时
   useEffect(() => {
@@ -122,7 +182,7 @@ const ClassroomAnswer: React.FC = () => {
 
   // 提交答案
   const handleSubmit = () => {
-    if (!currentQuestion || !isConnected) {
+    if (!currentQuestion || !isConnected || submittedRef.current || submittingRef.current) {
       return
     }
 
@@ -135,6 +195,8 @@ const ClassroomAnswer: React.FC = () => {
     // 单选题
     if (currentQuestion.questionContent.type === 'single_choice') {
       if (!answer) return
+      submittingRef.current = true
+      setSubmitting(true)
       emit('student:submit', {
         questionId: currentQuestion.questionId,
         startedAt: currentQuestion.startedAt,
@@ -144,6 +206,8 @@ const ClassroomAnswer: React.FC = () => {
     // 多选题
     else if (currentQuestion.questionContent.type === 'multiple_choice') {
       if (multiAnswers.length === 0) return
+      submittingRef.current = true
+      setSubmitting(true)
       emit('student:submit', {
         questionId: currentQuestion.questionId,
         startedAt: currentQuestion.startedAt,
@@ -153,6 +217,8 @@ const ClassroomAnswer: React.FC = () => {
     // 其他题型
     else {
       if (!answer) return
+      submittingRef.current = true
+      setSubmitting(true)
       emit('student:submit', {
         questionId: currentQuestion.questionId,
         startedAt: currentQuestion.startedAt,
@@ -200,7 +266,7 @@ const ClassroomAnswer: React.FC = () => {
                 <button
                   key={optionValue}
                   onClick={() => setAnswer(optionValue)}
-                  disabled={submitted}
+                  disabled={submitted || submitting || isFinished}
                   aria-pressed={answer === optionValue}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     answer === optionValue
@@ -232,7 +298,7 @@ const ClassroomAnswer: React.FC = () => {
                 <button
                   key={optionValue}
                   onClick={() => toggleMultiAnswer(optionValue)}
-                  disabled={submitted}
+                  disabled={submitted || submitting || isFinished}
                   aria-pressed={multiAnswers.includes(optionValue)}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all classroom-answer-option ${
                     multiAnswers.includes(optionValue)
@@ -280,7 +346,7 @@ const ClassroomAnswer: React.FC = () => {
               type="text"
               value={answer || ''}
               onChange={(e) => setAnswer(e.target.value)}
-              disabled={submitted}
+              disabled={submitted || submitting || isFinished}
               placeholder="请输入答案"
               className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 classroom-answer-input"
             />
@@ -296,7 +362,7 @@ const ClassroomAnswer: React.FC = () => {
             <textarea
               value={answer || ''}
               onChange={(e) => setAnswer(e.target.value)}
-              disabled={submitted}
+              disabled={submitted || submitting || isFinished}
               placeholder="请输入答案"
               rows={5}
               className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-action focus:outline-hidden disabled:opacity-50 resize-none classroom-answer-input"
@@ -368,14 +434,14 @@ const ClassroomAnswer: React.FC = () => {
         {currentQuestion && !submitted && !isFinished && (
           <button
             onClick={handleSubmit}
-            disabled={
+            disabled={submitting || (
               currentQuestion.questionContent.type === 'multiple_choice'
                 ? multiAnswers.length === 0
-                : !answer
+                : !answer)
             }
             className="w-full mt-6 px-4 py-4 bg-action text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed classroom-answer-submit"
           >
-            提交答案
+            {submitting ? '提交中…' : '提交答案'}
           </button>
         )}
 

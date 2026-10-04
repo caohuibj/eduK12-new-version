@@ -80,13 +80,15 @@ function createStorage(platform, origin) {
       const operation = queue.catch(() => {}).then(async () => {
         if (value === null) {
           try { return await call('removeStorage', {key: prefix + 'session'}) }
-          catch (_) {
+          catch (error) {
+            if (notFound(error)) return
             if (platform.removeStorageSync) { platform.removeStorageSync(prefix + 'session'); return }
             throw new ApiError('storageUnavailable', '无法清理本地登录，请重试退出')
           }
         }
         if (!platform.canIUse || !platform.canIUse('setStorage.object.encrypt')) throw new ApiError('storageUnavailable', '当前微信版本无法安全保存登录，请升级微信')
-        return call('setStorage', {key: prefix + 'session', data: value, encrypt: true})
+        try {return await call('setStorage', {key: prefix + 'session', data: value, encrypt: true})}
+        catch (_) {throw new ApiError('storageUnavailable', '无法安全保存登录状态，请释放本机存储后重试')}
       })
       queue = operation; return operation
     },

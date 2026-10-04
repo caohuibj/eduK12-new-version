@@ -1727,7 +1727,8 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   const composite = await loadComposite(id, true, prisma)
   assertOwner(composite, userId, role)
   assertDraft(composite)
-  if (composite.items.length === 0) throw compositeBadRequest('综合测评至少需要一个模块')
+  if (composite.items.length === 0) throw compositeBadRequest(composite.productKind === 'QUESTIONNAIRE'
+    ? '问卷内容为空，请先添加表单题或测评项再发布。' : '综合测评至少需要一个模块')
   // Publish gate (Work C): fail closed when any FORM module is not bound to a
   // section. The write-time invariant guarantees every FORM item is sectioned
   // on create/copy/import, so a published composite must never carry an orphan

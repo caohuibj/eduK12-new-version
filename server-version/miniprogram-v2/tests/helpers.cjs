@@ -12,6 +12,8 @@ function platform(handler) {
  setStorage(options){assert.equal(options.encrypt,true);stored.set(options.key,structuredClone(options.data));queueMicrotask(()=>options.success({}))},
  getStorage(options){assert.equal(options.encrypt,true);queueMicrotask(()=>stored.has(options.key)?options.success({data:structuredClone(stored.get(options.key))}):options.fail({errMsg:'getStorage:fail data not found'}))},
  removeStorage(options){stored.delete(options.key);queueMicrotask(()=>options.success({}))},
+ getAccountInfoSync(){return {miniProgram:{envVersion:"develop",appId:"wx0123456789abcdef"}}},
+ getPrivacySetting(options){options.success({needAuthorization:false,privacyContractName:"合成测试隐私指引"})},requirePrivacyAuthorize(options){options.success({})},onNeedPrivacyAuthorization(listener){p.privacyListener=listener},
  getNetworkType(options){options.success({networkType:'wifi'})},onNetworkStatusChange(listener){p.networkChange=listener},
  reLaunch(value){navigation.push(value.url)},navigateTo(value){navigation.push(value.url)},stopPullDownRefresh(){},showToast(){},scanCode(){},
  }

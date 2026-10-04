@@ -1,5 +1,8 @@
 # Huisurvey 小程序 v2 实施状态
 
+最新复核：2026-10-04，基于本地 `158ed887`。本轮上线前修复及 164 项原生 / 30 项实际 HTTP 验证见 [prelaunch-review-20261004.md](./prelaunch-review-20261004.md)，真实 AppID、隔离地址、微信编译/真机/审核发布步骤见 [release-runbook.md](./release-runbook.md)。本轮没有推送或部署；完整原生业务对等与设备验收仍未完成。以下 2026-10-02 记录保留历史基线，分支、路由计数、功能开关默认值及批准状态不代表当前生产状态。
+
+
 更新：2026-10-02（日本时间）。Web 基线 `main@1ff0e8ef`，PR1 `b2ee1682`，PR2 `ef5b2747`；当前本地分支 `codex/miniprogram-v2-runtime`。新端位于 `server-version/miniprogram-v2`。按用户追加授权，将三个阶段及审查修订作为单一 GitHub PR 推送并触发完整 CI；未合并、部署或操作生产数据库。此前各阶段验收记录保留当时仅本地开发的事实。
 
 ## 当前结论

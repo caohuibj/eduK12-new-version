@@ -25,7 +25,7 @@ function createApiClient({platform, config, jar, network, telemetry, onExpired =
         success: resolve, fail: () => reject(new ApiError('network', '连接失败，请重试', {retryable: true}))})
     })
     if (scope === 'session' && expectedEpoch !== jar.epoch()) throw new ApiError('sessionChanged', '登录状态已变化，请重试')
-    if (scope === 'session') await jar.absorb(response, expectedEpoch)
+    if (scope === 'session') {await jar.absorb(response, expectedEpoch);if(expectedEpoch!==jar.epoch())throw new ApiError('sessionChanged','登录状态已变化，请重试')}
     telemetry.record({kind: 'request', status: response.statusCode, durationMs: Date.now() - started})
     if (response.statusCode < 200 || response.statusCode >= 300 || !response.data || response.data.code !== 0) {
       const error = fromResponse(response)
@@ -66,11 +66,11 @@ function createApiClient({platform, config, jar, network, telemetry, onExpired =
     if(!/^\/(?:uploads\/image|courses\/[A-Za-z0-9_-]{1,128}\/cover|checkins\/[A-Za-z0-9_-]{1,128}\/submission-image|checkins\/public\/[A-Za-z0-9_-]{16,512}\/upload)$/.test(path)||typeof filePath!=='string'||!filePath||filePath.length>2048)throw new ApiError('invalidRequest','上传入口无效')
     const scope=path.startsWith('/checkins/public/')?'public':'session',epoch=jar.epoch()
     if(!network.isOnline())throw new ApiError('offline','网络不可用')
-    if(scope==='session')await ensureCsrf(epoch)
+    if(scope==='session'){await ensureCsrf(epoch);if(epoch!==jar.epoch())throw new ApiError('sessionChanged','登录状态已变化')}
     const header=headers(scope,'POST',path,options)
     const result=await new Promise((resolve,reject)=>platform.uploadFile({url:config.apiBase+path,filePath,name:path.endsWith('/cover')?'cover':scope==='public'?'file':'image',formData:options.formData||{},header,timeout:60000,success:resolve,fail:()=>reject(new ApiError('network','图片上传结果未知，请刷新确认'))}))
     if(scope==='session'&&epoch!==jar.epoch())throw new ApiError('sessionChanged','登录状态已变化')
-    if(scope==='session')await jar.absorb(result,epoch)
+    if(scope==='session'){await jar.absorb(result,epoch);if(epoch!==jar.epoch())throw new ApiError('sessionChanged','登录状态已变化')}
     try{result.data=JSON.parse(result.data)}catch(_){throw new ApiError('invalidResponse','上传响应无效')}
     if(result.statusCode<200||result.statusCode>=300||!result.data||result.data.code!==0){const e=fromResponse(result);if(e.status===401&&scope==='session')await onExpired(epoch);throw e}
     const asset=result.data.data;if(path.endsWith('/cover')&&asset&&typeof asset.coverUrl==='string')return asset;
@@ -78,7 +78,7 @@ function createApiClient({platform, config, jar, network, telemetry, onExpired =
   }
   function assetPath(url){const raw=typeof url==='string'&&url.startsWith(config.apiBase+'/')?url.slice(config.apiBase.length):url;if(typeof raw!=='string')throw new ApiError('invalidRequest','资源地址无效');const path=raw.startsWith('/api/')?raw.slice(4):raw;validate(path);if(!/^\/(?:public\/)?assets\/[A-Za-z0-9_-]{1,128}\/content\?/.test(path))throw new ApiError('invalidRequest','资源地址无效');return path}
   async function downloadAsset(url,options={}){
-    const path=assetPath(url),scope=path.startsWith('/public/')?'public':'session',epoch=jar.epoch();if(!network.isOnline())throw new ApiError('offline','网络不可用');const result=await new Promise((resolve,reject)=>platform.downloadFile({url:config.apiBase+path,header:headers(scope,'GET',path,options),timeout:60000,success:resolve,fail:()=>reject(new ApiError('network','资源下载失败，请重试'))}));if(scope==='session'&&epoch!==jar.epoch()){discardFile(result.tempFilePath);throw new ApiError('sessionChanged','登录状态已变化')}if(result.statusCode!==200||!result.tempFilePath){discardFile(result.tempFilePath);throw new ApiError('unavailable','资源链接已失效，请刷新获取')}return result.tempFilePath
+    const path=assetPath(url),scope=path.startsWith('/public/')?'public':'session',epoch=jar.epoch();if(!network.isOnline())throw new ApiError('offline','网络不可用');const result=await new Promise((resolve,reject)=>platform.downloadFile({url:config.apiBase+path,header:headers(scope,'GET',path,options),timeout:60000,success:resolve,fail:()=>reject(new ApiError('network','资源下载失败，请重试'))}));if(scope==='session'&&epoch!==jar.epoch()){discardFile(result.tempFilePath);throw new ApiError('sessionChanged','登录状态已变化')}if(result.statusCode!==200||!result.tempFilePath){discardFile(result.tempFilePath);if(result.statusCode===401&&scope==='session'){try{await request('GET','/auth/me',undefined,{retry:false})}catch(error){if(error.status===401||error.kind==='sessionChanged')throw error}if(epoch!==jar.epoch())throw new ApiError('sessionChanged','登录状态已变化')}if(result.statusCode===429)throw fromResponse(result);throw new ApiError('unavailable','资源链接已失效，请刷新获取',{status:result.statusCode})}return result.tempFilePath
   }
   function discardFile(path){if(typeof path!=='string'||!path||!platform.getFileSystemManager)return;try{platform.getFileSystemManager().unlink({filePath:path,fail:()=>{}})}catch(_){}}
   return {publicCheckinUrl(token){if(typeof token!=='string'||!/^ck_[a-z0-9]{16}$/.test(token))throw new ApiError('invalidRequest','打卡链接无效');return config.apiBase.replace(/\/api$/,'')+'/public/checkin/'+token},request,upload,downloadAsset,discardFile,assetUrl:url=>config.apiBase+assetPath(url), get: (path, options) => request('GET', path, undefined, options), post: (path,data,options) => request('POST',path,data,options), put: (path,data,options) => request('PUT',path,data,options), patch: (path,data,options) => request('PATCH',path,data,options), delete: (path,options) => request('DELETE',path,undefined,options)}

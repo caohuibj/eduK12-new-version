@@ -116,9 +116,16 @@ export const organizationAdminController = {
     try {
       const { page, pageSize, offset } = parsePage(req)
       const list = await prisma.$queryRaw`
-        SELECT "id", "action", "actor_user_id" AS "actorUserId", "target_type" AS "targetType", "target_id" AS "targetId", "created_at" AS "createdAt"
-        FROM "organization_governance_audits" WHERE "organization_id" = ${req.params.organizationId}
-        ORDER BY "created_at" DESC, "id" DESC LIMIT ${pageSize} OFFSET ${offset}
+        SELECT a.id, a.action, a.actor_user_id AS "actorUserId", a.target_type AS "targetType",
+               a.target_id AS "targetId", a.created_at AS "createdAt",
+               COALESCE(NULLIF(actor.nickname, ''), actor.username) AS "actorDisplayName",
+               COALESCE(NULLIF(subject.nickname, ''), subject.username) AS "targetDisplayName"
+        FROM organization_governance_audits a
+        LEFT JOIN users actor ON actor.id = a.actor_user_id
+        LEFT JOIN organization_memberships m ON a.target_type = 'MEMBERSHIP' AND m.id = a.target_id AND m.organization_id = a.organization_id
+        LEFT JOIN users subject ON subject.id = m.user_id
+        WHERE a.organization_id = ${req.params.organizationId}
+        ORDER BY a.created_at DESC, a.id DESC LIMIT ${pageSize} OFFSET ${offset}
       `
       return success(res, { list, page, pageSize })
     } catch (err) { return sendDomainError(res, err) }

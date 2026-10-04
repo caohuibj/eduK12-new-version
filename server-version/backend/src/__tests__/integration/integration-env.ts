@@ -14,3 +14,15 @@ export const integrationDatabaseUrl = (...names: string[]): string | undefined =
   }
   return value
 }
+
+/** Destructive release fixtures must select the same disposable loopback DB. */
+export const requireIsolatedReleaseDatabase = (selectedUrl: string): void => {
+  const selected = new URL(selectedUrl)
+  const actual = new URL(process.env.DATABASE_URL ?? '')
+  const local = ['127.0.0.1', 'localhost'].includes(selected.hostname)
+  const hosted = process.env.CI === 'true' && selected.pathname === '/ptool'
+  const release = process.env.RELEASE_VERIFY_LOCAL === 'true' && selected.pathname === '/eduk12_release'
+  if (!local || selected.href !== actual.href || (!/test|ci/i.test(selected.pathname) && !hosted && !release)) {
+    throw new Error('explicitly selected isolated loopback test database required')
+  }
+}

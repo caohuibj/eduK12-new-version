@@ -1,3 +1,4 @@
+import { formatLocalTimestamp } from '../../utils/dateTime'
 import { useCallback, useRef, useState } from 'react'
 import {
   organizationApi,
@@ -259,9 +260,9 @@ function AccessHistory({
                 })),
               ].map((g) => (
                 <li key={g.id}>
-                  {g.label} · {new Date(g.grantedAt).toLocaleString()} →{' '}
+                  {g.label} · {formatLocalTimestamp(g.grantedAt)} →{' '}
                   {g.revokedAt
-                    ? new Date(g.revokedAt).toLocaleString()
+                    ? formatLocalTimestamp(g.revokedAt)
                     : '当前有效'}
                 </li>
               ))}
@@ -505,9 +506,9 @@ export default function OrganizationMembersPanel({
                 <p className="break-all">用户 ID：{m.userId}</p>
                 <p>
                   {current ? '当前有效' : '历史关系'} ·{' '}
-                  {new Date(m.validFrom).toLocaleString()} →{' '}
+                  {formatLocalTimestamp(m.validFrom)} →{' '}
                   {m.validUntil
-                    ? new Date(m.validUntil).toLocaleString()
+                    ? formatLocalTimestamp(m.validUntil)
                     : '持续有效'}
                   {m.accountUsable === false ? ' · 账号尚不可用' : ''}
                 </p>

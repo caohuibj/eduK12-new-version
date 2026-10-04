@@ -83,9 +83,14 @@ export const withUploadAdmission = (handler: RequestHandler, maximumBytes = 10 *
 }
 
 export const boundedUpload = (field: string, maxBytes: number, allowedTypes: string[], handler: RequestHandler, materialize = true): RequestHandler => {
-  const parse = multer({ storage: createTemporaryUploadStorage(), limits: {
-    fileSize: maxBytes, files: 1, fields: 10, fieldSize: 16 * 1024, parts: 11,
-  } }).single(field)
+  // Browsers send plain multipart filename parameters as UTF-8. Let the
+  // parser decode them once; extended filename parameters retain their charset.
+  const options: multer.Options & { defParamCharset: string } = {
+    storage: createTemporaryUploadStorage(),
+    defParamCharset: 'utf8',
+    limits: { fileSize: maxBytes, files: 1, fields: 10, fieldSize: 16 * 1024, parts: 11 },
+  }
+  const parse = multer(options).single(field)
   return withUploadAdmission(async (req: Request, res: Response, next) => {
     await new Promise<void>((resolve, reject) => parse(req, res, error => error ? reject(error) : resolve()))
     await readTemporaryUpload(req, allowedTypes, materialize)
