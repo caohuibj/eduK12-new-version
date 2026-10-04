@@ -216,7 +216,7 @@ async function main() {
   const groupSpec = await spec(platform, 'GROUP')
   const artifact = await group(owner, all, groupSpec)
   await owner.goto(`${base}/organizations/${org}/delivery`)
-  assert.equal(await owner.getByLabel('报告类型', { exact: true }).inputValue(), 'AGGREGATE')
+  assert.equal(await owner.getByRole('combobox', { name: '报告类型', exact: true }).inputValue(), 'AGGREGATE')
   await owner.getByLabel('报告版本编号', { exact: true }).fill(artifact.artifactId)
   const ticketResponse = owner.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith('/reporting/exports'))
   await owner.getByRole('button', { name: '准备 CSV 导出', exact: true }).click()
