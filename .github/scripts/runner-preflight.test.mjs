@@ -9,7 +9,8 @@ test('heavy capacity guard rejects unsafe OS and resources without applying it t
   for(const override of [{os:'darwin'},{os:'win32'},{freeBytes:3*GiB},{memoryBytes:4*GiB}])
     assert.ok(resourceErrors({...ready,...override}).length);
   assert.deepEqual(resourceErrors({...ready,environment:'github-hosted',freeBytes:3*GiB}),[]);
-  assert.deepEqual(resourceErrors({...ready,os:'darwin',light:true,freeBytes:3*GiB,memoryBytes:3*GiB}),[]);
+  assert.deepEqual(resourceErrors({...ready,os:'darwin',light:true,freeBytes:6*GiB,memoryBytes:3*GiB}),[]);
+  assert.ok(resourceErrors({...ready,os:'darwin',light:true,freeBytes:3*GiB}).length);
 });
 test('occupied application port fails instead of trusting a previous process',async()=>{
   const server=createServer();

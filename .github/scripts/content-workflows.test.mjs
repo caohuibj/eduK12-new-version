@@ -102,14 +102,16 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('hybrid CI uses one Linux heavy label, keeps all platform gates and supports explicit hosted override', () => {
+test('balanced CI distributes compute while retaining one isolated Linux heavy runner and all gates', () => {
   const ci=source('ci');
   assert.match(job(ci,'scope'),/runs-on: ubuntu-24\.04/);
   assert.match(job(ci,'merge-gate'),/runs-on: ubuntu-24\.04/);
-  for(const name of ['backend','backend-regression','frontend','docker','browser','backend-browser-build'])
+  for(const name of ['backend','backend-regression','browser','backend-browser-build'])
     assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.heavy_runner\)/,name);
   for(const name of ['visual','pr-light-frontend','miniprogram'])
     assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.light_runner\)/,name);
+  assert.match(job(ci,'frontend'),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/);
+  assert.match(job(ci,'docker'),/fromJSON\(needs\.scope\.outputs\.docker_runner\)/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
   const classifier=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
   assert.match(classifier,/eduk12-win-ci/); assert.match(classifier,/CI_MAC_LIGHT_ENABLED/);

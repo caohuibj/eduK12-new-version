@@ -51,8 +51,8 @@ on:
     inputs:
       runner_profile:
         type: choice
-        options: [hybrid, hosted]
-        default: hybrid
+        options: [balanced, hybrid, hosted]
+        default: balanced
         description: 'Explicit runner profile; hosted consumes the remaining allowance'
 
 permissions:
@@ -75,6 +75,8 @@ jobs:
       heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
       light_runner: ${{ steps.scope.outputs.light_runner }}
       codeql_runner: ${{ steps.scope.outputs.codeql_runner }}
+      frontend_runner: ${{ steps.scope.outputs.frontend_runner }}
+      docker_runner: ${{ steps.scope.outputs.docker_runner }}
       media2: ${{ steps.scope.outputs.media2 }}
       media7: ${{ steps.scope.outputs.media7 }}
       situational_video: ${{ steps.scope.outputs.situational_video }}
@@ -97,10 +99,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
+      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs
       - id: scope
         env:
-          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
           CI_MAC_LIGHT_ENABLED: ${{ vars.CI_MAC_LIGHT_ENABLED }}
           CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           CI_EVENT: ${{ github.event_name }}
@@ -117,7 +119,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       scale: ${{ needs.scope.outputs.scale == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
@@ -154,6 +156,9 @@ jobs:
         run: npm run typecheck
       - name: production build
         run: npm run build
+      - name: bound dedicated Mac CI caches and remove job dependencies
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
 
   pr-light-backend:
     needs: scope
@@ -241,6 +246,9 @@ jobs:
         run: npm run lint
       - name: typecheck
         run: npm run typecheck
+      - name: bound dedicated Mac CI caches and remove job dependencies
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
 
   post-merge-smoke:
     needs: scope
@@ -495,7 +503,7 @@ jobs:
 
   backend-regression:
     needs: [scope, pr-light-frontend]
-    name: backend regression (GitHub-hosted, independent database)
+    name: backend regression (isolated job database)
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
     timeout-minutes: 35
@@ -603,6 +611,8 @@ jobs:
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: full functional regression
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         # Real-PG suites remain serial. The single hardware-sensitive burst is
         # covered by the isolated backend job and excluded here; every other file runs here.
         run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
@@ -688,9 +698,9 @@ jobs:
 
   frontend:
     needs: [scope, pr-light-frontend]
-    name: frontend (lint + typecheck + full tests + build)
+    name: frontend (full tests + build)
     if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    runs-on: ${{ fromJSON(needs.scope.outputs.frontend_runner) }}
     timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -1083,7 +1093,7 @@ jobs:
     # No backend/browser artifacts are consumed here; the merge gate requires all.
     needs: [scope, pr-light-frontend]
     if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    runs-on: ${{ fromJSON(needs.scope.outputs.docker_runner) }}
     timeout-minutes: 45
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
@@ -1235,6 +1245,9 @@ jobs:
         run: npm run verify
       - name: verify Web feature inventory
         run: node server-version/miniprogram-v2/scripts/feature-inventory.cjs --check
+      - name: bound dedicated Mac CI caches and remove job dependencies
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
 
   backend-browser-build:
     name: UI/content route / backend browser build
@@ -1310,7 +1323,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media2 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/media-2-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-media7:
@@ -1318,7 +1331,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media7 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/media-7-cross-runtime-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-situational-video:
@@ -1326,7 +1339,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_video == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/situational-video-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-situational-branching:
@@ -1334,7 +1347,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_branching == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/situational-branching-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-video-core:
@@ -1342,7 +1355,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.video_core == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/assessment-video-core-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-app-shell:
@@ -1350,7 +1363,7 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.app_shell == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/fe-11-app-shell-acceptance.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
       use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
   accept-visual:
@@ -1358,21 +1371,21 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.canonical_visual == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/visual-canonical-qa.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
 
   accept-perf:
     needs: [scope, backend, backend-browser-build, frontend]
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
 
   accept-ops:
     needs: [scope, backend, backend-browser-build, frontend]
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'balanced' }}
 
   merge-gate:
     name: merge gate / ready PR

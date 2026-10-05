@@ -109,8 +109,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const scenario = result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
   const acceptance = acceptanceFor(event === 'workflow_dispatch' ? [] : changedFiles(base));
-  const hosted = process.env.CI_RUNNER_PROFILE === 'hosted';
-  if (process.env.CI_RUNNER_PROFILE && !['hosted', 'hybrid'].includes(process.env.CI_RUNNER_PROFILE))
+  const profile = process.env.CI_RUNNER_PROFILE || 'balanced';
+  const hosted = profile === 'hosted';
+  if (process.env.CI_RUNNER_PROFILE && !['balanced', 'hosted', 'hybrid'].includes(profile))
     throw new Error('Unknown CI_RUNNER_PROFILE; refusing an unintended fallback');
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
     throw new Error('External PRs require a separately approved isolated workflow; no self-hosted execution');
@@ -121,7 +122,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, heavy_runner: JSON.stringify(heavy), light_runner: JSON.stringify(light),
-    codeql_runner: JSON.stringify(frontend ? heavy : ['ubuntu-24.04']) };
+    frontend_runner: JSON.stringify(profile === 'hybrid' ? heavy : ['ubuntu-24.04']),
+    docker_runner: JSON.stringify(profile === 'hybrid' ? heavy : ['ubuntu-24.04']),
+    codeql_runner: JSON.stringify(profile === 'hybrid' && frontend ? heavy : ['ubuntu-24.04']) };
   console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles',
     reason: result.content ? 'allowlisted content and optional UI changes'
       : result.presentation ? 'allowlisted presentation-only files'

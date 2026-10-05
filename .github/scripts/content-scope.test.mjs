@@ -301,3 +301,25 @@ test('explicit hosted diagnostic overrides even an enabled optional Mac runner',
   assert.deepEqual(JSON.parse(result.heavy_runner),['ubuntu-24.04']);
   assert.deepEqual(JSON.parse(result.light_runner),['ubuntu-24.04']);
 });
+
+test('balanced profile distributes Mac light checks, Windows database/browser, and hosted frontend/images/SAST',()=>{
+  const run=(profile,enabled='true')=>JSON.parse(execFileSync(process.execPath,['.github/scripts/content-scope.mjs'],{
+    cwd:new URL('../..',import.meta.url),encoding:'utf8',
+    env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:profile,CI_MAC_LIGHT_ENABLED:enabled,GITHUB_OUTPUT:''},
+  }).trim());
+  for(const profile of ['', 'balanced']) {
+    const result=run(profile);
+    assert.deepEqual(JSON.parse(result.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
+    assert.deepEqual(JSON.parse(result.light_runner),['self-hosted','macOS','eduk12-mac-ci']);
+    assert.deepEqual(JSON.parse(result.frontend_runner),['ubuntu-24.04']);
+    assert.deepEqual(JSON.parse(result.docker_runner),['ubuntu-24.04']);
+    assert.deepEqual(JSON.parse(result.codeql_runner),['ubuntu-24.04']);
+  }
+  const fallback=run('balanced','');
+  assert.deepEqual(JSON.parse(fallback.light_runner),JSON.parse(fallback.heavy_runner));
+  const saving=run('hybrid');
+  assert.deepEqual(JSON.parse(saving.docker_runner),JSON.parse(saving.heavy_runner));
+  const hosted=run('hosted');
+  for(const key of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner'])
+    assert.deepEqual(JSON.parse(hosted[key]),['ubuntu-24.04']);
+});

@@ -8,7 +8,7 @@ export function resourceErrors({ environment, os, freeBytes, memoryBytes, light 
   if (environment !== 'self-hosted') return [];
   const errors=[];
   if (!light && os !== 'linux') errors.push('Heavy jobs require a Linux runner with Docker');
-  if (freeBytes < (light ? 2 : 20) * 1024 ** 3) errors.push('Insufficient CI disk headroom');
+  if (freeBytes < (light ? (os === 'darwin' ? 5 : 2) : 20) * 1024 ** 3) errors.push('Insufficient CI disk headroom');
   if (memoryBytes < (light ? 2 : 6) * 1024 ** 3) errors.push('Insufficient CI memory capacity');
   return errors;
 }
