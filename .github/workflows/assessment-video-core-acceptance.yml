@@ -1,16 +1,25 @@
 name: Assessment Video Core Acceptance
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/assessment-video-core-acceptance.yml'
-      - 'server-version/backend/src/modules/assessment-media/**'
-      - 'server-version/backend/src/routes/assets.ts'
-      - 'server-version/backend/src/services/assetStorage.ts'
-      - 'server-version/frontend/src/modules/assessment-media/**'
-      - 'server-version/e2e/assessment-video-core-*'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: assessment-video-core-acceptance-${{ github.event.pull_request.number || github.ref }}
@@ -19,8 +28,9 @@ concurrency:
 jobs:
   video-core-browser:
     name: native video range + caption browser acceptance
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
@@ -74,6 +84,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure isolated test keys
         run: |
           for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
@@ -116,8 +128,18 @@ jobs:
           npx prisma generate
           npm run db:migrate:guarded
       - name: build backend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/backend
         run: npm run build
+      - name: restore exact-run tested backend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify exact-run backend build
+        if: inputs.use_build_artifacts
+        run: test -s backend/dist/index.js
       - name: seed assessment video core fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/assessment-video-core-fixture.ts
@@ -133,9 +155,22 @@ jobs:
           done
           cat /tmp/eduk12-assessment-video-backend.log
           exit 1
+      - name: build production frontend
+        if: ${{ !inputs.use_build_artifacts }}
+        working-directory: server-version/frontend
+        run: npm run build
+      - name: restore exact-run tested frontend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify exact-run frontend build
+        if: inputs.use_build_artifacts
+        run: test -s frontend/dist/index.html
       - name: start frontend
         run: |
-          nohup setsid npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173 > /tmp/eduk12-assessment-video-frontend.log 2>&1 &
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-assessment-video-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-assessment-video-frontend.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi

@@ -1,29 +1,26 @@
 name: MEDIA-7 Cross-runtime Acceptance
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/media-7-cross-runtime-acceptance.yml'
-      - 'server-version/backend/src/modules/assessment-media/**'
-      - 'server-version/backend/src/modules/cognitive/cognitive-video.controller.ts'
-      - 'server-version/backend/src/modules/cognitive/cognitive-video.service.ts'
-      - 'server-version/backend/src/modules/cognitive/cognitive.routes.ts'
-      - 'server-version/backend/src/modules/cognitive/cognitive.public.routes.ts'
-      - 'server-version/backend/src/modules/cognitive/v2/presentation.ts'
-      - 'server-version/backend/src/modules/cognitive/v2/session-snapshot.ts'
-      - 'server-version/backend/src/modules/cognitive/tasks/*/package.ts'
-      - 'server-version/frontend/src/modules/assessment-media/**'
-      - 'server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx'
-      - 'server-version/frontend/src/modules/cognitive/video-presentation.ts'
-      - 'server-version/frontend/src/modules/cognitive/useCognitiveVideoSources.ts'
-      - 'server-version/frontend/src/modules/cognitive/useCognitiveInstructionVideoCompletion.ts'
-      - 'server-version/frontend/src/modules/cognitive/types.ts'
-      - 'server-version/frontend/src/modules/cognitive/__tests__/*Video*'
-      - 'server-version/e2e/cognitive-video-*'
-      - 'server-version/e2e/helpers/session-auth.cjs'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
 
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: media-7-cross-runtime-acceptance-${{ github.event.pull_request.number || github.ref }}
@@ -32,13 +29,14 @@ concurrency:
 jobs:
   cognitive-video-and-cross-runtime:
     name: Cognitive VIDEO auth/public + media boundary acceptance
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_VIDEO_E2E_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       ASSET_MIGRATION_COMPLETE: 'false'
       COOKIE_SECURE: 'false'
@@ -88,6 +86,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure isolated test keys
         run: |
           for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
@@ -167,8 +167,18 @@ jobs:
           src/modules/assessment-media/__tests__/media-6.video-adapter.test.ts
           src/modules/assessment-media/__tests__/video-capability-client.test.ts
       - name: build backend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/backend
         run: npm run build
+      - name: restore exact-run tested backend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify exact-run backend build
+        if: inputs.use_build_artifacts
+        run: test -s backend/dist/index.js
       - name: seed Cognitive VIDEO frozen-session fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/cognitive-video-browser-fixture.ts
@@ -185,8 +195,18 @@ jobs:
           cat /tmp/eduk12-media-7-backend.log
           exit 1
       - name: build frontend for deterministic browser startup
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/frontend
         run: npm run build
+      - name: restore exact-run tested frontend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify exact-run frontend build
+        if: inputs.use_build_artifacts
+        run: test -s frontend/dist/index.html
       - name: start frontend
         run: |
           nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-media-7-frontend.log 2>&1 &

@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const match = require('../../server-version/backend/node_modules/picomatch');
+const scopes = JSON.parse(fs.readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
+const { matchesGlob: match } = require('node:path').posix;
 function triggered(workflow, files) {
-  const text = fs.readFileSync(new URL(`../workflows/${workflow}.yml`, import.meta.url), 'utf8');
-  const paths = [...text.split('  workflow_dispatch:')[0].matchAll(/^      - '([^']+)'$/gm)].map(row => row[1]);
+  const paths = Object.values(scopes).find(scope => scope.workflow === `${workflow}.yml`)?.paths ?? [];
   return files.some(file => paths.reduce((included, pattern) => {
     const exclude = pattern.startsWith('!');
-    return match(exclude ? pattern.slice(1) : pattern)(file) ? !exclude : included;
+    return match(file, exclude ? pattern.slice(1) : pattern) ? !exclude : included;
   }, false));
 }
 test('Cognitive declarations cannot trigger the independent video gate', () => {
@@ -69,8 +69,9 @@ test('force-full override schedules full jobs and uses a full aggregate even for
   const ci = source('ci');
   for (const name of ['backend', 'backend-regression', 'frontend', 'browser', 'docker', 'codeql', 'merge-gate'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL == 'true'/, name);
-  for (const name of ['pr-light-backend', 'pr-light-frontend', 'post-merge-smoke'])
+  for (const name of ['pr-light-backend', 'post-merge-smoke'])
     assert.match(job(ci, name), /vars.CI_FORCE_FULL != 'true'/, name);
+  assert.match(job(ci, 'pr-light-frontend'), /vars.CI_FORCE_FULL == 'true'/);
   assert.match(job(ci, 'merge-gate'), /IS_DRAFT:.*vars.CI_FORCE_FULL != 'true'/);
 });
 
@@ -101,27 +102,46 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('all CI jobs use isolated GitHub-hosted Ubuntu runners and preserve full gates', () => {
-  const directory = new URL('../workflows/', import.meta.url);
-  for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.yml'))) {
-    const text = fs.readFileSync(new URL(name, directory), 'utf8');
-    const runners = [...text.matchAll(/^    runs-on: (.+)$/gm)].map(match => match[1]);
-    assert.ok(runners.length, `${name}: no executable jobs found`);
-    for (const runner of runners) assert.equal(runner, 'ubuntu-24.04', name);
-    assert.doesNotMatch(text, /self-hosted|eduk12-(mac|win)-ci|hosted_runner/, name);
-    assert.doesNotMatch(text, /^    runs-on:\s*$/m, name);
+test('hybrid CI uses one Linux heavy label, keeps all platform gates and supports explicit hosted override', () => {
+  const ci=source('ci');
+  assert.match(job(ci,'scope'),/runs-on: ubuntu-24\.04/);
+  assert.match(job(ci,'merge-gate'),/runs-on: ubuntu-24\.04/);
+  for(const name of ['backend','backend-regression','frontend','docker','browser','backend-browser-build'])
+    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.heavy_runner\)/,name);
+  for(const name of ['visual','pr-light-frontend','miniprogram'])
+    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.light_runner\)/,name);
+  assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
+  const classifier=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
+  assert.match(classifier,/eduk12-win-ci/); assert.match(classifier,/CI_MAC_LIGHT_ENABLED/);
+  assert.match(classifier,/External PRs require/);
+  for(const {workflow} of Object.values(scopes)){
+    const text=fs.readFileSync(new URL('../workflows/'+workflow,import.meta.url),'utf8');
+    assert.match(text,/workflow_call:/,workflow); assert.doesNotMatch(text,/\n  pull_request:/,workflow);
+    assert.match(text,/runner_profile:/,workflow); assert.match(text,/eduk12-win-ci/,workflow);
+    assert.match(text,/github\.event\.pull_request\.draft == false/,workflow);
   }
-  const ci = source('ci');
-  const backend = job(ci, 'backend');
-  const regression = job(ci, 'backend-regression');
-  assert.match(regression, /--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
-  assert.match(backend, /run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
-  assert.match(job(ci, 'browser'), /needs: \[scope, backend, frontend\]/);
-  for (const name of ['codeql', 'docker']) assert.match(job(ci, name), /needs: \[scope\]/);
-  assert.match(job(ci, 'merge-gate'), /needs: \[scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram\]/);
+  const backend=job(ci,'backend'), regression=job(ci,'backend-regression');
+  assert.match(regression,/--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(backend,/run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
+  assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend\]/);
+  assert.match(job(ci,'browser'),/!cancelled\(\).*backend-browser-build\.result == 'success'/);
+  assert.match(job(ci,'frontend'),/needs: \[scope, pr-light-frontend\]/);
+  for(const name of ['codeql','docker']) assert.match(job(ci,name),/needs: \[scope, pr-light-frontend\]/);
+  assert.match(job(ci,'merge-gate'),/accept-media7/);
+  assert.match(job(ci,'merge-gate'),/accept-visual/);
+  assert.match(job(ci,'merge-gate'),/accept-ops/);
 });
-
-
+test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
+  const docker=job(source('ci'),'docker');
+  assert.match(docker,/docker compose build frontend/);
+  assert.match(docker,/docker compose build backend worker frontend/);
+  assert.match(docker,/FRONTEND_ONLY:/);
+  assert.match(docker,/scan frontend image \(high and critical\)/);
+  assert.match(docker,/frontend-nginx-static-smoke/);
+  const browser=job(source('ci'),'browser');
+  for(const check of ['storage fault','four-role','Organization cross-role','production CSP'])
+    assert.ok(browser.includes(check),check);
+});
 
 test('Phase 0 closure is manual targeted evidence and never competes with PR CI', () => {
   const text = source('perf-phase0-closure');
@@ -184,4 +204,17 @@ test('parent authority has draft unit coverage and non-skipping full integration
   for (const file of ['parentPortal', 'miniprogramParentHttp', 'miniprogramOperationsHttp']) {
     assert.ok(regression.includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
   }
+});
+
+test('reusable media/browser consumers use only exact-current-run artifacts and preserve independent databases', () => {
+  for(const name of ['media-2-acceptance','media-7-cross-runtime-acceptance','situational-video-acceptance','situational-branching-acceptance','fe-11-app-shell-acceptance']){
+    const text=source(name);
+    assert.match(text,/use_build_artifacts:/,name);
+    assert.match(text,/name: frontend-dist-\$\{\{ github\.sha \}\}/,name);
+    assert.doesNotMatch(text,/\n          (run-id|repository|github-token):/,name);
+    if(name !== 'fe-11-app-shell-acceptance') assert.match(text,/      postgres:/,name);
+  }
+  // Visual UI lab has different build flags: do not reuse the ordinary production artifact.
+  assert.match(source('visual-canonical-qa'),/VITE_UI_LAB_ENABLED: 'true'/);
+  assert.doesNotMatch(source('visual-canonical-qa'),/use_build_artifacts:/);
 });

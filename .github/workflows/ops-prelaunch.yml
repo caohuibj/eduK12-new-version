@@ -1,10 +1,17 @@
 name: Ops prelaunch acceptance
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
 
 permissions:
   contents: read
@@ -15,8 +22,8 @@ concurrency:
 
 jobs:
   runtime-recovery:
-    if: github.event_name == 'workflow_dispatch' || (github.head_ref == 'fix/ops-supported-runtime-bounded-workers' && github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -67,6 +74,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
 
       - name: Verify supported runtime pins
         working-directory: server-version

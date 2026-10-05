@@ -11,11 +11,12 @@
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
-# 编排（全部 GitHub-hosted Ubuntu，job 间使用独立临时环境）：
+# 编排：三场景分流；Windows Linux 单槽重任务、可选 Mac 轻检查、托管控制与后端 CodeQL。
 #   Router:       changed-scope classification
-#   Parallel:     backend build/performance, functional regression, frontend, CodeQL, Docker
+#   Dependencies: backend build/performance, functional regression, frontend, CodeQL, Docker
+#   Capacity:     one Windows heavy slot serializes eligible jobs; hosted controls may overlap
 #   Browser:      consumes backend/frontend artifacts from this exact run
-#   Merge gate:   requires every selected check to succeed; no runner affinity
+#   Merge gate:   exact success for every selected route and acceptance
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + 200-completion SLA
@@ -47,6 +48,17 @@ on:
       - 'refactor/unified-runtime-v32-unit'
       - 'content/cognitive-expansion'
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
+        description: 'Explicit runner profile; hosted consumes the remaining allowance'
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -56,7 +68,22 @@ jobs:
   scope:
     name: classify changed content
     runs-on: ubuntu-24.04
+    timeout-minutes: 3
     outputs:
+      scenario: ${{ steps.scope.outputs.scenario }}
+      frontend: ${{ steps.scope.outputs.frontend }}
+      heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
+      light_runner: ${{ steps.scope.outputs.light_runner }}
+      codeql_runner: ${{ steps.scope.outputs.codeql_runner }}
+      media2: ${{ steps.scope.outputs.media2 }}
+      media7: ${{ steps.scope.outputs.media7 }}
+      situational_video: ${{ steps.scope.outputs.situational_video }}
+      situational_branching: ${{ steps.scope.outputs.situational_branching }}
+      video_core: ${{ steps.scope.outputs.video_core }}
+      app_shell: ${{ steps.scope.outputs.app_shell }}
+      canonical_visual: ${{ steps.scope.outputs.canonical_visual }}
+      perf_smoke: ${{ steps.scope.outputs.perf_smoke }}
+      ops: ${{ steps.scope.outputs.ops }}
       content: ${{ steps.scope.outputs.content }}
       presentation: ${{ steps.scope.outputs.presentation }}
       scale: ${{ steps.scope.outputs.scale }}
@@ -70,9 +97,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - run: node --test .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
+      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs
       - id: scope
         env:
+          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+          CI_MAC_LIGHT_ENABLED: ${{ vars.CI_MAC_LIGHT_ENABLED }}
+          CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           CI_EVENT: ${{ github.event_name }}
           CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -87,6 +117,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
       scale: ${{ needs.scope.outputs.scale == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
@@ -97,7 +128,7 @@ jobs:
     needs: scope
     name: presentation / frontend lint + typecheck + build
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(needs.scope.outputs.light_runner) }}
     timeout-minutes: 15
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -109,6 +140,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --light
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -125,8 +158,9 @@ jobs:
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
-    runs-on: ubuntu-24.04
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: server-version/backend
@@ -137,6 +171,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -180,8 +216,9 @@ jobs:
   pr-light-frontend:
     needs: scope
     name: PR light / frontend lint + typecheck
-    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true'
-    runs-on: ubuntu-24.04
+    if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true')
+    runs-on: ${{ fromJSON(needs.scope.outputs.light_runner) }}
+    timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -192,6 +229,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --light
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -207,7 +246,8 @@ jobs:
     needs: scope
     name: main / post-merge compile smoke
     if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     steps:
@@ -217,6 +257,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -248,10 +290,11 @@ jobs:
         run: npm run build
 
   backend:
-    needs: scope
+    needs: [scope, pr-light-frontend]
     name: backend (migrate + build + performance gate)
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -313,6 +356,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -449,10 +494,10 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
 
   backend-regression:
-    needs: scope
+    needs: [scope, pr-light-frontend]
     name: backend regression (GitHub-hosted, independent database)
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -510,6 +555,8 @@ jobs:
           node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/backend/package-lock.json
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: check hosted runner disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - name: prepare canvas source-build dependencies
@@ -640,10 +687,11 @@ jobs:
           if-no-files-found: ignore
 
   frontend:
-    needs: scope
+    needs: [scope, pr-light-frontend]
     name: frontend (lint + typecheck + full tests + build)
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
     defaults:
@@ -654,6 +702,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
         run: |
           mkdir -p "$HOME/.npm"
@@ -672,10 +722,6 @@ jobs:
             fi
           done
           exit 1
-      - name: lint
-        run: npm run lint
-      - name: typecheck
-        run: npm run typecheck
       - name: full frontend tests
         run: npm test
       - name: install offline Cognitive diagnostic dependencies
@@ -697,9 +743,9 @@ jobs:
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance executes after both production lanes have passed.
-    needs: [scope, backend, frontend]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.frontend.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -765,6 +811,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm and Playwright caches
         run: |
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
@@ -1033,9 +1081,9 @@ jobs:
     name: docker (compose config + production builds)
     # Production images are built on a separate hosted VM.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
-    needs: [scope]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    needs: [scope, pr-light-frontend]
+    if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
     timeout-minutes: 45
     env:
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
@@ -1065,6 +1113,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local Trivy cache
         id: runner-cache
         run: |
@@ -1097,10 +1147,18 @@ jobs:
       - name: validate monitoring compose
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
-        run: docker compose build backend worker frontend
+        env:
+          FRONTEND_ONLY: ${{ needs.scope.outputs.frontend }}
+        run: |
+          if [ "$FRONTEND_ONLY" = true ]; then
+            docker compose build frontend
+          else
+            docker compose build backend worker frontend
+          fi
       - name: verify production Nginx static asset MIME and security headers
         run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
       - name: scan backend image (high and critical)
+        if: needs.scope.outputs.frontend != 'true'
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: server-version-backend:latest
@@ -1128,9 +1186,10 @@ jobs:
   codeql:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
-    needs: [scope]
-    if: needs.scope.outputs.content == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (needs.scope.outputs.presentation != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ubuntu-24.04
+    needs: [scope, pr-light-frontend]
+    if: (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.codeql_runner) }}
+    timeout-minutes: 12
     permissions:
       actions: read
       contents: read
@@ -1140,6 +1199,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -1159,25 +1220,166 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')
-    runs-on: ubuntu-24.04
+    if: needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')
+    runs-on: ${{ fromJSON(needs.scope.outputs.light_runner) }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --light
       - name: mini static and fixture smoke gates
         working-directory: server-version/miniprogram-v2
         run: npm run verify
       - name: verify Web feature inventory
         run: node server-version/miniprogram-v2/scripts/feature-inventory.cjs --check
 
+  backend-browser-build:
+    name: UI/content route / backend browser build
+    needs: scope
+    if: needs.scope.outputs.frontend == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    timeout-minutes: 15
+    env:
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: npm ci
+        run: npm ci
+      - name: prisma generate
+        run: npx prisma generate
+      - name: build unchanged backend for real API acceptance
+        run: npm run build
+      - name: publish tested backend build
+        id: backend-build-upload
+        # GitHub artifact creation/finalization can reset connections. Retry
+        # with bounded backoff; the final attempt must succeed or fail the job.
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+      - name: wait before retrying backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry backend build upload
+        id: backend-build-upload-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
+      - name: wait before final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        # Do not ignore this failure: browser must consume this run's exact build.
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          overwrite: true
+
+  accept-media2:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media2 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/media-2-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-media7:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media7 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/media-7-cross-runtime-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-situational-video:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_video == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/situational-video-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-situational-branching:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_branching == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/situational-branching-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-video-core:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.video_core == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/assessment-video-core-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-app-shell:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.app_shell == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/fe-11-app-shell-acceptance.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+
+  accept-visual:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.canonical_visual == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/visual-canonical-qa.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+
+  accept-perf:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/perf-phase0-smoke.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+
+  accept-ops:
+    needs: [scope, backend, backend-browser-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    uses: ./.github/workflows/ops-prelaunch.yml
+    with:
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'hybrid' }}
+
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-regression, frontend, browser, docker, codeql, miniprogram]
+    needs: [scope, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend, browser, docker, codeql, miniprogram, accept-media2, accept-media7, accept-situational-video, accept-situational-branching, accept-video-core, accept-app-shell, accept-visual, accept-perf, accept-ops]
     if: ${{ always() && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 3
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}

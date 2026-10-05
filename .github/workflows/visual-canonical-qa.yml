@@ -1,71 +1,22 @@
 name: Visual QA Canonical Screens
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/visual-canonical-qa.yml'
-      - 'server-version/e2e/visual-canonical-browser-e2e.cjs'
-      - 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'
-      - 'server-version/e2e/visual-legacy-dialogs-browser-e2e.cjs'
-      - 'server-version/frontend/tailwind.config.js'
-      - 'server-version/frontend/src/components/MediaSelector.tsx'
-      - 'server-version/frontend/src/components/MediaRenderer.tsx'
-      - 'server-version/frontend/src/components/PdfViewer.tsx'
-      - 'server-version/frontend/src/components/student/**'
-      - 'server-version/frontend/src/pages/DocumentLibrary.tsx'
-      - 'server-version/frontend/src/pages/ImageLibrary.tsx'
-      - 'server-version/frontend/src/pages/VideoLibrary.tsx'
-      - 'server-version/frontend/src/pages/QuestionnaireEdit.tsx'
-      - 'server-version/frontend/src/pages/QuestionnaireList.tsx'
-      - 'server-version/frontend/src/pages/ScaleList.tsx'
-      - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireEdit.tsx'
-      - 'server-version/frontend/src/components/MaterialGrantModal.tsx'
-      - 'server-version/frontend/src/api/materialGrants.ts'
-      - 'server-version/frontend/src/pages/teacher/GeneralQuestionnaireList.tsx'
-      - 'server-version/e2e/visual-staff-complex-browser-e2e.cjs'
-      - 'server-version/e2e/visual-classroom-control-browser-e2e.cjs'
-      - 'server-version/frontend/src/index.css'
-      - 'server-version/frontend/src/App.tsx'
-      - 'server-version/frontend/src/pages/dev/**'
-      - 'server-version/frontend/src/components/app-shell/**'
-      - 'server-version/frontend/src/components/product-ui/**'
-      - 'server-version/frontend/src/components/auth/**'
-      - 'server-version/frontend/src/components/student-ui/**'
-      - 'server-version/frontend/src/components/parent-ui/**'
-      - 'server-version/frontend/src/components/staff-ui/**'
-      - 'server-version/frontend/src/components/public-ui/**'
-      - 'server-version/frontend/src/components/classroom-ui/**'
-      - 'server-version/frontend/src/components/assessment-ui/**'
-      - 'server-version/frontend/src/components/shared-ui/**'
-      - 'server-version/frontend/src/pages/Portal.tsx'
-      - 'server-version/frontend/src/pages/*Login.tsx'
-      - 'server-version/frontend/src/pages/ScaleLibrary.tsx'
-      - 'server-version/frontend/src/pages/CourseList.tsx'
-      - 'server-version/frontend/src/pages/AssignmentList.tsx'
-      - 'server-version/frontend/src/pages/CheckinList.tsx'
-      - 'server-version/frontend/src/pages/teacher/TeacherCourseDetail.tsx'
-      - 'server-version/frontend/src/pages/teacher/Classroom*.tsx'
-      - 'server-version/frontend/src/pages/student/**'
-      - 'server-version/frontend/src/pages/parent/**'
-      - 'server-version/frontend/src/pages/public/**'
-      - 'server-version/frontend/src/pages/teacher/TeacherProfile.tsx'
-      - 'server-version/frontend/src/pages/organization/OrganizationIndexPage.tsx'
-      - 'server-version/frontend/src/modules/reporting/**'
-      - 'server-version/frontend/src/modules/cognitive/Cognitive*ReportCard.tsx'
-      - 'server-version/frontend/src/modules/cognitive/tasks/shared/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/cpt/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/gonogo/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/matrix/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/flanker/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/cardsort/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/taskswitch/**'
-      - 'server-version/frontend/src/modules/cognitive/tasks/sst/**'
-      - 'server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx'
-      - 'server-version/frontend/src/modules/composite/*Report*.tsx'
-      - 'server-version/frontend/src/pages/bundle/BundleReport.tsx'
-      - 'server-version/frontend/src/modules/cognitive/pages/CognitiveHistory.tsx'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: visual-canonical-${{ github.event.pull_request.number || github.ref }}
@@ -74,9 +25,9 @@ concurrency:
 jobs:
   canonical-visual-qa:
     # Run the full matrix when the release PR is ready for review.
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || !startsWith(github.head_ref, 'feat/scale-wave1-')
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
     name: canonical 390 / 768 / 1440 screenshot matrix
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 30
     env:
       VISUAL_QA_BASE_URL: http://127.0.0.1:5173
@@ -91,6 +42,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm and Playwright caches
         run: |
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"

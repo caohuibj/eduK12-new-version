@@ -3,7 +3,7 @@
 set -euo pipefail
 available_kib() { df -Pk . | awk 'NR == 2 {print $4}'; }
 minimum_kib=$((3 * 1024 * 1024))
-if (( $(available_kib) < minimum_kib )); then
+if [[ "${RUNNER_ENVIRONMENT:-}" == 'github-hosted' ]] && (( $(available_kib) < minimum_kib )); then
   docker builder prune --force --keep-storage 1GB
 fi
 df -h .

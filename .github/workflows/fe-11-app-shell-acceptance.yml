@@ -1,14 +1,25 @@
 name: FE-11 AppShell Device Accessibility Acceptance
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/fe-11-app-shell-acceptance.yml'
-      - 'server-version/e2e/app-shell-browser-e2e.cjs'
-      - 'server-version/frontend/src/components/app-shell/**'
-      - 'server-version/frontend/src/components/product-ui/**'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: fe-11-app-shell-${{ github.event.pull_request.number || github.ref }}
@@ -17,8 +28,9 @@ concurrency:
 jobs:
   app-shell-device-accessibility:
     name: AppShell viewport/input/accessibility browser matrix
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    timeout-minutes: 35
     env:
       APP_SHELL_BASE_URL: http://127.0.0.1:5173
       APP_SHELL_EVIDENCE_DIR: /tmp/eduk12-fe-11-app-shell
@@ -31,6 +43,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm and Playwright caches
         run: |
           mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
@@ -55,8 +69,18 @@ jobs:
         working-directory: server-version/frontend
         run: npm ci
       - name: build production frontend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/frontend
         run: npm run build
+      - name: restore exact-run tested frontend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify exact-run frontend build
+        if: inputs.use_build_artifacts
+        run: test -s frontend/dist/index.html
       - name: start production preview
         run: |
           rm -rf "$APP_SHELL_EVIDENCE_DIR"

@@ -1,13 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify } from './content-scope.mjs';
+import { classify, frontendFile, acceptanceFor } from './content-scope.mjs';
+function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
+  return { ...Object.fromEntries(Object.keys(acceptanceFor([])).map(key => [key, 'false'])), content, presentation, frontend,
+    scenario: content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform', ...extra };
+}
 const root = 'server-version/backend/src/modules/';
 const scale = `${root}scale/instruments/new_scale/1.0.0/instrument.ts`;
 const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
-  assert.deepEqual(classify([scale, cognitive, sjt]), { content: true, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
+  assert.deepEqual(classify([scale, cognitive, sjt]), { content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
 });
 test('empty, core, executable additions and mixed changes require full checks', () => {
   assert.equal(classify([]).content, false);
@@ -23,7 +27,7 @@ test('empty, core, executable additions and mixed changes require full checks', 
 
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
 test('aggregate checks only selected jobs, and fails closed for every selected job', () => {
-  assert.ok(requiredChecks({ scope: { outputs: { content: 'false', presentation: 'false' } } }, false).includes('backend-regression'));
+  assert.ok(requiredChecks({ scope: { outputs: scopeOutputs() } }, false).includes('backend-regression'));
   for (const [content, presentation, draft] of [
     ['true', 'false', false],
     ['true', 'false', true],
@@ -32,7 +36,7 @@ test('aggregate checks only selected jobs, and fails closed for every selected j
     ['false', 'false', true],
     ['false', 'false', false],
   ]) {
-    const needs = { scope: { outputs: { content, presentation }, result: 'success' } };
+    const needs = { scope: { outputs: scopeOutputs(content, presentation), result: 'success' } };
     for (const job of requiredChecks(needs, draft)) needs[job] = { ...needs[job], result: 'success' };
     assert.deepEqual(failedChecks(needs, draft), []);
     for (const job of requiredChecks(needs, draft)) {
@@ -43,7 +47,7 @@ test('aggregate checks only selected jobs, and fails closed for every selected j
   }
 });
 
-import { mkdtempSync, mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -80,8 +84,8 @@ import { classifyChanges, changedEntries, parseChangedEntries } from './content-
 test('malformed classification output never authorizes a passing aggregate', () => {
   for (const bad of [undefined, '', 'TRUE', ' true', true, 'bundle']) {
     for (const outputs of [
-      { content: bad, presentation: 'false' },
-      { content: 'false', presentation: bad },
+      scopeOutputs('false','false','false',{content:bad}),
+      scopeOutputs('false','false','false',{presentation:bad}),
     ]) {
       const needs = { scope: { result: 'success', outputs } };
       for (const name of requiredChecks(needs, false)) needs[name] = { ...needs[name], result: 'success' };
@@ -189,9 +193,111 @@ test('manual dispatch forces platform checks even with no base SHA', () => {
 
 test('platform mini gate cannot be skipped for draft or ready PR', () => {
   for (const draft of [true, false]) {
-    const needs = { scope: { outputs: { content: 'false', presentation: 'false' }, result: 'success' } };
+    const needs = { scope: { outputs: scopeOutputs(), result: 'success' } };
     assert.ok(requiredChecks(needs, draft).includes('miniprogram'));
     for (const name of requiredChecks(needs, draft)) needs[name] = { ...needs[name], result: 'success' };
     assert.ok(failedChecks({ ...needs, miniprogram: { result: 'skipped' } }, draft).includes('miniprogram'));
   }
+});
+
+test('UI-only route saves backend regression but retains real API browser, Docker and SAST', () => {
+  const files = ['server-version/frontend/src/pages/student/StudentHome.tsx',
+    'server-version/frontend/src/components/student-ui/student-ui.css'];
+  const result = classify(files);
+  assert.equal(result.frontend, true); assert.equal(result.content, false);
+  const needs = {scope: {result:'success', outputs:scopeOutputs('false','false','true')}};
+  assert.deepEqual(requiredChecks(needs,false), ['scope','pr-light-frontend','backend-browser-build','frontend','browser','docker','codeql']);
+  for (const job of requiredChecks(needs,false)) needs[job] = {...needs[job],result:'success'};
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for (const job of requiredChecks(needs,false))
+    for (const result of ['skipped','cancelled','failure',undefined])
+      assert.ok(failedChecks({...needs,[job]:{result}},false).includes(job));
+});
+test('measurement runtimes, timing/scoring, dependencies, schema and CI cannot use frontend route', () => {
+  const ui = 'server-version/frontend/src/pages/Portal.tsx';
+  for (const file of ['server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx',
+    'server-version/frontend/src/modules/situational/runtime.ts',
+    'server-version/frontend/src/modules/composite/scoring.ts',
+    'server-version/frontend/src/services/persistence/finalDraftStore.ts',
+    'server-version/frontend/src/utils/scoring.ts',
+    'server-version/frontend/src/hooks/trial-timing.ts',
+    'server-version/frontend/package-lock.json', 'server-version/frontend/vite.config.ts',
+    'server-version/backend/prisma/migrations/new/migration.sql',
+    'server-version/backend/src/routes/auth.ts', '.github/config/acceptance-scopes.json',
+    '.github/scripts/content-scope.mjs']) {
+    assert.equal(classify([ui,file]).frontend,false,file);
+  }
+});
+test('mixed declaration content and UI requires union of content, browser and frontend gates', () => {
+  const ui = 'server-version/frontend/src/pages/Portal.tsx';
+  const result = classify([sjt, ui]);
+  assert.equal(result.content,true); assert.equal(result.frontend,true);
+  const needs = {scope:{result:'success',outputs:scopeOutputs('true','false','true')}};
+  assert.ok(requiredChecks(needs,false).includes('content'));
+  assert.ok(requiredChecks(needs,false).includes('browser'));
+  assert.ok(!requiredChecks(needs,false).includes('backend-regression'));
+  assert.equal(classify([sjt,ui,'server-version/backend/src/routes/auth.ts']).content,false);
+  assert.equal(classify([sjt,ui,'server-version/backend/src/routes/auth.ts']).frontend,false);
+});
+test('selected acceptance failures and malformed flags cannot hide behind a successful main CI', () => {
+  const outputs = scopeOutputs('false','false','true',{media7:'true',canonical_visual:'true'});
+  const needs = {scope:{result:'success',outputs}};
+  for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
+  assert.ok(requiredChecks(needs,false).includes('accept-media7'));
+  assert.ok(requiredChecks(needs,false).includes('accept-visual'));
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for (const result of ['failure','skipped','cancelled',undefined])
+    assert.ok(failedChecks({...needs,'accept-media7':{result}},false).includes('accept-media7'));
+  assert.ok(!requiredChecks(needs,true).includes('accept-media7'));
+  for(const extra of [{frontend:undefined},{scenario:'content'},{media7:'TRUE'},{canonical_visual:undefined}])
+    assert.ok(failedChecks({...needs,scope:{...needs.scope,outputs:{...outputs,...extra}}},false).includes('scope'));
+});
+test('deletions, executable UI, empty and forced changes never authorize frontend fast path', () => {
+  const file='server-version/frontend/src/pages/Portal.tsx';
+  const regular={file,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([regular]).frontend,true);
+  assert.equal(classifyChanges([regular],true).frontend,false);
+  for(const entry of [{...regular,status:'D',newMode:'000000'},{...regular,newMode:'100755'},{...regular,newMode:'120000'}])
+    assert.equal(classifyChanges([entry]).frontend,false);
+  assert.equal(classify([]).frontend,false);
+  for(const bad of [file.replace('/src/','//src/'), file+'\n', file.replace('pages','..')])
+    assert.equal(frontendFile(bad),false,bad);
+});
+test('content governance closure retains all Bundles and focused acceptance scopes retain negative patterns', () => {
+  assert.equal(acceptanceFor(['server-version/backend/src/modules/situational/instruments/new/1.0.0/instrument.json']).situational_video,false);
+  assert.equal(acceptanceFor(['server-version/backend/src/modules/situational/situational-final-submit.service.ts']).situational_video,true);
+  assert.equal(acceptanceFor(['server-version/backend/prisma/migrations/new/migration.sql']).ops,true);
+  assert.equal(acceptanceFor(['server-version/frontend/src/pages/Portal.tsx']).canonical_visual,true);
+});
+
+test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never literal newline escapes',()=>{
+  const root=mkdtempSync(join(tmpdir(),'ci-outputs-'));
+  const output=join(root,'outputs');
+  try{
+    execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'hybrid',CI_MAC_LIGHT_ENABLED:'',GITHUB_OUTPUT:output},encoding:'utf8'});
+    const rows=readFileSync(output,'utf8').trim().split('\n');
+    assert.ok(rows.length>=19);
+    const fields=Object.fromEntries(rows.map(row=>[row.slice(0,row.indexOf('=')),row.slice(row.indexOf('=')+1)]));
+    assert.equal(fields.scenario,'platform'); assert.equal(fields.frontend,'false');
+    assert.deepEqual(JSON.parse(fields.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
+    assert.deepEqual(JSON.parse(fields.codeql_runner),['ubuntu-24.04']);
+    assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+test('API contracts, persistence and measurement inputs never use the UI shortcut',()=>{
+  for(const path of ['api/materialGrants.ts','types/index.ts','services/completionRetry.ts',
+    'modules/assessment-context/options.ts','components/reference-data.json','utils/scoring.ts'])
+    assert.equal(frontendFile('server-version/frontend/src/'+path),false,path);
+});
+
+test('explicit hosted diagnostic overrides even an enabled optional Mac runner',()=>{
+  const result=JSON.parse(execFileSync(process.execPath,['.github/scripts/content-scope.mjs'],{
+    cwd:new URL('../..',import.meta.url),encoding:'utf8',
+    env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'hosted',CI_MAC_LIGHT_ENABLED:'true',GITHUB_OUTPUT:''},
+  }).trim());
+  assert.deepEqual(JSON.parse(result.heavy_runner),['ubuntu-24.04']);
+  assert.deepEqual(JSON.parse(result.light_runner),['ubuntu-24.04']);
 });

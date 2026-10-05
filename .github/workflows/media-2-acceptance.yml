@@ -1,39 +1,25 @@
 name: MEDIA-2 Scale Form Image Acceptance
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/media-2-acceptance.yml'
-      - 'server-version/backend/src/modules/assessment-media/**'
-      - 'server-version/backend/src/modules/assessment-runtime/form-admission.service.ts'
-      - 'server-version/backend/src/modules/assessment-runtime/form-image.adapter.ts'
-      - 'server-version/backend/src/modules/scale/scale-definition.ts'
-      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
-      - 'server-version/backend/src/modules/scale/scale-image-retention.ts'
-      - 'server-version/backend/src/modules/scale/scale-image.adapter.ts'
-      - 'server-version/backend/src/modules/scale/questionnaire-scale-image-retention.ts'
-      - 'server-version/backend/src/modules/composite/composite-image.controller.ts'
-      - 'server-version/backend/src/modules/composite/composite.public.routes.ts'
-      - 'server-version/backend/src/modules/composite/composite.routes.ts'
-      - 'server-version/backend/src/modules/composite/composite.service.ts'
-      - 'server-version/backend/src/controllers/generalQuestionnaireImageController.ts'
-      - 'server-version/backend/src/controllers/publicQuestionnaireController.ts'
-      - 'server-version/backend/src/controllers/questionnaireController.ts'
-      - 'server-version/backend/src/controllers/questionnaireImageController.ts'
-      - 'server-version/backend/src/controllers/scaleController.ts'
-      - 'server-version/backend/src/controllers/scaleImageController.ts'
-      - 'server-version/backend/src/routes/generalQuestionnaires.ts'
-      - 'server-version/backend/src/routes/public.ts'
-      - 'server-version/backend/src/routes/questionnaires.ts'
-      - 'server-version/backend/src/routes/scales.ts'
-      - 'server-version/backend/src/services/questionnaire-form-section.service.ts'
-      - 'server-version/frontend/src/modules/assessment-media/**'
-      - 'server-version/frontend/src/components/FinalCompositeAssessment.tsx'
-      - 'server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx'
-      - 'server-version/frontend/src/pages/student/ScaleAssessment.tsx'
-      - 'server-version/frontend/src/utils/questionnaireResume.ts'
-      - 'server-version/e2e/media-2-browser-e2e.cjs'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: media-2-acceptance-${{ github.event.pull_request.number || github.ref }}
@@ -42,8 +28,9 @@ concurrency:
 jobs:
   browser:
     name: Scale Form image auth public Bundle browser acceptance
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    timeout-minutes: 35
     env:
       NODE_ENV: test
       PORT: '3000'
@@ -97,6 +84,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure isolated test keys
         run: |
           for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
@@ -144,8 +133,18 @@ jobs:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: build backend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/backend
         run: npm run build
+      - name: restore exact-run tested backend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify exact-run backend build
+        if: inputs.use_build_artifacts
+        run: test -s backend/dist/index.js
       - name: prepare MEDIA-2 upload directory
         run: |
           rm -rf "$UPLOAD_DIR"
@@ -164,8 +163,18 @@ jobs:
           cat /tmp/eduk12-media-2-backend.log
           exit 1
       - name: build production frontend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/frontend
         run: npm run build
+      - name: restore exact-run tested frontend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify exact-run frontend build
+        if: inputs.use_build_artifacts
+        run: test -s frontend/dist/index.html
       - name: start frontend
         run: |
           nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-media-2-frontend.log 2>&1 &

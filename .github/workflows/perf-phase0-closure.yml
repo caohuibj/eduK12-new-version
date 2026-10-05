@@ -4,6 +4,10 @@ on:
   # Manual evidence only: do not compete with required backend/browser CI.
   workflow_dispatch:
     inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
       ab_groups:
         description: Space-separated steady groups for same-host A/B
         required: true
@@ -44,7 +48,7 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 90
     services:
       postgres:
@@ -188,7 +192,7 @@ jobs:
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 45
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -277,7 +281,7 @@ jobs:
   lost-response:
     name: committed response loss + retry/replay recovery
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 35
     services:
       postgres:
@@ -357,7 +361,7 @@ jobs:
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 50
     services:
       postgres:

@@ -1,23 +1,26 @@
 name: Situational Branching Acceptance
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/situational-branching-acceptance.yml'
-      - 'server-version/backend/src/modules/situational/**'
-      - 'server-version/backend/src/modules/assessment-runtime/situational-runtime-snapshot.ts'
-      - 'server-version/backend/src/modules/assessment-runtime/compiler.ts'
-      - 'server-version/frontend/src/modules/situational/**'
-      - 'server-version/frontend/src/services/persistence/finalDraftStore.ts'
-      - 'server-version/e2e/situational-branching-browser-*'
-      # Declaration-only content is covered by the assessment content gate.
-      - '!server-version/backend/src/modules/situational/instruments/*/*/instrument.json'
-      - '!server-version/backend/src/modules/situational/instruments/*/*/publication.json'
-      - '!server-version/backend/src/modules/situational/instruments/*/*/scientific.json'
-      - '!server-version/backend/src/modules/situational/onboarding/instruments.generated.ts'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: hybrid
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [hybrid, hosted]
+        default: hybrid
 
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: situational-branching-acceptance-${{ github.event.pull_request.number || github.ref }}
@@ -26,8 +29,8 @@ concurrency:
 jobs:
   branching-browser:
     name: V2 branching browser acceptance
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -82,6 +85,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure isolated test keys
         run: |
           for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
@@ -135,8 +140,18 @@ jobs:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: build backend
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/backend
         run: npm run build
+      - name: restore exact-run tested backend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify exact-run backend build
+        if: inputs.use_build_artifacts
+        run: test -s backend/dist/index.js
       - name: seed V2 branching fixture
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-branching-browser-fixture.ts
@@ -153,8 +168,18 @@ jobs:
           cat /tmp/eduk12-situational-branching-backend.log
           exit 1
       - name: build frontend for deterministic browser startup
+        if: ${{ !inputs.use_build_artifacts }}
         working-directory: server-version/frontend
         run: npm run build
+      - name: restore exact-run tested frontend build
+        if: inputs.use_build_artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify exact-run frontend build
+        if: inputs.use_build_artifacts
+        run: test -s frontend/dist/index.html
       - name: start frontend
         run: |
           nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-branching-frontend.log 2>&1 &
