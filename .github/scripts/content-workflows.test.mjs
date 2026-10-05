@@ -115,7 +115,7 @@ test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
   assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend-build\]/);
   assert.doesNotMatch(job(ci,'browser'),/needs\.frontend\.result/);
   assert.match(job(ci,'accept-ui'),/runner_labels:.*frontend_runner/);
-  assert.match(job(ci,'accept-visual'),/engine: \[firefox, webkit\]/);
+  assert.match(job(ci,'accept-visual'),/engine: \[chromium, firefox, webkit\]/);
   assert.match(job(ci,'accept-media'),/media_selection/);
   for(const name of ['accept-perf','accept-ops']) assert.match(job(ci,name),/needs: \[scope, backend\]/);
   assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
@@ -238,7 +238,7 @@ test('frontend compilation and checks are separate while both remain required',(
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
   const ci=source('ci');
-  assert.match(ci,/options: \[none, images, cognitive, frontend, backend, backend-regression, reporting, browser, media, ui, qa-ui, ops, perf\]/);
+  assert.match(ci,/options: \[none, images, cognitive, frontend, backend, backend-regression, reporting, browser, media, ui, ui-chromium, qa-ui, ops, perf\]/);
   for(const name of ['scope','merge-gate']) assert.match(job(ci,name),/inputs\.step_probe == '' \|\| inputs\.step_probe == 'none'/);
   assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);

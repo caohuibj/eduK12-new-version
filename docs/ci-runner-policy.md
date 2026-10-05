@@ -35,7 +35,7 @@ validation. A server release is separate from WeChat mini-program publication.
 flowchart LR
   S[Classify and preflight] --> FB[GitHub: parallel production and UI-lab builds]
   FB --> FC[Mac: full frontend checks]
-  FC --> UI[Mac: Chromium, screenshots and AppShell]
+  FC --> UI[Mac: AppShell and reporting component UI]
   S --> BB[Windows: backend build and guarded migrations]
   BB --> IM[Windows: production images and scans]
   BB --> OP[Windows: Ops and performance]
@@ -45,7 +45,7 @@ flowchart LR
   BB --> API
   FB --> ME[GitHub: two media groups]
   BB --> ME
-  FB --> FF[GitHub: Firefox and WebKit in parallel]
+  FB --> FF[GitHub: Chromium, Firefox and WebKit in parallel]
   UI --> G[Required aggregate]
   IM --> G
   OP --> G
@@ -66,7 +66,7 @@ Profiles are explicit:
 
 | Profile | Hosted heavy work | Local work |
 | --- | --- | --- |
-| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
+| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, three visual engines | Mac frontend/AppShell/component UI; Windows migrations/images/Ops/performance |
 | `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
 | `local` (diagnostics) | CodeQL only | Mac frontend/UI, Windows real services |
 
@@ -75,8 +75,8 @@ GitHub when selected. Broad medium UI changes can require all three browser engi
 on Mac and take longer than a small medium change. `balanced`/`hybrid` are aliases
 for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
-The initial planning target for a warm successful heavy `speed` run is 18–25 minutes
-and approximately 42–60 hosted job-minutes. These are estimates, not measured guarantees or job
+The initial planning target for a warm successful heavy `speed` run is 14–20 minutes
+and approximately 48–66 hosted job-minutes. These are estimates, not measured guarantees or job
 timeouts. Budget cold starts, isolated rollout probes and retries separately, and
 check actual account usage before relying on an old remaining-minute figure.
 
@@ -107,9 +107,10 @@ fixture guards, test assertions and individual evidence remain mandatory. Standa
 media workflows invoke the same composite scenario actions as grouped validation.
 
 Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
-PostgreSQL, Redis or Docker on Mac. Chromium retains canonical/staff/classroom
+PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
 screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
-complete interaction and legacy-dialog suites. AppShell remains explicitly gated. The QA round 3 component browser flow runs on Mac
+complete interaction and legacy-dialog suites. AppShell remains explicitly gated on Mac. In speed mode all three visual engines run
+on GitHub; economy and medium routes keep visual acceptance on Mac. The QA round 3 component browser flow runs on Mac
 with its synthetic local APIs; real authorization and scoring remain covered by
 the independent backend/database gates.
 
@@ -144,7 +145,7 @@ formal gate. Do not use full CI as the first verification or relax timeouts,
 assertions, authorization boundaries or scan thresholds to obtain a green result.
 
 The existing CI workflow exposes `step_probe` values for frontend, backend,
-backend-regression, targeted reporting, browser, media, UI, QA component UI, Ops, performance, images and Cognitive checks.
+backend-regression, targeted reporting, browser, media, UI, hosted Chromium UI, QA component UI, Ops, performance, images and Cognitive checks.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
