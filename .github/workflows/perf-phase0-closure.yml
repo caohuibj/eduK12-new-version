@@ -75,6 +75,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: prepare BASE worktree and build both variants
         run: |
@@ -225,6 +227,8 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build and seed
         working-directory: server-version/backend
@@ -306,6 +310,8 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build and seed
         working-directory: server-version/backend
@@ -387,6 +393,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build backend
         working-directory: server-version/backend

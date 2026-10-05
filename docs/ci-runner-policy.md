@@ -87,7 +87,7 @@ scanned; do not invent hot publication to bypass immutable releases.
 
 ## Budget and rollout
 
-Plan hosted budget at about 3 minutes for content/UI controls and up to 14 minutes for
+Plan hosted budget at about 3 minutes for content/UI controls and reserve about 14 minutes for
 platform controls plus CodeQL, not an exact billing guarantee. Account usage, publication
 verification, shared repositories, artifacts and caches are measured separately.
 Keep evidence short-lived and retain release evidence under its existing policy.
@@ -116,3 +116,15 @@ Billing baseline was checked against
 [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions):
 self-hosted execution does not consume hosted compute minutes; artifacts and caches
 retain their separate storage accounting. Budget estimates exclude local execution time.
+
+A 500-minute remaining allowance can provisionally allocate 180 minutes to 60 content/UI
+or Draft runs, 210 minutes to 15 platform validations, 50 minutes to post-merge/manual
+diagnostics and 60 minutes to failures and release contingency. This is a planning mix,
+not a limit on actual runtime; check usage after the first measured runs. Job timeouts
+are emergency ceilings, not expected or promised billing durations.
+
+The execution topology is:
+GitHub scope → optional Mac light checks (otherwise Windows) → Windows serial build,
+regression, database/browser/image and selected acceptance jobs → GitHub aggregate.
+Platform CodeQL can overlap on GitHub; UI CodeQL queues on Windows. Different database
+jobs recreate their own PostgreSQL/Redis services and never share mutable test state.

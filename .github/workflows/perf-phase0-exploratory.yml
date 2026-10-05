@@ -1,15 +1,6 @@
 name: PERF Phase 0 exploratory
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
-    paths:
-      - 'server-version/backend/src/**'
-      - 'server-version/backend/scripts/**'
-      - 'server-version/perf/**'
-      - 'docs/performance-optimization-v1/**'
-      - '.github/workflows/perf-phase0-exploratory.yml'
   workflow_dispatch:
     inputs:
       runner_profile:
