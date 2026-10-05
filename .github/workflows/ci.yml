@@ -82,7 +82,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","qa-ui"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: ${{ inputs.runner_profile == 'speed' && '["ubuntu-24.04"]' || (vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]') }}
       ui_lab: ${{ inputs.step_probe == 'ui' }}
       ui_runner_labels: '["ubuntu-24.04"]'
 
@@ -474,7 +474,7 @@ jobs:
     if: needs.scope.outputs.frontend_build == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
+      runner_labels: ${{ needs.scope.outputs.visual_hosted == 'true' && '["ubuntu-24.04"]' || needs.scope.outputs.frontend_runner }}
       ui_lab: ${{ needs.scope.outputs.canonical_visual == 'true' }}
       ui_runner_labels: ${{ needs.scope.outputs.visual_hosted == 'true' && '["ubuntu-24.04"]' || needs.scope.outputs.frontend_runner }}
 

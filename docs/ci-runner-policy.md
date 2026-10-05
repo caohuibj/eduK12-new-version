@@ -33,7 +33,7 @@ validation. A server release is separate from WeChat mini-program publication.
 
 ```mermaid
 flowchart LR
-  S[Classify and preflight] --> FB[Mac production / parallel hosted UI-lab builds]
+  S[Classify and preflight] --> FB[GitHub: parallel production and UI-lab builds]
   FB --> FC[Mac: full frontend checks]
   FC --> UI[Mac: Chromium, screenshots and AppShell]
   S --> BB[Windows: backend build and guarded migrations]
@@ -66,7 +66,7 @@ Profiles are explicit:
 
 | Profile | Hosted heavy work | Local work |
 | --- | --- | --- |
-| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, UI-lab build, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
+| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
 | `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
 | `local` (diagnostics) | CodeQL only | Mac frontend/UI, Windows real services |
 
@@ -76,7 +76,7 @@ on Mac and take longer than a small medium change. `balanced`/`hybrid` are alias
 for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
 The initial planning target for a warm successful heavy `speed` run is 18–25 minutes
-and approximately 40–58 hosted job-minutes. These are estimates, not measured guarantees or job
+and approximately 42–60 hosted job-minutes. These are estimates, not measured guarantees or job
 timeouts. Budget cold starts, isolated rollout probes and retries separately, and
 check actual account usage before relying on an old remaining-minute figure.
 
@@ -86,8 +86,11 @@ Build artifacts belong to this run and exact checked-out SHA. The manifest verif
 SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
 missing or mismatched artifact. No latest-success or cross-run fallback exists.
 Ordinary production and UI-lab builds have distinct names and manifests. In heavy
-`speed` runs, the UI-lab build runs on GitHub alongside the Mac production build,
-so its extra compile does not extend the Mac queue. Native
+`speed` runs, both production and UI-lab builds run in parallel on GitHub,
+so compilation does not delay Mac checks or hosted browser consumers. Light and
+medium builds remain local. The initial producer probe measured 44 seconds for
+the hosted UI-lab job while the Mac production build took several minutes; final
+run measurements remain authoritative. Native
 `node_modules` are never transferred between Mac ARM and Linux x64.
 
 Production images retain complete Dockerfile builds and HIGH/CRITICAL scans. Buildx
@@ -141,7 +144,7 @@ formal gate. Do not use full CI as the first verification or relax timeouts,
 assertions, authorization boundaries or scan thresholds to obtain a green result.
 
 The existing CI workflow exposes `step_probe` values for frontend, backend,
-backend-regression, browser, media, UI, QA component UI, Ops, performance, images and Cognitive checks.
+backend-regression, targeted reporting, browser, media, UI, QA component UI, Ops, performance, images and Cognitive checks.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
