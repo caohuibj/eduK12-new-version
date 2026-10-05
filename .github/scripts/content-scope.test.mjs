@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, acceptanceFor } from './content-scope.mjs';
+import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
-  return { ...Object.fromEntries(Object.keys(acceptanceFor([])).map(key => [key, 'false'])), content, presentation, frontend,
+  return { ...Object.fromEntries(Object.keys(acceptanceFor([])).map(key => [key, 'false'])), content, presentation, frontend, documentation:'false', codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',
     scenario: content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform', ...extra };
 }
 const root = 'server-version/backend/src/modules/';
@@ -11,7 +11,7 @@ const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
-  assert.deepEqual(classify([scale, cognitive, sjt]), { content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
+  assert.deepEqual(classify([scale, cognitive, sjt]), { documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
 });
 test('empty, core, executable additions and mixed changes require full checks', () => {
   assert.equal(classify([]).content, false);
@@ -206,7 +206,7 @@ test('UI-only route saves backend regression but retains real API browser, Docke
   const result = classify(files);
   assert.equal(result.frontend, true); assert.equal(result.content, false);
   const needs = {scope: {result:'success', outputs:scopeOutputs('false','false','true')}};
-  assert.deepEqual(requiredChecks(needs,false), ['scope','pr-light-frontend','backend-browser-build','frontend','browser','docker','codeql']);
+  assert.deepEqual(requiredChecks(needs,false), ['scope','backend-browser-build','frontend','browser','docker','codeql']);
   for (const job of requiredChecks(needs,false)) needs[job] = {...needs[job],result:'success'};
   assert.deepEqual(failedChecks(needs,false),[]);
   for (const job of requiredChecks(needs,false))
@@ -293,33 +293,76 @@ test('API contracts, persistence and measurement inputs never use the UI shortcu
     assert.equal(frontendFile('server-version/frontend/src/'+path),false,path);
 });
 
-test('explicit hosted diagnostic overrides even an enabled optional Mac runner',()=>{
-  const result=JSON.parse(execFileSync(process.execPath,['.github/scripts/content-scope.mjs'],{
-    cwd:new URL('../..',import.meta.url),encoding:'utf8',
-    env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'hosted',CI_MAC_LIGHT_ENABLED:'true',GITHUB_OUTPUT:''},
-  }).trim());
-  assert.deepEqual(JSON.parse(result.heavy_runner),['ubuntu-24.04']);
-  assert.deepEqual(JSON.parse(result.light_runner),['ubuntu-24.04']);
+test('local runner plan reserves hosted compute exclusively for CodeQL and routes by Mac disk',()=>{
+  const GiB=1024**3;
+  for(const profile of ['local','balanced','hybrid']) {
+    const ready=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB});
+    assert.deepEqual(ready.frontend_runner,['self-hosted','macOS','eduk12-mac-ci']);
+    assert.deepEqual(ready.light_runner,ready.frontend_runner);
+    assert.deepEqual(ready.docker_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
+    assert.deepEqual(ready.codeql_runner,['ubuntu-24.04']);
+    for(const overrides of [{freeBytes:7*GiB},{macEnabled:false},{os:'linux'}]) {
+      const fallback=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB,...overrides});
+      assert.deepEqual(fallback.frontend_runner,fallback.heavy_runner);
+    }
+  }
+  assert.throws(()=>runnerPlan({profile:'hosted'}),/only CodeQL/);
+  assert.throws(()=>runnerPlan({profile:'typo'}));
+});
+test('only ordinary documentation qualifies and cannot hide scientific, runbook or executable changes',()=>{
+  for(const file of ['README.md','docs/ci-runner-policy.md','docs/development/architecture.md'])
+    assert.equal(classifyChanges([{file,oldMode:'100644',newMode:'100644',status:'M'}]).documentation,true);
+  for(const file of ['docs/scale-instruments/scientific.md','server-version/DEPLOYMENT-CHECKLIST.md',
+    'docs/miniprogram-v2/release-runbook.md','docs/development/scorer.ts','docs/development/../secret.md'])
+    assert.equal(documentationFile(file),false,file);
+  assert.equal(classify(['README.md',scale]).documentation,false);
+  assert.equal(classifyChanges([{file:'README.md',oldMode:'100644',newMode:'000000',status:'D'}]).documentation,false);
+});
+test('documentation and codeql selections remain explicit and fail closed',()=>{
+  const outputs=scopeOutputs('false','false','false',{documentation:'true',codeql:'false',scenario:'documentation'});
+  const needs={scope:{result:'success',outputs},documentation:{result:'success'}};
+  assert.deepEqual(requiredChecks(needs,false),['scope','documentation']);
+  assert.deepEqual(failedChecks(needs,false),[]);
+  assert.ok(failedChecks({...needs,documentation:{result:'skipped'}},false).includes('documentation'));
+  for(const key of ['documentation','codeql'])
+    assert.ok(failedChecks({...needs,scope:{result:'success',outputs:{...outputs,[key]:undefined}}},false).includes('scope'));
+  const platform={scope:{outputs:scopeOutputs('false','false','false',{codeql:'false'}),result:'success'}};
+  for(const name of requiredChecks(platform,false)) platform[name]={...platform[name],result:'success'};
+  assert.ok(failedChecks(platform,false).includes('scope'));
+  const content={scope:{outputs:scopeOutputs('true','false','false',{codeql:'true'}),result:'success'},content:{result:'success'}};
+  assert.ok(failedChecks(content,false).includes('codeql'));
 });
 
-test('balanced profile distributes Mac light checks, Windows database/browser, and hosted frontend/images/SAST',()=>{
-  const run=(profile,enabled='true')=>JSON.parse(execFileSync(process.execPath,['.github/scripts/content-scope.mjs'],{
-    cwd:new URL('../..',import.meta.url),encoding:'utf8',
-    env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:profile,CI_MAC_LIGHT_ENABLED:enabled,GITHUB_OUTPUT:''},
-  }).trim());
-  for(const profile of ['', 'balanced']) {
-    const result=run(profile);
-    assert.deepEqual(JSON.parse(result.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
-    assert.deepEqual(JSON.parse(result.light_runner),['self-hosted','macOS','eduk12-mac-ci']);
-    assert.deepEqual(JSON.parse(result.frontend_runner),['ubuntu-24.04']);
-    assert.deepEqual(JSON.parse(result.docker_runner),['ubuntu-24.04']);
-    assert.deepEqual(JSON.parse(result.codeql_runner),['ubuntu-24.04']);
-  }
-  const fallback=run('balanced','');
-  assert.deepEqual(JSON.parse(fallback.light_runner),JSON.parse(fallback.heavy_runner));
-  const saving=run('hybrid');
-  assert.deepEqual(JSON.parse(saving.docker_runner),JSON.parse(saving.heavy_runner));
-  const hosted=run('hosted');
-  for(const key of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner'])
-    assert.deepEqual(JSON.parse(hosted[key]),['ubuntu-24.04']);
+test('actual Git diffs select different documentation, presentation, content, frontend and heavy execution paths',()=>{
+  const fixture=mkdtempSync(join(tmpdir(),'ci-scenarios-'));
+  const git=(...args)=>execFileSync('git',args,{cwd:fixture,encoding:'utf8'}).trim();
+  try {
+    git('init','-q');writeFileSync(join(fixture,'base.txt'),'base\n');git('add','.');
+    git('-c','user.name=CI','-c','user.email=ci@example.invalid','commit','-qm','base');
+    const base=git('rev-parse','HEAD');
+    for(const [file,scenario,codeql] of [
+      ['README.md','documentation',false],
+      ['server-version/frontend/src/components/Card.css','presentation',false],
+      [sjt,'content',false], [cognitive,'content',true],
+      ['server-version/frontend/src/pages/Teacher.tsx','frontend',true],
+      ['server-version/frontend/src/modules/cognitive/core/runner.ts','platform',true],
+      ['server-version/backend/prisma/schema.prisma','platform',true],
+      ['.github/workflows/ci.yml','platform',true],
+    ]) {
+      git('reset','--hard',base);
+      const path=join(fixture,file);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,'fixture\n');
+      git('add','.');git('-c','user.name=CI','-c','user.email=ci@example.invalid','commit','-qm','case');
+      const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
+        cwd:fixture,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,
+        CI_PR_REPOSITORY:'owner/repo',GITHUB_REPOSITORY:'owner/repo',CI_RUNNER_PROFILE:'local',
+        CI_MAC_LIGHT_ENABLED:'false',CI_FORCE_FULL:'false',GITHUB_OUTPUT:''},
+      }).trim());
+      assert.equal(output.scenario,scenario,file);assert.equal(output.codeql,codeql,file);
+      const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));
+      const needs={scope:{result:'success',outputs}};
+      for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
+      assert.deepEqual(failedChecks(needs,false),[],file);
+      assert.deepEqual(JSON.parse(output.docker_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
+    }
+  } finally {rmSync(fixture,{recursive:true,force:true});}
 });

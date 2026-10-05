@@ -102,14 +102,15 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('balanced CI distributes compute while retaining one isolated Linux heavy runner and all gates', () => {
+test('local CI distributes Mac and Windows work and retains hosted CodeQL only', () => {
   const ci=source('ci');
-  assert.match(job(ci,'scope'),/runs-on: ubuntu-24\.04/);
-  assert.match(job(ci,'merge-gate'),/runs-on: ubuntu-24\.04/);
+  assert.match(job(ci,'scope'),/runs-on: .*eduk12-mac-ci/);
+  assert.match(job(ci,'merge-gate'),/runs-on: .*eduk12-mac-ci/);
   for(const name of ['backend','backend-regression','browser','backend-browser-build'])
     assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.heavy_runner\)/,name);
-  for(const name of ['visual','pr-light-frontend','miniprogram'])
-    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.light_runner\)/,name);
+  for(const name of ['visual','pr-light-frontend'])
+    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/,name);
+  assert.match(job(ci,'miniprogram'),/fromJSON\(needs\.scope\.outputs\.light_runner\)/);
   assert.match(job(ci,'frontend'),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/);
   assert.match(job(ci,'docker'),/fromJSON\(needs\.scope\.outputs\.docker_runner\)/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
@@ -127,8 +128,8 @@ test('balanced CI distributes compute while retaining one isolated Linux heavy r
   assert.match(backend,/run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend\]/);
   assert.match(job(ci,'browser'),/!cancelled\(\).*backend-browser-build\.result == 'success'/);
-  assert.match(job(ci,'frontend'),/needs: \[scope, pr-light-frontend\]/);
-  for(const name of ['codeql','docker']) assert.match(job(ci,name),/needs: \[scope, pr-light-frontend\]/);
+  assert.match(job(ci,'frontend'),/needs: scope/);
+  for(const name of ['codeql','docker']) assert.match(job(ci,name),/needs: scope/);
   assert.match(job(ci,'merge-gate'),/accept-media7/);
   assert.match(job(ci,'merge-gate'),/accept-visual/);
   assert.match(job(ci,'merge-gate'),/accept-ops/);
@@ -219,4 +220,20 @@ test('reusable media/browser consumers use only exact-current-run artifacts and 
   // Visual UI lab has different build flags: do not reuse the ordinary production artifact.
   assert.match(source('visual-canonical-qa'),/VITE_UI_LAB_ENABLED: 'true'/);
   assert.doesNotMatch(source('visual-canonical-qa'),/use_build_artifacts:/);
+});
+
+test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs once',()=>{
+  const ci=source('ci');
+  for(const name of ['backend','backend-regression','docker','codeql'])
+    assert.match(job(ci,name),/needs: scope/);
+  const front=job(ci,'frontend');
+  assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);
+  assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
+  assert.doesNotMatch(front,/pr-light-frontend/);
+  assert.match(job(ci,'pr-light-frontend'),/github\.event\.pull_request\.draft == true/);
+  assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
+  for(const {workflow} of Object.values(scopes)) {
+    const text=fs.readFileSync(new URL('../workflows/'+workflow,import.meta.url),'utf8');
+    assert.doesNotMatch(text,/ubuntu-24/);assert.match(text,/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
+  }
 });

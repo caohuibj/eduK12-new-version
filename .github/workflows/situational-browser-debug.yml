@@ -5,8 +5,8 @@ on:
     inputs:
       runner_profile:
         type: choice
-        options: [hybrid, hosted]
-        default: hybrid
+        options: [local]
+        default: local
       target_ref:
         description: 'Optional branch, tag, or commit SHA to debug; defaults to the dispatched ref'
         required: false
@@ -18,7 +18,7 @@ permissions:
 jobs:
   browser-debug:
     name: seeded Situational Bundle browser debug
-    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 25
     env:
       NODE_ENV: test

@@ -38,3 +38,11 @@ test('capacity follows the tightest cgroup limit, not the larger WSL total',()=>
   assert.throws(()=>effectiveMemory(10*GiB,'0::/runner',()=> 'broken'));
   assert.throws(()=>effectiveMemory(10*GiB,'0::/runner',()=>{throw Object.assign(new Error('denied'),{code:'EACCES'});}));
 });
+
+test('Mac control and frontend have different disk reserves and do not require Docker ports',()=>{
+  const base={environment:'self-hosted',os:'darwin',freeBytes:9*GiB,memoryBytes:8*GiB,light:false};
+  assert.deepEqual(resourceErrors({...base,frontend:true}),[]);
+  assert.ok(resourceErrors({...base,frontend:true,freeBytes:7*GiB}).length);
+  assert.deepEqual(resourceErrors({...base,control:true,freeBytes:2*GiB,memoryBytes:1*GiB}),[]);
+  assert.ok(resourceErrors({...base,control:true,freeBytes:0.5*GiB}).length);
+});

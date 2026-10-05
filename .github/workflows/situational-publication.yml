@@ -13,7 +13,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   publication:
-    runs-on: ubuntu-24.04
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:

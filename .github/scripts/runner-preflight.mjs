@@ -4,12 +4,13 @@ import { totalmem, platform } from 'node:os';
 import { createServer } from 'node:net';
 import { pathToFileURL } from 'node:url';
 
-export function resourceErrors({ environment, os, freeBytes, memoryBytes, light }) {
+export function resourceErrors({ environment, os, freeBytes, memoryBytes, light, control = false, frontend = false }) {
   if (environment !== 'self-hosted') return [];
   const errors=[];
-  if (!light && os !== 'linux') errors.push('Heavy jobs require a Linux runner with Docker');
-  if (freeBytes < (light ? (os === 'darwin' ? 5 : 2) : 20) * 1024 ** 3) errors.push('Insufficient CI disk headroom');
-  if (memoryBytes < (light ? 2 : 6) * 1024 ** 3) errors.push('Insufficient CI memory capacity');
+  if (!light && !control && !frontend && os !== 'linux') errors.push('Heavy jobs require a Linux runner with Docker');
+  const minimumDiskGiB = control ? 1 : frontend ? (os === 'darwin' ? 8 : 5) : light ? (os === 'darwin' ? 5 : 2) : 20;
+  if (freeBytes < minimumDiskGiB * 1024 ** 3) errors.push('Insufficient CI disk headroom');
+  if (memoryBytes < (control ? 0.5 : frontend ? 4 : light ? 2 : 6) * 1024 ** 3) errors.push('Insufficient CI memory capacity');
   return errors;
 }
 // systemd/WSL can expose 10 GiB to os.totalmem while limiting this service to 5 GiB.
@@ -52,14 +53,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(process.env.CI !== 'true') throw new Error('Runner preflight is CI-only');
   const disk=statfsSync(process.cwd());
   const light=process.argv.includes('--light');
+  const frontend=process.argv.includes('--frontend');
+  const control=process.argv.includes('--control');
   const resources={environment:process.env.RUNNER_ENVIRONMENT,os:platform(),
     freeBytes:disk.bavail*disk.bsize,memoryBytes:platform() === 'linux'
-      ? effectiveMemory(totalmem(), readFileSync('/proc/self/cgroup', 'utf8')) : totalmem(),light};
+      ? effectiveMemory(totalmem(), readFileSync('/proc/self/cgroup', 'utf8')) : totalmem(),light,frontend,control};
   console.log(JSON.stringify({ ...resources, runner:process.env.RUNNER_NAME, cpus:process.env.RUNNER_ARCH }));
   const errors=resourceErrors(resources);
   if(errors.length) throw new Error(errors.join('; '));
   // Never accept a leftover API/preview process as this run's freshly tested app.
   // Do not kill unrelated processes; fail and require isolated-environment cleanup.
-  if(resources.environment === 'self-hosted' && !light)
+  if(resources.environment === 'self-hosted' && !light && !frontend && !control)
     for(const port of [3000,5173]) await requireFreePort(port);
 }

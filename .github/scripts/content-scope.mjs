@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, readFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, statfsSync } from 'node:fs';
+import { platform } from 'node:os';
 import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -23,6 +24,15 @@ export function domainFor(file) {
       || file === `${modules}situational/onboarding/instruments.generated.ts`) return 'situational';
   if (new RegExp(`^${modules}cognitive/tasks/[^/]+/(seeds|participant-presentation|governance|scientific)\\.ts$`).test(file)) return 'cognitive';
   return null;
+}
+
+// Ordinary engineering documentation only; scientific/publication/runbook
+// documents keep their existing domain or platform validation.
+export function documentationFile(file) {
+  return typeof file === 'string' && !/[\\\x00-\x1f\x7f]/.test(file)
+    && !file.split('/').some(part => !part || part === '.' || part === '..')
+    && (['README.md', 'CONTRIBUTING.md', 'docs/ci-runner-policy.md'].includes(file)
+      || /^docs\/(development|contributing)\/[a-zA-Z0-9_./-]+\.md$/.test(file));
 }
 
 export function presentationFile(file) {
@@ -52,6 +62,7 @@ export function acceptanceFor(files) {
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
   return {
+    documentation: files.length > 0 && files.every(documentationFile),
     content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontendFile(file)),
     frontend: files.length > 0 && files.some(frontendFile) && files.every(file => domainFor(file) || frontendFile(file)) && !files.every(presentationFile),
     presentation: files.length > 0 && files.every(presentationFile),
@@ -82,6 +93,7 @@ export function classifyChanges(entries, forceFull = false) {
       || (status === 'M' && oldMode === '100644')));
   return {
     ...result,
+    documentation: !forceFull && result.documentation && regularChanges,
     content: !forceFull && result.content && regularChanges,
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
@@ -101,35 +113,49 @@ export function changedFiles(base, head = 'HEAD') {
   return changedEntries(base, head).map(entry => entry.file);
 }
 
+export function runnerPlan({ profile = 'local', macEnabled = false, os, freeBytes = 0 }) {
+  if (!['local', 'balanced', 'hybrid'].includes(profile))
+    throw new Error('Unsupported CI_RUNNER_PROFILE; only CodeQL may use hosted compute');
+  const windows = ['self-hosted', 'Linux', 'X64', 'eduk12-win-ci'];
+  const mac = ['self-hosted', 'macOS', 'eduk12-mac-ci'];
+  const frontendOnMac = macEnabled && os === 'darwin' && freeBytes >= 8 * 1024 ** 3;
+  return { heavy_runner: windows, light_runner: macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
+    frontend_runner: frontendOnMac ? mac : windows, docker_runner: windows,
+    codeql_runner: ['ubuntu-24.04'],
+    frontend_route_reason: frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
+      : 'Windows frontend fallback: Mac disabled or insufficient verified disk' };
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  const result = event === 'workflow_dispatch' ? { content: false, presentation: false, domains: [] } : classifyChanges(changedEntries(base), process.env.CI_FORCE_FULL === 'true');
-  const frontend = result.frontend === true;
-  const scenario = result.content ? (frontend ? 'content-frontend' : 'content')
-    : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
-  const acceptance = acceptanceFor(event === 'workflow_dispatch' ? [] : changedFiles(base));
-  const profile = process.env.CI_RUNNER_PROFILE || 'balanced';
-  const hosted = profile === 'hosted';
-  if (process.env.CI_RUNNER_PROFILE && !['balanced', 'hosted', 'hybrid'].includes(profile))
-    throw new Error('Unknown CI_RUNNER_PROFILE; refusing an unintended fallback');
+  // Admission is also checked in job.if before any self-hosted checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
     throw new Error('External PRs require a separately approved isolated workflow; no self-hosted execution');
-  const heavy = hosted ? ['ubuntu-24.04'] : ['self-hosted', 'Linux', 'X64', 'eduk12-win-ci'];
-  const light = !hosted && process.env.CI_MAC_LIGHT_ENABLED === 'true'
-    ? ['self-hosted', 'macOS', 'eduk12-mac-ci'] : heavy;
-  const output = { content: result.content, presentation: result.presentation, frontend, scenario,
+  const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
+  const files = entries.map(entry => entry.file);
+  const result = event === 'workflow_dispatch'
+    ? { content:false, presentation:false, frontend:false, documentation:false, domains:[] }
+    : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
+  const frontend = result.frontend === true;
+  const scenario = result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+    : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
+  const acceptance = acceptanceFor(files);
+  if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true')
+    for (const key of Object.keys(acceptance)) acceptance[key] = true;
+  const disk = statfsSync(process.cwd());
+  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'local',
+    macEnabled:process.env.CI_MAC_LIGHT_ENABLED === 'true', os:platform(),
+    freeBytes:disk.bavail*disk.bsize });
+  const codeql = scenario === 'platform' || frontend
+    || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
+  const output = { content: result.content, presentation: result.presentation, frontend,
+    documentation: result.documentation, codeql, scenario,
     scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
-    ...acceptance, heavy_runner: JSON.stringify(heavy), light_runner: JSON.stringify(light),
-    frontend_runner: JSON.stringify(profile === 'hybrid' ? heavy : ['ubuntu-24.04']),
-    docker_runner: JSON.stringify(profile === 'hybrid' ? heavy : ['ubuntu-24.04']),
-    codeql_runner: JSON.stringify(profile === 'hybrid' && frontend ? heavy : ['ubuntu-24.04']) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles',
-    reason: result.content ? 'allowlisted content and optional UI changes'
-      : result.presentation ? 'allowlisted presentation-only files'
-        : frontend ? 'UI files without measurement runtime changes'
-          : 'platform, manual override, empty or non-regular changes' }));
+    ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
+      [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles' }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

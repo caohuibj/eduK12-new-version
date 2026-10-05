@@ -5,13 +5,13 @@ on:
     inputs:
       runner_profile:
         type: string
-        default: hybrid
+        default: local
   workflow_dispatch:
     inputs:
       runner_profile:
         type: choice
-        options: [hybrid, hosted]
-        default: hybrid
+        options: [local]
+        default: local
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ concurrency:
 jobs:
   runtime-recovery:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
-    runs-on: ${{ inputs.runner_profile == 'hosted' && fromJSON('["ubuntu-24.04"]') || (inputs.runner_profile != 'hybrid' && vars.CI_RUNNER_PROFILE == 'hosted') && fromJSON('["ubuntu-24.04"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 35
     env:
       NODE_ENV: test
