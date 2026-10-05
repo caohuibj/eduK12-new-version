@@ -1,162 +1,153 @@
-# CI runner and scenario policy
+# CI scenarios, topology and validation
 
-GitHub Actions coordinates every run. **merge gate / ready PR** remains the stable
-required check. Every selected job must succeed; missing, skipped, failed or cancelled
-required jobs never grant merge readiness. No CI workflow deploys production.
+GitHub Actions coordinates all jobs. `merge gate / ready PR` is the stable required
+check. Every selected check must succeed; missing, skipped, failed or cancelled
+selected jobs never grant merge readiness. CI does not deploy production.
 
-## Execution topology
+## Scenarios
 
-Only CodeQL uses GitHub-hosted compute. Mac handles routing, documentation, frontend
-lint/types/regression/build, mini contracts and the final aggregate. Windows Linux
-handles content governance, backend, isolated databases, performance, production
-images/scans, browser/media/visual and recovery acceptance.
+Classification uses the complete Git diff against the PR base, including deletions,
+moves and file modes. Titles and labels cannot weaken coverage. Mixed changes select
+the union of applicable checks; unknown, schema, algorithm, authorization, dependency
+and CI changes select the full platform route. Malformed classification fails closed.
+
+- **Light content:** existing declarative instruments, norms and report content.
+  Retain immutable/scientific/publication rules, declaration AST boundaries,
+  all-Bundle closure, actual isolated-database import/scoring/report/FINAL and
+  historical/revocation lifecycle checks. JS/TS declarations also select CodeQL.
+  Executable behavior in a declaration must fail validation. Content compiled into
+  a deployment unit still requires that unit's normal build and security scan.
+- **Medium frontend:** ordinary UI functions without API, shared measurement,
+  permission, persistence or database changes. Run frontend lint/types/audit/full
+  regression/build, real API browser acceptance, the frontend image/scan and all
+  affected UI/media acceptances. Content plus UI retains both sets of checks.
+- **Heavy platform:** full frontend/backend/mini, production images, all media,
+  all three visual browser engines, performance, recovery and CodeQL checks.
+- Ordinary engineering documentation has a narrow allowlist; scientific,
+  publication and deployment documents retain their content/platform checks.
+
+Management-UI content publication without a Git change uses application publication
+validation. A server release is separate from WeChat mini-program publication.
+
+## Recommended speed topology
 
 ```mermaid
-flowchart TD
-  S[Mac: full Git diff and disk-aware routing] --> M[Mac: frontend checks and build]
-  S --> W[Windows: selected content/backend/database gates]
-  S --> Q[GitHub: CodeQL when selected]
-  S --> D[Windows: image build and security scan]
-  S --> L[Mac: selected docs or mini contracts]
-  M --> A[Windows: selected browser/media/visual/recovery acceptance]
-  W --> A
-  A --> G[Mac: fail-closed aggregate]
-  M --> G
-  W --> G
-  D --> G
+flowchart LR
+  S[Classify and preflight] --> FB[Mac: early production and UI-lab builds]
+  FB --> FC[Mac: full frontend checks]
+  FC --> UI[Mac: Chromium, screenshots and AppShell]
+  S --> BB[Windows: backend build and guarded migrations]
+  BB --> IM[Windows: production images and scans]
+  BB --> OP[Windows: Ops and performance]
+  S --> Q[GitHub: CodeQL]
+  S --> R[GitHub: full backend regression, isolated DB]
+  FB --> API[GitHub: real API browser]
+  BB --> API
+  FB --> ME[GitHub: two media groups]
+  BB --> ME
+  FB --> FF[GitHub: Firefox and WebKit in parallel]
+  UI --> G[Required aggregate]
+  IM --> G
+  OP --> G
   Q --> G
-  L --> G
+  R --> G
+  API --> G
+  ME --> G
+  FF --> G
 ```
 
-Backend, image and CodeQL lanes depend on routing rather than frontend lint. Ready
-frontend lint/types/full regression/build share one dependency installation. Cognitive
-onboarding diagnostics run in the selected Windows backend build, reusing its dependencies. Drafts
-retain the preparation-only frontend job. Browser consumers use this run's exact SHA
-backend/frontend artifacts; no latest-success or cross-run fallback is permitted.
-Application compilation is reused across browser consumers; production images retain
-independent complete Docker builds and scans at the same source. Persistent Windows
-image builds pull base images and bypass only runtime-stage caches via Buildx Bake,
-so apt/apk security updates run again even when the pinned base digest is unchanged.
-Dependency and application compilation caches remain reusable; HIGH/CRITICAL scans stay mandatory. Different UI-lab
-build flags deliberately require that acceptance's own frontend build.
+Mac and Windows each retain one job slot. Performance checks run exclusively on
+Windows and cannot overlap its image builds. Backend artifact production precedes
+other Windows full-gate work so consumers can begin early. Browser consumers wait
+for builds, not unrelated lint or frontend regression. The final aggregate waits
+for both producers and every required validation.
 
-## Scenario selection
+Profiles are explicit:
 
-| Scenario | Mac | Windows | GitHub |
-| --- | --- | --- | --- |
-| Ordinary engineering docs | Diff whitespace and scope check, aggregate | None unless another changed path selects it | No CodeQL |
-| Declaration-only content | Routing, any selected presentation checks | Existing immutable/scientific/publication rules, all-Bundle dependency closure, actual scoring/report/FINAL and guarded real-DB lifecycle | CodeQL for JS/TS declarations |
-| Presentation CSS/design docs | Lint/types/production build | Selected visual/accessibility gates | No unrelated SAST |
-| UI feature without measurement/backend changes | Lint/types/full frontend regression/build | Unchanged backend browser build, main real-API browser scenarios, frontend image/security/CSP, selected acceptance | CodeQL |
-| Backend/algorithm/platform | Full relevant frontend and mini contracts | Backend build/migration/performance, full regression and selected browser/image/recovery gates | CodeQL |
-| Schema/CI/dependencies/unknown mixed changes | Full consumers | Conservative platform route and selected migration/recovery/media/visual gates | CodeQL |
+| Profile | Hosted heavy work | Local work |
+| --- | --- | --- |
+| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
+| `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
+| `local` (diagnostics) | CodeQL only | Mac frontend/UI, Windows real services |
 
-Ordinary docs are a narrow allowlist: root README/CONTRIBUTING, this policy and
-engineering documentation under docs/development or docs/contributing. Scientific,
-publication and release/runbook documents retain their content or platform route.
-Content plus UI requires the union of both routes.
+Light/medium routes do not select heavy hosted acceleration. CodeQL remains on
+GitHub when selected. Broad medium UI changes can require all three browser engines
+on Mac and take longer than a small medium change. `balanced`/`hybrid` are aliases
+for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
-The router reads the complete NUL-delimited raw Git diff. It fetches the exact base
-commit shallowly when missing instead of fetching all history. Deletes, moves,
-symlinks and executable/type changes conservatively select platform. Unknown profiles
-or malformed output fail closed. Scientific engines, scorers, measurement timing,
-API contracts, persistence, shared configuration and schema cannot use the UI route.
-Scope is based on reviewed versioned paths/dependencies, not PR titles or labels;
-new measurement logic needs platform validation even when introduced in a page file.
-force-full can strengthen but never weaken coverage.
+The initial planning target for a warm successful heavy `speed` run is 18–25 minutes
+and 40–55 hosted job-minutes. These are estimates, not measured guarantees or job
+timeouts. Budget cold starts, isolated rollout probes and retries separately, and
+check actual account usage before relying on an old remaining-minute figure.
 
-Content validation retains its existing declaration AST boundary and all-Bundle
-closure. A content-looking path with executable behavior must fail validation;
-it cannot publish. Changes through the application's management UI without a Git
-change use business publication validation rather than a source build. Content
-compiled into a backend release still requires its normal deployment unit and scans.
-CI and CD remain separate under server-version/DEPLOYMENT-CHECKLIST.md.
+## Build and scenario isolation
 
-## Capacity and disk policy
+Build artifacts belong to this run and exact checked-out SHA. The manifest verifies
+SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
+missing or mismatched artifact. No latest-success or cross-run fallback exists.
+Ordinary production and UI-lab builds have distinct names and manifests. Native
+`node_modules` are never transferred between Mac ARM and Linux x64.
 
-The default profile is local. Legacy balanced/hybrid values select this same local
-policy; hosted override is rejected. Mac availability is enabled with the existing
-CI_MAC_LIGHT_ENABLED variable. Routing and aggregate use Mac when enabled, otherwise
-Windows. Offline self-hosted runners do not trigger hosted fallback.
+Production images retain complete Dockerfile builds and HIGH/CRITICAL scans. Buildx
+pulls base images and bypasses runtime-stage caches so OS security updates are not
+hidden by a persistent application build cache.
 
-Windows has one runner with the exclusive eduk12-win-ci label. Do not label multiple
-runners sharing Docker, ports or mutable paths. Every DB job has its own PostgreSQL/
-Redis services and guarded migrations. Heavy preflight requires Linux, at least
-20 GiB free disk and 6 GiB effective memory after every visible cgroup ancestor limit.
-Occupied application ports fail without killing unrelated processes. Future heavy
-parallelism requires measured memory capacity and separate ports/databases/fixtures.
+Media scenarios share dependency/browser installation and compiled artifacts inside
+two groups. Each scenario receives a freshly created `ptool` database and empty Redis
+state inside the current Actions job's pinned disposable service containers. Reset
+requires actual matching job service IDs, exact synthetic loopback URLs, test mode,
+expected images and anonymous volumes. Foreign containers, bind mounts and named
+persistent volumes are rejected. Ports must be free between scenarios. Existing
+fixture guards, test assertions and individual evidence remain mandatory. Standalone
+media workflows invoke the same composite scenario actions as grouped validation.
 
-Mac uses the dedicated non-admin eduk12ci account and eduk12-mac-ci label, with one
-job slot. Its memory can run full frontend checks. Frontend jobs use a 3072 MiB Node
-heap setting and the existing two-worker frontend test limit. Frontend test processes
-use UTC for parity with the former Linux CI; host and production business timezones
-are unchanged. Routing requires at
-least 8 GiB free disk before choosing Mac frontend (5 GiB reserve plus a provisional
-3 GiB working allowance); otherwise both frontend preparation and full build route
-to Windows. Frontend preflight verifies capacity again before dependency installation.
-Control jobs require only 1 GiB disk and 512 MiB memory; Mac light/mini jobs require
-5 GiB disk. The frontend working allowance must be adjusted from measured peaks.
+Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
+PostgreSQL, Redis or Docker on Mac. Chromium retains canonical/staff/classroom
+screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
+complete interaction and legacy-dialog suites. AppShell remains explicitly gated.
 
-Mac post-job cleanup removes only the dedicated checkout's frontend/backend
-node_modules and dist after artifacts are uploaded. npm cache is capped at 512 MiB,
-Actions cache at 256 MiB, tool cache at 512 MiB, all with seven-day expiry. Hourly
-launchd maintenance skips active Runner.Worker processes, clears expired temp/diagnostic
-files and rotates bounded service logs. Symlink roots/parents and personal accounts
-are rejected. Credentials/current runner binaries and personal files are preserved.
-Docker images/browser binaries are kept on Windows, where disk has more capacity;
-there is no global Docker pruning or deletion of retained user data volumes.
+## Resource and cleanup policy
 
-## Acceptance and security
+Mac uses the dedicated non-admin `eduk12ci` account and label `eduk12-mac-ci`.
+Frontend uses the existing 3072 MiB Node heap and test worker limits. Routing requires
+8 GiB disk headroom (5 GiB reserve plus a provisional 3 GiB working allowance), then
+the job checks again. Adjust the allowance using measured peaks. UI checks release
+preview processes and upload evidence before removing temporary outputs.
 
-Versioned acceptance-scopes.json chooses reusable media/browser/visual/PERF/ops gates
-inside the main aggregate. Ordinary PRs select only affected gates. CI changes are
-conservative and select the widest affected set during rollout. Manual full_acceptance
-(default true) explicitly executes all reusable acceptances for exact-commit validation.
-Standalone debug/performance workflows use Windows; they never consume hosted compute.
-Before full rollout, dispatch the existing CI entry with step_probe=images
-(frontend-only and complete image modes) or step_probe=cognitive / step_probe=frontend. The frontend probe calls the same
-reusable workflow as full CI, including lint, types, dependency audit, all frontend
-tests, production build, exact-commit artifact upload and Mac cleanup. Routing, full jobs,
-CodeQL and the normal aggregate are disabled for these component probes. Main image CI calls that same reusable workflow;
-Cognitive probes execute the same shared diagnostic script and include its frontend suites.
-Targeted failures must be repaired and revalidated before another full run.
+Each Mac job removes its frontend/backend/browser `node_modules` and build outputs.
+Download caches are bounded: npm 512 MiB, Actions 256 MiB, tools 512 MiB and browsers
+1536 MiB, with seven-day expiry. The existing hourly idle maintenance skips active
+Runner.Worker processes, rotates service logs and removes expired CI temporary files.
+Post-job cleanup updates the CI-account-owned maintenance script atomically so the
+hourly schedule includes the browser cache. Cleanup rejects symlinks and personal
+accounts and never globally prunes Docker or retained data volumes.
 
-External PRs are blocked in job.if before any self-hosted checkout and again by the
-router. Publication and aggregate also apply that admission guard. Public/untrusted
-contributions require a separate reviewed isolated workflow. Personal production SSH
-keys and environment files must not be accessible to a CI account or printed in logs.
+Windows uses one exclusive `eduk12-win-ci` Linux/WSL runner. Heavy preflight requires
+20 GiB free disk and 6 GiB effective memory across every visible cgroup ancestor.
+Its validated clock guard remains required before runner startup. Tests use UTC;
+host and production business timezones are unchanged. New concurrent heavy slots
+require measured memory and separate ports, services and fixtures.
 
-## Budget and validation
+## Failure handling and rollout
 
-Hosted compute is now the selected CodeQL job alone. Successful historical CodeQL
-median was 7.27 minutes; reserve approximately ten minutes per Ready source validation,
-then replace this estimate with measured billing usage. Ordinary docs, JSON content
-and Draft preparation need no hosted execution. Artifacts/cache storage is accounted
-separately. These are planning estimates, not job timeouts or billing guarantees.
+Diagnose a failure, fix it, and run the affected component and necessary targeted
+regressions with the same implementation/dependencies/parameters/isolation as the
+formal gate. Do not use full CI as the first verification or relax timeouts,
+assertions, authorization boundaries or scan thresholds to obtain a green result.
 
-For a hypothetical 500-minute remaining allowance, provision 400 minutes for forty
-CodeQL runs, 60 for retries and 40 for other account/release needs. Confirm actual
-remaining allowance and shared repository usage before treating this mix as capacity.
+The existing CI workflow exposes `step_probe` values for frontend, backend,
+backend-regression, browser, media, UI, Ops, performance, images and Cognitive checks.
+Probes invoke the formal reusable components and only their build prerequisites;
+they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
+kinds have separate concurrency groups. A successful probe is not a full merge gate.
 
-First validate synthetic actual-Git diffs and fail-closed aggregate across every
-scenario, all workflow syntax and cleanup safeguards. Then run this exact commit's
-Draft checks and one manual full acceptance. Record runner assignment, test counts,
-non-skipping assertions, execution/dependency waits, memory and disk peaks and cleanup.
-Do not merge or claim full rollout success while necessary gates are pending/failed.
+Keep integration work Draft during repair and probes. Freeze the combined functional
+and CI head, verify every affected component, then run one final complete gate.
+Same-source failed-job retries may preserve already successful jobs; changed source
+or validation inputs require renewed relevant verification. Two independent PR green
+results cannot prove their combined source. Main performs the normal post-merge
+integrity smoke without duplicating an already validated complete source tree.
 
-## Dated environment evidence (2026-10-05)
-
-Windows runner 25 has an 8 GiB service limit and 8 GiB WSL cap with memory reclaim.
-Its CI Docker proxy passed complete APT installation and HTTPS verification; formal
-production image results still require the new run. Mac runner 28 starts with launchd;
-idle maintenance passed and the dedicated account could not read the personal
-production SSH key. Previous cancelled Mac trial passed npm install/lint and post-job
-cleanup; typecheck/full regression/build are not claimed passed from that trial.
-
-SJT authoring's CI DB guard now verifies Actions/test context, the current job's exact
-64-character PostgreSQL container ID, the reserved synthetic loopback URL and equality
-to DATABASE_URL; it supports both self-hosted and hosted without spoofing context.
-MEDIA-7 uses its own explicit isolated published fixture, not a mutable DRAFT seed.
-These observations are dated; query actual service state before relying on them.
-
-Billing reference: [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
+not read production SSH keys, environment files, encrypted-backup keys or personal
+data. Required database suites retain non-skipping report assertions.

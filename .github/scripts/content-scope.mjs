@@ -3,6 +3,7 @@ import { appendFileSync, readFileSync, statfsSync } from 'node:fs';
 import { platform } from 'node:os';
 import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { mediaPlan } from './ci-media-plan.mjs';
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -113,16 +114,22 @@ export function changedFiles(base, head = 'HEAD') {
   return changedEntries(base, head).map(entry => entry.file);
 }
 
-export function runnerPlan({ profile = 'local', macEnabled = false, os, freeBytes = 0 }) {
-  if (!['local', 'balanced', 'hybrid'].includes(profile))
-    throw new Error('Unsupported CI_RUNNER_PROFILE; only CodeQL may use hosted compute');
+export function runnerPlan({ profile = 'speed', scenario = 'platform', macEnabled = false, os, freeBytes = 0 }) {
+  if (!['speed','economy','local','balanced','hybrid'].includes(profile)) throw new Error('Unsupported CI_RUNNER_PROFILE');
+  if (['balanced','hybrid'].includes(profile)) profile = 'economy';
   const windows = ['self-hosted', 'Linux', 'X64', 'eduk12-win-ci'];
   const mac = ['self-hosted', 'macOS', 'eduk12-mac-ci'];
+  const hosted = ['ubuntu-24.04'];
   const frontendOnMac = macEnabled && os === 'darwin' && freeBytes >= 8 * 1024 ** 3;
-  return { heavy_runner: windows, light_runner: macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
-    frontend_runner: frontendOnMac ? mac : windows, docker_runner: windows,
-    codeql_runner: ['ubuntu-24.04'],
-    frontend_route_reason: frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
+  const heavy = scenario === 'platform';
+  return { runner_profile:profile,
+    heavy_runner:windows, light_runner:macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
+    frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:hosted,
+    regression_runner:heavy && profile !== 'local' ? hosted : windows,
+    browser_runner:heavy && profile !== 'local' ? hosted : windows,
+    media_runner:heavy && profile === 'speed' ? hosted : windows,
+    visual_hosted:heavy && profile === 'speed',
+    frontend_route_reason:frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
       : 'Windows frontend fallback: Mac disabled or insufficient verified disk' };
 }
 
@@ -141,16 +148,21 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const scenario = result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
   const acceptance = acceptanceFor(files);
-  if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true')
+  if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const disk = statfsSync(process.cwd());
-  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'local',
+  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'speed', scenario,
     macEnabled:process.env.CI_MAC_LIGHT_ENABLED === 'true', os:platform(),
     freeBytes:disk.bavail*disk.bsize });
+  const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
+  const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
+  const frontendBuild = frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
   const codeql = scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const output = { content: result.content, presentation: result.presentation, frontend,
     documentation: result.documentation, codeql, scenario,
+    frontend_build:frontendBuild, ui_required:uiRequired,
+    media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
     scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>

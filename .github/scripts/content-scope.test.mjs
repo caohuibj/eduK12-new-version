@@ -2,9 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
-  return { ...Object.fromEntries(Object.keys(acceptanceFor([])).map(key => [key, 'false'])), content, presentation, frontend, documentation:'false', codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',
-    scenario: content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform', ...extra };
+  const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
+  const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
+    content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
+  const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
+  const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
+  const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
+  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(output.runner_profile === 'speed' && scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
 }
+
 const root = 'server-version/backend/src/modules/';
 const scale = `${root}scale/instruments/new_scale/1.0.0/instrument.ts`;
 const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
@@ -206,7 +212,7 @@ test('UI-only route saves backend regression but retains real API browser, Docke
   const result = classify(files);
   assert.equal(result.frontend, true); assert.equal(result.content, false);
   const needs = {scope: {result:'success', outputs:scopeOutputs('false','false','true')}};
-  assert.deepEqual(requiredChecks(needs,false), ['scope','backend-browser-build','frontend','browser','docker','codeql']);
+  assert.deepEqual(requiredChecks(needs,false), ['scope','backend-browser-build','frontend','browser','docker','frontend-build','codeql']);
   for (const job of requiredChecks(needs,false)) needs[job] = {...needs[job],result:'success'};
   assert.deepEqual(failedChecks(needs,false),[]);
   for (const job of requiredChecks(needs,false))
@@ -243,12 +249,12 @@ test('selected acceptance failures and malformed flags cannot hide behind a succ
   const outputs = scopeOutputs('false','false','true',{media7:'true',canonical_visual:'true'});
   const needs = {scope:{result:'success',outputs}};
   for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
-  assert.ok(requiredChecks(needs,false).includes('accept-media7'));
-  assert.ok(requiredChecks(needs,false).includes('accept-visual'));
+  assert.ok(requiredChecks(needs,false).includes('accept-media'));
+  assert.ok(requiredChecks(needs,false).includes('accept-ui'));
   assert.deepEqual(failedChecks(needs,false),[]);
   for (const result of ['failure','skipped','cancelled',undefined])
-    assert.ok(failedChecks({...needs,'accept-media7':{result}},false).includes('accept-media7'));
-  assert.ok(!requiredChecks(needs,true).includes('accept-media7'));
+    assert.ok(failedChecks({...needs,'accept-media':{result}},false).includes('accept-media'));
+  assert.ok(!requiredChecks(needs,true).includes('accept-media'));
   for(const extra of [{frontend:undefined},{scenario:'content'},{media7:'TRUE'},{canonical_visual:undefined}])
     assert.ok(failedChecks({...needs,scope:{...needs.scope,outputs:{...outputs,...extra}}},false).includes('scope'));
 });
@@ -293,9 +299,9 @@ test('API contracts, persistence and measurement inputs never use the UI shortcu
     assert.equal(frontendFile('server-version/frontend/src/'+path),false,path);
 });
 
-test('local runner plan reserves hosted compute exclusively for CodeQL and routes by Mac disk',()=>{
+test('runner profiles preserve Mac disk fallback and Windows images',()=>{
   const GiB=1024**3;
-  for(const profile of ['local','balanced','hybrid']) {
+  for(const profile of ['speed','economy','local','balanced','hybrid']) {
     const ready=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB});
     assert.deepEqual(ready.frontend_runner,['self-hosted','macOS','eduk12-mac-ci']);
     assert.deepEqual(ready.light_runner,ready.frontend_runner);
@@ -306,7 +312,7 @@ test('local runner plan reserves hosted compute exclusively for CodeQL and route
       assert.deepEqual(fallback.frontend_runner,fallback.heavy_runner);
     }
   }
-  assert.throws(()=>runnerPlan({profile:'hosted'}),/only CodeQL/);
+  assert.throws(()=>runnerPlan({profile:'hosted'}),/Unsupported CI_RUNNER_PROFILE/);
   assert.throws(()=>runnerPlan({profile:'typo'}));
 });
 test('only ordinary documentation qualifies and cannot hide scientific, runbook or executable changes',()=>{

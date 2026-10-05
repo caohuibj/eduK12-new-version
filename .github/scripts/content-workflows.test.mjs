@@ -45,14 +45,14 @@ test('Bundle JSON does not duplicate independent browser workflows; mixed trigge
   }
 });
 const source = name => fs.readFileSync(new URL(`../workflows/${name}.yml`, import.meta.url), 'utf8');
-const job = (text, name) => text.split(`  ${name}:\n`)[1]?.split(/\n  [a-z][a-z-]*:\n/)[0] ?? '';
+const job = (text, name) => text.split(`  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0] ?? '';
 test('Bundle validation is mandatory on content and platform routes with stable aggregate', () => {
   const ci = source('ci'), content = source('scale-onboarding-boundary');
   assert.match(job(ci, 'merge-gate'), /name: merge gate \/ ready PR/);
   assert.match(job(ci, 'scope'), /bundle: \$\{\{ steps.scope.outputs.bundle/);
   assert.match(job(ci, 'content'), /bundle: \$\{\{ needs.scope.outputs.bundle/);
   for (const name of ['backend', 'pr-light-backend', 'post-merge-smoke']) {
-    assert.match(job(ci, name), /run: npx tsx scripts\/bundle-content-check.ts/, name);
+    assert.match(job(name === 'backend' ? source('ci-backend') : ci, name), /run: npx tsx scripts\/bundle-content-check.ts/, name);
   }
   const steps = content.split('      - name: ');
   for (const command of ['scripts/bundle-content-check.ts', 'db:migrate:guarded', 'src/__tests__/bundle-onboarding', 'scripts/assert-release-test-report.mjs', 'tsc --noEmit']) {
@@ -102,38 +102,28 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('local CI distributes Mac and Windows work and retains hosted CodeQL only', () => {
+test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
   const ci=source('ci');
   assert.match(job(ci,'scope'),/runs-on: .*eduk12-mac-ci/);
   assert.match(job(ci,'merge-gate'),/runs-on: .*eduk12-mac-ci/);
-  for(const name of ['backend','backend-regression','browser','backend-browser-build'])
-    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.heavy_runner\)/,name);
-  for(const name of ['visual','pr-light-frontend'])
-    assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/,name);
-  assert.match(job(ci,'miniprogram'),/fromJSON\(needs\.scope\.outputs\.light_runner\)/);
-  assert.match(job(ci,'frontend'),/runner_labels:.*needs\.scope\.outputs\.frontend_runner/);
-  assert.match(job(ci,'docker'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
+  for(const [name,lane] of [['backend','heavy_runner'],['backend-regression','regression_runner'],['browser','browser_runner'],['backend-browser-build','heavy_runner']]) {
+    assert.ok(job(ci,name).includes('runner_labels: ${{ needs.scope.outputs.'+lane+' }}'));
+    assert.match(source('ci-'+name),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
+  }
+  assert.match(job(ci,'frontend-build'),/uses: \.\/\.github\/workflows\/ci-frontend-build\.yml/);
+  assert.match(job(ci,'frontend'),/needs: \[scope, frontend-build\]/);
+  assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend-build\]/);
+  assert.doesNotMatch(job(ci,'browser'),/needs\.frontend\.result/);
+  assert.match(job(ci,'accept-ui'),/runner_labels:.*frontend_runner/);
+  assert.match(job(ci,'accept-visual'),/engine: \[firefox, webkit\]/);
+  assert.match(job(ci,'accept-media'),/media_selection/);
+  for(const name of ['accept-perf','accept-ops']) assert.match(job(ci,name),/needs: \[scope, backend\]/);
   assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
-  const classifier=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
-  assert.match(classifier,/eduk12-win-ci/); assert.match(classifier,/CI_MAC_LIGHT_ENABLED/);
-  assert.match(classifier,/External PRs require/);
-  for(const {workflow} of Object.values(scopes)){
-    const text=fs.readFileSync(new URL('../workflows/'+workflow,import.meta.url),'utf8');
-    assert.match(text,/workflow_call:/,workflow); assert.doesNotMatch(text,/\n  pull_request:/,workflow);
-    assert.match(text,/runner_profile:/,workflow); assert.match(text,/eduk12-win-ci/,workflow);
-    assert.match(text,/github\.event\.pull_request\.draft == false/,workflow);
-  }
-  const backend=job(ci,'backend'), regression=job(ci,'backend-regression');
+  const backend=job(source('ci-backend'),'backend'), regression=job(source('ci-backend-regression'),'backend-regression');
   assert.match(regression,/--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   assert.match(backend,/run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
-  assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend\]/);
-  assert.match(job(ci,'browser'),/!cancelled\(\).*backend-browser-build\.result == 'success'/);
-  assert.match(job(ci,'frontend'),/needs: scope/);
-  for(const name of ['codeql','docker']) assert.match(job(ci,name),/needs: scope/);
-  assert.match(job(ci,'merge-gate'),/accept-media7/);
-  assert.match(job(ci,'merge-gate'),/accept-visual/);
-  assert.match(job(ci,'merge-gate'),/accept-ops/);
+  for(const name of ['accept-media','accept-ui','accept-visual','accept-ops']) assert.ok(job(ci,'merge-gate').includes(name));
 });
 test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
   const docker=job(source('ci-images'),'images');
@@ -149,7 +139,7 @@ test('frontend route builds only the frontend image but preserves scan, CSP and 
   assert.match(docker,/FRONTEND_ONLY:/);
   assert.match(docker,/scan frontend image \(high and critical\)/);
   assert.match(docker,/frontend-nginx-static-smoke/);
-  const browser=job(source('ci'),'browser');
+  const browser=job(source('ci-browser'),'browser');
   for(const check of ['storage fault','four-role','Organization cross-role','production CSP'])
     assert.ok(browser.includes(check),check);
 });
@@ -181,7 +171,7 @@ test('mixed A-B ordering is stable across independent BASE and HEAD fixture seed
 
 
 test('browser build restore retries retain exact-run authority and fail closed', () => {
-  const browser = job(source('ci'), 'browser');
+  const browser = job(source('ci-browser'), 'browser');
   for (const kind of ['frontend', 'backend']) {
     const names = [`restore tested ${kind} build`, `retry tested ${kind} build download`, `final tested ${kind} build download`];
     const steps = browser.split('      - name: ');
@@ -200,14 +190,14 @@ test('browser build restore retries retain exact-run authority and fail closed',
     const guard = steps.find(step => step.startsWith(`verify restored ${kind} entry point\n`));
     assert.ok(guard);
     assert.doesNotMatch(guard, /continue-on-error:|\n        if:/);
-    assert.ok(guard.includes(`run: test -s ${kind}/dist/index.`));
+    assert.ok(guard.includes(`ci-artifact.mjs\" verify ${kind}`));
   }
 });
 
 test('parent authority has draft unit coverage and non-skipping full integration gates', () => {
   const ci = source('ci');
   assert.match(job(ci, 'pr-light-backend'), /vitest run src\/__tests__\/parent-portal/);
-  const regression = job(ci, 'backend-regression');
+  const regression = job(source('ci-backend-regression'), 'backend-regression');
   assert.match(regression, /MINI_OPERATIONS_TEST_REDIS_URL: redis:\/\/localhost:6379/);
   const release = fs.readFileSync(new URL('../../server-version/scripts/release-verify-local.sh', import.meta.url), 'utf8');
   assert.ok(release.includes('export MINI_OPERATIONS_TEST_REDIS_URL="$REDIS_URL"'));
@@ -217,47 +207,38 @@ test('parent authority has draft unit coverage and non-skipping full integration
   }
 });
 
-test('reusable media/browser consumers use only exact-current-run artifacts and preserve independent databases', () => {
-  for(const name of ['media-2-acceptance','media-7-cross-runtime-acceptance','situational-video-acceptance','situational-branching-acceptance','fe-11-app-shell-acceptance']){
-    const text=source(name);
-    assert.match(text,/use_build_artifacts:/,name);
-    assert.match(text,/name: frontend-dist-\$\{\{ github\.sha \}\}/,name);
-    assert.doesNotMatch(text,/\n          (run-id|repository|github-token):/,name);
-    if(name !== 'fe-11-app-shell-acceptance') assert.match(text,/      postgres:/,name);
+test('media probes and grouped execution share scenarios, fresh databases and exact-run artifacts', () => {
+  const media=source('ci-media');
+  for(const kind of ['backend','frontend']) assert.ok(media.includes(kind+'-dist-${{ github.sha }}'));
+  assert.doesNotMatch(media,/\n\s+(run-id|repository|github-token):/);
+  assert.match(media,/postgres:/);assert.match(media,/redis:/);
+  for(const [name,key] of [['media-2-acceptance','media2'],['media-7-cross-runtime-acceptance','media7'],['situational-video-acceptance','situational_video'],['situational-branching-acceptance','situational_branching'],['assessment-video-core-acceptance','video_core']]) {
+    assert.match(source(name),/uses: \.\/\.github\/workflows\/ci-media\.yml/);
+    assert.ok(source(name).includes(`selected: '["${key}"]'`));
+    const action=fs.readFileSync(new URL('../actions/accept-'+key+'/action.yml',import.meta.url),'utf8');
+    assert.match(action,/ci-reset-media-services\.mjs/);assert.match(action,/db:migrate:guarded/);
+    assert.ok(action.includes('browser acceptance'));
   }
-  // Visual UI lab has different build flags: do not reuse the ordinary production artifact.
-  assert.match(source('visual-canonical-qa'),/VITE_UI_LAB_ENABLED: 'true'/);
-  assert.doesNotMatch(source('visual-canonical-qa'),/use_build_artifacts:/);
+  assert.match(source('ci-ui'),/frontend-ui-lab-dist-\$\{\{ github\.sha \}\}/);
+  assert.match(source('ci-ui'),/verify frontend-ui-lab/);
 });
 
-test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs once',()=>{
-  const ci=source('ci');
-  for(const name of ['backend','backend-regression','docker','codeql'])
-    assert.match(job(ci,name),/needs: scope/);
-  assert.match(job(ci,'frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
-  const front=job(source('ci-frontend'),'frontend');
-  assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);
+test('frontend compilation and checks are separate while both remain required',()=>{
+  const ci=source('ci'),front=job(source('ci-frontend'),'frontend');
+  for(const name of ['backend','backend-regression','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
+  assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);assert.match(front,/full frontend tests/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
-  assert.doesNotMatch(front,/pr-light-frontend/);
-  assert.doesNotMatch(front,/server-version\/backend|npm ci --ignore-scripts/);
-  for(const name of ['backend','backend-browser-build']) {
-    assert.match(job(ci,name),/cognitive-ci-diagnostics\.sh/);
-  }
-  assert.match(job(ci,'pr-light-frontend'),/github\.event\.pull_request\.draft == true/);
+  assert.doesNotMatch(front,/npm ci --ignore-scripts/);
+  for(const name of ['backend','backend-browser-build']) assert.match(source('ci-'+name),/cognitive-ci-diagnostics\.sh/);
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   const diagnostic=fs.readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
   assert.match(diagnostic,/server-version\/frontend[\s\S]*npm ci[\s\S]*server-version\/backend[\s\S]*cognitive:onboarding-check -- --all --json/);
   assert.match(job(source('ci-cognitive-step'),'cognitive'),/cognitive-ci-diagnostics\.sh/);
-  assert.match(source('ci-images'),/workflow_dispatch:/);
-  for(const workflow of [...Object.values(scopes).map(s=>s.workflow),'ci-images.yml','ci-cognitive-step.yml']) {
-    const text=fs.readFileSync(new URL('../workflows/'+workflow,import.meta.url),'utf8');
-    assert.doesNotMatch(text,/ubuntu-24/);assert.match(text,/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
-  }
 });
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
   const ci=source('ci');
-  assert.match(ci,/options: \[none, images, cognitive, frontend\]/);
+  assert.match(ci,/options: \[none, images, cognitive, frontend, backend, backend-regression, browser, media, ui, ops, perf\]/);
   for(const name of ['scope','merge-gate']) assert.match(job(ci,name),/inputs\.step_probe == '' \|\| inputs\.step_probe == 'none'/);
   assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
@@ -266,7 +247,7 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-frontend'),/inputs\.step_probe == 'frontend'/);
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(source('ci-frontend'),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
-  for(const name of ['backend','backend-regression','frontend','docker','codeql']) assert.match(job(ci,name),/needs: scope/);
+  for(const name of ['backend','backend-regression','codeql']) assert.match(job(ci,name),/needs: scope/);
 });
 
 test('different component probes have independent concurrency groups while same-route updates cancel stale runs', () => {

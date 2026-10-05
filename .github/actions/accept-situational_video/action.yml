@@ -1,0 +1,80 @@
+name: situational_video acceptance
+description: Shared scenario implementation for isolated probes and grouped CI.
+runs:
+  using: composite
+  steps:
+  - name: reset only this job disposable services
+    shell: bash
+    run: node "$GITHUB_WORKSPACE/.github/scripts/ci-reset-media-services.mjs"
+  - name: clear previous browser evidence
+    run: |
+      rm -rf /tmp/eduk12-situational-video-e2e /tmp/eduk12-situational-video-backend.log /tmp/eduk12-situational-video-frontend.log /tmp/eduk12-situational-video-backend.pid /tmp/eduk12-situational-video-frontend.pid
+    shell: bash
+    working-directory: server-version
+  - name: prisma generate and guarded migration
+    working-directory: server-version/backend
+    run: |
+      npx prisma generate
+      npm run db:migrate:guarded
+    shell: bash
+  - name: seed Situational VIDEO fixture
+    working-directory: server-version/backend
+    run: npx tsx ../e2e/situational-video-browser-fixture.ts
+    shell: bash
+  - name: start backend
+    run: |
+      rm -rf "$SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR"
+      mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR" "$SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR"
+      nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-video-backend.log 2>&1 &
+      echo $! > /tmp/eduk12-situational-video-backend.pid
+      for attempt in $(seq 1 60); do
+        if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+        sleep 1
+      done
+      cat /tmp/eduk12-situational-video-backend.log
+      exit 1
+    shell: bash
+    working-directory: server-version
+  - name: start frontend
+    run: |
+      nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-video-frontend.log 2>&1 &
+      echo $! > /tmp/eduk12-situational-video-frontend.pid
+      for attempt in $(seq 1 60); do
+        if ! kill -0 $(cat /tmp/eduk12-situational-video-frontend.pid) 2>/dev/null; then break; fi
+        if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+        sleep 1
+      done
+      cat /tmp/eduk12-situational-video-frontend.log
+      exit 1
+    shell: bash
+    working-directory: server-version
+  - name: verify built frontend in Chromium
+    run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-video-e2e/preflight
+    shell: bash
+    working-directory: server-version
+  - name: run FE-11 video capability fault acceptance
+    run: node e2e/fe-11-video-fault-browser-e2e.cjs
+    shell: bash
+    working-directory: server-version
+  - name: run Situational VIDEO browser acceptance
+    run: node e2e/situational-video-browser-e2e.cjs
+    shell: bash
+    working-directory: server-version
+  - name: upload Situational VIDEO evidence
+    if: always()
+    continue-on-error: true
+    uses: actions/upload-artifact@v4
+    with:
+      name: situational-video-acceptance-evidence
+      path: |
+        /tmp/eduk12-situational-video-e2e
+        /tmp/eduk12-situational-video-backend.log
+        /tmp/eduk12-situational-video-frontend.log
+      if-no-files-found: ignore
+  - name: stop seeded services
+    if: always()
+    run: |
+      if [ -f /tmp/eduk12-situational-video-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-video-frontend.pid) || true; fi
+      if [ -f /tmp/eduk12-situational-video-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-video-backend.pid) || true; fi
+    shell: bash
+    working-directory: server-version

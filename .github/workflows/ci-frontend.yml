@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   frontend:
-    name: frontend checks and build
+    name: frontend checks
     runs-on: ${{ fromJSON(inputs.runner_labels) }}
     timeout-minutes: 35
     env:
@@ -53,15 +53,6 @@ jobs:
           exit 1
       - name: full frontend tests
         run: npm test
-      - name: build (vite)
-        run: npm run build
-      - name: publish tested frontend for browser acceptance
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-          retention-days: 1
-          if-no-files-found: error
       - name: clean Mac dependencies and outputs after artifact upload
         if: ${{ always() && runner.os == 'macOS' }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"

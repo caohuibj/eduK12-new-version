@@ -1,8 +1,8 @@
-import { lstatSync, readdirSync, rmSync, readFileSync, writeFileSync, realpathSync, truncateSync } from 'node:fs';
+import { lstatSync, readdirSync, rmSync, readFileSync, writeFileSync, realpathSync, truncateSync, renameSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { homedir, platform, userInfo } from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 const MiB = 1024 ** 2;
 function exists(path) { try { return lstatSync(path); } catch (e) { if(e.code === 'ENOENT') return null; throw e; } }
 export function bytes(path) {
@@ -62,8 +62,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       for(const name of ['node_modules','dist']) rmSync(join(base,name),{recursive:true,force:true});
     }
   }
+  if (!idle) {
+    const browser = join(realpathSync(process.env.GITHUB_WORKSPACE),'ci','browser');
+    if(exists(browser) && realpathSync(browser) !== browser) throw new Error('Browser runtime root cannot be a symlink');
+    rmSync(join(browser,'node_modules'),{recursive:true,force:true});
+  }
   const week = 7*24*3600*1000;
   const results = {
+    browsers: boundedCache(join(home,'.cache','eduk12-ci-browsers'),{maxBytes:1536*MiB,maxAgeMs:week}),
     npm: boundedCache(join(home,'.npm','_cacache'),{maxBytes:512*MiB,maxAgeMs:week}),
   };
   removeExpired(join(home,'.npm','_logs'),week);
@@ -75,6 +81,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     for(const name of ['runner.stdout.log','runner.stderr.log','maintenance.stdout.log','maintenance.stderr.log']) {
       const path=join(home,'logs',name); if(exists(path)?.isFile() && bytes(path)>16*MiB) truncateSync(path,0);
     }
+  }
+  if (!idle) {
+    const target = join(home,'tools','mac-ci-cleanup.mjs');
+    const stat = exists(target);
+    if (!stat || !stat.isFile() || stat.isSymbolicLink() || stat.uid !== userInfo().uid || realpathSync(join(home,'tools')) !== join(home,'tools'))
+      throw new Error('Hourly maintenance must be an existing CI-account-owned regular file');
+    const source = readFileSync(fileURLToPath(import.meta.url),'utf8');
+    if (readFileSync(target,'utf8') !== source) {
+      const temporary = target + '.next-' + process.pid;
+      writeFileSync(temporary,source,{mode:0o600,flag:'wx'});
+      renameSync(temporary,target);
+    }
+    results.hourlyMaintenance = 'updated for bounded browser cache cleanup';
   }
   console.log(JSON.stringify({ cleanup:'dedicated Mac CI only', ...results }));
 }

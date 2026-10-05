@@ -1,112 +1,27 @@
 name: Visual QA Canonical Screens
-
 on:
   workflow_call:
     inputs:
       runner_profile:
         type: string
         default: local
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
-    inputs:
-      runner_profile:
-        type: choice
-        options: [local]
-        default: local
-
 permissions:
   contents: read
   actions: read
-  pull-requests: read
-
 concurrency:
-  group: visual-canonical-${{ github.event.pull_request.number || github.ref }}
+  group: visual-canonical-qa-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
 jobs:
-  canonical-visual-qa:
-    # Run the full matrix when the release PR is ready for review.
+  acceptance:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
-    name: canonical 390 / 768 / 1440 screenshot matrix
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
-    timeout-minutes: 30
-    env:
-      VISUAL_QA_BASE_URL: http://127.0.0.1:5173
-      VISUAL_QA_EVIDENCE_DIR: /tmp/eduk12-visual-qa
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      VITE_UI_LAB_ENABLED: 'true'
-    defaults:
-      run:
-        working-directory: server-version
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: configure runner-local npm and Playwright caches
-        run: |
-          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
-          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: backend npm ci for Playwright runtime
-        working-directory: server-version/backend
-        run: npm ci
-      - name: prepare Chromium Firefox and WebKit
-        working-directory: server-version/backend
-        run: |
-          playwright_version="$(node -p "require('playwright-core/package.json').version")"
-          deps_marker="$HOME/.cache/eduk12-ci/playwright-three-browser-deps-${playwright_version}"
-          if [ ! -f "$deps_marker" ]; then
-            npx playwright-core install-deps chromium firefox webkit
-            touch "$deps_marker"
-          fi
-          npx playwright-core install chromium firefox webkit
-      - name: frontend npm ci
-        working-directory: server-version/frontend
-        run: npm ci
-      - name: build production frontend
-        working-directory: server-version/frontend
-        run: npm run build
-      - name: start production preview
-        run: |
-          rm -rf "$VISUAL_QA_EVIDENCE_DIR"
-          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-visual-qa-frontend.log 2>&1 &
-          echo $! > /tmp/eduk12-visual-qa-frontend.pid
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-visual-qa-frontend.log
-          exit 1
-      - name: capture canonical visual matrix
-        run: node e2e/visual-canonical-browser-e2e.cjs
-      - name: capture staff complex controller family
-        run: node e2e/visual-staff-complex-browser-e2e.cjs
-      - name: capture classroom teacher control family
-        run: node e2e/visual-classroom-control-browser-e2e.cjs
-      - name: verify interactions and legacy dialogs in three browsers
-        run: |
-          for engine in chromium firefox webkit; do
-            VISUAL_QA_BROWSER_ENGINE="$engine" VISUAL_QA_EVIDENCE_DIR="$VISUAL_QA_EVIDENCE_DIR/cross-browser-$engine" node e2e/visual-interaction-states-browser-e2e.cjs
-            VISUAL_QA_BROWSER_ENGINE="$engine" VISUAL_QA_EVIDENCE_DIR="$VISUAL_QA_EVIDENCE_DIR/cross-browser-$engine" node e2e/visual-legacy-dialogs-browser-e2e.cjs
-          done
-      - name: upload canonical visual evidence
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-visual-qa-${{ github.sha }}
-          path: |
-            /tmp/eduk12-visual-qa
-            /tmp/eduk12-visual-qa-frontend.log
-          if-no-files-found: ignore
-          retention-days: 7
-      - name: stop frontend
-        if: always()
-        run: |
-          if [ -f /tmp/eduk12-visual-qa-frontend.pid ]; then
-            kill -- -$(cat /tmp/eduk12-visual-qa-frontend.pid) || true
-          fi
+    uses: ./.github/workflows/ci-ui.yml
+    with:
+      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      engine: all
+      canonical: true
+      app_shell: false
+      use_build_artifacts: ${{ inputs.use_build_artifacts || false }}

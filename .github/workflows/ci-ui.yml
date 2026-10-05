@@ -1,0 +1,109 @@
+name: CI UI acceptance component
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+      engine:
+        type: string
+        default: chromium
+      canonical:
+        type: boolean
+        default: true
+      app_shell:
+        type: boolean
+        default: false
+      use_build_artifacts:
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  ui:
+    name: ${{ inputs.engine }} frontend acceptance
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 20
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=3072
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node .github/scripts/runner-preflight.mjs --frontend
+      - name: install only frontend and browser runtime
+        run: |
+          npm ci --prefix server-version/frontend
+          npm ci --prefix ci/browser
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/eduk12-ci-browsers" >> "$GITHUB_ENV"
+      - name: prepare selected browser
+        env:
+          CI_BROWSER_ENGINE: ${{ inputs.engine }}
+        run: |
+          case "$CI_BROWSER_ENGINE" in
+            all) engines=(chromium firefox webkit) ;;
+            chromium|firefox|webkit) engines=("$CI_BROWSER_ENGINE") ;;
+            *) exit 1 ;;
+          esac
+          if [ "$RUNNER_OS" = Linux ]; then
+            node ci/browser/node_modules/playwright-core/cli.js install --with-deps "${engines[@]}"
+          else
+            node ci/browser/node_modules/playwright-core/cli.js install "${engines[@]}"
+          fi
+      - uses: actions/download-artifact@v4
+        if: inputs.app_shell && inputs.use_build_artifacts
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: build standalone AppShell input
+        if: inputs.app_shell && !inputs.use_build_artifacts
+        run: |
+          npm run build --prefix server-version/frontend
+          node .github/scripts/ci-artifact.mjs write frontend
+      - name: AppShell viewport input accessibility
+        if: inputs.app_shell
+        run: |
+          node .github/scripts/ci-artifact.mjs verify frontend
+          node .github/scripts/ci-ui.mjs app-shell chromium
+      - name: remove production preview before restoring UI-lab
+        if: inputs.canonical
+        run: node -e "require('fs').rmSync('server-version/frontend/dist',{recursive:true,force:true})"
+      - uses: actions/download-artifact@v4
+        if: inputs.canonical && inputs.use_build_artifacts
+        with:
+          name: frontend-ui-lab-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: build standalone UI-lab input
+        if: inputs.canonical && !inputs.use_build_artifacts
+        env:
+          VITE_UI_LAB_ENABLED: 'true'
+        run: |
+          npm run build --prefix server-version/frontend
+          node .github/scripts/ci-artifact.mjs write frontend-ui-lab
+      - name: canonical visual and interaction acceptance
+        if: inputs.canonical
+        env:
+          CI_BROWSER_ENGINE: ${{ inputs.engine }}
+        run: |
+          node .github/scripts/ci-artifact.mjs verify frontend-ui-lab
+          node .github/scripts/ci-ui.mjs canonical "$CI_BROWSER_ENGINE"
+      - name: upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-ui-${{ inputs.engine }}-${{ github.sha }}
+          path: ${{ runner.temp }}/eduk12-ui-${{ github.run_id }}-${{ inputs.engine }}
+          retention-days: 3
+          if-no-files-found: ignore
+      - name: clean Mac dependencies outputs and bounded browser cache
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node .github/scripts/mac-ci-cleanup.mjs
+      - name: remove uploaded temporary UI evidence
+        if: always()
+        env:
+          CI_UI_EVIDENCE: ${{ runner.temp }}/eduk12-ui-${{ github.run_id }}-${{ inputs.engine }}
+        run: node -e "require('fs').rmSync(process.env.CI_UI_EVIDENCE,{recursive:true,force:true})"

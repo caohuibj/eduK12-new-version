@@ -11,17 +11,17 @@
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
-# 编排：路径与容量分流；Mac 前端和控制、Windows 单槽重任务、GitHub 仅 CodeQL。
+# 编排：Mac 前端/UI，Windows 迁移/镜像/Ops，GitHub 按场景并行加速。
 #   Router:       changed-scope classification
 #   Dependencies: backend build/performance, functional regression, frontend, CodeQL, Docker
-#   Capacity:     Mac frontend/control overlaps Windows heavy work and hosted CodeQL
-#   Browser:      consumes backend/frontend artifacts from this exact run
+#   Capacity:     heavy speed profile releases builds early and parallelizes hosted consumers
+#   Browser:      consumes exact-run artifacts without waiting for unrelated frontend checks
 #   Merge gate:   exact success for every selected route and acceptance
 #
 # jobs：
 #   backend       : npm ci + prisma generate + guarded migrate deploy + seed + build + 200-completion SLA
 #   backend-regression: independent DB + full regression except the separately gated performance SLA file
-#   frontend      : npm ci + lint + typecheck + full regression + vite build
+#   frontend-build: early production/UI-lab artifacts; frontend: lint/types/audit/full regression
 #   browser       : isolated PostgreSQL/Redis + seeded Bundle + real Playwright acceptance flow
 #   docker        : baseline + monitoring compose config + backend/frontend production image build
 #   merge-gate    : fail-closed aggregate; only exact success for every Full Gate dependency passes
@@ -32,7 +32,7 @@
 #     不扩大本里程碑范围。
 #   - 两个 backend jobs 各有独立 CI Postgres service；集成测试不以跳过代替通过。
 #   - backend/frontend builds use exact GITHUB_SHA artifacts from this run; missing artifacts fail closed.
-#   - browser 下载同一运行的 production frontend build，用 preview 验收，避免重复构建和 Vite 首次转换超时。
+#   - Browser consumers verify source/run/lockfile/content provenance; UI-lab has a separate artifact.
 #   - merge-gate 使用 needs + always()；failure/cancelled/skipped/missing 均不得被解释为 merge-ready。
 
 name: CI
@@ -51,12 +51,12 @@ on:
     inputs:
       runner_profile:
         type: choice
-        options: [local]
-        default: local
-        description: 'Local Mac/Windows execution; GitHub hosted only for CodeQL'
+        options: [speed, economy, local]
+        default: speed
+        description: 'Heavy CI: speed uses hosted parallelism; economy limits hosted jobs; local is diagnostic'
       step_probe:
         type: choice
-        options: [none, images, cognitive, frontend]
+        options: [none, images, cognitive, frontend, backend, backend-regression, browser, media, ui, ops, perf]
         default: none
         description: 'Run one CI component without full CI or CodeQL'
       probe_frontend_only:
@@ -78,6 +78,76 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  probe-frontend-build:
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui"]'), inputs.step_probe)
+    uses: ./.github/workflows/ci-frontend-build.yml
+    with:
+      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      ui_lab: ${{ inputs.step_probe == 'ui' }}
+
+  probe-browser-build:
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)
+    uses: ./.github/workflows/ci-backend-browser-build.yml
+    with:
+      runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
+
+  probe-backend:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend'
+    uses: ./.github/workflows/ci-backend.yml
+    with:
+      runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
+
+  probe-backend-regression:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend-regression'
+    uses: ./.github/workflows/ci-backend-regression.yml
+    with:
+      runner_labels: '["ubuntu-24.04"]'
+
+  probe-browser:
+    needs: [probe-frontend-build, probe-browser-build]
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser'
+    uses: ./.github/workflows/ci-browser.yml
+    with:
+      runner_labels: '["ubuntu-24.04"]'
+
+  probe-media:
+    needs: [probe-frontend-build, probe-browser-build]
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media'
+    uses: ./.github/workflows/ci-media.yml
+    with:
+      runner_labels: '["ubuntu-24.04"]'
+      selected: '["media2","video_core","media7","situational_video","situational_branching"]'
+      groups: '["images-video","cognitive-situational"]'
+
+  probe-ui-mac:
+    needs: probe-frontend-build
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'
+    uses: ./.github/workflows/ci-ui.yml
+    with:
+      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      engine: chromium
+      app_shell: true
+
+  probe-ui-hosted:
+    needs: probe-frontend-build
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [firefox, webkit]
+    uses: ./.github/workflows/ci-ui.yml
+    with:
+      runner_labels: '["ubuntu-24.04"]'
+      engine: ${{ matrix.engine }}
+
+  probe-ops:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops'
+    uses: ./.github/workflows/ops-prelaunch.yml
+
+  probe-perf:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf'
+    uses: ./.github/workflows/perf-phase0-smoke.yml
+
   probe-images:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images'
     uses: ./.github/workflows/ci-images.yml
@@ -89,6 +159,7 @@ jobs:
     uses: ./.github/workflows/ci-cognitive-step.yml
 
   probe-frontend:
+    needs: probe-frontend-build
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend'
     uses: ./.github/workflows/ci-frontend.yml
     with:
@@ -100,6 +171,15 @@ jobs:
     runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 8
     outputs:
+      runner_profile: ${{ steps.scope.outputs.runner_profile }}
+      regression_runner: ${{ steps.scope.outputs.regression_runner }}
+      browser_runner: ${{ steps.scope.outputs.browser_runner }}
+      media_runner: ${{ steps.scope.outputs.media_runner }}
+      visual_hosted: ${{ steps.scope.outputs.visual_hosted }}
+      frontend_build: ${{ steps.scope.outputs.frontend_build }}
+      ui_required: ${{ steps.scope.outputs.ui_required }}
+      media_selection: ${{ steps.scope.outputs.media_selection }}
+      media_groups: ${{ steps.scope.outputs.media_groups }}
       scenario: ${{ steps.scope.outputs.scenario }}
       frontend: ${{ steps.scope.outputs.frontend }}
       documentation: ${{ steps.scope.outputs.documentation }}
@@ -137,10 +217,10 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
-      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs
+      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs
       - id: scope
         env:
-          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
+          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
           CI_MAC_LIGHT_ENABLED: ${{ vars.CI_MAC_LIGHT_ENABLED }}
           CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           CI_EVENT: ${{ github.event_name }}
@@ -178,7 +258,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
       scale: ${{ needs.scope.outputs.scale == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
@@ -364,414 +444,29 @@ jobs:
     needs: scope
     name: backend (migrate + build + performance gate)
     if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
-    timeout-minutes: 35
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      UPLOAD_DIR: /tmp/eduk12-ci-uploads
-      JWT_SECRET: ci-jwt-secret-123456789012345678901234
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      COGNITIVE_MODULE_ENABLED: 'true'
-      REDIS_URL: redis://localhost:6379
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: ptool
-        ports:
-          - 5432:5432
-        # 保持与正式 release gate 相同的持久化语义（默认 durability），
-        # 串行执行已实测满足 200 并发完成门（<10s SLA）。
-        # services.postgres.options 是 docker create 参数：这里的 -c 会被
-        # docker 解析为 --cpu-shares（非法值，服务直接起不来）；要给 PG
-        # 传启动参数必须走 services.postgres.command。
-        options: >-
-          --health-cmd "pg_isready -U ptool -d ptool"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7.4.11-bookworm
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    defaults:
-      run:
-        working-directory: server-version/backend
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: configure runner-local npm cache
-        run: |
-          mkdir -p "$HOME/.npm"
-          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: npm ci
-        run: npm ci
-      - name: dependency audit (high and critical)
-        run: |
-          for attempt in 1 2 3; do
-            if npm audit --audit-level=high; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
-              sleep $((attempt * 10))
-            fi
-          done
-          exit 1
-      - name: content routing boundary tests
-        run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
-      - name: prisma generate
-        run: npx prisma generate
-      - name: prisma migrate deploy
-        run: npm run db:migrate:guarded
-      - name: seed reference and configuration data
-        run: npm run db:seed
-        env:
-          ADMIN_USERNAME: ci-admin
-          ADMIN_PASSWORD: ci-admin-password-2026
-      - name: backfill and validate check-in token protection
-        run: npm run db:backfill:checkin-tokens
-      - name: guarded migration idempotency after seeded data
-        run: npm run db:migrate:guarded
-      - name: PR3 populated baseline-to-head upgrade rehearsal
-        run: node scripts/pr3-baseline-upgrade-rehearsal.mjs
-      - name: prepare release preflight upload directory
-        run: mkdir -p "$UPLOAD_DIR"
-      - name: read-only release data preflight
-        run: npm run db:release:preflight
-      - name: situational data-only manifests and publication gates
-        run: npm run situational:contracts
-      - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
-          npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
-      - name: cognitive task manifests and dependency boundaries
-        run: npm run cognitive:contracts
-      - name: Cognitive onboarding with frontend acceptances
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
-      - name: Bundle content and immutable history
-        env:
-          BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: npx tsx scripts/bundle-content-check.ts
-      - name: build (tsc)
-        run: npm run build
-      - name: publish tested backend build
-        id: backend-build-upload
-        # GitHub artifact creation/finalization can reset connections. Retry
-        # with bounded backoff; the final attempt must succeed or fail the job.
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-      - name: wait before retrying backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
-        run: sleep 15
-      - name: retry backend build upload
-        id: backend-build-upload-retry
-        continue-on-error: true
-        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-          # Finalization may have succeeded remotely before the connection reset.
-          overwrite: true
-      - name: wait before final backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
-        run: sleep 45
-      - name: final backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
-        # Do not ignore this failure: browser must consume this run's exact build.
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-          overwrite: true
-      - name: prelaunch load and resource contract self-tests
-        run: node --test ../scripts/load/prelaunch-mixed-load.test.mjs ../scripts/prelaunch-resource-preflight.test.mjs
-      - name: Wave1 calibration generator contracts
-        run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
-      - name: 200-completion performance and report integrity gate
-        # Keep the <10s burst on its own hosted VM and durable PostgreSQL.
-        run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-performance-vitest.json
-      - name: capture CI environment snapshot
-        if: always()
-        run: |-
-          {
-            echo "node $(node -v)"
-            echo "cpus $(nproc)"
-            grep -E 'MemTotal|MemAvailable' /proc/meminfo
-            df -h /tmp | tail -1
-            date -u +"timestamp %FT%TZ"
-          } > /tmp/eduk12-ci-env.txt
-      - name: performance suite must not skip
-        run: node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-performance-vitest.json src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
-      - name: upload vitest report artifact
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-performance-vitest-report
-          path: |
-            /tmp/eduk12-backend-performance-vitest.json
-            /tmp/eduk12-ci-env.txt
-          if-no-files-found: ignore
-
-      - name: remove this job's ephemeral service containers and anonymous volumes
-        if: always()
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+    uses: ./.github/workflows/ci-backend.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.heavy_runner }}
 
   backend-regression:
     needs: scope
     name: backend regression (isolated job database)
     if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
-    timeout-minutes: 35
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      SJT_UPLOAD_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      UPLOAD_DIR: /tmp/eduk12-ci-uploads
-      JWT_SECRET: ci-jwt-secret-123456789012345678901234
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      COGNITIVE_MODULE_ENABLED: 'true'
-      REDIS_URL: redis://localhost:6379
-      MINI_OPERATIONS_TEST_REDIS_URL: redis://localhost:6379
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: ptool
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U ptool -d ptool"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7.4.11-bookworm
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    defaults:
-      run:
-        working-directory: server-version/backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: check hosted runner disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: npm ci
-        run: npm ci
-      - name: prisma generate and guarded migration
-        run: |
-          npx prisma generate
-          npm run db:migrate:guarded
-      - name: configure independent regression database timezone
-        run: |
-          node <<'NODE'
-          const { PrismaClient } = require('@prisma/client');
-          const target = new URL(process.env.DATABASE_URL);
-          if (process.env.CI !== 'true' || !['localhost', '127.0.0.1'].includes(target.hostname) || target.pathname !== '/ptool') {
-            throw new Error('UTC setup requires the isolated CI database');
-          }
-          async function withClient(action) {
-            const client = new PrismaClient({ datasources: { db: { url: target.href } } });
-            try { await client.$connect(); return await action(client); }
-            finally { await client.$disconnect(); }
-          }
-          (async () => {
-            const before = await withClient(async client => {
-              const result = await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`;
-              await client.$executeRaw`ALTER DATABASE ptool SET timezone TO 'UTC'`;
-              return result[0].zone;
-            });
-            // A new connection verifies the default used by subsequent Prisma pools.
-            const after = await withClient(async client => (await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`)[0].zone);
-            console.log(JSON.stringify({ databaseTimezoneBefore: before, databaseTimezoneAfter: after }));
-            if (after !== 'UTC') throw new Error('CI database UTC configuration did not persist');
-          })().catch(error => { console.error(error); process.exitCode = 1; });
-          NODE
-      - name: seed reference and configuration data
-        run: npm run db:seed
-        env:
-          ADMIN_USERNAME: ci-admin
-          ADMIN_PASSWORD: ci-admin-password-2026
-      - name: backfill check-in token protection
-        run: npm run db:backfill:checkin-tokens
-      - name: frontend dependencies for cross-tree Cognitive package tests
-        working-directory: server-version/frontend
-        run: npm ci --ignore-scripts
-      - name: full functional regression
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-        # Real-PG suites remain serial. The single hardware-sensitive burst is
-        # covered by the isolated backend job and excluded here; every other file runs here.
-        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
-      - name: capture hosted runner resources
-        if: always()
-        run: |-
-          {
-            echo "node $(node -v)"
-            echo "cpus $(nproc)"
-            grep -E 'MemTotal|MemAvailable' /proc/meminfo
-            df -h /tmp | tail -1
-            date -u +"timestamp %FT%TZ"
-          } > /tmp/eduk12-hosted-ci-env.txt
-      - name: hosted critical integration suites must not skip
-        run: >-
-          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
-          src/__tests__/cognitive/concurrency.integration.test.ts
-          src/__tests__/scale/pr3-managed.postgres.integration.test.ts
-          src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts
-          src/__tests__/assessment-reference/scale-wave1-reporting.postgres.integration.test.ts
-          src/__tests__/scale/instruments/learning-motivation-wave1.postgres.integration.test.ts
-          src/__tests__/situational/situational-standalone.postgres.integration.test.ts
-          src/__tests__/situational/situational-vnext.postgres.integration.test.ts
-          src/__tests__/situational/sjt-authoring.postgres.integration.test.ts
-          src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
-          src/__tests__/bundle-product/product.postgres.integration.test.ts
-          src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
-          src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
-          src/__tests__/questionnaire/product.postgres.integration.test.ts
-          src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
-          src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
-          src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
-          src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts
-          src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
-          src/__tests__/migration/legacy-import.postgres.integration.test.ts
-          src/__tests__/migration/public-token-backfill.cli.integration.test.ts
-          src/__tests__/questionnaire/legacy-authoring.postgres.integration.test.ts
-          src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts
-          src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts
-          src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts
-          src/__tests__/composite/situational-bundle.postgres.integration.test.ts
-          src/__tests__/classroom/classroom-start.postgres.integration.test.ts
-          src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
-          src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
-          src/__tests__/hotpath/query-budget.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunConsentRecovery.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunStartClaim.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunAllocationMatrix.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunStartFences.postgres.integration.test.ts
-          src/__tests__/integration/reportingSubgroupPrivacy.postgres.integration.test.ts
-          src/__tests__/integration/reportingCore.postgres.integration.test.ts
-          src/__tests__/integration/reportingHttp.postgres.integration.test.ts
-          src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts
-          src/__tests__/integration/reportingDelivery.postgres.integration.test.ts
-          src/__tests__/integration/reportingSeries.postgres.integration.test.ts
-          src/__tests__/integration/reportingCohortSelector.postgres.integration.test.ts
-          src/__tests__/integration/reportingLongitudinalPlanner.postgres.integration.test.ts
-          src/__tests__/integration/reportingIndividualLongitudinal.postgres.integration.test.ts
-          src/__tests__/integration/organizationProductContext.postgres.integration.test.ts
-          src/__tests__/integration/organizationProductAdmin.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunProductRead.postgres.integration.test.ts
-          src/__tests__/integration/assessmentRunDeliveryModes.postgres.integration.test.ts
-          src/__tests__/integration/respondentAuthority.postgres.integration.test.ts
-          src/__tests__/integration/observerSingleQuestion.postgres.integration.test.ts
-          src/__tests__/integration/anonymousStudy.postgres.integration.test.ts
-          src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts
-          src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
-          src/__tests__/integration/parentPortal.postgres.integration.test.ts
-          src/__tests__/integration/qaRound2.postgres.integration.test.ts
-          src/__tests__/integration/webAcceptanceR2b.postgres.integration.test.ts
-          src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
-          src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
-          src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts
-          src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts
-      - name: upload vitest report artifact
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-vitest-report
-          path: |
-            /tmp/eduk12-backend-vitest.json
-            /tmp/eduk12-hosted-ci-env.txt
-          if-no-files-found: ignore
-      - name: remove this job's ephemeral services and anonymous volumes
-        if: always()
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+    uses: ./.github/workflows/ci-backend-regression.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.regression_runner }}
 
+  frontend-build:
+    name: frontend artifacts / release consumers early
+    needs: scope
+    if: needs.scope.outputs.frontend_build == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    uses: ./.github/workflows/ci-frontend-build.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
+      ui_lab: ${{ needs.scope.outputs.canonical_visual == 'true' }}
 
   frontend:
-    needs: scope
+    needs: [scope, frontend-build]
     name: frontend (lint + types + full tests + build)
     if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ci-frontend.yml
@@ -781,344 +476,16 @@ jobs:
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
     # Browser acceptance executes after both production lanes have passed.
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.frontend.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
-    timeout-minutes: 35
-    env:
-      NODE_ENV: test
-      PORT: '3000'
-      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      JWT_SECRET: ci-jwt-secret-123456789012345678901234
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
-      ASSET_MIGRATION_COMPLETE: 'false'
-      COOKIE_SECURE: 'false'
-      CORS_ORIGIN: http://127.0.0.1:5173
-      REDIS_URL: redis://localhost:6379
-      SOCKET_REDIS_REQUIRED: 'true'
-      COGNITIVE_MODULE_ENABLED: 'true'
-      # Browser START acceptance owns a fake fixture; production never opts in.
-      COGNITIVE_TEST_FIXTURES_ENABLED: 'true'
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      BACKGROUND_WORKERS_ENABLED: 'false'
-      TRUST_PROXY_HOPS: '0'
-      LOG_LEVEL: warn
-      UPLOAD_DIR: /tmp/eduk12-situational-bundle-e2e-uploads
-      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-bundle-e2e-credentials
-      SITUATIONAL_STATIC_VISUAL_FIXTURE: 'true'
-      SITUATIONAL_BUNDLE_E2E_INSTRUMENT_KEY: sjt-static-visual-e2e-fixture
-      SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-situational-bundle-fixture.json
-      SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
-      SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-bundle-e2e
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: ptool
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U ptool -d ptool"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7.4.11-bookworm
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    defaults:
-      run:
-        working-directory: server-version
-    steps:
-      - uses: actions/checkout@v4
-      - name: clear previous browser evidence
-        run: |
-          rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log /tmp/eduk12-bundle-products-e2e /tmp/eduk12-bundle-products-backend.log /tmp/eduk12-questionnaire-public-e2e /tmp/reporting-v22-evidence
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: configure runner-local npm and Playwright caches
-        run: |
-          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
-          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
-      - name: restore hosted dependency downloads
-        if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
-          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
-      - name: restore hosted Chromium binaries
-        if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: backend npm ci
-        working-directory: server-version/backend
-        run: npm ci
-      - name: prepare Chromium for seeded browser
-        working-directory: server-version/backend
-        run: |
-          playwright_version="$(node -p "require('playwright-core/package.json').version")"
-          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
-          if [ ! -f "$deps_marker" ]; then
-            npx playwright-core install-deps chromium
-            touch "$deps_marker"
-          fi
-          npx playwright-core install chromium
-      - name: frontend npm ci
-        working-directory: server-version/frontend
-        run: npm ci
-      - name: restore tested frontend build
-        id: frontend-build-download
-        # Runner DNS/transport can fail transiently even when the artifact exists.
-        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-      - name: wait before retrying frontend build download
-        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
-        run: sleep 15
-      - name: retry tested frontend build download
-        id: frontend-build-download-retry
-        continue-on-error: true
-        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-      - name: wait before final frontend build download
-        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
-        run: sleep 45
-      - name: final tested frontend build download
-        # Final failure remains fatal, even if earlier attempts left partial files.
-        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-      - name: verify restored frontend entry point
-        run: test -s frontend/dist/index.html
-      - name: prisma generate and guarded migration
-        working-directory: server-version/backend
-        run: |
-          npx prisma generate
-          npm run db:migrate:guarded
-      - name: seed reference and configuration data
-        working-directory: server-version/backend
-        run: npm run db:seed
-        env:
-          ADMIN_USERNAME: ci-admin
-          ADMIN_PASSWORD: ci-admin-password-2026
-      - name: restore tested backend build
-        id: backend-build-download
-        # Runner DNS/transport can fail transiently even when the artifact exists.
-        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-      - name: wait before retrying backend build download
-        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
-        run: sleep 15
-      - name: retry tested backend build download
-        id: backend-build-download-retry
-        continue-on-error: true
-        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-      - name: wait before final backend build download
-        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
-        run: sleep 45
-      - name: final tested backend build download
-        # Final failure remains fatal, even if earlier attempts left partial files.
-        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-      - name: verify restored backend entry point
-        run: test -s backend/dist/index.js
-      - name: seed isolated Bundle fixture
-        working-directory: server-version/backend
-        run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
-      - name: seed PR5 Organization fixture
-        working-directory: server-version/backend
-        run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
-      - name: start backend
-        run: |
-          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
-          nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-bundle-backend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-bundle-backend.pid
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-situational-bundle-backend.log
-          exit 1
-      - name: start frontend
-        run: |
-          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-bundle-frontend.pid
-          for attempt in $(seq 1 60); do
-            if ! kill -0 $(cat /tmp/eduk12-situational-bundle-frontend.pid) 2>/dev/null; then break; fi
-            if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-situational-bundle-frontend.log
-          exit 1
-      - name: verify built frontend in Chromium
-        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
-      - name: run seeded browser acceptance
-        run: node e2e/situational-bundle-browser-e2e.cjs
-      - name: run FE-11 storage fault acceptance
-        run: node e2e/fe-11-storage-fault-browser-e2e.cjs
-      - name: run RA-02 four-role relational acceptance
-        run: node e2e/relational-four-role-browser-e2e.cjs
-      - name: run PR5 Organization cross-role acceptance
-        run: node e2e/pr5-organization-browser-e2e.cjs
-      - name: seed three PR5 business scenarios
-        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-fixture.ts
-      - name: start isolated PR5 scenario resource server
-        env:
-          PR5_SCENARIOS_ENABLED: 'true'
-          # This loopback-only synthetic scenario explicitly includes parents.
-          # The production default and the preceding closed-entry checks stay off.
-          PARENT_PORTAL_ENABLED: 'true'
-        run: |
-          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
-          for attempt in $(seq 1 30); do
-            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
-            sleep 1
-          done
-          nohup setsid backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-server.ts > /tmp/eduk12-pr5-scenario-backend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-bundle-backend.pid
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-pr5-scenario-backend.log
-          exit 1
-      - name: certify three PR5 business scenarios
-        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios.ts
-      - name: rehearse PR5 encrypted backup restore and migration failure recovery
-        env:
-          PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-        run: node e2e/pr5-release-rehearsal.mjs
-      - name: verify Bundle V3 browser lifecycle in isolated catalog
-        env:
-          BUNDLE_PRODUCTS_ENABLED: 'true'
-          BUNDLE_PRODUCT_ISOLATED_DB: '1'
-          BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-          BUNDLE_PRODUCT_BASE_URL: http://127.0.0.1:5173
-          BUNDLE_PRODUCT_EVIDENCE: /tmp/eduk12-bundle-products-e2e
-        run: |
-          rm -rf /tmp/eduk12-bundle-products-e2e
-          backend/node_modules/.bin/tsx e2e/bundle-products-fixture.ts
-          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
-          for attempt in $(seq 1 30); do
-            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
-            sleep 1
-          done
-          nohup setsid backend/node_modules/.bin/tsx e2e/bundle-products-server.ts > /tmp/eduk12-bundle-products-backend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-bundle-backend.pid
-          ready=false
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then ready=true; break; fi
-            sleep 1
-          done
-          if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
-          node e2e/bundle-products-browser-e2e.cjs
-      - name: multi-role respondent inbox responsive acceptance
-        env:
-          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
-          INBOX_E2E_OUTPUT: /tmp/eduk12-inbox-e2e
-        run: node e2e/multi-role-inbox-browser-e2e.cjs
-      - name: anonymous study identity responsive acceptance
-        env:
-          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
-          STUDY_E2E_OUTPUT: /tmp/eduk12-anonymous-study-e2e
-        run: node e2e/anonymous-study-browser-e2e.cjs
-      - name: Reporting V2.2 final product scenarios
-        env:
-          REPORTING_BROWSER_ISOLATED_DB: '1'
-          REPORTING_BROWSER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-          REPORTING_BROWSER_BASE_URL: http://127.0.0.1:5173
-        run: |
-          backend/node_modules/.bin/tsx e2e/reporting-v22-fixture.ts
-          node e2e/reporting-v22-browser-e2e.cjs
-      - name: anonymous questionnaire completion and exhausted-link recovery
-        env:
-          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
-          QUESTIONNAIRE_PRODUCT_PUBLIC: '1'
-          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-          QUESTIONNAIRE_PRODUCT_BASE_URL: http://127.0.0.1:5173
-          QUESTIONNAIRE_PRODUCT_EVIDENCE: /tmp/eduk12-questionnaire-public-e2e
-        run: |
-          backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
-          node e2e/questionnaire-products-browser-e2e.cjs
-      - name: enforced production CSP browser acceptance
-        run: |
-          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
-          node e2e/production-csp-browser.cjs
-      - name: upload seeded browser evidence
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: situational-bundle-browser-evidence
-          path: |
-            /tmp/eduk12-situational-bundle-e2e
-            /tmp/eduk12-situational-bundle-backend.log
-            /tmp/eduk12-situational-bundle-frontend.log
-            /tmp/eduk12-pr5-scenarios-evidence
-            /tmp/eduk12-pr5-release-rehearsal
-            /tmp/eduk12-pr5-scenario-backend.log
-            /tmp/eduk12-bundle-products-e2e
-            /tmp/eduk12-questionnaire-public-e2e
-            /tmp/reporting-v22-evidence
-            /tmp/eduk12-bundle-products-backend.log
-          if-no-files-found: ignore
-      - name: stop seeded services
-        if: always()
-        run: |
-          if [ -f /tmp/eduk12-situational-bundle-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-frontend.pid) || true; fi
-          if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) || true; fi
-
-      - name: remove this job's ephemeral service containers and anonymous volumes
-        if: always()
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+    needs: [scope, backend, backend-browser-build, frontend-build]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    uses: ./.github/workflows/ci-browser.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.browser_runner }}
 
   docker:
     name: docker (compose config + production builds)
-    needs: scope
-    if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    needs: [scope, backend, backend-browser-build]
+    if: ${{ !cancelled() && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -1182,146 +549,73 @@ jobs:
   backend-browser-build:
     name: UI/content route / backend browser build
     needs: scope
-    if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.frontend == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
-    timeout-minutes: 15
-    env:
-      COGNITIVE_MODULE_ENABLED: 'true'
-      BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-    defaults:
-      run:
-        working-directory: server-version/backend
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: prepare canvas source-build dependencies
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
-      - name: npm ci
-        run: npm ci
-      - name: prisma generate
-        run: npx prisma generate
-      - name: Cognitive onboarding with frontend acceptances
-        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
-      - name: build unchanged backend for real API acceptance
-        run: npm run build
-      - name: publish tested backend build
-        id: backend-build-upload
-        # GitHub artifact creation/finalization can reset connections. Retry
-        # with bounded backoff; the final attempt must succeed or fail the job.
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-      - name: wait before retrying backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
-        run: sleep 15
-      - name: retry backend build upload
-        id: backend-build-upload-retry
-        continue-on-error: true
-        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-          # Finalization may have succeeded remotely before the connection reset.
-          overwrite: true
-      - name: wait before final backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
-        run: sleep 45
-      - name: final backend build upload
-        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
-        # Do not ignore this failure: browser must consume this run's exact build.
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
-          overwrite: true
-
-  accept-media2:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media2 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/media-2-acceptance.yml
+    if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario != 'platform' && needs.scope.outputs.media_selection != '[]')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+      runner_labels: ${{ needs.scope.outputs.heavy_runner }}
 
-  accept-media7:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media7 == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/media-7-cross-runtime-acceptance.yml
-    with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
-  accept-situational-video:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_video == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/situational-video-acceptance.yml
-    with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
-  accept-situational-branching:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.situational_branching == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/situational-branching-acceptance.yml
-    with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
-  accept-video-core:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.video_core == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/assessment-video-core-acceptance.yml
-    with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
 
-  accept-app-shell:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.app_shell == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/fe-11-app-shell-acceptance.yml
+
+
+
+
+
+
+
+
+
+
+  accept-media:
+    needs: [scope, backend, backend-browser-build, frontend-build]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media_selection != '[]' && needs.frontend-build.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    uses: ./.github/workflows/ci-media.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
-      use_build_artifacts: ${{ needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') }}
+      runner_labels: ${{ needs.scope.outputs.media_runner }}
+      selected: ${{ needs.scope.outputs.media_selection }}
+      groups: ${{ needs.scope.outputs.media_groups }}
+
+  accept-ui:
+    needs: [scope, frontend-build, frontend]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (needs.frontend.result == 'success' || needs.frontend.result == 'skipped') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    uses: ./.github/workflows/ci-ui.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
+      engine: ${{ needs.scope.outputs.visual_hosted == 'true' && 'chromium' || 'all' }}
+      canonical: ${{ needs.scope.outputs.canonical_visual == 'true' }}
+      app_shell: ${{ needs.scope.outputs.app_shell == 'true' }}
 
   accept-visual:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.canonical_visual == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
-    uses: ./.github/workflows/visual-canonical-qa.yml
+    needs: [scope, frontend-build]
+    if: needs.scope.outputs.canonical_visual == 'true' && needs.scope.outputs.visual_hosted == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [firefox, webkit]
+    uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
+      runner_labels: '["ubuntu-24.04"]'
+      engine: ${{ matrix.engine }}
 
   accept-perf:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    needs: [scope, backend]
+    if: needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
 
   accept-ops:
-    needs: [scope, backend, backend-browser-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) && (needs.scope.outputs.content == 'true' || needs.scope.outputs.presentation == 'true' || (needs.frontend.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success'))) }}
+    needs: [scope, backend]
+    if: needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
+      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
 
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend, browser, docker, codeql, miniprogram, accept-media2, accept-media7, accept-situational-video, accept-situational-branching, accept-video-core, accept-app-shell, accept-visual, accept-perf, accept-ops]
+    needs: [scope, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops]
     if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 8
