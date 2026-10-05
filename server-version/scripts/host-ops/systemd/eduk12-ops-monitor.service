@@ -1,0 +1,33 @@
+[Unit]
+Description=eduK12 bounded observe-only host monitoring
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 -B /opt/eduk12-ops/current/monitor.py
+TimeoutStartSec=180
+UMask=0077
+StateDirectory=eduk12-ops
+StateDirectoryMode=0700
+LogsDirectory=eduk12-ops
+LogsDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/eduk12-ops /var/log/eduk12-ops
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=20%
+MemoryMax=192M
+TasksMax=32
+StandardOutput=journal
+StandardError=journal

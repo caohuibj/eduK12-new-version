@@ -1,0 +1,41 @@
+{
+  "disk_paths": [
+    "/"
+  ],
+  "disk_warning_percent": 80,
+  "disk_critical_percent": 90,
+  "minimum_free_bytes": 2147483648,
+  "failure_samples": 2,
+  "recovery_samples": 2,
+  "repeat_seconds": 21600,
+  "containers": [
+    "eduk12-prod-frontend",
+    "eduk12-prod-backend",
+    "eduk12-prod-worker",
+    "eduk12-prod-postgres",
+    "eduk12-prod-redis"
+  ],
+  "ready_urls": [
+    "https://api.eduk12.top/ready",
+    "https://eduk12.top/ready"
+  ],
+  "tls_hosts": [
+    "api.eduk12.top",
+    "eduk12.top"
+  ],
+  "backup_roots": [
+    "/opt/eduk12-new/deploy",
+    "/backup/ptool"
+  ],
+  "backup_max_age_hours": 36,
+  "unreferenced_volume_warning": 2,
+  "integrity_files": [
+    "/etc/ssh/sshd_config",
+    "/etc/nginx/nginx.conf",
+    "/etc/eduk12-ops/config.json",
+    "/opt/eduk12-ops/current/monitor.py",
+    "/etc/systemd/system/eduk12-ops-monitor.service",
+    "/etc/systemd/system/eduk12-ops-monitor.timer"
+  ],
+  "cos_backup_receipt": "/opt/eduk12-new/deploy/cos-backup-migration-20261005/manifest.json"
+}
