@@ -54,6 +54,15 @@ on:
         options: [local]
         default: local
         description: 'Local Mac/Windows execution; GitHub hosted only for CodeQL'
+      step_probe:
+        type: choice
+        options: [none, images, cognitive]
+        default: none
+        description: 'Run one CI component without full CI or CodeQL'
+      probe_frontend_only:
+        type: boolean
+        default: false
+        description: 'Image probe: frontend only; false builds backend/worker/frontend'
       full_acceptance:
         type: boolean
         default: true
@@ -69,9 +78,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  probe-images:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images'
+    uses: ./.github/workflows/ci-images.yml
+    with:
+      frontend_only: ${{ inputs.probe_frontend_only }}
+
+  probe-cognitive:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive'
+    uses: ./.github/workflows/ci-cognitive-step.yml
+
   scope:
     name: classify changed content
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 8
     outputs:
@@ -457,11 +476,8 @@ jobs:
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
-      - name: Cognitive frontend acceptance dependencies
-        working-directory: server-version/frontend
-        run: npm ci
-      - name: all Cognitive onboarding decisions
-        run: npm run cognitive:onboarding-check -- --all --json
+      - name: Cognitive onboarding with frontend acceptances
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
       - name: Bundle content and immutable history
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -1142,118 +1158,11 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Production images are built in the dedicated Windows Linux slot.
-    # No backend/browser artifacts are consumed here; the merge gate requires all.
     needs: scope
     if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.docker_runner) }}
-    timeout-minutes: 45
-    env:
-      JWT_SECRET: ci-jwt-secret-123456789012345678901234
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
-      ASSET_MIGRATION_COMPLETE: 'true'
-      COOKIE_SECURE: 'true'
-      DB_USER: ci-ptool
-      DB_PASSWORD: ci-ptool-password
-      DB_NAME: ptool
-      DATABASE_URL: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?schema=public
-      POSTGRES_EXPORTER_DATA_SOURCE_NAME: postgresql://ci-ptool:ci-ptool-password@postgres:5432/ptool?sslmode=disable
-      ADMIN_USERNAME: ci-admin
-      ADMIN_PASSWORD: ci-admin-password-2026
-      GRAFANA_PASSWORD: ci-grafana-password-2026
-      COGNITIVE_MODULE_ENABLED: 'true'
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      CORS_ORIGIN: https://localhost
-    defaults:
-      run:
-        working-directory: server-version
-    steps:
-      - uses: actions/checkout@v4
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - name: configure runner-local Trivy cache
-        id: runner-cache
-        run: |
-          trivy_cache="$HOME/.cache/trivy"
-          trivy_bin_dir="$HOME/.local/bin/trivy-bin"
-          mkdir -p "$trivy_cache" "$trivy_bin_dir"
-          echo "trivy_cache=$trivy_cache" >> "$GITHUB_OUTPUT"
-          echo "$trivy_bin_dir" >> "$GITHUB_PATH"
-      - name: detect runner-local Trivy 0.70.0
-        id: trivy-local
-        run: |
-          trivy_bin="$HOME/.local/bin/trivy-bin/trivy"
-          if [ -x "$trivy_bin" ] && "$trivy_bin" --version 2>/dev/null | grep -q '^Version: 0\.70\.0$'; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: install Trivy 0.70.0 once per runner
-        if: steps.trivy-local.outputs.ready != 'true'
-        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-        with:
-          version: v0.70.0
-          cache: false
-      - name: validate compose
-        run: docker compose config --format json > /tmp/eduk12-compose-config.json
-      - name: assert prelaunch resource and HTTPS contract
-        run: node scripts/prelaunch-resource-preflight.mjs --compose-json /tmp/eduk12-compose-config.json
-      - name: assert API/worker isolation topology
-        run: node scripts/assert-compose-worker-topology.mjs /tmp/eduk12-compose-config.json
-      - name: validate monitoring compose
-        run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
-      - name: build production images
-        env:
-          FRONTEND_ONLY: ${{ needs.scope.outputs.frontend }}
-        run: |
-          if [ "$FRONTEND_ONLY" = true ]; then
-            images=(frontend)
-          else
-            images=(backend worker frontend)
-          fi
-          # Persistent runners must refresh security updates even if a pinned
-          # base tag/digest is unchanged. Keep expensive deps/build stage caches.
-          docker compose build --print "${images[@]}" > "$RUNNER_TEMP/eduk12-ci-images.bake.json"
-          node "$GITHUB_WORKSPACE/.github/scripts/ci-image-plan.mjs" "$RUNNER_TEMP/eduk12-ci-images.bake.json"
-          docker buildx bake --file "$RUNNER_TEMP/eduk12-ci-images.bake.json" \
-            --pull --load --print "${images[@]}" > "$RUNNER_TEMP/eduk12-ci-images.resolved.json"
-          node "$GITHUB_WORKSPACE/.github/scripts/ci-image-plan.mjs" "$RUNNER_TEMP/eduk12-ci-images.resolved.json" --verify
-          docker buildx bake --file "$RUNNER_TEMP/eduk12-ci-images.bake.json" \
-            --pull --load "${images[@]}"
-      - name: verify production Nginx static asset MIME and security headers
-        run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
-      - name: scan backend image (high and critical)
-        if: needs.scope.outputs.frontend != 'true'
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: server-version-backend:latest
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          cache: 'false'
-          skip-setup-trivy: true
-          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
-      - name: scan frontend image (high and critical)
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: server-version-frontend:latest
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          cache: 'false'
-          skip-setup-trivy: true
-          cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
+    uses: ./.github/workflows/ci-images.yml
+    with:
+      frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
 
   codeql:
     name: codeql (javascript/typescript SAST)
@@ -1338,11 +1247,8 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
-      - name: Cognitive frontend acceptance dependencies
-        working-directory: server-version/frontend
-        run: npm ci
-      - name: all Cognitive onboarding decisions
-        run: npm run cognitive:onboarding-check -- --all --json
+      - name: Cognitive onboarding with frontend acceptances
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
       - name: build unchanged backend for real API acceptance
         run: npm run build
       - name: publish tested backend build
@@ -1457,7 +1363,7 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [scope, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend, browser, docker, codeql, miniprogram, accept-media2, accept-media7, accept-situational-video, accept-situational-branching, accept-video-core, accept-app-shell, accept-visual, accept-perf, accept-ops]
-    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
+    if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 8
     env:

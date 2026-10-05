@@ -112,7 +112,8 @@ test('local CI distributes Mac and Windows work and retains hosted CodeQL only',
     assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/,name);
   assert.match(job(ci,'miniprogram'),/fromJSON\(needs\.scope\.outputs\.light_runner\)/);
   assert.match(job(ci,'frontend'),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/);
-  assert.match(job(ci,'docker'),/fromJSON\(needs\.scope\.outputs\.docker_runner\)/);
+  assert.match(job(ci,'docker'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
+  assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
   const classifier=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
   assert.match(classifier,/eduk12-win-ci/); assert.match(classifier,/CI_MAC_LIGHT_ENABLED/);
@@ -135,12 +136,16 @@ test('local CI distributes Mac and Windows work and retains hosted CodeQL only',
   assert.match(job(ci,'merge-gate'),/accept-ops/);
 });
 test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
-  const docker=job(source('ci'),'docker');
-  assert.match(docker,/images=\(frontend\)/);
-  assert.match(docker,/images=\(backend worker frontend\)/);
-  assert.match(docker,/docker compose build --print/);
-  assert.match(docker,/ci-image-plan\.mjs.*--verify/);
-  assert.match(docker,/--pull --load --print/);
+  const docker=job(source('ci-images'),'images');
+  const build=fs.readFileSync(new URL('./build-ci-images.sh',import.meta.url),'utf8');
+  assert.match(build,/true\) images=\(frontend\)/);
+  assert.match(build,/false\) images=\(backend worker frontend\)/);
+  assert.match(build,/docker compose --env-file \/dev\/null build --print/);
+  assert.ok(build.indexOf('compose.json" --print') < build.indexOf('ci-image-plan.mjs"'));
+  assert.match(build,/ci-image-plan\.mjs.*--verify/);
+  assert.match(build,/--pull --load --print/);
+  assert.match(docker,/build-ci-images\.sh/);
+  assert.match(job(source('ci'),'docker'),/frontend_only:.*frontend == 'true'/);
   assert.match(docker,/FRONTEND_ONLY:/);
   assert.match(docker,/scan frontend image \(high and critical\)/);
   assert.match(docker,/frontend-nginx-static-smoke/);
@@ -235,13 +240,27 @@ test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs on
   assert.doesNotMatch(front,/pr-light-frontend/);
   assert.doesNotMatch(front,/server-version\/backend|npm ci --ignore-scripts/);
   for(const name of ['backend','backend-browser-build']) {
-    assert.match(job(ci,name),/cognitive:onboarding-check -- --all --json/);
-    assert.match(job(ci,name),/Cognitive frontend acceptance dependencies\n        working-directory: server-version\/frontend\n        run: npm ci/);
+    assert.match(job(ci,name),/cognitive-ci-diagnostics\.sh/);
   }
   assert.match(job(ci,'pr-light-frontend'),/github\.event\.pull_request\.draft == true/);
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
-  for(const {workflow} of Object.values(scopes)) {
+  const diagnostic=fs.readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
+  assert.match(diagnostic,/server-version\/frontend[\s\S]*npm ci[\s\S]*server-version\/backend[\s\S]*cognitive:onboarding-check -- --all --json/);
+  assert.match(job(source('ci-cognitive-step'),'cognitive'),/cognitive-ci-diagnostics\.sh/);
+  assert.match(source('ci-images'),/workflow_dispatch:/);
+  for(const workflow of [...Object.values(scopes).map(s=>s.workflow),'ci-images.yml','ci-cognitive-step.yml']) {
     const text=fs.readFileSync(new URL('../workflows/'+workflow,import.meta.url),'utf8');
     assert.doesNotMatch(text,/ubuntu-24/);assert.match(text,/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
   }
+});
+
+test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
+  const ci=source('ci');
+  assert.match(ci,/options: \[none, images, cognitive\]/);
+  for(const name of ['scope','merge-gate']) assert.match(job(ci,name),/inputs\.step_probe == '' \|\| inputs\.step_probe == 'none'/);
+  assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
+  assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
+  assert.match(job(ci,'probe-cognitive'),/inputs\.step_probe == 'cognitive'/);
+  assert.match(job(ci,'probe-cognitive'),/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  for(const name of ['backend','backend-regression','frontend','docker','codeql']) assert.match(job(ci,name),/needs: scope/);
 });

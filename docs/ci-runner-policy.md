@@ -113,6 +113,11 @@ inside the main aggregate. Ordinary PRs select only affected gates. CI changes a
 conservative and select the widest affected set during rollout. Manual full_acceptance
 (default true) explicitly executes all reusable acceptances for exact-commit validation.
 Standalone debug/performance workflows use Windows; they never consume hosted compute.
+Before full rollout, dispatch the existing CI entry with step_probe=images
+(frontend-only and complete image modes) or step_probe=cognitive. Routing, full jobs,
+CodeQL and the normal aggregate are disabled for these component probes. Main image CI calls that same reusable workflow;
+Cognitive probes execute the same shared diagnostic script and include its frontend suites.
+Targeted failures must be repaired and revalidated before another full run.
 
 External PRs are blocked in job.if before any self-hosted checkout and again by the
 router. Publication and aggregate also apply that admission guard. Public/untrusted
