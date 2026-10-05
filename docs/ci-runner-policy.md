@@ -33,7 +33,7 @@ validation. A server release is separate from WeChat mini-program publication.
 
 ```mermaid
 flowchart LR
-  S[Classify and preflight] --> FB[Mac: early production and UI-lab builds]
+  S[Classify and preflight] --> FB[Mac production / parallel hosted UI-lab builds]
   FB --> FC[Mac: full frontend checks]
   FC --> UI[Mac: Chromium, screenshots and AppShell]
   S --> BB[Windows: backend build and guarded migrations]
@@ -66,7 +66,7 @@ Profiles are explicit:
 
 | Profile | Hosted heavy work | Local work |
 | --- | --- | --- |
-| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
+| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, UI-lab build, Firefox and WebKit | Mac frontend/Chromium/UI; Windows migrations/images/Ops/performance |
 | `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
 | `local` (diagnostics) | CodeQL only | Mac frontend/UI, Windows real services |
 
@@ -76,7 +76,7 @@ on Mac and take longer than a small medium change. `balanced`/`hybrid` are alias
 for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
 The initial planning target for a warm successful heavy `speed` run is 18–25 minutes
-and 40–55 hosted job-minutes. These are estimates, not measured guarantees or job
+and approximately 40–58 hosted job-minutes. These are estimates, not measured guarantees or job
 timeouts. Budget cold starts, isolated rollout probes and retries separately, and
 check actual account usage before relying on an old remaining-minute figure.
 
@@ -85,7 +85,9 @@ check actual account usage before relying on an old remaining-minute figure.
 Build artifacts belong to this run and exact checked-out SHA. The manifest verifies
 SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
 missing or mismatched artifact. No latest-success or cross-run fallback exists.
-Ordinary production and UI-lab builds have distinct names and manifests. Native
+Ordinary production and UI-lab builds have distinct names and manifests. In heavy
+`speed` runs, the UI-lab build runs on GitHub alongside the Mac production build,
+so its extra compile does not extend the Mac queue. Native
 `node_modules` are never transferred between Mac ARM and Linux x64.
 
 Production images retain complete Dockerfile builds and HIGH/CRITICAL scans. Buildx
@@ -104,7 +106,9 @@ media workflows invoke the same composite scenario actions as grouped validation
 Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
 PostgreSQL, Redis or Docker on Mac. Chromium retains canonical/staff/classroom
 screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
-complete interaction and legacy-dialog suites. AppShell remains explicitly gated.
+complete interaction and legacy-dialog suites. AppShell remains explicitly gated. The QA round 3 component browser flow runs on Mac
+with its synthetic local APIs; real authorization and scoring remain covered by
+the independent backend/database gates.
 
 ## Resource and cleanup policy
 
@@ -115,11 +119,12 @@ the job checks again. Adjust the allowance using measured peaks. UI checks relea
 preview processes and upload evidence before removing temporary outputs.
 
 Each Mac job removes its frontend/backend/browser `node_modules` and build outputs.
-Download caches are bounded: npm 512 MiB, Actions 256 MiB, tools 512 MiB and browsers
-1536 MiB, with seven-day expiry. The existing hourly idle maintenance skips active
+Download caches are bounded: npm 512 MiB, Actions 256 MiB and tools 512 MiB,
+with seven-day expiry. Browser installations use the job temporary directory and
+are removed after each job; they do not accumulate a persistent browser cache. The existing hourly idle maintenance skips active
 Runner.Worker processes, rotates service logs and removes expired CI temporary files.
-Post-job cleanup updates the CI-account-owned maintenance script atomically so the
-hourly schedule includes the browser cache. Cleanup rejects symlinks and personal
+Interrupted browser installations are covered by the existing idle temporary-file
+expiry without modifying the protected maintenance service. Cleanup rejects symlinks and personal
 accounts and never globally prunes Docker or retained data volumes.
 
 Windows uses one exclusive `eduk12-win-ci` Linux/WSL runner. Heavy preflight requires
@@ -136,7 +141,7 @@ formal gate. Do not use full CI as the first verification or relax timeouts,
 assertions, authorization boundaries or scan thresholds to obtain a green result.
 
 The existing CI workflow exposes `step_probe` values for frontend, backend,
-backend-regression, browser, media, UI, Ops, performance, images and Cognitive checks.
+backend-regression, browser, media, UI, QA component UI, Ops, performance, images and Cognitive checks.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.

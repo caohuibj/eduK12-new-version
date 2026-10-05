@@ -56,7 +56,7 @@ on:
         description: 'Heavy CI: speed uses hosted parallelism; economy limits hosted jobs; local is diagnostic'
       step_probe:
         type: choice
-        options: [none, images, cognitive, frontend, backend, backend-regression, browser, media, ui, ops, perf]
+        options: [none, images, cognitive, frontend, backend, backend-regression, reporting, browser, media, ui, qa-ui, ops, perf]
         default: none
         description: 'Run one CI component without full CI or CodeQL'
       probe_frontend_only:
@@ -79,11 +79,12 @@ concurrency:
 
 jobs:
   probe-frontend-build:
-    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui"]'), inputs.step_probe)
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","qa-ui"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
       runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
       ui_lab: ${{ inputs.step_probe == 'ui' }}
+      ui_runner_labels: '["ubuntu-24.04"]'
 
   probe-browser-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)
@@ -98,10 +99,11 @@ jobs:
       runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
 
   probe-backend-regression:
-    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend-regression'
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","reporting"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
+      focus: ${{ inputs.step_probe == 'reporting' && 'reporting' || 'full' }}
 
   probe-browser:
     needs: [probe-frontend-build, probe-browser-build]
@@ -127,6 +129,16 @@ jobs:
       runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
       engine: chromium
       app_shell: true
+      qa_round3: true
+
+  probe-qa-ui:
+    needs: probe-frontend-build
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui'
+    uses: ./.github/workflows/ci-ui.yml
+    with:
+      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      canonical: false
+      qa_round3: true
 
   probe-ui-hosted:
     needs: probe-frontend-build
@@ -464,6 +476,7 @@ jobs:
     with:
       runner_labels: ${{ needs.scope.outputs.frontend_runner }}
       ui_lab: ${{ needs.scope.outputs.canonical_visual == 'true' }}
+      ui_runner_labels: ${{ needs.scope.outputs.visual_hosted == 'true' && '["ubuntu-24.04"]' || needs.scope.outputs.frontend_runner }}
 
   frontend:
     needs: [scope, frontend-build]
@@ -586,6 +599,7 @@ jobs:
       engine: ${{ needs.scope.outputs.visual_hosted == 'true' && 'chromium' || 'all' }}
       canonical: ${{ needs.scope.outputs.canonical_visual == 'true' }}
       app_shell: ${{ needs.scope.outputs.app_shell == 'true' }}
+      qa_round3: ${{ needs.scope.outputs.canonical_visual == 'true' }}
 
   accept-visual:
     needs: [scope, frontend-build]

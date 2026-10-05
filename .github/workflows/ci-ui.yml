@@ -14,6 +14,9 @@ on:
       app_shell:
         type: boolean
         default: false
+      qa_round3:
+        type: boolean
+        default: false
       use_build_artifacts:
         type: boolean
         default: true
@@ -39,7 +42,7 @@ jobs:
         run: |
           npm ci --prefix server-version/frontend
           npm ci --prefix ci/browser
-          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/eduk12-ci-browsers" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/eduk12-ci-browsers" >> "$GITHUB_ENV"
       - name: prepare selected browser
         env:
           CI_BROWSER_ENGINE: ${{ inputs.engine }}
@@ -55,12 +58,12 @@ jobs:
             node ci/browser/node_modules/playwright-core/cli.js install "${engines[@]}"
           fi
       - uses: actions/download-artifact@v4
-        if: inputs.app_shell && inputs.use_build_artifacts
+        if: (inputs.app_shell || inputs.qa_round3) && inputs.use_build_artifacts
         with:
           name: frontend-dist-${{ github.sha }}
           path: server-version/frontend/dist
       - name: build standalone AppShell input
-        if: inputs.app_shell && !inputs.use_build_artifacts
+        if: (inputs.app_shell || inputs.qa_round3) && !inputs.use_build_artifacts
         run: |
           npm run build --prefix server-version/frontend
           node .github/scripts/ci-artifact.mjs write frontend
@@ -91,6 +94,15 @@ jobs:
         run: |
           node .github/scripts/ci-artifact.mjs verify frontend-ui-lab
           node .github/scripts/ci-ui.mjs canonical "$CI_BROWSER_ENGINE"
+      - name: QA round 3 real components with synthetic local APIs
+        if: inputs.qa_round3
+        env:
+          PLAYWRIGHT_CORE_PATH: ${{ github.workspace }}/ci/browser/node_modules/playwright-core
+          QA_EVIDENCE: ${{ runner.temp }}/eduk12-ui-${{ github.run_id }}-${{ inputs.engine }}/qa-round3
+          QA_BUILD_KIND: ${{ inputs.canonical && 'frontend-ui-lab' || 'frontend' }}
+        run: |
+          node .github/scripts/ci-artifact.mjs verify "$QA_BUILD_KIND"
+          node server-version/e2e/qa-round3-browser-e2e.cjs "$QA_EVIDENCE"
       - name: upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -99,7 +111,7 @@ jobs:
           path: ${{ runner.temp }}/eduk12-ui-${{ github.run_id }}-${{ inputs.engine }}
           retention-days: 3
           if-no-files-found: ignore
-      - name: clean Mac dependencies outputs and bounded browser cache
+      - name: clean Mac dependencies outputs and temporary browsers
         if: ${{ always() && runner.os == 'macOS' }}
         run: node .github/scripts/mac-ci-cleanup.mjs
       - name: remove uploaded temporary UI evidence

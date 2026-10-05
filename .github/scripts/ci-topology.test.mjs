@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { runnerPlan } from './content-scope.mjs';
 import { treeDigest, verifyManifest } from './ci-artifact.mjs';
 import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
+import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
 test('speed profile assigns independent heavy consumers to hosted Linux and preserves Windows resource exclusivity',()=>{
@@ -68,4 +69,11 @@ test('Mac browser runtime uses the same pinned Playwright build without installi
   assert.equal(browser.packages['node_modules/playwright-core'].version,backend.packages['node_modules/playwright-core'].version);
   assert.equal(browser.packages['node_modules/playwright-core'].integrity,backend.packages['node_modules/playwright-core'].integrity);
   assert.deepEqual(Object.keys(browser.packages),['','node_modules/playwright-core']);
+});
+
+test('temporary browser cleanup cannot target a personal directory or another checkout',()=>{
+  const home='/Users/eduk12ci';
+  assertRunnerTemp(home,home+'/actions-runner/_work/_temp');
+  for(const path of ['/Users/Qiang/Library/Caches',home+'/actions-runner/_work/repo/repo',home+'/actions-runner/_work/_temp/..'])
+    assert.throws(()=>assertRunnerTemp(home,path));
 });

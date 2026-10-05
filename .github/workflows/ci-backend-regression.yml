@@ -6,6 +6,9 @@ on:
       runner_labels:
         type: string
         required: true
+      focus:
+        type: string
+        default: full
 
 permissions:
   contents: read
@@ -119,7 +122,20 @@ jobs:
       - name: frontend dependencies for cross-tree Cognitive package tests
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
+      - name: validate regression selection
+        env:
+          REGRESSION_FOCUS: ${{ inputs.focus }}
+        run: |
+          case "$REGRESSION_FOCUS" in full|reporting) ;; *) exit 1 ;; esac
+      - name: reporting fixture and HTTP regression
+        if: inputs.focus == 'reporting'
+        run: |
+          npm test -- src/__tests__/integration/parentPortal.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-parent-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-parent-vitest.json src/__tests__/integration/parentPortal.postgres.integration.test.ts
+          npm test -- src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
       - name: full functional regression
+        if: inputs.focus == 'full'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         # Real-PG suites remain serial. The single hardware-sensitive burst is
@@ -136,6 +152,7 @@ jobs:
             date -u +"timestamp %FT%TZ"
           } > /tmp/eduk12-hosted-ci-env.txt
       - name: hosted critical integration suites must not skip
+        if: inputs.focus == 'full'
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
           src/__tests__/cognitive/concurrency.integration.test.ts
@@ -204,6 +221,7 @@ jobs:
           name: backend-vitest-report
           path: |
             /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-parent-vitest.json
             /tmp/eduk12-hosted-ci-env.txt
           if-no-files-found: ignore
       - name: remove this job's ephemeral services and anonymous volumes

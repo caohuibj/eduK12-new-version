@@ -175,7 +175,13 @@
       "server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx",
       "server-version/frontend/src/modules/composite/*Report*.tsx",
       "server-version/frontend/src/pages/bundle/BundleReport.tsx",
-      "server-version/frontend/src/modules/cognitive/pages/CognitiveHistory.tsx"
+      "server-version/frontend/src/modules/cognitive/pages/CognitiveHistory.tsx",
+      "server-version/e2e/qa-round3-browser-e2e.cjs",
+      "server-version/e2e/qa-round3-browser-fixture.tsx",
+      "server-version/frontend/src/pages/ScaleEdit.tsx",
+      "server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx",
+      "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+      "server-version/frontend/src/pages/admin/ReportingContent.tsx"
     ]
   },
   "perf_smoke": {
