@@ -136,8 +136,11 @@ test('local CI distributes Mac and Windows work and retains hosted CodeQL only',
 });
 test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
   const docker=job(source('ci'),'docker');
-  assert.match(docker,/docker compose build frontend/);
-  assert.match(docker,/docker compose build backend worker frontend/);
+  assert.match(docker,/images=\(frontend\)/);
+  assert.match(docker,/images=\(backend worker frontend\)/);
+  assert.match(docker,/docker compose build --print/);
+  assert.match(docker,/ci-image-plan\.mjs.*--verify/);
+  assert.match(docker,/--pull --load --print/);
   assert.match(docker,/FRONTEND_ONLY:/);
   assert.match(docker,/scan frontend image \(high and critical\)/);
   assert.match(docker,/frontend-nginx-static-smoke/);
@@ -230,6 +233,9 @@ test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs on
   assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
   assert.doesNotMatch(front,/pr-light-frontend/);
+  assert.doesNotMatch(front,/server-version\/backend|npm ci --ignore-scripts/);
+  for(const name of ['backend','backend-browser-build'])
+    assert.match(job(ci,name),/cognitive:onboarding-check -- --all --json/);
   assert.match(job(ci,'pr-light-frontend'),/github\.event\.pull_request\.draft == true/);
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   for(const {workflow} of Object.values(scopes)) {

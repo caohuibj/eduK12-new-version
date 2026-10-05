@@ -29,11 +29,15 @@ flowchart TD
 ```
 
 Backend, image and CodeQL lanes depend on routing rather than frontend lint. Ready
-frontend lint/types/full regression/build share one dependency installation. Drafts
+frontend lint/types/full regression/build share one dependency installation. Cognitive
+onboarding diagnostics run in the selected Windows backend build, reusing its dependencies. Drafts
 retain the preparation-only frontend job. Browser consumers use this run's exact SHA
 backend/frontend artifacts; no latest-success or cross-run fallback is permitted.
 Application compilation is reused across browser consumers; production images retain
-independent complete Docker builds and scans at the same source. Different UI-lab
+independent complete Docker builds and scans at the same source. Persistent Windows
+image builds pull base images and bypass only runtime-stage caches via Buildx Bake,
+so apt/apk security updates run again even when the pinned base digest is unchanged.
+Dependency and application compilation caches remain reusable; HIGH/CRITICAL scans stay mandatory. Different UI-lab
 build flags deliberately require that acceptance's own frontend build.
 
 ## Scenario selection

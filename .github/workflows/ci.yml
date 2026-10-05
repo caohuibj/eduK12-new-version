@@ -112,7 +112,7 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
-      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs
+      - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs
       - id: scope
         env:
           CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'local' }}
@@ -457,6 +457,8 @@ jobs:
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
+      - name: all Cognitive onboarding decisions
+        run: npm run cognitive:onboarding-check -- --all --json
       - name: Bundle content and immutable history
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -785,12 +787,6 @@ jobs:
           exit 1
       - name: full frontend tests
         run: npm test
-      - name: install offline Cognitive diagnostic dependencies
-        working-directory: server-version/backend
-        run: npm ci --ignore-scripts
-      - name: all Cognitive onboarding decisions
-        working-directory: server-version/backend
-        run: npm run cognitive:onboarding-check -- --all --json
       - name: build (vite)
         run: npm run build
       - name: publish tested frontend for browser acceptance
@@ -1143,7 +1139,7 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    # Production images are built on a separate hosted VM.
+    # Production images are built in the dedicated Windows Linux slot.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
     needs: scope
     if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
@@ -1215,10 +1211,19 @@ jobs:
           FRONTEND_ONLY: ${{ needs.scope.outputs.frontend }}
         run: |
           if [ "$FRONTEND_ONLY" = true ]; then
-            docker compose build frontend
+            images=(frontend)
           else
-            docker compose build backend worker frontend
+            images=(backend worker frontend)
           fi
+          # Persistent runners must refresh security updates even if a pinned
+          # base tag/digest is unchanged. Keep expensive deps/build stage caches.
+          docker compose build --print "${images[@]}" > "$RUNNER_TEMP/eduk12-ci-images.bake.json"
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-image-plan.mjs" "$RUNNER_TEMP/eduk12-ci-images.bake.json"
+          docker buildx bake --file "$RUNNER_TEMP/eduk12-ci-images.bake.json" \
+            --pull --load --print "${images[@]}" > "$RUNNER_TEMP/eduk12-ci-images.resolved.json"
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-image-plan.mjs" "$RUNNER_TEMP/eduk12-ci-images.resolved.json" --verify
+          docker buildx bake --file "$RUNNER_TEMP/eduk12-ci-images.bake.json" \
+            --pull --load "${images[@]}"
       - name: verify production Nginx static asset MIME and security headers
         run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
       - name: scan backend image (high and critical)
@@ -1330,6 +1335,8 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
+      - name: all Cognitive onboarding decisions
+        run: npm run cognitive:onboarding-check -- --all --json
       - name: build unchanged backend for real API acceptance
         run: npm run build
       - name: publish tested backend build
