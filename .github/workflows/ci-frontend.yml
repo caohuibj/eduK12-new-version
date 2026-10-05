@@ -1,0 +1,59 @@
+name: CI frontend component
+
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: frontend checks
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 35
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=3072
+      TZ: UTC
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: npm ci
+        run: npm ci
+      - name: lint
+        run: npm run lint
+      - name: typecheck
+        run: npm run typecheck
+      - name: dependency audit (high and critical)
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
+              sleep $((attempt * 10))
+            fi
+          done
+          exit 1
+      - name: full frontend tests
+        run: npm test
+      - name: clean Mac dependencies and outputs after artifact upload
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
+

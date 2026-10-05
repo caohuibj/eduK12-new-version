@@ -1,6 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, statfsSync } from 'node:fs';
+import { platform } from 'node:os';
+import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { mediaPlan } from './ci-media-plan.mjs';
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -24,6 +27,15 @@ export function domainFor(file) {
   return null;
 }
 
+// Ordinary engineering documentation only; scientific/publication/runbook
+// documents keep their existing domain or platform validation.
+export function documentationFile(file) {
+  return typeof file === 'string' && !/[\\\x00-\x1f\x7f]/.test(file)
+    && !file.split('/').some(part => !part || part === '.' || part === '..')
+    && (['README.md', 'CONTRIBUTING.md', 'docs/ci-runner-policy.md'].includes(file)
+      || /^docs\/(development|contributing)\/[a-zA-Z0-9_./-]+\.md$/.test(file));
+}
+
 export function presentationFile(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return false;
@@ -31,10 +43,29 @@ export function presentationFile(file) {
     || /^server-version\/docs\/frontend-[a-zA-Z0-9_-]+\.md$/.test(file);
 }
 
+// UI-only changes must not introduce measurement algorithms, client runtime
+// semantics, dependencies, or shared build/CI changes through a broad prefix.
+export function frontendFile(file) {
+  if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
+      || /[\\\x00-\x1f\x7f]/.test(file)) return false;
+  if (!file.startsWith(frontendSrc) || !/\.(?:tsx?|css|scss)$/.test(file)) return false;
+  return !/^server-version\/frontend\/src\/(?:modules\/(?:cognitive|situational|composite|assessment-runtime|assessment-bundle)\/|(?:api|types|services)\/|modules\/assessment-context\/|utils\/(?:scor|assessment|cognitive|situational)|.*(?:scoring|scorer|algorithm|finalizer|trial-timing|reference-data))/i.test(file);
+}
+
+export function acceptanceFor(files) {
+  const scopes = JSON.parse(readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
+  return Object.fromEntries(Object.entries(scopes).map(([id, { paths }]) => [id,
+    files.some(file => paths.reduce((selected, pattern) =>
+      posix.matchesGlob(file, pattern.startsWith('!') ? pattern.slice(1) : pattern)
+        ? !pattern.startsWith('!') : selected, false))]));
+}
+
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
   return {
-    content: files.length > 0 && files.every(domainFor),
+    documentation: files.length > 0 && files.every(documentationFile),
+    content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontendFile(file)),
+    frontend: files.length > 0 && files.some(frontendFile) && files.every(file => domainFor(file) || frontendFile(file)) && !files.every(presentationFile),
     presentation: files.length > 0 && files.every(presentationFile),
     domains,
   };
@@ -63,8 +94,10 @@ export function classifyChanges(entries, forceFull = false) {
       || (status === 'M' && oldMode === '100644')));
   return {
     ...result,
+    documentation: !forceFull && result.documentation && regularChanges,
     content: !forceFull && result.content && regularChanges,
     presentation: !forceFull && result.presentation && regularChanges,
+    frontend: !forceFull && result.frontend && regularChanges,
   };
 }
 
@@ -81,15 +114,60 @@ export function changedFiles(base, head = 'HEAD') {
   return changedEntries(base, head).map(entry => entry.file);
 }
 
+export function runnerPlan({ profile = 'speed', scenario = 'platform', macEnabled = false, os, freeBytes = 0 }) {
+  if (!['speed','economy','local','balanced','hybrid'].includes(profile)) throw new Error('Unsupported CI_RUNNER_PROFILE');
+  if (['balanced','hybrid'].includes(profile)) profile = 'economy';
+  const windows = ['self-hosted', 'Linux', 'X64', 'eduk12-win-ci'];
+  const mac = ['self-hosted', 'macOS', 'eduk12-mac-ci'];
+  const hosted = ['ubuntu-24.04'];
+  const frontendOnMac = macEnabled && os === 'darwin' && freeBytes >= 8 * 1024 ** 3;
+  const heavy = scenario === 'platform';
+  return { runner_profile:profile,
+    heavy_runner:windows, light_runner:macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
+    frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:hosted,
+    regression_runner:heavy && profile !== 'local' ? hosted : windows,
+    browser_runner:heavy && profile !== 'local' ? hosted : windows,
+    media_runner:heavy && profile === 'speed' ? hosted : windows,
+    visual_hosted:heavy && profile === 'speed',
+    frontend_route_reason:frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
+      : 'Windows frontend fallback: Mac disabled or insufficient verified disk' };
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  const result = event === 'workflow_dispatch' ? { content: false, presentation: false, domains: [] } : classifyChanges(changedEntries(base), process.env.CI_FORCE_FULL === 'true');
-  const output = { content: result.content, presentation: result.presentation, scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'), situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle') };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles',
-    reason: result.content ? 'allowlisted regular content files'
-      : result.presentation ? 'allowlisted regular presentation-only files'
-        : 'platform, manual override, empty or non-regular changes' }));
+  // Admission is also checked in job.if before any self-hosted checkout.
+  if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
+    throw new Error('External PRs require a separately approved isolated workflow; no self-hosted execution');
+  const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
+  const files = entries.map(entry => entry.file);
+  const result = event === 'workflow_dispatch'
+    ? { content:false, presentation:false, frontend:false, documentation:false, domains:[] }
+    : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
+  const frontend = result.frontend === true;
+  const scenario = result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+    : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
+  const acceptance = acceptanceFor(files);
+  if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
+    for (const key of Object.keys(acceptance)) acceptance[key] = true;
+  const disk = statfsSync(process.cwd());
+  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'speed', scenario,
+    macEnabled:process.env.CI_MAC_LIGHT_ENABLED === 'true', os:platform(),
+    freeBytes:disk.bavail*disk.bsize });
+  const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
+  const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
+  const frontendBuild = frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
+  const codeql = scenario === 'platform' || frontend
+    || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
+  const output = { content: result.content, presentation: result.presentation, frontend,
+    documentation: result.documentation, codeql, scenario,
+    frontend_build:frontendBuild, ui_required:uiRequired,
+    media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
+    scale: result.domains.includes('scale'), cognitive: result.domains.includes('cognitive'),
+    situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
+    ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
+      [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles' }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

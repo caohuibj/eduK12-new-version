@@ -1,16 +1,12 @@
 name: PERF Phase 0 exploratory
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
-    paths:
-      - 'server-version/backend/src/**'
-      - 'server-version/backend/scripts/**'
-      - 'server-version/perf/**'
-      - 'docs/performance-optimization-v1/**'
-      - '.github/workflows/perf-phase0-exploratory.yml'
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [local]
+        default: local
 
 concurrency:
   group: perf-phase0-exploratory-${{ github.event.pull_request.number || github.ref }}
@@ -49,7 +45,7 @@ jobs:
   invariants:
     name: P2-C01 PostgreSQL + privacy invariants
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 30
     services:
       postgres:
@@ -119,7 +115,7 @@ jobs:
     # Capacity/curve work is evidence collection, not a per-PR correctness gate.
     # Keep it manual until the qualified 4C4G host is available.
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 40
     strategy:
       fail-fast: false

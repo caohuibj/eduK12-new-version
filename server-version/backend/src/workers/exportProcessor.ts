@@ -1,5 +1,7 @@
 import { fork } from 'node:child_process'
 import path from 'node:path'
+import { createRequire } from 'node:module'
+import { pathToFileURL } from 'node:url'
 import { exportQueue, RESOURCE_LIMITS } from '../config/queue'
 import { prisma } from '../config/database'
 import { failExportBatchFinal, releaseExportBatchAttempt, isFinalExportAttempt, reconcilePendingExportBatches } from '../services/exportJobService'
@@ -8,7 +10,8 @@ import { logger } from '../utils/logger'
 export const runExportSubprocess = (job: any): Promise<unknown> => new Promise((resolve, reject) => {
   const source = __filename.endsWith('.ts')
   const child = fork(path.join(__dirname, `exportBatchChild.${source ? 'ts' : 'js'}`), [], {
-    execArgv: source ? ['--import', 'tsx'] : [], stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
+    // Resolve against this module: source workers can be started outside backend/.
+    execArgv: source ? ['--import', pathToFileURL(createRequire(__filename).resolve('tsx')).href] : [], stdio: ['ignore', 'inherit', 'inherit', 'ipc'],
   })
   let result: unknown
   let failed = false

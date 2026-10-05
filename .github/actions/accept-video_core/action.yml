@@ -1,0 +1,66 @@
+name: video_core acceptance
+description: Shared scenario implementation for isolated probes and grouped CI.
+runs:
+  using: composite
+  steps:
+  - name: reset only this job disposable services
+    shell: bash
+    run: node "$GITHUB_WORKSPACE/.github/scripts/ci-reset-media-services.mjs"
+  - name: prisma generate and guarded migration
+    working-directory: server-version/backend
+    run: |
+      npx prisma generate
+      npm run db:migrate:guarded
+    shell: bash
+  - name: seed assessment video core fixture
+    working-directory: server-version/backend
+    run: npx tsx ../e2e/assessment-video-core-fixture.ts
+    shell: bash
+  - name: start backend
+    run: |
+      rm -rf "$ASSESSMENT_VIDEO_E2E_SCREENSHOT_DIR"
+      mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR" "$ASSESSMENT_VIDEO_E2E_SCREENSHOT_DIR"
+      nohup setsid node backend/dist/index.js > /tmp/eduk12-assessment-video-backend.log 2>&1 &
+      echo $! > /tmp/eduk12-assessment-video-backend.pid
+      for attempt in $(seq 1 60); do
+        if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+        sleep 1
+      done
+      cat /tmp/eduk12-assessment-video-backend.log
+      exit 1
+    shell: bash
+    working-directory: server-version
+  - name: start frontend
+    run: |
+      nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-assessment-video-frontend.log 2>&1 &
+      echo $! > /tmp/eduk12-assessment-video-frontend.pid
+      for attempt in $(seq 1 60); do
+        if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+        sleep 1
+      done
+      cat /tmp/eduk12-assessment-video-frontend.log
+      exit 1
+    shell: bash
+    working-directory: server-version
+  - name: run native video core browser acceptance
+    run: node e2e/assessment-video-core-browser-e2e.cjs
+    shell: bash
+    working-directory: server-version
+  - name: upload video core evidence
+    if: always()
+    continue-on-error: true
+    uses: actions/upload-artifact@v4
+    with:
+      name: assessment-video-core-acceptance-evidence
+      path: |
+        /tmp/eduk12-assessment-video-e2e
+        /tmp/eduk12-assessment-video-backend.log
+        /tmp/eduk12-assessment-video-frontend.log
+      if-no-files-found: ignore
+  - name: stop seeded services
+    if: always()
+    run: |
+      if [ -f /tmp/eduk12-assessment-video-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-assessment-video-frontend.pid) || true; fi
+      if [ -f /tmp/eduk12-assessment-video-backend.pid ]; then kill -- -$(cat /tmp/eduk12-assessment-video-backend.pid) || true; fi
+    shell: bash
+    working-directory: server-version

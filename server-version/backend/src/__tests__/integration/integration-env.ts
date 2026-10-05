@@ -26,3 +26,13 @@ export const requireIsolatedReleaseDatabase = (selectedUrl: string): void => {
     throw new Error('explicitly selected isolated loopback test database required')
   }
 }
+
+/** The exact disposable Actions service, independent of the runner host OS. */
+export const isActionsServiceDatabase = (selectedUrl: string): boolean =>
+  process.env.CI === 'true' &&
+  process.env.GITHUB_ACTIONS === 'true' &&
+  process.env.NODE_ENV === 'test' &&
+  ['github-hosted', 'self-hosted'].includes(process.env.RUNNER_ENVIRONMENT ?? '') &&
+  /^[a-f0-9]{64}$/.test(process.env.CI_POSTGRES_SERVICE_ID ?? '') &&
+  selectedUrl === 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public' &&
+  process.env.DATABASE_URL === selectedUrl

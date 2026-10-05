@@ -1,0 +1,241 @@
+name: CI grouped media acceptance
+'on':
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+      selected:
+        type: string
+        required: true
+      groups:
+        type: string
+        required: true
+      use_build_artifacts:
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  media:
+    name: ${{ matrix.group }}
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(inputs.groups) }}
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+        - 5432:5432
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+        - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: validate selected media coverage
+      env:
+        CI_MEDIA_SELECTED: ${{ inputs.selected }}
+        CI_MEDIA_GROUPS: ${{ inputs.groups }}
+      run: node .github/scripts/ci-media-plan.mjs
+    - name: verify runner resources
+      run: |-
+        node .github/scripts/runner-preflight.mjs
+        bash server-version/scripts/ci-disk-preflight.sh
+    - name: configure isolated test keys
+      run: |
+        for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
+          value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+          echo "::add-mask::$value"
+          echo "$name=$value" >> "$GITHUB_ENV"
+        done
+    - name: configure runner-local npm and Playwright caches
+      run: |
+        mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+        echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+        echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+    - name: prepare native and browser dependencies once per group
+      run: |-
+        bash server-version/scripts/ci-install-canvas-deps.sh
+        npm ci --prefix server-version/backend
+        npm ci --prefix server-version/frontend
+        cd server-version/backend
+        npx playwright-core install --with-deps chromium
+        if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+        npx prisma generate
+    - name: build standalone backend and frontend
+      if: ${{ !inputs.use_build_artifacts }}
+      env:
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      run: |-
+        npm run build --prefix server-version/backend
+        npm run build --prefix server-version/frontend
+        node .github/scripts/ci-artifact.mjs write backend
+        node .github/scripts/ci-artifact.mjs write frontend
+    - name: restore exact-run backend build
+      if: ${{ inputs.use_build_artifacts }}
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-dist-${{ github.sha }}
+        path: server-version/backend/dist
+    - name: verify backend build provenance
+      run: node .github/scripts/ci-artifact.mjs verify backend
+    - name: restore exact-run frontend build
+      if: ${{ inputs.use_build_artifacts }}
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-dist-${{ github.sha }}
+        path: server-version/frontend/dist
+    - name: verify frontend build provenance
+      run: node .github/scripts/ci-artifact.mjs verify frontend
+    - name: media2 independent scenario
+      if: matrix.group == 'images-video' && contains(fromJSON(inputs.selected), 'media2')
+      uses: ./.github/actions/accept-media2
+      env:
+        NODE_ENV: test
+        PORT: '3000'
+        DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        ASSET_MIGRATION_COMPLETE: 'false'
+        COOKIE_SECURE: 'false'
+        CORS_ORIGIN: http://127.0.0.1:5173
+        REDIS_URL: redis://localhost:6379
+        SOCKET_REDIS_REQUIRED: 'true'
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+        BACKGROUND_WORKERS_ENABLED: 'false'
+        TRUST_PROXY_HOPS: '0'
+        LOG_LEVEL: warn
+        UPLOAD_DIR: /tmp/eduk12-media-2-e2e-uploads
+        CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-media-2-e2e-credentials
+        SITUATIONAL_STATIC_VISUAL_FIXTURE: 'true'
+        SITUATIONAL_BUNDLE_E2E_INSTRUMENT_KEY: sjt-static-visual-e2e-fixture
+        SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-media-2-base-fixture.json
+        SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        CI_JOB_SERVICES: ${{ toJSON(job.services) }}
+    - name: video_core independent scenario
+      if: matrix.group == 'images-video' && contains(fromJSON(inputs.selected), 'video_core')
+      uses: ./.github/actions/accept-video_core
+      env:
+        NODE_ENV: test
+        PORT: '3000'
+        DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        ASSET_MIGRATION_COMPLETE: 'false'
+        COOKIE_SECURE: 'false'
+        CORS_ORIGIN: http://127.0.0.1:5173
+        REDIS_URL: redis://localhost:6379
+        SOCKET_REDIS_REQUIRED: 'true'
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+        BACKGROUND_WORKERS_ENABLED: 'false'
+        TRUST_PROXY_HOPS: '0'
+        LOG_LEVEL: warn
+        UPLOAD_DIR: /tmp/eduk12-assessment-video-e2e-uploads
+        CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-assessment-video-e2e-credentials
+        ASSESSMENT_VIDEO_E2E_FIXTURE: 'true'
+        ASSESSMENT_VIDEO_E2E_FIXTURE_FILE: /tmp/eduk12-assessment-video-fixture.json
+        ASSESSMENT_VIDEO_E2E_BASE_URL: http://127.0.0.1:5173
+        ASSESSMENT_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-assessment-video-e2e
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        CI_JOB_SERVICES: ${{ toJSON(job.services) }}
+    - name: media7 independent scenario
+      if: matrix.group == 'cognitive-situational' && contains(fromJSON(inputs.selected), 'media7')
+      uses: ./.github/actions/accept-media7
+      env:
+        NODE_ENV: test
+        PORT: '3000'
+        DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        COGNITIVE_VIDEO_E2E_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        ASSET_MIGRATION_COMPLETE: 'false'
+        COOKIE_SECURE: 'false'
+        CORS_ORIGIN: http://127.0.0.1:5173
+        REDIS_URL: redis://localhost:6379
+        SOCKET_REDIS_REQUIRED: 'true'
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+        BACKGROUND_WORKERS_ENABLED: 'false'
+        TRUST_PROXY_HOPS: '0'
+        LOG_LEVEL: warn
+        UPLOAD_DIR: /tmp/eduk12-media-7-e2e-uploads
+        CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-media-7-e2e-credentials
+        COGNITIVE_VIDEO_E2E_FIXTURE_FILE: /tmp/eduk12-cognitive-video-fixture.json
+        COGNITIVE_VIDEO_E2E_BASE_URL: http://127.0.0.1:5173
+        COGNITIVE_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-cognitive-video-e2e
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        CI_JOB_SERVICES: ${{ toJSON(job.services) }}
+    - name: situational_video independent scenario
+      if: matrix.group == 'cognitive-situational' && contains(fromJSON(inputs.selected), 'situational_video')
+      uses: ./.github/actions/accept-situational_video
+      env:
+        NODE_ENV: test
+        PORT: '3000'
+        DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        ASSET_MIGRATION_COMPLETE: 'false'
+        COOKIE_SECURE: 'false'
+        CORS_ORIGIN: http://127.0.0.1:5173
+        REDIS_URL: redis://localhost:6379
+        SOCKET_REDIS_REQUIRED: 'true'
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+        BACKGROUND_WORKERS_ENABLED: 'false'
+        TRUST_PROXY_HOPS: '0'
+        LOG_LEVEL: warn
+        UPLOAD_DIR: /tmp/eduk12-situational-video-e2e-uploads
+        CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-video-e2e-credentials
+        SITUATIONAL_VIDEO_E2E_FIXTURE: 'true'
+        SITUATIONAL_VIDEO_E2E_FIXTURE_FILE: /tmp/eduk12-situational-video-fixture.json
+        SITUATIONAL_VIDEO_E2E_BASE_URL: http://127.0.0.1:5173
+        SITUATIONAL_VIDEO_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-video-e2e
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        CI_JOB_SERVICES: ${{ toJSON(job.services) }}
+    - name: situational_branching independent scenario
+      if: matrix.group == 'cognitive-situational' && contains(fromJSON(inputs.selected), 'situational_branching')
+      uses: ./.github/actions/accept-situational_branching
+      env:
+        NODE_ENV: test
+        PORT: '3000'
+        DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        ASSET_MIGRATION_COMPLETE: 'false'
+        COOKIE_SECURE: 'false'
+        CORS_ORIGIN: http://127.0.0.1:5173
+        REDIS_URL: redis://localhost:6379
+        SOCKET_REDIS_REQUIRED: 'true'
+        COGNITIVE_MODULE_ENABLED: 'true'
+        VITE_COGNITIVE_MODULE_ENABLED: 'true'
+        BACKGROUND_WORKERS_ENABLED: 'false'
+        TRUST_PROXY_HOPS: '0'
+        LOG_LEVEL: warn
+        UPLOAD_DIR: /tmp/eduk12-situational-branching-e2e-uploads
+        CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-branching-e2e-credentials
+        SITUATIONAL_BRANCHING_E2E_FIXTURE: 'true'
+        SITUATIONAL_BRANCHING_E2E_FIXTURE_FILE: /tmp/eduk12-situational-branching-fixture.json
+        SITUATIONAL_BRANCHING_E2E_BASE_URL: http://127.0.0.1:5173
+        SITUATIONAL_BRANCHING_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-branching-e2e
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        CI_JOB_SERVICES: ${{ toJSON(job.services) }}
+    - name: remove this job ephemeral services
+      if: always()
+      env:
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+      run: bash server-version/scripts/ci-cleanup-services.sh

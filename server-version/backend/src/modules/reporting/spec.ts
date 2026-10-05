@@ -321,6 +321,14 @@ export const retirePlatformReportingSpec = (input: { actor: { userId: string; pl
   transition({ ...input, expected: 'PUBLISHED', next: 'RETIRED' })
 )
 
+export async function listPlatformReportingSpecs(actor: { userId: string; platformRole: string }, page = 1) {
+  assertSystemAdmin(actor)
+  const rows = await prisma.$queryRaw<SpecRow[]>`SELECT id,spec_key AS "specKey",version,status,definition,spec_hash AS "specHash",
+    created_by_user_id AS "createdByUserId",created_at AS "createdAt",reviewed_at AS "reviewedAt",published_at AS "publishedAt"
+    FROM reporting_analysis_specs ORDER BY created_at DESC,id LIMIT 51 OFFSET ${(page - 1) * 50}`
+  return { list: rows.slice(0, 50).map(toRecord), nextPage: rows.length > 50 ? page + 1 : null }
+}
+
 export const getPublishedReportingSpec = async (specId: string, tx?: Tx): Promise<ReportingAnalysisSpecRecord> => {
   const db = tx ?? (prisma as unknown as Tx)
   const rows = await db.$queryRaw<SpecRow[]>`

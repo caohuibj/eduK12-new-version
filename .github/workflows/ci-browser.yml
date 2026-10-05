@@ -1,0 +1,349 @@
+name: CI browser component
+
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  browser:
+    name: browser (seeded Situational Bundle + static visual acceptance)
+    # Browser acceptance executes after both production lanes have passed.
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 35
+    env:
+      NODE_ENV: test
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      ASSET_SIGNING_SECRET: ci-asset-signing-secret-123456789012345678901234
+      ASSET_MIGRATION_COMPLETE: 'false'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://127.0.0.1:5173
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      # Browser START acceptance owns a fake fixture; production never opts in.
+      COGNITIVE_TEST_FIXTURES_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '0'
+      LOG_LEVEL: warn
+      UPLOAD_DIR: /tmp/eduk12-situational-bundle-e2e-uploads
+      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-bundle-e2e-credentials
+      SITUATIONAL_STATIC_VISUAL_FIXTURE: 'true'
+      SITUATIONAL_BUNDLE_E2E_INSTRUMENT_KEY: sjt-static-visual-e2e-fixture
+      SITUATIONAL_BUNDLE_E2E_FIXTURE_FILE: /tmp/eduk12-situational-bundle-fixture.json
+      SITUATIONAL_BUNDLE_E2E_BASE_URL: http://127.0.0.1:5173
+      SITUATIONAL_BUNDLE_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-bundle-e2e
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version
+    steps:
+      - uses: actions/checkout@v4
+      - name: clear previous browser evidence
+        run: |
+          rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log /tmp/eduk12-bundle-products-e2e /tmp/eduk12-bundle-products-backend.log /tmp/eduk12-questionnaire-public-e2e /tmp/reporting-v22-evidence
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
+      - name: configure runner-local npm and Playwright caches
+        run: |
+          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
+      - name: restore hosted dependency downloads
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
+          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
+      - name: restore hosted Chromium binaries
+        if: runner.environment == 'github-hosted'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: backend npm ci
+        working-directory: server-version/backend
+        run: npm ci
+      - name: prepare Chromium for seeded browser
+        working-directory: server-version/backend
+        run: |
+          playwright_version="$(node -p "require('playwright-core/package.json').version")"
+          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
+          if [ ! -f "$deps_marker" ]; then
+            npx playwright-core install-deps chromium
+            touch "$deps_marker"
+          fi
+          npx playwright-core install chromium
+      - name: frontend npm ci
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: restore tested frontend build
+        id: frontend-build-download
+        # Runner DNS/transport can fail transiently even when the artifact exists.
+        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: wait before retrying frontend build download
+        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry tested frontend build download
+        id: frontend-build-download-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.frontend-build-download.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: wait before final frontend build download
+        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final tested frontend build download
+        # Final failure remains fatal, even if earlier attempts left partial files.
+        if: ${{ !cancelled() && steps.frontend-build-download-retry.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify restored frontend entry point
+        run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify frontend
+      - name: prisma generate and guarded migration
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: seed reference and configuration data
+        working-directory: server-version/backend
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: restore tested backend build
+        id: backend-build-download
+        # Runner DNS/transport can fail transiently even when the artifact exists.
+        # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: wait before retrying backend build download
+        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry tested backend build download
+        id: backend-build-download-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: wait before final backend build download
+        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final tested backend build download
+        # Final failure remains fatal, even if earlier attempts left partial files.
+        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: verify restored backend entry point
+        run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify backend
+      - name: seed isolated Bundle fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
+      - name: seed PR5 Organization fixture
+        working-directory: server-version/backend
+        run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
+      - name: start backend
+        run: |
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-bundle-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-bundle-backend.log
+          exit 1
+      - name: start frontend
+        run: |
+          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-frontend.pid
+          for attempt in $(seq 1 60); do
+            if ! kill -0 $(cat /tmp/eduk12-situational-bundle-frontend.pid) 2>/dev/null; then break; fi
+            if curl --fail --silent --max-time 2 http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-situational-bundle-frontend.log
+          exit 1
+      - name: verify built frontend in Chromium
+        run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
+      - name: run seeded browser acceptance
+        run: node e2e/situational-bundle-browser-e2e.cjs
+      - name: run FE-11 storage fault acceptance
+        run: node e2e/fe-11-storage-fault-browser-e2e.cjs
+      - name: run RA-02 four-role relational acceptance
+        run: node e2e/relational-four-role-browser-e2e.cjs
+      - name: run PR5 Organization cross-role acceptance
+        run: node e2e/pr5-organization-browser-e2e.cjs
+      - name: seed three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-fixture.ts
+      - name: start isolated PR5 scenario resource server
+        env:
+          PR5_SCENARIOS_ENABLED: 'true'
+          # This loopback-only synthetic scenario explicitly includes parents.
+          # The production default and the preceding closed-entry checks stay off.
+          PARENT_PORTAL_ENABLED: 'true'
+        run: |
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          nohup setsid backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-server.ts > /tmp/eduk12-pr5-scenario-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/eduk12-pr5-scenario-backend.log
+          exit 1
+      - name: certify three PR5 business scenarios
+        run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios.ts
+      - name: rehearse PR5 encrypted backup restore and migration failure recovery
+        env:
+          PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: node e2e/pr5-release-rehearsal.mjs
+      - name: verify Bundle V3 browser lifecycle in isolated catalog
+        env:
+          BUNDLE_PRODUCTS_ENABLED: 'true'
+          BUNDLE_PRODUCT_ISOLATED_DB: '1'
+          BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          BUNDLE_PRODUCT_BASE_URL: http://127.0.0.1:5173
+          BUNDLE_PRODUCT_EVIDENCE: /tmp/eduk12-bundle-products-e2e
+        run: |
+          rm -rf /tmp/eduk12-bundle-products-e2e
+          backend/node_modules/.bin/tsx e2e/bundle-products-fixture.ts
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          nohup setsid backend/node_modules/.bin/tsx e2e/bundle-products-server.ts > /tmp/eduk12-bundle-products-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
+          node e2e/bundle-products-browser-e2e.cjs
+      - name: multi-role respondent inbox responsive acceptance
+        env:
+          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
+          INBOX_E2E_OUTPUT: /tmp/eduk12-inbox-e2e
+        run: node e2e/multi-role-inbox-browser-e2e.cjs
+      - name: anonymous study identity responsive acceptance
+        env:
+          INBOX_E2E_BASE_URL: http://127.0.0.1:5173
+          STUDY_E2E_OUTPUT: /tmp/eduk12-anonymous-study-e2e
+        run: node e2e/anonymous-study-browser-e2e.cjs
+      - name: Reporting V2.2 final product scenarios
+        env:
+          REPORTING_BROWSER_ISOLATED_DB: '1'
+          REPORTING_BROWSER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          REPORTING_BROWSER_BASE_URL: http://127.0.0.1:5173
+        run: |
+          backend/node_modules/.bin/tsx e2e/reporting-v22-fixture.ts
+          node e2e/reporting-v22-browser-e2e.cjs
+      - name: anonymous questionnaire completion and exhausted-link recovery
+        env:
+          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
+          QUESTIONNAIRE_PRODUCT_PUBLIC: '1'
+          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          QUESTIONNAIRE_PRODUCT_BASE_URL: http://127.0.0.1:5173
+          QUESTIONNAIRE_PRODUCT_EVIDENCE: /tmp/eduk12-questionnaire-public-e2e
+        run: |
+          backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
+          node e2e/questionnaire-products-browser-e2e.cjs
+      - name: enforced production CSP browser acceptance
+        run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          node e2e/production-csp-browser.cjs
+      - name: upload seeded browser evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: situational-bundle-browser-evidence
+          path: |
+            /tmp/eduk12-situational-bundle-e2e
+            /tmp/eduk12-situational-bundle-backend.log
+            /tmp/eduk12-situational-bundle-frontend.log
+            /tmp/eduk12-pr5-scenarios-evidence
+            /tmp/eduk12-pr5-release-rehearsal
+            /tmp/eduk12-pr5-scenario-backend.log
+            /tmp/eduk12-bundle-products-e2e
+            /tmp/eduk12-questionnaire-public-e2e
+            /tmp/reporting-v22-evidence
+            /tmp/eduk12-bundle-products-backend.log
+          if-no-files-found: ignore
+      - name: stop seeded services
+        if: always()
+        run: |
+          if [ -f /tmp/eduk12-situational-bundle-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-frontend.pid) || true; fi
+          if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) || true; fi
+
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+

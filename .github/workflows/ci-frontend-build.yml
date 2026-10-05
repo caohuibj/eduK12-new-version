@@ -1,0 +1,80 @@
+name: CI frontend artifact producer
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+      ui_runner_labels:
+        type: string
+        default: ''
+      ui_lab:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 15
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=3072
+      TZ: UTC
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
+      - run: npm ci
+      - name: build production frontend
+        run: |
+          npm run build
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 1
+          if-no-files-found: error
+      - name: clean Mac dependencies and outputs after artifact upload
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
+
+  ui-lab:
+    name: UI-lab artifact
+    if: inputs.ui_lab
+    runs-on: ${{ fromJSON(inputs.ui_runner_labels || inputs.runner_labels) }}
+    timeout-minutes: 15
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_UI_LAB_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=3072
+      TZ: UTC
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
+      - run: npm ci
+      - name: build separately flagged UI lab
+        run: |
+          npm run build
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend-ui-lab
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-ui-lab-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 1
+          if-no-files-found: error
+      - name: clean Mac dependencies and outputs after artifact upload
+        if: ${{ always() && runner.os == 'macOS' }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"

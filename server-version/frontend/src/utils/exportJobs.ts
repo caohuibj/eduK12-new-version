@@ -86,3 +86,17 @@ export const assertExportDownload = (response: Response): void => {
   if (response.status === 404 || response.status === 410) throw new ExportJobFailedError('导出文件已到期或不可用，请重新导出')
   if (!response.ok) throw new Error('下载导出文件失败')
 }
+
+/** Keep the URL alive until the browser has consumed the download request. */
+export const triggerExportDownload = (blob: Blob, fileName: string): void => {
+  if (!blob.size) throw new Error('导出文件为空，请重新导出')
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  document.body.appendChild(anchor)
+  try { anchor.click() } finally {
+    anchor.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+  }
+}

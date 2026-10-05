@@ -1,0 +1,234 @@
+name: CI backend-regression component
+
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+      focus:
+        type: string
+        default: full
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  backend-regression:
+    name: backend regression (isolated job database)
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 35
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SJT_UPLOAD_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      UPLOAD_DIR: /tmp/eduk12-ci-uploads
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      COGNITIVE_MODULE_ENABLED: 'true'
+      REDIS_URL: redis://localhost:6379
+      MINI_OPERATIONS_TEST_REDIS_URL: redis://localhost:6379
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
+      - name: check hosted runner disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: npm ci
+        run: npm ci
+      - name: prisma generate and guarded migration
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: configure independent regression database timezone
+        run: |
+          node <<'NODE'
+          const { PrismaClient } = require('@prisma/client');
+          const target = new URL(process.env.DATABASE_URL);
+          if (process.env.CI !== 'true' || !['localhost', '127.0.0.1'].includes(target.hostname) || target.pathname !== '/ptool') {
+            throw new Error('UTC setup requires the isolated CI database');
+          }
+          async function withClient(action) {
+            const client = new PrismaClient({ datasources: { db: { url: target.href } } });
+            try { await client.$connect(); return await action(client); }
+            finally { await client.$disconnect(); }
+          }
+          (async () => {
+            const before = await withClient(async client => {
+              const result = await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`;
+              await client.$executeRaw`ALTER DATABASE ptool SET timezone TO 'UTC'`;
+              return result[0].zone;
+            });
+            // A new connection verifies the default used by subsequent Prisma pools.
+            const after = await withClient(async client => (await client.$queryRaw`SELECT current_setting('TimeZone') AS zone`)[0].zone);
+            console.log(JSON.stringify({ databaseTimezoneBefore: before, databaseTimezoneAfter: after }));
+            if (after !== 'UTC') throw new Error('CI database UTC configuration did not persist');
+          })().catch(error => { console.error(error); process.exitCode = 1; });
+          NODE
+      - name: seed reference and configuration data
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: backfill check-in token protection
+        run: npm run db:backfill:checkin-tokens
+      - name: frontend dependencies for cross-tree Cognitive package tests
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
+      - name: validate regression selection
+        env:
+          REGRESSION_FOCUS: ${{ inputs.focus }}
+        run: |
+          case "$REGRESSION_FOCUS" in full|reporting) ;; *) exit 1 ;; esac
+      - name: reporting fixture and HTTP regression
+        if: inputs.focus == 'reporting'
+        run: |
+          npm test -- src/__tests__/integration/parentPortal.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-parent-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-parent-vitest.json src/__tests__/integration/parentPortal.postgres.integration.test.ts
+          npm test -- src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
+      - name: full functional regression
+        if: inputs.focus == 'full'
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        # Real-PG suites remain serial. The single hardware-sensitive burst is
+        # covered by the isolated backend job and excluded here; every other file runs here.
+        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+      - name: capture hosted runner resources
+        if: always()
+        run: |-
+          {
+            echo "node $(node -v)"
+            echo "cpus $(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo
+            df -h /tmp | tail -1
+            date -u +"timestamp %FT%TZ"
+          } > /tmp/eduk12-hosted-ci-env.txt
+      - name: hosted critical integration suites must not skip
+        if: inputs.focus == 'full'
+        run: >-
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
+          src/__tests__/cognitive/concurrency.integration.test.ts
+          src/__tests__/scale/pr3-managed.postgres.integration.test.ts
+          src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts
+          src/__tests__/assessment-reference/scale-wave1-reporting.postgres.integration.test.ts
+          src/__tests__/scale/instruments/learning-motivation-wave1.postgres.integration.test.ts
+          src/__tests__/situational/situational-standalone.postgres.integration.test.ts
+          src/__tests__/situational/situational-vnext.postgres.integration.test.ts
+          src/__tests__/situational/sjt-authoring.postgres.integration.test.ts
+          src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts
+          src/__tests__/bundle-product/product.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
+          src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
+          src/__tests__/questionnaire/product.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
+          src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
+          src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
+          src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts
+          src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
+          src/__tests__/migration/legacy-import.postgres.integration.test.ts
+          src/__tests__/migration/public-token-backfill.cli.integration.test.ts
+          src/__tests__/questionnaire/legacy-authoring.postgres.integration.test.ts
+          src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts
+          src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts
+          src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts
+          src/__tests__/composite/situational-bundle.postgres.integration.test.ts
+          src/__tests__/classroom/classroom-start.postgres.integration.test.ts
+          src/__tests__/integration/courseCodeRotationConcurrency.integration.test.ts
+          src/__tests__/integration/submissionIdempotencyReceipt.integration.test.ts
+          src/__tests__/hotpath/query-budget.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunConsentRecovery.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunStartClaim.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunAllocationMatrix.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunStartFences.postgres.integration.test.ts
+          src/__tests__/integration/reportingSubgroupPrivacy.postgres.integration.test.ts
+          src/__tests__/integration/reportingCore.postgres.integration.test.ts
+          src/__tests__/integration/reportingHttp.postgres.integration.test.ts
+          src/__tests__/integration/reportingQueryBudget.postgres.integration.test.ts
+          src/__tests__/integration/reportingDelivery.postgres.integration.test.ts
+          src/__tests__/integration/reportingSeries.postgres.integration.test.ts
+          src/__tests__/integration/reportingCohortSelector.postgres.integration.test.ts
+          src/__tests__/integration/reportingLongitudinalPlanner.postgres.integration.test.ts
+          src/__tests__/integration/reportingIndividualLongitudinal.postgres.integration.test.ts
+          src/__tests__/integration/organizationProductContext.postgres.integration.test.ts
+          src/__tests__/integration/organizationProductAdmin.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunProductRead.postgres.integration.test.ts
+          src/__tests__/integration/assessmentRunDeliveryModes.postgres.integration.test.ts
+          src/__tests__/integration/respondentAuthority.postgres.integration.test.ts
+          src/__tests__/integration/observerSingleQuestion.postgres.integration.test.ts
+          src/__tests__/integration/anonymousStudy.postgres.integration.test.ts
+          src/__tests__/integration/reportingDiscovery.postgres.integration.test.ts
+          src/__tests__/integration/safetyDiscovery.postgres.integration.test.ts
+          src/__tests__/integration/parentPortal.postgres.integration.test.ts
+          src/__tests__/integration/qaRound2.postgres.integration.test.ts
+          src/__tests__/integration/webAcceptanceR2b.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramParentHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts
+          src/__tests__/integration/miniprogramPublicationHttp.postgres.integration.test.ts
+      - name: upload vitest report artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-vitest-report
+          path: |
+            /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-parent-vitest.json
+            /tmp/eduk12-hosted-ci-env.txt
+          if-no-files-found: ignore
+      - name: remove this job's ephemeral services and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+
+

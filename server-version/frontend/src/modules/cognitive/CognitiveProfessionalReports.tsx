@@ -4,7 +4,7 @@ import CognitiveProfessionalReport from './CognitiveProfessionalReport'
 import { formatReportCompletedAt } from './report-record'
 
 type Page = NonNullable<Awaited<ReturnType<typeof cognitiveApi.professionalReports>>['data']>
-export default function CognitiveProfessionalReports({ assignmentId }: { assignmentId: string }) {
+export default function CognitiveProfessionalReports({ assignmentId, collectionId }: { assignmentId: string; collectionId?: string }) {
   const [offset, setOffset] = useState(0)
   const [page, setPage] = useState<Page | null>(null)
   const [selected, setSelected] = useState(0)
@@ -12,13 +12,13 @@ export default function CognitiveProfessionalReports({ assignmentId }: { assignm
   useEffect(() => {
     let cancelled = false
     setPage(null); setError(''); setSelected(0)
-    void cognitiveApi.professionalReports(assignmentId, offset).then(response => {
+    void (collectionId ? cognitiveApi.professionalReports(assignmentId, offset, collectionId) : cognitiveApi.professionalReports(assignmentId, offset)).then(response => {
       if (cancelled) return
       if (response.code !== 0 || !response.data) setError(response.message || '专业报告不可读取')
       else setPage(response.data)
     }).catch(() => { if (!cancelled) setError('专业报告暂不可读取，请稍后重试。') })
     return () => { cancelled = true }
-  }, [assignmentId, offset])
+  }, [assignmentId, offset, collectionId])
   if (error) return <p role="alert">{error}</p>
   if (!page) return <p role="status">正在读取冻结的专业报告…</p>
   const record = page.records[selected]

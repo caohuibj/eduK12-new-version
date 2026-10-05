@@ -1,0 +1,220 @@
+name: CI backend component
+
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  backend:
+    name: backend (migrate + build + performance gate)
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 35
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR34_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR38_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_1_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      UPLOAD_DIR: /tmp/eduk12-ci-uploads
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      COGNITIVE_MODULE_ENABLED: 'true'
+      REDIS_URL: redis://localhost:6379
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        # 保持与正式 release gate 相同的持久化语义（默认 durability），
+        # 串行执行已实测满足 200 并发完成门（<10s SLA）。
+        # services.postgres.options 是 docker create 参数：这里的 -c 会被
+        # docker 解析为 --cpu-shares（非法值，服务直接起不来）；要给 PG
+        # 传启动参数必须走 services.postgres.command。
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: check CI disk headroom
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
+      - name: configure runner-local npm cache
+        run: |
+          mkdir -p "$HOME/.npm"
+          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: npm ci
+        run: npm ci
+      - name: dependency audit (high and critical)
+        run: |
+          for attempt in 1 2 3; do
+            if npm audit --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
+              sleep $((attempt * 10))
+            fi
+          done
+          exit 1
+      - name: content routing boundary tests
+        run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
+      - name: prisma generate
+        run: npx prisma generate
+      - name: prisma migrate deploy
+        run: npm run db:migrate:guarded
+      - name: seed reference and configuration data
+        run: npm run db:seed
+        env:
+          ADMIN_USERNAME: ci-admin
+          ADMIN_PASSWORD: ci-admin-password-2026
+      - name: backfill and validate check-in token protection
+        run: npm run db:backfill:checkin-tokens
+      - name: guarded migration idempotency after seeded data
+        run: npm run db:migrate:guarded
+      - name: PR3 populated baseline-to-head upgrade rehearsal
+        run: node scripts/pr3-baseline-upgrade-rehearsal.mjs
+      - name: prepare release preflight upload directory
+        run: mkdir -p "$UPLOAD_DIR"
+      - name: read-only release data preflight
+        run: npm run db:release:preflight
+      - name: situational data-only manifests and publication gates
+        run: npm run situational:contracts
+      - name: verify SJT immutable releases and publication authority
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
+          npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
+      - name: cognitive task manifests and dependency boundaries
+        run: npm run cognitive:contracts
+      - name: Cognitive onboarding with frontend acceptances
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
+      - name: Bundle content and immutable history
+        env:
+          BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npx tsx scripts/bundle-content-check.ts
+      - name: build (tsc)
+        run: npm run build
+      - name: bind backend artifact to source and run
+        run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write backend
+      - name: publish tested backend build
+        id: backend-build-upload
+        # GitHub artifact creation/finalization can reset connections. Retry
+        # with bounded backoff; the final attempt must succeed or fail the job.
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+      - name: wait before retrying backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry backend build upload
+        id: backend-build-upload-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
+      - name: wait before final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        # Do not ignore this failure: browser must consume this run's exact build.
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          overwrite: true
+      - name: prelaunch load and resource contract self-tests
+        run: node --test ../scripts/load/prelaunch-mixed-load.test.mjs ../scripts/prelaunch-resource-preflight.test.mjs
+      - name: Wave1 calibration generator contracts
+        run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
+      - name: 200-completion performance and report integrity gate
+        # Keep the <10s burst on its own hosted VM and durable PostgreSQL.
+        run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-performance-vitest.json
+      - name: capture CI environment snapshot
+        if: always()
+        run: |-
+          {
+            echo "node $(node -v)"
+            echo "cpus $(nproc)"
+            grep -E 'MemTotal|MemAvailable' /proc/meminfo
+            df -h /tmp | tail -1
+            date -u +"timestamp %FT%TZ"
+          } > /tmp/eduk12-ci-env.txt
+      - name: performance suite must not skip
+        run: node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-performance-vitest.json src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+      - name: upload vitest report artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-performance-vitest-report
+          path: |
+            /tmp/eduk12-backend-performance-vitest.json
+            /tmp/eduk12-ci-env.txt
+          if-no-files-found: ignore
+
+      - name: remove this job's ephemeral service containers and anonymous volumes
+        if: always()
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+

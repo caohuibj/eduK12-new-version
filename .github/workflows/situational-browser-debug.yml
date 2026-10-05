@@ -3,6 +3,10 @@ name: Situational Browser Debug
 on:
   workflow_dispatch:
     inputs:
+      runner_profile:
+        type: choice
+        options: [local]
+        default: local
       target_ref:
         description: 'Optional branch, tag, or commit SHA to debug; defaults to the dispatched ref'
         required: false
@@ -14,7 +18,7 @@ permissions:
 jobs:
   browser-debug:
     name: seeded Situational Bundle browser debug
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 25
     env:
       NODE_ENV: test
@@ -76,6 +80,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: report debug target
         run: |
           echo "Debugging commit: $(git rev-parse HEAD)"

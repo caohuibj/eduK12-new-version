@@ -1,0 +1,85 @@
+name: CI backend-browser-build component
+
+on:
+  workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  backend-browser-build:
+    name: UI/content route / backend browser build
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 15
+    env:
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
+      - name: prepare canvas source-build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: npm ci
+        run: npm ci
+      - name: prisma generate
+        run: npx prisma generate
+      - name: Cognitive onboarding with frontend acceptances
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
+      - name: build unchanged backend for real API acceptance
+        run: npm run build
+      - name: bind backend artifact to source and run
+        run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write backend
+      - name: publish tested backend build
+        id: backend-build-upload
+        # GitHub artifact creation/finalization can reset connections. Retry
+        # with bounded backoff; the final attempt must succeed or fail the job.
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+      - name: wait before retrying backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        run: sleep 15
+      - name: retry backend build upload
+        id: backend-build-upload-retry
+        continue-on-error: true
+        if: ${{ !cancelled() && steps.backend-build-upload.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          # Finalization may have succeeded remotely before the connection reset.
+          overwrite: true
+      - name: wait before final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        run: sleep 45
+      - name: final backend build upload
+        if: ${{ !cancelled() && steps.backend-build-upload-retry.outcome == 'failure' }}
+        # Do not ignore this failure: browser must consume this run's exact build.
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+          overwrite: true
+

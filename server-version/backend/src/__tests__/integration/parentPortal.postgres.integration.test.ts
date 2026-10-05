@@ -5,6 +5,7 @@ import { PrismaClient,UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import { createParentPortalService } from '../../modules/parent-portal/service'
 import { LINK_CONSENT_VERSION,REPORT_CONSENT_VERSION,type ParentProjection,type ParentReportSource } from '../../modules/parent-portal/contracts'
+import { createPlatformReportingSpec, listPlatformReportingSpecs } from '../../modules/reporting/spec'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 const url=integrationDatabaseUrl('PARENT_PORTAL_TEST_DB_URL','RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
 if(url){
@@ -34,7 +35,7 @@ async function fixture(){
 async function reportFixture(longitudinal=false,withSibling=false){
  const f=await fixture();await f.service.approve(f.child,f.link.id,LINK_CONSENT_VERSION)
  await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:f.org.id,membershipId:f.officerMembership.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:f.admin.userId}})
- const artifactId=randomUUID(),specId=randomUUID(),seriesId=randomUUID()
+ const artifactId=randomUUID(),seriesId=randomUUID()
  const policy={key:'synthetic-parent-policy',version:'1',audience:'PARENT' as const,mode:'EDUCATIONAL_SUMMARY' as const,rawAnswers:false as const,itemLevel:false as const,researchExport:false as const}
  const toolRef={family:'SCALE' as const,key:'synthetic-'+randomUUID(),version:'1'}
  const root=await actor(UserRole.ADMIN);await db.user.update({where:{id:root.userId},data:{platformRole:'SYSTEM_ADMIN'}})
@@ -42,7 +43,20 @@ async function reportFixture(longitudinal=false,withSibling=false){
  const projection:ParentProjection={schemaVersion:1,toolRef,disclosedMetricKeys:['educational'],disclosedLongitudinalMetricKeys:longitudinal?['educational']:[],audience:'PARENT',artifactId,subjectUserId:f.child.userId,title:'Synthetic approved parent summary',publicationStatus:'PUBLISHED',policy,policyHash:canonicalHash(policy),summary:'服务端已批准的家长说明',blocks:[]}
  const payload={artifactId,organizationId:f.org.id,subjectUserId:f.child.userId,parentAudience:projection,PRIVATE_STAFF_DATA:'MUST_NEVER_LEAK'}
  const sourceHash=canonicalHash(payload);const identity=canonicalHash({artifactId});const scope={schemaVersion:1,resourceFamily:'SCALE',resourceKey:'synthetic'}
- await db.$executeRaw`INSERT INTO reporting_analysis_specs (id,spec_key,version,definition,spec_hash,created_by_user_id) VALUES (${specId},${specId},1,'{}'::jsonb,${identity},${f.officer.userId})`
+ // Shared integration databases must contain valid governance records even when
+ // this suite supplies a synthetic artifact reader. An empty definition breaks
+ // the platform list endpoint in later suites and hides fixture incompatibility.
+ const specActor={userId:root.userId,platformRole:'SYSTEM_ADMIN'}
+ const spec=await createPlatformReportingSpec({actor:specActor,specKey:randomUUID(),version:1,definition:{
+  schemaVersion:1,engineVersion:'1.0.0',analysisKind:'INDIVIDUAL_LONGITUDINAL',engineKey:'ORG_INDIVIDUAL_LONGITUDINAL_V1',
+  privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',reportEvidenceCeiling:'PILOT',comparabilityRules:[],
+  metricRules:[{metricId:'educational',sourceMetricKey:'educational',acceptedResultQuality:['interpretable'],
+   acceptedMetricQuality:'IGNORE_METRIC_QUALITY',missingnessRule:'EXCLUDE',observationUnit:'SUBJECT',
+   selectionPolicy:'UNIQUE_OR_REJECT',sourceFamily:toolRef.family,sourceResourceKey:toolRef.key,
+   valueType:'NUMBER',longitudinalMetricKey:'educational'}],
+ }})
+ const specId=spec.id
+ expect((await listPlatformReportingSpecs(specActor)).list.some(row=>row.id===specId)).toBe(true)
  await db.$executeRaw`INSERT INTO reporting_series (id,organization_id,series_key,scope,series_identity_hash,snapshot_hash,created_by_user_id) VALUES (${seriesId},${f.org.id},${seriesId},${JSON.stringify(scope)}::jsonb,${identity},${identity},${f.officer.userId})`
  await db.$executeRaw`INSERT INTO reporting_analysis_artifacts (id,organization_id,analysis_kind,policy_domain,subject_user_id,cohort_snapshot_id,series_id,spec_id,analysis_identity_hash,artifact_payload,snapshot_hash,generated_by_user_id) VALUES (${artifactId},${f.org.id},'INDIVIDUAL_LONGITUDINAL','ORG_INDIVIDUAL_REPORT_V1',${f.child.userId},NULL,${seriesId},${specId},${identity},${JSON.stringify(payload)}::jsonb,${sourceHash},${f.officer.userId})`
  // This suite exercises DB authority with synthetic preverified reader input.

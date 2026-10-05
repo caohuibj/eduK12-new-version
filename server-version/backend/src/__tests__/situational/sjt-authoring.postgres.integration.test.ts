@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { beforeAll, afterAll, describe, it, expect, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
-import { integrationDatabaseUrl } from '../integration/integration-env'
+import { integrationDatabaseUrl, isActionsServiceDatabase } from '../integration/integration-env'
 import example from '../../modules/situational/authoring/examples/teacher-demonstration.json'
 import { captureFixture } from './vnext-capture-fixture'
 import { compileSjtTemplate } from '../../modules/situational/authoring/template'
@@ -20,14 +20,9 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
     const localSyntheticDatabase =
       url?.startsWith('postgresql://situational_test:') &&
       url.includes('@127.0.0.1:' + (process.env.SJT_UPLOAD_TEST_PORT || '55473') + '/situational_vnext')
-    // The hosted regression job owns an ephemeral PostgreSQL service. Keep
-    // developer and production databases excluded when running locally.
-    const hostedSyntheticDatabase =
-      process.env.GITHUB_ACTIONS === 'true' &&
-      process.env.RUNNER_ENVIRONMENT === 'github-hosted' &&
-      process.env.NODE_ENV === 'test' &&
-      url === 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public'
-    if (!localSyntheticDatabase && !hostedSyntheticDatabase)
+    // Actions supplies the exact current job's disposable service ID. Host type
+    // does not grant access to a developer or production database.
+    if (!localSyntheticDatabase && !isActionsServiceDatabase(url!))
       throw new Error('Dedicated synthetic database required')
     process.env.DATABASE_URL = url!
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)

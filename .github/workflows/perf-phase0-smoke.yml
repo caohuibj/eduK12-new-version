@@ -1,27 +1,22 @@
 name: PERF Phase 0 smoke
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
-    paths:
-      - '.github/workflows/perf-phase0-smoke.yml'
-      - 'server-version/perf/**'
-      - 'server-version/backend/scripts/current-main-seed-fixtures.ts'
-      - 'server-version/backend/scripts/gate47-seed-fixtures.ts'
-      - 'server-version/backend/src/config/database.ts'
-      - 'server-version/backend/src/modules/assessment-runtime/**'
-      - 'server-version/backend/src/modules/scale/scale-final-submit.service.ts'
-      - 'server-version/backend/src/modules/scale/unified-final-submit.service.ts'
-      - 'server-version/backend/src/modules/cognitive/final-submit.service.ts'
-      - 'server-version/backend/src/modules/cognitive/unified-final-submit.service.ts'
-      - 'server-version/backend/src/modules/situational/situational-final-submit.service.ts'
-      - 'server-version/backend/src/services/unitSubmitAdmission.ts'
-      - 'server-version/backend/src/services/aggregateFinalizationAdmission.ts'
-      - 'server-version/backend/src/services/boundedAdmissionGate.ts'
-      - 'server-version/backend/src/services/instrumentFinalSubmit.ts'
-      - 'server-version/backend/src/services/runtimeObservability.ts'
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: local
   workflow_dispatch:
+    inputs:
+      runner_profile:
+        type: choice
+        options: [local]
+        default: local
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 concurrency:
   group: perf-phase0-smoke-${{ github.event.pull_request.number || github.ref }}
@@ -30,8 +25,8 @@ concurrency:
 jobs:
   smoke:
     name: Scale + Cognitive + SJT fresh accounting
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 35
     env:
       NODE_ENV: test
@@ -80,6 +75,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: prepare canvas source-build dependencies
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"

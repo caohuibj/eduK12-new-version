@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -14,7 +15,7 @@ beforeEach(()=>{
   api.analyzeIndividual.mockResolvedValue({artifactId:'private',projection:{kind:'INDIVIDUAL_LONGITUDINAL',state:'present',waves:[{waveId:'w',waveKey:'T1',ordinal:1,metrics:{score:{state:'present',value:7}},evidence:{level:'PILOT',limitations:[]}}],comparisons:[]}})
 })
 it('generates one student report and clears it after export authority is revoked',async()=>{
-  render(<IndividualLongitudinalBuilder organizationId="org" />)
+  render(<MemoryRouter><IndividualLongitudinalBuilder organizationId="org" /></MemoryRouter>)
   await userEvent.click(screen.getByRole('button',{name:'选择学生生成个人报告'}))
   await userEvent.selectOptions(await screen.findByLabelText('选择学生'),'a')
   await userEvent.selectOptions(await screen.findByLabelText('个人测量项目'),'SCALE/grit')
@@ -30,7 +31,7 @@ it('generates one student report and clears it after export authority is revoked
   expect(delivery.downloadExport).not.toHaveBeenCalled()
 })
 it('clears earlier observations and selections when the subject changes',async()=>{
-  render(<IndividualLongitudinalBuilder organizationId="org" />)
+  render(<MemoryRouter><IndividualLongitudinalBuilder organizationId="org" /></MemoryRouter>)
   await userEvent.click(screen.getByRole('button',{name:'选择学生生成个人报告'}))
   await userEvent.selectOptions(await screen.findByLabelText('选择学生'),'a')
   await userEvent.selectOptions(await screen.findByLabelText('个人测量项目'),'SCALE/grit')

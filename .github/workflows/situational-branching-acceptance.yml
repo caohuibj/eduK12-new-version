@@ -1,191 +1,33 @@
 name: Situational Branching Acceptance
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '.github/workflows/situational-branching-acceptance.yml'
-      - 'server-version/backend/src/modules/situational/**'
-      - 'server-version/backend/src/modules/assessment-runtime/situational-runtime-snapshot.ts'
-      - 'server-version/backend/src/modules/assessment-runtime/compiler.ts'
-      - 'server-version/frontend/src/modules/situational/**'
-      - 'server-version/frontend/src/services/persistence/finalDraftStore.ts'
-      - 'server-version/e2e/situational-branching-browser-*'
-      # Declaration-only content is covered by the assessment content gate.
-      - '!server-version/backend/src/modules/situational/instruments/*/*/instrument.json'
-      - '!server-version/backend/src/modules/situational/instruments/*/*/publication.json'
-      - '!server-version/backend/src/modules/situational/instruments/*/*/scientific.json'
-      - '!server-version/backend/src/modules/situational/onboarding/instruments.generated.ts'
+'on':
+  workflow_call:
+    inputs:
+      runner_profile:
+        type: string
+        default: local
+      use_build_artifacts:
+        type: boolean
+        default: false
   workflow_dispatch:
-
-
+    inputs:
+      runner_profile:
+        type: choice
+        options:
+        - local
+        - speed
+        default: local
+permissions:
+  contents: read
+  actions: read
 concurrency:
   group: situational-branching-acceptance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
 jobs:
-  branching-browser:
-    name: V2 branching browser acceptance
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
-    timeout-minutes: 35
-    env:
-      NODE_ENV: test
-      PORT: '3000'
-      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      ASSET_MIGRATION_COMPLETE: 'false'
-      COOKIE_SECURE: 'false'
-      CORS_ORIGIN: http://127.0.0.1:5173
-      REDIS_URL: redis://localhost:6379
-      SOCKET_REDIS_REQUIRED: 'true'
-      COGNITIVE_MODULE_ENABLED: 'true'
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      BACKGROUND_WORKERS_ENABLED: 'false'
-      TRUST_PROXY_HOPS: '0'
-      LOG_LEVEL: warn
-      UPLOAD_DIR: /tmp/eduk12-situational-branching-e2e-uploads
-      CREDENTIAL_HANDOFF_DIR: /tmp/eduk12-situational-branching-e2e-credentials
-      SITUATIONAL_BRANCHING_E2E_FIXTURE: 'true'
-      SITUATIONAL_BRANCHING_E2E_FIXTURE_FILE: /tmp/eduk12-situational-branching-fixture.json
-      SITUATIONAL_BRANCHING_E2E_BASE_URL: http://127.0.0.1:5173
-      SITUATIONAL_BRANCHING_E2E_SCREENSHOT_DIR: /tmp/eduk12-situational-branching-e2e
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: ptool
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U ptool -d ptool"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:7.4.11-bookworm
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    defaults:
-      run:
-        working-directory: server-version
-    steps:
-      - uses: actions/checkout@v4
-      - name: check CI disk headroom
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: configure isolated test keys
-        run: |
-          for name in JWT_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY ASSET_SIGNING_SECRET; do
-            value="$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
-            echo "::add-mask::$value"
-            echo "$name=$value" >> "$GITHUB_ENV"
-          done
-      - name: configure runner-local npm and Playwright caches
-        run: |
-          mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
-          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-          echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
-      - name: restore hosted dependency downloads
-        if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
-          restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
-      - name: restore hosted Chromium binaries
-        if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
-      - name: backend npm ci
-        working-directory: server-version/backend
-        run: npm ci
-      - name: prepare Chromium
-        working-directory: server-version/backend
-        run: |
-          playwright_version="$(node -p "require('playwright-core/package.json').version")"
-          deps_marker="$HOME/.cache/eduk12-ci/playwright-deps-${playwright_version}"
-          if [ ! -f "$deps_marker" ]; then
-            npx playwright-core install-deps chromium
-            touch "$deps_marker"
-          fi
-          npx playwright-core install chromium
-      - name: frontend npm ci
-        working-directory: server-version/frontend
-        run: npm ci
-      - name: prisma generate and guarded migration
-        working-directory: server-version/backend
-        run: |
-          npx prisma generate
-          npm run db:migrate:guarded
-      - name: seed reference and configuration data
-        working-directory: server-version/backend
-        run: npm run db:seed
-        env:
-          ADMIN_USERNAME: ci-admin
-          ADMIN_PASSWORD: ci-admin-password-2026
-      - name: build backend
-        working-directory: server-version/backend
-        run: npm run build
-      - name: seed V2 branching fixture
-        working-directory: server-version/backend
-        run: npx tsx ../e2e/situational-branching-browser-fixture.ts
-      - name: start backend
-        run: |
-          rm -rf "$SITUATIONAL_BRANCHING_E2E_SCREENSHOT_DIR"
-          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR" "$SITUATIONAL_BRANCHING_E2E_SCREENSHOT_DIR"
-          nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-branching-backend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-branching-backend.pid
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-situational-branching-backend.log
-          exit 1
-      - name: build frontend for deterministic browser startup
-        working-directory: server-version/frontend
-        run: npm run build
-      - name: start frontend
-        run: |
-          nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-branching-frontend.log 2>&1 &
-          echo $! > /tmp/eduk12-situational-branching-frontend.pid
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:5173/ > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/eduk12-situational-branching-frontend.log
-          exit 1
-      - name: run V2 branching browser acceptance
-        run: node e2e/situational-branching-browser-e2e.cjs
-      - name: upload branching evidence
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: situational-v2-branching-acceptance-evidence
-          path: |
-            /tmp/eduk12-situational-branching-e2e
-            /tmp/eduk12-situational-branching-backend.log
-            /tmp/eduk12-situational-branching-frontend.log
-          if-no-files-found: ignore
-      - name: stop seeded services
-        if: always()
-        run: |
-          if [ -f /tmp/eduk12-situational-branching-frontend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-branching-frontend.pid) || true; fi
-          if [ -f /tmp/eduk12-situational-branching-backend.pid ]; then kill -- -$(cat /tmp/eduk12-situational-branching-backend.pid) || true; fi
-      - name: remove this job's ephemeral service containers and anonymous volumes
-        if: always()
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
-        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
+  acceptance:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    uses: ./.github/workflows/ci-media.yml
+    with:
+      runner_labels: ${{ inputs.runner_profile == 'speed' && '["ubuntu-24.04"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      selected: '["situational_branching"]'
+      groups: '["cognitive-situational"]'
+      use_build_artifacts: ${{ inputs.use_build_artifacts || false }}

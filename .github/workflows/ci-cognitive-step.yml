@@ -1,0 +1,36 @@
+name: CI Cognitive diagnostic step
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cognitive:
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    timeout-minutes: 20
+    env:
+      NODE_ENV: test
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      TZ: UTC
+      DATABASE_URL: postgresql://ci_guard:ci_guard_pw@127.0.0.1:5432/eduk12_content_ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify dedicated Windows capacity
+        run: node .github/scripts/runner-preflight.mjs
+      - name: prepare native dependencies
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: install backend dependencies
+        working-directory: server-version/backend
+        run: npm ci
+      - name: generate Prisma client without database access
+        working-directory: server-version/backend
+        run: npx prisma generate
+      - name: run the exact shared Cognitive CI step
+        run: bash .github/scripts/cognitive-ci-diagnostics.sh

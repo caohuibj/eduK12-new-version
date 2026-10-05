@@ -18,6 +18,7 @@ import {
 import { buildCognitiveV2TaskDefinition } from '../backend/src/modules/cognitive/v2/registry'
 import { createSessionConfigSnapshot } from '../backend/src/modules/cognitive/v2/session-snapshot'
 import { createRecoveryCredential } from '../backend/src/services/anonymousAccess'
+import { createCognitiveVideoFixtureConfig } from './cognitive-video-fixture-config'
 
 const { PrismaClient } = require('../backend/node_modules/@prisma/client') as { PrismaClient: new () => any }
 const prisma = new PrismaClient()
@@ -67,16 +68,7 @@ const persistAsset = async (params: {
 const main = async () => {
   const fakeEntry = listCognitiveRegistryEntries().find((entry) => entry.testType === 'fake')
   if (!fakeEntry) throw new Error('fake cognitive registry entry missing')
-  const config = await prisma.cognitiveTestConfig.findFirst({
-    where: {
-      testType: fakeEntry.testType,
-      engineVersion: fakeEntry.engineVersion,
-      scoringVersion: fakeEntry.scoringVersion,
-      status: 'PUBLISHED',
-    },
-    orderBy: { createdAt: 'asc' },
-  })
-  if (!config) throw new Error('published fake cognitive config missing; run db:seed first')
+  const config = await createCognitiveVideoFixtureConfig(prisma, fakeEntry, suffix)
 
   const passwordHash = await bcrypt.hash(password, 10)
   const teacher = await prisma.user.create({
@@ -241,7 +233,7 @@ const main = async () => {
     runtime: { compiledRuntimeHash: compiledRuntime.compiledRuntimeHash, definitionHash: snapshot.configHash },
   }
   await mkdir(path.dirname(fixturePath), { recursive: true })
-  await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, 'utf8')
+  await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 })
   console.log(JSON.stringify({ fixturePath, authenticatedSessionId: authenticatedSession.id, publicSessionId: publicSession.id }))
 }
 

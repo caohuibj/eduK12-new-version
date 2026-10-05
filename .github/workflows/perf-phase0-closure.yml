@@ -4,6 +4,10 @@ on:
   # Manual evidence only: do not compete with required backend/browser CI.
   workflow_dispatch:
     inputs:
+      runner_profile:
+        type: choice
+        options: [local]
+        default: local
       ab_groups:
         description: Space-separated steady groups for same-host A/B
         required: true
@@ -44,7 +48,7 @@ env:
 jobs:
   ab:
     name: same-host BASE vs HEAD A-B / B-A / A-B
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 90
     services:
       postgres:
@@ -71,6 +75,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: prepare BASE worktree and build both variants
         run: |
@@ -188,7 +194,7 @@ jobs:
   burst:
     name: mixed one-shot burst / ${{ matrix.count }}
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 45
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -221,6 +227,8 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build and seed
         working-directory: server-version/backend
@@ -277,7 +285,7 @@ jobs:
   lost-response:
     name: committed response loss + retry/replay recovery
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 35
     services:
       postgres:
@@ -302,6 +310,8 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build and seed
         working-directory: server-version/backend
@@ -357,7 +367,7 @@ jobs:
   aggregate-size:
     name: Aggregate ready-parent 5 / 20 / 50 / 100
     if: inputs.scope == 'full'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     timeout-minutes: 50
     services:
       postgres:
@@ -383,6 +393,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-node@v4
         with: { node-version: '24.21.0' }
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - uses: grafana/setup-k6-action@v1
       - name: build backend
         working-directory: server-version/backend

@@ -141,6 +141,17 @@ export const ReactionFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     if (practiceSub === 'green' && practiceOnset != null) finishPractice(performance.now() - practiceOnset)
   }, [phase, practiceSub, practiceOnset, finishPractice])
 
+  useEffect(() => {
+    if (phase !== 'practice' || practiceSub === 'feedback') return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.repeat || event.isComposing || event.ctrlKey || event.metaKey || event.altKey || ['Tab', 'Shift', 'Control', 'Alt', 'Meta', 'Escape'].includes(event.key)) return
+      event.preventDefault()
+      handlePracticeInput()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [phase, practiceSub, handlePracticeInput])
+
   const retryPractice = () => { setPracticePremature(false); setPracticeSub('ready'); setPracticeOnset(null); setPracticeFeedback(null) }
   const advancePractice = () => {
     if (practiceIndex + 1 >= PRACTICE_TRIALS) { setPhase('formal'); setPracticeIndex(0); setPracticePremature(false); setPracticeFeedback(null); return }

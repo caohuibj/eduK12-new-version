@@ -6,6 +6,7 @@ import { decryptCognitivePayload } from './cognitive.security'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 import { createHash } from 'crypto'
+import { requireCognitiveCollection } from './collection-data.service'
 
 /** A report-scoped pseudonym of a random session ID, stable across pagination
  * and key rotation. Never expose participant/user/session IDs or join persons. */
@@ -14,10 +15,12 @@ const reportReference = (assignmentId: string, sessionId: string): string => `CR
   .digest('hex').slice(0, 24).toUpperCase()}`
 
 /** Read the persisted presentation only. No rescoring, raw submissions or research expansion. */
-export async function listProfessionalReports(input: { userId: string; role: UserRole; assignmentId: string; offset: number }) {
+export async function listProfessionalReports(input: { userId: string; role: UserRole; assignmentId: string; offset: number; collectionId?: string }) {
   const assignment = await getAssignmentForTeacher(input.userId, input.role, input.assignmentId)
   if (assignment.listedStandalone === false) throw FORBIDDEN('综合测评任务请从原有群体报告或综合测评流程读取')
-  const where = { assignmentId: input.assignmentId, status: 'COMPLETED' as const }
+  const collection = input.collectionId ? await requireCognitiveCollection({ ...input, collectionId: input.collectionId }) : null
+  const where = { assignmentId: collection ? { in: collection.assignmentIds } : input.assignmentId, status: 'COMPLETED' as const,
+    ...(collection ? { compositeAttempt: { is: { compositeAssessmentId: collection.id, assignmentRef: null } } } : {}) }
   const [total, sessions] = await Promise.all([
     prisma.cognitiveSession.count({ where }),
     prisma.cognitiveSession.findMany({ where, orderBy: [{ finishedAt: 'desc' }, { id: 'desc' }], skip: input.offset, take: 10,
@@ -48,6 +51,6 @@ export async function listProfessionalReports(input: { userId: string; role: Use
       records.push({ ...metadata, label, report: null, references: [], unavailableReason: '冻结报告暂不可读，请核查记录完整性；未重算或补值。' })
     }
   }
-  return { assignmentId: assignment.id, assignmentTitle: assignment.title, total, offset: input.offset,
+  return { assignmentId: assignment.id, assignmentTitle: collection ? `${assignment.title} · ${collection.name}` : assignment.title, total, offset: input.offset,
     nextOffset: sessions.length === 10 && input.offset + sessions.length < total ? input.offset + sessions.length : null, records }
 }

@@ -3,6 +3,9 @@ name: Assessment content gate
 on:
   workflow_call:
     inputs:
+      runner_profile:
+        type: string
+        default: local
       scale:
         type: boolean
         required: true
@@ -41,7 +44,7 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
     env:
       CI: 'true'
       NODE_ENV: test
@@ -67,6 +70,8 @@ jobs:
           node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/backend/package-lock.json
+      - name: verify runner capacity and clean application ports
+        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - run: npm ci --ignore-scripts
       - run: npx prisma generate
       - name: Scale content boundaries, registry and scientific qualification
