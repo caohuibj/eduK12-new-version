@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { DeviceInputProvenanceV1 } from '../../modules/scale/device-input-provenance'
 import type { CompositeAttemptState, CompositeCurrentItem } from '../../modules/composite/types'
@@ -141,6 +141,64 @@ const sharedProps = {
   onEnterCognitive: vi.fn(),
   onEnterSituational: vi.fn(),
 }
+
+describe('FinalCompositeAssessment durable selection and exit', () => {
+  const multiItem = (): CompositeCurrentItem => ({
+    ...scaleItem, scale: { ...scaleItem.scale!, definition: {
+      ...scaleItem.scale!.definition!, items: ['item-1', 'item-2', 'item-3'].map((itemCode, index) => ({
+        ...scaleItem.scale!.definition!.items[0], itemCode, content: `综合量表第 ${index + 1} 题`,
+        options: [{ value: 'often', label: '经常' }, { value: 'rare', label: '偶尔' }],
+      })),
+    } },
+  })
+  it('waits for the current item write before exiting, restores it, and does not advance or bleed across items', async () => {
+    const user = userEvent.setup()
+    const onExit = vi.fn()
+    const state = makeState(multiItem())
+    const props = { ...sharedProps, onExit, state, submitScale: vi.fn(), submitFormSection: vi.fn() }
+    const view = render(<FinalCompositeAssessment {...props} />)
+    await user.click(await screen.findByRole('button', { name: '经常' }))
+    await screen.findByText('已保存到本机。')
+    expect(screen.getByText('综合量表第 1 题')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /下一题/ }))
+    expect(screen.getByRole('button', { name: '经常' })).toHaveAttribute('aria-pressed', 'false')
+    let release!: () => void
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const original = finalDraftStore.putAnswer.bind(finalDraftStore)
+    const spy = vi.spyOn(finalDraftStore, 'putAnswer').mockImplementationOnce(async answer => { await gate; await original(answer) })
+    await user.click(screen.getByRole('button', { name: '偶尔' }))
+    await user.click(screen.getByRole('button', { name: '保存并退出' }))
+    expect(onExit).not.toHaveBeenCalled()
+    await act(async () => { release(); await gate })
+    await waitFor(() => expect(onExit).toHaveBeenCalledTimes(1))
+    spy.mockRestore()
+    view.unmount()
+    render(<FinalCompositeAssessment {...props} />)
+    expect(await screen.findByRole('button', { name: '经常' })).toHaveAttribute('aria-pressed', 'true')
+    await user.click(screen.getByRole('button', { name: /下一题/ }))
+    expect(screen.getByRole('button', { name: '偶尔' })).toHaveAttribute('aria-pressed', 'true')
+    await user.click(screen.getByRole('button', { name: /下一题/ }))
+    expect(screen.getByRole('button', { name: '偶尔' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('keeps the page and current selection when durable storage fails', async () => {
+    const user = userEvent.setup()
+    const onExit = vi.fn()
+    render(<FinalCompositeAssessment {...sharedProps} onExit={onExit} state={makeState(multiItem())} submitScale={vi.fn()} submitFormSection={vi.fn()} />)
+    await screen.findByRole('button', { name: '经常' })
+    const spy = vi.spyOn(finalDraftStore, 'putAnswer').mockRejectedValueOnce(new Error('本机保存失败，请重试'))
+    await user.click(screen.getByRole('button', { name: '经常' }))
+    await user.click(screen.getByRole('button', { name: '保存并退出' }))
+    await waitFor(() => expect(screen.getAllByText('本机保存失败，请重试').length).toBeGreaterThan(0))
+    expect(onExit).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: '经常' })).toHaveAttribute('aria-pressed', 'true')
+    spy.mockRestore()
+    await user.click(screen.getByRole('button', { name: '经常' }))
+    await screen.findByText('已保存到本机。')
+    await user.click(screen.getByRole('button', { name: '保存并退出' }))
+    await waitFor(() => expect(onExit).toHaveBeenCalledTimes(1))
+  })
+})
 
 describe('FinalCompositeAssessment provenance sibling placement', () => {
   it('sends one top-level provenance object for a Scale child', async () => {

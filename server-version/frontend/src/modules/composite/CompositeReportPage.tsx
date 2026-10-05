@@ -219,10 +219,10 @@ const CompositeReportPage: React.FC = () => {
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
-      {backgroundValues.length > 0 && <ReportSection title="背景信息" eyebrow="作答信息" testId="composite-background-values">
+      {backgroundValues.length > 0 && <ReportSection title="表单回答" eyebrow="作答信息" testId="composite-background-values">
         <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
-            <div className="report-metric__label">{background.label || '背景信息'}</div>
+            <div className="report-metric__label">{background.label || '表单回答'}</div>
             <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? '—'}</div>
           </div>
         ))}</div>

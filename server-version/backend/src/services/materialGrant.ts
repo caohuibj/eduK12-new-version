@@ -78,12 +78,13 @@ export const canUseScale = async (
   userId: string,
   role: UserRole | string,
   scale: { id: string; creatorId: string; status: string },
+  db: Pick<typeof prisma, 'materialGrant'> = prisma,
 ): Promise<boolean> => {
   if (role === UserRole.ADMIN) return true
   if (scale.creatorId === userId) return true
   if (!config.materialGrantsEnabled) return false
   if (scale.status !== 'PUBLISHED') return false
-  const grant = await prisma.materialGrant.findUnique({
+  const grant = await db.materialGrant.findUnique({
     where: {
       teacherId_resourceType_resourceId: {
         teacherId: userId,

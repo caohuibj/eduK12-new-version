@@ -38,6 +38,7 @@ jobs:
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       COGNITIVE_VIDEO_E2E_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      COGNITIVE_VIDEO_E2E_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       ASSET_MIGRATION_COMPLETE: 'false'
       COOKIE_SECURE: 'false'
       CORS_ORIGIN: http://127.0.0.1:5173

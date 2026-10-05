@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredResources'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
 import { reportingSpecHash, validateReportingSpecDefinition } from './spec'
 
@@ -41,7 +41,7 @@ export async function listParticipantLongitudinalMetadata(userId:string){
   WHERE aw.artifact_id IN (${Prisma.join(ids)})`)
  const byArtifact=new Map<string,Wave[]>()
  for(const wave of waves){const rows=byArtifact.get(wave.artifactId)||[];rows.push(wave);byArtifact.set(wave.artifactId,rows)}
- const eligible=page.filter(row=>{
+ const eligibility=await Promise.all(page.map(async row=>{
   const definition=validateReportingSpecDefinition(row.definition)
   if(definition.analysisKind!=='INDIVIDUAL_LONGITUDINAL'||reportingSpecHash(definition)!==row.specHash)return false
   const bound=byArtifact.get(row.id)||[]
@@ -49,14 +49,15 @@ export async function listParticipantLongitudinalMetadata(userId:string){
   let metrics=definition.metricRules
   for(const wave of bound){
    if(!['PUBLISHED','CLOSED'].includes(wave.runStatus)||wave.observations?.length!==1||wave.observations[0].subjectUserId!==userId||wave.executions.length!==1||wave.executions[0]!==wave.observations[0].executionId||!wave.policy||canonicalHash(wave.policy)!==wave.hash||!wave.policy.resultDisclosure)return false
-   const entry=relationalProductRegistry.findExact({resourceKind:wave.family as any,resourceKey:wave.key,resourceVersion:wave.version})
+   const entry=await resolveHistoricalRelationalEntry({resourceKind:wave.family as any,resourceKey:wave.key,resourceVersion:wave.version})
    if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure||canonicalHash(entry.resultDisclosure)!==canonicalHash(wave.policy.resultDisclosure))return false
    const rule=validateResultDisclosureContract(wave.policy.resultDisclosure).audiences.RESPONDENT
    if(rule.mode!=='INDIVIDUAL_SUMMARY'||!rule.longitudinalMetricKeys.length)return false
    metrics=metrics.filter(m=>m.sourceFamily===wave.family&&m.sourceResourceKey===wave.key&&rule.longitudinalMetricKeys.includes(m.sourceMetricKey))
   }
   return metrics.length>0
- })
+ }))
+ const eligible=page.filter((_row,index)=>eligibility[index])
  // Recheck all current memberships and denies in one query after resolving
  // registry contracts, without per-report organization lookups.
  const current=await prisma.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT a.id FROM reporting_analysis_artifacts a WHERE a.id IN (${Prisma.join(ids)}) AND ${scope(userId)}`)

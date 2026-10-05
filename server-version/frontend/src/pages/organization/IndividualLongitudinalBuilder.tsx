@@ -1,3 +1,6 @@
+import { apiErrorMessage } from '../../utils/apiErrorMessage'
+import { triggerExportDownload } from '../../utils/exportJobs'
+import { Link } from 'react-router-dom'
 import { ScaleReferenceTrajectory } from '../../modules/reporting/ScaleReferenceTrajectory'
 import { limitationLabel, comparabilityLabel, resourceLabel } from './reportingLabels'
 import { useEffect, useRef, useState } from 'react'
@@ -29,7 +32,7 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
     const request = ++epoch.current
     setBusy(true); setError(''); setArtifact(null)
     const current = () => epoch.current === request
-    try { await work(current) } catch (e) { if (current()) { setArtifact(null); setError(e instanceof Error ? e.message : '操作失败，请重新确认权限') } }
+    try { await work(current) } catch (e) { if (current()) { setArtifact(null); setError(apiErrorMessage(e)) } }
     finally { if (current()) setBusy(false) }
   }
   const findSubjects = (page = 1) => act(async current => {
@@ -53,8 +56,7 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
       const ticket = await deliveryApi.createArtifactExport(organizationId, 'MEMBER', saved.artifactId)
       const result = await deliveryApi.downloadExport(organizationId,ticket.exportId)
       if (!current()) return
-      const url = URL.createObjectURL(result.blob), a = document.createElement('a')
-      a.href=url; a.download=result.filename; a.click(); URL.revokeObjectURL(url); setArtifact(saved)
+      triggerExportDownload(result.blob, result.filename); setArtifact(saved)
     })
   }
   const projection = artifact?.projection.kind === 'INDIVIDUAL_LONGITUDINAL' ? artifact.projection : null
@@ -69,9 +71,10 @@ export function IndividualLongitudinalBuilder({ organizationId }: { organization
       {subjectPage && <ProductButton disabled={busy} onClick={()=>void findSubjects(subjectPage)}>更多学生</ProductButton>}
       <label className="grid gap-1">个人测量项目<select aria-label="个人测量项目" disabled={busy} value={resource} onChange={e=>{setResource(e.target.value);setSelected([]);setArtifact(null)}}><option value="">请选择</option>{[...new Set(sources.map(s=>`${s.resource.family}/${s.resource.key}`))].map(k=><option key={k} value={k}>{resourceLabel(sources,k)}</option>)}</select></label>
       <fieldset disabled={busy}><legend>个人测量时间</legend>{sources.filter(s=>`${s.resource.family}/${s.resource.key}`===resource).map(s=><label key={key(s)} className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={selected.includes(key(s))} onChange={e=>{setArtifact(null);setSelected(old=>e.target.checked?[...old,key(s)]:old.filter(k=>k!==key(s)))}} />{s.runName} · {s.publishedAt ? new Date(s.publishedAt).toLocaleDateString() : '日期未知'} · {s.resource.version}</label>)}</fieldset>
+      {subject && sources.length === 0 && !busy && !error && <p>此学生尚无可用组织测量。请在组织批次投放已注册资源并完成至少两次作答；课程问卷不会自动注册为组织测量。</p>}
       {sourcePage && <ProductButton disabled={busy} onClick={()=>void findSources(subject,sourcePage)}>更早的个人测量</ProductButton>}
       <label className="grid gap-1">个人报告方案<select aria-label="个人报告方案" disabled={busy} value={specId} onChange={e=>{setSpecId(e.target.value);setArtifact(null)}}><option value="">请选择</option>{specs.map(s=><option key={s.specId} value={s.specId}>{s.specKey} v{s.version}</option>)}</select></label>
-      {specs.length===0 && <p>尚无已发布的个人纵向报告方案，请由平台管理员审核并发布。</p>}
+      {specs.length===0 && <p>尚无已发布的个人纵向报告方案。平台管理员可在<Link to="/admin/reporting-content">测量资源与报告方案</Link>中创建、审核和发布。</p>}
       <label className="grid gap-1">参考范围<select aria-label="参考范围" disabled={busy} value={latestReference?'latest':'attached'} onChange={e=>{setLatestReference(e.target.value==='latest');setArtifact(null)}}><option value="attached">按所选测量中较晚的兼容参考范围</option><option value="latest">使用最新兼容参考范围重新生成（保留已有报告）</option></select></label>
       <ProductButton disabled={busy || !subject || !specId || selected.length<2} onClick={()=>void generate()}>生成个人纵向报告</ProductButton>
     </>}

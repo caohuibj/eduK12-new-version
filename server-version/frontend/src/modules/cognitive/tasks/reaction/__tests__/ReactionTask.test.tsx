@@ -101,6 +101,24 @@ describe('deterministicForeperiod (§29 seeded foreperiod)', () => {
 })
 
 describe('ReactionTask — instruction & practice', () => {
+  it('accepts Space in all three practice trials without storing practice or activating feedback buttons', async () => {
+    const onTrialComplete = vi.fn()
+    render(<ReactionTask taskContext={makeContext()} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    fireEvent.click(screen.getByText('开始练习'))
+    for (let index = 0; index < 3; index++) {
+      act(() => vi.advanceTimersByTime(1000))
+      now += 300
+      const key = new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true, cancelable: true })
+      fireEvent(window, key)
+      expect(key.defaultPrevented).toBe(true)
+      expect(screen.getByText('很好！保持专注，等绿色出现再点击。')).toBeTruthy()
+      fireEvent.keyDown(window, { key: ' ', code: 'Space' })
+      expect(screen.getByText(`练习 ${index + 1} / 3`)).toBeTruthy()
+      fireEvent.click(screen.getByText(index === 2 ? '开始正式测评' : '下一个'))
+    }
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('trial 0')).toBeTruthy()
+  })
   it('shows instruction first; practice does NOT persist (no onTrialComplete)', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     render(<ReactionTask taskContext={makeContext()} trialIndex={0} onTrialComplete={onTrialComplete} />)

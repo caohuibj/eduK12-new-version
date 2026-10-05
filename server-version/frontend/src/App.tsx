@@ -29,6 +29,7 @@ const DocumentLibrary = React.lazy(() => import('./pages/DocumentLibrary'))
 const UserList = React.lazy(() => import('./pages/UserList'))
 const TeacherCodeList = React.lazy(() => import('./pages/TeacherCodeList'))
 const LegacyArchive = React.lazy(() => import('./pages/admin/LegacyArchive'))
+const ReportingContent = React.lazy(() => import('./pages/admin/ReportingContent'))
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
 const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
@@ -520,6 +521,7 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/reporting-content" element={<ProtectedRoute roles={['ADMIN']}><ReportingContent /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive/:kind/:id" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route

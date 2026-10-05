@@ -26,6 +26,7 @@ import {
   type RunActorRole,
 } from './repository'
 import { getOrCreateOrganizationEpisodeAllocationInTransaction } from './episodeAllocation'
+import { assertRegisteredResourceUse } from './registeredResources'
 
 type Tx = Prisma.TransactionClient
 
@@ -152,10 +153,12 @@ const prepareTracks = async (
   runId: string,
   organizationId: string,
   registry: RunResourceAuthorityRegistry,
+  actorUserId: string,
 ): Promise<PreparedTrack[]> => {
   const tracks = await readDraftTracks(runId, organizationId)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
+    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId)
     registry.assertStartSupported(track.resourceFamily)
     const resourcePolicy = await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
     assertRunTrackNarrowing(resourcePolicy, track.requestedPolicy)
@@ -657,7 +660,7 @@ export const publishAssessmentRun = async (input: {
   resourceRegistry?: RunResourceAuthorityRegistry
 }): Promise<PublishedRunResult> => {
   const registry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
-  const preparedTracks = await prepareTracks(input.runId, input.organizationId, registry)
+  const preparedTracks = await prepareTracks(input.runId, input.organizationId, registry, input.actorUserId)
   const preparedIdentity = canonicalHash(preparedTracks.map((track) => ({
     id: track.id,
     resourceFamily: track.resourceFamily,
@@ -731,6 +734,7 @@ export const publishAssessmentRun = async (input: {
     let executionCount = 0
 
     for (const track of preparedTracks) {
+      await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true)
       const frozenPolicyJson = JSON.stringify(track.resourcePolicy)
       const policyHash = canonicalHash(track.resourcePolicy)
       await tx.$executeRaw`
@@ -822,7 +826,7 @@ export const previewAssessmentRun = async (input: {
   organizationId: string; runId: string; actorUserId: string; expectedVersion: number;
   resourceRegistry?: RunResourceAuthorityRegistry;
 }) => {
-  const prepared = await prepareTracks(input.runId, input.organizationId, input.resourceRegistry ?? productionRunResourceAuthorityRegistry)
+  const prepared = await prepareTracks(input.runId, input.organizationId, input.resourceRegistry ?? productionRunResourceAuthorityRegistry, input.actorUserId)
   return prisma.$transaction(async tx => {
     const organizations = await tx.$queryRaw<Array<{ status: string }>>`
       SELECT "status" FROM "organizations" WHERE "id" = ${input.organizationId} FOR SHARE

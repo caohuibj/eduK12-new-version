@@ -1,6 +1,7 @@
+import { apiErrorMessage } from '../../utils/apiErrorMessage'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import './questionnaire-products.css'
 import {
@@ -29,10 +30,7 @@ async function request(
   if (response.code !== 0) throw new Error(response.message || '操作失败')
   return response.data
 }
-const message = (e: unknown) =>
-  e && typeof e === 'object' && 'message' in e && typeof e.message === 'string'
-    ? e.message
-    : '操作失败，请稍后重试'
+const message = apiErrorMessage
 const labels: Record<string, string> = {
   SCALE: '量表',
   COGNITIVE: '认知测验',
@@ -88,7 +86,7 @@ export function QuestionnaireProductList() {
               <h2 className="font-semibold">{row.name}</h2>
               <p>
                 {labels[row.status] || row.status} ·{' '}
-                {row.kind === 'LEGACY' ? '原有问卷' : '四类问卷'}
+                {row.kind === 'LEGACY' ? '原有问卷' : '问卷'}
               </p>
               <div className="flex gap-4 mt-2">
                 <Link to={row.editHref}>查看与编制</Link>
@@ -128,6 +126,8 @@ export function QuestionnaireProductList() {
 export function QuestionnaireProductEdit() {
   const { id = 'new' } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const preselectedScaleId = searchParams.get('scaleId')
   const [detail, setDetail] = useState<any>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
@@ -171,13 +171,15 @@ export function QuestionnaireProductEdit() {
     hydrate(await request('/' + id))
   }
   useEffect(() => {
+    let active = true
     setDetail(null)
     setError('')
     request('/resources')
-      .then(setCatalog)
-      .catch((e) => setError(message(e)))
-    void reload().catch((e) => setError(message(e)))
-  }, [id])
+      .then(row => { if (!active) return; setCatalog(row); if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) { setType('SCALE'); setSelected(preselectedScaleId) } })
+      .catch((e) => { if (active) setError(message(e)) })
+    if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
+    return () => { active = false }
+  }, [id, preselectedScaleId])
   const action = async (fn: () => Promise<void>) => {
     setBusy(true)
     setError('')
@@ -225,7 +227,7 @@ export function QuestionnaireProductEdit() {
           questionnaireType: kind,
           requestId,
         })
-        navigate(base + '/' + row.id, { replace: true })
+        navigate(base + '/' + row.id + (preselectedScaleId ? '?scaleId=' + encodeURIComponent(preselectedScaleId) : ''), { replace: true })
       } else
         hydrate(
           await request(

@@ -1,9 +1,10 @@
-import { waitForExportArtifacts, requestExportIntent, assertExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
+import { waitForExportArtifacts, requestExportIntent, assertExportDownload, triggerExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Send, Archive } from 'lucide-react'
 import { cognitiveApi } from '../../modules/cognitive/api'
+import { compositeApi } from '../../modules/composite/api'
 import { sessionFetch } from '../../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 import CognitiveProfessionalReports from '../../modules/cognitive/CognitiveProfessionalReports'
@@ -26,8 +27,13 @@ const CognitiveAssignmentEdit: React.FC = () => {
   const [exporting, setExporting] = useState<CognitiveExportKind | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [readingReports, setReadingReports] = useState(false)
+  const [exportNotice, setExportNotice] = useState('')
+  const [collections, setCollections] = useState<Array<{ id: string; name: string; completedCount: number }>>([])
+  const [collectionId, setCollectionId] = useState('')
+  const [collectionsError, setCollectionsError] = useState('')
 
   const isWrapper = detail?.listedStandalone === false
+  const hasDetail = Boolean(detail)
   const isPackageLocked = isWrapper && Boolean(detail?.reportPackageLocked)
 
   const load = async () => {
@@ -43,6 +49,19 @@ const CognitiveAssignmentEdit: React.FC = () => {
   }
 
   useEffect(() => { void load() }, [id])
+
+  useEffect(() => {
+    if (!hasDetail || isWrapper) return
+    let cancelled = false
+    setCollectionsError('')
+    void cognitiveApi.collections(id).then(response => {
+      if (cancelled) return
+      if (response.code !== 0 || !response.data) throw new Error(response.message || '关联问卷加载失败')
+      setCollections(response.data)
+      setCollectionId(response.data.find(value => value.completedCount > 0)?.id || '')
+    }).catch(() => { if (!cancelled) setCollectionsError('同版本问卷列表暂不可用，请刷新重试。独立任务导出仍可使用。') })
+    return () => { cancelled = true }
+  }, [id, hasDetail, isWrapper])
 
   const publish = async () => {
     const response = await cognitiveApi.publishAssignment(id)
@@ -81,25 +100,25 @@ const CognitiveAssignmentEdit: React.FC = () => {
     format: 'csv' | 'zip' | 'xlsx' = 'csv',
   ) => {
     if (exporting) return
-    const scope = `cognitiveApi:${id}:${JSON.stringify({ detail: detailMode, format })}`
+    const scope = `cognitiveApi:${id}:${JSON.stringify({ detail: detailMode, format, collectionId })}`
     setExporting(kind)
     setError(null)
+    setExportNotice('正在生成导出文件…')
     try {
-      const response = await requestExportIntent(scope, key => cognitiveApi.exportData(id, { detail: detailMode, format }, key))
+      const response = await requestExportIntent(scope, key => collectionId && detailMode !== 'research' && format === 'csv'
+        ? compositeApi.exportData(collectionId, { detail: detailMode, format }, key)
+        : cognitiveApi.exportData(id, { detail: detailMode, format }, key))
       if (response.code !== 0 || !response.data?.artifacts) throw new Error(response.message || '导出失败')
       const artifacts = await waitForExportArtifacts(response.data.artifacts)
       const artifact = artifacts[0]
       const download = await sessionFetch(artifact.downloadUrl, { signal: AbortSignal.timeout(60000) })
       assertExportDownload(download)
-      const blobUrl = URL.createObjectURL(await download.blob())
-      const anchor = document.createElement('a')
-      anchor.href = blobUrl
-      anchor.download = artifact.fileName
-      anchor.click()
-      URL.revokeObjectURL(blobUrl)
+      triggerExportDownload(await download.blob(), artifact.fileName)
+      setExportNotice('已请求下载导出文件，请查看浏览器下载列表；若被拦截，请允许本站下载。')
       clearExportIntentKey(scope)
     } catch (err) {
       if (err instanceof ExportJobFailedError) clearExportIntentKey(scope)
+      setExportNotice('')
       setError((err as { message?: string }).message || '导出失败，请重试')
     } finally {
       setExporting(null)
@@ -134,8 +153,17 @@ const CognitiveAssignmentEdit: React.FC = () => {
           </div>
         )}
       />
+      {exportNotice && <p role="status" className="mb-4">{exportNotice}</p>}
       {error && <p role="alert" className="text-red-500 mb-4">{error}</p>}
-      {readingReports && !isWrapper && <CognitiveProfessionalReports key={id} assignmentId={id} />}
+      {!isWrapper && <section className="staff-panel staff-panel--padded mb-5 p-4" aria-label="数据来源设置">
+        <label>数据来源<select aria-label="认知数据来源" value={collectionId} disabled={exporting !== null} onChange={event => { setCollectionId(event.target.value); setExportNotice(''); setReadingReports(false) }} className="input ml-2">
+          <option value="">当前独立任务</option>
+          {collections.map(value => <option key={value.id} value={value.id}>{value.name} · 已完成 {value.completedCount} 份认知记录</option>)}
+        </select></label>
+        <p className="mt-2 text-sm text-gray-600">同版本问卷按冻结任务与报告设置匹配，仅列出你创建的普通问卷。选择问卷后，导出包含该问卷的全部单元；专业报告只读取其中此版本认知任务的冻结结果。</p>
+        {collectionsError && <p role="alert">{collectionsError}</p>}
+      </section>}
+      {readingReports && !isWrapper && <CognitiveProfessionalReports key={id + ':' + collectionId} assignmentId={id} collectionId={collectionId || undefined} />}
       {isWrapper ? (
         <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-2">任务信息</h2>

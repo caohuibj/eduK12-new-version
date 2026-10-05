@@ -279,7 +279,7 @@ const CognitiveRunner: React.FC = () => {
     const instructions = (
       <div className="space-y-1">
         <p>本次测评共 {total || '若干'} 个试次，请按任务提示完成。</p>
-        <p>尝试 #{state.session?.attemptNo}（{state.session?.testType} / {state.session?.engineVersion}）</p>
+        <p>本次为第 {state.session?.attemptNo} 次作答</p>
         {cognitiveInputNotice(state.session!.testType, state.session!.engineVersion) ? (
           <p>{cognitiveInputNotice(state.session!.testType, state.session!.engineVersion)}</p>
         ) : null}
@@ -290,7 +290,7 @@ const CognitiveRunner: React.FC = () => {
       <AssessmentShell
         title={title}
         instructions={instructions}
-        progress={{ kind: 'phase', phase: '准备开始', detail: '任务启动后，刺激与计时仍由具体 Cognitive task 自己管理。' }}
+        progress={{ kind: 'phase', phase: '准备开始', detail: '请先阅读任务说明并完成练习；正式测验开始后请保持专注。' }}
         interactionReadiness={interactionReadiness}
         actions={(
           <div className="text-center">

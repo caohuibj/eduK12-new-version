@@ -1,7 +1,7 @@
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveOrganizationAccessContext } from '../organization/access'
-import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredResources'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
 import { readReportingArtifactRecord } from './artifact'
 import { readExactReportingSeriesWavesBatch } from './series'
@@ -43,7 +43,7 @@ export async function readParticipantLongitudinal(userId: string, artifactId: st
     const track = tracks[0]
     if (!track?.policy || canonicalHash(track.policy) !== track.hash || !track.policy.resultDisclosure) return hidden()
     // Current content may revoke access; an unknown or changed contract cannot grant visibility.
-    const entry = relationalProductRegistry.findExact({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
+    const entry = await resolveHistoricalRelationalEntry({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
     if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(track.policy.resultDisclosure)) return hidden()
     const contract = validateResultDisclosureContract(track.policy.resultDisclosure)
     const rule = contract.audiences.RESPONDENT

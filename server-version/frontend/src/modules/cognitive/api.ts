@@ -41,10 +41,11 @@ const loadSessionAsset = async (
  * 禁止为了 Fake UI 新增 backend endpoint（v1.1 §15）。
  */
 export const cognitiveApi = {
-  professionalReports: (id: string, offset = 0) => apiClient.get<{
+  collections: (id: string) => apiClient.get<Array<{ id: string; name: string; completedCount: number }>>(`/cognitive/assignments/${encodeURIComponent(id)}/collections`),
+  professionalReports: (id: string, offset = 0, collectionId?: string) => apiClient.get<{
     assignmentId: string; assignmentTitle: string; total: number; offset: number; nextOffset: number | null
     records: Array<{ label: string; reportId: string; finishedAt: string | null; report: CognitiveV2Report | null; references: Array<Record<string, unknown>>; unavailableReason: string | null }>
-  }>(`/cognitive/assignments/${encodeURIComponent(id)}/reports?offset=${offset}`),
+  }>(`/cognitive/assignments/${encodeURIComponent(id)}/reports?offset=${offset}${collectionId ? '&collectionId=' + encodeURIComponent(collectionId) : ''}`),
   listTests: () =>
     apiClient.get<{ list: Array<{
       testType: string

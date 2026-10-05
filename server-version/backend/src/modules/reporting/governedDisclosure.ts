@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { validateResultDisclosureContract, type ResultAudience } from '../assessment-policy/result-disclosure'
-import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredResources'
 import { resolveOrganizationAccessContext } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { getPublishedReportingSpec } from './spec'
@@ -39,7 +39,7 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   let allowed = spec.definition.metricRules.map(r => r.metricId)
   for (const track of tracks) {
     if (canonicalHash(track.policy) !== track.hash) return hidden()
-    const entry = relationalProductRegistry.findExact({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
+    const entry = await resolveHistoricalRelationalEntry({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
     if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(track.policy.resultDisclosure)) return hidden()
     const contract = validateResultDisclosureContract(track.policy.resultDisclosure)
     const rule = contract.audiences[audience]

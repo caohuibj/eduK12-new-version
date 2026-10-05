@@ -5,10 +5,12 @@ import * as path from 'path'
 import { saveToFile, SavVariable, VariableType, VariableMeasure } from 'sav-writer'
 import { readScaleAnswers, readScaleResult } from '../modules/scale/scale-workflow.service'
 import { readContextFormAnswers } from '../modules/assessment-context'
+import { scaleExportScope } from './scaleExportScope'
 
 // ==================== 类型定义 ====================
 
 interface ExportOptions {
+  actor?: { userId: string }
   anonymize?: boolean           // 是否脱敏
   includeProgress?: boolean     // 是否包含进行中
   minProgress?: number          // 最低完成进度
@@ -187,8 +189,7 @@ export async function getScaleExportData(
 
   // 构建查询条件
   const where: any = {
-    scaleId,
-    compositeAttemptId: null,
+    ...scaleExportScope(scaleId, options.actor),
     progress: { gte: minProgress }
   }
   

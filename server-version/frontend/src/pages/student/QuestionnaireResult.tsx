@@ -68,7 +68,7 @@ const QuestionnaireResult: React.FC = () => {
       backAction={<button type="button" onClick={() => navigate('/student/questionnaires')} className="hui-button hui-button--secondary">返回问卷列表</button>}
     >
       {result.backgroundValues.length > 0 && (
-        <ReportSection title="背景信息" eyebrow="Context">
+        <ReportSection title="表单回答" eyebrow="作答信息">
           <div className="report-metric-grid">
             {result.backgroundValues.map((item) => (
               <div key={item.itemId} className="report-metric">

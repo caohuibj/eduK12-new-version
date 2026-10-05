@@ -115,8 +115,10 @@ export const normalizeApiError = (error: any): ApiClientError => {
   const message = typeof dataObject.message === 'string'
     ? dataObject.message
     : typeof error?.message === 'string'
-      ? error.message
-      : '网络请求失败'
+      ? /^Request failed with status code \d+$/.test(error.message)
+        ? error?.response?.status >= 500 ? '服务暂时不可用，请稍后重试。' : '请求未能完成，请检查后重试。'
+        : error.message
+      : '网络请求失败，请检查连接后重试。'
   const normalized: ApiClientError = {
     ...dataObject,
     name: error?.name || 'ApiClientError',

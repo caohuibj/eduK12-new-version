@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { normalizeApiError } from '../client'
 
 describe('api client error normalization', () => {
+  it('explains a raw transient 503 in Chinese and retains retry classification', () => {
+    const error = normalizeApiError({ message: 'Request failed with status code 503', response: { status: 503 } })
+    expect(error.message).toBe('服务暂时不可用，请稍后重试。')
+    expect(error.status).toBe(503)
+    expect(error.retryable).toBe(true)
+  })
   it('preserves the HTTP status alongside the API envelope', () => {
     const error = normalizeApiError({
       name: 'AxiosError',

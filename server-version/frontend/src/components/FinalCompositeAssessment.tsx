@@ -13,6 +13,7 @@ import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequire
 import { AssessmentShell } from './assessment-shell'
 import FormPlayer from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
+import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
@@ -96,6 +97,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       : null
   const unitKey = `${state.id}:${item?.type || 'complete'}:${item?.id || ''}`
   const draftLocked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
+  const { schedule: scheduleLocalSave, flush: flushLocalSaves, status: localSaveStatus } = useLocalDraftSaveQueue(draftKey)
+  const [exiting, setExiting] = useState(false)
 
   const loadAssessmentImage = useCallback(async (assetId: string): Promise<Blob> => {
     if (!item) throw new Error('当前没有冻结测评单元')
@@ -244,26 +247,30 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }, [state.status, onCompleted])
 
   const saveForm = async (itemId: string, value: FormValue) => {
-    if (!draftKey || submitting || draftLocked) return
+    if (!draftKey || submitting || exiting || draftLocked) return
     setFormValues((previous) => ({ ...previous, [itemId]: value }))
-    try {
+    await scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
-      setError(null)
-    } catch (cause) {
-      setError(normalizeApiError(cause).message)
-    }
+    })
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
-    if (!draftKey || submitting || draftLocked) return
+    if (!draftKey || submitting || exiting || draftLocked) return
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    try {
+    await scheduleLocalSave(`scale:${itemCode}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
-      setError(null)
-      if (item?.scale?.definition?.items && scaleIndex < item.scale.definition.items.length - 1) setScaleIndex((index) => index + 1)
+    })
+  }
+
+  const saveAndExit = async () => {
+    if (exiting || submitting) return
+    setExiting(true)
+    try {
+      await flushLocalSaves()
+      onExit()
     } catch (cause) {
       setError(normalizeApiError(cause).message)
-    }
+    } finally { setExiting(false) }
   }
 
   const submitSection = async () => {
@@ -287,6 +294,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
+      await flushLocalSaves()
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
         const missingStored = formAnswers.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
@@ -340,6 +348,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
+      await flushLocalSaves()
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const answerMap = new Map(snapshot.answers.map((answer) => {
           const value = answer.value as { responseValue?: ResponseValue } | ResponseValue
@@ -430,8 +439,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       submissionStatus={submissionStatus}
       recoveryState={recoveryState}
       actions={(
-        <button type="button" onClick={onExit} className="btn-secondary min-h-11">
-          <Save className="mr-1 inline h-4 w-4" />保存并退出
+        <button type="button" onClick={() => void saveAndExit()} disabled={exiting || submitting} className="btn-secondary min-h-11">
+          <Save className="mr-1 inline h-4 w-4" />{exiting ? '正在保存…' : '保存并退出'}
         </button>
       )}
       navigation={(
@@ -460,6 +469,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       ) : null}
 
       <CompositeUnitRequirements item={item} />
+      {localSaveStatus.state !== 'idle' ? <p role={localSaveStatus.state === 'error' ? 'alert' : 'status'} className="mb-4 text-sm">{localSaveStatus.message}</p> : null}
 
       {item?.type === 'COGNITIVE' ? (
         <div className="card p-8 text-center">
@@ -507,8 +517,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                     }}
                     options={options}
                     value={value}
-                    answerDisabled={draftLocked}
-                    submitDisabled={requiresRestart}
+                    navigationDisabled={exiting}
+                    answerDisabled={draftLocked || exiting}
+                    submitDisabled={requiresRestart || exiting}
                     position={sectionIndex + 1}
                     total={formFields.length}
                     onChange={(nextValue) => saveForm(field.formItemId, nextValue)}
@@ -548,10 +559,12 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                   ariaLabel={`${question.content} 视频内容`}
                 >
                   <ScalePlayer
+                    key={question.itemCode}
                     item={question}
                     value={scaleValues[question.itemCode]}
-                    answerDisabled={draftLocked}
-                    submitDisabled={requiresRestart}
+                    navigationDisabled={exiting}
+                    answerDisabled={draftLocked || exiting}
+                    submitDisabled={requiresRestart || exiting}
                     position={scaleIndex + 1}
                     total={scaleItems.length}
                     onChange={(nextValue) => saveScale(question.itemCode, nextValue)}
