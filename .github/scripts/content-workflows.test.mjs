@@ -264,3 +264,10 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-cognitive'),/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
   for(const name of ['backend','backend-regression','frontend','docker','codeql']) assert.match(job(ci,name),/needs: scope/);
 });
+
+test('different component probes have independent concurrency groups while same-route updates cancel stale runs', () => {
+  const ci=source('ci');
+  assert.match(ci,/group:.*inputs\.step_probe \|\| 'none'/);
+  assert.match(ci,/group:.*inputs\.step_probe == 'images' && inputs\.probe_frontend_only && 'frontend' \|\| 'all'/);
+  assert.match(ci,/cancel-in-progress: true/);
+});

@@ -74,7 +74,7 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.step_probe || 'none' }}-${{ inputs.step_probe == 'images' && inputs.probe_frontend_only && 'frontend' || 'all' }}
   cancel-in-progress: true
 
 jobs:
