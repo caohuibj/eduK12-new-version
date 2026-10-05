@@ -234,8 +234,10 @@ test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs on
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
   assert.doesNotMatch(front,/pr-light-frontend/);
   assert.doesNotMatch(front,/server-version\/backend|npm ci --ignore-scripts/);
-  for(const name of ['backend','backend-browser-build'])
+  for(const name of ['backend','backend-browser-build']) {
     assert.match(job(ci,name),/cognitive:onboarding-check -- --all --json/);
+    assert.match(job(ci,name),/Cognitive frontend acceptance dependencies\n        working-directory: server-version\/frontend\n        run: npm ci/);
+  }
   assert.match(job(ci,'pr-light-frontend'),/github\.event\.pull_request\.draft == true/);
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   for(const {workflow} of Object.values(scopes)) {

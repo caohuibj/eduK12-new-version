@@ -13,7 +13,8 @@ function validateTargets(plan, frontendOnly) {
   for (const name of expected) {
     const target = plan.target[name];
     assert.equal(typeof target.context, 'string');
-    assert.equal(target.dockerfile, 'Dockerfile');
+    assert.equal(typeof target.dockerfile, 'string');
+    assert.equal(path.resolve(target.context, target.dockerfile), path.resolve(target.context, 'Dockerfile'), 'Dockerfile must stay inside its Compose context');
     const tag = name === 'frontend' ? 'server-version-frontend' : 'server-version-backend';
     assert.ok(target.tags?.some(value => value === tag || value === `${tag}:latest`), 'Scanned image tag must match build');
     assert.ok(!target.push, 'CI must not publish images');

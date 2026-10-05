@@ -9,7 +9,11 @@ const fixture = frontendOnly => ({ target: Object.fromEntries((frontendOnly ? ['
 const resolved = plan => { for (const target of Object.values(plan.target)) {target.pull = true; target.output = [{type:'docker'}];} return plan;};
 test('runtime refresh preserves source, tags and build arguments without mutating Compose input', () => {
   for (const frontendOnly of [true,false]) {
-    const input = fixture(frontendOnly), before = structuredClone(input);
+    const input = fixture(frontendOnly);
+    for (const [name,target] of Object.entries(input.target)) {
+      if (name !== 'frontend') { target.context='/work/repo/server-version/backend'; target.dockerfile=target.context+'/Dockerfile'; }
+    }
+    const before = structuredClone(input);
     const plan = runtimeRefreshPlan(input,frontendOnly);
     assert.deepEqual(input,before);
     for (const [name,target] of Object.entries(plan.target)) {
@@ -21,7 +25,7 @@ test('runtime refresh preserves source, tags and build arguments without mutatin
 });
 test('missing refresh, whole-image cache bypass, wrong tags or publishing cannot pass resolved validation', () => {
   for (const change of [t=>delete t['no-cache-filter'],t=>t['no-cache']=true,t=>t.pull=false,
-    t=>t.tags=['other-image'],t=>t.push=true,t=>t.output=[{type:'registry'}],t=>t.output=[]]) {
+    t=>t.tags=['other-image'],t=>t.dockerfile='../other/Dockerfile',t=>t.push=true,t=>t.output=[{type:'registry'}],t=>t.output=[]]) {
     const plan=resolved(runtimeRefreshPlan(fixture(true),true)); change(plan.target.frontend);
     assert.throws(()=>verifyResolvedPlan(plan,true));
   }

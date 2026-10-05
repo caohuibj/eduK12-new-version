@@ -457,6 +457,9 @@ jobs:
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
         run: npm run cognitive:contracts
+      - name: Cognitive frontend acceptance dependencies
+        working-directory: server-version/frontend
+        run: npm ci
       - name: all Cognitive onboarding decisions
         run: npm run cognitive:onboarding-check -- --all --json
       - name: Bundle content and immutable history
@@ -1335,6 +1338,9 @@ jobs:
         run: npm ci
       - name: prisma generate
         run: npx prisma generate
+      - name: Cognitive frontend acceptance dependencies
+        working-directory: server-version/frontend
+        run: npm ci
       - name: all Cognitive onboarding decisions
         run: npm run cognitive:onboarding-check -- --all --json
       - name: build unchanged backend for real API acceptance
