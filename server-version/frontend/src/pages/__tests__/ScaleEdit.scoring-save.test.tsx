@@ -24,6 +24,17 @@ const scale = (value: unknown) => ({ id: 'scale-1', code: 's1', name: '测试量
 beforeEach(() => { vi.clearAllMocks() })
 
 describe('计分定义保存与回读', () => {
+  it('shows included items and matches the unweighted mean range even with historical weights', async () => {
+    const stored: any = definition(['Q1', 'Q2', 'Q3'])
+    stored.responseSets = [{ key: 'default', options: [{ value: 'a', label: 'A', score: 1 }, { value: 'b', label: 'B', score: 5 }] }]
+    stored.scoring.scores[0].source.aggregation = 'mean'
+    stored.scoring.scores[0].source.items.forEach((item: any) => { item.weight = 2 })
+    api.get.mockResolvedValue({ code: 0, data: scale(stored) })
+    const user = userEvent.setup()
+    render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
+    await user.click(await screen.findByRole('button', { name: '计分' }))
+    expect(screen.getByText(/已纳入 3\/3 题 · 预计范围 1.0–5.0/)).toBeInTheDocument()
+  })
   it('explicitly selects all three items, persists them, and keeps them selected after reopening', async () => {
     let stored: any = definition()
     api.get.mockImplementation(async () => ({ code: 0, data: scale(structuredClone(stored)) }))

@@ -349,6 +349,7 @@ const ScaleList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(scale.createdAt).toLocaleDateString('zh-CN')}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
+                        {scale.status === 'PUBLISHED' && <Link to={`/questionnaire-products/new?scaleId=${encodeURIComponent(scale.id)}`} className="text-action text-xs">用于问卷投放</Link>}
                         {scale.source === 'granted' ? (
                           <span className="text-xs text-gray-400">只读</span>
                         ) : (
@@ -414,6 +415,7 @@ const ScaleList: React.FC = () => {
             </div>
 
             <div className="space-y-4 p-4">
+              <p className="text-sm text-slate-600">本导出包含独立施测，以及当前账号创建的普通问卷中的已完成量表结果。其他账号投放的问卷、组织批次及固定报告包使用各自的报告导出入口。列表测评数还可能包含未完成记录，不能与此处已完成数直接比较。</p>
               <div className="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
                 <div className="rounded bg-blue-50 p-3"><div className="text-2xl font-bold text-blue-600">{exportPreview.completedCount}</div><div className="text-xs text-gray-500">已完成测评</div></div>
                 <div className="rounded bg-green-50 p-3"><div className="text-2xl font-bold text-green-600">{exportPreview.itemCount}</div><div className="text-xs text-gray-500">题目数量</div></div>

@@ -1,6 +1,7 @@
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode, EvaluationTargetRequest } from '../assessment-policy/target'
+import { resolveReleasedRelationalEntry } from './registeredResources'
 import { assertEvaluationTarget } from '../assessment-policy/target'
 import {
   relationalProductRegistry,
@@ -165,11 +166,12 @@ export const createRelationalRunResourceAdapter = (input: {
     family: input.family,
     capabilities,
     async resolveExact(ref) {
-      const entry = registry.findExact({
+      const identity = {
         resourceKind: input.family,
         resourceKey: ref.key,
         resourceVersion: ref.version,
-      })
+      }
+      const entry = input.registry ? registry.findExact(identity) : await resolveReleasedRelationalEntry(identity)
       if (!entry) {
         throw new RunResourceAuthorityError('RUN_RESOURCE_NOT_FOUND', 'exact resource version was not found', 404)
       }

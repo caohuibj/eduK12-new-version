@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
 vi.mock('../../../api/client', () => ({ default: api }))
@@ -32,6 +32,19 @@ describe('questionnaire draft feedback', () => {
         courses: [{ id: 'c', title: '课程' }],
       },
     })
+  })
+  it('discards a previous questionnaire response after switching pages', async () => {
+    let resolveOld!: (value: unknown) => void
+    const oldRequest = new Promise(resolve => { resolveOld = resolve })
+    const row = (name: string) => ({ name, status: 'DRAFT', revision: 1, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false })
+    api.get.mockImplementation(async path => path.endsWith('/resources')
+      ? { code: 0, data: { scales: [], cognitive: [], situational: [], courses: [] } }
+      : path.endsWith('/old') ? oldRequest : { code: 0, data: row('当前问卷') })
+    render(<MemoryRouter initialEntries={['/questionnaire-products/old']}><Link to="/questionnaire-products/current">切换问卷</Link><Routes><Route path="/questionnaire-products/:id" element={<QuestionnaireProductEdit />} /></Routes></MemoryRouter>)
+    await userEvent.setup().click(screen.getByRole('link', { name: '切换问卷' }))
+    await screen.findByDisplayValue('当前问卷')
+    await act(async () => { resolveOld({ code: 0, data: row('迟到的旧问卷') }); await oldRequest })
+    expect(screen.getByLabelText('问卷名称')).toHaveValue('当前问卷')
   })
   it('identifies and focuses an empty name without sending a request', async () => {
     mount()

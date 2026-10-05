@@ -28,7 +28,7 @@
     "cognitive:reports:audit": "tsx src/scripts/cognitive-report-rollout-audit.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts",
+    "test:integration": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts",
     "test:integration:cognitive": "vitest run src/__tests__/cognitive/concurrency.integration.test.ts",
     "test:integration:composite": "vitest run src/__tests__/composite/composite-analysis-snapshot.postgres.integration.test.ts",
     "test:integration:instrument-final": "vitest run src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",

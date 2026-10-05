@@ -4,6 +4,7 @@ import { authenticate } from '../../middleware/auth'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { reportingController } from '../reporting/reporting.controller'
+import { reportingContentController } from '../reporting/content.controller'
 import { reportingDiscoveryController } from '../reporting/discovery.controller'
 import { reportingAnalysisGuard, reportingExportBudget } from '../reporting/runtimeLimit'
 import {
@@ -20,6 +21,11 @@ router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); ne
 // current PlatformRole=SYSTEM_ADMIN themselves; Organization admins cannot
 // fork or weaken the platform spec contract.
 router.post('/reporting-specs', authenticate, reportingController.createSpec)
+router.get('/reporting-specs', authenticate, asyncHandler(reportingContentController.listSpecs))
+router.post('/reporting-specs/descriptive', authenticate, asyncHandler(reportingContentController.createDescriptiveSpec))
+router.get('/measurement-resources', authenticate, asyncHandler(reportingContentController.listResources))
+router.post('/measurement-resources', authenticate, asyncHandler(reportingContentController.registerResource))
+router.post('/measurement-resources/:resourceId/:action', authenticate, asyncHandler(reportingContentController.transitionResource))
 router.post('/reporting-specs/:specId/review', authenticate, reportingController.reviewSpec)
 router.post('/reporting-specs/:specId/publish', authenticate, reportingController.publishSpec)
 router.post('/reporting-specs/:specId/retire', authenticate, reportingController.retireSpec)

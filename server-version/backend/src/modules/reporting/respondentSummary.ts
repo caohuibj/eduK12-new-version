@@ -3,7 +3,7 @@ import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopul
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { projectAudienceResult, validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
-import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredResources'
 import { resolveAuthoritativeTrackObservations } from './resultSource'
 import { reportingFail } from './types'
 
@@ -42,7 +42,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   `
   const row = (await readOwn())[0]
   if (!row?.policy?.resultDisclosure || canonicalHash(row.policy) !== row.hash) return hidden()
-  const entry = relationalProductRegistry.findExact({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+  const entry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
   if (!entry || entry.releaseStatus !== 'PUBLISHED' || !entry.resultDisclosure || canonicalHash(entry.resultDisclosure) !== canonicalHash(row.policy.resultDisclosure)) return hidden()
   const contract = validateResultDisclosureContract(row.policy.resultDisclosure)
   const rule = contract.audiences.RESPONDENT
@@ -55,7 +55,7 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   const metrics = Object.fromEntries(result.metrics.filter(m=>m.resultQuality!=='invalid').map(m=>[m.key,m.value]))
   // Recheck revocation after awaiting canonical result reads.
   const current = (await readOwn())[0]
-  const currentEntry = relationalProductRegistry.findExact({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+  const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
   if (!current || current.hash !== row.hash || canonicalHash(current.policy) !== current.hash
       || !currentEntry || currentEntry.releaseStatus !== 'PUBLISHED' || !currentEntry.resultDisclosure
       || canonicalHash(currentEntry.resultDisclosure) !== canonicalHash(contract)) return hidden()

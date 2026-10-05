@@ -14,6 +14,7 @@ import {
   assertRunExecutionParent,
 } from './resourceBoundary'
 import { relationalProductRegistry } from '../assessment-relational/product-registry'
+import { listReleasedRegisteredResources } from './registeredResources'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
 import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
@@ -73,6 +74,10 @@ export const assessmentRunController = {
       }
     }
     try {
+      for (const entry of await listReleasedRegisteredResources(req.user.userId, req.user.role)) {
+        const ref = entry.applicability
+        entries.set(`${ref.resourceKind}:${ref.resourceKey}:${ref.resourceVersion}`, entry)
+      }
       const list = []
       for (const entry of entries.values()) {
         const ref = entry.applicability

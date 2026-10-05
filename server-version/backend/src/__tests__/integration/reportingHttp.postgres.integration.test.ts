@@ -18,6 +18,7 @@ import { freezeRunTrackCohort } from '../../modules/reporting/cohort'
 import { buildReportingArtifact } from '../../modules/reporting/engine'
 import { createOrReuseReportingArtifact } from '../../modules/reporting/artifact'
 import type { ReportingAnalysisSpecDefinitionV1, ReportingResultBatchV1 } from '../../modules/reporting/types'
+import { createCustomScaleDefinition, hashScaleDefinition } from '../../modules/scale/scale-definition'
 
 const DB_URL = integrationDatabaseUrl(
   'RELEASE_INTEGRATION_DATABASE_URL',
@@ -181,6 +182,39 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
   afterAll(async () => {
     if (server) await new Promise<void>((resolve) => server.close(() => resolve()))
     await db.$disconnect()
+  })
+
+  it('protects normal resource/spec management with platform authority, CSRF and publication order', async () => {
+    const admin = await createUser('content-admin', UserRole.ADMIN, PlatformRole.SYSTEM_ADMIN)
+    const ordinaryAdmin = await createUser('ordinary-admin', UserRole.ADMIN)
+    const teacher = await createUser('content-teacher', UserRole.TEACHER)
+    expect((await jsonRequest('/api/organizations/measurement-resources')).status).toBe(401)
+    expect((await jsonRequest('/api/organizations/reporting-specs', { user: ordinaryAdmin })).status).toBe(403)
+    expect((await jsonRequest('/api/organizations/measurement-resources', { user: teacher })).status).toBe(403)
+    const def = createCustomScaleDefinition()
+    def.source = { title: '原创 HTTP 合成素材' }
+    def.items = [{ itemCode: 'Q1', content: '原创偏好', type: 'single', required: true, sortOrder: 1, responseSetKey: 'default', randomizeOptions: false }]
+    def.scoring.itemRules = [{ itemCode: 'Q1', transform: { type: 'identity' } }]
+    def.scoring.scores = [{ key: 'total', label: '总分', type: 'total', direction: 'descriptive', canonical: true, displayPrecision: 1, source: { type: 'items', aggregation: 'sum', items: [{ itemCode: 'Q1', weight: 1 }] } }]
+    def.report.primaryScoreKeys = ['total']; def.report.scoreOrder = ['total']
+    def.report.interpretations = [{ scoreKey: 'total', headline: '偏好', source: { type: 'score_only' }, summary: '回答描述', bands: [], guidance: [] }]
+    const scale = await db.scale.create({ data: { code: `http_resource_${randomUUID().replaceAll('-', '')}`, name: '原创 HTTP 素材', creatorId: admin.id, status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE', definition: def, definitionHash: hashScaleDefinition(def) } })
+    const register = { method: 'POST', user: admin, body: { scaleId: scale.id, mode: 'INDIVIDUAL' } }
+    expect((await jsonRequest('/api/organizations/measurement-resources', { ...register, includeCsrf: false })).status).toBe(403)
+    expect((await jsonRequest('/api/organizations/measurement-resources', { ...register, user: teacher })).status).toBe(403)
+    const created = await jsonRequest('/api/organizations/measurement-resources', register)
+    expect(created.status).toBe(200); expect(created.body.data.status).toBe('DRAFT')
+    const id = created.body.data.id
+    expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/publish`, { method: 'POST', user: admin })).status).toBe(409)
+    for (const action of ['review', 'publish']) expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/${action}`, { method: 'POST', user: admin })).status).toBe(200)
+    const createSpec = { method: 'POST', user: admin, body: { resourceId: id, specKey: `http-description-${suffix}`, version: 1, analysisKind: 'INDIVIDUAL_LONGITUDINAL', minimumN: 3 } }
+    expect((await jsonRequest('/api/organizations/reporting-specs/descriptive', { ...createSpec, user: ordinaryAdmin })).status).toBe(403)
+    expect((await jsonRequest('/api/organizations/reporting-specs/descriptive', { ...createSpec, body: { ...createSpec.body, analysisKind: 'MATCHED_LONGITUDINAL' } })).status).toBe(400)
+    const spec = await jsonRequest('/api/organizations/reporting-specs/descriptive', createSpec)
+    expect(spec.status).toBe(200); expect(spec.body.data.status).toBe('DRAFT')
+    for (const action of ['review', 'publish']) expect((await jsonRequest(`/api/organizations/reporting-specs/${spec.body.data.id}/${action}`, { method: 'POST', user: admin })).status).toBe(200)
+    const list = await jsonRequest('/api/organizations/reporting-specs', { user: admin })
+    expect(list.status).toBe(200); expect(list.body.data.list.find((s: { id: string }) => s.id === spec.body.data.id).status).toBe('PUBLISHED')
   })
 
   it('enforces platform governance and strict request schemas at the HTTP boundary', async () => {
