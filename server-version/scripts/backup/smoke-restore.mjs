@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import crypto from 'node:crypto';
+import { cleanupRestoreContainer } from './cleanup-restore-container.mjs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
@@ -61,5 +62,8 @@ main().catch((error) => {
   console.error(error instanceof Error ? error.message : 'restore smoke test failed');
   process.exitCode = 1;
 }).finally(() => {
-  spawnSync('docker', ['rm', '--force', container], { stdio: 'ignore' });
+  if (!cleanupRestoreContainer(container)) {
+    console.error('temporary restore cleanup failed; inspect the named restore container');
+    process.exitCode = 1;
+  }
 });
