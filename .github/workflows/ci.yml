@@ -56,7 +56,7 @@ on:
         description: 'Local Mac/Windows execution; GitHub hosted only for CodeQL'
       step_probe:
         type: choice
-        options: [none, images, cognitive]
+        options: [none, images, cognitive, frontend]
         default: none
         description: 'Run one CI component without full CI or CodeQL'
       probe_frontend_only:
@@ -87,6 +87,12 @@ jobs:
   probe-cognitive:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive'
     uses: ./.github/workflows/ci-cognitive-step.yml
+
+  probe-frontend:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend'
+    uses: ./.github/workflows/ci-frontend.yml
+    with:
+      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
 
   scope:
     name: classify changed content
@@ -766,58 +772,9 @@ jobs:
     needs: scope
     name: frontend (lint + types + full tests + build)
     if: needs.scope.outputs.documentation != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
-    runs-on: ${{ fromJSON(needs.scope.outputs.frontend_runner) }}
-    timeout-minutes: 35
-    env:
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
-      NODE_OPTIONS: --max-old-space-size=3072
-      TZ: UTC
-    defaults:
-      run:
-        working-directory: server-version/frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs" --frontend
-      - name: configure runner-local npm cache
-        run: |
-          mkdir -p "$HOME/.npm"
-          echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
-      - name: npm ci
-        run: npm ci
-      - name: lint
-        run: npm run lint
-      - name: typecheck
-        run: npm run typecheck
-      - name: dependency audit (high and critical)
-        run: |
-          for attempt in 1 2 3; do
-            if npm audit --audit-level=high; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "npm audit failed on attempt $attempt; retrying after transient-registry backoff"
-              sleep $((attempt * 10))
-            fi
-          done
-          exit 1
-      - name: full frontend tests
-        run: npm test
-      - name: build (vite)
-        run: npm run build
-      - name: publish tested frontend for browser acceptance
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-          retention-days: 1
-          if-no-files-found: error
-      - name: clean Mac dependencies and outputs after artifact upload
-        if: ${{ always() && runner.os == 'macOS' }}
-        run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"
+    uses: ./.github/workflows/ci-frontend.yml
+    with:
+      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)

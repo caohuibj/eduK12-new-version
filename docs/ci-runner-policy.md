@@ -114,7 +114,9 @@ conservative and select the widest affected set during rollout. Manual full_acce
 (default true) explicitly executes all reusable acceptances for exact-commit validation.
 Standalone debug/performance workflows use Windows; they never consume hosted compute.
 Before full rollout, dispatch the existing CI entry with step_probe=images
-(frontend-only and complete image modes) or step_probe=cognitive. Routing, full jobs,
+(frontend-only and complete image modes) or step_probe=cognitive / step_probe=frontend. The frontend probe calls the same
+reusable workflow as full CI, including lint, types, dependency audit, all frontend
+tests, production build, exact-commit artifact upload and Mac cleanup. Routing, full jobs,
 CodeQL and the normal aggregate are disabled for these component probes. Main image CI calls that same reusable workflow;
 Cognitive probes execute the same shared diagnostic script and include its frontend suites.
 Targeted failures must be repaired and revalidated before another full run.

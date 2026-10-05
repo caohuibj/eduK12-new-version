@@ -81,7 +81,8 @@ describe('PR13 frontend task contracts', () => {
         />,
       )
       fireEvent.click(screen.getByText('开始练习'))
-      for (let tick = 0; tick < 10; tick += 1) {
+      // Four study words and the recall transition each schedule one timer.
+      for (let tick = 0; tick < 5; tick += 1) {
         await act(async () => {
           vi.advanceTimersByTime(1000)
           await Promise.resolve()
@@ -93,9 +94,19 @@ describe('PR13 frontend task contracts', () => {
         fireEvent.keyDown(input, { key: 'Enter' })
       }
       expect(screen.getByText(/最多输入 64 个词/)).toBeTruthy()
-      fireEvent.click(screen.getByRole('button', { name: '删除第 1 个输入' }))
+      // Label queries verify the same accessible names without recomputing
+      // visibility and styles for every growing recall chip in jsdom.
+      expect(screen.getAllByLabelText(/删除第 \d+ 个输入/)).toHaveLength(64)
+      expect(screen.queryByText('词64')).toBeNull()
+      const removeFirst = screen.getByLabelText('删除第 1 个输入')
+      expect(removeFirst.tagName).toBe('BUTTON')
+      fireEvent.click(removeFirst)
       expect(screen.queryByText('词0')).toBeNull()
-      expect(screen.getAllByRole('button', { name: /删除第/ })).toHaveLength(63)
+      expect(screen.getAllByLabelText(/删除第 \d+ 个输入/)).toHaveLength(63)
+      fireEvent.change(input, { target: { value: '补充词' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+      expect(screen.getByText('补充词')).toBeTruthy()
+      expect(screen.getAllByLabelText(/删除第 \d+ 个输入/)).toHaveLength(64)
       expect(onTrialComplete).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()

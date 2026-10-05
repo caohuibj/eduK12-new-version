@@ -111,7 +111,7 @@ test('local CI distributes Mac and Windows work and retains hosted CodeQL only',
   for(const name of ['visual','pr-light-frontend'])
     assert.match(job(ci,name),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/,name);
   assert.match(job(ci,'miniprogram'),/fromJSON\(needs\.scope\.outputs\.light_runner\)/);
-  assert.match(job(ci,'frontend'),/fromJSON\(needs\.scope\.outputs\.frontend_runner\)/);
+  assert.match(job(ci,'frontend'),/runner_labels:.*needs\.scope\.outputs\.frontend_runner/);
   assert.match(job(ci,'docker'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
   assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
@@ -234,7 +234,8 @@ test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs on
   const ci=source('ci');
   for(const name of ['backend','backend-regression','docker','codeql'])
     assert.match(job(ci,name),/needs: scope/);
-  const front=job(ci,'frontend');
+  assert.match(job(ci,'frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
+  const front=job(source('ci-frontend'),'frontend');
   assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
   assert.doesNotMatch(front,/pr-light-frontend/);
@@ -256,12 +257,15 @@ test('only the CodeQL plan uses hosted labels and Mac Ready frontend installs on
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
   const ci=source('ci');
-  assert.match(ci,/options: \[none, images, cognitive\]/);
+  assert.match(ci,/options: \[none, images, cognitive, frontend\]/);
   for(const name of ['scope','merge-gate']) assert.match(job(ci,name),/inputs\.step_probe == '' \|\| inputs\.step_probe == 'none'/);
   assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
   assert.match(job(ci,'probe-cognitive'),/inputs\.step_probe == 'cognitive'/);
   assert.match(job(ci,'probe-cognitive'),/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  assert.match(job(ci,'probe-frontend'),/inputs\.step_probe == 'frontend'/);
+  assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
+  assert.match(source('ci-frontend'),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
   for(const name of ['backend','backend-regression','frontend','docker','codeql']) assert.match(job(ci,name),/needs: scope/);
 });
 
