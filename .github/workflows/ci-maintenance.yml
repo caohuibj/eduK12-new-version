@@ -1,0 +1,39 @@
+name: Attachment maintenance CI
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attachment-safety:
+    name: attachment deduplication, indexes and protected cleanup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      CI: 'true'
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: CI routing and attachment invariants
+        run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
+      - name: Host launcher and existing monitoring guards
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
+      - name: Check shell and systemd units without starting production services
+        run: |
+          bash -n server-version/scripts/attachment-backup/install.sh
+          sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
+          sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/*
+      - name: Real isolated Docker launcher and failed-task cleanup
+        run: |
+          docker pull node:24.21.0-bookworm-slim
+          sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py

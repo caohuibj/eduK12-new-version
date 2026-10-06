@@ -93,12 +93,6 @@ jobs:
             exit 1
           fi
 
-      - name: Verify attachment deduplication, authenticated indexes and cleanup guards
-        run: |
-          node --test ../scripts/attachment-backup/core.test.mjs ../scripts/backup/cleanup-restore-container.test.mjs
-          python3 -B -m unittest discover -s ../scripts/attachment-backup -p "test_*.py" -v
-          python3 -B -m unittest discover -s ../scripts/host-ops -p "test_*.py" -v
-
       - name: Install backend dependencies on Node 24
         run: npm ci
 

@@ -60,9 +60,31 @@ export function acceptanceFor(files) {
         ? !pattern.startsWith('!') : selected, false))]));
 }
 
+const attachmentRoot = 'server-version/scripts/attachment-backup/';
+const attachmentFiles = new Set([
+  'README.md','cli.mjs','config.example.json','core.mjs','core.test.mjs',
+  'cos-store.mjs','install.sh','runner.py','test_runner.py','validate-transport.mjs',
+  'ci-container-smoke.py',
+  ...['backup','verify','plan'].flatMap(task =>
+    ['service','timer'].map(kind => 'systemd/eduk12-attachments-' + task + '.' + kind)),
+].map(file => attachmentRoot + file));
+const maintenanceRoutingFiles = new Set([
+  'AGENTS.md','docs/ci-runner-policy.md',
+  '.github/workflows/ci.yml','.github/workflows/ci-maintenance.yml',
+  '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
+  '.github/scripts/merge-gate.mjs','.github/scripts/maintenance-routing.test.mjs',
+  '.github/scripts/content-workflows.test.mjs',
+]);
+export function maintenanceFile(file) { return attachmentFiles.has(file); }
+export function maintenanceChange(files) {
+  return files.length > 0 && files.some(maintenanceFile)
+    && files.every(file => maintenanceFile(file) || maintenanceRoutingFiles.has(file));
+}
+
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
   return {
+    maintenance: maintenanceChange(files),
     documentation: files.length > 0 && files.every(documentationFile),
     content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontendFile(file)),
     frontend: files.length > 0 && files.some(frontendFile) && files.every(file => domainFor(file) || frontendFile(file)) && !files.every(presentationFile),
@@ -92,8 +114,15 @@ export function classifyChanges(entries, forceFull = false) {
   const regularChanges = entries.every(({ status, oldMode, newMode }) =>
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
+  const maintenanceChanges = entries.every(({ file, status, oldMode, newMode }) => {
+    const executable = [attachmentRoot + 'runner.py', attachmentRoot + 'install.sh'].includes(file);
+    const modes = executable ? ['100644','100755'] : ['100644'];
+    return modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
+      || (status === 'M' && modes.includes(oldMode)));
+  });
   return {
     ...result,
+    maintenance: !forceFull && result.maintenance && maintenanceChanges,
     documentation: !forceFull && result.documentation && regularChanges,
     content: !forceFull && result.content && regularChanges,
     presentation: !forceFull && result.presentation && regularChanges,
@@ -142,10 +171,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
   const files = entries.map(entry => entry.file);
   const result = event === 'workflow_dispatch'
-    ? { content:false, presentation:false, frontend:false, documentation:false, domains:[] }
+    ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
   const frontend = result.frontend === true;
-  const scenario = result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
   const acceptance = acceptanceFor(files);
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
@@ -159,7 +188,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const frontendBuild = frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
   const codeql = scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
-  const output = { content: result.content, presentation: result.presentation, frontend,
+  const output = { maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend,
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),

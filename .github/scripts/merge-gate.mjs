@@ -11,15 +11,17 @@ const acceptanceJobs = {
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   let checks = ['scope'];
-  if (scope.documentation === 'true') checks.push('documentation');
+  if (scope.maintenance === 'true') checks.push('maintenance');
+  else if (scope.documentation === 'true') checks.push('documentation');
   else if (scope.content === 'true') checks.push('content');
-  if (scope.documentation === 'true') { /* No runtime lane for ordinary docs. */ }
+  if (scope.maintenance === 'true') { /* Dedicated host-only checks. */ }
+  else if (scope.documentation === 'true') { /* No runtime lane for ordinary docs. */ }
   else if (scope.presentation === 'true') checks.push('visual');
   else if (scope.frontend === 'true') {
     if (draft) checks.push('pr-light-frontend');
     if (!draft) checks.push('backend-browser-build', 'frontend', 'browser', 'docker');
   } else if (scope.content !== 'true') {
-    checks.push('miniprogram');
+    checks.push('maintenance','miniprogram');
     if (draft) checks.push('pr-light-frontend');
     checks.push(...(draft ? ['pr-light-backend']
       : ['backend', 'backend-regression', 'frontend', 'browser', 'docker']));
@@ -35,12 +37,14 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
-  const flags = ['frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const flags = ['maintenance','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
+  const scenarios = {maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
   const requiresCodeql = ['platform','frontend','content-frontend'].includes(scope.scenario);
-  if ((requiresCodeql && scope.codeql !== 'true') || (scope.documentation === 'true' && scope.codeql !== 'false')) {
+  if ((scope.maintenance !== String(scope.scenario === 'maintenance'))
+      || (scope.scenario === 'maintenance' && (scope.codeql !== 'false' || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
+      || (requiresCodeql && scope.codeql !== 'true') || (scope.documentation === 'true' && scope.codeql !== 'false')) {
     if (!failed.includes('scope')) failed.unshift('scope');
   }
   if ((flags.some(flag => !['true','false'].includes(scope[flag])) || !expected

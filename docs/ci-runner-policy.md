@@ -9,7 +9,7 @@ selected jobs never grant merge readiness. CI does not deploy production.
 Classification uses the complete Git diff against the PR base, including deletions,
 moves and file modes. Titles and labels cannot weaken coverage. Mixed changes select
 the union of applicable checks; unknown, schema, algorithm, authorization, dependency
-and CI changes select the full platform route. Malformed classification fails closed.
+and unscoped CI changes select the full platform route. Malformed classification fails closed.
 
 - **Light content:** existing declarative instruments, norms and report content.
   Retain immutable/scientific/publication rules, declaration AST boundaries,
@@ -21,6 +21,17 @@ and CI changes select the full platform route. Malformed classification fails cl
   permission, persistence or database changes. Run frontend lint/types/audit/full
   regression/build, real API browser acceptance, the frontend image/scan and all
   affected UI/media acceptances. Content plus UI retains both sets of checks.
+- **Standalone attachment maintenance:** the exact allowlist under
+  `server-version/scripts/attachment-backup/` selects Node 24 deduplication,
+  authenticated-index and cleanup-guard tests, host launcher/restore-volume guards,
+  shell/systemd validation, and an isolated Docker launcher/failure-cleanup smoke.
+  No backend dependency installation, database services, application build, visual
+  browser or whole-platform CI is needed. Its coordinated routing tests and policy
+  files may accompany these component changes; CI-only changes are not admitted by
+  this shortcut. Draft and ready PRs both require actual maintenance job success.
+  Unknown scripts, deletions/symlinks, dependency/application/DB/Compose changes and
+  the existing restore workflow remain outside this allowlist. Forced-full still
+  strengthens the route when explicitly selected.
 - **Heavy platform:** full frontend/backend/mini, production images, all media,
   all three visual browser engines, performance, recovery and CodeQL checks.
 - Ordinary engineering documentation has a narrow allowlist; scientific,
@@ -156,6 +167,14 @@ Same-source failed-job retries may preserve already successful jobs; changed sou
 or validation inputs require renewed relevant verification. Two independent PR green
 results cannot prove their combined source. Main performs the normal post-merge
 integrity smoke without duplicating an already validated complete source tree.
+
+Standalone attachment timers can be enabled after the exact component head passes
+maintenance CI and a bounded production check. This is separate from deploying the
+application or database. Preserve `plan_only`, prior backup dependencies and
+resource limits; automatic deletion is not part of the current component. A failed
+unrelated application dependency audit does not redefine this host-only gate.
+When the user pauses full CI, continue independent component validation without
+starting full CI or presenting local results as a whole-platform pass.
 
 External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
 not read production SSH keys, environment files, encrypted-backup keys or personal

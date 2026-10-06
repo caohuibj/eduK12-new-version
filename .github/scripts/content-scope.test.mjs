@@ -4,7 +4,7 @@ import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } 
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
-    content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
+    maintenance:'false',content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
@@ -17,7 +17,7 @@ const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
-  assert.deepEqual(classify([scale, cognitive, sjt]), { documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
+  assert.deepEqual(classify([scale, cognitive, sjt]), { maintenance:false, documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
 });
 test('empty, core, executable additions and mixed changes require full checks', () => {
   assert.equal(classify([]).content, false);
