@@ -79,7 +79,14 @@ export function addReferenceRow(index,table,row,hosts) {
     }
     managedString(index,value,hosts);
   }
-  for(const [k,v]of Object.entries(row))visit(v,k);
+  for(const [k,v]of Object.entries(row)) {
+    // The migration-only batch summary stores historical import previews and
+    // diagnostics, not runtime attachment references (LegacyImportBatch schema).
+    // Its JSON remains in the database backup; business summaries and all other
+    // fields still receive the full reference check.
+    if(table==='_legacy_import_batches'&&k==='summary')continue;
+    visit(v,k);
+  }
 }
 export async function readRows(file,onRow,maxBytes=536870912) {
   const s=await fsp.lstat(file);need(s.isFile()&&!s.isSymbolicLink()&&s.size<=maxBytes,'RECOVERY_ROWS_LIMIT');

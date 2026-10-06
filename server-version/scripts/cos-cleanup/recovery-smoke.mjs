@@ -17,7 +17,10 @@ const repo={identity:{keyId},latestSnapshotId:manifest.id,snapshots:[{id:manifes
 const api={check:async version=>assert.ok([id(r),id(remote)].includes(id(version))),stream:version=>Readable.from((async function*(){yield await fs.readFile(version.key===r.key?blob:mf);})())};
 const evidence=JSON.parse(await fs.readFile(path.join(work,'restore-evidence.json'))),hosts={cos:['fixture.cos.test'],site:[]};
 const accepted=await verifyReferenceExports(api,repo,point,secret,work,hosts,evidence);assert.equal(accepted.verifiedBlobIds.length,1);assert.ok(accepted.referenceCount>=3);
-const original=await fs.readFile(path.join(work,'references.jsonl'));await fs.appendFile(path.join(work,'references.jsonl'),'\n'+JSON.stringify({table:'snapshots',data:{json:{image:'https://fixture.cos.test/assets/missing.pdf'}}})+'\n');
+const original=await fs.readFile(path.join(work,'references.jsonl'));
+const restoredRows=original.toString().trim().split('\n').map(line=>JSON.parse(line));
+assert.ok(restoredRows.some(row=>row.table==='_legacy_import_batches'&&row.data.summary?.preview?.asset_id==='old-missing'));
+await fs.appendFile(path.join(work,'references.jsonl'),'\n'+JSON.stringify({table:'snapshots',data:{json:{image:'https://fixture.cos.test/assets/missing.pdf'}}})+'\n');
 await assert.rejects(verifyReferenceExports(api,repo,point,secret,work,hosts,evidence),/REFERENCE_MISSING/);await fs.writeFile(path.join(work,'references.jsonl'),original);
 const cipher=await fs.readFile(blob);cipher[cipher.length-1]^=1;await fs.writeFile(blob,cipher);await assert.rejects(verifyReferenceExports(api,repo,point,secret,work,hosts,evidence),/HASH_MISMATCH/);
 console.log(JSON.stringify({actualRestoredRowsAndAttachmentDecryption:'PASS',missingDatabaseReferenceBlocks:true,ciphertextTamperBlocks:true}));
