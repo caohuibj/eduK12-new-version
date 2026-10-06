@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ReactionTask } from '../ReactionTask'
 import { deterministicForeperiod } from '../prng'
@@ -49,7 +50,7 @@ afterEach(() => {
 
 /** 走完 instruction + 3 次 practice，进入 formal（trial 0 的 ready 阶段）。 */
 async function enterFormal(
-  onTrialComplete: ReturnType<typeof vi.fn> = vi.fn().mockResolvedValue(undefined),
+  onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>> = vi.fn().mockResolvedValue(undefined),
   trialIndex = 0,
   seed = 'seed-123'
 ) {

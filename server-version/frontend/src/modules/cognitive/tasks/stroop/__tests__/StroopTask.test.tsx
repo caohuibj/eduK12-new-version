@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { fireEvent, render, screen, act } from '@testing-library/react'
 import { StroopTask } from '../StroopTask'
 
@@ -37,7 +38,7 @@ const respondWith = (name: RegExp) => {
   fireEvent.pointerDown(screen.getByRole('button', { name }), { pointerType: 'mouse', button: 0 })
 }
 
-const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
+const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>>) => {
   render(<StroopTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
   fireEvent.click(screen.getByText('开始练习'))
   act(() => vi.advanceTimersByTime(400))
