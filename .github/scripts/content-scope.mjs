@@ -4,6 +4,7 @@ import { platform } from 'node:os';
 import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
+import { dependencyScope } from './dependency-scope.mjs';
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -175,14 +176,14 @@ export function runnerPlan({ profile = 'speed', scenario = 'platform', macEnable
   const mac = ['self-hosted', 'macOS', 'eduk12-mac-ci'];
   const hosted = ['ubuntu-24.04'];
   const frontendOnMac = macEnabled && os === 'darwin' && freeBytes >= 8 * 1024 ** 3;
-  const heavy = scenario === 'platform';
+  const heavy = ['platform','dependencies'].includes(scenario);
   return { runner_profile:profile,
     heavy_runner:windows, light_runner:macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
     frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:hosted,
     regression_runner:heavy && profile !== 'local' ? hosted : windows,
     browser_runner:heavy && profile !== 'local' ? hosted : windows,
     media_runner:heavy && profile === 'speed' ? hosted : windows,
-    visual_hosted:heavy && profile === 'speed',
+    visual_hosted:scenario === 'platform' && profile === 'speed',
     frontend_route_reason:frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
       : 'Windows frontend fallback: Mac disabled or insufficient verified disk' };
 }
@@ -201,8 +202,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
+  const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+    && dependencyScope(entries, {base});
   const frontend = result.frontend === true;
-  const scenario = result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
   const acceptance = acceptanceFor(files);
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
@@ -213,8 +216,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     freeBytes:disk.bavail*disk.bsize });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
-  const frontendBuild = frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = scenario === 'platform' || frontend
+  const frontendBuild = dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
+  const codeql = dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const output = { maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend,
     documentation: result.documentation, codeql, scenario,
@@ -224,7 +227,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

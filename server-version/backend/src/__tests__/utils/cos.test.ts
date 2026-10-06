@@ -8,13 +8,15 @@ import { config } from '../../config'
 // Mock COS SDK
 vi.mock('cos-nodejs-sdk-v5', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      putObject: vi.fn(),
-      deleteObject: vi.fn(),
-      getObject: vi.fn(),
-      headObject: vi.fn(),
-      getBucket: vi.fn(),
-    })),
+    default: vi.fn().mockImplementation(function () {
+      return {
+        putObject: vi.fn(),
+        deleteObject: vi.fn(),
+        getObject: vi.fn(),
+        headObject: vi.fn(),
+        getBucket: vi.fn(),
+      }
+    }),
   }
 })
 

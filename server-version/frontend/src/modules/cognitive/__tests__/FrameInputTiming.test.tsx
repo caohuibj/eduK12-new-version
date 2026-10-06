@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import { resolveRunner } from '../registry'
 import { deterministicForeperiod } from '../tasks/reaction/prng'
 
@@ -68,7 +69,7 @@ const requireRunner = (testType: string) => {
   return Runner
 }
 
-const enterReactionFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
+const enterReactionFormal = async (onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>>) => {
   const Runner = requireRunner('reaction')
   const config = {
     totalTrials: 20,

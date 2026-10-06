@@ -18,7 +18,9 @@ test('runtime refresh preserves source, tags and build arguments without mutatin
     assert.deepEqual(input,before);
     for (const [name,target] of Object.entries(plan.target)) {
       assert.deepEqual(target['no-cache-filter'],['runtime']); assert.equal(target['no-cache'],false);
-      for (const key of ['context','dockerfile','tags','args']) assert.deepEqual(target[key],before.target[name][key]);
+      assert.deepEqual(target.args, name === 'frontend' ? before.target[name].args
+        : {...before.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn'});
+      for (const key of ['context','dockerfile','tags']) assert.deepEqual(target[key],before.target[name][key]);
     }
     verifyResolvedPlan(resolved(plan),frontendOnly);
   }
@@ -34,4 +36,19 @@ test('UI route cannot secretly build backend; full route cannot omit a productio
   assert.throws(()=>runtimeRefreshPlan(fixture(false),true));
   const plan=fixture(false);delete plan.target.worker;
   assert.throws(()=>runtimeRefreshPlan(plan,false));
+});
+
+test('Debian mirror applies to both API and worker and cannot disappear from the resolved build', () => {
+  const input=fixture(false);
+  input.target.backend.args.DEBIAN_MIRROR='untrusted.invalid';
+  const plan=runtimeRefreshPlan(input,false);
+  for (const name of ['backend','worker']) {
+    assert.equal(plan.target[name].args.DEBIAN_MIRROR,'mirrors.tuna.tsinghua.edu.cn');
+    for (const change of [t=>delete t.args.DEBIAN_MIRROR,t=>t.args.DEBIAN_MIRROR='untrusted.invalid']) {
+      const altered=resolved(structuredClone(plan));change(altered.target[name]);
+      assert.throws(()=>verifyResolvedPlan(altered,false));
+    }
+  }
+  assert.equal(Object.hasOwn(plan.target.frontend.args,'DEBIAN_MIRROR'),false);
+  verifyResolvedPlan(resolved(plan),false);
 });

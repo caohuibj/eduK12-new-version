@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { fireEvent, render, screen, act } from '@testing-library/react'
 import { MemoryTask } from '../MemoryTask'
 import { deterministicMemorySequence } from '../prng'
@@ -40,7 +41,7 @@ const showSequence = (length: number) => {
   act(() => vi.advanceTimersByTime((length - 1) * 1000 + 800))
 }
 
-const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
+const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>>) => {
   render(<MemoryTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
   fireEvent.click(screen.getByText('开始练习'))
   for (const sequence of [[3, 7, 1], [9, 4, 2]]) {

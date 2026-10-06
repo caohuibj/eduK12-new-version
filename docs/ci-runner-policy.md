@@ -215,3 +215,33 @@ An unchanged architecture does not by itself prove a change has a small impact:
 shared scoring, permissions, persistence and dependencies can affect many modules.
 Use the actual impact and tested file boundaries to choose the gate. Ordinary
 content and isolated maintenance do not need platform full acceptance.
+
+## Dependency upgrade route
+
+Version-only changes to existing npm dependencies, development dependency additions
+and installed transitive overrides, paired with consistent npm v3 root locks, may
+select dependencies CI. Existing backend/frontend test compatibility changes and
+coordinated routing policy may accompany a dependency change. scripts, engines,
+exports, build configuration, new production dependencies, removals, business code,
+DB, Compose, Dockerfiles, unknown files and type/mode/deletion changes stay outside
+this route. Unchanged manifests may accompany transitive lock refreshes.
+
+Both draft and ready dependency PRs require maintenance routing/guard tests, backend
+build/guarded migration/existing performance checks, isolated full backend regression,
+frontend build/lint/typecheck/audit/full regression, production API/worker/frontend
+image builds and the existing HIGH/CRITICAL scan, plus CodeQL. Every selected job
+must succeed; missing/skipped/cancelled/failed jobs cannot authorize merge. No browser,
+visual, media, mini-program or separate Ops acceptance is selected. Existing reusable
+components, audit thresholds and image assertions are unchanged. Full requests still
+strengthen selection. Main retains post-merge integrity smoke without repeating
+component regression. Repeated ready events are unnecessary: publish the frozen head
+and make it ready before the initial classification starts when local scoped checks
+have already passed.
+
+Production image CI passes the existing `DEBIAN_MIRROR` build argument for API and
+worker to `mirrors.tuna.tsinghua.edu.cn`; Debian archive signatures and the existing
+runtime refresh/security scans remain required. Frontend/npm sources are unchanged.
+The exact two mirror argument/verification insertions in `ci-image-plan.mjs` and its
+existing tests may accompany dependencies CI. The router compares the complete
+executable file against the PR base after removing only those exact insertions;
+other image-plan edits still select platform checks. Validate image-only first.
