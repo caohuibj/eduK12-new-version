@@ -30,19 +30,27 @@ jobs:
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
           node --test server-version/scripts/host-ops/backup-cos.test.mjs
           node --check server-version/scripts/host-ops/backup-crypto.mjs
+          node --test server-version/scripts/cos-cleanup/cleanup.test.mjs
+          python3 -B -m unittest discover -s server-version/scripts/cos-cleanup -p 'test_*.py' -v
+          node --check server-version/scripts/cos-cleanup/cli.mjs
+          node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
       - name: Check shell and systemd units without starting production services
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
           bash -n server-version/scripts/host-ops/install-backup.sh
+          bash -n server-version/scripts/cos-cleanup/install.sh
           sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
           sudo install -D -m 644 server-version/scripts/host-ops/monitor.py /opt/eduk12-ops/current/monitor.py
           sudo install -D -m 644 server-version/scripts/host-ops/backup.py /opt/eduk12-backups/current/backup.py
+          sudo install -D -m 644 server-version/scripts/cos-cleanup/runner.py /opt/eduk12-cos-cleanup/current/runner.py
           sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/* server-version/scripts/host-ops/systemd/*
+          sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
+          sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
         run: |
           docker pull postgres:16.15-bookworm

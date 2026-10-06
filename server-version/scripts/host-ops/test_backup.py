@@ -34,6 +34,14 @@ class BackupSafety(unittest.TestCase):
         for invalid in [backup.seal(value, 'wrong-key'), {**signed, 'schema': 2}, {'mac': None}]:
             with self.assertRaises(RuntimeError): backup.unseal(invalid, SECRET)
 
+    def test_pending_cleanup_authentication_blocks_writer_until_complete(self):
+        with patch.object(backup.Path, 'exists', return_value=True), patch.object(backup, 'private_read') as read:
+            for status in ['PREPARED', 'DETACHED', 'COMPLETE']:
+                read.return_value = json.dumps(backup.seal({'status': status}, SECRET))
+                self.assertEqual(backup.cleanup_pending(SECRET), status != 'COMPLETE')
+            read.return_value = json.dumps(backup.seal({'status': 'COMPLETE'}, 'wrong-key'))
+            with self.assertRaisesRegex(RuntimeError, 'CATALOG_AUTHENTICATION_FAILED'): backup.cleanup_pending(SECRET)
+
     def fixture(self, root, ident):
         p = root / ident; p.mkdir()
         file = p / 'database.edubackup.enc'; file.write_bytes(b'synthetic-encrypted-data')

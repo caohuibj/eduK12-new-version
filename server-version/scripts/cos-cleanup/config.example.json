@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "mode": "plan_only",
+  "sourceBucket": "ptool-videos-edu-1393949445",
+  "backupBucket": "eduk12-backups-1393949445",
+  "region": "ap-beijing",
+  "quarantineHours": 24,
+  "maxDeleteObjects": 20,
+  "maxDeleteBytes": 536870912,
+  "maxInventoryVersions": 10000,
+  "maxScanBytes": 67108864,
+  "retention": {"hourlyHours": 48, "dailyDays": 30, "weeklyWeeks": 12, "monthlyMonths": 12}
+}

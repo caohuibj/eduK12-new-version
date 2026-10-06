@@ -176,6 +176,18 @@ def collect(config):
                                   {"status": status.get("status"), "age_seconds": age, "verified": verified}))
         probe("collector:periodic_backup", periodic_backup)
 
+    if config.get('cos_cleanup_status'):
+        def cleanup_status():
+            status = json.loads(Path(config['cos_cleanup_status']).read_text())
+            timestamp = dt.datetime.fromisoformat(status['at'].replace('Z', '+00:00'))
+            if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
+                raise ValueError('cleanup timestamp invalid')
+            age = max(0, int(time.time() - timestamp.timestamp()))
+            level = 'critical' if status.get('pendingTransaction') or status.get('status') == 'FAILED' else 'warning' if age > 3 * 3600 else 'ok'
+            data['cos_cleanup'] = {k: status.get(k) for k in ['mode', 'status', 'pendingTransaction', 'deletedVersions', 'selectedBytes', 'blocked']}
+            checks.append(finding('cos_cleanup_health', level, {'status': status.get('status'), 'pendingTransaction': bool(status.get('pendingTransaction')), 'age_seconds': age}))
+        probe('collector:cos_cleanup', cleanup_status)
+
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
         data["unreferenced_volume_count"] = len(names.splitlines())

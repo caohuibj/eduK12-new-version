@@ -13,6 +13,18 @@ CONFIG = json.loads(Path(__file__).with_name('config.example.json').read_text())
 
 
 class MonitoringSafetyTests(unittest.TestCase):
+    def test_cleanup_failure_and_pending_transaction_are_critical(self):
+        import datetime as dt
+        config = copy.deepcopy(CONFIG); config['tls_hosts'] = []; config['ready_urls'] = []; config['backup_roots'] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            status = Path(tmp, 'cleanup.json'); config['cos_cleanup_status'] = str(status)
+            for edit in [{'status': 'FAILED'}, {'status': 'SUCCESS', 'pendingTransaction': True}, {'status': 'BLOCKED', 'mode': 'plan_only'}]:
+                status.write_text(json.dumps({'at': dt.datetime.now(dt.timezone.utc).isoformat(), **edit}))
+                with patch.object(m, 'command', side_effect=RuntimeError('isolated')):
+                    _, checks = m.collect(config)
+                level = next(c['level'] for c in checks if c['key'] == 'cos_cleanup_health')
+                self.assertEqual(level, 'ok' if edit['status'] == 'BLOCKED' else 'critical')
+
     def test_failure_debounce_recovery_and_reminder(self):
         bad = [m.finding('http:api', 'critical', {'status': 503})]
         good = [m.finding('http:api', 'ok', {'status': 200})]
