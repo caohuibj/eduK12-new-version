@@ -49,10 +49,27 @@ independent backup key. Schema: `schema=1`, dedicated `bucket`, `region=ap-beiji
 databaseReferences:true}`, and `bindings=[{hostPointId,databaseVersionId,
 attachmentSnapshotId,snapshotVersionId}]` for EVERY retained host point. This is an
 acceptance record from a real isolated database+attachment reference recovery;
-this PR does NOT fabricate it or introduce a proof generator. Successful independent
-DB restore plus attachment inventory is insufficient. Missing/older-than-36-hour
-proof or missing/stale scans blocks execution. Production currently has no complete
-attachment baseline or joint proof; enabling deletion is not part of this PR.
+the independent `recovery.py run` task creates it only after actual isolated DB
+restore, scanning all public table rows (including JSON snapshots) for managed
+asset IDs/COS keys/uploads URLs, and decrypting/verifying the referenced encrypted
+attachment versions. Deleted rows/assets are excluded; external domains are counted
+and explicitly outside coverage. Missing references or unknown asset metadata block
+proof issuance. Plaintext exports remain root-private and are removed on exit.
+The restore uses the existing pinned backup/restore scripts unchanged, a private
+network-none PostgreSQL container, and ownership-checked anonymous-volume cleanup.
+Maximum DB download/reference export 512 MiB, asset export 16 MiB, 6 GiB disk
+headroom; Node helper 256 MiB/0.3 CPU; SQL timeout 120 seconds.
+
+The recovery timer is installed disabled; after reviewed deployment enable it with
+`systemctl enable --now eduk12-cos-recovery.timer`. It runs hourly at :40. New DB
+versions require a new real restore and reference/decrypt check. Previously verified
+immutable bindings may be reused only if DB and snapshot versions/hashes, every
+blob receipt, key identity and the verifier's source hash remain identical; exact
+remote versions are checked again. This avoids repeatedly restoring a year of
+unchanged retained points. Missing/older-than-36-hour proof or missing/stale scans
+blocks cleanup. Pending cleanup journals prevent proof replacement, preserving
+transaction input hashes; lock contention skips instead of racing writers. A fresh
+proof alone never changes `mode`, credentials, retention or deletion authorization.
 
 Before any DELETE, a sealed/fsynced journal records the exact versions, input hashes,
 configuration, protected receipts and desired catalogs. Detach local indices,
@@ -83,3 +100,20 @@ Optional monitoring: configure host-ops `cos_cleanup_status` as
 or pending transactions produce a critical finding; status older than three hours
 produces a warning. A fresh, safely blocked plan is not a cleanup failure. This PR
 does not change production monitoring configuration.
+
+Optional one-time operator activation: `/etc/eduk12-cos-cleanup/activation-request.json`
+is a private root-0600 HMAC-signed request, created only after human authorization
+and a live dedicated-identity synthetic version-delete probe. It binds the current
+configuration hash, dedicated credentials fingerprint, reviewed verifier/executor
+and both writer source hashes. Requests expire within 48 hours. Without a request
+recovery never changes cleanup mode. With it, after proof issuance it re-runs ALL
+production readiness gates under both writer locks; only a fully ready result can
+atomically switch to execute and consume the request, preserving a signed activation
+record in `/var/lib/eduk12-cos-recovery`. This switch does not bypass the executor's
+fresh proof, quarantine, references, checkpoints, batch limits or exact VersionId
+checks. Changed code/config/identity, expired requests and pending journals block
+activation. Do not create unsigned requests or set `deleteProbeVerified` without a
+live probe of that exact identity. Source/config pinning detects changes while a
+long initial baseline is pending.
+
+Optional monitor `cos_recovery_status=/var/lib/eduk12-cos-recovery/status.json`: failed acceptance is critical, stale tasks over three hours warn, pending baseline/lock waits remain normal. Enable this only after the reviewed task has created its first status file. Activation requests also bind the immutable runtime image digest.

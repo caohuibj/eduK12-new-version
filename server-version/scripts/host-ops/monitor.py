@@ -188,6 +188,18 @@ def collect(config):
             checks.append(finding('cos_cleanup_health', level, {'status': status.get('status'), 'pendingTransaction': bool(status.get('pendingTransaction')), 'age_seconds': age}))
         probe('collector:cos_cleanup', cleanup_status)
 
+    if config.get('cos_recovery_status'):
+        def recovery_status():
+            status = json.loads(Path(config['cos_recovery_status']).read_text())
+            timestamp = dt.datetime.fromisoformat(status['at'].replace('Z', '+00:00'))
+            if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
+                raise ValueError('joint recovery timestamp invalid')
+            age = max(0, int(time.time() - timestamp.timestamp()))
+            level = 'critical' if status.get('status') == 'FAILED' else 'warning' if age > 3 * 3600 else 'ok'
+            data['cos_recovery'] = {k: status.get(k) for k in ['status','retainedPoints','newIsolatedRestores','immutableBindingsRechecked','cleanupActivated','blocked']}
+            checks.append(finding('cos_joint_recovery_health', level, {'status': status.get('status'), 'age_seconds': age}))
+        probe('collector:cos_joint_recovery', recovery_status)
+
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
         data["unreferenced_volume_count"] = len(names.splitlines())

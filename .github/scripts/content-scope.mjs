@@ -81,7 +81,9 @@ const monitorRoot = 'server-version/scripts/host-ops/';
 const cleanupRoot = 'server-version/scripts/cos-cleanup/';
 const cleanupFiles = new Set(['README.md','config.example.json','model.mjs','store.mjs','engine.mjs','cli.mjs',
   'runner.py','test_runner.py','cleanup.test.mjs','sdk-smoke.mjs','ci-container-smoke.py','install.sh',
-  'systemd/eduk12-cos-cleanup.service','systemd/eduk12-cos-cleanup.timer'].map(file=>cleanupRoot+file));
+  'systemd/eduk12-cos-cleanup.service','systemd/eduk12-cos-cleanup.timer',
+  'recovery.mjs','recovery.py','recovery.test.mjs','test_recovery.py','recovery-smoke.mjs','ci-recovery-smoke.py',
+  'systemd/eduk12-cos-recovery.service','systemd/eduk12-cos-recovery.timer'].map(file=>cleanupRoot+file));
 const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
   'backup.py','backup-cos.cjs','backup-cos.test.mjs','backup-crypto.mjs','backup-config.example.json',
   'test_backup.py','ci-backup-smoke.py','install-backup.sh','BACKUP-AUTOMATION.md',

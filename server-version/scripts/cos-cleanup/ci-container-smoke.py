@@ -18,7 +18,7 @@ try:
         '--tmpfs', '/tmp:size=64m,noexec,nosuid',
         '--mount', 'type=bind,src=' + str(source) + ',dst=/ops,readonly',
         '--mount', 'type=bind,src=' + str(source.parent / 'attachment-backup') + ',dst=/attachment-backup,readonly',
-        'node:24.21.0-bookworm-slim', 'node', '--test', '/ops/cleanup.test.mjs'], capture_output=True, timeout=180)
+        'node:24.21.0-bookworm-slim', 'node', '--test', '/ops/cleanup.test.mjs', '/ops/recovery.test.mjs'], capture_output=True, timeout=180)
     if result.returncode: print(result.stdout.decode()); print(result.stderr.decode()); raise RuntimeError('ISOLATED_CLEANUP_SUITE_FAILED')
 finally:
     item = subprocess.run(['docker', 'inspect', name], capture_output=True)
