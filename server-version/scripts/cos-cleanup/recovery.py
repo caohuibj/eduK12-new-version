@@ -61,8 +61,10 @@ def isolated_export(backup, file, source, secret, work, ident):
     try:
         backup.run(['docker', 'run', '-d', '--name', name, '--label', backup.LABEL + '=' + ident,
             '--network', 'none', '--memory', '384m', '--cpus', '0.5', '--pids-limit', '128', '--env-file', str(envfile), 'postgres:16.15-bookworm'])
+        # The image init server accepts Unix sockets before its final restart.
+        # TCP readiness waits for the actual restore server, not that temporary one.
         for _ in range(90):
-            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
+            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-h', '127.0.0.1', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
             if r.returncode == 0: break
             time.sleep(1)
         else: raise RuntimeError('JOINT_DATABASE_NOT_READY')
