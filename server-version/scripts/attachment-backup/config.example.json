@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "keyId": "release-234-attachments-v1",
+  "prefix": "attachments/v1/",
+  "sourceBucket": "ptool-videos-edu-1393949445",
+  "backupBucket": "eduk12-backups-1393949445",
+  "region": "ap-beijing",
+  "stateDir": "/state",
+  "localRoot": "/app/uploads",
+  "maxObjectBytes": 536870912,
+  "maxRunBytes": 536870912,
+  "maxSources": 10000,
+  "maxMetadataBytes": 16777216,
+  "minimumFreeBytes": 3221225472,
+  "maxVerifyBytes": 536870912,
+  "excludedCosPrefixes": [
+    "backups/"
+  ],
+  "cleanupMode": "plan_only",
+  "retention": {
+    "hourlyHours": 48,
+    "dailyDays": 30,
+    "weeklyWeeks": 12,
+    "monthlyMonths": 12
+  }
+}

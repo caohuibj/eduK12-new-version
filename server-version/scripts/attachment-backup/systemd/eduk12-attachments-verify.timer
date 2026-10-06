@@ -1,0 +1,11 @@
+[Unit]
+Description=eduK12 attachment verify schedule
+
+[Timer]
+OnCalendar=*-*-* *:35:00
+RandomizedDelaySec=30
+Persistent=true
+Unit=eduk12-attachments-verify.service
+
+[Install]
+WantedBy=timers.target
