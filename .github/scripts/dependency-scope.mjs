@@ -7,7 +7,21 @@ const policy = new Set(['AGENTS.md','docs/ci-runner-policy.md',
   '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
   '.github/scripts/merge-gate.mjs','.github/scripts/content-workflows.test.mjs',
   '.github/scripts/maintenance-routing.test.mjs',
-  '.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs']);
+  '.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs',
+  '.github/scripts/ci-image-plan.test.mjs']);
+const imagePlanFile = '.github/scripts/ci-image-plan.mjs';
+const imageMirrorAdditions = ["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'mirrors.tuna.tsinghua.edu.cn', 'CI Debian mirror was lost');\n"];
+
+// Only these two mirror argument insertions may accompany a dependency upgrade.
+// Any other build-plan edit retains platform classification.
+export function imageMirrorOnly(before, after) {
+  for (const addition of imageMirrorAdditions) {
+    if (before.includes(addition) || after.split(addition).length !== 2) return false;
+    after = after.replace(addition, '');
+  }
+  return after === before;
+}
+
 const sections = ['dependencies','devDependencies','optionalDependencies','overrides'];
 const clean = value => value && typeof value === 'object' && !Array.isArray(value);
 const canonical = value => JSON.stringify(Array.isArray(value) ? value.map(v=>JSON.parse(canonical(v)))
@@ -18,7 +32,7 @@ const version = value => typeof value === 'string' && /^[~^]?\d+\.\d+\.\d+(?:-[0
 export function dependencyFile(file) {
   if (typeof file !== 'string' || /[\\\x00-\x1f\x7f]/.test(file)
       || file.split('/').some(part=>!part || part==='.' || part==='..')) return false;
-  return manifests.has(file) || policy.has(file)
+  return manifests.has(file) || policy.has(file) || file === imagePlanFile
     || /^server-version\/backend\/src\/__tests__\/[^\x00-\x1f\\]+\.test\.tsx?$/.test(file)
     || /^server-version\/frontend\/src\/(?:[^/]+\/)*__tests__\/[^\x00-\x1f\\]+\.test\.tsx?$/.test(file);
 }
@@ -54,6 +68,10 @@ export function dependencyScope(entries, {base,head='HEAD'}) {
         && newMode==='100644' && ((status==='M' && oldMode==='100644')
           || (status==='A' && oldMode==='000000' && policy.has(file))))) return false;
   if (!/^[a-f0-9]{40}$/.test(base) || (head!=='HEAD' && !/^[a-f0-9]{40}$/.test(head))) throw new Error('Exact dependency diff commits required');
+  if (entries.some(({file}) => file === imagePlanFile)) {
+    const text = sha => execFileSync('git',['show',sha+':'+imagePlanFile],{encoding:'utf8'});
+    if (!imageMirrorOnly(text(base),text(head))) return false;
+  }
   const read = (sha,file) => JSON.parse(execFileSync('git',['show',sha+':'+file],{encoding:'utf8',maxBuffer:16*1024*1024}));
   for (const root of roots) {
     if (!entries.some(({file})=>file.startsWith(root+'/package'))) continue;

@@ -237,3 +237,11 @@ strengthen selection. Main retains post-merge integrity smoke without repeating
 component regression. Repeated ready events are unnecessary: publish the frozen head
 and make it ready before the initial classification starts when local scoped checks
 have already passed.
+
+Production image CI passes the existing `DEBIAN_MIRROR` build argument for API and
+worker to `mirrors.tuna.tsinghua.edu.cn`; Debian archive signatures and the existing
+runtime refresh/security scans remain required. Frontend/npm sources are unchanged.
+The exact two mirror argument/verification insertions in `ci-image-plan.mjs` and its
+existing tests may accompany dependencies CI. The router compares the complete
+executable file against the PR base after removing only those exact insertions;
+other image-plan edits still select platform checks. Validate image-only first.

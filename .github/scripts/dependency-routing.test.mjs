@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync } from 'node:fs';
 import { join,dirname } from 'node:path';
 import { tmpdir } from 'node:os';
-import { manifestDependencyOnly,dependencyScope,dependencyFile } from './dependency-scope.mjs';
+import { manifestDependencyOnly,dependencyScope,dependencyFile,imageMirrorOnly } from './dependency-scope.mjs';
 import { changedEntries,acceptanceFor,runnerPlan } from './content-scope.mjs';
 import { requiredChecks,failedChecks } from './merge-gate.mjs';
 const root='server-version/backend';
@@ -52,6 +52,7 @@ function fixture(body) {
     put(root+'/src/__tests__/utils/cos.test.ts','original');
     put(root+'/src/utils/cos.ts','original');
     put('.github/workflows/ci.yml','original');
+    put('.github/scripts/ci-image-plan.mjs','original');
     commit();const base=git('rev-parse','HEAD');process.chdir(dir);
     body({base,put,commit,git});
   } finally {process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
@@ -129,3 +130,16 @@ test('dependency allowlist rejects unknown files, path traversal, deletions and 
     assert.equal(dependencyScope([bad],{base:'a'.repeat(40)}),false);
   assert.throws(()=>dependencyScope([e],{base:'$(invalid)'}),/Exact dependency/);
 });
+
+test('exact mainland mirror companion is admitted; unrelated build edits cannot use dependencies CI',()=>fixture(({base,put,commit})=>{
+  const additions=["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'mirrors.tuna.tsinghua.edu.cn', 'CI Debian mirror was lost');\n"];
+  const after='original'+additions.join('');
+  assert.equal(imageMirrorOnly('original',after),true);
+  for(const bad of [after+'changed tag',after.replace("mirrors.tuna.tsinghua.edu.cn","untrusted.invalid"),after+additions[0],after.replace(additions[1],'')])
+    assert.equal(imageMirrorOnly('original',bad),false);
+  put(root+'/package.json',nextManifest());put(root+'/package-lock.json',lock(nextManifest()));
+  put('.github/scripts/ci-image-plan.mjs',after);commit();
+  assert.equal(dependencyScope(changedEntries(base),{base}),true);
+  put('.github/scripts/ci-image-plan.mjs',after+'changed tag');commit();
+  assert.equal(dependencyScope(changedEntries(base),{base}),false);
+}));
