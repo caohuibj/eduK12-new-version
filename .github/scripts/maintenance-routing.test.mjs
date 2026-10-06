@@ -67,3 +67,38 @@ test('normal scheduler runs maintenance for pure attachment changes and keeps ap
   for(const name of ['ci-backend','ci-frontend'])
     assert.match(source(name),/npm audit --audit-level=high/);
 });
+
+import { execFileSync } from 'node:child_process';
+import { platformReasons } from './content-scope.mjs';
+test('manual full CI is opt-in; a blank, false or malformed flag fails before selecting heavy jobs',()=>{
+  const script=new URL('./content-scope.mjs',import.meta.url).pathname;
+  for(const value of ['', 'false', 'TRUE', '1']) {
+    assert.throws(()=>execFileSync(process.execPath,[script],{env:{...process.env,
+      CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:value,CI_FORCE_FULL:'',
+      GITHUB_OUTPUT:''},encoding:'utf8',stdio:'pipe'}),/Choose a step_probe/);
+  }
+  const ci=source('ci');
+  assert.match(ci,/full_acceptance:\n        type: boolean\n        default: false/);
+  assert.match(job(ci,'scope'),/inputs\.step_probe == 'none'/);
+});
+test('known observe-only host monitoring files use maintenance, including executable installer',()=>{
+  const host='server-version/scripts/host-ops/';
+  for(const file of ['config.example.json','monitor.py','test_monitor.py','README.md',
+    'systemd/eduk12-ops-monitor.service','systemd/eduk12-ops-monitor.timer'])
+    assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
+  assert.equal(classifyChanges([entry(host+'install.sh','100755')]).maintenance,true);
+  for(const file of [host+'recovery.py','server-version/backend/src/config/database.ts',
+    'server-version/scripts/backup/restore-db.mjs'])
+    assert.equal(classifyChanges([entry(host+'config.example.json'),entry(file)]).maintenance,false,file);
+  const lane=source('ci-maintenance');
+  assert.match(lane,/bash -n server-version\/scripts\/host-ops\/install\.sh/);
+  assert.match(lane,/systemd-analyze verify[^\n]+host-ops\/systemd/);
+});
+test('platform escalation reports excluded paths and metadata changes without hiding full-force',()=>{
+  const core='server-version/backend/src/modules/scale/scale-scoring.ts';
+  assert.deepEqual(platformReasons([entry(root+'config.example.json')]),[]);
+  assert.deepEqual(platformReasons([entry(core)]),[{file:core,reason:'outside-scoped-allowlists'}]);
+  const deleted={...entry(root+'core.mjs'),status:'D',oldMode:'100644',newMode:'000000'};
+  assert.deepEqual(platformReasons([deleted]),[{file:deleted.file,reason:'deletion-or-file-type-or-mode-change'}]);
+  assert.deepEqual(platformReasons([entry(root+'core.mjs')],true),[{reason:'explicit-full-request'}]);
+});

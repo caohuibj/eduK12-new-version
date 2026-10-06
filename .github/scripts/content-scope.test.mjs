@@ -190,9 +190,9 @@ test('presentation-only classification is narrow and fail-closed', () => {
   assert.equal(classifyChanges([{ ...regular, status: 'D', newMode: '000000' }]).presentation, false);
 });
 
-test('manual dispatch forces platform checks even with no base SHA', () => {
+test('explicit manual full dispatch selects platform checks even with no base SHA', () => {
   const output = execFileSync(process.execPath, [new URL('./content-scope.mjs', import.meta.url).pathname], {
-    encoding: 'utf8', env: {...process.env, CI_EVENT:'workflow_dispatch', CI_BASE_SHA:'', GITHUB_OUTPUT:''},
+    encoding: 'utf8', env: {...process.env, CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true', CI_BASE_SHA:'', GITHUB_OUTPUT:''},
   });
   assert.equal(JSON.parse(output).content, false);
 });
@@ -281,7 +281,7 @@ test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never lit
   const output=join(root,'outputs');
   try{
     execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
-      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'hybrid',CI_MAC_LIGHT_ENABLED:'',GITHUB_OUTPUT:output},encoding:'utf8'});
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true',CI_RUNNER_PROFILE:'hybrid',CI_MAC_LIGHT_ENABLED:'',GITHUB_OUTPUT:output},encoding:'utf8'});
     const rows=readFileSync(output,'utf8').trim().split('\n');
     assert.ok(rows.length>=19);
     const fields=Object.fromEntries(rows.map(row=>[row.slice(0,row.indexOf('=')),row.slice(row.indexOf('=')+1)]));
@@ -289,7 +289,7 @@ test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never lit
     assert.deepEqual(JSON.parse(fields.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
     assert.deepEqual(JSON.parse(fields.codeql_runner),['ubuntu-24.04']);
     assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
-      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 

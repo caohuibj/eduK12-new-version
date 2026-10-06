@@ -75,7 +75,10 @@ const maintenanceRoutingFiles = new Set([
   '.github/scripts/merge-gate.mjs','.github/scripts/maintenance-routing.test.mjs',
   '.github/scripts/content-workflows.test.mjs',
 ]);
-export function maintenanceFile(file) { return attachmentFiles.has(file); }
+const monitorRoot = 'server-version/scripts/host-ops/';
+const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
+  'systemd/eduk12-ops-monitor.service','systemd/eduk12-ops-monitor.timer'].map(file => monitorRoot + file));
+export function maintenanceFile(file) { return attachmentFiles.has(file) || monitorFiles.has(file); }
 export function maintenanceChange(files) {
   return files.length > 0 && files.some(maintenanceFile)
     && files.every(file => maintenanceFile(file) || maintenanceRoutingFiles.has(file));
@@ -115,7 +118,7 @@ export function classifyChanges(entries, forceFull = false) {
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
   const maintenanceChanges = entries.every(({ file, status, oldMode, newMode }) => {
-    const executable = [attachmentRoot + 'runner.py', attachmentRoot + 'install.sh'].includes(file);
+    const executable = [attachmentRoot + 'runner.py', attachmentRoot + 'install.sh', monitorRoot + 'install.sh'].includes(file);
     const modes = executable ? ['100644','100755'] : ['100644'];
     return modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && modes.includes(oldMode)));
@@ -128,6 +131,27 @@ export function classifyChanges(entries, forceFull = false) {
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
   };
+}
+
+// Explain escalation using the same allowlists and metadata as admission.
+export function platformReasons(entries, forceFull = false) {
+  if (forceFull) return [{reason:'explicit-full-request'}];
+  const selected = classifyChanges(entries);
+  if (['maintenance','documentation','content','presentation','frontend'].some(key => selected[key])) return [];
+  if (!entries.length) return [{reason:'no-changes-classified'}];
+  const reasons = [];
+  for (const entry of entries) {
+    const {file,status,oldMode,newMode} = entry;
+    const executable = [attachmentRoot+'runner.py',attachmentRoot+'install.sh',monitorRoot+'install.sh'].includes(file);
+    const modes = executable ? ['100644','100755'] : ['100644'];
+    if (!(modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
+        || (status === 'M' && modes.includes(oldMode)))))
+      reasons.push({file,reason:'deletion-or-file-type-or-mode-change'});
+    if (![domainFor(file),frontendFile(file),documentationFile(file),presentationFile(file),
+        maintenanceFile(file),maintenanceRoutingFiles.has(file)].some(Boolean))
+      reasons.push({file,reason:'outside-scoped-allowlists'});
+  }
+  return reasons.length ? reasons : [{reason:'mixed-scopes-require-platform'}];
 }
 
 export function changedEntries(base, head = 'HEAD') {
@@ -168,6 +192,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   // Admission is also checked in job.if before any self-hosted checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
     throw new Error('External PRs require a separately approved isolated workflow; no self-hosted execution');
+  // A blank manual request must never silently select every platform job.
+  if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
+    throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
   const files = entries.map(entry => entry.file);
   const result = event === 'workflow_dispatch'
@@ -196,7 +223,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles' }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

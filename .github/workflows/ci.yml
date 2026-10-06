@@ -7,7 +7,7 @@
 #   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
 #   Ready platform PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
-#   workflow_dispatch: manual Full Gate for explicit debugging/verification.
+#   workflow_dispatch: one component probe; Full Gate requires explicit full_acceptance=true.
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
@@ -65,8 +65,8 @@ on:
         description: 'Image probe: frontend only; false builds backend/worker/frontend'
       full_acceptance:
         type: boolean
-        default: true
-        description: 'Manual rollout: execute all reusable acceptances'
+        default: false
+        description: 'Explicitly opt into whole-platform CI; otherwise choose a step_probe'
 
 permissions:
   contents: read

@@ -1,4 +1,4 @@
-name: Attachment maintenance CI
+name: Standalone maintenance CI
 
 on:
   workflow_call:
@@ -31,8 +31,10 @@ jobs:
       - name: Check shell and systemd units without starting production services
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
+          bash -n server-version/scripts/host-ops/install.sh
           sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
-          sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/*
+          sudo install -D -m 644 server-version/scripts/host-ops/monitor.py /opt/eduk12-ops/current/monitor.py
+          sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/* server-version/scripts/host-ops/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
         run: |
           docker pull node:24.21.0-bookworm-slim
