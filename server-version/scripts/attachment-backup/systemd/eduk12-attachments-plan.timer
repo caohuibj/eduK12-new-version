@@ -1,0 +1,11 @@
+[Unit]
+Description=eduK12 attachment plan schedule
+
+[Timer]
+OnCalendar=*-*-* *:55:00
+RandomizedDelaySec=30
+Persistent=true
+Unit=eduk12-attachments-plan.service
+
+[Install]
+WantedBy=timers.target

@@ -9,7 +9,7 @@ selected jobs never grant merge readiness. CI does not deploy production.
 Classification uses the complete Git diff against the PR base, including deletions,
 moves and file modes. Titles and labels cannot weaken coverage. Mixed changes select
 the union of applicable checks; unknown, schema, algorithm, authorization, dependency
-and CI changes select the full platform route. Malformed classification fails closed.
+and unscoped CI changes select the full platform route. Malformed classification fails closed.
 
 - **Light content:** existing declarative instruments, norms and report content.
   Retain immutable/scientific/publication rules, declaration AST boundaries,
@@ -21,6 +21,17 @@ and CI changes select the full platform route. Malformed classification fails cl
   permission, persistence or database changes. Run frontend lint/types/audit/full
   regression/build, real API browser acceptance, the frontend image/scan and all
   affected UI/media acceptances. Content plus UI retains both sets of checks.
+- **Standalone maintenance:** the exact allowlists under
+  `server-version/scripts/attachment-backup/` and `server-version/scripts/host-ops/` select Node 24 deduplication,
+  authenticated-index and cleanup-guard tests, host launcher/restore-volume guards,
+  shell/systemd validation, and an isolated Docker launcher/failure-cleanup smoke.
+  No backend dependency installation, database services, application build, visual
+  browser or whole-platform CI is needed. Its coordinated routing tests and policy
+  files may accompany these component changes; CI-only changes are not admitted by
+  this shortcut. Draft and ready PRs both require actual maintenance job success.
+  Unknown scripts, deletions/symlinks, dependency/application/DB/Compose changes and
+  the existing restore workflow remain outside this allowlist. Forced-full still
+  strengthens the route when explicitly selected.
 - **Heavy platform:** full frontend/backend/mini, production images, all media,
   all three visual browser engines, performance, recovery and CodeQL checks.
 - Ordinary engineering documentation has a narrow allowlist; scientific,
@@ -157,6 +168,50 @@ or validation inputs require renewed relevant verification. Two independent PR g
 results cannot prove their combined source. Main performs the normal post-merge
 integrity smoke without duplicating an already validated complete source tree.
 
+Standalone attachment timers can be enabled after the exact component head passes
+maintenance CI and a bounded production check. This is separate from deploying the
+application or database. Preserve `plan_only`, prior backup dependencies and
+resource limits; automatic deletion is not part of the current component. A failed
+unrelated application dependency audit does not redefine this host-only gate.
+When the user pauses full CI, continue independent component validation without
+starting full CI or presenting local results as a whole-platform pass.
+
 External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.
+
+## CI trigger audit (2026-10-06)
+
+Manual runs default to `full_acceptance=false`. Select a `step_probe` such as
+`maintenance`, `cognitive`, `frontend` or `backend` for independent validation.
+A manual request with no probe and no explicit full acceptance fails at the router,
+before any platform jobs start. Automatic PR classification still uses the complete
+Git diff. The router logs `platformReasons`, including each excluded path and file
+mode/deletion escalation. The repository currently has no `CI_FORCE_FULL` override.
+
+| Change | Selected checks | Escalation examples |
+| --- | --- | --- |
+| Versioned Scale instruments; existing Cognitive seeds/presentation/governance/scientific declarations; SJT instrument/publication/scientific JSON; exact Bundle content | Domain contracts, immutable/publication reviews, declaration boundaries, affected regression; all-Bundle dependency closure and isolated import/report/FINAL; TS declarations also select CodeQL on ready PRs | Scorers, task runners, authorization, shared contracts, Prisma, dependencies |
+| Known attachment backup and observe-only host monitoring files/config/timers | Maintenance tests, Python guards, shell/systemd syntax, isolated Docker launch/failure cleanup, aggregate gate | New unknown maintenance executors, deletes/symlinks, business code/Compose/DB/dependencies |
+| Existing database backup/restore scripts | Currently platform classification, with recovery rehearsal | These are outside the attachment component; a future dedicated recovery route needs equivalent isolated restore evidence before replacing this gate |
+
+Additional causes of platform selection are a content/maintenance change mixed with
+an unlisted file (including CI-only changes), content deletions/renames/mode changes,
+and an explicit full request. For example Cognitive `task-package.json`,
+`definitions.ts`, `semantics.ts` and `package.ts` currently stay outside the
+declarative shortcut: they can change task admission, timing or runtime behavior.
+The existing `scale/instruments/learning-motivation-wave1-data.json` is an exact
+Scale exception: its existing instrument test validates reference data and report
+behavior in the Scale lane. Other unlisted root-level data stays outside the
+versioned instrument allowlist. A pure metadata exception must be verified against
+its consumer and added with boundary tests, rather than widening a directory prefix.
+
+Independent visual/media/Ops/performance workflows are reusable or manual; they do
+not separately launch full CI for every PR. Situational publication has a separate
+PR/review trigger, but checks its own relevant paths first and retains scientific
+publication authority checks. It is a focused integrity check, not platform CI.
+
+An unchanged architecture does not by itself prove a change has a small impact:
+shared scoring, permissions, persistence and dependencies can affect many modules.
+Use the actual impact and tested file boundaries to choose the gate. Ordinary
+content and isolated maintenance do not need platform full acceptance.
