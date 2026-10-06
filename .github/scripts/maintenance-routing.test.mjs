@@ -115,3 +115,15 @@ test('isolated host backup wrappers use maintenance with actual restore evidence
   assert.match(source('ci-maintenance'),/ci-backup-smoke[.]py/);
   assert.match(source('ci-maintenance'),/node --test server-version\/scripts\/host-ops\/backup-cos[.]test[.]mjs/);
 });
+test('explicit protected COS cleanup files select maintenance, unknown executors and business mixtures do not',()=>{
+  const cleanup='server-version/scripts/cos-cleanup/';
+  for(const file of ['README.md','config.example.json','model.mjs','store.mjs','engine.mjs','cli.mjs','runner.py',
+    'test_runner.py','cleanup.test.mjs','sdk-smoke.mjs','ci-container-smoke.py','install.sh','systemd/eduk12-cos-cleanup.service','systemd/eduk12-cos-cleanup.timer']) {
+    assert.equal(classifyChanges([entry(cleanup+file)]).maintenance,true,file);
+    assert.deepEqual(platformReasons([entry(cleanup+file)]),[]);
+  }
+  for(const file of [cleanup+'delete-all.mjs','server-version/backend/src/utils/cos.ts','server-version/scripts/backup/restore-db.mjs'])
+    assert.equal(classifyChanges([entry(cleanup+'engine.mjs'),entry(file)]).maintenance,false,file);
+  const lane=source('ci-maintenance');assert.match(lane,/cos-cleanup\/cleanup[.]test[.]mjs/);
+  assert.match(lane,/cos-cleanup -p 'test_\*\.py'/);
+});

@@ -191,6 +191,18 @@ External/untrusted PRs are blocked before any self-hosted checkout. CI accounts 
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.
 
+The explicit `server-version/scripts/cos-cleanup/` file allowlist adds the protected
+version deletion component to maintenance. Unknown executors and mixed business,
+database, dependencies or Compose paths remain outside this route. It adds historical
+authenticated index scanning, retained DB/attachment reference closure, bounded
+version deletion protocol, real encrypted filesystem transaction/checkpoint recovery,
+host dual-writer locks and failed-task isolation checks. CI has no production COS
+credentials; SDK tests are not evidence of live cloud deletion. A separately bounded
+unique-prefix synthetic COS probe validates the same adapter's actual version deletion.
+Production is plan-only until real joint recovery acceptance, independent deletion
+identity and guarded backup writers are deployed; this is independent of application
+deployment. Never trigger full acceptance to verify this component.
+
 ## CI trigger audit (2026-10-06)
 
 Manual runs default to `full_acceptance=false`. Select a `step_probe` such as

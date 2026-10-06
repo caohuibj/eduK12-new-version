@@ -2,6 +2,8 @@
 """Root-owned launcher. Credentials go to an isolated task on stdin."""
 import datetime
 import fcntl
+import hashlib
+import hmac
 import json
 import os
 from pathlib import Path
@@ -64,6 +66,15 @@ def parse_key(text):
         raise RuntimeError("BACKUP_KEY_REQUIRED")
     return key
 
+def cleanup_pending():
+    journal = Path('/var/lib/eduk12-cos-cleanup/journal.json')
+    if not journal.exists(): return False
+    value = json.loads(private_file(journal)); signature = value.pop('mac', '')
+    expected = hmac.new(parse_key(private_file(KEY_FILE)).encode(), json.dumps(value, ensure_ascii=False, separators=(',', ':')).encode(), hashlib.sha256).hexdigest()
+    if not isinstance(signature, str) or not hmac.compare_digest(signature, expected):
+        raise RuntimeError('CLEANUP_JOURNAL_AUTHENTICATION_FAILED')
+    return value.get('status') != 'COMPLETE'
+
 def run(command):
     if os.geteuid() != 0 or command not in {"backup", "verify", "plan"}:
         raise RuntimeError("ROOT_AND_SUPPORTED_COMMAND_REQUIRED")
@@ -82,6 +93,8 @@ def run(command):
         except BlockingIOError:
             print(json.dumps({"command": command, "skipped": "another_attachment_task_running"}))
             return 0
+        if cleanup_pending():
+            print(json.dumps({'command': command, 'skipped': 'COS_CLEANUP_TRANSACTION_PENDING'})); return 0
         source = docker_json(["inspect", SOURCE_CONTAINER])[0]
         env = dict(s.split("=", 1) for s in source["Config"].get("Env", []) if "=" in s)
         if config["sourceBucket"] != env.get("COS_BUCKET") or config["region"] != env.get("COS_REGION"):

@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly protected COS cleanup planning/execution
+
+[Timer]
+OnCalendar=*-*-* *:50:00
+RandomizedDelaySec=30
+Persistent=true
+Unit=eduk12-cos-cleanup.service
+
+[Install]
+WantedBy=timers.target

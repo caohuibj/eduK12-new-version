@@ -5,6 +5,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 import runner
+import hashlib
+import hmac
 
 class RunnerSafetyTests(unittest.TestCase):
     def test_cleanup_rejects_production_before_docker(self):
@@ -52,6 +54,17 @@ class RunnerSafetyTests(unittest.TestCase):
         self.assertEqual(runner.parse_key("UNRELATED=value\nBACKUP_ENCRYPTION_KEY=" + value), value)
         with self.assertRaisesRegex(RuntimeError, "BACKUP_KEY_REQUIRED"):
             runner.parse_key("PASSWORD=private")
+
+    def test_pending_cleanup_journal_is_authenticated_before_reusing_content(self):
+        secret = 'synthetic-test-backup-key-0123456789'
+        def signed(status):
+            body = {'status': status}; body['mac'] = hmac.new(secret.encode(), json.dumps(body, separators=(',', ':')).encode(), hashlib.sha256).hexdigest(); return json.dumps(body)
+        with patch.object(runner.Path, 'exists', return_value=True), patch.object(runner, 'private_file') as read:
+            for status in ['PREPARED', 'DETACHED', 'COMPLETE']:
+                read.side_effect = [signed(status), 'BACKUP_ENCRYPTION_KEY=' + secret]
+                self.assertEqual(runner.cleanup_pending(), status != 'COMPLETE')
+            read.side_effect = ['{"status":"COMPLETE","mac":"bad"}', 'BACKUP_ENCRYPTION_KEY=' + secret]
+            with self.assertRaisesRegex(RuntimeError, 'CLEANUP_JOURNAL_AUTHENTICATION_FAILED'): runner.cleanup_pending()
 
 if __name__ == "__main__":
     unittest.main()

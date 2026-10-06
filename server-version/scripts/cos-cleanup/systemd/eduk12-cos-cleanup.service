@@ -1,0 +1,32 @@
+[Unit]
+Description=eduK12 protected version-specific COS backup cleanup
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 -B /opt/eduk12-cos-cleanup/current/runner.py run
+TimeoutStartSec=2400
+TimeoutStopSec=90
+UMask=0077
+StateDirectory=eduk12-cos-cleanup
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/eduk12-cos-cleanup /var/lib/eduk12-backups /var/lib/eduk12-attachments
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=30%
+MemoryMax=384M
+TasksMax=64
+StandardOutput=journal
+StandardError=journal

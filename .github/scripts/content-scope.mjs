@@ -78,12 +78,16 @@ const maintenanceRoutingFiles = new Set([
   '.github/scripts/content-workflows.test.mjs',
 ]);
 const monitorRoot = 'server-version/scripts/host-ops/';
+const cleanupRoot = 'server-version/scripts/cos-cleanup/';
+const cleanupFiles = new Set(['README.md','config.example.json','model.mjs','store.mjs','engine.mjs','cli.mjs',
+  'runner.py','test_runner.py','cleanup.test.mjs','sdk-smoke.mjs','ci-container-smoke.py','install.sh',
+  'systemd/eduk12-cos-cleanup.service','systemd/eduk12-cos-cleanup.timer'].map(file=>cleanupRoot+file));
 const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
   'backup.py','backup-cos.cjs','backup-cos.test.mjs','backup-crypto.mjs','backup-config.example.json',
   'test_backup.py','ci-backup-smoke.py','install-backup.sh','BACKUP-AUTOMATION.md',
   'systemd/eduk12-database-backup.service','systemd/eduk12-database-backup.timer',
   'systemd/eduk12-ops-monitor.service','systemd/eduk12-ops-monitor.timer'].map(file => monitorRoot + file));
-export function maintenanceFile(file) { return attachmentFiles.has(file) || monitorFiles.has(file); }
+export function maintenanceFile(file) { return attachmentFiles.has(file) || monitorFiles.has(file) || cleanupFiles.has(file); }
 export function maintenanceChange(files) {
   return files.length > 0 && files.some(maintenanceFile)
     && files.every(file => maintenanceFile(file) || maintenanceRoutingFiles.has(file));

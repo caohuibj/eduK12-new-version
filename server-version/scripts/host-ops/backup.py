@@ -74,6 +74,10 @@ def sha(path):
             digest.update(chunk)
     return digest.hexdigest()
 
+def cleanup_pending(secret):
+    journal = Path('/var/lib/eduk12-cos-cleanup/journal.json')
+    return journal.exists() and unseal(json.loads(private_read(journal)), secret).get('status') != 'COMPLETE'
+
 
 def validate_config(c):
     require(c.get('schema') == 1 and c.get('sourceBucket') == 'ptool-videos-edu-1393949445'
@@ -238,6 +242,8 @@ def backup():
         values = dict(line.split('=', 1) for line in private_read(KEY_FILE).splitlines() if '=' in line and not line.startswith('#'))
         secret = values.get('BACKUP_ENCRYPTION_KEY', '')
         require(len(secret) >= 32, 'BACKUP_KEY_REQUIRED')
+        if cleanup_pending(secret):
+            return {'status': 'SKIPPED', 'reason': 'COS_CLEANUP_TRANSACTION_PENDING'}
         backend = inspect(BACKEND); pg = inspect(POSTGRES)
         require(backend['State']['Running'] and pg['State']['Running'] and pg['Config']['Image'] == 'postgres:16.15-bookworm', 'PRODUCTION_NOT_READY')
         require(not inspect(backend['Image'])['Config'].get('Volumes'), 'HELPER_ANONYMOUS_VOLUMES_REFUSED')
