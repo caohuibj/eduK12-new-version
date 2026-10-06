@@ -30,6 +30,18 @@ test('external resources are counted, soft deleted data is excluded and ordinary
  addReferenceRow(ix,'documents',{is_deleted:true,file_path:'/uploads/missing'},hosts);
  assert.equal(ix.externalUrls,1);assert.equal(ix.needed.size,0);
 });
+test('migration batch summaries preserve historical diagnostics without treating them as live attachments',()=>{
+ const ix=index(),historical={preview:[{processedUrl:'/videos/old-missing.mp4',asset_id:'old-missing'}],notes:['https://media.test/old-missing.pdf']};
+ addReferenceRow(ix,'_legacy_import_batches',{mode:'dry_run',summary:historical},hosts);
+ assert.equal(ix.rows,1);assert.equal(ix.references,0);assert.equal(ix.needed.size,0);
+ // Exact table and field scope: business JSON, future tables/fields and explicit
+ // attachment references outside that audit summary remain protected.
+ for(const table of ['videos','snapshots','_legacy_import_batches_archive'])assert.throws(()=>addReferenceRow(index(),table,{summary:historical},hosts),/REFERENCE_MISSING/);
+ assert.throws(()=>addReferenceRow(index(),'_legacy_import_batches',{summary:historical,asset_id:'missing'},hosts),/ASSET_REFERENCE_MISSING/);
+ assert.throws(()=>addReferenceRow(index(),'_legacy_import_batches',{summary:historical,detail:'/videos/missing.mp4'},hosts),/REFERENCE_MISSING/);
+ addReferenceRow(ix,'_legacy_import_batches',{summary:historical,cos_key:'assets/test.pdf'},hosts);
+ assert.equal(ix.references,1);
+});
 test('immutable acceptance cache rejects missing restore evidence, changed identity, DB/manifest/blob receipts',()=>{
  const receipt={sha256:sha,bytes:12},r={key:blob,versionId:'blob-v',receipt},p={id:'point',objects:[{versionId:'db-v',sha256:sha}]},s={id:'snap',remote:{versionId:'snap-v',encryptedSha256:sha}},identity={keyId:'key1'};
  const b={hostPointId:p.id,databaseVersionId:'db-v',databaseSha256:sha,attachmentSnapshotId:'snap',snapshotVersionId:'snap-v',snapshotSha256:sha,databaseRestoredAt:'2026-01-01T00:00:00Z',databaseRestore:{status:'PASS',network:'none',failedMigrations:0,appliedMigrations:1},verifiedBlobIds:[id(r)],verifiedBlobHashes:{[id(r)]:hash(receipt)}};

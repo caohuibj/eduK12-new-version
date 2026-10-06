@@ -35,12 +35,13 @@ CREATE TABLE stored_assets(id text,provider text,object_key text,sha256 text,siz
 INSERT INTO stored_assets VALUES ('asset-1','cos','assets/fixture.pdf','''+"'"+digest+"'"+''',20,NULL);
 CREATE TABLE asset_references(asset_id text);INSERT INTO asset_references VALUES ('asset-1');
 CREATE TABLE documents(asset_id text,file_path text,cos_key text);INSERT INTO documents VALUES ('asset-1','/uploads/legacy.pdf','assets/fixture.pdf');
-CREATE TABLE snapshots(payload jsonb);INSERT INTO snapshots VALUES ('{"nested":{"url":"https://fixture.cos.test/assets/fixture.pdf"}}');'''
+CREATE TABLE snapshots(payload jsonb);INSERT INTO snapshots VALUES ('{"nested":{"url":"https://fixture.cos.test/assets/fixture.pdf"}}');
+CREATE TABLE _legacy_import_batches(mode text,summary jsonb);INSERT INTO _legacy_import_batches VALUES ('dry_run','{"preview":{"processedUrl":"/videos/old-missing.mp4","asset_id":"old-missing"}}');'''
    docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',sql)
    scripts=source.parent/'backup';env={**os.environ,'BACKUP_ENCRYPTION_KEY':secret,'POSTGRES_CONTAINER':name,'DB_USER':'fixture','DB_NAME':'fixture','ENCRYPTED_DIR':str(work)}
    subprocess.run([backup.NODE,str(scripts/'backup-db.mjs'),'full'],env=env,capture_output=True,check=True,timeout=120)
    encrypted=list(work.glob('*.edubackup.enc'));assert len(encrypted)==1
-   evidence=recovery.isolated_export(backup,encrypted[0],scripts,secret,work,uuid.uuid4().hex);assert evidence['status']=='PASS' and evidence['referenceTables']==6
+   evidence=recovery.isolated_export(backup,encrypted[0],scripts,secret,work,uuid.uuid4().hex);assert evidence['status']=='PASS' and evidence['referenceTables']==7
    (work/'restore-evidence.json').write_text(json.dumps(evidence))
    result=subprocess.run([backup.NODE,str(source/'recovery-smoke.mjs'),str(work)],env=os.environ,capture_output=True,timeout=120)
    if result.returncode:raise RuntimeError('CI_JOINT_REFERENCE_VERIFIER_FAILED: '+result.stderr.decode()[-3000:])
