@@ -200,7 +200,9 @@ an unlisted file (including CI-only changes), content deletions/renames/mode cha
 and an explicit full request. For example Cognitive `task-package.json`,
 `definitions.ts`, `semantics.ts` and `package.ts` currently stay outside the
 declarative shortcut: they can change task admission, timing or runtime behavior.
-A Scale JSON stored directly under `scale/instruments/` also stays outside the
+The existing `scale/instruments/learning-motivation-wave1-data.json` is an exact
+Scale exception: its existing instrument test validates reference data and report
+behavior in the Scale lane. Other unlisted root-level data stays outside the
 versioned instrument allowlist. A pure metadata exception must be verified against
 its consumer and added with boundary tests, rather than widening a directory prefix.
 

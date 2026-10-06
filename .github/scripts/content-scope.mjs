@@ -18,6 +18,7 @@ export function domainFor(file) {
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
   if (new RegExp(`^${modules}scale/instruments/[^/]+/[^/]+/`).test(file)
+      || file === `${modules}scale/instruments/learning-motivation-wave1-data.json`
       || file === `${modules}scale/onboarding/instruments.generated.ts`
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
       || file.startsWith('docs/scale-instruments/')) return 'scale';

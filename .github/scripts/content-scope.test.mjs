@@ -372,3 +372,17 @@ test('actual Git diffs select different documentation, presentation, content, fr
     }
   } finally {rmSync(fixture,{recursive:true,force:true});}
 });
+
+test('the existing learning-motivation JSON uses Scale checks without admitting arbitrary root data or behavior',()=>{
+  const file='server-version/backend/src/modules/scale/instruments/learning-motivation-wave1-data.json';
+  const regular={file,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([regular]).content,true);
+  assert.deepEqual(classifyChanges([regular]).domains,['scale']);
+  for(const path of [file.replace('wave1-data','other-data'),file.replace('.json','.ts'),
+    'server-version/backend/scripts/learning-motivation-wave1/generate-packages.py'])
+    assert.equal(classifyChanges([{...regular,file:path}]).content,false,path);
+  assert.equal(classifyChanges([{...regular,status:'D',newMode:'000000'}]).content,false);
+  assert.equal(classifyChanges([{...regular,newMode:'120000'}]).content,false);
+  assert.equal(classifyChanges([regular],true).content,false);
+  assert.equal(acceptanceFor([file]).ops,false);
+});
