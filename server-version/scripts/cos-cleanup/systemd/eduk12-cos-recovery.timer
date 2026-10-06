@@ -1,0 +1,11 @@
+[Unit]
+Description=eduK12 hourly joint recovery proof renewal
+
+[Timer]
+OnCalendar=*-*-* *:40:00
+Persistent=true
+AccuracySec=1s
+Unit=eduk12-cos-recovery.service
+
+[Install]
+WantedBy=timers.target

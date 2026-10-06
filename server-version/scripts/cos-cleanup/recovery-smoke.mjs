@@ -1,0 +1,23 @@
+// Hosted CI synthetic fixture; exercises the production reference/decrypt verifier.
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {Readable} from 'node:stream';
+import {encryptStream} from '../attachment-backup/core.mjs';
+import {verifyReferenceExports} from './recovery.mjs';
+import {id} from './model.mjs';
+assert.equal(process.env.CI,'true');assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.NODE_ENV,'test');
+const [work]=process.argv.slice(2),secret='synthetic-joint-recovery-key-0123456789',keyId='ci-key';
+const data=Buffer.from('synthetic attachment');
+const blob=path.join(work,'fixture-blob'),receipt=await encryptStream(Readable.from([data]),blob,secret,keyId,1000);
+const r={...receipt,receipt,key:'attachments/v1/objects/'+keyId+'/'+receipt.sha256+'.gcm',versionId:'ci-blob-v',bytes:receipt.encryptedBytes,sha256:receipt.encryptedSha256,kind:'blob'};
+const manifest={schema:1,id:'11111111-1111-4111-8111-111111111111',scope:'attachment_inventory_only',complete:true,entries:[{source:{provider:'cos',key:'assets/fixture.pdf'},blob:r.key,versionId:r.versionId,sha256:receipt.sha256,bytes:receipt.bytes}]};
+const mf=path.join(work,'fixture-manifest'),mr=await encryptStream(Readable.from([Buffer.from(JSON.stringify(manifest))]),mf,secret,keyId,16384),remote={...mr,key:'attachments/v1/snapshots/'+manifest.id+'.gcm',versionId:'ci-manifest-v'};
+const repo={identity:{keyId},latestSnapshotId:manifest.id,snapshots:[{id:manifest.id,remote}],records:[r]},point={id:'synthetic',objects:[{sha256:'a'.repeat(64),versionId:'ci-db-v'}]};
+const api={check:async version=>assert.ok([id(r),id(remote)].includes(id(version))),stream:version=>Readable.from((async function*(){yield await fs.readFile(version.key===r.key?blob:mf);})())};
+const evidence=JSON.parse(await fs.readFile(path.join(work,'restore-evidence.json'))),hosts={cos:['fixture.cos.test'],site:[]};
+const accepted=await verifyReferenceExports(api,repo,point,secret,work,hosts,evidence);assert.equal(accepted.verifiedBlobIds.length,1);assert.ok(accepted.referenceCount>=3);
+const original=await fs.readFile(path.join(work,'references.jsonl'));await fs.appendFile(path.join(work,'references.jsonl'),'\n'+JSON.stringify({table:'snapshots',data:{json:{image:'https://fixture.cos.test/assets/missing.pdf'}}})+'\n');
+await assert.rejects(verifyReferenceExports(api,repo,point,secret,work,hosts,evidence),/REFERENCE_MISSING/);await fs.writeFile(path.join(work,'references.jsonl'),original);
+const cipher=await fs.readFile(blob);cipher[cipher.length-1]^=1;await fs.writeFile(blob,cipher);await assert.rejects(verifyReferenceExports(api,repo,point,secret,work,hosts,evidence),/HASH_MISMATCH/);
+console.log(JSON.stringify({actualRestoredRowsAndAttachmentDecryption:'PASS',missingDatabaseReferenceBlocks:true,ciphertextTamperBlocks:true}));

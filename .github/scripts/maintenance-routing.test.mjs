@@ -127,3 +127,11 @@ test('explicit protected COS cleanup files select maintenance, unknown executors
   const lane=source('ci-maintenance');assert.match(lane,/cos-cleanup\/cleanup[.]test[.]mjs/);
   assert.match(lane,/cos-cleanup -p 'test_\*\.py'/);
 });
+
+test('joint recovery exact files stay in maintenance; unknown proof writers cannot bypass platform scope',()=>{
+ const base='server-version/scripts/cos-cleanup/';
+ for(const file of ['recovery.mjs','recovery.py','recovery.test.mjs','test_recovery.py','recovery-smoke.mjs','ci-recovery-smoke.py','systemd/eduk12-cos-recovery.service','systemd/eduk12-cos-recovery.timer'])assert.equal(classifyChanges([entry(base+file)]).maintenance,true,file);
+ for(const file of ['fake-proof.py','recover-production.mjs','nested/recovery.py'])assert.equal(classifyChanges([entry(base+'recovery.py'),entry(base+file)]).maintenance,false,file);
+ assert.match(source('ci-maintenance'),/cos-cleanup\/ci-recovery-smoke[.]py/);
+ assert.match(source('ci-maintenance'),/cos-cleanup\/recovery[.]test[.]mjs/);
+});

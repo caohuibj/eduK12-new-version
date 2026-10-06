@@ -30,10 +30,12 @@ jobs:
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
           node --test server-version/scripts/host-ops/backup-cos.test.mjs
           node --check server-version/scripts/host-ops/backup-crypto.mjs
-          node --test server-version/scripts/cos-cleanup/cleanup.test.mjs
+          node --test server-version/scripts/cos-cleanup/cleanup.test.mjs server-version/scripts/cos-cleanup/recovery.test.mjs
           python3 -B -m unittest discover -s server-version/scripts/cos-cleanup -p 'test_*.py' -v
           node --check server-version/scripts/cos-cleanup/cli.mjs
           node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
+          node --check server-version/scripts/cos-cleanup/recovery.mjs
+          node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
@@ -45,6 +47,7 @@ jobs:
           sudo install -D -m 644 server-version/scripts/host-ops/backup.py /opt/eduk12-backups/current/backup.py
           sudo install -D -m 644 server-version/scripts/cos-cleanup/runner.py /opt/eduk12-cos-cleanup/current/runner.py
           sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/* server-version/scripts/host-ops/systemd/*
+          sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
         run: |
@@ -55,3 +58,5 @@ jobs:
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
+
+          sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-recovery-smoke.py

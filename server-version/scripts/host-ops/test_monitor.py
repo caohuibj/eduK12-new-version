@@ -25,6 +25,17 @@ class MonitoringSafetyTests(unittest.TestCase):
                 level = next(c['level'] for c in checks if c['key'] == 'cos_cleanup_health')
                 self.assertEqual(level, 'ok' if edit['status'] == 'BLOCKED' else 'critical')
 
+    def test_joint_recovery_failure_and_stale_status_alert_but_baseline_wait_is_normal(self):
+        import datetime as dt
+        config = copy.deepcopy(CONFIG); config['tls_hosts'] = []; config['ready_urls'] = []; config['backup_roots'] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            status = Path(tmp, 'recovery.json'); config['cos_recovery_status'] = str(status)
+            for state, hours, expected in [('FAILED',0,'critical'),('VERIFIED',4,'warning'),('BLOCKED',0,'ok'),('SKIPPED',0,'ok')]:
+                status.write_text(json.dumps({'at':(dt.datetime.now(dt.timezone.utc)-dt.timedelta(hours=hours)).isoformat(),'status':state,'error':'code-only'}))
+                with patch.object(m,'command',side_effect=RuntimeError('isolated')):data,checks=m.collect(config)
+                self.assertEqual(next(c['level'] for c in checks if c['key']=='cos_joint_recovery_health'),expected)
+                self.assertNotIn('error',data['cos_recovery'])
+
     def test_failure_debounce_recovery_and_reminder(self):
         bad = [m.finding('http:api', 'critical', {'status': 503})]
         good = [m.finding('http:api', 'ok', {'status': 200})]
