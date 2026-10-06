@@ -4,7 +4,7 @@ import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } 
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
-    content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
+    maintenance:'false',content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
@@ -17,7 +17,7 @@ const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
-  assert.deepEqual(classify([scale, cognitive, sjt]), { documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
+  assert.deepEqual(classify([scale, cognitive, sjt]), { maintenance:false, documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
 });
 test('empty, core, executable additions and mixed changes require full checks', () => {
   assert.equal(classify([]).content, false);
@@ -190,9 +190,9 @@ test('presentation-only classification is narrow and fail-closed', () => {
   assert.equal(classifyChanges([{ ...regular, status: 'D', newMode: '000000' }]).presentation, false);
 });
 
-test('manual dispatch forces platform checks even with no base SHA', () => {
+test('explicit manual full dispatch selects platform checks even with no base SHA', () => {
   const output = execFileSync(process.execPath, [new URL('./content-scope.mjs', import.meta.url).pathname], {
-    encoding: 'utf8', env: {...process.env, CI_EVENT:'workflow_dispatch', CI_BASE_SHA:'', GITHUB_OUTPUT:''},
+    encoding: 'utf8', env: {...process.env, CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true', CI_BASE_SHA:'', GITHUB_OUTPUT:''},
   });
   assert.equal(JSON.parse(output).content, false);
 });
@@ -281,7 +281,7 @@ test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never lit
   const output=join(root,'outputs');
   try{
     execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
-      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'hybrid',CI_MAC_LIGHT_ENABLED:'',GITHUB_OUTPUT:output},encoding:'utf8'});
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true',CI_RUNNER_PROFILE:'hybrid',CI_MAC_LIGHT_ENABLED:'',GITHUB_OUTPUT:output},encoding:'utf8'});
     const rows=readFileSync(output,'utf8').trim().split('\n');
     assert.ok(rows.length>=19);
     const fields=Object.fromEntries(rows.map(row=>[row.slice(0,row.indexOf('=')),row.slice(row.indexOf('=')+1)]));
@@ -289,7 +289,7 @@ test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never lit
     assert.deepEqual(JSON.parse(fields.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
     assert.deepEqual(JSON.parse(fields.codeql_runner),['ubuntu-24.04']);
     assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
-      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
+      env:{...process.env,CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 
@@ -371,4 +371,18 @@ test('actual Git diffs select different documentation, presentation, content, fr
       assert.deepEqual(JSON.parse(output.docker_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
     }
   } finally {rmSync(fixture,{recursive:true,force:true});}
+});
+
+test('the existing learning-motivation JSON uses Scale checks without admitting arbitrary root data or behavior',()=>{
+  const file='server-version/backend/src/modules/scale/instruments/learning-motivation-wave1-data.json';
+  const regular={file,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([regular]).content,true);
+  assert.deepEqual(classifyChanges([regular]).domains,['scale']);
+  for(const path of [file.replace('wave1-data','other-data'),file.replace('.json','.ts'),
+    'server-version/backend/scripts/learning-motivation-wave1/generate-packages.py'])
+    assert.equal(classifyChanges([{...regular,file:path}]).content,false,path);
+  assert.equal(classifyChanges([{...regular,status:'D',newMode:'000000'}]).content,false);
+  assert.equal(classifyChanges([{...regular,newMode:'120000'}]).content,false);
+  assert.equal(classifyChanges([regular],true).content,false);
+  assert.equal(acceptanceFor([file]).ops,false);
 });
