@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "sourceBucket": "ptool-videos-edu-1393949445",
+  "backupBucket": "eduk12-backups-1393949445",
+  "region": "ap-beijing",
+  "maxBackupBytes": 536870912,
+  "minimumFreeBytes": 6442450944,
+  "localCopies": 2,
+  "cleanupMode": "plan_only",
+  "retention": {
+    "dailyDays": 30,
+    "weeklyWeeks": 12,
+    "monthlyMonths": 12
+  },
+  "backupSourceSha256": {
+    "backup-db.mjs": "f6946d782d0536171dff55dbeedd7aaab534563b273ca8794cda5beb826fb3a5",
+    "restore-db.mjs": "1ea4280adda4e5bc5f78ab40e4982c69185adf93ed2b2493f806efab403d1f03"
+  }
+}

@@ -176,6 +176,17 @@ unrelated application dependency audit does not redefine this host-only gate.
 When the user pauses full CI, continue independent component validation without
 starting full CI or presenting local results as a whole-platform pass.
 
+The exact host-ops backup wrapper/config/installer/transport files additionally
+select real encrypted DB backup/restore against a labelled disposable PostgreSQL
+16 database and checksum-failure anonymous-volume cleanup. These wrappers reuse
+the deployed backup/restore source unchanged and cannot restore production, write
+the media bucket or delete cloud backups. They retain the maintenance route; old
+backup/restore source edits, new unknown executors and application changes still
+escalate. Local retention needs two verified cloud-backed restored copies; cloud
+retention remains plan_only. Host backup installation is independent of deploying
+the application and requires exact-head maintenance success plus bounded COS and
+production verification.
+
 External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.

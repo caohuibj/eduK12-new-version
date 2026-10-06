@@ -158,6 +158,24 @@ def collect(config):
         checks.append(finding("backup_evidence_freshness", "warning" if best_age is None or best_age > config["backup_max_age_hours"] * 3600 else "ok", {"age_seconds": best_age}))
     probe("collector:backups", backups)
 
+    if config.get("periodic_backup_status"):
+        def periodic_backup():
+            status = json.loads(Path(config["periodic_backup_status"]).read_text())
+            receipt = json.loads(Path(config["cos_backup_receipt"]).read_text())
+            verified = (receipt.get("status") == "VERIFIED" and receipt.get("restore", {}).get("status") == "PASS"
+                        and bool(receipt.get("objects")) and all(o.get("downloadVerified") is True
+                        and o.get("authenticatedDecryptionVerified") is True for o in receipt["objects"]))
+            timestamp = dt.datetime.fromisoformat(receipt["at"].replace("Z", "+00:00"))
+            if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
+                raise ValueError("periodic receipt timestamp invalid")
+            age = max(0, int(time.time() - timestamp.timestamp()))
+            healthy = status.get("status") == "VERIFIED" and verified and age <= config["backup_max_age_hours"] * 3600
+            data["periodic_backup"] = {"status": status.get("status"), "age_seconds": age,
+                                       "last_recorded_cloud_and_restore_verified": verified, "live_cos_check": False}
+            checks.append(finding("periodic_backup_success", "ok" if healthy else "critical",
+                                  {"status": status.get("status"), "age_seconds": age, "verified": verified}))
+        probe("collector:periodic_backup", periodic_backup)
+
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
         data["unreferenced_volume_count"] = len(names.splitlines())
