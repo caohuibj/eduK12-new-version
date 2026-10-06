@@ -28,14 +28,22 @@ jobs:
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
+          node --test server-version/scripts/host-ops/backup-cos.test.mjs
+          node --check server-version/scripts/host-ops/backup-crypto.mjs
       - name: Check shell and systemd units without starting production services
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
+          bash -n server-version/scripts/host-ops/install-backup.sh
           sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
           sudo install -D -m 644 server-version/scripts/host-ops/monitor.py /opt/eduk12-ops/current/monitor.py
+          sudo install -D -m 644 server-version/scripts/host-ops/backup.py /opt/eduk12-backups/current/backup.py
           sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/* server-version/scripts/host-ops/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
+      - name: Actual encrypted database restore and failure-volume cleanup
+        run: |
+          docker pull postgres:16.15-bookworm
+          sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py

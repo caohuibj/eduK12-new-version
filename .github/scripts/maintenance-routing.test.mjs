@@ -102,3 +102,16 @@ test('platform escalation reports excluded paths and metadata changes without hi
   assert.deepEqual(platformReasons([deleted]),[{file:deleted.file,reason:'deletion-or-file-type-or-mode-change'}]);
   assert.deepEqual(platformReasons([entry(root+'core.mjs')],true),[{reason:'explicit-full-request'}]);
 });
+
+test('isolated host backup wrappers use maintenance with actual restore evidence; old restore edits stay outside',()=>{
+  const host='server-version/scripts/host-ops/';
+  const files=['backup.py','backup-cos.cjs','backup-cos.test.mjs','backup-crypto.mjs','backup-config.example.json',
+    'test_backup.py','ci-backup-smoke.py','install-backup.sh','BACKUP-AUTOMATION.md',
+    'systemd/eduk12-database-backup.service','systemd/eduk12-database-backup.timer'];
+  for(const file of files) assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
+  assert.equal(classifyChanges([entry(host+'install-backup.sh','100755')]).maintenance,true);
+  for(const unknown of [host+'delete-cos.py',host+'restore-production.py','server-version/scripts/backup/backup-db.mjs'])
+    assert.equal(classifyChanges([entry(host+'backup.py'),entry(unknown)]).maintenance,false,unknown);
+  assert.match(source('ci-maintenance'),/ci-backup-smoke[.]py/);
+  assert.match(source('ci-maintenance'),/node --test server-version\/scripts\/host-ops\/backup-cos[.]test[.]mjs/);
+});

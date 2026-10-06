@@ -136,6 +136,29 @@ class MonitoringSafetyTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text()), {'value': 1})
             self.assertFalse(path.with_suffix('.tmp').exists())
 
+    def test_failed_or_stale_periodic_backup_is_not_masked_by_fresh_local_artifact(self):
+        config = copy.deepcopy(CONFIG)
+        config.update(tls_hosts=[], ready_urls=[])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'fresh.edubackup.enc').write_bytes(b'not-verified')
+            (root / 'fresh.edubackup.enc.sha256').write_text('not-verified')
+            config.update(backup_roots=[tmp], cos_backup_receipt=str(root / 'receipt.json'), periodic_backup_status=str(root / 'status.json'))
+            receipt = {'at': m.dt.datetime.now(m.dt.timezone.utc).isoformat(), 'status': 'VERIFIED',
+                       'restore': {'status': 'PASS'}, 'objects': [{'downloadVerified': True, 'authenticatedDecryptionVerified': True}]}
+            (root / 'receipt.json').write_text(json.dumps(receipt))
+            for status, expected in [('VERIFIED', 'ok'), ('FAILED', 'critical')]:
+                (root / 'status.json').write_text(json.dumps({'status': status}))
+                with patch.object(m, 'command', side_effect=RuntimeError('no docker')):
+                    _, checks = m.collect(config)
+                self.assertEqual(next(c['level'] for c in checks if c['key'] == 'periodic_backup_success'), expected)
+            receipt['at'] = '2020-01-01T00:00:00+00:00'
+            (root / 'receipt.json').write_text(json.dumps(receipt)); (root / 'status.json').write_text(json.dumps({'status': 'VERIFIED'}))
+            with patch.object(m, 'command', side_effect=RuntimeError('no docker')):
+                data, checks = m.collect(config)
+            self.assertEqual(next(c['level'] for c in checks if c['key'] == 'periodic_backup_success'), 'critical')
+            self.assertLess(data['local_backup']['age_seconds'], 5)
+
 
 if __name__ == '__main__':
     unittest.main()

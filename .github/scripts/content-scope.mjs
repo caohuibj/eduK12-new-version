@@ -79,6 +79,9 @@ const maintenanceRoutingFiles = new Set([
 ]);
 const monitorRoot = 'server-version/scripts/host-ops/';
 const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
+  'backup.py','backup-cos.cjs','backup-cos.test.mjs','backup-crypto.mjs','backup-config.example.json',
+  'test_backup.py','ci-backup-smoke.py','install-backup.sh','BACKUP-AUTOMATION.md',
+  'systemd/eduk12-database-backup.service','systemd/eduk12-database-backup.timer',
   'systemd/eduk12-ops-monitor.service','systemd/eduk12-ops-monitor.timer'].map(file => monitorRoot + file));
 export function maintenanceFile(file) { return attachmentFiles.has(file) || monitorFiles.has(file); }
 export function maintenanceChange(files) {
@@ -120,7 +123,7 @@ export function classifyChanges(entries, forceFull = false) {
     newMode === '100644' && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && oldMode === '100644')));
   const maintenanceChanges = entries.every(({ file, status, oldMode, newMode }) => {
-    const executable = [attachmentRoot + 'runner.py', attachmentRoot + 'install.sh', monitorRoot + 'install.sh'].includes(file);
+    const executable = [attachmentRoot + 'runner.py', attachmentRoot + 'install.sh', monitorRoot + 'install.sh', monitorRoot + 'install-backup.sh'].includes(file);
     const modes = executable ? ['100644','100755'] : ['100644'];
     return modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && modes.includes(oldMode)));

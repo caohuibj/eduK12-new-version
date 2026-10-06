@@ -1,0 +1,33 @@
+[Unit]
+Description=eduK12 encrypted database and server configuration backup to private COS
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 -B /opt/eduk12-backups/current/backup.py backup
+TimeoutStartSec=2400
+TimeoutStopSec=90
+UMask=0077
+StateDirectory=eduk12-backups
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=read-only
+# Docker bind mounts must see the actual /var/lib workspace, not private /tmp.
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/eduk12-backups
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=50%
+MemoryMax=1536M
+TasksMax=128
+StandardOutput=journal
+StandardError=journal

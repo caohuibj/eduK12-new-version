@@ -37,5 +37,6 @@
     "/etc/systemd/system/eduk12-ops-monitor.service",
     "/etc/systemd/system/eduk12-ops-monitor.timer"
   ],
-  "cos_backup_receipt": "/opt/eduk12-new/deploy/cos-backup-migration-20261005/manifest.json"
+  "cos_backup_receipt": "/var/lib/eduk12-backups/latest.json",
+  "periodic_backup_status": "/var/lib/eduk12-backups/status.json"
 }
