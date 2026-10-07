@@ -397,10 +397,9 @@ const createScaleAndFormCompletionFixture = async () => {
     data: {
       code: `PR8-COLLECTION-${suffix}`,
       name: 'PR8 scale/form completion fixture',
-      status: 'PUBLISHED',
+      status: 'DRAFT',
       courseId,
       createdBy: userId,
-      publishedAt: new Date(),
     },
   })
   createdCompositeAssessmentIds.push(composite.id)
@@ -427,6 +426,10 @@ const createScaleAndFormCompletionFixture = async () => {
   // the same transaction. This fixture creates items directly, so it must
   // materialize the section before the pure-read start path can serve it.
   await ensureCompositeFormSections(composite.id)
+  await prisma.compositeAssessment.update({
+    where: { id: composite.id },
+    data: { status: 'PUBLISHED', publishedAt: new Date() },
+  })
   const started = await compositeService.startUserAttempt(userId, composite.id)
   return {
     attemptId: started.attempt.id,

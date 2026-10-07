@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { list } = vi.hoisted(() => ({ list: vi.fn() }))
-vi.mock('../../services/studentTasks', () => ({ listStudentTasks: list, taskStates: ['PENDING', 'IN_PROGRESS', 'UPCOMING', 'EXPIRED', 'COMPLETED', 'UNAVAILABLE'] }))
+vi.mock('../../services/studentTasks', async importOriginal => ({
+  ...await importOriginal<typeof import('../../services/studentTasks')>(),
+  listStudentTasks: list,
+}))
 vi.mock('../../config/database', () => ({ prisma: {} }))
+import { taskFilters } from '../../services/studentTasks'
 import { studentTaskList } from '../../controllers/studentTaskController'
 import { requireStudent } from '../../middleware/auth'
 const response = () => {
@@ -23,6 +27,13 @@ describe('student task endpoint', () => {
     const res = response()
     await studentTaskList({ user: { userId: 'mine' }, query: { userId: 'other' } } as any, res)
     expect(list).toHaveBeenCalledWith('mine', { page: 1, pageSize: 20 })
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0 }))
+  })
+  it.each(taskFilters)('forwards the supported %s filter for the authenticated student', async state => {
+    list.mockResolvedValue({ list: [], total: 0 })
+    const res = response()
+    await studentTaskList({ user: { userId: 'mine' }, query: { state, userId: 'other' } } as any, res)
+    expect(list).toHaveBeenCalledWith('mine', { page: 1, pageSize: 20, state })
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0 }))
   })
   it.each([{ page: '0' }, { page: '1.5' }, { pageSize: '101' }, { pageSize: '-1' }, { state: 'unknown' }, { page: ['1', '2'] }])('rejects invalid queries before reading (%j)', async query => {
