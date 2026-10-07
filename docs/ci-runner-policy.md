@@ -141,6 +141,27 @@ the independent backend/database gates.
 
 ## Resource and cleanup policy
 
+### Beijing production host: download and maintenance notes
+
+The production server is in Beijing. Server maintenance, release builds and local
+runner downloads must default to verified mainland mirrors or the existing
+controlled acceleration path. Use the configured Tencent container registry
+accelerator, `https://registry.npmmirror.com` for npm/native binaries, Tsinghua
+`debian`/`debian-security` for Debian, and the verified
+`https://mirrors.aliyun.com/alpine` source for Alpine security updates. The official
+Alpine CDN was slow inside the release builder; the Tsinghua Alpine endpoint
+returned HTTP 403 in that same container, while Aliyun served the signed index.
+
+Keep package/base-image versions, lockfile integrity, official package signing
+keys, TLS verification and HIGH/CRITICAL scan thresholds. Continue runtime security
+updates before scanning the actual production image. A mirror change must not
+skip upgrades or audits; use the official audit endpoint if a package mirror does
+not implement auditing. If a mirror is unavailable or stale, record that evidence
+before using a trusted official fallback. Verify the affected download/build and
+original security scan before release; no unrelated full CI is needed for an
+operator download setting. Preserve the immutable source checkout and record
+operator recipe hashes, mirror URLs and actual image IDs in the release proof.
+
 Mac uses the dedicated non-admin `eduk12ci` account and label `eduk12-mac-ci`.
 Frontend uses the existing 3072 MiB Node heap and test worker limits. Routing requires
 8 GiB disk headroom (5 GiB reserve plus a provisional 3 GiB working allowance), then
