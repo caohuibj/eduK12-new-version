@@ -188,7 +188,9 @@ def wait_for_database(name, user, database):
         if remaining <= 0:
             raise RuntimeError('ISOLATED_RESTORE_NOT_READY')
         try:
-            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', user, '-d', database],
+            # The entrypoint's temporary initialization server is socket-only
+            # and shuts down before normal startup. Wait for the final TCP server.
+            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-h', '127.0.0.1', '-U', user, '-d', database],
                                     capture_output=True, timeout=min(10, remaining))
             if result.returncode == 0 and time.monotonic() < deadline:
                 return

@@ -6,6 +6,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import uuid
 import backup
 
@@ -37,9 +39,31 @@ def main():
         work = Path(temp); backup.STATE = work; backup.NODE = shutil.which('node')
         secret = 'synthetic-host-backup-ci-key-0123456789'
         envfile = work/'fixture.env';envfile.write_text('POSTGRES_USER=fixture\nPOSTGRES_DB=fixture\nPOSTGRES_PASSWORD=synthetic-ci-only\n');envfile.chmod(0o600)
+        bootstrap = work/'pause-bootstrap.sh'
+        bootstrap.write_text('#!/bin/sh\nset -eu\ntouch /tmp/bootstrap-paused\nwhile [ ! -e /tmp/release-startup ]; do sleep 0.1; done\n')
+        bootstrap.chmod(0o755)
         try:
-            docker('run','-d','--name',name,'--label','eduk12.ci.fixture='+ident,'--network','none','--memory','384m','--cpus','0.5','--env-file',str(envfile),image)
-            backup.wait_for_database(name, 'fixture', 'fixture')
+            docker('run','-d','--name',name,'--label','eduk12.ci.fixture='+ident,'--network','none','--memory','384m','--cpus','0.5','--env-file',str(envfile),'--mount','type=bind,src='+str(bootstrap)+',dst=/docker-entrypoint-initdb.d/00-pause.sh,readonly',image)
+            deadline = time.monotonic() + 60
+            while docker('exec',name,'test','-f','/tmp/bootstrap-paused',check=False).returncode:
+                assert time.monotonic() < deadline, 'bootstrap fixture did not start'
+                time.sleep(0.2)
+            # PostgreSQL's bootstrap server accepts Unix sockets, but is stopped
+            # before the real TCP service starts. It must not permit a restore.
+            assert docker('exec',name,'pg_isready','-U','fixture','-d','fixture').returncode == 0
+            assert docker('exec',name,'pg_isready','-h','127.0.0.1','-U','fixture','-d','fixture',check=False).returncode != 0
+            ready = threading.Event(); errors = []
+            def probe():
+                try: backup.wait_for_database(name, 'fixture', 'fixture')
+                except Exception as error: errors.append(error)
+                finally: ready.set()
+            waiter = threading.Thread(target=probe, daemon=True); waiter.start()
+            try:
+                assert not ready.wait(1), 'temporary Unix-socket bootstrap server accepted as ready'
+            finally:
+                docker('exec',name,'touch','/tmp/release-startup')
+                waiter.join(95)
+            assert ready.is_set() and not errors, 'final database did not become ready'
             expected=[{'name':'synthetic','checksum':'a'*64}]
             sql='CREATE TABLE "_prisma_migrations" (id text, migration_name text, checksum text, finished_at timestamp, rolled_back_at timestamp); INSERT INTO "_prisma_migrations" VALUES (\'synthetic\',\'synthetic\',\''+'a'*64+'\',now(),NULL); CREATE TABLE users(id text); INSERT INTO users VALUES (\'synthetic-user\');'
             docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',sql)
@@ -69,7 +93,7 @@ def main():
                 docker('rm','-f','-v',name)
     assert set(docker('ps','-aq').stdout.split())==containers
     assert set(docker('volume','ls','-q').stdout.split())==volumes
-    print(json.dumps({'execution':'local' if local else 'hosted-ci','encryptedBackup':'PASS','actualIsolatedRestore':'PASS','wrongReleaseFailureCleanup':'PASS','checksumFailureCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
+    print(json.dumps({'execution':'local' if local else 'hosted-ci','bootstrapReadinessIsolation':'PASS','encryptedBackup':'PASS','actualIsolatedRestore':'PASS','wrongReleaseFailureCleanup':'PASS','checksumFailureCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
 
 
 if __name__=='__main__':main()
