@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database'
+import type { Prisma } from '@prisma/client'
 import { logger } from '../../utils/logger'
 import { decryptCognitivePayload } from './cognitive.security'
 import type { PaginationParams } from '../../utils/pagination'
@@ -16,14 +17,17 @@ type HistoryRow = {
   finishedAt: Date | null
   score: number | null
   qualityState: 'interpretable' | 'limited' | 'invalid'
+  source: 'standalone' | 'composition'
+  sourceName: string | null
+  reportHref: string
 }
 
 /** 学生自己的已完成记录；不返回 raw trial、密文或详细 metrics。 */
 export const listMyHistory = async (userId: string, pagination: PaginationParams) => {
-  const where = {
+  const where: Prisma.CognitiveSessionWhereInput = {
     userId,
     status: 'COMPLETED' as const,
-    compositeAttemptId: null,
+    AND: [{ OR: [{ compositeAttemptId: null }, { compositeAttempt: { userId, assignmentRef: null, compositeAssessment: { productKind: { in: ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'] }, reportPackageKey: null, analysisProtocolKey: null } } }] }],
     OR: [
       { scoreEncrypted: { not: null }, qualityFlagsEncrypted: { not: null } },
       { resultSnapshotEncrypted: { not: null } },
@@ -45,17 +49,24 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
       qualityFlagsEncrypted: true,
       resultSnapshotEncrypted: true,
       assignment: { select: { title: true } },
+      compositeAttempt: { select: { id: true, status: true, compositeAssessment: { select: { name: true } } } },
     },
   })
 
   const displayable: HistoryRow[] = []
   for (const session of sessions) {
+    const source = {
+      source: session.compositeAttempt ? 'composition' as const : 'standalone' as const,
+      sourceName: session.compositeAttempt?.compositeAssessment.name ?? null,
+      reportHref: `/student/cognitive/sessions/${session.id}/result`,
+    }
     try {
       if (session.resultSnapshotEncrypted) {
         const snapshot = parseCognitiveResultSnapshot(
           decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted),
         )
         displayable.push({
+          ...source,
           sessionId: session.id,
           assignmentId: session.assignmentId,
           title: session.assignment?.title ?? `${session.testType} 测评`,
@@ -76,6 +87,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
         session.qualityFlagsEncrypted as string
       )
       displayable.push({
+        ...source,
         sessionId: session.id,
         assignmentId: session.assignmentId,
         title: session.assignment?.title ?? `${session.testType} 测评`,

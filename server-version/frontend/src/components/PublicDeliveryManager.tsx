@@ -1,4 +1,5 @@
 import { AnonymousStudyManager } from './AnonymousStudyManager'
+import LocalDateTimeInput, { parseLocalDateTime } from './LocalDateTimeInput'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily, type PublicDeliveryLink } from '../api/publicDelivery'
 
@@ -25,8 +26,8 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     finally{if(current===generation.current)setBusy(false)}
   }
   const create=()=>act(async()=>{
-    const expiry=new Date(expiresAt)
-    if(!expiresAt || !Number.isFinite(expiry.getTime())) throw new Error('请选择有效期')
+    const expiry=parseLocalDateTime(expiresAt)
+    if(!expiry) throw new Error('请选择有效期，格式为年-月-日 时:分')
     if(maximumExpiry && expiry.getTime()>Date.parse(maximumExpiry)) throw new Error('链接有效期不能晚于测评截止时间，请先在测评设置中调整截止时间')
     if(!maxUses.trim()) throw new Error('请填写最大参与次数，0 表示不限')
     const current=generation.current
@@ -61,7 +62,7 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
       <div className="flex gap-3"><button disabled={busy} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>
     </article>})}
     {canCreate ? <div className="flex flex-wrap gap-3 items-end">
-      <label className="grid gap-1">有效期<input type="datetime-local" value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>
+      <label className="grid gap-1">有效期<LocalDateTimeInput value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>
       <label className="grid gap-1">最大参与次数（0 表示不限）<input type="number" min="0" max="2147483647" step="1" value={maxUses} onChange={e=>setMaxUses(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>
       <button disabled={busy} className="btn-primary" onClick={()=>void create()}>生成新链接</button>
       {maximumExpiry && <p className="w-full text-sm text-gray-600">测评截止：{new Date(maximumExpiry).toLocaleString()}</p>}

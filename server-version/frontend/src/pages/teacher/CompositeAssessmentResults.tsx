@@ -56,8 +56,8 @@ const CompositeAssessmentResults: React.FC = () => {
   useEffect(() => { void load() }, [id, status, q, page])
 
   const openReport = (row: CompositeTeacherAttemptRow) => {
-    if (row.status !== 'COMPLETED') return
-    navigate(`/composite-assessments/${id}/attempts/${row.id}/report`)
+    if (row.status !== 'COMPLETED' && !row.partialReportAvailable) return
+    navigate(`/composite-assessments/${id}/attempts/${row.id}/report${row.status === 'COMPLETED' ? '' : '?partial=1'}`)
   }
 
   const counts = data?.attemptCounts
@@ -142,11 +142,11 @@ const CompositeAssessmentResults: React.FC = () => {
                     <button
                       type="button"
                       className="btn-secondary py-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={row.status !== 'COMPLETED'}
-                      title={row.status === 'COMPLETED' ? '查看报告' : '完成后方可查看报告'}
+                      disabled={row.status !== 'COMPLETED' && !row.partialReportAvailable}
+                      title={row.status === 'COMPLETED' ? '查看报告' : row.partialReportAvailable ? '只读查看已完成单项' : '完成后方可查看报告'}
                       onClick={() => openReport(row)}
                     >
-                      查看
+                      {row.status === 'COMPLETED' ? '查看' : row.partialReportAvailable ? '已完成单项' : '查看'}
                     </button>
                   </td>
                 </tr>

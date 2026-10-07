@@ -118,6 +118,7 @@ export const compositeExportQuerySchema = z.object({
 })
 
 export const compositeReportQuerySchema = z.object({
+  partial: z.literal('1').optional(),
   snapshotId: z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/).optional(),
 }).strict()
 

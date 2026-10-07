@@ -1,4 +1,5 @@
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
+import LocalDateTimeInput, { parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import api from '../../api/client'
@@ -38,9 +39,11 @@ export function BundleProducts() {
     if (!chosen) return
     setBusy(true); setError('')
     try {
+      const expiry = expiresAt ? parseLocalDateTime(expiresAt) : null
+      if (publicEnabled && !expiry) throw new Error('请填写有效截止时间，格式为年-月-日 时:分')
       const payload = { name: name || chosen.name,
         bundleKey: chosen.bundleKey, bundleVersion: chosen.bundleVersion, courseId: courseId || null, publicEnabled,
-        expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+        expiresAt: expiry?.toISOString() ?? null,
         bindings: chosen.slots.filter((slot:any)=>slot.unitType!=='FORM').map((slot:any)=>({slotKey:slot.slotKey,
           ...(bindings[slot.slotKey]?{resourceId:bindings[slot.slotKey]}:{})})) }
       const fingerprint=JSON.stringify(payload)
@@ -70,7 +73,7 @@ export function BundleProducts() {
       <label className="block space-y-1">投放课程<select aria-label="投放课程" className="input w-full" value={courseId} onChange={e=>setCourse(e.target.value)}><option value="">仅公开投放</option>
         {resources.courses.map((v:any)=><option key={v.id} value={v.id}>{v.title}</option>)}</select></label>
       <label className="block space-y-1"><input type="checkbox" checked={publicEnabled} onChange={e=>setPublic(e.target.checked)} />允许匿名参与</label>
-      {publicEnabled && <label className="block space-y-1">截止时间<input type="datetime-local" value={expiresAt} onChange={e=>setExpiry(e.target.value)} /><span className="block text-sm text-gray-600">按浏览器时区 {Intl.DateTimeFormat().resolvedOptions().timeZone} 输入，保存时转换为 UTC。</span></label>}
+      {publicEnabled && <label className="block space-y-1">截止时间<LocalDateTimeInput value={expiresAt} onChange={e=>setExpiry(e.target.value)} /><span className="block text-sm text-gray-600">按浏览器时区 {Intl.DateTimeFormat().resolvedOptions().timeZone} 输入，保存时转换为 UTC。</span></label>}
       {chosen.slots.filter((v:any)=>['SCALE','COGNITIVE'].includes(v.unitType)).map((slot:any)=><label className="block" key={slot.slotKey}>
         {slot.slotKey} · {slot.instrumentKey} {slot.instrumentVersion}
         <select aria-label={slot.slotKey} className="input w-full" value={bindings[slot.slotKey] || ''} onChange={e=>setBindings({...bindings,[slot.slotKey]:e.target.value})}>

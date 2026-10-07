@@ -9,6 +9,8 @@ datasource db {
 }
 
 model User {
+  compositionTemplates AssessmentCompositionTemplate[]
+  assessmentManagementEvents AssessmentManagementEvent[]
   scalePublicationAudits ScalePublicationAudit[]
   id                                  String                           @id @default(uuid())
   username                            String                           @unique
@@ -1108,6 +1110,7 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  compositionTemplates AssessmentCompositionTemplate[]
   productKind         String @default("LEGACY_COMPOSITE") @map("product_kind")
   questionnaireType   QuestionnaireType? @map("questionnaire_type")
   revision            Int @default(0)
@@ -1156,6 +1159,34 @@ model CompositeAssessment {
   @@index([copyable, status])
   @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
   @@map("composite_assessments")
+}
+
+// Private reusable definitions. Prototype drafts contain no deliveries/answers.
+model AssessmentCompositionTemplate {
+  id String @id @default(uuid())
+  ownerId String @map("owner_id")
+  definitionId String @unique @map("definition_id")
+  name String
+  requestKey String @unique @map("request_key")
+  requestHash String @map("request_hash")
+  archivedAt DateTime? @map("archived_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  definition CompositeAssessment @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+  @@index([ownerId, createdAt])
+  @@map("assessment_composition_templates")
+}
+
+model AssessmentManagementEvent {
+  id String @id @default(uuid())
+  actorId String @map("actor_id")
+  resourceId String @map("resource_id")
+  action String
+  metadata Json
+  createdAt DateTime @default(now()) @map("created_at")
+  actor User @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  @@index([actorId, createdAt])
+  @@map("assessment_management_events")
 }
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
@@ -1463,6 +1494,7 @@ enum ClassroomStatus {
 
 // 课堂表
 model Classroom {
+  endSummary ClassroomEndSummary?
   id              String          @id @default(uuid())
   code            String          @unique // 课堂码（6位数字）
   name            String // 课堂名称
@@ -1488,6 +1520,16 @@ model Classroom {
   @@index([status])
   @@index([creatorId])
   @@map("classrooms")
+}
+
+model ClassroomEndSummary {
+  classroomId String @id @map("classroom_id")
+  createdBy String @map("created_by")
+  frozenAt DateTime @default(now()) @map("frozen_at")
+  payload Json
+  contentHash String @map("content_hash")
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  @@map("classroom_end_summaries")
 }
 
 // 课堂会话表（学生参与记录）

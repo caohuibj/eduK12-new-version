@@ -2,8 +2,14 @@ import { Router } from 'express'
 import { classroomController } from '../controllers/classroomController'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import { requireClassroomManager } from '../middleware/classroomAccess'
+import { classroomEndSummary } from '../services/classroomEndSummary'
+import { success, error } from '../utils/response'
 
 const router = Router()
+for (const method of ['get', 'post'] as const) router[method]('/:id/summary', authenticate, requireTeacher, requireClassroomManager(), async (req, res, next) => {
+  try { return success(res, await classroomEndSummary(req.user!, req.params.id, method === 'post')) }
+  catch (e: any) { if (e.statusCode) return error(res, e.message, -1, e.statusCode); return next(e) }
+})
 
 // ==================== 公开接口 ====================
 

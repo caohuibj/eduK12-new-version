@@ -18,6 +18,21 @@ export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: strin
   await db.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended($1, 0))', `cognitive-quota:${sourceId}:${userId}`)
 }
 
+export async function readCognitiveQuota(db: Tx, userId: string, assignmentId: string) {
+  const source = await cognitiveQuotaSource(db, assignmentId)
+  const where = { userId, OR: [
+    { assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } },
+    { compositeItem: { cognitiveAssignmentId: source.id } }, { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
+  ] }
+  const used = await db.cognitiveSession.count({ where })
+  const session = await db.cognitiveSession.findFirst({ where: { ...where, status: 'IN_PROGRESS', OR: [
+    { AND: [{ OR: where.OR }, { compositeAttemptId: null }] },
+    { AND: [{ OR: where.OR }, { compositeAttempt: { userId, assignmentRef: null, compositeAssessment: { reportPackageKey: null, analysisProtocolKey: null } } }] },
+  ] }, orderBy: { createdAt: 'desc' }, select: { id: true, compositeAttemptId: true } })
+  return { maxAttempts: source.maxAttempts, usedAttempts: used, remainingAttempts: Math.max(0, source.maxAttempts - used),
+    continueHref: session ? session.compositeAttemptId ? `/student/composite/attempts/${session.compositeAttemptId}` : `/student/cognitive/sessions/${session.id}` : null }
+}
+
 /** Caller holds this lock until the new session has been inserted. Counts all
  * statuses and exact historical item bindings, regardless of participant key. */
 export async function admitCognitiveAttempt(db: Tx, userId: string, assignmentId: string) {

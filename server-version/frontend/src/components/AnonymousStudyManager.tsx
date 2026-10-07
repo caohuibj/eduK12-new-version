@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import LocalDateTimeInput, { parseLocalDateTime } from './LocalDateTimeInput'
 import { anonymousStudyApi, type Study, type WaveStatistics } from '../api/anonymousStudy'
 import { sessionFetch } from '../api/client'
 import { publicDeliveryAdapter, type PublicDeliveryLink } from '../api/publicDelivery'
@@ -40,7 +41,7 @@ export function AnonymousStudyManager({compositeId,links,canCreate=true,maximumE
  })
  const createWave=async()=>{
   if(busy || !canCreate)return
-  const expiry=Date.parse(waveExpiry),quota=Number(waveMaxUses)
+  const expiry=parseLocalDateTime(waveExpiry)?.getTime() ?? NaN,quota=Number(waveMaxUses)
   if(!waveTitle.trim()){setError('请填写本波次名称');return}
   if(!waveExpiry || !Number.isFinite(expiry) || expiry<=Date.now()){setError('请选择未来的波次有效期');expiryField.current?.focus();return}
   if(maximumExpiry && expiry>Date.parse(maximumExpiry)){setError('波次有效期不能晚于测评截止时间');expiryField.current?.focus();return}
@@ -86,7 +87,7 @@ export function AnonymousStudyManager({compositeId,links,canCreate=true,maximumE
    {studies.find(s=>s.id===selected)?.status==='ACTIVE' && canCreate && <div className="space-y-3 rounded border p-3">
     <h4 className="font-semibold">建立新波次</h4><p className="text-sm">填写本波次设置后，一次建立波次和对应的公开链接，无需先生成链接。</p>
     <label className="grid gap-2">本波次名称<input className="input" disabled={busy} value={waveTitle} onChange={e=>setWaveTitle(e.target.value)} maxLength={120}/></label>
-    <label className="grid gap-2">波次有效期<input ref={expiryField} type="datetime-local" className="input" disabled={busy} value={waveExpiry} onChange={e=>setWaveExpiry(e.target.value)}/></label>
+    <label className="grid gap-2">波次有效期<LocalDateTimeInput ref={expiryField} className="input" disabled={busy} value={waveExpiry} onChange={e=>setWaveExpiry(e.target.value)}/></label>
     <label className="grid gap-2">波次最大参与次数（0 表示不限）<input type="number" min="0" max="2147483647" step="1" className="input" disabled={busy} value={waveMaxUses} onChange={e=>setWaveMaxUses(e.target.value)}/></label>
     <button className="btn-primary" disabled={busy} onClick={()=>void createWave()}>{busy?'正在建立…':'建立波次并生成链接'}</button>
     <details><summary>使用已有未使用链接（高级）</summary>{links.filter(l=>l.isActive && l.usedCount===0 && Date.parse(l.expiresAt)>Date.now() && !stats?.list.some(w=>w.tokenId===l.id)).map(link=><button key={link.id} className="btn-secondary mr-2" disabled={busy || !waveTitle.trim()} onClick={()=>void add(link)}>用 {link.createdAt?new Date(link.createdAt).toLocaleString():'新'} 链接建立波次</button>)}</details>

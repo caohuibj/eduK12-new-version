@@ -38,6 +38,9 @@ const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
 const ScaleLibrary = React.lazy(() => import('./pages/ScaleLibrary'))
 const QuestionnaireProductList = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductList })))
 const QuestionnaireProductEdit = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductEdit })))
+const AssessmentWorkbench = React.lazy(() => import('./pages/teacher/AssessmentWorkbench'))
+const AssessmentTemplates = React.lazy(() => import('./pages/questionnaire/AssessmentTemplates'))
+const AssessmentManagement = React.lazy(() => import('./pages/questionnaire/AssessmentManagement'))
 const QuestionnaireList = React.lazy(() => import('./pages/QuestionnaireList'))
 const QuestionnaireEdit = React.lazy(() => import('./pages/QuestionnaireEdit'))
 const TeacherCourseDetail = React.lazy(() => import('./pages/teacher/TeacherCourseDetail'))
@@ -266,6 +269,9 @@ function AppRoutes() {
           />
 
           {/* Admin/Teacher Routes */}
+          <Route path="/assessment-workbench" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentWorkbench /></ProtectedRoute>} />
+          <Route path="/assessment-templates" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentTemplates /></ProtectedRoute>} />
+          <Route path="/assessment-management" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentManagement /></ProtectedRoute>} />
           <Route
             path="/dashboard"
             element={

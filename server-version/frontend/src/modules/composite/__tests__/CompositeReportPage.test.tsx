@@ -6,6 +6,7 @@ import CompositeReportPage from '../CompositeReportPage'
 const { mockCompositeApi, authState } = vi.hoisted(() => ({
   mockCompositeApi: {
     report: vi.fn(),
+    partialReport: vi.fn(),
     teacherReport: vi.fn(),
     snapshots: vi.fn(),
     reanalyze: vi.fn(),
@@ -30,6 +31,17 @@ beforeEach(() => {
 })
 
 describe('CompositeReportPage cognitive module', () => {
+  it('marks an unfinished collection as read-only partial and never asks for package analysis', async () => {
+    authState.user = { role: 'STUDENT' }
+    mockCompositeApi.partialReport.mockResolvedValue({ code: 0, data: { id: 'partial-attempt', assessmentId: 'q', name: '部分结果', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', reportState: 'PARTIAL', completedAt: null, totalTime: null, anonymousCode: null, backgroundValues: [], unitReports: [] } })
+    render(<MemoryRouter initialEntries={['/student/composite/attempts/partial-attempt/report?partial=1']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。')).toBeInTheDocument()
+    expect(screen.getByText('暂无已完成单项')).toBeInTheDocument()
+    expect(mockCompositeApi.partialReport).toHaveBeenCalledWith('partial-attempt')
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
+    expect(mockCompositeApi.snapshots).not.toHaveBeenCalled()
+  })
   it('does not show 分 or raw JSON when a frozen single-task report is present', async () => {
     mockCompositeApi.report.mockResolvedValue({
       code: 0,

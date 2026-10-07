@@ -25,6 +25,8 @@ const files = [
   'cognitive/export.service.test.ts',
   'services/studentTasks.test.ts',
   'questionnaire/product.postgres.integration.test.ts',
+  'questionnaire/workbench.postgres.integration.test.ts',
+  'cognitive/history.service.test.ts',
   'bundle-product/product.postgres.integration.test.ts',
   'bundle-onboarding/lifecycle.postgres.integration.test.ts',
   'situational/sjt-authoring.postgres.integration.test.ts',

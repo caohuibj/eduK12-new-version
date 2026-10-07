@@ -241,10 +241,27 @@ suite('Four-type Questionnaire production lifecycle', () => {
     await scaleSubmit.submitScaleAssessmentFinal(scaleInput)
     const partial = await runtime.listAttemptsForTeacher(actor.userId, actor.role, row.id, { page: 1, pageSize: 20 })
     expect(partial.list.find((attempt: any) => attempt.id === attemptId)).toMatchObject({ progress: 50, completedItems: 2, progressUnavailableReason: null })
+    const parentBefore = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })
+    const participantPartial = await runtime.getPartialReport(attemptId, student)
+    expect(participantPartial).toMatchObject({ reportState: 'PARTIAL', completedAt: null })
+    expect(participantPartial.unitReports.map((unit: any) => unit.type)).toEqual(['SCALE'])
+    expect(participantPartial.backgroundValues).toEqual([])
+    expect((await runtime.getReportForTeacher(actor.userId, actor.role, row.id, attemptId, undefined, true)).unitReports.map((unit: any) => unit.type)).toEqual(['SCALE'])
+    await expect(runtime.getPartialReport(attemptId, student2)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(runtime.getReportForTeacher(other.userId, other.role, row.id, attemptId, undefined, true)).rejects.toMatchObject({ statusCode: 403 })
+    expect(await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })).toEqual(parentBefore)
     expect(await scaleSubmit.submitScaleAssessmentFinal(scaleInput)).toMatchObject({replayed:true})
     const cog=await db.cognitiveSession.findFirstOrThrow({where:{compositeAttemptId:attemptId},include:{assignment:true}})
     await cogSubmit.submitCognitiveSessionFinal(student,{sessionId:cog.id,submissionId:randomUUID(),attemptEpoch:1,definitionHash:cog.assignment!.resolvedConfigHash!,contextSnapshotHash:null,
       trials:gonogoSequence(cog.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1000,endedAtPerfMs:trialIndex*1000+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))})
+    const { listMyHistory } = await import('../../modules/cognitive/history.service')
+    const history = await listMyHistory(student, { page: 1, pageSize: 100, skip: 0, take: 100 })
+    expect(history.list.find(entry => entry.sessionId === cog.id)).toMatchObject({ source: 'composition', sourceName: row.name, score: null, reportHref: `/student/cognitive/sessions/${cog.id}/result` })
+    const { courseOverview } = await import('../../modules/questionnaire-product/workbench')
+    const overview = await courseOverview(actor, course1, {})
+    expect(overview.quality.find(entry => entry.id === cog.id)).toMatchObject({ status: 'COMPLETED', qualityState: 'interpretable', reportHref: `/composite-assessments/${row.id}/attempts/${attemptId}/report?partial=1` })
+    expect(JSON.stringify(overview)).not.toContain('medianRtMs')
+    expect(JSON.stringify(overview)).not.toContain('resultSnapshotEncrypted')
     const child=await db.situationalAttempt.findFirstOrThrow({where:{compositeAttemptId:attemptId}})
     await sjtSubmit.submitSituationalAttemptFinal({
       attemptId:child.id,userId:student,submissionId:randomUUID(),attemptEpoch:1,definitionHash:child.definitionHash,instrumentVersion:child.instrumentVersion,compiledRuntimeHash:child.compiledRuntimeHash,scoringVersion:child.scoringVersion,
@@ -463,6 +480,9 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const sessions = await db.cognitiveSession.findMany({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })
     expect(sessions).toHaveLength(1)
     const active = sessions[0]
+    const { readCognitiveQuota } = await import('../../modules/cognitive/attempt-quota')
+    const quota = await db.$transaction(tx => readCognitiveQuota(tx, student, source.id))
+    expect(quota).toMatchObject({ maxAttempts: 1, usedAttempts: 1, remainingAttempts: 0, continueHref: active.compositeAttemptId ? `/student/composite/attempts/${active.compositeAttemptId}` : `/student/cognitive/sessions/${active.id}` })
     if (active.compositeAttemptId) {
       const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: active.compositeAttemptId } })
       expect((await runtime.startUserAttempt(student, parent.compositeAssessmentId)).attempt.id).toBe(parent.id)

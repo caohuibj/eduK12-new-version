@@ -74,7 +74,7 @@ const CognitiveHistory: React.FC = () => {
           {items.map((item) => (
             <DiscoveryCard
               key={item.sessionId}
-              to={`/student/cognitive/sessions/${item.sessionId}/result`}
+              to={item.reportHref || `/student/cognitive/sessions/${item.sessionId}/result`}
               title={item.title}
               ariaLabel={`${item.title}，查看尝试 ${item.attemptNo} 的结果`}
               leading={(
@@ -87,7 +87,7 @@ const CognitiveHistory: React.FC = () => {
                   {item.score === null ? '查看结果' : `得分 ${Math.round(item.score)}`}
                 </span>
               )}
-              description={qualityLabel(item.qualityState)}
+              description={`${item.source === 'composition' ? `组合测评 · ${item.sourceName} · ` : '独立任务 · '}${qualityLabel(item.qualityState)}`}
               meta={(
                 <>
                   <span>{item.testType} / {item.engineVersion}</span>

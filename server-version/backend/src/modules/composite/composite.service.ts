@@ -1255,6 +1255,7 @@ export const listAttemptsForTeacher = async (
         id: true,
         status: true,
         progress: true,
+        assignmentRef: true,
         completedItems: true,
         runtimeGeneration: true,
         attemptEpoch: true,
@@ -1296,7 +1297,7 @@ export const listAttemptsForTeacher = async (
       courseId: composite.courseId,
     },
     attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
-    list: attempts.map(attempt => mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, headersByAttempt.get(attempt.id) ?? []) })),
+    list: attempts.map(attempt => ({ ...mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, headersByAttempt.get(attempt.id) ?? []) }), partialReportAvailable: !attempt.assignmentRef && ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(composite.productKind) && !composite.reportPackageKey && !composite.analysisProtocolKey })),
     page: query.page,
     pageSize: query.pageSize,
     total,
@@ -4709,6 +4710,30 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   return projectHttpReport(attempt, 'participant')
 }
 
+/** Reads completed, frozen children without finalizing the aggregate or admitting a new unit. */
+async function projectPartialReport(attempt: any, audience: CompositeReportAudience) {
+  const definition = attempt.compositeAssessment
+  if (attempt.assignmentRef || !['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(definition.productKind) || definition.reportPackageKey || definition.analysisProtocolKey) throw compositeNotFound('该产品不提供通用单项预览')
+  if (attempt.status === 'COMPLETED') return projectHttpReport(attempt, audience)
+  let finalized: Set<string> | null = null
+  if (attempt.runtimeGeneration === 'UNIFIED_V1') {
+    const headers = await prisma.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch } })
+    if (frozenCompositeProgress(attempt, headers)?.progressUnavailableReason) throw compositeConflict('冻结记录需要核对，暂不能读取单项结果')
+    const frozen = decryptFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    const slots = new Set(frozen.slots.map(slot => slot.slotKey))
+    finalized = new Set(headers.filter(row => row.terminalState === 'COMPLETED' && slots.has(row.slotKey)).map(row => row.sourceAttemptId))
+  }
+  const completed = (children: any[]) => [...latestChildrenByItem(children).values()].filter(child => child.status === 'COMPLETED' && (child.attemptEpoch === undefined || child.attemptEpoch === attempt.attemptEpoch) && (!finalized || finalized.has(child.id)))
+  const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
+  const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
+  const projected = projectCompositeCollectionReport(buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } }), audience)
+  return { ...projected, reportState: 'PARTIAL' as const, completedAt: null, totalTime: null }
+}
+
+export async function getPartialReport(attemptId: string, userId: string) {
+  return projectPartialReport(await findAttempt(attemptId, { userId }, true), 'participant')
+}
+
 export const getAnalysisExportForParticipant = async (
   attemptId: string,
   context: { userId?: string; recoveryTokenHash?: string },
@@ -4908,6 +4933,7 @@ export const getReportForTeacher = async (
   compositeId: string,
   attemptId: string,
   snapshotId?: string,
+  partial = false,
 ) => {
   assertTeacher(role)
   const composite = await loadComposite(compositeId)
@@ -4915,6 +4941,7 @@ export const getReportForTeacher = async (
   const attempt = await loadAttemptWithChildren(attemptId)
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
+  if (partial) return projectPartialReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher')
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)

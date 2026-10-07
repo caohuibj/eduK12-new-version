@@ -259,6 +259,7 @@ export interface CompositePackageReport {
 }
 
 export interface CompositeReport {
+  reportState?: 'PARTIAL'
   productKind?: 'QUESTIONNAIRE' | 'ASSESSMENT_BUNDLE'
   bundleReport?: import('../../pages/bundle/BundleReport').BundleReportData
   reportMode?: 'COLLECTION_ONLY'
@@ -311,6 +312,7 @@ export interface CompositeAttemptCounts {
 export type CompositeAttemptListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
 
 export interface CompositeTeacherAttemptRow {
+  partialReportAvailable?: boolean
   id: string
   status: CompositeAttemptListStatus
   progress: number

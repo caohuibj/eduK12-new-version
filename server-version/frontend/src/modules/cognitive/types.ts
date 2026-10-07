@@ -18,6 +18,9 @@ export interface CognitiveAssignmentSummary {
   opensAt: string | null
   dueAt: string | null
   maxAttempts: number
+  usedAttempts?: number
+  remainingAttempts?: number
+  continueHref?: string | null
   required: boolean
   listedStandalone?: boolean
   reportPackageLocked?: boolean
@@ -171,6 +174,9 @@ export interface CognitiveReference {
 }
 
 export interface CognitiveHistoryItem {
+  source?: 'standalone' | 'composition'
+  sourceName?: string | null
+  reportHref?: string
   sessionId: string
   assignmentId: string | null
   title: string

@@ -185,12 +185,12 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
   return prisma.$transaction(async tx => {
     await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', id)
     const row = await tx.compositeAssessment.findUnique({ where: { id }, include: {
-      questionnaireCourses: true, items: { include: { cognitiveAssignment: { include: { config: true } }, scale: true } },
+      questionnaireCourses: true, formSections: { include: { items: true } }, items: { include: { cognitiveAssignment: { include: { config: true } }, scale: true } },
     } })
     if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound()
     owner(actor, row)
     if (row.revision !== revision) throw compositeConflict('草稿已变化，请刷新后重新自检')
-    const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string }> = []
+    const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string; targetId?: string }> = []
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row)],
@@ -202,12 +202,25 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
         checks.push({ key, label, status: 'failed', message: cause.message })
       }
     }
+    if (checks.some(check => check.key === 'resources' && check.status === 'failed')) {
+      for (const item of row.items) {
+        try { await validateResources(tx, actor, { ...row, items: [item] }) }
+        catch (cause: any) {
+          if (!(cause.statusCode >= 400 && cause.statusCode < 500)) throw cause
+          checks.push({ key: 'resource:' + item.id, label: item.scale?.name || item.cognitiveAssignment?.title || item.formLabel || '内容依赖', status: 'failed', message: cause.message, targetId: item.formSectionId || item.id })
+        }
+      }
+    }
+    if (checks.some(check => check.key === 'content' && check.status === 'failed')) {
+      for (const section of row.formSections.filter(section => !section.items.length)) checks.push({ key: 'section:' + section.id, label: section.title, status: 'failed', message: '移除空区段或在当前草稿补齐字段，再重新自检。', targetId: section.id })
+    }
     return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY' }
   }, { timeout: 30000 })
 }
 
 export async function publish(actor: Actor, id: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
     await validateDelivery(tx, actor, row)
     await validateResources(tx, actor, row)
     for (const item of row.items) {
@@ -238,8 +251,9 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
   })
 }
 export async function archive(actor: Actor, id: string, raw: unknown) {
-  return mutate(actor, id, revisionSchema.parse(raw).revision, async tx => {
+  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
     await tx.compositeAssessment.update({ where: { id }, data: { status: 'ARCHIVED', publicEnabled: false } })
+    if (row.status !== 'ARCHIVED') await tx.assessmentManagementEvent.create({ data: { actorId: actor.userId, resourceId: id, action: 'ASSESSMENT_ARCHIVE', metadata: { name: row.name, previousStatus: row.status, revision: row.revision } } })
   }, false)
 }
 export async function remove(actor: Actor, id: string, raw: unknown) {
@@ -258,14 +272,16 @@ export async function remove(actor: Actor, id: string, raw: unknown) {
     } })
   })
 }
-export async function list(actor: Actor, page = 1, pageSize = 25) {
+export async function list(actor: Actor, page = 1, pageSize = 25, raw: unknown = {}) {
   author(actor)
+  const filters = z.object({ search: z.string().trim().max(200).default(''), status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'DEPRECATED']).optional(), since: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value, '创建日期无效').optional() }).strict().parse(raw)
+  const search = '%' + filters.search.toLowerCase().replace(/[\\%_]/g, '\\$&') + '%'
   // SQL is static; values remain positional parameters, never interpolated.
-  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT id, name, status::text, created_at AS created, created_by AS owner_id, CASE WHEN product_kind = 'QUESTIONNAIRE' THEN 'COLLECTION' ELSE 'LEGACY_COMPOSITE' END AS kind, questionnaire_type::text FROM composite_assessments WHERE product_kind = 'QUESTIONNAIRE' OR (product_kind = 'LEGACY_COMPOSITE' AND report_package_key IS NULL AND analysis_protocol_key IS NULL)"
-  const filter = '($1::boolean OR owner_id = $2)'
+  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT c.id, c.name, c.status::text, c.created_at AS created, c.created_by AS owner_id, CASE WHEN c.product_kind = 'QUESTIONNAIRE' THEN 'COLLECTION' ELSE 'LEGACY_COMPOSITE' END AS kind, c.questionnaire_type::text FROM composite_assessments c WHERE (c.product_kind = 'QUESTIONNAIRE' OR (c.product_kind = 'LEGACY_COMPOSITE' AND c.report_package_key IS NULL AND c.analysis_protocol_key IS NULL)) AND NOT EXISTS (SELECT 1 FROM assessment_composition_templates t WHERE t.definition_id = c.id)"
+  const filter = '($1::boolean OR owner_id = $2) AND LOWER(name) LIKE $3 AND ($4::text IS NULL OR status = $4::text) AND ($5::timestamp IS NULL OR created >= $5::timestamp)'
   const [rows, counts] = await prisma.$transaction([
-    prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $3 OFFSET $4', actor.role === 'ADMIN', actor.userId, pageSize, (page - 1) * pageSize),
-    prisma.$queryRawUnsafe<Array<{ total: bigint }>>('SELECT COUNT(*) AS total FROM (' + union + ') q WHERE ' + filter, actor.role === 'ADMIN', actor.userId),
+    prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $6 OFFSET $7', actor.role === 'ADMIN', actor.userId, search, filters.status ?? null, filters.since ? filters.since + 'T00:00:00.000Z' : null, pageSize, (page - 1) * pageSize),
+    prisma.$queryRawUnsafe<Array<{ total: bigint }>>('SELECT COUNT(*) AS total FROM (' + union + ') q WHERE ' + filter, actor.role === 'ADMIN', actor.userId, search, filters.status ?? null, filters.since ? filters.since + 'T00:00:00.000Z' : null),
   ])
   return { list: rows.map(v => ({ ...v, reportMode: 'COLLECTION_ONLY', editHref: v.kind === 'COLLECTION' ? '/questionnaire-products/' + v.id : v.kind === 'LEGACY_COMPOSITE' ? '/composite-assessments/' + v.id : v.questionnaire_type === 'GENERAL' ? '/general-questionnaires/' + v.id + '/edit' : '/questionnaires/' + v.id })), total: Number(counts[0].total), page, pageSize }
 }

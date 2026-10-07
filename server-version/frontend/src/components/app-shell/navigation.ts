@@ -20,6 +20,9 @@ const parent: NavigationItem[] = [
   { path: '/relational/tasks', label: '观察测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
 ]
 const staff: NavigationItem[] = [
+  { path: '/assessment-workbench', label: '测评结果工作台', section: 'assessment' },
+  { path: '/assessment-templates', label: '测评模板库', section: 'assessment' },
+  { path: '/assessment-management', label: '对象与操作记录', section: 'assessment' },
   { path: '/dashboard', label: '课程管理', aliases: ['/courses'], section: 'teaching' },
   { path: '/students', label: '学生管理', section: 'teaching' },
   { path: '/assignments', label: '作业管理', section: 'teaching' },
@@ -68,6 +71,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],
   ['/admin/bundle-authoring', '固定测评包制作与审批'],
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
   ['/organizations/new', '创建组织'], ['/organization-tasks', '组织测评任务'],
@@ -121,7 +125,7 @@ export function breadcrumbsFor(pathname: string, home: string, active?: Navigati
 }
 export function isStaffWorkspacePath(pathname: string): boolean {
   if (pathname.endsWith('/report')) return false
-  return ['/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
+  return ['/assessment-workbench','/assessment-templates','/assessment-management','/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
     '/users','/teacher-codes','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))

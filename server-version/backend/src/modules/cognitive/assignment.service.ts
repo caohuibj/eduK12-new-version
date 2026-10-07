@@ -1,6 +1,7 @@
 import { assertCognitiveProductEligible } from './product-eligibility'
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { readCognitiveQuota } from './attempt-quota'
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from './cognitive.registry'
 import { freezeAssignmentProfile, freezeDataForWrite, hashResolvedConfig, readFrozenReport } from './profile-freeze'
 import type { CognitiveProfile } from './cognitive.types'
@@ -340,6 +341,7 @@ export const getAssignmentForStudent = async (userId: string, id: string) => {
     throw FORBIDDEN('Not a member of this course')
   }
 
+  const quota = await prisma.$transaction(tx => readCognitiveQuota(tx, userId, id))
   return {
     id: assignment.id,
     courseId: assignment.courseId,
@@ -348,7 +350,7 @@ export const getAssignmentForStudent = async (userId: string, id: string) => {
     status: assignment.status,
     opensAt: assignment.opensAt,
     dueAt: assignment.dueAt,
-    maxAttempts: assignment.maxAttempts,
+    ...quota,
     required: assignment.required,
     publishedAt: assignment.publishedAt,
     course: assignment.course ? { id: assignment.course.id, title: assignment.course.title, courseCode: assignment.course.courseCode } : null,

@@ -522,6 +522,8 @@ export const compositeController = {
   async report(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
+      const query = compositeReportQuerySchema.parse(req.query)
+      if (query.partial) return success(res, await service.getPartialReport(req.params.attemptId, req.user.userId))
       return success(res, await service.getReport(req.params.attemptId, { userId: req.user.userId }))
     } catch (err) { return handleError(res, err) }
   },
@@ -582,6 +584,7 @@ export const compositeController = {
         req.params.id,
         req.params.attemptId,
         query.snapshotId,
+        query.partial === '1',
       ))
     } catch (err) { return handleError(res, err) }
   },

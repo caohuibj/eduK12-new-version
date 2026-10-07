@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 132 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 135 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -29,6 +29,9 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /relational/attempts/:attemptId | CompositeAssessmentPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /relational/attempts/:attemptId/report | CompositeReportPage | Authenticated; exact server resource authority | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /relational/composite/situational/:attemptId | SituationalRunner | Authenticated; exact server resource authority | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
+| /assessment-workbench | AssessmentWorkbench | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /assessment-templates | AssessmentTemplates | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /assessment-management | AssessmentManagement | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /dashboard | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /courses | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /courses/:courseId/students | CourseStudents | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |

@@ -143,7 +143,7 @@ const TeacherCourseDetail: React.FC = () => {
       <PageHeader
         title={course.title}
         description={course.description || '课程详情、学生与教学任务'}
-        actions={<Link className="staff-primary-link" to={`/courses/${courseId}/students`}>管理学生</Link>}
+        actions={<div className="flex flex-wrap gap-3"><Link className="staff-primary-link" to={`/courses/${courseId}/students`}>管理学生</Link>{!course.isLibrary && <Link className="staff-secondary-link" to={`/assessment-workbench?courseId=${courseId}`}>测评结果与质量概览</Link>}</div>}
       />
       {feedback}
 
