@@ -43,9 +43,19 @@ export async function listStudies(userId: string) {
   return {list}
 }
 export async function closeStudy(userId:string,studyId:string) {
-  await currentOwner(prisma,userId,studyId)
-  await prisma.$executeRaw`UPDATE anonymous_studies SET status='CLOSED' WHERE id=${studyId} AND owner_user_id=${userId}`
-  return {status:'CLOSED'}
+  return prisma.$transaction(async tx=>{
+    await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
+    await currentOwner(tx,userId,studyId)
+    await tx.$executeRaw`UPDATE anonymous_studies SET status='CLOSED' WHERE id=${studyId} AND owner_user_id=${userId}`
+    // A wave's ordinary public URL also admits single visitors. Stop both
+    // entry paths together while leaving existing recovery credentials valid.
+    await tx.$executeRaw`
+      UPDATE composite_assessment_access_tokens t SET is_active=false
+      FROM anonymous_study_waves w
+      WHERE w.access_token_id=t.id AND w.study_id=${studyId} AND t.created_by=${userId}
+    `
+    return {status:'CLOSED'}
+  })
 }
 export async function addWave(userId:string,role:UserRole,studyId:string, input:{compositeId:string;tokenId:string;title:string}) {
   // Both the study and underlying public delivery must belong to this publisher.
