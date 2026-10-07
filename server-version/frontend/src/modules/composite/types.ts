@@ -313,6 +313,7 @@ export type CompositeAttemptListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONE
 
 export interface CompositeTeacherAttemptRow {
   partialReportAvailable?: boolean
+  partialReportUnitCount?: number
   id: string
   status: CompositeAttemptListStatus
   progress: number

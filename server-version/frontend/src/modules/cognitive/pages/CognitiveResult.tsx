@@ -89,6 +89,12 @@ const CognitiveResult: React.FC = () => {
     return <ProductPage width="report" className="hui-report"><ProductStatus kind="pending" title="正在加载认知测评报告" announce="polite">正在读取已冻结结果。</ProductStatus></ProductPage>
   }
 
+  if (session?.feedbackDeferred) {
+    return <ProductPage width="report" className="hui-report">
+      <ProductStatus kind="pending" title="单项已提交，反馈暂未开放">完成整份测评后，按权限查看单项反馈。</ProductStatus>
+      <button onClick={back} className="btn-secondary mt-4">返回列表</button>
+    </ProductPage>
+  }
   if (error || !session?.result) {
     return (
       <ProductPage width="report" className="hui-report">

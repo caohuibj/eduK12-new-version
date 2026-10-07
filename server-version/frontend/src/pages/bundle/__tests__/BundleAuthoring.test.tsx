@@ -19,6 +19,30 @@ async function open(published = false) {
   await screen.findByRole('button', { name: published ? '独立续审并发布' : '独立审批发布' })
 }
 describe('fixed package independent review', () => {
+  it.each(['author', 'reviewer'])('makes HOLD restoration explicit and independently reviewed for %s', async userId => {
+    mocks.userId = userId
+    const held = { ...record, status: 'HOLD', review: { expiresAt: '2099-01-01T00:00:00.000Z' } }
+    mocks.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/definitions') ? [held] : held }))
+    render(<MemoryRouter><BundleAuthoring /></MemoryRouter>)
+    await userEvent.click(await screen.findByRole('button', { name: '查看定义与审批' }))
+    const action = await screen.findByRole('button', { name: '重新审核并恢复发布' })
+    expect(action).toBeDisabled()
+    expect(screen.getByText(/此版本暂停新投放/)).toBeInTheDocument()
+    if (userId === 'author') {
+      expect(screen.getByText('此版本由你登记，请交由另一位管理员审核。')).toBeInTheDocument()
+      return
+    }
+    const user = userEvent.setup()
+    for (const checkbox of screen.getAllByRole('checkbox')) await user.click(checkbox)
+    await user.click(action)
+    expect(await screen.findByRole('dialog', { name: '重新审核并恢复固定包发布' })).toBeInTheDocument()
+    mocks.post.mockResolvedValue({ code: 0, data: { ...held, status: 'PUBLISHED' } })
+    await user.click(screen.getByRole('button', { name: '重新审核并恢复' }))
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/bundle-products/admin/definitions/approved_content/1.0.0/approve', {
+      contentHash: record.contentHash, scientific: true, rights: true, language: true, report: true, claims: ['independent_summary'],
+    }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '独立续审并发布' })).toBeDisabled())
+  })
   it('keeps the installing administrator from approving their own version', async () => {
     mocks.userId = 'author'
     await open()

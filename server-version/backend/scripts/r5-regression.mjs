@@ -5,6 +5,7 @@ import { resolve } from 'node:path'
 // The local probe and Actions component execute this same list. The ordinary
 // full regression remains unchanged and still includes every selected file.
 const files = [
+  'assessment-policy/participant-feedback.test.ts',
   'assessment-runtime/form-context.test.ts',
   'assessment-runtime/v32-1.contract.test.ts',
   'assessment-runtime/v32-3.contract.test.ts',

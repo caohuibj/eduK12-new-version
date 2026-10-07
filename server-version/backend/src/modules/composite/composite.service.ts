@@ -1,5 +1,5 @@
 import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
-import { frozenCompositeProgress } from './frozen-progress'
+import { frozenCompositeProgress, frozenMeasurementFinalHeaders } from './frozen-progress'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
@@ -1287,6 +1287,16 @@ export const listAttemptsForTeacher = async (
     list.push(header)
     headersByAttempt.set(header.compositeAttemptId, list)
   }
+  const legacyIds = attempts.filter(attempt => attempt.runtimeGeneration !== 'UNIFIED_V1').map(attempt => attempt.id)
+  const legacyRows = legacyIds.length ? await prisma.compositeAssessmentAttempt.findMany({
+    where: { id: { in: legacyIds } },
+    select: { id: true,
+      scaleAssessments: { orderBy: [{ startedAt: 'asc' }, { id: 'asc' }], select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptEpoch: true } },
+      cognitiveSessions: { orderBy: { createdAt: 'asc' }, select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptNo: true } },
+      situationalAttempts: { orderBy: { createdAt: 'asc' }, select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptEpoch: true, attemptNo: true } },
+    },
+  }) : []
+  const legacyById = new Map(legacyRows.map(row => [row.id, row]))
   return {
     assessment: {
       id: composite.id,
@@ -1297,7 +1307,20 @@ export const listAttemptsForTeacher = async (
       courseId: composite.courseId,
     },
     attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
-    list: attempts.map(attempt => ({ ...mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, headersByAttempt.get(attempt.id) ?? []) }), partialReportAvailable: !attempt.assignmentRef && ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(composite.productKind) && !composite.reportPackageKey && !composite.analysisProtocolKey })),
+    list: attempts.map(attempt => {
+      const attemptHeaders = headersByAttempt.get(attempt.id) ?? []
+      const ordinary = !attempt.assignmentRef && ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(composite.productKind) && !composite.reportPackageKey && !composite.analysisProtocolKey
+      const legacy = legacyById.get(attempt.id)
+      const partialReportUnitCount = !ordinary ? 0 : attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? new Set(frozenMeasurementFinalHeaders(attempt, attemptHeaders).map(header => header.sourceAttemptId)).size
+        : legacy ? [
+          completedMeasurementChildren(legacy.scaleAssessments, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SCALE'),
+          completedMeasurementChildren(legacy.cognitiveSessions, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'COGNITIVE'),
+          completedMeasurementChildren(legacy.situationalAttempts, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SITUATIONAL'),
+        ].reduce((sum, children) => sum + children.length, 0) : 0
+      return { ...mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, attemptHeaders) }),
+        partialReportAvailable: partialReportUnitCount > 0, partialReportUnitCount }
+    }),
     page: query.page,
     pageSize: query.pageSize,
     total,
@@ -2965,10 +2988,10 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
   })
 }
 
-const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null) => {
+const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false) => {
   const storedConfig = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted)
   const config = storedConfig.config
-  const resultSnapshot = session.status === 'COMPLETED' && session.resultSnapshotEncrypted
+  const resultSnapshot = !feedbackDeferred && session.status === 'COMPLETED' && session.resultSnapshotEncrypted
     ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
     : null
   const result = resultSnapshot
@@ -2980,7 +3003,7 @@ const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | nul
         report: resultSnapshot.report,
         assessmentContext: resultSnapshot.assessmentContext,
       }
-    : session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
+    : !feedbackDeferred && session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
     ? {
         score: decryptCognitivePayload<number>(session.scoreEncrypted),
         metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
@@ -3005,6 +3028,7 @@ const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | nul
     randomSeed: session.randomSeed,
     nextTrialIndex: (session.trials?.[0]?.trialIndex ?? -1) + 1,
     ...(result ? { result } : {}),
+    ...(feedbackDeferred ? { feedbackDeferred: true } : {}),
   }
 }
 
@@ -3019,6 +3043,12 @@ const latestChildrenByItem = (children: any[]) => {
     }
   }
   return map
+}
+
+function completedMeasurementChildren(children: any[], attemptEpoch: number, finalized: Set<string> | null = null) {
+  return [...latestChildrenByItem(children).values()].filter(child => child.status === 'COMPLETED'
+    && (child.attemptEpoch === undefined || child.attemptEpoch === attemptEpoch)
+    && (!finalized || finalized.has(child.id)))
 }
 
 const attemptCompletedItemMaps = (attempt: any) => ({
@@ -3401,7 +3431,7 @@ const getUnifiedCompositeAttemptState = async (
         type: 'COGNITIVE',
         position: currentUnit.item.position,
         required: currentUnit.item.required,
-        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash),
+        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED'),
       }
     } catch (error) {
       if (isInstrumentFinalSubmitError(error)) throw error
@@ -4053,7 +4083,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash) : null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED') : null }
   }
   return {
     id: attempt.id,
@@ -4719,11 +4749,9 @@ async function projectPartialReport(attempt: any, audience: CompositeReportAudie
   if (attempt.runtimeGeneration === 'UNIFIED_V1') {
     const headers = await prisma.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch } })
     if (frozenCompositeProgress(attempt, headers)?.progressUnavailableReason) throw compositeConflict('冻结记录需要核对，暂不能读取单项结果')
-    const frozen = decryptFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
-    const slots = new Set(frozen.slots.map(slot => slot.slotKey))
-    finalized = new Set(headers.filter(row => row.terminalState === 'COMPLETED' && slots.has(row.slotKey)).map(row => row.sourceAttemptId))
+    finalized = new Set(frozenMeasurementFinalHeaders(attempt, headers).map(row => row.sourceAttemptId))
   }
-  const completed = (children: any[]) => [...latestChildrenByItem(children).values()].filter(child => child.status === 'COMPLETED' && (child.attemptEpoch === undefined || child.attemptEpoch === attempt.attemptEpoch) && (!finalized || finalized.has(child.id)))
+  const completed = (children: any[]) => completedMeasurementChildren(children, attempt.attemptEpoch, finalized)
   const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
   const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
   const projected = projectCompositeCollectionReport(buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } }), audience)
@@ -4731,7 +4759,8 @@ async function projectPartialReport(attempt: any, audience: CompositeReportAudie
 }
 
 export async function getPartialReport(attemptId: string, userId: string) {
-  return projectPartialReport(await findAttempt(attemptId, { userId }, true), 'participant')
+  // Legacy participant ?partial links cannot release feedback before the battery ends.
+  return getReport(attemptId, { userId })
 }
 
 export const getAnalysisExportForParticipant = async (

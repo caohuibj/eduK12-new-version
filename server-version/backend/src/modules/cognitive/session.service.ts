@@ -401,7 +401,7 @@ export const getSession = async (userId: string, sessionId: string) => {
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { contextSnapshotHash: true } },
+      compositeAttempt: { select: { contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -416,6 +416,9 @@ export const getSession = async (userId: string, sessionId: string) => {
     // Relational cohort-only attempts expose terminal state but never an
     // individual Cognitive result. The parent cohort projection is authoritative.
     const runnerPayload = toRunnerPayload(session)
+    if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
+      return { ...runnerPayload, status: session.status, finishedAt: session.finishedAt, feedbackDeferred: true }
+    }
     if (
       session.compositeAttemptId
       && await isRelationalCohortOnlyCompositeAttempt(session.compositeAttemptId)
@@ -500,7 +503,7 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { recoveryTokenHash: true, userId: true, contextSnapshotHash: true } },
+      compositeAttempt: { select: { recoveryTokenHash: true, userId: true, contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -518,6 +521,9 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
   const runnerPayload = toRunnerPayload(session, nextTrialIndex, true)
   if (session.status !== 'COMPLETED') return runnerPayload
+  if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
+    return { ...runnerPayload, finishedAt: session.finishedAt, feedbackDeferred: true }
+  }
 
   const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
   if (storedConfig.snapshot) {

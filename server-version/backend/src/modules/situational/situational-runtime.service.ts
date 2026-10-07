@@ -43,6 +43,7 @@ import {
 } from '../assessment-media/assessment-asset'
 import { assertSituationalAssetReferencesReady } from './situational-asset.service'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
+import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
@@ -282,16 +283,17 @@ export const situationalAttemptForResponse = (
   options: {
     replayed?: boolean
     suppressResult?: boolean
+    feedbackDeferred?: boolean
     committedResult?: {
       result: SituationalResultV1
       canonicalResult: CanonicalUnitResultEnvelopeV1
     }
   } = {},
 ) => measureRequestPhaseSync('response.build', () => {
-  const stored = row.status === 'COMPLETED' && !options.suppressResult
+  const stored = row.status === 'COMPLETED' && !options.suppressResult && !options.feedbackDeferred
     ? options.committedResult ?? decodeStoredResult(row)
     : null
-  if (row.status === 'COMPLETED' && !options.suppressResult && !stored) {
+  if (row.status === 'COMPLETED' && !options.suppressResult && !options.feedbackDeferred && !stored) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
   }
   return {
@@ -327,6 +329,7 @@ export const situationalAttemptForResponse = (
     },
     ...(stored ? { result: stored.result.model?.modelKey === 'AUTHOR_KEY_SUM' ? { ...stored.result, metrics: stored.result.metrics.map(({ contributions: _researchOnly, ...metric }) => metric) } : stored.result, canonicalResult: stored.canonicalResult } : {}),
     ...(options.replayed === undefined ? {} : { replayed: options.replayed }),
+    ...(options.feedbackDeferred ? { feedbackDeferred: true } : {}),
   }
 })
 
@@ -598,9 +601,11 @@ export const createEmbeddedSituationalAttempt = async (
 
 export const resumeSituationalAttempt = async (attemptId: string, userId: string) => {
   const runtime = await loadSituationalAttemptRuntime(attemptId, userId)
-  const suppressResult = runtime.row.status === 'COMPLETED'
-    && await isRelationalCohortOnlyCompositeAttempt(runtime.row.compositeAttemptId)
-  return situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult })
+  const feedbackDeferred = runtime.row.status === 'COMPLETED'
+    && await isCompositeParticipantFeedbackDeferred(runtime.row.compositeAttemptId)
+  const suppressResult = feedbackDeferred || (runtime.row.status === 'COMPLETED'
+    && await isRelationalCohortOnlyCompositeAttempt(runtime.row.compositeAttemptId))
+  return situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred })
 }
 
 export const getSituationalAttemptResult = resumeSituationalAttempt

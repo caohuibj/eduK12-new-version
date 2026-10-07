@@ -33,7 +33,7 @@ const SituationalResult: React.FC = () => {
     void situationalApi.result(attemptId)
       .then((response) => {
         if (response.code !== 0) throw Object.assign(new Error(response.message), { code: response.code })
-        if (!response.data.result) {
+        if (!response.data.result && !response.data.feedbackDeferred) {
           navigate(`${situationalBasePath()}/${encodeURIComponent(response.data.attempt.instrumentKey)}`, { replace: true })
           return
         }
@@ -50,6 +50,11 @@ const SituationalResult: React.FC = () => {
   }, [attemptId, navigate])
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500">加载权威结果…</div>
+  if (data?.feedbackDeferred) {
+    return <ReportShell title="情境化测评报告"
+      status={{ kind: 'pending', title: '单项已提交，反馈暂未开放', description: '完成整份测评后，按权限查看单项反馈。' }}
+      actions={<Link to={situationalBasePath() + '/history'} className="btn-secondary">查看历史</Link>} />
+  }
 
   if (error || !data || !data.result) {
     return (

@@ -179,4 +179,30 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     const provider = new BundleDefinitionProvider([packageEntry(pack)])
     expect(() => provider.register(packageEntry(installed.content))).not.toThrow()
   })
+  it('requires a new independent signed review to restore HOLD and never restores RETIRED', async () => {
+    const key = 'hold_review_' + suffix.replace(/-/g, '')
+    keys.push(key)
+    const pack = scaffoldPackage(key), preview = previewPackage(actor, pack), saved = await savePackage(db, actor, pack)
+    const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
+    const independent = { userId: reviewer, role: UserRole.ADMIN }
+    await approvePackage(db, independent, key, '1.0.0', material)
+    const where = { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: '1.0.0' } }
+    const published = await db.bundlePackageRelease.findUniqueOrThrow({ where })
+    await changePackageStatus(db, actor.userId, key, '1.0.0', 'HOLD')
+    await expect(publishPackage(db, reviewer, key, '1.0.0', published.review)).rejects.toThrow('BUNDLE_HOLD_REVIEW_REQUIRED')
+    await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
+    expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('HOLD')
+    vi.useFakeTimers({ toFake: ['Date'] })
+    try {
+      vi.setSystemTime(Date.now() + 1000)
+      const restored = await approvePackage(db, independent, key, '1.0.0', material)
+      expect(restored).toMatchObject({ status: 'PUBLISHED', contentHash: saved.contentHash, installedBy: actor.userId, publishedBy: reviewer })
+      expect(restored.content).toEqual(saved.content)
+      expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).review).not.toEqual(published.review)
+      await changePackageStatus(db, actor.userId, key, '1.0.0', 'RETIRED')
+      await expect(approvePackage(db, independent, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 409 })
+      await expect(changePackageStatus(db, reviewer, key, '1.0.0', 'HOLD')).rejects.toThrow('BUNDLE_RETIRED')
+      expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('RETIRED')
+    } finally { vi.useRealTimers() }
+  })
 })

@@ -16,6 +16,7 @@ const releaseConflicts: Record<string, string> = {
   BUNDLE_VERSION_IMMUTABLE: '该版本内容已锁定，请更换版本号后保存',
   BUNDLE_LEGACY_IDENTITY_RESERVED: '该包标识和版本已被历史定义占用，请使用新的标识或版本',
   BUNDLE_RETIRED: '该版本已退役，请制作新版本',
+  BUNDLE_HOLD_REVIEW_REQUIRED: '暂停版本需要重新独立审核后恢复，不能复用暂停前的审批',
   BUNDLE_CONTENT_HASH_MISMATCH: '登记内容校验失败，请联系管理员复核',
   BUNDLE_CLAIM_NOT_APPROVED: '仍有整体报告结论未获审核，请重新核对报告声明',
   BUNDLE_COGNITIVE_DEPENDENCY_UNAVAILABLE: '引用的认知任务版本不可用，请核对发布状态',
@@ -73,7 +74,7 @@ export async function getPackageDraft(db: PrismaClient, actor: BundleActor, key:
   administrator(actor)
   const row = await db.bundlePackageRelease.findUnique({ where: { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: version } } })
   if (!row) throw compositeNotFound('固定包版本不存在')
-  return { ...row, review: row.review ? { contentHash: (row.review as any).contentHash, reviewerId: (row.review as any).reviewerId, expiresAt: (row.review as any).expiresAt } : null }
+  return { ...row, review: row.review ? { contentHash: (row.review as any).contentHash, reviewerId: (row.review as any).reviewerId, reviewedAt: (row.review as any).reviewedAt, expiresAt: (row.review as any).expiresAt } : null }
 }
 const approval = z.object({ contentHash: z.string().regex(/^[a-f0-9]{64}$/), scientific: z.literal(true), rights: z.literal(true), language: z.literal(true), report: z.literal(true),
   claims: z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3) }).strict()
@@ -85,7 +86,8 @@ export async function approvePackage(db: PrismaClient, actor: BundleActor, key: 
   if (checked.contentHash !== row.contentHash) throw compositeConflict('审批内容与当前版本不一致，请重新预览')
   const secret = process.env.BUNDLE_REVIEW_SIGNING_KEY
   if (!secret || secret.length < 32) throw compositeConflict('固定包审批签名服务尚未配置，请联系运维')
-  const material = { ...checked, reviewerId: actor.userId, expiresAt: new Date(Date.now() + 7 * 86400000).toISOString() }
+  const now = Date.now()
+  const material = { ...checked, reviewerId: actor.userId, reviewedAt: new Date(now).toISOString(), expiresAt: new Date(now + 7 * 86400000).toISOString() }
   const signature = createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex')
   await publishPackage(db, actor.userId, key, version, { ...material, signature }).catch(releaseError)
   return getPackageDraft(db, actor, key, version)

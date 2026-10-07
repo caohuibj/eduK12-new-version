@@ -229,6 +229,7 @@ export interface CognitivePresentationDefinitionV1 {
 }
 
 export interface CognitiveSession {
+  feedbackDeferred?: boolean
   sessionId: string
   assignmentId: string | null
   testType: string

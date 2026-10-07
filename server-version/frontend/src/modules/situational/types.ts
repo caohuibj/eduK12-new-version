@@ -243,6 +243,7 @@ export interface CanonicalSituationalResult {
 }
 
 export interface SituationalAttemptResponse {
+  feedbackDeferred?: boolean
   attemptId: string
   attempt: SituationalAttempt
   instrument: SituationalInstrument

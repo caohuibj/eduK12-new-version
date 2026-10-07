@@ -77,7 +77,7 @@ export async function create(actor: Actor, raw: unknown) {
   try { id = await run() } catch (e: any) { if (e.code !== 'P2002') throw e; id = await run() }
   return detail(actor, id)
 }
-async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, row: any) => Promise<void>, draft = true) {
+async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, row: any) => Promise<void>, draft = true, noOp?: (row: any) => boolean) {
   author(actor)
   await prisma.$transaction(async tx => {
     await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', id)
@@ -87,9 +87,10 @@ async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, r
     } })
     if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
     owner(actor, row)
+    if (row.reportPackageKey || row.analysisProtocolKey) throw compositeConflict('问卷必须只收集单项结果')
+    if (noOp?.(row)) return
     if (row.revision !== revision) throw compositeConflict('问卷已被其他操作修改，请刷新后重试')
     if (draft && row.status !== 'DRAFT') throw compositeConflict('已发布问卷不能修改，请复制为新草稿')
-    if (row.reportPackageKey || row.analysisProtocolKey) throw compositeConflict('问卷必须只收集单项结果')
     await fn(tx, row)
     await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })
   }, { timeout: 30000 })
@@ -254,7 +255,7 @@ export async function archive(actor: Actor, id: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
     await tx.compositeAssessment.update({ where: { id }, data: { status: 'ARCHIVED', publicEnabled: false } })
     if (row.status !== 'ARCHIVED') await tx.assessmentManagementEvent.create({ data: { actorId: actor.userId, resourceId: id, action: 'ASSESSMENT_ARCHIVE', metadata: { name: row.name, previousStatus: row.status, revision: row.revision } } })
-  }, false)
+  }, false, row => row.status === 'ARCHIVED' && !row.publicEnabled)
 }
 export async function remove(actor: Actor, id: string, raw: unknown) {
   author(actor)

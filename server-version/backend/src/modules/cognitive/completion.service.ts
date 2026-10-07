@@ -370,7 +370,8 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
     const { finalizeCompositeAttemptIfReady } = await import('../composite/composite.service')
     await finalizeCompositeAttemptIfReady(compositeLink.compositeAttemptId)
   }
-  return result
+  const { projectRelationalUnitFinalResponse } = await import('../assessment-relational/result-authority')
+  return projectRelationalUnitFinalResponse(compositeLink?.compositeAttemptId, result)
 }
 
 export const completeSession = async (userId: string, sessionId: string) =>

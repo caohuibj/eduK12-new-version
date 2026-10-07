@@ -17,3 +17,18 @@ export const frozenCompositeProgress = (attempt: {
     return { progress: 0, completedItems: 0, progressUnavailableReason: '冻结单元进度暂不可读，请核查记录完整性。' }
   }
 }
+
+/** Reportable FINAL measurements only; forms and invalid/previous epochs
+ * cannot make a teacher's partial-report action available. */
+export function frozenMeasurementFinalHeaders(
+  attempt: Parameters<typeof frozenCompositeProgress>[0],
+  headers: AggregateSnapshotHeader[],
+): AggregateSnapshotHeader[] {
+  const progress = frozenCompositeProgress(attempt, headers)
+  if (!progress || progress.progressUnavailableReason) return []
+  const sourceTypes = { SCALE: 'ASSESSMENT', COGNITIVE: 'COGNITIVE_SESSION', SITUATIONAL: 'SITUATIONAL_ATTEMPT' }
+  return headers.filter(header => header.attemptEpoch === attempt.attemptEpoch
+    && header.unitType !== 'FORM_SECTION' && header.terminalState === 'COMPLETED'
+    && header.payloadKind === 'UNIT_RESULT' && Boolean(header.sourceAttemptId)
+    && header.sourceType === sourceTypes[header.unitType as keyof typeof sourceTypes])
+}

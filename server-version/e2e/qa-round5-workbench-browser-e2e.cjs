@@ -63,12 +63,80 @@ async function run(browser, engine, width) {
     assert.match(commands[1].body.requestId, /^[a-f0-9-]{36}$/)
     assert.deepEqual(Object.keys(commands[1].body), ['requestId'])
     assert.deepEqual(errors, [])
-    return { engine, width, passed: true, pages: ['editor', 'overview', 'templates'] }
+    await reviewBoundaries(browser, engine, width)
+    return { engine, width, passed: true, pages: ['editor', 'overview', 'templates', 'hold-review', 'participant-deferred-feedback'] }
   } catch (error) {
     await page.screenshot({ path: path.join(output, `${engine}-${width}-failure.png`), fullPage: true })
     console.error(JSON.stringify({ url: page.url(), pageErrors: errors, body: (await page.locator('body').innerText()).slice(-6000) }))
     throw error
   } finally { await context.close() }
+}
+
+async function reviewBoundaries(browser, engine, width) {
+  const options = { viewport: { width, height: 900 }, reducedMotion: 'reduce', locale: 'zh-CN', timezoneId: 'Asia/Tokyo' }
+  const adminContext = await browser.newContext(options), adminPage = await adminContext.newPage()
+  const errors = [], approvals = []
+  adminPage.on('pageerror', error => errors.push(error.message))
+  let record = { id: 'held', bundleKey: 'synthetic-held', bundleVersion: '1.0.0', status: 'HOLD', installedBy: 'another-admin', contentHash: 'a'.repeat(64), content: { schemaVersion: 1 } }
+  const preview = { contentHash: record.contentHash, blockers: [], requiredClaims: ['independent_summary'], definition: { name: '合成暂停版本', bundleVersion: '1.0.0', slots: [] }, scenarios: [], report: {}, scientific: {} }
+  await installApiFixture(adminPage, 'ADMIN')
+  await adminPage.route('**/api/bundle-products/admin/**', async route => {
+    const req = route.request(), pathname = new URL(req.url()).pathname
+    let data
+    if (req.method() === 'POST' && pathname.endsWith('/approve')) {
+      approvals.push(req.postDataJSON())
+      record = { ...record, status: 'PUBLISHED' }; data = record
+    } else if (req.method() === 'POST' && pathname.endsWith('/preview')) data = preview
+    else if (req.method() === 'GET') data = pathname.endsWith('/definitions') ? [record] : record
+    else return route.fulfill({ status: 405, json: { code: -1, message: 'Unexpected synthetic command' } })
+    return route.fulfill({ status: 200, json: { code: 0, message: 'ok', data } })
+  })
+  async function shot(page, name) {
+    await page.screenshot({ path: path.join(output, `${engine}-${width}-${name}.png`), fullPage: true })
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, name + ': no horizontal overflow')
+  }
+  try {
+    await adminPage.goto(base + '/admin/bundle-authoring')
+    await adminPage.getByRole('button', { name: '查看定义与审批' }).click()
+    const restore = adminPage.getByRole('button', { name: '重新审核并恢复发布', exact: true })
+    await restore.waitFor(); assert.equal(await restore.isDisabled(), true)
+    const checks = adminPage.getByRole('checkbox')
+    assert.equal(await checks.count(), 4)
+    for (let index = 0; index < 4; index++) {
+      await checks.nth(index).check()
+      assert.equal(await restore.isDisabled(), index < 3)
+    }
+    assert.equal(approvals.length, 0)
+    await shot(adminPage, 'hold-review')
+    await restore.click()
+    await adminPage.getByRole('dialog', { name: '重新审核并恢复固定包发布' }).waitFor()
+    assert.equal(approvals.length, 0)
+    await adminPage.getByRole('button', { name: '重新审核并恢复', exact: true }).click()
+    await adminPage.getByRole('button', { name: '独立续审并发布' }).waitFor()
+    assert.equal(approvals.length, 1)
+    assert.deepEqual(approvals[0], { contentHash: record.contentHash, scientific: true, rights: true, language: true, report: true, claims: ['independent_summary'] })
+  } finally { await adminContext.close() }
+  const studentContext = await browser.newContext(options), page = await studentContext.newPage()
+  page.on('pageerror', error => errors.push(error.message))
+  await installApiFixture(page, 'STUDENT')
+  await page.route('**/api/cognitive/sessions/session-reviewed', route => route.fulfill({ status: 200, json: { code: 0, message: 'ok', data: { sessionId: 'session-reviewed', status: 'COMPLETED', feedbackDeferred: true } } }))
+  await page.route('**/api/situational/attempts/sjt-reviewed/**', route => route.fulfill({ status: 200, json: { code: 0, message: 'ok', data: { feedbackDeferred: true, attempt: { id: 'sjt-reviewed', status: 'COMPLETED', instrumentKey: 'fixture' } } } }))
+  await page.route('**/api/composite-assessments/attempts/parent-reviewed/report**', route => {
+    assert.equal(new URL(route.request().url()).searchParams.has('partial'), false)
+    return route.fulfill({ status: 400, json: { code: -1, message: '综合测评尚未完成', data: null } })
+  })
+  try {
+    await page.goto(base + '/student/cognitive/sessions/session-reviewed/result')
+    await page.getByText('单项已提交，反馈暂未开放', { exact: true }).waitFor()
+    await shot(page, 'deferred-cognitive')
+    await page.goto(base + '/student/situational/attempts/sjt-reviewed/result')
+    await page.getByText('单项已提交，反馈暂未开放', { exact: true }).waitFor()
+    await shot(page, 'deferred-situational')
+    await page.goto(base + '/student/composite/attempts/parent-reviewed/report?partial=1')
+    await page.getByText('综合测评尚未完成', { exact: true }).waitFor()
+    await shot(page, 'deferred-composition')
+    assert.deepEqual(errors, [])
+  } finally { await studentContext.close() }
 }
 
 async function main() {

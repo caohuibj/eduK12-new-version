@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { frozenCompositeProgress } from '../../modules/composite/frozen-progress'
+import { frozenCompositeProgress, frozenMeasurementFinalHeaders } from '../../modules/composite/frozen-progress'
 import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet, type FrozenActiveSlotV1 } from '../../modules/assessment-runtime/slot-set'
 import type { AggregateSnapshotHeader } from '../../modules/assessment-runtime/unified-aggregate'
 
@@ -23,5 +23,16 @@ describe('frozen teacher progress', () => {
   })
   it('retains legacy progress without inventing a frozen slot set', () => {
     expect(frozenCompositeProgress({ runtimeGeneration: null }, [])).toBeNull()
+  })
+  it('excludes forms, old epochs, invalid payloads and mismatched source types from partial reports', () => {
+    const formSlot = { ...slots[0], slotKey: 'form:background', unitType: 'FORM_SECTION' as const }
+    const mixed = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [formSlot, ...slots] })
+    const mixedAttempt = { ...attempt, frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(mixed), frozenActiveSlotSetHash: mixed.snapshotHash }
+    const formHeader: AggregateSnapshotHeader = { ...headers[0], slotKey: formSlot.slotKey, unitType: 'FORM_SECTION', payloadKind: 'COLLECTION_FACTS', sourceType: 'COMPOSITE_FORM_SECTION' }
+    expect(frozenMeasurementFinalHeaders(mixedAttempt, [formHeader])).toEqual([])
+    expect(frozenMeasurementFinalHeaders(mixedAttempt, [formHeader, headers[0]])).toEqual([headers[0]])
+    expect(frozenMeasurementFinalHeaders(mixedAttempt, [formHeader, { ...headers[0], attemptEpoch: 0 }])).toEqual([])
+    expect(frozenMeasurementFinalHeaders(mixedAttempt, [formHeader, { ...headers[0], payloadKind: 'NONE' }])).toEqual([])
+    expect(frozenMeasurementFinalHeaders(mixedAttempt, [{ ...headers[0], sourceType: 'COMPOSITE_FORM_SECTION' }])).toEqual([])
   })
 })

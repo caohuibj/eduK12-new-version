@@ -58,7 +58,7 @@ describe('cognitive history service', () => {
       where: {
         userId: 'student-1',
         status: 'COMPLETED',
-        AND: [{ OR: [{ compositeAttemptId: null }, { compositeAttempt: { userId: 'student-1', assignmentRef: null, compositeAssessment: { productKind: { in: ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'] }, reportPackageKey: null, analysisProtocolKey: null } } }] }],
+        AND: [{ OR: [{ compositeAttemptId: null }, { compositeAttempt: { userId: 'student-1', status: 'COMPLETED', assignmentRef: null, compositeAssessment: { productKind: { in: ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'] }, reportPackageKey: null, analysisProtocolKey: null } } }] }],
         OR: [
           { scoreEncrypted: { not: null }, qualityFlagsEncrypted: { not: null } },
           { resultSnapshotEncrypted: { not: null } },

@@ -78,10 +78,11 @@ export async function courseOverview(actor: Actor, courseId: string, raw: unknow
   const attempts = await prisma.compositeAssessmentAttempt.groupBy({ by: ['compositeAssessmentId', 'status'], where: { compositeAssessmentId: { in: assessments.map(a => a.id) }, userId: { not: null }, assignmentRef: null, OR: [{ deliveryCourseId: courseId }, { deliveryCourseId: null, compositeAssessment: { courseId, productKind: { not: 'QUESTIONNAIRE' } } }] }, _count: { _all: true } })
   // Administrative completion counts, never psychological group statistics.
   const list = assessments.map(row => ({ ...row, attempts: Object.fromEntries(attempts.filter(a => a.compositeAssessmentId === row.id).map(a => [a.status, a._count._all])) }))
-  const sessions = await prisma.cognitiveSession.findMany({ where: { userId: { not: null }, assignment: { createdBy: actor.userId }, OR: [
-    { compositeAttemptId: null, assignment: { createdBy: actor.userId, courseId, listedStandalone: true } },
-    { compositeAttempt: { assignmentRef: null, deliveryCourseId: courseId, compositeAssessment: { createdBy: actor.userId, productKind: 'QUESTIONNAIRE', reportPackageKey: null, analysisProtocolKey: null } } },
-    { compositeAttempt: { assignmentRef: null, compositeAssessment: { createdBy: actor.userId, courseId, productKind: 'LEGACY_COMPOSITE', reportPackageKey: null, analysisProtocolKey: null } } },
+  const creatorScope = actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }
+  const sessions = await prisma.cognitiveSession.findMany({ where: { userId: { not: null }, assignment: creatorScope, OR: [
+    { compositeAttemptId: null, assignment: { ...creatorScope, courseId, listedStandalone: true } },
+    { compositeAttempt: { assignmentRef: null, deliveryCourseId: courseId, compositeAssessment: { ...creatorScope, productKind: 'QUESTIONNAIRE', reportPackageKey: null, analysisProtocolKey: null } } },
+    { compositeAttempt: { assignmentRef: null, compositeAssessment: { ...creatorScope, courseId, productKind: 'LEGACY_COMPOSITE', reportPackageKey: null, analysisProtocolKey: null } } },
   ] }, select: { id: true, status: true, finishedAt: true, resultSnapshotEncrypted: true, assignment: { select: { id: true, title: true } }, user: { select: { nickname: true, username: true } }, compositeAttemptId: true, compositeAttempt: { select: { compositeAssessmentId: true, status: true } } }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize + 1 })
   const quality = sessions.slice(0, pageSize).map(({ resultSnapshotEncrypted, user, assignment, compositeAttempt, ...row }) => {
     let qualityState = row.status === 'COMPLETED' ? 'unavailable' : 'pending'

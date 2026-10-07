@@ -24,6 +24,7 @@ let sjtSubmit: typeof import('../../modules/situational/situational-final-submit
 const suffix = randomUUID()
 const actor = { userId: 'q1-teacher-' + suffix, role: UserRole.TEACHER }
 const other = { userId: 'q1-other-' + suffix, role: UserRole.TEACHER }
+const admin = { userId: 'q1-admin-' + suffix, role: UserRole.ADMIN }
 const student = 'q1-student-' + suffix
 const student2 = 'q1-student2-' + suffix
 let course1: string, course2: string, scaleId: string, assignmentId: string, configId: string
@@ -48,7 +49,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     scaleSubmit = await import('../../modules/scale/scale-final-submit.service')
     cogSubmit = await import('../../modules/cognitive/final-submit.service')
     sjtSubmit = await import('../../modules/situational/situational-final-submit.service')
-    for (const [id, role] of [[actor.userId, 'TEACHER'], [other.userId, 'TEACHER'], [student, 'STUDENT'], [student2, 'STUDENT']] as const) {
+    for (const [id, role] of [[actor.userId, 'TEACHER'], [other.userId, 'TEACHER'], [admin.userId, 'ADMIN'], [student, 'STUDENT'], [student2, 'STUDENT']] as const) {
       await db.user.create({ data: { id, username: id, passwordHash: 'fixture-only', role } })
     }
     const cs = []
@@ -83,7 +84,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     await db.cognitiveAssignment.deleteMany({where:{createdBy:{in:[actor.userId,other.userId]}}})
     await db.scale.deleteMany({where:{creatorId:actor.userId}})
     await db.course.deleteMany({where:{creatorId:actor.userId}})
-    await db.user.deleteMany({where:{id:{in:[actor.userId,other.userId,student,student2]}}})
+    await db.user.deleteMany({where:{id:{in:[actor.userId,other.userId,admin.userId,student,student2]}}})
     await db.$disconnect()
   },60000)
 
@@ -235,17 +236,22 @@ suite('Four-type Questionnaire production lifecycle', () => {
     const form=started.attempt.currentItem as any
     expect(form.type).toBe('FORM_SECTION')
     const section=row.formSections[0]
+    const beforeUnits = await runtime.listAttemptsForTeacher(actor.userId, actor.role, row.id, { page: 1, pageSize: 20 })
+    expect(beforeUnits.list.find(attempt => attempt.id === attemptId)).toMatchObject({ partialReportAvailable: false, partialReportUnitCount: 0 })
     await forms.submitCompositeFormSectionFinal({attemptId,sectionId:section.id,userId:student,submissionId:randomUUID(),attemptEpoch:1,definitionHash:form.definitionHash,answers:section.items.map((i:any)=>({formItemId:i.id,value:'学习'}))})
+    const formsOnly = await runtime.listAttemptsForTeacher(actor.userId, actor.role, row.id, { page: 1, pageSize: 20 })
+    expect(formsOnly.list.find(attempt => attempt.id === attemptId)).toMatchObject({ completedItems: 1, partialReportAvailable: false, partialReportUnitCount: 0 })
     const scale=await db.assessment.findFirstOrThrow({where:{compositeAttemptId:attemptId}})
     const scaleInput={assessmentId:scale.id,submissionId:randomUUID(),attemptEpoch:1,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),contextSnapshotHash:null,answers:[{itemCode:'mixed-scale-item-1',responseValue:'yes'}],userId:student}
-    await scaleSubmit.submitScaleAssessmentFinal(scaleInput)
+    const scaleFinal = await scaleSubmit.submitScaleAssessmentFinal(scaleInput)
+    const { projectRelationalUnitFinalResponse } = await import('../../modules/assessment-relational/result-authority')
+    const scaleAck = await projectRelationalUnitFinalResponse(attemptId, scaleFinal)
+    expect(scaleAck).toMatchObject({ completed: true, feedbackDeferred: true, replayed: false })
+    expect(scaleAck).not.toHaveProperty('response')
     const partial = await runtime.listAttemptsForTeacher(actor.userId, actor.role, row.id, { page: 1, pageSize: 20 })
-    expect(partial.list.find((attempt: any) => attempt.id === attemptId)).toMatchObject({ progress: 50, completedItems: 2, progressUnavailableReason: null })
+    expect(partial.list.find((attempt: any) => attempt.id === attemptId)).toMatchObject({ progress: 50, completedItems: 2, progressUnavailableReason: null, partialReportAvailable: true, partialReportUnitCount: 1 })
     const parentBefore = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })
-    const participantPartial = await runtime.getPartialReport(attemptId, student)
-    expect(participantPartial).toMatchObject({ reportState: 'PARTIAL', completedAt: null })
-    expect(participantPartial.unitReports.map((unit: any) => unit.type)).toEqual(['SCALE'])
-    expect(participantPartial.backgroundValues).toEqual([])
+    await expect(runtime.getPartialReport(attemptId, student)).rejects.toMatchObject({ statusCode: 400 })
     expect((await runtime.getReportForTeacher(actor.userId, actor.role, row.id, attemptId, undefined, true)).unitReports.map((unit: any) => unit.type)).toEqual(['SCALE'])
     await expect(runtime.getPartialReport(attemptId, student2)).rejects.toMatchObject({ statusCode: 403 })
     await expect(runtime.getReportForTeacher(other.userId, other.role, row.id, attemptId, undefined, true)).rejects.toMatchObject({ statusCode: 403 })
@@ -256,12 +262,21 @@ suite('Four-type Questionnaire production lifecycle', () => {
       trials:gonogoSequence(cog.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1000,endedAtPerfMs:trialIndex*1000+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))})
     const { listMyHistory } = await import('../../modules/cognitive/history.service')
     const history = await listMyHistory(student, { page: 1, pageSize: 100, skip: 0, take: 100 })
-    expect(history.list.find(entry => entry.sessionId === cog.id)).toMatchObject({ source: 'composition', sourceName: row.name, score: null, reportHref: `/student/cognitive/sessions/${cog.id}/result` })
+    expect(history.list.some(entry => entry.sessionId === cog.id)).toBe(false)
+    const { getSession } = await import('../../modules/cognitive/session.service')
+    expect(await getSession(student, cog.id)).toMatchObject({ status: 'COMPLETED', feedbackDeferred: true })
+    expect(await getSession(student, cog.id)).not.toHaveProperty('result')
     const { courseOverview } = await import('../../modules/questionnaire-product/workbench')
     const overview = await courseOverview(actor, course1, {})
     expect(overview.quality.find(entry => entry.id === cog.id)).toMatchObject({ status: 'COMPLETED', qualityState: 'interpretable', reportHref: `/composite-assessments/${row.id}/attempts/${attemptId}/report?partial=1` })
     expect(JSON.stringify(overview)).not.toContain('medianRtMs')
     expect(JSON.stringify(overview)).not.toContain('resultSnapshotEncrypted')
+    const administratorOverview = await courseOverview(admin, course1, {})
+    expect(administratorOverview.list.find(entry => entry.id === row.id)).toBeDefined()
+    expect(administratorOverview.quality.find(entry => entry.id === cog.id)).toMatchObject({ status: 'COMPLETED', qualityState: 'interpretable' })
+    const foreignCourseSessions = await db.cognitiveSession.findMany({ where: { assignment: { courseId: course2 } }, select: { id: true } })
+    expect(foreignCourseSessions.length).toBeGreaterThan(0)
+    expect(administratorOverview.quality.every(entry => !foreignCourseSessions.some(foreign => foreign.id === entry.id))).toBe(true)
     const child=await db.situationalAttempt.findFirstOrThrow({where:{compositeAttemptId:attemptId}})
     await sjtSubmit.submitSituationalAttemptFinal({
       attemptId:child.id,userId:student,submissionId:randomUUID(),attemptEpoch:1,definitionHash:child.definitionHash,instrumentVersion:child.instrumentVersion,compiledRuntimeHash:child.compiledRuntimeHash,scoringVersion:child.scoringVersion,
@@ -269,6 +284,10 @@ suite('Four-type Questionnaire production lifecycle', () => {
       embedded:{compositeAttemptId:attemptId,compositeItemId:child.compositeItemId!,compositeSlotKey:compositeItemSlotKey(child.compositeItemId!,'SITUATIONAL'),userId:student},
     })
     expect(await runtime.getAttemptState(attemptId,{userId:student})).toMatchObject({status:'COMPLETED',progress:100,completedItems:4})
+    expect((await listMyHistory(student, { page: 1, pageSize: 100, skip: 0, take: 100 })).list.find(entry => entry.sessionId === cog.id)).toMatchObject({ source: 'composition', sourceName: row.name, score: null, reportHref: `/student/cognitive/sessions/${cog.id}/result` })
+    const ownCompletedSession = await getSession(student, cog.id)
+    expect(ownCompletedSession).toHaveProperty('result')
+    expect(ownCompletedSession).not.toHaveProperty('feedbackDeferred')
     const report=await runtime.getReport(attemptId,{userId:student})
     expect(report).toMatchObject({productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY'})
     expect(report.unitReports.find((v:any)=>v.type==='SCALE').reportKind).not.toBe('unavailable')
@@ -297,6 +316,47 @@ suite('Four-type Questionnaire production lifecycle', () => {
       expect((await runtime.getReportForTeacher(actor.userId,actor.role,row.id,attemptId)).unitReports).toHaveLength(3)
     } finally { await db.scale.update({where:{id:scaleId},data:{status:'PUBLISHED'}}) }
   },60000)
+  it('withholds anonymous Cognitive and Situational feedback until the final Scale completes the whole battery', async () => {
+    let row = await mixed({ questionnaireType: 'GENERAL', courseIds: [], publicEnabled: true, expiresAt: new Date(Date.now() + 86400000).toISOString() })
+    const types = ['form-section', 'cognitive', 'situational', 'scale']
+    const units = types.map(type => row.units.find((unit: any) => unit.type === type)).map((unit: any) => ({ id: unit.id, type: unit.type === 'form-section' ? 'FORM_SECTION' : unit.type.toUpperCase() }))
+    row = await product.reorder(actor, row.id, { revision: row.revision, units })
+    row = await product.publish(actor, row.id, { revision: row.revision })
+    const token = await runtime.createAccessTokenForComposite(actor.userId, actor.role, row.id, new Date(Date.now() + 3600000).toISOString(), 1)
+    const started = await runtime.startPublicAttempt(token.token!), attemptId = started.attempt.id
+    const recoveryToken = started.recoveryToken!, recoveryTokenHash = hashRecoveryToken(recoveryToken)
+    const form = started.attempt.currentItem as any, section = row.formSections[0]
+    await forms.submitCompositeFormSectionFinal({ attemptId, sectionId: section.id, recoveryTokenHash, userId: null, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: form.definitionHash, answers: section.items.map((item: any) => ({ formItemId: item.id, value: '合成匿名答案' })) })
+    const cog = await db.cognitiveSession.findFirstOrThrow({ where: { compositeAttemptId: attemptId }, include: { assignment: true } })
+    const publicService = await import('../../modules/cognitive/public.service')
+    const ack = await publicService.submitSessionFinal(cog.id, recoveryToken, {
+      submissionId: randomUUID(), attemptEpoch: 1, definitionHash: cog.assignment!.resolvedConfigHash!, contextSnapshotHash: null,
+      trials: gonogoSequence(cog.randomSeed, 120, 0.25).map((trialType, trialIndex) => createTrialEnvelope({ trialIndex, phase: 'test', startedAtPerfMs: trialIndex * 1000, endedAtPerfMs: trialIndex * 1000 + 300, payload: { trialType, responded: trialType === 'go', rtMs: trialType === 'go' ? 300 : null, interrupted: false } })),
+    })
+    expect(ack).toMatchObject({ completed: true, feedbackDeferred: true })
+    expect(ack).not.toHaveProperty('response')
+    expect(await publicService.getSession(cog.id, recoveryToken)).toMatchObject({ status: 'COMPLETED', feedbackDeferred: true })
+    expect(await publicService.getSession(cog.id, recoveryToken)).not.toHaveProperty('result')
+    const child = await db.situationalAttempt.findFirstOrThrow({ where: { compositeAttemptId: attemptId } })
+    await sjtSubmit.submitSituationalAttemptFinal({
+      attemptId: child.id, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: child.definitionHash, instrumentVersion: child.instrumentVersion, compiledRuntimeHash: child.compiledRuntimeHash, scoringVersion: child.scoringVersion,
+      responses: [{ sceneKey: 'AS-01', channelKey: 'behavior', responseValue: 'A' }, { sceneKey: 'AS-02', channelKey: 'behavior', responseValue: 'B' }],
+      embedded: { compositeAttemptId: attemptId, compositeItemId: child.compositeItemId!, compositeSlotKey: compositeItemSlotKey(child.compositeItemId!, 'SITUATIONAL'), recoveryTokenHash },
+    })
+    const { compositeController } = await import('../../modules/composite/composite.controller')
+    let response: any
+    const res: any = { status() { return this }, json(body: any) { response = body; return this } }
+    await compositeController.publicEmbeddedSituational({ params: { attemptId, itemId: child.compositeItemId, situationalAttemptId: child.id }, headers: { 'x-recovery-token': recoveryToken } } as any, res)
+    expect(response).toMatchObject({ code: 0, data: { feedbackDeferred: true, attempt: { status: 'COMPLETED' } } })
+    expect(response.data).not.toHaveProperty('result')
+    await expect(runtime.getReport(attemptId, { recoveryTokenHash })).rejects.toMatchObject({ statusCode: 400 })
+    expect((await runtime.getReportForTeacher(actor.userId, actor.role, row.id, attemptId, undefined, true)).unitReports.map((unit: any) => unit.type).sort()).toEqual(['COGNITIVE', 'SITUATIONAL'])
+    const scale = await db.assessment.findFirstOrThrow({ where: { compositeAttemptId: attemptId } })
+    await scaleSubmit.submitCompositeScaleFinal(attemptId, scale.compositeItemId!, { submissionId: randomUUID(), attemptEpoch: 1, definitionHash: hashScaleDefinition(MIXED_SCALE_DEFINITION), contextSnapshotHash: null, answers: [{ itemCode: 'mixed-scale-item-1', responseValue: 'yes' }] }, { userId: null, recoveryTokenHash })
+    expect(await runtime.getAttemptState(attemptId, { recoveryTokenHash })).toMatchObject({ status: 'COMPLETED', progress: 100 })
+    expect(await publicService.getSession(cog.id, recoveryToken)).toHaveProperty('result')
+    expect((await runtime.getReport(attemptId, { recoveryTokenHash })).unitReports).toHaveLength(3)
+  }, 60000)
   it('enforces the last anonymous slot atomically and preserves scoped report recovery after closure', async () => {
     let row=await fresh({questionnaireType:'GENERAL',courseIds:[],publicEnabled:true,expiresAt:new Date(Date.now()+86400000).toISOString()})
     row=await add(row,{type:'FORM',formType:'text_input',formLabel:'Anonymous response'})

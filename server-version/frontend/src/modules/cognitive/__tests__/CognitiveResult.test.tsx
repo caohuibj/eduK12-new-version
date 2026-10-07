@@ -31,6 +31,16 @@ beforeEach(() => {
 })
 
 describe('CognitiveResult page (generic metadata-driven renderer, Milestone E §74)', () => {
+  it('explains deferred composite feedback without rendering metrics or treating the FINAL as failed', async () => {
+    mockCognitiveApi.getSession.mockResolvedValue({ code: 0, data: {
+      sessionId: 's1', status: 'COMPLETED', feedbackDeferred: true, result: { metrics: { fixture: 999 }, report: { title: 'HIDDEN_RESULT' } },
+    } })
+    renderAt()
+    expect(await screen.findByText('单项已提交，反馈暂未开放')).toBeInTheDocument()
+    expect(screen.getByText('完成整份测评后，按权限查看单项反馈。')).toBeInTheDocument()
+    expect(screen.queryByText('HIDDEN_RESULT')).not.toBeInTheDocument()
+    expect(mockCognitiveApi.completeSession).not.toHaveBeenCalled()
+  })
   it('renders reportDefinition-driven card via GET only (no re-scoring)', async () => {
     mockCognitiveApi.getSession.mockResolvedValue({
       code: 0,

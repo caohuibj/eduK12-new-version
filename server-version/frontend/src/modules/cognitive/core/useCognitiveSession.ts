@@ -419,7 +419,7 @@ export function useCognitiveSession(
             return next
           },
         })
-        if (options.aggregateOnly && (response.data as any).completed === true) {
+        if ((options.aggregateOnly || (response.data as any).feedbackDeferred === true) && (response.data as any).completed === true) {
           await finalDraftStore.setStatus(draftKey, 'COMPLETED')
           await finalDraftStore.delete(draftKey)
           dispatch({

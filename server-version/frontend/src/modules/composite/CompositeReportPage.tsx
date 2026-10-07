@@ -38,7 +38,7 @@ const CompositeReportPage: React.FC = () => {
   const staffMode = teacherMode && (user?.role === 'TEACHER' || user?.role === 'ADMIN')
   const adminMode = teacherMode && user?.role === 'ADMIN'
   const selectedSnapshotId = new URLSearchParams(location.search).get('snapshotId') || undefined
-  const partial = !publicMode && new URLSearchParams(location.search).get('partial') === '1'
+  const partial = teacherMode && new URLSearchParams(location.search).get('partial') === '1'
   const [recoveryToken, setRecoveryToken] = useState(publicMode && attemptId ? readRecovery(attemptId) : '')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [report, setReport] = useState<CompositeReport | null>(null)

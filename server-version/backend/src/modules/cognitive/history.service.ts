@@ -27,7 +27,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
   const where: Prisma.CognitiveSessionWhereInput = {
     userId,
     status: 'COMPLETED' as const,
-    AND: [{ OR: [{ compositeAttemptId: null }, { compositeAttempt: { userId, assignmentRef: null, compositeAssessment: { productKind: { in: ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'] }, reportPackageKey: null, analysisProtocolKey: null } } }] }],
+    AND: [{ OR: [{ compositeAttemptId: null }, { compositeAttempt: { userId, status: 'COMPLETED', assignmentRef: null, compositeAssessment: { productKind: { in: ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'] }, reportPackageKey: null, analysisProtocolKey: null } } }] }],
     OR: [
       { scoreEncrypted: { not: null }, qualityFlagsEncrypted: { not: null } },
       { resultSnapshotEncrypted: { not: null } },

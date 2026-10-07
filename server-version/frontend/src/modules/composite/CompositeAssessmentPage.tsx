@@ -523,7 +523,7 @@ const CompositeAssessmentContent: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">整体进度：{state.completedItems} / {state.totalItems}（{state.progress}%）</p>{!publicMode && !relationalMode && state.productKind === 'QUESTIONNAIRE' && state.completedItems > 0 && <Link to={`/student/composite/attempts/${state.id}/report?partial=1`}>只读查看已完成单项</Link>}</div>
+        <div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">整体进度：{state.completedItems} / {state.totalItems}（{state.progress}%）</p><p className="text-sm text-gray-500">完成整份测评后，按权限查看单项反馈。</p></div>
         <button onClick={() => void saveAndExit()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2 mb-5"><div className="bg-action h-2 rounded-full" style={{ width: `${state.progress}%` }} /></div>
