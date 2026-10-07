@@ -451,7 +451,18 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         </section>
       )}
     >
-      {publicMode && recoveryToken ? <p className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">匿名恢复凭证已保存；请继续保管。</p> : null}
+      {publicMode && recoveryToken ? <div className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        <p>匿名恢复凭证已保存；请继续保管。</p>
+        <details className="mt-2" aria-label="本次匿名作答恢复凭证">
+          <summary className="cursor-pointer">保存本次恢复凭证</summary>
+          <p className="mt-2">换浏览器或设备时，用完整凭证恢复这次作答。请自行保管，勿公开分享。</p>
+          <code className="my-2 block select-all break-all">{recoveryToken}</code>
+          <button type="button" className="btn-secondary" onClick={() => void (async () => {
+            try { await navigator.clipboard.writeText(recoveryToken) }
+            catch { setError('复制失败，请选中并手动保存完整恢复凭证。') }
+          })()}>复制恢复凭证</button>
+        </details>
+      </div> : null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

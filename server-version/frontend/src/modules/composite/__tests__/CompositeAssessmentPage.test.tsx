@@ -55,6 +55,24 @@ beforeEach(() => {
 })
 
 describe('CompositeAssessmentPage public entry', () => {
+  it('clears the previous entry and credential when switching to a closed link in the same page', async () => {
+    mockPublicApi.info.mockImplementation((token: string) => Promise.resolve(token === 'token-1'
+      ? { code: 0, data: { name: '原开放入口', studyEntryPath: '/public/studies/waves/old/token-1' } }
+      : { code: -1, message: '综合测评未开放公开参与', data: null }))
+    render(<MemoryRouter initialEntries={['/public/composite/token-1']}>
+      <Link to="/public/composite/closed">切换到已停用入口</Link>
+      <Routes><Route path="/public/composite/:token" element={<CompositeAssessmentPage />} /></Routes>
+    </MemoryRouter>)
+    const user = userEvent.setup()
+    await screen.findByRole('link', { name: '选择单次访客或保存研究内身份码' })
+    await user.type(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）'), 'previous-credential')
+    await user.click(screen.getByRole('link', { name: '切换到已停用入口' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('未开放公开参与')
+    expect(screen.getByRole('button', { name: '开始匿名测评' })).toBeDisabled()
+    expect(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）')).toHaveValue('')
+    expect(screen.queryByRole('link', { name: '选择单次访客或保存研究内身份码' })).not.toBeInTheDocument()
+    expect(mockPublicApi.start).not.toHaveBeenCalled()
+  })
   it('disables a closed entry while allowing an explicit credential recovery', async () => {
     mockPublicApi.info.mockResolvedValue({ code: -1, message: '综合测评未开放公开参与', data: null })
     mockPublicApi.start.mockRejectedValue({ message: '凭证不属于此链接' })

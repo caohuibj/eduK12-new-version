@@ -99,14 +99,17 @@ async function scenario(browser, engine, width) {
     const choice = first.getByRole('link', { name: '选择单次访客或保存研究内身份码' })
     await choice.waitFor(); assert.equal(admitted, 0)
     await first.getByRole('button', { name: '开始匿名测评' }).click()
+    const credentialPanel = first.getByLabel('本次匿名作答恢复凭证')
+    await credentialPanel.locator('summary').click()
+    const saved = await credentialPanel.locator('code').innerText()
+    assert.ok(saved)
     for (const n of [1, 2]) {
       await first.getByRole('textbox', { name: new RegExp('合成回答 ' + n) }).fill('合成答卷 A' + n)
       await first.getByRole('button', { name: '提交整个区段' }).click()
     }
     await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
     assert.equal(attempts.get('synthetic-attempt-1').answers.length, 2)
-    const saved = await first.evaluate(() => sessionStorage.getItem('composite:recovery:token:open'))
-    assert.ok(saved)
+    assert.equal(await first.evaluate(() => sessionStorage.getItem('composite:recovery:token:open')), saved)
     await first.reload()
     await first.getByText('ANON-SYNTH-1', { exact: true }).waitFor()
 

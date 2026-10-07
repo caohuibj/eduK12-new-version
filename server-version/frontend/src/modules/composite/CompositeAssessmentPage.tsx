@@ -273,6 +273,14 @@ const CompositeAssessmentContent: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setState(null)
+    setPublicInfo(null)
+    setError(null)
+    setExistingReportId(null)
+    setRecoveryToken('')
+    setRecoveryInput('')
+    setNewRecoveryToken(null)
     const initialise = async () => {
       if (publicMode) {
         if (token) {
