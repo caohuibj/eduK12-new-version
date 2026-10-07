@@ -18,6 +18,7 @@ export async function installPackage(db:PrismaClient,actorId:string,raw:unknown)
   const p=parseDeclarativePackage(raw),hash=hashDeclarativePackage(p),d=p.manifest.definition
   const existing = (await import('./code-catalog')).createCodeBundleDefinitionProvider().exact(d.bundleKey, d.bundleVersion)
   if (existing && !existing.declarativePackage) throw new Error('BUNDLE_LEGACY_IDENTITY_RESERVED')
+  if (existing?.declarativePackage && hashDeclarativePackage(existing.declarativePackage) !== hash) throw new Error('BUNDLE_VERSION_IMMUTABLE')
   verifyPackageFixtures(p)
   const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
   return db.$transaction(async tx=>{
@@ -48,7 +49,9 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     if(row.status==='RETIRED')throw new Error('BUNDLE_RETIRED')
     const p=parseDeclarativePackage(row.content),review=validateReview(rawReview,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
     await admin(tx,review.reviewerId)
-    if(review.reviewerId===actorId)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+    // Review is independent of the content installer. The actual publisher
+    // may be that reviewer; publishedBy must identify the caller, not the installer.
+    if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
@@ -74,6 +77,7 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
   const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
   await admin(db,review.reviewerId)
+  if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row

@@ -87,7 +87,7 @@ export async function approvePackage(db: PrismaClient, actor: BundleActor, key: 
   if (!secret || secret.length < 32) throw compositeConflict('固定包审批签名服务尚未配置，请联系运维')
   const material = { ...checked, reviewerId: actor.userId, expiresAt: new Date(Date.now() + 7 * 86400000).toISOString() }
   const signature = createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex')
-  await publishPackage(db, row.installedBy, key, version, { ...material, signature }).catch(releaseError)
+  await publishPackage(db, actor.userId, key, version, { ...material, signature }).catch(releaseError)
   return getPackageDraft(db, actor, key, version)
 }
 /** Published JSON definitions use the same validator and admission signature

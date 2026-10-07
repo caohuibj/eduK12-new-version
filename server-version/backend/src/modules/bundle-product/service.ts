@@ -137,6 +137,8 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
           } : freezeDataForWrite(freezeAssignmentProfile({ entry: engine, profile: 'standard', baseConfig: engine.configSchema.parse(source.config.config) }))
           data.cognitiveAssignmentId = (await tx.cognitiveAssignment.create({ data: {
             configId: source.configId, createdBy: actor.userId, courseId: input.courseId, title: source.title, status: 'PUBLISHED',
+            quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null,
+            maxAttempts: source.maxAttempts,
             publishedAt: new Date(), listedStandalone: false, required: false, ...freeze,
           } })).id
         } else {

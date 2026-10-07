@@ -55,10 +55,18 @@ export function AnonymousStudyManager({compositeId,links,canCreate=true,maximumE
    await anonymousStudyApi.createWave(selected,{...payload,requestId})
    if(current!==epoch.current)return
    sessionStorage.removeItem(storageKey);setWaveTitle('');setWaveExpiry('')
-   const rows=await anonymousStudyApi.statistics(selected)
-   if(current!==epoch.current)return
-   setStats(rows);setNotice('波次与公开链接已建立。请使用“复制研究入口”邀请参与者选择单次访客或研究内身份。')
-   await onLinkCreated?.()
+   setNotice('波次与公开链接已建立。请使用“复制研究入口”邀请参与者选择单次访客或研究内身份。')
+   let refreshFailed=false
+   try {
+    const rows=await anonymousStudyApi.statistics(selected)
+    if(current!==epoch.current)return
+    setStats(rows)
+   } catch {
+    if(current!==epoch.current)return
+    setStats(null);refreshFailed=true
+   }
+   try {await onLinkCreated?.()} catch {refreshFailed=true}
+   if(current===epoch.current && refreshFailed)setError('波次已建立，但显示刷新失败。请刷新统计或页面，无需再次建立波次。')
   })
  }
  const download=(wave:WaveStatistics)=>act(async()=>{
@@ -85,7 +93,7 @@ export function AnonymousStudyManager({compositeId,links,canCreate=true,maximumE
    </div>}
    {stats?.list.map(w=><article key={w.id} className="space-y-2 rounded border p-3"><h4>第 {w.ordinal} 波：{w.title}</h4><p>参与人数 {w.participants} · 完成人数 {w.completedParticipants} · 作答次数 {w.attempts} · 已完成作答 {w.completedAttempts} · 已放弃 {w.abandonedAttempts}</p><div className="flex flex-wrap gap-3">{links.some(l=>l.id===w.tokenId) && <button disabled={busy} onClick={()=>void act(async()=>{const current=epoch.current;await copyEntry(w.id,w.tokenId);if(current===epoch.current)setNotice('研究入口已复制')})}>复制研究入口</button>}<button disabled={busy} onClick={()=>void download(w)}>导出本波次已完成数据（CSV）</button></div></article>)}
    {stats && <p className="text-sm text-gray-600">{stats.countMeaning} 导出继续遵循内容的字段权限；人数统计不提供群体心理指标。</p>}
-   {studies.find(s=>s.id===selected)?.status==='ACTIVE' && <button disabled={busy} onClick={()=>void act(async()=>{const current=epoch.current;await anonymousStudyApi.close(selected);if(current!==epoch.current)return;setStudies(old=>old.map(s=>s.id===selected?{...s,status:'CLOSED'}:s));setNotice('研究已结束，不再接受新作答；本人历史报告仍可按内容权限恢复。');await onLinkCreated?.()})}>结束研究，停止新作答</button>}
+   {studies.find(s=>s.id===selected)?.status==='ACTIVE' && <button disabled={busy} onClick={()=>void act(async()=>{const current=epoch.current;await anonymousStudyApi.close(selected);if(current!==epoch.current)return;setStudies(old=>old.map(s=>s.id===selected?{...s,status:'CLOSED'}:s));setNotice('研究已结束，不再接受新作答；本人历史报告仍可按内容权限恢复。');try{await onLinkCreated?.()}catch{if(current===epoch.current)setError('研究已结束，但链接显示刷新失败。请刷新页面。')}})}>结束研究，停止新作答</button>}
   </>}
  </section>
 }

@@ -13,10 +13,10 @@ beforeEach(() => {
   mocks.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/definitions') ? [record] : record }))
   mocks.post.mockResolvedValue({ code: 0, data: preview })
 })
-async function open() {
+async function open(published = false) {
   render(<MemoryRouter><BundleAuthoring /></MemoryRouter>)
   await userEvent.click(await screen.findByRole('button', { name: '查看定义与审批' }))
-  await screen.findByRole('button', { name: '独立审批发布' })
+  await screen.findByRole('button', { name: published ? '独立续审并发布' : '独立审批发布' })
 }
 describe('fixed package independent review', () => {
   it('keeps the installing administrator from approving their own version', async () => {
@@ -39,5 +39,30 @@ describe('fixed package independent review', () => {
       contentHash: record.contentHash, scientific: true, rights: true, language: true, report: true, claims: ['independent_summary'],
     }))
     expect(JSON.stringify(mocks.post.mock.calls)).not.toContain('signature')
+    await waitFor(() => expect(screen.getByRole('button', { name: '独立续审并发布' })).toBeDisabled())
+  })
+  it.each(['author', 'reviewer'])('provides expired-version renewal with independent review for %s', async userId => {
+    mocks.userId = userId
+    const published = { ...record, status: 'PUBLISHED', review: { expiresAt: '2020-01-01T00:00:00.000Z' } }
+    mocks.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/definitions') ? [published] : published }))
+    await open(true)
+    expect(screen.getByText(/审批已到期/)).toBeInTheDocument()
+    const action = screen.getByRole('button', { name: '独立续审并发布' })
+    expect(action).toBeDisabled()
+    if (userId === 'author') {
+      expect(screen.getByText('此版本由你登记，请交由另一位管理员审核。')).toBeInTheDocument()
+      return
+    }
+    const user = userEvent.setup()
+    for (const checkbox of screen.getAllByRole('checkbox')) await user.click(checkbox)
+    await user.click(action)
+    expect(await screen.findByRole('dialog', { name: '续审已发布固定包版本' })).toBeInTheDocument()
+    mocks.post.mockResolvedValue({ code: 0, data: { ...published, review: { expiresAt: '2099-01-01T00:00:00.000Z' } } })
+    await user.click(screen.getByRole('button', { name: '确认续审' }))
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/bundle-products/admin/definitions/approved_content/1.0.0/approve', {
+      contentHash: record.contentHash, scientific: true, rights: true, language: true, report: true, claims: ['independent_summary'],
+    }))
+    expect(JSON.stringify(mocks.post.mock.calls)).not.toContain('signature')
+    await waitFor(() => expect(screen.getByRole('button', { name: '独立续审并发布' })).toBeDisabled())
   })
 })

@@ -46,12 +46,13 @@ export default function BundleAuthoring() {
   }
   async function approve() {
     if (!selected || !preview || selected.contentHash !== preview.contentHash || reviewed.length !== 4) return
-    if (!await confirm({ title: '审批并发布固定包版本', body: `确认已独立审核 ${selected.bundleKey} ${selected.bundleVersion} 的科学声明、材料权限、语言及报告。发布后版本内容不可改写，当前签名有效期为七天。`, confirmLabel: '审批发布' })) return
+    const renewal = selected.status === 'PUBLISHED'
+    if (!await confirm({ title: renewal ? '续审已发布固定包版本' : '审批并发布固定包版本', body: `确认已独立审核 ${selected.bundleKey} ${selected.bundleVersion} 的科学声明、材料权限、语言及报告。版本内容不可改写；审核有效期为七天，到期后停止新投放，可再次独立续审，已有冻结报告保留。`, confirmLabel: renewal ? '确认续审' : '审批发布' })) return
     await action(async () => {
       const record = await request('/definitions/' + encodeURIComponent(selected.bundleKey) + '/' + encodeURIComponent(selected.bundleVersion) + '/approve', {
         contentHash: selected.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims,
       })
-      setSelected(record); await load(); success('版本已审批发布', '教师仍需精确版本授权；生产新建开关由受控发布流程管理。')
+      setSelected(record); setReviewed([]); await load(); success(renewal ? '版本已独立续审' : '版本已审批发布', '教师仍需精确版本授权；生产新建开关由受控发布流程管理。')
     })
   }
   return <ProductPage width="management"><PageHeader title="固定测评包制作与审批" description="制作不可变包版本，预览整体报告，交由另一位管理员独立审核。" />
@@ -83,11 +84,12 @@ export default function BundleAuthoring() {
         {scenario.conclusions?.length ? scenario.conclusions.map((conclusion: any) => <p key={conclusion.ruleId}>{conclusion.text}</p>) : <p>{scenario.message || '当前证据不支持整体结论；仍可按授权查看单项依据。'}</p>}
       </li>)}</ul>
       <details><summary>报告块和适用范围</summary><pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words text-sm">{JSON.stringify({ report: preview.report, scientific: preview.scientific }, null, 2)}</pre></details>
-      {selected?.status === 'DRAFT' && <fieldset disabled={busy || selected.installedBy === user?.id} className="space-y-2">
-        <legend className="font-semibold">3. 独立审核</legend>
+      {selected?.review?.expiresAt && <p>{Date.parse(selected.review.expiresAt) <= Date.now() ? '审批已到期' : '审批仍有效'}；审核有效期至：{new Date(selected.review.expiresAt).toLocaleString()}。到期后停止新投放，已有冻结报告保留；请由另一位管理员独立续审。</p>}
+      {selected && ['DRAFT', 'PUBLISHED'].includes(selected.status) && <fieldset disabled={busy || selected.installedBy === user?.id} className="space-y-2">
+        <legend className="font-semibold">3. {selected.status === 'PUBLISHED' ? '独立续审' : '独立审核'}</legend>
         {selected.installedBy === user?.id && <p>此版本由你登记，请交由另一位管理员审核。</p>}
         {['科学声明与适用范围', '材料使用权限', '语言与说明', '整体报告及单项依据'].map(label => <label key={label} className="block"><input type="checkbox" checked={reviewed.includes(label)} onChange={event => setReviewed(values => event.target.checked ? [...values, label] : values.filter(value => value !== label))} /> 已审核{label}</label>)}
-        <ProductButton variant="primary" disabled={reviewed.length !== 4 || preview.blockers.length > 0 || selected.contentHash !== preview.contentHash} onClick={() => void approve()}>独立审批发布</ProductButton>
+        <ProductButton variant="primary" disabled={reviewed.length !== 4 || preview.blockers.length > 0 || selected.contentHash !== preview.contentHash} onClick={() => void approve()}>{selected.status === 'PUBLISHED' ? '独立续审并发布' : '独立审批发布'}</ProductButton>
       </fieldset>}
     </section>}
     <section className="my-6 space-y-3" aria-label="登记的固定包版本"><h2 className="text-lg font-semibold">版本与审批记录</h2>
