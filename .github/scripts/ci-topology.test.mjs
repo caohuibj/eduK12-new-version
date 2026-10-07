@@ -29,7 +29,11 @@ test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
   }
   assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
   const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  assert.match(regression,/QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql:\/\/ptool:ptool123@localhost:5432\/ptool\?schema=public/);
   assert.match(regression,/if: inputs\.focus == 'assessment-repair'[\s\S]*CI_POSTGRES_SERVICE_ID:.*\$\{\{ job\.services\.postgres\.id \}\}[\s\S]*run: node scripts\/r5-regression\.mjs/);
+  for(const file of ['questionnaire/workbench','integration/registered-resource-catalog','integration/runtime-role']) {
+    assert.ok(regression.split('hosted critical integration suites must not skip')[1]?.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`full regression must require ${file}`);
+  }
 });
 test('speed profile assigns independent heavy consumers to hosted Linux and preserves Windows resource exclusivity',()=>{
   const plan=runnerPlan({...capacity,profile:'speed',scenario:'platform'});
