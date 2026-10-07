@@ -71,10 +71,15 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+      - name: clear reports from previous regression jobs
+        # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
+        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
+          # Self-hosted runners already retain ~/.npm; remote cache uploads can
+          # block the single slot long after the tests and service cleanup finish.
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
           cache-dependency-path: server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"

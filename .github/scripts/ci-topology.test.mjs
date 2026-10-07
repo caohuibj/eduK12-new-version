@@ -29,6 +29,10 @@ test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
   }
   assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
   const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  const reportCleanup=regression.indexOf('name: clear reports from previous regression jobs');
+  assert.ok(reportCleanup>=0 && reportCleanup<regression.indexOf('uses: actions/setup-node@v4'));
+  for(const report of ['backend','parent','r5']) assert.match(regression.slice(reportCleanup,regression.indexOf('uses: actions/setup-node@v4')),new RegExp(`/tmp/eduk12-${report}-vitest\\.json`));
+  assert.match(regression,/cache: \$\{\{ runner\.environment == 'github-hosted' && 'npm' \|\| '' \}\}/);
   assert.match(regression,/QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql:\/\/ptool:ptool123@localhost:5432\/ptool\?schema=public/);
   assert.match(regression,/if: inputs\.focus == 'assessment-repair'[\s\S]*CI_POSTGRES_SERVICE_ID:.*\$\{\{ job\.services\.postgres\.id \}\}[\s\S]*run: node scripts\/r5-regression\.mjs/);
   for(const file of ['questionnaire/workbench','integration/registered-resource-catalog','integration/runtime-role']) {

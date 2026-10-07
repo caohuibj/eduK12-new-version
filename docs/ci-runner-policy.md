@@ -165,6 +165,12 @@ Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
 
+Regression jobs clear their exact temporary report paths before setup, so a
+persistent self-hosted runner cannot upload a previous focus's test evidence.
+Self-hosted regression uses its existing local npm download cache; remote npm
+cache restore/save is limited to GitHub-hosted jobs. Lockfile installation, actual
+tests, non-skipping assertions, artifacts and service cleanup are unchanged.
+
 Keep integration work Draft during repair and probes. Freeze the combined functional
 and CI head, verify every affected component, then run one final complete gate.
 Same-source failed-job retries may preserve already successful jobs; changed source
