@@ -32,13 +32,16 @@ async function main(){
   await db.$executeRaw`INSERT INTO organization_student_class_assignments (id,organization_id,membership_id,class_unit_id,valid_from,valid_until) VALUES (${randomUUID()},${first.organizationId},${member.membershipId},${cls},'2026-09-01'::timestamptz,'2026-09-20'::timestamptz)`
   await db.$executeRaw`INSERT INTO organization_student_class_assignments (id,organization_id,membership_id,class_unit_id,valid_from) VALUES (${randomUUID()},${first.organizationId},${member.membershipId},${nextClass},'2026-09-20'::timestamptz)`
  }
- const actor={userId:first.ownerId,platformRole:'SYSTEM_ADMIN' as const}, specs:Record<string,string>={}
+ const createPlatformAdmin=async(label:string)=>db.user.create({data:{username:`reporting_browser_${label}_${randomUUID()}`,passwordHash:await bcrypt.hash(password,10),role:'ADMIN',platformRole:'SYSTEM_ADMIN',isActive:true,teacherApproved:true,mustChangePassword:false}})
+ const creatorUser=await createPlatformAdmin('creator'),reviewerUser=await createPlatformAdmin('reviewer')
+ const actor={userId:creatorUser.id,platformRole:'SYSTEM_ADMIN' as const}, specs:Record<string,string>={}
+ const reviewer={userId:reviewerUser.id,platformRole:'SYSTEM_ADMIN' as const}
  for(const kind of ['GROUP','REPEATED_COHORT','MATCHED_LONGITUDINAL','INDIVIDUAL_LONGITUDINAL']){
   const individual=kind==='INDIVIDUAL_LONGITUDINAL',group=kind==='GROUP'
   const definition={schemaVersion:1,analysisKind:kind,engineKey:group?'ORG_GROUP_V1':`ORG_${kind}_V1`,engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',reportEvidenceCeiling:'PILOT',...(!individual?{minimumCohortN:3,minimumContributorN:3}:{}),
    metricRules:[{metricId:'score',sourceMetricKey:'score',...(!group?{sourceFamily:'BUNDLE',sourceResourceKey:resource,valueType:'NUMBER',longitudinalMetricKey:'score'}:{}),acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',...(!individual?{aggregations:['MEAN'],minimumMetricN:3}:{}),missingnessRule:'EXCLUDE',observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],...(!group?{comparabilityRules:[]}:{})}
   const spec=await createPlatformReportingSpec({actor,specKey:`!browser-${kind}-${randomUUID()}`,version:1,definition})
-  await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id});specs[kind]=spec.id
+  await reviewPlatformReportingSpec({actor:reviewer,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id});specs[kind]=spec.id
  }
  const owner=await db.user.findUniqueOrThrow({where:{id:first.ownerId}})
  await writeFile(process.env.REPORTING_BROWSER_FIXTURE||'/tmp/reporting-v22-fixture.json',JSON.stringify({organizationId:first.organizationId,username:owner.username,password,resource:'BUNDLE/'+resource,first:{runId:first.runId,trackId:first.trackId},subject:first.members[0].userId,specs}),{mode:0o600})

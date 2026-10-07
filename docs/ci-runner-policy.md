@@ -158,6 +158,9 @@ assertions, authorization boundaries or scan thresholds to obtain a green result
 The existing CI workflow exposes `step_probe` values for frontend, backend,
 backend-regression, targeted reporting, browser, media, UI, hosted Chromium UI, QA component UI, Ops, performance, images and Cognitive checks.
 The `assessment-repair` probe runs the shared R5 regression selector, including
+task-controller admission and collection snapshot completion fixtures, so the
+focused gate catches filter-export and draft-before-publication contract drift.
+It requires
 non-skipping Questionnaire, Bundle, onboarding, SJT and anonymous-study PostgreSQL
 evidence. With `runner_profile=local`, backend regression, browser, media, visual
 and maintenance probes use self-hosted runners; there is no hosted fallback.
