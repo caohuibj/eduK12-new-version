@@ -193,12 +193,13 @@ async function main() {
         const query = new URL(route.request().url()).searchParams
         queries.push(query.toString())
         const state = query.get('state')
-        const list = state ? [] : [{ id: 'task', kind: 'ASSIGNMENT', title: '继续实验记录', courses: [{ id: sampleCourse.id, title: sampleCourse.title }], state: 'IN_PROGRESS', deadline: null, opensAt: null, canContinue: true, canStart: false, href: '/student/assignments/task' }]
-        return fulfill(route, failed ? null : { list, total: list.length, page: 1, pageSize: 20, generatedAt: '2026-09-30T00:00:00Z', counts: { PENDING: 0, IN_PROGRESS: 1, UPCOMING: 0, EXPIRED: 0, COMPLETED: 0, UNAVAILABLE: 0 } }, failed ? 503 : 200)
+        const list = !state || state === 'ACTIONABLE' || state === 'IN_PROGRESS' ? [{ id: 'task', kind: 'ASSIGNMENT', title: '继续实验记录', courses: [{ id: sampleCourse.id, title: sampleCourse.title }], state: 'IN_PROGRESS', deadline: null, opensAt: null, canContinue: true, canStart: false, href: '/student/assignments/task' }] : []
+        return fulfill(route, failed ? null : { list, total: list.length, page: 1, pageSize: 20, generatedAt: '2026-09-30T00:00:00Z', counts: { ACTIONABLE: 1, PENDING: 0, IN_PROGRESS: 1, UPCOMING: 0, EXPIRED: 0, COMPLETED: 0, UNAVAILABLE: 0 } }, failed ? 503 : 200)
       })
       await page.goto(base + '/student')
       await page.getByRole('link', { name: '继续继续实验记录', exact: true }).waitFor()
       assert.equal(queries.length, 1, 'home uses a single task aggregation request')
+      assert.equal(new URLSearchParams(queries[0]).get('state'), 'ACTIONABLE', 'home defaults to actionable tasks')
       failed = true
       await page.getByLabel('任务状态', { exact: true }).selectOption('COMPLETED')
       await page.getByText('待办加载失败', { exact: true }).waitFor()
