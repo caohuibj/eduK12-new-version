@@ -227,6 +227,7 @@ jobs:
           path: |
             /tmp/eduk12-backend-vitest.json
             /tmp/eduk12-parent-vitest.json
+            /tmp/eduk12-r5-vitest.json
             /tmp/eduk12-hosted-ci-env.txt
           if-no-files-found: ignore
       - name: remove this job's ephemeral services and anonymous volumes
@@ -235,4 +236,3 @@ jobs:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
-
