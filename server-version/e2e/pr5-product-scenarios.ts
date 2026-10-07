@@ -139,6 +139,17 @@ async function complete(name, r) {
   return { task, attemptId, snapshot: snapshots[0], canonical, page, executionStatus: rows[0].status }
 }
 async function finishRuntime(page, attemptId) {
+  const parentReads = [], clientErrors = []
+  let finalAck
+  const captureParentRead = async response => {
+    if (response.request().method() !== 'GET' || new URL(response.url()).pathname !== `/api/composite-assessments/attempts/${attemptId}`) return
+    const body = await response.json().catch(() => null)
+    parentReads.push({ httpStatus: response.status(), code: body?.code, message: body?.message, status: body?.data?.status, completedItems: body?.data?.completedItems, totalItems: body?.data?.totalItems })
+  }
+  const captureClientError = error => clientErrors.push(error.message)
+  page.on('response', captureParentRead)
+  page.on('pageerror', captureClientError)
+  try {
   await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).click()
   for (const scene of [1, 2]) {
     await page.getByText(`情境 ${scene} / 2`, { exact: true }).waitFor()
@@ -148,7 +159,10 @@ async function finishRuntime(page, attemptId) {
   }
   const final = page.waitForResponse(response => response.request().method() === 'POST' && response.url().includes(`/attempts/${attemptId}/items/`) && response.url().endsWith('/submit'))
   await page.getByRole('button', { name: '提交测评', exact: true }).click()
-  assert.equal((await (await final).json()).code, 0)
+  const submitted = await final
+  assert.equal(submitted.status(), 200)
+  finalAck = await submitted.json()
+  assert.equal(finalAck.code, 0)
   await page.waitForURL(/\/(my-assessments|relational\/tasks)$/)
   const persisted = await prisma.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })
   assert.equal(persisted.status, 'COMPLETED')
@@ -159,6 +173,17 @@ async function finishRuntime(page, attemptId) {
   const metric = canonical.core.metrics.find(m => m.key === 'bfi2.assertiveness.behavior')
   assert.equal(typeof metric.value, 'number')
   return { snapshots, canonical }
+  } catch (error) {
+    await page.screenshot({ path: `${output}/runtime-${attemptId}-failure.png`, fullPage: true }).catch(() => undefined)
+    const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: { status: true, attemptEpoch: true } })
+    writeFileSync(`${output}/runtime-${attemptId}-failure.json`, JSON.stringify({ url: page.url(), parent, finalAckStatus: finalAck?.data?.attempt?.status, parentReads, clientErrors, visibleText: (await page.locator('body').innerText().catch(() => '')).slice(0, 4000) }, null, 2))
+    throw error
+  } finally {
+    evidence.runtimeTransitions ??= []
+    evidence.runtimeTransitions.push({ attemptId, finalAckStatus: finalAck?.data?.attempt?.status, parentReads, clientErrors })
+    page.off('response', captureParentRead)
+    page.off('pageerror', captureClientError)
+  }
 }
 const baseMetric = { metricId: 'behavior', sourceMetricKey: 'bfi2.assertiveness.behavior', acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY',
   aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT' }
