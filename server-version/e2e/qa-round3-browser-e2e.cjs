@@ -13,6 +13,8 @@ const options = [1, 2, 3, 4].map(value => ({ value: 'option_' + value, label: '�
 const items = [1, 2, 3].map(number => ({ itemCode: 'Q' + number, content: '浏览器量表题 ' + number, type: 'single', required: true, sortOrder: number, responseSetKey: 'default', randomizeOptions: false, options }))
 let definition = { schemaVersion: 2, responseSets: [{ key: 'default', options }], items, scoring: { scores: [], itemRules: [] } }
 const resources = [], specs = []
+const creatorId = 'r3-content-creator', reviewerId = 'r3-independent-reviewer'
+const reviewActors = []
 const fixture = { attempt: {
   id: 'r3-browser-attempt', name: '本地合成测评', status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', attemptEpoch: 1,
   currentIndex: 0, completedItems: 0, totalItems: 1, items: [{ id: 'unit-1', type: 'SCALE', label: '量表', index: 0 }],
@@ -31,27 +33,33 @@ const server = http.createServer(async (req, res) => {
   }
   if (!url.pathname.startsWith('/api/')) { res.setHeader('Content-Type', 'text/html'); res.end(html); return }
   let raw = ''; for await (const chunk of req) raw += chunk
+  const actorId = /(?:^|;\s*)qa-content-actor=reviewer(?:;|$)/.test(req.headers.cookie || '') ? reviewerId : creatorId
   let data = {}
   if (url.pathname === '/api/auth/csrf') data = { csrfToken: 'local-synthetic-csrf-only' }
+  else if (url.pathname === '/api/auth/me') data = { id: actorId, username: actorId, role: 'ADMIN', platformRole: 'SYSTEM_ADMIN', isActive: true, mustChangePassword: false }
   else if (url.pathname === '/api/organizations/measurement-resources') {
     if (req.method === 'POST') {
       const input = JSON.parse(raw); assert.equal(input.scaleId, 'original-1'); assert.equal(input.mode, 'INDIVIDUAL')
-      resources.push({ id: 'resource-1', status: 'DRAFT', scale_id: input.scaleId, resource_key: 'custom-scale:original-1:INDIVIDUAL', resource_version: '1.0.1', entry: { title: '本地原创量表（个人自评）', description: '描述性试用', applicability: { analysisMode: 'INDIVIDUAL_ONLY' }, resultDisclosure: { audiences: { SUBJECT: { metricKeys: ['total'] } } } } })
+      assert.equal(actorId, creatorId)
+      resources.push({ id: 'resource-1', status: 'DRAFT', created_by_user_id: actorId, scale_id: input.scaleId, resource_key: 'custom-scale:original-1:INDIVIDUAL', resource_version: '1.0.1', entry: { title: '本地原创量表（个人自评）', description: '描述性试用', applicability: { analysisMode: 'INDIVIDUAL_ONLY' }, resultDisclosure: { audiences: { SUBJECT: { metricKeys: ['total'] } } } } })
       data = resources[0]
     } else data = { list: resources, truncated: false }
   }
   else if (/^\/api\/organizations\/measurement-resources\/resource-1\/(review|publish)$/.test(url.pathname)) {
     assert.equal(req.method, 'POST'); const row = resources[0], review = url.pathname.endsWith('/review')
+    if (review) { assert.equal(actorId, reviewerId); assert.notEqual(actorId, row.created_by_user_id); reviewActors.push(actorId) }
     assert.equal(row.status, review ? 'DRAFT' : 'REVIEWED'); row.status = review ? 'REVIEWED' : 'PUBLISHED'; data = row
   }
   else if (url.pathname === '/api/organizations/reporting-specs') data = { list: specs, nextPage: null }
   else if (url.pathname === '/api/organizations/reporting-specs/descriptive') {
     const input = JSON.parse(raw); assert.equal(resources[0].status, 'PUBLISHED'); assert.equal(input.resourceId, 'resource-1')
     assert.equal(input.analysisKind, 'INDIVIDUAL_LONGITUDINAL'); assert.equal(input.minimumN, 3)
-    specs.push({ id: 'spec-1', status: 'DRAFT', specKey: input.specKey, version: input.version, specHash: 'local-synthetic', definition: { analysisKind: input.analysisKind, reportEvidenceCeiling: 'PILOT', metricRules: [{ metricId: 'total', sourceResourceKey: resources[0].resource_key }] } }); data = specs[0]
+    assert.equal(actorId, creatorId)
+    specs.push({ id: 'spec-1', status: 'DRAFT', createdByUserId: actorId, specKey: input.specKey, version: input.version, specHash: 'local-synthetic', definition: { analysisKind: input.analysisKind, reportEvidenceCeiling: 'PILOT', metricRules: [{ metricId: 'total', sourceResourceKey: resources[0].resource_key }] } }); data = specs[0]
   }
   else if (/^\/api\/organizations\/reporting-specs\/spec-1\/(review|publish)$/.test(url.pathname)) {
     assert.equal(req.method, 'POST'); const row = specs[0], review = url.pathname.endsWith('/review')
+    if (review) { assert.equal(actorId, reviewerId); assert.notEqual(actorId, row.createdByUserId); reviewActors.push(actorId) }
     assert.equal(row.status, review ? 'DRAFT' : 'REVIEWED'); row.status = review ? 'REVIEWED' : 'PUBLISHED'; data = row
   }
   else if (url.pathname === '/api/scales') data = { list: [{ id: 'scale-1', code: 'r3', name: '本地量表', status: 'DEPRECATED', definition, creator: { username: 'local-fixture' }, _count: { assessments: 1 } }, { id: 'original-1', code: 'original', name: '本地原创量表', status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE', creator: { username: 'local-fixture' }, _count: { assessments: 0 } }], total: 2 }
@@ -150,22 +158,31 @@ const server = http.createServer(async (req, res) => {
     await page.getByRole('combobox', { name: '原创量表', exact: true }).selectOption('original-1')
     await page.getByRole('button', { name: '注册资源草稿', exact: true }).click()
     await page.getByRole('heading', { name: '本地原创量表（个人自评） · 草稿' }).waitFor()
+    assert.equal(await page.getByRole('button', { name: '审核', exact: true }).isDisabled(), true)
+    await page.context().addCookies([{ name: 'qa-content-actor', value: 'reviewer', url: base }])
+    await page.reload()
     for (const [action, status] of [['审核', '已审核'], ['发布', '已发布']]) {
       await page.getByRole('button', { name: action, exact: true }).click()
       await page.getByRole('heading', { name: '本地原创量表（个人自评） · ' + status }).waitFor()
     }
+    await page.context().clearCookies()
+    await page.reload()
     await page.getByRole('combobox', { name: '已发布测量资源', exact: true }).selectOption('resource-1')
     await page.getByLabel('方案名称', { exact: true }).fill('本地两波次描述方案')
     await page.getByRole('button', { name: '创建方案草稿', exact: true }).click()
     await page.getByRole('heading', { name: '本地两波次描述方案 v1 · 草稿' }).waitFor()
+    assert.equal(await page.getByRole('button', { name: '审核', exact: true }).isDisabled(), true)
+    await page.context().addCookies([{ name: 'qa-content-actor', value: 'reviewer', url: base }])
+    await page.reload()
     for (const [action, status] of [['审核', '已审核'], ['发布', '已发布']]) {
       await page.getByRole('button', { name: action, exact: true }).click()
       await page.getByRole('heading', { name: '本地两波次描述方案 v1 · ' + status }).waitFor()
     }
     await page.reload()
     await page.getByRole('heading', { name: '本地两波次描述方案 v1 · 已发布' }).waitFor()
+    assert.deepEqual(reviewActors, [reviewerId, reviewerId])
     await page.screenshot({ path: path.join(output, 'reporting-content-published.png'), fullPage: true })
-    evidence.checks.push('normal management UI registers, reviews and publishes a resource and matching report spec, retaining published state on reload (synthetic HTTP fixture; actual services and scoring verified separately in PostgreSQL)')
+    evidence.checks.push('authenticated management UI disables creator self-review; a separate platform admin reviews the resource and matching report spec, retaining published state on reload (synthetic HTTP fixture; actual services and scoring verified separately in PostgreSQL)')
     assert.deepEqual(errors, [])
     evidence.pageErrors = errors
     fs.writeFileSync(path.join(output, 'browser-proof.json'), JSON.stringify(evidence, null, 2) + '\n')
