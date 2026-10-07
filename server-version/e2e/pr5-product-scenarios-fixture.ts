@@ -12,10 +12,11 @@ async function main() {
   const password = 'Pr5ScenarioPass2026!'
   const passwordHash = await bcrypt.hash(password, 10)
   const users: Record<string, any> = {}
-  for (const name of ['platform', 'owner', 'parent', 'legacyTeacher', 'teacher0', 'teacher1', 'teacher2', 'student0', 'student1', 'student2', 'counselor0', 'counselor1', 'counselor2', 'client0', 'client1', 'client2']) {
-    const role = name === 'platform' || name === 'counselor0' ? 'ADMIN' : name === 'parent' ? 'PARENT' : name === 'legacyTeacher' ? 'TEACHER' : 'STUDENT'
+  for (const name of ['platform', 'platformReviewer', 'owner', 'parent', 'legacyTeacher', 'teacher0', 'teacher1', 'teacher2', 'student0', 'student1', 'student2', 'counselor0', 'counselor1', 'counselor2', 'client0', 'client1', 'client2']) {
+    const isPlatformAdmin = name === 'platform' || name === 'platformReviewer'
+    const role = isPlatformAdmin || name === 'counselor0' ? 'ADMIN' : name === 'parent' ? 'PARENT' : name === 'legacyTeacher' ? 'TEACHER' : 'STUDENT'
     const user = await prisma.user.create({ data: { username: `pr5_scenario_${name}_${suffix}`, passwordHash, role,
-      platformRole: name === 'platform' ? 'SYSTEM_ADMIN' : 'STANDARD', teacherApproved: true, mustChangePassword: false } })
+      platformRole: isPlatformAdmin ? 'SYSTEM_ADMIN' : 'STANDARD', teacherApproved: true, mustChangePassword: false } })
     users[name] = { id: user.id, username: user.username, password, role }
   }
   const composite = await prisma.compositeAssessment.create({ data: {

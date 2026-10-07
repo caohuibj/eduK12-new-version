@@ -169,7 +169,9 @@ async function spec(platform, kind, key = 'teacher-self') {
   if (kind === 'PROTECTED_FEEDBACK') { delete definition.minimumCohortN; definition.minimumRespondentN = 3; definition.privacyUnit = 'RESPONDENT'; definition.metricRules[0].observationUnit = 'RESPONDENT' }
   else if (kind !== 'GROUP') definition.comparabilityRules = []
   const s = await ok(platform, '/organizations/reporting-specs', { specKey: `pr5-${kind}-${randomUUID()}`, version: 1, definition })
-  await ok(platform, `/organizations/reporting-specs/${s.id}/review`, {})
+  const selfReview = await denied(platform, `/organizations/reporting-specs/${s.id}/review`, {})
+  assert.equal(selfReview.status, 403, 'spec creator cannot self-review')
+  await ok(await pageFor('platformReviewer'), `/organizations/reporting-specs/${s.id}/review`, {})
   await ok(platform, `/organizations/reporting-specs/${s.id}/publish`, {})
   return s.id
 }
