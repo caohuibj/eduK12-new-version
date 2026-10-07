@@ -4,14 +4,28 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import uuid
 import backup
 
 
-def main():
-    if os.geteuid() != 0 or any(os.environ.get(k) != v for k, v in {'CI':'true','GITHUB_ACTIONS':'true','NODE_ENV':'test'}.items()):
+def require_fixture_environment(local, env, uid, home):
+    if local:
+        # Explicitly opt in to the dedicated local socket; reject remote hosts,
+        # context overrides and impersonation of the hosted CI environment.
+        if env.get('NODE_ENV') != 'test' or env.get('CI') == 'true' or env.get('GITHUB_ACTIONS') == 'true' \
+                or env.get('DOCKER_CONTEXT') or env.get('DOCKER_HOST') != 'unix://' + str(home / '.colima/r5-validation/docker.sock'):
+            raise RuntimeError('ISOLATED_LOCAL_DOCKER_ONLY')
+    elif uid != 0 or any(env.get(k) != v for k, v in {'CI':'true','GITHUB_ACTIONS':'true','NODE_ENV':'test'}.items()):
         raise RuntimeError('ISOLATED_HOSTED_CI_ONLY')
+
+
+def main():
+    if sys.argv[1:] not in [[], ['--local']]:
+        raise RuntimeError('BACKUP_FIXTURE_ARGUMENTS_INVALID')
+    local = sys.argv[1:] == ['--local']
+    require_fixture_environment(local, os.environ, os.geteuid(), Path.home())
     ident = uuid.uuid4().hex
     name = 'eduk12-ci-host-backup-' + ident
     def docker(*args, check=True):
@@ -25,11 +39,7 @@ def main():
         envfile = work/'fixture.env';envfile.write_text('POSTGRES_USER=fixture\nPOSTGRES_DB=fixture\nPOSTGRES_PASSWORD=synthetic-ci-only\n');envfile.chmod(0o600)
         try:
             docker('run','-d','--name',name,'--label','eduk12.ci.fixture='+ident,'--network','none','--memory','384m','--cpus','0.5','--env-file',str(envfile),image)
-            import time
-            for _ in range(90):
-                if docker('exec',name,'pg_isready','-U','fixture','-d','fixture',check=False).returncode==0:break
-                time.sleep(1)
-            else:raise RuntimeError('CI_DATABASE_NOT_READY')
+            backup.wait_for_database(name, 'fixture', 'fixture')
             expected=[{'name':'synthetic','checksum':'a'*64}]
             sql='CREATE TABLE "_prisma_migrations" (id text, migration_name text, checksum text, finished_at timestamp, rolled_back_at timestamp); INSERT INTO "_prisma_migrations" VALUES (\'synthetic\',\'synthetic\',\''+'a'*64+'\',now(),NULL); CREATE TABLE users(id text); INSERT INTO users VALUES (\'synthetic-user\');'
             docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',sql)
@@ -59,7 +69,7 @@ def main():
                 docker('rm','-f','-v',name)
     assert set(docker('ps','-aq').stdout.split())==containers
     assert set(docker('volume','ls','-q').stdout.split())==volumes
-    print(json.dumps({'encryptedBackup':'PASS','actualIsolatedRestore':'PASS','checksumFailureCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
+    print(json.dumps({'execution':'local' if local else 'hosted-ci','encryptedBackup':'PASS','actualIsolatedRestore':'PASS','wrongReleaseFailureCleanup':'PASS','checksumFailureCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
 
 
 if __name__=='__main__':main()

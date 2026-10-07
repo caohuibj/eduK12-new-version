@@ -20,7 +20,9 @@ export async function verifyRuntimePrivileges(db) {
     (c.relname='_prisma_migrations' OR (has_table_privilege(current_user,c.oid,'INSERT')
       AND has_table_privilege(current_user,c.oid,'UPDATE') AND has_table_privilege(current_user,c.oid,'DELETE'))) AS writable,
     (c.relname<>'_prisma_migrations' OR NOT (has_table_privilege(current_user,c.oid,'INSERT')
-      OR has_table_privilege(current_user,c.oid,'UPDATE') OR has_table_privilege(current_user,c.oid,'DELETE'))) AS migration_safe
+      OR has_table_privilege(current_user,c.oid,'UPDATE') OR has_table_privilege(current_user,c.oid,'DELETE')
+      OR has_table_privilege(current_user,c.oid,'TRUNCATE') OR has_table_privilege(current_user,c.oid,'REFERENCES')
+      OR has_table_privilege(current_user,c.oid,'TRIGGER'))) AS migration_safe
     FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','p')`)
   const sequences = await db.$queryRawUnsafe(`SELECT c.relname AS name,
     has_sequence_privilege(current_user,c.oid,'USAGE') AND has_sequence_privilege(current_user,c.oid,'SELECT') AS usable

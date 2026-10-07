@@ -167,16 +167,36 @@ def source_runtime_proof(expected):
     # A runtime outage must not stop taking a recoverable database backup.
     # This is source-side evidence, never a claim that restore provisioned roles.
     try:
-        proof = json.loads(run(['docker', 'exec', BACKEND, 'node', 'scripts/runtime-role-contract.mjs', 'verify-current']))
+        proof = json.loads(run(['docker', 'exec', BACKEND, 'node', 'scripts/runtime-role-contract.mjs', 'verify-current'], timeout=60))
         require(proof.get('ok') and proof.get('restrictedRuntimeRole')
                 and proof.get('migrationFingerprint') == migration_fingerprint(expected), 'SOURCE_RELEASE_RUNTIME_NOT_READY')
         return {'status': 'PASS', **proof}
     except RuntimeError as error:
         if str(error) not in ['BACKUP_COMMAND_FAILED', 'SOURCE_RELEASE_RUNTIME_NOT_READY']:
             raise
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, subprocess.TimeoutExpired):
         pass
     return {'status': 'NOT_VERIFIED', 'reason': 'runtime_preflight_failed_or_unavailable', 'applicationReleaseReady': False}
+
+
+def wait_for_database(name, user, database):
+    # One slow Docker exec during cold startup is not a readiness verdict.
+    # Keep the per-probe cap; bound the entire wait by a monotonic deadline.
+    deadline = time.monotonic() + 90
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError('ISOLATED_RESTORE_NOT_READY')
+        try:
+            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', user, '-d', database],
+                                    capture_output=True, timeout=min(10, remaining))
+            if result.returncode == 0 and time.monotonic() < deadline:
+                return
+        except subprocess.TimeoutExpired:
+            pass
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(1, remaining))
 
 
 def restore_check(file, source, secret, work, ident, expected_migrations=None):
@@ -189,13 +209,7 @@ def restore_check(file, source, secret, work, ident, expected_migrations=None):
         run(['docker', 'run', '-d', '--name', name, '--label', LABEL + '=' + ident,
              '--network', 'none', '--memory', '384m', '--cpus', '0.5', '--pids-limit', '128',
              '--env-file', str(envfile), 'postgres:16.15-bookworm'])
-        for _ in range(90):
-            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
-            if result.returncode == 0:
-                break
-            time.sleep(1)
-        else:
-            raise RuntimeError('ISOLATED_RESTORE_NOT_READY')
+        wait_for_database(name, 'restore', 'restore')
         env = os.environ.copy()
         env.update(BACKUP_ENCRYPTION_KEY=secret, RESTORE_CONFIRMATION='RESTORE', RESTORE_TARGET_CONTAINER=name,
                    RESTORE_TARGET_DB_NAME='restore', RESTORE_TARGET_DB_USER='restore', NODE_OPTIONS='--max-old-space-size=768')

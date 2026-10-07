@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { Client } from 'pg'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
@@ -59,6 +61,13 @@ suite('actual restricted runtime role and exact release identity', () => {
     await owner.$executeRawUnsafe(`GRANT INSERT ON "_prisma_migrations" TO "${role}"`)
     await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
     await owner.$executeRawUnsafe(`REVOKE INSERT ON "_prisma_migrations" FROM "${role}"`)
+    for (const privilege of ['TRUNCATE', 'REFERENCES', 'TRIGGER']) {
+      await owner.$executeRawUnsafe(`GRANT ${privilege} ON "_prisma_migrations" TO "${role}"`)
+      await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
+      await owner.$executeRawUnsafe(`REVOKE ${privilege} ON "_prisma_migrations" FROM "${role}"`)
+    }
+    await expect(runtime.$executeRawUnsafe('TRUNCATE "_prisma_migrations"')).rejects.toThrow()
+    expect((await runtime.$queryRawUnsafe('SELECT count(*)::int AS count FROM "_prisma_migrations"') as { count: number }[])[0].count).toBe(1)
     expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
   })
   it('rejects owner credentials and an elevated runtime principal', async () => {
@@ -67,6 +76,40 @@ suite('actual restricted runtime role and exact release identity', () => {
     await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_ROLE_NOT_RESTRICTED')
     await admin.$executeRawUnsafe(`ALTER ROLE "${role}" NOCREATEDB`)
     expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
+  })
+  it('binds default privileges to the exact owner, database and role; protects the ledger and admits a future table', async () => {
+    const [{ name: ownerName }] = await owner.$queryRawUnsafe('SELECT current_user AS name') as { name: string }[]
+    const source = readFileSync(new URL('../../../scripts/runtime-role-defaults.sql', import.meta.url), 'utf8')
+    const literal = (value: string) => "'" + value.replaceAll("'", "''") + "'"
+    const sql = (target: string, migrationOwner: string, runtimeRole: string) => source
+      .replaceAll(":'target_database'", literal(target))
+      .replaceAll(":'migration_owner'", literal(migrationOwner))
+      .replaceAll(":'runtime_role'", literal(runtimeRole))
+    const url = new URL(selected!); url.pathname = '/' + database
+    const client = new Client({ connectionString: url.href })
+    await client.connect()
+    try {
+      await owner.$executeRawUnsafe(`GRANT INSERT ON "_prisma_migrations" TO "${role}"`)
+      for (const args of [[database + '_wrong', ownerName, role], [database, role, role], [database, ownerName, ownerName]]) {
+        await expect(client.query(sql(...args as [string, string, string]))).rejects.toThrow('EXACT_RUNTIME_PROVISION_SCOPE_MISMATCH')
+        await client.query('ROLLBACK')
+      }
+      // Invalid plans must not silently revoke or grant anything.
+      await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
+      await client.query(sql(database, ownerName, role))
+      await client.query(sql(database, ownerName, role)) // idempotent
+      await owner.$executeRawUnsafe('CREATE TABLE future_runtime_business (id SERIAL PRIMARY KEY, name text)')
+      await runtime.$executeRawUnsafe("INSERT INTO future_runtime_business(name) VALUES ('future')")
+      await runtime.$executeRawUnsafe("UPDATE future_runtime_business SET name='updated'")
+      expect((await runtime.$queryRawUnsafe('SELECT name FROM future_runtime_business') as { name: string }[])[0].name).toBe('updated')
+      await runtime.$executeRawUnsafe('DELETE FROM future_runtime_business')
+      await expect(runtime.$executeRawUnsafe('TRUNCATE "_prisma_migrations"')).rejects.toThrow()
+      expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
+    } finally {
+      await client.query('ROLLBACK')
+      await client.end()
+      await owner.$executeRawUnsafe('DROP TABLE IF EXISTS future_runtime_business')
+    }
   })
   it('binds the actual migration ledger to the exact release and rejects changed, missing, extra or unfinished migrations', async () => {
     expect(await verifyReleaseSchema(runtime, expected)).toMatchObject({ migrationCount: 1 })

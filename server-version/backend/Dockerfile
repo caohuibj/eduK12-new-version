@@ -121,6 +121,7 @@ CMD ["node", "dist/index.js"]
 # ---------- Stage 4: ops（migrate / seed 一次性任务，保留 devDependencies） ----------
 FROM build AS ops
 WORKDIR /app
+COPY scripts/runtime-role-defaults.sql ./scripts/runtime-role-defaults.sql
 # 继承 build 阶段的完整 node_modules（含 prisma CLI 与 tsx）
 # compose 通过 profiles: ["ops"] + command 调用：
 #   migrate -> npm run db:migrate:guarded
