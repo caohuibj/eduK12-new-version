@@ -40,7 +40,21 @@ and unscoped CI changes select the full platform route. Malformed classification
 Management-UI content publication without a Git change uses application publication
 validation. A server release is separate from WeChat mini-program publication.
 
-## Recommended speed topology
+## Current production routing: all self-hosted
+
+The repository variable `CI_RUNNER_PROFILE` is `local`, and manual component/full
+dispatch defaults to `local`. Hosted Actions minutes are exhausted. Keep subsequent
+PR, main and diagnostic work self-hosted; do not select `speed` or `economy` without
+an explicit decision to resume hosted usage. Windows/WSL `eduk12-win-ci` runs CodeQL,
+backend/isolated database regression, production images/scans, recovery, performance
+and actual API/media browser checks in its single exclusive slot. Mac runs routing,
+frontend builds/regression, pure component UI and the three visual engines. Each
+machine's existing resource preflight and exact-source artifact checks still apply.
+
+The hosted speed topology below is retained as an optional capacity profile, not
+the current default.
+
+## Optional speed topology
 
 ```mermaid
 flowchart LR
@@ -79,10 +93,10 @@ Profiles are explicit:
 | --- | --- | --- |
 | `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, three visual engines | Mac frontend/AppShell/component UI; Windows migrations/images/Ops/performance |
 | `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
-| `local` (diagnostics) | CodeQL only | Mac frontend/UI, Windows real services |
+| `local` (current default) | None | Mac frontend/UI, Windows real services and CodeQL |
 
-Light/medium routes do not select heavy hosted acceleration. CodeQL remains on
-GitHub when selected. Broad medium UI changes can require all three browser engines
+Light/medium routes do not select heavy hosted acceleration. CodeQL runs on
+Windows/WSL in local mode and on GitHub in hosted profiles. Broad medium UI changes can require all three browser engines
 on Mac and take longer than a small medium change. `balanced`/`hybrid` are aliases
 for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
