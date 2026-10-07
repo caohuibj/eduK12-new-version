@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { createServer, type Server } from 'node:http'
 import express from 'express'
@@ -57,7 +58,7 @@ suite('PR4 delivery, Safety and CSV authority gate (real PostgreSQL/HTTP)', () =
         acceptedMetricQuality: 'IGNORE_METRIC_QUALITY', aggregations: ['MEAN'], missingnessRule: 'EXCLUDE',
         minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT' }],
     } })
-    await reviewPlatformReportingSpec({ actor: principal, specId: spec.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer(principal), specId: spec.id })
     await publishPlatformReportingSpec({ actor: principal, specId: spec.id })
     const artifact = await generateOrganizationGroupAnalysis({ principal, organizationId: orgId, runId: fixture.runId, trackId: fixture.trackId, specId: spec.id })
     expect(artifact.projection.state).toBe('present')
@@ -152,7 +153,7 @@ suite('PR4 delivery, Safety and CSV authority gate (real PostgreSQL/HTTP)', () =
         acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY', aggregations: ['MEAN'],
         missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'RESPONDENT', selectionPolicy: 'UNIQUE_OR_REJECT' }],
     } })
-    await reviewPlatformReportingSpec({ actor: principal, specId: spec.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer(principal), specId: spec.id })
     await publishPlatformReportingSpec({ actor: principal, specId: spec.id })
     const input = { principal, organizationId, runId: fixture.runId, trackId: fixture.trackId,
       subjectUserId: fixture.ownerId, relationshipKind: 'CLASS_TEACHER_STUDENT', perspective: 'RELATIONAL_EXPERIENCE' as const, specId: spec.id }

@@ -88,4 +88,36 @@ class BackupSafety(unittest.TestCase):
         with self.assertRaises(RuntimeError): backup.cleanup_container('eduk12-prod-postgres', 'a' * 32)
 
 
+class ReleaseIdentityTests(unittest.TestCase):
+    def test_runtime_evidence_is_precise_and_outage_does_not_block_database_backup(self):
+        expected = [{'name': 'synthetic', 'checksum': 'a' * 64}]
+        valid = {'ok': True, 'restrictedRuntimeRole': True, 'migrationFingerprint': backup.migration_fingerprint(expected)}
+        with patch.object(backup, 'run', return_value=json.dumps(valid).encode()):
+            self.assertEqual(backup.source_runtime_proof(expected)['status'], 'PASS')
+        for value in [b'not json', b'[]', json.dumps({**valid, 'migrationFingerprint': 'b' * 64}).encode()]:
+            with patch.object(backup, 'run', return_value=value):
+                self.assertEqual(backup.source_runtime_proof(expected)['status'], 'NOT_VERIFIED')
+        with patch.object(backup, 'run', side_effect=RuntimeError('BACKUP_COMMAND_FAILED')):
+            self.assertFalse(backup.source_runtime_proof(expected)['applicationReleaseReady'])
+        with patch.object(backup, 'run', side_effect=RuntimeError('BACKUP_INTERRUPTED')):
+            with self.assertRaisesRegex(RuntimeError, 'BACKUP_INTERRUPTED'): backup.source_runtime_proof(expected)
+
+    def test_exact_migration_identity_refuses_missing_extra_changed_duplicate(self):
+        expected = [{'name': 'one', 'checksum': 'a' * 64}, {'name': 'two', 'checksum': 'b' * 64}]
+        self.assertEqual(backup.verify_restored_migrations(list(reversed(expected)), expected), backup.migration_fingerprint(expected))
+        for actual in [expected[:1], expected + [{'name': 'three', 'checksum': 'c' * 64}],
+                       [expected[0], {'name': 'two', 'checksum': 'c' * 64}], [expected[0], expected[0]]]:
+            with self.assertRaisesRegex(RuntimeError, 'RESTORE_RELEASE_SCHEMA_MISMATCH'):
+                backup.verify_restored_migrations(actual, expected)
+
+    def test_migration_source_is_bound_to_release_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); source = root / 'scripts/backup'; source.mkdir(parents=True)
+            sql = root / 'backend/prisma/migrations/one/migration.sql'; sql.parent.mkdir(parents=True); sql.write_text('CREATE TABLE synthetic(id text);')
+            expected = backup.release_migrations(source)
+            self.assertEqual(expected, [{'name': 'one', 'checksum': backup.sha(sql)}])
+            sql.unlink(); sql.symlink_to(root / 'foreign.sql')
+            with self.assertRaises(RuntimeError): backup.release_migrations(source)
+
+
 if __name__ == '__main__': unittest.main()

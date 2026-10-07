@@ -1,6 +1,6 @@
 import { formatLocalTimestamp } from '../../utils/dateTime'
 import ManagementDialog from '../../components/staff-ui/ManagementDialog'
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { runApi, type EvaluationTargetMode, type RunResourceChoice, type RunPreview, type AssessmentRunDetail, type RunActorRole, type RunAnalysisMode, type RunPerspective, type RunPopulationSelector, type RunProgressProjection, type RunRelationshipKind, type RunResourceFamily } from '../../api/runs'
 import { useOrganization } from '../../contexts/OrganizationContext'
@@ -51,6 +51,10 @@ export default function OrganizationRunDetailPage() {
   const [targetIds, setTargetIds] = useState('')
   const [targetCourse, setTargetCourse] = useState('')
   const [resources, setResources] = useState<RunResourceChoice[]>([])
+  const [resourceNextPage, setResourceNextPage] = useState<number | null>(null)
+  const [resourceLoading, setResourceLoading] = useState(false)
+  const resourceScope = useRef(0)
+  useEffect(() => { const epoch = resourceScope; epoch.current++; return () => { epoch.current++ } }, [organizationId, runId])
   const [selectedResource, setSelectedResource] = useState<RunResourceChoice | null>(null)
   const [resourceFamily, setResourceFamily] = useState<RunResourceFamily>('BUNDLE')
   const [resourceKey, setResourceKey] = useState('')
@@ -74,22 +78,31 @@ export default function OrganizationRunDetailPage() {
 
   const load = useCallback(async () => {
     if (!organizationId || !runId || !canGovern) return
+    const scope = ++resourceScope.current
+    setResourceLoading(false)
     setLoading(true)
     setLoadError(null)
     setProgress(null)
     try {
       const next = await runApi.detail(organizationId, runId)
+      if (scope !== resourceScope.current) return
       setDetail(next)
-      if (next.run.status === 'DRAFT') { setProgress(null); setResources((await runApi.resources(organizationId)).list) }
+      if (next.run.status === 'DRAFT') {
+        setProgress(null)
+        const choices = await runApi.resources(organizationId)
+        if (scope !== resourceScope.current) return
+        setResources(choices.list); setResourceNextPage(choices.nextPage ?? null)
+      }
       else {
-        try { setProgress(await runApi.progress(organizationId, runId)) }
-        catch (err) { setLoadError(errorText(err, '执行进度读取失败，请重试。')) }
+        try { const nextProgress = await runApi.progress(organizationId, runId); if (scope === resourceScope.current) setProgress(nextProgress) }
+        catch (err) { if (scope === resourceScope.current) setLoadError(errorText(err, '执行进度读取失败，请重试。')) }
       }
     } catch (err) {
+      if (scope !== resourceScope.current) return
       setDetail(null)
       setLoadError(errorText(err, '无法加载 Run'))
     } finally {
-      setLoading(false)
+      if (scope === resourceScope.current) setLoading(false)
     }
   }, [organizationId, runId, canGovern])
 
@@ -215,6 +228,15 @@ export default function OrganizationRunDetailPage() {
           <div><h2 id="run-add-track-heading" className="text-xl font-semibold text-slate-900">添加测评项目</h2><p className="mt-1 text-sm text-slate-600">选择已发布测量资源与参与者。发布时服务器会重新核对权限，并冻结内容、成员身份及关系。</p></div>
           {resources.length === 0 && <ProductStatus kind="info" title="暂无已发布的可用资源">当前没有已发布且已授权给您的组织测量资源。请由平台管理员在“测量与报告方案”中注册并发布资源，再在原材料页面授权给指定教师。课程量表发布不会自动进入此目录。</ProductStatus>}
           <label className="grid gap-1 text-sm font-medium">已发布资源<select aria-label="已发布资源" className="min-h-11 rounded-lg border px-3" defaultValue="" onChange={event => chooseResource(event.target.value)}><option value="" disabled>请选择资源</option>{resources.map((item, index) => <option key={`${item.family}:${item.key}:${item.version}`} value={index}>{item.title} · {item.family}/{item.key}@{item.version}</option>)}</select></label>
+          {resourceNextPage && <ProductButton disabled={busy || resourceLoading || loading} onClick={() => {
+            const scope = resourceScope.current
+            setResourceLoading(true); setMutationError(null)
+            void runApi.resources(organizationId, resourceNextPage).then(page => {
+              if (scope !== resourceScope.current) return
+              setResources(current => [...current, ...page.list.filter(item => !current.some(existing => existing.family === item.family && existing.key === item.key && existing.version === item.version))])
+              setResourceNextPage(page.nextPage ?? null)
+            }).catch(err => { if (scope === resourceScope.current) setMutationError(errorText(err, '资源读取失败，请重试。')) }).finally(() => { if (scope === resourceScope.current) setResourceLoading(false) })
+          }}>加载更多已授权资源</ProductButton>}
           <form className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 lg:grid-cols-3" onSubmit={addTrack}>
             {selectedResource?.allowedTargetModes?.length ? <fieldset className="space-y-2 lg:col-span-3"><legend>评价对象（由服务器解析关系）</legend><select aria-label="评价对象模式" value={targetMode} onChange={e => setTargetMode(e.target.value as EvaluationTargetMode)}>{selectedResource.allowedTargetModes.map(mode => <option key={mode} value={mode}>{mode}</option>)}</select>{targetMode === 'SELECTED_CLASS_TEACHERS' && <input aria-label="指定教师成员编号" value={targetIds} onChange={e => setTargetIds(e.target.value)} placeholder="教师成员编号，以逗号分隔" />}{targetMode === 'COURSE_TEACHER' && <input aria-label="评价课程编号" value={targetCourse} onChange={e => setTargetCourse(e.target.value)} placeholder="课程编号" />}<p>指定编号只会收窄合法关系范围，不能新增评价对象。</p></fieldset> : null}
             <label className="grid gap-1 text-sm font-medium">资源类型<select className="min-h-11 rounded-lg border border-slate-300 px-3" disabled value={resourceFamily} onChange={(event) => setResourceFamily(event.target.value as RunResourceFamily)}>{RESOURCE_FAMILIES.map((family) => <option key={family}>{family}</option>)}</select></label>

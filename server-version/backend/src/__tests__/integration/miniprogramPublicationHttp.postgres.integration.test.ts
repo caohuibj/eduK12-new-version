@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import {randomUUID} from 'node:crypto'
 import type {Server} from 'node:http'
 import express from 'express'
@@ -14,6 +15,7 @@ import {createMembership,grantCapability,revokeCapability} from '../../modules/o
 import {createParentPublisher} from '../../modules/parent-portal/publisher'
 import {createParentTemplateRegistry} from '../../modules/parent-portal/templates'
 import {parentToolPolicyService} from '../../modules/parent-portal/tool-policy'
+import {readParentReportSource} from '../../modules/parent-portal/source'
 import authRoutes from '../../routes/auth'
 import capabilitiesRoutes from '../../routes/capabilities'
 import {parentLinksRouter,parentsRouter,parentPublicationRouter} from '../../modules/parent-portal/routes'
@@ -38,9 +40,10 @@ suite('PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and
   const member=await createMembership({organizationId,userId:manager.id,orgRole:'ORG_ADMIN',meta:meta(manager.id)})
   const [ref]=await prisma.$queryRaw<Array<{key:string;version:string}>>`SELECT resource_key AS key,resource_version AS version FROM assessment_run_tracks WHERE id=${f.trackId}`
   const spec=await createPlatformReportingSpec({actor:principal,specKey:randomUUID(),version:1,definition:{schemaVersion:1,analysisKind:'PROTECTED_FEEDBACK',engineKey:'ORG_PROTECTED_FEEDBACK_V1',engineVersion:'1.0.0',privacyUnit:'RESPONDENT',selectionPolicy:'UNIQUE_OR_REJECT',minimumRespondentN:3,minimumContributorN:3,reportEvidenceCeiling:'PILOT',metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:ref.key,valueType:'NUMBER',longitudinalMetricKey:'score',acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',minimumMetricN:3,observationUnit:'RESPONDENT',selectionPolicy:'UNIQUE_OR_REJECT'}]}})
-  await reviewPlatformReportingSpec({actor:principal,specId:spec.id});await publishPlatformReportingSpec({actor:principal,specId:spec.id})
+  await reviewPlatformReportingSpec({actor: await independentReviewer(principal),specId:spec.id});await publishPlatformReportingSpec({actor:principal,specId:spec.id})
   const report=await generateOrganizationProtectedFeedback({principal,organizationId,runId:f.runId,trackId:f.trackId,subjectUserId:child.id,relationshipKind:'CLASS_TEACHER_STUDENT',perspective:'RELATIONAL_EXPERIENCE',specId:spec.id})
   const artifactId=report.artifactId,[sourceBefore]=await prisma.$queryRaw<any[]>`SELECT artifact_payload,snapshot_hash FROM reporting_analysis_artifacts WHERE id=${artifactId}`
+  await expect(readParentReportSource(artifactId)).rejects.toMatchObject({code:'PARENT_REPORT_NOT_PUBLISHED',status:404})
   const parent=await prisma.user.create({data:{username:'publication-parent-'+randomUUID(),passwordHash,role:'PARENT'}})
   const outsider=await prisma.user.create({data:{username:'publication-outsider-'+randomUUID(),passwordHash,role:'PARENT'}})
   const course=await prisma.course.create({data:{creatorId:manager.id,title:'Publication synthetic course',courseCode:randomUUID().slice(0,12)}});await prisma.courseStudent.create({data:{courseId:course.id,studentId:child.id,status:'ACTIVE'}})
@@ -64,7 +67,7 @@ suite('PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and
   expect(consentPreview).toMatchObject({consentStatus:'NOT_ACCEPTED',canConsent:true,canRevoke:false})
   // A second, independently published report proves withdrawal remains artifact-scoped.
   const independentSpec=await createPlatformReportingSpec({actor:principal,specKey:randomUUID(),version:1,definition:{...spec.definition,metricRules:spec.definition.metricRules.map(rule=>({...rule,aggregations:['MEAN','MEDIAN']}))}})
-  await reviewPlatformReportingSpec({actor:principal,specId:independentSpec.id});await publishPlatformReportingSpec({actor:principal,specId:independentSpec.id})
+  await reviewPlatformReportingSpec({actor: await independentReviewer(principal),specId:independentSpec.id});await publishPlatformReportingSpec({actor:principal,specId:independentSpec.id})
   const independent=await generateOrganizationProtectedFeedback({principal,organizationId,runId:f.runId,trackId:f.trackId,subjectUserId:child.id,relationshipKind:'CLASS_TEACHER_STUDENT',perspective:'RELATIONAL_EXPERIENCE',specId:independentSpec.id})
   expect(independent.artifactId).not.toBe(artifactId)
   await a.runtime.parentPublications.publish(await a.runtime.parentPublications.preview(independent.artifactId))

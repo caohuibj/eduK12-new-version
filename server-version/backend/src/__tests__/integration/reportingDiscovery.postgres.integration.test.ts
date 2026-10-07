@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PlatformRole, PrismaClient, UserRole } from '@prisma/client'
@@ -139,7 +140,7 @@ suite('PR5 reporting product discovery (real PostgreSQL)', () => {
       version: 1,
       definition,
     })
-    await reviewPlatformReportingSpec({ actor: { userId: owner.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer({ userId: owner.id, platformRole: 'SYSTEM_ADMIN' }), specId: draft.id })
     await publishPlatformReportingSpec({ actor: { userId: owner.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
 
     const ownerPrincipal = { userId: owner.id, platformRole: 'SYSTEM_ADMIN' as const }

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { config } from '../../config'
 import { canUseScale } from '../../services/materialGrant'
 import { UserRole } from '../../types'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -9,7 +10,7 @@ import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } 
 import { reportingFail } from '../reporting/types'
 
 type Actor = { userId: string; platformRole: string }
-type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string }
+type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string; created_by_user_id: string; reviewed_by_user_id: string | null }
 const admin = (actor: Actor) => { if (actor.platformRole !== 'SYSTEM_ADMIN') reportingFail('RESOURCE_AUTHORITY', '只有平台管理员可以注册、审核和发布测量资源', 403) }
 
 export function validateDescriptiveResourceScale(scale: { status: string; instrumentClass: string; definition: unknown; definitionHash: string | null }): ScaleDefinitionV2 {
@@ -63,8 +64,15 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
     if (!scale) return reportingFail('RESOURCE_NOT_FOUND', '量表不存在', 404)
     const definition = validateDescriptiveResourceScale(scale)
     const hash = hashScaleDefinition(definition), key = `custom-scale:${scale.id}:${mode}`
-    const existing = await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${key} AND definition_hash=${hash}`
-    if (existing[0]) { checkedEntry(existing[0]); return existing[0] }
+    const existing = await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${key} AND definition_hash=${hash} ORDER BY created_at DESC,id DESC`
+    if (existing[0]) {
+      const prior = existing[0]; checkedEntry(prior)
+      // Legacy self-reviewed, unpublished rows cannot pass the new publish
+      // gate. Registration creates a fresh version without rewriting old audit.
+      const needsIndependentVersion = prior.status === 'REVIEWED'
+        && (!prior.reviewed_by_user_id || [prior.created_by_user_id, scale.creatorId].includes(prior.reviewed_by_user_id))
+      if (!needsIndependentVersion) return prior
+    }
     const versions = await tx.$queryRaw<Array<{ n: number }>>`SELECT COUNT(*)::int AS n FROM registered_assessment_resources WHERE resource_key=${key}`
     const version = `1.0.${versions[0].n + 1}`
     const target = await tx.compositeAssessment.create({ data: {
@@ -93,6 +101,8 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
       const scale = await tx.scale.findUniqueOrThrow({ where: { id: row.scale_id } })
       validateDescriptiveResourceScale(scale)
       if (scale.definitionHash !== row.definition_hash) reportingFail('RESOURCE_INTEGRITY', '量表已变化，请重新注册当前版本', 409)
+      if (action === 'review' && [row.created_by_user_id, scale.creatorId].includes(actor.userId)) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '资源注册者和量表作者不能自审，请交由另一位平台管理员审核', 403)
+      if (action === 'publish' && (!row.reviewed_by_user_id || [row.created_by_user_id, scale.creatorId].includes(row.reviewed_by_user_id))) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请重新登记新版本并独立审核', 409)
     }
     if (action === 'publish') await tx.compositeAssessment.update({ where: { id: row.composite_id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
     const status = { review: 'REVIEWED', publish: 'PUBLISHED', retire: 'RETIRED' }[action]
@@ -130,14 +140,20 @@ export async function resolveHistoricalRelationalEntry(ref: { resourceKind: stri
 }
 
 export async function listReleasedRegisteredResources(userId: string, role: UserRole) {
-  const rows = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE status='PUBLISHED' ORDER BY created_at DESC,id LIMIT 101`
-  if (rows.length > 100) reportingFail('RESOURCE_CATALOG_LIMIT', '资源目录超过当前分页范围，请联系管理员整理', 409)
-  const entries = []
-  for (const row of rows) {
-    const scale = await prisma.scale.findUnique({ where: { id: row.scale_id } })
-    if (scale?.status === 'PUBLISHED' && scale.definitionHash === row.definition_hash && await canUseScale(userId, role, scale)) entries.push(checkedEntry(row))
-  }
-  return entries
+  return (await listReleasedRegisteredResourcePage(userId, role)).entries
+}
+
+export async function listReleasedRegisteredResourcePage(userId: string, role: UserRole, page = 1) {
+  if (!Number.isSafeInteger(page) || page < 1 || page > 100000) reportingFail('RESOURCE_PAGE_INVALID', '资源页码无效', 400)
+  // Permission filtering precedes the page limit; source status/hash and grants
+  // are read in the same statement, without per-resource DB lookups.
+  const rows = await prisma.$queryRaw<Row[]>`SELECT resource.* FROM registered_assessment_resources resource
+    JOIN scales scale ON scale.id=resource.scale_id AND scale.status='PUBLISHED' AND scale.definition_hash=resource.definition_hash
+    WHERE resource.status='PUBLISHED' AND (${role === UserRole.ADMIN} OR scale.creator_id=${userId}
+      OR (${config.materialGrantsEnabled} AND EXISTS (SELECT 1 FROM material_grants grant_row
+        WHERE grant_row.teacher_id=${userId} AND grant_row.resource_type='SCALE' AND grant_row.resource_id=scale.id)))
+    ORDER BY resource.created_at DESC,resource.id LIMIT 101 OFFSET ${(page - 1) * 100}`
+  return { entries: rows.slice(0, 100).map(checkedEntry), nextPage: rows.length > 100 ? page + 1 : null }
 }
 
 export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false) {

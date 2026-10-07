@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -45,11 +46,22 @@ suite('registered descriptive content → real two-wave canonical reports', () =
     definition.report.interpretations=[{scoreKey:'total',headline:'偏好描述',source:{type:'score_only'},summary:'三题回答合计。',bands:[],guidance:[]}]
     const definitionHash = hashScaleDefinition(definition)
     const scale = await db.scale.create({data:{code:'r3resource_' + suffix.replaceAll('-',''),name:'原创偏好',status:'PUBLISHED',creatorId:admin.id,instrumentClass:'CUSTOM_DESCRIPTIVE',definition,definitionHash}})
-    const resource = await registerDescriptiveResource(actor,scale.id)
+    let resource = await registerDescriptiveResource(actor,scale.id)
     expect((await registerDescriptiveResource(actor,scale.id)).id).toBe(resource.id)
     await expect(updateComposite(admin.id, UserRole.ADMIN, resource.composite_id, {name:'replace'})).rejects.toMatchObject({statusCode:403})
     await expect(transitionDescriptiveResource(actor,resource.id,'publish')).rejects.toMatchObject({code:'RESOURCE_STATE_CONFLICT'})
-    await transitionDescriptiveResource(actor,resource.id,'review')
+    await expect(transitionDescriptiveResource(actor,resource.id,'review')).rejects.toMatchObject({code:'RESOURCE_INDEPENDENT_REVIEW_REQUIRED',statusCode:403})
+    expect((await db.$queryRaw<Array<{status:string}>>`SELECT status FROM registered_assessment_resources WHERE id=${resource.id}`)[0].status).toBe('DRAFT')
+    // Construct an existing pre-policy self-review, then use only production
+    // registration/review/publish to repair it as a new version.
+    await db.$executeRaw`UPDATE registered_assessment_resources SET status='REVIEWED',reviewed_by_user_id=${admin.id},reviewed_at=CURRENT_TIMESTAMP WHERE id=${resource.id}`
+    await expect(transitionDescriptiveResource(actor,resource.id,'publish')).rejects.toMatchObject({code:'RESOURCE_INDEPENDENT_REVIEW_REQUIRED',statusCode:409})
+    const oldId = resource.id
+    resource = await registerDescriptiveResource(actor,scale.id)
+    expect(resource.id).not.toBe(oldId); expect(resource.status).toBe('DRAFT'); expect(resource.resource_version).toBe('1.0.2')
+    expect((await registerDescriptiveResource(actor,scale.id)).id).toBe(resource.id)
+    expect((await db.$queryRaw<Array<{status:string;reviewed_by_user_id:string}>>`SELECT status,reviewed_by_user_id FROM registered_assessment_resources WHERE id=${oldId}`)[0]).toEqual({status:'REVIEWED',reviewed_by_user_id:admin.id})
+    await transitionDescriptiveResource(await independentReviewer(actor),resource.id,'review')
     await transitionDescriptiveResource(actor,resource.id,'publish')
     expect(await listReleasedRegisteredResources(teacher.id, UserRole.TEACHER)).toEqual([])
     const ref = {family:'SCALE' as const,key:resource.resource_key,version:resource.resource_version}
@@ -89,7 +101,7 @@ suite('registered descriptive content → real two-wave canonical reports', () =
     }
     const spec = await createPlatformReportingSpec({actor,specKey:'r3-individual-' + suffix,version:1,
       definition:descriptiveReportingDefinition({...resource.entry,definitionHash},'INDIVIDUAL_LONGITUDINAL',3)})
-    await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+    await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
     const input={organizationId,subjectUserId:student.id,sources,specId:spec.id}
     // Platform admin and org admin alone must not disclose an individual's report.
     await expect(generateIndividualLongitudinal({...input,principal:actor})).rejects.toMatchObject({statusCode:404})
@@ -112,7 +124,7 @@ suite('registered descriptive content → real two-wave canonical reports', () =
     const adminDownload=await downloadReportingExport({organizationId,principal:actor,exportId:adminTicket.exportId})
     expect(adminDownload.csv).toBe(download.csv)
     const groupResource=await registerDescriptiveResource(actor,scale.id,'GROUP')
-    await transitionDescriptiveResource(actor,groupResource.id,'review');await transitionDescriptiveResource(actor,groupResource.id,'publish')
+    await transitionDescriptiveResource(await independentReviewer(actor),groupResource.id,'review');await transitionDescriptiveResource(actor,groupResource.id,'publish')
     const groupMembers=[{userId:student.id,membershipId:studentMembership.id}]
     for (let i=0;i<2;i++) {
       const user=await db.user.create({data:{username:`r3-group-${i}-${suffix}`,passwordHash:'synthetic-only',role:'STUDENT'}})
@@ -140,7 +152,7 @@ suite('registered descriptive content → real two-wave canonical reports', () =
       groupSources.push({runId:run.id,trackId:executions[0].track_id})
     }
     const groupSpec=await createPlatformReportingSpec({actor,specKey:'r3-group-spec-'+suffix,version:1,definition:descriptiveReportingDefinition({...groupResource.entry,definitionHash},'MATCHED_LONGITUDINAL',3)})
-    await reviewPlatformReportingSpec({actor,specId:groupSpec.id});await publishPlatformReportingSpec({actor,specId:groupSpec.id})
+    await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:groupSpec.id});await publishPlatformReportingSpec({actor,specId:groupSpec.id})
     const groupInput={organizationId,principal:actor,sources:groupSources,specId:groupSpec.id,analysisKind:'MATCHED_LONGITUDINAL' as const,mode:'FULL_CASE' as const,cohortStrategy:'WAVE_SPECIFIC' as const}
     const groupReport=await generateAutomaticLongitudinal(groupInput)
     expect(groupReport.projection).toMatchObject({kind:'MATCHED_LONGITUDINAL',state:'present',matchedEligibleN:3,metrics:{total:{state:'present',validCaseN:3}}})

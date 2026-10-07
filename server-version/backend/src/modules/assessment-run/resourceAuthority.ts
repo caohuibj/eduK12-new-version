@@ -122,10 +122,19 @@ export class RunResourceAuthorityRegistry {
   }
 }
 
-const relationalEntryToRunPolicy = (
+export const relationalEntryToRunPolicy = (
   entry: RelationalProductEntryV1,
-  registry: RelationalProductRegistryV1,
-): RunResourcePolicy => ({
+  registry: RelationalProductRegistryV1 = relationalProductRegistry,
+): RunResourcePolicy => {
+  // Shared readiness checks apply to both exact lookups and already batched
+  // catalog entries; eliminating a second lookup must not bypass this contract.
+  if (entry.releaseStatus !== 'PUBLISHED') throw new RunResourceAuthorityError('RUN_RESOURCE_NOT_PUBLISHED', 'resource version is not published', 409)
+  if (!entry.launchTarget) throw new RunResourceAuthorityError('RUN_RESOURCE_RUNTIME_UNAVAILABLE', 'resource has no runtime launch target', 409)
+  if (entry.applicability.subjectRoles.includes('TEACHER') && entry.applicability.respondentRoles.includes('STUDENT') && !entry.allowedTargetModes?.length) {
+    throw new RunResourceAuthorityError('RUN_TARGET_POLICY_MISSING', 'Published teacher-evaluation content must declare target modes', 409)
+  }
+  if (!entry.initiationModes?.length) throw new RunResourceAuthorityError('RUN_INITIATION_POLICY_MISSING', 'Published delivery content must declare initiation modes', 409)
+  return {
   resultDisclosure: entry.resultDisclosure,
   ...(entry.initiationModes ? { initiationModes: entry.initiationModes } : {}),
   ...(entry.allowedTargetModes ? { allowedTargetModes: entry.allowedTargetModes } : {}),
@@ -144,7 +153,8 @@ const relationalEntryToRunPolicy = (
   runtimeLaunchTarget: entry.launchTarget
     ? { kind: entry.launchTarget.runtime, ref: entry.launchTarget.compositeAssessmentId }
     : null,
-})
+  }
+}
 
 export const createRelationalRunResourceAdapter = (input: {
   family: RelationalResourceKindV1
@@ -175,16 +185,6 @@ export const createRelationalRunResourceAdapter = (input: {
       if (!entry) {
         throw new RunResourceAuthorityError('RUN_RESOURCE_NOT_FOUND', 'exact resource version was not found', 404)
       }
-      if (entry.releaseStatus !== 'PUBLISHED') {
-        throw new RunResourceAuthorityError('RUN_RESOURCE_NOT_PUBLISHED', 'resource version is not published', 409)
-      }
-      if (!entry.launchTarget) {
-        throw new RunResourceAuthorityError('RUN_RESOURCE_RUNTIME_UNAVAILABLE', 'resource has no runtime launch target', 409)
-      }
-      if (entry.applicability.subjectRoles.includes('TEACHER') && entry.applicability.respondentRoles.includes('STUDENT') && !entry.allowedTargetModes?.length) {
-        throw new RunResourceAuthorityError('RUN_TARGET_POLICY_MISSING', 'Published teacher-evaluation content must declare target modes', 409)
-      }
-      if (!entry.initiationModes?.length) throw new RunResourceAuthorityError('RUN_INITIATION_POLICY_MISSING', 'Published delivery content must declare initiation modes', 409)
       return relationalEntryToRunPolicy(entry, registry)
     },
   }

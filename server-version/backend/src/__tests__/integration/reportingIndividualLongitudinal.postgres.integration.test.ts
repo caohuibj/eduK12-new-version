@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { listParticipantLongitudinalMetadata } from '../../modules/reporting/participantMetadata'
 import { prisma as sharedDb } from '../../config/database'
 import { testDisclosure } from '../assessment-policy/result-disclosure.fixture'
@@ -49,7 +50,7 @@ describe('individual longitudinal PostgreSQL',()=>{
       comparabilityRules:[{schemaVersion:1,metricId:'score',resourceFamily:'BUNDLE',resourceKey:resource,fromVersion:'1.0.0',toVersion:'1.0.0',level:'EXACT',evidenceRef:'test:same-protocol',evidenceHash:'e'.repeat(64)}]}
     expect(()=>validateReportingSpecDefinition({...definition,minimumCohortN:1})).toThrow()
     const spec=await createPlatformReportingSpec({actor,specKey:randomUUID(),version:1,definition})
-    await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+    await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
     const discovery=await listIndividualSubjects({...scope,page:1,pageSize:2})
     expect(discovery.list).toHaveLength(2);expect(discovery.nextPage).toBe(2)
     expect((await listIndividualSources({...scope,subjectUserId:subject.userId,page:1,pageSize:1})).nextPage).toBe(2)

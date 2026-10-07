@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -127,7 +128,7 @@ async function prepare() {
       ],
     },
   })
-  await reviewPlatformReportingSpec({ actor: principal, specId: spec.id })
+  await reviewPlatformReportingSpec({ actor: await independentReviewer(principal), specId: spec.id })
   await publishPlatformReportingSpec({ actor: principal, specId: spec.id })
   const report = await generateOrganizationProtectedFeedback({
     principal,

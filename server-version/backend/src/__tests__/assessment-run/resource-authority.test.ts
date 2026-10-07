@@ -4,6 +4,7 @@ import {
   RunResourceAuthorityRegistry,
   assertRunTrackNarrowing,
   createRelationalRunResourceAdapter,
+  relationalEntryToRunPolicy,
   productionRunResourceAuthorityRegistry,
   type RunResourceAuthorityAdapter,
 } from '../../modules/assessment-run/resourceAuthority'
@@ -45,6 +46,19 @@ const publishedRegistry = createRelationalProductRegistry([{
 }])
 
 describe('Run owning-resource authority adapters', () => {
+  it('preserves every readiness gate when converting batched catalog entries without a second lookup', () => {
+    const entry = publishedRegistry.findExact({ resourceKind: 'BUNDLE', resourceKey: 'demo-bundle', resourceVersion: '1.0.0' })!
+    expect(relationalEntryToRunPolicy(entry, publishedRegistry).runtimeLaunchTarget?.ref).toBe('composite-demo-v1')
+    for (const [patch, code] of [
+      [{ releaseStatus: 'DRAFT' }, 'RUN_RESOURCE_NOT_PUBLISHED'],
+      [{ launchTarget: null }, 'RUN_RESOURCE_RUNTIME_UNAVAILABLE'],
+      [{ initiationModes: [] }, 'RUN_INITIATION_POLICY_MISSING'],
+      [{ applicability: { ...entry.applicability, subjectRoles: ['TEACHER'], respondentRoles: ['STUDENT'] }, allowedTargetModes: [] }, 'RUN_TARGET_POLICY_MISSING'],
+    ] as const) {
+      expect(() => relationalEntryToRunPolicy({ ...entry, ...patch } as typeof entry, publishedRegistry)).toThrow(expect.objectContaining({ code }))
+    }
+  })
+
   it('resolves only the exact published version and preserves owning policy', async () => {
     const registry = new RunResourceAuthorityRegistry([
       createRelationalRunResourceAdapter({ family: 'BUNDLE', registry: publishedRegistry }),

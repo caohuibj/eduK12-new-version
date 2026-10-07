@@ -126,6 +126,7 @@ export interface ReportingAnalysisSpecRecord<TDefinition extends ReportingAnalys
   specHash: string
   createdByUserId: string
   createdAt: Date
+  reviewedByUserId?: string | null
   reviewedAt: Date | null
   publishedAt: Date | null
 }

@@ -33,6 +33,8 @@ const files = [
   'situational/sjt-authoring.postgres.integration.test.ts',
   'situational/sjt-authoring.test.ts',
   'integration/anonymousStudy.postgres.integration.test.ts',
+  'integration/registered-resource-catalog.postgres.integration.test.ts',
+  'integration/runtime-role.postgres.integration.test.ts',
 ].map(file => 'src/__tests__/' + file)
 for (const file of files) if (!existsSync(file)) throw new Error('Missing R5 regression file: ' + file)
 const report = resolve(process.argv[2] || '/tmp/eduk12-r5-vitest.json')

@@ -14,7 +14,8 @@ import {
   assertRunExecutionParent,
 } from './resourceBoundary'
 import { relationalProductRegistry } from '../assessment-relational/product-registry'
-import { listReleasedRegisteredResources } from './registeredResources'
+import { listReleasedRegisteredResourcePage } from './registeredResources'
+import { relationalEntryToRunPolicy } from './resourceAuthority'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
 import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
@@ -74,7 +75,9 @@ export const assessmentRunController = {
       }
     }
     try {
-      for (const entry of await listReleasedRegisteredResources(req.user.userId, req.user.role)) {
+      const page = req.query.page === undefined ? 1 : Number(req.query.page)
+      const registered = await listReleasedRegisteredResourcePage(req.user.userId, req.user.role, page)
+      for (const entry of registered.entries) {
         const ref = entry.applicability
         entries.set(`${ref.resourceKind}:${ref.resourceKey}:${ref.resourceVersion}`, entry)
       }
@@ -82,10 +85,14 @@ export const assessmentRunController = {
       for (const entry of entries.values()) {
         const ref = entry.applicability
         productionRunResourceAuthorityRegistry.assertStartSupported(ref.resourceKind)
-        const policy = await productionRunResourceAuthorityRegistry.resolveExact({ family: ref.resourceKind, key: ref.resourceKey, version: ref.resourceVersion })
+        // Entries are already release-checked; static adapters remain the
+        // authority for static content. Registered entries need no second read.
+        const policy = ref.resourceKind === 'SCALE' && ref.resourceKey.startsWith('custom-scale:')
+          ? relationalEntryToRunPolicy(entry)
+          : await productionRunResourceAuthorityRegistry.resolveExact({ family: ref.resourceKind, key: ref.resourceKey, version: ref.resourceVersion })
         list.push({ title: entry.title, ...policy })
       }
-      return success(res, { list })
+      return success(res, { list, nextPage: registered.nextPage })
     } catch (err) { return fail(res, err) }
   },
   async assignedTasks(req: Request, res: Response) {

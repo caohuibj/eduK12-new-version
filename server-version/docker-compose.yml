@@ -264,6 +264,7 @@ services:
     profiles: ["ops"]
     environment:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      DATABASE_URL_RUNTIME: ${DATABASE_URL_RUNTIME:-}
       NODE_ENV: production
     command: npm run db:migrate:guarded
     depends_on:
@@ -302,6 +303,7 @@ services:
     profiles: ["ops"]
     environment:
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set with URL-encoded credentials}
+      DATABASE_URL_RUNTIME: ${DATABASE_URL_RUNTIME:-}
       NODE_ENV: production
       UPLOAD_DIR: /app/uploads
     command: npm run db:release:preflight

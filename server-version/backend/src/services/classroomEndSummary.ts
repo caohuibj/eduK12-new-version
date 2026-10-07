@@ -23,7 +23,7 @@ export async function classroomEndSummary(actor: { userId: string; role: UserRol
     const payload = { schemaVersion: 1, classroomId, name: classroom.name, frozenAt, endedAt: classroom.endedAt?.toISOString() ?? null, endTimeStatus: classroom.endedAt ? 'recorded' : 'historical_missing', participants,
       questions: classroom.questions.map(q => { const content = q.questionContent as Record<string, unknown> | null; return {
         id: q.id, ordinal: q.questionIndex, questionVersion: canonicalHash(q.questionContent), startedAt: q.startedAt?.toISOString() ?? null, endedAt: q.endedAt?.toISOString() ?? null,
-        title: typeof content?.title === 'string' ? content.title : typeof content?.question === 'string' ? content.question : `第 ${q.questionIndex + 1} 题`,
+        title: typeof content?.title === 'string' ? content.title : typeof content?.question === 'string' ? content.question : `第 ${q.questionIndex} 题`,
         type: typeof content?.type === 'string' ? content.type : 'unknown', answered: counts.find(c => c.questionId === q.id)?._count._all ?? 0,
       } }), meaning: '参与数按课堂会话计数；作答数按题目提交计数。主观题不生成正确率，小结不包含学生身份或原始答案。' }
     const row = await tx.classroomEndSummary.create({ data: { classroomId, createdBy: actor.userId, payload: payload as unknown as Prisma.InputJsonValue, contentHash: canonicalHash(payload) } })

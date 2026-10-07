@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PlatformRole, PrismaClient, UserRole } from '@prisma/client'
@@ -175,7 +176,7 @@ suite('PR4 Reporting Series/Wave gate (real PostgreSQL)', () => {
         comparabilityRules: [],
       },
     })
-    await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: specDraft.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer({ userId: admin.id, platformRole: 'SYSTEM_ADMIN' }), specId: specDraft.id })
     const published = await publishPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: specDraft.id })
     if (published.definition.analysisKind !== 'REPEATED_COHORT') throw new Error('test spec kind mismatch')
     const repeatedSpec = published as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1>

@@ -92,6 +92,34 @@ suite('Assessment Run atomic publish (real PostgreSQL)', () => {
 
   })
 
+  it('freezes only usable current principals, including a finite future end but excluding a future start', async () => {
+    const owner = await createUser('population-owner')
+    const org = await createOrganization({ name: `current population ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('current-org') } })
+    const organizationId = org.organization.id
+    const eligible: string[] = []
+    for (const state of ['current', 'finite-end', 'inactive', 'frozen', 'expired', 'must-change', 'future-start', 'future-persona', 'ended', 'denied']) {
+      const student = await createUser(state)
+      const member = await createMembership({ organizationId, userId: student.id, meta: { actorUserId: owner.id, commandKey: key('member-' + state) } })
+      await grantPersona({ organizationId, membershipId: member.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: key('persona-' + state) } })
+      if (state === 'inactive') await db.user.update({ where: { id: student.id }, data: { isActive: false } })
+      if (state === 'frozen') await db.user.update({ where: { id: student.id }, data: { isFrozen: true } })
+      if (state === 'expired') await db.user.update({ where: { id: student.id }, data: { expiresAt: new Date(0) } })
+      if (state === 'must-change') await db.user.update({ where: { id: student.id }, data: { mustChangePassword: true } })
+      if (state === 'future-start') await db.$executeRaw`UPDATE organization_memberships SET valid_from=CURRENT_TIMESTAMP+INTERVAL '1 day' WHERE id=${member.id}`
+      if (state === 'future-persona') await db.$executeRaw`UPDATE organization_persona_grants SET granted_at=CURRENT_TIMESTAMP+INTERVAL '1 day' WHERE membership_id=${member.id}`
+      if (state === 'ended') await db.$executeRaw`UPDATE organization_memberships SET valid_from=CURRENT_TIMESTAMP-INTERVAL '2 days',valid_until=CURRENT_TIMESTAMP-INTERVAL '1 day' WHERE id=${member.id}`
+      if (state === 'finite-end') await db.$executeRaw`UPDATE organization_memberships SET valid_until=CURRENT_TIMESTAMP+INTERVAL '1 day' WHERE id=${member.id}`
+      if (state === 'denied') await denyOrganizationAccess({ organizationId, userId: student.id, permission: 'RUN_START', reason: 'synthetic deny', meta: { actorUserId: owner.id, commandKey: key('deny') } })
+      if (['current', 'finite-end'].includes(state)) eligible.push(student.id)
+    }
+    const run = await createAssessmentRunDraft({ organizationId, name: 'current-only', createdByUserId: owner.id })
+    await addAssessmentRunTrackDraft({ organizationId, runId: run.id, resource: { family: 'BUNDLE', key: 'self-demo', version: '1.0.0' },
+      subjectSelector: { kind: 'ALL_CURRENT' }, respondentSelector: { kind: 'ALL_CURRENT' }, requestedPolicy })
+    expect((await publishAssessmentRun({ organizationId, runId: run.id, actorUserId: owner.id, expectedVersion: 2, resourceRegistry: registry })).executionCount).toBe(2)
+    const rows = await db.$queryRaw<Array<{ userId: string }>>`SELECT DISTINCT user_id AS "userId" FROM assessment_run_actor_snapshots WHERE run_id=${run.id}`
+    expect(rows.map(row => row.userId).sort()).toEqual(eligible.sort())
+  })
+
   it('rolls back the complete graph if a later Track resolves an empty population', async () => {
     const owner = await createUser('rollback-owner')
     const student = await createUser('rollback-student')

@@ -1,3 +1,4 @@
+import { independentReviewer } from '../integration/independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { beforeAll,afterAll,describe,it,expect } from 'vitest'
 import { PrismaClient } from '@prisma/client'
@@ -25,7 +26,7 @@ suite('Wave1 frozen references through authoritative reporting (real PostgreSQL)
   const resource=(await db.$queryRaw<Array<{key:string}>>`SELECT resource_key AS key FROM assessment_run_tracks WHERE id=${first.trackId}`)[0].key
   const second=await buildReportingFixture(db,1,false,{ownerId:first.ownerId,organizationId:first.organizationId,members:first.members,resourceKey:resource,at:new Date('2026-10-01')},undefined,{identity:identity(2),value:5/3})
   const actor={userId:first.ownerId,platformRole:'SYSTEM_ADMIN' as const},definition:ReportingIndividualLongitudinalSpecV1={schemaVersion:1,analysisKind:'INDIVIDUAL_LONGITUDINAL',engineKey:'ORG_INDIVIDUAL_LONGITUDINAL_V1',engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',reportEvidenceCeiling:'PILOT',metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:resource,valueType:'NUMBER',longitudinalMetricKey:'score',acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',missingnessRule:'EXCLUDE',observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[]}
-  const spec=await createPlatformReportingSpec({actor,specKey:randomUUID(),version:1,definition});await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+  const spec=await createPlatformReportingSpec({actor,specKey:randomUUID(),version:1,definition});await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
   const input={principal:{userId:first.ownerId,platformRole:'STANDARD' as const},organizationId:first.organizationId,subjectUserId:first.members[0].userId,specId:spec.id,sources:[first,second].map(({runId,trackId})=>({runId,trackId}))}
   const report=await generateIndividualLongitudinal(input)
   expect(report.projection.referenceTrajectories!.metrics.score.selectedReferenceVersions).toEqual(['v2'])

@@ -50,7 +50,8 @@ describe('bounded login execution and failure classification', () => {
     admit()
     await pending
     expect(res.code).toBe(401)
-    expect(mocks.comparePassword).not.toHaveBeenCalled()
+    expect(mocks.comparePassword).toHaveBeenCalledOnce()
+    expect(mocks.comparePassword.mock.calls[0][1]).toMatch(/^\$2a\$10\$/)
     expect(mocks.generateToken).not.toHaveBeenCalled()
   })
 
@@ -65,13 +66,64 @@ describe('bounded login execution and failure classification', () => {
     expect(mocks.generateToken).not.toHaveBeenCalled()
   })
 
-  it.each([null, { ...user, isActive: false }, { ...user, isFrozen: true }, { ...user, expiresAt: new Date(0) }])('uses the same credential error for missing or unusable authority', async (current) => {
+  it.each([null, { ...user, isActive: false }, { ...user, isFrozen: true }, { ...user, expiresAt: new Date(0) }, { ...user, role: 'TEACHER', teacherApproved: false }])('awaits bounded verification and never authenticates dummy success for unusable authority', async (current) => {
     mocks.findUnique.mockResolvedValue(current)
+    let settle!: (matched: boolean) => void
+    mocks.comparePassword.mockImplementation(() => new Promise<boolean>(resolve => { settle = resolve }))
     const res = response()
-    await authController.login(request(), res)
+    const pending = authController.login(request(), res)
+    await vi.waitFor(() => expect(mocks.comparePassword).toHaveBeenCalledOnce())
+    expect(mocks.comparePassword.mock.calls[0][1]).toMatch(/^\$2a\$10\$/)
+    expect(res.json).not.toHaveBeenCalled()
+    expect(mocks.recordLoginFailure).not.toHaveBeenCalled()
+    settle(true)
+    await pending
     expect(res.code).toBe(401)
     expect(res.json).toHaveBeenCalledWith({ code: -1, message: '用户名或密码错误', data: null })
     expect(mocks.recordLoginFailure).toHaveBeenCalledOnce()
+    expect(mocks.generateToken).not.toHaveBeenCalled()
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+  })
+
+  it('keeps wrong-password verification and dummy worker outages in their existing error classes', async () => {
+    mocks.comparePassword.mockResolvedValue(false)
+    const wrong = response()
+    await authController.login(request(), wrong)
+    expect(wrong.code).toBe(401)
+    expect(mocks.comparePassword).toHaveBeenCalledWith('secret-password-1', user.passwordHash)
+    mocks.recordLoginFailure.mockClear()
+    mocks.findUnique.mockResolvedValue(null)
+    mocks.comparePassword.mockRejectedValue(new Error('worker unavailable'))
+    const unavailable = response()
+    await authController.login(request(), unavailable)
+    expect(unavailable.code).toBe(503)
+    expect(mocks.recordLoginFailure).not.toHaveBeenCalled()
+  })
+
+  it('uses a valid cost-10 dummy hash with the real password verifier and never issues a session', async () => {
+    const { comparePassword } = await vi.importActual<typeof import('../../utils/password')>('../../utils/password')
+    mocks.findUnique.mockResolvedValue(null)
+    mocks.comparePassword.mockImplementation(comparePassword)
+    const res = response()
+    await authController.login(request(), res)
+    expect(res.code).toBe(401)
+    expect(mocks.comparePassword).toHaveBeenCalledOnce()
+    expect(mocks.generateToken).not.toHaveBeenCalled()
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+  })
+
+  it('rejects an account that expires during a queued password comparison', async () => {
+    const now = Date.now()
+    vi.useFakeTimers(); vi.setSystemTime(now)
+    mocks.findUnique.mockResolvedValue({ ...user, expiresAt: new Date(now + 1000) })
+    mocks.comparePassword.mockImplementation(async () => { vi.setSystemTime(now + 2000); return true })
+    try {
+      const res = response()
+      await authController.login(request(), res)
+      expect(res.code).toBe(401)
+      expect(mocks.comparePassword).toHaveBeenCalledWith('secret-password-1', user.passwordHash)
+      expect(mocks.generateToken).not.toHaveBeenCalled()
+    } finally { vi.useRealTimers() }
   })
 
   it('bounds retained password and username input before admission, lookup or hashing', async () => {
