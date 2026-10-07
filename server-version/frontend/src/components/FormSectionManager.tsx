@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import apiClient from '../api/client'
+import { apiErrorMessage } from '../utils/apiErrorMessage'
 
 type FormItem = {
   id: string
@@ -22,7 +23,7 @@ type FormSection = {
 }
 
 type ContentUnit = {
-  type: 'scale' | 'cognitive' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'FORM_SECTION'
+  type: 'scale' | 'cognitive' | 'situational' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL' | 'FORM_SECTION'
   id: string
   position: number
   label: string
@@ -34,6 +35,10 @@ export interface FormSectionManagerProps {
   basePath: string
   readOnly?: boolean
   title?: string
+  refreshKey?: unknown
+  onChange?: () => Promise<void>
+  onRemoveItem?: (id: string) => Promise<void>
+  allowRemoveEmptySection?: boolean
 }
 
 const itemLabel = (item: FormItem): string => item.formLabel || item.label || item.id
@@ -43,7 +48,7 @@ const itemLabel = (item: FormItem): string => item.formLabel || item.label || it
  * The server remains authoritative for section/content positions; this UI
  * only sends complete reorder lists and never mutates participant attempts.
  */
-const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readOnly = false, title = '表单区段' }) => {
+const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readOnly = false, title = '内容与顺序', refreshKey, onChange, onRemoveItem, allowRemoveEmptySection = false }) => {
   const [sections, setSections] = useState<FormSection[]>([])
   const [items, setItems] = useState<FormItem[]>([])
   const [units, setUnits] = useState<ContentUnit[]>([])
@@ -62,23 +67,21 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
       ])
       if (sectionResponse.code !== 0) throw new Error(sectionResponse.message || '区段加载失败')
       if (itemResponse.code !== 0) throw new Error(itemResponse.message || '字段加载失败')
+      if (contentResponse.code !== 0) throw new Error(contentResponse.message || '内容顺序加载失败')
       setSections((sectionResponse.data?.list ?? []).slice().sort((left, right) => left.position - right.position))
       setItems(itemResponse.data?.list ?? [])
       setUnits((contentResponse?.code === 0 ? contentResponse.data?.units ?? [] : []).slice().sort((left, right) => left.position - right.position))
       setNotice(null)
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : '区段加载失败')
+      setNotice(apiErrorMessage(error, '区段加载失败'))
     } finally {
       setLoading(false)
     }
   }, [basePath])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => { void load() }, [load, refreshKey])
 
-  const unassigned = useMemo(
-    () => items.filter((item) => !(item.formSectionId || item.sectionId)),
-    [items],
-  )
+  const movableItems = useMemo(() => items.filter(item => !item.contextKey), [items])
 
   const run = async (operation: () => Promise<{ code: number | string; message: string }>) => {
     setSaving(true)
@@ -86,8 +89,9 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
       const response = await operation()
       if (response.code !== 0) throw new Error(response.message || '保存失败')
       await load()
+      await onChange?.()
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : '保存失败')
+      setNotice(apiErrorMessage(error, '保存失败'))
     } finally {
       setSaving(false)
     }
@@ -113,6 +117,12 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
     const nextIndex = index + delta
     if (nextIndex < 0 || nextIndex >= units.length) return
     const next = units.slice()
+    if (next[index].contextSection && delta === -1) {
+      const [context] = next.splice(index, 1)
+      next.unshift(context)
+      await reorderUnits(next)
+      return
+    }
     ;[next[index], next[nextIndex]] = [next[nextIndex], next[index]]
     await reorderUnits(next)
   }
@@ -148,7 +158,7 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-semibold text-gray-900">{title}</h2>
-          <p className="text-sm text-gray-600">每个区段是一次提交单元，字段只在区段内排序。</p>
+          <p className="text-sm text-gray-600">在这里统一编排测评单元。每个表单区段一次提交，字段在所属区段内管理。</p>
         </div>
         {!readOnly && (
           <div className="flex gap-2">
@@ -171,13 +181,14 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
                       <span className="mr-2 text-xs text-gray-400">{index + 1}.</span>
                       {unit.label}
                       <span className="ml-2 text-xs text-gray-400">
-                        {unit.type.toLowerCase().replace(/_/g, '-') === 'form-section' ? `表单区段 · ${unit.itemCount} 个字段` : unit.type.toLowerCase() === 'cognitive' ? '认知任务' : '心理量表'}
+                        {unit.type.toLowerCase().replace(/_/g, '-') === 'form-section' ? `表单区段 · ${unit.itemCount} 个字段` : unit.type.toLowerCase() === 'cognitive' ? '认知任务' : unit.type.toLowerCase() === 'situational' ? '情境测评' : '心理量表'}
                       </span>
                     </span>
                     {!readOnly && (
                       <span className="flex gap-1">
-                        <button type="button" onClick={() => void moveUnit(index, -1)} disabled={saving || index === 0} className="rounded border px-1.5 py-0.5 text-xs">上移</button>
-                        <button type="button" onClick={() => void moveUnit(index, 1)} disabled={saving || index === units.length - 1} className="rounded border px-1.5 py-0.5 text-xs">下移</button>
+                        <button type="button" onClick={() => void moveUnit(index, -1)} disabled={saving || index === 0 || Boolean(units[index - 1]?.contextSection)} className="rounded border px-1.5 py-0.5 text-xs">{unit.contextSection ? '置顶' : '上移'}</button>
+                        <button type="button" onClick={() => void moveUnit(index, 1)} disabled={saving || index === units.length - 1 || unit.contextSection || Boolean(units[index + 1]?.contextSection)} className="rounded border px-1.5 py-0.5 text-xs">下移</button>
+                        {onRemoveItem && unit.type.toLowerCase().replace(/_/g, '-') !== 'form-section' && <button type="button" disabled={saving} onClick={() => void run(async () => { await onRemoveItem(unit.id); return { code: 0, message: '' } })} className="rounded border px-1.5 py-0.5 text-xs text-red-600">移除</button>}
                       </span>
                     )}
                   </li>
@@ -206,17 +217,11 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
                     <button type="button" onClick={() => void moveSection(sectionIndex, -1)} disabled={readOnly || saving || sectionIndex === 0} className="rounded border px-2 py-1 text-sm">上移</button>
                     <button type="button" onClick={() => void moveSection(sectionIndex, 1)} disabled={readOnly || saving || sectionIndex === sections.length - 1} className="rounded border px-2 py-1 text-sm">下移</button>
                   </>}
-                  <label className="flex items-center gap-1 text-sm text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={section.contextSection}
-                      disabled={readOnly || saving || !section.items.some((item) => item.contextKey)}
-                      onChange={(event) => void run(() => apiClient.put(`${basePath}/form-sections/${section.id}`, { contextSection: event.target.checked }))}
-                    />
-                    首个上下文区段
-                  </label>
+                  {section.contextSection && <span className="text-sm text-indigo-700">背景信息 · 必须首先提交</span>}
+                  {!readOnly && allowRemoveEmptySection && !section.items.length && <button type="button" disabled={saving} onClick={() => void run(() => apiClient.delete(`${basePath}/form-sections/${section.id}`))} className="btn-secondary text-red-600">移除空区段</button>}
                 </div>
                 {section.description && <p className="mt-1 text-xs text-gray-500">{section.description}</p>}
+                {section.contextSection && <p className="mt-2 text-sm text-gray-500">由背景字段自动确定；使用上方“置顶”一次恢复合法顺序。移除最后一个字段会同时清理此区段。</p>}
                 <ol className="mt-2 space-y-1 pl-5 text-sm text-gray-700">
                   {orderedItems.map((item, itemIndex) => (
                     <li key={item.id} className="flex items-center justify-between gap-2">
@@ -224,11 +229,12 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
                       <span className="flex gap-1">
                         <button type="button" onClick={() => void moveItem(section, itemIndex, -1)} disabled={readOnly || saving || itemIndex === 0} className="rounded border px-1.5 py-0.5 text-xs">上</button>
                         <button type="button" onClick={() => void moveItem(section, itemIndex, 1)} disabled={readOnly || saving || itemIndex === orderedItems.length - 1} className="rounded border px-1.5 py-0.5 text-xs">下</button>
+                        {!readOnly && onRemoveItem && <button type="button" disabled={saving} onClick={() => void run(async () => { await onRemoveItem(item.id); return { code: 0, message: '' } })} className="rounded border px-1.5 py-0.5 text-xs text-red-600">移除字段</button>}
                       </span>
                     </li>
                   ))}
                 </ol>
-                {!readOnly && unassigned.length > 0 && (
+                {!readOnly && !section.contextSection && movableItems.some(item => (item.formSectionId || item.sectionId) !== section.id) && (
                   <select
                     value=""
                     onChange={(event) => {
@@ -238,8 +244,8 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
                     className="mt-2 rounded border px-2 py-1 text-sm"
                     aria-label={`向${section.title}添加字段`}
                   >
-                    <option value="">添加未分配字段...</option>
-                    {unassigned.map((item) => <option key={item.id} value={item.id}>{itemLabel(item)}</option>)}
+                    <option value="">将字段移入此区段...</option>
+                    {movableItems.filter(item => (item.formSectionId || item.sectionId) !== section.id).map((item) => <option key={item.id} value={item.id}>{itemLabel(item)}</option>)}
                   </select>
                 )}
               </div>

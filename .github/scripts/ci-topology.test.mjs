@@ -9,6 +9,22 @@ import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
+test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const probes=workflow.slice(workflow.indexOf('  probe-frontend-build:'),workflow.indexOf('  scope:'));
+  for(const [lineNo,line] of probes.split('\n').entries()) {
+    if(!/runner_labels:/.test(line)||!line.includes('ubuntu-24.04'))continue;
+    assert.match(line,/inputs\.runner_profile == '(local|speed)'/,`hosted probe runner at line ${lineNo}`);
+    assert.match(line,/self-hosted/);
+  }
+  for(const name of ['probe-backend-regression','probe-browser','probe-media','probe-ui-hosted','probe-maintenance']) {
+    const block=probes.split(`  ${name}:\n`)[1]?.split(/\n  [a-z-]+:/)[0];
+    assert.match(block??'',/inputs\.runner_profile == 'local'.*self-hosted.*eduk12-win-ci/);
+  }
+  assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
+  const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  assert.match(regression,/if: inputs\.focus == 'assessment-repair'[\s\S]*CI_POSTGRES_SERVICE_ID:.*\$\{\{ job\.services\.postgres\.id \}\}[\s\S]*run: node scripts\/r5-regression\.mjs/);
+});
 test('speed profile assigns independent heavy consumers to hosted Linux and preserves Windows resource exclusivity',()=>{
   const plan=runnerPlan({...capacity,profile:'speed',scenario:'platform'});
   for(const lane of ['regression_runner','browser_runner','media_runner','codeql_runner']) assert.deepEqual(plan[lane],['ubuntu-24.04']);

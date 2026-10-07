@@ -17,6 +17,19 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { encryptScaleAnswers } from '../../modules/scale/scale-workflow.service'
 import { compositeExportService, toSavVariables } from '../../modules/composite/composite-export.service'
+import fs from 'node:fs/promises'
+
+it('writes the projected composite data and dictionary into one ZIP without rebuilding disclosure', async () => {
+  const data = { assessmentId: 'synthetic-zip', assessmentName: 'Synthetic', detail: 'summary' as const, trialCount: 0, fields: [{ name: 'U_id', label: '参与者', type: 'string' as const }], rows: [{ U_id: 'ANON-SYNTHETIC' }] }
+  const { filePath } = await compositeExportService.saveExportFiles(data.assessmentId, { detail: 'summary' }, 'zip', data)
+  try {
+    expect(filePath).toMatch(/_summary_.*\.zip$/)
+    const bytes = await fs.readFile(filePath)
+    expect(bytes.readUInt32LE(0)).toBe(0x04034b50)
+    expect(bytes.includes(Buffer.from('data_dictionary.json'))).toBe(true)
+    expect(bytes.includes(Buffer.from('\uFEFFU_id\nANON-SYNTHETIC'))).toBe(true)
+  } finally { await fs.rm(filePath, { force: true }) }
+})
 
 const makeScaleDefinition = (itemCode: string, scoreKeys: string[]) => ({
   schemaVersion: 2,

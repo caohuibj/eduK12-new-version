@@ -3,7 +3,7 @@ import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assertValidItem, getCompositeForTeacher, publishComposite, listAvailableForStudent } from '../composite/composite.service'
+import { assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../assessment-runtime/form-section-definition'
 import { compositeFormSectionImageReferences, publishedFormMediaOwner, retainFormSectionImages } from '../assessment-runtime/form-image.adapter'
@@ -152,22 +152,66 @@ export async function reorder(actor: Actor, id: string, raw: unknown) {
     }
   })
 }
-export async function publish(actor: Actor, id: string, raw: unknown) {
+
+export async function removeEmptySection(actor: Actor, id: string, sectionId: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    const section = row.formSections.find((value: any) => value.id === sectionId)
+    if (!section) throw compositeNotFound('表单区段不存在')
+    if (section.items.length) throw compositeConflict('区段中还有字段，请先移除字段')
+    await tx.compositeFormSection.delete({ where: { id: sectionId } })
+  })
+}
+const copiedCognitiveBinding = (item: any, row: any) => item.type === 'COGNITIVE' && item.cognitiveAssignment?.listedStandalone === false
+  && item.cognitiveAssignment?.createdBy === row.createdBy && item.cognitiveAssignment?.courseId === null
+  && item.cognitiveAssignment?.resolvedConfigSnapshotEncrypted && item.cognitiveAssignment?.resolvedReportSnapshotEncrypted
+
+async function validateDelivery(tx: Tx, actor: Actor, row: any) {
     if (row.questionnaireType === 'COURSE' && !row.questionnaireCourses.length) throw compositeBadRequest('请选择至少一个投放课程')
     if (row.questionnaireType === 'GENERAL' && !row.publicEnabled) throw compositeBadRequest('通用问卷需要启用公开链接')
+    windowCheck({ publicEnabled: row.publicEnabled, opensAt: row.opensAt?.toISOString(), expiresAt: row.expiresAt?.toISOString() })
     await courses(tx, actor, row.questionnaireCourses.map((v: any) => v.courseId), row.questionnaireType)
-    for (const item of row.items) {
-      const input = { type: item.type, required: item.required,
-        ...(item.type === 'SCALE' ? { scaleId: item.scaleId } : {}),
-        ...(item.type === 'COGNITIVE' ? { cognitiveAssignmentId: item.cognitiveAssignmentId } : {}),
-        ...(item.type === 'SITUATIONAL' ? { situationalInstrumentKey: item.situationalInstrumentKey, situationalInstrumentVersion: item.situationalInstrumentVersion } : {}),
-        ...(item.type === 'FORM' ? { formType: item.formType, formLabel: item.formLabel, formOptions: item.formOptions, contextKey: item.contextKey } : {}),
+}
+
+async function validateResources(tx: Tx, actor: Actor, row: any) {
+  for (const item of row.items) {
+    if (copiedCognitiveBinding(item, row)) continue
+    await assertValidItem({ ...item, required: item.required } as any, actor.userId, actor.role, row, tx)
+  }
+}
+
+export async function preflight(actor: Actor, id: string, raw: unknown) {
+  author(actor)
+  const { revision } = revisionSchema.parse(raw)
+  return prisma.$transaction(async tx => {
+    await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', id)
+    const row = await tx.compositeAssessment.findUnique({ where: { id }, include: {
+      questionnaireCourses: true, items: { include: { cognitiveAssignment: { include: { config: true } }, scale: true } },
+    } })
+    if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound()
+    owner(actor, row)
+    if (row.revision !== revision) throw compositeConflict('草稿已变化，请刷新后重新自检')
+    const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string }> = []
+    for (const [key, label, validate] of [
+      ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
+      ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row)],
+      ['content', '区段、背景顺序、字段与冻结定义', () => prepareCompositePublication(actor.userId, actor.role, id, tx)],
+    ] as const) {
+      try { await validate(); checks.push({ key, label, status: 'passed', message: '通过' }) }
+      catch (cause: any) {
+        if (!(cause.statusCode >= 400 && cause.statusCode < 500)) throw cause
+        checks.push({ key, label, status: 'failed', message: cause.message })
       }
-      const copiedBinding = item.type === 'COGNITIVE' && item.cognitiveAssignment?.listedStandalone === false
-        && item.cognitiveAssignment?.createdBy === row.createdBy && item.cognitiveAssignment?.courseId === null
-        && item.cognitiveAssignment?.resolvedConfigSnapshotEncrypted && item.cognitiveAssignment?.resolvedReportSnapshotEncrypted
-      if (!copiedBinding) await assertValidItem(input as any, actor.userId, actor.role, row, tx)
+    }
+    return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY' }
+  }, { timeout: 30000 })
+}
+
+export async function publish(actor: Actor, id: string, raw: unknown) {
+  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    await validateDelivery(tx, actor, row)
+    await validateResources(tx, actor, row)
+    for (const item of row.items) {
+      const copiedBinding = copiedCognitiveBinding(item, row)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
         const source = item.cognitiveAssignment
         const entry = requireCognitiveRegistryEntry(source.config.testType, source.config.engineVersion, source.config.scoringVersion)
@@ -179,6 +223,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
         const binding = await tx.cognitiveAssignment.create({ data: {
           configId: source.configId, createdBy: actor.userId, title: source.title, instruction: source.instruction,
           status: 'PUBLISHED', publishedAt: new Date(), listedStandalone: false, required: false, ...freeze,
+          quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null, maxAttempts: source.maxAttempts,
         } })
         await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { cognitiveAssignmentId: binding.id } })
       }
@@ -216,13 +261,13 @@ export async function remove(actor: Actor, id: string, raw: unknown) {
 export async function list(actor: Actor, page = 1, pageSize = 25) {
   author(actor)
   // SQL is static; values remain positional parameters, never interpolated.
-  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT id, name, status::text, created_at AS created, created_by AS owner_id, 'COLLECTION' AS kind, questionnaire_type::text FROM composite_assessments WHERE product_kind = 'QUESTIONNAIRE'"
+  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT id, name, status::text, created_at AS created, created_by AS owner_id, CASE WHEN product_kind = 'QUESTIONNAIRE' THEN 'COLLECTION' ELSE 'LEGACY_COMPOSITE' END AS kind, questionnaire_type::text FROM composite_assessments WHERE product_kind = 'QUESTIONNAIRE' OR (product_kind = 'LEGACY_COMPOSITE' AND report_package_key IS NULL AND analysis_protocol_key IS NULL)"
   const filter = '($1::boolean OR owner_id = $2)'
   const [rows, counts] = await prisma.$transaction([
     prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $3 OFFSET $4', actor.role === 'ADMIN', actor.userId, pageSize, (page - 1) * pageSize),
     prisma.$queryRawUnsafe<Array<{ total: bigint }>>('SELECT COUNT(*) AS total FROM (' + union + ') q WHERE ' + filter, actor.role === 'ADMIN', actor.userId),
   ])
-  return { list: rows.map(v => ({ ...v, editHref: v.kind === 'COLLECTION' ? '/questionnaire-products/' + v.id : v.questionnaire_type === 'GENERAL' ? '/general-questionnaires/' + v.id + '/edit' : '/questionnaires/' + v.id })), total: Number(counts[0].total), page, pageSize }
+  return { list: rows.map(v => ({ ...v, reportMode: 'COLLECTION_ONLY', editHref: v.kind === 'COLLECTION' ? '/questionnaire-products/' + v.id : v.kind === 'LEGACY_COMPOSITE' ? '/composite-assessments/' + v.id : v.questionnaire_type === 'GENERAL' ? '/general-questionnaires/' + v.id + '/edit' : '/questionnaires/' + v.id })), total: Number(counts[0].total), page, pageSize }
 }
 export async function available(userId: string) {
   const rows = await listAvailableForStudent(userId)
@@ -270,7 +315,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
     if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
-    const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.questionnaireCourses.map(v => v.courseId)
+    const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.productKind === 'LEGACY_COMPOSITE' ? (composite!.courseId ? [composite!.courseId] : []) : composite!.questionnaireCourses.map(v => v.courseId)
     await courses(tx, actor, sourceCourses, questionnaireType)
     if (legacy?.formItems.some(form => !form.required && !form.contextKey)) {
       throw compositeConflict('新版问卷暂不支持普通非必填字段；请继续维护历史问卷，不会自动改为必填')
@@ -317,6 +362,8 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
             resolvedConfigSnapshotEncrypted: cognitiveAssignment.resolvedConfigSnapshotEncrypted,
             resolvedConfigHash: cognitiveAssignment.resolvedConfigHash,
             resolvedReportSnapshotEncrypted: cognitiveAssignment.resolvedReportSnapshotEncrypted,
+            maxAttempts: cognitiveAssignment.maxAttempts,
+            quotaSourceAssignmentId: cognitiveAssignment.createdBy === actor.userId ? cognitiveAssignment.quotaSourceAssignmentId ?? cognitiveAssignment.id : null,
           } })
           data.cognitiveAssignmentId = binding.id
         }

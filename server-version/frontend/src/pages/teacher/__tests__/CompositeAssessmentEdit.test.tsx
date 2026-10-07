@@ -100,7 +100,7 @@ describe('CompositeAssessmentEdit copyable toggle', () => {
     render(<CompositeAssessmentEdit />)
     expect(await screen.findByText('可导出的教师测评')).toBeInTheDocument()
     expect(mockGet).toHaveBeenCalledWith('/situational/instruments', { timeout: 3000 })
-    expect(screen.getByText('情境测评题包暂不可用，已加载的综合测评仍可管理和导出。')).toBeInTheDocument()
+    expect(screen.queryByText('情境测评题包暂不可用，已加载的综合测评仍可管理和导出。')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '导出摘要' }))
     await waitFor(() => expect(mockCompositeApi.exportData).toHaveBeenCalledWith(
       'tpl-1', { detail: 'summary', format: 'csv' }, expect.any(String),

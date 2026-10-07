@@ -22,8 +22,12 @@ export default function MoreActions({ label = '更多操作', children, align = 
     setPosition(window.innerWidth < 640
       ? { position: 'fixed', inset: 'auto 12px 12px', maxHeight: 'calc(100dvh - 24px)' }
       : { position: 'fixed', inset: 'auto', top, left, width, maxHeight: 'calc(100dvh - 24px)' })
-    menu.current.querySelector<HTMLElement>('button:not(:disabled), a[href]')?.focus({ preventScroll: true })
   }, [open, align])
+  useLayoutEffect(() => {
+    // The first commit is hidden while its viewport position is measured.
+    // Browsers reject focus on that hidden node; focus after the visible commit.
+    if (open && position.visibility !== 'hidden') menu.current?.querySelector<HTMLElement>('button:not(:disabled), a[href]')?.focus({ preventScroll: true })
+  }, [open, position])
   useEffect(() => {
     if (!open) return
     const dismiss = (event: PointerEvent) => {
@@ -49,7 +53,13 @@ export default function MoreActions({ label = '更多操作', children, align = 
     }
   }, [open])
   return <div className={`staff-more-actions staff-more-actions--${align}`}>
-    <button ref={trigger} className="staff-more-actions__trigger" type="button" aria-label={label} aria-expanded={open} aria-controls={open ? id : undefined} onClick={() => setOpen(value => !value)}><MoreHorizontal size={18} aria-hidden="true" /></button>
-    {open && createPortal(<div ref={menu} id={id} className="staff-more-actions__menu" role="group" aria-label={`${label}菜单`} style={position} onClick={event => { if ((event.target as Element).closest('button:not(:disabled), a[href]')) setOpen(false) }}>{children}</div>, document.body)}
+    <button ref={trigger} className="staff-more-actions__trigger" type="button" aria-label={label} aria-expanded={open} aria-controls={open ? id : undefined} onClick={() => setOpen(value => !value)} onKeyDown={event => { if (event.key === 'ArrowDown') { event.preventDefault(); setOpen(true) } }}><MoreHorizontal size={18} aria-hidden="true" /></button>
+    {open && createPortal(<div ref={menu} id={id} className="staff-more-actions__menu" role="group" aria-label={`${label}菜单`} style={position} onKeyDown={event => {
+      const controls = [...(menu.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href]') ?? [])]
+      if (!controls.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
+      event.preventDefault()
+      const index = controls.indexOf(document.activeElement as HTMLElement)
+      controls[event.key === 'Home' ? 0 : event.key === 'End' ? controls.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + controls.length) % controls.length]?.focus()
+    }} onClick={event => { if ((event.target as Element).closest('button:not(:disabled), a[href]')) { setOpen(false); trigger.current?.focus({ preventScroll: true }) } }}>{children}</div>, document.body)}
   </div>
 }

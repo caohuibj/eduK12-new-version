@@ -1652,6 +1652,7 @@ model CognitiveAssignment {
   opensAt                         DateTime?                 @map("opens_at")
   dueAt                           DateTime?                 @map("due_at")
   maxAttempts                     Int                       @default(1) @map("max_attempts")
+  quotaSourceAssignmentId         String?                   @map("quota_source_assignment_id")
   required                        Boolean                   @default(true)
   createdAt                       DateTime                  @default(now()) @map("created_at")
   updatedAt                       DateTime                  @updatedAt @map("updated_at")
@@ -1669,8 +1670,11 @@ model CognitiveAssignment {
   sessions       CognitiveSession[]
   compositeItems CompositeAssessmentItem[] @relation("CompositeAssessmentCognitiveAssignment")
   accessTokens   CognitiveAccessToken[]
+  quotaSource    CognitiveAssignment?      @relation("CognitiveQuotaSource", fields: [quotaSourceAssignmentId], references: [id], onDelete: Restrict)
+  quotaCopies    CognitiveAssignment[]     @relation("CognitiveQuotaSource")
 
   @@index([courseId])
+  @@index([quotaSourceAssignmentId])
   @@map("cognitive_assignments")
 }
 

@@ -8,6 +8,8 @@ import { compositeApi } from '../../modules/composite/api'
 import { sessionFetch } from '../../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 import CognitiveProfessionalReports from '../../modules/cognitive/CognitiveProfessionalReports'
+import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
+import { apiErrorMessage } from '../../utils/apiErrorMessage'
 
 const statusLabel: Record<string, string> = {
   DRAFT: '草稿',
@@ -15,11 +17,13 @@ const statusLabel: Record<string, string> = {
   ARCHIVED: '已归档',
 }
 
-type CognitiveExportKind = 'summary-csv' | 'full-csv' | 'research-zip' | 'research-xlsx'
+type CognitiveExportKind = 'summary-csv' | 'full-csv' | 'summary-zip' | 'research-zip' | 'research-xlsx'
 
 const CognitiveAssignmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { feedback, confirm: confirmAction, success } = useStaffFeedback()
+  const [archiving, setArchiving] = useState(false)
   const [detail, setDetail] = useState<any>(null)
   const [title, setTitle] = useState('')
   const [instruction, setInstruction] = useState('')
@@ -70,10 +74,16 @@ const CognitiveAssignmentEdit: React.FC = () => {
   }
 
   const archive = async () => {
-    if (!confirm('归档后学生将看不到此任务，确定继续？')) return
-    const response = await cognitiveApi.archiveAssignment(id)
-    if (response.code !== 0) setError(response.message || '归档失败')
-    else await load()
+    if (archiving || !await confirmAction({ title: '归档认知任务', body: '归档后停止新作答，已完成记录和历史报告会保留。若被未归档测评引用，请先处理对应测评。', confirmLabel: '确认归档' })) return
+    try {
+      setArchiving(true)
+      setError(null)
+      const response = await cognitiveApi.archiveAssignment(id)
+      if (response.code !== 0) throw new Error(response.message || '归档失败')
+      await load()
+      success('任务已归档', '历史记录和报告已保留。')
+    } catch (cause) { setError(apiErrorMessage(cause, '归档失败，请重试')) }
+    finally { setArchiving(false) }
   }
 
   const saveWrapper = async () => {
@@ -105,10 +115,11 @@ const CognitiveAssignmentEdit: React.FC = () => {
     setError(null)
     setExportNotice('正在生成导出文件…')
     try {
-      const response = await requestExportIntent(scope, key => collectionId && detailMode !== 'research' && format === 'csv'
+      const response = await requestExportIntent(scope, key => collectionId && detailMode !== 'research' && (format === 'csv' || format === 'zip')
         ? compositeApi.exportData(collectionId, { detail: detailMode, format }, key)
         : cognitiveApi.exportData(id, { detail: detailMode, format }, key))
       if (response.code !== 0 || !response.data?.artifacts) throw new Error(response.message || '导出失败')
+      setExportNotice('导出已受理，正在生成文件；刷新后可重试同一导出，继续等待原任务。')
       const artifacts = await waitForExportArtifacts(response.data.artifacts)
       const artifact = artifacts[0]
       const download = await sessionFetch(artifact.downloadUrl, { signal: AbortSignal.timeout(60000) })
@@ -146,14 +157,17 @@ const CognitiveAssignmentEdit: React.FC = () => {
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />返回认知任务
             </button>
             {isDraft && !isWrapper && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
-            {canArchive && !isPackageLocked && <button onClick={() => void archive()} className="hui-button hui-button--secondary"><Archive className="w-4 h-4" aria-hidden="true" />归档</button>}
+            {canArchive && !isPackageLocked && <button disabled={archiving} onClick={() => void archive()} className="hui-button hui-button--secondary"><Archive className="w-4 h-4" aria-hidden="true" />{archiving ? '正在归档…' : '归档'}</button>}
             {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50"><Download className="w-4 h-4" aria-hidden="true" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}</button>}
             {!isWrapper && <button type="button" onClick={() => setReadingReports(value => !value)} aria-expanded={readingReports} className="hui-button hui-button--secondary">{readingReports ? '收起专业报告' : '阅读专业报告'}</button>}
             {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('full-csv', 'full')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50">{exporting === 'full-csv' ? '导出完整数据中...' : '导出完整数据'}</button>}
+            {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('summary-zip', 'summary', 'zip')} className="hui-button hui-button--secondary">{exporting === 'summary-zip' ? '生成数据与字典…' : '摘要与字段字典（ZIP）'}</button>}
           </div>
         )}
       />
+      {feedback}
       {exportNotice && <p role="status" className="mb-4">{exportNotice}</p>}
+      {!isWrapper && <p className="mb-4 text-sm text-gray-600">ZIP 包含标准 CSV、对应字段字典和解释说明。单位及版本以冻结结果为准，参与者编号不保证跨测评关联。</p>}
       {error && <p role="alert" className="text-red-500 mb-4">{error}</p>}
       {!isWrapper && <section className="staff-panel staff-panel--padded mb-5 p-4" aria-label="数据来源设置">
         <label>数据来源<select aria-label="认知数据来源" value={collectionId} disabled={exporting !== null} onChange={event => { setCollectionId(event.target.value); setExportNotice(''); setReadingReports(false) }} className="input ml-2">

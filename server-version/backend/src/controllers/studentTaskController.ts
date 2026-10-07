@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import { z } from 'zod'
-import { listStudentTasks, taskStates } from '../services/studentTasks'
+import { listStudentTasks, taskFilters } from '../services/studentTasks'
 import { error, success } from '../utils/response'
 import { logger } from '../utils/logger'
 
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).max(100000).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
-  state: z.enum(taskStates).optional(),
+  state: z.enum(taskFilters).optional(),
 })
 
 export async function studentTaskList(req: Request, res: Response) {

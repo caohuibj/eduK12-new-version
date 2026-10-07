@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto'
-import {beforeAll,describe,expect,it} from 'vitest'
+import {beforeAll,afterAll,describe,expect,it} from 'vitest'
 import express from 'express'
 import {prisma} from '../../config/database'
 import {integrationDatabaseUrl} from './integration-env'
@@ -17,9 +17,20 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   owner=(await prisma.user.create({data:{username:randomUUID(),passwordHash:'test',role:'TEACHER'}})).id
   other=(await prisma.user.create({data:{username:randomUUID(),passwordHash:'test',role:'TEACHER'}})).id
   const course=await prisma.course.create({data:{title:'anonymous study test',courseCode:randomUUID(),status:'PUBLISHED',creatorId:owner}})
-  const c=await prisma.compositeAssessment.create({data:{code:randomUUID(),name:'Study form',status:'PUBLISHED',courseId:course.id,createdBy:owner,publicEnabled:true,publishedAt:new Date()}});cid=c.id
-  itemId=(await prisma.compositeAssessmentItem.create({data:{compositeAssessmentId:cid,type:'FORM',position:0,required:true,formType:'text',formLabel:'Response'}})).id
+  const c=await prisma.compositeAssessment.create({data:{code:randomUUID(),name:'Study form',status:'DRAFT',courseId:course.id,createdBy:owner,publicEnabled:true,expiresAt:new Date(Date.now()+7*86400000)}});cid=c.id
+  itemId=(await prisma.compositeAssessmentItem.create({data:{compositeAssessmentId:cid,type:'FORM',position:0,required:true,formType:'text_input',formLabel:'Response'}})).id
   await ensureCompositeFormSections(cid)
+  await composite.publishComposite(owner,'TEACHER',cid)
+ })
+ afterAll(async()=>{
+  if(!owner)return
+  await prisma.$executeRaw`DELETE FROM anonymous_study_attempts WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
+  await prisma.$executeRaw`DELETE FROM anonymous_study_participants WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
+  await prisma.$executeRaw`DELETE FROM anonymous_study_waves WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
+  await prisma.$executeRaw`DELETE FROM anonymous_studies WHERE owner_user_id=${owner}`
+  await prisma.compositeAssessment.deleteMany({where:{createdBy:owner}})
+  await prisma.course.deleteMany({where:{creatorId:owner}})
+  await prisma.user.deleteMany({where:{id:{in:[owner,other].filter(Boolean)}}})
  })
  const token=(limit=0)=>composite.createAccessTokenForComposite(owner,'TEACHER',cid,new Date(Date.now()+86400000).toISOString(),limit)
  const complete=async(a:{attemptId:string;recoveryToken:string},answer:string)=>{
@@ -91,5 +102,30 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await expect(study.joinStudy(w.id,t.token,true)).rejects.toMatchObject({statusCode:403})
   const used=await token();await composite.startPublicAttempt(used.token)
   await expect(study.addWave(owner,'TEACHER',s.id,{compositeId:cid,tokenId:used.id,title:'Historical'})).rejects.toMatchObject({statusCode:404})
+ },60000)
+ it('creates a wave and link once under retries, exposes identity entry and rejects changed or foreign requests',async()=>{
+  const s=await study.createStudy(owner,'One action synthetic wave')
+  const input={requestId:randomUUID(),compositeId:cid,title:'Wave one',expiresAt:new Date(Date.now()+86400000).toISOString(),maxUses:2}
+  const before=await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})
+  const [first,replayed]=await Promise.all([study.createWaveWithLink(owner,'TEACHER',s.id,input),study.createWaveWithLink(owner,'TEACHER',s.id,input)])
+  expect(replayed).toEqual(first)
+  expect(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})).toBe(before+1)
+  const revealed=await composite.revealAccessToken(owner,'TEACHER',cid,first.tokenId)
+  expect((await composite.getPublicCompositeInfo(revealed.token)).studyEntryPath).toBe(first.entryPath)
+  await expect(study.createWaveWithLink(owner,'TEACHER',s.id,{...input,title:'Changed'})).rejects.toMatchObject({statusCode:409})
+  await expect(study.createWaveWithLink(other,'TEACHER',s.id,{...input,requestId:randomUUID()})).rejects.toMatchObject({statusCode:404})
+  await study.closeStudy(owner,s.id)
+  await expect(study.createWaveWithLink(owner,'TEACHER',s.id,{...input,requestId:randomUUID()})).rejects.toMatchObject({statusCode:403})
+  expect(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})).toBe(before+1)
+ })
+ it('rolls back the generated token when wave admission fails after token creation',async()=>{
+  const s=await study.createStudy(owner,'Synthetic full study')
+  for(let ordinal=1;ordinal<=100;ordinal++){
+   const t=await token()
+   await prisma.$executeRaw`INSERT INTO anonymous_study_waves(id,study_id,access_token_id,title,ordinal) VALUES(${randomUUID()},${s.id},${t.id},${'Synthetic '+ordinal},${ordinal})`
+  }
+  const before=await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})
+  await expect(study.createWaveWithLink(owner,'TEACHER',s.id,{requestId:randomUUID(),compositeId:cid,title:'Over limit',expiresAt:new Date(Date.now()+86400000).toISOString(),maxUses:0})).rejects.toMatchObject({statusCode:400})
+  expect(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:cid}})).toBe(before)
  },60000)
 })

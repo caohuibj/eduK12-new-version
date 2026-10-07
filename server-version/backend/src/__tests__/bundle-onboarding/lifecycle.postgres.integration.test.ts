@@ -10,6 +10,7 @@ import { scaffoldPackage } from '../../modules/assessment-bundle/onboarding/temp
 import { writePackage,loadPackage,generatePackages } from '../../modules/assessment-bundle/onboarding/loader'
 import { hashDeclarativePackage } from '../../modules/assessment-bundle/onboarding/contract'
 import { installPackage,publishPackage,changePackageStatus } from '../../modules/bundle-product/package-release'
+import { previewPackage, savePackage, approvePackage, getPackageDraft, refreshPublishedPackages } from '../../modules/bundle-product/admin-authoring'
 import { packageEntry } from '../../modules/assessment-bundle/onboarding/catalog'
 import { BundleDefinitionProvider } from '../../modules/bundle-product/definition-provider'
 import { getExecutableScalePackage } from '../../modules/scale/onboarding/executable-registry'
@@ -119,4 +120,27 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     expect((await db.bundlePackageRelease.findUniqueOrThrow({where:{id:installed.id}})).review).toEqual(review)
     expect((await analysis.readReport(attemptId,'admin',initial.analysisId)).factsHash).toBe(initial.factsHash)
   },60000)
+  it('supports admin authoring and independent signed approval without exposing signing material', async () => {
+    const key = 'admin_authoring_' + suffix.replace(/-/g, '')
+    keys.push(key)
+    const pack = scaffoldPackage(key)
+    const preview = previewPackage(actor, pack)
+    expect(preview.blockers).toEqual([])
+    expect(preview.scenarios.every(scenario => scenario.synthetic)).toBe(true)
+    expect(() => previewPackage({ userId: student, role: UserRole.TEACHER }, pack)).toThrow()
+    const saved = await savePackage(db, actor, pack)
+    expect(saved.status).toBe('DRAFT')
+    const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
+    await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(approvePackage(db, { userId: reviewer, role: UserRole.ADMIN }, key, '1.0.0', { ...material, contentHash: 'f'.repeat(64) })).rejects.toMatchObject({ statusCode: 409 })
+    const approved = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN }, key, '1.0.0', material)
+    expect(approved.status).toBe('PUBLISHED')
+    expect(approved.review).toMatchObject({ reviewerId: reviewer, contentHash: saved.contentHash })
+    expect(approved.review).not.toHaveProperty('signature')
+    const provider = new BundleDefinitionProvider([])
+    await refreshPublishedPackages(db, provider)
+    expect(provider.exact(key, '1.0.0')?.declarativePackage).toEqual(pack)
+    await expect(savePackage(db, actor, { ...pack, manifest: { ...pack.manifest, definition: { ...pack.manifest.definition, name: 'Changed immutable title' } } })).rejects.toMatchObject({ statusCode: 409, message: expect.stringContaining('更换版本号') })
+    expect((await getPackageDraft(db, actor, key, '1.0.0')).contentHash).toBe(saved.contentHash)
+  })
 })

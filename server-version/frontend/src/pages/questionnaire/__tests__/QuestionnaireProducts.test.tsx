@@ -44,14 +44,14 @@ describe('questionnaire draft feedback', () => {
     await userEvent.setup().click(screen.getByRole('link', { name: '切换问卷' }))
     await screen.findByDisplayValue('当前问卷')
     await act(async () => { resolveOld({ code: 0, data: row('迟到的旧问卷') }); await oldRequest })
-    expect(screen.getByLabelText('问卷名称')).toHaveValue('当前问卷')
+    expect(screen.getByLabelText('测评名称')).toHaveValue('当前问卷')
   })
   it('identifies and focuses an empty name without sending a request', async () => {
     mount()
     fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
-    expect(screen.getByRole('alert')).toHaveTextContent('请填写问卷名称')
-    expect(screen.getByLabelText('问卷名称')).toHaveFocus()
-    expect(screen.getByLabelText('问卷名称')).toHaveAttribute(
+    expect(screen.getByRole('alert')).toHaveTextContent('请填写测评名称')
+    expect(screen.getByLabelText('测评名称')).toHaveFocus()
+    expect(screen.getByLabelText('测评名称')).toHaveAttribute(
       'aria-invalid',
       'true',
     )
@@ -61,20 +61,20 @@ describe('questionnaire draft feedback', () => {
     const user = userEvent.setup()
     api.post.mockRejectedValue({ message: '该名称暂不可用' })
     mount()
-    await user.type(screen.getByLabelText('问卷名称'), '合成问卷')
+    await user.type(screen.getByLabelText('测评名称'), '合成问卷')
     await user.click(screen.getByRole('button', { name: '创建草稿' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('该名称暂不可用')
     expect(api.post).toHaveBeenCalledWith(
       '/questionnaire-products',
       expect.objectContaining({ courseIds: [], name: '合成问卷' }),
     )
-    expect(screen.getByLabelText('问卷名称')).toHaveValue('合成问卷')
+    expect(screen.getByLabelText('测评名称')).toHaveValue('合成问卷')
   })
   it('shows a field-level deadline requirement for public drafts', async () => {
     const user = userEvent.setup()
     mount()
-    await user.type(screen.getByLabelText('问卷名称'), '公开问卷')
-    await user.selectOptions(screen.getByLabelText('问卷类型'), 'GENERAL')
+    await user.type(screen.getByLabelText('测评名称'), '公开问卷')
+    await user.selectOptions(screen.getByLabelText('投放方式'), 'GENERAL')
     await user.click(screen.getByRole('button', { name: '创建草稿' }))
     expect(screen.getByRole('alert')).toHaveTextContent(
       '公开问卷需要设置截止时间',

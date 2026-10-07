@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { beforeAll, afterAll, describe, it, expect, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl, isActionsServiceDatabase } from '../integration/integration-env'
 import example from '../../modules/situational/authoring/examples/teacher-demonstration.json'
 import { captureFixture } from './vnext-capture-fixture'
 import { compileSjtTemplate } from '../../modules/situational/authoring/template'
+import { readSjtWorkbook } from '../../modules/situational/authoring/workbook'
 const url = integrationDatabaseUrl('SJT_UPLOAD_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
 suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
@@ -66,7 +68,8 @@ suite('SJT upload real PostgreSQL governance and frozen FINAL', () => {
   const a = () => ({ userId: author, admin: false }),
     r = () => ({ userId: reviewer, admin: true })
   async function draft() {
-    const t = structuredClone(example)
+    const t = await readSjtWorkbook(readFileSync('assets/sjt-upload-example-v1.xlsx')) as typeof example
+    expect(compileSjtTemplate(t).contentDigest).toBe(compileSjtTemplate(example).contentDigest)
     t.instrumentKey = `synthetic-sjt-${randomUUID()}`
     keys.push(t.instrumentKey)
     const d = await service.createSjtDraft(a(), t)

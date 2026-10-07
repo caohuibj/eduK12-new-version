@@ -9,16 +9,16 @@ export interface TaskPage {
   list: { id: string; kind: 'ASSIGNMENT' | 'CHECKIN' | 'QUESTIONNAIRE' | 'COMPOSITE'; title: string;
     courses: { id: string; title: string }[]; state: State; deadline: string | null; opensAt: string | null;
     canContinue: boolean; canStart: boolean; href: string | null }[]
-  counts: Record<State, number>
+  counts: Record<State, number> & { ACTIONABLE?: number }
   page: number
   pageSize: number
   total: number
   generatedAt: string
 }
-const kindLabels = { ASSIGNMENT: '作业', CHECKIN: '打卡', QUESTIONNAIRE: '问卷', COMPOSITE: '综合测评' }
+const kindLabels = { ASSIGNMENT: '作业', CHECKIN: '打卡', QUESTIONNAIRE: '问卷', COMPOSITE: '组合测评' }
 
 export default function StudentTasks({ refreshKey = 0 }: { refreshKey?: number }) {
-  const [state, setState] = useState<State | ''>('')
+  const [state, setState] = useState<State | 'ACTIONABLE' | ''>('ACTIONABLE')
   const [page, setPage] = useState(1)
   const [retry, setRetry] = useState(0)
   const [result, setResult] = useState<TaskPage | null>(null)
@@ -52,7 +52,8 @@ export default function StudentTasks({ refreshKey = 0 }: { refreshKey?: number }
       <ProductButton onClick={() => setRetry(value => value + 1)} disabled={loading}>刷新待办</ProductButton>
     </div>
     <div className="mb-4 flex flex-wrap items-center gap-2 text-sm"><label htmlFor="student-task-state">任务状态</label>
-      <select id="student-task-state" className="input w-auto" value={state} onChange={event => { setState(event.target.value as State | ''); setPage(1) }}>
+      <select id="student-task-state" className="input w-auto" value={state} onChange={event => { setState(event.target.value as State | 'ACTIONABLE' | ''); setPage(1) }}>
+        <option value="ACTIONABLE">需要处理{result?.counts.ACTIONABLE !== undefined ? `（${result.counts.ACTIONABLE}）` : ''}</option>
         <option value="">全部状态</option>
         {Object.entries(labels).map(([key, label]) => <option key={key} value={key}>{label}{result ? `（${result.counts[key as State]}）` : ''}</option>)}
       </select>

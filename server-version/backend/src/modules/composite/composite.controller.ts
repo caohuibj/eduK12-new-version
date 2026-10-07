@@ -247,6 +247,14 @@ export const compositeController = {
     }
   },
 
+  async removeEmptyFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.removeEmptyFormSection(req.user.userId, req.user.role, req.params.id, req.params.sectionId)
+      return success(res, null, '空区段已移除')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async reorderFormSections(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)

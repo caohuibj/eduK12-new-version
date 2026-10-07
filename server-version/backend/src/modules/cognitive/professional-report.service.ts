@@ -6,7 +6,7 @@ import { decryptCognitivePayload } from './cognitive.security'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
 import { createHash } from 'crypto'
-import { requireCognitiveCollection } from './collection-data.service'
+import { requireCognitiveCollection, cognitiveCollectionSessionWhere } from './collection-data.service'
 
 /** A report-scoped pseudonym of a random session ID, stable across pagination
  * and key rotation. Never expose participant/user/session IDs or join persons. */
@@ -19,8 +19,8 @@ export async function listProfessionalReports(input: { userId: string; role: Use
   const assignment = await getAssignmentForTeacher(input.userId, input.role, input.assignmentId)
   if (assignment.listedStandalone === false) throw FORBIDDEN('综合测评任务请从原有群体报告或综合测评流程读取')
   const collection = input.collectionId ? await requireCognitiveCollection({ ...input, collectionId: input.collectionId }) : null
-  const where = { assignmentId: collection ? { in: collection.assignmentIds } : input.assignmentId, status: 'COMPLETED' as const,
-    ...(collection ? { compositeAttempt: { is: { compositeAssessmentId: collection.id, assignmentRef: null } } } : {}) }
+  const where = { status: 'COMPLETED' as const,
+    ...(collection ? cognitiveCollectionSessionWhere(collection) : { assignmentId: input.assignmentId }) }
   const [total, sessions] = await Promise.all([
     prisma.cognitiveSession.count({ where }),
     prisma.cognitiveSession.findMany({ where, orderBy: [{ finishedAt: 'desc' }, { id: 'desc' }], skip: input.offset, take: 10,

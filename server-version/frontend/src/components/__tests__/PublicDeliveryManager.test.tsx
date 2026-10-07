@@ -29,6 +29,13 @@ it('does not turn empty, fractional, or negative quotas into unlimited links',as
     expect(api.post).not.toHaveBeenCalled()
   }
 })
+it('explains a missing expiry instead of silently ignoring link generation',async()=>{
+ render(<PublicDeliveryManager family="QUESTIONNAIRE" resourceId="q" />)
+ await screen.findByText(/已使用 3 次/)
+ await userEvent.click(screen.getByRole('button',{name:'生成新链接'}))
+ expect(await screen.findByRole('alert')).toHaveTextContent('请选择有效期')
+ expect(api.post).not.toHaveBeenCalled()
+})
 it('does not retain links when switching resources',async()=>{
   const view=render(<PublicDeliveryManager family="QUESTIONNAIRE" resourceId="q" />)
   await screen.findByText(/\/opaque/)

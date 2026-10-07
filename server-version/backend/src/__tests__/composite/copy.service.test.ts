@@ -9,8 +9,9 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     compositeAssessment: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     compositeAssessmentAttempt: { groupBy: vi.fn(), findMany: vi.fn(), count: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
-    cognitiveSession: { create: vi.fn() },
+    cognitiveSession: { create: vi.fn(), count: vi.fn() },
     $queryRaw: vi.fn(),
+    $queryRawUnsafe: vi.fn(),
     compositeAssessmentAccessToken: { findUnique: vi.fn(), create: vi.fn() },
     course: { findUnique: vi.fn() },
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
@@ -243,6 +244,8 @@ describe('copyComposite', () => {
 
   it('copies a frozen cognitive snapshot into composite child sessions', async () => {
     const frozenCipher = encryptCognitivePayload(publishedConfig.config)
+    mockPrisma.cognitiveAssignment.findUnique.mockResolvedValue({ id: 'wrapper-1', configId: publishedConfig.id, createdBy: 'teacher-1', maxAttempts: 1 })
+    mockPrisma.cognitiveSession.count.mockResolvedValue(0)
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue({
       id: 'comp-1',
       status: 'PUBLISHED',
@@ -255,6 +258,7 @@ describe('copyComposite', () => {
         id: 'item-cog',
         type: 'COGNITIVE',
         required: true,
+        cognitiveAssignmentId: 'wrapper-1',
         cognitiveAssignment: {
           id: 'wrapper-1',
           resolvedConfigSnapshotEncrypted: frozenCipher,

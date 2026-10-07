@@ -3,6 +3,7 @@ import { listAvailableForStudent } from '../modules/composite/composite.service'
 
 export const taskStates = ['PENDING', 'IN_PROGRESS', 'UPCOMING', 'EXPIRED', 'COMPLETED', 'UNAVAILABLE'] as const
 export type TaskState = typeof taskStates[number]
+export const taskFilters = ['ACTIONABLE', ...taskStates] as const
 export interface StudentTask {
   id: string
   kind: 'ASSIGNMENT' | 'CHECKIN' | 'QUESTIONNAIRE' | 'COMPOSITE'
@@ -17,7 +18,7 @@ export interface StudentTask {
 }
 
 /** Batched reads, independent of course count. No answers, scores or peer data. */
-export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: TaskState }, now = new Date()) {
+export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number] }, now = new Date()) {
   const memberships = await prisma.courseStudent.findMany({
     where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false } },
     select: { course: { select: { id: true, title: true } } },
@@ -100,10 +101,11 @@ export async function listStudentTasks(userId: string, options: { page: number; 
   }
   const counts = Object.fromEntries(taskStates.map(state => [state, tasks.filter(item => item.state === state).length])) as Record<TaskState, number>
   const order: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'COMPLETED']
-  const filtered = tasks.filter(item => !options.state || item.state === options.state).sort((left, right) =>
+  const actionable = (item: StudentTask) => Boolean(item.href && (item.canContinue || item.canStart))
+  const filtered = tasks.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
     order.indexOf(left.state) - order.indexOf(right.state)
     || (left.deadline ?? '9999').localeCompare(right.deadline ?? '9999')
     || `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`))
   return { list: filtered.slice((options.page - 1) * options.pageSize, options.page * options.pageSize), total: filtered.length,
-    counts, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
+    counts: { ...counts, ACTIONABLE: tasks.filter(actionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
 }

@@ -109,10 +109,10 @@ export const cognitiveExportRequestSchema = z
   .strict()
   .refine((value) => {
     const wide = value.detail === 'summary' || value.detail === 'full'
-    if (wide) return value.format === 'csv' || value.format === 'sav'
+    if (wide) return value.format === 'csv' || value.format === 'sav' || value.format === 'zip'
     return value.format === 'zip' || value.format === 'xlsx'
   }, {
-    message: '导出 detail 与 format 组合无效：summary/full 仅 csv|sav，research 仅 zip|xlsx',
+    message: '导出 detail 与 format 组合无效：summary/full 支持 csv|sav|zip，research 支持 zip|xlsx',
   })
 
 export type CognitiveExportQuery = z.infer<typeof cognitiveExportQuerySchema>

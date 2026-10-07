@@ -135,7 +135,7 @@ const CompositeAssessmentResults: React.FC = () => {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{row.isAnonymous ? '匿名' : '登录'}</td>
                   <td className="px-4 py-3 text-gray-600">{statusLabel[row.status]}</td>
-                  <td className="px-4 py-3 text-gray-600">{row.progress}%</td>
+                  <td className="px-4 py-3 text-gray-600" title={row.progressUnavailableReason || undefined}>{row.progressUnavailableReason ? '进度待核对' : `${row.progress}%`}</td>
                   <td className="px-4 py-3 text-gray-600">{formatTime(row.startedAt)}</td>
                   <td className="px-4 py-3 text-gray-600">{formatTime(row.completedAt)}</td>
                   <td className="px-4 py-3">

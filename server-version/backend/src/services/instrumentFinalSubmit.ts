@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 export type InstrumentDeliveryMode = 'LEGACY' | 'FINAL_ONLY'
 
 export type FinalSubmitErrorCode =
+  | 'FORM_ANSWER_INVALID'
   | 'LEGACY_WRITE_DISABLED'
   | 'STALE_ATTEMPT'
   | 'SUBMISSION_PAYLOAD_CONFLICT'

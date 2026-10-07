@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const { mockCognitiveApi } = vi.hoisted(() => ({
@@ -87,6 +87,29 @@ describe('CognitiveAssignmentEdit wrapper', () => {
     expect(await screen.findByText(/已被报告包引用并冻结/)).toBeInTheDocument()
     expect(screen.queryByDisplayValue('冻结槽位任务')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '保存' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '归档' })).not.toBeInTheDocument()
+  })
+  it('requires confirmation, explains a refused archive and allows a guarded retry', async () => {
+    const detail = { id: 'wrap-1', title: '归档验证', status: 'PUBLISHED', listedStandalone: false, config: {} }
+    mockCognitiveApi.getAssignment.mockResolvedValue({ code: 0, data: detail })
+    mockCognitiveApi.archiveAssignment.mockRejectedValueOnce({ status: 409, message: '仍被未归档测评引用，请先归档对应测评' })
+    const user = userEvent.setup()
+    render(<CognitiveAssignmentEdit />)
+    await user.click(await screen.findByRole('button', { name: '归档' }))
+    expect(await screen.findByRole('dialog', { name: '归档认知任务' })).toBeInTheDocument()
+    expect(mockCognitiveApi.archiveAssignment).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: '确认归档' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('请先归档对应测评')
+    expect(screen.getByRole('button', { name: '归档' })).toBeEnabled()
+    let finish!: (value: unknown) => void
+    mockCognitiveApi.archiveAssignment.mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    await user.click(screen.getByRole('button', { name: '归档' }))
+    await user.click(screen.getByRole('button', { name: '确认归档' }))
+    expect(await screen.findByRole('button', { name: '正在归档…' })).toBeDisabled()
+    expect(mockCognitiveApi.archiveAssignment).toHaveBeenCalledTimes(2)
+    mockCognitiveApi.getAssignment.mockResolvedValue({ code: 0, data: { ...detail, status: 'ARCHIVED' } })
+    await act(async () => { finish({ code: 0, data: {} }) })
+    expect(await screen.findByText('任务已归档')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '归档' })).not.toBeInTheDocument()
   })
 })

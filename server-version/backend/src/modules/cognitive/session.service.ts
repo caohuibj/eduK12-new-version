@@ -11,6 +11,7 @@ import {
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
 import { lockSession } from './session-lock'
+import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from './attempt-quota'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { rejectWrapperForStandaloneUse } from './assignment.access'
 import { resolveCognitiveReferenceForResult } from './reference'
@@ -337,18 +338,6 @@ export const createSession = async (userId: string, assignmentId: string) => {
   const ctx = await loadStartableAssignment(assignmentId, userId)
 
   // 已用次数（COMPLETED/ABANDONED/INVALID 均计入；IN_PROGRESS 已在上方返回）。
-  const used = await prisma.cognitiveSession.count({ where: { assignmentId, participantKey } })
-  if (used >= ctx.assignment.maxAttempts) {
-    throw CONFLICT('Maximum attempts reached for this assignment')
-  }
-
-  const last = await prisma.cognitiveSession.findFirst({
-    where: { assignmentId, participantKey },
-    orderBy: { attemptNo: 'desc' },
-    select: { attemptNo: true },
-  })
-  const attemptNo = (last?.attemptNo ?? 0) + 1
-
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
   const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
@@ -361,7 +350,17 @@ export const createSession = async (userId: string, assignmentId: string) => {
   const randomSeed = randomBytes(16).toString('hex')
 
   try {
-    const session = await prisma.cognitiveSession.create({
+    const session = await prisma.$transaction(async tx => {
+      const source = await cognitiveQuotaSource(tx, assignmentId)
+      await lockCognitiveQuota(tx, userId, source.id)
+      const resumed = await tx.cognitiveSession.findFirst({
+        where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
+        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } } },
+      })
+      if (resumed) return resumed
+      await admitCognitiveAttempt(tx, userId, assignmentId)
+      const last = await tx.cognitiveSession.findFirst({ where: { assignmentId, participantKey }, orderBy: { attemptNo: 'desc' }, select: { attemptNo: true } })
+      return tx.cognitiveSession.create({
       data: {
         userId,
         participantKey,
@@ -369,7 +368,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
         assignmentId: ctx.assignment.id,
         configId: ctx.config.id,
         testType: ctx.config.testType,
-        attemptNo,
+        attemptNo: (last?.attemptNo ?? 0) + 1,
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         configVersion: ctx.config.configVersion,
@@ -380,6 +379,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
         runtimeGeneration: 'UNIFIED_V1',
         compiledRuntimeHash: unifiedSnapshot.compiledRuntime.compiledRuntimeHash,
       },
+      })
     })
     return toRunnerPayload(session, undefined, false, ctx.frozenReport)
   } catch (err) {
@@ -595,11 +595,6 @@ export const restartSession = async (userId: string, sessionId: string) => {
   // make the completion path unable to select it as the latest result.
   const participantKey = session.participantKey
 
-  const used = await prisma.cognitiveSession.count({ where: { assignmentId: session.assignmentId, participantKey } })
-  if (used >= ctx.assignment.maxAttempts) {
-    throw CONFLICT('Maximum attempts reached for this assignment')
-  }
-
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { nickname: true } })
   const participantSnapshotEncrypted = encryptCognitivePayload({ nickname: user?.nickname ?? null })
   const unifiedSnapshot = await createUnifiedCognitiveSessionConfigSnapshot({
@@ -613,6 +608,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
 
   try {
     return await prisma.$transaction(async (tx) => {
+      await admitCognitiveAttempt(tx, userId, session.assignmentId!)
       // D6.1 (P0)：行锁串行化 restart 与 append/complete；锁内校验仍 IN_PROGRESS。
       const locked = await lockSession(tx, sessionId)
       if (!locked) throw NOT_FOUND('CognitiveSession not found')

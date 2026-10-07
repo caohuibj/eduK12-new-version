@@ -160,6 +160,7 @@ export interface CompositePublicInfo {
   expiresAt: string
   maxUses: number
   usedCount: number
+  studyEntryPath?: string | null
   items: Array<{ type: CompositeItemType; position: number; label: string | null }>
 }
 
@@ -313,6 +314,7 @@ export interface CompositeTeacherAttemptRow {
   id: string
   status: CompositeAttemptListStatus
   progress: number
+  progressUnavailableReason?: string | null
   completedItems: number
   startedAt: string
   lastSavedAt: string

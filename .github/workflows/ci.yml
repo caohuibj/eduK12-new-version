@@ -56,7 +56,7 @@ on:
         description: 'Heavy CI: speed uses hosted parallelism; economy limits hosted jobs; local is diagnostic'
       step_probe:
         type: choice
-        options: [none, images, cognitive, frontend, backend, backend-regression, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]
+        options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]
         default: none
         description: 'Run one CI component without full CI or CodeQL'
       probe_frontend_only:
@@ -84,7 +84,7 @@ jobs:
     with:
       runner_labels: ${{ inputs.runner_profile == 'speed' && '["ubuntu-24.04"]' || (vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]') }}
       ui_lab: ${{ contains(fromJSON('["ui","ui-chromium"]'), inputs.step_probe) }}
-      ui_runner_labels: '["ubuntu-24.04"]'
+      ui_runner_labels: ${{ inputs.runner_profile == 'local' && (vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]') || '["ubuntu-24.04"]' }}
 
   probe-browser-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)
@@ -99,25 +99,25 @@ jobs:
       runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
 
   probe-backend-regression:
-    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","reporting"]'), inputs.step_probe)
+    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
-      runner_labels: '["ubuntu-24.04"]'
-      focus: ${{ inputs.step_probe == 'reporting' && 'reporting' || 'full' }}
+      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      focus: ${{ inputs.step_probe == 'reporting' && 'reporting' || (inputs.step_probe == 'assessment-repair' && 'assessment-repair' || 'full') }}
 
   probe-browser:
     needs: [probe-frontend-build, probe-browser-build]
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser'
     uses: ./.github/workflows/ci-browser.yml
     with:
-      runner_labels: '["ubuntu-24.04"]'
+      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
 
   probe-media:
     needs: [probe-frontend-build, probe-browser-build]
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media'
     uses: ./.github/workflows/ci-media.yml
     with:
-      runner_labels: '["ubuntu-24.04"]'
+      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
       selected: '["media2","video_core","media7","situational_video","situational_branching"]'
       groups: '["images-video","cognitive-situational"]'
 
@@ -151,12 +151,14 @@ jobs:
         engine: ${{ fromJSON(inputs.step_probe == 'ui-chromium' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: '["ubuntu-24.04"]'
+      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
       engine: ${{ matrix.engine }}
 
   probe-maintenance:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance'
     uses: ./.github/workflows/ci-maintenance.yml
+    with:
+      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
 
   probe-ops:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops'

@@ -11,6 +11,7 @@ export const anonymousStudyApi={
   list:async()=>data(await apiClient.get<{list:Study[]}>('/anonymous-studies')),
   create:async(title:string)=>data(await apiClient.post<Study>('/anonymous-studies',{title})),
   addWave:async(studyId:string,compositeId:string,tokenId:string,title:string)=>data(await apiClient.post<{id:string;entryPath:string}>(`/anonymous-studies/${encodeURIComponent(studyId)}/waves`,{compositeId,tokenId,title})),
+  createWave:async(studyId:string,input:{requestId:string;compositeId:string;title:string;expiresAt:string;maxUses:number})=>data(await apiClient.post<{id:string;tokenId:string;entryPath:string}>(`/anonymous-studies/${encodeURIComponent(studyId)}/waves/create-with-link`,input)),
   statistics:async(studyId:string)=>data(await apiClient.get<{list:WaveStatistics[];countMeaning:string}>(`/anonymous-studies/${encodeURIComponent(studyId)}/statistics`)),
   close:async(studyId:string)=>data(await apiClient.post(`/anonymous-studies/${encodeURIComponent(studyId)}/close`,{})),
 }

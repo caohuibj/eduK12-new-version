@@ -78,6 +78,23 @@ const compositeHasContextSection = (assessment: any): boolean => Boolean(
   )),
 )
 
+/** Put a newly collected context first in one transaction, without moving FORM rows. */
+const placeDraftContextFirst = async (client: Prisma.TransactionClient, compositeId: string, sectionId: string) => {
+  const row = await client.compositeAssessment.findUnique({ where: { id: compositeId }, select: {
+    status: true, items: { select: { id: true, type: true, position: true } },
+    formSections: { select: { id: true, position: true } },
+  } })
+  if (!row || row.status !== 'DRAFT') return
+  const units = finalCompositeUnits(row)
+  if (units[0]?.id === sectionId) return
+  const ordered = [units.find(unit => unit.id === sectionId)!, ...units.filter(unit => unit.id !== sectionId)]
+  const base = Math.max(-1, ...row.items.map(item => item.position), ...row.formSections.map(section => section.position)) + 1
+  for (const [index, unit] of ordered.entries()) {
+    if (unit.type === 'FORM_SECTION') await client.compositeFormSection.update({ where: { id: unit.id }, data: { position: base + index } })
+    else await client.compositeAssessmentItem.update({ where: { id: unit.id }, data: { position: base + index } })
+  }
+}
+
 /** Assign unassigned FORM modules to contiguous sections after migration. */
 export const ensureCompositeFormSections = async (
   compositeId: string,
@@ -103,14 +120,17 @@ export const ensureCompositeFormSections = async (
     // transaction (addItem / copy), the section assignment shares that
     // transaction so a crash can never leave an orphan FORM module behind.
     const repair = async (client: Prisma.TransactionClient) => {
+      await client.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
       const latest = await client.compositeAssessment.findUnique({
         where: { id: compositeId },
         select: {
-          items: { orderBy: { position: 'asc' }, select: { id: true, type: true, position: true, formSectionId: true, contextKey: true } },
-          formSections: { select: { id: true, position: true } },
+          status: true,
+          items: { orderBy: { position: 'asc' }, select: { id: true, type: true, position: true, formSectionId: true, formSectionPosition: true, contextKey: true } },
+          formSections: { select: { id: true, position: true, contextSection: true } },
         },
       })
       if (!latest) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评不存在', 404)
+      if (latest.status !== 'DRAFT') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '已发布定义包含未归属区段的字段，请复制为新草稿修复；历史答卷保持只读', 409)
       const missing = latest.items.filter((item) => item.type === 'FORM' && !item.formSectionId)
       const missingIds = new Set(missing.map((item) => item.id))
       const runs: typeof missing[] = []
@@ -126,25 +146,32 @@ export const ensureCompositeFormSections = async (
       const formSections = latest.formSections ?? []
       const occupied = new Set(formSections.map((section) => section.position))
       const maximum = Math.max(-1, ...latest.items.map((item) => item.position), ...formSections.map((section) => section.position))
+      let contextId = formSections.find(section => section.contextSection || latest.items.some(item => item.formSectionId === section.id && item.contextKey))?.id
+      const counts = new Map(formSections.map(section => [section.id, Math.max(-1, ...latest.items.filter(item => item.formSectionId === section.id).map(item => item.formSectionPosition ?? item.position)) + 1]))
       for (const [runIndex, items] of runs.entries()) {
         let position = items[0].position
         if (occupied.has(position)) position = maximum + runIndex + 1
         occupied.add(position)
-        const section = await client.compositeFormSection.create({
+        const hasContext = items.some(item => Boolean(item.contextKey))
+        const section = hasContext && contextId ? { id: contextId } : await client.compositeFormSection.create({
           data: {
             compositeAssessmentId: compositeId,
-            title: '表单',
+            title: hasContext ? '背景信息' : '表单',
             position,
-            contextSection: items.some((item) => Boolean(item.contextKey)),
+            contextSection: hasContext,
           },
         })
+        if (hasContext) contextId = section.id
+        const offset = counts.get(section.id) ?? 0
         for (const [sectionPosition, item] of items.entries()) {
           await client.compositeAssessmentItem.update({
             where: { id: item.id },
-            data: { formSectionId: section.id, formSectionPosition: sectionPosition },
+            data: { formSectionId: section.id, formSectionPosition: offset + sectionPosition },
           })
         }
+        counts.set(section.id, offset + items.length)
       }
+      if (contextId) await placeDraftContextFirst(client, compositeId, contextId)
     }
     if (tx) {
       await repair(tx)
@@ -202,12 +229,26 @@ export const listCompositeFormItems = async (compositeId: string) => prisma.comp
   },
 })
 
+const withDraftSectionEdit = <T>(compositeId: string, edit: (tx: Prisma.TransactionClient) => Promise<T>) => prisma.$transaction(async tx => {
+  await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+  const row = await tx.compositeAssessment.findUnique({ where: { id: compositeId }, select: { status: true } })
+  if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评不存在', 404)
+  if (row.status !== 'DRAFT') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '已发布定义不能修改，请复制为新草稿', 409)
+  const result = await edit(tx)
+  await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
+  return result
+})
+const sectionViews = async (tx: Prisma.TransactionClient, compositeId: string) => {
+  const rows = await tx.compositeFormSection.findMany({ where: { compositeAssessmentId: compositeId }, orderBy: { position: 'asc' }, include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } } })
+  return rows.map(row => { const section = mapCompositeSection(row); return { ...section, definitionHash: compositeFormSectionDefinitionHash(section) } })
+}
+
 export const createCompositeFormSection = async (
   compositeId: string,
   input: { title?: string; description?: string; position?: number; contextSection?: boolean },
-) => {
-  await ensureCompositeFormSections(compositeId)
-  const current = await prisma.compositeAssessment.findUnique({
+) => withDraftSectionEdit(compositeId, async tx => {
+  await ensureCompositeFormSections(compositeId, tx)
+  const current = await tx.compositeAssessment.findUnique({
     where: { id: compositeId },
     select: {
       items: { select: { position: true } },
@@ -220,7 +261,7 @@ export const createCompositeFormSection = async (
     ...current.items.map((item) => item.position),
     ...current.formSections.map((section) => section.position),
   ) + 1
-  const section = await prisma.compositeFormSection.create({
+  const section = await tx.compositeFormSection.create({
     data: {
       compositeAssessmentId: compositeId,
       title: input.title?.trim() || '表单',
@@ -232,20 +273,20 @@ export const createCompositeFormSection = async (
   })
   const mapped = mapCompositeSection(section)
   return { ...mapped, definitionHash: compositeFormSectionDefinitionHash(mapped) }
-}
+})
 
 export const updateCompositeFormSection = async (
   compositeId: string,
   sectionId: string,
   input: { title?: string; description?: string | null; contextSection?: boolean },
-) => {
-  const current = await prisma.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId }, include: { items: true } })
+) => withDraftSectionEdit(compositeId, async tx => {
+  const current = await tx.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId }, include: { items: true } })
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
   if (input.contextSection && !current.items.some((item) => item.contextKey)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '没有人口学字段的区段不能作为上下文区段', 400)
   }
   if (input.contextSection) {
-    const assessment = await prisma.compositeAssessment.findUnique({
+    const assessment = await tx.compositeAssessment.findUnique({
       where: { id: compositeId },
       select: {
         items: { select: { id: true, type: true, position: true } },
@@ -256,7 +297,7 @@ export const updateCompositeFormSection = async (
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 400)
     }
   }
-  const updated = await prisma.compositeFormSection.update({
+  const updated = await tx.compositeFormSection.update({
     where: { id: sectionId },
     data: {
       ...(input.title === undefined ? {} : { title: input.title.trim() || '表单' }),
@@ -267,40 +308,37 @@ export const updateCompositeFormSection = async (
   })
   const mapped = mapCompositeSection(updated)
   return { ...mapped, definitionHash: compositeFormSectionDefinitionHash(mapped) }
-}
+})
 
-export const reorderCompositeFormSections = async (compositeId: string, sectionIds: string[]) => {
-  const sections = await prisma.compositeFormSection.findMany({ where: { compositeAssessmentId: compositeId }, select: { id: true } })
+export const reorderCompositeFormSections = async (compositeId: string, sectionIds: string[]) => withDraftSectionEdit(compositeId, async tx => {
+  const sections = await tx.compositeFormSection.findMany({ where: { compositeAssessmentId: compositeId }, select: { id: true, position: true } })
   if (new Set(sectionIds).size !== sectionIds.length || sections.length !== sectionIds.length || sections.some((section) => !sectionIds.includes(section.id))) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段排序列表不一致', 400)
   }
-  await prisma.$transaction(async (tx) => {
-    const offset = sections.length + 1000
+    const offset = Math.max(1000, ...sections.map(section => section.position)) + sections.length + 1
     for (const [index, id] of sectionIds.entries()) await tx.compositeFormSection.update({ where: { id }, data: { position: offset + index } })
     for (const [index, id] of sectionIds.entries()) await tx.compositeFormSection.update({ where: { id }, data: { position: index } })
-  })
-  return listCompositeFormSections(compositeId)
-}
+  return sectionViews(tx, compositeId)
+})
 
-export const reorderCompositeFormSectionItems = async (compositeId: string, sectionId: string, itemIds: string[]) => {
-  const section = await prisma.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId }, include: { items: { select: { id: true } } } })
+export const reorderCompositeFormSectionItems = async (compositeId: string, sectionId: string, itemIds: string[]) => withDraftSectionEdit(compositeId, async tx => {
+  const section = await tx.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId }, include: { items: { select: { id: true, formSectionPosition: true } } } })
   if (!section || new Set(itemIds).size !== itemIds.length || section.items.length !== itemIds.length || section.items.some((item) => !itemIds.includes(item.id))) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '区段字段排序列表不一致', 400)
   }
-  await prisma.$transaction(async (tx) => {
-    for (const [index, id] of itemIds.entries()) await tx.compositeAssessmentItem.update({ where: { id }, data: { formSectionPosition: 1000 + index } })
+    const offset = Math.max(1000, ...section.items.map(item => item.formSectionPosition ?? 0)) + itemIds.length + 1
+    for (const [index, id] of itemIds.entries()) await tx.compositeAssessmentItem.update({ where: { id }, data: { formSectionPosition: offset + index } })
     for (const [index, id] of itemIds.entries()) await tx.compositeAssessmentItem.update({ where: { id }, data: { formSectionPosition: index } })
-  })
-  return listCompositeFormSections(compositeId)
-}
+  return sectionViews(tx, compositeId)
+})
 
-export const assignCompositeFormItemToSection = async (compositeId: string, sectionId: string, itemId: string, position?: number) => {
+export const assignCompositeFormItemToSection = async (compositeId: string, sectionId: string, itemId: string, position?: number) => withDraftSectionEdit(compositeId, async tx => {
   const [section, item] = await Promise.all([
-    prisma.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId } }),
-    prisma.compositeAssessmentItem.findFirst({ where: { id: itemId, compositeAssessmentId: compositeId, type: 'FORM' }, select: { id: true, formSectionId: true, contextKey: true } }),
+    tx.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId } }),
+    tx.compositeAssessmentItem.findFirst({ where: { id: itemId, compositeAssessmentId: compositeId, type: 'FORM' }, select: { id: true, formSectionId: true, contextKey: true } }),
   ])
   if (!section || !item) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '区段或字段不存在', 404)
-  const assessment = await prisma.compositeAssessment.findUnique({
+  const assessment = await tx.compositeAssessment.findUnique({
     where: { id: compositeId },
     select: {
       items: { select: { id: true, type: true, position: true } },
@@ -310,8 +348,9 @@ export const assignCompositeFormItemToSection = async (compositeId: string, sect
   if ((section.contextSection || item.contextKey) && (!assessment || !isFirstCompositeContentSection(assessment, sectionId))) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '人口学上下文区段必须是第一个内容区段', 400)
   }
-  const nextPosition = position ?? await prisma.compositeAssessmentItem.count({ where: { formSectionId: sectionId } })
-  await prisma.$transaction(async (tx) => {
+  const siblings = await tx.compositeAssessmentItem.findMany({ where: { formSectionId: sectionId, id: { not: itemId } }, select: { formSectionPosition: true } })
+  const nextPosition = position ?? Math.max(-1, ...siblings.map(sibling => sibling.formSectionPosition ?? -1)) + 1
+  if (siblings.some(sibling => sibling.formSectionPosition === nextPosition)) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '目标区段位置已占用，请刷新后重试', 400)
     await tx.compositeAssessmentItem.update({
       where: { id: itemId },
       data: { formSectionId: sectionId, formSectionPosition: nextPosition },
@@ -327,9 +366,8 @@ export const assignCompositeFormItemToSection = async (compositeId: string, sect
         await tx.compositeFormSection.update({ where: { id: item.formSectionId }, data: { contextSection: false } })
       }
     }
-  })
-  return listCompositeFormSections(compositeId)
-}
+  return sectionViews(tx, compositeId)
+})
 
 const lockAttempt = async (tx: Prisma.TransactionClient, attemptId: string) => {
   const rows = await tx.$queryRaw<Array<{ id: string }>>`
@@ -346,23 +384,24 @@ const lockCompositeFormSectionAttempt = async (tx: Prisma.TransactionClient, sec
 }
 
 export const normalizeCompositeSectionAnswers = (section: CompositeSection, values: SectionSubmitInput['answers']) => {
+  if (section.contextSection && !section.items.length) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '历史背景信息区段缺少字段，请联系教师发布修复版本后重新开始；已提交记录会保留', 422)
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   const provided = new Map<string, string | string[] | null>()
   for (const answer of values) {
     const item = itemMap.get(answer.formItemId)
-    if (!item) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '提交中包含不属于该区段的字段', 400)
-    if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '同一字段不能重复提交', 400)
+    if (!item) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '提交中包含不属于该区段的字段', 400)
+    if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '同一字段不能重复提交', 400)
     provided.set(answer.formItemId, answer.value)
   }
   const normalized = orderedItems(section.items).map((item) => {
     const value = provided.has(item.id) ? provided.get(item.id)! : null
     if (value === null) {
-      if (item.required) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `${item.formLabel} 为必填项`, 400)
+      if (item.required) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', `${item.formLabel} 为必填项`, 400)
       return { item, normalizedValue: null, storedValue: null, completed: false }
     }
     const form = { id: item.id, type: item.formType, label: item.formLabel, required: item.required, options: item.formOptions, contextKey: item.contextKey }
     const validation = validateQuestionnaireFormAnswer(form, value)
-    if (validation) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', validation, 400)
+    if (validation) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', validation, 400)
     const valueAfterNormalization = normalizeQuestionnaireFormAnswer(form, value) as string | string[]
     const serialized = Array.isArray(valueAfterNormalization) ? JSON.stringify(valueAfterNormalization) : valueAfterNormalization
     return { item, normalizedValue: valueAfterNormalization, storedValue: writeContextFormAnswer(item.contextKey, serialized), completed: true }

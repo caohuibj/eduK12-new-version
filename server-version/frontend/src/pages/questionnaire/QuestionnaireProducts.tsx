@@ -68,17 +68,17 @@ export function QuestionnaireProductList() {
   return (
     <ProductPage width="management" className="hui-questionnaire-products">
       <PageHeader
-        title="问卷管理"
-        description="编排量表、认知测验、情境判断和表单，分别展示各项结果。"
+        title="组合测评"
+        description="自由编排量表、认知任务、情境判断和表单，提供单项报告合集。历史问卷与综合测评在此统一管理。"
         actions={
           <Link className="hui-button hui-button--primary" to={base + '/new'}>
-            创建问卷
+            创建组合测评
           </Link>
         }
       />
       {error && <p role="alert">{error}</p>}
       {loading ? (
-        <p role="status">正在加载问卷…</p>
+        <p role="status">正在加载组合测评…</p>
       ) : (
         <div className="space-y-3">
           {data.list.map((row: any) => (
@@ -86,20 +86,20 @@ export function QuestionnaireProductList() {
               <h2 className="font-semibold">{row.name}</h2>
               <p>
                 {labels[row.status] || row.status} ·{' '}
-                {row.kind === 'LEGACY' ? '原有问卷' : '问卷'}
+                {row.kind === 'LEGACY' ? '历史问卷' : row.kind === 'LEGACY_COMPOSITE' ? '历史组合测评' : '组合测评'} · 单项报告合集
               </p>
               <div className="flex gap-4 mt-2">
                 <Link to={row.editHref}>查看与编制</Link>
                 <ProductButton onClick={() => void copy(row.id)}>
-                  复制为新版问卷
+                  复制为新草稿
                 </ProductButton>
               </div>
             </article>
           ))}
-          {!data.list.length && <p>暂无问卷</p>}
+          {!data.list.length && <p>暂无组合测评。创建草稿后选择已有测评内容。</p>}
         </div>
       )}
-      <nav aria-label="问卷分页" className="flex gap-4 mt-4">
+      <nav aria-label="组合测评分页" className="flex gap-4 mt-4">
         <ProductButton
           disabled={page === 1}
           onClick={() => setPage((p) => p - 1)}
@@ -118,6 +118,8 @@ export function QuestionnaireProductList() {
       </nav>
       <p className="mt-4">
         <Link to="/questionnaires/legacy">原有问卷管理与导出</Link>
+        {' · '}<Link to="/composite-assessments">历史综合测评管理</Link>
+        {' · '}<Link to="/bundle-products">固定测评包：管理员审批版本与整体报告</Link>
       </p>
     </ProductPage>
   )
@@ -152,6 +154,7 @@ export function QuestionnaireProductEdit() {
   const [required, setRequired] = useState(true)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
   const [requestId] = useState(() => crypto.randomUUID())
@@ -202,9 +205,9 @@ export function QuestionnaireProductEdit() {
   })
   const save = () => {
     const invalidName = !name.trim()
-      ? '请填写问卷名称'
+      ? '请填写测评名称'
       : name.trim().length > 200
-        ? '问卷名称不能超过200字'
+        ? '测评名称不能超过200字'
         : ''
     const invalidExpiry =
       publicEnabled && !expiresAt ? '公开问卷需要设置截止时间' : ''
@@ -287,10 +290,15 @@ export function QuestionnaireProductEdit() {
     action(async () => {
       const reordered = units.map((v) => ({ id: v.id, type: v.type }))
       const target = index + direction
+      if (units[index]?.contextSection && direction < 0) {
+        const [context] = reordered.splice(index, 1)
+        reordered.unshift(context)
+      } else {
       ;[reordered[index], reordered[target]] = [
         reordered[target],
         reordered[index],
       ]
+      }
       hydrate(
         await request('/' + id + '/reorder', {
           revision: detail.revision,
@@ -363,10 +371,10 @@ export function QuestionnaireProductEdit() {
   return (
     <ProductPage width="management" className="hui-questionnaire-products">
       <PageHeader
-        title={id === 'new' ? '创建问卷' : '编制问卷'}
-        description="各测评独立反馈。当前支持网页作答；小程序暂不提供新版问卷入口。"
+        title={id === 'new' ? '创建组合测评' : '编制组合测评'}
+        description="各项测评独立反馈，报告为单项结果合集。当前支持网页作答。"
       />
-      <Link to="/questionnaires">返回问卷列表</Link>
+      <Link to="/questionnaires">返回组合测评列表</Link>
       {error && (
         <div role="alert" className="my-3 rounded border border-red-400 p-3">
           {error}
@@ -384,7 +392,7 @@ export function QuestionnaireProductEdit() {
             className="space-y-3 my-4 rounded border p-4"
           >
             <label className="block">
-              问卷名称
+              测评名称
               <input
                 id="questionnaire-product-name"
                 required
@@ -424,9 +432,9 @@ export function QuestionnaireProductEdit() {
             </label>
             {id === 'new' && (
               <label className="block">
-                问卷类型
+                投放方式
                 <select
-                  aria-label="问卷类型"
+                  aria-label="投放方式"
                   className="input ml-2 max-w-full"
                   value={kind}
                   onChange={(e) => {
@@ -477,6 +485,7 @@ export function QuestionnaireProductEdit() {
                 onChange={(e) => setOpens(e.target.value)}
               />
             </label>
+            <p className="text-sm text-gray-600">时间按当前浏览器时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）输入，保存时换算为 UTC。</p>
             <label className="block">
               截止时间
               <input
@@ -522,13 +531,13 @@ export function QuestionnaireProductEdit() {
                     {draft && (
                       <div className="flex gap-3">
                         <ProductButton
-                          disabled={busy || dirty || index === 0}
+                          disabled={busy || dirty || index === 0 || Boolean(units[index - 1]?.contextSection)}
                           onClick={() => void move(index, -1)}
                         >
-                          上移
+                          {v.contextSection ? '置顶' : '上移'}
                         </ProductButton>
                         <ProductButton
-                          disabled={busy || dirty || index === units.length - 1}
+                          disabled={busy || dirty || index === units.length - 1 || v.contextSection || Boolean(units[index + 1]?.contextSection)}
                           onClick={() => void move(index, 1)}
                         >
                           下移
@@ -580,6 +589,7 @@ export function QuestionnaireProductEdit() {
                           )}
                         </div>
                       ))}
+                    {draft && v.type === 'FORM_SECTION' && !v.items.length && <ProductButton disabled={busy || dirty} onClick={() => void action(async () => hydrate(await request('/' + id + '/form-sections/' + v.id + '/remove', { revision: detail.revision })))}>移除空区段</ProductButton>}
                   </li>
                 ))}
               </ol>
@@ -738,18 +748,19 @@ export function QuestionnaireProductEdit() {
                     </>
                   )}
                   <ProductButton variant="primary" onClick={() => void add()}>
-                    添加到问卷
+                    添加到测评
                   </ProductButton>
                 </fieldset>
               )}
               <div className="flex flex-wrap gap-4 my-5">
+                {draft && <ProductButton disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
                   <ProductButton
                     disabled={busy || dirty}
                     variant="primary"
                     onClick={() => void publish()}
                   >
-                    发布问卷
+                    发布组合测评
                   </ProductButton>
                 )}
                 <ProductButton
@@ -804,6 +815,11 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
               </div>
+              {preflight && preflight.revision === detail.revision && <section aria-label="发布自检结果" className="my-4 rounded border p-4">
+                <h2 className="font-semibold">{preflight.ok ? '当前草稿自检通过' : '发布前请处理以下问题'}</h2>
+                <ul className="mt-2 space-y-2">{preflight.checks.map(check => <li key={check.key}><strong>{check.label}：{check.status === 'passed' ? '通过' : '需要处理'}</strong><p>{check.message}</p></li>)}</ul>
+                <p className="mt-2 text-sm text-slate-600">正式发布时会再次检查当前草稿与权限。</p>
+              </section>}
               {detail.publicEnabled && detail.status === 'PUBLISHED' && id && (
                 <PublicDeliveryManager
                   key={id}

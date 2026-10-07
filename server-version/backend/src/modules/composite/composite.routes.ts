@@ -95,6 +95,7 @@ router.get('/:id/form-sections', authenticate, requireTeacher, compositeControll
 router.get('/:id/form-items', authenticate, requireTeacher, compositeController.listFormItems)
 router.post('/:id/form-sections', authenticate, requireTeacher, compositeController.createFormSection)
 router.put('/:id/form-sections/:sectionId', authenticate, requireTeacher, compositeController.updateFormSection)
+router.delete('/:id/form-sections/:sectionId', authenticate, requireTeacher, compositeController.removeEmptyFormSection)
 router.post('/:id/form-sections/reorder', authenticate, requireTeacher, compositeController.reorderFormSections)
 router.post('/:id/form-sections/:sectionId/items/reorder', authenticate, requireTeacher, compositeController.reorderFormSectionItems)
 router.post('/:id/form-sections/:sectionId/items/:itemId', authenticate, requireTeacher, compositeController.assignFormItemToSection)

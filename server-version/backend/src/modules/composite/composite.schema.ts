@@ -134,7 +134,7 @@ export const compositeReanalysisBodySchema = z.object({}).strict()
 
 export const compositeExportRequestSchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
-  format: z.enum(['csv', 'sav']).default('csv'),
+  format: z.enum(['csv', 'sav', 'zip']).default('csv'),
   anonymize: z.boolean().default(true),
   dateRange: z.object({ start: exportDate.optional(), end: exportDate.optional() }).strict().optional(),
 }).strict()

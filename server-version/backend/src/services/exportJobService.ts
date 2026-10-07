@@ -51,6 +51,7 @@ export const formatsForRequest = (resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COG
   const normalized = typeof format === 'string' ? format.toLowerCase() : 'csv'
   if (resourceType === 'SCALE' && normalized === 'spss') return ['csv', 'sps']
   if (resourceType === 'COGNITIVE' && (normalized === 'zip' || normalized === 'xlsx')) return [normalized]
+  if (resourceType === 'COMPOSITE' && normalized === 'zip') return ['zip']
   if (normalized === 'csv' || normalized === 'sav') return [normalized]
   throw Object.assign(new Error('不支持的导出格式'), { statusCode: 400 })
 }

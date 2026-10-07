@@ -26,6 +26,7 @@ anonymousStudyRouter.get('/',wrap(async(req,res)=>success(res,await service.list
 anonymousStudyRouter.post('/',wrap(async(req,res)=>success(res,await service.createStudy(req.user!.userId,z.object({title}).strict().parse(req.body).title))))
 anonymousStudyRouter.post('/:studyId/close',wrap(async(req,res)=>success(res,await service.closeStudy(req.user!.userId,id.parse(req.params.studyId)))))
 anonymousStudyRouter.post('/:studyId/waves',wrap(async(req,res)=>success(res,await service.addWave(req.user!.userId,req.user!.role,id.parse(req.params.studyId),z.object({compositeId:id,tokenId:id,title}).strict().parse(req.body)))))
+anonymousStudyRouter.post('/:studyId/waves/create-with-link',wrap(async(req,res)=>success(res,await service.createWaveWithLink(req.user!.userId,req.user!.role,id.parse(req.params.studyId),z.object({requestId:id,compositeId:id,title,expiresAt:z.string().datetime(),maxUses:z.number().int().min(0).max(2147483647)}).strict().parse(req.body)))))
 anonymousStudyRouter.get('/:studyId/statistics',wrap(async(req,res)=>success(res,await service.waveStatistics(req.user!.userId,id.parse(req.params.studyId)))))
 anonymousStudyRouter.get('/:studyId/waves/:waveId/export.csv',wrap(async(req,res)=>{
   const csv=await service.exportWaveCsv(req.user!.userId,req.user!.role,id.parse(req.params.studyId),id.parse(req.params.waveId))

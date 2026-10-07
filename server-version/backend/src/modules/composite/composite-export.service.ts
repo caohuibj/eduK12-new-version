@@ -1,4 +1,5 @@
 import { compositeForbidden } from './composite.errors'
+import { wideExportPackage } from '../../services/wideExportPackage'
 import { exportRoot } from '../../services/exportArtifactService'
 import * as fs from 'fs'
 import { createHash } from 'crypto'
@@ -26,7 +27,7 @@ import {
 } from '../../services/exportStorage'
 
 export type CompositeExportDetail = 'summary' | 'full'
-export type CompositeExportFormat = 'csv' | 'sav'
+export type CompositeExportFormat = 'csv' | 'sav' | 'zip'
 
 export interface CompositeExportField {
   name: string
@@ -34,6 +35,9 @@ export interface CompositeExportField {
   type: 'numeric' | 'string' | 'date'
   width?: number
   decimals?: number
+  unit?: string | null
+  allowedValues?: unknown[]
+  missingMeaning?: string
 }
 
 export interface CompositeExportData {
@@ -335,6 +339,7 @@ export const getExportData = async (
             frozenMetricType(definition),
             12,
             frozenMetricDecimals(definition),
+            { unit: definition.unit ?? null },
           )
         }
       }
@@ -527,6 +532,8 @@ export const saveExportFiles = async (
     const content = '\uFEFF' + exportToCSV(exportData)
     assertExportLimits({ bytes: Buffer.byteLength(content, 'utf8') })
     fs.writeFileSync(filePath, content, 'utf8')
+  } else if (format === 'zip') {
+    fs.writeFileSync(filePath, wideExportPackage(exportToCSV(exportData), exportData.fields, { resourceType: 'COMPOSITE', resourceId: assessmentId, detail: exportData.detail }))
   } else {
     const variables = toSavVariables(exportData.fields)
     saveToFile(filePath, exportData.rows, variables)

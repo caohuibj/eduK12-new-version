@@ -142,6 +142,22 @@ const sharedProps = {
   onEnterSituational: vi.fn(),
 }
 
+describe('historical empty sections', () => {
+  it('submits an explicit empty FINAL for an ordinary frozen section', async () => {
+    const submitFormSection = vi.fn().mockResolvedValue({ code: 0 })
+    render(<FinalCompositeAssessment state={makeState({ ...formItem, formAnswers: [], contextSection: false })} submitFormSection={submitFormSection} submitScale={vi.fn()} {...sharedProps} />)
+    await userEvent.click(await screen.findByRole('button', { name: '确认并继续' }))
+    await waitFor(() => expect(submitFormSection).toHaveBeenCalledWith('composite-attempt-1', 'composite-form-section-1', expect.objectContaining({ answers: [], definitionHash: 'composite-form-definition-hash' })))
+  })
+  it('explains recovery for an invalid frozen context instead of silently skipping it', async () => {
+    const submitFormSection = vi.fn()
+    render(<FinalCompositeAssessment state={makeState({ ...formItem, formAnswers: [], contextSection: true })} submitFormSection={submitFormSection} submitScale={vi.fn()} {...sharedProps} />)
+    expect(await screen.findByRole('alert')).toHaveTextContent('请联系教师发布修复版本')
+    expect(screen.queryByRole('button', { name: '确认并继续' })).not.toBeInTheDocument()
+    expect(submitFormSection).not.toHaveBeenCalled()
+  })
+})
+
 describe('FinalCompositeAssessment durable selection and exit', () => {
   const multiItem = (): CompositeCurrentItem => ({
     ...scaleItem, scale: { ...scaleItem.scale!, definition: {

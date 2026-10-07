@@ -114,7 +114,7 @@ export interface CognitiveSingleTaskReport {
   profileLabel: string | null
   title: string
   interpretable: boolean
-  qualityState: 'interpretable' | 'insufficient'
+  qualityState: 'interpretable' | 'insufficient' | 'limited' | 'invalid'
   qualityFlags: Array<{ key: string; label: string; active: boolean }>
   interpretationSummary?: string | null
   headline: CognitiveReportMetricView | null

@@ -498,7 +498,7 @@ export const archiveAssignment = async (userId: string, role: UserRole, id: stri
     where: { cognitiveAssignmentId: id, compositeAssessment: { status: { not: 'ARCHIVED' } } },
     select: { id: true },
   })
-  if (referenced) throw CONFLICT('仍被综合测评引用的认知任务不能归档')
+  if (referenced) throw CONFLICT('任务仍被未归档测评引用。请先在“组合测评”中归档相关测评；草稿可移除该认知单元，再重试归档。历史记录会保留。')
 
   // DRAFT/PUBLISHED -> ARCHIVED；不物理删除；不提供 ARCHIVED -> PUBLISHED。
   const { count } = await prisma.cognitiveAssignment.updateMany({
@@ -529,6 +529,8 @@ export const ensureTeacherPublishedAssignment = async (
     instruction: string | null
     sourceFreeze?: FrozenAssignmentCopy | null
     profile?: CognitiveProfile
+    quotaSourceAssignmentId?: string | null
+    maxAttempts?: number
   },
 ) => {
   const config = await tx.cognitiveTestConfig.findUnique({ where: { id: input.configId } })
@@ -581,6 +583,7 @@ export const ensureTeacherPublishedAssignment = async (
       listedStandalone: false,
       profile: copiedProfile,
       resolvedConfigHash: copiedHash,
+      quotaSourceAssignmentId: input.quotaSourceAssignmentId ?? null,
     },
   })
   if (hasFreeze) {
@@ -628,7 +631,8 @@ export const ensureTeacherPublishedAssignment = async (
       publishedAt: new Date(),
       listedStandalone: false,
       required: false,
-      maxAttempts: 1,
+      maxAttempts: input.maxAttempts ?? 1,
+      quotaSourceAssignmentId: input.quotaSourceAssignmentId ?? null,
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
       ...freezeData,
     },

@@ -70,6 +70,13 @@ export class BundleDefinitionProvider {
   list(): BundleDefinitionEntry[] {
     return [...this.entries.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, entry]) => clone(entry))
   }
+  register(entry: BundleDefinitionEntry) {
+    const validated = validateEntry(entry)
+    const key = identity(validated.definition.bundleKey, validated.definition.bundleVersion)
+    const previous = this.entries.get(key)
+    if (previous && canonicalHash(previous) !== canonicalHash(validated)) throw new Error('BUNDLE_VERSION_IMMUTABLE')
+    this.entries.set(key, validated)
+  }
   /** Structural readiness only; usage rights, population and course authorization are still required. */
   publicationBlockers(key: string, version: string): string[] {
     const entry = this.exact(key, version)
