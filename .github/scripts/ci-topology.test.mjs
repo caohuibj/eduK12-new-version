@@ -9,6 +9,12 @@ import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
+test('Draft platform maintenance uses self-hosted capacity instead of the reusable hosted default',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const maintenance=workflow.split('  maintenance:\n')[1]?.split('\n  documentation:')[0];
+  assert.match(maintenance??'',/github\.event\.pull_request\.draft == true.*self-hosted.*eduk12-win-ci/);
+  assert.match(maintenance??'',/needs\.scope\.outputs\.runner_profile == 'local'.*self-hosted/);
+});
 test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
   const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   const probes=workflow.slice(workflow.indexOf('  probe-frontend-build:'),workflow.indexOf('  scope:'));

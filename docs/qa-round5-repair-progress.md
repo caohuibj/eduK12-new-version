@@ -44,7 +44,7 @@
 - 前端类型、路由清单、会话访问门、lint（0 错误，既有 warnings）、生产构建通过；前端 198 个文件 / 831 项测试通过。
 - backend 正式 `npm run build` 的内容准入及 TypeScript 编译通过。
 - `node scripts/r5-regression.mjs <report.json>` 是本地与 CI 的共同执行入口；25 个文件 / 326 项通过，其中五组 PostgreSQL 必须实际执行，报告断言不接受缺失或跳过。
-- CI 路由/资源/门禁 89 项测试通过。`runner_profile=local` 的单步后端、浏览器、媒体、UI、maintenance 都明确路由到自建 runner；完整正式路线和合并门禁保留。
+- CI 路由/资源/门禁 90 项测试通过。`runner_profile=local` 的单步后端、浏览器、媒体、UI、maintenance 都明确路由到自建 runner，Draft 自动 maintenance 同样使用自建 runner；完整正式路线和合并门禁保留。
 - 菜单和匿名恢复：Chromium / WebKit，375、768、1280、1920 像素通过；本机 Firefox 因 macOS 进程沙箱启动失败，交由自建 Linux 的同一 UI 门禁验证，未关闭沙箱。
 - 全量 CI 暂停。Draft PR 的精确提交、各次单步运行链接和 runner 名称记录在 PR 验证说明；所有必需项成功前不宣称合并/上线就绪。
 
