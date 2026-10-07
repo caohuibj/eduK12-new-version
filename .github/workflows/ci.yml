@@ -52,8 +52,8 @@ on:
       runner_profile:
         type: choice
         options: [speed, economy, local]
-        default: speed
-        description: 'Heavy CI: speed uses hosted parallelism; economy limits hosted jobs; local is diagnostic'
+        default: local
+        description: 'Default local uses only self-hosted runners including Windows/WSL CodeQL; hosted profiles require available minutes'
       step_probe:
         type: choice
         options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]

@@ -188,7 +188,7 @@ export function runnerPlan({ profile = 'speed', scenario = 'platform', macEnable
   const heavy = ['platform','dependencies'].includes(scenario);
   return { runner_profile:profile,
     heavy_runner:windows, light_runner:macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
-    frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:hosted,
+    frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:profile === 'local' ? windows : hosted,
     regression_runner:heavy && profile !== 'local' ? hosted : windows,
     browser_runner:heavy && profile !== 'local' ? hosted : windows,
     media_runner:heavy && profile === 'speed' ? hosted : windows,

@@ -306,7 +306,7 @@ test('runner profiles preserve Mac disk fallback and Windows images',()=>{
     assert.deepEqual(ready.frontend_runner,['self-hosted','macOS','eduk12-mac-ci']);
     assert.deepEqual(ready.light_runner,ready.frontend_runner);
     assert.deepEqual(ready.docker_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
-    assert.deepEqual(ready.codeql_runner,['ubuntu-24.04']);
+    assert.deepEqual(ready.codeql_runner,profile === 'local' ? ready.heavy_runner : ['ubuntu-24.04']);
     for(const overrides of [{freeBytes:7*GiB},{macEnabled:false},{os:'linux'}]) {
       const fallback=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB,...overrides});
       assert.deepEqual(fallback.frontend_runner,fallback.heavy_runner);
@@ -314,6 +314,18 @@ test('runner profiles preserve Mac disk fallback and Windows images',()=>{
   }
   assert.throws(()=>runnerPlan({profile:'hosted'}),/Unsupported CI_RUNNER_PROFILE/);
   assert.throws(()=>runnerPlan({profile:'typo'}));
+});
+
+test('local gates use only self-hosted runners including Windows CodeQL',()=>{
+  for (const scenario of ['platform','dependencies','frontend','content','maintenance','documentation']) {
+    for (const macEnabled of [true,false]) {
+      const plan=runnerPlan({profile:'local',scenario,macEnabled,os:'darwin',freeBytes:9*1024**3});
+      for (const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
+        assert.equal(plan[lane][0],'self-hosted',`${scenario}: ${lane}`);
+      assert.deepEqual(plan.codeql_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
+      assert.equal(plan.visual_hosted,false);
+    }
+  }
 });
 test('only ordinary documentation qualifies and cannot hide scientific, runbook or executable changes',()=>{
   for(const file of ['README.md','docs/ci-runner-policy.md','docs/development/architecture.md'])
