@@ -27,6 +27,24 @@ export interface FinalDraftSealedSubmission {
   payload: unknown
 }
 
+export type RejectedFormSubmission = {
+  code: 'FORM_ANSWER_INVALID'
+  submissionId: string
+  nextSubmissionId: string
+}
+
+const reopenRejectedForm = (meta: FinalDraftMeta, rejection: RejectedFormSubmission): FinalDraftMeta => {
+  if (rejection.code !== 'FORM_ANSWER_INVALID'
+    || !['questionnaire-form-section', 'composite-form-section'].includes(meta.instrument)
+    || !['SUBMITTING', 'RETRY_PENDING'].includes(meta.status)
+    || !meta.sealedSubmission || meta.submissionId !== rejection.submissionId
+    || !rejection.nextSubmissionId || rejection.nextSubmissionId === meta.submissionId) {
+    throw new FinalDraftNotWritableError(meta.status)
+  }
+  return { ...meta, status: 'DRAFT', submissionId: rejection.nextSubmissionId, sealedSubmission: undefined,
+    errorCode: null, errorMessage: null, updatedAt: Date.now() }
+}
+
 export interface FinalDraftMeta {
   draftKey: string
   instrument: FinalDraftInstrument
@@ -242,6 +260,7 @@ export interface FinalDraftStore {
   putTrial(trial: FinalDraftTrial): Promise<void>
   listTrials(draftKey: string): Promise<FinalDraftTrial[]>
   setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }): Promise<FinalDraftMeta | null>
+  reopenRejectedForm(draftKey: string, rejection: RejectedFormSubmission): Promise<FinalDraftMeta | null>
   snapshot(draftKey: string): Promise<FinalDraftSnapshot | null>
   sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T): Promise<FinalDraftSealResult<T> | null>
   delete(draftKey: string): Promise<void>
@@ -253,6 +272,14 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   private readonly trials = new Map<string, FinalDraftTrial>()
 
   async get(draftKey: string) { return this.metas.get(draftKey) ?? null }
+
+  async reopenRejectedForm(draftKey: string, rejection: RejectedFormSubmission) {
+    const current = this.metas.get(draftKey)
+    if (!current) return null
+    const next = reopenRejectedForm(current, rejection)
+    this.metas.set(draftKey, next)
+    return cloneValue(next)
+  }
 
   async ensure(meta: FinalDraftMeta) {
     const existing = this.metas.get(meta.draftKey)
@@ -412,6 +439,17 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     return this.run<FinalDraftMeta | null>([META_STORE], 'readonly', async (transaction) => (
       (await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))) ?? null
     ))
+  }
+
+  async reopenRejectedForm(draftKey: string, rejection: RejectedFormSubmission) {
+    return this.run<FinalDraftMeta | null>([META_STORE], 'readwrite', async transaction => {
+      const store = transaction.objectStore(META_STORE)
+      const current = await requestResult<FinalDraftMeta | undefined>(store.get(draftKey))
+      if (!current) return null
+      const next = reopenRejectedForm(current, rejection)
+      store.put(next)
+      return next
+    })
   }
 
   async ensure(meta: FinalDraftMeta) {

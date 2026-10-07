@@ -157,9 +157,22 @@ assertions, authorization boundaries or scan thresholds to obtain a green result
 
 The existing CI workflow exposes `step_probe` values for frontend, backend,
 backend-regression, targeted reporting, browser, media, UI, hosted Chromium UI, QA component UI, Ops, performance, images and Cognitive checks.
+The `assessment-repair` probe runs the shared R5 regression selector, including
+task-controller admission and collection snapshot completion fixtures, so the
+focused gate catches filter-export and draft-before-publication contract drift.
+It requires
+non-skipping Questionnaire, Bundle, onboarding, SJT and anonymous-study PostgreSQL
+evidence. With `runner_profile=local`, backend regression, browser, media, visual
+and maintenance probes use self-hosted runners; there is no hosted fallback.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
+
+Regression jobs clear their exact temporary report paths before setup, so a
+persistent self-hosted runner cannot upload a previous focus's test evidence.
+Self-hosted regression uses its existing local npm download cache; remote npm
+cache restore/save is limited to GitHub-hosted jobs. Lockfile installation, actual
+tests, non-skipping assertions, artifacts and service cleanup are unchanged.
 
 Keep integration work Draft during repair and probes. Freeze the combined functional
 and CI head, verify every affected component, then run one final complete gate.

@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { afterAll, describe, expect, it } from 'vitest'
 import { UserRole } from '@prisma/client'
@@ -55,7 +56,7 @@ const fixture = async (population: number) => {
         aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT',
         ...longitudinalIdentity }],
     } })
-    await reviewPlatformReportingSpec({ actor, specId: spec.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer(actor), specId: spec.id })
     await publishPlatformReportingSpec({ actor, specId: spec.id })
     return spec
   }

@@ -23,6 +23,7 @@ const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
     cognitiveTestConfig: { findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
     $transaction: vi.fn(),
+    $queryRaw: vi.fn(),
   },
   packageMock: vi.fn(),
   protocolMock: vi.fn(),

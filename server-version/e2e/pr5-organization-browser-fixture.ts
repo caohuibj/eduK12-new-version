@@ -44,6 +44,7 @@ const main = async () => {
   const client = await createUser('client', 'STUDENT')
   const outsider = await createUser('outsider', 'STUDENT')
   const systemAdmin = await createUser('system_admin', 'ADMIN', 'SYSTEM_ADMIN')
+  const specReviewer = await createUser('spec_reviewer', 'ADMIN', 'SYSTEM_ADMIN')
 
   const primary = await createOrganization({
     name: `PR5 Browser Organization ${suffix}`,
@@ -128,7 +129,7 @@ const main = async () => {
       }],
     },
   })
-  await reviewPlatformReportingSpec({ actor: { userId: systemAdmin.id, platformRole: 'SYSTEM_ADMIN' }, specId: spec.id })
+  await reviewPlatformReportingSpec({ actor: { userId: specReviewer.id, platformRole: 'SYSTEM_ADMIN' }, specId: spec.id })
   await publishPlatformReportingSpec({ actor: { userId: systemAdmin.id, platformRole: 'SYSTEM_ADMIN' }, specId: spec.id })
 
   const fixture = {

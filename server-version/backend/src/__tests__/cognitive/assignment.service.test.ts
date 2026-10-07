@@ -16,6 +16,8 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
     compositeAssessmentItem: { findFirst: vi.fn() },
+    cognitiveSession: { count: vi.fn(), findFirst: vi.fn() },
+    $transaction: vi.fn(),
   },
 }))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -103,6 +105,9 @@ const baseInput = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$transaction.mockImplementation((run: any) => run(mockPrisma))
+  mockPrisma.cognitiveSession.count.mockResolvedValue(0)
+  mockPrisma.cognitiveSession.findFirst.mockResolvedValue(null)
   mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue(null)
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
   mockPrisma.materialGrant.findMany.mockResolvedValue([])
@@ -301,6 +306,7 @@ describe('getAssignmentForTeacher / getAssignmentForStudent', () => {
     const result = await getAssignmentForStudent('student-1', 'asg-1')
     expect(result.config.config).toBeUndefined()
     expect(result.config.configVersion).toBe('1.0.0')
+    expect(result).toMatchObject({ usedAttempts: 0, remainingAttempts: 1, continueHref: null })
   })
 
   it('student detail rejects PENDING membership', async () => {

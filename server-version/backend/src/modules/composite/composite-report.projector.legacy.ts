@@ -1,3 +1,4 @@
+import { adaptFrozenSingleTaskReport } from '../cognitive/frozen-single-report-adapter'
 import type {
   CognitiveDomainResult,
   CognitivePackageAnalysisResult,
@@ -53,6 +54,8 @@ const safeMetricView = (metric: any) => {
     label,
     ...(unit !== undefined ? { unit } : {}),
     formatted,
+    ...(typeof metric.presentationVersion === 'string' ? { presentationVersion: metric.presentationVersion,
+      participantLabel: metric.participantLabel, explanation: metric.explanation } : {}),
   }
 }
 
@@ -64,6 +67,7 @@ const projectSafeSingleTaskReport = (
   report: any,
   metricDefinitions?: Record<string, { availableProfiles?: string[]; role?: string }>,
 ) => {
+  report = adaptFrozenSingleTaskReport(report)
   if (!report || typeof report !== 'object' || Array.isArray(report)) return null
   const participantMetric = (metric: any) => {
     if (!metric || typeof metric !== 'object' || Array.isArray(metric)) return null
@@ -86,6 +90,7 @@ const projectSafeSingleTaskReport = (
     profile: report.profile ?? null,
     profileLabel: report.profileLabel ?? null,
     title: report.title,
+    interpretationSummary: typeof report.interpretationSummary === 'string' ? report.interpretationSummary : null,
     interpretable: report.interpretable,
     qualityState: report.qualityState,
     qualityFlags: Array.isArray(report.qualityFlags)
@@ -159,6 +164,7 @@ const projectReference = (reference: any) => {
 }
 
 const projectResearchSingleTaskReport = (report: any) => {
+  report = adaptFrozenSingleTaskReport(report)
   if (!report || typeof report !== 'object' || Array.isArray(report)) return null
   const metrics = (value: unknown) => Array.isArray(value)
     ? value.map(projectResearchMetric).filter(Boolean)

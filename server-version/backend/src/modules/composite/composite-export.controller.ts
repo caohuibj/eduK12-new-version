@@ -84,7 +84,7 @@ export const compositeExportController = {
       const fileName = req.params.fileName
       const safeName = path.basename(fileName) === fileName
         && fileName.startsWith(`composite_${req.params.id.substring(0, 8)}_`)
-        && /^composite_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
+        && /^composite_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav|zip)$/.test(fileName)
       if (!safeName || !compositeExportFileNameMatchesProjection(fileName, binding)) {
         return notFound(res, '文件不存在')
       }

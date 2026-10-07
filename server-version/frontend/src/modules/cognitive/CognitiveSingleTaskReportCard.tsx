@@ -25,6 +25,9 @@ const CognitiveSingleTaskReportCard: React.FC<{
   headingLevel?: 1 | 2 | 3
 }> = ({ report, attemptNo, finishedAt, anonymousCode, headingLevel }) => {
   const interpretable = report.interpretable
+  const qualityLabel = report.qualityState === 'limited' ? '本次数据存在质量限制，仅阅读可显示的指标。'
+    : report.qualityState === 'invalid' ? '本次数据未通过质量要求，指标暂不解释。'
+      : interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议在相近设备和环境下重新测量。'
   const method = report.method || {} as CognitiveSingleTaskReport['method']
   const comparison = report.reference?.comparison
   const activeFlags = report.qualityFlags.filter((flag) => flag.active)
@@ -62,8 +65,8 @@ const CognitiveSingleTaskReportCard: React.FC<{
       )}
 
       <ReportSection title="数据质量" eyebrow="解释前提" headingLevel={sectionHeadingLevel}>
-        <div className={`rounded-lg px-4 py-3 text-sm ${interpretable ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
-          {interpretable ? '数据质量：本次结果可作任务表现参考。' : '本次数据不足以稳定解释，建议在相近设备和环境下重新测量。'}
+        <div className={`rounded-lg px-4 py-3 text-sm ${interpretable && report.qualityState !== 'limited' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-800'}`}>
+          {qualityLabel}
         </div>
         {activeFlags.length > 0 && (
           <div className="mt-2 text-xs text-gray-500">

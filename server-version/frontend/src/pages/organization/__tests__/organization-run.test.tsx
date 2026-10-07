@@ -61,6 +61,26 @@ beforeEach(() => {
 })
 
 describe('Organization Run product journey', () => {
+  it('loads remaining authorized resources, deduplicates repeated static entries and permits retry', async () => {
+    const first = { family: 'SCALE', key: 'custom-scale:first', version: '1.0.0', title: '第一页资源', subjectRoles: ['STUDENT'], respondentRoles: ['STUDENT'], relationshipKinds: ['SELF'], perspectives: ['SELF_REPORT'], analysisMode: 'INDIVIDUAL_ONLY', visibilityPolicyKey: 'ORG_SELF_V1', minimumRespondents: null }
+    const second = { ...first, key: 'custom-scale:second', title: '第二页资源' }
+    api.resources.mockResolvedValueOnce({ list: [first], nextPage: 2 })
+      .mockRejectedValueOnce(new Error('资源读取失败，请重试。'))
+      .mockResolvedValueOnce({ list: [first, second], nextPage: null })
+    renderPage()
+    const more = await screen.findByRole('button', { name: '加载更多已授权资源' })
+    await userEvent.click(more)
+    expect(await screen.findByText('资源读取失败，请重试。')).toBeInTheDocument()
+    await waitFor(() => expect(more).toBeEnabled())
+    await userEvent.click(more)
+    expect(await screen.findByRole('option', { name: /第二页资源/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('option', { name: /第一页资源/ })).toHaveLength(1)
+    expect(api.resources).toHaveBeenLastCalledWith('org-1', 2)
+    expect(screen.queryByRole('button', { name: '加载更多已授权资源' })).not.toBeInTheDocument()
+    await userEvent.selectOptions(screen.getByLabelText('已发布资源'), '1')
+    expect(screen.getByLabelText('资源 key')).toHaveValue('custom-scale:second')
+  })
+
   it('publishes using the exact server-returned optimistic version', async () => {
     renderPage()
     const publish = await screen.findByRole('button', { name: '发布测评批次' })

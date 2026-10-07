@@ -138,7 +138,69 @@ def transfer(c, credentials, image, work, ident, command='put', file=None):
         cleanup_container(name, ident)
 
 
-def restore_check(file, source, secret, work, ident):
+def migration_fingerprint(rows):
+    return hashlib.sha256(''.join(row['name'] + '\t' + row['checksum'] + '\n'
+                                  for row in sorted(rows, key=lambda row: row['name'])).encode()).hexdigest()
+
+
+def release_migrations(source):
+    directory = source.parent.parent / 'backend/prisma/migrations'
+    require(directory.is_dir() and not directory.is_symlink(), 'RELEASE_MIGRATIONS_REQUIRED')
+    rows = []
+    for folder in sorted(directory.iterdir()):
+        if folder.is_dir():
+            sql = folder / 'migration.sql'
+            require(not folder.is_symlink() and sql.is_file() and not sql.is_symlink(), 'RELEASE_MIGRATION_SOURCE_INVALID')
+            rows.append({'name': folder.name, 'checksum': sha(sql)})
+    require(bool(rows), 'RELEASE_MIGRATIONS_REQUIRED')
+    return rows
+
+
+def verify_restored_migrations(applied, expected):
+    require(bool(expected) and len(applied) == len(expected)
+            and len({row['name'] for row in applied}) == len(applied)
+            and migration_fingerprint(applied) == migration_fingerprint(expected), 'RESTORE_RELEASE_SCHEMA_MISMATCH')
+    return migration_fingerprint(expected)
+
+
+def source_runtime_proof(expected):
+    # A runtime outage must not stop taking a recoverable database backup.
+    # This is source-side evidence, never a claim that restore provisioned roles.
+    try:
+        proof = json.loads(run(['docker', 'exec', BACKEND, 'node', 'scripts/runtime-role-contract.mjs', 'verify-current'], timeout=60))
+        require(proof.get('ok') and proof.get('restrictedRuntimeRole')
+                and proof.get('migrationFingerprint') == migration_fingerprint(expected), 'SOURCE_RELEASE_RUNTIME_NOT_READY')
+        return {'status': 'PASS', **proof}
+    except RuntimeError as error:
+        if str(error) not in ['BACKUP_COMMAND_FAILED', 'SOURCE_RELEASE_RUNTIME_NOT_READY']:
+            raise
+    except (ValueError, AttributeError, subprocess.TimeoutExpired):
+        pass
+    return {'status': 'NOT_VERIFIED', 'reason': 'runtime_preflight_failed_or_unavailable', 'applicationReleaseReady': False}
+
+
+def wait_for_database(name, user, database):
+    # One slow Docker exec during cold startup is not a readiness verdict.
+    # Keep the per-probe cap; bound the entire wait by a monotonic deadline.
+    deadline = time.monotonic() + 90
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError('ISOLATED_RESTORE_NOT_READY')
+        try:
+            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', user, '-d', database],
+                                    capture_output=True, timeout=min(10, remaining))
+            if result.returncode == 0 and time.monotonic() < deadline:
+                return
+        except subprocess.TimeoutExpired:
+            pass
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(1, remaining))
+
+
+def restore_check(file, source, secret, work, ident, expected_migrations=None):
+    expected = release_migrations(source) if expected_migrations is None else expected_migrations
     name = 'eduk12-restore-' + ident[:12]
     envfile = work / 'restore.env'
     envfile.write_text('POSTGRES_USER=restore\nPOSTGRES_DB=restore\nPOSTGRES_PASSWORD=' + uuid.uuid4().hex + '\n')
@@ -147,21 +209,19 @@ def restore_check(file, source, secret, work, ident):
         run(['docker', 'run', '-d', '--name', name, '--label', LABEL + '=' + ident,
              '--network', 'none', '--memory', '384m', '--cpus', '0.5', '--pids-limit', '128',
              '--env-file', str(envfile), 'postgres:16.15-bookworm'])
-        for _ in range(90):
-            result = subprocess.run(['docker', 'exec', name, 'pg_isready', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
-            if result.returncode == 0:
-                break
-            time.sleep(1)
-        else:
-            raise RuntimeError('ISOLATED_RESTORE_NOT_READY')
+        wait_for_database(name, 'restore', 'restore')
         env = os.environ.copy()
         env.update(BACKUP_ENCRYPTION_KEY=secret, RESTORE_CONFIRMATION='RESTORE', RESTORE_TARGET_CONTAINER=name,
                    RESTORE_TARGET_DB_NAME='restore', RESTORE_TARGET_DB_USER='restore', NODE_OPTIONS='--max-old-space-size=768')
         run([NODE, str(source / 'restore-db.mjs'), str(file)], env=env, timeout=600)
-        sql = 'SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL; SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL; SELECT count(*) FROM users;'
+        sql = 'SELECT COALESCE(json_agg(row_to_json(m)),\'[]\'::json) FROM (SELECT migration_name AS name, checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL) m; SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL; SELECT count(*) FROM users;'
         counts = run(['docker', 'exec', name, 'psql', '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-U', 'restore', '-d', 'restore', '-Atc', sql]).decode().strip().splitlines()
-        require(len(counts) == 3 and all(x.isdigit() for x in counts) and int(counts[0]) > 0 and counts[1] == '0', 'RESTORE_SCHEMA_CHECK_FAILED')
-        return {'status': 'PASS', 'appliedMigrations': int(counts[0]), 'failedMigrations': 0, 'users': int(counts[2]), 'network': 'none'}
+        require(len(counts) == 3 and counts[1] == '0' and counts[2].isdigit(), 'RESTORE_SCHEMA_CHECK_FAILED')
+        applied = json.loads(counts[0])
+        fingerprint = verify_restored_migrations(applied, expected)
+        return {'status': 'PASS', 'appliedMigrations': len(applied), 'migrationFingerprint': fingerprint,
+                'failedMigrations': 0, 'users': int(counts[2]), 'network': 'none',
+                'runtimeRoleRestored': False, 'applicationReleaseReady': False}
     finally:
         cleanup_container(name, ident)
         envfile.unlink(missing_ok=True)
@@ -256,6 +316,8 @@ def backup():
         source = Path('/opt/eduk12-new/releases') / revision[:8] / 'source/server-version/scripts/backup'
         require((source / 'backup-db.mjs').is_file() and (source / 'restore-db.mjs').is_file(), 'RELEASE_BACKUP_SOURCE_REQUIRED')
         require(all(not (source / file).is_symlink() and sha(source / file) == expected for file, expected in c['backupSourceSha256'].items()), 'BACKUP_SOURCE_CHANGED_REVALIDATE')
+        expected_migrations = release_migrations(source)
+        runtime_proof = source_runtime_proof(expected_migrations)
         require(shutil.disk_usage(STATE).free >= c['minimumFreeBytes'], 'BACKUP_DISK_HEADROOM_REQUIRED')
         ident = uuid.uuid4().hex; work = STATE / ('.work-' + ident); work.mkdir(mode=0o700)
         fingerprint = hmac.new(secret.encode(), b'eduk12-host-backup-key-v1', hashlib.sha256).hexdigest()
@@ -279,7 +341,7 @@ def backup():
             downloaded = work / (database.name + '.remote')
             Path(str(downloaded) + '.sha256').write_text(remote_db['sha256'] + '  ' + downloaded.name + '\n')
             run([NODE, str(source / 'backup-db.mjs'), 'verify', str(downloaded)], env=task_env)
-            restoration = restore_check(downloaded, source, secret, work, ident)
+            restoration = restore_check(downloaded, source, secret, work, ident, expected_migrations)
             remote_db.update(file=database.name, authenticatedDecryptionVerified=True)
             archive, config_count = config_archive(work)
             crypto_receipt = json.loads(run([NODE, str(CODE / 'backup-crypto.mjs'), 'encrypt'],
@@ -292,6 +354,7 @@ def backup():
             require(inspect(BACKEND)['Image'] == backend['Image'], 'RELEASE_CHANGED_DURING_BACKUP')
             receipt = {'schema': 1, 'id': ident, 'at': dt.datetime.now(dt.timezone.utc).isoformat(), 'status': 'VERIFIED',
                        'bucket': c['backupBucket'], 'region': c['region'], 'sourceRevision': revision,
+                       'expectedMigrationFingerprint': migration_fingerprint(expected_migrations), 'sourceRuntimeProof': runtime_proof,
                        'scope': 'database_and_server_configuration', 'fullServerDiskImage': False,
                        'objects': [remote_db, remote_config], 'serverConfigFiles': config_count,
                        'restore': restoration, 'attachmentAssociation': attachment_association(secret), 'protected': not catalog['points']}

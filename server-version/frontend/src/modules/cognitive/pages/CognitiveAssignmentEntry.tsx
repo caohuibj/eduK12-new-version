@@ -137,6 +137,8 @@ const CognitiveAssignmentEntry: React.FC = () => {
             <p>截止时间：{new Date(assignment.dueAt).toLocaleString('zh-CN')}</p>
           )}
           <p>最多尝试：{assignment.maxAttempts} 次</p>
+          {assignment.usedAttempts !== undefined && <p>已使用 {assignment.usedAttempts} 次 · 剩余 {assignment.remainingAttempts} 次。独立入口与组合测评共用次数，继续原作答不额外计次。</p>}
+          <p>预计用时以本任务指导语为准，请在可连续完成的环境中开始。</p>
           {assignment.config && (
             <p>
               测评类型：{assignment.config.testType} / 引擎 {assignment.config.engineVersion}
@@ -151,14 +153,14 @@ const CognitiveAssignmentEntry: React.FC = () => {
         ) : null}
 
         <div className="flex space-x-3">
-          {entryAction.kind === 'result' ? (
+          {assignment.continueHref ? <button className="btn-primary" onClick={() => navigate(assignment.continueHref!)}>继续已有作答</button> : entryAction.kind === 'result' ? (
             <button onClick={() => ledgerSessionId && navigate(`/student/cognitive/sessions/${ledgerSessionId}/result`)} className="btn-primary">
               {entryAction.label}
             </button>
           ) : (
             <button
               onClick={entryAction.kind === 'continue' ? handleResume : handleStart}
-              disabled={submitting}
+              disabled={submitting || (assignment.remainingAttempts === 0 && entryAction.kind !== 'continue')}
               className="btn-primary"
             >
               {entryAction.kind === 'continue' ? (

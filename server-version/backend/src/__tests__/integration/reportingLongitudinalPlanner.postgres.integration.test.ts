@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { buildReportingFixture } from './reporting-fixture'
 import { endMembership } from '../../modules/organization/service'
 import { generateAutomaticLongitudinal } from '../../modules/reporting/longitudinal-planner'
@@ -127,7 +128,7 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
         privacyUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT', minimumCohortN: 3, minimumContributorN: 3, reportEvidenceCeiling: 'PILOT',
         metricRules: [{ metricId: 'score', sourceMetricKey: 'score', sourceFamily: 'BUNDLE', sourceResourceKey: resourceKey, valueType: 'NUMBER', longitudinalMetricKey: 'score', acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY', aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT' }], comparabilityRules: [],
       } })
-      await reviewPlatformReportingSpec({ actor: principal, specId: spec.id })
+      await reviewPlatformReportingSpec({ actor: await independentReviewer(principal), specId: spec.id })
       await publishPlatformReportingSpec({ actor: principal, specId: spec.id })
       for (const cohortStrategy of ['WAVE_SPECIFIC', 'BASELINE_FIXED'] as const) {
         const input = { principal, organizationId, specId: spec.id, analysisKind, sources: [third, second, first], cohortStrategy, ...(analysisKind === 'MATCHED_LONGITUDINAL' ? { mode: 'FULL_CASE' as const } : {}),
@@ -169,7 +170,7 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
       metricRules: [{ metricId: 'score', sourceMetricKey: 'score', sourceFamily: 'BUNDLE', sourceResourceKey: track[0].key, valueType: 'NUMBER', longitudinalMetricKey: 'score', acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY', aggregations: ['MEAN'], missingnessRule: 'EXCLUDE', minimumMetricN: 3, observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT' }],
       comparabilityRules: [{ schemaVersion: 1, metricId: 'score', resourceFamily: 'BUNDLE', resourceKey: track[0].key, fromVersion: '1.0.0', toVersion: '1.0.0', level: 'EXACT', evidenceRef: 'test:same-protocol', evidenceHash: 'e'.repeat(64) }],
     } })
-    await reviewPlatformReportingSpec({ actor, specId: spec.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer(actor), specId: spec.id })
     await publishPlatformReportingSpec({ actor, specId: spec.id })
     const input = { principal, organizationId: f.organizationId, specId: spec.id, analysisKind: 'MATCHED_LONGITUDINAL' as const, mode: 'FULL_CASE' as const,
       sources: [f, second].map(({ runId, trackId }) => ({ runId, trackId })), cohortStrategy: 'BASELINE_FIXED' as const,
@@ -262,7 +263,7 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
         acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',
         minimumMetricN:3,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[],
     }})
-    await reviewPlatformReportingSpec({actor,specId:rawSpec.id})
+    await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:rawSpec.id})
     const spec=await publishPlatformReportingSpec({actor,specId:rawSpec.id}) as ReportingAnalysisSpecRecord<ReportingRepeatedCohortSpecV1>
     const sizes=[2,10,50]
     const artifacts=[]
@@ -313,7 +314,7 @@ suite('automatic filtered longitudinal planning (real PostgreSQL)', () => {
       const spec=await createPlatformReportingSpec({actor,specKey:key('performance'),version:1,definition:{
         schemaVersion:1,analysisKind:'MATCHED_LONGITUDINAL',engineKey:'ORG_MATCHED_LONGITUDINAL_V1',engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',minimumCohortN:3,minimumContributorN:3,reportEvidenceCeiling:'PILOT',
         metricRules:[{metricId:'score',sourceMetricKey:'score',sourceFamily:'BUNDLE',sourceResourceKey:resource,valueType:'NUMBER',longitudinalMetricKey:'score',acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN'],missingnessRule:'EXCLUDE',minimumMetricN:3,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],comparabilityRules:[]}})
-      await reviewPlatformReportingSpec({actor,specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
+      await reviewPlatformReportingSpec({actor: await independentReviewer(actor),specId:spec.id});await publishPlatformReportingSpec({actor,specId:spec.id})
       queries=0
       const result=await generateAutomaticLongitudinal({principal:{userId:first.ownerId,platformRole:'STANDARD'},organizationId:first.organizationId,specId:spec.id,analysisKind:'MATCHED_LONGITUDINAL',sources:waves.map(({runId,trackId})=>({runId,trackId})),cohortStrategy:'BASELINE_FIXED',mode:'FULL_CASE'})
       counts.push(queries)

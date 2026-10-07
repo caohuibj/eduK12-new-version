@@ -86,7 +86,7 @@ suite('Bundle V3 real FINAL lifecycle', () => {
       create: { testType:'gonogo',configVersion:'1.0.0',name:'Q1 fixture',config:freeze.resolvedConfig as any,status:'PUBLISHED',engineVersion:'1.0.0',scoringVersion:'1.0.0',accessPolicy:'OPEN',publishedAt:new Date() },
     })
     configId=config.id
-    assignmentId=(await db.cognitiveAssignment.create({ data: { configId,courseId:course1,createdBy:actor.userId,title:'Go/No-Go fixture',status:'PUBLISHED',listedStandalone:true,...freezeDataForWrite(freeze) } })).id
+    assignmentId=(await db.cognitiveAssignment.create({ data: { configId,courseId:course1,createdBy:actor.userId,title:'Go/No-Go fixture',status:'PUBLISHED',listedStandalone:true,maxAttempts:100,...freezeDataForWrite(freeze) } })).id
     scaleId=(await db.scale.create({ data: { code:'Q1-'+suffix,name:'Scale fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:MIXED_SCALE_DEFINITION as any,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),itemCount:1,dimensionCount:1 } })).id
 
     const { createCodeBundleDefinitionProvider } = await import('../../modules/bundle-product/code-catalog')
@@ -111,6 +111,8 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     await db.situationalAttempt.deleteMany({where:{compositeAttemptId:{in:attempts}}})
     await db.cognitiveRawSubmission.deleteMany({where:{session:{compositeAttemptId:{in:attempts}}}})
     await db.cognitiveSession.deleteMany({where:{compositeAttemptId:{in:attempts}}})
+    await db.cognitiveRawSubmission.deleteMany({where:{session:{assignment:{createdBy:{in:[actor.userId,other.userId]}}}}})
+    await db.cognitiveSession.deleteMany({where:{assignment:{createdBy:{in:[actor.userId,other.userId]}}}})
     await db.assessment.deleteMany({where:{compositeAttemptId:{in:attempts}}})
     await db.compositeAssessment.deleteMany({where:{id:{in:ids}}})
     await db.questionnaire.deleteMany({where:{creatorId:actor.userId}})
@@ -131,6 +133,47 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     await expect(fresh({bundleVersion:'latest'})).rejects.toBeDefined()
     expect((await import('../../modules/bundle-product/code-catalog')).createCodeBundleDefinitionProvider().list().every(v=>v.definition.status==='DRAFT')).toBe(true)
   })
+  it.each(['standalone-first', 'bundle-first', 'concurrent'])('shares one cognitive quota across all four entrances: %s', async mode => {
+    const original = await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: assignmentId } })
+    const source = await db.cognitiveAssignment.create({ data: {
+      configId, courseId: course1, createdBy: actor.userId, title: 'Bundle quota root', status: 'PUBLISHED', maxAttempts: 1,
+      profile: original.profile, profileDefinitionVersion: original.profileDefinitionVersion,
+      resolvedConfigHash: original.resolvedConfigHash, resolvedConfigSnapshotEncrypted: original.resolvedConfigSnapshotEncrypted,
+      resolvedReportSnapshotEncrypted: original.resolvedReportSnapshotEncrypted,
+    } })
+    const questionnaire = await import('../../modules/questionnaire-product/service')
+    let combined = await questionnaire.create(actor, { requestId: randomUUID(), name: 'Shared quota course copy', questionnaireType: 'COURSE', courseIds: [course1] })
+    combined = await questionnaire.addItem(actor, combined.id, { revision: combined.revision, item: { type: 'COGNITIVE', cognitiveAssignmentId: source.id, required: true } })
+    combined = await questionnaire.publish(actor, combined.id, { revision: combined.revision })
+    const legacy = await runtime.createComposite(actor.userId, actor.role, { code: 'bundle-quota-' + mode + '-' + suffix, name: 'Shared quota composition', courseId: course1, maxAttempts: 3 })
+    await runtime.addItem(actor.userId, actor.role, legacy.id, { type: 'COGNITIVE', cognitiveAssignmentId: source.id, required: true })
+    await runtime.publishComposite(actor.userId, actor.role, legacy.id)
+    let fixed = await fresh({ bindings: [{ slotKey: 'gonogo', resourceId: source.id }, { slotKey: 'adexi', resourceId: scaleId }, { slotKey: 'situational' }] })
+    fixed = await product.publish(actor, fixed.id, fixed.revision)
+    const item = await db.compositeAssessmentItem.findFirstOrThrow({ where: { compositeAssessmentId: fixed.id, type: 'COGNITIVE' } })
+    expect(await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: item.cognitiveAssignmentId! } })).toMatchObject({ maxAttempts: 1, quotaSourceAssignmentId: source.id })
+    const standalone = await import('../../modules/cognitive/session.service')
+    const starts = [() => standalone.createSession(student, source.id), () => runtime.startUserAttempt(student, combined.id), () => runtime.startUserAttempt(student, legacy.id), () => runtime.startUserAttempt(student, fixed.id)]
+    if (mode === 'concurrent') {
+      const results = await Promise.allSettled(starts.map(start => start()))
+      expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1)
+      const rejected = results.filter(result => result.status === 'rejected') as PromiseRejectedResult[]
+      expect(rejected).toHaveLength(3)
+      expect(rejected.every(result => result.reason.statusCode === 409)).toBe(true)
+    } else {
+      const first = mode === 'bundle-first' ? 3 : 0
+      await starts[first]()
+      for (let index = 0; index < starts.length; index++) if (index !== first) await expect(starts[index]()).rejects.toMatchObject({ statusCode: 409 })
+    }
+    const sessions = await db.cognitiveSession.findMany({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })
+    expect(sessions).toHaveLength(1)
+    const active = sessions[0]
+    if (active.compositeAttemptId) {
+      const parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: active.compositeAttemptId } })
+      expect((await runtime.startUserAttempt(student, parent.compositeAssessmentId)).attempt.id).toBe(parent.id)
+    } else expect((await standalone.createSession(student, source.id)).sessionId).toBe(active.id)
+    expect(await db.cognitiveSession.count({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })).toBe(1)
+  }, 30000)
   it('completes four canonical sources, persists once, and appends reanalysis without changing original facts', async () => {
     let row=await fresh()
     row=await product.publish(actor,row.id,row.revision)

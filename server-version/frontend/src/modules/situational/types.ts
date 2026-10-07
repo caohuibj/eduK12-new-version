@@ -157,6 +157,7 @@ export interface SituationalInstrument {
 }
 
 export interface SituationalAttempt {
+  compositeAttemptId?: string | null
   id: string
   instrumentKey: string
   instrumentVersion: string
@@ -243,6 +244,7 @@ export interface CanonicalSituationalResult {
 }
 
 export interface SituationalAttemptResponse {
+  feedbackDeferred?: boolean
   attemptId: string
   attempt: SituationalAttempt
   instrument: SituationalInstrument

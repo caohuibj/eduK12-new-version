@@ -22,10 +22,36 @@ import {
   getCognitiveExportData,
   isAllowedCognitiveExportFileName,
   makeCognitiveExportFileName,
+  ExportFieldBuilder,
 } from '../../modules/cognitive/export.service'
 import { cognitiveExportRequestSchema } from '../../modules/cognitive/cognitive.schema'
+import fs from 'node:fs/promises'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
+
+it('does not label a mixed-version column with only the first frozen unit or enum', () => {
+  const fields = new ExportFieldBuilder()
+  const name = fields.add('M_value', 'Frozen metric', 'numeric', undefined, 2, { unit: 'ms', allowedValues: [1, 2] })
+  expect(fields.add('M_value', 'Frozen metric', 'numeric', undefined, 4, { unit: 's', allowedValues: [1, 3] })).toBe(name)
+  expect(fields.fields).toHaveLength(1)
+  expect(fields.fields[0]).toMatchObject({ unit: null, decimals: 4 })
+  expect(fields.fields[0].allowedValues).toBeUndefined()
+  fields.add('M_value', 'Frozen metric', 'numeric', undefined, 2, { unit: 'ms', allowedValues: [1, 2] })
+  expect(fields.fields[0].unit).toBeNull()
+})
+
+it('writes a summary dictionary ZIP from the authorized materialized data without querying again', async () => {
+  const data = { assignmentId: 'synthetic-zip', assignmentTitle: 'Synthetic', testType: null, detail: 'summary' as const, completedCount: 1, trialCount: 0, fields: [{ name: 'U_id', label: '参与者', type: 'string' as const }], rows: [{ U_id: 'ANON-SYNTHETIC' }] }
+  const files = await saveCognitiveExportFiles(data.assignmentId, { detail: 'summary' }, 'zip', data)
+  try {
+    expect(files.csvPath).toBeUndefined()
+    expect(files.zipPath).toMatch(/_summary_.*\.zip$/)
+    const bytes = await fs.readFile(files.zipPath!)
+    expect(bytes.readUInt32LE(0)).toBe(0x04034b50)
+    expect(bytes.includes(Buffer.from('data_dictionary.json'))).toBe(true)
+    expect(bytes.includes(Buffer.from('\uFEFFU_id\nANON-SYNTHETIC'))).toBe(true)
+  } finally { await fs.rm(files.zipPath!, { force: true }) }
+})
 
 const assignment = {
   id: 'assignment-1',
@@ -411,8 +437,9 @@ describe('cognitive export service', () => {
     const xlsx = makeCognitiveExportFileName('assignment-1', 'research', 'xlsx')
     expect(isAllowedCognitiveExportFileName(zip)).toBe(true)
     expect(isAllowedCognitiveExportFileName(xlsx)).toBe(true)
-    expect(isAllowedCognitiveExportFileName(zip.replace('research', 'summary'))).toBe(false)
-    expect(cognitiveExportRequestSchema.safeParse({ detail: 'summary', format: 'zip' }).success).toBe(false)
+    expect(isAllowedCognitiveExportFileName(zip.replace('research', 'summary'))).toBe(true)
+    expect(cognitiveExportRequestSchema.safeParse({ detail: 'summary', format: 'zip' }).success).toBe(true)
+    expect(cognitiveExportRequestSchema.safeParse({ detail: 'summary', format: 'xlsx' }).success).toBe(false)
     expect(cognitiveExportRequestSchema.safeParse({ detail: 'research', format: 'csv' }).success).toBe(false)
     expect(cognitiveExportRequestSchema.safeParse({ detail: 'research', format: 'zip' }).success).toBe(true)
   })

@@ -525,9 +525,14 @@ export const submitCognitiveSessionFinal = async (
   input: Omit<FinalCognitiveSubmitInput, 'userId'>,
 ) => (await submitCognitiveSessionFinalWithContext(userId, input)).data
 
-export const submitCognitiveSessionFinalForPublic = async (
+export const submitCognitiveSessionFinalForPublicWithContext = async (
   input: Omit<FinalCognitiveSubmitInput, 'userId'>,
   recoveryTokenHash: string,
 ) => splitCognitiveFinalContext(
   await submitWithPrincipal({ ...input, userId: null, recoveryTokenHash }),
-).data
+)
+
+export const submitCognitiveSessionFinalForPublic = async (
+  input: Parameters<typeof submitCognitiveSessionFinalForPublicWithContext>[0],
+  recoveryTokenHash: string,
+) => (await submitCognitiveSessionFinalForPublicWithContext(input, recoveryTokenHash)).data

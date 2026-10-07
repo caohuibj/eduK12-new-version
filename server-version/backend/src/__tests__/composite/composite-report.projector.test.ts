@@ -2,7 +2,29 @@ import { describe, expect, it } from 'vitest'
 import {
   projectCompositeCollectionReport,
   projectCompositeReport,
+  projectCompositeUnitReports,
 } from '../../modules/composite/composite-report.projector'
+
+describe('frozen V2 cognitive collection presentation', () => {
+  const unit = (profile = 'standard', qualityState = 'limited') => ({ type: 'COGNITIVE', itemId: 'item',
+    __frozenMetricDefinitions: { meanRt: { availableProfiles: ['standard', 'research'] }, researchSlope: { role: 'research_only', availableProfiles: ['research'] } },
+    singleTaskReport: { title: '冻结反应时间报告', method: { testType: 'rt', profile }, qualityState, conclusion: '部分指标可读',
+      headline: [{ key: 'meanRt', label: '平均反应时', formatted: '300 ms', value: 300 }],
+      user: [{ key: 'meanRt', label: '平均反应时', formatted: '300 ms', value: 300, presentationVersion: '1', participantLabel: '反应时间', explanation: '任务内有效反应的平均值' }],
+      detail: [{ key: 'researchSlope', label: '科研斜率', formatted: '99', value: 99 }], quality: [{ key: 'short', label: '试次数较少', active: true }],
+      practicalTips: ['保持相近设备'], disclaimer: '不作诊断', payloadEncrypted: 'must-not-leak' } })
+  it.each(['participant', 'teacher'] as const)('retains permitted frozen metrics for %s without reference/index or research expansion', audience => {
+    const report = projectCompositeUnitReports([unit('research')], audience, 'collection')[0].singleTaskReport
+    expect(report).toMatchObject({ testType: 'rt', profile: 'research', qualityState: 'limited', interpretable: true, headline: { key: 'meanRt', formatted: '300 ms' },
+      primaryMetrics: [{ key: 'meanRt', formatted: '300 ms', explanation: '任务内有效反应的平均值' }], secondaryMetrics: [], showProductIndex: false, productIndex: null, reference: null })
+    expect(JSON.stringify(report)).not.toContain('must-not-leak')
+    expect(JSON.stringify(report)).not.toContain('researchSlope')
+  })
+  it('does not expose metric values for an invalid frozen report', () => {
+    const report = projectCompositeUnitReports([unit('standard', 'invalid')], 'teacher', 'collection')[0].singleTaskReport
+    expect(report).toMatchObject({ interpretable: false, qualityState: 'invalid', headline: null, primaryMetrics: [], secondaryMetrics: [] })
+  })
+})
 
 const scaleResult = {
   schemaVersion: 2 as const,

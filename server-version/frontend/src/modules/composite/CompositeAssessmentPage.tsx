@@ -171,7 +171,7 @@ const CompositeAssessmentContent: React.FC = () => {
       if (publicMode) {
         const credential =
           resumeToken ||
-          recoveryInput ||
+          recoveryInput.trim() ||
           (token ? readStored(tokenKey(token)) : '')
         const response = await publicCompositeApi(credential).start(
           token,
@@ -273,13 +273,21 @@ const CompositeAssessmentContent: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setState(null)
+    setPublicInfo(null)
+    setError(null)
+    setExistingReportId(null)
+    setRecoveryToken('')
+    setRecoveryInput('')
+    setNewRecoveryToken(null)
     const initialise = async () => {
       if (publicMode) {
         if (token) {
           try {
             const infoResponse = await publicCompositeApi('').info(token)
-            if (!cancelled && infoResponse.code === 0 && infoResponse.data)
-              setPublicInfo(infoResponse.data)
+            if (infoResponse.code !== 0 || !infoResponse.data) throw new Error(infoResponse.message || '公开链接不可用')
+            if (!cancelled) setPublicInfo(infoResponse.data)
           } catch (err) {
             if (!cancelled)
               setError(
@@ -440,7 +448,9 @@ const CompositeAssessmentContent: React.FC = () => {
         <p className="text-gray-600 whitespace-pre-wrap mb-6">{publicInfo?.instruction || publicInfo?.description || '完成后可分别查看量表反馈和认知任务结果。'}</p>
         <label className="block text-sm text-gray-600 mb-2">已有恢复凭证？</label>
         <input value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-4" placeholder="粘贴保存时获得的恢复凭证（可选）" />
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        {error && <p role="alert" className="text-red-500 text-sm mb-4">{error}</p>}
+        {!params.attemptId && !publicInfo && <p className="mb-4 text-sm">当前入口不能开始新作答。已有恢复凭证可继续尝试恢复原记录。</p>}
+        {publicInfo?.studyEntryPath && <Link className="block mb-4 text-action" to={publicInfo.studyEntryPath}>选择单次访客或保存研究内身份码</Link>}
         <button
           onClick={() => {
             const credential = recoveryInput.trim()
@@ -453,11 +463,12 @@ const CompositeAssessmentContent: React.FC = () => {
               void start()
             }
           }}
-          disabled={submitting || (Boolean(params.attemptId) && !recoveryInput.trim())}
+          disabled={submitting || (!recoveryInput.trim() && (Boolean(params.attemptId) || !publicInfo))}
           className="btn-primary w-full"
         >
           <Play className="w-4 h-4 inline mr-1" />{params.attemptId ? '继续作答' : recoveryInput ? '继续作答' : '开始匿名测评'}
         </button>
+        {!params.attemptId && !publicInfo && <ProductButton className="mt-3" onClick={() => window.location.reload()}>重新读取入口</ProductButton>}
       </div>
     )
   }
@@ -512,7 +523,7 @@ const CompositeAssessmentContent: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">整体进度：{state.completedItems} / {state.totalItems}（{state.progress}%）</p></div>
+        <div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">整体进度：{state.completedItems} / {state.totalItems}（{state.progress}%）</p><p className="text-sm text-gray-500">完成整份测评后，按权限查看单项反馈。</p></div>
         <button onClick={() => void saveAndExit()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2 mb-5"><div className="bg-action h-2 rounded-full" style={{ width: `${state.progress}%` }} /></div>

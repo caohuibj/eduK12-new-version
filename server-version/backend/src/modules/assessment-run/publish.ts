@@ -3,6 +3,7 @@ import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
+import { currentRunActorAuthoritySql, currentWindowSql } from './currentActorAuthority'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { validateOrganizationRelationalSnapshot } from '../assessment-relational/organization-contract'
@@ -191,7 +192,7 @@ const selectorMembershipFilter = async (
         JOIN "organization_memberships" m
           ON m."organization_id" = a."organization_id" AND m."id" = a."membership_id"
         WHERE a."organization_id" = ${organizationId}
-          AND a."valid_until" IS NULL AND m."valid_until" IS NULL
+          AND ${currentWindowSql(Prisma.sql`a`)} AND ${currentWindowSql(Prisma.sql`m`)}
           AND a."label_id" IN (${Prisma.join(selector.labelIds)})
       `
     : await tx.$queryRaw<Array<{ membershipId: string }>>`
@@ -200,7 +201,7 @@ const selectorMembershipFilter = async (
         JOIN "organization_memberships" m
           ON m."organization_id" = a."organization_id" AND m."id" = a."membership_id"
         WHERE a."organization_id" = ${organizationId}
-          AND a."valid_until" IS NULL AND m."valid_until" IS NULL
+          AND ${currentWindowSql(Prisma.sql`a`)} AND ${currentWindowSql(Prisma.sql`m`)}
           AND a."label_id" IN (${Prisma.join(selector.labelIds)})
         GROUP BY a."membership_id"
         HAVING COUNT(DISTINCT a."label_id") = ${selector.labelIds.length}
@@ -232,8 +233,8 @@ const resolveSelfPairs = async (tx: Tx, organizationId: string, role: Exclude<Ru
       AND pg."persona" = ${role} AND pg."revoked_at" IS NULL
     LEFT JOIN "organization_student_class_assignments" sc
       ON sc."organization_id" = m."organization_id" AND sc."membership_id" = m."id"
-      AND sc."valid_until" IS NULL
-    WHERE m."organization_id" = ${organizationId} AND m."valid_until" IS NULL
+      AND ${currentWindowSql(Prisma.sql`sc`)}
+    WHERE m."organization_id" = ${organizationId} AND ${currentWindowSql(Prisma.sql`m`)}
     ORDER BY m."id", sc."class_unit_id" NULLS LAST
   `
   const byMembership = new Map<string, PopulationPair>()
@@ -268,7 +269,7 @@ const resolveParentSelfPairs = async (tx: Tx, organizationId: string): Promise<P
     JOIN "organization_memberships" m
       ON m."organization_id" = ${organizationId}
       AND m."user_id" = r."student_user_id"
-      AND m."valid_until" IS NULL
+      AND ${currentWindowSql(Prisma.sql`m`)}
     JOIN "organization_persona_grants" pg
       ON pg."organization_id" = m."organization_id"
       AND pg."membership_id" = m."id"
@@ -277,7 +278,7 @@ const resolveParentSelfPairs = async (tx: Tx, organizationId: string): Promise<P
     LEFT JOIN "organization_student_class_assignments" sc
       ON sc."organization_id" = m."organization_id"
       AND sc."membership_id" = m."id"
-      AND sc."valid_until" IS NULL
+      AND ${currentWindowSql(Prisma.sql`sc`)}
     WHERE r."status" = 'ACTIVE' AND r."approved_at" IS NOT NULL
     ORDER BY r."parent_user_id", r."id", sc."class_unit_id" NULLS LAST
   `
@@ -324,16 +325,16 @@ const resolveClassPairs = async (tx: Tx, organizationId: string, subjectRole: Ru
       tp."id" AS "teacherPersonaGrantId", sa."id" AS "staffAssignmentId", sa."staff_role" AS "staffRole", sc."class_unit_id" AS "classUnitId"
     FROM "organization_student_class_assignments" sc
     JOIN "organization_staff_class_assignments" sa
-      ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id" AND sa."valid_until" IS NULL
+      ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id" AND ${currentWindowSql(Prisma.sql`sa`)}
     JOIN "organization_memberships" sm
-      ON sm."organization_id" = sc."organization_id" AND sm."id" = sc."membership_id" AND sm."valid_until" IS NULL
+      ON sm."organization_id" = sc."organization_id" AND sm."id" = sc."membership_id" AND ${currentWindowSql(Prisma.sql`sm`)}
     JOIN "organization_memberships" tm
-      ON tm."organization_id" = sa."organization_id" AND tm."id" = sa."membership_id" AND tm."valid_until" IS NULL
+      ON tm."organization_id" = sa."organization_id" AND tm."id" = sa."membership_id" AND ${currentWindowSql(Prisma.sql`tm`)}
     JOIN "organization_persona_grants" sp
       ON sp."organization_id" = sm."organization_id" AND sp."membership_id" = sm."id" AND sp."persona" = 'STUDENT' AND sp."revoked_at" IS NULL
     JOIN "organization_persona_grants" tp
       ON tp."organization_id" = tm."organization_id" AND tp."membership_id" = tm."id" AND tp."persona" = 'TEACHER' AND tp."revoked_at" IS NULL
-    WHERE sc."organization_id" = ${organizationId} AND sc."valid_until" IS NULL
+    WHERE sc."organization_id" = ${organizationId} AND ${currentWindowSql(Prisma.sql`sc`)}
   `
   return rows.map((row) => {
     const student = actorFromMember({ userId: row.studentUserId, membershipId: row.studentMembershipId, personaGrantId: row.studentPersonaGrantId }, 'STUDENT')
@@ -362,14 +363,14 @@ const resolveCounselorPairs = async (tx: Tx, organizationId: string, subjectRole
       lp."id" AS "clientPersonaGrantId"
     FROM "organization_counselor_client_relationships" r
     JOIN "organization_memberships" cm
-      ON cm."organization_id" = r."organization_id" AND cm."id" = r."counselor_membership_id" AND cm."valid_until" IS NULL
+      ON cm."organization_id" = r."organization_id" AND cm."id" = r."counselor_membership_id" AND ${currentWindowSql(Prisma.sql`cm`)}
     JOIN "organization_memberships" lm
-      ON lm."organization_id" = r."organization_id" AND lm."id" = r."client_membership_id" AND lm."valid_until" IS NULL
+      ON lm."organization_id" = r."organization_id" AND lm."id" = r."client_membership_id" AND ${currentWindowSql(Prisma.sql`lm`)}
     JOIN "organization_persona_grants" cp
       ON cp."organization_id" = cm."organization_id" AND cp."membership_id" = cm."id" AND cp."persona" = 'COUNSELOR' AND cp."revoked_at" IS NULL
     JOIN "organization_persona_grants" lp
       ON lp."organization_id" = lm."organization_id" AND lp."membership_id" = lm."id" AND lp."persona" = 'CLIENT' AND lp."revoked_at" IS NULL
-    WHERE r."organization_id" = ${organizationId} AND r."valid_until" IS NULL
+    WHERE r."organization_id" = ${organizationId} AND ${currentWindowSql(Prisma.sql`r`)}
   `
   return rows.map((row) => {
     const counselor = actorFromMember({ userId: row.counselorUserId, membershipId: row.counselorMembershipId, personaGrantId: row.counselorPersonaGrantId }, 'COUNSELOR')
@@ -396,11 +397,11 @@ const resolveParentPairs = async (tx: Tx, organizationId: string, subjectRole: R
       m."id" AS "studentMembershipId", pg."id" AS "studentPersonaGrantId", sc."class_unit_id" AS "classUnitId"
     FROM "parent_student_relationships" r
     JOIN "organization_memberships" m
-      ON m."organization_id" = ${organizationId} AND m."user_id" = r."student_user_id" AND m."valid_until" IS NULL
+      ON m."organization_id" = ${organizationId} AND m."user_id" = r."student_user_id" AND ${currentWindowSql(Prisma.sql`m`)}
     JOIN "organization_persona_grants" pg
       ON pg."organization_id" = m."organization_id" AND pg."membership_id" = m."id" AND pg."persona" = 'STUDENT' AND pg."revoked_at" IS NULL
     LEFT JOIN "organization_student_class_assignments" sc
-      ON sc."organization_id" = m."organization_id" AND sc."membership_id" = m."id" AND sc."valid_until" IS NULL
+      ON sc."organization_id" = m."organization_id" AND sc."membership_id" = m."id" AND ${currentWindowSql(Prisma.sql`sc`)}
     WHERE r."status" = 'ACTIVE' AND r."approved_at" IS NOT NULL
   `
   const seen = new Set<string>()
@@ -478,7 +479,31 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     const key = `${pair.subject.userId}:${pair.subject.membershipId ?? pair.relationshipRef}:${pair.respondent.userId}:${pair.respondent.membershipId ?? pair.relationshipRef}`
     if (!unique.has(key)) unique.set(key, pair)
   }
-  return [...unique.values()]
+  const candidates = [...unique.values()]
+  if (!candidates.length) return []
+  // One batch applies the same current principal gate used by START/history
+  // before any actor snapshot, execution or denominator is frozen.
+  const data = candidates.map((pair, index) => {
+    const fields = (actor: PairActor, prefix: string) => ({
+      [prefix + 'UserId']: actor.userId, [prefix + 'MembershipId']: actor.membershipId,
+      [prefix + 'PersonaId']: actor.provenanceKind === 'ORG_MEMBER' ? actor.personaGrantId : null,
+      [prefix + 'Provenance']: actor.provenanceKind, [prefix + 'Role']: actor.actorRole,
+    })
+    return { index, ...fields(pair.subject, 'subject'), ...fields(pair.respondent, 'respondent') }
+  })
+  const actorSql = (prefix: 'subject' | 'respondent') => currentRunActorAuthoritySql({
+    userId: Prisma.raw(`candidate."${prefix}UserId"`), organizationId: Prisma.sql`${organizationId}`,
+    membershipId: Prisma.raw(`candidate."${prefix}MembershipId"`), personaGrantId: Prisma.raw(`candidate."${prefix}PersonaId"`),
+    provenance: Prisma.raw(`candidate."${prefix}Provenance"`), role: Prisma.raw(`candidate."${prefix}Role"`),
+  })
+  const current = await tx.$queryRaw<Array<{ index: number }>>(Prisma.sql`
+    SELECT candidate.index FROM jsonb_to_recordset(${JSON.stringify(data)}::jsonb) AS candidate(
+      index int, "subjectUserId" text, "subjectMembershipId" text, "subjectPersonaId" text, "subjectProvenance" text, "subjectRole" text,
+      "respondentUserId" text, "respondentMembershipId" text, "respondentPersonaId" text, "respondentProvenance" text, "respondentRole" text)
+    WHERE ${actorSql('subject')} AND ${actorSql('respondent')}
+  `)
+  const allowed = new Set(current.map(row => row.index))
+  return candidates.filter((_, index) => allowed.has(index))
 }
 
 const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserId: string): Promise<PublisherAuthority> => {
@@ -500,7 +525,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
   }
   const memberships = await tx.$queryRaw<Array<{ id: string; orgRole: string }>>`
     SELECT "id", "org_role" AS "orgRole" FROM "organization_memberships"
-    WHERE "organization_id" = ${organizationId} AND "user_id" = ${actorUserId} AND "valid_until" IS NULL
+    WHERE "organization_id" = ${organizationId} AND "user_id" = ${actorUserId} AND "valid_from" <= statement_timestamp() AND ("valid_until" IS NULL OR "valid_until" > statement_timestamp())
     FOR SHARE
   `
   const membership = memberships[0]
@@ -515,7 +540,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     SELECT DISTINCT sa."class_unit_id" AS "classUnitId", sc."membership_id" AS "studentMembershipId"
     FROM "organization_staff_class_assignments" sa
     LEFT JOIN "organization_student_class_assignments" sc
-      ON sc."organization_id" = sa."organization_id" AND sc."class_unit_id" = sa."class_unit_id" AND sc."valid_until" IS NULL
+      ON sc."organization_id" = sa."organization_id" AND sc."class_unit_id" = sa."class_unit_id" AND ${currentWindowSql(Prisma.sql`sc`)}
     WHERE sa."organization_id" = ${organizationId}
       AND sa."membership_id" = ${membership.id}
       AND ${currentClassDeliverySql}
@@ -523,7 +548,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
   const clientRows = counselorPersona ? await tx.$queryRaw<Array<{ clientMembershipId: string }>>`
     SELECT "client_membership_id" AS "clientMembershipId"
     FROM "organization_counselor_client_relationships"
-    WHERE "organization_id" = ${organizationId} AND "counselor_membership_id" = ${membership.id} AND "valid_until" IS NULL
+    WHERE "organization_id" = ${organizationId} AND "counselor_membership_id" = ${membership.id} AND "valid_from" <= statement_timestamp() AND ("valid_until" IS NULL OR "valid_until" > statement_timestamp())
   ` : []
   const authority = {
     membershipId: membership.id,

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "originalSha256": "ace40a1e3e1dea9dd40ece56e9304b6bbfb8b8bc8c4413e6875a715e876a86d1",
+  "originalDeployment": "index-CV6R73cJ.js",
+  "rows": 55,
+  "columns": 6,
+  "counts": {
+    "passed": 41,
+    "partial": 6,
+    "failed": 8
+  },
+  "corrections": [
+    "CSV standard quoting while preserving remarks",
+    "R508 N-R5-3 priority P1",
+    "Original report counts corrected: 41/6/8"
+  ],
+  "originalFilesUnchanged": true
+}

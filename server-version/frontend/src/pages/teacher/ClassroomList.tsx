@@ -28,7 +28,7 @@ interface Classroom {
 }
 
 const ClassroomList: React.FC = () => {
-  const { feedback, info } = useStaffFeedback()
+  const { feedback, info, confirm: confirmAction, success } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,12 +56,13 @@ const ClassroomList: React.FC = () => {
   }, [])
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`确定要删除课堂"${name}"吗？此操作不可恢复。`)) return
+    if (!await confirmAction({ title: '删除课堂', body: `确定删除“${name}”及其课堂记录？此操作不可恢复。`, confirmLabel: '确认删除', danger: true })) return
 
     try {
       const response = await apiClient.delete(`/classrooms/${id}`)
       if (response.code === 0) {
         setClassrooms(current => current.filter(classroom => classroom.id !== id))
+        success('课堂已删除')
       } else {
         showMessage(response.message)
       }

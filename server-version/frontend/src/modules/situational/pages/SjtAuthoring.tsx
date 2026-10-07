@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../contexts/AuthContext'
 import { sessionFetch } from '../../../api/client'
-import { ProductPage, PageHeader } from '../../../components/product-ui'
+import { ProductPage, PageHeader, ProductStatus } from '../../../components/product-ui'
 import type { SituationalRunnerDefinition, SituationalDraftAnswer } from '../types'
 import { deriveReachableTrajectory } from '../traversal'
 
@@ -80,22 +80,29 @@ export default function SjtAuthoring() {
     [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false),
     [note, setNote] = useState('')
+  const [loading, setLoading] = useState(true), [failed, setFailed] = useState(false)
   const [preview, setPreview] = useState(false),
     [answers, setAnswers] = useState<Record<string, SituationalDraftAnswer>>({}),
     [stage, setStage] = useState<'CHOICE' | 'PROBES'>('CHOICE'),
     [cursor, setCursor] = useState(0),
     [paragraphs, setParagraphs] = useState<string[]>([])
-  const refresh = async () => setDrafts(await call<Draft[]>('/drafts'))
+  const refresh = async () => {
+    setLoading(true)
+    try { setDrafts(await call<Draft[]>('/drafts')) }
+    finally { setLoading(false) }
+  }
   useEffect(() => {
-    void refresh().catch((e) => setNotice(e.message))
+    void refresh().catch((e) => {setFailed(true);setNotice(e.message)})
   }, [])
   async function run(action: () => Promise<void>) {
     setBusy(true)
     setIssues([])
     setNotice('')
+    setFailed(false)
     try {
       await action()
     } catch (e) {
+      setFailed(true)
       setNotice((e as Error).message)
       setIssues((e as { issues?: Issue[] }).issues ?? [])
     } finally {
@@ -160,15 +167,18 @@ export default function SjtAuthoring() {
         description="填写模板，检查内容并预览作答；审核通过后发布试点版本。"
       />
       <section className="card my-5 space-y-4 p-6">
-        <a href={`${base}/template`} className="btn-secondary">
+        <div className="flex flex-wrap gap-3">
+        <a href={`${base}/template`} className="btn-secondary inline-flex">
           下载空白 Excel 模板
         </a>
-        <a href={`${base}/example-template`} className="btn-secondary ml-3">
+        <a href={`${base}/example-template`} className="btn-secondary inline-flex">
           下载已填写示范
         </a>
+        </div>
         <p className="text-sm text-gray-600">
           首版支持文字情境、行动后追问、五级或名义类别、非回答与补充文字。评分键按作者暂定规则求和，发布不代表已完成科学校准。
         </p>
+        <p className="text-sm text-gray-600">制作步骤：下载并填写模板 → 检查并保存草稿 → 预览作答与报告 → 提交独立审核 → 审批发布。上传或预览不会创建正式作答。</p>
         <label className="block">
           选择填写后的模板
           <input
@@ -176,7 +186,7 @@ export default function SjtAuthoring() {
             type="file"
             accept=".xlsx,.json"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="mt-2 block"
+            className="mt-2 block w-full min-w-0 text-sm"
           />
         </label>
         <div className="flex flex-wrap gap-3">
@@ -206,7 +216,7 @@ export default function SjtAuthoring() {
         </div>
       </section>
       {notice ? (
-        <p role="status" className="rounded-lg bg-amber-50 p-4">
+        <p role={failed?'alert':'status'} className="rounded-lg bg-amber-50 p-4">
           {notice}
         </p>
       ) : null}
@@ -229,13 +239,16 @@ export default function SjtAuthoring() {
         </section>
       ) : null}
       <div className="grid gap-5 lg:grid-cols-2">
-        <section className="card p-5">
+        <section className="card min-w-0 p-5">
           <h2 className="mb-3 text-lg font-semibold">题包草稿</h2>
+          {loading && <ProductStatus kind="pending" title="正在读取题包草稿" announce="polite" />}
+          {!loading && !failed && !drafts.length && <ProductStatus kind="info" title="尚无题包草稿">请先下载示范或空白模板，选择填写后的文件，检查通过后保存新草稿。</ProductStatus>}
+          {!loading && failed && <button className="btn-secondary mb-3" disabled={busy} onClick={()=>void run(refresh)}>重新读取草稿</button>}
           {drafts.map((d) => (
             <button
               key={d.id}
               aria-label={`打开题包 ${d.template.instrumentKey} ${d.template.instrumentVersion}`}
-              className="mb-2 block w-full rounded-lg border p-3 text-left"
+              className="mb-2 block w-full break-words rounded-lg border p-3 text-left"
               onClick={() => void run(() => open(d.id))}
             >
               {d.template.title} · {d.template.instrumentVersion}
@@ -255,7 +268,7 @@ export default function SjtAuthoring() {
           ))}
         </section>
         {selected ? (
-          <section className="card space-y-4 p-5">
+          <section className="card min-w-0 space-y-4 break-words p-5">
             <h2 className="text-lg font-semibold">{selected.template.title}</h2>
             <p>
               内容版本 {selected.template.instrumentVersion} · 修订 {selected.revision}

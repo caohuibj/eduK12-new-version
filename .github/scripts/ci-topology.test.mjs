@@ -9,6 +9,39 @@ import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
+test('Draft platform maintenance uses self-hosted capacity instead of the reusable hosted default',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const maintenance=workflow.split('  maintenance:\n')[1]?.split('\n  documentation:')[0];
+  assert.match(maintenance??'',/github\.event\.pull_request\.draft == true.*self-hosted.*eduk12-win-ci/);
+  assert.match(maintenance??'',/needs\.scope\.outputs\.runner_profile == 'local'.*self-hosted/);
+});
+test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const probes=workflow.slice(workflow.indexOf('  probe-frontend-build:'),workflow.indexOf('  scope:'));
+  for(const [lineNo,line] of probes.split('\n').entries()) {
+    if(!/runner_labels:/.test(line)||!line.includes('ubuntu-24.04'))continue;
+    assert.match(line,/inputs\.runner_profile == '(local|speed)'/,`hosted probe runner at line ${lineNo}`);
+    assert.match(line,/self-hosted/);
+  }
+  for(const name of ['probe-backend-regression','probe-browser','probe-media','probe-ui-hosted','probe-maintenance']) {
+    const block=probes.split(`  ${name}:\n`)[1]?.split(/\n  [a-z-]+:/)[0];
+    assert.match(block??'',/inputs\.runner_profile == 'local'.*self-hosted.*eduk12-win-ci/);
+  }
+  assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
+  const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  const reportCleanup=regression.indexOf('name: clear reports from previous regression jobs');
+  assert.ok(reportCleanup>=0 && reportCleanup<regression.indexOf('uses: actions/setup-node@v4'));
+  for(const report of ['backend','parent','r5']) assert.match(regression.slice(reportCleanup,regression.indexOf('uses: actions/setup-node@v4')),new RegExp(`/tmp/eduk12-${report}-vitest\\.json`));
+  assert.match(regression,/cache: \$\{\{ runner\.environment == 'github-hosted' && 'npm' \|\| '' \}\}/);
+  const backend=readFileSync(new URL('../workflows/ci-backend.yml',import.meta.url),'utf8');
+  assert.match(backend,/run: rm -f \/tmp\/eduk12-backend-performance-vitest\.json \/tmp\/eduk12-ci-env\.txt/);
+  assert.ok(backend.indexOf('name: clear reports from previous backend jobs')<backend.indexOf('uses: actions/setup-node@v4'));
+  assert.match(regression,/QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql:\/\/ptool:ptool123@localhost:5432\/ptool\?schema=public/);
+  assert.match(regression,/if: inputs\.focus == 'assessment-repair'[\s\S]*CI_POSTGRES_SERVICE_ID:.*\$\{\{ job\.services\.postgres\.id \}\}[\s\S]*run: node scripts\/r5-regression\.mjs/);
+  for(const file of ['questionnaire/workbench','integration/registered-resource-catalog','integration/runtime-role']) {
+    assert.ok(regression.split('hosted critical integration suites must not skip')[1]?.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`full regression must require ${file}`);
+  }
+});
 test('speed profile assigns independent heavy consumers to hosted Linux and preserves Windows resource exclusivity',()=>{
   const plan=runnerPlan({...capacity,profile:'speed',scenario:'platform'});
   for(const lane of ['regression_runner','browser_runner','media_runner','codeql_runner']) assert.deepEqual(plan[lane],['ubuntu-24.04']);

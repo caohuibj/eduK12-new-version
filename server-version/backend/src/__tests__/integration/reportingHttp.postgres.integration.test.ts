@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { createServer, type Server } from 'node:http'
 import express from 'express'
@@ -186,6 +187,7 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
 
   it('protects normal resource/spec management with platform authority, CSRF and publication order', async () => {
     const admin = await createUser('content-admin', UserRole.ADMIN, PlatformRole.SYSTEM_ADMIN)
+    const reviewer = await createUser('content-reviewer', UserRole.ADMIN, PlatformRole.SYSTEM_ADMIN)
     const ordinaryAdmin = await createUser('ordinary-admin', UserRole.ADMIN)
     const teacher = await createUser('content-teacher', UserRole.TEACHER)
     expect((await jsonRequest('/api/organizations/measurement-resources')).status).toBe(401)
@@ -206,13 +208,19 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
     expect(created.status).toBe(200); expect(created.body.data.status).toBe('DRAFT')
     const id = created.body.data.id
     expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/publish`, { method: 'POST', user: admin })).status).toBe(409)
-    for (const action of ['review', 'publish']) expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/${action}`, { method: 'POST', user: admin })).status).toBe(200)
+    const selfResourceReview = await jsonRequest(`/api/organizations/measurement-resources/${id}/review`, { method: 'POST', user: admin })
+    expect(selfResourceReview.status).toBe(403); expect(selfResourceReview.body.code).toBe('RESOURCE_INDEPENDENT_REVIEW_REQUIRED')
+    expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/review`, { method: 'POST', user: reviewer })).status).toBe(200)
+    expect((await jsonRequest(`/api/organizations/measurement-resources/${id}/publish`, { method: 'POST', user: admin })).status).toBe(200)
     const createSpec = { method: 'POST', user: admin, body: { resourceId: id, specKey: `http-description-${suffix}`, version: 1, analysisKind: 'INDIVIDUAL_LONGITUDINAL', minimumN: 3 } }
     expect((await jsonRequest('/api/organizations/reporting-specs/descriptive', { ...createSpec, user: ordinaryAdmin })).status).toBe(403)
     expect((await jsonRequest('/api/organizations/reporting-specs/descriptive', { ...createSpec, body: { ...createSpec.body, analysisKind: 'MATCHED_LONGITUDINAL' } })).status).toBe(400)
     const spec = await jsonRequest('/api/organizations/reporting-specs/descriptive', createSpec)
     expect(spec.status).toBe(200); expect(spec.body.data.status).toBe('DRAFT')
-    for (const action of ['review', 'publish']) expect((await jsonRequest(`/api/organizations/reporting-specs/${spec.body.data.id}/${action}`, { method: 'POST', user: admin })).status).toBe(200)
+    const selfSpecReview = await jsonRequest(`/api/organizations/reporting-specs/${spec.body.data.id}/review`, { method: 'POST', user: admin })
+    expect(selfSpecReview.status).toBe(403); expect(selfSpecReview.body.code).toBe('REPORT_SPEC_INDEPENDENT_REVIEW_REQUIRED')
+    expect((await jsonRequest(`/api/organizations/reporting-specs/${spec.body.data.id}/review`, { method: 'POST', user: reviewer })).status).toBe(200)
+    expect((await jsonRequest(`/api/organizations/reporting-specs/${spec.body.data.id}/publish`, { method: 'POST', user: admin })).status).toBe(200)
     const list = await jsonRequest('/api/organizations/reporting-specs', { user: admin })
     expect(list.status).toBe(200); expect(list.body.data.list.find((s: { id: string }) => s.id === spec.body.data.id).status).toBe('PUBLISHED')
   })
@@ -324,7 +332,7 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
     expect(crossOrgRun.status).toBe(404)
     expect(crossOrgRun.body.code).toBe('REPORT_NOT_FOUND')
 
-    await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
+    await reviewPlatformReportingSpec({ actor: await independentReviewer({ userId: admin.id, platformRole: 'SYSTEM_ADMIN' }), specId: draft.id })
     const published = await publishPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
     const resultBatch: ReportingResultBatchV1 = {
       resourceFamily: 'BUNDLE',

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { useClassroomSocket } from '../../hooks/useClassroomSocket'
 import ClassroomQRCode from './ClassroomQRCode'
+import ClassroomSummary from './ClassroomSummary'
 import { useAuth } from '../../contexts/AuthContext'
 import { Play, Square, Users, QrCode, CheckCircle, Edit, Monitor } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
@@ -295,6 +296,7 @@ const ClassroomControl: React.FC = () => {
         }
       />
       {feedback}
+      {classroom.status === 'ENDED' && <ClassroomSummary key={classroom.id} id={classroom.id} />}
 
       <section className="staff-detail-header classroom-control-summary" aria-label="课堂实时状态">
         <div className="staff-detail-header__top">

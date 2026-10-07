@@ -100,7 +100,7 @@ export const compositeApi = {
   createToken: (id: string, input: { expiresAt: string; maxUses: number }) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
   revealToken: (id: string, tokenId: string) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
-  exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
+  exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip' }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
   listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available'),
   start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/${assessmentId}/attempts`),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
@@ -113,6 +113,7 @@ export const compositeApi = {
   submitFinalFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: string | string[] | null }> }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/submit`, input),
   submitFinalScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number }> }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/submit`, input),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report`),
+  partialReport: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report?partial=1`),
   snapshots: (attemptId: string) => apiClient.get<{ list: CompositeSnapshotMetadata[]; total: number }>(`/composite-assessments/attempts/${attemptId}/snapshots`),
   reanalyze: (attemptId: string) => apiClient.post<CompositeSnapshotMetadata>(`/composite-assessments/attempts/${attemptId}/reanalyze`, {}),
   attempts: (id: string, query: { status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; q?: string; page?: number; pageSize?: number } = {}) => {
@@ -125,8 +126,11 @@ export const compositeApi = {
     const qs = params.toString()
     return apiClient.get<CompositeTeacherAttemptsResponse>(`/composite-assessments/${id}/attempts${qs ? `?${qs}` : ''}`)
   },
-  teacherReport: (compositeId: string, attemptId: string, snapshotId?: string) => {
-    const query = snapshotId ? `?${new URLSearchParams({ snapshotId }).toString()}` : ''
+  teacherReport: (compositeId: string, attemptId: string, snapshotId?: string, partial = false) => {
+    const params = new URLSearchParams()
+    if (snapshotId) params.set('snapshotId', snapshotId)
+    if (partial) params.set('partial', '1')
+    const query = params.size ? '?' + params.toString() : ''
     return apiClient.get<CompositeReport>(`/composite-assessments/${compositeId}/attempts/${attemptId}/report${query}`)
   },
   analysisExportPath: compositeAnalysisExportPath,

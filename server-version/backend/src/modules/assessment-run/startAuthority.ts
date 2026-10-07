@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { currentWindowSql } from './currentActorAuthority'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { RunStartAdmissionError } from './startAdmission'
 
@@ -30,7 +31,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       SELECT 1 FROM "organization_memberships" m
       JOIN "organization_persona_grants" pg ON pg."membership_id" = m."id" AND pg."organization_id" = m."organization_id"
       WHERE m."id" = a."membership_id" AND m."user_id" = a."user_id" AND m."organization_id" = a."organization_id"
-        AND m."valid_from" <= statement_timestamp() AND m."valid_until" IS NULL
+        AND m."valid_from" <= statement_timestamp() AND ${currentWindowSql(Prisma.sql`m`)}
         AND pg."id" = a."snapshot_payload"->>'personaGrantId' AND pg."persona" = a."actor_role" AND pg."revoked_at" IS NULL
     )) AS "valid", EXISTS (
       SELECT 1 FROM "organization_access_denies" d WHERE d."organization_id" = a."organization_id"
@@ -56,7 +57,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
         JOIN "organization_memberships" m
           ON m."organization_id" = ${envelope.organizationId}
           AND m."user_id" = r."student_user_id"
-          AND m."valid_until" IS NULL
+          AND ${currentWindowSql(Prisma.sql`m`)}
         JOIN "organization_persona_grants" pg
           ON pg."organization_id" = m."organization_id"
           AND pg."membership_id" = m."id"
@@ -86,7 +87,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   } else if (relationship.kind === 'COUNSELOR_CLIENT') {
     const rows = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_counselor_client_relationships"
-      WHERE "id" = ${relationship.ref} AND "organization_id" = ${envelope.organizationId} AND "valid_until" IS NULL
+      WHERE "id" = ${relationship.ref} AND "organization_id" = ${envelope.organizationId} AND "valid_from" <= statement_timestamp() AND ("valid_until" IS NULL OR "valid_until" > statement_timestamp())
       FOR SHARE
     `
     valid = Boolean(rows[0])
@@ -95,7 +96,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       SELECT sc."id" FROM "organization_student_class_assignments" sc
       JOIN "organization_staff_class_assignments" sa ON sa."organization_id" = sc."organization_id" AND sa."class_unit_id" = sc."class_unit_id"
       WHERE sc."id" = ${relationship.facts.studentClassAssignmentId} AND sa."id" = ${relationship.facts.staffClassAssignmentId}
-        AND sc."organization_id" = ${envelope.organizationId} AND sc."valid_until" IS NULL AND sa."valid_until" IS NULL
+        AND sc."organization_id" = ${envelope.organizationId} AND ${currentWindowSql(Prisma.sql`sc`)} AND ${currentWindowSql(Prisma.sql`sa`)}
       FOR SHARE OF sc, sa
     `
     valid = Boolean(rows[0])

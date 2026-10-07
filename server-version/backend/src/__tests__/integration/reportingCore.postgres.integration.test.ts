@@ -1,3 +1,4 @@
+import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { ParentRelationshipStatus, PlatformRole, PrismaClient, UserRole } from '@prisma/client'
@@ -271,8 +272,10 @@ suite('PR3 reporting core release gate (real PostgreSQL)', () => {
       version: 1,
       definition: specDefinition,
     })).rejects.toMatchObject({ code: 'REPORT_SPEC_VERSION_CONFLICT', statusCode: 409 })
-    const reviewed = await reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })
+    await expect(reviewPlatformReportingSpec({ actor: { userId: admin.id, platformRole: 'SYSTEM_ADMIN' }, specId: draft.id })).rejects.toMatchObject({ code: 'REPORT_SPEC_INDEPENDENT_REVIEW_REQUIRED', statusCode: 403 })
+    const reviewed = await reviewPlatformReportingSpec({ actor: await independentReviewer({ userId: admin.id, platformRole: 'SYSTEM_ADMIN' }), specId: draft.id })
     expect(reviewed.status).toBe('REVIEWED')
+    expect(reviewed.reviewedByUserId).not.toBe(admin.id)
     await expect(db.$executeRawUnsafe(
       `UPDATE reporting_analysis_specs SET definition='{}'::jsonb, spec_hash=$2 WHERE id=$1`,
       draft.id,

@@ -3,6 +3,7 @@ import {
   type RelationalDisclosureDispositionV1,
 } from '../assessment-policy/disclosure'
 import { prisma } from '../../config/database'
+import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
 
 export type RelationalResultDispositionV1 = RelationalDisclosureDispositionV1
 
@@ -71,6 +72,7 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
   payloadHash?: string
   replayed: boolean
   completed: true
+  feedbackDeferred?: true
 }> => {
   const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db)
   const disclosure = disclosureFromRelationalDisposition({
@@ -78,11 +80,13 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
     audience: 'RESPONDENT',
     policyKey: 'frozen-relational-final-v1',
   })
-  if (disclosure.mode !== 'COMPLETION_ONLY') return data
+  const feedbackDeferred = await isCompositeParticipantFeedbackDeferred(compositeAttemptId, db)
+  if (disclosure.mode !== 'COMPLETION_ONLY' && !feedbackDeferred) return data
   return {
     ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
     ...(typeof data.payloadHash === 'string' ? { payloadHash: data.payloadHash } : {}),
     replayed: Boolean(data.replayed),
     completed: true,
+    ...(feedbackDeferred ? { feedbackDeferred: true as const } : {}),
   }
 }

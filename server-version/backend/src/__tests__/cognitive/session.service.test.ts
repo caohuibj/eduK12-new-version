@@ -23,6 +23,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     user: { findUnique: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
+    $queryRawUnsafe: vi.fn(),
   },
 }))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
@@ -287,6 +288,7 @@ describe('createSession data', () => {
     // 第一次 findFirst：无 IN_PROGRESS；第二次 findFirst：上一 attempt 为 1
     mockPrisma.cognitiveSession.findFirst
       .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null) // recheck after acquiring shared source lock
       .mockResolvedValueOnce({ attemptNo: 1 })
     mockPrisma.cognitiveSession.count.mockResolvedValue(1)
     mockPrisma.cognitiveSession.create.mockImplementation(async ({ data }: any) =>

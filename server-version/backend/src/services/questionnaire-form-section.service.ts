@@ -1311,23 +1311,24 @@ const lockQuestionnaireFormSectionAttempt = async (tx: Prisma.TransactionClient,
 }
 
 export const normalizeQuestionnaireSectionAnswers = (section: SectionRow, values: SectionSubmitInput['answers']) => {
+  if (section.contextSection && !section.items.length) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '历史背景信息区段缺少字段，请联系教师发布修复版本后重新开始；已提交记录会保留', 422)
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   const provided = new Map<string, string | string[] | null>()
   for (const answer of values) {
     const item = itemMap.get(answer.formItemId)
-    if (!item) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '提交中包含不属于该区段的字段', 400)
-    if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '同一字段不能重复提交', 400)
+    if (!item) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '提交中包含不属于该区段的字段', 400)
+    if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '同一字段不能重复提交', 400)
     provided.set(answer.formItemId, answer.value)
   }
 
   const normalized = orderedSectionItems(section.items).map((item) => {
     const value = provided.has(item.id) ? provided.get(item.id)! : null
     if (value === null) {
-      if (item.required) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `${item.label} 为必填项`, 400)
+      if (item.required) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', `${item.label} 为必填项`, 400)
       return { item, normalizedValue: null, storedValue: null, status: 'SKIPPED' as const }
     }
     const validation = validateQuestionnaireFormAnswer(item, value)
-    if (validation) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', validation, 400)
+    if (validation) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', validation, 400)
     const valueAfterNormalization = normalizeQuestionnaireFormAnswer(item, value) as string | string[]
     const serialized = Array.isArray(valueAfterNormalization) ? JSON.stringify(valueAfterNormalization) : valueAfterNormalization
     return {

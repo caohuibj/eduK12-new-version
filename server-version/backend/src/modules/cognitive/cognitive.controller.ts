@@ -332,7 +332,8 @@ export const cognitiveController = {
     try {
       if (!req.user) return unauthorized(res)
       const { listCognitiveCollections } = await import('./collection-data.service')
-      return success(res, await listCognitiveCollections({ userId: req.user.userId, role: req.user.role, assignmentId: req.params.id }))
+      const collections = await listCognitiveCollections({ userId: req.user.userId, role: req.user.role, assignmentId: req.params.id })
+      return success(res, collections.map(({ id, name, completedCount }) => ({ id, name, completedCount })))
     } catch (err) { return handleError(res, err) }
   },
 

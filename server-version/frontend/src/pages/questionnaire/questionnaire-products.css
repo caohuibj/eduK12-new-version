@@ -18,3 +18,9 @@
 .hui-questionnaire-products :where(p[role="alert"]) { color: var(--hui-color-danger); }
 .hui-questionnaire-products :where(.flex) { flex-wrap: wrap; align-items: center; }
 .hui-questionnaire-products input[type="checkbox"] { width: 20px; height: 20px; vertical-align: middle; }
+
+.questionnaire-editor-grid { display: grid; gap: 20px; }
+@media (min-width: 1024px) { .questionnaire-editor-grid { grid-template-columns: 240px minmax(0, 1fr); align-items: start; } }
+.hui-questionnaire-products [id^="questionnaire-"] { scroll-margin-top: 90px; }
+.hui-questionnaire-products .questionnaire-unit-trigger { width: 100%; justify-content: flex-start; text-align: left; white-space: normal; margin-bottom: 8px; }
+.hui-questionnaire-products .questionnaire-unit-trigger[aria-pressed="true"] { border-color: var(--hui-color-action); background: var(--hui-ds-color-soft); font-weight: 600; }

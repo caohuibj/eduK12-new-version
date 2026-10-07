@@ -1,13 +1,8 @@
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import {
-  buildAssessmentContext,
-  hashAssessmentContext,
-  type ContextFormAnswer,
-  type ContextFormItem,
-} from '../assessment-context'
-import { encryptAssessmentContext } from '../assessment-context/security'
+import { type ContextFormItem } from '../assessment-context'
+import { contextForNormalizedFormEntries } from './form-context'
 import {
   assertAttemptEpoch,
   assertCanonicalSubmissionPayloadSize,
@@ -88,19 +83,7 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
     options: item.options,
     contextKey: item.contextKey ?? null,
   }))
-  const answers: ContextFormAnswer[] = entries
-    .filter((entry) => Boolean(entry.item.contextKey) && entry.storedValue !== null)
-    .map((entry) => ({ formItemId: entry.item.id, value: entry.storedValue as string }))
-  try {
-    const context = buildAssessmentContext({ items, answers })
-    return { encrypted: encryptAssessmentContext(context), hash: hashAssessmentContext(context) }
-  } catch (error) {
-    throw new InstrumentFinalSubmitError(
-      'SUBMISSION_PAYLOAD_CONFLICT',
-      error instanceof Error ? error.message : '人口学上下文无效',
-      409,
-    )
-  }
+  return contextForNormalizedFormEntries(entries, items)
 }
 
 const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => createFormSectionCollectionFacts({

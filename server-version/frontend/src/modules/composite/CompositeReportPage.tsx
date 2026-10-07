@@ -1,5 +1,5 @@
 import BundleReport from '../../pages/bundle/BundleReport'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAnalysisExportFormat, CompositeReport, CompositeSnapshotMetadata } from './types'
@@ -28,6 +28,7 @@ type LegacyCompositeModule = Record<string, unknown> & {
 }
 
 const CompositeReportPage: React.FC = () => {
+  const epoch = useRef(0)
   const { id, attemptId } = useParams<{ id?: string; attemptId?: string }>()
   const location = useLocation()
   const navigate = useNavigate()
@@ -37,6 +38,7 @@ const CompositeReportPage: React.FC = () => {
   const staffMode = teacherMode && (user?.role === 'TEACHER' || user?.role === 'ADMIN')
   const adminMode = teacherMode && user?.role === 'ADMIN'
   const selectedSnapshotId = new URLSearchParams(location.search).get('snapshotId') || undefined
+  const partial = teacherMode && new URLSearchParams(location.search).get('partial') === '1'
   const [recoveryToken, setRecoveryToken] = useState(publicMode && attemptId ? readRecovery(attemptId) : '')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [report, setReport] = useState<CompositeReport | null>(null)
@@ -58,6 +60,7 @@ const CompositeReportPage: React.FC = () => {
 
   const load = useCallback(async (credential = recoveryToken, snapshotId = selectedSnapshotId) => {
     if (!attemptId) return
+    const current = ++epoch.current
     setLoading(true)
     setError(null)
     if (teacherMode && !id) {
@@ -72,17 +75,19 @@ const CompositeReportPage: React.FC = () => {
     }
     try {
       const response = teacherMode && id
-        ? await compositeApi.teacherReport(id, attemptId, snapshotId)
+        ? partial ? await compositeApi.teacherReport(id, attemptId, snapshotId, true) : await compositeApi.teacherReport(id, attemptId, snapshotId)
         : publicMode
           ? await publicCompositeApi(credential).report(attemptId)
-          : await compositeApi.report(attemptId)
+          : partial ? await compositeApi.partialReport(attemptId) : await compositeApi.report(attemptId)
       if (response.code !== 0 || !response.data) throw new Error(response.message || '报告不存在')
+      if (current !== epoch.current) return
       setReport(response.data)
     } catch (err) {
+      if (current !== epoch.current) return
       setError((err as { message?: string }).message || '加载报告失败')
       setReport(null)
-    } finally { setLoading(false) }
-  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode])
+    } finally { if (current === epoch.current) setLoading(false) }
+  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, partial])
 
   const loadSnapshots = useCallback(async () => {
     if (!staffMode || !attemptId) return
@@ -97,7 +102,7 @@ const CompositeReportPage: React.FC = () => {
     } finally { setSnapshotLoading(false) }
   }, [attemptId, staffMode])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => { void load(); return () => { epoch.current++ } }, [load])
   useEffect(() => {
     if (!shouldLoadSnapshots) {
       setSnapshots([])
@@ -211,7 +216,7 @@ const CompositeReportPage: React.FC = () => {
   return (
     <ReportShell
       title={report.name}
-      description={report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : report.productKind === 'QUESTIONNAIRE' ? '以下按问卷顺序展示各项测评的独立结果。' : '以下按容器顺序展示各模块的独立结果。'}
+      description={report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
       facts={facts}
       status={{ kind: 'success', title: '已提交', description: '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
@@ -219,6 +224,8 @@ const CompositeReportPage: React.FC = () => {
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
+      {report.reportState === 'PARTIAL' && !unitReports.length && <ReportSection title="暂无已完成单项">完成单项并正式提交后，可在此查看其冻结结果。</ReportSection>}
+      <ReportSection title="适用范围与解释边界" description="参考来源、适用人群与版本以各单项报告的已审批方案为准。">质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。</ReportSection>
       {backgroundValues.length > 0 && <ReportSection title="表单回答" eyebrow="作答信息" testId="composite-background-values">
         <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">

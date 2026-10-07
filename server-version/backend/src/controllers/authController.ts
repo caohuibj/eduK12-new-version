@@ -21,6 +21,10 @@ const loginSchema = z.object({
   password: z.string().min(1, '密码不能为空').max(PASSWORD_MAX_LENGTH),
 }).strict()
 
+// Precomputed synthetic cost-10 hash, matching hashPassword. Never authenticate
+// against it; absent/unusable accounts still perform the same bounded work.
+const LOGIN_DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'
+
 const teacherRegisterSchema = z.object({
   teacherCode: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
@@ -64,9 +68,12 @@ export const authController = {
       req.body = result.data
       const user = await withLoginPasswordVerification(async () => {
         const current = await prisma.user.findUnique({ where: { username } })
-        if (!current || !current.isActive || current.isFrozen || (current.expiresAt && current.expiresAt <= new Date())) return null
-        if (current.role === UserRole.TEACHER && !current.teacherApproved) return null
-        return await comparePassword(password, current.passwordHash) ? current : null
+        const usable = current && current.isActive && !current.isFrozen
+          && (!current.expiresAt || current.expiresAt > new Date())
+          && (current.role !== UserRole.TEACHER || current.teacherApproved)
+        const matches = await comparePassword(password, usable ? current.passwordHash : LOGIN_DUMMY_HASH)
+        // Recheck expiry after queued hashing; dummy success must stay a failure.
+        return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
       })
       if (!user) return failedLogin()
 

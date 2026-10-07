@@ -84,7 +84,15 @@
 }
 .hui-app--staff .hui-navigation .hui-nav-group a{
   transition:background .14s ease,color .14s ease,border-color .14s ease;
+  font-size:14px;
+  letter-spacing:normal;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
+.hui-nav-group__toggle { font-size:13px; letter-spacing:normal; }
+.hui-nav-group__toggle > svg { flex-shrink:0; }
+.hui-nav-group__toggle > span { min-width:0; text-align:left; }
 .hui-app--staff .hui-navigation .hui-nav-group a[aria-current=page]{
   background:#eef4ff;
   color:#21488e;

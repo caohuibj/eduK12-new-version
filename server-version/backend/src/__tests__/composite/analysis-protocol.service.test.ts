@@ -16,6 +16,7 @@ const { mockPrisma, getProtocolMock } = vi.hoisted(() => ({
     scale: { findUnique: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
     $transaction: vi.fn(),
+    $queryRaw: vi.fn(),
   },
   getProtocolMock: vi.fn(),
 }))

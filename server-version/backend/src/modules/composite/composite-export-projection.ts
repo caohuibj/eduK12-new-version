@@ -177,7 +177,7 @@ export const bindCompositeExportFileName = (
   binding: CompositeExportProjectionBindingV1,
   entropy = randomBytes(4).toString('hex').slice(0, 7),
 ): string => {
-  const match = fileName.match(/_([0-9a-f-]{36})\.(csv|sav)$/i)
+  const match = fileName.match(/_([0-9a-f-]{36})\.(csv|sav|zip)$/i)
   if (!match) throw new Error('导出文件名缺少可绑定的 artifact identity')
   const compact = `${expectedArtifactPrefix(binding)}${entropy.toLowerCase()}`
   if (!/^[0-9a-f]{32}$/.test(compact)) throw new Error('导出 artifact identity 无效')
@@ -188,7 +188,7 @@ export const compositeExportFileNameMatchesProjection = (
   fileName: string,
   binding: CompositeExportProjectionBindingV1,
 ): boolean => {
-  const match = fileName.match(/_([0-9a-f-]{36})\.(csv|sav)$/i)
+  const match = fileName.match(/_([0-9a-f-]{36})\.(csv|sav|zip)$/i)
   if (!match) return false
   const compact = match[1].replace(/-/g, '').toLowerCase()
   return /^[0-9a-f]{32}$/.test(compact) && compact.startsWith(expectedArtifactPrefix(binding))

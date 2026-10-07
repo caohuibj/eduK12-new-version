@@ -38,6 +38,9 @@ const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
 const ScaleLibrary = React.lazy(() => import('./pages/ScaleLibrary'))
 const QuestionnaireProductList = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductList })))
 const QuestionnaireProductEdit = React.lazy(() => import('./pages/questionnaire/QuestionnaireProducts').then(module => ({ default: module.QuestionnaireProductEdit })))
+const AssessmentWorkbench = React.lazy(() => import('./pages/teacher/AssessmentWorkbench'))
+const AssessmentTemplates = React.lazy(() => import('./pages/questionnaire/AssessmentTemplates'))
+const AssessmentManagement = React.lazy(() => import('./pages/questionnaire/AssessmentManagement'))
 const QuestionnaireList = React.lazy(() => import('./pages/QuestionnaireList'))
 const QuestionnaireEdit = React.lazy(() => import('./pages/QuestionnaireEdit'))
 const TeacherCourseDetail = React.lazy(() => import('./pages/teacher/TeacherCourseDetail'))
@@ -52,6 +55,7 @@ const ClassroomQRCode = React.lazy(() => import('./pages/teacher/ClassroomQRCode
 const ClassroomQuestionEdit = React.lazy(() => import('./pages/teacher/ClassroomQuestionEdit'))
 const BundleProducts = React.lazy(() => import('./pages/bundle/BundleProducts').then(m => ({ default: m.BundleProducts })))
 const BundleProductDetail = React.lazy(() => import('./pages/bundle/BundleProducts').then(m => ({ default: m.BundleProductDetail })))
+const BundleAuthoring = React.lazy(() => import('./pages/bundle/BundleAuthoring'))
 const CompositeAssessmentList = React.lazy(() => import('./pages/teacher/CompositeAssessmentList'))
 const CompositeAssessmentEdit = React.lazy(() => import('./pages/teacher/CompositeAssessmentEdit'))
 const CompositeAssessmentResults = React.lazy(() => import('./pages/teacher/CompositeAssessmentResults'))
@@ -265,6 +269,9 @@ function AppRoutes() {
           />
 
           {/* Admin/Teacher Routes */}
+          <Route path="/assessment-workbench" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentWorkbench /></ProtectedRoute>} />
+          <Route path="/assessment-templates" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentTemplates /></ProtectedRoute>} />
+          <Route path="/assessment-management" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentManagement /></ProtectedRoute>} />
           <Route
             path="/dashboard"
             element={
@@ -380,6 +387,7 @@ function AppRoutes() {
             }
           />
           <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
+          <Route path="/admin/bundle-authoring" element={<ProtectedRoute roles={['ADMIN']}><BundleAuthoring /></ProtectedRoute>} />
           <Route path="/bundle-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProductDetail /></ProtectedRoute>} />
           <Route
             path="/composite-assessments"
@@ -867,4 +875,3 @@ function App() {
 }
 
 export default App
-

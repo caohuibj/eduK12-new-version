@@ -20,6 +20,9 @@ const parent: NavigationItem[] = [
   { path: '/relational/tasks', label: '观察测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'] },
 ]
 const staff: NavigationItem[] = [
+  { path: '/assessment-workbench', label: '测评结果工作台', section: 'assessment' },
+  { path: '/assessment-templates', label: '测评模板库', section: 'assessment' },
+  { path: '/assessment-management', label: '对象与操作记录', section: 'assessment' },
   { path: '/dashboard', label: '课程管理', aliases: ['/courses'], section: 'teaching' },
   { path: '/students', label: '学生管理', section: 'teaching' },
   { path: '/assignments', label: '作业管理', section: 'teaching' },
@@ -28,10 +31,8 @@ const staff: NavigationItem[] = [
   { path: '/sjt-authoring', label: 'SJT 题包管理', section: 'assessment' },
   { path: '/scales', label: '心理量表', section: 'assessment' },
   { path: '/scale-library', label: '量表库', section: 'assessment' },
-  { path: '/questionnaires', label: '聚合问卷', aliases: ['/questionnaire-products'], section: 'assessment' },
-  { path: '/composite-assessments', label: '综合测评', section: 'assessment' },
-  { path: '/bundle-products', label: '综合测评包', section: 'assessment' },
-  { path: '/general-questionnaires', label: '历史泛化问卷', section: 'assessment' },
+  { path: '/questionnaires', label: '组合测评', aliases: ['/questionnaire-products', '/composite-assessments', '/general-questionnaires'], section: 'assessment' },
+  { path: '/bundle-products', label: '固定测评包', section: 'assessment' },
   { path: '/videos', label: '视频库', section: 'content' }, { path: '/images', label: '图片库', section: 'content' },
   { path: '/documents', label: '文档库', section: 'content' },
 ]
@@ -43,6 +44,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
   if (role === 'TEACHER') items.push({ path: '/relational/tasks', label: '关系测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'], section: 'assessment' })
   if (role === 'ADMIN') items.push(
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
+    { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
     { path: '/admin/reporting-content', label: '测量与报告方案', section: 'system' }, { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
@@ -69,6 +71,8 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],
+  ['/admin/bundle-authoring', '固定测评包制作与审批'],
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
   ['/organizations/new', '创建组织'], ['/organization-tasks', '组织测评任务'],
   ['/parent-tool-policies','家长工具披露设置'], ['/parent-accounts','家长账号管理'], ['/parent/links','家长关联'], ['/parent/children/:childId/reports/:artifactId','孩子报告'], ['/parent/children/:childId','孩子概况'], ['/parent/children','我的孩子'], ['/parent/profile','家长账户设置'], ['/student/parent-links/:relationshipId/reports/:artifactId','报告授权预览'], ['/student/parent-links/:relationshipId/reports','管理报告授权'], ['/student/parent-links','家长关联'], ['/organization-invitations','加入组织'], ['/organizations/:organizationId/parent-reports','家长报告'],
@@ -76,11 +80,11 @@ const staffTitles: Array<[string, string]> = [
   ['/organizations/:organizationId/reporting', '报告分析'], ['/organizations/:organizationId/delivery', '安全事项与导出'],
   ['/organizations/:organizationId', '组织概览'], ['/organizations', '组织空间'],
   ['/courses/:courseId/students', '课程学生'], ['/courses/:courseId/detail', '课程详情'],
-  ['/questionnaire-products/new', '创建聚合问卷'], ['/questionnaire-products/:id', '编辑聚合问卷'],
+  ['/questionnaire-products/new', '创建组合测评'], ['/questionnaire-products/:id', '编辑组合测评'],
   ['/questionnaires/legacy', '历史问卷'], ['/questionnaires/:id', '编辑历史问卷'],
   ['/general-questionnaires/create', '创建泛化问卷'], ['/general-questionnaires/:id/edit', '编辑泛化问卷'],
   ['/scales/:id', '量表详情与编辑'], ['/bundle-products/:id', '测评包详情'],
-  ['/composite-assessments/:id/results', '作答与报告'], ['/composite-assessments/:id', '综合测评配置'],
+  ['/composite-assessments/:id/results', '作答与报告'], ['/composite-assessments/:id', '历史组合测评配置'],
   ['/cognitive-assignments/:id', '认知任务配置'], ['/teacher/classrooms/create', '创建课堂'],
   ['/teacher/classrooms/:id/control', '课堂控制'], ['/teacher/classrooms/:id/edit', '编辑课堂'],
   ['/teacher/classrooms/:id/questions', '课堂题目'], ['/teacher/classrooms/:id/qrcode', '课堂参与码'], ['/profile', '账户设置'],
@@ -121,8 +125,8 @@ export function breadcrumbsFor(pathname: string, home: string, active?: Navigati
 }
 export function isStaffWorkspacePath(pathname: string): boolean {
   if (pathname.endsWith('/report')) return false
-  return ['/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
+  return ['/assessment-workbench','/assessment-templates','/assessment-management','/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
-    '/users','/teacher-codes','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/profile','/organizations','/organization-tasks']
+    '/users','/teacher-codes','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))
 }

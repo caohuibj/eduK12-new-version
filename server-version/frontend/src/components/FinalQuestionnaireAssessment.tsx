@@ -9,6 +9,7 @@ import {
   type FinalDraftMeta,
 } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
+import { recordFinalSubmissionFailure } from '../services/persistence/finalSubmissionFailure'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import { readQuestionnaireResumeTokenForSession } from '../utils/questionnaireResume'
 import type { ApiResponse } from '../types'
@@ -134,19 +135,12 @@ const parseOptions = (options: FinalQuestionnaireFormSection['items'][number]['o
 
 const isEmpty = (value: FormValue | undefined) => value === null || value === undefined || (Array.isArray(value) ? value.length === 0 : !String(value).trim())
 
-const finalErrorStatus = (error: unknown) => {
-  const normalized = normalizeApiError(error)
-  const code = String(normalized.code ?? '')
-  return normalized.status === 409 || code === '409' || code === 'STALE_ATTEMPT' || code === 'DEFINITION_MISMATCH' || code === 'SUBMISSION_PAYLOAD_CONFLICT'
-    ? 'CONFLICT' as const
-    : 'RETRY_PENDING' as const
-}
-
 const apiResponseError = (response: ApiResponse<unknown>) => {
   const error = new Error(response.message || '提交失败') as Error & { status?: number; code?: number | string }
   error.code = response.code
   if (typeof response.code === 'number') error.status = response.code
   if (response.code === 'ASSESSMENT_SUBMIT_BUSY' || response.code === 'COMPLETION_BUSY') error.status = 503
+  if (response.code === 'FORM_ANSWER_INVALID') error.status = 400
   return error
 }
 
@@ -364,20 +358,9 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   }
 
   const recordSubmissionFailure = async (draftKey: string, cause: unknown) => {
-    const currentMeta = await finalDraftStore.get(draftKey).catch(() => null)
-    if (currentMeta?.status === 'DRAFT' && !currentMeta.sealedSubmission) {
-      setMeta(currentMeta)
-      setRequiresRestart(false)
-      setError(normalizeApiError(cause).message)
-      return
-    }
-    const status = finalErrorStatus(cause)
-    const nextMeta = await finalDraftStore.setStatus(draftKey, status, {
-      code: String((cause as any)?.code || ''),
-      message: normalizeApiError(cause).message,
-    }).catch(() => null)
+    const nextMeta = await recordFinalSubmissionFailure(draftKey, cause, meta?.submissionId).catch(() => finalDraftStore.get(draftKey)).catch(() => meta ? ({ ...meta, status: 'RETRY_PENDING' as const }) : null)
     if (nextMeta) setMeta(nextMeta)
-    setRequiresRestart(status === 'CONFLICT')
+    setRequiresRestart(nextMeta?.status === 'CONFLICT')
     setError(normalizeApiError(cause).message)
   }
 
@@ -585,7 +568,9 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
           </div>
           {(() => {
             const item = currentSection.items[sectionIndex]
-            if (!item) return <p className="text-gray-500">该区段没有字段。</p>
+            if (!item) return currentSection.contextSection
+              ? <p role="alert" className="text-amber-800">历史背景信息区段缺少字段。请联系教师发布修复版本后重新开始，已提交记录会保留。</p>
+              : <div className="space-y-3"><p className="text-gray-600">此历史区段没有字段。确认后会提交空区段记录并继续。</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
             const value = formValues[item.id]
             const options = parseOptions(item.options)
             const imageItems = assessmentOptionImageItems(options)

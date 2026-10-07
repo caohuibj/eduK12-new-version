@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { DeviceInputProvenanceV1 } from '../../modules/scale/device-input-provenance'
 import type { CompositeAttemptState, CompositeCurrentItem } from '../../modules/composite/types'
 import FinalCompositeAssessment from '../FinalCompositeAssessment'
-import { finalDraftStore } from '../../services/persistence/finalDraftStore'
+import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
 
 const { mockCapture, mockResolve, mockRetry } = vi.hoisted(() => ({
   mockCapture: vi.fn(),
@@ -128,6 +128,7 @@ beforeEach(() => {
 })
 
 afterEach(async () => {
+  vi.restoreAllMocks()
   await Promise.all([
     finalDraftStore.delete('composite-scale:composite-scale-assessment-1'),
     finalDraftStore.delete('composite-form-section:composite-attempt-1:composite-form-section-1'),
@@ -142,6 +143,22 @@ const sharedProps = {
   onEnterSituational: vi.fn(),
 }
 
+describe('historical empty sections', () => {
+  it('submits an explicit empty FINAL for an ordinary frozen section', async () => {
+    const submitFormSection = vi.fn().mockResolvedValue({ code: 0 })
+    render(<FinalCompositeAssessment state={makeState({ ...formItem, formAnswers: [], contextSection: false })} submitFormSection={submitFormSection} submitScale={vi.fn()} {...sharedProps} />)
+    await userEvent.click(await screen.findByRole('button', { name: '确认并继续' }))
+    await waitFor(() => expect(submitFormSection).toHaveBeenCalledWith('composite-attempt-1', 'composite-form-section-1', expect.objectContaining({ answers: [], definitionHash: 'composite-form-definition-hash' })))
+  })
+  it('explains recovery for an invalid frozen context instead of silently skipping it', async () => {
+    const submitFormSection = vi.fn()
+    render(<FinalCompositeAssessment state={makeState({ ...formItem, formAnswers: [], contextSection: true })} submitFormSection={submitFormSection} submitScale={vi.fn()} {...sharedProps} />)
+    expect(await screen.findByRole('alert')).toHaveTextContent('请联系教师发布修复版本')
+    expect(screen.queryByRole('button', { name: '确认并继续' })).not.toBeInTheDocument()
+    expect(submitFormSection).not.toHaveBeenCalled()
+  })
+})
+
 describe('FinalCompositeAssessment durable selection and exit', () => {
   const multiItem = (): CompositeCurrentItem => ({
     ...scaleItem, scale: { ...scaleItem.scale!, definition: {
@@ -151,12 +168,12 @@ describe('FinalCompositeAssessment durable selection and exit', () => {
       })),
     } },
   })
-  it('waits for the current item write before exiting, restores it, and does not advance or bleed across items', async () => {
+  it('waits for the current item write before exiting and preserves both item answers', async () => {
     const user = userEvent.setup()
     const onExit = vi.fn()
     const state = makeState(multiItem())
     const props = { ...sharedProps, onExit, state, submitScale: vi.fn(), submitFormSection: vi.fn() }
-    const view = render(<FinalCompositeAssessment {...props} />)
+    render(<FinalCompositeAssessment {...props} />)
     await user.click(await screen.findByRole('button', { name: '经常' }))
     await screen.findByText('已保存到本机。')
     expect(screen.getByText('综合量表第 1 题')).toBeInTheDocument()
@@ -166,15 +183,31 @@ describe('FinalCompositeAssessment durable selection and exit', () => {
     const gate = new Promise<void>(resolve => { release = resolve })
     const original = finalDraftStore.putAnswer.bind(finalDraftStore)
     const spy = vi.spyOn(finalDraftStore, 'putAnswer').mockImplementationOnce(async answer => { await gate; await original(answer) })
-    await user.click(screen.getByRole('button', { name: '偶尔' }))
-    await user.click(screen.getByRole('button', { name: '保存并退出' }))
-    expect(onExit).not.toHaveBeenCalled()
-    await act(async () => { release(); await gate })
-    await waitFor(() => expect(onExit).toHaveBeenCalledTimes(1))
-    spy.mockRestore()
-    view.unmount()
-    render(<FinalCompositeAssessment {...props} />)
+    try {
+      await user.click(screen.getByRole('button', { name: '偶尔' }))
+      await user.click(screen.getByRole('button', { name: '保存并退出' }))
+      expect(onExit).not.toHaveBeenCalled()
+      await act(async () => { release(); await gate })
+      await waitFor(() => expect(onExit).toHaveBeenCalledTimes(1))
+      expect(await finalDraftStore.listAnswers('composite-scale:composite-scale-assessment-1')).toEqual(expect.arrayContaining([
+        expect.objectContaining({ itemKey: 'item-1', value: { responseValue: 'often' } }),
+        expect.objectContaining({ itemKey: 'item-2', value: { responseValue: 'rare' } }),
+      ]))
+    } finally {
+      release()
+      spy.mockRestore()
+    }
+  })
+
+  it('restores saved item selections without advancing or bleeding into the next item', async () => {
+    const user = userEvent.setup(), draftKey = 'composite-scale:composite-scale-assessment-1'
+    await finalDraftStore.ensure(createFinalDraftMeta({ draftKey, instrument: 'scale', attemptId: 'composite-scale-assessment-1',
+      attemptEpoch: 1, definitionHash: scaleItem.definitionHash!, contextSnapshotHash: null, deliveryMode: 'final_only', submissionId: 'saved-scale-selection' }))
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'item-1', value: { responseValue: 'often' }, updatedAt: Date.now() })
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'item-2', value: { responseValue: 'rare' }, updatedAt: Date.now() })
+    render(<FinalCompositeAssessment {...sharedProps} state={makeState(multiItem())} submitScale={vi.fn()} submitFormSection={vi.fn()} />)
     expect(await screen.findByRole('button', { name: '经常' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('综合量表第 1 题')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /下一题/ }))
     expect(screen.getByRole('button', { name: '偶尔' })).toHaveAttribute('aria-pressed', 'true')
     await user.click(screen.getByRole('button', { name: /下一题/ }))

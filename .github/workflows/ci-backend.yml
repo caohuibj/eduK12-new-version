@@ -72,6 +72,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: clear reports from previous backend jobs
+        run: rm -f /tmp/eduk12-backend-performance-vitest.json /tmp/eduk12-ci-env.txt
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -217,4 +219,3 @@ jobs:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
-

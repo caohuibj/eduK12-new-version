@@ -11,6 +11,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { PrismaClient } from '@prisma/client'
+import { verifyReleaseSchema } from './release-schema-contract.mjs'
+import { verifyConfiguredRuntime } from './runtime-role-contract.mjs'
 
 const prisma = new PrismaClient()
 const uploadDir = path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads'))
@@ -81,6 +83,8 @@ const countFilesOutsideAssetRoot = async () => {
 }
 
 const run = async () => {
+  const releaseSchema = await verifyReleaseSchema(prisma)
+  const runtime = await verifyConfiguredRuntime({ allowIsolatedTestAbsence: true })
   const missingTables = []
   for (const table of requiredTables) {
     if (!(await tableExists(table))) missingTables.push(table)
@@ -316,7 +320,7 @@ const run = async () => {
     'orphan_composite_form_items',
   ]
   const blocking = blockingFields.filter((field) => metrics[field] > 0)
-  const result = { ok: blocking.length === 0, metrics }
+  const result = { ok: blocking.length === 0, releaseSchema, runtime, metrics }
   console.log(JSON.stringify(result))
   if (blocking.length > 0) {
     throw new Error(`release preflight blocked by ${blocking.join(',')}`)

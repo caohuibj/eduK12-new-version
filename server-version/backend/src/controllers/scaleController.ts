@@ -50,6 +50,7 @@ import {
 import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
 import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
+import { isCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
 
 // ==================== Validation Schemas ====================
 
@@ -1131,6 +1132,9 @@ export const scaleController = {
       })
       if (!assessment) return notFound(res, '测评记录不存在')
       if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')
+      if (assessment.status === 'COMPLETED' && await isCompositeParticipantFeedbackDeferred(assessment.compositeAttemptId)) {
+        return forbidden(res, '完成整份测评后才能查看单项反馈')
+      }
       if (
         assessment.status === 'COMPLETED'
         && await isRelationalCohortOnlyCompositeAttempt(assessment.compositeAttemptId)

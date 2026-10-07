@@ -1,4 +1,5 @@
 import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
+import { frozenCompositeProgress, frozenMeasurementFinalHeaders } from './frozen-progress'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
@@ -39,6 +40,7 @@ import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
+import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
 import { missingRequiredScaleItemCodes, ScaleAnswerValidationError, validateScaleAnswer } from '../scale/scale-scoring'
 import type { DeviceInputProvenanceV1 } from '../scale/device-input-provenance'
@@ -711,6 +713,7 @@ const mapAttemptRowForTeacher = (attempt: {
   id: string
   status: string
   progress: number
+  progressUnavailableReason?: string | null
   completedItems: number
   startedAt: Date
   lastSavedAt: Date
@@ -724,6 +727,7 @@ const mapAttemptRowForTeacher = (attempt: {
     id: attempt.id,
     status: attempt.status,
     progress: attempt.progress,
+    progressUnavailableReason: attempt.progressUnavailableReason ?? null,
     completedItems: attempt.completedItems,
     startedAt: attempt.startedAt,
     lastSavedAt: attempt.lastSavedAt,
@@ -1251,7 +1255,12 @@ export const listAttemptsForTeacher = async (
         id: true,
         status: true,
         progress: true,
+        assignmentRef: true,
         completedItems: true,
+        runtimeGeneration: true,
+        attemptEpoch: true,
+        frozenActiveSlotSetEncrypted: true,
+        frozenActiveSlotSetHash: true,
         startedAt: true,
         lastSavedAt: true,
         completedAt: true,
@@ -1266,6 +1275,28 @@ export const listAttemptsForTeacher = async (
   ])
 
   const totalPages = Math.ceil(total / query.pageSize)
+  const unifiedIds = attempts.filter(attempt => attempt.runtimeGeneration === 'UNIFIED_V1').map(attempt => attempt.id)
+  const headers = unifiedIds.length ? await prisma.assessmentUnitSnapshot.findMany({
+    where: { compositeAttemptId: { in: unifiedIds } },
+    select: { compositeAttemptId: true, slotKey: true, attemptEpoch: true, unitType: true, terminalState: true, payloadKind: true, sourceType: true, sourceAttemptId: true },
+  }) : []
+  const headersByAttempt = new Map<string, AggregateSnapshotHeader[]>()
+  for (const header of headers) {
+    if (!header.compositeAttemptId) continue
+    const list = headersByAttempt.get(header.compositeAttemptId) ?? []
+    list.push(header)
+    headersByAttempt.set(header.compositeAttemptId, list)
+  }
+  const legacyIds = attempts.filter(attempt => attempt.runtimeGeneration !== 'UNIFIED_V1').map(attempt => attempt.id)
+  const legacyRows = legacyIds.length ? await prisma.compositeAssessmentAttempt.findMany({
+    where: { id: { in: legacyIds } },
+    select: { id: true,
+      scaleAssessments: { orderBy: [{ startedAt: 'asc' }, { id: 'asc' }], select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptEpoch: true } },
+      cognitiveSessions: { orderBy: { createdAt: 'asc' }, select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptNo: true } },
+      situationalAttempts: { orderBy: { createdAt: 'asc' }, select: { id: true, compositeItemId: true, compositeItem: { select: { type: true } }, status: true, attemptEpoch: true, attemptNo: true } },
+    },
+  }) : []
+  const legacyById = new Map(legacyRows.map(row => [row.id, row]))
   return {
     assessment: {
       id: composite.id,
@@ -1276,7 +1307,20 @@ export const listAttemptsForTeacher = async (
       courseId: composite.courseId,
     },
     attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
-    list: attempts.map(mapAttemptRowForTeacher),
+    list: attempts.map(attempt => {
+      const attemptHeaders = headersByAttempt.get(attempt.id) ?? []
+      const ordinary = !attempt.assignmentRef && ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(composite.productKind) && !composite.reportPackageKey && !composite.analysisProtocolKey
+      const legacy = legacyById.get(attempt.id)
+      const partialReportUnitCount = !ordinary ? 0 : attempt.runtimeGeneration === 'UNIFIED_V1'
+        ? new Set(frozenMeasurementFinalHeaders(attempt, attemptHeaders).map(header => header.sourceAttemptId)).size
+        : legacy ? [
+          completedMeasurementChildren(legacy.scaleAssessments, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SCALE'),
+          completedMeasurementChildren(legacy.cognitiveSessions, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'COGNITIVE'),
+          completedMeasurementChildren(legacy.situationalAttempts, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SITUATIONAL'),
+        ].reduce((sum, children) => sum + children.length, 0) : 0
+      return { ...mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, attemptHeaders) }),
+        partialReportAvailable: partialReportUnitCount > 0, partialReportUnitCount }
+    }),
     page: query.page,
     pageSize: query.pageSize,
     total,
@@ -1470,20 +1514,19 @@ export const setCompositeReportPackage = async (
 
 export const addItem = async (userId: string, role: UserRole, compositeId: string, input: AddCompositeItemInput) => {
   assertTeacher(role)
-  const composite = await loadComposite(compositeId, true)
-  assertOwner(composite, userId, role)
-  assertDraft(composite)
-  assertCollectionOnlyEditing(composite)
   if (input.required !== true) throw compositeBadRequest('新增加的综合测评模块必须为必答模块')
-  await assertValidItem(input, userId, role, composite)
-  const position = input.position ?? (composite.items.length ? Math.max(...composite.items.map((item: any) => item.position)) + 1 : 0)
-  if (composite.items.some((item: any) => item.position === position)) {
-    throw compositeConflict('模块排序位置已存在')
-  }
   // Atomic materialize-on-write: the item create and its section assignment
   // share one transaction so a crash can never leave an orphan FORM module
   // that GET/start/publish would otherwise have to lazily repair.
   const item = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+    const composite = await loadComposite(compositeId, true, tx)
+    assertOwner(composite, userId, role)
+    assertDraft(composite)
+    assertCollectionOnlyEditing(composite)
+    await assertValidItem(input, userId, role, composite, tx)
+    const position = input.position ?? Math.max(-1, ...composite.items.map((item: any) => item.position), ...(composite.formSections ?? []).map((section: any) => section.position)) + 1
+    if (composite.items.some((item: any) => item.position === position)) throw compositeConflict('模块排序位置已存在')
     const created = await tx.compositeAssessmentItem.create({
       data: {
         compositeAssessmentId: compositeId,
@@ -1505,6 +1548,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
       const { ensureCompositeFormSections } = await import('./final-submit.service')
       await ensureCompositeFormSections(compositeId, tx)
     }
+    await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
     return created
   })
   return item
@@ -1512,19 +1556,42 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
 
 export const removeItem = async (userId: string, role: UserRole, compositeId: string, itemId: string) => {
   assertTeacher(role)
-  const composite = await loadComposite(compositeId)
-  assertOwner(composite, userId, role)
-  assertDraft(composite)
-  assertCollectionOnlyEditing(composite)
-  const item = await prisma.compositeAssessmentItem.findUnique({ where: { id: itemId } })
-  if (!item || item.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评模块不存在')
-  await prisma.compositeAssessmentItem.delete({ where: { id: itemId } })
+  await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+    const composite = await loadComposite(compositeId, false, tx)
+    assertOwner(composite, userId, role)
+    assertDraft(composite)
+    assertCollectionOnlyEditing(composite)
+    const item = await tx.compositeAssessmentItem.findUnique({ where: { id: itemId } })
+    if (!item || item.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评模块不存在')
+    await tx.compositeAssessmentItem.delete({ where: { id: itemId } })
+    if (item.formSectionId && !await tx.compositeAssessmentItem.count({ where: { formSectionId: item.formSectionId } })) {
+      await tx.compositeFormSection.delete({ where: { id: item.formSectionId } })
+    }
+    await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
+  })
 }
 
 type CompositeContentUnitInput = {
   type: 'scale' | 'cognitive' | 'situational' | 'form-section' | 'SCALE' | 'COGNITIVE' | 'SITUATIONAL' | 'FORM_SECTION'
   id: string
   position: number
+}
+
+export const removeEmptyFormSection = async (userId: string, role: UserRole, compositeId: string, sectionId: string) => {
+  assertTeacher(role)
+  await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+    const composite = await loadComposite(compositeId, false, tx)
+    assertOwner(composite, userId, role)
+    assertDraft(composite)
+    assertCollectionOnlyEditing(composite)
+    const section = await tx.compositeFormSection.findFirst({ where: { id: sectionId, compositeAssessmentId: compositeId }, include: { _count: { select: { items: true } } } })
+    if (!section) throw compositeNotFound('表单区段不存在')
+    if (section._count.items) throw compositeConflict('区段中还有字段，请先移除或移动字段')
+    await tx.compositeFormSection.delete({ where: { id: sectionId } })
+    await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
+  })
 }
 
 const canonicalCompositeContentUnitType = (type: CompositeContentUnitInput['type']) => {
@@ -1604,9 +1671,11 @@ export const reorderCompositeContentUnits = async (
   input: CompositeContentUnitInput[],
 ) => {
   assertTeacher(role)
+  await prisma.$transaction(async (tx) => {
+  await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
   const { ensureCompositeFormSections } = await import('./final-submit.service')
-  await ensureCompositeFormSections(compositeId)
-  const composite = await loadComposite(compositeId, true)
+  await ensureCompositeFormSections(compositeId, tx)
+  const composite = await loadComposite(compositeId, true, tx)
   assertOwner(composite, userId, role)
   assertDraft(composite)
   assertCollectionOnlyEditing(composite)
@@ -1651,7 +1720,6 @@ export const reorderCompositeContentUnits = async (
   ) + expected.size + 1
   const itemTemporaryBase = unitBase + expected.size + composite.items.length + 1
   const sectionTemporaryBase = unitBase + expected.size + sections.length + 1
-  await prisma.$transaction(async (tx) => {
     for (const [index, item] of childItems.entries()) {
       await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { position: itemTemporaryBase + index } })
     }
@@ -1666,6 +1734,7 @@ export const reorderCompositeContentUnits = async (
         await tx.compositeAssessmentItem.update({ where: { id: unit.id }, data: { position } })
       }
     }
+    await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
   })
   return listCompositeContentUnits(compositeId)
 }
@@ -1718,7 +1787,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma) => {
+export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma) => {
   assertTeacher(role)
   // Publish validates, it never repairs. The write-time invariant guarantees
   // every FORM module is sectioned on create/copy/import, so a published
@@ -1736,6 +1805,8 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
   // that the participant read path would otherwise have to lazily materialize.
   const orphanFormItems = composite.items.filter((item: any) => item.type === 'FORM' && !item.formSectionId)
   if (orphanFormItems.length > 0) throw compositeBadRequest('综合测评包含未归属区段的表单模块，发布失败')
+  const emptySections = (composite.formSections ?? []).filter((section: any) => !section.items.length)
+  if (emptySections.length > 0) throw compositeBadRequest(`区段“${emptySections[0].title}”没有字段，请添加字段或移除空区段后发布`)
   await validateCourse(composite.courseId, userId, role, { allowLibrary: role === UserRole.ADMIN })
   if (composite.publicEnabled && !composite.expiresAt) throw compositeBadRequest('公开链接必须设置有效期')
 
@@ -1890,17 +1961,26 @@ export const publishComposite = async (userId: string, role: UserRole, id: strin
     }
   }
 
-  const published = await prisma.compositeAssessment.update({
+  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted }
+}
+
+const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db) => {
+  await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
+  const prepared = await prepareCompositePublication(userId, role, id, db)
+  const published = await db.compositeAssessment.update({
     where: { id },
     data: {
       status: 'PUBLISHED',
       publishedAt: new Date(),
-      analysisProtocolSnapshotEncrypted,
-      reportPackageSnapshotEncrypted,
+      ...prepared,
     },
   })
   return withoutAnalysisProtocolCipher(published)
 }
+
+export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma): Promise<any> =>
+  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx))
+    : publishCompositeInTransaction(userId, role, id, db)
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw compositeForbidden('公开链接已停用')
@@ -1913,10 +1993,10 @@ const assertCompositeWindow = (composite: { opensAt: Date | null; expiresAt: Dat
   if (composite.expiresAt && composite.expiresAt.getTime() < Date.now()) throw compositeBadRequest('综合测评已过期')
 }
 
-export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number) => {
+export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number, db: Db = prisma) => {
   assertTeacher(role)
   if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw compositeBadRequest('最大参与次数无效')
-  const composite = await loadComposite(compositeId)
+  const composite = await loadComposite(compositeId, false, db)
   assertOwner(composite, userId, role)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
   assertNotLibraryComposite(composite, '库课程上的综合测评不能公开作答')
@@ -1925,7 +2005,7 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
     throw compositeBadRequest('公开链接有效期必须在未来一年内，且不能晚于综合测评有效期')
   }
   const rawToken = createAccessToken()
-  const record = await prisma.compositeAssessmentAccessToken.create({
+  const record = await db.compositeAssessmentAccessToken.create({
     data: {
       compositeAssessmentId: compositeId,
       token: null,
@@ -2121,6 +2201,8 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
       configId: assignment.configId,
       title: assignment.title,
       instruction: assignment.instruction ?? null,
+      quotaSourceAssignmentId: assignment.quotaSourceAssignmentId ?? assignment.id,
+      maxAttempts: assignment.maxAttempts,
       sourceFreeze: {
         profile: assignment.profile,
         profileDefinitionVersion: assignment.profileDefinitionVersion,
@@ -2166,6 +2248,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
     scoringVersion: config.scoringVersion,
     config: sessionConfig,
   })
+  if (userId) await admitCognitiveAttempt(db, userId, assignment.id)
   return db.cognitiveSession.create({
     data: {
       userId,
@@ -2194,6 +2277,12 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
 }
 
 const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[]) => {
+  // A composition may reference several sources in different orders. Always
+  // acquire their locks in the same order to avoid cross-composition deadlocks.
+  if (userId) {
+    const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE').map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
+    for (const id of [...new Set(sources.map(source => source.id))].sort()) await lockCognitiveQuota(db, userId, id)
+  }
   const runtime = {
     scales: [] as Array<{ compositeItemId: string; code: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
     cognitive: [] as Array<{ compositeItemId: string; testType: string; instrumentVersion: string; sourceDefinitionHash: string; compiledRuntimeHash: string }>,
@@ -2563,14 +2652,14 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
 }
 
-const findPublicToken = async (tokenValue: string) => {
+const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   const tokenHash = hashPublicAccessToken(tokenValue)
   // Token/content layering (Work C): the token lookup reads only the token
   // metadata plus the minimal composite fields required for validation. The
   // full composite content graph is loaded separately (loadComposite) by the
   // callers that actually render it, so a public read never loads the content
   // twice.
-  let token = await prisma.compositeAssessmentAccessToken.findUnique({
+  let token = await db.compositeAssessmentAccessToken.findUnique({
     where: { tokenHash },
     include: {
       compositeAssessment: {
@@ -2589,7 +2678,7 @@ const findPublicToken = async (tokenValue: string) => {
   if (!token) {
     // Keep a bounded compatibility window for rows not yet processed by the
     // explicit backfill. New rows never use this plaintext lookup path.
-    token = await prisma.compositeAssessmentAccessToken.findUnique({
+    token = await db.compositeAssessmentAccessToken.findUnique({
       where: { token: tokenValue },
       include: {
         compositeAssessment: {
@@ -2614,15 +2703,15 @@ const findPublicToken = async (tokenValue: string) => {
   return token as any
 }
 
-export const getPublicCompositeInfo = async (tokenValue: string) => {
-  const token = await findPublicToken(tokenValue)
+export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {
+  const token = await findPublicToken(tokenValue, db)
   assertTokenWindow(token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
   // Pure-read (write-time invariant): the public info path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
-  const current = await loadComposite(composite.id, true)
+  const current = await loadComposite(composite.id, true, db)
   const packageSlotLabels = getFrozenPackageSlotLabels(current)
   const units = [
     ...current.items
@@ -2644,6 +2733,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
       contextSection: compositeSectionHasContext(section),
     })),
   ].sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+  const waves = await db.$queryRaw`SELECT w.id FROM anonymous_study_waves w JOIN anonymous_studies s ON s.id=w.study_id WHERE w.access_token_id=${token.id} AND s.status='ACTIVE' LIMIT 1`
   return {
     id: current.id,
     name: current.name,
@@ -2652,6 +2742,7 @@ export const getPublicCompositeInfo = async (tokenValue: string) => {
     expiresAt: token.expiresAt,
     maxUses: token.maxUses,
     usedCount: token.usedCount,
+    studyEntryPath: waves[0] ? `/public/studies/waves/${waves[0].id}/${encodeURIComponent(tokenValue)}` : null,
     deliveryMode: 'FINAL_ONLY' as const,
     attemptEpoch: 1,
     items: current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
@@ -2897,10 +2988,10 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
   })
 }
 
-const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null) => {
+const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false) => {
   const storedConfig = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted)
   const config = storedConfig.config
-  const resultSnapshot = session.status === 'COMPLETED' && session.resultSnapshotEncrypted
+  const resultSnapshot = !feedbackDeferred && session.status === 'COMPLETED' && session.resultSnapshotEncrypted
     ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
     : null
   const result = resultSnapshot
@@ -2912,7 +3003,7 @@ const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | nul
         report: resultSnapshot.report,
         assessmentContext: resultSnapshot.assessmentContext,
       }
-    : session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
+    : !feedbackDeferred && session.status === 'COMPLETED' && session.scoreEncrypted && session.metricsEncrypted && session.qualityFlagsEncrypted
     ? {
         score: decryptCognitivePayload<number>(session.scoreEncrypted),
         metrics: decryptCognitivePayload<Record<string, unknown>>(session.metricsEncrypted),
@@ -2937,6 +3028,7 @@ const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | nul
     randomSeed: session.randomSeed,
     nextTrialIndex: (session.trials?.[0]?.trialIndex ?? -1) + 1,
     ...(result ? { result } : {}),
+    ...(feedbackDeferred ? { feedbackDeferred: true } : {}),
   }
 }
 
@@ -2951,6 +3043,12 @@ const latestChildrenByItem = (children: any[]) => {
     }
   }
   return map
+}
+
+function completedMeasurementChildren(children: any[], attemptEpoch: number, finalized: Set<string> | null = null) {
+  return [...latestChildrenByItem(children).values()].filter(child => child.status === 'COMPLETED'
+    && (child.attemptEpoch === undefined || child.attemptEpoch === attemptEpoch)
+    && (!finalized || finalized.has(child.id)))
 }
 
 const attemptCompletedItemMaps = (attempt: any) => ({
@@ -3333,7 +3431,7 @@ const getUnifiedCompositeAttemptState = async (
         type: 'COGNITIVE',
         position: currentUnit.item.position,
         required: currentUnit.item.required,
-        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash),
+        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED'),
       }
     } catch (error) {
       if (isInstrumentFinalSubmitError(error)) throw error
@@ -3985,7 +4083,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash) : null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED') : null }
   }
   return {
     id: attempt.id,
@@ -4642,6 +4740,29 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   return projectHttpReport(attempt, 'participant')
 }
 
+/** Reads completed, frozen children without finalizing the aggregate or admitting a new unit. */
+async function projectPartialReport(attempt: any, audience: CompositeReportAudience) {
+  const definition = attempt.compositeAssessment
+  if (attempt.assignmentRef || !['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(definition.productKind) || definition.reportPackageKey || definition.analysisProtocolKey) throw compositeNotFound('该产品不提供通用单项预览')
+  if (attempt.status === 'COMPLETED') return projectHttpReport(attempt, audience)
+  let finalized: Set<string> | null = null
+  if (attempt.runtimeGeneration === 'UNIFIED_V1') {
+    const headers = await prisma.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch } })
+    if (frozenCompositeProgress(attempt, headers)?.progressUnavailableReason) throw compositeConflict('冻结记录需要核对，暂不能读取单项结果')
+    finalized = new Set(frozenMeasurementFinalHeaders(attempt, headers).map(row => row.sourceAttemptId))
+  }
+  const completed = (children: any[]) => completedMeasurementChildren(children, attempt.attemptEpoch, finalized)
+  const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
+  const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
+  const projected = projectCompositeCollectionReport(buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } }), audience)
+  return { ...projected, reportState: 'PARTIAL' as const, completedAt: null, totalTime: null }
+}
+
+export async function getPartialReport(attemptId: string, userId: string) {
+  // Legacy participant ?partial links cannot release feedback before the battery ends.
+  return getReport(attemptId, { userId })
+}
+
 export const getAnalysisExportForParticipant = async (
   attemptId: string,
   context: { userId?: string; recoveryTokenHash?: string },
@@ -4841,6 +4962,7 @@ export const getReportForTeacher = async (
   compositeId: string,
   attemptId: string,
   snapshotId?: string,
+  partial = false,
 ) => {
   assertTeacher(role)
   const composite = await loadComposite(compositeId)
@@ -4848,6 +4970,7 @@ export const getReportForTeacher = async (
   const attempt = await loadAttemptWithChildren(attemptId)
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
+  if (partial) return projectPartialReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher')
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)

@@ -113,8 +113,8 @@ export interface RunResourceChoice extends RunRequestedPolicy {
   title: string; family: RunResourceFamily; key: string; version: string;
 }
 export const runApi = {
-  async resources(organizationId: string): Promise<{ list: RunResourceChoice[] }> {
-    return requireData(await apiClient.get(`/organizations/${encodeURIComponent(organizationId)}/run-resources`))
+  async resources(organizationId: string, page?: number): Promise<{ list: RunResourceChoice[]; nextPage?: number | null }> {
+    return requireData(await apiClient.get(`/organizations/${encodeURIComponent(organizationId)}/run-resources${page ? '?page=' + page : ''}`))
   },
   async preview(organizationId: string, runId: string, expectedVersion: number): Promise<RunPreview> {
     return requireData(await apiClient.post(`${runPath(organizationId, runId)}/preview`, { expectedVersion }))

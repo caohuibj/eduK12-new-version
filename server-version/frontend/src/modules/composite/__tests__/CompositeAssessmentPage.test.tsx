@@ -55,6 +55,42 @@ beforeEach(() => {
 })
 
 describe('CompositeAssessmentPage public entry', () => {
+  it('clears the previous entry and credential when switching to a closed link in the same page', async () => {
+    mockPublicApi.info.mockImplementation((token: string) => Promise.resolve(token === 'token-1'
+      ? { code: 0, data: { name: '原开放入口', studyEntryPath: '/public/studies/waves/old/token-1' } }
+      : { code: -1, message: '综合测评未开放公开参与', data: null }))
+    render(<MemoryRouter initialEntries={['/public/composite/token-1']}>
+      <Link to="/public/composite/closed">切换到已停用入口</Link>
+      <Routes><Route path="/public/composite/:token" element={<CompositeAssessmentPage />} /></Routes>
+    </MemoryRouter>)
+    const user = userEvent.setup()
+    await screen.findByRole('link', { name: '选择单次访客或保存研究内身份码' })
+    await user.type(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）'), 'previous-credential')
+    await user.click(screen.getByRole('link', { name: '切换到已停用入口' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('未开放公开参与')
+    expect(screen.getByRole('button', { name: '开始匿名测评' })).toBeDisabled()
+    expect(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）')).toHaveValue('')
+    expect(screen.queryByRole('link', { name: '选择单次访客或保存研究内身份码' })).not.toBeInTheDocument()
+    expect(mockPublicApi.start).not.toHaveBeenCalled()
+  })
+  it('disables a closed entry while allowing an explicit credential recovery', async () => {
+    mockPublicApi.info.mockResolvedValue({ code: -1, message: '综合测评未开放公开参与', data: null })
+    mockPublicApi.start.mockRejectedValue({ message: '凭证不属于此链接' })
+    renderPublicPage()
+    expect(await screen.findByRole('alert')).toHaveTextContent('未开放公开参与')
+    expect(screen.getByRole('button', { name: '开始匿名测评' })).toBeDisabled()
+    expect(mockPublicApi.start).not.toHaveBeenCalled()
+    const user = userEvent.setup()
+    await user.type(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）'), 'saved-recovery')
+    await user.click(screen.getByRole('button', { name: '继续作答' }))
+    await waitFor(() => expect(mockPublicApi.start).toHaveBeenCalledWith('token-1', 'saved-recovery'))
+  })
+  it('makes study identity selection discoverable from a bound ordinary link', async () => {
+    mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '波次测评', studyEntryPath: '/public/studies/waves/wave/token-1' } })
+    renderPublicPage()
+    expect(await screen.findByRole('link', { name: '选择单次访客或保存研究内身份码' })).toHaveAttribute('href', '/public/studies/waves/wave/token-1')
+    expect(mockPublicApi.start).not.toHaveBeenCalled()
+  })
   it('only loads public info until the participant explicitly starts', async () => {
     const user = userEvent.setup()
     mockPublicApi.start.mockResolvedValue({

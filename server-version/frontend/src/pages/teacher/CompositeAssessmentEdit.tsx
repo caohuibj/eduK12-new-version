@@ -1,4 +1,4 @@
-import { waitForExportArtifacts, requestExportIntent, assertExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
+import { waitForExportArtifacts, requestExportIntent, assertExportDownload, triggerExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -34,6 +34,8 @@ const CompositeAssessmentEdit: React.FC = () => {
   // records that predate the package endpoint.
   const packageCatalogAvailable = typeof compositeApi.listReportPackages === 'function'
   const [detail, setDetail] = useState<any>(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportNotice, setExportNotice] = useState('')
   const [scales, setScales] = useState<any[]>([])
   const [cognitiveAssignments, setCognitiveAssignments] = useState<any[]>([])
   const [protocols, setProtocols] = useState<AnalysisProtocolCatalogItem[]>([])
@@ -87,7 +89,7 @@ const CompositeAssessmentEdit: React.FC = () => {
       setScales(scaleData)
       const situationalData = Array.isArray(situationalResponse.data) ? situationalResponse.data : situationalResponse.data?.list || []
       setSituationalInstruments(situationalData)
-      if (situationalResponse.code !== 0) setError(situationalResponse.message || '情境测评题包暂不可用')
+      if (situationalResponse.code !== 0 && detailResponse.data.items?.some((item: any) => item.type === 'SITUATIONAL')) setError(situationalResponse.message || '情境测评题包暂不可用')
       try {
         const cognitiveResponse = await apiClient.get<any>('/cognitive/assignments?status=PUBLISHED&listedStandalone=true')
         const cognitiveData = Array.isArray(cognitiveResponse.data)
@@ -194,24 +196,6 @@ const CompositeAssessmentEdit: React.FC = () => {
     }
   }
 
-  const moveItem = async (index: number, direction: -1 | 1) => {
-    if (!detail?.items) return
-    const targetIndex = index + direction
-    if (targetIndex < 0 || targetIndex >= detail.items.length) return
-    const reordered = detail.items.map((item: any, itemIndex: number) => {
-      if (itemIndex === index) return { id: item.id, position: detail.items[targetIndex].position }
-      if (itemIndex === targetIndex) return { id: item.id, position: detail.items[index].position }
-      return { id: item.id, position: item.position }
-    })
-    try {
-      const response = await compositeApi.reorderItems(id, reordered)
-      if (response.code !== 0) throw new Error(response.message || '调整顺序失败')
-      await load()
-    } catch (err) {
-      setError(errorMessage(err, '调整顺序失败'))
-    }
-  }
-
   const publish = async () => {
     try {
       const response = await compositeApi.publish(id)
@@ -236,26 +220,28 @@ const CompositeAssessmentEdit: React.FC = () => {
     }
   }
 
-  const exportData = async (detailMode: 'summary' | 'full') => {
-    const scope = `compositeApi:${id}:${JSON.stringify({ detail: detailMode, format: 'csv' })}`
+  const exportData = async (detailMode: 'summary' | 'full', format: 'csv' | 'zip' = 'csv') => {
+    if (exporting) return
+    setExporting(true)
+    setError(null)
+    setExportNotice('正在提交导出…')
+    const scope = `compositeApi:${id}:${JSON.stringify({ detail: detailMode, format })}`
     try {
-      const response = await requestExportIntent(scope, key => compositeApi.exportData(id, { detail: detailMode, format: 'csv' }, key))
+      const response = await requestExportIntent(scope, key => compositeApi.exportData(id, { detail: detailMode, format }, key))
       if (response.code !== 0 || !response.data?.artifacts) throw new Error(response.message || '导出失败')
+      setExportNotice('导出已受理，正在生成文件；刷新后可重试同一导出，继续等待原任务。')
       const artifacts = await waitForExportArtifacts(response.data.artifacts)
       const artifact = artifacts[0]
       const download = await sessionFetch(artifact.downloadUrl, { signal: AbortSignal.timeout(60000) })
       assertExportDownload(download)
-      const blobUrl = URL.createObjectURL(await download.blob())
-      const anchor = document.createElement('a')
-      anchor.href = blobUrl
-      anchor.download = artifact.fileName
-      anchor.click()
-      URL.revokeObjectURL(blobUrl)
+      triggerExportDownload(await download.blob(), artifact.fileName)
+      setExportNotice('已请求下载，请查看浏览器下载列表。')
       clearExportIntentKey(scope)
     } catch (err) {
       if (err instanceof ExportJobFailedError) clearExportIntentKey(scope)
+      setExportNotice('')
       setError(errorMessage(err, '下载导出文件失败'))
-    }
+    } finally { setExporting(false) }
   }
 
   if (!detail) return <div className="p-8 text-gray-500">{error || '加载中...'}</div>
@@ -290,11 +276,13 @@ const CompositeAssessmentEdit: React.FC = () => {
             <button type="button" onClick={() => navigate('/composite-assessments')} className="hui-button hui-button--secondary"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回综合测评</button>
             {isDraft && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
             <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="hui-button hui-button--secondary">查看结果</button>
-            <button onClick={() => void exportData('summary')} className="hui-button hui-button--secondary"><Download className="w-4 h-4" aria-hidden="true" />导出摘要</button>
+            <button disabled={exporting} onClick={() => void exportData('summary')} className="hui-button hui-button--secondary"><Download className="w-4 h-4" aria-hidden="true" />{exporting ? '正在导出…' : '导出摘要'}</button>
+            <button disabled={exporting} onClick={() => void exportData('summary', 'zip')} className="hui-button hui-button--secondary">摘要与字段字典（ZIP）</button>
           </div>
         )}
       />
       {error && <p className="text-red-500 mb-4">{error}</p>}
+      {exportNotice && <p role="status" className="mb-4">{exportNotice}</p>}
       {detail.canSetCopyable && (
         <div className="staff-panel staff-panel--padded p-6 mb-5">
           <h2 className="font-semibold mb-2">管理员模板</h2>
@@ -446,9 +434,9 @@ const CompositeAssessmentEdit: React.FC = () => {
           <p className="text-xs text-gray-500">发布后报告模式和协议版本不可更改。</p>
         )}
       </div>}
-      <div className="staff-panel staff-panel--padded p-6 mb-5">
-        <h2 className="font-semibold mb-4">测评顺序</h2>
-        <p className="mb-3 text-xs text-gray-500">量表、认知任务和表单区段的统一顺序请在下方“表单区段”管理器中调整；这里仅移除模块。</p>
+      {protocolLocked && <div className="staff-panel staff-panel--padded p-6 mb-5">
+        <h2 className="font-semibold mb-4">固定测评内容</h2>
+        <p className="mb-3 text-sm text-gray-500">固定测评内容与顺序由已审批的方案版本确定。</p>
         {detail.items?.length ? (
           <div className="space-y-2">
             {detail.items.map((item: any, index: number) => (
@@ -474,11 +462,15 @@ const CompositeAssessmentEdit: React.FC = () => {
         {isDraft && protocolLocked && (
           <p className="text-xs text-blue-700 mt-3">固定协议的任务、必答属性和顺序不可单独修改。</p>
         )}
-      </div>
+      </div>}
       {detail && (
         <FormSectionManager
           basePath={`/composite-assessments/${id}`}
           readOnly={!isDraft || protocolLocked}
+          refreshKey={detail}
+          onChange={load}
+          onRemoveItem={removeItem}
+          allowRemoveEmptySection
         />
       )}
       {isDraft && !protocolLocked && (

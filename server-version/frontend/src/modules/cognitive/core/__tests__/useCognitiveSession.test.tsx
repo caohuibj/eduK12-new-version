@@ -147,7 +147,7 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     }
   })
 
-  it('accepts a relational aggregate-only FINAL terminal ACK without exposing an individual result', async () => {
+  it.each([false, true])('accepts a FINAL terminal ACK without exposing an individual result (deferred=%s)', async deferred => {
     const finalSession: CognitiveSession = {
       ...session,
       sessionId: 'cognitive-session-relational-aggregate',
@@ -167,6 +167,7 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
           payloadHash: 'relational-payload-1',
           replayed: false,
           completed: true,
+          ...(deferred ? { feedbackDeferred: true } : {}),
         },
       }),
     }
@@ -174,7 +175,7 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     const { result } = renderHook(() => useCognitiveSession(
       finalSession.sessionId,
       finalApi,
-      { aggregateOnly: true },
+      { aggregateOnly: !deferred },
     ))
 
     await waitFor(() => expect(result.current.state.status).toBe('READY'))

@@ -14,6 +14,19 @@ beforeEach(() => {
   available.mockResolvedValue([])
 })
 describe('student task aggregate', () => {
+  it('uses the same actionable rule for the default list, count and pagination', async () => {
+    db.assignment.findMany.mockResolvedValue([
+      { id: 'pending', courseId: 'c', title: 'pending', deadline: null, submissions: [] },
+      { id: 'active', courseId: 'c', title: 'active', deadline: null, submissions: [{ status: 'DRAFT' }] },
+      { id: 'complete', courseId: 'c', title: 'complete', deadline: null, submissions: [{ status: 'SUBMITTED' }] },
+      { id: 'expired', courseId: 'c', title: 'expired', deadline: new Date(now.getTime() - 1), submissions: [] },
+    ])
+    const result = await listStudentTasks('student', { page: 1, pageSize: 1, state: 'ACTIONABLE' }, now)
+    expect(result.total).toBe(2)
+    expect(result.counts.ACTIONABLE).toBe(2)
+    expect(result.list.map(item => item.id)).toEqual(['active'])
+    expect((await listStudentTasks('student', { page: 2, pageSize: 1, state: 'ACTIONABLE' }, now)).list.map(item => item.id)).toEqual(['pending'])
+  })
   it('limits membership to the current active student and excludes library/private/draft content in every batch', async () => {
     await listStudentTasks('student', { page: 1, pageSize: 20 }, now)
     expect(db.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { studentId: 'student', status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false } } }))

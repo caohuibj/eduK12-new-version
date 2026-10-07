@@ -31,6 +31,7 @@ jobs:
       V32_2_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       V32_3_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SJT_UPLOAD_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -70,10 +71,15 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+      - name: clear reports from previous regression jobs
+        # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
+        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
+          # Self-hosted runners already retain ~/.npm; remote cache uploads can
+          # block the single slot long after the tests and service cleanup finish.
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
           cache-dependency-path: server-version/backend/package-lock.json
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
@@ -126,7 +132,12 @@ jobs:
         env:
           REGRESSION_FOCUS: ${{ inputs.focus }}
         run: |
-          case "$REGRESSION_FOCUS" in full|reporting) ;; *) exit 1 ;; esac
+          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair) ;; *) exit 1 ;; esac
+      - name: R5 assessment repair regression
+        if: inputs.focus == 'assessment-repair'
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        run: node scripts/r5-regression.mjs /tmp/eduk12-r5-vitest.json
       - name: reporting fixture and HTTP regression
         if: inputs.focus == 'reporting'
         run: |
@@ -168,6 +179,9 @@ jobs:
           src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
           src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
           src/__tests__/questionnaire/product.postgres.integration.test.ts
+          src/__tests__/questionnaire/workbench.postgres.integration.test.ts
+          src/__tests__/integration/registered-resource-catalog.postgres.integration.test.ts
+          src/__tests__/integration/runtime-role.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer.postgres.integration.test.ts
           src/__tests__/questionnaire/form-answer-bulk-mutation.pr38.postgres.integration.test.ts
           src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts
@@ -222,6 +236,7 @@ jobs:
           path: |
             /tmp/eduk12-backend-vitest.json
             /tmp/eduk12-parent-vitest.json
+            /tmp/eduk12-r5-vitest.json
             /tmp/eduk12-hosted-ci-env.txt
           if-no-files-found: ignore
       - name: remove this job's ephemeral services and anonymous volumes
@@ -230,5 +245,3 @@ jobs:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-cleanup-services.sh"
-
-

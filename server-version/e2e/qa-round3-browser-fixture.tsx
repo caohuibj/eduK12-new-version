@@ -23,7 +23,7 @@ const mode = new URLSearchParams(location.search).get('mode')
 const component = mode === 'draft' ? <Draft /> : mode === 'reaction'
   ? <ReactionFrameTask taskContext={{ sessionId: 'r3-local-reaction', testType: 'reaction', engineVersion: '1.0.0', scoringVersion: '1.1.0', configVersion: '1.2.0', attemptNo: 1, randomSeed: 'r3-local-seed', config: { totalTrials: 20, readyDurationMs: 100, foreperiodMinMs: 200, foreperiodMaxMs: 300, timeoutMs: 2000 } }} trialIndex={0} onTrialComplete={async () => undefined} />
   : <MemoryRouter initialEntries={[mode === 'content' ? '/admin/reporting-content' : mode === 'cognitive' ? '/cognitive/source' : mode === 'scale-export' ? '/scales' : '/scales/scale-1']}><Routes>
-    <Route path="/admin/reporting-content" element={<ReportingContent />} />
+    <Route path="/admin/reporting-content" element={<AuthProvider><ReportingContent /></AuthProvider>} />
     <Route path="/scales" element={<AuthProvider><ScaleList /></AuthProvider>} />
     <Route path="/scales/:id" element={<ScaleEdit />} /><Route path="/cognitive/:id" element={<CognitiveAssignmentEdit />} />
   </Routes></MemoryRouter>

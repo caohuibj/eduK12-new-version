@@ -6,6 +6,7 @@ const api = vi.hoisted(() => ({resources:vi.fn(),specs:vi.fn(),register:vi.fn(),
 const client = vi.hoisted(() => ({get:vi.fn()}))
 vi.mock('../../../api/reportingContent',()=>({reportingContentApi:api}))
 vi.mock('../../../api/client',()=>({default:client}))
+vi.mock('../../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'reviewer'}})}))
 import ReportingContent from '../ReportingContent'
 const resource = {id:'resource',status:'DRAFT',entry:{title:'原创偏好',description:'描述性自评',applicability:{analysisMode:'INDIVIDUAL_ONLY'},resultDisclosure:{audiences:{SUBJECT:{metricKeys:['total']}}}}}
 beforeEach(()=>{
@@ -38,4 +39,28 @@ it('offers retry for a plain-object 502 and does not claim a permissions problem
   render(<MemoryRouter><ReportingContent/></MemoryRouter>)
   expect(await screen.findByRole('alert')).toHaveTextContent('服务暂时不可用，请稍后重试')
   expect(screen.getByRole('button',{name:'刷新准备状态'})).toBeEnabled()
+})
+it('loads older resources without losing selection or duplicating overlapping page rows',async()=>{
+  const first={...resource,status:'PUBLISHED'},old={...first,id:'old',entry:{...first.entry,title:'更早资源'}}
+  api.resources.mockImplementation(async(page=1)=>page===1?{list:[first],nextPage:2}:{list:[first,old],nextPage:null})
+  const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+  await user.selectOptions(await screen.findByLabelText('已发布测量资源'),'resource')
+  await user.click(screen.getByRole('button',{name:'更多资源'}))
+  await screen.findByText('更早资源 · 已发布')
+  expect(api.resources).toHaveBeenCalledWith(2)
+  expect(screen.getByLabelText('已发布测量资源')).toHaveValue('resource')
+  expect(screen.getAllByRole('option',{name:'原创偏好'})).toHaveLength(1)
+  await user.selectOptions(screen.getByLabelText('已发布测量资源'),'old')
+  expect(screen.queryByRole('button',{name:'更多资源'})).not.toBeInTheDocument()
+})
+
+it('disables self-review of registered resources and reporting specs',async()=>{
+ api.resources.mockResolvedValue({list:[{...resource,created_by_user_id:'reviewer'}],truncated:false})
+ api.specs.mockResolvedValue({list:[{id:'self-spec',specKey:'My spec',version:1,status:'DRAFT',createdByUserId:'reviewer',definition:{analysisKind:'INDIVIDUAL_LONGITUDINAL',reportEvidenceCeiling:'PILOT',metricRules:[]}}],nextPage:null})
+ render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+ await screen.findByText('原创偏好 · 草稿')
+ const buttons=screen.getAllByRole('button',{name:'审核'})
+ expect(buttons).toHaveLength(2);buttons.forEach(button=>expect(button).toBeDisabled())
+ expect(screen.getByText(/注册者、量表作者与方案创建者不能自审/)).toBeInTheDocument()
+ expect(api.transitionResource).not.toHaveBeenCalled();expect(api.transitionSpec).not.toHaveBeenCalled()
 })

@@ -5,12 +5,13 @@ import { z } from 'zod'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { dependencyBlockers } from '../assessment-bundle/onboarding/dependencies'
-const reviewSchema=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),reviewerId:z.string().min(1),expiresAt:z.string().datetime(),claims:z.array(z.enum(['independent_summary','cross_source_condition','joint_conclusion'])),scientific:z.literal(true),rights:z.literal(true),language:z.literal(true),report:z.literal(true),signature:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
+const reviewSchema=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),reviewerId:z.string().min(1),reviewedAt:z.string().datetime().optional(),expiresAt:z.string().datetime(),claims:z.array(z.enum(['independent_summary','cross_source_condition','joint_conclusion'])),scientific:z.literal(true),rights:z.literal(true),language:z.literal(true),report:z.literal(true),signature:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 export function validateReview(raw:unknown,hash:string,secret:string|undefined,now=Date.now()) {
   const review=reviewSchema.parse(raw),{signature,...material}=review
   if(!secret||secret.length<32)throw new Error('BUNDLE_REVIEW_KEY_REQUIRED')
   const expected=createHmac('sha256',secret).update(canonicalJsonString(material)).digest()
   if(hash!==review.contentHash||Date.parse(review.expiresAt)<=now||!timingSafeEqual(expected,Buffer.from(signature,'hex')))throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+  if(review.reviewedAt && (Date.parse(review.reviewedAt)>now || Date.parse(review.expiresAt)-Date.parse(review.reviewedAt)!==7*86400000))throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
   return review
 }
 async function admin(db:Prisma.TransactionClient,id:string){const user=await db.user.findUnique({where:{id}});if(user?.role!=='ADMIN')throw new Error('BUNDLE_ADMIN_REQUIRED')}
@@ -18,6 +19,7 @@ export async function installPackage(db:PrismaClient,actorId:string,raw:unknown)
   const p=parseDeclarativePackage(raw),hash=hashDeclarativePackage(p),d=p.manifest.definition
   const existing = (await import('./code-catalog')).createCodeBundleDefinitionProvider().exact(d.bundleKey, d.bundleVersion)
   if (existing && !existing.declarativePackage) throw new Error('BUNDLE_LEGACY_IDENTITY_RESERVED')
+  if (existing?.declarativePackage && hashDeclarativePackage(existing.declarativePackage) !== hash) throw new Error('BUNDLE_VERSION_IMMUTABLE')
   verifyPackageFixtures(p)
   const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
   return db.$transaction(async tx=>{
@@ -48,7 +50,12 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     if(row.status==='RETIRED')throw new Error('BUNDLE_RETIRED')
     const p=parseDeclarativePackage(row.content),review=validateReview(rawReview,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
     await admin(tx,review.reviewerId)
-    if(review.reviewerId===actorId)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+    // Review is independent of the content installer. The actual publisher
+    // may be that reviewer; publishedBy must identify the caller, not the installer.
+    if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+    // HOLD is a temporary admission stop. It can only be lifted with a new
+    // independent signed review, never by replaying the pre-HOLD approval.
+    if(row.status==='HOLD' && (!review.reviewedAt || Date.parse(review.reviewedAt)<=row.updatedAt.getTime() || (row.review as any)?.signature===review.signature))throw new Error('BUNDLE_HOLD_REVIEW_REQUIRED')
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
@@ -74,6 +81,7 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
   const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
   await admin(db,review.reviewerId)
+  if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row

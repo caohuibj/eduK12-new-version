@@ -242,10 +242,13 @@ export const submitSessionFinal = async (
   sessionId: string,
   recoveryToken: string,
   input: Omit<Parameters<typeof finalSubmitService.submitCognitiveSessionFinalForPublic>[0], 'sessionId'>,
-) => finalSubmitService.submitCognitiveSessionFinalForPublic(
-  { sessionId, ...input },
-  hashRecoveryToken(recoveryToken),
-)
+) => {
+  const { data, internalContext } = await finalSubmitService.submitCognitiveSessionFinalForPublicWithContext(
+    { sessionId, ...input }, hashRecoveryToken(recoveryToken),
+  )
+  const { projectRelationalUnitFinalResponse } = await import('../assessment-relational/result-authority')
+  return projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)
+}
 
 /**
  * Replace an anonymous legacy/in-progress session with a fresh final-only

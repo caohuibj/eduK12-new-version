@@ -17,6 +17,7 @@ import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import { checkpointId } from '../services/persistence/checkpointTypes'
 import { createFinalDraftMeta, finalDraftStore, type FinalDraftMeta } from '../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../services/persistence/finalDraftCapacityRetry'
+import { recordFinalSubmissionFailure } from '../services/persistence/finalSubmissionFailure'
 import { normalizeApiError } from '../utils/normalizeApiError'
 import {
   SCALE_DEVICE_INPUT_PROVENANCE_METADATA_KEY,
@@ -63,15 +64,8 @@ const responseError = (response: ApiResponse<unknown>) => {
   error.code = response.code
   if (typeof response.code === 'number') error.status = response.code
   if (response.code === 'ASSESSMENT_SUBMIT_BUSY' || response.code === 'COMPLETION_BUSY') error.status = 503
+  if (response.code === 'FORM_ANSWER_INVALID') error.status = 400
   return error
-}
-
-const errorStatus = (error: unknown) => {
-  const normalized = normalizeApiError(error)
-  const code = String(normalized.code ?? '')
-  return normalized.status === 409 || code === '409' || code === 'STALE_ATTEMPT' || code === 'DEFINITION_MISMATCH' || code === 'SUBMISSION_PAYLOAD_CONFLICT'
-    ? 'CONFLICT' as const
-    : 'RETRY_PENDING' as const
 }
 
 const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart }) => {
@@ -326,10 +320,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       await finalDraftStore.delete(draftKey)
       await onReload()
     } catch (cause) {
-      const status = errorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(draftKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
+      const nextMeta = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => finalDraftStore.get(draftKey)).catch(() => ({ ...meta, status: 'RETRY_PENDING' as const }))
       if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
+      setRequiresRestart(nextMeta?.status === 'CONFLICT')
       setError(normalizeApiError(cause).message)
     } finally {
       setSubmitting(false)
@@ -389,10 +382,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       await finalDraftStore.delete(draftKey)
       await onReload()
     } catch (cause) {
-      const status = errorStatus(cause)
-      const nextMeta = await finalDraftStore.setStatus(draftKey, status, { code: String((cause as any)?.code || ''), message: normalizeApiError(cause).message }).catch(() => null)
+      const nextMeta = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => finalDraftStore.get(draftKey)).catch(() => ({ ...meta, status: 'RETRY_PENDING' as const }))
       if (nextMeta) setMeta(nextMeta)
-      setRequiresRestart(status === 'CONFLICT')
+      setRequiresRestart(nextMeta?.status === 'CONFLICT')
       setError(normalizeApiError(cause).message)
     } finally {
       setSubmitting(false)
@@ -459,7 +451,18 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         </section>
       )}
     >
-      {publicMode && recoveryToken ? <p className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-700">匿名恢复凭证已保存；请继续保管。</p> : null}
+      {publicMode && recoveryToken ? <div className="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        <p>匿名恢复凭证已保存；请继续保管。</p>
+        <details className="mt-2" aria-label="本次匿名作答恢复凭证">
+          <summary className="cursor-pointer">保存本次恢复凭证</summary>
+          <p className="mt-2">换浏览器或设备时，用完整凭证恢复这次作答。请自行保管，勿公开分享。</p>
+          <code className="my-2 block select-all break-all">{recoveryToken}</code>
+          <button type="button" className="btn-secondary" onClick={() => void (async () => {
+            try { await navigator.clipboard.writeText(recoveryToken) }
+            catch { setError('复制失败，请选中并手动保存完整恢复凭证。') }
+          })()}>复制恢复凭证</button>
+        </details>
+      </div> : null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -496,7 +499,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           </div>
           {(() => {
             const field = formFields[sectionIndex]
-            if (!field) return <p className="text-gray-500">该区段没有字段。</p>
+            if (!field) return item.contextSection || item.formSection?.contextSection
+              ? <p role="alert" className="text-amber-800">历史背景信息区段缺少字段。请联系教师发布修复版本后重新开始，已提交记录会保留。</p>
+              : <div className="space-y-3"><p className="text-gray-600">此历史区段没有字段。确认后会提交空区段记录并继续。</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart || exiting} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
             const value = formValues[field.formItemId]
             const options = parseOptions(field.options)
             const imageItems = assessmentOptionImageItems(options)

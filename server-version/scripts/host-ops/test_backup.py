@@ -3,6 +3,8 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import subprocess
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -14,6 +16,51 @@ SECRET = 'synthetic-test-master-key-01234567890123456789'
 class BackupSafety(unittest.TestCase):
     def setUp(self):
         self.config = json.loads(Path(__file__).with_name('backup-config.example.json').read_text())
+
+    def test_cold_readiness_probe_timeout_retries_within_existing_caps(self):
+        clock = [0.0]
+        calls = []
+        def probe(args, **kwargs):
+            calls.append(kwargs['timeout'])
+            if len(calls) == 1:
+                clock[0] += kwargs['timeout']
+                raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+            return SimpleNamespace(returncode=0)
+        def sleep(seconds): clock[0] += seconds
+        with patch.object(backup.time, 'monotonic', side_effect=lambda: clock[0]), \
+                patch.object(backup.time, 'sleep', side_effect=sleep), \
+                patch.object(backup.subprocess, 'run', side_effect=probe):
+            backup.wait_for_database('synthetic', 'restore', 'restore')
+        self.assertEqual(calls, [10, 10])
+        self.assertLess(clock[0], 90)
+
+    def test_readiness_timeout_is_bounded_by_total_deadline(self):
+        clock = [0.0]
+        calls = []
+        def probe(args, **kwargs):
+            calls.append(kwargs['timeout'])
+            clock[0] += kwargs['timeout']
+            raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+        def sleep(seconds): clock[0] += seconds
+        with patch.object(backup.time, 'monotonic', side_effect=lambda: clock[0]), \
+                patch.object(backup.time, 'sleep', side_effect=sleep), \
+                patch.object(backup.subprocess, 'run', side_effect=probe):
+            with self.assertRaisesRegex(RuntimeError, 'ISOLATED_RESTORE_NOT_READY'):
+                backup.wait_for_database('synthetic', 'restore', 'restore')
+        self.assertEqual(clock[0], 90)
+        self.assertTrue(all(0 < timeout <= 10 for timeout in calls))
+
+    def test_readiness_failure_still_reclaims_restore_container(self):
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            with patch.object(backup, 'run'), \
+                    patch.object(backup, 'wait_for_database', side_effect=RuntimeError('ISOLATED_RESTORE_NOT_READY')), \
+                    patch.object(backup, 'cleanup_container') as cleanup:
+                with self.assertRaisesRegex(RuntimeError, 'ISOLATED_RESTORE_NOT_READY'):
+                    backup.restore_check(work / 'synthetic.enc', work, SECRET, work, 'a' * 32,
+                                         [{'name': 'synthetic', 'checksum': 'a' * 64}])
+            cleanup.assert_called_once_with('eduk12-restore-' + 'a' * 12, 'a' * 32)
+            self.assertFalse((work / 'restore.env').exists())
 
     def test_media_bucket_cannot_be_backup_destination(self):
         for edit in [{'backupBucket': self.config['sourceBucket']}, {'region': 'ap-shanghai'},
@@ -86,6 +133,46 @@ class BackupSafety(unittest.TestCase):
                 with self.assertRaises(RuntimeError): backup.cleanup_container(name, 'a' * 32)
                 run.assert_not_called()
         with self.assertRaises(RuntimeError): backup.cleanup_container('eduk12-prod-postgres', 'a' * 32)
+
+
+class ReleaseIdentityTests(unittest.TestCase):
+    def test_runtime_proof_timeout_is_unverified_without_blocking_backup(self):
+        expected = [{'name': 'synthetic', 'checksum': 'a' * 64}]
+        with patch.object(backup, 'run', side_effect=subprocess.TimeoutExpired('synthetic-runtime-probe', 60)) as run:
+            proof = backup.source_runtime_proof(expected)
+        self.assertEqual(proof['status'], 'NOT_VERIFIED')
+        self.assertFalse(proof['applicationReleaseReady'])
+        self.assertEqual(run.call_args.kwargs['timeout'], 60)
+
+    def test_runtime_evidence_is_precise_and_outage_does_not_block_database_backup(self):
+        expected = [{'name': 'synthetic', 'checksum': 'a' * 64}]
+        valid = {'ok': True, 'restrictedRuntimeRole': True, 'migrationFingerprint': backup.migration_fingerprint(expected)}
+        with patch.object(backup, 'run', return_value=json.dumps(valid).encode()):
+            self.assertEqual(backup.source_runtime_proof(expected)['status'], 'PASS')
+        for value in [b'not json', b'[]', json.dumps({**valid, 'migrationFingerprint': 'b' * 64}).encode()]:
+            with patch.object(backup, 'run', return_value=value):
+                self.assertEqual(backup.source_runtime_proof(expected)['status'], 'NOT_VERIFIED')
+        with patch.object(backup, 'run', side_effect=RuntimeError('BACKUP_COMMAND_FAILED')):
+            self.assertFalse(backup.source_runtime_proof(expected)['applicationReleaseReady'])
+        with patch.object(backup, 'run', side_effect=RuntimeError('BACKUP_INTERRUPTED')):
+            with self.assertRaisesRegex(RuntimeError, 'BACKUP_INTERRUPTED'): backup.source_runtime_proof(expected)
+
+    def test_exact_migration_identity_refuses_missing_extra_changed_duplicate(self):
+        expected = [{'name': 'one', 'checksum': 'a' * 64}, {'name': 'two', 'checksum': 'b' * 64}]
+        self.assertEqual(backup.verify_restored_migrations(list(reversed(expected)), expected), backup.migration_fingerprint(expected))
+        for actual in [expected[:1], expected + [{'name': 'three', 'checksum': 'c' * 64}],
+                       [expected[0], {'name': 'two', 'checksum': 'c' * 64}], [expected[0], expected[0]]]:
+            with self.assertRaisesRegex(RuntimeError, 'RESTORE_RELEASE_SCHEMA_MISMATCH'):
+                backup.verify_restored_migrations(actual, expected)
+
+    def test_migration_source_is_bound_to_release_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); source = root / 'scripts/backup'; source.mkdir(parents=True)
+            sql = root / 'backend/prisma/migrations/one/migration.sql'; sql.parent.mkdir(parents=True); sql.write_text('CREATE TABLE synthetic(id text);')
+            expected = backup.release_migrations(source)
+            self.assertEqual(expected, [{'name': 'one', 'checksum': backup.sha(sql)}])
+            sql.unlink(); sql.symlink_to(root / 'foreign.sql')
+            with self.assertRaises(RuntimeError): backup.release_migrations(source)
 
 
 if __name__ == '__main__': unittest.main()

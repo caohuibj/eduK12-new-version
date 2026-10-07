@@ -48,6 +48,7 @@ import { submitSituationalAttemptFinal } from '../situational/situational-final-
 import { situationalFinalSubmitSchema } from '../situational/situational-final-submit.schema'
 import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
 import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
+import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
 import {
   assignCompositeFormItemToSection,
   createCompositeFormSection,
@@ -247,6 +248,14 @@ export const compositeController = {
     }
   },
 
+  async removeEmptyFormSection(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.removeEmptyFormSection(req.user.userId, req.user.role, req.params.id, req.params.sectionId)
+      return success(res, null, '空区段已移除')
+    } catch (err) { return handleError(res, err) }
+  },
+
   async reorderFormSections(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -381,9 +390,11 @@ export const compositeController = {
         req.params.situationalAttemptId,
         embeddedSituationalAccess(req, { userId: req.user.userId }),
       )
-      const suppressResult = runtime.row.status === 'COMPLETED'
-        && await isRelationalCohortOnlyCompositeAttempt(req.params.attemptId)
-      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult }))
+      const feedbackDeferred = runtime.row.status === 'COMPLETED'
+        && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
+      const suppressResult = feedbackDeferred || (runtime.row.status === 'COMPLETED'
+        && await isRelationalCohortOnlyCompositeAttempt(req.params.attemptId))
+      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred }))
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
@@ -514,6 +525,8 @@ export const compositeController = {
   async report(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
+      const query = compositeReportQuerySchema.parse(req.query)
+      if (query.partial) return success(res, await service.getPartialReport(req.params.attemptId, req.user.userId))
       return success(res, await service.getReport(req.params.attemptId, { userId: req.user.userId }))
     } catch (err) { return handleError(res, err) }
   },
@@ -574,6 +587,7 @@ export const compositeController = {
         req.params.id,
         req.params.attemptId,
         query.snapshotId,
+        ...(query.partial === '1' ? [true] as const : [] as const),
       ))
     } catch (err) { return handleError(res, err) }
   },
@@ -668,7 +682,9 @@ export const compositeController = {
         req.params.situationalAttemptId,
         embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
       )
-      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot))
+      const suppressResult = runtime.row.status === 'COMPLETED'
+        && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
+      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred: suppressResult }))
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
@@ -702,7 +718,8 @@ export const compositeController = {
         embedded: embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
         ...parsed.data,
       })
-      return success(res, data, data.replayed ? '匿名综合测评情境化模块提交已确认' : '匿名综合测评情境化模块提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '匿名综合测评情境化模块提交已确认' : '匿名综合测评情境化模块提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
@@ -778,7 +795,8 @@ export const compositeController = {
         input,
         { userId: null, recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
       )
-      return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)

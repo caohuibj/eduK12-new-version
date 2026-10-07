@@ -1,4 +1,5 @@
 import { exportRoot } from '../../services/exportArtifactService'
+import { wideExportPackage } from '../../services/wideExportPackage'
 import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../../config/database'
@@ -49,6 +50,9 @@ export interface CognitiveExportField {
   type: 'numeric' | 'string' | 'date'
   width?: number
   decimals?: number
+  unit?: string | null
+  allowedValues?: unknown[]
+  missingMeaning?: string
 }
 
 export interface CognitiveExportData {
@@ -112,7 +116,7 @@ const MAX_FIELD_NAME_LENGTH = 64
 const EXPORT_DIR = exportRoot()
 
 export const isAllowedCognitiveExportFileName = (fileName: string): boolean =>
-  /^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav)$/.test(fileName)
+  /^cognitive_[a-zA-Z0-9-]+_(summary|full)_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(csv|sav|zip)$/.test(fileName)
   || /^cognitive_[a-zA-Z0-9-]+_research_\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_[a-f0-9-]{36}\.(zip|xlsx)$/.test(fileName)
 
 export const makeCognitiveExportFileName = (
@@ -174,14 +178,14 @@ export class ExportFieldBuilder {
     label: string,
     type: CognitiveExportField['type'],
     width?: number,
-    decimals?: number
+    decimals?: number,
+    metadata?: Pick<CognitiveExportField, 'unit' | 'allowedValues' | 'missingMeaning'>,
   ): string {
     const baseName = preferredName.slice(0, MAX_FIELD_NAME_LENGTH) || 'F_value'
     const fieldKey = this.key(baseName, label)
     const knownName = this.byKey.get(fieldKey)
-    if (knownName) return knownName
 
-    let name = baseName
+    let name = knownName || baseName
     let suffix = 2
 
     while (this.byName.has(name) && this.byName.get(name)?.label !== label) {
@@ -195,11 +199,16 @@ export class ExportFieldBuilder {
       existing.type = mergeFieldType(existing.type, type)
       existing.width = Math.max(existing.width || 0, width || 0) || existing.width
       existing.decimals = Math.max(existing.decimals || 0, decimals || 0)
+      // A wide export may contain several frozen versions. A common column
+      // must not claim the first version's unit or enum for every row.
+      if ((existing.unit ?? null) !== (metadata?.unit ?? null)) existing.unit = null
+      if (JSON.stringify(existing.allowedValues) !== JSON.stringify(metadata?.allowedValues)) existing.allowedValues = undefined
+      if (existing.missingMeaning !== metadata?.missingMeaning) existing.missingMeaning = undefined
       return name
     }
 
     if (this.list.length >= EXPORT_MAX_FIELDS) throw exportLimitError('导出字段数超过上限，请缩小导出范围')
-    const field: CognitiveExportField = { name, label, type, width, decimals }
+    const field: CognitiveExportField = { name, label, type, width, decimals, ...metadata }
     this.list.push(field)
     this.byName.set(name, field)
     this.byKey.set(fieldKey, name)
@@ -506,7 +515,8 @@ const addSessionFields = (
       `[${session.testType}] ${metricLabel(session, key, context.metricDefinitions)}`,
       inferFieldType(value),
       12,
-      typeof value === 'number' && !Number.isInteger(value) ? 4 : 0
+      typeof value === 'number' && !Number.isInteger(value) ? 4 : 0,
+      { unit: context.metricDefinitions[key]?.unit ?? null },
     )
   }
 
@@ -845,6 +855,11 @@ export async function saveCognitiveExportFiles(
   if (format === 'sav') {
     const savPath = await exportCognitiveToSav(exportData)
     return { data: exportData, savPath }
+  }
+  if (format === 'zip' && exportData.detail !== 'research') {
+    const zipPath = path.join(EXPORT_DIR, makeCognitiveExportFileName(assignmentId, exportData.detail, 'zip'))
+    fs.writeFileSync(zipPath, wideExportPackage(exportCognitiveToCSV(exportData), exportData.fields, { resourceType: 'COGNITIVE', resourceId: assignmentId, detail: exportData.detail }))
+    return { data: exportData, zipPath }
   }
 
   const snapshot = materialized.get(exportData)

@@ -16,6 +16,7 @@ import {
 } from '../../components/product-ui'
 import ParentFeature from './ParentFeature'
 import ParentReportView from './ParentReportView'
+import ParentBatchPreparation from './ParentBatchPreparation'
 import { parentError, useParentResource } from './useParentResource'
 function Actions({ artifactId }: { artifactId: string }) {
   const load = useCallback(
@@ -285,6 +286,7 @@ function Content({ organizationId }: { organizationId: string }) {
             </ProductButton>
           </div>
           {selected && <Actions key={selected} artifactId={selected} />}
+          {data?.list.length ? <ParentBatchPreparation key={`${organizationId}:${page}`} scope={`${organizationId}:${page}`} rows={data.list} /> : null}
         </>
       )}
     </div>

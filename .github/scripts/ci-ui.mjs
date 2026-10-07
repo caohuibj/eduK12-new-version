@@ -35,7 +35,7 @@ try {
   const engines = engine === 'all' ? ['chromium','firefox','webkit'] : [engine];
   const scripts = kind === 'app-shell' ? [{file:'app-shell-browser-e2e.cjs',engine:'chromium'}] : engines.flatMap(browser => [
     ...(browser === 'chromium' ? ['visual-canonical-browser-e2e.cjs','visual-staff-complex-browser-e2e.cjs','visual-classroom-control-browser-e2e.cjs'] : []),
-    'visual-interaction-states-browser-e2e.cjs','visual-legacy-dialogs-browser-e2e.cjs',
+    'visual-interaction-states-browser-e2e.cjs','visual-legacy-dialogs-browser-e2e.cjs','qa-round5-more-actions-browser-e2e.cjs','qa-round5-anonymous-browser-e2e.cjs','qa-round5-sjt-upload-browser-e2e.cjs','qa-round5-workbench-browser-e2e.cjs',
   ].map(file => ({file,engine:browser})));
   for(const item of scripts) {
     const script=item.file;

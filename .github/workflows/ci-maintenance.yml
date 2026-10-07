@@ -2,6 +2,10 @@ name: Standalone maintenance CI
 
 on:
   workflow_call:
+    inputs:
+      runner_labels:
+        type: string
+        default: '["ubuntu-24.04"]'
   workflow_dispatch:
 
 permissions:
@@ -10,7 +14,7 @@ permissions:
 jobs:
   attachment-safety:
     name: attachment deduplication, indexes and protected cleanup
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(inputs.runner_labels || '["ubuntu-24.04"]') }}
     timeout-minutes: 12
     env:
       CI: 'true'

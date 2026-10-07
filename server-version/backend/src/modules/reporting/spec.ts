@@ -139,6 +139,7 @@ type SpecRow = {
   specHash: string
   createdByUserId: string
   createdAt: Date
+  reviewedByUserId: string | null
   reviewedAt: Date | null
   publishedAt: Date | null
 }
@@ -215,7 +216,7 @@ const readSpecForUpdate = async (tx: Tx, specId: string): Promise<SpecRow> => {
   const rows = await tx.$queryRaw<SpecRow[]>`
     SELECT "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
       "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt",
-      "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+      "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
     FROM "reporting_analysis_specs" WHERE "id"=${specId} FOR UPDATE
   `
   return rows[0] ?? reportingFail('REPORT_SPEC_NOT_FOUND', 'reporting spec not found', 404)
@@ -254,7 +255,7 @@ export const createPlatformReportingSpec = async (input: {
       VALUES (${id},${specKey},${input.version},'DRAFT',${JSON.stringify(definition)}::jsonb,${specHash},${input.actor.userId})
       RETURNING "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
         "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt",
-        "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+        "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
     `
     return toRecord(rows[0])
   } catch (error) {
@@ -278,6 +279,12 @@ const transition = async (input: {
       reportingFail('REPORT_SPEC_STATE_CONFLICT', `reporting spec must be ${input.expected}`, 409)
     }
     toRecord(current)
+    if (input.next === 'REVIEWED' && current.createdByUserId === input.actor.userId) {
+      reportingFail('REPORT_SPEC_INDEPENDENT_REVIEW_REQUIRED', '方案创建者不能自审，请交由另一位平台管理员审核', 403)
+    }
+    if (input.next === 'PUBLISHED' && (!current.reviewedByUserId || current.reviewedByUserId === current.createdByUserId)) {
+      reportingFail('REPORT_SPEC_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请创建新版本并独立审核', 409)
+    }
     const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const now = nowRows[0].now
     const rows = input.next === 'REVIEWED'
@@ -285,20 +292,20 @@ const transition = async (input: {
           UPDATE "reporting_analysis_specs" SET "status"='REVIEWED', "reviewed_by_user_id"=${input.actor.userId}, "reviewed_at"=${now}
           WHERE "id"=${input.specId}
           RETURNING "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
-            "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+            "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
         `
       : input.next === 'PUBLISHED'
         ? await tx.$queryRaw<SpecRow[]>`
             UPDATE "reporting_analysis_specs" SET "status"='PUBLISHED', "published_by_user_id"=${input.actor.userId}, "published_at"=${now}
             WHERE "id"=${input.specId}
             RETURNING "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
-              "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+              "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
           `
         : await tx.$queryRaw<SpecRow[]>`
             UPDATE "reporting_analysis_specs" SET "status"='RETIRED', "retired_by_user_id"=${input.actor.userId}, "retired_at"=${now}
             WHERE "id"=${input.specId}
             RETURNING "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
-              "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+              "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt", "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
           `
     if (input.next === 'PUBLISHED') {
       await tx.$executeRaw`
@@ -324,7 +331,7 @@ export const retirePlatformReportingSpec = (input: { actor: { userId: string; pl
 export async function listPlatformReportingSpecs(actor: { userId: string; platformRole: string }, page = 1) {
   assertSystemAdmin(actor)
   const rows = await prisma.$queryRaw<SpecRow[]>`SELECT id,spec_key AS "specKey",version,status,definition,spec_hash AS "specHash",
-    created_by_user_id AS "createdByUserId",created_at AS "createdAt",reviewed_at AS "reviewedAt",published_at AS "publishedAt"
+    created_by_user_id AS "createdByUserId",created_at AS "createdAt",reviewed_by_user_id AS "reviewedByUserId",reviewed_at AS "reviewedAt",published_at AS "publishedAt"
     FROM reporting_analysis_specs ORDER BY created_at DESC,id LIMIT 51 OFFSET ${(page - 1) * 50}`
   return { list: rows.slice(0, 50).map(toRecord), nextPage: rows.length > 50 ? page + 1 : null }
 }
@@ -334,7 +341,7 @@ export const getPublishedReportingSpec = async (specId: string, tx?: Tx): Promis
   const rows = await db.$queryRaw<SpecRow[]>`
     SELECT "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
       "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt",
-      "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
+      "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
     FROM "reporting_analysis_specs" WHERE "id"=${specId} AND "status"='PUBLISHED' LIMIT 1
   `
   if (!rows[0]) reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'published reporting spec not found', 404)

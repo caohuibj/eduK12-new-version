@@ -13,6 +13,7 @@ const { mockPrisma } = vi.hoisted(() => {
     course: { findUnique: vi.fn() },
     scale: { findUnique: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
+    $queryRaw: vi.fn(),
   }
   // addItem materializes FORM sections inside the same transaction, so the
   // mock must expose $transaction and run the callback against itself.
