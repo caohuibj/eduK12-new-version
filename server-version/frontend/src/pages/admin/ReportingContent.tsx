@@ -18,7 +18,7 @@ export default function ReportingContent() {
   const [mode, setMode] = useState<'INDIVIDUAL' | 'GROUP'>('INDIVIDUAL')
   const [kind, setKind] = useState<DescriptiveKind>('INDIVIDUAL_LONGITUDINAL'), [minimumN, setMinimumN] = useState(3)
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('')
-  const [nextPage, setNextPage] = useState<number | null>(null), [truncated, setTruncated] = useState(false)
+  const [nextPage, setNextPage] = useState<number | null>(null), [resourceNextPage, setResourceNextPage] = useState<number | null>(null)
   const epoch = useRef(0)
   useEffect(() => () => { epoch.current++ }, [])
   async function load() {
@@ -28,7 +28,7 @@ export default function ReportingContent() {
       const [r, s, scale] = await Promise.all([reportingContentApi.resources(), reportingContentApi.specs(), apiClient.get<{ list: typeof scales }>('/scales?page=1&pageSize=100')])
       if (request !== epoch.current) return
       if (scale.code !== 0 || !scale.data) throw new Error(scale.message || '量表列表加载失败')
-      setResources(r.list); setSpecs(s.list); setNextPage(s.nextPage); setTruncated(r.truncated)
+      setResources(r.list); setSpecs(s.list); setNextPage(s.nextPage); setResourceNextPage(r.nextPage)
       setScales(scale.data.list.filter(item => item.status === 'PUBLISHED' && item.instrumentClass === 'CUSTOM_DESCRIPTIVE'))
     } catch (e) { if (request === epoch.current) { setResources([]); setSpecs([]); setScales([]); setError(apiErrorMessage(e)) } }
     finally { if (request === epoch.current) setBusy(false) }
@@ -59,7 +59,12 @@ export default function ReportingContent() {
       <label className="grid gap-1">资源用途<select className="input" aria-label="资源用途" disabled={busy} value={mode} onChange={e => setMode(e.target.value as typeof mode)}><option value="INDIVIDUAL">个人自评与纵向报告</option><option value="GROUP">群体汇总（至少3人）</option></select></label>
       <ProductButton disabled={busy || !scaleId} onClick={() => void act(() => reportingContentApi.register(scaleId, mode), '资源草稿已注册；请交由另一位平台管理员核对指标与适用范围，再独立审核和发布。')}>注册资源草稿</ProductButton>
       {resources.map(r => <article className="rounded-lg border p-3" key={r.id}><h3>{r.entry.title} · {statusLabel[r.status]}</h3><p>{r.entry.description}</p><p>指标：{r.entry.resultDisclosure.audiences.SUBJECT.metricKeys.join('、')}；适用：组织内学生自评，{r.entry.applicability.analysisMode === 'INDIVIDUAL_ONLY' ? '个人反馈' : '群体汇总（至少3人，隐藏个人分数）'}；证据：描述性试用。</p>{transitions(r.id, r.status, true, r.created_by_user_id)}<details><summary>版本与技术标识</summary><p className="break-all">{r.resource_key} / {r.resource_version}</p></details></article>)}
-      {truncated && <p>仅显示最近100个资源，需整理目录后使用更早资源。</p>}
+      {resourceNextPage && <ProductButton disabled={busy} onClick={() => void act(async () => {
+        const request = epoch.current
+        const page = await reportingContentApi.resources(resourceNextPage)
+        if (request !== epoch.current) return
+        setResources(old => [...new Map([...old, ...page.list].map(row => [row.id, row])).values()]); setResourceNextPage(page.nextPage)
+      }, '已加载更多资源。', false)}>更多资源</ProductButton>}
     </section>
     <section className="space-y-4 rounded-xl border bg-white p-4"><h2 className="text-xl font-semibold">2. 创建纵向报告方案</h2>
       <label className="grid gap-1">已发布测量资源<select className="input" aria-label="已发布测量资源" disabled={busy} value={resourceId} onChange={e => setResourceId(e.target.value)}><option value="">请选择</option>{resources.filter(r => r.status === 'PUBLISHED' && (kind === 'INDIVIDUAL_LONGITUDINAL') === (r.entry.applicability.analysisMode === 'INDIVIDUAL_ONLY')).map(r => <option key={r.id} value={r.id}>{r.entry.title}</option>)}</select></label>

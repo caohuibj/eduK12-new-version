@@ -17,7 +17,7 @@
 
 `DATABASE_URL` 用于迁移/运维；`DATABASE_URL_RUNTIME` 为同一数据库的独立运行角色。Compose 的 migrate 和 release-preflight 已传递后者。API/Worker 的 hardened overlay 保留原独立凭据设置。运行镜像携带只读检查器和迁移清单。
 
-正式生产 `db:migrate:guarded` 的末尾检查及 `db:release:preflight` 在缺少运行凭据、角色不受限、权限不足或迁移身份不一致时失败。检查拒绝 owner/superuser/createdb/createrole/bypassrls/replication，包括通过角色成员关系获得的能力；检查 public schema USAGE、当前业务表 SELECT/I/U/D、序列 USAGE/SELECT，并要求迁移账本只读。DDL 与数据库/schema CREATE 不应由应用运行角色持有。新表自动纳入检查。
+正式生产 `db:migrate:guarded` 的末尾检查及 `db:release:preflight` 在缺少运行凭据、角色不受限、权限不足或迁移身份不一致时失败。检查拒绝 owner/superuser/createdb/createrole/bypassrls/replication，包括通过角色成员关系获得的能力；检查 public schema USAGE，并按 release 的 `runtime-table-policy.json` 检查各表及所属序列。业务表 SELECT/I/U/D、迁移账本只读，legacy 导入运维表不可由 runtime 访问；未知表拒绝发布。DDL 与数据库/schema CREATE 不应由应用运行角色持有。
 
 现有 owner-only CI 服务和本地 release code gate 是合成代码验证，不是生产运行角色证明。仅在 `NODE_ENV=test`、明确 CI 的 loopback `/ptool` 或本地 release 的 loopback `/eduk12_release`，缺少运行 URL 的数据预检可以继续原数据检查，但返回 `runtimeRoleVerified:false`；部署或独立 runtime 验证不能使用此例外。真实非 owner 正/负对照在临时数据库套件中执行，纳入共同 R5 入口。
 
@@ -25,18 +25,31 @@
 
 实际发现 `_prisma_migrations` 被旧通用授权赋予 SELECT/I/U/D。生产修复在事务中核对精确 DB、owner、角色后，只撤销该账本的 INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER，保留 SELECT；API 和 worker 各自实际运行凭据重验 121 张表通过。owner、其他业务 ACL、默认权限、应用镜像和服务均未改动。生产既有 100 条迁移的名称/checksum 与 PR 全部一致，无重复、未结束或未知迁移；PR 的 `20261007010000_cognitive_quota_lineage`、`20261007020000_assessment_workbench` 尚未执行，不能充当 PR release schema 就绪证明。
 
-仓库检查现在连 TRUNCATE/REFERENCES/TRIGGER 也拒绝。新增显式 operator 脚本 `server-version/backend/scripts/runtime-role-defaults.sql` 记录未来对象授权合同，随 ops 镜像交付；只有确认 public 是专用应用 schema、审核完整作用域后才手动运行。示例使用受限权限的 PGSERVICE 配置，不能把密码写进命令或日志：
+迁移账本的 TRUNCATE/REFERENCES/TRIGGER 也被拒绝。显式 operator 脚本 `server-version/backend/scripts/runtime-role-defaults.sql` 随 ops 镜像交付；本次 f55 review 后改为按明确清单 reconcile，撤销指定 owner/runtime 的未来对象默认授权，仅为已分类现存对象赋权。只有确认目标是专用应用数据库、审核完整作用域后才手动运行。示例使用受限权限的 PGSERVICE 配置，不能把密码写进命令或日志：
 
 ```bash
 psql service=eduk12-migration -X -v ON_ERROR_STOP=1 \
   -v target_database=eduk12_prod -v migration_owner=ptool \
   -v runtime_role=eduk12_runtime_v1 \
+  -v table_policy="$(cat server-version/backend/scripts/runtime-table-policy.json)" \
   -f server-version/backend/scripts/runtime-role-defaults.sql
 ```
 
-这不是本次生产执行记录：生产默认权限已正确配置，故未执行该脚本。脚本只作用于明确 owner 在 public 创建的未来对象，并保护既有迁移账本；不创建角色、不转移 ownership、不批量授权现存业务表。错误数据库、owner、角色或混合 owner 的 schema 会整笔回滚，运行角色本身不能成为 operator。default privileges 不能排除某张未来表；若重建迁移账本，必须重做账本收紧，再通过实际 runtime 门禁。现存业务表若缺权，应基于审核过的逐表最小差异授权；新环境需先完成角色、schema USAGE、连接权限和现存表的专门配置，不能把这个脚本当作完整 provisioning。
+这不是生产执行记录：本轮只读盘点发现两个 legacy 导入运维表仍具 runtime 读写权，生产的 future-table 默认授权也仍较宽，尚未执行新 reconcile 脚本。脚本不创建角色、不转移 ownership；错误数据库、owner、角色、混合 owner、未知表及运维表/账本继承越权会整笔回滚，运行角色本身不能成为 operator。首次配置、新增表及恢复必须在 migrate 和 runtime postcheck 之间显式 reconcile；详细步骤、角色 bootstrap、恢复顺序与应用就绪条件见 [数据库运行角色配置流程](runtime-database-provisioning.md)。正式迁移不会自动赋权。
 
 ## 既有数据与治理升级
+
+### f55b164 review 后的兼容与权限修订
+
+2026-10-07 只读生产盘点：有效 `publication_id IS NULL` 的家长 grant 与 consent 均为 0。旧授权管理退化在源码上成立，但当前没有有效存量数据受影响。兼容修订仍纳入：学生列表补充旧同意/授权，返回 `legacy:true/canConsent:false/canGrant:false/canRevoke:true`；预览仅显示撤回管理信息，不读取旧报告正文，也不把 parentAudience 作为新授权来源。学生/家长可逐份撤回；负责人从已有 grant 的不可变组织/学生/关系/报告绑定取得撤回作用域，并重验当前 PARENT_REPORT_DISCLOSURE 及显式 deny。尚无首次 grant 的当前发布报告保留原负责人撤回路径。
+
+管理员注册资源列表增加页码与“更多资源”，追加去重并保留当前选择；创建分析方案按 resourceId 精确读取 PUBLISHED 资源，继续检查 canonical entry、适用模式和当前量表 hash/status，不使用第一页作为资源存在性判断。资源及方案的独立审核仍保留。情境单项反馈暂缓时，服务端返回已授权父 composite ID，结果页可直接继续整份测评，仍不返回指标或导出按钮。
+
+权限清单覆盖真实 102 迁移后的 124 张表；两个导入运维表不要求 runtime CRUD，反而拒绝有效 runtime 访问。未知表拒绝，未来表默认不赋权。显式 reconcile 校验精确作用域并拒绝继承越权；首次/恢复顺序见独立 runbook。本轮未改变生产 ACL/defaults、迁移、应用或备份配置。上述生产盘点不是新 checker 的发布通过证明。
+
+针对性验证：10 个后端文件共 102 项实际通过（其中 8 个数据库/政策文件 87 项、来源与发布边界 15 项），无跳过；5 个前端文件 39 项通过。前端正式 typecheck（135 条路由、会话门）、生产 build 及修改文件 lint 通过，lint 0 errors/2 原有 warnings。正式后端内容合同与 TypeScript 在最终 runtime/ops 构建中通过。新权限 SQL 另在完整 102 迁移的独立本地 clone 实际执行两次，受限角色验证 124 表、精确迁移指纹及真实业务 CRUD，运维表读取拒绝，测试库/角色回收。
+
+最终 runtime/ops 本地 arm64 镜像只读、无网络冒烟通过：UID 1000、缺凭据拒绝、权限清单/检查器/ops SQL 哈希及 102 条迁移指纹与源码一致。证据保存于 `validation-r5/review-f55-*`，前序证据仍绑定各自 SHA。本次测试初轮合成 deny 字段拼写错误已修正；两个原 preview 隐私断言改为核对“撤回元数据可见、projection 不可见、不能新同意”，对应刻意改变的管理行为，并保留报告读取/授权拒绝断言。额外 SJT standalone 文件首次未设置其专属 DB 变量产生 9 skipped，最终补齐并全部实际执行；未把跳过记为通过。生产 amd64/安全扫描/全量 CI/正式部署门禁仍未执行。
 
 - 旧家长 JSON 保留历史审计，缺少正式发布的报告不再能作为新的同意/授权来源。上线前只读盘点包含 parentAudience 且没有合法 publication head 的历史 artifact；不输出答案或报告内容。确有披露需求时重新经过模板预览、独立发布、学生同意及逐份授权，不自动 grandfather。
 - 既有已发布的资源、报告和审核记录不自动重写或停用。新发布严格要求独立 reviewer。旧自审的 REVIEWED 资源重新登记会生成新 DRAFT 版本，重复登记该新草稿仍幂等，旧行及旧审计保留；旧自审的报告方案需创建新版本并独立审核。

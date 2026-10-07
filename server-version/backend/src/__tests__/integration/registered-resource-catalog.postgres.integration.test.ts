@@ -4,7 +4,9 @@ import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { createCustomScaleDefinition, hashScaleDefinition } from '../../modules/scale/scale-definition'
-import { descriptiveResourceEntry, listReleasedRegisteredResourcePage } from '../../modules/assessment-run/registeredResources'
+import { descriptiveResourceEntry, listRegisteredResources, readPublishedRegisteredResource, listReleasedRegisteredResourcePage } from '../../modules/assessment-run/registeredResources'
+import { reportingContentController } from '../../modules/reporting/content.controller'
+import type { Request, Response } from 'express'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
@@ -55,6 +57,29 @@ suite('authorized registered catalog beyond the former global 100 limit', () => 
     }
     await prisma.user.deleteMany({ where: { id: { in: users } } })
     await prisma.$disconnect()
+  })
+  it('paginates the administrator catalog and creates a spec from an exact resource beyond its first page', async () => {
+    const actor = { userId: adminId, platformRole: 'SYSTEM_ADMIN' }
+    const first = await listRegisteredResources(actor), second = await listRegisteredResources(actor, 2)
+    expect(first.list).toHaveLength(100); expect(first.nextPage).toBe(2)
+    expect(second.list.length).toBeGreaterThan(0)
+    const [old] = await prisma.$queryRaw<Array<{id:string}>>`SELECT id FROM registered_assessment_resources WHERE scale_id=${scales[0]} ORDER BY created_at,id LIMIT 1`
+    expect(first.list.some(row=>row.id===old.id)).toBe(false)
+    expect((await readPublishedRegisteredResource(actor,old.id)).id).toBe(old.id)
+    await expect(readPublishedRegisteredResource({userId:teacherId,platformRole:'STANDARD'},old.id)).rejects.toMatchObject({code:'RESOURCE_AUTHORITY'})
+    const response = { setHeader: vi.fn(), json: vi.fn(), status: vi.fn() }
+    response.status.mockReturnValue(response)
+    const specKey = marker + ':exact-spec'
+    try {
+      await reportingContentController.createDescriptiveSpec({user:{userId:adminId,platformRole:'SYSTEM_ADMIN'},body:{resourceId:old.id,specKey,version:1,analysisKind:'INDIVIDUAL_LONGITUDINAL',minimumN:3}} as Request, response as unknown as Response)
+      expect(response.json).toHaveBeenCalledWith(expect.objectContaining({code:0,data:expect.objectContaining({specKey,status:'DRAFT'})}))
+      await prisma.$executeRaw`UPDATE registered_assessment_resources SET status='RETIRED' WHERE id=${old.id}`
+      await expect(readPublishedRegisteredResource(actor,old.id)).rejects.toMatchObject({code:'RESOURCE_NOT_PUBLISHED'})
+      await prisma.$executeRaw`UPDATE registered_assessment_resources SET status='PUBLISHED' WHERE id=${old.id}`
+    } finally {
+      await prisma.$executeRaw`DELETE FROM reporting_analysis_specs WHERE spec_key=${specKey}`
+      await prisma.$executeRaw`DELETE FROM organization_governance_audits WHERE payload->>'specKey'=${specKey}`
+    }
   })
   it('filters before pagination, batches reads, exposes remaining pages and rechecks revocation/source versions', async () => {
     const scaleLookup = vi.spyOn(prisma.scale, 'findUnique'), grantLookup = vi.spyOn(prisma.materialGrant, 'findUnique')

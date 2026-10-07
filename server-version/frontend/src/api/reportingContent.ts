@@ -16,7 +16,7 @@ async function data<T>(promise: Promise<{ code: number | string; message: string
 }
 const root = '/organizations'
 export const reportingContentApi = {
-  resources: () => data(apiClient.get<{ list: RegisteredResource[]; truncated: boolean }>(`${root}/measurement-resources`)),
+  resources: (page = 1) => data(apiClient.get<{ list: RegisteredResource[]; truncated: boolean; nextPage: number | null }>(`${root}/measurement-resources`, { params: { page } })),
   register: (scaleId: string, mode: 'INDIVIDUAL' | 'GROUP') => data(apiClient.post<RegisteredResource>(`${root}/measurement-resources`, { scaleId, mode })),
   transitionResource: (id: string, action: 'review' | 'publish' | 'retire') => data(apiClient.post<RegisteredResource>(`${root}/measurement-resources/${id}/${action}`)),
   specs: (page = 1) => data(apiClient.get<{ list: ManagedReportingSpec[]; nextPage: number | null }>(`${root}/reporting-specs`, { params: { page } })),

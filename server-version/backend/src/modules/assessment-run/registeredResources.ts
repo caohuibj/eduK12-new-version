@@ -115,10 +115,18 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
   })
 }
 
-export async function listRegisteredResources(actor: Actor) {
+export async function listRegisteredResources(actor: Actor, page = 1) {
   admin(actor)
-  const list = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources ORDER BY created_at DESC,id LIMIT 101`
-  return { list: list.slice(0, 100).map(row => ({ ...row, entry: checkedEntry(row) })), truncated: list.length > 100 }
+  if (!Number.isSafeInteger(page) || page < 1 || page > 100000) reportingFail('RESOURCE_PAGE_INVALID', '资源页码无效', 400)
+  const list = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources ORDER BY created_at DESC,id LIMIT 101 OFFSET ${(page - 1) * 100}`
+  return { list: list.slice(0, 100).map(row => ({ ...row, entry: checkedEntry(row) })), truncated: list.length > 100, nextPage: list.length > 100 ? page + 1 : null }
+}
+
+export async function readPublishedRegisteredResource(actor: Actor, id: string) {
+  admin(actor)
+  const [row] = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE id=${id} AND status='PUBLISHED'`
+  if (!row) return reportingFail('RESOURCE_NOT_PUBLISHED', '请先审核并发布测量资源', 409)
+  return { ...row, entry: checkedEntry(row) }
 }
 
 /** Static content stays authoritative; registered content uses an exact, persisted identity. */

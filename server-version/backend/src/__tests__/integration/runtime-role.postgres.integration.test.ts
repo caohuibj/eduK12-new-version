@@ -4,7 +4,7 @@ import { Client } from 'pg'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
-import { verifyConfiguredRuntime, verifyRuntimePrivileges } from '../../../scripts/runtime-role-contract.mjs'
+import { runtimeTablePolicy, verifyConfiguredRuntime, verifyRuntimePrivileges } from '../../../scripts/runtime-role-contract.mjs'
 import { verifyReleaseSchema } from '../../../scripts/release-schema-contract.mjs'
 
 const selected = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
@@ -36,10 +36,12 @@ suite('actual restricted runtime role and exact release identity', () => {
     await owner.$executeRawUnsafe('CREATE TABLE users (id SERIAL PRIMARY KEY, name text)')
     await owner.$executeRawUnsafe('CREATE TABLE parent_report_publications (id text PRIMARY KEY)')
     await owner.$executeRawUnsafe('CREATE TABLE registered_assessment_resources (id text PRIMARY KEY)')
-    await owner.$executeRawUnsafe('CREATE TABLE reporting_specs (id text PRIMARY KEY)')
+    await owner.$executeRawUnsafe('CREATE TABLE reporting_analysis_specs (id text PRIMARY KEY)')
+    await owner.$executeRawUnsafe('CREATE TABLE "_legacy_import_batches" (id SERIAL PRIMARY KEY)')
+    await owner.$executeRawUnsafe('CREATE TABLE "_legacy_import_id_map" (id text PRIMARY KEY)')
     await owner.$executeRawUnsafe(`GRANT USAGE ON SCHEMA public TO "${role}"`)
     await owner.$executeRawUnsafe(`GRANT SELECT ON "_prisma_migrations" TO "${role}"`)
-    await owner.$executeRawUnsafe(`GRANT SELECT,INSERT,UPDATE,DELETE ON users,parent_report_publications,registered_assessment_resources,reporting_specs TO "${role}"`)
+    await owner.$executeRawUnsafe(`GRANT SELECT,INSERT,UPDATE,DELETE ON users,parent_report_publications,registered_assessment_resources,reporting_analysis_specs TO "${role}"`)
     await owner.$executeRawUnsafe(`GRANT USAGE,SELECT ON SEQUENCE users_id_seq TO "${role}"`)
   })
   afterAll(async () => {
@@ -49,7 +51,7 @@ suite('actual restricted runtime role and exact release identity', () => {
     await admin?.$disconnect()
   })
   it('allows real runtime writes, rejects newly missing grants and sequence privilege', async () => {
-    expect(await verifyRuntimePrivileges(runtime)).toMatchObject({ restrictedRuntimeRole: true, runtimeTables: 5, runtimeSequences: 1 })
+    expect(await verifyRuntimePrivileges(runtime)).toMatchObject({ restrictedRuntimeRole: true, runtimeTables: 7, runtimeSequences: 2 })
     await runtime.$executeRawUnsafe("INSERT INTO users(name) VALUES ('synthetic')")
     await runtime.$executeRawUnsafe("INSERT INTO parent_report_publications VALUES ('synthetic')")
     await owner.$executeRawUnsafe(`REVOKE INSERT ON parent_report_publications FROM "${role}"`)
@@ -70,6 +72,24 @@ suite('actual restricted runtime role and exact release identity', () => {
     expect((await runtime.$queryRawUnsafe('SELECT count(*)::int AS count FROM "_prisma_migrations"') as { count: number }[])[0].count).toBe(1)
     expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
   })
+  it('requires no operator-table authority and rejects unclassified tables instead of demanding blanket CRUD', async () => {
+    for (const name of ['_legacy_import_batches','_legacy_import_id_map']) {
+      await expect(runtime.$queryRawUnsafe(`SELECT * FROM "${name}"`)).rejects.toThrow()
+      await expect(runtime.$executeRawUnsafe(`INSERT INTO "${name}" DEFAULT VALUES`)).rejects.toThrow()
+      await owner.$executeRawUnsafe(`GRANT SELECT ON "${name}" TO "${role}"`)
+      await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
+      await owner.$executeRawUnsafe(`REVOKE SELECT ON "${name}" FROM "${role}"`)
+    }
+    await owner.$executeRawUnsafe('CREATE TABLE unclassified_operator_evidence (id text)')
+    try { await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE') }
+    finally { await owner.$executeRawUnsafe('DROP TABLE unclassified_operator_evidence') }
+    expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
+  })
+  it('classifies every table in the actual migrated release without treating operator records as runtime data', async () => {
+    const actual=await admin.$queryRawUnsafe("SELECT c.relname AS name FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','p')") as {name:string}[]
+    expect(actual.map(row=>row.name).sort()).toEqual(Object.keys(runtimeTablePolicy.tables).sort())
+    expect(Object.values(runtimeTablePolicy.tables).filter(value=>value==='OPERATOR_ONLY')).toHaveLength(2)
+  })
   it('rejects owner credentials and an elevated runtime principal', async () => {
     await expect(verifyRuntimePrivileges(owner)).rejects.toThrow('RUNTIME_ROLE_NOT_RESTRICTED')
     await admin.$executeRawUnsafe(`ALTER ROLE "${role}" CREATEDB`)
@@ -77,7 +97,7 @@ suite('actual restricted runtime role and exact release identity', () => {
     await admin.$executeRawUnsafe(`ALTER ROLE "${role}" NOCREATEDB`)
     expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
   })
-  it('binds default privileges to the exact owner, database and role; protects the ledger and admits a future table', async () => {
+  it('binds explicit ACL reconciliation to the exact scope and classifies future tables before granting authority', async () => {
     const [{ name: ownerName }] = await owner.$queryRawUnsafe('SELECT current_user AS name') as { name: string }[]
     const source = readFileSync(new URL('../../../scripts/runtime-role-defaults.sql', import.meta.url), 'utf8')
     const literal = (value: string) => "'" + value.replaceAll("'", "''") + "'"
@@ -85,6 +105,7 @@ suite('actual restricted runtime role and exact release identity', () => {
       .replaceAll(":'target_database'", literal(target))
       .replaceAll(":'migration_owner'", literal(migrationOwner))
       .replaceAll(":'runtime_role'", literal(runtimeRole))
+      .replaceAll(":'table_policy'", literal(JSON.stringify(runtimeTablePolicy)))
     const url = new URL(selected!); url.pathname = '/' + database
     const client = new Client({ connectionString: url.href })
     await client.connect()
@@ -96,19 +117,33 @@ suite('actual restricted runtime role and exact release identity', () => {
       }
       // Invalid plans must not silently revoke or grant anything.
       await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
+      await owner.$executeRawUnsafe('GRANT SELECT ON "_legacy_import_batches" TO PUBLIC')
+      await expect(client.query(sql(database, ownerName, role))).rejects.toThrow('INHERITED_RUNTIME_PRIVILEGE_FORBIDDEN')
+      await client.query('ROLLBACK')
+      await owner.$executeRawUnsafe('REVOKE SELECT ON "_legacy_import_batches" FROM PUBLIC')
+      // An inherited operator grant must roll back ledger reconciliation too.
+      await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
       await client.query(sql(database, ownerName, role))
       await client.query(sql(database, ownerName, role)) // idempotent
-      await owner.$executeRawUnsafe('CREATE TABLE future_runtime_business (id SERIAL PRIMARY KEY, name text)')
-      await runtime.$executeRawUnsafe("INSERT INTO future_runtime_business(name) VALUES ('future')")
-      await runtime.$executeRawUnsafe("UPDATE future_runtime_business SET name='updated'")
-      expect((await runtime.$queryRawUnsafe('SELECT name FROM future_runtime_business') as { name: string }[])[0].name).toBe('updated')
-      await runtime.$executeRawUnsafe('DELETE FROM future_runtime_business')
+      await owner.$executeRawUnsafe('CREATE TABLE courses (id SERIAL PRIMARY KEY, name text)')
+      await expect(runtime.$executeRawUnsafe("INSERT INTO courses(name) VALUES ('future')")).rejects.toThrow()
+      await expect(verifyRuntimePrivileges(runtime)).rejects.toThrow('RUNTIME_PRIVILEGES_INCOMPLETE')
+      await client.query(sql(database, ownerName, role))
+      await runtime.$executeRawUnsafe("INSERT INTO courses(name) VALUES ('future')")
+      await runtime.$executeRawUnsafe("UPDATE courses SET name='updated'")
+      expect((await runtime.$queryRawUnsafe('SELECT name FROM courses') as { name: string }[])[0].name).toBe('updated')
+      await runtime.$executeRawUnsafe('DELETE FROM courses')
+      await expect(runtime.$queryRawUnsafe('SELECT * FROM "_legacy_import_batches"')).rejects.toThrow()
+      await owner.$executeRawUnsafe('CREATE TABLE unclassified_operator_evidence (id text)')
+      await expect(client.query(sql(database, ownerName, role))).rejects.toThrow('UNCLASSIFIED_RUNTIME_TABLE')
+      await client.query('ROLLBACK')
+      await owner.$executeRawUnsafe('DROP TABLE unclassified_operator_evidence')
       await expect(runtime.$executeRawUnsafe('TRUNCATE "_prisma_migrations"')).rejects.toThrow()
       expect((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole).toBe(true)
     } finally {
       await client.query('ROLLBACK')
       await client.end()
-      await owner.$executeRawUnsafe('DROP TABLE IF EXISTS future_runtime_business')
+      await owner.$executeRawUnsafe('DROP TABLE IF EXISTS courses,unclassified_operator_evidence')
     }
   })
   it('binds the actual migration ledger to the exact release and rejects changed, missing, extra or unfinished migrations', async () => {

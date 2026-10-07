@@ -95,6 +95,19 @@ describe('parent operation boundaries', () => {
       expect(state.parents.acceptConsent).toHaveBeenCalledWith(preview),
     )
   })
+  it('shows withdrawal-only legacy consent without exposing a new-consent action or old report content', async () => {
+    state.parents.previewConsent.mockResolvedValue({legacy:true,relationshipId:'link',artifactId:'report',parentName:'确认家长',title:'历史报告授权（仅可撤回）',canConsent:false,canGrant:false,canRevoke:true})
+    vi.spyOn(window,'confirm').mockReturnValue(true)
+    state.parents.withdraw.mockResolvedValue({revoked:true})
+    consent()
+    expect(await screen.findByText('历史报告授权（仅可撤回）')).toBeInTheDocument()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'同意这份报告'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'撤回本份报告授权'}))
+    await waitFor(()=>expect(state.parents.withdraw).toHaveBeenCalledWith('link','report'))
+    expect(state.parents.acceptConsent).not.toHaveBeenCalled()
+    vi.restoreAllMocks()
+  })
   it('requires fresh consent when focus refresh replaces the displayed publication', async () => {
     consent()
     await screen.findByText('确认家长')

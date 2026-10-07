@@ -52,6 +52,7 @@ COPY scripts/pr24-migration-preflight.mjs ./scripts/pr24-migration-preflight.mjs
 COPY scripts/release-data-preflight.mjs ./scripts/release-data-preflight.mjs
 COPY scripts/release-schema-contract.mjs ./scripts/release-schema-contract.mjs
 COPY scripts/runtime-role-contract.mjs ./scripts/runtime-role-contract.mjs
+COPY scripts/runtime-table-policy.json ./scripts/runtime-table-policy.json
 COPY scripts/assert-release-test-report.mjs ./scripts/assert-release-test-report.mjs
 COPY scripts/generate-scale-instruments.ts ./scripts/generate-scale-instruments.ts
 COPY scripts/scale-onboarding-check.mjs ./scripts/scale-onboarding-check.mjs
@@ -100,6 +101,7 @@ COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/assets ./assets
 COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY --from=build --chown=node:node /app/scripts/runtime-role-contract.mjs /app/scripts/release-schema-contract.mjs ./scripts/
+COPY --from=build --chown=node:node /app/scripts/runtime-table-policy.json ./scripts/
 COPY package*.json ./
 
 # npm is needed by the build and ops stages, but the long-running API only

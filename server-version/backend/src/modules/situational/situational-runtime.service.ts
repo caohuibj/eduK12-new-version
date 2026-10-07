@@ -300,6 +300,7 @@ export const situationalAttemptForResponse = (
     attemptId: row.id,
     attempt: {
       id: row.id,
+      compositeAttemptId: row.compositeAttemptId,
       instrumentKey: row.instrumentKey,
       instrumentVersion: row.instrumentVersion,
       attemptNo: row.attemptNo,

@@ -157,6 +157,7 @@ export interface SituationalInstrument {
 }
 
 export interface SituationalAttempt {
+  compositeAttemptId?: string | null
   id: string
   instrumentKey: string
   instrumentVersion: string

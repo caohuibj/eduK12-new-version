@@ -1,6 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 import { pathToFileURL } from 'node:url'
+import { readFileSync } from 'node:fs'
 import { verifyReleaseSchema } from './release-schema-contract.mjs'
+
+export const runtimeTablePolicy = JSON.parse(readFileSync(new URL('./runtime-table-policy.json', import.meta.url), 'utf8'))
+const classes = ['RUNTIME_RW', 'RUNTIME_READ', 'OPERATOR_ONLY', 'MIGRATION_LEDGER']
+if (runtimeTablePolicy.schemaVersion !== 1 || !runtimeTablePolicy.tables
+  || Object.values(runtimeTablePolicy.tables).some(value => !classes.includes(value))
+  || runtimeTablePolicy.tables._prisma_migrations !== 'MIGRATION_LEDGER'
+  || ['_legacy_import_batches', '_legacy_import_id_map'].some(name => runtimeTablePolicy.tables[name] !== 'OPERATOR_ONLY')) {
+  throw new Error('RUNTIME_TABLE_POLICY_INVALID')
+}
 
 /** Read-only verification using the actual connected runtime principal. This
  * script never grants privileges, changes roles, or stands in with owner credentials. */
@@ -17,17 +27,32 @@ export async function verifyRuntimePrivileges(db) {
   const [schema] = await db.$queryRawUnsafe("SELECT has_schema_privilege(current_user,'public','USAGE') AS usable")
   const tables = await db.$queryRawUnsafe(`SELECT c.relname AS name,
     has_table_privilege(current_user,c.oid,'SELECT') AS readable,
-    (c.relname='_prisma_migrations' OR (has_table_privilege(current_user,c.oid,'INSERT')
-      AND has_table_privilege(current_user,c.oid,'UPDATE') AND has_table_privilege(current_user,c.oid,'DELETE'))) AS writable,
-    (c.relname<>'_prisma_migrations' OR NOT (has_table_privilege(current_user,c.oid,'INSERT')
+    (has_table_privilege(current_user,c.oid,'INSERT')
+      AND has_table_privilege(current_user,c.oid,'UPDATE') AND has_table_privilege(current_user,c.oid,'DELETE')) AS writable,
+    NOT (has_table_privilege(current_user,c.oid,'INSERT')
       OR has_table_privilege(current_user,c.oid,'UPDATE') OR has_table_privilege(current_user,c.oid,'DELETE')
       OR has_table_privilege(current_user,c.oid,'TRUNCATE') OR has_table_privilege(current_user,c.oid,'REFERENCES')
-      OR has_table_privilege(current_user,c.oid,'TRIGGER'))) AS migration_safe
+      OR has_table_privilege(current_user,c.oid,'TRIGGER')) AS read_only
     FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','p')`)
-  const sequences = await db.$queryRawUnsafe(`SELECT c.relname AS name,
-    has_sequence_privilege(current_user,c.oid,'USAGE') AND has_sequence_privilege(current_user,c.oid,'SELECT') AS usable
-    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='S'`)
-  if (!schema.usable || !tables.length || tables.some(row => !row.readable || !row.writable || !row.migration_safe) || sequences.some(row => !row.usable)) {
+  const sequences = await db.$queryRawUnsafe(`SELECT c.relname AS name,owning.relname AS owner_table,
+    has_sequence_privilege(current_user,c.oid,'USAGE') AND has_sequence_privilege(current_user,c.oid,'SELECT') AS usable,
+    NOT (has_sequence_privilege(current_user,c.oid,'USAGE') OR has_sequence_privilege(current_user,c.oid,'SELECT')
+      OR has_sequence_privilege(current_user,c.oid,'UPDATE')) AS inaccessible
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    LEFT JOIN pg_depend d ON d.classid='pg_class'::regclass AND d.refclassid='pg_class'::regclass AND d.objid=c.oid AND d.deptype IN ('a','i')
+    LEFT JOIN pg_class owning ON owning.oid=d.refobjid
+    WHERE n.nspname='public' AND c.relkind='S'`)
+  const validTable = row => {
+    const category = runtimeTablePolicy.tables[row.name]
+    if (category === 'OPERATOR_ONLY') return !row.readable && row.read_only
+    if (category === 'MIGRATION_LEDGER' || category === 'RUNTIME_READ') return row.readable && row.read_only
+    return category === 'RUNTIME_RW' && row.readable && row.writable
+  }
+  const validSequence = row => {
+    const category = runtimeTablePolicy.tables[row.owner_table]
+    return category === 'RUNTIME_RW' ? row.usable : ['OPERATOR_ONLY','RUNTIME_READ','MIGRATION_LEDGER'].includes(category) && row.inaccessible
+  }
+  if (!schema.usable || !tables.length || tables.some(row => !validTable(row)) || sequences.some(row => !validSequence(row))) {
     throw new Error('RUNTIME_PRIVILEGES_INCOMPLETE')
   }
   return { runtimeTables: tables.length, runtimeSequences: sequences.length, restrictedRuntimeRole: true }

@@ -73,6 +73,20 @@ function reportScope(actor:string,child:string) {
     AND NOT EXISTS (SELECT 1 FROM organization_access_denies d WHERE d.organization_id=g.organization_id AND d.user_id IN (g.parent_user_id,g.student_user_id) AND d.lifted_at IS NULL AND (d.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_READ') OR d.permission=a.policy_domain))`
 }
 const reportJoins=Prisma.sql`parent_report_disclosure_grants g JOIN parent_student_relationships r ON r.id=g.relationship_id JOIN parent_report_consents consent ON consent.id=g.consent_id JOIN users p ON p.id=g.parent_user_id JOIN users u ON u.id=g.student_user_id JOIN organizations o ON o.id=g.organization_id JOIN reporting_analysis_artifacts a ON a.id=g.source_artifact_id LEFT JOIN parent_report_publication_heads head ON head.source_artifact_id=a.id LEFT JOIN parent_report_publications publication ON publication.id=head.publication_id`
+// Withdrawal authority comes from the persisted relationship-bound consent or
+// grant, never from treating old artifact JSON as a new publication.
+function legacyWithdrawalScope(link:Link) {
+  return Prisma.sql`record.relationship_id=${link.id} AND record.student_user_id=${link.studentUserId}
+    AND record.parent_user_id=${link.parentUserId} AND record.publication_id IS NULL AND record.revoked_at IS NULL
+    AND NOT EXISTS(SELECT 1 FROM parent_report_publication_heads head
+      WHERE head.source_artifact_id=record.source_artifact_id AND head.revoked_at IS NULL)`
+}
+async function legacyWithdrawalOptions(tx:Tx,link:Link) {
+  return tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT DISTINCT id FROM (
+    SELECT record.source_artifact_id AS id FROM parent_report_consents record WHERE ${legacyWithdrawalScope(link)}
+    UNION SELECT record.source_artifact_id AS id FROM parent_report_disclosure_grants record WHERE ${legacyWithdrawalScope(link)}
+  ) existing ORDER BY id LIMIT 21`)
+}
 export function createParentPortalService(db=prisma,readSource:(id:string)=>Promise<ParentReportSource>=readParentReportSource) {
   const run=<T>(operation:(tx:Tx)=>Promise<T>)=>db.$transaction(operation,{isolationLevel:Prisma.TransactionIsolationLevel.Serializable})
   return {
@@ -178,7 +192,8 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
         const ceiling=parentToolVisibleSqlFor(Prisma.sql`publication.projection_payload`,Prisma.sql`publication.projection_payload->'policy'->>'mode'`)
         const rows=await tx.$queryRaw<Array<ParentPublicationRow&{artifactHash:string;artifactPayload:unknown}>>(Prisma.sql`SELECT DISTINCT ON(publication.id,publication.published_at) ${publicationColumns},a.snapshot_hash AS "artifactHash",a.artifact_payload AS "artifactPayload" FROM parent_report_publication_heads head JOIN parent_report_publications publication ON publication.id=head.publication_id JOIN reporting_analysis_artifacts a ON a.id=publication.source_artifact_id JOIN organizations o ON o.id=publication.organization_id JOIN organization_memberships m ON m.organization_id=o.id AND m.user_id=publication.subject_user_id WHERE publication.subject_user_id=${actor.userId} AND head.revoked_at IS NULL AND o.status='ACTIVE' AND m.valid_from<=statement_timestamp() AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp()) AND (${ceiling}) AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=o.id AND d.user_id IN (${link.studentUserId},${link.parentUserId}) AND d.lifted_at IS NULL AND (d.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_READ') OR d.permission=a.policy_domain)) ORDER BY publication.published_at DESC,publication.id LIMIT 21`)
         const list=rows.slice(0,20).map(row=>{if(row.artifactHash!==row.sourceHash||canonicalHash(row.artifactPayload)!==row.sourceHash)fail('PARENT_SOURCE_INTEGRITY',409);const projection=verifyParentPublication(row,{artifactId:row.artifactId,sourceHash:row.artifactHash,subjectUserId:actor.userId,organizationId:row.organizationId});return {id:row.artifactId,title:projection.title,canConsent:true}})
-        return {list,truncated:rows.length>20}
+        const legacy=await legacyWithdrawalOptions(tx,link)
+        return {list:[...list,...legacy.slice(0,20).map(row=>({id:row.id,title:'历史报告授权（仅可撤回）',legacy:true,canConsent:false,canGrant:false,canRevoke:true}))],truncated:rows.length>20||legacy.length>20}
       })
     },
     async disclosureConsents(actor:Principal,artifactId:string){
@@ -191,6 +206,18 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
     },
     async reportConsentPreview(actor:Principal,relationshipId:string,artifactId:string) {
       expectRole(actor,'STUDENT')
+      const withdrawal=await run(async tx=>{
+        const row=await lockLink(tx,relationshipId);await assertLiveLink(tx,row)
+        if(row.studentUserId!==actor.userId)return fail()
+        const [existing]=await tx.$queryRaw<Array<{found:boolean}>>(Prisma.sql`SELECT (
+          EXISTS(SELECT 1 FROM parent_report_consents record WHERE ${legacyWithdrawalScope(row)} AND record.source_artifact_id=${artifactId})
+          OR EXISTS(SELECT 1 FROM parent_report_disclosure_grants record WHERE ${legacyWithdrawalScope(row)} AND record.source_artifact_id=${artifactId})
+        ) AS found`)
+        if(!existing.found)return null
+        const parent=await tx.user.findUnique({where:{id:row.parentUserId},select:{nickname:true,username:true}})??fail()
+        return {legacy:true as const,relationshipId,artifactId,parentName:parent.nickname??parent.username,title:'历史报告授权（仅可撤回）',canConsent:false as const,canGrant:false as const,canRevoke:true}
+      })
+      if(withdrawal)return withdrawal
       const source=await readSource(artifactId)
       return run(async tx=>{
         await assertCurrentParentPublication(tx,source)
@@ -258,7 +285,22 @@ export function createParentPortalService(db=prisma,readSource:(id:string)=>Prom
     async revokeReport(actor:Principal,relationshipId:string,artifactId:string,reason:string) {
       return run(async tx=>{
         const row=await lockLink(tx,relationshipId)
-        if(![row.studentUserId,row.parentUserId].includes(actor.userId)){const source=await readSource(artifactId);if(!source.organizationId||source.subjectUserId!==row.studentUserId)return fail();await assertDisclosureOfficer(tx,actor,source.organizationId)}
+        if(![row.studentUserId,row.parentUserId].includes(actor.userId)){
+          const grants=await tx.$queryRaw<Array<{organizationId:string}>>`SELECT DISTINCT g.organization_id AS "organizationId"
+            FROM parent_report_disclosure_grants g JOIN reporting_analysis_artifacts a
+              ON a.id=g.source_artifact_id AND a.organization_id=g.organization_id AND a.subject_user_id=g.student_user_id
+            WHERE g.relationship_id=${relationshipId} AND g.source_artifact_id=${artifactId}
+              AND g.student_user_id=${row.studentUserId} AND g.parent_user_id=${row.parentUserId}`
+          if(grants.length>1)return fail()
+          if(grants.length===1)await assertDisclosureOfficer(tx,actor,grants[0].organizationId)
+          else {
+            // Preserve withdrawal of a current published consent before its
+            // first grant; legacy consent alone never supplies this authority.
+            const source=await readSource(artifactId)
+            if(!source.organizationId||source.subjectUserId!==row.studentUserId)return fail()
+            await assertDisclosureOfficer(tx,actor,source.organizationId)
+          }
+        }
         await tx.$executeRaw`UPDATE parent_report_disclosure_grants SET revoked_at=statement_timestamp(),revoked_by_user_id=${actor.userId},revoke_reason=${reason} WHERE relationship_id=${relationshipId} AND source_artifact_id=${artifactId} AND revoked_at IS NULL`
         await tx.$executeRaw`UPDATE parent_report_consents SET revoked_at=statement_timestamp() WHERE relationship_id=${relationshipId} AND source_artifact_id=${artifactId} AND revoked_at IS NULL`
         await audit(tx,actor.userId,'REPORT_DISCLOSURE_REVOKED',relationshipId,artifactId)

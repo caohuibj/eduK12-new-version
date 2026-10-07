@@ -9,6 +9,13 @@ vi.mock('../api', () => ({ situationalApi: { result: resultMock } }))
 
 describe('SituationalResult report convergence', () => {
   beforeEach(() => vi.clearAllMocks())
+  it('returns a deferred composite child to its authoritative parent instead of standalone history', async () => {
+    resultMock.mockResolvedValue({code:0,data:{feedbackDeferred:true,attempt:{id:'attempt-1',compositeAttemptId:'parent-1',status:'COMPLETED',instrumentKey:'fixture'}}})
+    render(<MemoryRouter initialEntries={['/student/situational/attempts/attempt-1/result']}><Routes><Route path="/student/situational/attempts/:attemptId/result" element={<SituationalResult/>}/></Routes></MemoryRouter>)
+    expect(await screen.findByRole('link',{name:'继续整份测评'})).toHaveAttribute('href','/student/composite/attempts/parent-1')
+    expect(screen.queryByRole('link',{name:'查看历史'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'JSON'})).not.toBeInTheDocument()
+  })
   it('keeps deferred feedback on a completion notice rather than starting a new instrument', async () => {
     resultMock.mockResolvedValue({ code: 0, data: { feedbackDeferred: true, attempt: { id: 'attempt-1', status: 'COMPLETED', instrumentKey: 'fixture' } } })
     render(<MemoryRouter initialEntries={['/student/situational/attempts/attempt-1/result']}>

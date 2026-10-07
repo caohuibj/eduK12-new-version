@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { parentsApi, type ConsentPreview } from '../../api/parents'
+import { parentsApi, type ConsentPreview, type WithdrawalPreview } from '../../api/parents'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   DiscoveryCard,
@@ -13,7 +13,7 @@ import ParentFeature from './ParentFeature'
 import ParentReportView from './ParentReportView'
 import { parentError, useParentResource } from './useParentResource'
 type Options = {
-  list: Array<{ id: string; title: string; canConsent: boolean }>
+  list: Array<{ id: string; title: string; canConsent: boolean; legacy?: boolean }>
   truncated: boolean
 }
 function Content({
@@ -24,7 +24,7 @@ function Content({
   artifactId?: string
 }) {
   const load = useCallback(
-    async (signal: AbortSignal): Promise<ConsentPreview | Options> =>
+    async (signal: AbortSignal): Promise<ConsentPreview | WithdrawalPreview | Options> =>
       artifactId
         ? parentsApi.previewConsent(relationshipId, artifactId, signal)
         : parentsApi.reportOptions(relationshipId, signal),
@@ -85,7 +85,7 @@ function Content({
               key={report.id}
               to={`/student/parent-links/${encodeURIComponent(relationshipId)}/reports/${encodeURIComponent(report.id)}`}
               title={report.title}
-              description="预览并管理这份报告的家长授权"
+              description={report.legacy ? '管理历史授权；仅支持撤回，重新授权须由学校重新发布' : '预览并管理这份报告的家长授权'}
             />
           ))
         ) : (
@@ -115,9 +115,8 @@ function Content({
       <p>
         接收家长：<strong>{data.parentName}</strong>
       </p>
-      <ParentReportView report={data.projection} />
-      <p>{data.consentText}</p>
-      {data.consentStatus === 'ACCEPTED' ? (
+      {data.legacy ? <ProductStatus kind="info" title={data.title}>可以撤回已有授权。重新授权须由学校重新发布家长专用报告，并重新确认同意。</ProductStatus> : <><ParentReportView report={data.projection} /><p>{data.consentText}</p></>}
+      {data.legacy ? null : data.consentStatus === 'ACCEPTED' ? (
         <ProductStatus kind="success" title="已同意当前报告版本">
           还需报告负责人逐份授权；您可以随时撤回。
         </ProductStatus>

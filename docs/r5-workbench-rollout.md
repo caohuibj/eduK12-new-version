@@ -6,7 +6,7 @@
 
 `20261007020000_assessment_workbench` 仅新增私有组合模板、管理事件和课堂结束小结三张表及索引，不修改既有作答或报告。发布时仍使用正式 `npm run db:migrate:guarded`，先应用迁移再启动新后端。旧应用版本可以忽略这些表；回退应用时保留新表和记录，不能直接删除已经产生的小结或审计。
 
-跨 PR 修订后，正式生产的 guarded migration 末尾和 release preflight 还需 `DATABASE_URL_RUNTIME`；Compose 已传递。检查器使用独立运行角色只读验证受限身份、表/序列/schema 权限和精确迁移指纹，缺权时阻止发布，不自动授予权限。授权后已盘点生产 `eduk12_prod/ptool/eduk12_runtime_v1`：业务表及未来对象授权完整，迁移账本多余写权已精确撤销。其他环境应核对作用域，必要时执行经审核的 `runtime-role-defaults.sql` 和逐表最小差异配置，再用实际 runtime 重验；不要用 owner 凭据替代。生产仍在原 100 条迁移 release，不代表 PR 的 102 条迁移就绪。旧家长兼容 JSON 不再具有正式发布权限，未发布历史来源需重新走合法发布、同意和逐份授权。完整边界见 [跨 PR 修订说明](qa-cross-pr-review-repair.md)。
+跨 PR 修订后，正式生产的 guarded migration 末尾和 release preflight 还需 `DATABASE_URL_RUNTIME`；Compose 已传递。检查器使用独立运行角色只读验证受限身份、按 release 清单分类的表/序列/schema 权限和精确迁移指纹，缺权、未分类表或运维表越权阻止发布，不自动授予权限。前序授权已精确撤销生产迁移账本多余写权；本轮进一步只读确认两个 legacy 导入运维表及 future-table 默认授权仍较宽，未在生产运行新 reconcile。首次配置、新增表和灾备恢复按 [数据库运行角色配置流程](runtime-database-provisioning.md)，在 migrate 后显式 reconcile，再以真实 runtime 重验。生产仍在原 100 条迁移 release，不代表 PR 的 102 条迁移就绪。旧家长兼容 JSON 不再具有新发布权限；已有旧同意/授权仅提供逐份撤回，重新授权需合法发布、同意和逐份授权。完整边界见 [跨 PR 修订说明](qa-cross-pr-review-repair.md)。
 
 组合模板保存为无投放能力的草稿：不复制课程绑定、公开 token、学生答案或报告授权。教师使用固定包仍经过精确版本、审批有效期和依赖校验。批量家长报告仅复用已有准入、预览、幂等发布、学生同意及逐份授权接口，不自动发送消息。
 

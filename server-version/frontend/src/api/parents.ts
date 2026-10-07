@@ -40,6 +40,7 @@ export interface Report extends Projection {
   canRevoke: boolean
 }
 export interface ConsentPreview {
+  legacy?: false
   relationshipId: string
   artifactId: string
   parentName: string
@@ -50,6 +51,16 @@ export interface ConsentPreview {
   commandKey: string
   consentStatus: 'ACCEPTED' | 'NOT_ACCEPTED'
   canConsent: boolean
+  canRevoke: boolean
+}
+export interface WithdrawalPreview {
+  legacy: true
+  relationshipId: string
+  artifactId: string
+  parentName: string
+  title: string
+  canConsent: false
+  canGrant: false
   canRevoke: boolean
 }
 export interface PublicationPreview {
@@ -130,7 +141,7 @@ export const parentsApi = {
     ),
   reportOptions: (relationshipId: string, signal?: AbortSignal) =>
     get<{
-      list: Array<{ id: string; title: string; canConsent: boolean }>
+      list: Array<{ id: string; title: string; canConsent: boolean; legacy?: boolean }>
       truncated: boolean
     }>(`/parent-links/${id(relationshipId)}/report-options`, signal),
   previewConsent: (
@@ -138,7 +149,7 @@ export const parentsApi = {
     artifactId: string,
     signal?: AbortSignal,
   ) =>
-    get<ConsentPreview>(
+    get<ConsentPreview | WithdrawalPreview>(
       `/parent-links/${id(relationshipId)}/reports/${id(artifactId)}/consent`,
       signal,
     ),

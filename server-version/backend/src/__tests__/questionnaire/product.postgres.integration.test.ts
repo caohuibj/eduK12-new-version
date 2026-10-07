@@ -347,7 +347,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     let response: any
     const res: any = { status() { return this }, json(body: any) { response = body; return this } }
     await compositeController.publicEmbeddedSituational({ params: { attemptId, itemId: child.compositeItemId, situationalAttemptId: child.id }, headers: { 'x-recovery-token': recoveryToken } } as any, res)
-    expect(response).toMatchObject({ code: 0, data: { feedbackDeferred: true, attempt: { status: 'COMPLETED' } } })
+    expect(response).toMatchObject({ code: 0, data: { feedbackDeferred: true, attempt: { status: 'COMPLETED', compositeAttemptId: attemptId } } })
     expect(response.data).not.toHaveProperty('result')
     await expect(runtime.getReport(attemptId, { recoveryTokenHash })).rejects.toMatchObject({ statusCode: 400 })
     expect((await runtime.getReportForTeacher(actor.userId, actor.role, row.id, attemptId, undefined, true)).unitReports.map((unit: any) => unit.type).sort()).toEqual(['COGNITIVE', 'SITUATIONAL'])

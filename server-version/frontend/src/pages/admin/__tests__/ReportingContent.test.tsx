@@ -40,6 +40,19 @@ it('offers retry for a plain-object 502 and does not claim a permissions problem
   expect(await screen.findByRole('alert')).toHaveTextContent('服务暂时不可用，请稍后重试')
   expect(screen.getByRole('button',{name:'刷新准备状态'})).toBeEnabled()
 })
+it('loads older resources without losing selection or duplicating overlapping page rows',async()=>{
+  const first={...resource,status:'PUBLISHED'},old={...first,id:'old',entry:{...first.entry,title:'更早资源'}}
+  api.resources.mockImplementation(async(page=1)=>page===1?{list:[first],nextPage:2}:{list:[first,old],nextPage:null})
+  const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+  await user.selectOptions(await screen.findByLabelText('已发布测量资源'),'resource')
+  await user.click(screen.getByRole('button',{name:'更多资源'}))
+  await screen.findByText('更早资源 · 已发布')
+  expect(api.resources).toHaveBeenCalledWith(2)
+  expect(screen.getByLabelText('已发布测量资源')).toHaveValue('resource')
+  expect(screen.getAllByRole('option',{name:'原创偏好'})).toHaveLength(1)
+  await user.selectOptions(screen.getByLabelText('已发布测量资源'),'old')
+  expect(screen.queryByRole('button',{name:'更多资源'})).not.toBeInTheDocument()
+})
 
 it('disables self-review of registered resources and reporting specs',async()=>{
  api.resources.mockResolvedValue({list:[{...resource,created_by_user_id:'reviewer'}],truncated:false})
