@@ -662,3 +662,5 @@
   .hui-training.hui-app--standard .staff-dialog__header .staff-inline-actions .staff-icon-button { width: 44px; }
 }
 .hui-training.hui-app--standard :is(.text-gray-500,.hui-auth-stage__tagline) { color: var(--training-muted); }
+.hui-training.hui-app--standard .student-submit-richtext { color: var(--training-ink); }
+.hui-training.hui-app--standard .student-submit-deadline { background: #e8eee5; color: var(--training-muted); border-radius: 4px; }
