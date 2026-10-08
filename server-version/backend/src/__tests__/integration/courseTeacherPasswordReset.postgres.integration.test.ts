@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PlatformRole, PrismaClient, UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
+import { createOrganization } from '../../modules/organization/service'
 import {
   assertTeacherCourseResetPreflight,
   resetEnrolledStudentPassword,
@@ -136,6 +137,23 @@ suite('Training Course teacher credential recovery — real PostgreSQL', () => {
       })).rejects.toMatchObject({ code: 'COURSE_PASSWORD_RESET_FORBIDDEN', statusCode: 403 })
       expect(await beforeReset(studentId)).toEqual(old)
     }
+  })
+
+  it('refuses course-based reset of a learner who governs another Organization', async () => {
+    const owner = await makeUser(UserRole.TEACHER, 'owner')
+    const learner = await makeUser(UserRole.STUDENT, 'org-admin-learner')
+    const course = await makeCourse(owner.id)
+    await enroll(course.id, learner.id)
+    await createOrganization({
+      name: unique('sensitive-organization'),
+      meta: { actorUserId: learner.id, commandKey: unique('org-command') },
+    })
+    const old = await beforeReset(learner.id)
+    await expect(resetEnrolledStudentPassword({
+      actorUserId: owner.id, courseId: course.id, studentId: learner.id,
+      passwordHash: 'should-not-write',
+    })).rejects.toMatchObject({ code: 'COURSE_PASSWORD_RESET_FORBIDDEN', statusCode: 403 })
+    expect(await beforeReset(learner.id)).toEqual(old)
   })
 
   it('re-checks a demoted or unapproved trainer against current DB authority', async () => {
