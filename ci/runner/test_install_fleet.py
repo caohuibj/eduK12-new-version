@@ -4,7 +4,7 @@ spec=importlib.util.spec_from_file_location('installer',pathlib.Path(__file__).w
 class InstallerTests(unittest.TestCase):
  def test_private_root_symlink_foreign_mode_and_controls(self):
   with tempfile.TemporaryDirectory()as raw:
-   root=pathlib.Path(raw);self.assertEqual(module.checked_directory(root),root)
+   root=pathlib.Path(raw).resolve();self.assertEqual(module.checked_directory(root),root)
    (root/'link').symlink_to(root,target_is_directory=True)
    for bad in [root/'link'/'nested',root/'line\nbreak']:
     with self.assertRaises(ValueError):module.checked_directory(bad)
@@ -12,7 +12,7 @@ class InstallerTests(unittest.TestCase):
    with self.assertRaises(ValueError):module.checked_directory(root/'public')
  def test_archive_escape_is_rejected_and_internal_links_allowed(self):
   with tempfile.TemporaryDirectory()as raw:
-   root=pathlib.Path(raw);archive=root/'bad.tar.gz'
+   root=pathlib.Path(raw).resolve();archive=root/'bad.tar.gz'
    with tarfile.open(archive,'w:gz')as tar:
     item=tarfile.TarInfo('../escape');item.size=1;tar.addfile(item,io.BytesIO(b'x'))
    with self.assertRaises(tarfile.FilterError):module.safe_extract(archive,root/'out')
@@ -23,7 +23,7 @@ class InstallerTests(unittest.TestCase):
    module.safe_extract(archive,root/'good');self.assertEqual((root/'good/lib/link').read_text(),'x')
  def test_registration_partial_progress_is_persisted_and_credentials_not_written(self):
   with tempfile.TemporaryDirectory()as raw:
-   root=pathlib.Path(raw);lanes=[]
+   root=pathlib.Path(raw).resolve();lanes=[]
    for name in ['win-light','win-heavy']:
     path=root/name;path.mkdir(mode=0o700)
     lanes.append({'root':str(path),'name':'eduk12-'+name,'labels':['eduk12-'+name],'registered':False})
@@ -43,3 +43,14 @@ class InstallerTests(unittest.TestCase):
    record=json.loads((root/'inventory.json').read_text());self.assertTrue(record['lanes'][0]['registered']);self.assertFalse(record['lanes'][1]['registered'])
    self.assertNotIn('synthetic-registration-token',(root/'inventory.json').read_text())
 if __name__=='__main__':unittest.main()
+
+class ExistingRunnerTests(unittest.TestCase):
+ def test_reuse_reads_only_public_identity_and_requires_exact_repository(self):
+  with tempfile.TemporaryDirectory()as raw:
+   root=pathlib.Path(raw).resolve();config=root/'.runner'
+   identity={'agentName':'existing-runner','agentId':123,'gitHubUrl':'https://github.com/'+module.REPO}
+   config.write_text(json.dumps(identity));self.assertEqual(module.existing_identity(root)[1],identity)
+   config.write_text(json.dumps({**identity,'gitHubUrl':'https://github.com/another/repo'}))
+   with self.assertRaises(ValueError):module.existing_identity(root)
+   config.unlink();(root/'identity.json').write_text(json.dumps(identity));config.symlink_to(root/'identity.json')
+   with self.assertRaises(ValueError):module.existing_identity(root)

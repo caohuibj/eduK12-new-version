@@ -13,12 +13,12 @@ Mac 保留1536 MiB系统余量，Win保留1024 MiB。Windows当前有效7941 MiB
 
 ## 安装
 
-安装只使用专用非root CI账号；不改生产服务，不复制旧runner凭据。每lane拥有独立安装、`_work`、`_work/_temp`、npm下载缓存和按系统/架构/Playwright版本的浏览器缓存。`~/eduk12-ci-fleet/host`是同宿主机的私有资源协调目录。
+安装只使用专用非root CI账号；不改生产服务，不复制旧runner凭据。复用每台现有runner为light，仅各新增一个heavy；复用runner不改名称/安装目录，只增加精确标签并在切换时加载资源钩子。每lane拥有独立安装、`_work`、`_work/_temp`、npm下载缓存和按系统/架构/Playwright版本的浏览器缓存。`~/eduk12-ci-fleet/host`是同宿主机的私有资源协调目录。
 
-1. `python3 -B ci/runner/install-fleet.py prepare --host mac`（Windows/WSL为`--host win`）。现有两个runner可执行独立`fleet-prepare`诊断完成此步骤。官方runner版本/平台包及SHA256锁定在`ci/runner/runner-release.json`；没有已验证二进制镜像时保留官方可信源，不关闭TLS或校验。
+1. `python3 -B ci/runner/install-fleet.py prepare --host mac --reuse-light-root /原runner实际安装目录`（Windows/WSL为`--host win`）。现有两个runner可执行独立`fleet-prepare`诊断完成此步骤。官方runner版本/平台包及SHA256锁定在`ci/runner/runner-release.json`；没有已验证二进制镜像时保留官方可信源，不关闭TLS或校验。
 2. 使用拥有仓库runner管理权限的本机`gh`认证，再执行同路径`register --host mac|win`。注册token仅存于进程内存/子进程环境，不输出、写日志或保存到清单。部分成功立即保存非秘密注册状态；重试不得覆盖未跟踪的现有runner。
 3. 同账号执行`start --host mac|win`；Windows的服务安装要求本机sudo。runner使用官方自动更新策略，更新后先独立运行实际服务身份的启动/渲染/退出与并发探针。
-4. GitHub管理接口核对四个名称、精确标签、online状态及目录清单。执行四lane健康、同机并发、取消恢复、性能独占验证。验证后受控排空/停用旧两个listener，避免未加入资源仲裁的旧任务与新runner争用端口和内存。
+4. GitHub管理接口核对四个名称、精确标签、online状态及目录清单。执行四lane健康、同机并发、取消恢复、性能独占验证。验证后把准备好的`pending-light.env`配置在保留既有环境项的前提下写入原runner的`.env`，受控排空/重启原两个listener加载资源钩子；确认四个runner均参与仲裁后移除原通用业务标签。不得从正在执行的runner job内直接停止自己。
 
 `prepare`不等于`register`，`register`不等于通过验收。runner管理HTTP403必须先补Administration权限；Actions/Contents权限无法替代。不要在聊天粘贴注册token或机器密码。
 

@@ -20,12 +20,17 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: validate installer and host isolation
         run: python3 -B -m unittest discover -s ci/runner -p 'test_*.py' -v
       - name: prepare checksum-verified binaries and private lane directories
         env:
           CI_FLEET_HOST: ${{ matrix.host }}
-        run: python3 -B ci/runner/install-fleet.py prepare --host "$CI_FLEET_HOST"
+        run: |
+          legacy_root="$(python3 -c 'import os,pathlib; print(pathlib.Path(os.environ["GITHUB_WORKSPACE"]).resolve().parents[2])')"
+          python3 -B ci/runner/install-fleet.py prepare --host "$CI_FLEET_HOST" --reuse-light-root "$legacy_root"
       - name: capture non-secret fleet inventory
         run: cp "$HOME/eduk12-ci-fleet/inventory.json" "$RUNNER_TEMP/ci-fleet-inventory.json"
       - uses: actions/upload-artifact@v4

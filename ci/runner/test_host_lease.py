@@ -8,7 +8,7 @@ def child_acquire(root,name,lane,memory,exclusive,events,hold):
  r=request(name,lane,memory,exclusive);events.put(('queued',name,time.monotonic()));m.acquire(root,r,8192,1024,timeout=5,poll=.01);events.put(('start',name,time.monotonic()));time.sleep(hold);events.put(('end',name,time.monotonic()));m.release(root,name)
 
 class LeaseTests(unittest.TestCase):
- def setUp(self):self.temp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.temp.name)/'host';self.root.mkdir(mode=0o700)
+ def setUp(self):self.temp=tempfile.TemporaryDirectory();self.root=pathlib.Path(self.temp.name).resolve()/'host';self.root.mkdir(mode=0o700)
  def tearDown(self):self.temp.cleanup()
  def test_safe_light_heavy_overlap_and_budget(self):
   active=request('heavy','win-heavy',6144);light=request('static','win-light',768);codeql=request('codeql','win-light',4096)
