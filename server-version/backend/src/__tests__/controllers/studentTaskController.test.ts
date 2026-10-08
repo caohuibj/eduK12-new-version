@@ -29,6 +29,12 @@ describe('student task endpoint', () => {
     expect(list).toHaveBeenCalledWith('mine', { page: 1, pageSize: 20 })
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0 }))
   })
+  it('forwards a bounded courseId filter only for the authenticated student', async () => {
+    list.mockResolvedValue({ list: [], total: 0 })
+    const res = response()
+    await studentTaskList({ user: { userId: 'mine' }, query: { courseId: 'course-1', page: '1', pageSize: '100' } } as any, res)
+    expect(list).toHaveBeenCalledWith('mine', { page: 1, pageSize: 100, courseId: 'course-1' })
+  })
   it.each(taskFilters)('forwards the supported %s filter for the authenticated student', async state => {
     list.mockResolvedValue({ list: [], total: 0 })
     const res = response()
