@@ -26,7 +26,7 @@ export default function TrainingPortal() {
       <div className="training-wordmark"><span className="training-seal" aria-hidden="true">山</span><span>Huisurvey <small>TRAINING</small></span></div>
       <span className="training-portal-edition">纸墨 · 见山</span>
     </header>
-    <main className="training-portal-main" aria-labelledby="training-title">
+    <section className="training-portal-main" aria-labelledby="training-title">
       <div className="training-portal-copy">
         <p className="training-eyebrow">一段学习 · 一程生长</p>
         <h1 id="training-title">学有所思，<br />行有所获。</h1>
@@ -37,7 +37,7 @@ export default function TrainingPortal() {
         </nav>
       </div>
       <div className="training-sketch-panel"><StudySketch /><span className="training-sketch-caption">读 · 思 · 行</span></div>
-    </main>
+    </section>
     <footer className="training-portal-footer"><span>Huisurvey Training</span><span>学习，始于当下。</span></footer>
   </div>
 }
