@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Key, Lock, Search, Unlock, Users, UserX } from 'lucide-react'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
+import { isTrainingHost } from '../training/context'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import { ProductPage } from '../components/product-ui/ProductPage'
@@ -21,6 +23,9 @@ const CourseStudents: React.FC = () => {
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { courseId } = useParams<{ courseId: string }>()
+  const { user } = useAuth()
+  const canManageGlobalAccount = user?.role === 'ADMIN'
+  const training = isTrainingHost()
   const [course, setCourse] = useState<Course | null>(null)
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
@@ -130,10 +135,10 @@ const CourseStudents: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader
-        title={course?.title || '课程学生管理'}
-        description={`课程号: ${course?.courseCode || '—'} · 共 ${students.length} 名学生`}
+        title={course?.title || (training ? '课程学员管理' : '课程学生管理')}
+        description={`课程码: ${course?.courseCode || '—'} · 共 ${students.length} 名${training ? '学员' : '学生'}`}
         actions={(
-          <Link to="/courses" className="btn-secondary inline-flex items-center gap-2">
+          <Link to={training && courseId ? `/courses/${encodeURIComponent(courseId)}/detail` : '/courses'} className="btn-secondary inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回课程
           </Link>
         )}
@@ -229,7 +234,7 @@ const CourseStudents: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(student.joinedAt)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        {canManageGlobalAccount && <button
                           type="button"
                           onClick={() => handleToggleFreeze(student)}
                           disabled={processingId === student.id}
@@ -238,8 +243,8 @@ const CourseStudents: React.FC = () => {
                           aria-label={student.isFrozen ? `解冻 ${student.nickname} 的账号` : `冻结 ${student.nickname} 的账号`}
                         >
                           {student.isFrozen ? <Unlock className="h-4 w-4" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
-                        </button>
-                        <button
+                        </button>}
+                        {canManageGlobalAccount && <button
                           type="button"
                           onClick={() => handleResetPassword(student)}
                           disabled={processingId === student.id}
@@ -248,7 +253,7 @@ const CourseStudents: React.FC = () => {
                           aria-label={`为 ${student.nickname} 生成一次性临时密码`}
                         >
                           <Key className="h-4 w-4" aria-hidden="true" />
-                        </button>
+                        </button>}
                         <button
                           type="button"
                           onClick={() => handleRemoveStudent(student)}
