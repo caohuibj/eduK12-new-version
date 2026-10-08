@@ -48,7 +48,8 @@ PR, main and diagnostic work self-hosted; do not select `speed` or `economy` wit
 an explicit decision to resume hosted usage. Windows/WSL `eduk12-win-ci` runs CodeQL,
 backend/isolated database regression, production images/scans, recovery, performance
 and actual API/media browser checks in its single exclusive slot. Mac runs routing,
-frontend builds/regression, pure component UI and the three visual engines. Each
+frontend builds/regression, pure component UI and Chromium. Firefox/WebKit run
+on Windows/WSL because the Mac service session failed browser initialization. Each
 machine's existing resource preflight and exact-source artifact checks still apply.
 
 The hosted speed topology below is retained as an optional capacity profile, not
@@ -92,12 +93,12 @@ Profiles are explicit:
 | Profile | Hosted heavy work | Local work |
 | --- | --- | --- |
 | `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, three visual engines | Mac frontend/AppShell/component UI; Windows migrations/images/Ops/performance |
-| `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
+| `economy` | CodeQL, backend regression, main API browser | Mac frontend/Chromium; Windows Firefox/WebKit and remaining real-service work |
 | `local` (current default) | None | Mac frontend/UI, Windows real services and CodeQL |
 
 Light/medium routes do not select heavy hosted acceleration. CodeQL runs on
 Windows/WSL in local mode and on GitHub in hosted profiles. Broad medium UI changes can require all three browser engines
-on Mac and take longer than a small medium change. `balanced`/`hybrid` are aliases
+across Mac and Windows and take longer than a small medium change. `balanced`/`hybrid` are aliases
 for `economy`. Self-hosted outages do not silently activate hosted fallback.
 
 The initial planning target for a warm successful heavy `speed` run is 14–20 minutes
@@ -149,7 +150,8 @@ Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packa
 PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
 screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
 complete interaction and legacy-dialog suites. AppShell remains explicitly gated on Mac. In speed mode all three visual engines run
-on GitHub; economy and medium routes keep visual acceptance on Mac. The QA round 3 component browser flow runs on Mac
+on GitHub; economy and medium routes keep Chromium on Mac and Firefox/WebKit
+on Windows/WSL. The QA round 3 component browser flow runs on Mac
 with its synthetic local APIs; real authorization and scoring remain covered by
 the independent backend/database gates.
 
