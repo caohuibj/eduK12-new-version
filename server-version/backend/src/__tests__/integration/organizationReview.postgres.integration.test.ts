@@ -149,7 +149,7 @@ suite('Organization PR1 review regressions (real PostgreSQL)', () => {
 
   it('routes admin-authorized course freezing through the same usable-admin invariant', async () => {
     const teacher = await createUser('freeze-teacher', { role: UserRole.TEACHER })
-    const admin = await createUser('freeze-admin', { role: UserRole.ADMIN })
+    const admin = await createUser('freeze-admin', { role: UserRole.ADMIN, platformRole: PlatformRole.SYSTEM_ADMIN })
     const primary = await createUser('freeze-primary', { role: UserRole.STUDENT })
     const backup = await createUser('freeze-backup', { role: UserRole.TEACHER })
     const created = await createOrganization({
