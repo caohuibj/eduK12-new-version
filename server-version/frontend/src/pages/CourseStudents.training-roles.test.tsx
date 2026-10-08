@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { get, auth } = vi.hoisted(() => ({
   get: vi.fn(),
-  auth: { user: { id: 'teacher-1', role: 'TEACHER' as 'TEACHER' | 'ADMIN' } },
+  auth: { user: { id: 'teacher-1', role: 'TEACHER' as 'TEACHER' | 'ADMIN', platformRole: 'STANDARD' as 'STANDARD' | 'SYSTEM_ADMIN' } },
 }))
 vi.mock('../api/client', () => ({ default: { get, put: vi.fn(), post: vi.fn(), delete: vi.fn() } }))
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => auth }))
@@ -23,7 +23,7 @@ function showRoster() {
 
 beforeEach(() => {
   get.mockReset()
-  auth.user = { id: 'teacher-1', role: 'TEACHER' }
+  auth.user = { id: 'teacher-1', role: 'TEACHER', platformRole: 'STANDARD' }
   get.mockImplementation((path: string) => {
     if (path === '/courses/course-1') return Promise.resolve({ code: 0, data: { id: 'course-1', title: '培训课', courseCode: 'ABC123', creatorId: 'teacher-1' } })
     if (path === '/courses/course-1/students') return Promise.resolve({ code: 0, data: { list: [{ id: 'learner-1', nickname: '学员甲', username: 'l1', isFrozen: false, joinedAt: '2026-10-01T00:00:00Z' }] } })
@@ -40,7 +40,7 @@ describe('trainer course roster only grants course-level actions', () => {
   })
 
   it('retains explicit global-account controls for platform admin only', async () => {
-    auth.user = { id: 'admin-1', role: 'ADMIN' }
+    auth.user = { id: 'admin-1', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' }
     showRoster()
     expect(await screen.findByRole('button', { name: /冻结 学员甲 的账号/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /生成一次性临时密码/ })).toBeInTheDocument()
