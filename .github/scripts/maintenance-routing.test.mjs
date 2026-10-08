@@ -8,7 +8,7 @@ const entry = (file, mode='100644') => ({file,status:'A',oldMode:'000000',newMod
 function outputs() {
   return {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,'false'])),
     maintenance:'true',content:'false',presentation:'false',frontend:'false',documentation:'false',
-    codeql:'false',scenario:'maintenance',runner_profile:'speed',frontend_build:'false',
+    codeql:'false',scenario:'maintenance',runner_profile:'hosted',frontend_build:'false',
     ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'};
 }
 test('known standalone attachment files and their coordinated routing update select lightweight maintenance',()=>{

@@ -4,7 +4,7 @@ on:
     inputs:
       runner_profile:
         type: string
-        default: local
+        default: hosted
       use_build_artifacts:
         type: boolean
         default: false
@@ -20,7 +20,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       engine: all
       canonical: true
       app_shell: false

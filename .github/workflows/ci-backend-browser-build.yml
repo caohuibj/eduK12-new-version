@@ -14,7 +14,7 @@ permissions:
 jobs:
   backend-browser-build:
     name: UI/content route / backend browser build
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       COGNITIVE_MODULE_ENABLED: 'true'

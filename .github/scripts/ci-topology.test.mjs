@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runnerPlan } from './content-scope.mjs';
@@ -9,24 +9,22 @@ import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
-test('Draft platform maintenance uses self-hosted capacity instead of the reusable hosted default',()=>{
-  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
-  const maintenance=workflow.split('  maintenance:\n')[1]?.split('\n  documentation:')[0];
-  assert.match(maintenance??'',/github\.event\.pull_request\.draft == true.*self-hosted.*eduk12-win-ci/);
-  assert.match(maintenance??'',/needs\.scope\.outputs\.runner_profile == 'local'.*self-hosted/);
+test('CI workflows use hosted-only labels across every entrypoint',()=>{
+  const dir=new URL('../workflows/',import.meta.url);
+  for(const name of readdirSync(dir).filter(name=>name.endsWith('.yml')||name.endsWith('.yaml'))) {
+    const source=readFileSync(new URL(name,dir),'utf8');
+    assert.ok(!/self-hosted|eduk12-(win|mac)-ci/.test(source),name+' has a legacy runner');
+    for(const line of source.split('\n').filter(line=>line.trimStart().startsWith('runs-on:'))) {
+      assert.ok(line.includes('runs-on: ubuntu-24.04') || line.includes('runs-on: $'+'{{ fromJSON(needs.scope.outputs.'),name+': '+line);
+    }
+  }
 });
-test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
+test('single-component probes remain hosted and safety assertions remain intact',()=>{
   const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   const probes=workflow.slice(workflow.indexOf('  probe-frontend-build:'),workflow.indexOf('  scope:'));
-  for(const [lineNo,line] of probes.split('\n').entries()) {
-    if(!/runner_labels:/.test(line)||!line.includes('ubuntu-24.04'))continue;
-    assert.match(line,/inputs\.runner_profile == '(local|speed)'/,`hosted probe runner at line ${lineNo}`);
-    assert.match(line,/self-hosted/);
-  }
-  for(const name of ['probe-backend-regression','probe-browser','probe-media','probe-ui-hosted','probe-maintenance']) {
-    const block=probes.split(`  ${name}:\n`)[1]?.split(/\n  [a-z-]+:/)[0];
-    assert.match(block??'',/inputs\.runner_profile == 'local'.*self-hosted.*eduk12-win-ci/);
-  }
+  assert.ok(!probes.includes('self-hosted'));
+  for(const line of probes.split('\n').filter(line=>line.trimStart().startsWith('runner_labels:')))
+    assert.ok(line.includes('ubuntu-24.04'),line);
   assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
   const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
   const reportCleanup=regression.indexOf('name: clear reports from previous regression jobs');
@@ -42,22 +40,17 @@ test('local single-step dispatch cannot retain a hard-coded hosted runner',()=>{
     assert.ok(regression.split('hosted critical integration suites must not skip')[1]?.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`full regression must require ${file}`);
   }
 });
-test('speed profile assigns independent heavy consumers to hosted Linux and preserves Windows resource exclusivity',()=>{
-  const plan=runnerPlan({...capacity,profile:'speed',scenario:'platform'});
-  for(const lane of ['regression_runner','browser_runner','media_runner','codeql_runner']) assert.deepEqual(plan[lane],['ubuntu-24.04']);
-  assert.deepEqual(plan.frontend_runner,['self-hosted','macOS','eduk12-mac-ci']);
-  assert.deepEqual(plan.heavy_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
-  assert.deepEqual(plan.docker_runner,plan.heavy_runner);assert.equal(plan.visual_hosted,true);
-});
-test('light and medium scenarios do not spend hosted heavy acceleration minutes',()=>{
-  for(const scenario of ['content','content-frontend','frontend','presentation','documentation']) {
-    const plan=runnerPlan({...capacity,profile:'speed',scenario});
-    for(const lane of ['regression_runner','browser_runner','media_runner']) assert.deepEqual(plan[lane],plan.heavy_runner);
-    assert.equal(plan.visual_hosted,false);
+test('all runner profiles and change scenarios resolve to hosted Ubuntu',()=>{
+  for(const profile of ['hosted','speed','economy','local','balanced','hybrid']) {
+    for(const scenario of ['platform','dependencies','frontend','content','maintenance','documentation']) {
+      const plan=runnerPlan({...capacity,profile,scenario});
+      assert.equal(plan.runner_profile,'hosted');
+      for(const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
+        assert.deepEqual(plan[lane],['ubuntu-24.04']);
+      assert.equal(plan.visual_hosted,scenario==='platform');
+    }
   }
-  const economy=runnerPlan({...capacity,profile:'economy'});
-  assert.deepEqual(economy.regression_runner,['ubuntu-24.04']);
-  assert.deepEqual(economy.media_runner,economy.heavy_runner);assert.equal(economy.visual_hosted,false);
+  assert.throws(()=>runnerPlan({profile:'invalid'}));
 });
 test('artifact provenance rejects another commit, run, build profile, lockfile or modified content',()=>{
   const dir=mkdtempSync(join(tmpdir(),'ci-artifact-'));

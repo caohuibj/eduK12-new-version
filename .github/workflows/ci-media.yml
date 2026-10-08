@@ -20,7 +20,7 @@ permissions:
 jobs:
   media:
     name: ${{ matrix.group }}
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false

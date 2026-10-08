@@ -17,7 +17,7 @@ permissions:
 jobs:
   backend-regression:
     name: backend regression (isolated job database)
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       NODE_ENV: test
