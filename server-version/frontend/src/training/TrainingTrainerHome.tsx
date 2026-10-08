@@ -69,13 +69,14 @@ export default function TrainingTrainerHome() {
     if (!title.trim() || creating) return
     setCreating(true)
     setCreateError('')
+    setMutationNotice('')
     try {
       const result = await apiClient.post('/courses', { title: title.trim(), description: description.trim() })
       if (result.code !== 0) throw new Error(result.message || '课程创建失败')
       setCreateOpen(false)
       setTitle('')
       setDescription('')
-      setMutationNotice('课程已创建，课程列表正在更新。')
+      setMutationNotice('课程已创建。')
       await refresh()
     } catch (error) {
       setCreateError(error instanceof Error ? error.message : '课程创建失败')
