@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Brain, Plus, Settings } from 'lucide-react'
 import apiClient from '../../api/client'
+import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 import { useAuth } from '../../contexts/AuthContext'
 import { cognitiveApi } from '../../modules/cognitive/api'
 import MaterialGrantModal from '../../components/MaterialGrantModal'
@@ -88,7 +89,14 @@ const CognitiveAssignmentList: React.FC = () => {
       // Keep package-internal wrappers out of the teacher library even if an
       // older backend ignores the default listedStandalone query parameter.
       setList(isAdmin ? rows : rows.filter((row: AssignmentRow) => row.listedStandalone !== false))
-      setCourses(coursesRes.code === 0 ? (coursesRes.data?.list || []) : [])
+      const available = coursesRes.code === 0 ? (coursesRes.data?.list || []) : []
+      const supplemental = searchParams.get('create') === 'true'
+        ? await resolveTrainingCoursePrefill({
+          courseId: searchParams.get('courseId'),
+          userId: user?.id,
+          knownIds: available.map(course => course.id),
+        }) : null
+      setCourses(supplemental ? [...available, supplemental] : available)
       setConfigs(configsRes.code === 0 ? (configsRes.data?.list || []) : [])
       setTests(testsRes.code === 0 ? (testsRes.data?.list || []) : [])
     } catch (err) {
