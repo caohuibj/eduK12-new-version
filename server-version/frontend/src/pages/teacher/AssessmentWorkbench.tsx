@@ -6,6 +6,7 @@ import { useOrganization } from '../../contexts/OrganizationContext'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
 import { isTrainingHost } from '../../training/context'
+import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 
 interface Overview {
  course: { id: string; title: string }; page: number; total: number; pageSize: number; countMeaning: string
@@ -17,10 +18,16 @@ const labels: Record<string,string> = { PUBLISHED:'已发布', DRAFT:'草稿', A
 export default function AssessmentWorkbench() { const { user } = useAuth(); return <Workbench key={user?.id} /> }
 function Workbench() {
  const training = isTrainingHost()
+ const { user } = useAuth()
  const [query] = useSearchParams(), { organizations, active, activeLoading, selectOrganization } = useOrganization()
  const [courses,setCourses]=useState<Array<{id:string;title:string}>>([]), [course,setCourse]=useState(query.get('courseId')||''), [page,setPage]=useState(1)
  const [data,setData]=useState<Overview|null>(null), [loading,setLoading]=useState(false), [error,setError]=useState(''), [retry,setRetry]=useState(0), epoch=useRef(0)
- useEffect(()=>{ let live=true; void api.get<{courses:Array<{id:string;title:string}>}>('/questionnaire-products/resources').then(r=>{if(r.code!==0)throw r;if(live)setCourses(r.data.courses)}).catch(e=>{if(live)setError(apiErrorMessage(e))});return()=>{live=false} },[])
+ useEffect(()=>{ let live=true; void api.get<{courses:Array<{id:string;title:string}>}>('/questionnaire-products/resources').then(async r=>{
+  if(r.code!==0)throw r
+  const rows = r.data.courses
+  const extra = await resolveTrainingCoursePrefill({ courseId: query.get('courseId'), userId: user?.id, knownIds: rows.map(row=>row.id) })
+  if(live)setCourses(extra ? [...rows, { id: extra.id, title: extra.title }] : rows)
+ }).catch(e=>{if(live)setError(apiErrorMessage(e))});return()=>{live=false} },[query,user?.id])
  useEffect(()=>{ const current=++epoch.current;setData(null);setError('');if(!course){setLoading(false);return}setLoading(true)
   void api.get<Overview>(`/questionnaire-products/workspace/courses/${encodeURIComponent(course)}?page=${page}`).then(r=>{if(r.code!==0)throw r;if(current===epoch.current)setData(r.data)}).catch(e=>{if(current===epoch.current)setError(apiErrorMessage(e))}).finally(()=>{if(current===epoch.current)setLoading(false)})
   return()=>{epoch.current++}
