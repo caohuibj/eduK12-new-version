@@ -24,7 +24,7 @@ const CourseStudents: React.FC = () => {
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { courseId } = useParams<{ courseId: string }>()
   const { user } = useAuth()
-  const canManageGlobalAccount = user?.role === 'ADMIN'
+  const canManageGlobalAccount = user?.role === 'ADMIN' && user.platformRole === 'SYSTEM_ADMIN'
   const training = isTrainingHost()
   const [course, setCourse] = useState<Course | null>(null)
   const [students, setStudents] = useState<Student[]>([])
