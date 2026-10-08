@@ -359,7 +359,7 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
       'anonymous questionnaire completion and exhausted-link recovery'],
     security:['enforced production CSP browser acceptance'],
   })) for(const title of steps){
-    const start=part.indexOf('      - name: '+title+'\\n');
+    const start=part.indexOf('      - name: '+title+'\n');
     assert.ok(start>=0,title);
     assert.match(part.slice(start,start+160),new RegExp("if: matrix\\.group == '"+group+"'"),title);
   }
@@ -370,4 +370,16 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
   assert.match(part,/timeout -k 10s 180s sudo -n apt-get install/);
   assert.match(job(source('ci'),'browser'),/uses: \.\/\.github\/workflows\/ci-browser\.yml/);
   assert.match(job(source('ci'),'merge-gate'),/backend-regression.*frontend-build.*frontend.*browser.*docker/);
+});
+
+test('light test-only route never starts unrelated builds, scans or platform smoke',()=>{
+  const ci=source('ci');
+  for(const name of ['pr-light-backend','pr-light-frontend','post-merge-smoke',
+    'backend','backend-regression','docker','miniprogram']) {
+    const block=job(ci,name);
+    assert.match(block,/if: \$\{\{ needs\.scope\.outputs\.scenario != 'frontend-test' &&/,
+      name+' would otherwise run a redundant platform check');
+  }
+  assert.match(job(ci,'frontend'),/scenario == 'frontend-test'/);
+  assert.match(job(ci,'merge-gate'),/needs: .*frontend.*browser.*docker/);
 });

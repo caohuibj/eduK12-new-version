@@ -17,6 +17,13 @@ and unscoped CI changes select the full platform route. Malformed classification
   historical/revocation lifecycle checks. JS/TS declarations also select CodeQL.
   Executable behavior in a declaration must fail validation. Content compiled into
   a deployment unit still requires that unit's normal build and security scan.
+- **Frontend test-only:** changes exclusively to existing ordinary UI `.test.ts(x)`
+  or `.spec.ts(x)` modules use the full frontend lint/typecheck/audit/Vitest
+  component but do not start production builds, Docker/Trivy, backend regression,
+  browser acceptance, mini-program checks or CodeQL. This never admits runtime
+  modules, sensitive Cognitive/assessment modules, fixtures/harness changes,
+  altered file modes, deletions, other file types, or mixed changes. A malformed
+  scope result or missing frontend success fails the stable Merge Gate.
 - **Medium frontend:** ordinary UI functions without API, shared measurement,
   permission, persistence or database changes. Run frontend lint/types/audit/full
   regression/build, real API browser acceptance, the frontend image/scan and all
@@ -72,6 +79,14 @@ source until an independent trust-model review approves safely testing forks.
 Production secrets and production database access are never exposed to public CI.
 
 The full acceptance graph now permits independent hosted jobs to run concurrently.
+Full real-API browser acceptance is partitioned into **foundation**, **products** and
+**security** groups. Each checks the same immutable backend/frontend build
+artifacts in isolated GitHub-hosted VMs with disposable PostgreSQL/Redis;
+all three are mandatory for a successful aggregated browser job. Matrix inputs
+are validated against an exact list; missing or duplicated groups fail closed.
+Browser evidence artifact names include the group to prevent collisions.
+
+Only proven-unaffected checks are skipped; no cross-commit CI evidence is reused.
 The exact-run artifact contract and isolation checks below remain authoritative.
 
 ### Hosted critical-path and dependency-download policy (2026-10-09)

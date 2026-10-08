@@ -342,7 +342,7 @@ jobs:
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true') }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     defaults:
@@ -400,7 +400,7 @@ jobs:
   pr-light-frontend:
     needs: scope
     name: PR light / frontend lint + typecheck
-    if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true')) }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -434,7 +434,7 @@ jobs:
   post-merge-smoke:
     needs: scope
     name: main / post-merge compile smoke
-    if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -481,7 +481,7 @@ jobs:
   backend:
     needs: scope
     name: backend (migrate + build + performance gate)
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -489,7 +489,7 @@ jobs:
   backend-regression:
     needs: scope
     name: backend regression (isolated job database)
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -529,7 +529,7 @@ jobs:
     # artifacts. Start it with scope; the merge gate independently requires
     # backend, production image scans and all other selected checks.
     needs: scope
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -571,7 +571,7 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')) }}
+    if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
