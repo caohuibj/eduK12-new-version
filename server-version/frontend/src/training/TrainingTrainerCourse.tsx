@@ -88,6 +88,7 @@ export default function TrainingTrainerCourse() {
     catch { setCodeNotice('复制失败，请手动选中课程码。') }
   }
   const measureCount = questionnaires.rows.length + cognitives.rows.length
+  const measurementsLoading = questionnaires.loading || cognitives.loading
 
   return <div className="training-detail training-trainer-course">
     <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
@@ -152,7 +153,7 @@ export default function TrainingTrainerCourse() {
                 {cognitives.error && <p>认知任务读取失败：{cognitives.error}</p>}
                 <button type="button" onClick={retry}>重试</button>
               </div>}
-              {(questionnaires.loading || cognitives.loading) ? <p role="status">正在读取已投放测评…</p>
+              {measurementsLoading ? <p role="status">正在读取已投放测评…</p>
                 : measureCount === 0 && !questionnaires.error && !cognitives.error
                   ? <p className="training-empty-small">这门课程尚未发布测评。可从上方选择可用资源。</p>
                   : <div className="training-item-list">
