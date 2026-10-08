@@ -69,6 +69,20 @@ suite('Organization account-authority mutation regressions (real PostgreSQL)', (
     })).rejects.toMatchObject({ code: 'LAST_ORG_ADMIN', statusCode: 409 })
   })
 
+  it('does not let legacy ADMIN without current platform authority freeze an account', async () => {
+    const legacyAdmin = await createUser('legacy-course-admin', {
+      role: UserRole.ADMIN,
+      platformRole: PlatformRole.STANDARD,
+    })
+    await expect(setCourseStudentFrozenState({
+      actorUserId: legacyAdmin.id,
+      actorRole: UserRole.ADMIN,
+      courseId: 'arbitrary-course',
+      studentId: 'arbitrary-user',
+      isFrozen: true,
+    })).rejects.toMatchObject({ code: 'SYSTEM_ADMIN_REQUIRED', statusCode: 403 })
+  })
+
   it('never lets an admin course freeze surface make SYSTEM_ADMIN unusable', async () => {
     const teacher = await createUser('course-teacher', { role: UserRole.TEACHER })
     const admin = await createUser('course-admin', { role: UserRole.ADMIN, platformRole: PlatformRole.SYSTEM_ADMIN })
