@@ -11,6 +11,7 @@ import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import StaffNavigation from './StaffNavigation'
 import { isTrainingHost, trainingNavigation } from '../../training/context'
+import TrainingBrand from '../../training/TrainingBrand'
 import TrainingContextBack from '../../training/TrainingContextBack'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
 import { activeNavigation, breadcrumbsFor, isStaffWorkspacePath, navigationFor, organizationNavigation, routeTitle } from './navigation'
@@ -54,7 +55,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training?' hui-training':''}`} data-shell-mode={mode}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
-    {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?'Huisurvey Training':'Huisurvey'}</Link>}
+    {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {mode==='standard'&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'平台管理员':'旧版管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
         {!training&&user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
