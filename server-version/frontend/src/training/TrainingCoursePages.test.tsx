@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -124,6 +124,29 @@ describe('course-first training workspaces', () => {
     await screen.findByRole('button', { name: '轮换课程码' })
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ title: '轮换课程码？' }))
     await waitFor(() => expect(post).toHaveBeenCalledWith('/courses/course-1/rotate-code', {}))
+  })
+
+  it('keeps settings open while a successful recruitment change refreshes the same course', async () => {
+    const original = get.getMockImplementation()!
+    let courseReads = 0
+    let resolveRefresh!: (value: { code: number; data: typeof course }) => void
+    get.mockImplementation((url: string) => {
+      if (url === '/courses/course-1' && courseReads++ > 0) return new Promise(resolve => { resolveRefresh = resolve })
+      return original(url)
+    })
+    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+    await screen.findByRole('heading', { name: course.title })
+    const summary = screen.getByText(/课程设置/)
+    const settings = summary.closest('details')!
+    fireEvent.click(summary)
+    expect(settings.open).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: '暂停报名' }))
+    await waitFor(() => expect(courseReads).toBe(2))
+    expect(settings).toBeInTheDocument()
+    expect(settings.open).toBe(true)
+    await act(async () => resolveRefresh({ code: 0, data: { ...course, isRecruiting: false } }))
+    expect(await screen.findByRole('button', { name: '恢复报名' })).toBeVisible()
+    expect(settings.open).toBe(true)
   })
 
   it('keeps course end behind explicit confirmation', async () => {
