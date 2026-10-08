@@ -23,6 +23,8 @@ const CourseList = React.lazy(() => import('./pages/CourseList'))
 const TrainingPortal = React.lazy(() => import('./training/TrainingPortal'))
 const TrainingLearnerHome = React.lazy(() => import('./training/TrainingLearnerHome'))
 const TrainingTrainerHome = React.lazy(() => import('./training/TrainingTrainerHome'))
+const TrainingLearnerCourse = React.lazy(() => import('./training/TrainingLearnerCourse'))
+const TrainingTrainerCourse = React.lazy(() => import('./training/TrainingTrainerCourse'))
 const CourseStudents = React.lazy(() => import('./pages/CourseStudents'))
 const StudentManagement = React.lazy(() => import('./pages/StudentManagement'))
 const AssignmentList = React.lazy(() => import('./pages/AssignmentList'))
@@ -308,8 +310,8 @@ function AppRoutes() {
           <Route
             path="/courses/:courseId/detail"
             element={
-              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                <TeacherCourseDetail />
+              <ProtectedRoute roles={isTrainingHost() ? ['TEACHER'] : ['TEACHER', 'ADMIN']}>
+                {isTrainingHost() ? <TrainingTrainerCourse /> : <TeacherCourseDetail />}
               </ProtectedRoute>
             }
           />
@@ -603,7 +605,7 @@ function AppRoutes() {
             path="/student/courses/:courseId"
             element={
               <StudentProtectedRoute>
-                <CourseDetail />
+                {isTrainingHost() ? <TrainingLearnerCourse /> : <CourseDetail />}
               </StudentProtectedRoute>
             }
           />
