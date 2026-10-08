@@ -209,6 +209,7 @@ const CourseStudents: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
+          {training && <p className="px-4 pt-3 text-sm text-gray-600 hidden sm:block lg:hidden">左右滑动可查看账号与加入时间，学员操作固定在右侧。</p>}
           {training && <p className="px-4 pt-3 text-sm text-gray-600 sm:hidden">账号信息随姓名显示；重置密码和移除操作可直接点击。</p>}
           <div className="overflow-x-auto" role="region" tabIndex={0} aria-label={training ? '课程学员列表，可横向滚动' : '课程学生列表，可横向滚动'}>
             <table className="min-w-full divide-y divide-gray-200">

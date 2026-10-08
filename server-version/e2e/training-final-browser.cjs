@@ -18,11 +18,23 @@ async function json(page, endpoint, data, method = 'POST') {
 }
 function passed(name) { checks.push({ name, status: 'PASS' }); console.log('PASS:', name); save(); }
 function save(status = 'RUNNING') { fs.writeFileSync(path.join(output, 'manifest.json'), JSON.stringify({ status, head: process.env.TRAINING_HEAD_SHA, environment: 'local Vite + actual API + disposable PostgreSQL 16/Redis; synthetic accounts only', screenshots, checks, errors }, null, 2)); }
-async function shots(page, name, role) {
+async function shots(page, name, role, options = {}) {
  for (const width of widths) {
   await page.setViewportSize({ width, height: 960 });
   await page.evaluate(() => document.fonts.ready);
-  const size = await page.evaluate(() => ({ viewport: innerWidth, scroll: document.documentElement.scrollWidth }));
+  if (options.scrollBottom) await page.locator(options.scrollBottom).evaluate(element => { element.scrollTop = element.scrollHeight; });
+  if (options.reveal) await page.locator(options.reveal).scrollIntoViewIfNeeded();
+  if (width === 768 && await page.locator('.training-roster').count()) {
+   for (const button of await page.locator('.training-roster td:last-child button').all()) {
+    const box = await button.boundingBox(); assert.ok(box.x >= 0 && box.x + box.width <= width, 'Tablet member actions must be fully visible');
+   }
+  }
+  if (width === 390 && await page.locator('.hui-training.hui-app--standard .hui-app-main > .hui-page').count()) {
+   const panel = page.locator('.hui-app-main > .hui-page');
+   const inset = await panel.evaluate(element => element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft));
+   assert.ok(Math.abs(inset - 18) < 2, `${name}: consistent phone content inset ${inset}`);
+  }
+  const size = await page.evaluate(() => ({ viewportWidth: innerWidth, scroll: document.documentElement.scrollWidth }));
   assert.ok(size.scroll <= width + 1, `${name} at ${width}: overflow ${size.scroll}`);
   const file = name + '-' + width + '.png';
   await page.screenshot({ path: path.join(output, file), fullPage: true });
@@ -138,6 +150,8 @@ async function main() {
   await trainer.getByRole('row').filter({hasText:'第一周教学反思'}).getByRole('button',{name:'查看提交',exact:true}).click();
   await trainer.getByRole('dialog').waitFor(); await shots(trainer,'trainer-homework-grading','trainer');
   await open(trainer,'/checkins?create=true&courseId='+f.courseId,p=>p.getByRole('dialog'),'trainer-checkin-editor','trainer');
+  await shots(trainer,'trainer-checkin-editor-bottom','trainer',{scrollBottom:'.staff-dialog__body'});
+  await shots(trainer,'trainer-checkin-editor-permissions','trainer',{reveal:'#allowViewOthers'});
   await trainer.getByLabel('打卡标题 *',{exact:true}).fill('浏览器发布新打卡');
   const newCheckin=trainer.waitForResponse(r=>r.url().endsWith('/api/checkins')&&r.request().method()==='POST');
   await trainer.getByRole('dialog').getByRole('button',{name:'创建打卡',exact:true}).click();

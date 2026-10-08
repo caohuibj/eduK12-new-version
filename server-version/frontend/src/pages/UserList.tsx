@@ -172,6 +172,7 @@ const UserList: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
+          <p className="training-user-scroll-note">左右滑动可查看姓名、完整用户 ID、状态与审核操作；也可聚焦表格后使用方向键。</p>
           <div className="overflow-x-auto" role="region" tabIndex={0} aria-label="用户列表，可左右滚动查看更多列和操作">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

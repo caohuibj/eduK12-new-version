@@ -49,3 +49,11 @@
 .hui-training-admin-content :is(.text-green-600,.text-green-700) { color: var(--training-bamboo); }
 .hui-training-admin-content .staff-table th { color: var(--training-muted); }
 .hui-training-admin-content .hui-staff-workspace .staff-table td { color: var(--training-ink); }
+
+.training-user-scroll-note { display: none; }
+.hui-training-admin-content .training-user-scroll-note { display: block; padding: 12px 16px; color: var(--training-muted); font-size: 12px; line-height: 1.7; border-bottom: 1px solid var(--training-border); }
+.hui-training-admin-content .staff-course-cover--placeholder { height: 88px; background: #efebe2; color: var(--training-bamboo); border-radius: 4px 4px 0 0; }
+.hui-training-admin-content .staff-badge { flex-shrink: 0; white-space: nowrap; border-color: var(--training-border); }
+.hui-training-admin-content .staff-badge--success { background: #e8eee5; color: var(--training-bamboo); }
+.hui-training-admin-content .staff-course-card__heading { flex-wrap: wrap; gap: 8px; }
+.hui-training-admin-content .staff-course-card__heading h2 { flex: 1 1 180px; }
