@@ -221,12 +221,12 @@ const StudentManagement: React.FC = () => {
   const getCourseStudentCount = (courseId: string) => students.filter(student => student.courseId === courseId).length
 
   const renderStudentActions = (student: Student, compact = false) => (
-    <div className={`flex items-center justify-end ${compact ? 'gap-1' : 'gap-2'}`}>
+    <div className={`flex min-w-max items-center justify-end ${compact ? 'gap-1' : 'gap-2'}`}>
       {canManageGlobalAccount && <button
         type="button"
         onClick={() => handleToggleFreeze(student)}
         disabled={processingId === student.id}
-        className={`${compact ? 'p-1' : 'p-2'} rounded ${
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center ${compact ? 'p-1' : 'p-2'} rounded ${
           student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'
         } disabled:opacity-50`}
         aria-label={student.isFrozen ? `解冻 ${student.nickname} 的账号` : `冻结 ${student.nickname} 的账号`}
@@ -238,7 +238,7 @@ const StudentManagement: React.FC = () => {
         type="button"
         onClick={() => handleResetPassword(student)}
         disabled={processingId === student.id}
-        className={`${compact ? 'p-1' : 'p-2'} text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50`}
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center ${compact ? 'p-1' : 'p-2'} text-blue-700 hover:bg-blue-50 rounded disabled:opacity-50`}
         aria-label={`重置 ${student.nickname} 的密码`}
         title="重置密码"
       >
@@ -248,7 +248,7 @@ const StudentManagement: React.FC = () => {
         type="button"
         onClick={() => handleRemoveStudent(student)}
         disabled={processingId === student.id}
-        className={`${compact ? 'p-1' : 'p-2'} text-red-600 hover:bg-red-50 rounded disabled:opacity-50`}
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center ${compact ? 'p-1' : 'p-2'} text-red-700 hover:bg-red-50 rounded disabled:opacity-50`}
         aria-label={`将 ${student.nickname} 从课程中移除`}
         title="从课程中移除"
       >
