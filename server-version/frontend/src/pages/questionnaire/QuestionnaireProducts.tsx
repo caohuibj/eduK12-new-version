@@ -3,6 +3,7 @@ import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../../api/client'
+import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
@@ -149,6 +150,7 @@ export function QuestionnaireProductList() {
 }
 
 export function QuestionnaireProductEdit() {
+  const { user } = useAuth()
   const { feedback, confirm: confirmManagement } = useStaffFeedback()
   const { id = 'new' } = useParams()
   const navigate = useNavigate()
@@ -204,23 +206,32 @@ export function QuestionnaireProductEdit() {
     setDetail(null)
     setError('')
     request('/resources')
-      .then(row => {
+      .then(async row => {
         if (!active) return
-        setCatalog(row)
+        const courses: Array<{ id: string; title: string }> = row.courses || []
+        const supplemental = id === 'new'
+          ? await resolveTrainingCoursePrefill({
+            courseId: preselectedCourseId,
+            userId: user?.id,
+            knownIds: courses.map(course => course.id),
+          }) : null
+        if (!active) return
+        const resolvedCourses = supplemental ? [...courses, supplemental] : courses
+        setCatalog({ ...row, courses: resolvedCourses })
         if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) {
           setType('SCALE')
           setSelected(preselectedScaleId)
         }
-        // Course context from the Training course page is a suggestion only:
-        // only a course returned by the authorized resource catalog is selected.
-        if (id === 'new' && preselectedCourseId && row.courses.some((course: any) => course.id === preselectedCourseId)) {
+        // One verified creator-owned course may be appended when omitted by
+        // the first catalog page; no URL parameter becomes an authority.
+        if (id === 'new' && preselectedCourseId && resolvedCourses.some(course => course.id === preselectedCourseId)) {
           setCourseIds(current => current.length ? current : [preselectedCourseId])
         }
       })
       .catch((e) => { if (active) setError(message(e)) })
     if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
-  }, [id, preselectedScaleId, preselectedCourseId])
+  }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>) => {
     setBusy(true)
     setError('')

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { get } = vi.hoisted(() => ({ get: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: { get }, sessionFetch: vi.fn() }))
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }) }))
 vi.mock('../../components/RichTextEditor', () => ({ default: () => null }))
 vi.mock('../../components/QuestionEditor', () => ({ default: () => null }))
 vi.mock('../../components/MediaSelector', () => ({ default: () => null }))
