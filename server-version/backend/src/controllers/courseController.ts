@@ -511,6 +511,8 @@ export const courseController = {
       const userRole = req.user?.role
       const { courseCode } = req.body
 
+      if (userRole !== UserRole.STUDENT) return forbidden(res, '只有学员可以报名课程')
+
       if (!courseCode) {
         return error(res, '请输入课程号')
       }
