@@ -582,3 +582,7 @@
   outline: 3px solid var(--training-bamboo);
   outline-offset: 3px;
 }
+
+/* TrainingContextBack supplies a stable course return on every task page,
+   including a refreshed deep link with no in-app browser history. */
+.hui-training.hui-app--standard .student-submit-back { display: none; }
