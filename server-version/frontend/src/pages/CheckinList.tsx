@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
+import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
 import { sessionFetch } from '../api/client'
 import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
@@ -67,6 +69,7 @@ interface CheckinSubmission {
 }
 
 const CheckinList: React.FC = () => {
+  const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
@@ -153,9 +156,16 @@ const CheckinList: React.FC = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await apiClient.get('/courses')
+      const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
-        setCourses(response.data.list)
+        const list = response.data.list
+        const appended = searchParams.get('create') === 'true'
+          ? await resolveTrainingCoursePrefill({
+            courseId: searchParams.get('courseId'),
+            userId: user?.id,
+            knownIds: list.map(course => course.id),
+          }) : null
+        setCourses(appended ? [...list, appended] : list)
       }
     } catch (error) {
       console.error('获取课程列表失败:', error)
