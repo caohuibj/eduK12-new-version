@@ -66,7 +66,7 @@ export default function AuthShell({
   const Icon = preset.Icon
   const training = isTrainingHost() && (tone === 'student' || tone === 'teacher')
   const trainingRole = tone === 'student' ? '学员' : '培训师'
-  const copy = (value: string) => training ? value.replaceAll('学生', '学员').replaceAll('教师', '培训师').replaceAll('班级', '课程') : value
+  const copy = (value: string) => training ? value.replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
   const displayHeroTitle = training ? (tone === 'student' ? '循着课程，慢慢向前。' : '以所学，启发更多人。') : (heroTitle ?? preset.heroTitle)
   const displayHeroDescription = training
     ? (tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
