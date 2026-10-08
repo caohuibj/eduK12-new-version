@@ -132,8 +132,9 @@ fixture guards, test assertions and individual evidence remain mandatory. Standa
 media workflows invoke the same composite scenario actions as grouped validation.
 
 Local visual acceptance and the `ui` component probe use one matrix job per
-Chromium/Firefox/WebKit engine. Chromium/Firefox retain the single Mac slot; WebKit uses the exclusive
-Windows/WSL slot because Mac WebKit failed before page startup in run 37762383022.
+Chromium/Firefox/WebKit engine. Chromium retains the single Mac slot; Firefox/WebKit use the exclusive
+Windows/WSL slot because both engines failed before page startup in run 37762383022
+(Mac sandbox/graphics initialization).
 AppShell and QA round 3 run once in the Chromium job. Each engine retains the
 20-minute timeout, complete scenarios, exact-run artifacts and cleanup. The
 aggregate requires success from the whole matrix, and fail-fast is disabled so
