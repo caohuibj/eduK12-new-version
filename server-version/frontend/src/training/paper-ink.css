@@ -187,6 +187,8 @@
 .training-course-text small { font-size: 14px; color: var(--training-muted); overflow-wrap: anywhere; line-height: 1.6; }
 .training-status, .training-empty, .training-message { padding: 40px 8px; color: var(--training-muted); line-height: 1.8; }
 .training-empty button, .training-message button { display: block; color: var(--training-bamboo); text-decoration: underline; min-height: 44px; margin-top: 8px; }
+.training-load-more { display: grid; justify-content: center; gap: 12px; padding: 24px 0; font-size: 14px; color: var(--training-muted); }
+.training-load-more .training-action { text-align: center; }
 .training-bottom-line { text-align: center; color: var(--training-muted); font-family: var(--training-serif); letter-spacing: .18em; margin: 90px 0 0; font-size: 14px; }
 
 .training-dialog-backdrop {
