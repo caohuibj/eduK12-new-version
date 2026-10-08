@@ -88,7 +88,7 @@ test('real CLI selects scoped consumers and force-full only strengthens; no chan
 function outputs() {
   return {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,'false'])),
     maintenance:'false',content:'false',frontend:'false',presentation:'false',documentation:'false',
-    codeql:'true',scenario:'dependencies',runner_profile:'speed',frontend_build:'true',
+    codeql:'true',scenario:'dependencies',runner_profile:'hosted',frontend_build:'true',
     ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'};
 }
 test('draft and ready dependency aggregate require every formal affected component and reject skips or forged selections',()=>{

@@ -4,7 +4,7 @@ import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } 
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
-    maintenance:'false',content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'speed',...extra};
+    maintenance:'false',content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'hosted',...extra};
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
