@@ -80,7 +80,14 @@
 
 .report-body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
+}
+
+/* Long frozen evidence identifiers must wrap instead of widening report grids. */
+.report-body > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .report-section {
