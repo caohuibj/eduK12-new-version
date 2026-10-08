@@ -37,7 +37,7 @@ const errorMessage = (value: unknown, fallback: string) => {
   return typeof message === 'string' && message.trim() ? message : fallback
 }
 
-export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const OrganizationProvider: React.FC<{ children: ReactNode; suspended?: boolean }> = ({ children, suspended = false }) => {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const principal = isAuthenticated ? user?.id ?? null : null
   const [statePrincipal, setStatePrincipal] = useState(principal)
@@ -45,7 +45,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [allowedActions, setAllowedActions] = useState<string[]>([])
   const [organizations, setOrganizations] = useState<AccessibleOrganization[]>([])
   const [total, setTotal] = useState(0)
-  const [isLoading, setIsLoading] = useState(Boolean(principal))
+  const [isLoading, setIsLoading] = useState(Boolean(principal) && !suspended)
   const [error, setError] = useState<string | null>(null)
   const [active, setActive] = useState<OrganizationContextProjection | null>(null)
   const [activeLoading, setActiveLoading] = useState(false)
@@ -78,7 +78,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
   }
 
   const refresh = useCallback(async () => {
-    if (!principal) {
+    if (!principal || suspended) {
       reset()
       return
     }
@@ -129,10 +129,10 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       if (discoveryEpoch === discoveryEpochRef.current) setIsLoading(false)
     }
-  }, [principal, reset])
+  }, [principal, reset, suspended])
 
   const selectOrganization = useCallback(async (organizationId: string) => {
-    if (!principal || !organizationId) return null
+    if (suspended || !principal || !organizationId) return null
     const activeEpoch = ++activeEpochRef.current
     setActiveLoading(true)
     setActive(null)
@@ -151,7 +151,7 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       if (activeEpoch === activeEpochRef.current) setActiveLoading(false)
     }
-  }, [principal])
+  }, [principal, suspended])
 
   const clearActiveOrganization = useCallback(() => {
     activeEpochRef.current += 1
@@ -161,20 +161,21 @@ export const OrganizationProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [])
 
   useEffect(() => {
+    if (suspended) { reset(); return }
     if (authLoading) return
     if (!isAuthenticated) {
       reset()
       return
     }
     void refresh()
-  }, [authLoading, isAuthenticated, user?.id, refresh, reset])
+  }, [authLoading, isAuthenticated, user?.id, refresh, reset, suspended])
 
   useEffect(() => {
-    if (!isAuthenticated || authLoading) return
+    if (suspended || !isAuthenticated || authLoading) return
     const refreshOnFocus = () => { void refresh() }
     window.addEventListener('focus', refreshOnFocus)
     return () => window.removeEventListener('focus', refreshOnFocus)
-  }, [isAuthenticated, authLoading, refresh])
+  }, [isAuthenticated, authLoading, refresh, suspended])
 
   return (
     <OrganizationProductContext.Provider value={{

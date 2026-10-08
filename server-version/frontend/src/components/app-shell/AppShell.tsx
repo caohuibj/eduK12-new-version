@@ -11,6 +11,7 @@ import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import StaffNavigation from './StaffNavigation'
 import { isTrainingHost, trainingNavigation } from '../../training/context'
+import TrainingContextBack from '../../training/TrainingContextBack'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
 import { activeNavigation, breadcrumbsFor, isStaffWorkspacePath, navigationFor, organizationNavigation, routeTitle } from './navigation'
 import './app-shell.css'
@@ -65,9 +66,22 @@ function AppShellContent({ children }: { children: ReactNode }) {
     </header>}
     <div className="hui-app-body">{mode==='standard'&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode&&!training?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
       <div className="hui-app-content">{mode==='standard'&&<nav className="hui-product hui-breadcrumb" aria-label="当前位置"><ol>{breadcrumbs.map((crumb,index)=><li key={`${index}:${crumb.label}`}>{index>0&&<ChevronRight size={14} aria-hidden="true"/>}{crumb.path?<Link to={crumb.path}>{crumb.label}</Link>:<span aria-current="page">{crumb.label}</span>}</li>)}</ol></nav>}
-        <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}>{!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</main>
+        <main id="hui-main" ref={mainRef} tabIndex={-1} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}>{training && mode==='standard' && <TrainingContextBack role={user?.role}/>} {!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</main>
       </div>
     </div>{!training&&!entryMode&&mode!=='focused'&&<Footer variant="light"/>}
   </div>
 }
-export default function AppShell({children}:{children:ReactNode}){return <OrganizationProvider><RelationalAvailabilityProvider><AppShellContent>{children}</AppShellContent></RelationalAvailabilityProvider></OrganizationProvider>}
+export default function AppShell({children}:{children:ReactNode}) {
+  const { pathname } = useLocation()
+  const training = isTrainingHost()
+  // Direct deep links to the existing Organization/Relational product must
+  // still be functional; only ordinary Training course navigation skips
+  // irrelevant discovery. Host context changes presentation, not API authority.
+  const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
+  const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
+  return <OrganizationProvider suspended={training && !requiresOrganization}>
+    <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
+      <AppShellContent>{children}</AppShellContent>
+    </RelationalAvailabilityProvider>
+  </OrganizationProvider>
+}

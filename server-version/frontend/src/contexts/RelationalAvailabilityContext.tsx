@@ -7,9 +7,9 @@ type State = { key: string; status: Availability }
 const Context = createContext<{ status: Availability; retry: () => void }>({ status: 'loading', retry: () => {} })
 
 /** Discovery only: direct routes and historical report access remain independent. */
-export function RelationalAvailabilityProvider({ children }: { children: ReactNode }) {
+export function RelationalAvailabilityProvider({ children, suspended = false }: { children: ReactNode; suspended?: boolean }) {
   const { user } = useAuth()
-  const key = user && !user.mustChangePassword && ['STUDENT', 'PARENT', 'TEACHER'].includes(user.role) ? `${user.id}:${user.role}` : ''
+  const key = !suspended && user && !user.mustChangePassword && ['STUDENT', 'PARENT', 'TEACHER'].includes(user.role) ? `${user.id}:${user.role}` : ''
   const [state, setState] = useState<State>({ key: '', status: 'empty' })
   const [revision, setRevision] = useState(0)
   const retry = useCallback(() => setRevision(value => value + 1), [])
