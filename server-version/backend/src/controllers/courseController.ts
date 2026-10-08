@@ -14,8 +14,7 @@ import {
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
-import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
-import path from 'node:path'
+import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
@@ -827,28 +826,10 @@ export const courseController = {
         return error(res, '该学生未加入此课程')
       }
 
-      // 生成随机临时密码
-      const { hashPassword, generateTempPassword } = await import('../utils/password')
-      const tempPassword = generateTempPassword()
-      const hashedPassword = await hashPassword(tempPassword)
-
-      const student = await prisma.user.findUnique({ where: { id: studentId }, select: { username: true } })
-      const handoffFile = await writeCredentialHandoff([{ username: student?.username || studentId, temporaryPassword: tempPassword }], 'student-password-reset')
-      try {
-        await prisma.user.update({
-          where: { id: studentId },
-          data: {
-            passwordHash: hashedPassword,
-            tokenVersion: { increment: 1 },
-            mustChangePassword: true,
-          }
-        })
-      } catch (updateError) {
-        removeCredentialHandoff(handoffFile)
-        throw updateError
-      }
-
-      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
+      // An old course-roster URL remains compatible, but account mutation now
+      // executes the same system-admin admission, rate limit, transaction and
+      // Organization usable-admin invariant as /users/:id/reset-password.
+      return resetPasswordForPlatformAdmin(req, res, studentId)
     } catch (err) {
       logger.error('重置密码错误', err)
       return error(res, '重置密码失败')
