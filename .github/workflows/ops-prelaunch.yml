@@ -5,13 +5,13 @@ on:
     inputs:
       runner_profile:
         type: string
-        default: local
+        default: hosted
   workflow_dispatch:
     inputs:
       runner_profile:
         type: choice
-        options: [local]
-        default: local
+        options: [hosted]
+        default: hosted
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ concurrency:
 jobs:
   runtime-recovery:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       NODE_ENV: test

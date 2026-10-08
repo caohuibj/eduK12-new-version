@@ -1,4 +1,2 @@
-self-hosted-runner:
-  labels:
-    - eduk12-win-ci
-    - eduk12-mac-ci
+# All versioned jobs use the standard GitHub-hosted Ubuntu runner.
+{}

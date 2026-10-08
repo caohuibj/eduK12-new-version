@@ -1,6 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, readFileSync, statfsSync } from 'node:fs';
-import { platform } from 'node:os';
+import { appendFileSync, readFileSync } from 'node:fs';
 import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
@@ -178,31 +177,25 @@ export function changedFiles(base, head = 'HEAD') {
   return changedEntries(base, head).map(entry => entry.file);
 }
 
-export function runnerPlan({ profile = 'speed', scenario = 'platform', macEnabled = false, os, freeBytes = 0 }) {
-  if (!['speed','economy','local','balanced','hybrid'].includes(profile)) throw new Error('Unsupported CI_RUNNER_PROFILE');
-  if (['balanced','hybrid'].includes(profile)) profile = 'economy';
-  const windows = ['self-hosted', 'Linux', 'X64', 'eduk12-win-ci'];
-  const mac = ['self-hosted', 'macOS', 'eduk12-mac-ci'];
+export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
+  // Old repository variables and saved dispatch requests cannot restore local runners.
+  if (!['hosted','speed','economy','local','balanced','hybrid'].includes(profile))
+    throw new Error('Unsupported CI_RUNNER_PROFILE');
   const hosted = ['ubuntu-24.04'];
-  const frontendOnMac = macEnabled && os === 'darwin' && freeBytes >= 8 * 1024 ** 3;
-  const heavy = ['platform','dependencies'].includes(scenario);
-  return { runner_profile:profile,
-    heavy_runner:windows, light_runner:macEnabled && os === 'darwin' && freeBytes >= 5 * 1024 ** 3 ? mac : windows,
-    frontend_runner:frontendOnMac ? mac : windows, docker_runner:windows, codeql_runner:profile === 'local' ? windows : hosted,
-    regression_runner:heavy && profile !== 'local' ? hosted : windows,
-    browser_runner:heavy && profile !== 'local' ? hosted : windows,
-    media_runner:heavy && profile === 'speed' ? hosted : windows,
-    visual_hosted:scenario === 'platform' && profile === 'speed',
-    frontend_route_reason:frontendOnMac ? 'Mac has 5 GiB reserve plus 3 GiB frontend allowance'
-      : 'Windows frontend fallback: Mac disabled or insufficient verified disk' };
+  return { runner_profile:'hosted',
+    heavy_runner:hosted, light_runner:hosted, frontend_runner:hosted,
+    docker_runner:hosted, codeql_runner:hosted, regression_runner:hosted,
+    browser_runner:hosted, media_runner:hosted,
+    visual_hosted:scenario === 'platform',
+    frontend_route_reason:'GitHub-hosted Ubuntu; each job uses an isolated VM' };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  // Admission is also checked in job.if before any self-hosted checkout.
+  // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
-    throw new Error('External PRs require a separately approved isolated workflow; no self-hosted execution');
+    throw new Error('External PRs require a separately approved isolated workflow');
   // A blank manual request must never silently select every platform job.
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
@@ -219,10 +212,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const acceptance = acceptanceFor(files);
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
-  const disk = statfsSync(process.cwd());
-  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'speed', scenario,
-    macEnabled:process.env.CI_MAC_LIGHT_ENABLED === 'true', os:platform(),
-    freeBytes:disk.bavail*disk.bsize });
+  const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;

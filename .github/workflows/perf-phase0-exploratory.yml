@@ -5,8 +5,8 @@ on:
     inputs:
       runner_profile:
         type: choice
-        options: [local]
-        default: local
+        options: [hosted]
+        default: hosted
 
 concurrency:
   group: perf-phase0-exploratory-${{ github.event.pull_request.number || github.ref }}
@@ -45,7 +45,7 @@ jobs:
   invariants:
     name: P2-C01 PostgreSQL + privacy invariants
     if: github.event_name == 'workflow_dispatch'
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     services:
       postgres:
@@ -115,7 +115,7 @@ jobs:
     # Capacity/curve work is evidence collection, not a per-PR correctness gate.
     # Keep it manual until the qualified 4C4G host is available.
     if: github.event_name == 'workflow_dispatch'
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
       fail-fast: false

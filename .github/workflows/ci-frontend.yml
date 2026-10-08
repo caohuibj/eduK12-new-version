@@ -13,7 +13,7 @@ permissions:
 jobs:
   frontend:
     name: frontend checks
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'

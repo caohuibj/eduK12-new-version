@@ -57,8 +57,8 @@ export function failedChecks(needs, draft) {
   const selected = ['media2','video_core','media7','situational_video','situational_branching'].filter(key=>scope[key] === 'true');
   const uiRequired = scope.app_shell === 'true' || scope.canonical_visual === 'true';
   const buildRequired = scope.frontend === 'true' || ['platform','dependencies'].includes(scope.scenario) || uiRequired || selected.length > 0;
-  const hostedVisual = scope.runner_profile === 'speed' && scope.scenario === 'platform';
-  const malformedTopology = !['speed','economy','local'].includes(scope.runner_profile)
+  const hostedVisual = scope.runner_profile === 'hosted' && scope.scenario === 'platform';
+  const malformedTopology = scope.runner_profile !== 'hosted'
     || scope.frontend_build !== String(buildRequired) || scope.ui_required !== String(uiRequired)
     || scope.visual_hosted !== String(hostedVisual)
     || scope.media_selection !== JSON.stringify(selected)

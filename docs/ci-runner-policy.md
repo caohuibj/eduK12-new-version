@@ -40,84 +40,42 @@ and unscoped CI changes select the full platform route. Malformed classification
 Management-UI content publication without a Git change uses application publication
 validation. A server release is separate from WeChat mini-program publication.
 
-## Current production routing: all self-hosted
+## Current routing: GitHub-hosted Ubuntu
 
-The repository variable `CI_RUNNER_PROFILE` is `local`, and manual component/full
-dispatch defaults to `local`. Hosted Actions minutes are exhausted. Keep subsequent
-PR, main and diagnostic work self-hosted; do not select `speed` or `economy` without
-an explicit decision to resume hosted usage. Windows/WSL `eduk12-win-ci` runs CodeQL,
-backend/isolated database regression, production images/scans, recovery, performance
-and actual API/media browser checks in its single exclusive slot. Mac runs routing,
-frontend builds/regression, pure component UI and Chromium. Firefox/WebKit run
-on Windows/WSL because the Mac service session failed browser initialization. Each
-machine's existing resource preflight and exact-source artifact checks still apply.
+All 26 versioned workflows pin every executable job to GitHub-hosted
+`ubuntu-24.04`. This includes routing, draft checks, maintenance, content,
+frontend/backend builds and regression, CodeQL, images/scans, isolated recovery,
+performance, real API/media browsers, all three visual engines and manual probes.
+Each job receives its own disposable VM; CI does not deploy production.
 
-The hosted speed topology below is retained as an optional capacity profile, not
-the current default.
+Manual dispatch defaults to `hosted`. Reusable `runner_labels` inputs remain for
+caller compatibility but cannot override the pinned job runner. The classifier
+normalizes old `speed`, `economy`, `local`, `balanced` and `hybrid` profile values
+to `hosted`; obsolete repository variables cannot select local machines. Unknown
+profiles still fail closed. `.github/scripts/content-workflows.test.mjs` checks
+every versioned workflow against self-hosted labels and dynamic runner overrides.
 
-## Optional speed topology
+The repository is public. Standard GitHub-hosted Actions runners are free for
+public repositories; the earlier private-repository minute shortage no longer
+determines routing. Historical runs retain their original workflow revision;
+rerunning an old self-hosted run does not validate this migration. Existing local
+runner registrations and host services are managed separately from versioned CI.
 
-```mermaid
-flowchart LR
-  S[Classify and preflight] --> FB[GitHub: parallel production and UI-lab builds]
-  FB --> FC[Mac: full frontend checks]
-  FC --> UI[Mac: AppShell and reporting component UI]
-  S --> BB[Windows: backend build and guarded migrations]
-  BB --> IM[Windows: production images and scans]
-  BB --> OP[Windows: Ops and performance]
-  S --> Q[GitHub: CodeQL]
-  S --> R[GitHub: full backend regression, isolated DB]
-  FB --> API[GitHub: real API browser]
-  BB --> API
-  FB --> ME[GitHub: two media groups]
-  BB --> ME
-  FB --> FF[GitHub: Chromium, Firefox and WebKit in parallel]
-  UI --> G[Required aggregate]
-  IM --> G
-  OP --> G
-  Q --> G
-  R --> G
-  API --> G
-  ME --> G
-  FF --> G
-```
-
-Mac and Windows each retain one job slot. Performance checks run exclusively on
-Windows and cannot overlap its image builds. Backend artifact production precedes
-other Windows full-gate work so consumers can begin early. Browser consumers wait
-for builds, not unrelated lint or frontend regression. The final aggregate waits
-for both producers and every required validation.
-
-Profiles are explicit:
-
-| Profile | Hosted heavy work | Local work |
-| --- | --- | --- |
-| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, three visual engines | Mac frontend/AppShell/component UI; Windows migrations/images/Ops/performance |
-| `economy` | CodeQL, backend regression, main API browser | Mac frontend/Chromium; Windows Firefox/WebKit and remaining real-service work |
-| `local` (current default) | None | Mac frontend/UI, Windows real services and CodeQL |
-
-Light/medium routes do not select heavy hosted acceleration. CodeQL runs on
-Windows/WSL in local mode and on GitHub in hosted profiles. Broad medium UI changes can require all three browser engines
-across Mac and Windows and take longer than a small medium change. `balanced`/`hybrid` are aliases
-for `economy`. Self-hosted outages do not silently activate hosted fallback.
-
-The initial planning target for a warm successful heavy `speed` run is 14–20 minutes
-and approximately 48–66 hosted job-minutes. These are estimates, not measured guarantees or job
-timeouts. Budget cold starts, isolated rollout probes and retries separately, and
-check actual account usage before relying on an old remaining-minute figure.
+Frontend production/UI-lab artifacts start early and independent consumers run in
+parallel. Platform visual acceptance keeps Chromium, Firefox and WebKit in separate
+jobs; scoped UI routes retain the existing grouped checks. Performance and Docker
+jobs use separate VMs rather than sharing a local exclusive slot. Dependencies and
+fail-closed aggregate coverage remain unchanged.
 
 ## Build and scenario isolation
 
 Build artifacts belong to this run and exact checked-out SHA. The manifest verifies
 SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
 missing or mismatched artifact. No latest-success or cross-run fallback exists.
-Ordinary production and UI-lab builds have distinct names and manifests. In heavy
-`speed` runs, both production and UI-lab builds run in parallel on GitHub,
-so compilation does not delay Mac checks or hosted browser consumers. Light and
-medium builds remain local. The initial producer probe measured 44 seconds for
-the hosted UI-lab job while the Mac production build took several minutes; final
-run measurements remain authoritative. Native
-`node_modules` are never transferred between Mac ARM and Linux x64.
+Ordinary production and UI-lab builds have distinct names and manifests. Both
+producers run independently on GitHub, so compilation does not delay unrelated
+checks. Native `node_modules` are installed from lockfiles inside each job and
+are never transferred through build artifacts.
 
 Production images retain complete Dockerfile builds and HIGH/CRITICAL scans. Buildx
 pulls base images and bypasses runtime-stage caches so OS security updates are not
@@ -132,28 +90,12 @@ persistent volumes are rejected. Ports must be free between scenarios. Existing
 fixture guards, test assertions and individual evidence remain mandatory. Standalone
 media workflows invoke the same composite scenario actions as grouped validation.
 
-Local visual acceptance and the `ui` component probe use one matrix job per
-Chromium/Firefox/WebKit engine. Chromium retains the single Mac slot; Firefox/WebKit use the exclusive
-Windows/WSL slot because both engines failed before page startup in run 37762383022
-(Mac sandbox/graphics initialization).
-AppShell and QA round 3 run once in the Chromium job. Each engine retains the
-20-minute timeout, complete scenarios, exact-run artifacts and cleanup. The
-aggregate requires success from the whole matrix, and fail-fast is disabled so
-one engine cannot suppress evidence from the others. The previous combined job
-spent approximately ten minutes in Chromium alone in run 37755658225; combining
-all engines and setup did not fit its unchanged 20-minute budget. This division
-changes task scheduling, not assertions, scanner thresholds or runner capacity.
-The standalone visual workflow accepts an explicit diagnostic engine (default all);
-partial probes cannot substitute for the complete merge gate.
-
-Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
-PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
-screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
-complete interaction and legacy-dialog suites. AppShell remains explicitly gated on Mac. In speed mode all three visual engines run
-on GitHub; economy and medium routes keep Chromium on Mac and Firefox/WebKit
-on Windows/WSL. The QA round 3 component browser flow runs on Mac
-with its synthetic local APIs; real authorization and scoring remain covered by
-the independent backend/database gates.
+Pure UI uses a minimal lockfile-pinned Playwright runtime without backend packages,
+PostgreSQL, Redis or Docker. Linux browser installation includes system dependencies.
+Chromium retains canonical/staff/classroom screenshots, interaction and legacy-dialog
+checks; Firefox and WebKit retain their complete interaction and legacy-dialog suites.
+AppShell and QA round 3 synthetic component checks also run on hosted Ubuntu; real
+authorization and scoring remain covered by independent backend/database gates.
 
 ## Resource and cleanup policy
 
@@ -178,26 +120,15 @@ original security scan before release; no unrelated full CI is needed for an
 operator download setting. Preserve the immutable source checkout and record
 operator recipe hashes, mirror URLs and actual image IDs in the release proof.
 
-Mac uses the dedicated non-admin `eduk12ci` account and label `eduk12-mac-ci`.
-Frontend uses the existing 3072 MiB Node heap and test worker limits. Routing requires
-8 GiB disk headroom (5 GiB reserve plus a provisional 3 GiB working allowance), then
-the job checks again. Adjust the allowance using measured peaks. UI checks release
-preview processes and upload evidence before removing temporary outputs.
+### Hosted job isolation
 
-Each Mac job removes its frontend/backend/browser `node_modules` and build outputs.
-Download caches are bounded: npm 512 MiB, Actions 256 MiB and tools 512 MiB,
-with seven-day expiry. Browser installations use the job temporary directory and
-are removed after each job; they do not accumulate a persistent browser cache. The existing hourly idle maintenance skips active
-Runner.Worker processes, rotates service logs and removes expired CI temporary files.
-Interrupted browser installations are covered by the existing idle temporary-file
-expiry without modifying the protected maintenance service. Cleanup rejects symlinks and personal
-accounts and never globally prunes Docker or retained data volumes.
-
-Windows uses one exclusive `eduk12-win-ci` Linux/WSL runner. Heavy preflight requires
-20 GiB free disk and 6 GiB effective memory across every visible cgroup ancestor.
-Its validated clock guard remains required before runner startup. Tests use UTC;
-host and production business timezones are unchanged. New concurrent heavy slots
-require measured memory and separate ports, services and fixtures.
+GitHub provides a fresh Ubuntu VM for every job. Existing disk preflight, service
+identity guards, evidence uploads and exact temporary-service cleanup remain in
+place. CI keeps UTC, existing Node heap/test worker limits and pinned dependencies.
+Dedicated Mac cleanup and local-machine resource checks are historical utilities;
+Ubuntu workflows do not invoke Mac account cleanup. No workflow globally prunes
+Docker or retained data volumes. The production host's download and backup rules
+remain independent from hosted CI.
 
 ## Failure handling and rollout
 
@@ -213,16 +144,15 @@ task-controller admission and collection snapshot completion fixtures, so the
 focused gate catches filter-export and draft-before-publication contract drift.
 It requires
 non-skipping Questionnaire, Bundle, onboarding, SJT and anonymous-study PostgreSQL
-evidence. With `runner_profile=local`, backend regression, browser, media, visual
-and maintenance probes use self-hosted runners; there is no hosted fallback.
+evidence. All probes use GitHub-hosted Ubuntu, including saved requests with
+`runner_profile=local`.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
 
-Regression jobs clear their exact temporary report paths before setup, so a
-persistent self-hosted runner cannot upload a previous focus's test evidence.
-Self-hosted regression uses its existing local npm download cache; remote npm
-cache restore/save is limited to GitHub-hosted jobs. Lockfile installation, actual
+Regression jobs clear their exact temporary report paths before setup so a
+previous focus cannot supply test evidence. Regression uses the GitHub-hosted
+lockfile-keyed npm download cache. Lockfile installation, actual
 tests, non-skipping assertions, artifacts and service cleanup are unchanged.
 
 Keep integration work Draft during repair and probes. Freeze the combined functional
@@ -251,7 +181,8 @@ retention remains plan_only. Host backup installation is independent of deployin
 the application and requires exact-head maintenance success plus bounded COS and
 production verification.
 
-External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
+External/untrusted PR admission retains the existing explicit isolation approval
+requirement before checkout. CI accounts must
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.
 

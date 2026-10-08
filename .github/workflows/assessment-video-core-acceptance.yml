@@ -4,7 +4,7 @@ name: Assessment Video Core Acceptance
     inputs:
       runner_profile:
         type: string
-        default: local
+        default: hosted
       use_build_artifacts:
         type: boolean
         default: false
@@ -12,10 +12,8 @@ name: Assessment Video Core Acceptance
     inputs:
       runner_profile:
         type: choice
-        options:
-        - local
-        - speed
-        default: local
+        options: [hosted]
+        default: hosted
 permissions:
   contents: read
   actions: read
@@ -27,7 +25,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
     uses: ./.github/workflows/ci-media.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'speed' && '["ubuntu-24.04"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       selected: '["video_core"]'
       groups: '["images-video"]'
       use_build_artifacts: ${{ inputs.use_build_artifacts || false }}

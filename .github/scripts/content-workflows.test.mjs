@@ -102,24 +102,24 @@ test('Cognitive management changes do not trigger the video gate', () => {
   assert.equal(triggered(workflow, ['server-version/frontend/src/modules/cognitive/video-presentation.ts']), true);
 });
 
-test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
+test('scenario CI uses early artifacts and hosted Ubuntu for every lane', () => {
   const ci=source('ci');
-  assert.match(job(ci,'scope'),/runs-on: .*eduk12-mac-ci/);
-  assert.match(job(ci,'merge-gate'),/runs-on: .*eduk12-mac-ci/);
-  for(const [name,lane] of [['backend','heavy_runner'],['backend-regression','regression_runner'],['browser','browser_runner'],['backend-browser-build','heavy_runner']]) {
-    assert.ok(job(ci,name).includes('runner_labels: ${{ needs.scope.outputs.'+lane+' }}'));
-    assert.match(source('ci-'+name),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
+  assert.match(job(ci,'scope'),/runs-on: ubuntu-24\.04/);
+  assert.match(job(ci,'merge-gate'),/runs-on: ubuntu-24\.04/);
+  for(const name of ['backend','backend-regression','browser','backend-browser-build']) {
+    assert.ok(job(ci,name).includes('runner_labels: \'["ubuntu-24.04"]\''));
+    assert.match(source('ci-'+name),/runs-on: ubuntu-24\.04/);
   }
   assert.match(job(ci,'frontend-build'),/uses: \.\/\.github\/workflows\/ci-frontend-build\.yml/);
   assert.match(job(ci,'frontend'),/needs: \[scope, frontend-build\]/);
   assert.match(job(ci,'browser'),/needs: \[scope, backend, backend-browser-build, frontend-build\]/);
   assert.doesNotMatch(job(ci,'browser'),/needs\.frontend\.result/);
-  assert.match(job(ci,'accept-ui'),/runner_labels:.*frontend_runner/);
+  assert.match(job(ci,'accept-ui'),/runner_labels: '\["ubuntu-24.04"\]'/);
   assert.match(job(ci,'accept-visual'),/engine: \[chromium, firefox, webkit\]/);
   assert.match(job(ci,'accept-media'),/media_selection/);
   for(const name of ['accept-perf','accept-ops']) assert.match(job(ci,name),/needs: \[scope, backend\]/);
-  assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
-  assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
+  assert.match(job(source('ci-images'),'images'),/runs-on: ubuntu-24\.04/);
+  assert.match(job(ci,'codeql'),/runs-on: ubuntu-24\.04/);
   const backend=job(source('ci-backend'),'backend'), regression=job(source('ci-backend-regression'),'backend-regression');
   assert.match(regression,/--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   assert.match(backend,/run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
@@ -142,9 +142,9 @@ test('visual partition retains three engines and once-only AppShell/QA within th
   assert.match(standalone, /engine:.*chromium.*firefox.*webkit/);
   assert.match(standalone, /engine: \$\{\{ matrix\.engine \}\}/);
   assert.match(source('visual-canonical-qa'), /group: visual-canonical-qa-.*inputs\.engine \|\| 'all'/);
-  assert.match(job(ci, 'accept-ui'), /matrix\.engine != 'chromium' && needs\.scope\.outputs\.heavy_runner/);
+  assert.match(job(ci, 'accept-ui'), /runner_labels: '\["ubuntu-24.04"\]'/);
   for (const ui of [job(ci, 'probe-ui-mac'), standalone]) {
-    assert.match(ui, /matrix\.engine == 'chromium'.*eduk12-mac-ci.*eduk12-win-ci/);
+    assert.match(ui, /runner_labels: '\["ubuntu-24.04"\]'/);
   }
   assert.match(source('ci-ui'), /timeout-minutes: 20/);
   assert.ok(job(ci, 'merge-gate').includes('accept-ui'));
@@ -273,7 +273,7 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);
   assert.match(job(ci,'probe-maintenance'),/uses: \.\/\.github\/workflows\/ci-maintenance\.yml/);
-  assert.match(source('ci-frontend'),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
+  assert.match(source('ci-frontend'),/runs-on: ubuntu-24\.04/);
   for(const name of ['backend','backend-regression','codeql']) assert.match(job(ci,name),/needs: scope/);
 });
 
@@ -282,4 +282,19 @@ test('different component probes have independent concurrency groups while same-
   assert.match(ci,/group:.*inputs\.step_probe \|\| 'none'/);
   assert.match(ci,/group:.*inputs\.step_probe == 'images' && inputs\.probe_frontend_only && 'frontend' \|\| 'all'/);
   assert.match(ci,/cancel-in-progress: true/);
+});
+
+test('all versioned jobs are pinned to hosted Ubuntu and cannot accept local runner overrides',()=>{
+  const dir=new URL('../workflows/',import.meta.url);
+  const files=fs.readdirSync(dir).filter(name=>/\.ya?ml$/.test(name));
+  assert.ok(files.length>=26);
+  for(const name of files) {
+    const text=fs.readFileSync(new URL(name,dir),'utf8');
+    assert.doesNotMatch(text,/self-hosted|eduk12-(mac|win)-ci|vars\.CI_(RUNNER_PROFILE|MAC_LIGHT_ENABLED)/,name);
+    for(const line of text.split('\n')) {
+      if(/^\s*runs-on:/.test(line)) assert.equal(line.trim(),'runs-on: ubuntu-24.04',name);
+      if(/^\s*(?:runner_labels|ui_runner_labels): ./.test(line)) assert.match(line,/: '\["ubuntu-24.04"\]'$/,name);
+      if(/^\s*(?:default: (local|speed|economy)$|options:.*(?:local|speed|economy)|- (?:local|speed|economy)$)/.test(line)) assert.fail(`${name}: obsolete profile default`);
+    }
+  }
 });
