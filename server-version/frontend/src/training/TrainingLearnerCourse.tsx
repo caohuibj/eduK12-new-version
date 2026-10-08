@@ -104,11 +104,21 @@ export default function TrainingLearnerCourse() {
             {assignments.loading ? <p role="status">正在读取作业…</p>
               : assignments.error ? <div role="alert">作业读取失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
                 : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置作业。</p>
-                  : <div className="training-item-list">{assignments.rows.map(task =>
-                    <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '请阅读作业要求后提交。'}</p><span>{task.submitted ? '已提交' : '待完成'}</span></div>
-                      <Link to={'/student/assignments/' + encodeURIComponent(task.id)} className="training-row-action">{task.submitted ? '查看提交' : '完成作业'}<ArrowRight size={16} aria-hidden="true" /></Link>
-                    </article>)}</div>}
+                  : <div className="training-item-list">{assignments.rows.map(task => {
+                    const draft = task.mySubmission?.status === 'DRAFT'
+                    const done = task.mySubmission?.status === 'SUBMITTED'
+                      || task.mySubmission?.status === 'GRADED'
+                      || Boolean(task.submitted && !task.mySubmission)
+                    const expired = Boolean(task.deadline && Date.parse(task.deadline) < Date.now())
+                    const state = done ? '已提交' : expired ? '已截止'
+                      : draft ? '已保存草稿' : '待完成'
+                    const action = done ? '查看提交' : expired ? '查看作业'
+                      : draft ? '继续作业' : '完成作业'
+                    return <article className="training-task-item" key={task.id}>
+                      <div><h2>{task.title}</h2><p>{task.description || '请阅读作业要求后提交。'}</p><span>{state}</span></div>
+                      <Link to={'/student/assignments/' + encodeURIComponent(task.id)} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
+                    </article>
+                  })}</div>}
           </section>}
           {section === 'checkins' && <section className="training-detail-content" aria-label="课程打卡">
             {checkins.loading ? <p role="status">正在读取打卡…</p>
@@ -116,9 +126,10 @@ export default function TrainingLearnerCourse() {
                 : checkins.rows.length === 0 ? <p className="training-empty-small">目前没有布置打卡。</p>
                   : <div className="training-item-list">{checkins.rows.map(task => {
                     const done = Boolean(task.submission || task.submitted)
+                    const expired = Boolean(task.endTime && Date.parse(task.endTime) < Date.now())
                     return <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span>{done ? '已打卡' : '待完成'}</span></div>
-                      <Link to={'/student/checkins/' + encodeURIComponent(task.id)} className="training-row-action">{done ? '查看记录' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span>{done ? '已打卡' : expired ? '已截止' : '待完成'}</span></div>
+                      <Link to={'/student/checkins/' + encodeURIComponent(task.id)} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
