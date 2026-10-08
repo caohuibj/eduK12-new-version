@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, ClipboardCheck, KeyRound, ShieldCheck, Users } from 'lucide-react'
 import { PageHeader, ProductPage } from '../../components/product-ui'
+import './admin-training.css'
 
 const work = [
   {
