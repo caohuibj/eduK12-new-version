@@ -284,7 +284,7 @@ function AppRoutes() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
+              <ProtectedRoute roles={isTrainingHost() ? ['TEACHER'] : ['TEACHER', 'ADMIN']}>
                 {isTrainingHost() ? <TrainingTrainerHome /> : <CourseList />}
               </ProtectedRoute>
             }
