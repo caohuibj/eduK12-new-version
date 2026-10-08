@@ -132,7 +132,8 @@ fixture guards, test assertions and individual evidence remain mandatory. Standa
 media workflows invoke the same composite scenario actions as grouped validation.
 
 Local visual acceptance and the `ui` component probe use one matrix job per
-Chromium/Firefox/WebKit engine. The existing single Mac slot serializes them;
+Chromium/Firefox/WebKit engine. Chromium/Firefox retain the single Mac slot; WebKit uses the exclusive
+Windows/WSL slot because Mac WebKit failed before page startup in run 37762383022.
 AppShell and QA round 3 run once in the Chromium job. Each engine retains the
 20-minute timeout, complete scenarios, exact-run artifacts and cleanup. The
 aggregate requires success from the whole matrix, and fail-fast is disabled so
@@ -140,6 +141,8 @@ one engine cannot suppress evidence from the others. The previous combined job
 spent approximately ten minutes in Chromium alone in run 37755658225; combining
 all engines and setup did not fit its unchanged 20-minute budget. This division
 changes task scheduling, not assertions, scanner thresholds or runner capacity.
+The standalone visual workflow accepts an explicit diagnostic engine (default all);
+partial probes cannot substitute for the complete merge gate.
 
 Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
 PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom

@@ -5,10 +5,18 @@ on:
       runner_profile:
         type: string
         default: local
+      engine:
+        type: string
+        default: all
       use_build_artifacts:
         type: boolean
         default: false
   workflow_dispatch:
+    inputs:
+      engine:
+        type: choice
+        options: [all, chromium, firefox, webkit]
+        default: all
 permissions:
   contents: read
   actions: read
@@ -21,10 +29,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine: [chromium, firefox, webkit]
+        engine: ${{ fromJSON(inputs.engine == 'chromium' && '["chromium"]' || inputs.engine == 'firefox' && '["firefox"]' || inputs.engine == 'webkit' && '["webkit"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: ${{ matrix.engine != 'webkit' && vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
       engine: ${{ matrix.engine }}
       canonical: true
       app_shell: false
