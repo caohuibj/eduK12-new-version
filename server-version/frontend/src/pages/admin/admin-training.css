@@ -1,0 +1,17 @@
+/* Unified admin workspace, not a copy of the learner/trainer Training shell. */
+.training-admin-space { width: 100%; }
+.training-admin-scope { padding: 15px 18px; margin: 8px 0 22px; border: 1px solid #d5e2ef; border-radius: 10px; background: #f8fbfd; font-size: 13px; line-height: 1.8; color: #50677a; }
+.training-admin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.training-admin-card { display: flex; flex-direction: column; gap: 13px; min-width: 0; min-height: 210px; padding: clamp(18px, 3vw, 24px); background: white; border: 1px solid #dbe4ed; border-radius: 12px; }
+.training-admin-card > svg { color: #315f71; }
+.training-admin-card h2 { margin: 0; font-size: 19px; color: #243c4c; }
+.training-admin-card p { margin: 0; color: #52687b; line-height: 1.8; font-size: 14px; }
+.training-admin-links { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: auto; }
+.training-admin-links a { min-height: 44px; display: inline-flex; align-items: center; color: #245f64; font-weight: 600; text-decoration: none; }
+.training-admin-links a:hover { text-decoration: underline; }
+.training-admin-policy { display: flex; align-items: flex-start; gap: 16px; margin-top: 24px; padding: 22px; border: 1px solid #d6e3e9; border-radius: 10px; background: #f6faf9; }
+.training-admin-policy svg { flex-shrink: 0; color: #2e6959; }
+.training-admin-policy h2 { margin: 0 0 8px; font-size: 17px; color: #244839; }
+.training-admin-policy p { margin: 6px 0; font-size: 13px; color: #526a64; line-height: 1.8; }
+.training-admin-space a:focus-visible { outline: 3px solid #315f71; outline-offset: 3px; }
+@media (max-width: 740px) { .training-admin-grid { grid-template-columns: 1fr; } .training-admin-policy { padding: 16px; } }
