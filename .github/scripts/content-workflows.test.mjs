@@ -141,6 +141,7 @@ test('visual partition retains three engines and once-only AppShell/QA within th
   const standalone = job(source('visual-canonical-qa'), 'acceptance');
   assert.match(standalone, /engine:.*chromium.*firefox.*webkit/);
   assert.match(standalone, /engine: \$\{\{ matrix\.engine \}\}/);
+  assert.match(source('visual-canonical-qa'), /group: visual-canonical-qa-.*inputs\.engine \|\| 'all'/);
   assert.match(job(ci, 'accept-ui'), /matrix\.engine != 'chromium' && needs\.scope\.outputs\.heavy_runner/);
   for (const ui of [job(ci, 'probe-ui-mac'), standalone]) {
     assert.match(ui, /matrix\.engine == 'chromium'.*eduk12-mac-ci.*eduk12-win-ci/);

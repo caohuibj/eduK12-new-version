@@ -21,7 +21,7 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: visual-canonical-qa-${{ github.event.pull_request.number || github.ref }}
+  group: visual-canonical-qa-${{ github.event.pull_request.number || github.ref }}-${{ inputs.engine || 'all' }}
   cancel-in-progress: true
 jobs:
   acceptance:
