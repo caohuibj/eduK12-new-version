@@ -80,10 +80,10 @@ describe('course-scoped read-only Training measurement inventory', () => {
   it('filters all sources by exact course delivery, status and standalone nature', async () => {
     await courseTrainingAssessments(req(UserRole.TEACHER) as any, res())
     expect(mock.questionnaire.mock.calls[0][0].where).toMatchObject({
-      type: 'COURSE', status: 'PUBLISHED', courseQuestionnaires: { some: { courseId: 'course-1' } },
+      type: 'COURSE', status: 'PUBLISHED', visibility: { in: ['PUBLIC', 'COURSE'] }, courseQuestionnaires: { some: { courseId: 'course-1' } },
     })
     expect(mock.scale.mock.calls[0][0].where).toMatchObject({
-      status: 'PUBLISHED', courseScales: { some: { courseId: 'course-1' } },
+      status: 'PUBLISHED', visibility: { in: ['PUBLIC', 'COURSE'] }, courseScales: { some: { courseId: 'course-1' } },
     })
     expect(mock.cognitive.mock.calls[0][0].where).toMatchObject({
       courseId: 'course-1', status: 'PUBLISHED', listedStandalone: true,
