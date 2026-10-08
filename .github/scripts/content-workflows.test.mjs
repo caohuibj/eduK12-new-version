@@ -326,3 +326,62 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/ci-artifact\.mjs verify frontend/);
   assert.match(media,/ci-cleanup-services\.sh/);
 });
+
+test('test-only UI code runs frontend regression without production/backend builds',()=>{
+  const ci=source('ci');
+  const frontend=job(ci,'frontend');
+  assert.match(frontend,/needs: scope/);
+  assert.match(frontend,/scenario == 'frontend-test'/);
+  assert.match(job(ci,'scope'),/frontend_test: \$\{\{ steps\.scope\.outputs\.frontend_test \}\}/);
+  assert.match(frontend,/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
+  assert.match(job(ci,'merge-gate'),/needs: .*frontend/);
+  const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
+  const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
+  assert.match(scope,/frontendTestOnly/);
+  assert.match(gate,/scope\.scenario === 'frontend-test'/);
+  assert.match(gate,/checks\.push\('frontend'\)/);
+});
+
+test('browser scenario matrix partitions every former acceptance, isolates databases, and never drops a lane',()=>{
+  const browser=source('ci-browser'),part=job(browser,'browser');
+  assert.match(browser,/default: '\["foundation","products","security"\]'/);
+  assert.match(part,/fail-fast: false/);
+  assert.match(part,/group: \$\{\{ fromJSON\(inputs\.groups\) \}\}/);
+  assert.match(part,/CI_BROWSER_GROUPS: \$\{\{ inputs\.groups \}\}/);
+  assert.match(part,/ci-browser-plan\.mjs/);
+  assert.match(part,/node "\$GITHUB_WORKSPACE\/\.github\/scripts\/ci-browser-plan\.mjs"/);
+  assert.match(part,/name: situational-bundle-browser-evidence-\$\{\{ matrix\.group \}\}/);
+  for(const [group,steps] of Object.entries({
+    foundation:['run seeded browser acceptance','run FE-11 storage fault acceptance',
+      'run RA-02 four-role relational acceptance','run PR5 Organization cross-role acceptance',
+      'seed three PR5 business scenarios','start isolated PR5 scenario resource server',
+      'certify three PR5 business scenarios','rehearse PR5 encrypted backup restore and migration failure recovery'],
+    products:['verify Bundle V3 browser lifecycle in isolated catalog','multi-role respondent inbox responsive acceptance',
+      'anonymous study identity responsive acceptance','Reporting V2.2 final product scenarios',
+      'anonymous questionnaire completion and exhausted-link recovery'],
+    security:['enforced production CSP browser acceptance'],
+  })) for(const title of steps){
+    const start=part.indexOf('      - name: '+title+'\n');
+    assert.ok(start>=0,title);
+    assert.match(part.slice(start,start+160),new RegExp("if: matrix\\.group == '"+group+"'"),title);
+  }
+  assert.match(part,/postgres:/);
+  assert.match(part,/redis:/);
+  assert.match(part,/ci-artifact\.mjs\" verify backend/);
+  assert.match(part,/ci-artifact\.mjs\" verify frontend/);
+  assert.match(part,/timeout -k 10s 180s sudo -n apt-get install/);
+  assert.match(job(source('ci'),'browser'),/uses: \.\/\.github\/workflows\/ci-browser\.yml/);
+  assert.match(job(source('ci'),'merge-gate'),/backend-regression.*frontend-build.*frontend.*browser.*docker/);
+});
+
+test('light test-only route never starts unrelated builds, scans or platform smoke',()=>{
+  const ci=source('ci');
+  for(const name of ['pr-light-backend','pr-light-frontend','post-merge-smoke',
+    'backend','backend-regression','docker','miniprogram']) {
+    const block=job(ci,name);
+    assert.match(block,/if: \$\{\{ needs\.scope\.outputs\.scenario != 'frontend-test' &&/,
+      name+' would otherwise run a redundant platform check');
+  }
+  assert.match(job(ci,'frontend'),/scenario == 'frontend-test'/);
+  assert.match(job(ci,'merge-gate'),/needs: .*frontend.*browser.*docker/);
+});

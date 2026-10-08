@@ -7,7 +7,7 @@ const root = 'server-version/scripts/attachment-backup/';
 const entry = (file, mode='100644') => ({file,status:'A',oldMode:'000000',newMode:mode});
 function outputs() {
   return {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,'false'])),
-    maintenance:'true',content:'false',presentation:'false',frontend:'false',documentation:'false',
+    maintenance:'true',content:'false',presentation:'false',frontend:'false',frontend_test:'false',documentation:'false',
     codeql:'false',scenario:'maintenance',runner_profile:'hosted',frontend_build:'false',
     ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'};
 }
