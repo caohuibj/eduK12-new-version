@@ -25,13 +25,19 @@ export async function listStudentTasks(userId: string, options: { page: number; 
   })
   const courses = new Map(memberships.map(row => [row.course.id, row.course]))
   const courseIds = [...courses.keys()]
+  // The caller-selected course never creates an entitlement. Push the
+  // membership intersection into simple SQL predicates where possible;
+  // global Composite eligibility still uses its original runtime service.
+  const scopedCourseIds = options.courseId
+    ? courseIds.filter(id => id === options.courseId)
+    : courseIds
   const [assignments, checkins, questionnaires, composites] = await Promise.all([
-    courseIds.length ? prisma.assignment.findMany({
-      where: { courseId: { in: courseIds }, status: 'PUBLISHED' },
+    scopedCourseIds.length ? prisma.assignment.findMany({
+      where: { courseId: { in: scopedCourseIds }, status: 'PUBLISHED' },
       select: { id: true, title: true, courseId: true, deadline: true, submissions: { where: { studentId: userId }, select: { status: true } } },
     }) : [],
-    courseIds.length ? prisma.checkin.findMany({
-      where: { courseId: { in: courseIds } },
+    scopedCourseIds.length ? prisma.checkin.findMany({
+      where: { courseId: { in: scopedCourseIds } },
       select: { id: true, title: true, courseId: true, endTime: true, submissions: { where: { studentId: userId }, select: { id: true } } },
     }) : [],
     // PUBLIC course questionnaires are available even without a membership,
@@ -39,15 +45,15 @@ export async function listStudentTasks(userId: string, options: { page: number; 
     prisma.questionnaire.findMany({
       where: { status: 'PUBLISHED', type: 'COURSE', OR: [
         { visibility: 'PUBLIC' },
-        { visibility: 'COURSE', courseQuestionnaires: { some: { courseId: { in: courseIds } } } },
+        { visibility: 'COURSE', courseQuestionnaires: { some: { courseId: { in: scopedCourseIds } } } },
       ] },
-      select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: courseIds } }, select: { courseId: true } },
+      select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: scopedCourseIds } }, select: { courseId: true } },
         assessments: { where: { userId }, select: { id: true, status: true, completedAt: true } } },
     }),
     listAvailableForStudent(userId, now.getTime()),
   ])
   const deliveries = composites.length ? await prisma.questionnaireCourseDelivery.findMany({
-    where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: courseIds } },
+    where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: scopedCourseIds } },
     select: { compositeId: true, courseId: true },
   }) : []
   const deliveryCourses = new Map<string, string[]>()
