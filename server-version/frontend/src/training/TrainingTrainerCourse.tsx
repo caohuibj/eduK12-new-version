@@ -74,7 +74,7 @@ export default function TrainingTrainerCourse() {
     return () => { active = false }
   }, [courseId, revision, cognitiveEnabled])
 
-  const owned = Boolean(course && user && course.creatorId === user.id)
+  const owned = Boolean(course && course.id === courseId && user && course.creatorId === user.id)
   const retry = () => setRevision(value => value + 1)
   const code = course?.courseCode || ''
   const encoded = courseId ? encodeURIComponent(courseId) : ''
@@ -91,7 +91,7 @@ export default function TrainingTrainerCourse() {
 
   return <div className="training-detail training-trainer-course">
     <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
-    {courseLoading ? <p role="status" className="training-status">正在读取课程…</p>
+    {courseLoading || (course && course.id !== courseId) ? <p role="status" className="training-status">正在读取课程…</p>
       : courseError || !course ? <div role="alert" className="training-message">无法读取课程：{courseError || '请确认课程状态'}<button type="button" onClick={retry}>重试</button></div>
         : !owned ? <div role="alert" className="training-message">当前账号不是这门课程的创建者，无法在培训版管理此课程。<Link to="/dashboard">返回我的课程</Link></div>
           : <>
