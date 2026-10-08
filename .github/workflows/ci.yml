@@ -11,7 +11,7 @@
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
-# 编排：Mac 前端/UI，Windows 迁移/镜像/Ops，GitHub 按场景并行加速。
+# 编排：全部使用 GitHub-hosted Ubuntu 24.04，按场景独立并行。
 #   Router:       changed-scope classification
 #   Dependencies: backend build/performance, functional regression, frontend, CodeQL, Docker
 #   Capacity:     heavy speed profile releases builds early and parallelizes hosted consumers
@@ -51,9 +51,9 @@ on:
     inputs:
       runner_profile:
         type: choice
-        options: [speed, economy, local]
-        default: local
-        description: 'Default local uses only self-hosted runners including Windows/WSL CodeQL; hosted profiles require available minutes'
+        options: [hosted]
+        default: hosted
+        description: 'Only standard GitHub-hosted Ubuntu 24.04 runners are used'
       step_probe:
         type: choice
         options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]
@@ -82,27 +82,27 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'speed' && '["ubuntu-24.04"]' || (vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+      runner_labels: '["ubuntu-24.04"]'
       ui_lab: ${{ contains(fromJSON('["ui","ui-chromium"]'), inputs.step_probe) }}
-      ui_runner_labels: ${{ inputs.runner_profile == 'local' && (vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]') || '["ubuntu-24.04"]' }}
+      ui_runner_labels: '["ubuntu-24.04"]'
 
   probe-browser-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
-      runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
+      runner_labels: '["ubuntu-24.04"]'
 
   probe-backend:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend'
     uses: ./.github/workflows/ci-backend.yml
     with:
-      runner_labels: '["self-hosted","Linux","X64","eduk12-win-ci"]'
+      runner_labels: '["ubuntu-24.04"]'
 
   probe-backend-regression:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       focus: ${{ inputs.step_probe == 'reporting' && 'reporting' || (inputs.step_probe == 'assessment-repair' && 'assessment-repair' || 'full') }}
 
   probe-browser:
@@ -110,14 +110,14 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser'
     uses: ./.github/workflows/ci-browser.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      runner_labels: '["ubuntu-24.04"]'
 
   probe-media:
     needs: [probe-frontend-build, probe-browser-build]
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media'
     uses: ./.github/workflows/ci-media.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       selected: '["media2","video_core","media7","situational_video","situational_branching"]'
       groups: '["images-video","cognitive-situational"]'
 
@@ -126,7 +126,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       engine: chromium
       canonical: false
       app_shell: true
@@ -137,7 +137,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui'
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       canonical: false
       app_shell: true
       qa_round3: true
@@ -151,14 +151,14 @@ jobs:
         engine: ${{ fromJSON(inputs.step_probe == 'ui-chromium' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      runner_labels: '["ubuntu-24.04"]'
       engine: ${{ matrix.engine }}
 
   probe-maintenance:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance'
     uses: ./.github/workflows/ci-maintenance.yml
     with:
-      runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
+      runner_labels: '["ubuntu-24.04"]'
 
   probe-ops:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops'
@@ -183,12 +183,12 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend'
     uses: ./.github/workflows/ci-frontend.yml
     with:
-      runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
+      runner_labels: '["ubuntu-24.04"]'
 
   scope:
     name: classify changed content
     if: (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
       runner_profile: ${{ steps.scope.outputs.runner_profile }}
@@ -241,8 +241,7 @@ jobs:
       - run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
       - id: scope
         env:
-          CI_RUNNER_PROFILE: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
-          CI_MAC_LIGHT_ENABLED: ${{ vars.CI_MAC_LIGHT_ENABLED }}
+          CI_RUNNER_PROFILE: hosted
           CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           CI_EVENT: ${{ github.event_name }}
           CI_FULL_ACCEPTANCE: ${{ inputs.full_acceptance }}
@@ -255,7 +254,7 @@ jobs:
     if: needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies'
     uses: ./.github/workflows/ci-maintenance.yml
     with:
-      runner_labels: ${{ (github.event_name == 'pull_request' && github.event.pull_request.draft == true) && '["self-hosted","Linux","X64","eduk12-win-ci"]' || (needs.scope.outputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]') }}
+      runner_labels: '["ubuntu-24.04"]'
 
   documentation:
     name: documentation / whitespace and scope validation
@@ -286,7 +285,7 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
+      runner_profile: hosted
       scale: ${{ needs.scope.outputs.scale == 'true' }}
       cognitive: ${{ needs.scope.outputs.cognitive == 'true' }}
       situational: ${{ needs.scope.outputs.situational == 'true' }}
@@ -634,20 +633,20 @@ jobs:
     if: needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
+      runner_profile: hosted
 
   accept-ops:
     needs: [scope, backend]
     if: needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
-      runner_profile: ${{ inputs.runner_profile || vars.CI_RUNNER_PROFILE || 'speed' }}
+      runner_profile: hosted
 
   merge-gate:
     name: merge gate / ready PR
     needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops]
     if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
-    runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
