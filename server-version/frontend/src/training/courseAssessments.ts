@@ -123,12 +123,21 @@ export function projectCourseAssessments(
 
   for (const item of cognitives) {
     if (item.courseId !== courseId || item.listedStandalone === false || item.status !== 'PUBLISHED') continue
+    const canContinue = Boolean(item.continueHref)
+    const now = Date.now()
+    const upcoming = Boolean(item.opensAt && new Date(item.opensAt).getTime() > now)
+    const expired = Boolean(item.dueAt && new Date(item.dueAt).getTime() < now)
+    const exhausted = item.remainingAttempts === 0
+    // These labels are hints from existing metadata, not a second admission
+    // system: the original CognitiveAssignmentEntry checks server authority.
+    const status = canContinue ? '进行中' : exhausted ? '尝试次数已用尽'
+      : upcoming ? '尚未开始' : expired ? '已截止' : '待完成'
     items.push({
       key: 'cognitive:' + item.id, kind: 'cognitive', name: item.title,
       typeLabel: '认知测评', description: item.instruction,
-      status: item.continueHref ? '进行中' : '已发布',
+      status,
       href: '/student/cognitive/assignments/' + enc(item.id),
-      action: item.continueHref ? '继续测评' : '查看测评',
+      action: canContinue ? '继续测评' : status === '待完成' ? '进入测评' : '查看任务',
     })
   }
 
