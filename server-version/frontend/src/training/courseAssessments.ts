@@ -21,8 +21,9 @@ type Question = {
   completed: boolean; inProgress?: boolean; assessmentId: string | null
 }
 type Scale = {
-  id: string; name: string; description: string | null; course: CourseRef
-  completed: boolean; inProgress?: boolean; assessmentId: string | null
+  id: string; name: string; description: string | null
+  courses?: Array<{ id: string; title: string }>; course?: CourseRef
+  completed: boolean; inProgress?: boolean; assessmentId: string | null; retakeAllowed?: boolean
 }
 type Composite = {
   id: string; name: string; description: string | null; productKind?: string
@@ -97,14 +98,21 @@ export function projectCourseAssessments(
   }
 
   for (const item of scales) {
-    if (item.course?.id !== courseId) continue
+    // Current /scales/available returns courses[], not the old course field.
+    // PUBLIC standalone scales must not become training course assignments.
+    if (!item.courses?.some(course => course.id === courseId) && item.course?.id !== courseId) continue
     const done = item.completed && !item.inProgress
+    const canRetake = done && Boolean(item.retakeAllowed)
+    const href = done
+      ? item.assessmentId ? '/student/scales/result/' + enc(item.assessmentId)
+        : canRetake ? '/student/scales/' + enc(item.id) : null
+      : '/student/scales/' + enc(item.id)
     items.push({
       key: 'scale:' + item.id, kind: 'scale', name: item.name, typeLabel: '课程测评',
       description: item.description,
       status: item.inProgress ? '进行中' : done ? '已完成' : '待完成',
-      href: done && item.assessmentId ? '/student/scales/result/' + enc(item.assessmentId) : '/student/scales/' + enc(item.id),
-      action: item.inProgress ? '继续测评' : done && item.assessmentId ? '查看反馈' : '进入测评',
+      href,
+      action: item.inProgress ? '继续测评' : done ? item.assessmentId ? '查看反馈' : canRetake ? '再次测评' : '已完成' : '开始测评',
     })
   }
 
