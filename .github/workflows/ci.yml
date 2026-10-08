@@ -56,7 +56,7 @@ on:
         description: 'Default local uses only self-hosted runners including Windows/WSL CodeQL; hosted profiles require available minutes'
       step_probe:
         type: choice
-        options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]
+        options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf, fleet-prepare]
         default: none
         description: 'Run one CI component without full CI or CodeQL'
       probe_frontend_only:
@@ -78,6 +78,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  probe-fleet-prepare:
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'fleet-prepare'
+    uses: ./.github/workflows/ci-runner-fleet.yml
+
   probe-frontend-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)
     uses: ./.github/workflows/ci-frontend-build.yml

@@ -1,0 +1,13 @@
+{
+  "version": "2.338.0",
+  "assets": {
+    "win": {
+      "url": "https://github.com/actions/runner/releases/download/v2.338.0/actions-runner-linux-x64-2.338.0.tar.gz",
+      "sha256": "af4b794c1bc41d73d40535e3fe092a39f9679cd8d965954c2aca25a05ca41d32"
+    },
+    "mac": {
+      "url": "https://github.com/actions/runner/releases/download/v2.338.0/actions-runner-osx-arm64-2.338.0.tar.gz",
+      "sha256": "df4cebda25c86a886ed204e49fee63f5c2e7cec5f447b5c98440a826bbdf9df2"
+    }
+  }
+}
