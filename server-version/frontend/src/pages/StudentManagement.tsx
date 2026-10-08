@@ -4,6 +4,7 @@ import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
+import TemporaryPasswordHandoff, { type TemporaryPasswordHandoffValue } from '../components/staff-ui/TemporaryPasswordHandoff'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { Course } from '../types'
 
@@ -17,11 +18,13 @@ interface Student {
   courseId: string
   courseTitle: string
   courseCode: string
+  enrollmentStatus?: 'ACTIVE' | 'APPROVED' | 'PENDING'
 }
 
 const StudentManagement: React.FC = () => {
   const { user } = useAuth()
   const canManageGlobalAccount = user?.role === 'ADMIN' && user.platformRole === 'SYSTEM_ADMIN'
+  const canResetCoursePassword = user?.role === 'TEACHER' || canManageGlobalAccount
   const { feedback, confirm, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
@@ -32,6 +35,7 @@ const StudentManagement: React.FC = () => {
   const [keyword, setKeyword] = useState('')
   const [selectedCourseId, setSelectedCourseId] = useState<string>('all')
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [credential, setCredential] = useState<TemporaryPasswordHandoffValue | null>(null)
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -141,19 +145,31 @@ const StudentManagement: React.FC = () => {
   }
 
   const handleResetPassword = async (student: Student) => {
-    if (!await ask(`确定要重置 ${student.nickname} 的密码吗？`)) {
-      return
-    }
+    if (!await ask(`确定为「${student.nickname}」重置登录密码吗？重置会使学员所有课程的旧登录会话失效，临时密码仅展示一次，并要求首次登录修改。`)) return
 
     setProcessingId(student.id)
     try {
-      const response = await apiClient.post(`/courses/${student.courseId}/students/${student.id}/reset-password`)
-      if (response.code === 0) {
-        const handoffFile = response.data?.handoffFile || '受保护的交接文件'
-        showMessage(`${response.message || '密码已重置'}\n文件：${handoffFile}\n请从本机受保护的交接目录读取临时密码，并让学生首次登录后立即修改。`)
+      const response = await apiClient.post<{ temporaryPassword?: string; username?: string; handoffFile?: string }>(
+        `/courses/${student.courseId}/students/${student.id}/reset-password`,
+      )
+      if (response.code !== 0) throw new Error(response.message || '重置失败')
+      if (user?.role === 'TEACHER') {
+        if (response.data?.temporaryPassword) {
+          setCredential({
+            studentName: student.nickname || student.username,
+            username: response.data.username || student.username,
+            temporaryPassword: response.data.temporaryPassword,
+          })
+        } else {
+          showMessage('密码已重置，但未返回临时凭据。请联系平台管理员处理。')
+        }
+      } else {
+        showMessage(response.data?.handoffFile
+          ? `密码已重置，交接文件：${response.data.handoffFile}`
+          : response.message || '密码已重置')
       }
-    } catch (operationError: any) {
-      showMessage(operationError.message || '重置密码失败')
+    } catch (operationError) {
+      showMessage(operationError instanceof Error ? operationError.message : '重置密码失败')
     } finally {
       setProcessingId(null)
     }
@@ -218,7 +234,7 @@ const StudentManagement: React.FC = () => {
       >
         {student.isFrozen ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
       </button>}
-      {canManageGlobalAccount && <button
+      {canResetCoursePassword && !student.isFrozen && student.enrollmentStatus !== 'PENDING' && <button
         type="button"
         onClick={() => handleResetPassword(student)}
         disabled={processingId === student.id}
@@ -244,6 +260,7 @@ const StudentManagement: React.FC = () => {
   return (
     <ProductPage width="management" className="space-y-6">
       {feedback}
+      <TemporaryPasswordHandoff value={credential} onClose={() => setCredential(null)} />
       <PageHeader
         title="学生管理"
         description={`共 ${students.length} 名学生 · ${courses.length} 个课程`}
