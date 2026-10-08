@@ -807,7 +807,7 @@ export function QuestionnaireProductEdit() {
               <div className="flex flex-wrap gap-4 my-5">
                 {draft && <ProductButton variant={!dirty && !(preflight?.ok && preflight.revision === detail.revision) ? 'primary' : 'secondary'} disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
-                  <ProductButton
+                  <ProductButton variant="danger"
                     disabled={busy || dirty}
                     variant={preflight?.ok && preflight.revision === detail.revision ? 'primary' : 'secondary'}
                     onClick={() => void publish()}
@@ -835,7 +835,7 @@ export function QuestionnaireProductEdit() {
                   导出独立报告（JSON）
                 </ProductButton>
                 {detail.status === 'PUBLISHED' && (
-                  <ProductButton
+                  <ProductButton variant="danger"
                     disabled={busy || dirty}
                     onClick={() =>
                       void action(async () =>
@@ -851,7 +851,7 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
                 {draft && (
-                  <ProductButton
+                  <ProductButton variant="danger"
                     disabled={busy}
                     onClick={async () => {
                       if (await confirmManagement({ title: '删除组合草稿', body: '仅删除尚未发布的定义；存在引用时服务器会拦截。', confirmLabel: '删除草稿', danger: true }))
