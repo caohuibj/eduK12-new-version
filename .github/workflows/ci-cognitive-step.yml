@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   cognitive:
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       NODE_ENV: test

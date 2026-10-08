@@ -15,7 +15,7 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -48,7 +48,7 @@ jobs:
   ui-lab:
     name: UI-lab artifact
     if: inputs.ui_lab
-    runs-on: ${{ fromJSON(inputs.ui_runner_labels || inputs.runner_labels) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
