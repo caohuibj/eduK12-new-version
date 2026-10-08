@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { courseQuestionnaires } from '../controllers/courseQuestionnairesController'
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
-import { authenticate, requireTeacher, requireStudent } from '../middleware/auth'
+import { authenticate, requireAdmin, requireTeacher, requireStudent } from '../middleware/auth'
 import { studentTaskList } from '../controllers/studentTaskController'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
@@ -70,10 +70,10 @@ router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionna
 // 学生管理
 router.get('/:id/students', authenticate, requireTeacher, courseController.getStudents)
 router.post('/batch-students', authenticate, requireTeacher, courseController.getBatchStudents)
-router.post('/:courseId/students/:studentId/reset-password', authenticate, requireTeacher, courseController.resetStudentPassword)
+router.post('/:courseId/students/:studentId/reset-password', authenticate, requireAdmin, courseController.resetStudentPassword)
 router.delete('/:courseId/students/:studentId', authenticate, requireTeacher, courseController.removeStudent)
 // Freezing makes an account unusable, so route it through the Organization
 // usable-admin invariant instead of the legacy direct user update.
-router.put('/:courseId/students/:studentId/freeze', authenticate, requireTeacher, courseStudentLifecycleController.setFrozen)
+router.put('/:courseId/students/:studentId/freeze', authenticate, requireAdmin, courseStudentLifecycleController.setFrozen)
 
 export default router
