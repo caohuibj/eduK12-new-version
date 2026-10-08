@@ -50,6 +50,27 @@ describe('course-first training workspaces', () => {
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
   })
 
+  it('does not mislabel a saved draft as submitted or a closed check-in as actionable', async () => {
+    get.mockImplementation((url: string) => {
+      if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
+      if (url === '/courses/course-1/assignments') return Promise.resolve({ code: 0, data: { list: [{
+        id: 'draft-1', title: '尚未提交的草稿', status: 'PUBLISHED',
+        submitted: true, mySubmission: { status: 'DRAFT' },
+      }] } })
+      if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [{
+        id: 'closed-1', title: '已到期打卡', endTime: '2020-01-01T00:00:00Z', submitted: false,
+      }] } })
+      throw new Error('unexpected url ' + url)
+    })
+    mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
+    expect(await screen.findByText('已保存草稿')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /继续作业/ })).toHaveAttribute('href', '/student/assignments/draft-1')
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    expect(await screen.findByText('已截止')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /去打卡/ })).toBeNull()
+    expect(screen.getByRole('link', { name: /查看打卡/ })).toHaveAttribute('href', '/student/checkins/closed-1')
+  })
+
   it('shows assignment API failure without crashing the course page', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
