@@ -98,14 +98,18 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   expect(await prisma.checkinSubmission.count({where:{checkinId:checkin.id,studentId:student.id}})).toBe(1)
   const submitted=await s.runtime.api.post('/checkins/'+checkin.id+'/submit',{content:'forged',studentId:stranger.id,expectedRevision:1});expect(submitted.studentId).toBe(student.id);expect(await prisma.checkinSubmission.count({where:{checkinId:checkin.id,studentId:stranger.id}})).toBe(0)
  })
- it('teacher grading and course freeze use canonical controllers and refresh current membership',async()=>{
+ it('teacher grades but cannot freeze globally; SYSTEM_ADMIN freeze refreshes current membership',async()=>{
   const t=await logged(teacher),s=await logged(student),submission=await prisma.submission.findFirstOrThrow({where:{assignmentId:assignment.id}})
   await t.runtime.operations.grade(assignment.id,submission.id,'Good')
   expect((await prisma.submission.findUniqueOrThrow({where:{id:submission.id}})).comment).toBe('Good')
-  await t.runtime.operations.roster(course.id,student.id,'freeze')
+  await expect(t.runtime.operations.roster(course.id,student.id,'freeze')).rejects.toMatchObject({kind:'forbidden',status:403})
+  expect((await prisma.user.findUniqueOrThrow({where:{id:student.id}})).isFrozen).toBe(false)
+  const administrator=await account('ADMIN');await prisma.user.update({where:{id:administrator.id},data:{platformRole:'SYSTEM_ADMIN'}})
+  const a=await logged(administrator)
+  await a.runtime.operations.roster(course.id,student.id,'freeze')
   await expect(s.runtime.api.get('/mobile/lists/assignments')).rejects.toMatchObject({kind:'unauthorized'})
   expect(s.runtime.session.get().user).toBe(null)
-  await t.runtime.operations.roster(course.id,student.id,'unfreeze')
+  await a.runtime.operations.roster(course.id,student.id,'unfreeze')
  })
  it('current legacy ADMIN manages invitations and creates parents without child authority; platform lifecycle needs SYSTEM_ADMIN',async()=>{
   const admin=await account('ADMIN'),a=await logged(admin)
