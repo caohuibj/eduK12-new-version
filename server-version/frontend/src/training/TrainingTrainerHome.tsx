@@ -12,6 +12,7 @@ export default function TrainingTrainerHome() {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [mutationNotice, setMutationNotice] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -46,6 +47,7 @@ export default function TrainingTrainerHome() {
       setCreateOpen(false)
       setTitle('')
       setDescription('')
+      setMutationNotice('课程已创建，课程列表正在更新。')
       await refresh()
     } catch (error) {
       setCreateError(error instanceof Error ? error.message : '课程创建失败')
@@ -63,6 +65,7 @@ export default function TrainingTrainerHome() {
       </div>
       <button type="button" className="training-action" onClick={() => { setCreateError(''); setCreateOpen(true) }}><Plus size={18} aria-hidden="true" />创建课程</button>
     </header>
+    {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="trainer-courses">
       <div className="training-section-header"><h2 id="trainer-courses">我的课程</h2><span className="training-small-label">教学 · 实践 · 反馈</span></div>
       {loading ? <p role="status" className="training-status">正在读取课程…</p>
