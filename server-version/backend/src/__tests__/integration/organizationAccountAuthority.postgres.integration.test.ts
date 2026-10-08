@@ -71,7 +71,7 @@ suite('Organization account-authority mutation regressions (real PostgreSQL)', (
 
   it('never lets an admin course freeze surface make SYSTEM_ADMIN unusable', async () => {
     const teacher = await createUser('course-teacher', { role: UserRole.TEACHER })
-    const admin = await createUser('course-admin', { role: UserRole.ADMIN })
+    const admin = await createUser('course-admin', { role: UserRole.ADMIN, platformRole: PlatformRole.SYSTEM_ADMIN })
     const systemStudent = await createUser('system-student', {
       role: UserRole.STUDENT,
       platformRole: PlatformRole.SYSTEM_ADMIN,
