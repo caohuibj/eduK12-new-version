@@ -40,6 +40,8 @@
   color: var(--training-ink);
 }
 
+.hui-training.hui-app--standard .hui-brand::before { display: none; }
+
 .hui-training.hui-app--standard .hui-app-body { display: block; }
 .hui-training.hui-app--standard .hui-navigation {
   display: flex;
