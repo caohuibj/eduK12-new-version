@@ -12,6 +12,7 @@ export default function TrainingLearnerHome() {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [mutationNotice, setMutationNotice] = useState('')
   const [joinOpen, setJoinOpen] = useState(false)
   const [courseCode, setCourseCode] = useState('')
   const [joinError, setJoinError] = useState('')
@@ -44,6 +45,7 @@ export default function TrainingLearnerHome() {
       if (result.code !== 0) throw new Error(result.message || '加入课程失败')
       setJoinOpen(false)
       setCourseCode('')
+      setMutationNotice('已加入课程，课程列表正在更新。')
       await refresh()
     } catch (error) {
       setJoinError(error instanceof Error ? error.message : '加入课程失败')
@@ -62,6 +64,7 @@ export default function TrainingLearnerHome() {
       <button type="button" className="training-action" onClick={() => { setJoinError(''); setJoinOpen(true) }}><Plus size={18} aria-hidden="true" />加入课程</button>
     </header>
 
+    {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="learner-courses">
       <div className="training-section-header"><h2 id="learner-courses">我的课程</h2><span className="training-small-label">慢慢学 · 认真做</span></div>
       {loading ? <p role="status" className="training-status">正在读取课程…</p>
