@@ -2,6 +2,7 @@ import { PlatformRole, UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
 import {
   AccountAuthorityError,
+  assertCurrentSystemAdmin,
   assertAccountUsabilityMutationSafe,
   assertNonPlatformAuthorityTargetCanBecomeUnusable,
 } from './accountAuthorityService'
@@ -40,6 +41,9 @@ export async function setCourseStudentFrozenState(input: {
   }
   try {
     return await prisma.$transaction(async (tx) => {
+      // The current database platform role, not the legacy role or course
+      // ownership, governs global account availability.
+      await assertCurrentSystemAdmin(tx, input.actorUserId)
       const courses = await tx.$queryRaw<CourseRow[]>`
         SELECT "id", "creator_id" AS "creatorId"
         FROM "courses"
