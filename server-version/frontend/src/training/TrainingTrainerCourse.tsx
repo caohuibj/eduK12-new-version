@@ -5,12 +5,15 @@ import apiClient from '../api/client'
 import { internalReturnTo } from '../components/app-shell/access'
 import { useAuth } from '../contexts/AuthContext'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
-import { cognitiveApi } from '../modules/cognitive/api'
+import TrainingCourseSettings from './TrainingCourseSettings'
 import type { Course, Assignment, Checkin } from '../types'
 
 type Section = 'assignments' | 'checkins' | 'assessments'
-type Questionnaire = { id: string; name: string; kind: string; unitCount: number; unitLabel: string; manageHref: string | null }
-type Cognitive = { id: string; title: string; status: string; courseId: string | null; listedStandalone?: boolean }
+type CourseAssessment = {
+  id: string; key: string; kind: string; typeLabel: string
+  name: string; description: string | null; status: string
+  unitCount: number | null; unitLabel: string | null; manageHref: string | null
+}
 type Collection<T> = { rows: T[]; loading: boolean; error: string | null }
 const pending = <T,>(): Collection<T> => ({ rows: [], loading: true, error: null })
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : '加载失败'
@@ -26,8 +29,7 @@ export default function TrainingTrainerCourse() {
   const [courseError, setCourseError] = useState<string | null>(null)
   const [assignments, setAssignments] = useState<Collection<Assignment>>(pending())
   const [checkins, setCheckins] = useState<Collection<Checkin>>(pending())
-  const [questionnaires, setQuestionnaires] = useState<Collection<Questionnaire>>(pending())
-  const [cognitives, setCognitives] = useState<Collection<Cognitive>>(pending())
+  const [assessments, setAssessments] = useState<Collection<CourseAssessment>>(pending())
   const [codeNotice, setCodeNotice] = useState('')
 
   useEffect(() => {
@@ -40,8 +42,7 @@ export default function TrainingTrainerCourse() {
     setCodeNotice('')
     setAssignments(pending<Assignment>())
     setCheckins(pending<Checkin>())
-    setQuestionnaires(pending<Questionnaire>())
-    setCognitives(pending<Cognitive>())
+    setAssessments(pending<CourseAssessment>())
     const load = async <T,>(url: string, setter: (value: Collection<T>) => void) => {
       try {
         const response = await apiClient.get<{ list: T[] }>(url)
@@ -60,16 +61,7 @@ export default function TrainingTrainerCourse() {
       })(),
       load('/courses/' + id + '/assignments', setAssignments),
       load('/courses/' + id + '/checkins', setCheckins),
-      load('/courses/' + id + '/questionnaires', setQuestionnaires),
-      (async () => {
-        if (!cognitiveEnabled) { if (active) setCognitives({ rows: [], loading: false, error: null }); return }
-        try {
-          const result = await cognitiveApi.listTeacherAssignments(undefined, true)
-          if (result.code !== 0) throw new Error(result.message || '认知任务读取失败')
-          const rows: Cognitive[] = Array.isArray(result.data) ? result.data : result.data?.list || []
-          if (active) setCognitives({ rows: rows.filter(item => item.courseId === courseId && item.listedStandalone !== false), loading: false, error: null })
-        } catch (error) { if (active) setCognitives({ rows: [], loading: false, error: errorMessage(error) }) }
-      })(),
+      load('/courses/' + id + '/training-assessments', setAssessments),
     ])
     return () => { active = false }
   }, [courseId, revision, cognitiveEnabled])
@@ -87,8 +79,7 @@ export default function TrainingTrainerCourse() {
     try { await navigator.clipboard.writeText(code); setCodeNotice('课程码已复制。') }
     catch { setCodeNotice('复制失败，请手动选中课程码。') }
   }
-  const measureCount = questionnaires.rows.length + cognitives.rows.length
-  const measurementsLoading = questionnaires.loading || cognitives.loading
+  const displayedAssessments = assessments.rows.filter(item => cognitiveEnabled || item.kind !== 'COGNITIVE')
 
   return <div className="training-detail training-trainer-course">
     <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
@@ -112,6 +103,7 @@ export default function TrainingTrainerCourse() {
                 <Link to={'/assessment-workbench?courseId=' + encoded}>查看培训结果 <ArrowRight size={15} aria-hidden="true" /></Link>
               </div>
             </header>
+            <TrainingCourseSettings course={course} onUpdated={retry} />
             <nav className="training-section-switch" aria-label="课程管理内容">
               {([
                 ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'],
@@ -148,27 +140,27 @@ export default function TrainingTrainerCourse() {
                 <Link to="/questionnaires" className="training-action training-action--quiet">已有测评</Link>
               </div>
               <p className="training-science-note">只可发布当前拥有使用权且满足内容资格的测评，资源发布和报告披露仍由平台规则控制。</p>
-              {(questionnaires.error || cognitives.error) && <div className="training-message training-message--compact" role="alert">
-                {questionnaires.error && <p>课程测评读取失败：{questionnaires.error}</p>}
-                {cognitives.error && <p>认知任务读取失败：{cognitives.error}</p>}
-                <button type="button" onClick={retry}>重试</button>
+              {assessments.error && <div className="training-message training-message--compact" role="alert">
+                <p>当前课程测评清单暂时无法读取：{assessments.error}</p>
+                <button type="button" onClick={retry}>重新加载测评</button>
               </div>}
-              {measurementsLoading ? <p role="status">正在读取已投放测评…</p>
-                : measureCount === 0 && !questionnaires.error && !cognitives.error
-                  ? <p className="training-empty-small">这门课程尚未发布测评。可从上方选择可用资源。</p>
-                  : <div className="training-item-list">
-                    {questionnaires.rows.map(task =>
-                      <article key={'questionnaire:' + task.id} className="training-task-item">
-                        <div><span className="training-task-type">课程测评</span><h2>{task.name}</h2><p>{task.unitCount} {task.unitLabel}</p></div>
-                        {task.manageHref && internalReturnTo(task.manageHref) ? <Link to={internalReturnTo(task.manageHref)!} className="training-row-action">查看测评<ArrowRight size={16} aria-hidden="true" /></Link>
-                          : <span className="training-task-disabled">由创建者管理</span>}
-                      </article>)}
-                    {cognitives.rows.map(task =>
-                      <article key={'cognitive:' + task.id} className="training-task-item">
-                        <div><span className="training-task-type">认知测评</span><h2>{task.title}</h2><p>{task.status === 'PUBLISHED' ? '已发布' : task.status === 'DRAFT' ? '草稿' : '已归档'}</p></div>
-                        <Link to={'/cognitive-assignments/' + encodeURIComponent(task.id)} className="training-row-action">管理测评<ArrowRight size={16} aria-hidden="true" /></Link>
-                      </article>)}
-                  </div>}
+              {assessments.loading ? <p role="status">正在核对本课程已发布的测评…</p>
+                : assessments.error ? null
+                  : displayedAssessments.length === 0
+                    ? <p className="training-empty-small">这门课程尚未发布测评。可从上方选择已授权资源。</p>
+                    : <div className="training-item-list">{displayedAssessments.map(task => {
+                      const safeHref = internalReturnTo(task.manageHref)
+                      return <article key={task.key} className="training-task-item">
+                        <div>
+                          <span className="training-task-type">{task.typeLabel}</span>
+                          <h2>{task.name}</h2>
+                          <p>{task.description || (task.unitCount === null ? '已发布的独立认知任务' : `${task.unitCount} ${task.unitLabel || '测评单元'}`)}</p>
+                          <span>已发布 · 按课程授权</span>
+                        </div>
+                        {safeHref ? <Link to={safeHref} className="training-row-action">管理测评<ArrowRight size={16} aria-hidden="true" /></Link>
+                          : <span className="training-task-disabled">由资源创建者管理</span>}
+                      </article>
+                    })}</div>}
             </section>}
           </>}
   </div>
