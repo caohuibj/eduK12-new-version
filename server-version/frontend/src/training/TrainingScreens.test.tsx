@@ -29,6 +29,12 @@ describe('training presentation and course-first entry', () => {
     expect(student.getAttribute('href')).toContain('/student/login?returnTo=')
     expect(trainer.getAttribute('href')).toContain('/teacher/account-login?returnTo=')
     expect(screen.queryByRole('link', { name: /管理员入口/ })).toBeNull()
+    const choices = screen.getByRole('navigation', { name: '选择培训身份' })
+    expect(choices.querySelectorAll('a')).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: /让学习，.*更有回响。/ })).toBeInTheDocument()
+    expect(screen.getByText('huisurvey')).toBeInTheDocument()
+    expect(screen.queryByText('纸墨 · 见山')).toBeNull()
+    expect(screen.getByRole('link', { name: '登录' })).toHaveAttribute('href', '#training-roles')
   })
 
   it('learner home presents only enrolled courses with real course links', async () => {
