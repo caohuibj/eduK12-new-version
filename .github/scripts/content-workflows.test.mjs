@@ -332,6 +332,7 @@ test('test-only UI code runs frontend regression without production/backend buil
   const frontend=job(ci,'frontend');
   assert.match(frontend,/needs: scope/);
   assert.match(frontend,/scenario == 'frontend-test'/);
+  assert.match(job(ci,'scope'),/frontend_test: \$\{\{ steps\.scope\.outputs\.frontend_test \}\}/);
   assert.match(frontend,/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'merge-gate'),/needs: .*frontend/);
   const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');

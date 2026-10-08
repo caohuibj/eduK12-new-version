@@ -214,6 +214,7 @@ jobs:
       maintenance: ${{ steps.scope.outputs.maintenance }}
       scenario: ${{ steps.scope.outputs.scenario }}
       frontend: ${{ steps.scope.outputs.frontend }}
+      frontend_test: ${{ steps.scope.outputs.frontend_test }}
       documentation: ${{ steps.scope.outputs.documentation }}
       codeql: ${{ steps.scope.outputs.codeql }}
       heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
