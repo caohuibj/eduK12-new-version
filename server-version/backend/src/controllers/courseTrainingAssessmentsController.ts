@@ -23,7 +23,7 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
 
     const [questionnaires, composed, scales, cognitive] = await Promise.all([
       prisma.questionnaire.findMany({
-        where: { type: 'COURSE', status: 'PUBLISHED', courseQuestionnaires: { some: { courseId } } },
+        where: { type: 'COURSE', status: 'PUBLISHED', visibility: { in: ['PUBLIC', 'COURSE'] }, courseQuestionnaires: { some: { courseId } } },
         select: { id: true, name: true, description: true, creatorId: true,
           _count: { select: { questionnaireScales: true } } },
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
@@ -41,7 +41,7 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
       }),
       prisma.scale.findMany({
-        where: { status: 'PUBLISHED', courseScales: { some: { courseId } } },
+        where: { status: 'PUBLISHED', visibility: { in: ['PUBLIC', 'COURSE'] }, courseScales: { some: { courseId } } },
         select: { id: true, name: true, description: true, creatorId: true, itemCount: true },
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
       }),
