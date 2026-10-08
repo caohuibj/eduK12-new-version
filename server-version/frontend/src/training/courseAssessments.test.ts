@@ -27,8 +27,8 @@ beforeEach(() => {
       { id: 'q-1', name: '课程反馈', description: null, completed: false, assessmentId: null },
     ] } })
     if (url === '/scales/available') return Promise.resolve({ code: 0, data: { list: [
-      { id: 'scale-a', name: '课程量表', description: null, course: { id: course, title: '研修' }, completed: false, assessmentId: null },
-      { id: 'scale-b', name: '另一门课', description: null, course: { id: 'another', title: '其他' }, completed: false, assessmentId: null },
+      { id: 'scale-a', name: '课程量表', description: null, courses: [{ id: course, title: '研修' }, { id: 'second', title: '另一相关课程' }], completed: false, assessmentId: null },
+      { id: 'scale-b', name: '另一门课', description: null, courses: [{ id: 'another', title: '其他' }], completed: false, assessmentId: null },
     ] } })
     if (url === '/composite-assessments/available') return Promise.resolve({ code: 0, data: { list: [
       composite('legacy', course), composite('external', 'another'), composite('delivered', null),
