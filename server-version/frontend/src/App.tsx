@@ -5,6 +5,7 @@ import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesCo
 import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
+import { isTrainingHost } from './training/context'
 
 // Portal & Auth Pages
 import Portal from './pages/Portal'
@@ -19,6 +20,9 @@ import StudentRegister from './pages/student/StudentRegister'
 
 // Admin/Teacher Pages
 const CourseList = React.lazy(() => import('./pages/CourseList'))
+const TrainingPortal = React.lazy(() => import('./training/TrainingPortal'))
+const TrainingLearnerHome = React.lazy(() => import('./training/TrainingLearnerHome'))
+const TrainingTrainerHome = React.lazy(() => import('./training/TrainingTrainerHome'))
 const CourseStudents = React.lazy(() => import('./pages/CourseStudents'))
 const StudentManagement = React.lazy(() => import('./pages/StudentManagement'))
 const AssignmentList = React.lazy(() => import('./pages/AssignmentList'))
@@ -166,6 +170,11 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <RouteLoading />
   }
 
+  // Training is a separate product entrance, not a new security role.
+  if (isAuthenticated && isTrainingHost() && user?.role !== 'STUDENT' && user?.role !== 'TEACHER') {
+    return <ProductPage><ProductStatus kind="info" title="请使用培训账号">这个入口仅供学员和培训师使用。其他身份请返回统一平台入口。</ProductStatus></ProductPage>
+  }
+
   // 已登录用户跳转到对应首页
   if (isAuthenticated) {
     if (user?.role === 'STUDENT') return <Navigate to="/student" replace />
@@ -193,7 +202,7 @@ function AppRoutes() {
             path="/"
             element={
               <EntryRoute>
-                <Portal />
+                {isTrainingHost() ? <TrainingPortal /> : <Portal />}
               </EntryRoute>
             }
           />
@@ -276,7 +285,7 @@ function AppRoutes() {
             path="/dashboard"
             element={
               <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                <CourseList />
+                {isTrainingHost() ? <TrainingTrainerHome /> : <CourseList />}
               </ProtectedRoute>
             }
           />
@@ -578,7 +587,7 @@ function AppRoutes() {
             path="/student"
             element={
               <StudentProtectedRoute>
-                <StudentHome />
+                {isTrainingHost() ? <TrainingLearnerHome /> : <StudentHome />}
               </StudentProtectedRoute>
             }
           />
