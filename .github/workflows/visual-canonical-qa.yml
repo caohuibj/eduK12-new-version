@@ -18,10 +18,14 @@ concurrency:
 jobs:
   acceptance:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
-      engine: all
+      engine: ${{ matrix.engine }}
       canonical: true
       app_shell: false
       use_build_artifacts: ${{ inputs.use_build_artifacts || false }}

@@ -125,6 +125,26 @@ test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
   assert.match(backend,/run: npm test -- src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
   for(const name of ['accept-media','accept-ui','accept-visual','accept-ops']) assert.ok(job(ci,'merge-gate').includes(name));
 });
+test('visual partition retains three engines and once-only AppShell/QA within the original budget', () => {
+  const ci = source('ci');
+  for (const name of ['accept-ui', 'probe-ui-mac']) {
+    const ui = job(ci, name);
+    assert.match(ui, /fail-fast: false/);
+    assert.match(ui, /engine:.*chromium.*firefox.*webkit/);
+    assert.match(ui, /engine: \$\{\{ matrix\.engine \}\}/);
+    for (const flag of ['app_shell', 'qa_round3']) {
+      assert.match(ui, new RegExp(flag + ":.*matrix\\.engine == 'chromium'"));
+    }
+    assert.doesNotMatch(ui, /engine: all/);
+  }
+  assert.match(job(ci, 'probe-ui-hosted'), /inputs\.step_probe == 'ui-chromium'/);
+  const standalone = job(source('visual-canonical-qa'), 'acceptance');
+  assert.match(standalone, /engine: \[chromium, firefox, webkit\]/);
+  assert.match(standalone, /engine: \$\{\{ matrix\.engine \}\}/);
+  assert.match(source('ci-ui'), /timeout-minutes: 20/);
+  assert.ok(job(ci, 'merge-gate').includes('accept-ui'));
+});
+
 test('frontend route builds only the frontend image but preserves scan, CSP and API evidence', () => {
   const docker=job(source('ci-images'),'images');
   const build=fs.readFileSync(new URL('./build-ci-images.sh',import.meta.url),'utf8');

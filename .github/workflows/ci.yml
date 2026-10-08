@@ -124,13 +124,17 @@ jobs:
   probe-ui-mac:
     needs: probe-frontend-build
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && '["self-hosted","macOS","eduk12-mac-ci"]' || '["self-hosted","Linux","X64","eduk12-win-ci"]' }}
-      engine: chromium
-      canonical: false
-      app_shell: true
-      qa_round3: true
+      engine: ${{ matrix.engine }}
+      canonical: true
+      app_shell: ${{ matrix.engine == 'chromium' }}
+      qa_round3: ${{ matrix.engine == 'chromium' }}
 
   probe-qa-ui:
     needs: probe-frontend-build
@@ -144,11 +148,11 @@ jobs:
 
   probe-ui-hosted:
     needs: probe-frontend-build
-    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["ui","ui-chromium"]'), inputs.step_probe)
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium'
     strategy:
       fail-fast: false
       matrix:
-        engine: ${{ fromJSON(inputs.step_probe == 'ui-chromium' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
+        engine: [chromium]
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
@@ -609,13 +613,17 @@ jobs:
   accept-ui:
     needs: [scope, frontend-build, frontend]
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (needs.frontend.result == 'success' || needs.frontend.result == 'skipped') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: ${{ fromJSON(needs.scope.outputs.visual_hosted == 'true' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: ${{ needs.scope.outputs.frontend_runner }}
-      engine: ${{ needs.scope.outputs.visual_hosted == 'true' && 'chromium' || 'all' }}
+      engine: ${{ matrix.engine }}
       canonical: ${{ needs.scope.outputs.canonical_visual == 'true' && needs.scope.outputs.visual_hosted != 'true' }}
-      app_shell: ${{ needs.scope.outputs.app_shell == 'true' }}
-      qa_round3: ${{ needs.scope.outputs.canonical_visual == 'true' }}
+      app_shell: ${{ needs.scope.outputs.app_shell == 'true' && matrix.engine == 'chromium' }}
+      qa_round3: ${{ needs.scope.outputs.canonical_visual == 'true' && matrix.engine == 'chromium' }}
 
   accept-visual:
     needs: [scope, frontend-build]

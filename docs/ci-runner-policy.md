@@ -131,6 +131,16 @@ persistent volumes are rejected. Ports must be free between scenarios. Existing
 fixture guards, test assertions and individual evidence remain mandatory. Standalone
 media workflows invoke the same composite scenario actions as grouped validation.
 
+Local visual acceptance and the `ui` component probe use one matrix job per
+Chromium/Firefox/WebKit engine. The existing single Mac slot serializes them;
+AppShell and QA round 3 run once in the Chromium job. Each engine retains the
+20-minute timeout, complete scenarios, exact-run artifacts and cleanup. The
+aggregate requires success from the whole matrix, and fail-fast is disabled so
+one engine cannot suppress evidence from the others. The previous combined job
+spent approximately ten minutes in Chromium alone in run 37755658225; combining
+all engines and setup did not fit its unchanged 20-minute budget. This division
+changes task scheduling, not assertions, scanner thresholds or runner capacity.
+
 Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
 PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
 screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
