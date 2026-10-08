@@ -273,7 +273,7 @@ const CourseStudents: React.FC = () => {
                           disabled={processingId === student.id}
                           className="inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
                           title="重置密码"
-                          aria-label={`为 ${student.nickname} 生成一次性临时密码`}
+                          aria-label={`${training ? '重置密码：' : ''}为 ${student.nickname} 生成一次性临时密码`}
                         >
                           <Key className="h-4 w-4" aria-hidden="true" />{training && <span className="training-roster-action-label">重置密码</span>}
                         </button>}
