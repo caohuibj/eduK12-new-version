@@ -101,19 +101,8 @@ export async function scan(api, c, local, secret, work) {
     finally{await fsp.rm(encrypted,{force:true});await fsp.rm(plain,{force:true});}
   };
   const metadataRecord=r=>({key:r.key,versionId:r.versionId,bytes:r.encryptedBytes,sha256:r.encryptedSha256});
-  const states=[local.attachment];
-  for(const v of versions.filter(v=>v.kind==='object'&&v.key==='attachments/v1/catalog-latest.json')) {
-    const body=await read(v),pointer=unseal(JSON.parse(body),secret);
-    need(/^attachments\/v1\/catalogs\/[a-f0-9-]{36}\.gcm$/.test(pointer.key)&&pointer.keyId===local.attachment.identity.keyId,'CATALOG_POINTER_INVALID');
-    register({...v,sha256:hash(body)},'pointer',{catalog:id(pointer),publishedAt:pointer.at});
-    if(!catalogs.has(id(pointer))){
-      const state=unseal(await decrypted(pointer),secret);
-      need(JSON.stringify(state.identity)===JSON.stringify(local.attachment.identity)&&state.schema===1,'HISTORICAL_REPOSITORY_IDENTITY_CHANGED');
-      const blobs=Object.values(state.receipts).map(r=>id(r));
-      catalogs.set(id(pointer),{blobs,snapshotIds:state.snapshots.map(s=>s.id),state});register(metadataRecord(pointer),'catalog');states.push(state);
-    }
-  }
-  for(const state of states) {
+  // Retain the dependency graph, not every historical catalog's full source map.
+  const registerState=async state=>{
     for(const r of Object.values(state.receipts)) {
       need(r.verified===true&&r.key===`attachments/v1/objects/${local.attachment.identity.keyId}/${r.sha256}.gcm`,'BLOB_RECEIPT_INVALID');
       // An authenticated old catalog may include an orphan already deleted by a completed journal.
@@ -131,6 +120,19 @@ export async function scan(api, c, local, secret, work) {
         need(JSON.stringify([...new Set(manifest.entries.map(e=>e.blob))].sort())===JSON.stringify([...blobKeys].sort()),'SNAPSHOT_REFERENCE_MISMATCH');
         snapshots.set(s.id,{...s,blobs,blobKeys});register(metadataRecord(s.remote),'snapshot',{snapshotId:s.id});
       } else need(id(snapshots.get(s.id).remote)===id(s.remote),'CONFLICTING_SNAPSHOT_ID');
+    }
+  };
+  await registerState(local.attachment);
+  for(const v of versions.filter(v=>v.kind==='object'&&v.key==='attachments/v1/catalog-latest.json')) {
+    const body=await read(v),pointer=unseal(JSON.parse(body),secret);
+    need(/^attachments\/v1\/catalogs\/[a-f0-9-]{36}\.gcm$/.test(pointer.key)&&pointer.keyId===local.attachment.identity.keyId,'CATALOG_POINTER_INVALID');
+    register({...v,sha256:hash(body)},'pointer',{catalog:id(pointer),publishedAt:pointer.at});
+    if(!catalogs.has(id(pointer))){
+      const state=unseal(await decrypted(pointer),secret);
+      need(JSON.stringify(state.identity)===JSON.stringify(local.attachment.identity)&&state.schema===1,'HISTORICAL_REPOSITORY_IDENTITY_CHANGED');
+      const blobs=Object.values(state.receipts).map(r=>id(r));
+      catalogs.set(id(pointer),{blobs,snapshotIds:state.snapshots.map(s=>s.id)});register(metadataRecord(pointer),'catalog');
+      await registerState(state);
     }
   }
   // Sidecars are authenticated, version-specific owners of deduplicated payloads.
