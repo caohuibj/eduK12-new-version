@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Lock, Unlock, Key, Users, UserX, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import { ProductPage } from '../components/product-ui/ProductPage'
@@ -19,6 +20,8 @@ interface Student {
 }
 
 const StudentManagement: React.FC = () => {
+  const { user } = useAuth()
+  const canManageGlobalAccount = user?.role === 'ADMIN' && user.platformRole === 'SYSTEM_ADMIN'
   const { feedback, confirm, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
@@ -203,7 +206,7 @@ const StudentManagement: React.FC = () => {
 
   const renderStudentActions = (student: Student, compact = false) => (
     <div className={`flex items-center justify-end ${compact ? 'gap-1' : 'gap-2'}`}>
-      <button
+      {canManageGlobalAccount && <button
         type="button"
         onClick={() => handleToggleFreeze(student)}
         disabled={processingId === student.id}
@@ -214,8 +217,8 @@ const StudentManagement: React.FC = () => {
         title={student.isFrozen ? '解冻账号' : '冻结账号'}
       >
         {student.isFrozen ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-      </button>
-      <button
+      </button>}
+      {canManageGlobalAccount && <button
         type="button"
         onClick={() => handleResetPassword(student)}
         disabled={processingId === student.id}
@@ -224,7 +227,7 @@ const StudentManagement: React.FC = () => {
         title="重置密码"
       >
         <Key className="w-4 h-4" />
-      </button>
+      </button>}
       <button
         type="button"
         onClick={() => handleRemoveStudent(student)}
