@@ -211,7 +211,10 @@
 @media (max-width: 760px) {
   .training-portal { padding: 20px; }
   .training-portal-main { grid-template-columns: minmax(0, 1fr); padding-block: 58px; }
-  .training-sketch-panel { display: none; }
+  /* Keep one small, quiet original hand-drawn signature on phones. */
+  .training-portal-main { gap: 0; }
+  .training-sketch-panel { display: flex; width: clamp(112px, 30vw, 150px); justify-self: end; opacity: .55; margin-top: -12px; }
+  .training-sketch-caption { display: none; }
   .training-home-header { padding-bottom: 36px; }
   .training-home { margin-top: 24px; }
   .training-portal-copy h1 { font-size: clamp(39px, 8vw, 56px); }
@@ -331,4 +334,117 @@
 .hui-training .hui-auth-page--training .hui-auth-card__body :where(a,button,input,select,textarea):focus-visible,
 .hui-training .hui-auth-page--training :is(.hui-auth-back,.hui-auth-brand):focus-visible {
   outline: 3px solid var(--training-bamboo); outline-offset: 3px;
+}
+
+/* Deep Training pages share an editorial paper hierarchy, not a second Runtime.
+   Scope to standard/published product surfaces; focused timed runners retain
+   their frozen scientific presentation and report-specific legibility. */
+.hui-training.hui-app--standard {
+  --hui-ds-color-ink: var(--training-ink);
+  --hui-ds-color-muted: var(--training-muted);
+  --hui-ds-color-focus: var(--training-bamboo);
+  --hui-color-action: var(--training-bamboo);
+  --hui-color-action-hover: #294938;
+  --hui-color-border: var(--training-border);
+  --staff-ink: var(--training-ink);
+  --staff-muted: var(--training-muted);
+  --staff-line: var(--training-border);
+  --staff-accent: var(--training-bamboo);
+  --staff-bg: var(--training-paper);
+}
+.hui-training.hui-app--standard .hui-page-header__title {
+  font-family: var(--training-serif);
+  color: var(--training-ink);
+  font-weight: 560;
+  letter-spacing: .015em;
+  line-height: 1.45;
+}
+.hui-training.hui-app--standard .hui-page-header__description {
+  color: var(--training-muted);
+}
+.hui-training.hui-app--standard :is(.card, .staff-toolbar, .staff-catalog-card, .staff-record-table, .staff-table-container, .student-submit-panel) {
+  background: var(--training-surface);
+  border-color: var(--training-border);
+  border-radius: 5px;
+  box-shadow: none;
+}
+.hui-training.hui-app--standard :is(.staff-table, .staff-table th, .staff-table td) {
+  border-color: var(--training-border);
+}
+.hui-training.hui-app--standard .staff-table thead,
+.hui-training.hui-app--standard .staff-table th {
+  background: #efebe2;
+  color: var(--training-ink);
+}
+.hui-training.hui-app--standard :is(.staff-record-button, .staff-text-action, .staff-help, .staff-detail-header__description) {
+  color: var(--training-bamboo);
+}
+.hui-training.hui-app--standard :is(.btn-primary, .hui-button--primary, .staff-primary-link) {
+  background: var(--training-bamboo);
+  border-color: var(--training-bamboo);
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.hui-training.hui-app--standard :is(.btn-primary, .hui-button--primary, .staff-primary-link):hover:not(:disabled) {
+  background: #294938;
+  border-color: #294938;
+}
+.hui-training.hui-app--standard :is(.btn-secondary, .hui-button--secondary, .staff-secondary-link) {
+  border-color: #9cafa0;
+  color: var(--training-bamboo);
+  border-radius: 4px;
+  box-shadow: none;
+}
+.hui-training.hui-app--standard :is(input.input, select.input, textarea.input, .staff-dialog input, .staff-dialog textarea, .staff-dialog select) {
+  border-color: var(--training-border);
+  color: var(--training-ink);
+  border-radius: 4px;
+}
+.hui-training.hui-app--standard .staff-dialog {
+  background: var(--training-surface);
+  color: var(--training-ink);
+  border-radius: 5px;
+}
+.hui-training.hui-app--standard .staff-dialog__header {
+  background: var(--training-surface);
+  border-color: var(--training-border);
+}
+.hui-training.hui-app--standard .staff-dialog__header h2 {
+  font-family: var(--training-serif);
+  font-weight: 600;
+  color: var(--training-ink);
+}
+.hui-training.hui-app--standard .staff-dialog__body,
+.hui-training.hui-app--standard .staff-dialog__actions {
+  background: var(--training-surface);
+  border-color: var(--training-border);
+}
+.hui-training.hui-app--standard :is(.student-submit-info, .student-submit-response, .student-submit-feedback) {
+  border-color: var(--training-border);
+  background: #f9f7f1;
+}
+.hui-training.hui-app--standard .student-submit-feedback :is(h4, p) { color: var(--training-ink); }
+.hui-training.hui-app--standard :is(.staff-icon-button, .student-submit-back, .student-submit-inline-action, .staff-table-actions button) {
+  min-height: 44px;
+  min-width: 44px;
+}
+.hui-training.hui-app--standard :is(.hui-navigation a, .hui-account button, .hui-breadcrumb a, .staff-table-actions button):focus-visible {
+  outline: 3px solid var(--training-bamboo);
+  outline-offset: 3px;
+}
+.hui-training.hui-app--standard .hui-app-main {
+  padding-bottom: max(26px, env(safe-area-inset-bottom));
+}
+@media (max-width: 640px) {
+  .hui-training.hui-app--standard .staff-table-container { overflow-x: auto; }
+  .hui-training.hui-app--standard .hui-navigation {
+    gap: 18px;
+    padding-inline: 18px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hui-training.hui-app--standard .hui-navigation a { flex: 0 0 auto; }
+  .hui-training.hui-app--standard .staff-dialog { max-width: calc(100vw - 20px); }
+  .hui-training.hui-app--standard .staff-dialog__actions :is(button, a) { min-height: 44px; }
 }
