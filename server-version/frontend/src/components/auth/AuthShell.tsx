@@ -77,7 +77,7 @@ export default function AuthShell({
     <div className={`hui-auth-page hui-auth-page--${tone}${training ? ' hui-auth-page--training' : ''}`}>
       <aside className="hui-auth-hero" aria-label="Huisurvey 介绍">
         <div className="hui-auth-hero__inner">
-          <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
+          <Link to="/" className="hui-auth-brand" aria-label={training ? '返回 Huisurvey Training 入口' : '返回 Huisurvey 入口'}>
             <span className="hui-auth-brand__mark" aria-hidden="true" />
             <strong>{training ? 'Huisurvey Training' : 'Huisurvey'}</strong>
           </Link>
