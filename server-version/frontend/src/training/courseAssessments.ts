@@ -120,9 +120,9 @@ export function projectCourseAssessments(
   }
 
   for (const item of composites) {
-    // Defensive recheck even after the calling loader scopes its results.
-    // New multi-course QUESTIONNAIRE delivery is validated by the task feed
-    // before this function; do not discard those legitimate null-course rows.
+    // Null-course multi-delivery rows must be validated by the task feed in
+    // availableComposites(). Legacy course-bound rows are checked again here.
+    if (item.course && item.course.id !== courseId) continue
     const inProgress = Boolean(item.canContinue && item.attempt?.id)
     const finished = item.latestCompletedAttempt || (item.attempt?.status === 'COMPLETED' ? item.attempt : null)
     const reportHref = finished ? '/student/composite/attempts/' + enc(finished.id) + '/report' : null
