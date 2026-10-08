@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, Copy } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import apiClient from '../api/client'
+import { internalReturnTo } from '../components/app-shell/access'
 import { useAuth } from '../contexts/AuthContext'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 import { cognitiveApi } from '../modules/cognitive/api'
@@ -37,10 +38,10 @@ export default function TrainingTrainerCourse() {
     setCourseError(null)
     setCourse(null)
     setCodeNotice('')
-    setAssignments(pending())
-    setCheckins(pending())
-    setQuestionnaires(pending())
-    setCognitives(pending())
+    setAssignments(pending<Assignment>())
+    setCheckins(pending<Checkin>())
+    setQuestionnaires(pending<Questionnaire>())
+    setCognitives(pending<Cognitive>())
     const load = async <T,>(url: string, setter: (value: Collection<T>) => void) => {
       try {
         const response = await apiClient.get<{ list: T[] }>(url)
@@ -158,7 +159,7 @@ export default function TrainingTrainerCourse() {
                     {questionnaires.rows.map(task =>
                       <article key={'questionnaire:' + task.id} className="training-task-item">
                         <div><span className="training-task-type">课程测评</span><h2>{task.name}</h2><p>{task.unitCount} {task.unitLabel}</p></div>
-                        {task.manageHref ? <Link to={task.manageHref} className="training-row-action">查看测评<ArrowRight size={16} aria-hidden="true" /></Link>
+                        {task.manageHref && internalReturnTo(task.manageHref) ? <Link to={internalReturnTo(task.manageHref)!} className="training-row-action">查看测评<ArrowRight size={16} aria-hidden="true" /></Link>
                           : <span className="training-task-disabled">由创建者管理</span>}
                       </article>)}
                     {cognitives.rows.map(task =>
