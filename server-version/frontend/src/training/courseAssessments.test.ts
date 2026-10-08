@@ -85,6 +85,20 @@ describe('course-scope measurement projection', () => {
     expect(result[0].status).toBe('未开放')
   })
 
+  it('does not present an expired composite attempt as resumable', () => {
+    const result = projectCourseAssessments(course, [], [], [], [{
+      ...composite('deadline-ended', course),
+      availability: 'EXPIRED',
+      canStartNewAttempt: false,
+      canContinue: true,
+      attempt: { id: 'unfinished', status: 'IN_PROGRESS', progress: 0.4 },
+    }])
+    expect(result).toHaveLength(1)
+    expect(result[0].status).toBe('已截止')
+    expect(result[0].href).toBeNull()
+    expect(result[0].action).not.toBe('继续测评')
+  })
+
   it('retains usable sources and reports partial outages explicitly', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/scales/available') throw new Error('source unavailable')
