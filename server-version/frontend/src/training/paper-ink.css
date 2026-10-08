@@ -590,3 +590,5 @@
 
 .hui-training.hui-app--standard .staff-dialog__description { color: var(--training-muted); }
 .hui-training.hui-app--standard .text-green-600 { color: var(--training-bamboo); }
+
+.hui-training .hui-auth-page--training .text-green-600 { color: var(--training-bamboo); }
