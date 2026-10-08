@@ -783,6 +783,7 @@ export const courseController = {
           nickname: s.student.nickname,
           avatarUrl: s.student.avatarUrl,
           isFrozen: s.student.isFrozen,
+          enrollmentStatus: s.status,
           joinedAt: s.joinedAt,
         })),
         total: students.length,
@@ -906,6 +907,7 @@ export const courseController = {
             nickname: cs.student.nickname,
             avatarUrl: cs.student.avatarUrl,
             isFrozen: cs.student.isFrozen,
+            enrollmentStatus: cs.status,
             joinedAt: cs.joinedAt,
           })
         }
