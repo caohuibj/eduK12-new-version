@@ -15,10 +15,13 @@ const work = [
   },
   {
     title: '测评资源授权',
-    description: '查看培训师可使用的量表、认知配置、报告包与固定测评包的实际授权，保留平台资源准入规则。',
+    description: '先在已发布资源页面发放使用授权，再到授权记录页核对或撤销。科学发布资格与培训师使用权限分别管理。',
     Icon: KeyRound,
     links: [
-      { to: '/admin/material-grants', label: '材料使用授权' },
+      { to: '/scales', label: '量表资源与授权' },
+      { to: '/cognitive-assignments', label: '认知配置与授权' },
+      { to: '/bundle-products', label: '固定测评包' },
+      { to: '/admin/material-grants', label: '查看和撤销授权' },
       { to: '/admin/instrument-authorizations', label: '测评使用授权' },
     ],
   },
