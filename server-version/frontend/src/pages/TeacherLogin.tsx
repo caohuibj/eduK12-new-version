@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import AuthShell from '../components/auth/AuthShell'
 import React, { useState } from 'react'
@@ -7,6 +8,7 @@ import apiClient from '../api/client'
 
 const TeacherLogin: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -60,7 +62,7 @@ const TeacherLogin: React.FC = () => {
       <form onSubmit={handleVerifyCode} className="space-y-4">
         <div>
           <label htmlFor="auth-teacherCode" className="block text-sm font-medium text-gray-700 mb-1">
-            教师邀请码
+            {training ? '培训师注册码' : '教师邀请码'}
           </label>
           <input aria-describedby={error ? "auth-error" : undefined} id="auth-teacherCode"
             type="text"
@@ -71,7 +73,7 @@ const TeacherLogin: React.FC = () => {
             required
           />
           <p className="mt-2 text-xs text-gray-500">
-            教师邀请码由管理员创建，仅限使用一次
+            {training ? '培训师注册码由平台管理员创建，仅能使用一次' : '教师邀请码由管理员创建，仅限使用一次'}
           </p>
         </div>
 
@@ -92,7 +94,7 @@ const TeacherLogin: React.FC = () => {
       </form>
 
       <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-2">已有教师账号？</p>
+        <p className="text-sm text-gray-500 mb-2">{training ? '已有培训师账号？' : '已有教师账号？'}</p>
         <Link to={authLink("/teacher/account-login")} className="text-action hover:underline font-medium">
           直接登录
         </Link>
