@@ -40,70 +40,39 @@ and unscoped CI changes select the full platform route. Malformed classification
 Management-UI content publication without a Git change uses application publication
 validation. A server release is separate from WeChat mini-program publication.
 
-## Current production routing: all self-hosted
+## Current CI routing: GitHub-hosted only (public repository)
 
-The repository variable `CI_RUNNER_PROFILE` is `local`, and manual component/full
-dispatch defaults to `local`. Hosted Actions minutes are exhausted. Keep subsequent
-PR, main and diagnostic work self-hosted; do not select `speed` or `economy` without
-an explicit decision to resume hosted usage. Windows/WSL `eduk12-win-ci` runs CodeQL,
-backend/isolated database regression, production images/scans, recovery, performance
-and actual API/media browser checks in its single exclusive slot. Mac runs routing,
-frontend builds/regression, pure component UI and the three visual engines. Each
-machine's existing resource preflight and exact-source artifact checks still apply.
+The repository is public. All automatic PR CI, post-merge smoke, manual component probes,
+full acceptance, standalone visual/media/browser checks, scientific content gates, CodeQL,
+Docker image scans, performance and Ops recovery workflows execute exclusively on
+**standard GitHub-hosted `ubuntu-24.04` runners**. No workflow schedules the
+former Mac or Windows/WSL runner labels, and reusable workflow jobs themselves are
+pinned to `ubuntu-24.04` so stale callers cannot reactivate local execution.
 
-The hosted speed topology below is retained as an optional capacity profile, not
-the current default.
+The old repository variables `CI_RUNNER_PROFILE=local` and `CI_MAC_LIGHT_ENABLED`
+no longer influence routing. The main manual CI dispatch offers only `hosted`;
+`runnerPlan` accepts legacy `speed`, `economy`, `local`, `balanced` and
+`hybrid` arguments solely for compatibility and normalizes them to `hosted`.
+Remove obsolete repository variables when convenient; no Settings change is required
+to make the new committed workflows use Hosted runners.
 
-## Optional speed topology
+Standard hosted runner *compute minutes* are free for public repositories under
+GitHub's published Actions billing rules. Standard resource limits, concurrency
+quotas and artifact/cache storage limits still apply; larger hosted runners are
+not selected. Re-check the policy if repository visibility or GitHub terms change.
 
-```mermaid
-flowchart LR
-  S[Classify and preflight] --> FB[GitHub: parallel production and UI-lab builds]
-  FB --> FC[Mac: full frontend checks]
-  FC --> UI[Mac: AppShell and reporting component UI]
-  S --> BB[Windows: backend build and guarded migrations]
-  BB --> IM[Windows: production images and scans]
-  BB --> OP[Windows: Ops and performance]
-  S --> Q[GitHub: CodeQL]
-  S --> R[GitHub: full backend regression, isolated DB]
-  FB --> API[GitHub: real API browser]
-  BB --> API
-  FB --> ME[GitHub: two media groups]
-  BB --> ME
-  FB --> FF[GitHub: Chromium, Firefox and WebKit in parallel]
-  UI --> G[Required aggregate]
-  IM --> G
-  OP --> G
-  Q --> G
-  R --> G
-  API --> G
-  ME --> G
-  FF --> G
-```
+Jobs retain the existing conditional scope/classification rules: light content,
+medium frontend, maintenance and full platform tests remain distinct. A ready heavy
+platform PR still requires the original backend/frontend regressions, real-API
+browser, all three visual engines, grouped media, Docker scans, CodeQL, performance,
+recovery, mini-program and merge gate. No checks are waived because jobs are hosted.
 
-Mac and Windows each retain one job slot. Performance checks run exclusively on
-Windows and cannot overlap its image builds. Backend artifact production precedes
-other Windows full-gate work so consumers can begin early. Browser consumers wait
-for builds, not unrelated lint or frontend regression. The final aggregate waits
-for both producers and every required validation.
+Fork PR admission is **unchanged**: the main CI still requires same-repository PR
+source until an independent trust-model review approves safely testing forks.
+Production secrets and production database access are never exposed to public CI.
 
-Profiles are explicit:
-
-| Profile | Hosted heavy work | Local work |
-| --- | --- | --- |
-| `speed` (recommended) | CodeQL, backend regression, main API browser, two media groups, production/UI-lab builds, three visual engines | Mac frontend/AppShell/component UI; Windows migrations/images/Ops/performance |
-| `economy` | CodeQL, backend regression, main API browser | Mac frontend/all visual engines; Windows remaining real-service work |
-| `local` (current default) | None | Mac frontend/UI, Windows real services and CodeQL |
-
-Light/medium routes do not select heavy hosted acceleration. CodeQL runs on
-Windows/WSL in local mode and on GitHub in hosted profiles. Broad medium UI changes can require all three browser engines
-on Mac and take longer than a small medium change. `balanced`/`hybrid` are aliases
-for `economy`. Self-hosted outages do not silently activate hosted fallback.
-
-The initial planning target for a warm successful heavy `speed` run is 14–20 minutes
-and approximately 48–66 hosted job-minutes. These are estimates, not measured guarantees or job
-timeouts. Budget cold starts, isolated rollout probes and retries separately, and
-check actual account usage before relying on an old remaining-minute figure.
+The full acceptance graph now permits independent hosted jobs to run concurrently.
+The exact-run artifact contract and isolation checks below remain authoritative.
 
 ## Build and scenario isolation
 
@@ -141,6 +110,21 @@ the independent backend/database gates.
 
 ## Resource and cleanup policy
 
+Every active CI job uses an ephemeral standard GitHub-hosted Ubuntu VM. The existing
+runner preflight observes disk/memory but its special self-managed-host constraints
+are not needed on these ephemeral machines. Heavy Docker CI keeps its 3 GiB
+minimum-free-space guard and may reclaim only regenerable *local build cache*
+in that CI VM. Never prune production data or persistent host services.
+
+Isolated PostgreSQL/Redis containers, temporary credentials, bounded browser
+artifacts, SHA-scoped build manifests and job-specific cleanup remain mandatory.
+`npm ci`, pinned images, vulnerability scan thresholds, signature checks and
+`PERF_CAPACITY_QUALIFIED=0` for Phase 0 evidence are unchanged.
+
+Legacy Mac cleanup utilities and old self-managed runner references in historical
+records may remain in the repository as inert code/evidence; no Actions job runs
+on those machines after this change.
+
 ### Beijing production host: download and maintenance notes
 
 The production server is in Beijing. Server maintenance, release builds and local
@@ -162,26 +146,6 @@ original security scan before release; no unrelated full CI is needed for an
 operator download setting. Preserve the immutable source checkout and record
 operator recipe hashes, mirror URLs and actual image IDs in the release proof.
 
-Mac uses the dedicated non-admin `eduk12ci` account and label `eduk12-mac-ci`.
-Frontend uses the existing 3072 MiB Node heap and test worker limits. Routing requires
-8 GiB disk headroom (5 GiB reserve plus a provisional 3 GiB working allowance), then
-the job checks again. Adjust the allowance using measured peaks. UI checks release
-preview processes and upload evidence before removing temporary outputs.
-
-Each Mac job removes its frontend/backend/browser `node_modules` and build outputs.
-Download caches are bounded: npm 512 MiB, Actions 256 MiB and tools 512 MiB,
-with seven-day expiry. Browser installations use the job temporary directory and
-are removed after each job; they do not accumulate a persistent browser cache. The existing hourly idle maintenance skips active
-Runner.Worker processes, rotates service logs and removes expired CI temporary files.
-Interrupted browser installations are covered by the existing idle temporary-file
-expiry without modifying the protected maintenance service. Cleanup rejects symlinks and personal
-accounts and never globally prunes Docker or retained data volumes.
-
-Windows uses one exclusive `eduk12-win-ci` Linux/WSL runner. Heavy preflight requires
-20 GiB free disk and 6 GiB effective memory across every visible cgroup ancestor.
-Its validated clock guard remains required before runner startup. Tests use UTC;
-host and production business timezones are unchanged. New concurrent heavy slots
-require measured memory and separate ports, services and fixtures.
 
 ## Failure handling and rollout
 
@@ -190,15 +154,15 @@ regressions with the same implementation/dependencies/parameters/isolation as th
 formal gate. Do not use full CI as the first verification or relax timeouts,
 assertions, authorization boundaries or scan thresholds to obtain a green result.
 
-The existing CI workflow exposes `step_probe` values for frontend, backend,
+The hosted-only CI workflow exposes `step_probe` values for frontend, backend,
 backend-regression, targeted reporting, browser, media, UI, hosted Chromium UI, QA component UI, Ops, performance, images and Cognitive checks.
 The `assessment-repair` probe runs the shared R5 regression selector, including
 task-controller admission and collection snapshot completion fixtures, so the
 focused gate catches filter-export and draft-before-publication contract drift.
 It requires
 non-skipping Questionnaire, Bundle, onboarding, SJT and anonymous-study PostgreSQL
-evidence. With `runner_profile=local`, backend regression, browser, media, visual
-and maintenance probes use self-hosted runners; there is no hosted fallback.
+evidence. All backend regression, browser, media, visual and maintenance probes use standard
+GitHub-hosted Ubuntu 24.04 runners, regardless of legacy profile inputs.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.

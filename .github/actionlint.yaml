@@ -1,4 +1,0 @@
-self-hosted-runner:
-  labels:
-    - eduk12-win-ci
-    - eduk12-mac-ci
