@@ -74,7 +74,7 @@ describe('StudentManagement product semantics', () => {
     await user.click(courseToggle)
     expect(courseToggle).toHaveAttribute('aria-expanded', 'true')
     expect(screen.queryByRole('button', { name: '冻结 小明 的账号' })).toBeNull()
-    expect(screen.queryByRole('button', { name: '重置 小明 的密码' })).toBeNull()
+    expect(screen.getByRole('button', { name: '重置 小明 的密码' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '将 小明 从课程中移除' })).toBeInTheDocument()
   })
   it('permits system admin account actions but not legacy ADMIN with STANDARD platform role', async () => {
@@ -84,6 +84,7 @@ describe('StudentManagement product semantics', () => {
     const firstToggle = await screen.findByRole('button', { name: /课程一/ })
     await u.click(firstToggle)
     expect(screen.queryByRole('button', { name: '冻结 小明 的账号' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '重置 小明 的密码' })).toBeNull()
     view.unmount()
 
     auth.user = { role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' }
