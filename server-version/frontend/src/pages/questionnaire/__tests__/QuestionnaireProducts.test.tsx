@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,9 +8,9 @@ vi.mock('../../../components/PublicDeliveryManager', () => ({
   PublicDeliveryManager: () => null,
 }))
 import { QuestionnaireProductEdit } from '../QuestionnaireProducts'
-function mount(id = 'new') {
+function mount(id = 'new', search = '') {
   render(
-    <MemoryRouter initialEntries={['/questionnaire-products/' + id]}>
+    <MemoryRouter initialEntries={['/questionnaire-products/' + id + search]}>
       <Routes>
         <Route
           path="/questionnaire-products/:id"
@@ -33,6 +33,18 @@ describe('questionnaire draft feedback', () => {
       },
     })
   })
+  it('prefills only an authorized course passed by the Training course route', async () => {
+    mount('new', '?courseId=c')
+    const courseCheck = await screen.findByRole('checkbox', { name: '课程' })
+    await waitFor(() => expect(courseCheck).toBeChecked())
+  })
+
+  it('does not preselect an unlisted course from a tampered URL', async () => {
+    mount('new', '?courseId=outside')
+    const courseCheck = await screen.findByRole('checkbox', { name: '课程' })
+    expect(courseCheck).not.toBeChecked()
+  })
+
   it('discards a previous questionnaire response after switching pages', async () => {
     let resolveOld!: (value: unknown) => void
     const oldRequest = new Promise(resolve => { resolveOld = resolve })
