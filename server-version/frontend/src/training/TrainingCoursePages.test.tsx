@@ -50,6 +50,18 @@ describe('course-first training workspaces', () => {
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
   })
 
+  it('shows assignment API failure without crashing the course page', async () => {
+    get.mockImplementation((url: string) => {
+      if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
+      if (url === '/courses/course-1/assignments') return Promise.reject(new Error('作业查询超时'))
+      if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [] } })
+      throw new Error('unexpected url ' + url)
+    })
+    mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
+    expect(await screen.findByRole('alert')).toHaveTextContent('作业查询超时')
+    expect(screen.getByRole('button', { name: '重试' })).toBeInTheDocument()
+  })
+
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
