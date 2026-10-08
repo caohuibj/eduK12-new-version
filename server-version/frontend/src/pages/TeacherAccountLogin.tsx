@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import AuthShell from '../components/auth/AuthShell'
@@ -9,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 const TeacherAccountLogin: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const completeLogin = useLoginReturn()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -92,9 +94,9 @@ const TeacherAccountLogin: React.FC = () => {
       </form>
 
       <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-2">还没有教师账号？</p>
+        <p className="text-sm text-gray-500 mb-2">{training ? '还没有培训师账号？' : '还没有教师账号？'}</p>
         <Link to={authLink("/teacher/login")} className="text-action hover:underline font-medium">
-          使用教师码注册
+          {training ? '使用培训师注册码注册' : '使用教师码注册'}
         </Link>
       </div>
     </AuthShell>
