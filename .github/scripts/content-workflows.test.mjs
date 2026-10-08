@@ -133,7 +133,8 @@ test('frontend route builds only the frontend image but preserves scan, CSP and 
   assert.match(build,/docker compose --env-file \/dev\/null build --print/);
   assert.ok(build.indexOf('compose.json" --print') < build.indexOf('ci-image-plan.mjs"'));
   assert.match(build,/ci-image-plan\.mjs.*--verify/);
-  assert.match(build,/--pull --load --print/);
+  assert.match(build,/--pull '--set=\\*\\.output=type=docker' --print/);
+  assert.doesNotMatch(build,/^docker buildx bake .*--load/m);
   assert.match(docker,/build-ci-images\.sh/);
   assert.match(job(source('ci'),'docker'),/frontend_only:.*frontend == 'true'/);
   assert.match(docker,/FRONTEND_ONLY:/);
