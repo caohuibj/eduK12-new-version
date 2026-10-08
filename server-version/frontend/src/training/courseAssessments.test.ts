@@ -54,6 +54,7 @@ describe('course-scope measurement projection', () => {
     expect(result.items.some(item => item.name === '全站公开但未布置')).toBe(false)
     expect(result.items.find(item => item.key === 'composite:delivered')?.href).toBe('/student/composite/delivered')
     expect(myCognitive).toHaveBeenCalledTimes(1)
+    expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + encodeURIComponent(course))
   })
 
   it('distinguishes exhausted cognitive quotas without offering an implicit fresh start', () => {
