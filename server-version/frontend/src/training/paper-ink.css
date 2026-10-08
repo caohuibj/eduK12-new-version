@@ -224,3 +224,42 @@
 @media (prefers-reduced-motion: reduce) {
   .training-role-link { transition: none; }
 }
+
+
+/* Override the staff workspace's legacy sticky dark sidebar on the training
+ * host. The shared course-management controls keep their original behavior. */
+.hui-training.hui-app--standard.hui-app--staff {
+  background: var(--training-paper);
+  color: var(--training-ink);
+}
+.hui-training.hui-app--standard.hui-app--staff .hui-app-header {
+  position: static;
+  top: auto;
+  min-height: 65px;
+  box-shadow: none;
+  border-bottom: 1px solid var(--training-border);
+  background: var(--training-surface);
+}
+.hui-training.hui-app--standard.hui-app--staff .hui-brand::before { display: none; }
+.hui-training.hui-app--standard.hui-app--staff .hui-app-body { display: block; align-items: stretch; }
+.hui-training.hui-app--standard.hui-app--staff .hui-app-content { width: 100%; }
+.hui-training.hui-app--standard.hui-app--staff .hui-app-main { max-width: 1050px; padding: 24px; }
+.hui-training.hui-app--standard.hui-app--staff .hui-navigation {
+  width: 100%;
+  height: auto;
+  position: static;
+  top: auto;
+  overflow: visible;
+  padding: 2px clamp(18px, 5vw, 80px);
+  background: var(--training-surface);
+  color: var(--training-ink);
+  box-shadow: none;
+  border-bottom: 1px solid var(--training-border);
+}
+.hui-training.hui-app--standard.hui-app--staff .hui-breadcrumb {
+  padding: 12px clamp(18px, 5vw, 80px) 0;
+  color: var(--training-muted);
+}
+@media (max-width: 430px) {
+  .hui-training.hui-app--standard.hui-app--staff .hui-app-main { padding: 16px; }
+}
