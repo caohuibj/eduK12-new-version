@@ -9,7 +9,7 @@ const HOUR = 3600000;
 export function config(c) {
   need(c?.schema === 1 && c.backupBucket === 'eduk12-backups-1393949445' && c.sourceBucket === 'ptool-videos-edu-1393949445' && c.region === 'ap-beijing', 'BUCKET_BINDING_REFUSED');
   need(['plan_only', 'execute'].includes(c.mode), 'CLEANUP_MODE_REFUSED');
-  for (const [k, min, max] of [['quarantineHours',24,168],['maxDeleteObjects',1,100],['maxDeleteBytes',1,536870912],['maxInventoryVersions',1,10000],['maxScanBytes',1,67108864]])
+  for (const [k, min, max] of [['quarantineHours',24,168],['maxDeleteObjects',1,100],['maxDeleteBytes',1,536870912],['maxInventoryVersions',1,10000],['maxScanBytes',1,536870912]])
     need(Number.isSafeInteger(c[k]) && c[k] >= min && c[k] <= max, 'CLEANUP_LIMIT_REFUSED');
   need(c.retention?.hourlyHours >= 48 && c.retention.dailyDays >= 30 && c.retention.weeklyWeeks >= 12 && c.retention.monthlyMonths >= 12, 'RETENTION_TOO_SHORT');
   return c;

@@ -12,7 +12,12 @@ remote catalog pointer version, downloads/decrypts the indexed historical catalo
 and manifests, and reconstructs version-specific dependencies. Authenticated blob
 sidecars provide ownership for orphan content. Unknown recovery metadata, corrupt
 indices, incomplete pagination or resource limits fail closed. Unknown payload
-versions stay protected. Retention: 48 hourly hours, 30 daily days, 12 weekly weeks,
+versions stay protected. Metadata scans remain bounded to 512 MiB per run; catalogs
+are authenticated one at a time and only their version/reference graph is retained,
+keeping the existing 256 MiB helper memory limit. Existing installations must update
+`maxScanBytes` explicitly after reviewed validation. Budget exhaustion still blocks
+planning and joint recovery, without deleting or ignoring historical metadata.
+Retention: 48 hourly hours, 30 daily days, 12 weekly weeks,
 12 monthly months, permanent initial baseline, protected points and at least two
 recovery points. Retained DB points pin their attached manifests. Currently retained
 snapshots outside the local rotating index are rehydrated before index retirement.
