@@ -145,7 +145,8 @@ export function projectCourseAssessments(
     // Null-course multi-delivery rows must be validated by the task feed in
     // availableComposites(). Legacy course-bound rows are checked again here.
     if (item.course && item.course.id !== courseId) continue
-    const inProgress = Boolean(item.canContinue && item.attempt?.id)
+    // An unfinished attempt is not resumable after the delivery window closes.
+    const inProgress = item.availability === 'OPEN' && Boolean(item.canContinue && item.attempt?.id)
     const finished = item.latestCompletedAttempt || (item.attempt?.status === 'COMPLETED' ? item.attempt : null)
     const reportHref = finished ? '/student/composite/attempts/' + enc(finished.id) + '/report' : null
     const href = inProgress
