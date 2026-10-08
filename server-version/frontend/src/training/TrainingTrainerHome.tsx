@@ -6,12 +6,18 @@ import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
 
+const PAGE_SIZE = 100
+
 /** The course is the training workspace. Resources and reports live inside it. */
 export default function TrainingTrainerHome() {
   const { user } = useAuth()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [moreError, setMoreError] = useState('')
+  const [nextPage, setNextPage] = useState(2)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [mutationNotice, setMutationNotice] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [title, setTitle] = useState('')
@@ -24,14 +30,36 @@ export default function TrainingTrainerHome() {
     setLoading(true)
     setLoadError('')
     try {
-      const result = await apiClient.get<{ list: Course[] }>('/courses')
-      if (result.code !== 0) throw new Error(result.message || '无法读取课程')
+      const result = await apiClient.get<{ list: Course[]; total?: number }>(`/courses?status=all&page=1&pageSize=${PAGE_SIZE}`)
+      if (result.code !== 0 || !Array.isArray(result.data?.list)) throw new Error(result.message || '无法读取课程')
       setCourses(result.data.list.filter(course => !course.isLibrary))
+      setNextPage(2)
+      setMoreError('')
+      setHasMore(PAGE_SIZE < (result.data.total ?? result.data.list.length))
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : '无法读取课程')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function loadMore() {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    setMoreError('')
+    const page = nextPage
+    try {
+      const result = await apiClient.get<{ list: Course[]; total?: number }>(`/courses?status=all&page=${page}&pageSize=${PAGE_SIZE}`)
+      if (result.code !== 0 || !Array.isArray(result.data?.list)) throw new Error(result.message || '无法读取更多课程')
+      setCourses(current => {
+        const seen = new Set(current.map(course => course.id))
+        return [...current, ...result.data.list.filter(course => !course.isLibrary && !seen.has(course.id))]
+      })
+      setNextPage(page + 1)
+      setHasMore(page * PAGE_SIZE < (result.data.total ?? (page - 1) * PAGE_SIZE + result.data.list.length))
+    } catch (error) {
+      setMoreError(error instanceof Error ? error.message : '无法读取更多课程')
+    } finally { setLoadingMore(false) }
   }
 
   useEffect(() => { void refresh() }, [])
@@ -77,6 +105,12 @@ export default function TrainingTrainerHome() {
             <span className="training-course-text"><strong>{course.title}</strong><small>{course.description || '管理学员、作业、打卡与课程测评'}</small></span>
             <ArrowRight size={20} aria-hidden="true" />
           </Link>)}</div>}
+      {!loading && !loadError && (hasMore || moreError) && <div className="training-load-more">
+        {moreError && <p role="alert">后续课程暂未加载：{moreError}</p>}
+        {hasMore && <button type="button" disabled={loadingMore} onClick={() => void loadMore()} className="training-action training-action--quiet">
+          {loadingMore ? '正在加载…' : '加载更多课程'}
+        </button>}
+      </div>}
     </section>
     <p className="training-bottom-line">教与学，都是一次彼此成就。</p>
     {createOpen && <ModalSurface open={createOpen} onClose={() => { if (!creating) setCreateOpen(false) }} initialFocusRef={titleRef} className="training-dialog-backdrop">
