@@ -16,15 +16,17 @@ import { BoundedAdmissionGate, isBoundedAdmissionBusyError } from '../services/b
 const credentialAdmission = new BoundedAdmissionGate({ name: 'platform_password_reset', maxConcurrent: 1, maxQueue: 4, maxWaitMs: 1000, retryAfterSeconds: 2 })
 
 /** Platform-authoritative account credential commands. */
-export const platformAccountController = {
-  async resetPassword(req: Request, res: Response) {
+/** Shared, rate-bounded and SYSTEM_ADMIN-authorized account reset command.
+ * Legacy course-roster views must route here rather than writing credentials
+ * directly; a legacy ADMIN role alone is not sufficient. */
+export async function resetPasswordForPlatformAdmin(req: Request, res: Response, targetUserId: string) {
     let handoffFile: string | null = null
     try {
       // Reject before looking up a target, generating a password, or writing credentials.
       await assertCurrentSystemAdmin(prisma, req.user!.userId)
       return await credentialAdmission.run(async () => {
         const target = await prisma.user.findUnique({
-          where: { id: req.params.id },
+          where: { id: targetUserId },
           select: { id: true, username: true },
         })
         if (!target) return notFound(res, '用户不存在')
@@ -60,5 +62,10 @@ export const platformAccountController = {
       logger.error('平台重置密码错误', err)
       return error(res, '密码重置失败')
     }
+}
+
+export const platformAccountController = {
+  resetPassword(req: Request, res: Response) {
+    return resetPasswordForPlatformAdmin(req, res, req.params.id)
   },
 }
