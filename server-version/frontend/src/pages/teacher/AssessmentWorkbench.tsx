@@ -1,3 +1,4 @@
+import './assessment-workbench.css'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import api from '../../api/client'
@@ -33,7 +34,7 @@ function Workbench() {
   return()=>{epoch.current++}
  },[course,page,retry])
  useEffect(()=>{const refresh=()=>{setData(null);setRetry(x=>x+1)};window.addEventListener('focus',refresh);return()=>window.removeEventListener('focus',refresh)},[])
- return <ProductPage width="management"><PageHeader title={training ? '培训结果' : '测评结果工作台'} description={training
+ return <ProductPage width="management" className={training ? 'training-results' : undefined}><PageHeader title={training ? '培训结果' : '测评结果工作台'} description={training
   ? '查看当前课程的组合测评和认知任务完成情况。普通量表与课程问卷请从课程测评清单进入各自获授权的管理页。'
   : '先核对课程完成情况与数据质量，再进入获授权的群体或纵向报告。'}/>
   {!training && <nav className="my-4 flex flex-wrap gap-4"><Link to="/assessment-templates">模板库</Link><Link to="/assessment-management">合成对象与操作记录</Link><Link to="/questionnaires">组合测评</Link></nav>}

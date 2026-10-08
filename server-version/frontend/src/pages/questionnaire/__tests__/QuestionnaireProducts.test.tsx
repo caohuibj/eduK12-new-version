@@ -34,6 +34,17 @@ describe('questionnaire draft feedback', () => {
       },
     })
   })
+  it('exposes the active composition section to keyboard and screen-reader users', async () => {
+    mount()
+    const steps = screen.getByRole('navigation', { name: '编制步骤' })
+    const basic = steps.querySelector('a[href="#questionnaire-basic"]')!
+    const delivery = steps.querySelector('a[href="#questionnaire-delivery"]')!
+    expect(basic).toHaveAttribute('aria-current', 'step')
+    fireEvent.click(delivery)
+    expect(delivery).toHaveAttribute('aria-current', 'step')
+    expect(basic).not.toHaveAttribute('aria-current')
+  })
+
   it('prefills only an authorized course passed by the Training course route', async () => {
     mount('new', '?courseId=c')
     const courseCheck = await screen.findByRole('checkbox', { name: '课程' })
