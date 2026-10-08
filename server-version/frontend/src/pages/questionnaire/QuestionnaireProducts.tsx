@@ -807,7 +807,7 @@ export function QuestionnaireProductEdit() {
               <div className="flex flex-wrap gap-4 my-5">
                 {draft && <ProductButton variant={!dirty && !(preflight?.ok && preflight.revision === detail.revision) ? 'primary' : 'secondary'} disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
-                  <ProductButton variant="danger"
+                  <ProductButton
                     disabled={busy || dirty}
                     variant={preflight?.ok && preflight.revision === detail.revision ? 'primary' : 'secondary'}
                     onClick={() => void publish()}
