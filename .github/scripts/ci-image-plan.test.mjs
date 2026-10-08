@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runtimeRefreshPlan, verifyResolvedPlan } from './ci-image-plan.mjs';
+import { readFileSync } from 'node:fs';
 const fixture = frontendOnly => ({ target: Object.fromEntries((frontendOnly ? ['frontend'] : ['backend','worker','frontend']).map(name => [name, {
   context: `./${name === 'frontend' ? 'frontend' : 'backend'}`, dockerfile: 'Dockerfile',
   tags: [name === 'frontend' ? 'server-version-frontend' : 'server-version-backend:latest'],
@@ -51,4 +52,24 @@ test('Debian mirror applies to both API and worker and cannot disappear from the
   }
   assert.equal(Object.hasOwn(plan.target.frontend.args,'DEBIAN_MIRROR'),false);
   verifyResolvedPlan(resolved(plan),false);
+});
+
+// Regression: Buildx --load can preserve an image exporter and add a docker exporter.
+// CI must explicitly override *all* target outputs and enforce that exact plan.
+test('CI image script forces only local Docker export for printed and executed builds', () => {
+  const script = readFileSync(new URL('./build-ci-images.sh', import.meta.url), 'utf8');
+  const commands = script.split('\n').filter(line => line.startsWith('docker buildx bake --file "$ci_task_bake_dir/plan.json" --pull'));
+  assert.equal(commands.length, 2);
+  for (const command of commands) {
+    assert.match(command, /'--set=\*\.output=type=docker'/);
+    assert.doesNotMatch(command, /--load|--push/);
+  }
+  assert.match(commands[0], /--print/);
+  assert.doesNotMatch(commands[1], /--print/);
+  const resolved = runtimeRefreshPlan(fixture(true), true);
+  resolved.target.frontend.pull = true;
+  resolved.target.frontend.output = [{type:'image',push:false},{type:'docker'}];
+  assert.throws(() => verifyResolvedPlan(resolved,true), /Only local Docker image outputs are allowed/);
+  resolved.target.frontend.output = [{type:'docker'}];
+  verifyResolvedPlan(resolved,true);
 });

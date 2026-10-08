@@ -55,7 +55,7 @@ test('proof version mismatch and protected historical host association prohibit 
   const g=fixture();g.host.points[1].protected=true;const p=mature(g);assert.ok(p.retainedSnapshotIds.includes(g.host.points[1].attachmentAssociation.snapshot.id));assert.ok(!p.actions.some(r=>r.key===g.expired.key));
 });
 test('namespace, version, retention and resource-limit guards refuse unsafe inputs',()=>{
-  for(const patch of [{backupBucket:c.sourceBucket},{region:'ap-shanghai'},{quarantineHours:1},{maxDeleteObjects:101},{mode:'delete_all'}])assert.throws(()=>config({...c,...patch}));
+  for(const patch of [{backupBucket:c.sourceBucket},{region:'ap-shanghai'},{quarantineHours:1},{maxDeleteObjects:101},{maxScanBytes:536870913},{maxScanBytes:0},{mode:'delete_all'}])assert.throws(()=>config({...c,...patch}));
   for(const patch of [{key:'media/original.pdf'},{versionId:'null'},{versionId:''},{sha256:'etag'}])assert.throws(()=>validRecord({...fixture().baseline,...patch}));
 });
 test('small batch never partially retires a host point or removes a referenced payload',()=>{
@@ -128,12 +128,12 @@ test('SDK version pagination uses both markers and rejects repeated cursors',asy
   client.listObjectVersions=(args,cb)=>cb(null,{Versions:[],IsTruncated:true,NextKeyMarker:'same',NextVersionIdMarker:'v'});
   await assert.rejects(new CosApi(c,client).versions(),/VERSION_PAGINATION_INCOMPLETE/);
 });
-test('historical encrypted catalog scan reconstructs a manifest pruned from local rotating state',async t=>{
+test('historical encrypted catalog scan exceeds the old budget with bounded retained state',async t=>{
   const temp=await fs.mkdtemp(path.join(os.tmpdir(),'cleanup-scan-'));t.after(()=>fs.rm(temp,{recursive:true,force:true}));
   const api=new MemoryApi({inventory:[]}),identity=fixture().attachment.identity,receipts={};
   async function upload(value,folder) {
-    const file=path.join(temp,crypto.randomUUID()+'.gcm'),r=await encryptStream(Readable.from([Buffer.from(JSON.stringify(value))]),file,secret,identity.keyId,1000000);
-    const remote=await api.put(`attachments/v1/${folder}/${crypto.randomUUID()}.gcm`,file);return {...r,key:remote.key,versionId:remote.versionId,keyId:identity.keyId};
+    const file=path.join(temp,crypto.randomUUID()+'.gcm'),r=await encryptStream(Readable.from([Buffer.from(JSON.stringify(value))]),file,secret,identity.keyId,16*1024**2);
+    const remote=await api.put(`attachments/v1/${folder}/${crypto.randomUUID()}.gcm`,file);await fs.rm(file);return {...r,key:remote.key,versionId:remote.versionId,keyId:identity.keyId};
   }
   const file=path.join(temp,'blob.gcm'),receipt=await encryptStream(Readable.from([Buffer.from('synthetic-file')]),file,secret,identity.keyId,1000);
   const key=`attachments/v1/objects/${identity.keyId}/${receipt.sha256}.gcm`,remote=await api.put(key,file),blob={...receipt,key,versionId:remote.versionId,keyId:identity.keyId,verified:true};receipts[key]=blob;
@@ -143,13 +143,24 @@ test('historical encrypted catalog scan reconstructs a manifest pruned from loca
     const sid=crypto.randomUUID(),manifest={id:sid,scope:'attachment_inventory_only',complete:true,entries:[{blob:key,versionId:blob.versionId,sha256:blob.sha256,bytes:blob.bytes}]};
     const r=await upload(manifest,'snapshots');ss.push({id:sid,at:at(n?60000:400*24*hour),complete:true,protected:n===0,blobs:[key],remote:r});
   }
-  for(const points of [ss,ss.slice(1)]) {
-    const state={schema:1,identity,receipts,snapshots:points,blobSets:{},sources:{},candidates:{},pending:false};
+  // Historical source maps are irrelevant to the retained dependency graph.
+  // Twelve authenticated 6 MiB catalogs reproduce production growth past 64 MiB.
+  for(let n=0;n<12;n++) {
+    const points=n===0?ss:ss.slice(1);
+    const state={schema:1,identity,receipts,snapshots:points,blobSets:{},sources:{historical:{padding:'x'.repeat(6*1024**2)}},candidates:{},pending:false};
     const pointer=await upload(seal(state,secret),'catalogs');await api.put('attachments/v1/catalog-latest.json',Buffer.from(JSON.stringify(seal(pointer,secret))));
   }
   const local={host:{schema:1,points:[]},attachment:{schema:1,identity,receipts,snapshots:ss.slice(1),blobSets:{},pending:false},sourceHashes:{}};
-  const result=await scan(api,c,local,secret,temp);assert.equal(result.snapshots.size,2);assert.ok(result.snapshots.has(ss[0].id));assert.equal(result.unknownMetadata.length,0);
-  await assert.rejects(scan(api,{...c,maxScanBytes:1},local,secret,temp),/METADATA_SCAN_BUDGET/);
+  const cfg={...c,maxScanBytes:536870912};config(cfg);
+  const result=await scan(api,cfg,local,secret,temp);assert.equal(result.snapshots.size,2);assert.ok(result.snapshots.has(ss[0].id));assert.equal(result.unknownMetadata.length,0);
+  assert.ok(result.scanBytes>64*1024**2);assert.equal(result.catalogs.size,12);
+  assert.ok([...result.catalogs.values()].every(cat=>!Object.hasOwn(cat,'state')));
+  await assert.rejects(scan(api,c,local,secret,temp),/METADATA_SCAN_BUDGET/);
+  await assert.rejects(scan(api,{...cfg,maxScanBytes:1},local,secret,temp),/METADATA_SCAN_BUDGET/);
+  const historicalPointer=[...api.rows.values()].find(r=>r.key==='attachments/v1/catalog-latest.json'&&!r.latest);
+  const body=JSON.parse(api.bodies.get(id(historicalPointer)));body.mac='0'.repeat(64);
+  api.bodies.set(id(historicalPointer),Buffer.from(JSON.stringify(body)));
+  await assert.rejects(scan(api,cfg,local,secret,temp),/INDEX_AUTHENTICATION_FAILED/);
 });
 
 test('detachment refuses conflicting versions for one retained deduplication key',()=>{

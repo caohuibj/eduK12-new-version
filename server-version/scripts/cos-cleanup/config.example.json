@@ -8,6 +8,6 @@
   "maxDeleteObjects": 20,
   "maxDeleteBytes": 536870912,
   "maxInventoryVersions": 10000,
-  "maxScanBytes": 67108864,
+  "maxScanBytes": 536870912,
   "retention": {"hourlyHours": 48, "dailyDays": 30, "weeklyWeeks": 12, "monthlyMonths": 12}
 }
