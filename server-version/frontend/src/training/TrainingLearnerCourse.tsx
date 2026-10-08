@@ -116,7 +116,7 @@ export default function TrainingLearnerCourse() {
                       : draft ? '继续作业' : '完成作业'
                     return <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '请阅读作业要求后提交。'}</p><span>{state}</span></div>
-                      <Link to={'/student/assignments/' + encodeURIComponent(task.id)} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={'/student/assignments/' + encodeURIComponent(task.id) + '?courseId=' + encodeURIComponent(courseId)} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
@@ -129,7 +129,7 @@ export default function TrainingLearnerCourse() {
                     const expired = Boolean(task.endTime && Date.parse(task.endTime) < Date.now())
                     return <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span>{done ? '已打卡' : expired ? '已截止' : '待完成'}</span></div>
-                      <Link to={'/student/checkins/' + encodeURIComponent(task.id)} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={'/student/checkins/' + encodeURIComponent(task.id) + '?courseId=' + encodeURIComponent(courseId)} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
