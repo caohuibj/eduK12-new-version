@@ -18,7 +18,7 @@ export interface StudentTask {
 }
 
 /** Batched reads, independent of course count. No answers, scores or peer data. */
-export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number] }, now = new Date()) {
+export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number]; courseId?: string }, now = new Date()) {
   const memberships = await prisma.courseStudent.findMany({
     where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false } },
     select: { course: { select: { id: true, title: true } } },
@@ -99,13 +99,18 @@ export async function listStudentTasks(userId: string, options: { page: number; 
         : state === 'COMPLETED' ? `/student/composite/attempts/${item.latestCompletedAttempt.id}/report`
           : state === 'PENDING' ? `/student/composite/${item.id}` : null })
   }
-  const counts = Object.fromEntries(taskStates.map(state => [state, tasks.filter(item => item.state === state).length])) as Record<TaskState, number>
+  // Optional course filter is applied to the already-authorized membership
+  // projection. A caller cannot add a course merely by naming its ID.
+  const scoped = options.courseId
+    ? tasks.filter(item => item.courses.some(course => course.id === options.courseId))
+    : tasks
+  const counts = Object.fromEntries(taskStates.map(state => [state, scoped.filter(item => item.state === state).length])) as Record<TaskState, number>
   const order: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'COMPLETED']
   const actionable = (item: StudentTask) => Boolean(item.href && (item.canContinue || item.canStart))
-  const filtered = tasks.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
+  const filtered = scoped.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
     order.indexOf(left.state) - order.indexOf(right.state)
     || (left.deadline ?? '9999').localeCompare(right.deadline ?? '9999')
     || `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`))
   return { list: filtered.slice((options.page - 1) * options.pageSize, options.page * options.pageSize), total: filtered.length,
-    counts: { ...counts, ACTIONABLE: tasks.filter(actionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
+    counts: { ...counts, ACTIONABLE: scoped.filter(actionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
 }
