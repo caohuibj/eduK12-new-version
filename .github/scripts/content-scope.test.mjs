@@ -8,7 +8,7 @@ function scopeOutputs(content='false', presentation='false', frontend='false', e
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
-  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(output.runner_profile === 'speed' && scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
+  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
 }
 
 const root = 'server-version/backend/src/modules/';
