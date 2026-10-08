@@ -20,6 +20,7 @@
   --hui-ds-color-page-elevated: var(--training-paper);
   --hui-ds-color-surface: var(--training-surface);
   --hui-ds-color-action: var(--training-bamboo);
+  --hui-ds-color-action-rgb: 54 90 72;
   --hui-ds-color-action-hover: #294938;
   --hui-ds-color-line: var(--training-border);
   color: var(--training-ink);
@@ -586,3 +587,6 @@
 /* TrainingContextBack supplies a stable course return on every task page,
    including a refreshed deep link with no in-app browser history. */
 .hui-training.hui-app--standard .student-submit-back { display: none; }
+
+.hui-training.hui-app--standard .staff-dialog__description { color: var(--training-muted); }
+.hui-training.hui-app--standard .text-green-600 { color: var(--training-bamboo); }
