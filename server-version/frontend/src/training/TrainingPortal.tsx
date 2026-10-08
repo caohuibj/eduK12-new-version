@@ -1,3 +1,4 @@
+import TrainingBrand from './TrainingBrand'
 import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
@@ -23,7 +24,7 @@ export default function TrainingPortal() {
   const authLink = useAuthLinks()
   return <div className="training-portal">
     <header className="training-portal-header">
-      <div className="training-wordmark"><span className="training-seal" aria-hidden="true">山</span><span>Huisurvey <small>TRAINING</small></span></div>
+      <TrainingBrand />
       <span className="training-portal-edition">纸墨 · 见山</span>
     </header>
     <section className="training-portal-main" aria-labelledby="training-title">

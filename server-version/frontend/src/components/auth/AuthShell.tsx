@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck } from 'lucide-react'
 import './auth-shell.css'
+import TrainingBrand from '../../training/TrainingBrand'
 import { isTrainingHost } from '../../training/context'
 
 export type AuthTone = 'student' | 'teacher' | 'parent' | 'admin'
@@ -78,13 +79,12 @@ export default function AuthShell({
       <aside className="hui-auth-hero" aria-label="Huisurvey 介绍">
         <div className="hui-auth-hero__inner">
           <Link to="/" className="hui-auth-brand" aria-label={training ? '返回 Huisurvey Training 入口' : '返回 Huisurvey 入口'}>
-            <span className="hui-auth-brand__mark" aria-hidden="true" />
-            <strong>{training ? 'Huisurvey Training' : 'Huisurvey'}</strong>
+            {training ? <TrainingBrand /> : <><span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong></>}
           </Link>
 
           <div className="hui-auth-hero__copy">
             <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? `${trainingRole}入口` : preset.label}</span>
-            <p className="hui-auth-hero__title">{displayHeroTitle}</p>
+            <p className="hui-auth-hero__title">{training ? <>{(tone === 'student' ? ['循着课程，', '慢慢向前。'] : ['以所学，', '启发更多人。']).map(line => <span className="training-auth-title-line" key={line}>{line}</span>)}</> : displayHeroTitle}</p>
             <p className="hui-auth-hero__description">{displayHeroDescription}</p>
           </div>
 
