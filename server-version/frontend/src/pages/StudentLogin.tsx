@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import AuthShell from '../components/auth/AuthShell'
@@ -9,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 const StudentLogin: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const completeLogin = useLoginReturn()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
@@ -102,8 +104,8 @@ const StudentLogin: React.FC = () => {
       </div>
 
       <div className="hui-auth-note">
-        <strong>学生注册说明</strong>
-        <div>注册后使用课程号加入课程，即可查看作业和打卡任务。</div>
+        <strong>{training ? '学员注册说明' : '学生注册说明'}</strong>
+        <div>{training ? '首次注册时使用培训师提供的课程码；加入后可查看作业、打卡与课程测评。' : '注册后使用课程号加入课程，即可查看作业和打卡任务。'}</div>
       </div>
     </AuthShell>
   )
