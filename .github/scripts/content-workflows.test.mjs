@@ -326,3 +326,17 @@ test('hosted CI starts independent checks in parallel and bounds media setup wit
   assert.match(media,/ci-artifact\.mjs verify frontend/);
   assert.match(media,/ci-cleanup-services\.sh/);
 });
+
+test('test-only UI code runs frontend regression without production/backend builds',()=>{
+  const ci=source('ci');
+  const frontend=job(ci,'frontend');
+  assert.match(frontend,/needs: scope/);
+  assert.match(frontend,/scenario == 'frontend-test'/);
+  assert.match(frontend,/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
+  assert.match(job(ci,'merge-gate'),/needs: .*frontend/);
+  const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
+  const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
+  assert.match(scope,/frontendTestOnly/);
+  assert.match(gate,/scope\.scenario === 'frontend-test'/);
+  assert.match(gate,/checks\.push\('frontend'\)/);
+});

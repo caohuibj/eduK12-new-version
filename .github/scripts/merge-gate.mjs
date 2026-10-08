@@ -13,6 +13,7 @@ export function requiredChecks(needs, draft) {
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
   if (dependencies) checks.push('maintenance','backend','backend-regression','frontend-build','frontend','docker');
+  if (scope.scenario === 'frontend-test') checks.push('frontend');
   if (scope.maintenance === 'true') checks.push('maintenance');
   else if (scope.documentation === 'true') checks.push('documentation');
   else if (scope.content === 'true') checks.push('content');
@@ -23,7 +24,7 @@ export function requiredChecks(needs, draft) {
   else if (scope.frontend === 'true') {
     if (draft) checks.push('pr-light-frontend');
     if (!draft) checks.push('backend-browser-build', 'frontend', 'browser', 'docker');
-  } else if (scope.content !== 'true') {
+  } else if (scope.content !== 'true' && scope.scenario !== 'frontend-test') {
     checks.push('maintenance','miniprogram');
     if (draft) checks.push('pr-light-frontend');
     checks.push(...(draft ? ['pr-light-backend']
@@ -40,8 +41,8 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
-  const flags = ['maintenance','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
+  const scenarios = {'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
   const requiresCodeql = ['platform','dependencies','frontend','content-frontend'].includes(scope.scenario);
@@ -59,11 +60,15 @@ export function failedChecks(needs, draft) {
   const buildRequired = scope.frontend === 'true' || ['platform','dependencies'].includes(scope.scenario) || uiRequired || selected.length > 0;
   const hostedVisual = scope.runner_profile === 'hosted' && scope.scenario === 'platform';
   const malformedTopology = scope.runner_profile !== 'hosted'
+    || scope.frontend_test !== String(scope.scenario === 'frontend-test')
     || scope.frontend_build !== String(buildRequired) || scope.ui_required !== String(uiRequired)
     || scope.visual_hosted !== String(hostedVisual)
     || scope.media_selection !== JSON.stringify(selected)
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
     || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'true'));
+  if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
+    || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
+    if (!failed.includes('scope')) failed.unshift('scope');
   if (malformedTopology && !failed.includes('scope')) failed.unshift('scope');
   return failed;
 }

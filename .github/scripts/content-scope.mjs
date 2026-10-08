@@ -53,6 +53,16 @@ export function frontendFile(file) {
   return !/^server-version\/frontend\/src\/(?:modules\/(?:cognitive|situational|composite|assessment-runtime|assessment-bundle)\/|(?:api|types|services)\/|modules\/assessment-context\/|utils\/(?:scor|assessment|cognitive|situational)|.*(?:scoring|scorer|algorithm|finalizer|trial-timing|reference-data))/i.test(file);
 }
 
+// Only existing UI-surface test modules qualify. Production source, shared
+// assessment/scoring modules, config, dependency and executable test harness
+// changes never enter this fast lane.
+export function frontendTestFile(file) {
+  return frontendFile(file) && /\.(?:test|spec)\.tsx?$/.test(file);
+}
+export function frontendTestOnly(files) {
+  return files.length > 0 && files.every(frontendTestFile);
+}
+
 export function acceptanceFor(files) {
   const scopes = JSON.parse(readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
   return Object.fromEntries(Object.entries(scopes).map(([id, { paths }]) => [id,
@@ -140,6 +150,7 @@ export function classifyChanges(entries, forceFull = false) {
     content: !forceFull && result.content && regularChanges,
     presentation: !forceFull && result.presentation && regularChanges,
     frontend: !forceFull && result.frontend && regularChanges,
+    frontend_test: !forceFull && frontendTestOnly(entries.map(entry => entry.file)) && regularChanges,
   };
 }
 
@@ -206,10 +217,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
   const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const frontend = result.frontend === true;
+  const frontendTest = result.frontend_test === true;
+  const frontend = result.frontend === true && !frontendTest;
   const scenario = dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
-    : result.presentation ? 'presentation' : frontend ? 'frontend' : 'platform';
-  const acceptance = acceptanceFor(files);
+    : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
+  // No production artifact or acceptance scenario is changed by a narrowly
+  // admitted test-only diff. Keep the full frontend test suite itself mandatory.
+  const selectedAcceptance = acceptanceFor(files);
+  const acceptance = frontendTest ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
@@ -218,7 +233,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const frontendBuild = dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
   const codeql = dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
-  const output = { maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend,
+  const output = { maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),

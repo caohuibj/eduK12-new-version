@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, frontendFile, frontendTestFile, frontendTestOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
-    maintenance:'false',content,presentation,frontend,documentation:'false',codeql:frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'hosted',...extra};
+    maintenance:'false',content,presentation,frontend,frontend_test:String(scenario === 'frontend-test'),documentation:'false',codeql:scenario === 'frontend-test' ? 'false' : frontend === 'true' || (content !== 'true' && presentation !== 'true') ? 'true' : 'false',scenario,runner_profile:'hosted',...extra};
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
@@ -338,6 +338,51 @@ test('documentation and codeql selections remain explicit and fail closed',()=>{
   assert.ok(failedChecks(content,false).includes('codeql'));
 });
 
+
+test('only strict UI test modules can use the lightweight frontend-test route',()=>{
+  const accepted=[
+    'server-version/frontend/src/pages/__tests__/StudentManagement.test.tsx',
+    'server-version/frontend/src/training/TrainingScreens.test.tsx',
+    'server-version/frontend/src/components/staff-ui/Form.spec.ts',
+  ];
+  for(const file of accepted) assert.equal(frontendTestFile(file),true,file);
+  assert.equal(frontendTestOnly(accepted),true);
+  const entry=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+  assert.equal(classifyChanges(accepted.map(entry)).frontend_test,true);
+  for(const file of [
+    'server-version/frontend/src/pages/StudentManagement.tsx',
+    'server-version/frontend/src/modules/cognitive/core/runner.test.ts',
+    'server-version/frontend/src/services/access.test.ts',
+    'server-version/frontend/src/pages/__tests__/fixture.ts',
+    'server-version/frontend/vite.config.test.ts',
+    'server-version/frontend/src/pages/__tests__/../Page.test.tsx',
+    'server-version/frontend/src/pages/Scale.test.tsx\\n',
+    '.github/scripts/content-scope.test.mjs',
+    'server-version/backend/src/__tests__/integration/access.test.ts',
+  ]) {
+    assert.equal(frontendTestFile(file),false,file);
+    assert.equal(classifyChanges([entry(accepted[0]),entry(file)]).frontend_test,false,file);
+  }
+  for(const meta of [{status:'D',newMode:'000000'},{status:'T',newMode:'120000'},{status:'M',newMode:'100755'}])
+    assert.equal(classifyChanges([{...entry(accepted[0]),...meta}]).frontend_test,false);
+  assert.equal(classifyChanges([entry(accepted[0])],true).frontend_test,false);
+  assert.equal(frontendTestOnly([]),false);
+});
+test('frontend-test route requires real frontend regression and never permits missing checks',()=>{
+  for(const draft of [true,false]){
+    const outputs=scopeOutputs('false','false','false',{scenario:'frontend-test'});
+    const needs={scope:{result:'success',outputs},frontend:{result:'success'}};
+    assert.deepEqual(requiredChecks(needs,draft),['scope','frontend']);
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const bad of ['skipped','failure','cancelled',undefined])
+      assert.ok(failedChecks({...needs,frontend:{result:bad}},draft).includes('frontend'));
+    for(const extra of [{frontend_test:'false'},{frontend_test:'wat'},{codeql:'true'},
+      {frontend_build:'true'},{media2:'true'},{canonical_visual:'true'},{ui_required:'true'},
+      {scenario:'platform'},{frontend:'true'}])
+      assert.ok(failedChecks({...needs,scope:{...needs.scope,outputs:{...outputs,...extra}}},draft).includes('scope'),JSON.stringify(extra));
+  }
+});
+
 test('actual Git diffs select different documentation, presentation, content, frontend and heavy execution paths',()=>{
   const fixture=mkdtempSync(join(tmpdir(),'ci-scenarios-'));
   const git=(...args)=>execFileSync('git',args,{cwd:fixture,encoding:'utf8'}).trim();
@@ -350,6 +395,7 @@ test('actual Git diffs select different documentation, presentation, content, fr
       ['server-version/frontend/src/components/Card.css','presentation',false],
       [sjt,'content',false], [cognitive,'content',true],
       ['server-version/frontend/src/pages/Teacher.tsx','frontend',true],
+      ['server-version/frontend/src/pages/__tests__/Teacher.test.tsx','frontend-test',false],
       ['server-version/frontend/src/modules/cognitive/core/runner.ts','platform',true],
       ['server-version/backend/prisma/schema.prisma','platform',true],
       ['.github/workflows/ci.yml','platform',true],
