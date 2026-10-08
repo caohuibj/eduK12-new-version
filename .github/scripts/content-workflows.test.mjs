@@ -348,6 +348,7 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
   assert.match(part,/group: \$\{\{ fromJSON\(inputs\.groups\) \}\}/);
   assert.match(part,/CI_BROWSER_GROUPS: \$\{\{ inputs\.groups \}\}/);
   assert.match(part,/ci-browser-plan\.mjs/);
+  assert.match(part,/node "\$GITHUB_WORKSPACE\/\.github\/scripts\/ci-browser-plan\.mjs"/);
   assert.match(part,/name: situational-bundle-browser-evidence-\$\{\{ matrix\.group \}\}/);
   for(const [group,steps] of Object.entries({
     foundation:['run seeded browser acceptance','run FE-11 storage fault acceptance',

@@ -83,7 +83,7 @@ jobs:
       - name: ensure the full browser scenario matrix is required
         env:
           CI_BROWSER_GROUPS: ${{ inputs.groups }}
-        run: node .github/scripts/ci-browser-plan.mjs
+        run: node "$GITHUB_WORKSPACE/.github/scripts/ci-browser-plan.mjs"
       - name: clear previous browser evidence
         run: |
           rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log /tmp/eduk12-bundle-products-e2e /tmp/eduk12-bundle-products-backend.log /tmp/eduk12-questionnaire-public-e2e /tmp/reporting-v22-evidence
