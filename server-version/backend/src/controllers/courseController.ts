@@ -1035,54 +1035,10 @@ export const courseController = {
     }
   },
 
-  // 冻结/解冻学生账号
-  async toggleFreezeStudent(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { courseId, studentId } = req.params
-      const { isFrozen } = req.body
-
-      // 验证课程权限
-      const course = await prisma.course.findUnique({
-        where: { id: courseId }
-      })
-
-      if (!course) {
-        return notFound(res, '课程不存在')
-      }
-
-      if (!canAccessCourseRoster(course, userId, userRole)) {
-        return forbidden(res, '无权限管理此课程的学生')
-      }
-
-      // 验证学生是否在该课程中
-      const courseStudent = await prisma.courseStudent.findFirst({
-        where: {
-          courseId,
-          studentId,
-        }
-      })
-
-      if (!courseStudent) {
-        return error(res, '该学生未加入此课程')
-      }
-
-      // 更新学生冻结状态
-      await prisma.user.update({
-        where: { id: studentId },
-        data: {
-          isFrozen,
-          tokenVersion: { increment: 1 },
-        }
-      })
-
-      return success(res, { isFrozen }, isFrozen ? '学生账号已冻结' : '学生账号已解冻')
-    } catch (err) {
-      logger.error('冻结/解冻学生错误', err)
-      return error(res, '操作失败')
-    }
-  },
+  // Global account suspension is no longer implemented here. The active
+  // course endpoint uses courseStudentLifecycleController and a platform-admin
+  // authority check; keeping a direct prisma.user.update helper would risk
+  // reintroducing an unguarded global account mutation.
 
   // 停止招募 - 不再允许新学生加入
   async stopRecruiting(req: Request, res: Response) {
