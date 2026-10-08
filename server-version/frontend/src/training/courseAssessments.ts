@@ -19,6 +19,7 @@ type CourseRef = { id: string; title: string } | null
 type Question = {
   id: string; name: string; description: string | null
   completed: boolean; inProgress?: boolean; assessmentId: string | null
+  courses: Array<{ id: string; title: string }>
 }
 type Scale = {
   id: string; name: string; description: string | null
@@ -85,6 +86,10 @@ export function projectCourseAssessments(
   const enc = encodeURIComponent
 
   for (const item of questions) {
+    // Student-facing /questionnaires/available?courseId=... also includes all
+    // PUBLIC questionnaires. Only a true course-delivery association makes an
+    // item a Training course task; visibility alone is never an assignment.
+    if (!item.courses?.some(course => course.id === courseId)) continue
     const done = item.completed && !item.inProgress
     const href = done
       ? (item.assessmentId ? '/student/questionnaires/result/' + enc(item.assessmentId) : null)
