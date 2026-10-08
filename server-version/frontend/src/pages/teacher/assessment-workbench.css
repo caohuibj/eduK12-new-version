@@ -1,0 +1,6 @@
+/* Training course results use the same editorial task hierarchy. */
+.hui-training .training-results > div:has(> article) { display: block; }
+.hui-training .training-results article { border: 0; border-block: 1px solid var(--training-border); border-radius: 0; background: transparent; padding: 20px 0; }
+.hui-training .training-results article h3 { font-family: var(--training-serif); font-size: 18px; }
+.hui-training .training-results article dl { margin-block: 16px; }
+.hui-training .training-results article a { display: inline-flex; align-items: center; min-height: 44px; color: var(--training-bamboo); }

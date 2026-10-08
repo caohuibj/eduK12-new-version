@@ -464,6 +464,7 @@ const CheckinList: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
+                <p className="training-editor-scroll-note">向下滚动查看完整设置</p>
                 <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件。</p>
               </div>
             </div>

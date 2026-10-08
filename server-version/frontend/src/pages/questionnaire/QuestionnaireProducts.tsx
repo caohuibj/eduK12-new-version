@@ -176,6 +176,7 @@ export function QuestionnaireProductEdit() {
   const [selected, setSelected] = useState('')
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
+  const [activeStep, setActiveStep] = useState('questionnaire-basic')
   const [formType, setFormType] = useState('text_input')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
@@ -500,7 +501,11 @@ export function QuestionnaireProductEdit() {
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
-      <nav aria-label="编制步骤" className="my-4 flex gap-4"><a href="#questionnaire-basic">1. 基本信息</a><a href="#questionnaire-content">2. 内容与顺序</a><a href="#questionnaire-delivery">3. 投放与发布</a></nav>
+      <nav aria-label="编制步骤" className="questionnaire-step-nav my-4">
+        {[['questionnaire-basic','基本信息'],['questionnaire-content','内容与顺序'],['questionnaire-delivery','投放与发布']].map(([step,label],index) =>
+          <a key={step} href={'#'+step} aria-current={activeStep === step ? 'step' : undefined} onClick={() => setActiveStep(step)}><span className="questionnaire-step-number">{index+1}.</span><span>{label}</span></a>
+        )}
+      </nav>
       {error && (
         <div role="alert" className="my-3 rounded border border-red-400 p-3">
           {error}
