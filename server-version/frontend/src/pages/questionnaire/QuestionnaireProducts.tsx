@@ -575,7 +575,7 @@ export function QuestionnaireProductEdit() {
               <div className="questionnaire-editor-grid"><ol className="space-y-3 my-4" aria-label="内容单元">
                 {units.map((v, index) => (
                   <li id={'questionnaire-unit-'+v.id} key={v.id} className="border rounded p-3">
-                    <ProductButton className="questionnaire-unit-trigger" aria-label={`配置第 ${index+1} 项`} aria-pressed={(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)===v.id} onClick={()=>setEditingUnit(v.id)}>{index+1}. {v.label}</ProductButton>
+                    <ProductButton className="questionnaire-unit-trigger" aria-label={`配置第 ${index+1} 项：${index+1}. ${v.label}`} aria-pressed={(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)===v.id} onClick={()=>setEditingUnit(v.id)}>{index+1}. {v.label}</ProductButton>
                     <span>{labels[v.type] || '表单区段'}</span>
                     {draft && (
                       <div className="flex gap-3">
