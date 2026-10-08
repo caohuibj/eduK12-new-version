@@ -80,6 +80,20 @@ describe('course isLibrary', () => {
     }))
   })
 
+  it.each([UserRole.TEACHER, UserRole.ADMIN, UserRole.PARENT])(
+    'rejects non-student role %s before looking up a course code',
+    async (role) => {
+      const res = makeRes()
+      await courseController.join(makeReq({
+        user: { userId: 'non-student', role },
+        body: { courseCode: 'SYNTHETIC' },
+      }) as any, res)
+      expect(res.statusCode).toBe(403)
+      expect(mockPrisma.course.findUnique).not.toHaveBeenCalled()
+      expect(mockPrisma.courseStudent.create).not.toHaveBeenCalled()
+    },
+  )
+
   it('rejects joining a library course by course code', async () => {
     mockPrisma.course.findUnique.mockResolvedValue({
       id: 'library-1',
