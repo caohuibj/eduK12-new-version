@@ -286,7 +286,7 @@ test('CLI emits separate GITHUB_OUTPUT records and JSON runner labels, never lit
     assert.ok(rows.length>=19);
     const fields=Object.fromEntries(rows.map(row=>[row.slice(0,row.indexOf('=')),row.slice(row.indexOf('=')+1)]));
     assert.equal(fields.scenario,'platform'); assert.equal(fields.frontend,'false');
-    assert.deepEqual(JSON.parse(fields.heavy_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
+    assert.deepEqual(JSON.parse(fields.heavy_runner),['ubuntu-24.04']);
     assert.deepEqual(JSON.parse(fields.codeql_runner),['ubuntu-24.04']);
     assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{
       env:{...process.env,CI_EVENT:'workflow_dispatch',CI_FULL_ACCEPTANCE:'true',CI_RUNNER_PROFILE:'typo',GITHUB_OUTPUT:''},stdio:'pipe'}));
@@ -299,33 +299,16 @@ test('API contracts, persistence and measurement inputs never use the UI shortcu
     assert.equal(frontendFile('server-version/frontend/src/'+path),false,path);
 });
 
-test('runner profiles preserve Mac disk fallback and Windows images',()=>{
-  const GiB=1024**3;
-  for(const profile of ['speed','economy','local','balanced','hybrid']) {
-    const ready=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB});
-    assert.deepEqual(ready.frontend_runner,['self-hosted','macOS','eduk12-mac-ci']);
-    assert.deepEqual(ready.light_runner,ready.frontend_runner);
-    assert.deepEqual(ready.docker_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
-    assert.deepEqual(ready.codeql_runner,profile === 'local' ? ready.heavy_runner : ['ubuntu-24.04']);
-    for(const overrides of [{freeBytes:7*GiB},{macEnabled:false},{os:'linux'}]) {
-      const fallback=runnerPlan({profile,macEnabled:true,os:'darwin',freeBytes:9*GiB,...overrides});
-      assert.deepEqual(fallback.frontend_runner,fallback.heavy_runner);
+test('legacy runner profiles never dispatch to self-hosted machines',()=>{
+  for(const profile of ['hosted','speed','economy','local','balanced','hybrid']) {
+    for(const opts of [{macEnabled:true,os:'darwin',freeBytes:9*1024**3},{macEnabled:false,os:'linux',freeBytes:0}]) {
+      const plan=runnerPlan({profile,...opts});
+      assert.equal(plan.runner_profile,'hosted');
+      for(const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
+        assert.deepEqual(plan[lane],['ubuntu-24.04']);
     }
   }
-  assert.throws(()=>runnerPlan({profile:'hosted'}),/Unsupported CI_RUNNER_PROFILE/);
   assert.throws(()=>runnerPlan({profile:'typo'}));
-});
-
-test('local gates use only self-hosted runners including Windows CodeQL',()=>{
-  for (const scenario of ['platform','dependencies','frontend','content','maintenance','documentation']) {
-    for (const macEnabled of [true,false]) {
-      const plan=runnerPlan({profile:'local',scenario,macEnabled,os:'darwin',freeBytes:9*1024**3});
-      for (const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
-        assert.equal(plan[lane][0],'self-hosted',`${scenario}: ${lane}`);
-      assert.deepEqual(plan.codeql_runner,['self-hosted','Linux','X64','eduk12-win-ci']);
-      assert.equal(plan.visual_hosted,false);
-    }
-  }
 });
 test('only ordinary documentation qualifies and cannot hide scientific, runbook or executable changes',()=>{
   for(const file of ['README.md','docs/ci-runner-policy.md','docs/development/architecture.md'])
@@ -380,7 +363,7 @@ test('actual Git diffs select different documentation, presentation, content, fr
       const needs={scope:{result:'success',outputs}};
       for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
       assert.deepEqual(failedChecks(needs,false),[],file);
-      assert.deepEqual(JSON.parse(output.docker_runner),['self-hosted','Linux','X64','eduk12-win-ci']);
+      assert.deepEqual(JSON.parse(output.docker_runner),['ubuntu-24.04']);
     }
   } finally {rmSync(fixture,{recursive:true,force:true});}
 });

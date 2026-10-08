@@ -104,11 +104,11 @@ test('Cognitive management changes do not trigger the video gate', () => {
 
 test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
   const ci=source('ci');
-  assert.match(job(ci,'scope'),/runs-on: .*eduk12-mac-ci/);
-  assert.match(job(ci,'merge-gate'),/runs-on: .*eduk12-mac-ci/);
+  assert.match(job(ci,'scope'),/runs-on: ubuntu-24\.04/);
+  assert.match(job(ci,'merge-gate'),/runs-on: ubuntu-24\.04/);
   for(const [name,lane] of [['backend','heavy_runner'],['backend-regression','regression_runner'],['browser','browser_runner'],['backend-browser-build','heavy_runner']]) {
     assert.ok(job(ci,name).includes('runner_labels: ${{ needs.scope.outputs.'+lane+' }}'));
-    assert.match(source('ci-'+name),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
+    assert.match(source('ci-'+name),/runs-on: ubuntu-24\.04/);
   }
   assert.match(job(ci,'frontend-build'),/uses: \.\/\.github\/workflows\/ci-frontend-build\.yml/);
   assert.match(job(ci,'frontend'),/needs: \[scope, frontend-build\]/);
@@ -118,7 +118,7 @@ test('scenario CI uses early artifacts and bounded hosted heavy lanes', () => {
   assert.match(job(ci,'accept-visual'),/engine: \[chromium, firefox, webkit\]/);
   assert.match(job(ci,'accept-media'),/media_selection/);
   for(const name of ['accept-perf','accept-ops']) assert.match(job(ci,name),/needs: \[scope, backend\]/);
-  assert.match(job(source('ci-images'),'images'),/runs-on: \[self-hosted, Linux, X64, eduk12-win-ci\]/);
+  assert.match(job(source('ci-images'),'images'),/runs-on: ubuntu-24\.04/);
   assert.match(job(ci,'codeql'),/fromJSON\(needs\.scope\.outputs\.codeql_runner\)/);
   const backend=job(source('ci-backend'),'backend'), regression=job(source('ci-backend-regression'),'backend-regression');
   assert.match(regression,/--exclude=src\/__tests__\/questionnaire\/aggregate-report\.postgres\.integration\.test\.ts/);
@@ -248,7 +248,7 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);
   assert.match(job(ci,'probe-maintenance'),/uses: \.\/\.github\/workflows\/ci-maintenance\.yml/);
-  assert.match(source('ci-frontend'),/runs-on:.*fromJSON\(inputs\.runner_labels\)/);
+  assert.match(source('ci-frontend'),/runs-on: ubuntu-24\.04/);
   for(const name of ['backend','backend-regression','codeql']) assert.match(job(ci,name),/needs: scope/);
 });
 
