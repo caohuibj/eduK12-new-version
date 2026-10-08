@@ -33,6 +33,11 @@ export async function setCourseStudentFrozenState(input: {
   studentId: string
   isFrozen: boolean
 }): Promise<{ id: string; isFrozen: boolean }> {
+  // A course membership does not confer authority over the user's global account.
+  // Route guards alone are not sufficient for services invoked from elsewhere.
+  if (input.actorRole !== UserRole.ADMIN) {
+    throw new CourseStudentLifecycleError('COURSE_ACCOUNT_ADMIN_REQUIRED', '账号冻结由平台管理员处理', 403)
+  }
   try {
     return await prisma.$transaction(async (tx) => {
       const courses = await tx.$queryRaw<CourseRow[]>`
