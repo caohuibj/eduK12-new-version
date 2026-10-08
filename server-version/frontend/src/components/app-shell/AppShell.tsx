@@ -71,4 +71,17 @@ function AppShellContent({ children }: { children: ReactNode }) {
     </div>{!training&&!entryMode&&mode!=='focused'&&<Footer variant="light"/>}
   </div>
 }
-export default function AppShell({children}:{children:ReactNode}){return <OrganizationProvider><RelationalAvailabilityProvider><AppShellContent>{children}</AppShellContent></RelationalAvailabilityProvider></OrganizationProvider>}
+export default function AppShell({children}:{children:ReactNode}) {
+  const { pathname } = useLocation()
+  const training = isTrainingHost()
+  // Direct deep links to the existing Organization/Relational product must
+  // still be functional; only ordinary Training course navigation skips
+  // irrelevant discovery. Host context changes presentation, not API authority.
+  const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
+  const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
+  return <OrganizationProvider suspended={training && !requiresOrganization}>
+    <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
+      <AppShellContent>{children}</AppShellContent>
+    </RelationalAvailabilityProvider>
+  </OrganizationProvider>
+}
