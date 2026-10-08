@@ -48,3 +48,4 @@
 .hui-training-admin-content :is(.text-red-600,.text-red-700) { color: #973e30; }
 .hui-training-admin-content :is(.text-green-600,.text-green-700) { color: var(--training-bamboo); }
 .hui-training-admin-content .staff-table th { color: var(--training-muted); }
+.hui-training-admin-content .hui-staff-workspace .staff-table td { color: var(--training-ink); }
