@@ -566,3 +566,4 @@
 @media(max-width:640px) {
   .hui-training.hui-app--standard .staff-dialog__header .staff-inline-actions .staff-icon-button { width: 44px; }
 }
+.hui-training.hui-app--standard :is(.text-gray-500,.hui-auth-stage__tagline) { color: var(--training-muted); }
