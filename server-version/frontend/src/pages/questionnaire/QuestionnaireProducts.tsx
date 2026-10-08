@@ -154,6 +154,7 @@ export function QuestionnaireProductEdit() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const preselectedScaleId = searchParams.get('scaleId')
+  const preselectedCourseId = searchParams.get('courseId')
   const [detail, setDetail] = useState<any>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
@@ -203,11 +204,23 @@ export function QuestionnaireProductEdit() {
     setDetail(null)
     setError('')
     request('/resources')
-      .then(row => { if (!active) return; setCatalog(row); if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) { setType('SCALE'); setSelected(preselectedScaleId) } })
+      .then(row => {
+        if (!active) return
+        setCatalog(row)
+        if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) {
+          setType('SCALE')
+          setSelected(preselectedScaleId)
+        }
+        // Course context from the Training course page is a suggestion only:
+        // only a course returned by the authorized resource catalog is selected.
+        if (id === 'new' && preselectedCourseId && row.courses.some((course: any) => course.id === preselectedCourseId)) {
+          setCourseIds(current => current.length ? current : [preselectedCourseId])
+        }
+      })
       .catch((e) => { if (active) setError(message(e)) })
     if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
-  }, [id, preselectedScaleId])
+  }, [id, preselectedScaleId, preselectedCourseId])
   const action = async (fn: () => Promise<void>) => {
     setBusy(true)
     setError('')
