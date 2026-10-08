@@ -42,6 +42,27 @@
 
 .hui-training.hui-app--standard .hui-brand::before { display: none; }
 
+.hui-training.hui-app--standard {
+  --student-ink: var(--training-ink);
+  --student-muted: var(--training-muted);
+  --student-blue: var(--training-bamboo);
+  --student-blue-hover: #294938;
+}
+.hui-training.hui-app--standard .hui-student-page .hui-page-header {
+  padding: 24px 0;
+  border: 0;
+  border-bottom: 1px solid var(--training-border);
+  border-radius: 0;
+  background: transparent;
+}
+.hui-training.hui-app--standard .hui-student-page .hui-page-header::after { display: none; }
+.hui-training.hui-app--standard :is(.student-submit-info, .student-submit-response, .student-submit-feedback) {
+  border-radius: 5px;
+  box-shadow: none;
+}
+.hui-training.hui-app--standard .hui-navigation a { border: 0; border-bottom: 2px solid transparent; }
+.hui-training.hui-app--standard .hui-navigation a[aria-current="page"] { border-color: var(--training-bamboo); }
+
 .hui-training.hui-app--standard .hui-app-body { display: block; }
 .hui-training.hui-app--standard .hui-navigation {
   display: flex;
