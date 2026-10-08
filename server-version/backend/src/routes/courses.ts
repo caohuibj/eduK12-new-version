@@ -70,7 +70,15 @@ router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionna
 // 学生管理
 router.get('/:id/students', authenticate, requireTeacher, courseController.getStudents)
 router.post('/batch-students', authenticate, requireTeacher, courseController.getBatchStudents)
-router.post('/:courseId/students/:studentId/reset-password', authenticate, requireAdmin, courseController.resetStudentPassword)
+// Share the canonical platform reset rate budget. A Course membership must
+// not bypass the SYSTEM_ADMIN-only credential lifecycle or throttle.
+const platformResetRateLimit = createRedisRateLimiter({
+  name: 'platform_password_reset',
+  limit: 10,
+  windowSeconds: 900,
+  key: req => req.user!.userId,
+})
+router.post('/:courseId/students/:studentId/reset-password', authenticate, requireAdmin, platformResetRateLimit, courseController.resetStudentPassword)
 router.delete('/:courseId/students/:studentId', authenticate, requireTeacher, courseController.removeStudent)
 // Freezing makes an account unusable, so route it through the Organization
 // usable-admin invariant instead of the legacy direct user update.
