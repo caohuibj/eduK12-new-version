@@ -14,7 +14,7 @@ concurrency:
 jobs:
   publication:
     if: github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, Linux, X64, eduk12-win-ci]
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
