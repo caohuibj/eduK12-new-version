@@ -157,6 +157,9 @@ jobs:
     with:
       runner_labels: ${{ inputs.runner_profile == 'local' && '["self-hosted","Linux","X64","eduk12-win-ci"]' || '["ubuntu-24.04"]' }}
       engine: ${{ matrix.engine }}
+      canonical: true
+      app_shell: true
+      qa_round3: true
 
   probe-maintenance:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance'
