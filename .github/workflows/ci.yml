@@ -14,7 +14,7 @@
 # 编排：全部使用 GitHub-hosted Ubuntu 24.04，按场景独立并行。
 #   Router:       changed-scope classification
 #   Dependencies: backend build/performance, functional regression, frontend, CodeQL, Docker
-#   Capacity:     heavy speed profile releases builds early and parallelizes hosted consumers
+#   Capacity:     standard hosted Linux jobs run independently with early exact-run artifacts
 #   Browser:      consumes exact-run artifacts without waiting for unrelated frontend checks
 #   Merge gate:   exact success for every selected route and acceptance
 #

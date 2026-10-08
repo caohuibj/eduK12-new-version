@@ -168,7 +168,7 @@ they disable normal classification/full jobs/CodeQL/merge readiness. Different p
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
 
 Regression jobs clear their exact temporary report paths before setup, so a
-persistent self-hosted runner cannot upload a previous focus's test evidence.
+previous or interrupted job cannot upload stale test evidence.
 Self-hosted regression uses its existing local npm download cache; remote npm
 cache restore/save is limited to GitHub-hosted jobs. Lockfile installation, actual
 tests, non-skipping assertions, artifacts and service cleanup are unchanged.
@@ -199,7 +199,7 @@ retention remains plan_only. Host backup installation is independent of deployin
 the application and requires exact-head maintenance success plus bounded COS and
 production verification.
 
-External/untrusted PRs are blocked before any self-hosted checkout. CI accounts must
+External/untrusted PRs are blocked by the existing source-admission policy. CI jobs must
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.
 

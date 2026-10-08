@@ -19,7 +19,7 @@ permissions:
 jobs:
   images:
     name: production image build and scan
-    # Production images are built in the dedicated Windows Linux slot.
+    # Production images are built and scanned on an isolated GitHub-hosted Ubuntu runner.
     # No backend/browser artifacts are consumed here; the merge gate requires all.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
