@@ -209,7 +209,8 @@ const CourseStudents: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
+          {training && <p className="px-4 pt-3 text-sm text-gray-600 sm:hidden">表格可左右滑动；所有学员操作均可点击或使用键盘访问。</p>}
+          <div className="overflow-x-auto" role="region" tabIndex={0} aria-label={training ? '课程学员列表，可横向滚动' : '课程学生列表，可横向滚动'}>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
