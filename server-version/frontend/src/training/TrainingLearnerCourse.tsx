@@ -102,7 +102,7 @@ export default function TrainingLearnerCourse() {
 
           {section === 'assignments' && <section className="training-detail-content" aria-label="课程作业">
             {assignments.loading ? <p role="status">正在读取作业…</p>
-              : assignments.error ? <div role="alert">作业读取失败：{selected.error}<button type="button" onClick={retry}>重试</button></div>
+              : assignments.error ? <div role="alert">作业读取失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
                 : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置作业。</p>
                   : <div className="training-item-list">{assignments.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
