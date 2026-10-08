@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -16,7 +17,7 @@ import TrainingTrainerCourse from './TrainingTrainerCourse'
 
 const course = { id: 'course-1', title: '教师专业发展培训', description: '学习·实践·反馈', creatorId: 'teacher-1', courseCode: 'ABCD12', status: 'PUBLISHED', studentCount: 12 }
 
-function mount(path: string, route: string, Page: () => JSX.Element) {
+function mount(path: string, route: string, Page: ComponentType) {
   return render(<MemoryRouter initialEntries={[path]}><Routes><Route path={route} element={<Page />} /></Routes></MemoryRouter>)
 }
 
@@ -41,9 +42,9 @@ describe('course-first training workspaces', () => {
   it('learner sees only three task groups, reuses existing assignment and check-in routes', async () => {
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /完成作业/ })).toHaveAttribute('href', '/student/assignments/a-1')
+    expect(await screen.findByRole('link', { name: /完成作业/ })).toHaveAttribute('href', '/student/assignments/a-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
-    expect(screen.getByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1')
+    expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1')
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1')
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
@@ -52,7 +53,7 @@ describe('course-first training workspaces', () => {
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
+    expect(await screen.findByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(screen.getByRole('link', { name: /发布打卡/ })).toHaveAttribute('href', '/checkins?create=true&courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
