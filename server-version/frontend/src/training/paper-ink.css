@@ -553,3 +553,5 @@
   .hui-training.hui-app--standard .training-roster td:last-child button { padding-inline: 4px; }
   .hui-training .training-roster-account { display: block; margin-top: 5px; font-size: 11px; color: var(--training-muted); overflow-wrap: anywhere; }
 }
+.hui-training.hui-app--standard .hui-button--danger { background: #973e30; border-color: #973e30; color: white; border-radius: 4px; }
+.hui-training.hui-app--standard .hui-button--danger:hover:not(:disabled) { background: #7d3025; }
