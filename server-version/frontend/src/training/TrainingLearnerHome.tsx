@@ -40,12 +40,13 @@ export default function TrainingLearnerHome() {
     if (!courseCode.trim() || joining) return
     setJoining(true)
     setJoinError('')
+    setMutationNotice('')
     try {
       const result = await apiClient.post('/courses/join', { courseCode: courseCode.trim() })
       if (result.code !== 0) throw new Error(result.message || '加入课程失败')
       setJoinOpen(false)
       setCourseCode('')
-      setMutationNotice('已加入课程，课程列表正在更新。')
+      setMutationNotice('已加入课程。')
       await refresh()
     } catch (error) {
       setJoinError(error instanceof Error ? error.message : '加入课程失败')
