@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 
 const { mockGet, authState } = vi.hoisted(() => ({
   mockGet: vi.fn(),
@@ -65,7 +66,7 @@ describe('CognitiveAssignmentList config grants', () => {
 
   it('shows OPEN/GRANT and grant-to-teacher next to the selected config, not on assignment rows', async () => {
     const user = userEvent.setup()
-    render(<CognitiveAssignmentList />)
+    render(<MemoryRouter><CognitiveAssignmentList /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: /新建认知任务/ }))
     const configSelect = screen.getAllByRole('combobox')[1]
     await user.selectOptions(configSelect, 'cfg-1')
