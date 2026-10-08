@@ -37,6 +37,8 @@ describe('student task aggregate', () => {
       { id: 'a-d', courseId: 'd', title: '他课作业', deadline: null, submissions: [] },
     ])
     const scoped = await listStudentTasks('student', { page: 1, pageSize: 20, courseId: 'c' }, now)
+    expect(db.assignment.findMany.mock.calls.at(-1)?.[0].where.courseId).toEqual({ in: ['c'] })
+    expect(db.checkin.findMany.mock.calls.at(-1)?.[0].where.courseId).toEqual({ in: ['c'] })
     expect(scoped.total).toBe(1)
     expect(scoped.list.map(row => row.id)).toEqual(['a-c'])
     expect(scoped.counts.PENDING).toBe(1)
