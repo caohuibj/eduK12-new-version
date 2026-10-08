@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import AuthShell from '../components/auth/AuthShell'
 import React, { useState } from 'react'
@@ -7,6 +8,7 @@ import apiClient from '../api/client'
 
 const StudentCourseLogin: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -75,7 +77,7 @@ const StudentCourseLogin: React.FC = () => {
             required
           />
           <p className="mt-2 text-xs text-gray-500">
-            课程码由教师创建，向您的教师索取
+            {training ? '课程码由培训师提供，请向培训师索取' : '课程码由教师创建，向您的教师索取'}
           </p>
         </div>
 
