@@ -448,3 +448,19 @@
   .hui-training.hui-app--standard .staff-dialog { max-width: calc(100vw - 20px); }
   .hui-training.hui-app--standard .staff-dialog__actions :is(button, a) { min-height: 44px; }
 }
+
+.hui-training.hui-app--standard .training-context-back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 0 clamp(0px, 1.5vw, 18px);
+  color: var(--training-bamboo);
+  font-size: 14px;
+  text-decoration: none;
+}
+.hui-training.hui-app--standard .training-context-back:hover { text-decoration: underline; }
+.hui-training.hui-app--standard .training-context-back:focus-visible {
+  outline: 3px solid var(--training-bamboo);
+  outline-offset: 3px;
+}
