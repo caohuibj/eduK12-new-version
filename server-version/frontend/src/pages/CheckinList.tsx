@@ -67,7 +67,7 @@ interface CheckinSubmission {
 }
 
 const CheckinList: React.FC = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -104,6 +104,30 @@ const CheckinList: React.FC = () => {
     fetchCourses()
     fetchTags()
   }, [])
+
+  // Permit a course page to open the existing check-in editor with its
+  // course preselected. Never accept a course not in the authorized roster.
+  useEffect(() => {
+    const requested = searchParams.get('courseId')
+    if (searchParams.get('create') !== 'true' || !requested) return
+    if (!courses.some(course => course.id === requested)) return
+    setEditingCheckin(null)
+    setFormData({
+      courseId: requested,
+      title: '',
+      content: '',
+      videos: [],
+      images: [],
+      documents: [],
+      endTime: '',
+      allowViewOthers: false,
+      tags: [],
+    })
+    setShowModal(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('create')
+    setSearchParams(next, { replace: true })
+  }, [courses, searchParams, setSearchParams])
 
   useEffect(() => {
     if (loading || !focusId) return
