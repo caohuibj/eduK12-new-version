@@ -24,7 +24,8 @@ beforeEach(() => {
   ] })
   get.mockImplementation((url: string) => {
     if (url.includes('/questionnaires/available')) return Promise.resolve({ code: 0, data: { list: [
-      { id: 'q-1', name: '课程反馈', description: null, completed: false, assessmentId: null },
+      { id: 'q-1', name: '课程反馈', description: null, completed: false, assessmentId: null, courses: [{ id: course, title: '研修' }] },
+      { id: 'q-public', name: '全站公开但未布置', description: null, completed: false, assessmentId: null, courses: [] },
     ] } })
     if (url === '/scales/available') return Promise.resolve({ code: 0, data: { list: [
       { id: 'scale-a', name: '课程量表', description: null, courses: [{ id: course, title: '研修' }, { id: 'second', title: '另一相关课程' }], completed: false, assessmentId: null },
@@ -50,6 +51,7 @@ describe('course-scope measurement projection', () => {
       'composite:legacy', 'composite:delivered',
     ])
     expect(result.items.some(item => item.name === '外部任务' || item.name === '另一门课')).toBe(false)
+    expect(result.items.some(item => item.name === '全站公开但未布置')).toBe(false)
     expect(result.items.find(item => item.key === 'composite:delivered')?.href).toBe('/student/composite/delivered')
     expect(myCognitive).toHaveBeenCalledTimes(1)
   })
@@ -75,7 +77,7 @@ describe('course-scope measurement projection', () => {
     get.mockImplementation((url: string) => {
       if (url === '/scales/available') throw new Error('source unavailable')
       if (url.includes('/questionnaires/available')) return Promise.resolve({ code: 0, data: { list: [
-        { id: 'q', name: '仍可填写', description: null, completed: false, assessmentId: null },
+        { id: 'q', name: '仍可填写', description: null, completed: false, assessmentId: null, courses: [{ id: course, title: '研修' }] },
       ] } })
       if (url === '/composite-assessments/available') return Promise.resolve({ code: 0, data: { list: [] } })
       throw new Error('Unexpected request ' + url)
