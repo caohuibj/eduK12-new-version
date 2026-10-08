@@ -30,8 +30,18 @@ async function shots(page, name, role, options = {}) {
    }
   }
   if (width === 390 && await page.locator('.hui-training.hui-app--standard .hui-app-main > .hui-page').count()) {
-   const panel = page.locator('.hui-app-main > .hui-page');
-   const inset = await panel.evaluate(element => element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft));
+   const selector = '.hui-app-main > .hui-page';
+   // FINAL navigation can replace the loading panel between the locator and layout read.
+   // Wait for a connected, visible panel and read its current layout in one evaluation.
+   await page.waitForFunction(selector => {
+    const element = document.querySelector(selector);
+    return element?.isConnected && element.getBoundingClientRect().width > 0
+     && Number.isFinite(parseFloat(getComputedStyle(element).paddingLeft));
+   }, selector);
+   const inset = await page.evaluate(selector => {
+    const element = document.querySelector(selector);
+    return element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft);
+   }, selector);
    assert.ok(Math.abs(inset - 18) < 2, `${name}: consistent phone content inset ${inset}`);
   }
   const size = await page.evaluate(() => ({ viewportWidth: innerWidth, scroll: document.documentElement.scrollWidth }));
