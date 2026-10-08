@@ -13,7 +13,8 @@ describe('safe course option for >100 Training courses', () => {
     } })
     const row = await resolveTrainingCoursePrefill({ courseId: 'course-101', userId: owner, knownIds: ['course-1'] })
     expect(row?.id).toBe('course-101')
-    expect(get).toHaveBeenCalledExactlyOnceWith('/courses/course-101')
+    expect(get).toHaveBeenCalledTimes(1)
+    expect(get).toHaveBeenCalledWith('/courses/course-101')
   })
 
   it('makes no request for an already-visible course option', async () => {
