@@ -6,6 +6,9 @@ on:
       runner_labels:
         type: string
         required: true
+      groups:
+        type: string
+        default: '["foundation","products","security"]'
 
 permissions:
   contents: read
@@ -13,8 +16,12 @@ permissions:
 
 jobs:
   browser:
-    name: browser (seeded Situational Bundle + static visual acceptance)
-    # Browser acceptance executes after both production lanes have passed.
+    name: ${{ matrix.group }} / seeded browser acceptance
+    # Independent exact-SHA artifacts and isolated PostgreSQL/Redis per scenario group.
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(inputs.groups) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -73,6 +80,10 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+      - name: ensure the full browser scenario matrix is required
+        env:
+          CI_BROWSER_GROUPS: ${{ inputs.groups }}
+        run: node .github/scripts/ci-browser-plan.mjs
       - name: clear previous browser evidence
         run: |
           rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log /tmp/eduk12-bundle-products-e2e /tmp/eduk12-bundle-products-backend.log /tmp/eduk12-questionnaire-public-e2e /tmp/reporting-v22-evidence
@@ -225,16 +236,22 @@ jobs:
       - name: verify built frontend in Chromium
         run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
       - name: run seeded browser acceptance
+        if: matrix.group == 'foundation'
         run: node e2e/situational-bundle-browser-e2e.cjs
       - name: run FE-11 storage fault acceptance
+        if: matrix.group == 'foundation'
         run: node e2e/fe-11-storage-fault-browser-e2e.cjs
       - name: run RA-02 four-role relational acceptance
+        if: matrix.group == 'foundation'
         run: node e2e/relational-four-role-browser-e2e.cjs
       - name: run PR5 Organization cross-role acceptance
+        if: matrix.group == 'foundation'
         run: node e2e/pr5-organization-browser-e2e.cjs
       - name: seed three PR5 business scenarios
+        if: matrix.group == 'foundation'
         run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios-fixture.ts
       - name: start isolated PR5 scenario resource server
+        if: matrix.group == 'foundation'
         env:
           PR5_SCENARIOS_ENABLED: 'true'
           # This loopback-only synthetic scenario explicitly includes parents.
@@ -255,12 +272,15 @@ jobs:
           cat /tmp/eduk12-pr5-scenario-backend.log
           exit 1
       - name: certify three PR5 business scenarios
+        if: matrix.group == 'foundation'
         run: backend/node_modules/.bin/tsx e2e/pr5-product-scenarios.ts
       - name: rehearse PR5 encrypted backup restore and migration failure recovery
+        if: matrix.group == 'foundation'
         env:
           PR5_SOURCE_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: node e2e/pr5-release-rehearsal.mjs
       - name: verify Bundle V3 browser lifecycle in isolated catalog
+        if: matrix.group == 'products'
         env:
           BUNDLE_PRODUCTS_ENABLED: 'true'
           BUNDLE_PRODUCT_ISOLATED_DB: '1'
@@ -285,16 +305,19 @@ jobs:
           if [ "$ready" != true ]; then cat /tmp/eduk12-bundle-products-backend.log; exit 1; fi
           node e2e/bundle-products-browser-e2e.cjs
       - name: multi-role respondent inbox responsive acceptance
+        if: matrix.group == 'products'
         env:
           INBOX_E2E_BASE_URL: http://127.0.0.1:5173
           INBOX_E2E_OUTPUT: /tmp/eduk12-inbox-e2e
         run: node e2e/multi-role-inbox-browser-e2e.cjs
       - name: anonymous study identity responsive acceptance
+        if: matrix.group == 'products'
         env:
           INBOX_E2E_BASE_URL: http://127.0.0.1:5173
           STUDY_E2E_OUTPUT: /tmp/eduk12-anonymous-study-e2e
         run: node e2e/anonymous-study-browser-e2e.cjs
       - name: Reporting V2.2 final product scenarios
+        if: matrix.group == 'products'
         env:
           REPORTING_BROWSER_ISOLATED_DB: '1'
           REPORTING_BROWSER_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -303,6 +326,7 @@ jobs:
           backend/node_modules/.bin/tsx e2e/reporting-v22-fixture.ts
           node e2e/reporting-v22-browser-e2e.cjs
       - name: anonymous questionnaire completion and exhausted-link recovery
+        if: matrix.group == 'products'
         env:
           QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
           QUESTIONNAIRE_PRODUCT_PUBLIC: '1'
@@ -313,15 +337,20 @@ jobs:
           backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
           node e2e/questionnaire-products-browser-e2e.cjs
       - name: enforced production CSP browser acceptance
+        if: matrix.group == 'security'
         run: |
-          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          if ! command -v ffmpeg >/dev/null; then
+            timeout -k 10s 120s sudo -n apt-get update -o Acquire::Retries=1
+            timeout -k 10s 180s sudo -n apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -version >/dev/null
           node e2e/production-csp-browser.cjs
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: situational-bundle-browser-evidence
+          name: situational-bundle-browser-evidence-${{ matrix.group }}
           path: |
             /tmp/eduk12-situational-bundle-e2e
             /tmp/eduk12-situational-bundle-backend.log
