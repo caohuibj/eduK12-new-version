@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="skywash" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fcfaf6"/><stop offset=".72" stop-color="#f8f7f1"/><stop offset="1" stop-color="#e9eeea"/></linearGradient>
+    <radialGradient id="sun"><stop stop-color="#ca886e" stop-opacity=".88"/><stop offset=".82" stop-color="#ce967e" stop-opacity=".7"/><stop offset="1" stop-color="#ca947f" stop-opacity="0"/></radialGradient>
+    <linearGradient id="distant" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#8da69c" stop-opacity=".28"/><stop offset="1" stop-color="#b7c9c0" stop-opacity=".045"/></linearGradient>
+    <linearGradient id="mountain" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6c8a7e" stop-opacity=".50"/><stop offset=".64" stop-color="#739486" stop-opacity=".23"/><stop offset="1" stop-color="#b4c7bf" stop-opacity="0"/></linearGradient>
+    <linearGradient id="shore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#57746b" stop-opacity=".55"/><stop offset="1" stop-color="#a2b9ae" stop-opacity=".04"/></linearGradient>
+    <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b5c9c0" stop-opacity=".2"/><stop offset="1" stop-color="#b3cac3" stop-opacity=".03"/></linearGradient>
+    <filter id="haze"><feGaussianBlur stdDeviation="11"/></filter>
+    <filter id="lightwash"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <path fill="url(#skywash)" d="M0 0h1600v900H0z"/>
+  <circle cx="1325" cy="156" r="56" fill="url(#sun)"/>
+  <g fill="url(#distant)" filter="url(#haze)">
+    <path d="M470 432 592 352 638 374 730 291 793 326 844 267 912 319 999 230 1079 304 1152 219 1210 249 1307 191 1367 238 1451 174 1532 204 1600 166v455H470Z"/>
+    <path d="M714 444 882 328 940 360 1057 287 1135 323 1254 225 1321 273 1429 194 1524 249 1600 196v398H714Z" opacity=".76"/>
+  </g>
+  <g fill="url(#mountain)" filter="url(#lightwash)">
+    <path d="M685 548 820 377 883 412 969 316 1047 365 1153 239 1218 297 1296 224 1390 301 1495 197 1600 272v392H685Z"/>
+    <path d="M1023 550 1127 378 1203 418 1335 286 1420 339 1546 259 1600 283v406h-577Z" opacity=".8"/>
+    <path d="M1365 529 1439 398 1508 416 1600 365v304h-235Z" opacity=".62"/>
+  </g>
+  <g filter="url(#haze)" opacity=".48" fill="#fbfaf6">
+    <ellipse cx="845" cy="494" rx="386" ry="59"/><ellipse cx="1345" cy="553" rx="460" ry="65"/>
+    <ellipse cx="1204" cy="643" rx="510" ry="80"/>
+  </g>
+  <g stroke="#294940" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".61">
+    <path d="M1118 201q11-9 21 0q10-9 22 0"/><path d="M1157 218q7-6 15 0q8-6 16 0"/><path d="M1190 182q8-7 16 0q7-7 16 0"/>
+  </g>
+  <path d="M0 737q103-22 200-12t190 4q121-13 213-5t193 8q162 5 259-8 195-12 327 8t218-3v171H0Z" fill="url(#lake)"/>
+  <g fill="url(#shore)" filter="url(#lightwash)">
+    <path d="M0 715q38-51 72-48l37 14q37-51 63-46l39 35q32-24 61-8l57 24q57-16 123 23l73 10H0Z"/>
+    <path d="M1237 733q43-27 79-27t79-11q53-21 86-5 65-10 119-32v95h-363Z" opacity=".52"/>
+  </g>
+  <g stroke="#345749" stroke-linecap="round" opacity=".52" fill="none">
+    <path d="M36 707v-77m0 9-16-13m16 10 20-22m-20 43-25-20m25 14 25-23" stroke-width="2.5"/>
+    <path d="M94 686v-56m0 23-16-11m16-8 17-16m-17 40 18-9" stroke-width="2"/>
+    <path d="M1522 694v-65m0 21-17-13m17 11 15-13m-15 35-21-11m21 2 21-14" stroke-width="2.2"/>
+    <path d="M1570 680v-85m0 34-18-16m18 16 20-23m-20 49-23-15m23 10 24-16" stroke-width="2"/>
+  </g>
+  <g stroke="#78988d" stroke-linecap="round" fill="none" opacity=".28">
+    <path d="M0 762h1600M0 780h1600M0 803h1600M0 840h1600" stroke-width=".7"/>
+    <path d="M0 771h320m50-5h620m55 7h555M0 824h450m100-8h800m60 7h190" stroke-width="1.1"/>
+  </g>
+  <g filter="url(#haze)" fill="#fffdf8" opacity=".38"><ellipse cx="756" cy="761" rx="570" ry="37"/><ellipse cx="1398" cy="765" rx="300" ry="31"/></g>
+</svg>
