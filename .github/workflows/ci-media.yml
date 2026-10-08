@@ -67,15 +67,41 @@ jobs:
         mkdir -p "$HOME/.npm" "$HOME/.cache/ms-playwright" "$HOME/.cache/eduk12-ci"
         echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
         echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright" >> "$GITHUB_ENV"
-    - name: prepare native and browser dependencies once per group
-      run: |-
-        bash server-version/scripts/ci-install-canvas-deps.sh
-        npm ci --prefix server-version/backend
-        npm ci --prefix server-version/frontend
-        cd server-version/backend
-        npx playwright-core install --with-deps chromium
-        if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
-        npx prisma generate
+    # Cache only downloaded packages/browser binaries, never node_modules or
+    # generated build output. These keys match the real-API browser lane.
+    - name: restore hosted npm downloads
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: browser-npm-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json') }}
+        restore-keys: browser-npm-${{ runner.os }}-${{ runner.arch }}-
+    - name: restore exact Chromium binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: browser-chromium-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('server-version/backend/package-lock.json') }}
+    # Each external installation is independently observable and bounded.
+    # A stalled registry / apt / browser download fails the gate rather than
+    # holding the whole 25-minute media job without progress.
+    - name: prepare native Canvas libraries (bounded)
+      run: timeout -k 10s 240s bash server-version/scripts/ci-install-canvas-deps.sh
+    - name: install backend dependencies (bounded)
+      run: timeout -k 10s 240s npm ci --prefix server-version/backend
+    - name: install frontend dependencies (bounded)
+      run: timeout -k 10s 240s npm ci --prefix server-version/frontend
+    - name: install pinned Chromium and system dependencies (bounded)
+      working-directory: server-version/backend
+      run: timeout -k 10s 240s npx playwright-core install --with-deps chromium
+    - name: ensure FFmpeg is present (bounded)
+      run: |
+        if ! command -v ffmpeg >/dev/null; then
+          timeout -k 10s 120s sudo -n apt-get update -o Acquire::Retries=1
+          timeout -k 10s 120s sudo -n apt-get install -y --no-install-recommends ffmpeg
+        fi
+        ffmpeg -version >/dev/null
+    - name: generate Prisma client
+      working-directory: server-version/backend
+      run: timeout -k 10s 120s npx prisma generate
     - name: build standalone backend and frontend
       if: ${{ !inputs.use_build_artifacts }}
       env:

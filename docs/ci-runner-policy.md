@@ -40,42 +40,72 @@ and unscoped CI changes select the full platform route. Malformed classification
 Management-UI content publication without a Git change uses application publication
 validation. A server release is separate from WeChat mini-program publication.
 
-## Current routing: GitHub-hosted Ubuntu
+## Current CI routing: GitHub-hosted only (public repository)
 
-All 26 versioned workflows pin every executable job to GitHub-hosted
-`ubuntu-24.04`. This includes routing, draft checks, maintenance, content,
-frontend/backend builds and regression, CodeQL, images/scans, isolated recovery,
-performance, real API/media browsers, all three visual engines and manual probes.
-Each job receives its own disposable VM; CI does not deploy production.
+The repository is public. All automatic PR CI, post-merge smoke, manual component probes,
+full acceptance, standalone visual/media/browser checks, scientific content gates, CodeQL,
+Docker image scans, performance and Ops recovery workflows execute exclusively on
+**standard GitHub-hosted `ubuntu-24.04` runners**. No workflow schedules the
+former Mac or Windows/WSL runner labels, and reusable workflow jobs themselves are
+pinned to `ubuntu-24.04` so stale callers cannot reactivate local execution.
 
-Manual dispatch defaults to `hosted`. Reusable `runner_labels` inputs remain for
-caller compatibility but cannot override the pinned job runner. The classifier
-normalizes old `speed`, `economy`, `local`, `balanced` and `hybrid` profile values
-to `hosted`; obsolete repository variables cannot select local machines. Unknown
-profiles still fail closed. `.github/scripts/content-workflows.test.mjs` checks
-every versioned workflow against self-hosted labels and dynamic runner overrides.
+The old repository variables `CI_RUNNER_PROFILE=local` and `CI_MAC_LIGHT_ENABLED`
+no longer influence routing. The main manual CI dispatch offers only `hosted`;
+`runnerPlan` accepts legacy `speed`, `economy`, `local`, `balanced` and
+`hybrid` arguments solely for compatibility and normalizes them to `hosted`.
+Remove obsolete repository variables when convenient; no Settings change is required
+to make the new committed workflows use Hosted runners.
 
-The repository is public. Standard GitHub-hosted Actions runners are free for
-public repositories; the earlier private-repository minute shortage no longer
-determines routing. Historical runs retain their original workflow revision;
-rerunning an old self-hosted run does not validate this migration. Existing local
-runner registrations and host services are managed separately from versioned CI.
+Standard hosted runner *compute minutes* are free for public repositories under
+GitHub's published Actions billing rules. Standard resource limits, concurrency
+quotas and artifact/cache storage limits still apply; larger hosted runners are
+not selected. Re-check the policy if repository visibility or GitHub terms change.
 
-Frontend production/UI-lab artifacts start early and independent consumers run in
-parallel. Platform visual acceptance keeps Chromium, Firefox and WebKit in separate
-jobs; scoped UI routes retain the existing grouped checks. Performance and Docker
-jobs use separate VMs rather than sharing a local exclusive slot. Dependencies and
-fail-closed aggregate coverage remain unchanged.
+Jobs retain the existing conditional scope/classification rules: light content,
+medium frontend, maintenance and full platform tests remain distinct. A ready heavy
+platform PR still requires the original backend/frontend regressions, real-API
+browser, all three visual engines, grouped media, Docker scans, CodeQL, performance,
+recovery, mini-program and merge gate. No checks are waived because jobs are hosted.
+
+Fork PR admission is **unchanged**: the main CI still requires same-repository PR
+source until an independent trust-model review approves safely testing forks.
+Production secrets and production database access are never exposed to public CI.
+
+The full acceptance graph now permits independent hosted jobs to run concurrently.
+The exact-run artifact contract and isolation checks below remain authoritative.
+
+### Hosted critical-path and dependency-download policy (2026-10-09)
+
+Frontend lint/typecheck/audit/full regression, Docker production builds and HIGH/CRITICAL
+scans, performance fresh-accounting and Ops recovery can start after deterministic scope
+classification; none consumes an unrelated backend/front-end job's build artifact.
+Each is still independently required by the fail-closed merge gate. Real-API browser,
+grouped media acceptance and visual consumers continue to wait for exact-current-run
+backend/frontend artifacts and verify their provenance. This reduces the critical path
+without reusing a previous commit's result.
+
+The two media groups retain complete scenario assertions and independent fresh
+PostgreSQL/Redis service state. Lockfile-keyed npm/Chromium *download* caches are
+allowed; node_modules, databases, built products and cross-SHA artifacts are not.
+Break external media dependency setup into individually named, bounded steps. On
+registry/apt/browser install timeout, fail the job and diagnose the individual step;
+never skip media scenarios, loosen scoring/security checks or label timed-out steps
+as passed. Scope-based skips remain limited to proven unaffected surfaces; mixed
+permissions, DB, runtime and CI edits still select full-platform validation.
+
 
 ## Build and scenario isolation
 
 Build artifacts belong to this run and exact checked-out SHA. The manifest verifies
 SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
 missing or mismatched artifact. No latest-success or cross-run fallback exists.
-Ordinary production and UI-lab builds have distinct names and manifests. Both
-producers run independently on GitHub, so compilation does not delay unrelated
-checks. Native `node_modules` are installed from lockfiles inside each job and
-are never transferred through build artifacts.
+Ordinary production and UI-lab builds have distinct names and manifests. In heavy
+`speed` runs, both production and UI-lab builds run in parallel on GitHub,
+so compilation does not delay Mac checks or hosted browser consumers. Light and
+medium builds remain local. The initial producer probe measured 44 seconds for
+the hosted UI-lab job while the Mac production build took several minutes; final
+run measurements remain authoritative. Native
+`node_modules` are never transferred between Mac ARM and Linux x64.
 
 Production images retain complete Dockerfile builds and HIGH/CRITICAL scans. Buildx
 pulls base images and bypasses runtime-stage caches so OS security updates are not
@@ -90,14 +120,30 @@ persistent volumes are rejected. Ports must be free between scenarios. Existing
 fixture guards, test assertions and individual evidence remain mandatory. Standalone
 media workflows invoke the same composite scenario actions as grouped validation.
 
-Pure UI uses a minimal lockfile-pinned Playwright runtime without backend packages,
-PostgreSQL, Redis or Docker. Linux browser installation includes system dependencies.
-Chromium retains canonical/staff/classroom screenshots, interaction and legacy-dialog
-checks; Firefox and WebKit retain their complete interaction and legacy-dialog suites.
-AppShell and QA round 3 synthetic component checks also run on hosted Ubuntu; real
-authorization and scoring remain covered by independent backend/database gates.
+Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
+PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
+screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
+complete interaction and legacy-dialog suites. AppShell remains explicitly gated on Mac. In speed mode all three visual engines run
+on GitHub; economy and medium routes keep visual acceptance on Mac. The QA round 3 component browser flow runs on Mac
+with its synthetic local APIs; real authorization and scoring remain covered by
+the independent backend/database gates.
 
 ## Resource and cleanup policy
+
+Every active CI job uses an ephemeral standard GitHub-hosted Ubuntu VM. The existing
+runner preflight observes disk/memory but its special self-managed-host constraints
+are not needed on these ephemeral machines. Heavy Docker CI keeps its 3 GiB
+minimum-free-space guard and may reclaim only regenerable *local build cache*
+in that CI VM. Never prune production data or persistent host services.
+
+Isolated PostgreSQL/Redis containers, temporary credentials, bounded browser
+artifacts, SHA-scoped build manifests and job-specific cleanup remain mandatory.
+`npm ci`, pinned images, vulnerability scan thresholds, signature checks and
+`PERF_CAPACITY_QUALIFIED=0` for Phase 0 evidence are unchanged.
+
+Legacy Mac cleanup utilities and old self-managed runner references in historical
+records may remain in the repository as inert code/evidence; no Actions job runs
+on those machines after this change.
 
 ### Beijing production host: download and maintenance notes
 
@@ -120,15 +166,6 @@ original security scan before release; no unrelated full CI is needed for an
 operator download setting. Preserve the immutable source checkout and record
 operator recipe hashes, mirror URLs and actual image IDs in the release proof.
 
-### Hosted job isolation
-
-GitHub provides a fresh Ubuntu VM for every job. Existing disk preflight, service
-identity guards, evidence uploads and exact temporary-service cleanup remain in
-place. CI keeps UTC, existing Node heap/test worker limits and pinned dependencies.
-Dedicated Mac cleanup and local-machine resource checks are historical utilities;
-Ubuntu workflows do not invoke Mac account cleanup. No workflow globally prunes
-Docker or retained data volumes. The production host's download and backup rules
-remain independent from hosted CI.
 
 ## Failure handling and rollout
 
@@ -137,22 +174,23 @@ regressions with the same implementation/dependencies/parameters/isolation as th
 formal gate. Do not use full CI as the first verification or relax timeouts,
 assertions, authorization boundaries or scan thresholds to obtain a green result.
 
-The existing CI workflow exposes `step_probe` values for frontend, backend,
+The hosted-only CI workflow exposes `step_probe` values for frontend, backend,
 backend-regression, targeted reporting, browser, media, UI, hosted Chromium UI, QA component UI, Ops, performance, images and Cognitive checks.
 The `assessment-repair` probe runs the shared R5 regression selector, including
 task-controller admission and collection snapshot completion fixtures, so the
 focused gate catches filter-export and draft-before-publication contract drift.
 It requires
 non-skipping Questionnaire, Bundle, onboarding, SJT and anonymous-study PostgreSQL
-evidence. All probes use GitHub-hosted Ubuntu, including saved requests with
-`runner_profile=local`.
+evidence. All backend regression, browser, media, visual and maintenance probes use standard
+GitHub-hosted Ubuntu 24.04 runners, regardless of legacy profile inputs.
 Probes invoke the formal reusable components and only their build prerequisites;
 they disable normal classification/full jobs/CodeQL/merge readiness. Different probe
 kinds have separate concurrency groups. A successful probe is not a full merge gate.
 
-Regression jobs clear their exact temporary report paths before setup so a
-previous focus cannot supply test evidence. Regression uses the GitHub-hosted
-lockfile-keyed npm download cache. Lockfile installation, actual
+Regression jobs clear their exact temporary report paths before setup, so a
+previous or interrupted job cannot upload stale test evidence.
+Self-hosted regression uses its existing local npm download cache; remote npm
+cache restore/save is limited to GitHub-hosted jobs. Lockfile installation, actual
 tests, non-skipping assertions, artifacts and service cleanup are unchanged.
 
 Keep integration work Draft during repair and probes. Freeze the combined functional
@@ -181,8 +219,7 @@ retention remains plan_only. Host backup installation is independent of deployin
 the application and requires exact-head maintenance success plus bounded COS and
 production verification.
 
-External/untrusted PR admission retains the existing explicit isolation approval
-requirement before checkout. CI accounts must
+External/untrusted PRs are blocked by the existing source-admission policy. CI jobs must
 not read production SSH keys, environment files, encrypted-backup keys or personal
 data. Required database suites retain non-skipping report assertions.
 

@@ -505,9 +505,11 @@ jobs:
       ui_runner_labels: '["ubuntu-24.04"]'
 
   frontend:
-    needs: [scope, frontend-build]
+    # Frontend lint/types/audit/tests consume source, not the production artifact.
+    # Run independently; the aggregate still requires both successful jobs.
+    needs: scope
     name: frontend (lint + types + full tests + build)
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request' && needs.frontend-build.result == 'success') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -523,8 +525,11 @@ jobs:
 
   docker:
     name: docker (compose config + production builds)
-    needs: [scope, backend, backend-browser-build]
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request' && needs.backend.result == 'success') || (!cancelled() && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    # This job builds images from source and does not consume backend build
+    # artifacts. Start it with scope; the merge gate independently requires
+    # backend, production image scans and all other selected checks.
+    needs: scope
+    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -617,8 +622,9 @@ jobs:
       groups: ${{ needs.scope.outputs.media_groups }}
 
   accept-ui:
-    needs: [scope, frontend-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (needs.frontend.result == 'success' || needs.frontend.result == 'skipped') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    # UI acceptance uses exact-run artifacts; lint/test result is independently gated.
+    needs: [scope, frontend-build]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
     strategy:
       fail-fast: false
       matrix:
@@ -644,14 +650,16 @@ jobs:
       engine: ${{ matrix.engine }}
 
   accept-perf:
-    needs: [scope, backend]
+    # Independent fresh-fixture runtime proof; do not wait for backend compile.
+    needs: scope
     if: needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
       runner_profile: hosted
 
   accept-ops:
-    needs: [scope, backend]
+    # Independent recovery evidence; merge gate still requires backend success.
+    needs: scope
     if: needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
