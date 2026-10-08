@@ -15,6 +15,7 @@ import {
 } from '../utils/courseAccess'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
 import { resetPasswordForPlatformAdmin } from './platformAccountController'
+import { resetPasswordForCourseTeacher } from './courseStudentPasswordController'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
@@ -792,8 +793,12 @@ export const courseController = {
     }
   },
 
-  // 重置学生密码
+  // Resetting credentials is a narrowly granted course support action for
+  // the current owner only. The existing SYSTEM_ADMIN alias stays unchanged.
   async resetStudentPassword(req: Request, res: Response) {
+    if (req.user?.role === UserRole.TEACHER) {
+      return resetPasswordForCourseTeacher(req, res)
+    }
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
