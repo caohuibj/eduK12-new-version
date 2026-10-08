@@ -156,7 +156,7 @@ const TeacherCodeList: React.FC = () => {
                 </dl>
 
                 <div className="mt-4 flex items-center justify-between border-t pt-4">
-                  <span className={`rounded px-2 py-1 text-xs ${valid ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <span className={`rounded px-2 py-1 text-xs ${valid ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                     {valid ? '有效' : '已失效'}
                   </span>
                   <button
