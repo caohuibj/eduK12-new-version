@@ -798,6 +798,8 @@ export const courseController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      // Course ownership permits roster management, not global credential changes.
+      if (userRole !== UserRole.ADMIN) return forbidden(res, '重置全局账号密码仅限平台管理员')
       const { courseId, studentId } = req.params
 
       // 验证课程权限
