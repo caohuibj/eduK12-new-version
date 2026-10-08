@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { isTrainingHost } from '../training/context'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
+import TemporaryPasswordHandoff, { type TemporaryPasswordHandoffValue } from '../components/staff-ui/TemporaryPasswordHandoff'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { Course } from '../types'
 
@@ -16,6 +17,7 @@ interface Student {
   avatarUrl?: string
   isFrozen: boolean
   joinedAt: string
+  enrollmentStatus?: 'ACTIVE' | 'APPROVED' | 'PENDING'
 }
 
 const CourseStudents: React.FC = () => {
@@ -25,6 +27,7 @@ const CourseStudents: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const { user } = useAuth()
   const canManageGlobalAccount = user?.role === 'ADMIN' && user.platformRole === 'SYSTEM_ADMIN'
+  const canResetCoursePassword = user?.role === 'TEACHER' || canManageGlobalAccount
   const training = isTrainingHost()
   const [course, setCourse] = useState<Course | null>(null)
   const [students, setStudents] = useState<Student[]>([])
@@ -32,6 +35,7 @@ const CourseStudents: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [keyword, setKeyword] = useState('')
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [credential, setCredential] = useState<TemporaryPasswordHandoffValue | null>(null)
 
   useEffect(() => {
     if (courseId) {
@@ -92,16 +96,32 @@ const CourseStudents: React.FC = () => {
   }
 
   const handleResetPassword = async (student: Student) => {
-    if (!await ask(`确定要为 ${student.nickname} 生成一次性临时密码吗？\n\n临时密码只会写入受保护的本地交接文件。`)) return
+    if (!await ask(`确定为「${student.nickname}」重置登录密码吗？这是学员的全局账号：旧会话会失效，首次使用临时密码登录必须修改密码。培训师只能重置本人课程的已报名学员；临时密码仅展示一次，须私下交付。`)) return
 
     setProcessingId(student.id)
     try {
-      const response = await apiClient.post(`/courses/${courseId}/students/${student.id}/reset-password`)
-      if (response.code === 0) {
-        showMessage(response.message || `已为 ${student.nickname} 生成一次性临时密码，请从受保护的本地交接文件中读取。`)
+      const response = await apiClient.post<{ temporaryPassword?: string; username?: string; handoffFile?: string }>(
+        `/courses/${courseId}/students/${student.id}/reset-password`,
+      )
+      if (response.code !== 0) throw new Error(response.message || '重置失败')
+      if (user?.role === 'TEACHER') {
+        const oneTimePassword = response.data?.temporaryPassword
+        if (oneTimePassword) {
+          setCredential({
+            studentName: student.nickname || student.username,
+            username: response.data?.username || student.username,
+            temporaryPassword: oneTimePassword,
+          })
+        } else {
+          showMessage('账号密码已重置，但未收到临时密码。请联系平台管理员处理。')
+        }
+      } else {
+        showMessage(response.data?.handoffFile
+          ? `密码已重置，交接文件：${response.data.handoffFile}`
+          : response.message || '密码已重置')
       }
-    } catch (operationError: any) {
-      showMessage(operationError.message || '重置密码失败')
+    } catch (operationError) {
+      showMessage(operationError instanceof Error ? operationError.message : '重置密码失败')
     } finally {
       setProcessingId(null)
     }
@@ -134,6 +154,7 @@ const CourseStudents: React.FC = () => {
   return (
     <ProductPage width="management" className="space-y-6">
       {feedback}
+      <TemporaryPasswordHandoff value={credential} onClose={() => setCredential(null)} />
       <PageHeader
         title={course?.title || (training ? '课程学员管理' : '课程学生管理')}
         description={`课程码: ${course?.courseCode || '—'} · 共 ${students.length} 名${training ? '学员' : '学生'}`}
@@ -244,7 +265,7 @@ const CourseStudents: React.FC = () => {
                         >
                           {student.isFrozen ? <Unlock className="h-4 w-4" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
                         </button>}
-                        {canManageGlobalAccount && <button
+                        {canResetCoursePassword && !student.isFrozen && student.enrollmentStatus !== 'PENDING' && <button
                           type="button"
                           onClick={() => handleResetPassword(student)}
                           disabled={processingId === student.id}
