@@ -23,3 +23,15 @@ Bundle 使用既有 canonical bundle-products-fixture.ts 和 bundle-products-ser
 后端全量回归沿用正式 selector，聚合报告性能测试另设硬件门禁。所有 PASS / FAIL / SKIPPED / NOT RUN 单独记录；条件未配置的其他运维/浏览器 opt-in 测试不能算作通过，真实 PostgreSQL 课程权限与重置测试必须实际执行。
 
 最终代码通过本地验收后才集中激活 GitHub CI。保持当前 local/self-hosted 路由，不更改生产配置、不强制推送。每次合并前重新检查 main、精确 head、实际 base/diff/依赖与稳定 merge gate；按 #246 → #247 → #248 合并。CI 不执行生产部署。
+
+
+## 小程序 CI 独立验证
+
+前端 Product Route Inventory 与小程序 Web Feature Inventory 是两个不同清单。新增 Web 路由后，使用现有生成器同步 `docs/miniprogram-v2/web-feature-inventory.json`；不删除或弱化 `--check`。启动完整 CI 前从仓库根执行正式小程序 job 的两步：
+
+```bash
+npm run verify --prefix server-version/miniprogram-v2
+node server-version/miniprogram-v2/scripts/feature-inventory.cjs --check
+```
+
+仅 `npm run verify` 成功不足以证明 Web Feature Inventory 同步；该清单不表示小程序功能已发布或设备验收通过。
