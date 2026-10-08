@@ -21,10 +21,10 @@ type CourseRow = { id: string; creatorId: string }
 type FrozenStateRow = { id: string; isFrozen: boolean; platformRole: PlatformRole }
 
 /**
- * Preserve the legacy Course roster authority while making account freezing
- * participate in the Organization usable-admin invariant. Course is not mapped
- * to Organization; it is only the authorization basis for this legacy action.
- * A Course surface may never make a SYSTEM_ADMIN account unusable.
+ * A Course membership grants roster access, never control of the participant's
+ * global User account. Only the platform admin route may invoke a freeze, and
+ * the existing Organization usable-admin invariant still protects the target.
+ * Course is not mapped to Organization.
  */
 export async function setCourseStudentFrozenState(input: {
   actorUserId: string
