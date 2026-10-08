@@ -43,3 +43,7 @@
 .training-grants-table button { min-height: 44px; min-width: 64px; }
 .training-grants-table :is(th,td):last-child { position: sticky; right: 0; background: var(--hui-ds-color-surface,#fff); box-shadow: -1px 0 var(--hui-ds-color-line,#ded8cb); }
 .hui-training-admin-content :is(a,button,input,select,[tabindex]):focus-visible { outline: 3px solid var(--training-bamboo); outline-offset: 3px; }
+.hui-training-admin-content .hui-staff-workspace .hui-page-header { background: transparent; border-width: 0 0 1px; border-color: var(--training-border); border-radius: 0; padding-inline: 0; box-shadow: none; }
+.hui-training-admin-content .hui-staff-workspace .hui-page-header::after { display: none; }
+.hui-training-admin-content :is(.text-red-600,.text-red-700) { color: #973e30; }
+.hui-training-admin-content :is(.text-green-600,.text-green-700) { color: var(--training-bamboo); }
