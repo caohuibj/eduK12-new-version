@@ -53,9 +53,9 @@ describe('course-first training workspaces', () => {
   it('learner sees only three task groups, reuses existing assignment and check-in routes', async () => {
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /完成作业/ })).toHaveAttribute('href', '/student/assignments/a-1')
+    expect(await screen.findByRole('link', { name: /完成作业/ })).toHaveAttribute('href', '/student/assignments/a-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
-    expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1')
+    expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1')
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
@@ -75,11 +75,11 @@ describe('course-first training workspaces', () => {
     })
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByText('已保存草稿')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /继续作业/ })).toHaveAttribute('href', '/student/assignments/draft-1')
+    expect(screen.getByRole('link', { name: /继续作业/ })).toHaveAttribute('href', '/student/assignments/draft-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(await screen.findByText('已截止')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /去打卡/ })).toBeNull()
-    expect(screen.getByRole('link', { name: /查看打卡/ })).toHaveAttribute('href', '/student/checkins/closed-1')
+    expect(screen.getByRole('link', { name: /查看打卡/ })).toHaveAttribute('href', '/student/checkins/closed-1?courseId=course-1')
   })
 
   it('shows assignment API failure without crashing the course page', async () => {
