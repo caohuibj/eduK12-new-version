@@ -56,6 +56,18 @@ describe('course-scope measurement projection', () => {
     expect(myCognitive).toHaveBeenCalledTimes(1)
   })
 
+  it('distinguishes exhausted cognitive quotas without offering an implicit fresh start', () => {
+    const cognitive = {
+      id: 'cog-quota', courseId: course, title: '可查看的任务',
+      instruction: null, listedStandalone: true, status: 'PUBLISHED' as const,
+      remainingAttempts: 0, continueHref: null,
+    }
+    const result = projectCourseAssessments(course, [], [], [cognitive as any], [])
+    expect(result[0].status).toBe('尝试次数已用尽')
+    expect(result[0].action).toBe('查看任务')
+    expect(result[0].href).toBe('/student/cognitive/assignments/cog-quota')
+  })
+
   it('does not fetch a disabled cognitive capability', async () => {
     const result = await loadCourseAssessments(course, false)
     expect(result.errors).toEqual([])
