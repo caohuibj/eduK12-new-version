@@ -76,9 +76,12 @@ export default function TrainingLearnerCourse() {
     return () => { alive = false }
   }, [courseId, course, section, assessments, assessmentRevision, cognitiveEnabled])
 
+  // The capability check may finish after the course page first renders.
+  // Re-discover available cognitive assignments when the authoritative flag changes.
+  useEffect(() => { setAssessments(null) }, [cognitiveEnabled])
+
   const retry = () => { setEpoch(value => value + 1) }
   const retryAssessments = () => { setAssessments(null); setAssessmentRevision(value => value + 1) }
-  const selected = { assignments, checkins }[section as 'assignments' | 'checkins']
 
   return <div className="training-detail">
     <Link className="training-back" to="/student"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
@@ -98,8 +101,8 @@ export default function TrainingLearnerCourse() {
           </nav>
 
           {section === 'assignments' && <section className="training-detail-content" aria-label="课程作业">
-            {selected.loading ? <p role="status">正在读取作业…</p>
-              : selected.error ? <div role="alert">作业读取失败：{selected.error}<button type="button" onClick={retry}>重试</button></div>
+            {assignments.loading ? <p role="status">正在读取作业…</p>
+              : assignments.error ? <div role="alert">作业读取失败：{selected.error}<button type="button" onClick={retry}>重试</button></div>
                 : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置作业。</p>
                   : <div className="training-item-list">{assignments.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
