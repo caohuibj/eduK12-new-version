@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -111,6 +111,19 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '轮换课程码' }))
     await screen.findByRole('button', { name: '轮换课程码' })
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ title: '轮换课程码？' }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/courses/course-1/rotate-code', {}))
+  })
+
+  it('keeps course end behind explicit confirmation', async () => {
+    confirm.mockResolvedValueOnce(false)
+    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+    expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
+    fireEvent.click(screen.getByText(/课程设置/))
+    fireEvent.click(screen.getByRole('button', { name: '结束课程' }))
+    await waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: '确定结束课程？', danger: true,
+    })))
+    expect(post).not.toHaveBeenCalledWith('/courses/course-1/end', {})
   })
 
   it('trainer publishing links keep the exact course context', async () => {
