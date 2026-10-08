@@ -61,6 +61,18 @@ describe('course-first training workspaces', () => {
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
   })
 
+  it('settles a failed assessment load and lets the learner retry', async () => {
+    loadAssessments.mockRejectedValueOnce(new Error('测评查询超时'))
+    mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('heading', { name: course.title })
+    fireEvent.click(screen.getByRole('button', { name: '测评' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('测评查询超时')
+    expect(screen.queryByText('正在核对本课程的可用测评…')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '重新加载测评' }))
+    expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1')
+    expect(loadAssessments).toHaveBeenCalledTimes(2)
+  })
+
   it('does not mislabel a saved draft as submitted or a closed check-in as actionable', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
