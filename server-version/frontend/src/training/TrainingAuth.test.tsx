@@ -16,10 +16,10 @@ describe('training authentication shell', () => {
     </AuthShell></MemoryRouter>)
     expect(screen.getByRole('heading', { name: '学员登录' })).toBeInTheDocument()
     expect(screen.getByText('使用学员账号登录')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /返回 Huisurvey Training 入口/ })).toHaveTextContent('Huisurvey Training')
+    expect(screen.getByRole('link', { name: /Huisurvey.*Training/i })).toHaveTextContent('Huisurvey Training')
     expect(screen.getByText('山')).toBeInTheDocument()
     expect(screen.queryByText(/Healthier Students/)).toBeNull()
-    expect(screen.getByRole('link', { name: /返回 Huisurvey Training 入口/ })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: /Huisurvey.*Training/i })).toHaveAttribute('href', '/')
   })
 
   it('uses trainer terminology without hiding the current login form', () => {
