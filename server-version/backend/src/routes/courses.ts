@@ -40,7 +40,7 @@ router.put('/:id', authenticate, requireTeacher, courseController.update)
 router.patch('/:id', authenticate, requireTeacher, courseController.update)
 router.post('/:id/rotate-code', authenticate, requireTeacher, courseController.rotateCourseCode)
 router.delete('/:id', authenticate, requireTeacher, courseController.delete)
-router.post('/join', authenticate, courseController.join)
+router.post('/join', authenticate, requireStudent, courseController.join)
 
 // 上传课程封面
 router.post('/:id/cover', authenticate, requireTeacher, uploadPrincipalRateLimit, boundedUpload('cover', 5 * 1024 * 1024, allowedCoverTypes, courseController.uploadCover))
