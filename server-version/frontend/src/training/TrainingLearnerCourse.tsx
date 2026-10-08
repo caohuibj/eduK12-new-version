@@ -65,7 +65,7 @@ export default function TrainingLearnerCourse() {
   }, [courseId, epoch])
 
   useEffect(() => {
-    if (!courseId || !course || section !== 'assessments' || assessments) return
+    if (!courseId || !course || course.id !== courseId || section !== 'assessments' || assessments) return
     let alive = true
     setAssessmentsLoading(true)
     void loadCourseAssessments(courseId, cognitiveEnabled).then(result => {
@@ -85,7 +85,7 @@ export default function TrainingLearnerCourse() {
 
   return <div className="training-detail">
     <Link className="training-back" to="/student"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
-    {courseLoading ? <p className="training-status" role="status">正在读取课程…</p>
+    {courseLoading || (course && course.id !== courseId) ? <p className="training-status" role="status">正在读取课程…</p>
       : courseError || !course ? <div className="training-message" role="alert">课程暂时不可用：{courseError || '无权访问这门课程'}<button type="button" onClick={retry}>重试</button></div>
         : <>
           <header className="training-detail-header">
