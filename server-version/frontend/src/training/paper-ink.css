@@ -650,3 +650,14 @@
 }
 .hui-training.hui-app--standard .hui-button--danger { background: #973e30; border-color: #973e30; color: white; border-radius: 4px; }
 .hui-training.hui-app--standard .hui-button--danger:hover:not(:disabled) { background: #7d3025; }
+.hui-training.hui-app--standard.hui-app--student .hui-navigation a[aria-current="page"] { background: transparent; }
+.hui-training .hui-auth-page--training .hui-auth-stage__tagline { color: var(--training-muted); }
+.hui-training.hui-app--standard :is(.hui-student-profile,.hui-teacher-profile) { max-width: 760px; }
+.hui-training.hui-app--standard .hui-app-main:has(> .hui-student-page) > .training-context-back { display: flex; width: 100%; max-width: var(--hui-ds-width-reading); margin-inline: auto; }
+.hui-training.hui-app--standard .hui-auth-content:has(> .hui-student-profile) > .training-context-back { max-width: 760px; }
+.hui-training.hui-app--standard :is(.student-submit-rich-content,.student-submit-info) { color: var(--training-ink); }
+.hui-training.hui-app--standard .student-submit-info .student-submit-meta { background: #e8eee5; color: var(--training-muted); }
+.hui-training.hui-app--standard .text-orange-500 { color: #8b5933; }
+@media(max-width:640px) {
+  .hui-training.hui-app--standard .staff-dialog__header .staff-inline-actions .staff-icon-button { width: 44px; }
+}
