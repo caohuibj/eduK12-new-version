@@ -263,7 +263,7 @@ test('frontend compilation and checks are separate while both remain required',(
 
 test('manual step probes select one shared component and cannot schedule full CI or CodeQL', () => {
   const ci=source('ci');
-  assert.match(ci,/options: \[none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf, fleet-prepare\]/);
+  assert.match(ci,/options: \[none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf\]/);
   for(const name of ['scope','merge-gate']) assert.match(job(ci,name),/inputs\.step_probe == '' \|\| inputs\.step_probe == 'none'/);
   assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
