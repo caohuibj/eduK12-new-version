@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
 vi.mock('../../../api/client', () => ({ default: api }))
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }) }))
 vi.mock('../../../components/PublicDeliveryManager', () => ({
   PublicDeliveryManager: () => null,
 }))
