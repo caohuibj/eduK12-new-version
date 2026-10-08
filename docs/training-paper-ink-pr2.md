@@ -2,8 +2,16 @@
 
 - Design authority: https://app.notion.com/p/3f3d27635a3881ff90e1eb79adaaea63
 - Depends on PR #246 `feat/training-paper-ink-entry`; **base this PR on the PR1 branch**, not main.
-- This PR is frontend integration only: do not change scoring, FINAL, scientific release, database or resource authorization.
+- This PR adds **read-only scoped API projection** to complete Training course inventory, plus a backwards-compatible courseId filter to the existing student task feed. It does **not** change scoring, FINAL, scientific release, schema, database migrations, or content authorization.
 - **No CI has been run. No production domain or API configuration has been changed.**
+
+## Joint review fixes after the first implementation
+- `TrainingCourseSettings.tsx`: unobtrusive course settings covers title/description, code rotation, pause/resume enrollment, and course end with confirmation. It calls **existing** Course APIs and refreshes the authoritative course state after mutation.
+- `GET /courses/:id/training-assessments`: authenticated TEACHER / legacy ADMIN, with exact course roster/owner authority before querying; returns *metadata only* for currently published, course-linked and student-visible Scale/Questionnaire, published Composite/ASSESSMENT_BUNDLE, standalone Cognitive. No personal reports, answers, or attempt metadata are included. Source creation only creates `manageHref` for actual creator/admin.
+- Scoped discovery in `GET /courses/my/tasks?courseId=...`: optional `courseId` is filtered after projecting the authenticated student's valid memberships; users cannot add another course to their visibility by guessing IDs. Course-specific feed reduces client-side pages needed for multi-course QUESTIONNAIRE composite linkage and keeps source/overall counts scope-consistent.
+- Training results workbench does not display Organization GROUP/longitudinal as if it were a Training course report. Its own workbench summary remains limited to composite and cognitive completion/quality; individual legacy Scale/report authority remains canonical.
+- Deep authoring and submission pages retain a course-context return link; saved assignment drafts, expired check-ins and expired composite attempts are distinctly labeled. The front-end remains a view over original Runtime policies.
+- CSS has a restrained deep-surface paper/ink theme, mobile hand-drawn signature and 44px affordances; visual screenshot, mobile overflow and accessibility cannot be deemed passed without actual browser execution.
 
 ## Product structure
 

@@ -8,6 +8,7 @@ const querySchema = z.object({
   page: z.coerce.number().int().min(1).max(100000).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
   state: z.enum(taskFilters).optional(),
+  courseId: z.string().trim().min(1).max(100).optional(),
 })
 
 export async function studentTaskList(req: Request, res: Response) {

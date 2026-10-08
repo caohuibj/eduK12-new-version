@@ -59,7 +59,7 @@ async function availableComposites(courseId: string): Promise<Composite[]> {
       const result = await apiClient.get<{
         list: Array<{ id: string; kind: string; courses: Array<{ id: string }> }>
         total: number
-      }>('/courses/my/tasks?page=' + page + '&pageSize=' + pageSize)
+      }>('/courses/my/tasks?page=' + page + '&pageSize=' + pageSize + '&courseId=' + encodeURIComponent(courseId))
       if (result.code !== 0) throw new Error(result.message || '课程测评投放查询失败')
       const rows = result.data?.list || []
       total = result.data?.total ?? 0
