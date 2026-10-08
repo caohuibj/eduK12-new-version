@@ -100,14 +100,14 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByText('积极应对量表')).toBeInTheDocument()
     expect(screen.getByText('学习综合测评包')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /管理测评/ })).toHaveAttribute('href', '/questionnaire-products/q-1')
+    expect(screen.getAllByRole('link', { name: /管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/bundle-products/b-1'])
     expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments')
   })
 
   it('keeps course code operations in a low-frequency settings section with explicit confirmation', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    fireEvent.click(screen.getByText('课程设置'))
+    fireEvent.click(screen.getByText(/课程设置/))
     fireEvent.click(screen.getByRole('button', { name: '轮换课程码' }))
     await screen.findByRole('button', { name: '轮换课程码' })
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ title: '轮换课程码？' }))
