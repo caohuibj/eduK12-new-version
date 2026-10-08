@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import { returnAfterLogin } from '../../components/app-shell/access'
 import { useAuthLinks } from '../../components/app-shell/useAuthLinks'
 import AuthShell from '../../components/auth/AuthShell'
@@ -26,6 +27,7 @@ type CourseVerificationState = 'verifying' | 'verified' | 'invalid'
 
 const StudentRegister: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const location = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -211,7 +213,7 @@ const StudentRegister: React.FC = () => {
           <span className="font-medium">课程码验证成功</span>
         </div>
         <p className="text-sm text-green-600 mt-1">
-          请设置您的学生账号信息
+          {training ? '请设置您的学员账号信息' : '请设置您的学生账号信息'}
         </p>
       </div>
 
