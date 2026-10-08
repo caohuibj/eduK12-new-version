@@ -1,0 +1,22 @@
+/* Shared brand: approved mountain / h monogram and lowercase Huisurvey wordmark. */
+.hui-training .training-wordmark.training-wordmark--mountain {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #153e33;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 31px;
+  font-weight: 680;
+  line-height: 1.1;
+  letter-spacing: -.048em;
+  white-space: nowrap;
+}
+.hui-training .training-brand-icon { width: 85px; height: 55px; flex: none; }
+.hui-training.hui-app--standard .training-wordmark.training-wordmark--mountain { font-size: 23px; }
+.hui-training.hui-app--standard .training-brand-icon { width: 53px; height: 41px; }
+.hui-training .hui-auth-page--training .training-wordmark.training-wordmark--mountain { font-size: 25px; }
+.hui-training .hui-auth-page--training .training-brand-icon { width: 61px; height: 46px; }
+@media (max-width: 620px) {
+  .hui-training .training-brand-icon { width: 60px; height: 42px; }
+  .hui-training .training-wordmark.training-wordmark--mountain { font-size: 25px; }
+}
