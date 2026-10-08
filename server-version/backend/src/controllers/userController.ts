@@ -3,12 +3,11 @@ import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
-import { hashPassword, generateTempPassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
+import { hashPassword, isValidPassword, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '../utils/password'
 import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { z } from 'zod'
-import path from 'node:path'
-import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
+import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { setUserActiveState, UserLifecycleError } from '../services/userLifecycleService'
 
 const createUserSchema = z.object({
@@ -281,46 +280,11 @@ export const userController = {
     }
   },
 
-  // 重置密码（管理员）
-  async resetPassword(req: Request, res: Response) {
-    try {
-      const { id } = req.params
-
-      const user = await prisma.user.findUnique({
-        where: { id },
-        select: { id: true, username: true },
-      })
-
-      if (!user) {
-        return notFound(res, '用户不存在')
-      }
-
-      const temporaryPassword = generateTempPassword()
-      const hashedPassword = await hashPassword(temporaryPassword)
-      const handoffFile = await writeCredentialHandoff([{
-        username: user.username,
-        temporaryPassword,
-      }], 'admin-password-reset')
-
-      try {
-        await prisma.user.update({
-          where: { id },
-          data: {
-            passwordHash: hashedPassword,
-            tokenVersion: { increment: 1 },
-            mustChangePassword: true,
-          }
-        })
-      } catch (updateError) {
-        removeCredentialHandoff(handoffFile)
-        throw updateError
-      }
-
-      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
-    } catch (err) {
-      logger.error('重置密码错误', err)
-      return error(res, Messages.USER.PASSWORD_RESET)
-    }
+  // Compatibility alias only: the canonical platform controller rechecks
+  // current SYSTEM_ADMIN, uses bounded admission, and preserves Organization
+  // account invariants. Never persist passwords directly from this controller.
+  resetPassword(req: Request, res: Response) {
+    return resetPasswordForPlatformAdmin(req, res, req.params.id)
   },
 
   // 修改自己的密码

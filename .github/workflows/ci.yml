@@ -11,10 +11,10 @@
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
 #   Pull-request review events do not rerun CI because review metadata does not change the tested head SHA.
 #
-# 编排：全部使用 GitHub-hosted Ubuntu 24.04，按场景独立并行。
+# 编排：全部任务使用 GitHub 托管 Ubuntu，按场景并行执行。
 #   Router:       changed-scope classification
 #   Dependencies: backend build/performance, functional regression, frontend, CodeQL, Docker
-#   Capacity:     standard hosted Linux jobs run independently with early exact-run artifacts
+#   Capacity:     hosted jobs release builds early and parallelize independent consumers
 #   Browser:      consumes exact-run artifacts without waiting for unrelated frontend checks
 #   Merge gate:   exact success for every selected route and acceptance
 #
@@ -53,7 +53,7 @@ on:
         type: choice
         options: [hosted]
         default: hosted
-        description: 'Only standard GitHub-hosted Ubuntu 24.04 runners are used'
+        description: 'Use GitHub-hosted Ubuntu for every CI job'
       step_probe:
         type: choice
         options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]
@@ -63,6 +63,10 @@ on:
         type: boolean
         default: false
         description: 'Image probe: frontend only; false builds backend/worker/frontend'
+      complete_training:
+        type: boolean
+        default: false
+        description: 'Approved frozen Training evidence receipt; no application tests rerun'
       full_acceptance:
         type: boolean
         default: false
@@ -124,13 +128,17 @@ jobs:
   probe-ui-mac:
     needs: probe-frontend-build
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
-      engine: chromium
-      canonical: false
-      app_shell: true
-      qa_round3: true
+      engine: ${{ matrix.engine }}
+      canonical: true
+      app_shell: ${{ matrix.engine == 'chromium' }}
+      qa_round3: ${{ matrix.engine == 'chromium' }}
 
   probe-qa-ui:
     needs: probe-frontend-build
@@ -144,15 +152,18 @@ jobs:
 
   probe-ui-hosted:
     needs: probe-frontend-build
-    if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["ui","ui-chromium"]'), inputs.step_probe)
+    if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium'
     strategy:
       fail-fast: false
       matrix:
-        engine: ${{ fromJSON(inputs.step_probe == 'ui-chromium' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
+        engine: [chromium]
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
       engine: ${{ matrix.engine }}
+      canonical: true
+      app_shell: true
+      qa_round3: true
 
   probe-maintenance:
     if: github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance'
@@ -187,7 +198,7 @@ jobs:
 
   scope:
     name: classify changed content
-    if: (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    if: ${{ !inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
@@ -260,7 +271,7 @@ jobs:
     name: documentation / whitespace and scope validation
     needs: scope
     if: needs.scope.outputs.documentation == 'true'
-    runs-on: ${{ fromJSON(needs.scope.outputs.light_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -296,7 +307,7 @@ jobs:
     needs: scope
     name: presentation / frontend lint + typecheck + build
     if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation == 'true' && github.event_name == 'pull_request' && vars.CI_FORCE_FULL != 'true'
-    runs-on: ${{ fromJSON(needs.scope.outputs.frontend_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -332,7 +343,7 @@ jobs:
     needs: scope
     name: PR light / backend compile
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true') }}
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     defaults:
       run:
@@ -390,7 +401,7 @@ jobs:
     needs: scope
     name: PR light / frontend lint + typecheck
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || vars.CI_FORCE_FULL == 'true')) }}
-    runs-on: ${{ fromJSON(needs.scope.outputs.frontend_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -424,7 +435,7 @@ jobs:
     needs: scope
     name: main / post-merge compile smoke
     if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.presentation != 'true' && github.event_name == 'push' && vars.CI_FORCE_FULL != 'true'
-    runs-on: ${{ fromJSON(needs.scope.outputs.heavy_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
@@ -473,7 +484,7 @@ jobs:
     if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.heavy_runner }}
+      runner_labels: '["ubuntu-24.04"]'
 
   backend-regression:
     needs: scope
@@ -481,7 +492,7 @@ jobs:
     if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.regression_runner }}
+      runner_labels: '["ubuntu-24.04"]'
 
   frontend-build:
     name: frontend artifacts / release consumers early
@@ -489,17 +500,19 @@ jobs:
     if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.frontend_build == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
-      runner_labels: ${{ (needs.scope.outputs.visual_hosted == 'true' || (needs.scope.outputs.scenario == 'dependencies' && needs.scope.outputs.runner_profile == 'speed')) && '["ubuntu-24.04"]' || needs.scope.outputs.frontend_runner }}
+      runner_labels: '["ubuntu-24.04"]'
       ui_lab: ${{ needs.scope.outputs.canonical_visual == 'true' }}
-      ui_runner_labels: ${{ (needs.scope.outputs.visual_hosted == 'true' || (needs.scope.outputs.scenario == 'dependencies' && needs.scope.outputs.runner_profile == 'speed')) && '["ubuntu-24.04"]' || needs.scope.outputs.frontend_runner }}
+      ui_runner_labels: '["ubuntu-24.04"]'
 
   frontend:
-    needs: [scope, frontend-build]
+    # Frontend lint/types/audit/tests consume source, not the production artifact.
+    # Run independently; the aggregate still requires both successful jobs.
+    needs: scope
     name: frontend (lint + types + full tests + build)
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request' && needs.frontend-build.result == 'success') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
+      runner_labels: '["ubuntu-24.04"]'
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
@@ -508,12 +521,15 @@ jobs:
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) }}
     uses: ./.github/workflows/ci-browser.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.browser_runner }}
+      runner_labels: '["ubuntu-24.04"]'
 
   docker:
     name: docker (compose config + production builds)
-    needs: [scope, backend, backend-browser-build]
-    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request' && needs.backend.result == 'success') || (!cancelled() && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
+    # This job builds images from source and does not consume backend build
+    # artifacts. Start it with scope; the merge gate independently requires
+    # backend, production image scans and all other selected checks.
+    needs: scope
+    if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' }}
@@ -523,7 +539,7 @@ jobs:
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
     if: ${{ !cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) }}
-    runs-on: ${{ fromJSON(needs.scope.outputs.codeql_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     permissions:
       actions: read
@@ -556,7 +572,7 @@ jobs:
     name: mini program / foundation contract and page smoke
     needs: scope
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true')) }}
-    runs-on: ${{ fromJSON(needs.scope.outputs.light_runner) }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -580,7 +596,7 @@ jobs:
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.scenario != 'platform' && needs.scope.outputs.media_selection != '[]')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) }}
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.heavy_runner }}
+      runner_labels: '["ubuntu-24.04"]'
 
 
 
@@ -601,20 +617,25 @@ jobs:
     if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.media_selection != '[]' && needs.frontend-build.result == 'success' && (needs.backend.result == 'success' || needs.backend-browser-build.result == 'success') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
     uses: ./.github/workflows/ci-media.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.media_runner }}
+      runner_labels: '["ubuntu-24.04"]'
       selected: ${{ needs.scope.outputs.media_selection }}
       groups: ${{ needs.scope.outputs.media_groups }}
 
   accept-ui:
-    needs: [scope, frontend-build, frontend]
-    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (needs.frontend.result == 'success' || needs.frontend.result == 'skipped') && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    # UI acceptance uses exact-run artifacts; lint/test result is independently gated.
+    needs: [scope, frontend-build]
+    if: ${{ !cancelled() && needs.scope.result == 'success' && needs.scope.outputs.ui_required == 'true' && needs.frontend-build.result == 'success' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: ${{ fromJSON(needs.scope.outputs.visual_hosted == 'true' && '["chromium"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
-      runner_labels: ${{ needs.scope.outputs.frontend_runner }}
-      engine: ${{ needs.scope.outputs.visual_hosted == 'true' && 'chromium' || 'all' }}
+      runner_labels: '["ubuntu-24.04"]'
+      engine: ${{ matrix.engine }}
       canonical: ${{ needs.scope.outputs.canonical_visual == 'true' && needs.scope.outputs.visual_hosted != 'true' }}
-      app_shell: ${{ needs.scope.outputs.app_shell == 'true' }}
-      qa_round3: ${{ needs.scope.outputs.canonical_visual == 'true' }}
+      app_shell: ${{ needs.scope.outputs.app_shell == 'true' && matrix.engine == 'chromium' }}
+      qa_round3: ${{ needs.scope.outputs.canonical_visual == 'true' && matrix.engine == 'chromium' }}
 
   accept-visual:
     needs: [scope, frontend-build]
@@ -629,14 +650,16 @@ jobs:
       engine: ${{ matrix.engine }}
 
   accept-perf:
-    needs: [scope, backend]
+    # Independent fresh-fixture runtime proof; do not wait for backend compile.
+    needs: scope
     if: needs.scope.outputs.perf_smoke == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/perf-phase0-smoke.yml
     with:
       runner_profile: hosted
 
   accept-ops:
-    needs: [scope, backend]
+    # Independent recovery evidence; merge gate still requires backend success.
+    needs: scope
     if: needs.scope.outputs.ops == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))
     uses: ./.github/workflows/ops-prelaunch.yml
     with:
@@ -653,8 +676,28 @@ jobs:
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: require exact success for the selected route
+        if: ${{ !inputs.complete_training }}
         run: node .github/scripts/merge-gate.mjs
+      - name: verify approved frozen Training receipt and refusal cases
+        if: inputs.complete_training
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m unittest discover -s .github/scripts -p test_training_completion.py
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+          python3 .github/scripts/training-completion.py
+      - name: upload current-head evidence receipt
+        if: always() && inputs.complete_training
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-completion-${{ github.sha }}
+          path: training-completion.json
+          retention-days: 3
+          if-no-files-found: error

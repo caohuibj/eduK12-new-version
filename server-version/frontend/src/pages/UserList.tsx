@@ -172,7 +172,8 @@ const UserList: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
+          <p className="training-user-scroll-note">左右滑动可查看姓名、完整用户 ID、状态与审核操作；也可聚焦表格后使用方向键。</p>
+          <div className="overflow-x-auto" role="region" tabIndex={0} aria-label="用户列表，可左右滚动查看更多列和操作">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -195,7 +196,7 @@ const UserList: React.FC = () => {
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.username}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.nickname || '-'}</td>
-                      <td className="px-6 py-4 text-sm"><code className="break-all">{user.id}</code><button type="button" className="ml-2 text-action underline" aria-label={`复制 ${displayName} 的用户 ID`} onClick={() => void copyUserId(user.id)}>复制 ID</button></td>
+                      <td className="px-6 py-4 text-sm"><code className="inline-block min-w-72 whitespace-nowrap">{user.id}</code><button type="button" className="ml-2 text-action underline" aria-label={`复制 ${displayName} 的用户 ID`} onClick={() => void copyUserId(user.id)}>复制 ID</button></td>
                       {activeTab === 'TEACHER' && (
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">

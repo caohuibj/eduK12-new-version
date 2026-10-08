@@ -8,7 +8,7 @@ function scopeOutputs(content='false', presentation='false', frontend='false', e
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
-  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
+  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(output.runner_profile === 'hosted' && scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
 }
 
 const root = 'server-version/backend/src/modules/';
@@ -299,16 +299,20 @@ test('API contracts, persistence and measurement inputs never use the UI shortcu
     assert.equal(frontendFile('server-version/frontend/src/'+path),false,path);
 });
 
-test('legacy runner profiles never dispatch to self-hosted machines',()=>{
-  for(const profile of ['hosted','speed','economy','local','balanced','hybrid']) {
-    for(const opts of [{macEnabled:true,os:'darwin',freeBytes:9*1024**3},{macEnabled:false,os:'linux',freeBytes:0}]) {
-      const plan=runnerPlan({profile,...opts});
-      assert.equal(plan.runner_profile,'hosted');
-      for(const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
-        assert.deepEqual(plan[lane],['ubuntu-24.04']);
+test('all scenarios and legacy profile aliases use hosted runners regardless of local capacity',()=>{
+  for (const profile of ['hosted','speed','economy','local','balanced','hybrid']) {
+    for (const scenario of ['platform','dependencies','frontend','content','content-frontend','presentation','maintenance','documentation']) {
+      for (const capacity of [{macEnabled:true,os:'darwin',freeBytes:9*1024**3},{macEnabled:false,os:'linux',freeBytes:0}]) {
+        const plan=runnerPlan({profile,scenario,...capacity});
+        assert.equal(plan.runner_profile,'hosted');
+        for (const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
+          assert.deepEqual(plan[lane],['ubuntu-24.04'],`${profile}/${scenario}: ${lane}`);
+        assert.equal(plan.visual_hosted,scenario === 'platform');
+      }
     }
   }
-  assert.throws(()=>runnerPlan({profile:'typo'}));
+  assert.deepEqual(runnerPlan().heavy_runner,['ubuntu-24.04']);
+  assert.throws(()=>runnerPlan({profile:'typo'}),/Unsupported CI_RUNNER_PROFILE/);
 });
 test('only ordinary documentation qualifies and cannot hide scientific, runbook or executable changes',()=>{
   for(const file of ['README.md','docs/ci-runner-policy.md','docs/development/architecture.md'])

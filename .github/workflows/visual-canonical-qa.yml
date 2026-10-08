@@ -5,23 +5,35 @@ on:
       runner_profile:
         type: string
         default: hosted
+      engine:
+        type: string
+        default: all
       use_build_artifacts:
         type: boolean
         default: false
   workflow_dispatch:
+    inputs:
+      engine:
+        type: choice
+        options: [all, chromium, firefox, webkit]
+        default: all
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: visual-canonical-qa-${{ github.event.pull_request.number || github.ref }}
+  group: visual-canonical-qa-${{ github.event.pull_request.number || github.ref }}-${{ inputs.engine || 'all' }}
   cancel-in-progress: true
 jobs:
   acceptance:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: ${{ fromJSON(inputs.engine == 'chromium' && '["chromium"]' || inputs.engine == 'firefox' && '["firefox"]' || inputs.engine == 'webkit' && '["webkit"]' || '["chromium","firefox","webkit"]') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
-      engine: all
+      engine: ${{ matrix.engine }}
       canonical: true
       app_shell: false
       use_build_artifacts: ${{ inputs.use_build_artifacts || false }}

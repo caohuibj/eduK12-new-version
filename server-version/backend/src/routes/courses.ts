@@ -1,9 +1,10 @@
 import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
 import { Router } from 'express'
 import { courseQuestionnaires } from '../controllers/courseQuestionnairesController'
+import { courseTrainingAssessments } from '../controllers/courseTrainingAssessmentsController'
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
-import { authenticate, requireTeacher, requireStudent } from '../middleware/auth'
+import { authenticate, requireAdmin, requireTeacher, requireStudent } from '../middleware/auth'
 import { studentTaskList } from '../controllers/studentTaskController'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
@@ -40,7 +41,7 @@ router.put('/:id', authenticate, requireTeacher, courseController.update)
 router.patch('/:id', authenticate, requireTeacher, courseController.update)
 router.post('/:id/rotate-code', authenticate, requireTeacher, courseController.rotateCourseCode)
 router.delete('/:id', authenticate, requireTeacher, courseController.delete)
-router.post('/join', authenticate, courseController.join)
+router.post('/join', authenticate, requireStudent, courseController.join)
 
 // 上传课程封面
 router.post('/:id/cover', authenticate, requireTeacher, uploadPrincipalRateLimit, boundedUpload('cover', 5 * 1024 * 1024, allowedCoverTypes, courseController.uploadCover))
@@ -66,14 +67,37 @@ router.post('/share/:shareId/clone', authenticate, courseController.cloneFromSha
 router.get('/:id/assignments', authenticate, courseController.getAssignments)
 router.get('/:id/checkins', authenticate, courseController.getCheckins)
 router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionnaires)
+router.get('/:id/training-assessments', authenticate, requireTeacher, courseTrainingAssessments)
 
 // 学生管理
 router.get('/:id/students', authenticate, requireTeacher, courseController.getStudents)
 router.post('/batch-students', authenticate, requireTeacher, courseController.getBatchStudents)
-router.post('/:courseId/students/:studentId/reset-password', authenticate, requireTeacher, courseController.resetStudentPassword)
+// Teacher reset is limited to an owned active enrollment by the service;
+// global account freeze remains SYSTEM_ADMIN-only. Share the platform reset
+// rate budget, and add a per-target fuse to limit repeated resets.
+const platformResetRateLimit = createRedisRateLimiter({
+  name: 'platform_password_reset',
+  limit: 10,
+  windowSeconds: 900,
+  key: req => req.user!.userId,
+})
+const courseResetTargetRateLimit = createRedisRateLimiter({
+  name: 'course_password_reset_target',
+  limit: 4,
+  windowSeconds: 60 * 60,
+  key: req => req.params.studentId || 'invalid',
+})
+router.post(
+  '/:courseId/students/:studentId/reset-password',
+  authenticate,
+  requireTeacher,
+  platformResetRateLimit,
+  courseResetTargetRateLimit,
+  courseController.resetStudentPassword,
+)
 router.delete('/:courseId/students/:studentId', authenticate, requireTeacher, courseController.removeStudent)
 // Freezing makes an account unusable, so route it through the Organization
 // usable-admin invariant instead of the legacy direct user update.
-router.put('/:courseId/students/:studentId/freeze', authenticate, requireTeacher, courseStudentLifecycleController.setFrozen)
+router.put('/:courseId/students/:studentId/freeze', authenticate, requireAdmin, courseStudentLifecycleController.setFrozen)
 
 export default router

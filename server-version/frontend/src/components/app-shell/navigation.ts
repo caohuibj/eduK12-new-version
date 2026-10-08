@@ -43,6 +43,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
   if (role === 'TEACHER') items.push({ path: '/teacher/situational', label: '情境测评', section: 'assessment' })
   if (role === 'TEACHER') items.push({ path: '/relational/tasks', label: '关系测评', aliases: ['/relational/attempts', '/relational/cognitive', '/relational/composite'], section: 'assessment' })
   if (role === 'ADMIN') items.push(
+    { path: '/admin/training', label: '培训版管理', section: 'system' },
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
     { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
     { path: '/admin/reporting-content', label: '测量与报告方案', section: 'system' }, { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
@@ -71,6 +72,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/admin/training', '培训版管理'],
   ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],
   ['/admin/bundle-authoring', '固定测评包制作与审批'],
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
@@ -127,6 +129,6 @@ export function isStaffWorkspacePath(pathname: string): boolean {
   if (pathname.endsWith('/report')) return false
   return ['/assessment-workbench','/assessment-templates','/assessment-management','/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
-    '/users','/teacher-codes','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
+    '/users','/teacher-codes','/admin/training','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))
 }

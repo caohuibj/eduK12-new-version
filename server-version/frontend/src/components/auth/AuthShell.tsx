@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck } from 'lucide-react'
 import './auth-shell.css'
+import TrainingBrand from '../../training/TrainingBrand'
+import { isTrainingHost } from '../../training/context'
 
 export type AuthTone = 'student' | 'teacher' | 'parent' | 'admin'
 
@@ -63,26 +65,32 @@ export default function AuthShell({
 }: AuthShellProps) {
   const preset = toneContent[tone]
   const Icon = preset.Icon
-  const bullets = heroBullets ?? preset.bullets
+  const training = isTrainingHost() && (tone === 'student' || tone === 'teacher')
+  const trainingRole = tone === 'student' ? '学员' : '培训师'
+  const copy = (value: string) => training ? value.replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
+  const displayHeroTitle = training ? (tone === 'student' ? '循着课程，慢慢向前。' : '以所学，启发更多人。') : (heroTitle ?? preset.heroTitle)
+  const displayHeroDescription = training
+    ? (tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
+    : (heroDescription ?? preset.heroDescription)
+  const bullets = training ? [] : (heroBullets ?? preset.bullets)
 
   return (
-    <div className={`hui-auth-page hui-auth-page--${tone}`}>
+    <div className={`hui-auth-page hui-auth-page--${tone}${training ? ' hui-auth-page--training' : ''}`}>
       <aside className="hui-auth-hero" aria-label="Huisurvey 介绍">
         <div className="hui-auth-hero__inner">
-          <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
-            <span className="hui-auth-brand__mark" aria-hidden="true" />
-            <strong>Huisurvey</strong>
+          <Link to="/" className="hui-auth-brand" aria-label={training ? undefined : '返回 Huisurvey 入口'} title={training ? '返回培训入口' : undefined}>
+            {training ? <TrainingBrand /> : <><span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong></>}
           </Link>
 
           <div className="hui-auth-hero__copy">
-            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{preset.label}</span>
-            <p className="hui-auth-hero__title">{heroTitle ?? preset.heroTitle}</p>
-            <p className="hui-auth-hero__description">{heroDescription ?? preset.heroDescription}</p>
+            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? `${trainingRole}入口` : preset.label}</span>
+            <p className="hui-auth-hero__title">{training ? <>{(tone === 'student' ? ['循着课程，', '慢慢向前。'] : ['以所学，', '启发更多人。']).map(line => <span className="training-auth-title-line" key={line}>{line}</span>)}</> : displayHeroTitle}</p>
+            <p className="hui-auth-hero__description">{displayHeroDescription}</p>
           </div>
 
-          <ul className="hui-auth-benefits">
+          {bullets.length > 0 && <ul className="hui-auth-benefits">
             {bullets.map((item) => <li key={item}><span aria-hidden="true" />{item}</li>)}
-          </ul>
+          </ul>}
         </div>
       </aside>
 
@@ -100,14 +108,14 @@ export default function AuthShell({
             <header className="hui-auth-card__header">
               <span className="hui-auth-card__icon" aria-hidden="true"><Icon size={23} /></span>
               <div>
-                <h1>{title}</h1>
-                <p>{description}</p>
+                <h1>{copy(title)}</h1>
+                <p>{copy(description)}</p>
               </div>
             </header>
             <div className="hui-auth-card__body">{children}</div>
           </div>
 
-          <p className="hui-auth-stage__tagline">Better Assessment. Healthier Students. Brighter Schools.</p>
+          <p className="hui-auth-stage__tagline">{training ? '学有所思，行有所获。' : 'Better Assessment. Healthier Students. Brighter Schools.'}</p>
         </div>
       </section>
     </div>

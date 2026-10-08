@@ -142,3 +142,21 @@ test('R3: unchanged assignment date, unset creation and nullable checkin date fo
  const create=await app.runtime.operations.prepare('assignments',undefined,'create');await app.runtime.operations.execute('assignments',undefined,'create',create,{title:'New',courseId:'course-1',deadline:''});assert.equal(Object.hasOwn(app.p.calls.at(-1).data,'deadline'),false)
  const checkin=await app.runtime.operations.prepare('checkins','checkin-1','edit');await app.runtime.operations.execute('checkins','checkin-1','edit',checkin,{endTime:''});assert.equal(app.p.calls.at(-1).data.endTime,null)
 })
+test('course roster distinguishes teacher recovery from SYSTEM_ADMIN freeze',()=>{
+ for(const [role,platformRole,canFreeze,canResetPassword] of [['TEACHER','STANDARD',false,true],['ADMIN','STANDARD',false,false],['ADMIN','SYSTEM_ADMIN',true,true],['STUDENT','STANDARD',false,false]]){
+  const operations=createOperations({}, {get:()=>({user:{role,platformRole}})})
+  const capabilities=operations.rosterCapabilities()
+  assert.equal(capabilities.canFreeze,canFreeze);assert.equal(capabilities.canResetPassword,canResetPassword)
+ }
+})
+test('native teacher credential handoff is shown once without page or storage persistence',async t=>{
+ const secret='Synthetic-One-Time-Only-2026',modals=[]
+ const app=await authenticated(setup('TEACHER',(o,endpoint)=>endpoint==='/courses/course-1/students'?response({list:[{id:'student-1',username:'synthetic-learner',nickname:'Learner',enrollmentStatus:'ACTIVE'}],total:1}):endpoint==='/courses/course-1/students/student-1/reset-password'?response({username:'synthetic-learner',temporaryPassword:secret,mustChangePassword:true}):(()=>{throw new Error('Unexpected endpoint '+endpoint)})()))
+ app.p.showModal=o=>{modals.push({title:o.title,content:o.content});o.success({confirm:true})}
+ const record=page('record/index',app,t);record.onLoad({domain:'students',parent:'course-1',id:'student-1'});await record.onShow()
+ assert.equal(record.data.canFreeze,false);assert.equal(record.data.canResetPassword,true)
+ await record.roster({currentTarget:{dataset:{action:'resetPassword'}}})
+ assert.equal(modals.filter(m=>m.content.includes(secret)).length,1)
+ assert.ok(!JSON.stringify(record.data).includes(secret));assert.ok(!JSON.stringify([...app.p.stored.values()]).includes(secret))
+ record.onHide();assert.ok(!JSON.stringify(record.data).includes(secret));record.onUnload()
+})

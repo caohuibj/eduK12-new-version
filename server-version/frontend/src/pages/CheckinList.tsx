@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
+import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
 import { sessionFetch } from '../api/client'
 import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
@@ -67,7 +69,8 @@ interface CheckinSubmission {
 }
 
 const CheckinList: React.FC = () => {
-  const [searchParams] = useSearchParams()
+  const { user } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -105,6 +108,30 @@ const CheckinList: React.FC = () => {
     fetchTags()
   }, [])
 
+  // Permit a course page to open the existing check-in editor with its
+  // course preselected. Never accept a course not in the authorized roster.
+  useEffect(() => {
+    const requested = searchParams.get('courseId')
+    if (searchParams.get('create') !== 'true' || !requested) return
+    if (!courses.some(course => course.id === requested)) return
+    setEditingCheckin(null)
+    setFormData({
+      courseId: requested,
+      title: '',
+      content: '',
+      videos: [],
+      images: [],
+      documents: [],
+      endTime: '',
+      allowViewOthers: false,
+      tags: [],
+    })
+    setShowModal(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('create')
+    setSearchParams(next, { replace: true })
+  }, [courses, searchParams, setSearchParams])
+
   useEffect(() => {
     if (loading || !focusId) return
     const element = document.getElementById(`checkin-record-${focusId}`)
@@ -129,9 +156,16 @@ const CheckinList: React.FC = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await apiClient.get('/courses')
+      const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
-        setCourses(response.data.list)
+        const list = response.data.list
+        const appended = searchParams.get('create') === 'true'
+          ? await resolveTrainingCoursePrefill({
+            courseId: searchParams.get('courseId'),
+            userId: user?.id,
+            knownIds: list.map(course => course.id),
+          }) : null
+        setCourses(appended ? [...list, appended] : list)
       }
     } catch (error) {
       console.error('获取课程列表失败:', error)
@@ -430,6 +464,7 @@ const CheckinList: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
+                <p className="training-editor-scroll-note">向下滚动查看完整设置</p>
                 <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件。</p>
               </div>
             </div>

@@ -2,6 +2,7 @@ import { PlatformRole, UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
 import {
   AccountAuthorityError,
+  assertCurrentSystemAdmin,
   assertAccountUsabilityMutationSafe,
   assertNonPlatformAuthorityTargetCanBecomeUnusable,
 } from './accountAuthorityService'
@@ -21,10 +22,10 @@ type CourseRow = { id: string; creatorId: string }
 type FrozenStateRow = { id: string; isFrozen: boolean; platformRole: PlatformRole }
 
 /**
- * Preserve the legacy Course roster authority while making account freezing
- * participate in the Organization usable-admin invariant. Course is not mapped
- * to Organization; it is only the authorization basis for this legacy action.
- * A Course surface may never make a SYSTEM_ADMIN account unusable.
+ * A Course membership grants roster access, never control of the participant's
+ * global User account. Only the platform admin route may invoke a freeze, and
+ * the existing Organization usable-admin invariant still protects the target.
+ * Course is not mapped to Organization.
  */
 export async function setCourseStudentFrozenState(input: {
   actorUserId: string
@@ -33,8 +34,16 @@ export async function setCourseStudentFrozenState(input: {
   studentId: string
   isFrozen: boolean
 }): Promise<{ id: string; isFrozen: boolean }> {
+  // A course membership does not confer authority over the user's global account.
+  // Route guards alone are not sufficient for services invoked from elsewhere.
+  if (input.actorRole !== UserRole.ADMIN) {
+    throw new CourseStudentLifecycleError('COURSE_ACCOUNT_ADMIN_REQUIRED', '账号冻结由平台管理员处理', 403)
+  }
   try {
     return await prisma.$transaction(async (tx) => {
+      // The current database platform role, not the legacy role or course
+      // ownership, governs global account availability.
+      await assertCurrentSystemAdmin(tx, input.actorUserId)
       const courses = await tx.$queryRaw<CourseRow[]>`
         SELECT "id", "creator_id" AS "creatorId"
         FROM "courses"

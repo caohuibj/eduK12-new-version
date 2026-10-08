@@ -24,3 +24,11 @@
 .hui-questionnaire-products [id^="questionnaire-"] { scroll-margin-top: 90px; }
 .hui-questionnaire-products .questionnaire-unit-trigger { width: 100%; justify-content: flex-start; text-align: left; white-space: normal; margin-bottom: 8px; }
 .hui-questionnaire-products .questionnaire-unit-trigger[aria-pressed="true"] { border-color: var(--hui-color-action); background: var(--hui-ds-color-soft); font-weight: 600; }
+
+.questionnaire-step-nav { display: flex; flex-wrap: wrap; gap: 12px; }
+.questionnaire-step-nav a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.hui-training .questionnaire-step-nav { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; border-bottom: 1px solid var(--training-border); }
+.hui-training .questionnaire-step-nav a { padding: 12px 4px; border-bottom: 3px solid transparent; color: var(--training-muted); font-size: 14px; text-decoration: none; }
+.hui-training .questionnaire-step-nav a[aria-current="step"] { color: var(--training-bamboo); border-bottom-color: var(--training-bamboo); font-weight: 600; }
+.hui-training .questionnaire-step-number { font-family: var(--training-serif); font-size: 18px; }
+@media(max-width:640px) { .hui-training .questionnaire-step-nav a { flex-direction: column; align-items: flex-start; gap: 2px; font-size: 12px; } }

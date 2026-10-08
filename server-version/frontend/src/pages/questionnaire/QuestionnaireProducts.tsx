@@ -3,6 +3,7 @@ import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../../api/client'
+import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
@@ -149,11 +150,13 @@ export function QuestionnaireProductList() {
 }
 
 export function QuestionnaireProductEdit() {
+  const { user } = useAuth()
   const { feedback, confirm: confirmManagement } = useStaffFeedback()
   const { id = 'new' } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const preselectedScaleId = searchParams.get('scaleId')
+  const preselectedCourseId = searchParams.get('courseId')
   const [detail, setDetail] = useState<any>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
@@ -173,6 +176,7 @@ export function QuestionnaireProductEdit() {
   const [selected, setSelected] = useState('')
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
+  const [activeStep, setActiveStep] = useState('questionnaire-basic')
   const [formType, setFormType] = useState('text_input')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
@@ -203,11 +207,32 @@ export function QuestionnaireProductEdit() {
     setDetail(null)
     setError('')
     request('/resources')
-      .then(row => { if (!active) return; setCatalog(row); if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) { setType('SCALE'); setSelected(preselectedScaleId) } })
+      .then(async row => {
+        if (!active) return
+        const courses: Array<{ id: string; title: string }> = row.courses || []
+        const supplemental = id === 'new'
+          ? await resolveTrainingCoursePrefill({
+            courseId: preselectedCourseId,
+            userId: user?.id,
+            knownIds: courses.map(course => course.id),
+          }) : null
+        if (!active) return
+        const resolvedCourses = supplemental ? [...courses, supplemental] : courses
+        setCatalog({ ...row, courses: resolvedCourses })
+        if (preselectedScaleId && row.scales.some((scale: any) => scale.id === preselectedScaleId)) {
+          setType('SCALE')
+          setSelected(preselectedScaleId)
+        }
+        // One verified creator-owned course may be appended when omitted by
+        // the first catalog page; no URL parameter becomes an authority.
+        if (id === 'new' && preselectedCourseId && resolvedCourses.some(course => course.id === preselectedCourseId)) {
+          setCourseIds(current => current.length ? current : [preselectedCourseId])
+        }
+      })
       .catch((e) => { if (active) setError(message(e)) })
     if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
-  }, [id, preselectedScaleId])
+  }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>) => {
     setBusy(true)
     setError('')
@@ -476,7 +501,11 @@ export function QuestionnaireProductEdit() {
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
-      <nav aria-label="编制步骤" className="my-4 flex gap-4"><a href="#questionnaire-basic">1. 基本信息</a><a href="#questionnaire-content">2. 内容与顺序</a><a href="#questionnaire-delivery">3. 投放与发布</a></nav>
+      <nav aria-label="编制步骤" className="questionnaire-step-nav my-4">
+        {[['questionnaire-basic','基本信息'],['questionnaire-content','内容与顺序'],['questionnaire-delivery','投放与发布']].map(([step,label],index) =>
+          <a key={step} href={'#'+step} aria-current={activeStep === step ? 'step' : undefined} onClick={() => setActiveStep(step)}><span className="questionnaire-step-number">{index+1}.</span><span>{label}</span></a>
+        )}
+      </nav>
       {error && (
         <div role="alert" className="my-3 rounded border border-red-400 p-3">
           {error}
@@ -551,7 +580,7 @@ export function QuestionnaireProductEdit() {
               <div className="questionnaire-editor-grid"><ol className="space-y-3 my-4" aria-label="内容单元">
                 {units.map((v, index) => (
                   <li id={'questionnaire-unit-'+v.id} key={v.id} className="border rounded p-3">
-                    <ProductButton className="questionnaire-unit-trigger" aria-label={`配置第 ${index+1} 项`} aria-pressed={(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)===v.id} onClick={()=>setEditingUnit(v.id)}>{index+1}. {v.label}</ProductButton>
+                    <ProductButton className="questionnaire-unit-trigger" aria-label={`配置第 ${index+1} 项：${index+1}. ${v.label}`} aria-pressed={(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)===v.id} onClick={()=>setEditingUnit(v.id)}>{index+1}. {v.label}</ProductButton>
                     <span>{labels[v.type] || '表单区段'}</span>
                     {draft && (
                       <div className="flex gap-3">
@@ -811,7 +840,7 @@ export function QuestionnaireProductEdit() {
                   导出独立报告（JSON）
                 </ProductButton>
                 {detail.status === 'PUBLISHED' && (
-                  <ProductButton
+                  <ProductButton variant="danger"
                     disabled={busy || dirty}
                     onClick={() =>
                       void action(async () =>
@@ -827,7 +856,7 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
                 {draft && (
-                  <ProductButton
+                  <ProductButton variant="danger"
                     disabled={busy}
                     onClick={async () => {
                       if (await confirmManagement({ title: '删除组合草稿', body: '仅删除尚未发布的定义；存在引用时服务器会拦截。', confirmLabel: '删除草稿', danger: true }))

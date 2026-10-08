@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Key, Lock, Search, Unlock, Users, UserX } from 'lucide-react'
 import apiClient from '../api/client'
+import { useAuth } from '../contexts/AuthContext'
+import { isTrainingHost } from '../training/context'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
+import TemporaryPasswordHandoff, { type TemporaryPasswordHandoffValue } from '../components/staff-ui/TemporaryPasswordHandoff'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { Course } from '../types'
 
@@ -14,6 +17,7 @@ interface Student {
   avatarUrl?: string
   isFrozen: boolean
   joinedAt: string
+  enrollmentStatus?: 'ACTIVE' | 'APPROVED' | 'PENDING'
 }
 
 const CourseStudents: React.FC = () => {
@@ -21,12 +25,17 @@ const CourseStudents: React.FC = () => {
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const { courseId } = useParams<{ courseId: string }>()
+  const { user } = useAuth()
+  const canManageGlobalAccount = user?.role === 'ADMIN' && user.platformRole === 'SYSTEM_ADMIN'
+  const canResetCoursePassword = user?.role === 'TEACHER' || canManageGlobalAccount
+  const training = isTrainingHost()
   const [course, setCourse] = useState<Course | null>(null)
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [keyword, setKeyword] = useState('')
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [credential, setCredential] = useState<TemporaryPasswordHandoffValue | null>(null)
 
   useEffect(() => {
     if (courseId) {
@@ -87,16 +96,32 @@ const CourseStudents: React.FC = () => {
   }
 
   const handleResetPassword = async (student: Student) => {
-    if (!await ask(`确定要为 ${student.nickname} 生成一次性临时密码吗？\n\n临时密码只会写入受保护的本地交接文件。`)) return
+    if (!await ask(`确定为「${student.nickname}」重置登录密码吗？这是学员的全局账号：旧会话会失效，首次使用临时密码登录必须修改密码。培训师只能重置本人课程的已报名学员；临时密码仅展示一次，须私下交付。`)) return
 
     setProcessingId(student.id)
     try {
-      const response = await apiClient.post(`/courses/${courseId}/students/${student.id}/reset-password`)
-      if (response.code === 0) {
-        showMessage(response.message || `已为 ${student.nickname} 生成一次性临时密码，请从受保护的本地交接文件中读取。`)
+      const response = await apiClient.post<{ temporaryPassword?: string; username?: string; handoffFile?: string }>(
+        `/courses/${courseId}/students/${student.id}/reset-password`,
+      )
+      if (response.code !== 0) throw new Error(response.message || '重置失败')
+      if (user?.role === 'TEACHER') {
+        const oneTimePassword = response.data?.temporaryPassword
+        if (oneTimePassword) {
+          setCredential({
+            studentName: student.nickname || student.username,
+            username: response.data?.username || student.username,
+            temporaryPassword: oneTimePassword,
+          })
+        } else {
+          showMessage('账号密码已重置，但未收到临时密码。请联系平台管理员处理。')
+        }
+      } else {
+        showMessage(response.data?.handoffFile
+          ? `密码已重置，交接文件：${response.data.handoffFile}`
+          : response.message || '密码已重置')
       }
-    } catch (operationError: any) {
-      showMessage(operationError.message || '重置密码失败')
+    } catch (operationError) {
+      showMessage(operationError instanceof Error ? operationError.message : '重置密码失败')
     } finally {
       setProcessingId(null)
     }
@@ -127,13 +152,14 @@ const CourseStudents: React.FC = () => {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN')
 
   return (
-    <ProductPage width="management" className="space-y-6">
+    <ProductPage width="management" className={`space-y-6 ${training ? 'training-roster' : ''}`}>
       {feedback}
+      <TemporaryPasswordHandoff value={credential} onClose={() => setCredential(null)} />
       <PageHeader
-        title={course?.title || '课程学生管理'}
-        description={`课程号: ${course?.courseCode || '—'} · 共 ${students.length} 名学生`}
+        title={course?.title || (training ? '课程学员管理' : '课程学生管理')}
+        description={`课程码: ${course?.courseCode || '—'} · 共 ${students.length} 名${training ? '学员' : '学生'}`}
         actions={(
-          <Link to="/courses" className="btn-secondary inline-flex items-center gap-2">
+          <Link to={training && courseId ? `/courses/${encodeURIComponent(courseId)}/detail` : '/courses'} className="btn-secondary inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回课程
           </Link>
         )}
@@ -158,7 +184,7 @@ const CourseStudents: React.FC = () => {
       )}
 
       <label className="block max-w-md">
-        <span className="mb-1 block text-sm font-medium text-gray-700">搜索学生</span>
+        <span className="mb-1 block text-sm font-medium text-gray-700">{training ? '搜索学员' : '搜索学生'}</span>
         <span className="relative block">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" aria-hidden="true" />
           <input
@@ -183,11 +209,13 @@ const CourseStudents: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
+          {training && <p className="px-4 pt-3 text-sm text-gray-600 hidden sm:block lg:hidden">左右滑动可查看账号与加入时间，学员操作固定在右侧。</p>}
+          {training && <p className="px-4 pt-3 text-sm text-gray-600 sm:hidden">账号信息随姓名显示；重置密码和移除操作可直接点击。</p>}
+          <div className="overflow-x-auto" role="region" tabIndex={0} aria-label={training ? '课程学员列表，可横向滚动' : '课程学生列表，可横向滚动'}>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">学生信息</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{training ? '学员信息' : '学生信息'}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">账号</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">状态</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">加入时间</th>
@@ -208,7 +236,7 @@ const CourseStudents: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 min-w-0">
                           <div className={`text-sm font-medium ${student.isFrozen ? 'text-gray-500' : 'text-gray-900'}`}>
                             {student.nickname}
                             {student.isFrozen && (
@@ -217,6 +245,7 @@ const CourseStudents: React.FC = () => {
                               </span>
                             )}
                           </div>
+                          {training && <p className="training-roster-account">{student.username}</p>}
                         </div>
                       </div>
                     </td>
@@ -228,36 +257,36 @@ const CourseStudents: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(student.joinedAt)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
+                      <div className="flex min-w-max items-center justify-end gap-2">
+                        {canManageGlobalAccount && <button
                           type="button"
                           onClick={() => handleToggleFreeze(student)}
                           disabled={processingId === student.id}
-                          className={`rounded p-2 ${student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'} disabled:opacity-50`}
+                          className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 ${student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'} disabled:opacity-50`}
                           title={student.isFrozen ? '解冻账号' : '冻结账号'}
                           aria-label={student.isFrozen ? `解冻 ${student.nickname} 的账号` : `冻结 ${student.nickname} 的账号`}
                         >
                           {student.isFrozen ? <Unlock className="h-4 w-4" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
-                        </button>
-                        <button
+                        </button>}
+                        {canResetCoursePassword && !student.isFrozen && student.enrollmentStatus !== 'PENDING' && <button
                           type="button"
                           onClick={() => handleResetPassword(student)}
                           disabled={processingId === student.id}
-                          className="rounded p-2 text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
                           title="重置密码"
-                          aria-label={`为 ${student.nickname} 生成一次性临时密码`}
+                          aria-label={`${training ? '重置密码：' : ''}为 ${student.nickname} 生成一次性临时密码`}
                         >
-                          <Key className="h-4 w-4" aria-hidden="true" />
-                        </button>
+                          <Key className="h-4 w-4" aria-hidden="true" />{training && <span className="training-roster-action-label">重置密码</span>}
+                        </button>}
                         <button
                           type="button"
                           onClick={() => handleRemoveStudent(student)}
                           disabled={processingId === student.id}
-                          className="rounded p-2 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-red-700 hover:bg-red-50 disabled:opacity-50"
                           title="从课程中移除"
                           aria-label={`将 ${student.nickname} 从课程中移除`}
                         >
-                          <UserX className="h-4 w-4" aria-hidden="true" />
+                          <UserX className="h-4 w-4" aria-hidden="true" />{training && <span className="training-roster-action-label">移除</span>}
                         </button>
                       </div>
                     </td>
@@ -269,10 +298,10 @@ const CourseStudents: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className={`grid grid-cols-1 gap-4 sm:grid-cols-3 ${training ? 'training-roster-stats' : ''}`}>
         <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-gray-800">{students.length}</div>
-          <div className="text-sm text-gray-500">总学生数</div>
+          <div className="text-sm text-gray-500">{training ? '学员总数' : '总学生数'}</div>
         </div>
         <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-green-600">{students.filter(student => !student.isFrozen).length}</div>

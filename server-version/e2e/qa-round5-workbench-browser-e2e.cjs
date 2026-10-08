@@ -40,7 +40,9 @@ async function run(browser, engine, width) {
   try {
     await page.goto(base + '/questionnaire-products/' + detail.id)
     await page.getByText('合成字段 0', { exact: true }).waitFor()
-    await page.getByRole('button', { name: '配置第 2 项', exact: true }).click()
+    const secondUnit = page.getByRole('button', { name: '配置第 2 项：2. 合成区段 1', exact: true })
+    await secondUnit.click()
+    assert.equal(await secondUnit.getAttribute('aria-pressed'), 'true', 'selected unit is announced')
     await page.getByText('合成字段 1', { exact: true }).waitFor()
     assert.equal(await page.getByText('合成字段 0', { exact: true }).count(), 0, 'single configuration panel')
     if (width >= 1024) assert.match(await page.locator('.questionnaire-editor-grid').evaluate(element => getComputedStyle(element).gridTemplateColumns), /^240px /)

@@ -177,28 +177,25 @@ export function changedFiles(base, head = 'HEAD') {
   return changedEntries(base, head).map(entry => entry.file);
 }
 
-// Hosted-only policy. Legacy profile arguments remain accepted by reusable/manual
-// callers, but cannot select self-managed machines or weaken test coverage.
 export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
-  if (!['hosted', 'speed', 'economy', 'local', 'balanced', 'hybrid'].includes(profile))
+  // Old repository variables and saved dispatch requests cannot restore local runners.
+  if (!['hosted','speed','economy','local','balanced','hybrid'].includes(profile))
     throw new Error('Unsupported CI_RUNNER_PROFILE');
   const hosted = ['ubuntu-24.04'];
-  return {
-    runner_profile:'hosted',
+  return { runner_profile:'hosted',
     heavy_runner:hosted, light_runner:hosted, frontend_runner:hosted,
     docker_runner:hosted, codeql_runner:hosted, regression_runner:hosted,
     browser_runner:hosted, media_runner:hosted,
     visual_hosted:scenario === 'platform',
-    frontend_route_reason:'Public repository uses standard GitHub-hosted Ubuntu runners',
-  };
+    frontend_route_reason:'GitHub-hosted Ubuntu; each job uses an isolated VM' };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
-  // Retain fork admission policy until a separately reviewed public-PR trust model is approved.
+  // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
-    throw new Error('External fork PRs require a separately approved isolated workflow');
+    throw new Error('External PRs require a separately approved isolated workflow');
   // A blank manual request must never silently select every platform job.
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');

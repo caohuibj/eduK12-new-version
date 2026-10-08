@@ -69,8 +69,23 @@ suite('Organization account-authority mutation regressions (real PostgreSQL)', (
     })).rejects.toMatchObject({ code: 'LAST_ORG_ADMIN', statusCode: 409 })
   })
 
-  it('never lets a Course freeze surface make SYSTEM_ADMIN unusable', async () => {
+  it('does not let legacy ADMIN without current platform authority freeze an account', async () => {
+    const legacyAdmin = await createUser('legacy-course-admin', {
+      role: UserRole.ADMIN,
+      platformRole: PlatformRole.STANDARD,
+    })
+    await expect(setCourseStudentFrozenState({
+      actorUserId: legacyAdmin.id,
+      actorRole: UserRole.ADMIN,
+      courseId: 'arbitrary-course',
+      studentId: 'arbitrary-user',
+      isFrozen: true,
+    })).rejects.toMatchObject({ code: 'SYSTEM_ADMIN_REQUIRED', statusCode: 403 })
+  })
+
+  it('never lets an admin course freeze surface make SYSTEM_ADMIN unusable', async () => {
     const teacher = await createUser('course-teacher', { role: UserRole.TEACHER })
+    const admin = await createUser('course-admin', { role: UserRole.ADMIN, platformRole: PlatformRole.SYSTEM_ADMIN })
     const systemStudent = await createUser('system-student', {
       role: UserRole.STUDENT,
       platformRole: PlatformRole.SYSTEM_ADMIN,
@@ -94,6 +109,14 @@ suite('Organization account-authority mutation regressions (real PostgreSQL)', (
     await expect(setCourseStudentFrozenState({
       actorUserId: teacher.id,
       actorRole: UserRole.TEACHER,
+      courseId: course.id,
+      studentId: systemStudent.id,
+      isFrozen: true,
+    })).rejects.toMatchObject({ code: 'COURSE_ACCOUNT_ADMIN_REQUIRED', statusCode: 403 })
+
+    await expect(setCourseStudentFrozenState({
+      actorUserId: admin.id,
+      actorRole: UserRole.ADMIN,
       courseId: course.id,
       studentId: systemStudent.id,
       isFrozen: true,

@@ -18,20 +18,26 @@ export interface StudentTask {
 }
 
 /** Batched reads, independent of course count. No answers, scores or peer data. */
-export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number] }, now = new Date()) {
+export async function listStudentTasks(userId: string, options: { page: number; pageSize: number; state?: typeof taskFilters[number]; courseId?: string }, now = new Date()) {
   const memberships = await prisma.courseStudent.findMany({
     where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false } },
     select: { course: { select: { id: true, title: true } } },
   })
   const courses = new Map(memberships.map(row => [row.course.id, row.course]))
   const courseIds = [...courses.keys()]
+  // The caller-selected course never creates an entitlement. Push the
+  // membership intersection into simple SQL predicates where possible;
+  // global Composite eligibility still uses its original runtime service.
+  const scopedCourseIds = options.courseId
+    ? courseIds.filter(id => id === options.courseId)
+    : courseIds
   const [assignments, checkins, questionnaires, composites] = await Promise.all([
-    courseIds.length ? prisma.assignment.findMany({
-      where: { courseId: { in: courseIds }, status: 'PUBLISHED' },
+    scopedCourseIds.length ? prisma.assignment.findMany({
+      where: { courseId: { in: scopedCourseIds }, status: 'PUBLISHED' },
       select: { id: true, title: true, courseId: true, deadline: true, submissions: { where: { studentId: userId }, select: { status: true } } },
     }) : [],
-    courseIds.length ? prisma.checkin.findMany({
-      where: { courseId: { in: courseIds } },
+    scopedCourseIds.length ? prisma.checkin.findMany({
+      where: { courseId: { in: scopedCourseIds } },
       select: { id: true, title: true, courseId: true, endTime: true, submissions: { where: { studentId: userId }, select: { id: true } } },
     }) : [],
     // PUBLIC course questionnaires are available even without a membership,
@@ -39,15 +45,15 @@ export async function listStudentTasks(userId: string, options: { page: number; 
     prisma.questionnaire.findMany({
       where: { status: 'PUBLISHED', type: 'COURSE', OR: [
         { visibility: 'PUBLIC' },
-        { visibility: 'COURSE', courseQuestionnaires: { some: { courseId: { in: courseIds } } } },
+        { visibility: 'COURSE', courseQuestionnaires: { some: { courseId: { in: scopedCourseIds } } } },
       ] },
-      select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: courseIds } }, select: { courseId: true } },
+      select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: scopedCourseIds } }, select: { courseId: true } },
         assessments: { where: { userId }, select: { id: true, status: true, completedAt: true } } },
     }),
     listAvailableForStudent(userId, now.getTime()),
   ])
   const deliveries = composites.length ? await prisma.questionnaireCourseDelivery.findMany({
-    where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: courseIds } },
+    where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: scopedCourseIds } },
     select: { compositeId: true, courseId: true },
   }) : []
   const deliveryCourses = new Map<string, string[]>()
@@ -99,13 +105,18 @@ export async function listStudentTasks(userId: string, options: { page: number; 
         : state === 'COMPLETED' ? `/student/composite/attempts/${item.latestCompletedAttempt.id}/report`
           : state === 'PENDING' ? `/student/composite/${item.id}` : null })
   }
-  const counts = Object.fromEntries(taskStates.map(state => [state, tasks.filter(item => item.state === state).length])) as Record<TaskState, number>
+  // Optional course filter is applied to the already-authorized membership
+  // projection. A caller cannot add a course merely by naming its ID.
+  const scoped = options.courseId
+    ? tasks.filter(item => item.courses.some(course => course.id === options.courseId))
+    : tasks
+  const counts = Object.fromEntries(taskStates.map(state => [state, scoped.filter(item => item.state === state).length])) as Record<TaskState, number>
   const order: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'COMPLETED']
   const actionable = (item: StudentTask) => Boolean(item.href && (item.canContinue || item.canStart))
-  const filtered = tasks.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
+  const filtered = scoped.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
     order.indexOf(left.state) - order.indexOf(right.state)
     || (left.deadline ?? '9999').localeCompare(right.deadline ?? '9999')
     || `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`))
   return { list: filtered.slice((options.page - 1) * options.pageSize, options.page * options.pageSize), total: filtered.length,
-    counts: { ...counts, ACTIONABLE: tasks.filter(actionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
+    counts: { ...counts, ACTIONABLE: scoped.filter(actionable).length }, page: options.page, pageSize: options.pageSize, generatedAt: now.toISOString() }
 }

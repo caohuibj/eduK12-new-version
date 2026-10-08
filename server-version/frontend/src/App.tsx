@@ -5,6 +5,7 @@ import { CapabilitiesProvider, useCapabilities } from './contexts/CapabilitiesCo
 import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
+import { isTrainingHost } from './training/context'
 
 // Portal & Auth Pages
 import Portal from './pages/Portal'
@@ -19,6 +20,11 @@ import StudentRegister from './pages/student/StudentRegister'
 
 // Admin/Teacher Pages
 const CourseList = React.lazy(() => import('./pages/CourseList'))
+const TrainingPortal = React.lazy(() => import('./training/TrainingPortal'))
+const TrainingLearnerHome = React.lazy(() => import('./training/TrainingLearnerHome'))
+const TrainingTrainerHome = React.lazy(() => import('./training/TrainingTrainerHome'))
+const TrainingLearnerCourse = React.lazy(() => import('./training/TrainingLearnerCourse'))
+const TrainingTrainerCourse = React.lazy(() => import('./training/TrainingTrainerCourse'))
 const CourseStudents = React.lazy(() => import('./pages/CourseStudents'))
 const StudentManagement = React.lazy(() => import('./pages/StudentManagement'))
 const AssignmentList = React.lazy(() => import('./pages/AssignmentList'))
@@ -31,6 +37,7 @@ const TeacherCodeList = React.lazy(() => import('./pages/TeacherCodeList'))
 const LegacyArchive = React.lazy(() => import('./pages/admin/LegacyArchive'))
 const ReportingContent = React.lazy(() => import('./pages/admin/ReportingContent'))
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
+const AdminTrainingWorkspace = React.lazy(() => import('./pages/admin/AdminTrainingWorkspace'))
 const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
@@ -166,6 +173,11 @@ const EntryRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return <RouteLoading />
   }
 
+  // Training is a separate product entrance, not a new security role.
+  if (isAuthenticated && isTrainingHost() && user?.role !== 'STUDENT' && user?.role !== 'TEACHER') {
+    return <ProductPage><ProductStatus kind="info" title="请使用培训账号">这个入口仅供学员和培训师使用。其他身份请返回统一平台入口。</ProductStatus></ProductPage>
+  }
+
   // 已登录用户跳转到对应首页
   if (isAuthenticated) {
     if (user?.role === 'STUDENT') return <Navigate to="/student" replace />
@@ -193,7 +205,7 @@ function AppRoutes() {
             path="/"
             element={
               <EntryRoute>
-                <Portal />
+                {isTrainingHost() ? <TrainingPortal /> : <Portal />}
               </EntryRoute>
             }
           />
@@ -275,8 +287,8 @@ function AppRoutes() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                <CourseList />
+              <ProtectedRoute roles={isTrainingHost() ? ['TEACHER'] : ['TEACHER', 'ADMIN']}>
+                {isTrainingHost() ? <TrainingTrainerHome /> : <CourseList />}
               </ProtectedRoute>
             }
           />
@@ -299,8 +311,8 @@ function AppRoutes() {
           <Route
             path="/courses/:courseId/detail"
             element={
-              <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                <TeacherCourseDetail />
+              <ProtectedRoute roles={isTrainingHost() ? ['TEACHER'] : ['TEACHER', 'ADMIN']}>
+                {isTrainingHost() ? <TrainingTrainerCourse /> : <TeacherCourseDetail />}
               </ProtectedRoute>
             }
           />
@@ -529,6 +541,7 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/training" element={<ProtectedRoute roles={['ADMIN']}><AdminTrainingWorkspace /></ProtectedRoute>} />
           <Route path="/admin/reporting-content" element={<ProtectedRoute roles={['ADMIN']}><ReportingContent /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive/:kind/:id" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
@@ -578,7 +591,7 @@ function AppRoutes() {
             path="/student"
             element={
               <StudentProtectedRoute>
-                <StudentHome />
+                {isTrainingHost() ? <TrainingLearnerHome /> : <StudentHome />}
               </StudentProtectedRoute>
             }
           />
@@ -594,7 +607,7 @@ function AppRoutes() {
             path="/student/courses/:courseId"
             element={
               <StudentProtectedRoute>
-                <CourseDetail />
+                {isTrainingHost() ? <TrainingLearnerCourse /> : <CourseDetail />}
               </StudentProtectedRoute>
             }
           />

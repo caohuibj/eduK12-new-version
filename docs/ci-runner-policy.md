@@ -74,6 +74,26 @@ Production secrets and production database access are never exposed to public CI
 The full acceptance graph now permits independent hosted jobs to run concurrently.
 The exact-run artifact contract and isolation checks below remain authoritative.
 
+### Hosted critical-path and dependency-download policy (2026-10-09)
+
+Frontend lint/typecheck/audit/full regression, Docker production builds and HIGH/CRITICAL
+scans, performance fresh-accounting and Ops recovery can start after deterministic scope
+classification; none consumes an unrelated backend/front-end job's build artifact.
+Each is still independently required by the fail-closed merge gate. Real-API browser,
+grouped media acceptance and visual consumers continue to wait for exact-current-run
+backend/frontend artifacts and verify their provenance. This reduces the critical path
+without reusing a previous commit's result.
+
+The two media groups retain complete scenario assertions and independent fresh
+PostgreSQL/Redis service state. Lockfile-keyed npm/Chromium *download* caches are
+allowed; node_modules, databases, built products and cross-SHA artifacts are not.
+Break external media dependency setup into individually named, bounded steps. On
+registry/apt/browser install timeout, fail the job and diagnose the individual step;
+never skip media scenarios, loosen scoring/security checks or label timed-out steps
+as passed. Scope-based skips remain limited to proven unaffected surfaces; mixed
+permissions, DB, runtime and CI edits still select full-platform validation.
+
+
 ## Build and scenario isolation
 
 Build artifacts belong to this run and exact checked-out SHA. The manifest verifies

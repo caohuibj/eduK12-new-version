@@ -14,8 +14,8 @@ import {
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
-import { removeCredentialHandoff, writeCredentialHandoff } from '../utils/credentialHandoff'
-import path from 'node:path'
+import { resetPasswordForPlatformAdmin } from './platformAccountController'
+import { resetPasswordForCourseTeacher } from './courseStudentPasswordController'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
@@ -511,6 +511,8 @@ export const courseController = {
       const userRole = req.user?.role
       const { courseCode } = req.body
 
+      if (userRole !== UserRole.STUDENT) return forbidden(res, '只有学员可以报名课程')
+
       if (!courseCode) {
         return error(res, '请输入课程号')
       }
@@ -783,6 +785,7 @@ export const courseController = {
           nickname: s.student.nickname,
           avatarUrl: s.student.avatarUrl,
           isFrozen: s.student.isFrozen,
+          enrollmentStatus: s.status,
           joinedAt: s.joinedAt,
         })),
         total: students.length,
@@ -793,11 +796,17 @@ export const courseController = {
     }
   },
 
-  // 重置学生密码
+  // Resetting credentials is a narrowly granted course support action for
+  // the current owner only. The existing SYSTEM_ADMIN alias stays unchanged.
   async resetStudentPassword(req: Request, res: Response) {
+    if (req.user?.role === UserRole.TEACHER) {
+      return resetPasswordForCourseTeacher(req, res)
+    }
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      // Course ownership permits roster management, not global credential changes.
+      if (userRole !== UserRole.ADMIN) return forbidden(res, '重置全局账号密码仅限平台管理员')
       const { courseId, studentId } = req.params
 
       // 验证课程权限
@@ -825,28 +834,10 @@ export const courseController = {
         return error(res, '该学生未加入此课程')
       }
 
-      // 生成随机临时密码
-      const { hashPassword, generateTempPassword } = await import('../utils/password')
-      const tempPassword = generateTempPassword()
-      const hashedPassword = await hashPassword(tempPassword)
-
-      const student = await prisma.user.findUnique({ where: { id: studentId }, select: { username: true } })
-      const handoffFile = await writeCredentialHandoff([{ username: student?.username || studentId, temporaryPassword: tempPassword }], 'student-password-reset')
-      try {
-        await prisma.user.update({
-          where: { id: studentId },
-          data: {
-            passwordHash: hashedPassword,
-            tokenVersion: { increment: 1 },
-            mustChangePassword: true,
-          }
-        })
-      } catch (updateError) {
-        removeCredentialHandoff(handoffFile)
-        throw updateError
-      }
-
-      return success(res, { handoffFile: path.basename(handoffFile) }, '密码已重置；临时密码已写入受保护的本地交接文件')
+      // An old course-roster URL remains compatible, but account mutation now
+      // executes the same system-admin admission, rate limit, transaction and
+      // Organization usable-admin invariant as /users/:id/reset-password.
+      return resetPasswordForPlatformAdmin(req, res, studentId)
     } catch (err) {
       logger.error('重置密码错误', err)
       return error(res, '重置密码失败')
@@ -918,6 +909,7 @@ export const courseController = {
             nickname: cs.student.nickname,
             avatarUrl: cs.student.avatarUrl,
             isFrozen: cs.student.isFrozen,
+            enrollmentStatus: cs.status,
             joinedAt: cs.joinedAt,
           })
         }
@@ -1052,54 +1044,10 @@ export const courseController = {
     }
   },
 
-  // 冻结/解冻学生账号
-  async toggleFreezeStudent(req: Request, res: Response) {
-    try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
-      const { courseId, studentId } = req.params
-      const { isFrozen } = req.body
-
-      // 验证课程权限
-      const course = await prisma.course.findUnique({
-        where: { id: courseId }
-      })
-
-      if (!course) {
-        return notFound(res, '课程不存在')
-      }
-
-      if (!canAccessCourseRoster(course, userId, userRole)) {
-        return forbidden(res, '无权限管理此课程的学生')
-      }
-
-      // 验证学生是否在该课程中
-      const courseStudent = await prisma.courseStudent.findFirst({
-        where: {
-          courseId,
-          studentId,
-        }
-      })
-
-      if (!courseStudent) {
-        return error(res, '该学生未加入此课程')
-      }
-
-      // 更新学生冻结状态
-      await prisma.user.update({
-        where: { id: studentId },
-        data: {
-          isFrozen,
-          tokenVersion: { increment: 1 },
-        }
-      })
-
-      return success(res, { isFrozen }, isFrozen ? '学生账号已冻结' : '学生账号已解冻')
-    } catch (err) {
-      logger.error('冻结/解冻学生错误', err)
-      return error(res, '操作失败')
-    }
-  },
+  // Global account suspension is no longer implemented here. The active
+  // course endpoint uses courseStudentLifecycleController and a platform-admin
+  // authority check; keeping a direct prisma.user.update helper would risk
+  // reintroducing an unguarded global account mutation.
 
   // 停止招募 - 不再允许新学生加入
   async stopRecruiting(req: Request, res: Response) {

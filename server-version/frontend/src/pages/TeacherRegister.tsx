@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
 import AuthShell from '../components/auth/AuthShell'
 import React, { useState } from 'react'
@@ -13,6 +14,7 @@ interface TeacherRegisterData {
 
 const TeacherRegister: React.FC = () => {
   const authLink = useAuthLinks()
+  const training = isTrainingHost()
   const [searchParams] = useSearchParams()
   const teacherCode = searchParams.get('code') || ''
   
@@ -100,7 +102,7 @@ const TeacherRegister: React.FC = () => {
       <AuthShell tone="teacher" title="教师账号注册" description="需要先完成教师邀请码验证" backTo={authLink("/teacher/login")} backLabel="返回邀请码验证">
         <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           <strong className="block mb-1">无效的访问</strong>
-          <span>请先验证教师邀请码，再创建账号。</span>
+          <span>{training ? '请先验证培训师注册码，再创建账号。' : '请先验证教师邀请码，再创建账号。'}</span>
         </div>
         <Link to={authLink("/teacher/login")} className="btn-primary inline-flex w-full mt-5 items-center justify-center">
           返回邀请码验证
@@ -119,7 +121,7 @@ const TeacherRegister: React.FC = () => {
             账号已创建。管理员在「用户管理」中点通过后，即可用刚才设置的用户名和密码登录。
           </p>
           <Link to={authLink("/teacher/account-login")} className="btn-primary inline-flex w-full items-center justify-center">
-            前往教师登录
+            {training ? '前往培训师登录' : '前往教师登录'}
           </Link>
         </div>
       </AuthShell>
@@ -131,10 +133,10 @@ const TeacherRegister: React.FC = () => {
       <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center space-x-2 text-green-700">
           <CheckCircle className="w-5 h-5" aria-hidden="true" />
-          <span className="font-medium">教师码验证成功</span>
+          <span className="font-medium">{training ? '培训师注册码验证成功' : '教师码验证成功'}</span>
         </div>
         <p className="text-sm text-green-600 mt-1">
-          请设置您的教师账号信息，设置完成后该教师码将失效
+          {training ? '请设置您的培训师账号信息，注册完成后该注册码失效' : '请设置您的教师账号信息，设置完成后该教师码将失效'}
         </p>
       </div>
 
@@ -231,7 +233,7 @@ const TeacherRegister: React.FC = () => {
 
       <div className="hui-auth-note">
         <strong>账号说明</strong>
-        <div>提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。</div>
+        <div>{training ? '注册码仅用于首次注册。账号经平台管理员审核后可以登录，有效期为1年。' : '提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。'}</div>
       </div>
     </AuthShell>
   )

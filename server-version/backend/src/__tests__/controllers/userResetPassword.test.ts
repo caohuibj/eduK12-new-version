@@ -1,85 +1,42 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockPrisma, mockWriteHandoff, mockRemoveHandoff, mockGenerateTempPassword } = vi.hoisted(() => ({
-  mockPrisma: {
-    user: { findUnique: vi.fn(), update: vi.fn() },
-  },
-  mockWriteHandoff: vi.fn(),
-  mockRemoveHandoff: vi.fn(),
-  mockGenerateTempPassword: vi.fn(),
+const { delegatedReset, unsafeUserUpdate } = vi.hoisted(() => ({
+  delegatedReset: vi.fn(),
+  unsafeUserUpdate: vi.fn(),
 }))
-
-vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
-vi.mock('../../utils/password', () => ({
-  PASSWORD_MIN_LENGTH: 8,
-  PASSWORD_MAX_LENGTH: 128,
-  isValidPassword: vi.fn(() => true),
-  hashPassword: vi.fn(async () => 'temporary-hash'),
-  comparePassword: vi.fn(),
-  generateTempPassword: mockGenerateTempPassword,
+vi.mock('../../controllers/platformAccountController', () => ({
+  resetPasswordForPlatformAdmin: delegatedReset,
 }))
-vi.mock('../../utils/credentialHandoff', () => ({
-  writeCredentialHandoff: mockWriteHandoff,
-  removeCredentialHandoff: mockRemoveHandoff,
+vi.mock('../../config/database', () => ({
+  prisma: { user: { update: unsafeUserUpdate } },
 }))
 
 import { userController } from '../../controllers/userController'
 
-const makeRes = () => {
-  const res: any = { statusCode: 200, body: null }
-  res.status = vi.fn((code: number) => {
-    res.statusCode = code
-    return res
-  })
-  res.json = vi.fn((body: any) => {
-    res.body = body
-    return res
-  })
-  return res
-}
-
-describe('administrator password reset handoff', () => {
+describe('legacy user-controller reset is a secure platform alias', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGenerateTempPassword.mockReturnValue('Temporary2026')
-    mockWriteHandoff.mockResolvedValue('/tmp/admin-password-reset.json')
-    mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', username: 'student-1' })
-    mockPrisma.user.update.mockResolvedValue({ id: 'user-1' })
+    delegatedReset.mockResolvedValue({ marker: 'handled by canonical platform flow' })
   })
 
-  it('ignores a caller-supplied password and returns only the protected handoff filename', async () => {
-    const res = makeRes()
-
-    await userController.resetPassword({
-      params: { id: 'user-1' },
-      body: { newPassword: 'attacker-controlled-password' },
-    } as any, res)
-
-    expect(res.body.code).toBe(0)
-    expect(res.body.data).toEqual({ handoffFile: 'admin-password-reset.json' })
-    expect(JSON.stringify(res.body)).not.toContain('Temporary2026')
-    expect(mockWriteHandoff).toHaveBeenCalledWith([
-      { username: 'student-1', temporaryPassword: 'Temporary2026' },
-    ], 'admin-password-reset')
-    expect(mockPrisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: 'user-1' },
-      data: expect.objectContaining({
-        passwordHash: 'temporary-hash',
-        mustChangePassword: true,
-        tokenVersion: { increment: 1 },
-      }),
-    }))
+  it('passes the exact target and current actor context to the canonical reset', async () => {
+    const request = {
+      params: { id: 'learner-1' },
+      user: { userId: 'system-actor', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' },
+      body: { newPassword: 'must never write this value directly' },
+    } as any
+    const response = {} as any
+    await userController.resetPassword(request, response)
+    expect(delegatedReset).toHaveBeenCalledOnce()
+    expect(delegatedReset).toHaveBeenCalledWith(request, response, 'learner-1')
+    expect(unsafeUserUpdate).not.toHaveBeenCalled()
   })
 
-  it('removes the handoff file if the database update fails', async () => {
-    const handoffFile = '/tmp/admin-password-reset-failed.json'
-    mockWriteHandoff.mockResolvedValue(handoffFile)
-    mockPrisma.user.update.mockRejectedValue(new Error('database unavailable'))
-    const res = makeRes()
-
-    await userController.resetPassword({ params: { id: 'user-1' }, body: {} } as any, res)
-
-    expect(res.statusCode).toBe(400)
-    expect(mockRemoveHandoff).toHaveBeenCalledWith(handoffFile)
+  it('propagates the authoritative rejection instead of performing fallback writes', async () => {
+    const response = { statusCode: 403 }
+    delegatedReset.mockResolvedValueOnce(response)
+    const result = await userController.resetPassword({ params: { id: 'learner-2' } } as any, {} as any)
+    expect(result).toBe(response)
+    expect(unsafeUserUpdate).not.toHaveBeenCalled()
   })
 })

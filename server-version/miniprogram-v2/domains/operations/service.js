@@ -168,6 +168,7 @@ function createOperations(api,session) {
   async questionContext(classroomId,questionId){spec('classrooms');return api.get('/mobile/classrooms/'+id(classroomId)+'/questions/'+id(questionId)+'/context')},
   async question(classroomId,questionId,action,body){spec('classrooms');const path='/classrooms/'+id(classroomId)+'/questions/'+id(questionId);if(action==='stats')return api.get(path+'/stats');if(action==='delete')return api.delete(path);if(action==='edit')return api.put(path,body);throw new ApiError('invalidRequest','题目操作无效')},
   async grade(assignmentId,submissionId,comment){if(!comment.trim())throw new ApiError('invalidRequest','请填写评语');return api.post('/assignments/'+id(assignmentId)+'/submissions/'+id(submissionId)+'/grade',{comment})},
+  rosterCapabilities(){const actor=session.get().user||{};return {canFreeze:actor.platformRole==='SYSTEM_ADMIN',canResetPassword:actor.role==='TEACHER'||actor.platformRole==='SYSTEM_ADMIN',resetWarning:actor.role==='TEACHER'?'仅可重置本人课程有效学员。旧会话将失效，临时密码只展示一次，学员须修改密码。':'重置后必须通过受保护的服务器交接文件提供临时密码。'}},
   async roster(courseId,studentId,action){if(!['freeze','unfreeze','remove','resetPassword'].includes(action))throw new ApiError('invalidRequest','操作无效');const path='/courses/'+id(courseId)+'/students/'+id(studentId);if(action==='remove')return api.delete(path);if(action==='resetPassword')return api.post(path+'/reset-password',{});return api.put(path+'/freeze',{isFrozen:action==='freeze'})},
  }
 }

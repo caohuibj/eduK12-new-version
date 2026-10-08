@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync, readdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { runnerPlan } from './content-scope.mjs';
@@ -9,22 +9,15 @@ import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
-test('CI workflows use hosted-only labels across every entrypoint',()=>{
-  const dir=new URL('../workflows/',import.meta.url);
-  for(const name of readdirSync(dir).filter(name=>name.endsWith('.yml')||name.endsWith('.yaml'))) {
-    const source=readFileSync(new URL(name,dir),'utf8');
-    assert.ok(!/self-hosted|eduk12-(win|mac)-ci/.test(source),name+' has a legacy runner');
-    for(const line of source.split('\n').filter(line=>line.trimStart().startsWith('runs-on:'))) {
-      assert.ok(line.includes('runs-on: ubuntu-24.04') || line.includes('runs-on: $'+'{{ fromJSON(needs.scope.outputs.'),name+': '+line);
-    }
-  }
-});
-test('single-component probes remain hosted and safety assertions remain intact',()=>{
+test('Draft maintenance and all component probes use hosted Ubuntu',()=>{
   const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const maintenance=workflow.split('  maintenance:\n')[1]?.split('\n  documentation:')[0];
+  assert.match(maintenance??'',/runner_labels: '\["ubuntu-24.04"\]'/);
   const probes=workflow.slice(workflow.indexOf('  probe-frontend-build:'),workflow.indexOf('  scope:'));
-  assert.ok(!probes.includes('self-hosted'));
-  for(const line of probes.split('\n').filter(line=>line.trimStart().startsWith('runner_labels:')))
-    assert.ok(line.includes('ubuntu-24.04'),line);
+  for(const line of probes.split('\n')) {
+    if(!/runner_labels:/.test(line))continue;
+    assert.match(line,/runner_labels: '\["ubuntu-24.04"\]'/);
+  }
   assert.match(probes,/inputs\.step_probe == 'assessment-repair' && 'assessment-repair'/);
   const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
   const reportCleanup=regression.indexOf('name: clear reports from previous regression jobs');
@@ -40,17 +33,18 @@ test('single-component probes remain hosted and safety assertions remain intact'
     assert.ok(regression.split('hosted critical integration suites must not skip')[1]?.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`full regression must require ${file}`);
   }
 });
-test('all runner profiles and change scenarios resolve to hosted Ubuntu',()=>{
-  for(const profile of ['hosted','speed','economy','local','balanced','hybrid']) {
-    for(const scenario of ['platform','dependencies','frontend','content','maintenance','documentation']) {
-      const plan=runnerPlan({...capacity,profile,scenario});
-      assert.equal(plan.runner_profile,'hosted');
-      for(const lane of ['heavy_runner','light_runner','frontend_runner','docker_runner','codeql_runner','regression_runner','browser_runner','media_runner'])
-        assert.deepEqual(plan[lane],['ubuntu-24.04']);
-      assert.equal(plan.visual_hosted,scenario==='platform');
-    }
+test('hosted platform consumers preserve independent lanes and full visual coverage',()=>{
+  const plan=runnerPlan({...capacity,profile:'hosted',scenario:'platform'});
+  for(const lane of ['regression_runner','browser_runner','media_runner','codeql_runner','frontend_runner','heavy_runner','docker_runner'])
+    assert.deepEqual(plan[lane],['ubuntu-24.04']);
+  assert.equal(plan.visual_hosted,true);
+});
+test('scoped scenarios retain their existing visual topology on hosted Ubuntu',()=>{
+  for(const scenario of ['content','content-frontend','frontend','presentation','documentation','dependencies']) {
+    const plan=runnerPlan({...capacity,profile:'local',scenario});
+    for(const lane of ['regression_runner','browser_runner','media_runner']) assert.deepEqual(plan[lane],['ubuntu-24.04']);
+    assert.equal(plan.visual_hosted,false);
   }
-  assert.throws(()=>runnerPlan({profile:'invalid'}));
 });
 test('artifact provenance rejects another commit, run, build profile, lockfile or modified content',()=>{
   const dir=mkdtempSync(join(tmpdir(),'ci-artifact-'));

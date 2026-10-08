@@ -147,8 +147,9 @@ suite('Organization PR1 review regressions (real PostgreSQL)', () => {
     })).resolves.toEqual({ isActive: true })
   })
 
-  it('routes legacy course freezing through the same usable-admin invariant', async () => {
+  it('routes admin-authorized course freezing through the same usable-admin invariant', async () => {
     const teacher = await createUser('freeze-teacher', { role: UserRole.TEACHER })
+    const admin = await createUser('freeze-admin', { role: UserRole.ADMIN, platformRole: PlatformRole.SYSTEM_ADMIN })
     const primary = await createUser('freeze-primary', { role: UserRole.STUDENT })
     const backup = await createUser('freeze-backup', { role: UserRole.TEACHER })
     const created = await createOrganization({
@@ -180,8 +181,8 @@ suite('Organization PR1 review regressions (real PostgreSQL)', () => {
     })
 
     await expect(setCourseStudentFrozenState({
-      actorUserId: teacher.id,
-      actorRole: UserRole.TEACHER,
+      actorUserId: admin.id,
+      actorRole: UserRole.ADMIN,
       courseId: course.id,
       studentId: primary.id,
       isFrozen: true,

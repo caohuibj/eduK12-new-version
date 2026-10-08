@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: verify hosted runner resources
+      - name: verify runner capacity
         run: node .github/scripts/runner-preflight.mjs
       - name: prepare native dependencies
         run: bash server-version/scripts/ci-install-canvas-deps.sh

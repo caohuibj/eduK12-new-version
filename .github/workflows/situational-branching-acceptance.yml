@@ -12,8 +12,7 @@ name: Situational Branching Acceptance
     inputs:
       runner_profile:
         type: choice
-        options:
-        - hosted
+        options: [hosted]
         default: hosted
 permissions:
   contents: read

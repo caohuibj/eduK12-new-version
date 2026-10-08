@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { evaluateScientificQualification } from '../../modules/assessment-governance/scientific-qualification'
 
@@ -36,7 +36,9 @@ describe('assessment qualification governance boundaries', () => {
   it('keeps qualification and operational-hold evaluators out of save/scorer/FINAL hot paths', () => {
     const hotPathName = /(final|submit|scor|save|attempt-runtime)/iu
     const forbiddenImport = /assessment-governance\/(?:scientific-qualification|scientific-evidence|product-readiness|operational-hold)|library\/(?:product-readiness|scientific-qualification)|situational\/(?:product-readiness|scientific-qualification)/u
-    const hotPaths = walkTs(MODULE_ROOT).filter((file) => hotPathName.test(file))
+    // Only module-relative paths describe runtime responsibilities. Checkout
+    // names such as final-review or scoring-audit must not classify every file.
+    const hotPaths = walkTs(MODULE_ROOT).filter((file) => hotPathName.test(relative(MODULE_ROOT, file)))
     expect(hotPaths.length).toBeGreaterThan(0)
     for (const file of hotPaths) {
       expect(readFileSync(file, 'utf8'), file).not.toMatch(forbiddenImport)

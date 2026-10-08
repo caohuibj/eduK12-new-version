@@ -1,0 +1,139 @@
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const { chromium } = require('../backend/node_modules/playwright-core')
+const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const { shots, save, passed } = require('./training-final-browser.cjs')
+const fixture = JSON.parse(fs.readFileSync(process.env.BUNDLE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-b2-browser-fixture.json','utf8'))
+const baseUrl = process.env.BUNDLE_PRODUCT_BASE_URL || 'http://127.0.0.1:5142'
+const output = process.env.BUNDLE_PRODUCT_EVIDENCE || '/tmp/huisurvey-b2-browser'
+fs.mkdirSync(output,{recursive:true})
+function ok(response) { assert.equal(response.status,200,JSON.stringify(response.body)); assert.equal(response.body.code,0); return response.body.data }
+async function completeFour(page, label) {
+  await page.locator('textarea').fill('25')
+  await page.waitForTimeout(300)
+  const route=page.url()
+  await page.reload()
+  await page.locator('textarea').waitFor()
+  assert.equal(await page.locator('textarea').inputValue(),'25')
+  assert.equal(page.url(),route)
+  await page.getByRole('button',{name:'提交整个区段',exact:true}).click()
+  await page.getByRole('button',{name:'是',exact:true}).click()
+  await page.waitForTimeout(300)
+  await page.getByRole('button',{name:'提交整份量表',exact:true}).click()
+  await page.getByRole('button',{name:'开始/继续文字情境测评',exact:true}).click()
+  await page.locator('input[type="radio"]').first().click()
+  await page.waitForFunction(()=>document.querySelector('input[type="radio"]')?.checked)
+  await page.getByRole('button',{name:'情境 2，未完成',exact:true}).click()
+  await page.locator('input[type="radio"]').first().click()
+  await page.waitForFunction(()=>document.querySelector('input[type="radio"]')?.checked)
+  await page.getByRole('button',{name:'提交测评',exact:true}).click()
+  await page.getByRole('button',{name:'开始/继续认知任务',exact:true}).click()
+  await page.getByRole('button',{name:'开始测评',exact:true}).click()
+  await page.getByRole('button',{name:'开始练习',exact:true}).click()
+  let green=false
+  const deadline=Date.now()+300000
+  while(Date.now()<deadline) {
+    const formal=page.getByRole('button',{name:'开始正式测验',exact:true})
+    if(await formal.isVisible()) { await formal.click(); green=false }
+    const retry=page.getByRole('button',{name:'重新练习',exact:true})
+    if(await retry.isVisible()) { await retry.click(); green=false }
+    const stimulus=page.getByRole('button',{name:'respond',exact:true})
+    // Sample once: the stimulus unmounts when practice or the formal run ends.
+    const visible=await stimulus.evaluateAll(elements=>elements.some(element=>element.classList.contains('bg-green-500')))
+    if(visible&&!green) { await page.waitForTimeout(150); await page.keyboard.press('Space') }
+    green=visible
+    if(page.url().includes('/report') || await page.getByRole('button',{name:'查看个人报告',exact:true}).isVisible()) break
+    const finish=page.getByRole('button',{name:/完成测评|提交结果|查看报告|返回综合测评/}).first()
+    if(await finish.isVisible()) await finish.click()
+    await page.waitForTimeout(75)
+  }
+  // Completed parent state redirects automatically; the transient button may unmount before a click.
+  // Wait for the actual report route, then verify report contents and authority below.
+  await page.waitForURL(url=>url.pathname.endsWith('/report'),{timeout:30000})
+  await page.getByRole('region',{name:'Bundle 综合报告'}).waitFor()
+  await page.screenshot({path:output+'/'+label+'-report.png',fullPage:true})
+}
+
+async function main() {
+  assert.equal(process.env.BUNDLE_PRODUCT_ISOLATED_DB,'1')
+  const browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXECUTABLE||(process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':chromium.executablePath())})
+  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage()
+  const errors=[];page.on('pageerror',e=>errors.push(e.message))
+  try {
+    await loginWithSession(page,{baseUrl,route:'/teacher/account-login',...fixture.teacher,timeout:60000})
+    if(process.env.BUNDLE_PRODUCT_REPORT_ONLY==='1') {
+      const previous=JSON.parse(fs.readFileSync(output+'/result.json','utf8'))
+      await page.goto(baseUrl+'/composite-assessments/'+previous.id+'/attempts/'+previous.attemptId+'/report')
+      await page.getByRole('region',{name:'Bundle 综合报告'}).waitFor()
+      const report=ok(await sessionJsonFetch(page,'/bundle-products/attempts/'+previous.attemptId+'/report'))
+      assert.equal(report.snapshotFamily,'ASSESSMENT_BUNDLE')
+      assert.equal(report.view.sensitiveContextValues,null)
+      assert.equal((await sessionJsonFetch(page,'/composite-assessments/'+previous.id+'/export/preview')).status,409)
+      const downloadPromise=page.waitForEvent('download')
+      await page.getByRole('button',{name:'导出综合报告 JSON',exact:true}).click()
+      await (await downloadPromise).saveAs(output+'/final-report.json')
+      assert.equal(JSON.parse(fs.readFileSync(output+'/final-report.json','utf8')).factsHash,report.factsHash)
+      await page.setViewportSize({width:390,height:844})
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),'mobile overflow')
+      await page.screenshot({path:output+'/final-report-mobile.png',fullPage:true})
+      assert.deepEqual(errors,[])
+      passed('Isolated canonical Bundle authoring, course delivery, four-type completion, reports and append-only reanalysis');save('PASS');
+    console.log('Final Bundle report, authorized export and mobile layout: PASS')
+      return
+    }
+    await page.goto(baseUrl+'/bundle-products')
+    await page.getByRole('button',{name:'选择此包',exact:true}).click()
+    const name='Bundle browser acceptance '+Date.now()
+    await page.getByLabel('名称',{exact:true}).fill(name)
+    await page.getByLabel('投放课程',{exact:true}).selectOption(fixture.courses[0].id)
+    await page.getByLabel('adexi',{exact:false}).selectOption(fixture.scaleId)
+    await page.getByLabel('gonogo',{exact:false}).selectOption(fixture.assignmentId)
+    await page.getByRole('button',{name:'创建投放草稿',exact:true}).click()
+    await page.waitForURL(url=>/bundle-products\/[^/]+$/.test(url.pathname))
+    const id=page.url().split('/').pop()
+    await page.getByRole('button',{name:'发布投放',exact:true}).click()
+    await page.getByText(/ · 已发布$/).waitFor()
+    assert.equal(ok(await sessionJsonFetch(page,'/bundle-products/'+id)).status,'PUBLISHED')
+    await page.screenshot({path:output+'/teacher-published.png',fullPage:true})
+    await shots(page,'trainer-bundle-publication','trainer')
+    assert.equal((await sessionJsonFetch(page,'/composite-assessments/'+id,{method:'PATCH',body:JSON.stringify({name:'bypass'})})).status,409)
+    const studentContext=await browser.newContext(),student=await studentContext.newPage()
+    student.on('pageerror',e=>errors.push(e.message))
+    await loginWithSession(student,{baseUrl,route:'/student/login',...fixture.student,timeout:60000})
+    await student.goto(baseUrl+'/student/courses/'+fixture.courses[0].id)
+    await student.getByRole('button',{name:'测评',exact:true}).click()
+    await student.screenshot({path:output+'/student-course.png',fullPage:true})
+    await shots(student,'learner-course-bundle','learner')
+    await student.locator('article').filter({has:student.getByRole('heading',{name,exact:true})}).getByRole('link',{name:/开始/}).click()
+    await completeFour(student,'student').catch(async e=>{await student.screenshot({path:output+'/student-failure.png',fullPage:true});throw e})
+    await shots(student,'learner-bundle-feedback','learner')
+    const attemptId=student.url().split('/').at(-2)
+    const participant=ok(await sessionJsonFetch(student,'/composite-assessments/attempts/'+attemptId+'/report'))
+    assert.equal(participant.bundleReport.snapshotFamily,'ASSESSMENT_BUNDLE')
+    assert.ok(['READY','UNAVAILABLE'].includes(participant.bundleReport.status))
+    assert.equal(participant.bundleReport.view.sensitiveContextValues,null)
+    await page.goto(baseUrl+'/composite-assessments/'+id+'/attempts/'+attemptId+'/report')
+    await page.getByRole('region',{name:'Bundle 综合报告'}).waitFor()
+    const downloadPromise=page.waitForEvent('download')
+    await page.getByRole('button',{name:'导出综合报告 JSON',exact:true}).click()
+    const download=await downloadPromise;await download.saveAs(output+'/report.json')
+    const exported=JSON.parse(fs.readFileSync(output+'/report.json','utf8'))
+    assert.equal(exported.factsHash,participant.bundleReport.factsHash)
+    await page.getByText('分析历史与显式重分析',{exact:true}).click()
+    await page.getByLabel('目标包标识',{exact:true}).fill('b2_browser_fixture_v1')
+    await page.getByLabel('精确版本',{exact:true}).fill('1.0.0')
+    await page.getByLabel('重分析原因',{exact:true}).fill('Browser append-only acceptance')
+    await page.getByRole('button',{name:'追加重分析',exact:true}).click()
+    await page.waitForURL(url=>url.searchParams.has('snapshotId'))
+    await page.getByRole('region',{name:'Bundle 综合报告'}).waitFor()
+    const history=ok(await sessionJsonFetch(page,'/bundle-products/attempts/'+attemptId+'/history'))
+    assert.equal(history.length,2)
+    await page.screenshot({path:output+'/teacher-reanalysis.png',fullPage:true})
+    assert.deepEqual(errors,[])
+    fs.writeFileSync(output+'/result.json',JSON.stringify({id,attemptId,completed:true,historyCount:history.length,errors},null,2))
+    passed('Isolated canonical Bundle authoring, course delivery, four-type completion, reports and append-only reanalysis');save('PASS');
+    console.log('Bundle browser authoring, four FINALs, audience report, export and reanalysis: PASS')
+  } catch(e) {save('FAIL');await page.screenshot({path:output+'/failure.png',fullPage:true});throw e}
+  finally {await browser.close()}
+}
+main().catch(e=>{console.error(e);process.exitCode=1})
