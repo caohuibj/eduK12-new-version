@@ -139,6 +139,22 @@ export async function resetEnrolledStudentPassword(input: {
         || (target.expiresAt && target.expiresAt.getTime() <= Date.now())
       ) throw denied('只可重置当前有效的普通学员账号')
 
+      // A STUDENT may also hold sensitive Organization governance rights.
+      // Course ownership must not become an account-takeover path for any
+      // current ORG_ADMIN, even when another administrator remains usable.
+      const privilegedMembership = await tx.$queryRaw<Array<{ protected: boolean }>>`
+        SELECT EXISTS(
+          SELECT 1 FROM "organization_memberships"
+          WHERE "user_id" = ${target.id}
+            AND "org_role" = 'ORG_ADMIN'
+            AND "valid_from" <= statement_timestamp()
+            AND "valid_until" IS NULL
+        ) AS "protected"
+      `
+      if (privilegedMembership[0]?.protected) {
+        throw denied('该学员具有组织管理权限，请由平台管理员处理密码重置')
+      }
+
       // Preserve every Organization's last usable admin, even when that
       // admin also has a legacy STUDENT role in a course.
       await assertAccountUsabilityMutationSafe(tx, target.id)
