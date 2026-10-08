@@ -184,7 +184,7 @@ const CourseStudents: React.FC = () => {
       )}
 
       <label className="block max-w-md">
-        <span className="mb-1 block text-sm font-medium text-gray-700">搜索学生</span>
+        <span className="mb-1 block text-sm font-medium text-gray-700">{training ? '搜索学员' : '搜索学生'}</span>
         <span className="relative block">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" aria-hidden="true" />
           <input
@@ -213,7 +213,7 @@ const CourseStudents: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">学生信息</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{training ? '学员信息' : '学生信息'}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">账号</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">状态</th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">加入时间</th>
@@ -254,12 +254,12 @@ const CourseStudents: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(student.joinedAt)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex min-w-max items-center justify-end gap-2">
                         {canManageGlobalAccount && <button
                           type="button"
                           onClick={() => handleToggleFreeze(student)}
                           disabled={processingId === student.id}
-                          className={`rounded p-2 ${student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'} disabled:opacity-50`}
+                          className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 ${student.isFrozen ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'} disabled:opacity-50`}
                           title={student.isFrozen ? '解冻账号' : '冻结账号'}
                           aria-label={student.isFrozen ? `解冻 ${student.nickname} 的账号` : `冻结 ${student.nickname} 的账号`}
                         >
@@ -269,7 +269,7 @@ const CourseStudents: React.FC = () => {
                           type="button"
                           onClick={() => handleResetPassword(student)}
                           disabled={processingId === student.id}
-                          className="rounded p-2 text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
                           title="重置密码"
                           aria-label={`为 ${student.nickname} 生成一次性临时密码`}
                         >
@@ -279,7 +279,7 @@ const CourseStudents: React.FC = () => {
                           type="button"
                           onClick={() => handleRemoveStudent(student)}
                           disabled={processingId === student.id}
-                          className="rounded p-2 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded p-2 text-red-700 hover:bg-red-50 disabled:opacity-50"
                           title="从课程中移除"
                           aria-label={`将 ${student.nickname} 从课程中移除`}
                         >
