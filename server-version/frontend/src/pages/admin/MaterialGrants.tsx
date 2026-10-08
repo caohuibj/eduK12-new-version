@@ -82,8 +82,9 @@ const MaterialGrants: React.FC = () => {
       ) : list.length === 0 ? (
         <div className="staff-panel staff-panel--padded p-10 text-center text-gray-500">还没有授权记录</div>
       ) : (
-        <div className="staff-table-container">
-            <table className="staff-table">
+        <div className="staff-table-container training-grants-table" role="region" tabIndex={0} aria-label="授权记录，可左右滚动查看更多列和撤销操作">
+          <p className="training-table-hint">左右滑动可查看全部信息；最右侧为撤销操作。</p>
+            <table className="staff-table" aria-label="材料授权记录">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">材料</th>

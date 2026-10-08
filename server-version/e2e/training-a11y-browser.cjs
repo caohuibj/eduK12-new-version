@@ -15,7 +15,7 @@ const results=[];let teacherCode;
    if(role==='admin')teacherCode=(await sessionJsonFetch(page,'/teacher-codes')).body.data.list.find(row=>row.id===f.teacherCodeId).code;
    const routes=role==='public'?['/','/student/login','/student/course-login','/student/register?course='+f.courseCode,'/teacher/account-login','/teacher/login','/teacher/register?code='+teacherCode]:role==='learner'?['/student','/student/courses/'+f.courseId,'/student/assignments/'+f.assignmentId+'?courseId='+f.courseId,'/student/checkins/'+f.checkinId+'?courseId='+f.courseId,'/student/profile']:role==='trainer'?['/dashboard','/courses/'+f.courseId+'/detail','/courses/'+f.courseId+'/students','/assignments?create=true&courseId='+f.courseId,'/checkins?create=true&courseId='+f.courseId,'/questionnaire-products/'+f.questionnaireId,'/assessment-workbench?courseId='+f.courseId,'/profile']:['/admin/training','/users','/teacher-codes','/admin/material-grants','/courses'];
    for(const route of routes){
-    await page.goto(base+route);await page.waitForTimeout(700);await page.addScriptTag({content:source});
+    await page.goto(base+route+(role==='admin'&&route!=='/admin/training'?'?workspace=training':''));await page.waitForTimeout(700);await page.addScriptTag({content:source});
     const outcome=await page.evaluate(async()=>{const result=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}});return result.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
     results.push({role,route,viewport:{width:390,height:960},violations:outcome});console.log(role,route,outcome.map(v=>v.id));
    }

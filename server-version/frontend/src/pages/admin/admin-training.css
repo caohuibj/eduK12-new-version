@@ -15,3 +15,31 @@
 .training-admin-policy p { margin: 6px 0; font-size: 13px; color: #526a64; line-height: 1.8; }
 .training-admin-space a:focus-visible { outline: 3px solid #315f71; outline-offset: 3px; }
 @media (max-width: 740px) { .training-admin-grid { grid-template-columns: 1fr; } .training-admin-policy { padding: 16px; } }
+
+/* Explicit training-workspace content; canonical navigation and ordinary
+   administration retain their existing presentation and authority. */
+.hui-training-admin-content {
+  --training-paper: #f5f0e7; --training-surface: #fffdf8; --training-ink: #292d2b;
+  --training-bamboo: #365a48; --training-border: #ded8cb; --training-muted: #626a60;
+  --staff-ink: var(--training-ink); --staff-muted: var(--training-muted);
+  --staff-line: var(--training-border); --staff-accent: var(--training-bamboo);
+  --hui-ds-color-action: var(--training-bamboo); --hui-ds-color-action-rgb: 54 90 72;
+  --hui-ds-color-surface: var(--training-surface); --hui-ds-color-line: var(--training-border);
+  --hui-ds-color-ink: var(--training-ink); --hui-ds-color-muted: var(--training-muted);
+  background: var(--training-paper); color: var(--training-ink);
+}
+.hui-training-admin-content :is(.hui-page-header__title,.training-admin-card h2,.training-admin-policy h2) { font-family: 'Noto Serif SC','Noto Serif CJK SC','Songti SC',serif; color: var(--training-ink); font-weight: 600; }
+.hui-training-admin-content :is(.training-admin-card,.training-admin-scope,.training-admin-policy,.staff-panel,.staff-table-container,.staff-course-card,.bg-white) { background: var(--training-surface); border-color: var(--training-border); border-radius: 5px; box-shadow: none; }
+.hui-training-admin-content :is(.training-admin-card p,.training-admin-scope,.training-admin-policy p,.hui-page-header__description) { color: var(--training-muted); }
+.hui-training-admin-content :is(.training-admin-links a,.training-admin-card > svg,.training-admin-policy svg,.text-action) { color: var(--training-bamboo); }
+.hui-training-admin-content :is(.btn-primary,.hui-button--primary) { background: var(--training-bamboo); border-color: var(--training-bamboo); color: white; }
+.hui-training-admin-content :is(.btn-secondary,.hui-button--secondary) { background: var(--training-surface); border-color: var(--training-border); color: var(--training-bamboo); }
+.hui-training-admin-content :is(th,.bg-gray-50) { background: #efebe2; }
+.hui-training-admin-content :is(input,select,textarea) { border-color: var(--training-border); }
+.training-table-hint { padding: 12px 16px; font-size: 12px; color: var(--staff-muted,#626a60); }
+.training-grants-table { overflow-x: auto; }
+.training-grants-table table { min-width: 620px; }
+.training-grants-table :is(th,td) { white-space: nowrap; }
+.training-grants-table button { min-height: 44px; min-width: 64px; }
+.training-grants-table :is(th,td):last-child { position: sticky; right: 0; background: var(--hui-ds-color-surface,#fff); box-shadow: -1px 0 var(--hui-ds-color-line,#ded8cb); }
+.hui-training-admin-content :is(a,button,input,select,[tabindex]):focus-visible { outline: 3px solid var(--training-bamboo); outline-offset: 3px; }

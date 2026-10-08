@@ -118,7 +118,7 @@ const TeacherProfile: React.FC = () => {
   }
 
   return (
-    <ProductPage width="reading" className="space-y-6">
+    <ProductPage width="reading" className="hui-teacher-profile space-y-6">
       <PageHeader title="个人资料" description="管理显示姓名与登录密码。" />
 
       {loadError && (

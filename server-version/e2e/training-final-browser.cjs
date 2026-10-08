@@ -31,7 +31,7 @@ async function shots(page, name, role) {
  save();
 }
 async function open(page, route, ready, name, role) {
- await page.goto((role === 'admin' ? canonical : base) + route);
+ await page.goto((role === 'admin' ? canonical : base) + route + (role === 'admin' && route !== '/admin/training' ? '?workspace=training' : ''));
  await ready(page).waitFor();
  await shots(page, name, role);
 }

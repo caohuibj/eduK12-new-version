@@ -94,7 +94,7 @@ async function main(){
   const registeredResponse=pub.waitForResponse(r=>r.url().endsWith('/api/auth/teacher-register')&&r.request().method()==='POST');await pub.getByRole('button',{name:'完成注册',exact:true}).click();
   const registered=await (await registeredResponse).json();assert.equal(registered.code,0);assert.equal(registered.data.pendingApproval,true);await pub.getByText('已提交，等待管理员审核',{exact:true}).waitFor();await shots(pub,'trainer-registration-pending','public');
   const pendingLogin=await json(pub,'/auth/login',{username:teacherUsername,password:'TrainingNewTeacher2026'});assert.notEqual(pendingLogin.body.code,0);
-  await admin.goto(canonical+'/users');await admin.getByPlaceholder('用户名或姓名').fill(teacherUsername);await admin.getByRole('button',{name:'通过教师 待审核培训师 的注册审核',exact:true}).click();
+  await admin.goto(canonical+'/users?workspace=training');await admin.getByPlaceholder('用户名或姓名').fill(teacherUsername);await admin.getByRole('button',{name:'通过教师 待审核培训师 的注册审核',exact:true}).click();
   await admin.getByText('已通过该教师的注册审核',{exact:true}).waitFor();await shots(admin,'admin-trainer-approval-completed','admin');
   await loginWithSession(pub,{baseUrl:base,route:'/teacher/account-login',username:teacherUsername,password:'TrainingNewTeacher2026'});await pub.getByRole('heading',{name:/你好/}).waitFor();
   const reuse=await json(outsider,'/auth/teacher-register',{teacherCode:code.code,username:'Duplicate'+f.suffix,password:'TrainingNewTeacher2026',nickname:'重复注册测试'});assert.notEqual(reuse.body.code,0);

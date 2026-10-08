@@ -56,7 +56,7 @@ export default function AdminTrainingWorkspace() {
         <h2>{title}</h2>
         <p>{description}</p>
         <div className="training-admin-links">
-          {links.map(({ to, label }) => <Link key={to} to={to}>{label} →</Link>)}
+          {links.map(({ to, label }) => <Link key={to} to={to + '?workspace=training'}>{label} →</Link>)}
         </div>
       </section>)}
     </div>

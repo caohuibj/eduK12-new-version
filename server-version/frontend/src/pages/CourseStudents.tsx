@@ -152,7 +152,7 @@ const CourseStudents: React.FC = () => {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN')
 
   return (
-    <ProductPage width="management" className="space-y-6">
+    <ProductPage width="management" className={`space-y-6 ${training ? 'training-roster' : ''}`}>
       {feedback}
       <TemporaryPasswordHandoff value={credential} onClose={() => setCredential(null)} />
       <PageHeader
@@ -209,7 +209,7 @@ const CourseStudents: React.FC = () => {
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          {training && <p className="px-4 pt-3 text-sm text-gray-600 sm:hidden">表格可左右滑动；所有学员操作均可点击或使用键盘访问。</p>}
+          {training && <p className="px-4 pt-3 text-sm text-gray-600 sm:hidden">账号信息随姓名显示；重置密码和移除操作可直接点击。</p>}
           <div className="overflow-x-auto" role="region" tabIndex={0} aria-label={training ? '课程学员列表，可横向滚动' : '课程学生列表，可横向滚动'}>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -235,7 +235,7 @@ const CourseStudents: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 min-w-0">
                           <div className={`text-sm font-medium ${student.isFrozen ? 'text-gray-500' : 'text-gray-900'}`}>
                             {student.nickname}
                             {student.isFrozen && (
@@ -244,6 +244,7 @@ const CourseStudents: React.FC = () => {
                               </span>
                             )}
                           </div>
+                          {training && <p className="training-roster-account">{student.username}</p>}
                         </div>
                       </div>
                     </td>
@@ -274,7 +275,7 @@ const CourseStudents: React.FC = () => {
                           title="重置密码"
                           aria-label={`为 ${student.nickname} 生成一次性临时密码`}
                         >
-                          <Key className="h-4 w-4" aria-hidden="true" />
+                          <Key className="h-4 w-4" aria-hidden="true" />{training && <span className="training-roster-action-label">重置密码</span>}
                         </button>}
                         <button
                           type="button"
@@ -284,7 +285,7 @@ const CourseStudents: React.FC = () => {
                           title="从课程中移除"
                           aria-label={`将 ${student.nickname} 从课程中移除`}
                         >
-                          <UserX className="h-4 w-4" aria-hidden="true" />
+                          <UserX className="h-4 w-4" aria-hidden="true" />{training && <span className="training-roster-action-label">移除</span>}
                         </button>
                       </div>
                     </td>
@@ -296,10 +297,10 @@ const CourseStudents: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className={`grid grid-cols-1 gap-4 sm:grid-cols-3 ${training ? 'training-roster-stats' : ''}`}>
         <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-gray-800">{students.length}</div>
-          <div className="text-sm text-gray-500">总学生数</div>
+          <div className="text-sm text-gray-500">{training ? '学员总数' : '总学生数'}</div>
         </div>
         <div className="rounded-lg bg-white p-4 shadow">
           <div className="text-2xl font-bold text-green-600">{students.filter(student => !student.isFrozen).length}</div>
