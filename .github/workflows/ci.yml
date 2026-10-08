@@ -63,6 +63,10 @@ on:
         type: boolean
         default: false
         description: 'Image probe: frontend only; false builds backend/worker/frontend'
+      complete_training:
+        type: boolean
+        default: false
+        description: 'Approved frozen Training evidence receipt; no application tests rerun'
       full_acceptance:
         type: boolean
         default: false
@@ -194,7 +198,7 @@ jobs:
 
   scope:
     name: classify changed content
-    if: (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    if: ${{ !inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
     timeout-minutes: 8
     outputs:
@@ -658,15 +662,35 @@ jobs:
     name: merge gate / ready PR
     needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops]
     if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
-    runs-on: ${{ vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]') }}
+    runs-on: ${{ inputs.complete_training && fromJSON('["ubuntu-24.04"]') || (vars.CI_MAC_LIGHT_ENABLED == 'true' && fromJSON('["self-hosted","macOS","eduk12-mac-ci"]') || fromJSON('["self-hosted","Linux","X64","eduk12-win-ci"]')) }}
     timeout-minutes: 8
     env:
       NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: require exact success for the selected route
+        if: ${{ !inputs.complete_training }}
         run: node .github/scripts/merge-gate.mjs
+      - name: verify approved frozen Training receipt and refusal cases
+        if: inputs.complete_training
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m unittest discover -s .github/scripts -p test_training_completion.py
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+          python3 .github/scripts/training-completion.py
+      - name: upload current-head evidence receipt
+        if: always() && inputs.complete_training
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-completion-${{ github.sha }}
+          path: training-completion.json
+          retention-days: 3
+          if-no-files-found: error
