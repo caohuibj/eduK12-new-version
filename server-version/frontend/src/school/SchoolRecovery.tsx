@@ -61,6 +61,8 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
   const [incidentId,setIncidentId]=useState('')
   const [resolution,setResolution]=useState<'VERIFIED_CORRECT'|'STUDENT_QUARANTINED'|'ROSTER_CORRECTED'>('VERIFIED_CORRECT')
   const [quarantineNo,setQuarantineNo]=useState('')
+  const [reissueNo,setReissueNo]=useState('')
+  const [reissueVerified,setReissueVerified]=useState(false)
 
   async function execute(action:()=>Promise<void>){
     setBusy(true);setError('');setNotice('')
@@ -131,6 +133,19 @@ export function SchoolRecoveryOfficer({api,classPath}: {api:SchoolApi;classPath:
         await readIncidents();setIncidentId('');setNotice('已记入处理结果，请检查注册状态。')
       })}>关闭已核实的异常</button>
     </div>}
+    <h3>重新发放被冒用的资格</h3>
+    <p>仅在冻结原账号、保留未结案异常并完成独立身份核验后操作。
+      新资格需使用新注册码注册；历史测评和原账号不会转移。</p>
+    <TextField label="经核验的真实学生学号" value={reissueNo} setValue={setReissueNo}/>
+    <label className="hs-field"><span><input type="checkbox" checked={reissueVerified}
+      onChange={event=>setReissueVerified(event.target.checked)}/> 已线下独立核实资格重发对象</span></label>
+    <button disabled={busy||!reissueNo||!reissueVerified} onClick={()=>void execute(async()=>{
+      await api(classPath+'/reissue-eligibility','POST',{
+        studentNumber:reissueNo,verifiedOffline:true,
+      })
+      setReissueNo('');setReissueVerified(false)
+      setNotice('已创建全新待领取资格。请由管理员重新分发限时随机注册码；完成注册后再结案。')
+    })}>审核后重新发放资格</button>
     <h3>紧急冻结疑似抢注的账号</h3>
     <TextField label="涉嫌被冒用的资格学号" value={quarantineNo} setValue={setQuarantineNo}/>
     <button disabled={busy||!quarantineNo} onClick={()=>void execute(async()=>{

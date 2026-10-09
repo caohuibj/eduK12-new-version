@@ -6,7 +6,7 @@ type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
 type SchoolAccess={orgRole:string|null;canGovern:boolean;personas:string[];capabilities:string[];explicitDenies:string[]}
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
-type Summary={status:string;rosterVersion:number;eligibleCount:number;registeredCount:number;unresolvedIncidents:number}
+type Summary={status:string;rosterVersion:number;rosterExpectedCount:number;eligibleCount:number;registeredCount:number;unresolvedIncidents:number}
 type Envelope<T>={code:number|string;message:string;data:T}
 type MfaState={mfaRequired:true;enrolled:boolean}
 const cookie=(name:string)=>{
@@ -333,7 +333,7 @@ export default function SchoolApp(){
           </section>
           {schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
             {schoolAdmin&&<p>注册链接：<code className="hs-break">{joinUrl}</code></p>}
-            {summary&&<p>状态：{summary.status} · 名册 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
+            {summary&&<p>状态：{summary.status} · 名册预期 {summary.rosterExpectedCount} · 当前资格 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
             <button onClick={()=>void loadSummary()} disabled={working}>刷新班级状态</button>
             {schoolAdmin&&<><label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span>
               <textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label>
@@ -344,7 +344,7 @@ export default function SchoolApp(){
               <button disabled={working} onClick={()=>void actionWindow('CLOSE')}>关闭注册</button></div></>}
             {psychologyStaff&&<button className="hs-primary"
               disabled={working||!summary||summary.status!=='CLOSED'
-                ||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0}
+                ||summary.rosterExpectedCount!==summary.eligibleCount||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0}
               onClick={()=>void approve()}>心理教师 · 确认整班身份审批</button>}
             {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}

@@ -7,6 +7,7 @@ import {
   registerCampusStudent, approveCampusClass, readCampusClassSummary,
   assertCampusPsychologyStaff, quarantineCampusStudent,
   createCampusAdmissionIncident, resolveCampusAdmissionIncident,listCampusAdmissionIncidents,
+  reissueCampusStudentEligibility,
   digestCampusStudentNumber,
 } from '../../modules/campus/admission.service'
 import { issueSchoolStudentRecovery, completeSchoolStudentRecovery } from '../../modules/campus/recovery.service'
@@ -219,6 +220,78 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
       .toMatchObject({isFrozen:true,tokenVersion:1})
     expect(await db.campusStudentEnrollment.findUnique({where:{userId:student.userId}}))
       .toMatchObject({status:'QUARANTINED'})
+  })
+
+
+  it('reissues a quarantined school qualification to a NEW user without resurrecting prior identity',async()=>{
+    const f=await school(),number=studentNo('reregister')
+    const base=await replaceCampusRoster({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,studentNumbers:[number],
+    })
+    await setCampusRegistrationWindow({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,
+      action:'OPEN',closesAt:new Date(Date.now()+3600_000),
+    })
+    const firstCodes=await issueCampusActivationCodes({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,count:1,ttlMinutes:30,
+    })
+    const original=await registerCampusStudent({
+      organizationId:f.org,classUnitId:f.classId,studentNumber:number,
+      activationCode:firstCodes.codes[0],username:name('compromised'),password:'OriginalPassword123',
+    })
+    const quarantine=await quarantineCampusStudent({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,studentNumber:number,
+    })
+    expect(quarantine.status).toBe('QUARANTINED')
+    const afterQuarantine=await readCampusClassSummary({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+    })
+    expect(afterQuarantine).toMatchObject({
+      rosterExpectedCount:1,eligibleCount:0,registeredCount:0,unresolvedIncidents:1,
+    })
+    await expect(reissueCampusStudentEligibility({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      studentNumber:number,verifiedOffline:false,
+    })).rejects.toMatchObject({code:'OFFLINE_VERIFICATION_REQUIRED'})
+    await expect(reissueCampusStudentEligibility({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      studentNumber:number,verifiedOffline:true,
+    })).resolves.toMatchObject({status:'UNCLAIMED',rosterVersion:base.rosterVersion})
+    await expect(reissueCampusStudentEligibility({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      studentNumber:number,verifiedOffline:true,
+    })).rejects.toMatchObject({code:'REISSUE_ACTIVE_ELIGIBILITY_EXISTS'})
+    const secondCodes=await issueCampusActivationCodes({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,count:1,ttlMinutes:30,
+    })
+    const actualStudent=await registerCampusStudent({
+      organizationId:f.org,classUnitId:f.classId,studentNumber:number,
+      activationCode:secondCodes.codes[0],username:name('realstudent'),password:'ActualStudent123',
+    })
+    expect(actualStudent.userId).not.toBe(original.userId)
+    await setCampusRegistrationWindow({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,action:'CLOSE',
+    })
+    await expect(approveCampusClass({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      expectedRosterVersion:base.rosterVersion,
+    })).rejects.toMatchObject({code:'CLASS_NOT_READY'})
+    await resolveCampusAdmissionIncident({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      incidentId:quarantine.incidentId,resolution:'STUDENT_QUARANTINED',
+    })
+    await expect(approveCampusClass({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      expectedRosterVersion:base.rosterVersion,
+    })).resolves.toMatchObject({status:'APPROVED',approvedCount:1})
+    const histories=await db.campusStudentEligibility.findMany({
+      where:{organizationId:f.org,studentNoDigest:digestCampusStudentNumber(f.org,number)},
+    })
+    expect(histories.map(x=>x.status).sort()).toEqual(['VALID','VOID'])
+    const frozen=await db.user.findUniqueOrThrow({where:{id:original.userId}})
+    expect(frozen.isFrozen).toBe(true)
+    const current=await db.user.findUniqueOrThrow({where:{id:actualStudent.userId}})
+    expect(current.isFrozen).toBe(false)
   })
 
   it('recovers only an offline-verified school student and revokes old sessions',async()=>{
