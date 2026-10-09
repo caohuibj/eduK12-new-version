@@ -1,4 +1,5 @@
 import { matchesClassTarget } from '../assessment-policy/target'
+import { campusRunParticipantScope } from '../campus/activity.runScope'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -429,7 +430,8 @@ const resolveParentPairs = async (tx: Tx, organizationId: string, subjectRole: R
   return pairs
 }
 
-const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack): Promise<PopulationPair[]> => {
+const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack,
+  campusSelected: Set<string>|null = null): Promise<PopulationPair[]> => {
   const subjectRole = requireSingle(track.requestedPolicy.subjectRoles, 'subjectRoles') as RunActorRole
   const respondentRole = requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles') as RunActorRole
   const relationshipKind = requireSingle(track.requestedPolicy.relationshipKinds, 'relationshipKinds') as RelationalRelationshipKindV1
@@ -484,6 +486,11 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
   pairs = pairs.filter((pair) => (
     selectorAllows(track.subjectSelector, subjectFilter, pair.subject, pair)
     && selectorAllows(track.respondentSelector, respondentFilter, pair.respondent, pair)
+    && (campusSelected===null||(()=>{
+      const students=[pair.subject,pair.respondent].filter(actor=>actor.actorRole==='STUDENT')
+      return students.length>0 && students.every(actor =>
+        actor.provenanceKind==='ORG_MEMBER' && campusSelected.has(actor.membershipId))
+    })())
   ))
   const unique = new Map<string, PopulationPair>()
   for (const pair of pairs) {
@@ -766,6 +773,10 @@ export const publishAssessmentRun = async (input: {
 
     const timeRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const verifiedAt = timeRows[0].now.toISOString()
+    const campusSelected=await campusRunParticipantScope(tx,{
+      organizationId:input.organizationId,runId:input.runId,
+      actorUserId:input.actorUserId,publish:true,
+    })
     const actorCache = new Map<string, string>()
     let executionCount = 0
 
@@ -778,7 +789,7 @@ export const publishAssessmentRun = async (input: {
         SET "frozen_resource_policy" = ${frozenPolicyJson}::jsonb, "resource_policy_hash" = ${policyHash}
         WHERE "id" = ${track.id} AND "run_id" = ${input.runId}
       `
-      const pairs = await resolvePairs(tx, input.organizationId, track)
+      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
       const perspective = requireSingle(track.requestedPolicy.perspectives, 'perspectives')
       for (const pair of pairs) {
@@ -883,9 +894,13 @@ export const previewAssessmentRun = async (input: {
     if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
     }
+    const campusSelected=await campusRunParticipantScope(tx,{
+      organizationId:input.organizationId,runId:input.runId,
+      actorUserId:input.actorUserId,publish:false,
+    })
     const tracks = []
     for (const track of prepared) {
-      const pairs = await resolvePairs(tx, input.organizationId, track)
+      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', 'Track resolved no eligible actor pairs', 409)
       for (const pair of pairs) assertPublisherScope(authority, input.actorUserId, pair, track.resourcePolicy)
       tracks.push({ trackId: track.id, executionCount: pairs.length, subjectCount: new Set(pairs.map(pair => actorCacheKey(pair.subject))).size, respondentCount: new Set(pairs.map(pair => actorCacheKey(pair.respondent))).size, resourcePolicy: track.resourcePolicy })
