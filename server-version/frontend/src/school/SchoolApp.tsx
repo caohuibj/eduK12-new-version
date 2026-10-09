@@ -63,6 +63,7 @@ export default function SchoolApp(){
   const [classId,setClassId]=useState(new URLSearchParams(window.location.search).get('classUnitId')??'')
   const [mfaEnrolled,setMfaEnrolled]=useState(true)
   const [mfaCode,setMfaCode]=useState('')
+  const [stepUpCode,setStepUpCode]=useState('')
   const [mfaUri,setMfaUri]=useState('')
   const [recoveryCodes,setRecoveryCodes]=useState<string[]>([])
   const [orgs,setOrgs]=useState<CampusOrg[]>([])
@@ -153,9 +154,15 @@ export default function SchoolApp(){
     setMfaUri('');setMfaCode('')
   })
   const logOut=()=>run(async()=>{
-    try{await api('/auth/logout','POST',{})}catch{/* local state still clears */}
+    // Do not claim logout or clear the UI on a failed server-side revocation.
+    await api('/auth/logout','POST',{})
     setUser(null);setSummary(null);setIssuedCodes([]);setRecoveryCodes([])
     setScreen('home');notify('已退出校园账号')
+  })
+  const stepUp=()=>run(async()=>{
+    await api('/auth/mfa/step-up','POST',{code:stepUpCode})
+    setStepUpCode('')
+    notify('高权限操作已重新验证，有效期五分钟。')
   })
   const createUnit=(kind:'GRADE'|'CLASS')=>run(async()=>{
     const body=kind==='GRADE'?{unitKind:kind,name:gradeName}:{unitKind:kind,name:className,parentUnitId:parentGrade}
@@ -264,6 +271,18 @@ export default function SchoolApp(){
       {!loading&&user&&screen==='workspace'&&recoveryCodes.length===0&&<section>
         <p className="hs-eyebrow">HUISCHOOL · 校园工作台</p>
         <h1>欢迎，{user.username}</h1>
+        {user.role!=='STUDENT'&&<section className="hs-panel">
+          <h2>敏感操作二次验证</h2>
+          <p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p>
+          <div className="hs-actions">
+            <label className="hs-field"><span>验证器 6 位动态验证码</span>
+              <input value={stepUpCode} onChange={event=>setStepUpCode(event.target.value)}
+                inputMode="numeric" autoComplete="one-time-code" maxLength={6} />
+            </label>
+            <button disabled={working||!/^[0-9]{6}$/.test(stepUpCode)}
+              onClick={()=>void stepUp()}>重新验证高权限操作</button>
+          </div>
+        </section>}
         {user.role==='STUDENT'?<section className="hs-panel"><h2>我的校园活动</h2>
           <p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':
             studentStatus==='APPROVED'?'身份已获批。学校正式开放活动后，才会显示授权任务。':
