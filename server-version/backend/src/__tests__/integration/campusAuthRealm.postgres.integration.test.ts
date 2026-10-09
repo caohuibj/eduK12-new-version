@@ -6,6 +6,7 @@ import { integrationDatabaseUrl } from './integration-env'
 import { authenticate, authenticateSchool } from '../../middleware/auth'
 import { generateToken } from '../../utils/jwt'
 import { schoolAccountNeedsMfa } from '../../modules/campus/mfa.service'
+import { requestSchoolMfaReset } from '../../modules/campus/recovery.service'
 
 const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
 const suite=URL?describe:describe.skip
@@ -91,6 +92,43 @@ suite('Huischool product sessions use database account realm and live role eleva
      accountDomain:'SCHOOL',tokenVersion:admin.tokenVersion,
    })
    expect((await check(authenticateSchool,'huischool_session',passwordOnly)).code).toBe(401)
+ })
+
+ it('counts future-expiring school memberships before allowing an MFA reset',async()=>{
+   const admin=await db.user.create({data:{
+     username:'mfa_review_admin_'+randomUUID().replace(/-/g,''),
+     passwordHash:'synthetic',accountDomain:'SCHOOL',role:'ADMIN',
+   }})
+   const target=await db.user.create({data:{
+     username:'mfa_review_target_'+randomUUID().replace(/-/g,''),
+     passwordHash:'synthetic',accountDomain:'SCHOOL',role:'TEACHER',
+   }})
+   const a=await db.organization.create({data:{
+     id:randomUUID(),name:'realmA-'+randomUUID(),productDomain:'SCHOOL',
+     createdByUserId:admin.id,
+   }})
+   const b=await db.organization.create({data:{
+     id:randomUUID(),name:'realmB-'+randomUUID(),productDomain:'SCHOOL',
+     createdByUserId:admin.id,
+   }})
+   const future=new Date(Date.now()+60*60_000)
+   await db.organizationMembership.createMany({data:[
+     {id:randomUUID(),organizationId:a.id,userId:admin.id,orgRole:'ORG_ADMIN',validUntil:future},
+     {id:randomUUID(),organizationId:a.id,userId:target.id,orgRole:'MEMBER',validUntil:future},
+     {id:randomUUID(),organizationId:b.id,userId:target.id,orgRole:'MEMBER',validUntil:future},
+   ]})
+   await db.campusMfaCredential.create({data:{
+     userId:target.id,secretCipher:'synthetic-unused-secret',enabled:true,
+   }})
+   await expect(requestSchoolMfaReset({
+     actor:{
+       userId:admin.id,username:admin.username,role:admin.role,
+       platformRole:'STANDARD',accountDomain:'SCHOOL',
+       tokenVersion:admin.tokenVersion,mustChangePassword:false,
+     },organizationId:a.id,targetUserId:target.id,reasonCode:'DEVICE_LOST',
+   })).rejects.toMatchObject({
+     code:'MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR',
+   })
  })
 
 })

@@ -140,7 +140,9 @@ export async function requestSchoolMfaReset(input:{
      SELECT m."id" FROM "organization_memberships" m
      JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
      WHERE m."organization_id"=${input.organizationId}
-       AND m."user_id"=${input.targetUserId} AND m."valid_until" IS NULL
+       AND m."user_id"=${input.targetUserId}
+       AND m."valid_from"<=statement_timestamp()
+       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
        AND u."is_active"=TRUE AND u."is_frozen"=FALSE
      FOR SHARE OF m
    `
@@ -152,7 +154,9 @@ export async function requestSchoolMfaReset(input:{
      FROM "organization_memberships" m
      JOIN "organizations" o ON o."id"=m."organization_id"
        AND o."product_domain"='SCHOOL'
-     WHERE m."user_id"=${input.targetUserId} AND m."valid_until" IS NULL
+     WHERE m."user_id"=${input.targetUserId}
+       AND m."valid_from"<=statement_timestamp()
+       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
    `
    if(schoolScopes[0]?.count!==1)deny('MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR',403)
    const enabled=await tx.campusMfaCredential.findUnique({where:{userId:input.targetUserId}})
@@ -201,22 +205,30 @@ export async function approveSchoolMfaReset(input:{
        JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
        WHERE m."organization_id"=${input.organizationId}
          AND m."user_id"=${request.requestedById} AND m."org_role"='ORG_ADMIN'
-         AND m."valid_until" IS NULL AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+         AND m."valid_from"<=statement_timestamp()
+         AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+         AND u."is_active"=TRUE AND u."is_frozen"=FALSE
      ) AS "valid"
    `
    if(!original[0]?.valid)deny('MFA_RESET_REQUESTER_REVOKED',403)
    const target=await tx.user.findUnique({where:{id:request.targetUserId}})
    if(!target||target.accountDomain!=='SCHOOL'||target.isFrozen||!target.isActive)
      throw new CampusAdmissionError('MFA_RESET_TARGET_UNAVAILABLE',404)
-   const targetMembership=await tx.organizationMembership.findFirst({
-     where:{organizationId:input.organizationId,userId:target.id,validUntil:null},
-   })
-   if(!targetMembership)deny('MFA_RESET_TARGET_UNAVAILABLE',404)
+   const targetMembership=await tx.$queryRaw<Array<{id:string}>>`
+     SELECT "id" FROM "organization_memberships"
+     WHERE "organization_id"=${input.organizationId}
+       AND "user_id"=${target.id} AND "valid_from"<=statement_timestamp()
+       AND ("valid_until" IS NULL OR "valid_until">statement_timestamp())
+     LIMIT 1 FOR SHARE
+   `
+   if(!targetMembership.length)deny('MFA_RESET_TARGET_UNAVAILABLE',404)
    const schoolScopes=await tx.$queryRaw<Array<{count:number}>>`
      SELECT COUNT(DISTINCT m."organization_id")::int AS "count"
      FROM "organization_memberships" m JOIN "organizations" o
        ON o."id"=m."organization_id" AND o."product_domain"='SCHOOL'
-     WHERE m."user_id"=${target.id} AND m."valid_until" IS NULL
+     WHERE m."user_id"=${target.id}
+       AND m."valid_from"<=statement_timestamp()
+       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
    `
    if(schoolScopes[0]?.count!==1)deny('MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR',403)
    const enabled=await tx.campusMfaCredential.findUnique({where:{userId:target.id}})
