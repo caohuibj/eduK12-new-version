@@ -47,6 +47,7 @@ export async function assertTeacherCourseResetPreflight(input: {
     where: {
       id: input.courseId,
       creatorId: input.actorUserId,
+      courseType: { not: 'CAMPUS_ACTIVITY' },
       isLibrary: false,
       students: {
         some: {
@@ -94,6 +95,7 @@ export async function resetEnrolledStudentPassword(input: {
         SELECT "id" FROM "users"
         WHERE "id" = ${input.actorUserId}
           AND "role" = 'TEACHER'
+          AND "account_domain" <> 'SCHOOL'
           AND "teacher_approved" = TRUE
           AND "is_active" = TRUE
           AND "is_frozen" = FALSE
@@ -107,6 +109,7 @@ export async function resetEnrolledStudentPassword(input: {
         SELECT "id" FROM "courses"
         WHERE "id" = ${input.courseId}
           AND "creator_id" = ${input.actorUserId}
+          AND "course_type" <> 'CAMPUS_ACTIVITY'
           AND "is_library" = FALSE
         FOR UPDATE
       `

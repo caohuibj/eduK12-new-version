@@ -122,6 +122,7 @@ model Organization {
 
   createdBy        User                          @relation("OrganizationCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   memberships      OrganizationMembership[]
+  courses          Course[] @relation("OrganizationCourses")
   accessDenies     OrganizationAccessDeny[]
   governanceAudits OrganizationGovernanceAudit[]
   commandReceipts  OrganizationCommandReceipt[]
@@ -264,6 +265,10 @@ model Course {
   coverAssetId         String?               @map("cover_asset_id")
   status               CourseStatus          @default(DRAFT)
   courseCode           String                @unique @map("course_code")
+  // Legacy rows remain LEGACY_COURSE, never inferred from user role or hostname.
+  courseType           String                @default("LEGACY_COURSE") @map("course_type")
+  organizationId       String?               @map("organization_id")
+  organization         Organization?         @relation("OrganizationCourses", fields: [organizationId], references: [id], onDelete: Restrict)
   creatorId            String                @map("creator_id")
   createdAt            DateTime              @default(now()) @map("created_at")
   updatedAt            DateTime              @updatedAt @map("updated_at")

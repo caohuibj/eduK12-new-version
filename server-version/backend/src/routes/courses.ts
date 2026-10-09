@@ -1,5 +1,7 @@
 import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
 import { Router } from 'express'
+import { prisma } from '../config/database'
+import { notFound } from '../utils/response'
 import { courseQuestionnaires } from '../controllers/courseQuestionnairesController'
 import { courseTrainingAssessments } from '../controllers/courseTrainingAssessmentsController'
 import { courseController } from '../controllers/courseController'
@@ -9,6 +11,20 @@ import { studentTaskList } from '../controllers/studentTaskController'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
+
+// All /:id and /:courseId training endpoints, including mutations and
+// incidental detail/read routes, reject CAMPUS_ACTIVITY before controllers.
+// Legacy student enrollments never authorize Activity access.
+const rejectCampusCourse = async (req: import('express').Request,
+  res: import('express').Response, next: import('express').NextFunction, id: string) => {
+  try {
+    const course=await prisma.course.findUnique({where:{id},select:{courseType:true}})
+    if (course?.courseType==='CAMPUS_ACTIVITY') return notFound(res,'课程不存在')
+    next()
+  } catch (err) { next(err) }
+}
+router.param('id',rejectCampusCourse)
+router.param('courseId',rejectCampusCourse)
 
 
 
