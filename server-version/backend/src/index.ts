@@ -45,6 +45,7 @@ import authRoutes from './routes/auth'
 import campusAuthRoutes from './modules/campus/auth.routes'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
 import campusStaffRoutes from './modules/campus/staff.routes'
+import { schoolOriginGuard } from './modules/campus/originGuard'
 import campusOrganizationRoutes from './modules/campus/organization.routes'
 import userRoutes from './routes/users'
 import courseRoutes from './routes/courses'
@@ -234,6 +235,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)
 app.use('/api/campus', campusStaffRoutes)

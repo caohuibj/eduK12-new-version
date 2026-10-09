@@ -4,7 +4,7 @@ import { prisma } from '../../config/database'
 import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
-import { issueCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie } from '../../utils/authCookies'
+import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie } from '../../utils/authCookies'
 import { authenticateSchool } from '../../middleware/auth'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
@@ -39,7 +39,7 @@ async function failedLogin(req: Request, res: Response) {
 }
 
 router.get('/csrf', (req, res) => {
-  return success(res, { csrfToken: issueCsrfToken(req, res) })
+  return success(res, { csrfToken: issueSchoolCsrfToken(req, res) })
 })
 
 router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req, res) => {

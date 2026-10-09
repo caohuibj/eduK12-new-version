@@ -36,7 +36,7 @@ const normalizeLogin = (value: string) => {
 function digestNo(organizationId: string, studentNumber: string): string {
   const hex = process.env.CAMPUS_ELIGIBILITY_HMAC_KEY
   if (!hex || !/^[a-fA-F0-9]{64}$/.test(hex)) fail('CAMPUS_KEY_NOT_CONFIGURED', 503)
-  return createHmac('sha256', Buffer.from(hex, 'hex'))
+  return createHmac('sha256', Buffer.from(hex!, 'hex'))
     .update('HUISCHOOL:ELIGIBILITY:v1\x00')
     .update(organizationId).update('\x00').update(normalizeNo(studentNumber))
     .digest('hex')
@@ -60,7 +60,7 @@ export async function assertCampusGovernance(actor: AuthenticatedPrincipal, orga
   if (actor.accountDomain !== 'SCHOOL') fail('CAMPUS_ACCOUNT_REQUIRED', 403)
   const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
   if (!context?.canGovern || !context.membershipId) fail('CAMPUS_GOVERNANCE_REQUIRED', 403)
-  return context
+  return context!
 }
 
 /** Psychological staff approval must not be implied by ORG_ADMIN. */
@@ -72,7 +72,7 @@ export async function assertCampusPsychologyStaff(actor: AuthenticatedPrincipal,
     || !context.capabilities.includes('PSYCHOLOGY_STAFF')) {
     fail('PSYCHOLOGY_STAFF_REQUIRED', 403)
   }
-  return context
+  return context!
 }
 
 export async function replaceCampusRoster(input: {

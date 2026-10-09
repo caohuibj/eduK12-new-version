@@ -5,6 +5,7 @@ import { config } from '../config'
 export const AUTH_COOKIE_NAME = 'ptool_session'
 export const SCHOOL_AUTH_COOKIE_NAME = 'huischool_session'
 export const CSRF_COOKIE_NAME = 'ptool_csrf'
+export const SCHOOL_CSRF_COOKIE_NAME = 'huischool_csrf'
 export const CSRF_HEADER_NAME = 'x-csrf-token'
 
 const COOKIE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
@@ -121,4 +122,13 @@ export const clearSchoolSessionCookie = (req: Request, res: Response): void => {
   appendSetCookie(res, serializeCookie(SCHOOL_AUTH_COOKIE_NAME, '', {
     httpOnly: true, maxAge: 0, secure: isSecureRequest(req),
   }))
+}
+
+export const getSchoolCsrfCookie = (req: Request): string | null => getCookie(req, SCHOOL_CSRF_COOKIE_NAME)
+export const issueSchoolCsrfToken = (req: Request, res: Response): string => {
+  const token = randomBytes(32).toString('base64url')
+  appendSetCookie(res, serializeCookie(SCHOOL_CSRF_COOKIE_NAME, token, {
+    maxAge: COOKIE_MAX_AGE_SECONDS, secure: isSecureRequest(req),
+  }))
+  return token
 }
