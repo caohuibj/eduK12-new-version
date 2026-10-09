@@ -2608,3 +2608,21 @@ model CampusMfaRecoveryCode {
   @@id([userId, codeHash])
   @@map("campus_mfa_recovery_codes")
 }
+
+// Staff onboarding is a separate, once-only SCHOOL invitation; it never adds
+// a legacy training account to a school or reuses training credentials.
+model CampusStaffInvitation {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  tokenHash      String    @unique(map: "campus_staff_invitations_token_hash_key") @map("token_hash")
+  persona        String
+  adminRole      Boolean   @default(false) @map("admin_role")
+  psychologyStaff Boolean  @default(false) @map("psychology_staff")
+  invitedByUserId String   @map("invited_by_user_id")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt     DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String? @map("consumed_by_user_id")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, expiresAt], map: "campus_staff_invitations_org_idx")
+  @@map("campus_staff_invitations")
+}
