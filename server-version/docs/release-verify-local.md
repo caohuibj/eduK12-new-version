@@ -1,3 +1,5 @@
+> Historical full-platform checklist. For newly implemented scoped A/B application releases use `docs/release/README.md`; this remains applicable to C and its unchanged scientific/data/security/recovery contracts. Do not use it to silently weaken a selected check.
+
 # 本地发布门禁（Fix-2）
 
 > 这是隔离证据门禁，不是生产部署脚本。它只创建带有

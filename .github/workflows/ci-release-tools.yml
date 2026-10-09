@@ -1,0 +1,19 @@
+name: Release tooling contracts only
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  tools:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: release classification, exact gates and existing routing contracts
+        run: node --test server-version/scripts/release/policy.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
+      - name: evidence, bounded readiness, rollback and retry on synthetic HTTP
+        run: python3 -B -m unittest discover -s server-version/scripts/release -p 'test_*.py'

@@ -1,0 +1,71 @@
+name: Scoped application release qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: verify the frozen full-diff plan
+        run: |
+          python3 -c 'import os,json;from pathlib import Path;Path("release-plan.json").write_text(json.dumps(json.loads(os.environ["PLAN"])))'
+          python3 -c 'import json,subprocess;from pathlib import Path;p=json.loads(Path("release-plan.json").read_text());assert p["route"] in ["A","B"];assert subprocess.check_output(["git","rev-parse","HEAD"]).decode().strip()==p["head"];assert json.loads(subprocess.check_output(["node","server-version/scripts/release/policy.mjs",p["base"],p["head"]]))==p'
+      - uses: docker/setup-buildx-action@v3
+      - name: compile once and check only changed components in the same build stage
+        run: python3 -B server-version/scripts/release/build.py
+      - name: isolated Compose rollback and safe retry proof
+        run: python3 -B server-version/scripts/release/ci-container-rehearsal.py > executor-rehearsal.json
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan actual changed runtime images
+        run: python3 -B server-version/scripts/release/scan.py
+      - name: install the candidate browser
+        run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: affected pages and login contracts on the actual candidate
+        run: python3 -B server-version/scripts/release/candidate.py
+      - name: immutable image transport and source-bound evidence
+        run: python3 -B server-version/scripts/release/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-components-${{ github.sha }}
+          path: release-package/
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: release-failure-${{ github.sha }}
+          path: |
+            release-evidence/
+            release-checks.json
+          if-no-files-found: ignore
+          retention-days: 3
+  qualified:
+    needs: candidate
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: candidate must succeed; skipped or missing cannot qualify
+        env:
+          RESULT: ${{ needs.candidate.result }}
+        run: test "$RESULT" = success

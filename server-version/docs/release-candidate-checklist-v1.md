@@ -1,3 +1,5 @@
+> Historical full-platform checklist. For newly implemented scoped A/B application releases use `docs/release/README.md`; this remains applicable to C and its unchanged scientific/data/security/recovery contracts. Do not use it to silently weaken a selected check.
+
 # Milestone F Release Candidate Checklist v1
 
 **候选版本：** eduK12 + Cognitive Core v1

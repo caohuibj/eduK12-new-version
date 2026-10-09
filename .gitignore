@@ -7,3 +7,10 @@
 
 # disposable compose validation env (holds local test credentials)
 server-version/compose-validate.env
+
+# Ephemeral release qualification output (never commit credentials/artifacts).
+.github/release-tools/node_modules/
+release-package/
+release-evidence/
+release-*.json
+server-version/scripts/release/__pycache__/

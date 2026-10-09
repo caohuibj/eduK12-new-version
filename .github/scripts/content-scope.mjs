@@ -4,6 +4,7 @@ import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
 import { dependencyScope } from './dependency-scope.mjs';
+import { plan as applicationPlan, toolingOnly } from '../../server-version/scripts/release/policy.mjs';
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -219,21 +220,23 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     && dependencyScope(entries, {base});
   const frontendTest = result.frontend_test === true;
   const frontend = result.frontend === true && !frontendTest;
-  const scenario = dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const releaseTools = !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
+  const scenario = releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = frontendTest ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = dependencies || scenario === 'platform' || frontend
+  const codeql = releaseTools || dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
-  const output = { maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  const output = { application_route:release && release.route !== 'C' ? release.route : 'legacy', release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
