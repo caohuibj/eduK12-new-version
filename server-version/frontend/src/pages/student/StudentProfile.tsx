@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import React, { useEffect, useState } from 'react'
 import { CheckCircle, Eye, EyeOff, Loader2, Lock, Save, User } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -119,7 +120,7 @@ const StudentProfile: React.FC = () => {
 
   return (
     <ProductPage width="reading" className="hui-student-page hui-student-profile space-y-6">
-      <PageHeader title="个人资料" description="管理显示姓名与登录密码。" />
+      <PageHeader title={isTrainingHost() ? "我的账户" : "个人资料"} description="管理显示姓名与登录密码。" />
 
       {loadError && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
@@ -194,12 +195,14 @@ const StudentProfile: React.FC = () => {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-gray-600" aria-hidden="true" />
-                <h2 id="student-password-title" className="text-lg font-semibold text-gray-800">修改密码</h2>
+                <h2 id="student-password-title" className="text-lg font-semibold text-gray-800">{isTrainingHost() ? "账户安全" : "修改密码"}</h2>
               </div>
               <button type="button" onClick={() => setShowPasswordForm(current => !current)} className="text-sm text-action hover:underline" aria-expanded={showPasswordForm}>
                 {showPasswordForm ? '取消' : '修改密码'}
               </button>
             </div>
+
+            {!showPasswordForm && <p className="training-security-hint text-sm text-gray-500">定期更新密码，保护账户与学习记录。</p>}
 
             {showPasswordForm && (
               <form onSubmit={handleChangePassword} className="space-y-4">

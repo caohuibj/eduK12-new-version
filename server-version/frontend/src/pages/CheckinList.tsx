@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect } from 'react'
@@ -446,13 +447,13 @@ const CheckinList: React.FC = () => {
       {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
       : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
-      : <div className="staff-table-container"><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
+      : <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
         {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
           <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(checkin)}>{checkin.title}</button>{checkin.tags?.length?<div className="staff-inline-tags">{checkin.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
-          <td>{checkin.course?.title || '未知课程'}</td>
-          <td>{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</td>
-          <td><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(checkin)}>{checkin._count?.submissions || 0} 人参与</button></td>
-          <td><span className={`staff-badge ${checkin.allowAnonymous?'staff-badge--success':''}`}>{checkin.allowAnonymous?'已开启':'未开启'}</span></td>
+          <td data-label="课程" className="staff-record-course">{checkin.course?.title || '未知课程'}</td>
+          <td data-label="截止时间">{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</td>
+          <td data-label="参与"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(checkin)}>{checkin._count?.submissions || 0} 人参与</button></td>
+          <td data-label="公开参与"><span className={`staff-badge ${checkin.allowAnonymous?'staff-badge--success':''}`}>{checkin.allowAnonymous?'已开启':'未开启'}</span></td>
           <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleExport(checkin)}>导出数据</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
@@ -522,7 +523,7 @@ const CheckinList: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                   className="input w-full"
                 />
-                <p className="text-xs text-gray-500 mt-1">设置后，学生需在截止时间前完成打卡</p>
+                <p className="text-xs text-gray-500 mt-1">{isTrainingHost() ? '设置后，学员需在截止时间前完成打卡' : '设置后，学生需在截止时间前完成打卡'}</p>
               </div>
 
               {/* Tags */}
@@ -545,7 +546,7 @@ const CheckinList: React.FC = () => {
                   className="w-4 h-4 text-action rounded"
                 />
                 <label htmlFor="allowViewOthers" className="text-sm text-gray-700">
-                  允许学生查看其他人的打卡内容
+                  {isTrainingHost() ? '允许学员查看其他人的打卡内容' : '允许学生查看其他人的打卡内容'}
                 </label>
               </div>
 

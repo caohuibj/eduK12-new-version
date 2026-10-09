@@ -29,17 +29,17 @@ const TeacherLogin: React.FC = () => {
 
       if (response.code === 0 && response.data) {
         if (response.data.isUsed) {
-          setError('该教师码已被使用，请直接使用用户名密码登录')
+          setError(training ? '该注册码已被使用，请使用账号密码登录' : '该教师码已被使用，请直接使用用户名密码登录')
         } else {
           // 教师码有效且未使用，跳转到注册页面
           navigate(authLink(`/teacher/register?code=${encodeURIComponent(teacherCode.trim())}`))
           return
         }
       } else {
-        setError(response.message || '教师码无效或已过期')
+        setError(response.message || (training ? '注册码无效或已过期' : '教师码无效或已过期'))
       }
     } catch (err: any) {
-      setError(err.message || '验证失败，请检查教师码')
+      setError(err.message || (training ? '验证失败，请检查注册码' : '验证失败，请检查教师码'))
     } finally {
       setLoading(false)
     }
@@ -49,7 +49,7 @@ const TeacherLogin: React.FC = () => {
     <AuthShell
       tone="teacher"
       title="教师注册"
-      description="使用教师邀请码创建账号"
+      description={training ? "先验证注册码，再创建培训师账号" : "使用教师邀请码创建账号"}
       heroTitle="从一个清晰的入口，开始课程与测评管理"
       heroDescription="教师邀请码用于首次创建账号；已有账号可直接返回教师登录。"
     >
@@ -69,11 +69,11 @@ const TeacherLogin: React.FC = () => {
             value={teacherCode}
             onChange={(e) => setTeacherCode(e.target.value)}
             className="input"
-            placeholder="请输入教师邀请码"
+            placeholder={training ? "请输入培训师注册码" : "请输入教师邀请码"}
             required
           />
           <p className="mt-2 text-xs text-gray-500">
-            {training ? '培训师注册码由平台管理员创建，仅能使用一次' : '教师邀请码由管理员创建，仅限使用一次'}
+            {training ? '培训师注册码由平台管理员创建，首次注册使用，请向管理员索取' : '教师邀请码由管理员创建，仅限使用一次'}
           </p>
         </div>
 
@@ -88,13 +88,13 @@ const TeacherLogin: React.FC = () => {
               <span>验证中...</span>
             </>
           ) : (
-            <span>验证并注册</span>
+            <span>{training ? "验证并继续" : "验证并注册"}</span>
           )}
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-2">{training ? '已有培训师账号？' : '已有教师账号？'}</p>
+      <div className={training ? "training-auth-register-entry" : "mt-6 pt-6 border-t text-center"}>
+        <p className={training ? "text-sm text-gray-500" : "text-sm text-gray-500 mb-2"}>{training ? '已有培训师账号？' : '已有教师账号？'}</p>
         <Link to={authLink("/teacher/account-login")} className="text-action hover:underline font-medium">
           直接登录
         </Link>
@@ -102,11 +102,11 @@ const TeacherLogin: React.FC = () => {
 
       <div className="hui-auth-note">
         <strong>注册流程</strong>
-        <ol className="list-decimal list-inside mt-1 space-y-1">
-          <li>输入教师邀请码</li>
+        {training ? <p>验证后设置账号信息。提交后等待管理员审核，通过后即可登录。</p> : <ol className="list-decimal list-inside mt-1 space-y-1">
+          <li>{training ? "验证管理员提供的培训师注册码" : "输入教师邀请码"}</li>
           <li>设置用户名、密码和真实姓名</li>
           <li>提交后等待管理员审核，通过后即可登录</li>
-        </ol>
+        </ol>}
       </div>
     </AuthShell>
   )

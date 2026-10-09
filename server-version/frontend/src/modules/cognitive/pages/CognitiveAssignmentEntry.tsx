@@ -115,7 +115,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
   const entryAction = resolveCognitiveEntryAction(ledgerSessionId, ledgerStatus)
 
   return (
-    <div>
+    <div className="hui-cognitive-entry">
       <button
         onClick={() => navigate('/student/cognitive')}
         className="flex items-center text-gray-500 hover:text-gray-700 mb-4"

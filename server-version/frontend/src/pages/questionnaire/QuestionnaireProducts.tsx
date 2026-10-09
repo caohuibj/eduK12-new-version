@@ -1,7 +1,7 @@
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 import { useAuth } from '../../contexts/AuthContext'
@@ -113,6 +113,7 @@ export function QuestionnaireProductList() {
               </p>
               <div className="flex gap-4 mt-2">
                 <Link to={row.editHref}>查看与编制</Link>
+                {row.kind === 'COLLECTION' && row.status === 'DRAFT' && <Link className="hui-button hui-button--primary" to={row.editHref + '#questionnaire-publish'}>前往发布</Link>}
                 <ProductButton onClick={() => void copy(row.id)}>
                   复制为新草稿
                 </ProductButton>
@@ -176,7 +177,17 @@ export function QuestionnaireProductEdit() {
   const [selected, setSelected] = useState('')
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
+  const location = useLocation()
+  const hasDetail = Boolean(detail)
   const [activeStep, setActiveStep] = useState('questionnaire-basic')
+  useEffect(() => {
+    const step = location.hash.slice(1)
+    setActiveStep(['questionnaire-basic', 'questionnaire-content', 'questionnaire-delivery'].includes(step) ? step : 'questionnaire-basic')
+    if ((hasDetail || id === 'new') && step) {
+      const frame = requestAnimationFrame(() => document.getElementById(step)?.scrollIntoView({ block: 'start' }))
+      return () => cancelAnimationFrame(frame)
+    }
+  }, [location.hash, hasDetail, id])
   const [formType, setFormType] = useState('text_input')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
@@ -260,7 +271,7 @@ export function QuestionnaireProductEdit() {
         ? '测评名称不能超过200字'
         : ''
     const invalidExpiry =
-      publicEnabled && !expiresAt ? '公开问卷需要设置截止时间' : expiresAt && !parseLocalDateTime(expiresAt) ? '截止时间无效，请按年-月-日 时:分填写' : ''
+      publicEnabled && !expiresAt ? '公开问卷需要设置截止时间' : expiresAt && !parseLocalDateTime(expiresAt) ? '截止时间无效，请按年-月-日 时:分填写' : opensAt && expiresAt && parseLocalDateTime(opensAt) && parseLocalDateTime(expiresAt) && parseLocalDateTime(opensAt)! > parseLocalDateTime(expiresAt)! ? '截止时间不能早于开始时间' : ''
     setNameError(invalidName)
     setExpiryError(invalidExpiry)
     if (opensAt && !parseLocalDateTime(opensAt)) { setError('开始时间无效，请按年-月-日 时:分填写'); document.getElementById('questionnaire-product-opens')?.focus(); return }
@@ -414,7 +425,7 @@ export function QuestionnaireProductEdit() {
   const localDate = (v: string) => {
     return localDateTimeValue(v)
   }
-  const deliverySettings = <fieldset id="questionnaire-delivery" disabled={busy || !draft} className="space-y-3 my-4 rounded border p-4"><legend>3. 投放与发布</legend>
+  const deliverySettings = <fieldset id="questionnaire-delivery" disabled={busy || !draft} className="space-y-3 my-4 rounded border p-4 questionnaire-delivery-panel"><legend>3. 投放设置</legend><div className="questionnaire-delivery-grid"><div className="questionnaire-delivery-audience">
             {id === 'new' && (
               <label className="block">
                 投放方式
@@ -435,7 +446,7 @@ export function QuestionnaireProductEdit() {
             {kind === 'COURSE' && (
               <fieldset>
                 <legend>投放课程（可多选）</legend>
-                <p>草稿可暂不选择课程，发布前需选择至少一个投放课程。</p>
+                <p>{draft ? '草稿可暂不选择课程，发布前需选择至少一个投放课程。' : '当前版本的课程投放范围。'}</p>
                 {catalog.courses.map((v: any) => (
                   <label className="block" key={v.id}>
                     <input
@@ -462,18 +473,17 @@ export function QuestionnaireProductEdit() {
               />{' '}
               允许通过公开链接作答
             </label>
-            <label className="block">
+            </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
               开始时间
-              <LocalDateTimeInput
+              {!draft && !opensAt ? <p className="questionnaire-window-summary">发布后立即开放</p> : <LocalDateTimeInput picker className="input w-full"
                 id="questionnaire-product-opens"
                 value={localDate(opensAt)}
                 onChange={(e) => setOpens(e.target.value)}
-              />
+              />}
             </label>
-            <p className="text-sm text-gray-600">时间按当前浏览器时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）输入，保存时换算为 UTC。</p>
             <label className="block">
               截止时间
-              <LocalDateTimeInput
+              {!draft && !expiresAt ? <p className="questionnaire-window-summary">不设截止时间</p> : <LocalDateTimeInput picker className="input w-full"
                 id="questionnaire-product-expiry"
                 aria-invalid={Boolean(expiryError)}
                 aria-describedby={
@@ -484,26 +494,53 @@ export function QuestionnaireProductEdit() {
                   setExpiry(e.target.value)
                   setExpiryError('')
                 }}
-              />
+              />}
             </label>
+            </div>
+            <p className="text-sm text-gray-600">按设备时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）设置。开始时间留空即发布后开放；公开链接需设置截止时间。</p>
             {expiryError && (
               <p id="questionnaire-product-expiry-error" role="alert">
                 {expiryError}
               </p>
             )}
-    <div className="flex flex-wrap gap-3"><ProductButton onClick={()=>setOpens(new Date().toISOString())}>设为现在开放</ProductButton><ProductButton onClick={()=>{setExpiry(new Date(Date.now()+7*86400000).toISOString());setExpiryError('')}}>设为七天后截止</ProductButton></div>
+    {draft && <div className="flex flex-wrap gap-3"><ProductButton onClick={()=>setOpens(new Date().toISOString())}>设为现在开放</ProductButton><ProductButton onClick={()=>{setExpiry(new Date(Date.now()+7*86400000).toISOString());setExpiryError('')}}>设为七天后截止</ProductButton></div>}
+    </div></div>
+    {detail && draft && <div className="questionnaire-delivery-footer"><p role="status">{dirty ? '设置有未保存的修改' : '设置已保存'}</p><ProductButton variant={dirty ? 'primary' : 'secondary'} disabled={busy || !dirty} onClick={() => void save()}>保存投放设置</ProductButton><a href="#questionnaire-publish">前往正式发布 ↑</a></div>}
   </fieldset>
   return (
     <ProductPage width="management" className="hui-questionnaire-products">
       <PageHeader
-        title={id === 'new' ? '创建组合测评' : '编制组合测评'}
+        title={id === 'new' ? '创建组合测评' : detail && !draft ? '查看组合测评' : '编制组合测评'}
         description="各项测评独立反馈，报告为单项结果合集。当前支持网页作答。"
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
+      {id === 'new' && <p className="questionnaire-publish-hint" role="status">先创建草稿，再添加测评内容、设置投放范围，最后正式发布。</p>}
+      {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
+      {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
+        <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
+        <div className="flex flex-wrap gap-3">
+                {dirty && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}
+                {draft && <ProductButton variant="secondary" disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
+                {draft && (
+                  <ProductButton
+                    disabled={busy || dirty}
+                    variant="primary"
+                    onClick={() => void publish()}
+                  >
+                    发布组合测评
+                  </ProductButton>
+                )}
+        </div></div>
+              {preflight && !dirty && preflight.revision === detail.revision && <section aria-label="发布自检结果" className="questionnaire-preflight-results my-4 rounded border p-4">
+                <h2 className="font-semibold">{preflight.ok ? '当前草稿自检通过' : '发布前请处理以下问题'}</h2>
+                <ul className="mt-2 space-y-2">{preflight.checks.map(check => <li key={check.key}><strong>{check.label}：{check.status === 'passed' ? '通过' : '需要处理'}</strong>{check.message !== '通过' && <p>{check.message}</p>}{check.targetId&&<ProductButton onClick={()=>{setEditingUnit(check.targetId!);document.getElementById('questionnaire-unit-'+check.targetId)?.scrollIntoView({block:'center'})}}>配置对应单元</ProductButton>}{check.status!=='passed'&&<a href={check.key==='delivery'?'#questionnaire-delivery':'#questionnaire-content'}>定位并修复{check.key==='delivery'?'投放设置':'内容单元'}</a>}</li>)}</ul>
+                <p className="mt-2 text-sm text-slate-600">正式发布时会再次检查当前草稿与权限。</p>
+              </section>}
+      </section>}
       <nav aria-label="编制步骤" className="questionnaire-step-nav my-4">
-        {[['questionnaire-basic','基本信息'],['questionnaire-content','内容与顺序'],['questionnaire-delivery','投放与发布']].map(([step,label],index) =>
-          <a key={step} href={'#'+step} aria-current={activeStep === step ? 'step' : undefined} onClick={() => setActiveStep(step)}><span className="questionnaire-step-number">{index+1}.</span><span>{label}</span></a>
+        {[['questionnaire-basic','基本信息'],['questionnaire-content','内容与顺序'],['questionnaire-delivery','投放设置']].map(([step,label],index) =>
+          id === 'new' && step === 'questionnaire-content' ? <span key={step} className="questionnaire-step-pending" aria-disabled="true"><span className="questionnaire-step-number">{index+1}.</span><span>内容（创建后设置）</span></span> : <a key={step} href={'#'+step} aria-current={activeStep === step ? 'step' : undefined} onClick={() => setActiveStep(step)}><span className="questionnaire-step-number">{index+1}.</span><span>{label}</span></a>
         )}
       </nav>
       {error && (
@@ -521,7 +558,7 @@ export function QuestionnaireProductEdit() {
           <fieldset
             id="questionnaire-basic"
             disabled={busy || !draft}
-            className="space-y-3 my-4 rounded border p-4"
+            className="questionnaire-basic-grid my-4 rounded border p-4"
           >
             <label className="block">
               测评名称
@@ -562,9 +599,9 @@ export function QuestionnaireProductEdit() {
                 onChange={(e) => setInstruction(e.target.value)}
               />
             </label>
-            <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} onClick={() => void save()}>
+            {draft && <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} disabled={busy || (id !== 'new' && !dirty)} onClick={() => void save()}>
               {id === 'new' ? '创建草稿' : '保存设置'}
-            </ProductButton>
+            </ProductButton>}
           </fieldset>
           {id === 'new' && deliverySettings}
           {detail && (
@@ -810,16 +847,6 @@ export function QuestionnaireProductEdit() {
               </div></div>
               {deliverySettings}
               <div className="flex flex-wrap gap-4 my-5">
-                {draft && <ProductButton variant={!dirty && !(preflight?.ok && preflight.revision === detail.revision) ? 'primary' : 'secondary'} disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
-                {draft && (
-                  <ProductButton
-                    disabled={busy || dirty}
-                    variant={preflight?.ok && preflight.revision === detail.revision ? 'primary' : 'secondary'}
-                    onClick={() => void publish()}
-                  >
-                    发布组合测评
-                  </ProductButton>
-                )}
                 <ProductButton
                   disabled={busy}
                   onClick={() =>
@@ -872,11 +899,6 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
               </div>
-              {preflight && preflight.revision === detail.revision && <section aria-label="发布自检结果" className="my-4 rounded border p-4">
-                <h2 className="font-semibold">{preflight.ok ? '当前草稿自检通过' : '发布前请处理以下问题'}</h2>
-                <ul className="mt-2 space-y-2">{preflight.checks.map(check => <li key={check.key}><strong>{check.label}：{check.status === 'passed' ? '通过' : '需要处理'}</strong><p>{check.message}</p>{check.targetId&&<ProductButton onClick={()=>{setEditingUnit(check.targetId!);document.getElementById('questionnaire-unit-'+check.targetId)?.scrollIntoView({block:'center'})}}>配置对应单元</ProductButton>}{check.status!=='passed'&&<a href={check.key==='delivery'?'#questionnaire-delivery':'#questionnaire-content'}>定位并修复{check.key==='delivery'?'投放设置':'内容单元'}</a>}</li>)}</ul>
-                <p className="mt-2 text-sm text-slate-600">正式发布时会再次检查当前草稿与权限。</p>
-              </section>}
               {detail.publicEnabled && detail.status === 'PUBLISHED' && id && (
                 <PublicDeliveryManager
                   key={id}

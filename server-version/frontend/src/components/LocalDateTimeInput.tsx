@@ -16,8 +16,13 @@ export function localDateTimeValue(value: string): string {
   const date = parseLocalDateTime(value)
   return date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : value
 }
-type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & { value: string }
-const LocalDateTimeInput = forwardRef<HTMLInputElement, Props>(function LocalDateTimeInput({ value, onChange, ...props }, ref) {
+type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & { value: string; picker?: boolean }
+const LocalDateTimeInput = forwardRef<HTMLInputElement, Props>(function LocalDateTimeInput({ value, onChange, picker = false, ...props }, ref) {
+  if (picker) return <input {...props} ref={ref} type="datetime-local" step="60"
+    title={`时区：${Intl.DateTimeFormat().resolvedOptions().timeZone}`}
+    value={localDateTimeValue(value)}
+    aria-invalid={props['aria-invalid'] || Boolean(value && !parseLocalDateTime(value))}
+    onChange={onChange} />
   return <input {...props} ref={ref} type="text" placeholder="年-月-日 时:分，如 2026-10-14 23:59"
     title={`格式：YYYY-MM-DD HH:mm；时区：${Intl.DateTimeFormat().resolvedOptions().timeZone}`}
     pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}[ T][0-9]{2}:[0-9]{2}" value={localDateTimeValue(value).replace('T', ' ')}

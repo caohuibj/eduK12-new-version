@@ -14,8 +14,16 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   // The two purpose-built Training Course pages have their own back link.
   if (studentRoot && /^\/student\/courses\/[^/]+$/.test(path)) return null
   if (!studentRoot && /^\/courses\/[^/]+\/detail$/.test(path)) return null
+  // The scale editor already has a return-to-list action.
+  if (!studentRoot && /^\/scales\/[^/]+$/.test(path)) return null
+  // The cognitive task editor provides its own return-to-list action.
+  if (!studentRoot && /^\/cognitive-assignments\/[^/]+$/.test(path)) return null
+  // Composition editors already provide a return-to-list link.
+  if (!studentRoot && /^\/questionnaire-products\/[^/]+$/.test(path)) return null
   // The authorized roster page already has an explicit return-to-course action.
   if (!studentRoot && /^\/courses\/[^/]+\/students$/.test(path)) return null
+  // Learner task entry and history have their own return action.
+  if (studentRoot && /^\/student\/cognitive\/(?:history|assignments\/[^/]+)$/.test(path)) return null
   const params = new URLSearchParams(location.search)
   const hintedId = params.get('courseId')
   const courseId = hintedId && /^[A-Za-z0-9_-]{1,100}$/.test(hintedId) ? hintedId : null

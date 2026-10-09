@@ -26,7 +26,7 @@ const StudentLogin: React.FC = () => {
     setError('')
 
     try {
-      await login(formData.username, formData.password)
+      await login(formData.username, formData.password, 'STUDENT')
       completeLogin()
     } catch (err: any) {
       setError(err.message || '登录失败')
@@ -93,7 +93,7 @@ const StudentLogin: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 flex items-center justify-between gap-4 text-sm">
+      <div className={training ? "training-auth-register-entry" : "mt-6 flex items-center justify-between gap-4 text-sm"}>
         <span className="text-gray-500">还没有账号？</span>
         <Link
           to={authLink("/student/course-login")}
@@ -105,7 +105,7 @@ const StudentLogin: React.FC = () => {
 
       <div className="hui-auth-note">
         <strong>{training ? '学员注册说明' : '学生注册说明'}</strong>
-        <div>{training ? '首次注册时使用培训师提供的课程码；加入后可查看作业、打卡与课程测评。' : '注册后使用课程号加入课程，即可查看作业和打卡任务。'}</div>
+        <div>{training ? '首次注册需使用培训师提供的课程码，验证后创建账号。' : '注册后使用课程号加入课程，即可查看作业和打卡任务。'}</div>
       </div>
     </AuthShell>
   )

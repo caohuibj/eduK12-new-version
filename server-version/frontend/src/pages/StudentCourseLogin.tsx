@@ -53,7 +53,7 @@ const StudentCourseLogin: React.FC = () => {
     <AuthShell
       tone="student"
       title="学生注册"
-      description="输入课程码加入课程"
+      description={training ? "先验证课程码，再创建学员账号" : "输入课程码加入课程"}
       heroTitle="用课程码加入班级，再创建自己的学生账号"
       heroDescription="课程码只用于找到正确的课程；已经注册过的学生可以直接返回账号登录。"
     >
@@ -92,25 +92,25 @@ const StudentCourseLogin: React.FC = () => {
               <span>验证中...</span>
             </>
           ) : (
-            <span>下一步</span>
+            <span>{training ? "验证并继续" : "下一步"}</span>
           )}
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-3">已经注册过？用账号密码登录即可，不必再填课程码。</p>
-        <Link to={authLink("/student/login")} className="inline-flex justify-center w-full btn-secondary">
+      <div className={training ? "training-auth-register-entry" : "mt-6 pt-6 border-t text-center"}>
+        <p className={training ? "text-sm text-gray-500" : "text-sm text-gray-500 mb-3"}>{training ? "已有学员账号？" : "已经注册过？用账号密码登录即可，不必再填课程码。"}</p>
+        <Link to={authLink("/student/login")} className={training ? "text-action hover:underline font-medium" : "inline-flex justify-center w-full btn-secondary"}>
           已有账号，去登录
         </Link>
       </div>
 
       <div className="hui-auth-note">
-        <strong>注册流程</strong>
-        <ol className="list-decimal list-inside mt-1 space-y-1">
+        <strong>{training ? "接下来" : "注册流程"}</strong>
+        {training ? <p>验证后设置用户名、昵称和密码，即可加入课程。</p> : <ol className="list-decimal list-inside mt-1 space-y-1">
           <li>输入课程码验证</li>
-          <li>设置账号信息（用户名、密码、姓名）</li>
+          <li>设置用户名、昵称和密码</li>
           <li>完成注册加入课程</li>
-        </ol>
+        </ol>}
       </div>
     </AuthShell>
   )

@@ -156,8 +156,8 @@ const CourseStudents: React.FC = () => {
       {feedback}
       <TemporaryPasswordHandoff value={credential} onClose={() => setCredential(null)} />
       <PageHeader
-        title={course?.title || (training ? '课程学员管理' : '课程学生管理')}
-        description={`课程码: ${course?.courseCode || '—'} · 共 ${students.length} 名${training ? '学员' : '学生'}`}
+        title={training ? '课程学员' : course?.title || '课程学生管理'}
+        description={`${training && course?.title ? course.title + ' · ' : ''}课程码: ${course?.courseCode || '—'} · 共 ${students.length} 名${training ? '学员' : '学生'}`}
         actions={(
           <Link to={training && courseId ? `/courses/${encodeURIComponent(courseId)}/detail` : '/courses'} className="btn-secondary inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回课程

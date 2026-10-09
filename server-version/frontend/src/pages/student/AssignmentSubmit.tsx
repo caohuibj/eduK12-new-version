@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import { formatLocalDateTime } from '../../utils/dateTime'
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -249,14 +250,14 @@ const AssignmentSubmit: React.FC = () => {
       <VideoList
         videos={assignment.videos}
         title="关联视频"
-        watermarkText="慧育空间专属教学视频"
+        watermarkText={isTrainingHost() ? "Huitraining 专属培训视频" : "慧育空间专属教学视频"}
       />
 
       {/* Image Attachments */}
       <ImageList
         images={assignment.images}
         title="相关图片"
-        watermarkText="慧育空间专属教学图片"
+        watermarkText={isTrainingHost() ? "Huitraining 专属培训图片" : "慧育空间专属教学图片"}
       />
 
       {/* Document Attachments */}
@@ -316,7 +317,7 @@ const AssignmentSubmit: React.FC = () => {
             </div>}
             {submission.comment && (
               <div className="student-submit-feedback">
-                <h4 className="text-sm font-semibold text-blue-800 mb-2">教师评语</h4>
+                <h4 className="text-sm font-semibold text-blue-800 mb-2">{isTrainingHost() ? "培训师评语" : "教师评语"}</h4>
                 <p className="text-blue-700">{submission.comment}</p>
               </div>
             )}

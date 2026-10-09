@@ -182,7 +182,7 @@ const StudentRegister: React.FC = () => {
 
   if (verificationState === 'verifying') {
     return (
-      <AuthShell tone="student" title="学生账号注册" description="正在确认课程码" backTo={authLink("/student/course-login")} backLabel="返回输入课程码">
+      <AuthShell tone="student" title="学生账号注册" description="正在确认课程码" registrationStep="verify" backTo={authLink("/student/course-login")} backLabel="返回输入课程码">
         <div className="hui-auth-note mt-0 text-center" role="status" aria-live="polite">
           <Loader2 className="w-6 h-6 animate-spin mx-auto mb-3 text-blue-600" aria-hidden="true" />
           正在验证课程码...
@@ -193,7 +193,7 @@ const StudentRegister: React.FC = () => {
 
   if (!courseCode || verificationState === 'invalid' || !courseInfo) {
     return (
-      <AuthShell tone="student" title="学生账号注册" description="需要先完成课程码验证" backTo={authLink("/student/course-login")} backLabel="返回输入课程码">
+      <AuthShell tone="student" title="学生账号注册" description="需要先完成课程码验证" registrationStep="verify" backTo={authLink("/student/course-login")} backLabel="返回输入课程码">
         <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           <strong className="block mb-1">{error || '无效的访问'}</strong>
           <span>请先输入课程码。</span>
@@ -207,7 +207,9 @@ const StudentRegister: React.FC = () => {
 
   return (
     <AuthShell tone="student" title="学生账号注册" description={`加入课程：${courseInfo.courseName}`} backTo={authLink("/student/course-login")} backLabel="返回课程码">
-      <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
+      {training ? <div className="training-auth-verified" role="status">
+        <CheckCircle size={18} aria-hidden="true" /><span>课程码已验证，请设置学员账号。</span>
+      </div> : <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center space-x-2 text-green-700">
           <CheckCircle className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">课程码验证成功</span>
@@ -215,7 +217,7 @@ const StudentRegister: React.FC = () => {
         <p className="text-sm text-green-600 mt-1">
           {training ? '请设置您的学员账号信息' : '请设置您的学生账号信息'}
         </p>
-      </div>
+      </div>}
 
       {error && (
         <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -308,9 +310,9 @@ const StudentRegister: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-3">已经有账号？</p>
-        <Link to={authLink("/student/login")} className="inline-flex justify-center w-full btn-secondary">
+      <div className={training ? "training-auth-register-entry" : "mt-6 pt-6 border-t text-center"}>
+        <p className={training ? "text-sm text-gray-500" : "text-sm text-gray-500 mb-3"}>已经有账号？</p>
+        <Link to={authLink("/student/login")} className={training ? "text-action hover:underline font-medium" : "inline-flex justify-center w-full btn-secondary"}>
           已有账号，去登录
         </Link>
       </div>

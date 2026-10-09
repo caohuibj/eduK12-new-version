@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useState, useEffect, useRef } from 'react'
@@ -298,7 +299,7 @@ const ScaleList: React.FC = () => {
       ) : filteredScales.length === 0 ? (
         <div className="rounded-lg bg-white py-12 text-center shadow text-gray-500">没有符合当前标签筛选条件的量表。</div>
       ) : (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className={`overflow-hidden rounded-lg bg-white shadow ${isTrainingHost() ? "training-record-table" : ""}`}>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -314,7 +315,7 @@ const ScaleList: React.FC = () => {
               <tbody className="divide-y divide-gray-200 bg-white">
                 {filteredScales.map(scale => (
                   <tr key={scale.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td data-label="量表信息" className="px-6 py-4">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <div className="text-sm font-medium text-gray-900">{scale.name}</div>
@@ -337,17 +338,17 @@ const ScaleList: React.FC = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(scale.status)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label="状态" className="px-6 py-4 whitespace-nowrap">{getStatusBadge(scale.status)}</td>
+                    <td data-label="统计" className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         <div className="flex items-center gap-1"><ClipboardList className="h-4 w-4" aria-hidden="true" />{v2ItemCount(scale)} 题</div>
                         <div className="mt-1 flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" />{v2DimensionCount(scale)} 维度</div>
                         <div className="mt-1 flex items-center gap-1"><Users className="h-4 w-4" aria-hidden="true" />{scale._count?.assessments ?? 0} 测评</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{scale.creator.nickname || scale.creator.username}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(scale.createdAt).toLocaleDateString('zh-CN')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td data-label="创建者" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{scale.creator.nickname || scale.creator.username}</td>
+                    <td data-label="创建时间" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(scale.createdAt).toLocaleDateString('zh-CN')}</td>
+                    <td data-label="操作" className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         {scale.status === 'PUBLISHED' && <Link to={`/questionnaire-products/new?scaleId=${encodeURIComponent(scale.id)}`} className="text-action text-xs">用于问卷投放</Link>}
                         {scale.source === 'granted' ? (

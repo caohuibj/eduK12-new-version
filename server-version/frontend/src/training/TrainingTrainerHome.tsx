@@ -100,11 +100,10 @@ export default function TrainingTrainerHome() {
       {loading ? <p role="status" className="training-status">正在读取课程…</p>
         : loadError ? <div className="training-message" role="alert">课程暂时无法显示：{loadError}<button type="button" onClick={() => void refresh()}>重试</button></div>
         : courses.length === 0 ? <div className="training-empty"><p>还没有创建课程。</p><button type="button" onClick={() => setCreateOpen(true)}>创建第一门课程 →</button></div>
-        : <div className="training-course-list">{courses.map(course =>
+        : <div className={`training-course-list ${courses.length === 1 ? 'training-course-list--single' : ''}`}>{courses.map(course =>
           <Link key={course.id} to={`/courses/${encodeURIComponent(course.id)}/detail`} className="training-course-item">
-            <span className="training-course-mark" aria-hidden="true">授</span>
-            <span className="training-course-text"><strong>{course.title}</strong><small>{course.description || '管理学员、作业、打卡与课程测评'}</small></span>
-            <ArrowRight size={20} aria-hidden="true" />
+            <span className="training-course-cover" aria-hidden="true"><span>授</span></span>
+            <span className="training-course-text"><strong>{course.title}</strong><small>{course.description || '管理学员、作业、打卡与课程测评'}</small><span className="training-course-card-bottom"><span>{course.status === 'DRAFT' ? '草稿' : course.status === 'COMPLETED' ? '已完结' : course.status === 'PUBLISHED' ? '已发布' : ''}</span><span>管理课程 <ArrowRight size={16} aria-hidden="true" /></span></span></span>
           </Link>)}</div>}
       {!loading && !loadError && (hasMore || moreError) && <div className="training-load-more">
         {moreError && <p role="alert">后续课程暂未加载：{moreError}</p>}

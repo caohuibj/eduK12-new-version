@@ -71,11 +71,10 @@ export default function TrainingLearnerHome() {
       {loading ? <p role="status" className="training-status">正在读取课程…</p>
         : loadError ? <div className="training-message" role="alert">课程暂时无法显示：{loadError}<button type="button" onClick={() => void refresh()}>重试</button></div>
         : courses.length === 0 ? <div className="training-empty"><p>还没有加入课程。</p><button type="button" onClick={() => setJoinOpen(true)}>输入培训师提供的课程码 →</button></div>
-        : <div className="training-course-list">{courses.map(course =>
+        : <div className={`training-course-list ${courses.length === 1 ? 'training-course-list--single' : ''}`}>{courses.map(course =>
           <Link key={course.id} to={`/student/courses/${encodeURIComponent(course.id)}`} className="training-course-item">
-            <span className="training-course-mark" aria-hidden="true">课</span>
-            <span className="training-course-text"><strong>{course.title}</strong>{course.description ? <small>{course.description}</small> : <small>进入课程，查看作业、打卡与测评</small>}</span>
-            <ArrowRight size={20} aria-hidden="true" />
+            <span className="training-course-cover" aria-hidden="true"><span>课</span></span>
+            <span className="training-course-text"><strong>{course.title}</strong>{course.description ? <small>{course.description}</small> : <small>进入课程，查看作业、打卡与测评</small>}<span className="training-course-card-bottom"><span>已加入</span><span>进入学习 <ArrowRight size={16} aria-hidden="true" /></span></span></span>
           </Link>)}</div>}
     </section>
 

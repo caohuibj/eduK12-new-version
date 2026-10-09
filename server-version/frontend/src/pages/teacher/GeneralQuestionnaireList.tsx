@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import React, { useEffect, useState } from 'react'
 import { CheckCircle, Copy, Download, Edit3, Link2, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -120,7 +121,7 @@ const GeneralQuestionnaireList: React.FC = () => {
           </ProductButton>
         </div>
       ) : (
-        <div className="staff-table-container">
+        <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}>
           <table className="staff-table">
             <thead>
               <tr>
@@ -136,10 +137,10 @@ const GeneralQuestionnaireList: React.FC = () => {
               {questionnaires.map((record) => (
                 <tr key={record.id}>
                   <td><strong className="staff-record-title">{record.name}</strong></td>
-                  <td>{record.code}</td>
-                  <td><span className={`staff-badge ${record.status === 'PUBLISHED' ? 'staff-badge--success' : 'staff-badge--warning'}`}>{record.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></td>
-                  <td>{record.questionnaireScales?.length || 0}</td>
-                  <td>{new Date(record.createdAt).toLocaleDateString()}</td>
+                  <td data-label="问卷编码">{record.code}</td>
+                  <td data-label="状态"><span className={`staff-badge ${record.status === 'PUBLISHED' ? 'staff-badge--success' : 'staff-badge--warning'}`}>{record.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></td>
+                  <td data-label="包含量表">{record.questionnaireScales?.length || 0}</td>
+                  <td data-label="创建时间">{new Date(record.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="staff-table-actions">
                       {record.status === 'DRAFT' && (

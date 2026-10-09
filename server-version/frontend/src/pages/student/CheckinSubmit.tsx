@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -278,7 +279,7 @@ const CheckinSubmit: React.FC = () => {
           <VideoList
             videos={checkin.videos}
             title="相关视频"
-            watermarkText="慧育空间专属教学视频"
+            watermarkText={isTrainingHost() ? "Huitraining 专属培训视频" : "慧育空间专属教学视频"}
             className="!p-0 !shadow-none !border-0"
           />
         )}
@@ -288,7 +289,7 @@ const CheckinSubmit: React.FC = () => {
           <ImageList
             images={checkin.images}
             title="相关图片"
-            watermarkText="慧育空间专属教学图片"
+            watermarkText={isTrainingHost() ? "Huitraining 专属培训图片" : "慧育空间专属教学图片"}
             className="!p-0 !shadow-none !border-0"
           />
         )}
