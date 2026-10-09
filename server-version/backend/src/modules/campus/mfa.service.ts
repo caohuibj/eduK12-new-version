@@ -66,11 +66,15 @@ export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {
       OR EXISTS (
         SELECT 1 FROM "organization_memberships" m JOIN "organizations" o
           ON o."id"=m."organization_id" AND o."status"='ACTIVE'
-        WHERE m."user_id"=u."id" AND m."valid_until" IS NULL AND m."org_role"='ORG_ADMIN'
+        WHERE m."user_id"=u."id" AND m."valid_from"<=statement_timestamp()
+          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+          AND m."org_role"='ORG_ADMIN'
       )
       OR EXISTS (
         SELECT 1 FROM "organization_capability_grants" c
-        JOIN "organization_memberships" m ON m."id"=c."membership_id" AND m."valid_until" IS NULL
+        JOIN "organization_memberships" m ON m."id"=c."membership_id"
+          AND m."valid_from"<=statement_timestamp()
+          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
         JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE'
         WHERE m."user_id"=u."id" AND c."revoked_at" IS NULL
           AND c."capability" IN ('PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE','REPORT_MEMBER_EXPORT','REPORT_EXPORT')
