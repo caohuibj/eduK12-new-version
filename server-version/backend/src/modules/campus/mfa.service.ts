@@ -73,7 +73,7 @@ export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {
         JOIN "organization_memberships" m ON m."id"=c."membership_id" AND m."valid_until" IS NULL
         JOIN "organizations" o ON o."id"=m."organization_id" AND o."status"='ACTIVE'
         WHERE m."user_id"=u."id" AND c."revoked_at" IS NULL
-          AND c."capability" IN ('PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE','REPORT_MEMBER_EXPORT')
+          AND c."capability" IN ('PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE','REPORT_MEMBER_EXPORT','REPORT_EXPORT')
       )
     ) AS "required"
     FROM "users" u WHERE u."id"=${userId} AND u."account_domain"='SCHOOL'
