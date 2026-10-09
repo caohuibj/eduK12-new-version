@@ -111,6 +111,7 @@ model User {
 // append-only audit trigger remain authoritative in the handwritten migrations.
 model Organization {
   homeroomDeliveryEnabled Boolean @default(true) @map("homeroom_delivery_enabled")
+  productDomain String @default("LEGACY") @map("product_domain")
   id              String    @id
   name            String
   status          String    @default("ACTIVE")
@@ -2505,4 +2506,74 @@ model CampusAccount {
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   @@map("campus_accounts")
+}
+
+// Campus admissions use handwritten multi-column FKs/partial indexes in SQL
+// migrations, because OrganizationUnit is intentionally SQL-owned.
+model CampusClassAdmission {
+  classUnitId      String    @id @map("class_unit_id")
+  organizationId   String    @map("organization_id")
+  rosterVersion    Int       @default(0) @map("roster_version")
+  status           String    @default("DRAFT")
+  windowOpensAt    DateTime? @map("window_opens_at") @db.Timestamptz(6)
+  windowClosesAt   DateTime? @map("window_closes_at") @db.Timestamptz(6)
+  approvedAt       DateTime? @map("approved_at") @db.Timestamptz(6)
+  approvedByUserId String?   @map("approved_by_user_id")
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@index([organizationId, status], map: "campus_class_admissions_org_status_idx")
+  @@map("campus_class_admissions")
+}
+
+model CampusStudentEligibility {
+  id                String    @id
+  organizationId    String    @map("organization_id")
+  classUnitId       String    @map("class_unit_id")
+  studentNoDigest   String    @map("student_no_digest")
+  keyVersion        Int       @default(1) @map("key_version")
+  rosterVersion     Int       @map("roster_version")
+  claimedUserId     String?   @unique(map: "campus_student_eligibilities_claimed_user_key") @map("claimed_user_id")
+  status            String    @default("VALID")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@unique([organizationId, studentNoDigest], map: "campus_student_eligibilities_org_digest_key")
+  @@index([organizationId, classUnitId, rosterVersion], map: "campus_student_eligibilities_class_idx")
+  @@map("campus_student_eligibilities")
+}
+
+model CampusActivationCode {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  classUnitId    String    @map("class_unit_id")
+  rosterVersion  Int       @map("roster_version")
+  codeDigest     String    @unique(map: "campus_activation_codes_digest_key") @map("code_digest")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt     DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedUserId String?   @map("consumed_user_id")
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, expiresAt], map: "campus_activation_codes_class_idx")
+  @@map("campus_activation_codes")
+}
+
+model CampusStudentEnrollment {
+  userId          String    @id @map("user_id")
+  organizationId  String    @map("organization_id")
+  classUnitId     String    @map("class_unit_id")
+  eligibilityId   String    @unique(map: "campus_student_enrollments_eligibility_key") @map("eligibility_id")
+  rosterVersion   Int       @map("roster_version")
+  status          String    @default("PENDING_CLASS_APPROVAL")
+  approvedAt      DateTime? @map("approved_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, status], map: "campus_student_enrollments_class_idx")
+  @@map("campus_student_enrollments")
+}
+
+model CampusAdmissionIncident {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  classUnitId     String    @map("class_unit_id")
+  reason          String
+  resolvedAt      DateTime? @map("resolved_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, resolvedAt], map: "campus_admission_incidents_class_idx")
+  @@map("campus_admission_incidents")
 }

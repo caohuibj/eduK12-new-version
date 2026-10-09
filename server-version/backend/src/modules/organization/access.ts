@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-type OrgRow = { id: string; status: OrganizationStatus }
+type OrgRow = { id: string; status: OrganizationStatus; productDomain: string; viewerDomain: string }
 type MembershipRow = { id: string; orgRole: OrganizationRole }
 type PersonaRow = { persona: OrganizationPersona }
 type CapabilityRow = { capability: OrganizationCapability }
@@ -41,13 +41,18 @@ export async function resolveOrganizationAccessContext(input: {
 }, tx?: Prisma.TransactionClient): Promise<OrganizationAccessContext | null> {
   const db=tx??prisma
   const organizations = await db.$queryRaw<OrgRow[]>`
-    SELECT "id", "status"
-    FROM "organizations"
-    WHERE "id" = ${input.organizationId}
+    SELECT o."id", o."status", o."product_domain" AS "productDomain",
+           u."account_domain" AS "viewerDomain"
+    FROM "organizations" o
+    JOIN "users" u ON u."id" = ${input.principal.userId}
+    WHERE o."id" = ${input.organizationId}
     LIMIT 1
   `
   const organization = organizations[0]
   if (!organization) return null
+  // Fail closed even for legacy SYSTEM_ADMIN: bootstrap is a separate
+  // audited operation, not an implicit right to SCHOOL member/report data.
+  if ((organization.productDomain === 'SCHOOL') !== (organization.viewerDomain === 'SCHOOL')) return null
 
   const [memberships, denyRows] = await Promise.all([
     db.$queryRaw<MembershipRow[]>`
