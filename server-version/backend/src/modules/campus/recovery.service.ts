@@ -145,6 +145,18 @@ export async function requestSchoolMfaReset(input:{
      FOR SHARE OF m
    `
    if(!membership.length)deny('MFA_RESET_TARGET_UNAVAILABLE',404)
+   // A global SCHOOL account shared by more than one school must not have
+   // its MFA removed solely through one school's administrators.
+   const schoolScopes=await tx.$queryRaw<Array<{count:number}>>`
+     SELECT COUNT(DISTINCT m."organization_id")::int AS "count"
+     FROM "organization_memberships" m
+     JOIN "organizations" o ON o."id"=m."organization_id"
+       AND o."product_domain"='SCHOOL'
+     WHERE m."user_id"=${input.targetUserId} AND m."valid_until" IS NULL
+   `
+   if(schoolScopes[0]?.count!==1)deny('MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR',403)
+   const enabled=await tx.campusMfaCredential.findUnique({where:{userId:input.targetUserId}})
+   if(!enabled?.enabled)deny('MFA_RESET_TARGET_NOT_ENROLLED',409)
    await tx.$executeRaw`
      UPDATE "campus_mfa_reset_requests" SET "status"='EXPIRED',
        "decided_at"=statement_timestamp()
@@ -200,6 +212,15 @@ export async function approveSchoolMfaReset(input:{
      where:{organizationId:input.organizationId,userId:target.id,validUntil:null},
    })
    if(!targetMembership)deny('MFA_RESET_TARGET_UNAVAILABLE',404)
+   const schoolScopes=await tx.$queryRaw<Array<{count:number}>>`
+     SELECT COUNT(DISTINCT m."organization_id")::int AS "count"
+     FROM "organization_memberships" m JOIN "organizations" o
+       ON o."id"=m."organization_id" AND o."product_domain"='SCHOOL'
+     WHERE m."user_id"=${target.id} AND m."valid_until" IS NULL
+   `
+   if(schoolScopes[0]?.count!==1)deny('MULTI_SCHOOL_MFA_RESET_REQUIRES_OPERATOR',403)
+   const enabled=await tx.campusMfaCredential.findUnique({where:{userId:target.id}})
+   if(!enabled?.enabled)deny('MFA_RESET_TARGET_NOT_ENROLLED',409)
    await tx.campusMfaCredential.upsert({
      where:{userId:target.id},
      create:{userId:target.id,secretCipher:'RESET_PENDING',enabled:false,lastUsedStep:BigInt(-1)},
