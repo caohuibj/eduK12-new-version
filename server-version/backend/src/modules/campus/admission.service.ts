@@ -75,6 +75,22 @@ export async function assertCampusPsychologyStaff(actor: AuthenticatedPrincipal,
   return context!
 }
 
+/** A recovery officer is a current SCHOOL admin or separately authorized
+ * psychology staff member; homeroom/teacher/course ownership never qualify.
+ */
+export async function assertCampusRecoveryAuthority(actor: AuthenticatedPrincipal, organizationId: string) {
+  if (actor.accountDomain !== 'SCHOOL') fail('CAMPUS_ACCOUNT_REQUIRED', 403)
+  const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
+  if (!context || context.productDomain !== 'SCHOOL' || !context.membershipId
+      || context.organizationStatus !== 'ACTIVE'
+      || context.explicitDenies.some(d => ['*','STUDENT_RECOVERY','CLASS_APPROVE','ORGANIZATION_GOVERNANCE'].includes(d))
+      || !(context.orgRole === 'ORG_ADMIN'
+           || (context.capabilities.includes('PSYCHOLOGY_STAFF') && context.personas.includes('COUNSELOR')))) {
+    fail('CAMPUS_RECOVERY_AUTH_REQUIRED', 403)
+  }
+  return context
+}
+
 export async function replaceCampusRoster(input: {
   actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
   studentNumbers: string[]
@@ -390,3 +406,90 @@ export async function readCampusStudentStatus(actor: AuthenticatedPrincipal) {
   `
   return rows[0]??{status:'NO_CAMPUS_CLASS',organizationId:null,classUnitId:null}
 }
+
+// Recording a suspected identity incident blocks class approval; no student
+// number, username or answer material is accepted in the incident payload.
+export async function createCampusAdmissionIncident(input: {
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string;
+  reason: 'SUSPECTED_REGISTRATION_TAKEOVER'|'ELIGIBILITY_DISPUTE'|'OTHER_REGISTRATION_ERROR'
+}) {
+  await assertCampusRecoveryAuthority(input.actor,input.organizationId)
+  return prisma.$transaction(async tx=>{
+    const admission=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
+    if(admission.status==='APPROVED')fail('INCIDENT_AFTER_APPROVAL_REQUIRES_QUARANTINE')
+    const record=await tx.campusAdmissionIncident.create({data:{
+      id:randomUUID(),organizationId:input.organizationId,classUnitId:input.classUnitId,reason:input.reason,
+    }})
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:'CAMPUS_ADMISSION_INCIDENT_OPENED',targetType:'INCIDENT',targetId:record.id,
+      domainEventId:randomUUID(),payload:{reason:input.reason},
+    })
+    return {incidentId:record.id,status:'OPEN' as const}
+  })
+}
+export async function resolveCampusAdmissionIncident(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string;incidentId:string;
+  resolution:'VERIFIED_CORRECT'|'STUDENT_QUARANTINED'|'ROSTER_CORRECTED'
+}) {
+  await assertCampusRecoveryAuthority(input.actor,input.organizationId)
+  return prisma.$transaction(async tx=>{
+    await admissionForUpdate(tx,input.organizationId,input.classUnitId)
+    const incident=await tx.campusAdmissionIncident.updateMany({
+      where:{id:input.incidentId,organizationId:input.organizationId,classUnitId:input.classUnitId,resolvedAt:null},
+      data:{resolvedAt:new Date()},
+    })
+    if(incident.count!==1)fail('INCIDENT_NOT_FOUND',404)
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:'CAMPUS_ADMISSION_INCIDENT_RESOLVED',targetType:'INCIDENT',targetId:input.incidentId,
+      domainEventId:randomUUID(),payload:{resolution:input.resolution},
+    })
+    return {resolved:true}
+  })
+}
+
+/** Quarantine never reassigns any existing FINAL or assessment respondent.
+ * End an existing org membership, freeze credentials and revoke all sessions.
+ * The incident stays open until separately reviewed, not automatically cleared.
+ */
+export async function quarantineCampusStudent(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string;studentNumber:string
+}) {
+  await assertCampusRecoveryAuthority(input.actor,input.organizationId)
+  const eligibilityDigest=digestNo(input.organizationId,input.studentNumber)
+  return prisma.$transaction(async tx=>{
+    await admissionForUpdate(tx,input.organizationId,input.classUnitId)
+    const elig=await tx.$queryRaw<Array<{id:string;userId:string|null}>>`
+      SELECT "id","claimed_user_id" AS "userId" FROM "campus_student_eligibilities"
+      WHERE "organization_id"=${input.organizationId} AND "class_unit_id"=${input.classUnitId}
+        AND "student_no_digest"=${eligibilityDigest} FOR UPDATE
+    `
+    const userId=elig[0]?.userId
+    if(!userId)fail('STUDENT_QUARANTINE_UNAVAILABLE',404)
+    const account=await tx.user.findUnique({where:{id:userId}})
+    if(!account||account.accountDomain!=='SCHOOL')fail('STUDENT_QUARANTINE_UNAVAILABLE',404)
+    await tx.user.update({where:{id:userId},data:{isFrozen:true,tokenVersion:{increment:1}}})
+    await tx.$executeRaw`
+      UPDATE "campus_student_enrollments" SET "status"='QUARANTINED'
+      WHERE "user_id"=${userId}
+    `
+    await tx.$executeRaw`
+      UPDATE "organization_memberships" SET "valid_until"=statement_timestamp(),
+          "ended_by_user_id"=${input.actor.userId},"end_reason"='CAMPUS_IDENTITY_QUARANTINE'
+      WHERE "user_id"=${userId} AND "organization_id"=${input.organizationId}
+        AND "valid_until" IS NULL
+    `
+    const incident=await tx.campusAdmissionIncident.create({data:{
+      id:randomUUID(),organizationId:input.organizationId,
+      classUnitId:input.classUnitId,reason:'SUSPECTED_REGISTRATION_TAKEOVER',
+    }})
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:'CAMPUS_STUDENT_QUARANTINED',targetType:'INCIDENT',targetId:incident.id,
+      domainEventId:randomUUID(),payload:{eligibilityId:elig[0].id},
+    })
+    return {status:'QUARANTINED' as const,incidentId:incident.id}
+  })
+}
+
