@@ -54,6 +54,7 @@ export async function assertTeacherCourseResetPreflight(input: {
           status: { in: ['ACTIVE', 'APPROVED'] },
           student: {
             role: UserRole.STUDENT,
+            accountDomain: { not: 'SCHOOL' },
             platformRole: PlatformRole.STANDARD,
             isActive: true,
             isFrozen: false,

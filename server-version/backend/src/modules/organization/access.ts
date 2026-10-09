@@ -9,6 +9,7 @@ import { OrganizationCapability, OrganizationPersona, OrganizationRole, Organiza
 export interface OrganizationAccessContext {
   organizationId: string
   organizationStatus: OrganizationStatus
+  productDomain: 'LEGACY' | 'SCHOOL'
   userId: string
   platformRole: 'SYSTEM_ADMIN' | 'STANDARD'
   membershipId: string | null
@@ -29,7 +30,7 @@ declare global {
   }
 }
 
-type OrgRow = { id: string; status: OrganizationStatus; productDomain: string; viewerDomain: string }
+type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string }
 type MembershipRow = { id: string; orgRole: OrganizationRole }
 type PersonaRow = { persona: OrganizationPersona }
 type CapabilityRow = { capability: OrganizationCapability }
@@ -109,6 +110,7 @@ export async function resolveOrganizationAccessContext(input: {
   return {
     organizationId: input.organizationId,
     organizationStatus: organization.status,
+    productDomain: organization.productDomain,
     userId: input.principal.userId,
     platformRole: input.principal.platformRole,
     membershipId: membership?.id ?? null,
@@ -127,6 +129,10 @@ export function contextHasCapability(
 ): boolean {
   if (context.explicitDenies.includes('*') || context.explicitDenies.includes(capability)) return false
   if (context.organizationStatus !== 'ACTIVE') return false
+  // SCHOOL sensitive capabilities are explicit; governance is not a report grant.
+  if (context.productDomain === 'SCHOOL' && [
+    'PSYCHOLOGY_STAFF', 'REPORT_MEMBER_EXPORT', 'PARENT_REPORT_DISCLOSURE',
+  ].includes(capability)) return context.capabilities.includes(capability)
   if (context.platformRole === 'SYSTEM_ADMIN' || context.orgRole === 'ORG_ADMIN') return true
   return context.capabilities.includes(capability)
 }

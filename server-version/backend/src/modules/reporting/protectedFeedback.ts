@@ -115,6 +115,10 @@ export const resolveProtectedFeedbackManagerContext = async (input: {
     || context.explicitDenies.includes('REPORT_READ')
     || context.explicitDenies.includes(ORG_PROTECTED_FEEDBACK_POLICY)
   ) hidden()
+  if (context.productDomain === 'SCHOOL' && (
+    !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    || !context.personas.includes('COUNSELOR')
+  )) hidden()
   if (
     context.orgRole !== 'ORG_ADMIN'
     && !context.capabilities.includes('PSYCHOLOGY_STAFF')
@@ -127,6 +131,7 @@ export const resolveProtectedFeedbackManagerContext = async (input: {
 /** One canonical subject predicate shared by discovery and current source access helpers. */
 export async function protectedFeedbackSubjectScope(input:{principal:ReportingPrincipal;organizationId:string;tx?:Prisma.TransactionClient}){
  const context=await resolveProtectedFeedbackManagerContext(input),subject=Prisma.sql`m.user_id`
+ if(context.productDomain==='SCHOOL') return Prisma.sql`m.user_id<> ${input.principal.userId} AND (${counselorSubjectQuery({organizationId:input.organizationId,counselorMembershipId:context.membershipId,subjectUserId:subject})})`
  return Prisma.sql`m.user_id<>${input.principal.userId} AND (${context.orgRole==='ORG_ADMIN'||context.capabilities.includes('PSYCHOLOGY_STAFF')} OR (${context.personas.includes('TEACHER')} AND (${teacherSubjectQuery({organizationId:input.organizationId,teacherMembershipId:context.membershipId,subjectUserId:subject})})) OR (${context.personas.includes('COUNSELOR')} AND (${counselorSubjectQuery({organizationId:input.organizationId,counselorMembershipId:context.membershipId,subjectUserId:subject})})))`
 }
 
@@ -138,6 +143,15 @@ export const assertProtectedFeedbackManagerAccess = async (input: {
 }): Promise<void> => {
   assertProtectedSubjectNotViewer(input.principal.userId, input.subjectUserId)
   const context = await resolveProtectedFeedbackManagerContext(input)
+  if (context.productDomain === 'SCHOOL') {
+    if (await hasCounselorSubjectScope({
+      organizationId: input.organizationId,
+      counselorMembershipId: context.membershipId,
+      subjectUserId: input.subjectUserId,
+      tx: input.tx,
+    })) return
+    hidden()
+  }
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (context.personas.includes('TEACHER')) {
     if (await hasTeacherSubjectScope({
