@@ -49,6 +49,7 @@ import { schoolOriginGuard } from './modules/campus/originGuard'
 import campusOrganizationRoutes from './modules/campus/organization.routes'
 import campusRecoveryRoutes from './modules/campus/recovery.routes'
 import campusActivityRoutes from './modules/campus/activity.routes'
+import campusActivityRunRoutes from './modules/campus/activity.run.routes'
 import userRoutes from './routes/users'
 import courseRoutes from './routes/courses'
 import assignmentRoutes from './routes/assignments'
@@ -244,6 +245,7 @@ app.use('/api/campus', campusStaffRoutes)
 app.use('/api/campus', campusOrganizationRoutes)
 app.use('/api/campus', campusRecoveryRoutes)
 app.use('/api/campus', campusActivityRoutes)
+app.use('/api/campus', campusActivityRunRoutes)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)
 app.use('/api/parent-accounts', parentAccountsRouter)

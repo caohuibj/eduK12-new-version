@@ -136,7 +136,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       kind:'MEASUREMENT',title:e.runName,status,
       deadline:e.deadline?.toISOString()??null,
       href:status==='PENDING'||status==='IN_PROGRESS'
-        ?`/activities/${courseId}/runs/${e.runId}/executions/${e.executionId}`:null})
+        ?`/organizations/${activity.organizationId}/activities/${courseId}/runs/${e.runId}/executions/${e.executionId}`:null})
   }
   const order={IN_PROGRESS:0,PENDING:1,EXPIRED:2,UNAVAILABLE:3,COMPLETED:4}
   tasks.sort((a,b)=>order[a.status]-order[b.status]||
