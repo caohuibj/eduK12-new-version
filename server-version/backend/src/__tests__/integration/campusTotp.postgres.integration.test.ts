@@ -43,9 +43,9 @@ suite('Huischool TOTP challenge and recovery replay — isolated PostgreSQL',()=
       username:'campus_mfa_test_'+randomUUID().replace(/-/g,''),
       passwordHash:'synthetic-only',role:'ADMIN',accountDomain:'SCHOOL',
     }})
+    const loginName='mfatest_'+randomUUID().slice(0,8)
     await db.campusAccount.create({data:{
-      userId:user.id,loginName:'mfatest_'+randomUUID().slice(0,8),
-      normalizedLogin:'mfatest_'+randomUUID().slice(0,8),
+      userId:user.id,loginName,normalizedLogin:loginName.toLowerCase(),
     }})
     expect(await schoolAccountNeedsMfa(user.id)).toBe(true)
     const req1=reqRes()
