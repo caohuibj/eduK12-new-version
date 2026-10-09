@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import './school.css'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
+import { SchoolActivityManager } from './SchoolActivityManager'
+import { SchoolStudentTasks } from './SchoolStudentTasks'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -313,12 +315,14 @@ export default function SchoolApp(){
               onClick={()=>void stepUp()}>重新验证高权限操作</button>
           </div>
         </section>}
-        {user.role==='STUDENT'?<section className="hs-panel"><h2>我的校园活动</h2>
-          <p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':
-            studentStatus==='APPROVED'?'身份已获批。学校正式开放活动后，才会显示授权任务。':
-            '目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p>
-          <p>本页面不会展示历史培训课程或未经授权的心理测评报告。</p>
-        </section>:<>
+        {user.role==='STUDENT'?
+          studentStatus==='APPROVED'?<SchoolStudentTasks api={api}/>:
+            <section className="hs-panel"><h2>我的校园活动</h2>
+              <p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':
+                '目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p>
+              <p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p>
+            </section>:
+        user.role==='TEACHER'||user.role==='ADMIN'?<>
           <section className="hs-panel"><h2>学校与班级</h2>
             <label className="hs-field"><span>当前学校</span><select value={schoolId} onChange={e=>setSchoolId(e.target.value)}>
               <option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}
@@ -350,6 +354,9 @@ export default function SchoolApp(){
           </section>}
           {(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
+          {schoolId&&access&&<SchoolActivityManager
+            key={schoolId} api={api} organizationId={schoolId}
+            isAdmin={schoolAdmin} classes={units}/>}
           {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
@@ -358,7 +365,12 @@ export default function SchoolApp(){
               <button disabled={working} onClick={()=>void invite()}>生成邀请</button></div>
             {newInvite&&<div className="hs-secret"><p>仅显示一次的邀请码：</p><code>{newInvite}</code></div>}
           </section>}
-        </>}
+        </>:<section className="hs-panel">
+          <h2>家长校园入口</h2>
+          <p>家长只可使用经过学校确认的独立校园账号和亲子关系，查看明确授权的内容。
+            不得使用培训版账号或直接继承学生敏感心理报告。</p>
+          <p>家校测评的具体权限、活动关系和报告披露按后续正式授权流程执行。</p>
+        </section>}
       </section>}
     </main>
     <footer className="hs-footer">Huischool · 林间见心 · 校园心理健康 | 教育支持而非医学诊断</footer>
