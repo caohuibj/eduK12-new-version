@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { reportingFail } from './types'
 
@@ -15,7 +15,7 @@ export async function individualSubjectScope(input: IndividualScopeInput): Promi
   // SCHOOL sensitive individual reporting is professional and relationship-scoped.
   // Neither ORG_ADMIN nor class TEACHER can inherit psychological report access.
   if (context.productDomain === 'SCHOOL') {
-    if (!context.capabilities.includes('PSYCHOLOGY_STAFF')
+    if (!contextHasCapability(context,'PSYCHOLOGY_STAFF')
       || !context.personas.includes('COUNSELOR')) return hidden()
     return Prisma.sql`m.user_id <> ${input.principal.userId}
       AND m.valid_from <= statement_timestamp()

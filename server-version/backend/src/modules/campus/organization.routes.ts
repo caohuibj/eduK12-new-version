@@ -4,6 +4,7 @@ import { requireOrganizationGovernance } from '../organization/access'
 import { organizationController } from '../organization/organization.controller'
 import { organizationAdminController } from '../organization/organization.admin.controller'
 import { requireRecentSchoolMfa } from './mfa.middleware'
+import { guardCampusCapabilityGrant } from './capabilityGuard'
 
 // Reuse the existing Organization structure and relationship services, never
 // the legacy /api/organizations entrypoint or its training session cookie.
@@ -17,6 +18,6 @@ router.delete('/organizations/:organizationId/units/:unitId',authenticateSchool,
 router.get('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireOrganizationGovernance,organizationAdminController.listStaffClassAssignments)
 router.post('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.assignStaff)
 router.post('/organizations/:organizationId/staff-class-assignments/:assignmentId/end',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.endStaffAssignment)
-router.post('/organizations/:organizationId/memberships/:membershipId/capabilities',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationController.grantCapability)
+router.post('/organizations/:organizationId/memberships/:membershipId/capabilities',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,guardCampusCapabilityGrant,organizationController.grantCapability)
 router.post('/organizations/:organizationId/memberships/:membershipId/capabilities/revoke',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationController.revokeCapability)
 export default router

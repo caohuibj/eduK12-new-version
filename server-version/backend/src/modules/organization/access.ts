@@ -131,7 +131,7 @@ export function contextHasCapability(
   if (context.organizationStatus !== 'ACTIVE') return false
   // SCHOOL sensitive capabilities are explicit; governance is not a report grant.
   if (context.productDomain === 'SCHOOL' && [
-    'PSYCHOLOGY_STAFF', 'REPORT_MEMBER_EXPORT', 'PARENT_REPORT_DISCLOSURE',
+    'PSYCHOLOGY_STAFF', 'REPORT_EXPORT', 'REPORT_MEMBER_EXPORT', 'PARENT_REPORT_DISCLOSURE',
   ].includes(capability)) return context.capabilities.includes(capability)
   if (context.platformRole === 'SYSTEM_ADMIN' || context.orgRole === 'ORG_ADMIN') return true
   return context.capabilities.includes(capability)

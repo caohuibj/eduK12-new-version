@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, contextHasCapability, type OrganizationAccessContext } from '../organization/access'
 import { reportingAggregations } from './statistics'
 import {
   reportingFail,
@@ -116,7 +116,7 @@ export const resolveProtectedFeedbackManagerContext = async (input: {
     || context.explicitDenies.includes(ORG_PROTECTED_FEEDBACK_POLICY)
   ) hidden()
   if (context.productDomain === 'SCHOOL' && (
-    !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    !contextHasCapability(context,'PSYCHOLOGY_STAFF')
     || !context.personas.includes('COUNSELOR')
   )) hidden()
   if (

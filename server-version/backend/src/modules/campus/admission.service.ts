@@ -3,7 +3,7 @@ import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { hashPassword } from '../../utils/password'
 import { appendAudit } from '../organization/service'
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import type { AuthenticatedPrincipal } from '../../types'
 
 type Tx = Prisma.TransactionClient
@@ -69,7 +69,7 @@ export async function assertCampusPsychologyStaff(actor: AuthenticatedPrincipal,
   const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
   if (!context?.membershipId || context.organizationStatus !== 'ACTIVE'
     || context.explicitDenies.some(x => ['*', 'PSYCHOLOGY_STAFF', 'CLASS_APPROVE'].includes(x))
-    || !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    || !contextHasCapability(context,'PSYCHOLOGY_STAFF')
     || !context.personas.includes('COUNSELOR')) {
     fail('PSYCHOLOGY_STAFF_REQUIRED', 403)
   }
@@ -86,7 +86,7 @@ export async function assertCampusRecoveryAuthority(actor: AuthenticatedPrincipa
       || context.organizationStatus !== 'ACTIVE'
       || context.explicitDenies.some(d => ['*','STUDENT_RECOVERY','CLASS_APPROVE','ORGANIZATION_GOVERNANCE'].includes(d))
       || !(context.orgRole === 'ORG_ADMIN'
-           || (context.capabilities.includes('PSYCHOLOGY_STAFF') && context.personas.includes('COUNSELOR')))) {
+           || (contextHasCapability(context,'PSYCHOLOGY_STAFF') && context.personas.includes('COUNSELOR')))) {
     fail('CAMPUS_RECOVERY_AUTH_REQUIRED', 403)
   }
   return context
