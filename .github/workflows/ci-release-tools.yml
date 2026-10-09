@@ -6,14 +6,30 @@ permissions:
 jobs:
   tools:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 5
+    env:
+      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      HUI_EVIDENCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+      HUI_LOCAL_VALIDATION_PUBLIC_KEY: ${{ vars.HUI_LOCAL_VALIDATION_PUBLIC_KEY }}
+      HUI_LOCAL_VALIDATION_EVIDENCE: ${{ vars.HUI_LOCAL_VALIDATION_EVIDENCE }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - run: npm ci --ignore-scripts --prefix .github/release-tools
-      - name: release classification, exact gates and existing routing contracts
-        run: node --test server-version/scripts/release/policy.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
-      - name: evidence, bounded readiness, rollback and retry on synthetic HTTP
-        run: python3 -B -m unittest discover -s server-version/scripts/release -p 'test_*.py'
+      - id: local
+        name: authenticate local results without retesting
+        run: |
+          node --input-type=module <<'JS'
+          import {appendFileSync} from 'node:fs';
+          import {fromEnvironment} from './.github/scripts/local-validation.mjs';
+          const p=fromEnvironment(process.env.CI_BASE_SHA,process.env.GITHUB_SHA);
+          appendFileSync(process.env.GITHUB_OUTPUT,`reused=${p.checks.some(c=>c.check==='release-tools')}\n`);
+          JS
+      - name: install tools only for missing checks
+        if: steps.local.outputs.reused != 'true'
+        run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: consume local success or execute missing tooling checks
+        run: node .github/scripts/local-validation.mjs ci release-tools

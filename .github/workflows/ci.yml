@@ -253,7 +253,7 @@ jobs:
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
       - id: documentation-scope
-        name: select dependency-free documentation classification
+        name: select dependency-free documentation or tooling classification
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_EVENT: ${{ github.event_name }}
@@ -262,11 +262,14 @@ jobs:
           node --input-type=module <<'JS'
           import {appendFileSync} from 'node:fs';
           import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
-          const docs=process.env.CI_EVENT!=='workflow_dispatch' && classifyChanges(changedEntries(process.env.CI_BASE_SHA),process.env.CI_FORCE_FULL==='true').documentation;
-          appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\n`);
+          import {toolingOnly} from './server-version/scripts/release/policy.mjs';
+          const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(process.env.CI_BASE_SHA);
+          const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (docs||toolingOnly(entries));
+          appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
-        if: steps.documentation-scope.outputs.documentation != 'true'
+        if: steps.documentation-scope.outputs.lightweight != 'true'
         run: npm ci --ignore-scripts --prefix .github/release-tools
       - id: scope
         env:
@@ -304,9 +307,12 @@ jobs:
       - name: validate the exact documentation diff
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HUI_EVIDENCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          HUI_LOCAL_VALIDATION_PUBLIC_KEY: ${{ vars.HUI_LOCAL_VALIDATION_PUBLIC_KEY }}
+          HUI_LOCAL_VALIDATION_EVIDENCE: ${{ vars.HUI_LOCAL_VALIDATION_EVIDENCE }}
         run: |
           node .github/scripts/fetch-ci-base.mjs
-          node .github/scripts/documentation-check.mjs
+          node .github/scripts/local-validation.mjs ci documentation
 
   content:
     name: assessment content
@@ -717,7 +723,7 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: install pinned release classification tools
-        if: needs.scope.outputs.documentation != 'true'
+        if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.scenario != 'release-tooling'
         run: npm ci --ignore-scripts --prefix .github/release-tools
       - name: require exact success for the selected route
         if: ${{ !inputs.complete_training }}

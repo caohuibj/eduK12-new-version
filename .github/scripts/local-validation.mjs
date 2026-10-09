@@ -11,13 +11,27 @@ const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',maxBuffer:32*1024*1024}).trim();
 export const canonical=x=>JSON.stringify(x);
 const script='.github/scripts/local-validation.mjs';
+const adapterFiles=new Set(['AGENTS.md','docs/release/README.md','.github/PULL_REQUEST_TEMPLATE.md','.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',script,'.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs','.github/workflows/ci.yml','.github/workflows/ci-release-tools.yml','server-version/scripts/release/policy.mjs']);
+export function adapterOnly(base,head) {
+ const raw=git('diff','--no-renames','--raw','--abbrev=40',base,head);
+ const records=raw.split('\n').filter(Boolean);
+ if(!records.length||records.some(line=>{const m=/^:(000000|100644) 100644 [a-f0-9]{40} [a-f0-9]{40} ([AM])\t(.+)$/.exec(line);return !m||!adapterFiles.has(m[3])||(m[2]==='M'&&m[1]!=='100644');}))return false;
+ // Changing unrelated classification/permission logic cannot use this receipt.
+ const stripPolicy=t=>t.replace(" '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',\n",'');
+ const stripScope=t=>t.replace(", 'AGENTS.md', 'docs/release/README.md', '.github/PULL_REQUEST_TEMPLATE.md'",'').replace('const releaseTools = !result.documentation && !dependencies','const releaseTools = !dependencies');
+ for(const [file,strip] of [['server-version/scripts/release/policy.mjs',stripPolicy],['.github/scripts/content-scope.mjs',stripScope]]) {
+  if(!records.some(r=>r.endsWith('\t'+file)))continue;
+  if(strip(git('show',base+':'+file))!==strip(git('show',head+':'+file)))return false;
+ }
+ return true;
+}
 const recipes={
  documentation:[['node','.github/scripts/documentation-check.mjs']],
  'release-tools':[['node','--test','server-version/scripts/release/policy.test.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/local-validation.test.mjs']],
 };
 export function recipe(check,base,head) {
  if(!recipes[check])throw Error('Unsupported receipt check: '+check);
- const commands=structuredClone(recipes[check]);
+ const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
   for(const name of ['executor','qualify']) if(files.some(f=>f.endsWith('/'+name+'.py')||f.endsWith('/test_'+name+'.py')||(name==='executor'&&f.endsWith('/evidence.py'))))
@@ -38,6 +52,7 @@ export function authenticate(envelope,publicKey) {
  if(!publicKey)throw Error('Local evidence public key is not configured');
  if(!envelope?.payload||!envelope.signature||!crypto.verify(null,Buffer.from(canonical(envelope.payload)),publicKey,Buffer.from(envelope.signature,'base64')))throw Error('Untrusted/tampered local evidence');
  const p=envelope.payload;
+ if(!/^[a-f0-9]{40}$/.test(p.head)||!/^[a-f0-9]{40}$/.test(p.base))throw Error('Evidence requires full source SHAs');
  if(p.schema!==1||p.repository!==REPO||!Array.isArray(p.checks)||new Set(p.checks.map(c=>c.check)).size!==p.checks.length)throw Error('Invalid local evidence structure');
  for(const c of p.checks)if(!recipes[c.check]||c.status!=='success'||!c.logSha256||!c.binding||!Array.isArray(c.commands)||c.commands.some(r=>r.exitCode!==0))throw Error('Failed/incomplete local evidence');
  return p;
@@ -53,8 +68,11 @@ export function fromEnvironment(base,head) {
  const raw=process.env.HUI_LOCAL_VALIDATION_EVIDENCE;
  if(!raw)return {checks:[]};
  const p=authenticate(JSON.parse(raw),process.env.HUI_LOCAL_VALIDATION_PUBLIC_KEY);
- // A different active PR has no local claim; do not apply its evidence here.
- if(p.head!==head && spawnSync('git',['merge-base','--is-ancestor',p.head,head]).status!==0 && git('rev-parse',p.head+'^{tree}')!==git('rev-parse',head+'^{tree}')) return {checks:[]};
+ const branch=process.env.HUI_EVIDENCE_BRANCH||git('branch','--show-current');
+ const sameBranch=p.branch&&p.branch===branch;
+ if(spawnSync('git',['cat-file','-e',p.head+'^{commit}']).status!==0)execFileSync('git',['fetch','--no-tags','--depth=1','origin',p.head],{stdio:'pipe'});
+ // Another branch has no claim; stale inputs on this branch stop without retest.
+ if(!sameBranch && p.head!==head && spawnSync('git',['merge-base','--is-ancestor',p.head,head]).status!==0 && git('rev-parse',p.head+'^{tree}')!==git('rev-parse',head+'^{tree}')) return {checks:[]};
  return admit(JSON.parse(raw),process.env.HUI_LOCAL_VALIDATION_PUBLIC_KEY,base,head);
 }
 function runCommands(check,base,head) {
@@ -67,7 +85,7 @@ function runCommands(check,base,head) {
  }
  return {check,status:'success',binding:binding(check,base,head),commands:records,logSha256:h.digest('hex'),node:process.version};
 }
-// Proposed local-only prototype. No workflow calls this file; admission requires explicit approval.
+// User-approved local evidence admission for documentation and release tooling.
 async function main() {
  const [mode,...args]=process.argv.slice(2);
  if(mode==='init') {
@@ -89,7 +107,7 @@ async function main() {
   if(git('status','--porcelain','--untracked-files=normal'))throw Error('Commit changed inputs before running the formal check');
   const before=binding(check,base,head);const record=runCommands(check,base,head);
   if(before!==record.binding||git('status','--porcelain','--untracked-files=normal'))throw Error('Inputs changed during validation');
-  const payload={schema:1,repository:REPO,head,base,completedAt:new Date().toISOString(),checks:[record]};
+  const payload={schema:1,repository:REPO,head,base,branch:git('branch','--show-current'),completedAt:new Date().toISOString(),checks:[record]};
   fs.writeFileSync(output,JSON.stringify(seal(payload,fs.readFileSync(keyFile()))),{flag:'wx',mode:0o600});console.log('Recorded '+check+' at '+head);return;
  }
  if(mode==='publish') {

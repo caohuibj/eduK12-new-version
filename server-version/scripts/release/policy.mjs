@@ -84,6 +84,7 @@ const releaseToolFiles=new Set([
  '.github/PULL_REQUEST_TEMPLATE.md','.github/release-tools/package.json','.github/release-tools/package-lock.json',
  '.github/workflows/ci.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/merge-gate.mjs',
+ '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',
  '.gitignore','AGENTS.md','docs/ci-runner-policy.md','docs/release/README.md','docs/release/audit-20261009.md','docs/release/validation-20261009.md',
  'server-version/docs/release-candidate-checklist-v1.md','server-version/docs/release-verify-local.md',
  ...['policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
