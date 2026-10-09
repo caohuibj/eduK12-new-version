@@ -29,12 +29,12 @@ export function domainFor(file) {
   return null;
 }
 
-// Ordinary engineering documentation only; scientific/publication/runbook
-// documents keep their existing domain or platform validation.
+// Exact engineering/guidance documents only; other scientific/publication
+// and deployment behavior paths keep their existing domain/platform checks.
 export function documentationFile(file) {
   return typeof file === 'string' && !/[\\\x00-\x1f\x7f]/.test(file)
     && !file.split('/').some(part => !part || part === '.' || part === '..')
-    && (['README.md', 'CONTRIBUTING.md', 'docs/ci-runner-policy.md'].includes(file)
+    && (['README.md', 'CONTRIBUTING.md', 'docs/ci-runner-policy.md', 'AGENTS.md', 'docs/release/README.md', '.github/PULL_REQUEST_TEMPLATE.md'].includes(file)
       || /^docs\/(development|contributing)\/[a-zA-Z0-9_./-]+\.md$/.test(file));
 }
 
@@ -220,7 +220,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     && dependencyScope(entries, {base});
   const frontendTest = result.frontend_test === true;
   const frontend = result.frontend === true && !frontendTest;
-  const releaseTools = !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
+  const releaseTools = !result.documentation && !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
   const scenario = releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly

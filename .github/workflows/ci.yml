@@ -246,14 +246,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: install pinned release classification tools
-        run: npm ci --ignore-scripts --prefix .github/release-tools
       - name: fetch the exact diff base without full history
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - id: documentation-scope
+        name: select dependency-free documentation or tooling classification
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_EVENT: ${{ github.event_name }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+        run: |
+          node --input-type=module <<'JS'
+          import {appendFileSync} from 'node:fs';
+          import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
+          import {toolingOnly} from './server-version/scripts/release/policy.mjs';
+          const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(process.env.CI_BASE_SHA);
+          const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (docs||toolingOnly(entries));
+          appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
+          JS
+      - name: install pinned release classification tools
+        if: steps.documentation-scope.outputs.lightweight != 'true'
+        run: npm ci --ignore-scripts --prefix .github/release-tools
       - id: scope
         env:
           CI_RUNNER_PROFILE: hosted
@@ -264,7 +281,7 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/content-scope.mjs
       - name: legacy routing contracts only for the legacy route
-        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling'
+        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
 
   maintenance:
@@ -290,9 +307,12 @@ jobs:
       - name: validate the exact documentation diff
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HUI_EVIDENCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          HUI_LOCAL_VALIDATION_PUBLIC_KEY: ${{ vars.HUI_LOCAL_VALIDATION_PUBLIC_KEY }}
+          HUI_LOCAL_VALIDATION_EVIDENCE: ${{ vars.HUI_LOCAL_VALIDATION_EVIDENCE }}
         run: |
           node .github/scripts/fetch-ci-base.mjs
-          node .github/scripts/documentation-check.mjs
+          node .github/scripts/local-validation.mjs ci documentation
 
   content:
     name: assessment content
@@ -703,6 +723,7 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: install pinned release classification tools
+        if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.scenario != 'release-tooling'
         run: npm ci --ignore-scripts --prefix .github/release-tools
       - name: require exact success for the selected route
         if: ${{ !inputs.complete_training }}
