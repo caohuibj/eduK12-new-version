@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import { authenticate, authenticateSchool } from '../../middleware/auth'
 import { generateToken } from '../../utils/jwt'
+import { schoolAccountNeedsMfa } from '../../modules/campus/mfa.service'
 
 const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
 const suite=URL?describe:describe.skip
@@ -71,4 +72,25 @@ suite('Huischool product sessions use database account realm and live role eleva
    await db.user.update({where:{id:staff.id},data:{role:'ADMIN'}})
    expect((await check(authenticateSchool,'huischool_session',token)).code).toBe(401)
  })
+ it('requires TOTP when SCHOOL governance is valid until a future date',async()=>{
+   const admin=await db.user.create({data:{
+     username:'realm_expiring_'+randomUUID().replace(/-/g,''),
+     role:'TEACHER',accountDomain:'SCHOOL',passwordHash:'synthetic',
+   }})
+   const org=await db.organization.create({data:{
+     id:randomUUID(),name:'realm-expiring-'+randomUUID(),
+     createdByUserId:admin.id,productDomain:'SCHOOL',
+   }})
+   await db.organizationMembership.create({data:{
+     id:randomUUID(),organizationId:org.id,userId:admin.id,orgRole:'ORG_ADMIN',
+     validUntil:new Date(Date.now()+60*60*1000),
+   }})
+   expect(await schoolAccountNeedsMfa(admin.id)).toBe(true)
+   const passwordOnly=generateToken({
+     userId:admin.id,username:admin.username,role:admin.role,
+     accountDomain:'SCHOOL',tokenVersion:admin.tokenVersion,
+   })
+   expect((await check(authenticateSchool,'huischool_session',passwordOnly)).code).toBe(401)
+ })
+
 })

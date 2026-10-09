@@ -13,6 +13,8 @@ import { createOrganizationUnit } from '../../modules/organization/structure'
 import { forceResetPasswordBySystemAdmin } from '../../services/accountAuthorityService'
 import { setUserActiveState } from '../../services/userLifecycleService'
 import { comparePassword } from '../../utils/password'
+import { individualSubjectScope } from '../../modules/reporting/individualAuthorization'
+import { resolveProtectedFeedbackManagerContext } from '../../modules/reporting/protectedFeedback'
 import type { AuthenticatedPrincipal } from '../../types'
 
 const URL = integrationDatabaseUrl(
@@ -221,6 +223,16 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
     await expect(completeSchoolStudentRecovery({
       recoveryCode:recovery.recoveryCode,newPassword:'NewPassword123',
     })).rejects.toMatchObject({code:'RECOVERY_UNAVAILABLE'})
+  })
+
+  it('does not make SCHOOL ORG_ADMIN a reader of individual psychological reports',async()=>{
+    const f=await school()
+    await expect(individualSubjectScope({
+      principal:{userId:f.admin.userId,platformRole:'STANDARD'},organizationId:f.org,
+    })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+    await expect(resolveProtectedFeedbackManagerContext({
+      principal:{userId:f.admin.userId,platformRole:'STANDARD'},organizationId:f.org,
+    })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
   })
 
   it('hides school targets from legacy platform reset and account lifecycle mutations',async()=>{
