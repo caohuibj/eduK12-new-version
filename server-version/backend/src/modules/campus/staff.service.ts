@@ -21,7 +21,6 @@ export async function createCampusStaffInvitation(input:{
   persona:'TEACHER'|'COUNSELOR';adminRole:boolean;psychologyStaff:boolean
 }) {
   await assertCampusGovernance(input.actor,input.organizationId)
-  if(input.adminRole && input.persona==='COUNSELOR')fail('STAFF_INVITE_ROLE_COMBINATION',400)
   if(input.psychologyStaff && input.persona!=='COUNSELOR')fail('STAFF_INVITE_ROLE_COMBINATION',400)
   const code=randomBytes(24).toString('base64url')
   const expiresAt=new Date(Date.now()+24*60*60*1000)

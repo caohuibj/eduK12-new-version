@@ -11,7 +11,7 @@ import { CampusAdmissionError } from './admission.service'
 import { createCampusStaffInvitation, registerCampusStaff } from './staff.service'
 
 const router=Router()
-router.use((_req,res,next)=>res.setHeader('Cache-Control','no-store')||next())
+router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const rate=createRedisRateLimiter({name:'campus-staff-invite-claim',limit:30,windowSeconds:900})
 const response=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try{return await fn(req,res)}
