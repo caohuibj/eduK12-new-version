@@ -537,3 +537,65 @@ export async function quarantineCampusStudent(input:{
   })
 }
 
+
+/** Reissue the same school-number qualification after a documented takeover.
+ * This creates a new eligibility row, never reactivates the frozen User or
+ * moves that User's measurements or FINAL. The class must still be reapproved.
+ */
+export async function reissueCampusStudentEligibility(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string
+  studentNumber:string;verifiedOffline:boolean
+}) {
+  await assertCampusRecoveryAuthority(input.actor,input.organizationId)
+  if(!input.verifiedOffline)fail('OFFLINE_VERIFICATION_REQUIRED',400)
+  const digest=digestCampusStudentNumber(input.organizationId,input.studentNumber)
+  return prisma.$transaction(async tx=>{
+    const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
+    if(!['OPEN','CLOSED'].includes(row.status))fail('REISSUE_WINDOW_INVALID')
+    const old=await tx.$queryRaw<Array<{id:string}>>`
+      SELECT e."id" FROM "campus_student_eligibilities" e
+      JOIN "campus_student_enrollments" s ON s."eligibility_id"=e."id"
+        AND s."status"='QUARANTINED'
+      JOIN "users" u ON u."id"=s."user_id"
+        AND u."is_frozen"=TRUE AND u."account_domain"='SCHOOL'
+      WHERE e."organization_id"=${input.organizationId}
+        AND e."class_unit_id"=${input.classUnitId}
+        AND e."student_no_digest"=${digest}
+        AND e."status"='VOID' AND e."roster_version"=${row.rosterVersion}
+      LIMIT 1 FOR UPDATE OF e
+    `
+    if(!old.length)fail('REISSUE_SOURCE_NOT_VERIFIED',404)
+    const incident=await tx.$queryRaw<Array<{id:string}>>`
+      SELECT "id" FROM "campus_admission_incidents"
+      WHERE "organization_id"=${input.organizationId}
+        AND "class_unit_id"=${input.classUnitId}
+        AND "reason"='SUSPECTED_REGISTRATION_TAKEOVER'
+        AND "resolved_at" IS NULL
+      ORDER BY "created_at" DESC LIMIT 1
+    `
+    if(!incident.length)fail('REISSUE_REQUIRES_OPEN_INCIDENT')
+    const active=await tx.$queryRaw<Array<{id:string}>>`
+      SELECT "id" FROM "campus_student_eligibilities"
+      WHERE "organization_id"=${input.organizationId}
+        AND "student_no_digest"=${digest} AND "status"='VALID'
+      LIMIT 1
+    `
+    if(active.length)fail('REISSUE_ACTIVE_ELIGIBILITY_EXISTS')
+    const id=randomUUID()
+    await tx.campusStudentEligibility.create({data:{
+      id,organizationId:input.organizationId,
+      classUnitId:input.classUnitId,studentNoDigest:digest,
+      keyVersion:1,rosterVersion:row.rosterVersion,status:'VALID',
+    }})
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:'CAMPUS_QUARANTINED_ELIGIBILITY_REISSUED',
+      targetType:'ELIGIBILITY',targetId:id,domainEventId:randomUUID(),
+      payload:{
+        replacedEligibilityId:old[0].id,incidentId:incident[0].id,
+        offlineVerification:true,
+      },
+    })
+    return {status:'UNCLAIMED' as const,rosterVersion:row.rosterVersion}
+  })
+}

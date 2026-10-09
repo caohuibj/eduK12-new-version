@@ -12,7 +12,7 @@ import {
   approveCampusClass, readCampusStudentStatus,
   createCampusAdmissionIncident, resolveCampusAdmissionIncident,
   listCampusAdmissionIncidents,
-  quarantineCampusStudent,
+  quarantineCampusStudent, reissueCampusStudentEligibility,
 } from './admission.service'
 
 const router=Router()
@@ -113,6 +113,21 @@ router.post('/organizations/:organizationId/classes/:classUnitId/quarantine',
     const params=classParams.parse(req.params)
     const body=z.object({studentNumber:z.string().min(2).max(40)}).strict().parse(req.body)
     return success(res,await quarantineCampusStudent({actor:req.user!,...params,...body}))
+  })
+)
+
+// A documented and independently verified identity recovery creates a new
+// eligibility, not a reassignment of the quarantined account or FINAL.
+router.post('/organizations/:organizationId/classes/:classUnitId/reissue-eligibility',
+  authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
+    const params=classParams.parse(req.params)
+    const body=z.object({
+      studentNumber:z.string().min(2).max(40),
+      verifiedOffline:z.literal(true),
+    }).strict().parse(req.body)
+    return success(res,await reissueCampusStudentEligibility({
+      actor:req.user!,...params,...body,
+    }))
   })
 )
 
