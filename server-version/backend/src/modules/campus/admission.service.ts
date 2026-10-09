@@ -33,7 +33,7 @@ const normalizeLogin = (value: string) => {
   if (!/^[a-z0-9_.-]{4,32}$/.test(normalized)) fail('INVALID_LOGIN', 400)
   return normalized
 }
-function digestNo(organizationId: string, studentNumber: string): string {
+export function digestCampusStudentNumber(organizationId: string, studentNumber: string): string {
   const hex = process.env.CAMPUS_ELIGIBILITY_HMAC_KEY
   if (!hex || !/^[a-fA-F0-9]{64}$/.test(hex)) fail('CAMPUS_KEY_NOT_CONFIGURED', 503)
   return createHmac('sha256', Buffer.from(hex!, 'hex'))
@@ -100,7 +100,7 @@ export async function replaceCampusRoster(input: {
   if (!nums.length || nums.length > 5000 || new Set(nums).size !== nums.length) {
     fail('ROSTER_SIZE_OR_DUPLICATES', 400)
   }
-  const digests = nums.map(num => digestNo(input.organizationId, num))
+  const digests = nums.map(num => digestCampusStudentNumber(input.organizationId, num))
   return prisma.$transaction(async (tx) => {
     // A class admission row is the concurrency lock for roster/window/claims.
     await tx.$executeRaw`
@@ -247,7 +247,7 @@ export async function registerCampusStudent(input: {
   const normalizedLogin=normalizeLogin(input.username)
   const normalizedNumber=normalizeNo(input.studentNumber)
   if (input.activationCode.length < 24 || input.activationCode.length > 64) fail('CAMPUS_REGISTRATION_INVALID',400)
-  const studentNoDigest=digestNo(input.organizationId,normalizedNumber)
+  const studentNoDigest=digestCampusStudentNumber(input.organizationId,normalizedNumber)
   const codeDigest=digestCode(input.activationCode)
   const passwordHash=await hashPassword(input.password)
   try {
@@ -457,7 +457,7 @@ export async function quarantineCampusStudent(input:{
   actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string;studentNumber:string
 }) {
   await assertCampusRecoveryAuthority(input.actor,input.organizationId)
-  const eligibilityDigest=digestNo(input.organizationId,input.studentNumber)
+  const eligibilityDigest=digestCampusStudentNumber(input.organizationId,input.studentNumber)
   return prisma.$transaction(async tx=>{
     await admissionForUpdate(tx,input.organizationId,input.classUnitId)
     const elig=await tx.$queryRaw<Array<{id:string;userId:string|null}>>`
