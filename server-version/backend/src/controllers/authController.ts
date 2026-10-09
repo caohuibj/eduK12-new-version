@@ -76,7 +76,7 @@ export const authController = {
         // Recheck expiry after queued hashing; dummy success must stay a failure.
         return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
       })
-      if (!user) return failedLogin()
+      if (!user || user.accountDomain === 'SCHOOL') return failedLogin()
 
       // Verify the entrance against authoritative account data before issuing a session.
       // Omitted entrance preserves the existing general login contract.
@@ -88,6 +88,7 @@ export const authController = {
 
       await clearLoginFailures(req)
       const token = generateToken({
+        accountDomain: user.accountDomain as 'LEGACY' | 'TRAINING' | 'SCHOOL',
         userId: user.id,
         username: user.username,
         role: user.role,

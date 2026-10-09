@@ -6,6 +6,7 @@ export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
 export interface CurrentPrincipal {
   userId: string
   username: string
+  accountDomain: 'LEGACY' | 'TRAINING' | 'SCHOOL'
   role: UserRole
   platformRole: PlatformRole
   tokenVersion: number
@@ -26,6 +27,7 @@ export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrinc
     SELECT
       "id" AS "userId",
       "username",
+      "account_domain" AS "accountDomain",
       "role",
       "platform_role"::text AS "platformRole",
       "token_version" AS "tokenVersion",
@@ -50,6 +52,7 @@ export function toRequestPrincipal(principal: CurrentPrincipal) {
   return {
     userId: principal.userId,
     username: principal.username,
+    accountDomain: principal.accountDomain,
     role: principal.role,
     platformRole: principal.platformRole,
     tokenVersion: principal.tokenVersion,

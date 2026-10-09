@@ -3,7 +3,7 @@ import { verifyToken } from '../utils/jwt'
 import { AuthenticatedPrincipal, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
-import { getSessionToken } from '../utils/authCookies'
+import { getSessionToken, getSchoolSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 
@@ -20,9 +20,9 @@ const loadPrincipal = async (userId: string) => {
   return measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId))
 }
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+const authenticateProduct = async (req: Request, res: Response, next: NextFunction, school: boolean) => {
   try {
-    const token = getSessionToken(req)
+    const token = school ? getSchoolSessionToken(req) : getSessionToken(req)
     if (!token) {
       return unauthorized(res, '缺少认证令牌')
     }
@@ -43,6 +43,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
 
+    // A domain mismatch cannot be fixed by a client-supplied hostname or
+    // JWT role. Historical JWTs without an audience remain legacy-only.
+    if (school
+      ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL'
+      : principal!.accountDomain === 'SCHOOL' || payload.accountDomain === 'SCHOOL') {
+      return unauthorized(res, '账号不属于当前产品')
+    }
+
     // JWT proves possession of a session credential. Current database state is
     // authoritative for every mutable authorization attribute, including the
     // legacy role and the independent platform role.
@@ -54,6 +62,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       '/api/users/change-password',
       '/api/auth/logout',
       '/api/auth/csrf',
+      '/api/campus/auth/change-password',
     ])
     if (
       principal!.mustChangePassword &&
@@ -67,6 +76,9 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
+export const authenticate = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, false)
+export const authenticateSchool = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, true)
+
 // 可选认证中间件 - 有有效且未停用的 token 才挂上当前数据库 principal；公开入口不因冻结账号 401。
 export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -76,7 +88,7 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
 
       if (payload) {
         const principal = await loadPrincipal(payload.userId)
-        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion) {
+        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && principal!.accountDomain !== 'SCHOOL' && payload.accountDomain !== 'SCHOOL') {
           req.user = toRequestPrincipal(principal!)
         }
       }

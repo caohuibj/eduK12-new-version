@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { config } from '../config'
 
 export const AUTH_COOKIE_NAME = 'ptool_session'
+export const SCHOOL_AUTH_COOKIE_NAME = 'huischool_session'
 export const CSRF_COOKIE_NAME = 'ptool_csrf'
 export const CSRF_HEADER_NAME = 'x-csrf-token'
 
@@ -107,4 +108,17 @@ export const csrfTokensMatch = (cookieToken: string | null, headerToken: string 
   const cookieDigest = createHash('sha256').update(cookieToken).digest()
   const headerDigest = createHash('sha256').update(headerToken).digest()
   return timingSafeEqual(cookieDigest, headerDigest)
+}
+
+/** Isolated host-only session: never alias a SCHOOL bearer token as ptool_session. */
+export const getSchoolSessionToken = (req: Request): string | null => getCookie(req, SCHOOL_AUTH_COOKIE_NAME)
+export const setSchoolSessionCookie = (req: Request, res: Response, token: string): void => {
+  appendSetCookie(res, serializeCookie(SCHOOL_AUTH_COOKIE_NAME, token, {
+    httpOnly: true, maxAge: COOKIE_MAX_AGE_SECONDS, secure: isSecureRequest(req),
+  }))
+}
+export const clearSchoolSessionCookie = (req: Request, res: Response): void => {
+  appendSetCookie(res, serializeCookie(SCHOOL_AUTH_COOKIE_NAME, '', {
+    httpOnly: true, maxAge: 0, secure: isSecureRequest(req),
+  }))
 }
