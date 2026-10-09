@@ -15,6 +15,9 @@ import { setUserActiveState } from '../../services/userLifecycleService'
 import { comparePassword } from '../../utils/password'
 import { individualSubjectScope } from '../../modules/reporting/individualAuthorization'
 import { resolveProtectedFeedbackManagerContext } from '../../modules/reporting/protectedFeedback'
+import { guardCampusCapabilityGrant } from '../../modules/campus/capabilityGuard'
+import type { Request, Response, NextFunction } from 'express'
+import { vi } from 'vitest'
 import type { AuthenticatedPrincipal } from '../../types'
 
 const URL = integrationDatabaseUrl(
@@ -233,6 +236,41 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
     await expect(resolveProtectedFeedbackManagerContext({
       principal:{userId:f.admin.userId,platformRole:'STANDARD'},organizationId:f.org,
     })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+  })
+
+
+  it('honors an explicit PSYCHOLOGY_STAFF deny even if the original grant remains active',async()=>{
+    const f=await school()
+    await db.organizationAccessDeny.create({data:{
+      id:randomUUID(),organizationId:f.org,
+      userId:f.counselor.userId,permission:'PSYCHOLOGY_STAFF',
+      reason:'test explicit campus denial',deniedByUserId:f.admin.userId,
+    }})
+    await expect(individualSubjectScope({
+      principal:{userId:f.counselor.userId,platformRole:'STANDARD'},organizationId:f.org,
+    })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+    await expect(resolveProtectedFeedbackManagerContext({
+      principal:{userId:f.counselor.userId,platformRole:'STANDARD'},organizationId:f.org,
+    })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+  })
+
+  it('does not allow a school administrator to grant sensitive capabilities to their own membership',async()=>{
+    const f=await school()
+    const actorMembership=await db.organizationMembership.findFirstOrThrow({
+      where:{organizationId:f.org,userId:f.admin.userId,validUntil:null},
+    })
+    const req={user:f.admin,params:{
+      organizationId:f.org,membershipId:actorMembership.id,
+    },body:{capability:'PSYCHOLOGY_STAFF'}} as unknown as Request
+    const state:{status:number}={status:200}
+    const res={
+      status(code:number){state.status=code;return res},
+      json(){return res},
+    } as unknown as Response
+    const next=vi.fn() as unknown as NextFunction
+    await guardCampusCapabilityGrant(req,res,next)
+    expect(state.status).toBe(403)
+    expect(next).not.toHaveBeenCalled()
   })
 
   it('hides school targets from legacy platform reset and account lifecycle mutations',async()=>{
