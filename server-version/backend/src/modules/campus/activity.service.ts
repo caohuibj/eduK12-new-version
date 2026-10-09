@@ -267,6 +267,18 @@ export async function changeCampusActivityStatus(input:{
     return {status:transition.to,version:a.version+1}
   })
 }
+/** Reuse within an existing transaction; do not authorize outside a
+ * transaction and then select/allocate after the activity state changed.
+ */
+export async function lockAndAssertCampusActivityEditor(tx:Tx,input:{
+  actor:AuthenticatedPrincipal;organizationId:string;courseId:string
+}){
+  const context=await currentSchoolContext(tx,input.actor,input.organizationId)
+  const activity=await lockSchoolActivity(tx,input.organizationId,input.courseId)
+  await requireEditor(tx,context,activity)
+  return {activity,context}
+}
+
 export async function assertCampusActivityEditor(input:{
   actor:AuthenticatedPrincipal;organizationId:string;courseId:string
 }){
