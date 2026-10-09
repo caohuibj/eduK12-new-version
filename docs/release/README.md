@@ -2,6 +2,95 @@
 
 本文件是新发布路线的统一入口，实现位于 `server-version/scripts/release/`。生产启用须有当次用户授权；文档本身不自动赋予部署权限。本轮用户已追加快速合并及部署授权，实际结果另行记录。
 
+## 规则位置与每次开工方式
+
+仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。
+
+每次开发/发布先给短执行清单：**修改范围 → 检查发现的具体故障 → 主要执行位置 → 输入一致的复用证据 → 时间预算**。不引入额外审批轮次或新验收机制。
+
+| 阶段 | 最小执行范围与主要位置 | 预算/停止规则 |
+|---|---|---|
+| 开发 | 只检查改动及直接影响契约；提前处理连接/权限/工具/定位器，保留代码、依赖、配置、参数和工具绑定证据 | 冻结前说明预算；额外优化不纳入当前发布 |
+| GitHub | 只运行实际差异对应门禁；选择该检查唯一主要位置，正式支持的同输入合格证据可复用 | 轻量路线约 5 分钟仍未结束时指出具体等待项；定位，不追加完整检查 |
+| 服务器 | 使用同一产物；核对版本、就绪、一条受影响短流程和回退；不重新构建或重跑 CI | 约一分钟就绪截止及短观察；持续错误回退 |
+| 完成 | 上述通过即完成；完整回归、灾备和性能独立报告 | 不等待无关恢复任务才能宣布应用完成 |
+
+本地→GitHub 自动证据接纳尚未启用；已准备本地签名原型，接入被自动审批阻止；当前正式机制核验官方 CI artifact 并供部署及适用的 artifact 复用。不得假称本地证明已经被 GitHub 接纳，或伪造必需成功状态。对此缺口先明确执行位置，不默认本地与 GitHub各跑完整一轮；后续正式实现另限范围，当前不扩展自动化。
+
+5 分钟是等待项报告/定位阈值，并非当前自动作业终止值；现有工具 CI 作业上限仍为 8 分钟。完整 A/B 时间目标仍待实际需要时实测。
+
+普通可回退界面的非关键缺陷可上线后修订。阻塞项集中于产物/版本错误、相关门禁真实失败、越权登录、不可逆数据缺少保护、服务持续不可用及无法回退。每个必需检查必须对应具体故障，不能因“以前执行过”或“更放心”追加。
+
+## 一次验证的执行规则与接纳方案（待接入批准）
+
+铁律：本机已通过且消费输入一致的检查，CI 只接纳结果，不复测；本机/CI 已完成的检查，服务器不重复。不因文档或已证明的 UI/CSS 调整构建或验收无关后端。
+
+拟采用的具体信任链：仓库维护者的本地固定检查入口实际执行命令，非零退出不签发成功；Ed25519 私钥仅存在本机 `~/.codex/huisurvey-local-validation/key.pem`（0600），公钥拟存储于仓库 Actions 变量 `HUI_LOCAL_VALIDATION_PUBLIC_KEY`，签名结果拟发布至 `HUI_LOCAL_VALIDATION_EVIDENCE`。CI 验签并重算所消费的 Git 对象/模式、依赖/配置、检查程序和命令指纹，不执行已通过测试；不匹配时明确拒绝，不静默重跑。文档改字不使无关工具证明失效。已有真实镜像来源、扫描、权限、恢复保护和回退条件不因本原型取消。
+
+本轮隔离验证记录：新建的 7 项原型用例首轮执行 1.552 秒，6 通过、1 失败；定位为关联提交的输入变化被错误视为缺失证据并触发重跑。修复后只执行该一项，0.512 秒通过；其余 6 项未重跑。未执行既有业务测试、CI、构建或部署。这不是已接入 GitHub 的门禁成功证明。
+
+当前 `.github/scripts/local-validation.mjs` 仅为本地可审查原型，支持文档/发布工具检查；没有工作流调用它，没有配置仓库变量，也没有在生产启用。本轮自动审批拒绝接入共享 CI，要求明确批准这一具体的本地证据信任链。不能把原型单元验证说成 GitHub 已经接纳。
+
+批准接入后的使用：先提交冻结输入，再初始化本机身份；通过 `run CHECK OUTPUT` 实际执行并保存签名结果，`publish OUTPUT` 发布证据；CI 消费同一结果，服务器保持既有同产物安装程序。输出放在仓库外，不提交日志或私钥。支持范围先限定文档/发布工具；应用产物的完整本地接纳另需审核具体传输与来源绑定，当前不跳过应用门禁。
+
+## 本机、GitHub、服务器的明确分工
+
+正式自动检查的默认主要位置是 GitHub；本机用于设计确认、复现/定位和提前处理环境问题，服务器用于安装同一合格产物并确认运行状态。不是三个地方各跑一轮。当前本机证据没有自动接纳通道，不能既要求本机先整验再跑正式 CI，也不能把本机结果伪装成 GitHub 门禁成功。
+
+| 内容 | 本机 | GitHub CI（主要自动验证位置） | 服务器安装 |
+|---|---|---|---|
+| 完整差异与路线 | 冻结修改范围，说明受影响项 | 根据完整差异正式分类；所选项汇总到稳定合并门禁 | 核对获准计划、实际旧版本和同一产物，拒绝范围不符 |
+| 普通 CSS / 布局 | 确认修改效果；提前发现布局、定位器和浏览器工具问题 | 构建变化的前端一次；检查实际产物与受影响页面；不启动后端、登录权限、科学回归、DB / 附件恢复 | 只安装前端；版本、就绪、一条受影响短流程和回退 |
+| 前端交互 | 复现改动交互，定位失败项 | 仅相应页面/契约；正式响应式与无障碍验收绑定实际候选产物 | 不重复响应式、无障碍或完整页面验收 |
+| 登录身份修复 | 复现身份错误；只为定位运行相关失败用例 | 相关既有登录契约；正确/错误密码、错误身份拒绝且不建会话及受影响旧入口；真实隔离 API 权限边界 | 版本、就绪、短认证边界和回退；不重跑账号生命周期 |
+| 编译与镜像 | 不要求正式 CI 前再完整构建；开发预览不算可部署产物 | 只构建变化组件一次，扫描实际镜像，保存摘要与来源证据 | 取用同一产物；禁止重新构建 |
+| 发布工具修改 | 阅读/定位修改；不启动应用验证 | 分类、门禁、证据、就绪重试、失败/回退和安全重复执行的隔离验证 | 安装版本、入口兼容、回退文件；不重跑工具单元测试 |
+| 文档修改 | 内容审阅 | 文档精确范围与格式、合并汇总；无业务依赖安装/构建/验收 | 不需要安装或业务检查 |
+| 数据 / 评分 / 恢复程序修改 | 明确影响与保护需求 | 只做实际相关迁移、科学契约或恢复验证；无法证明范围时保守处理 | 执行该变更必需的数据保护、版本和运行确认；普通发布不借此追加完整灾备 |
+| 完整灾备 / 定期性能 | 不作为普通发布额外验收 | 独立任务，仅实际相关程序变化时进入发布阻塞链 | 独立状态；不阻塞普通 A/B 的应用完成 |
+
+失败先看该阶段的日志，只复验受影响项。相同输入已有正式合格证据时按已实现的规则复用；没有支持的证据不能自行跳过门禁。轻量 CI 约 5 分钟未结束时说明具体排队/下载/执行项；不能用超时作理由追加整套测试。
+
+### 已实现与仍需落实的边界
+
+- 已实现：A/B 与旧平台整套消费者互斥、变化组件构建、官方产物供服务器复用、服务器不构建/不重跑 CI、有限就绪等待及明确回退；只有工具变化时使用工具门禁。完整应用路线耗时仍未实测。
+- 文档快路线在 PR #256：精确指导文档不再误入工具路线，文档分类与合并汇总不安装工具依赖；尚未合并，不能声称已在 main 生效。
+- 尚未落实：A/B 的候选作业仍将构建、扫描、页面验收和 Compose 演练串在一起；作业重试没有完整的阶段独立复用。前端变化目前仍统一跑 lint、应用/认知类型检查及依赖审计，CSS-only 尚未细化到只消费其相关输入。
+- 下一步限于上述已有执行器：按每个检查消费的组件/依赖/配置/工具输入拆分和失效；CSS-only 不启动无关类型或科学检查，依赖审计只在其输入变化或无适用正式证据时执行。Compose 回退演练保留；将其正式复用条件落实前，不宣称已经免除当前候选要求。不得为拆分而再次引入另一套全量检查。
+
+以上分工是目标规则；“尚未落实”项不能用文档代替程序改动，也不能据此伪造必需成功状态。本次只补充规则说明，不启动 CI、业务构建或生产验收。
+
+## 历史固定 22 项到底是什么
+
+原始记录：2026-10-09 的 [手动完整 CI 运行 37888127045](https://github.com/caohuibj/eduK12-new-version/actions/runs/37888127045)。该次共有下列 22 个成功作业；其余跳过项不计入此表。服务器历史 `release-20261009-5f2c67a5/complete-release.py` 实际写死 `len(ci['selectedJobs']) == 22`，并另外强制数据库/附件联合恢复。**22 是该历史发布的作业数量，不是 GitHub main 的 22 个必需状态，也不是所有改动必须做的 22 种检查。** 2026-10-09 只读核对的 active ruleset `23665026 / PR` 仅要求 `merge gate / ready PR`，并要求分支跟上 main；该汇总门按差异要求所选检查成功。
+
+| 编号 | 历史成功作业（GitHub 原名） | 今后适用范围 / 具体目的 |
+|---|---|---|
+| 1 | `classify changed content` | 所有 PR：完整差异路由，防止错误进入轻量路线 |
+| 2 | `mini program / foundation contract and page smoke` | 小程序及其直接共享契约变化，普通培训站 CSS 不适用 |
+| 3 | `codeql (javascript/typescript SAST)` | 所选路线相关可执行代码；纯 CSS/文档不因历史数量追加 |
+| 4 | `maintenance / attachment deduplication, indexes and protected cleanup` | 备份/去重/保护清理相关程序变化，不适用于普通 UI |
+| 5 | `frontend (lint + types + full tests + build) / frontend checks` | 按前端受影响契约拆分；不因 CSS 修改跑全部测试 |
+| 6 | `docker (compose config + production builds) / production image build and scan` | 变化组件一次构建/实际镜像扫描；部署配置检查只在相关变化时选取 |
+| 7 | `backend regression (isolated job database) / backend regression (isolated job database)` | 实际受影响后端契约；窄登录修复取相关契约，不追加完整生命周期 |
+| 8 | `backend (migrate + build + performance gate) / backend (migrate + build + performance gate)` | 拆成后端构建、迁移、性能；只选相关项，CSS 不适用 |
+| 9 | `frontend artifacts / release consumers early / build` | 与正式前端构建合并，同一产物供消费者使用，不重复编译 |
+| 10 | `frontend artifacts / release consumers early / UI-lab artifact` | UI-lab 消费者实际相关时；普通应用发布不默认额外生成 |
+| 11 | `accept-perf / Scale + Cognitive + SJT fresh accounting` | 相关评分/科学/性能变化或独立周期任务 |
+| 12 | `accept-ops / runtime-recovery` | 恢复/运行基础设施变化；普通 UI 不跑恢复演练 |
+| 13 | `accept-ui (chromium) / chromium frontend acceptance` | 相应页面/交互变化；与第 16 项相同断言合并，避免重复 |
+| 14 | `accept-visual (webkit) / webkit frontend acceptance` | WebKit 特有行为、相关兼容风险；不默认全部页面矩阵 |
+| 15 | `accept-visual (firefox) / firefox frontend acceptance` | Firefox 特有行为、相关兼容风险；不默认全部页面矩阵 |
+| 16 | `accept-visual (chromium) / chromium frontend acceptance` | 相应视觉页面；同一 Chromium 消费同一候选产物，避免重复第 13 项断言 |
+| 17 | `browser (seeded Situational Bundle + static visual acceptance) / products / seeded browser acceptance` | 相关测评产品流程变化 |
+| 18 | `browser (seeded Situational Bundle + static visual acceptance) / security / seeded browser acceptance` | 相关认证/权限边界变化 |
+| 19 | `browser (seeded Situational Bundle + static visual acceptance) / foundation / seeded browser acceptance` | 相关基础业务流程变化 |
+| 20 | `accept-media / images-video` | 图片/视频上传、播放或媒体契约变化 |
+| 21 | `accept-media / cognitive-situational` | 认知/情境测评媒体流程变化 |
+| 22 | `merge gate / ready PR` | 所有 PR：汇总所选必需项；不重复测试，不按成功数量判断 |
+
+构建合并不取消实际产物扫描；跨浏览器和断言消重需基于具体影响与输入。上表是拆分适用性，不代表旧完整工作流已全部完成细化。混合改动取所需项并集，未知项保守处理，不用标题/标签/行数降低风险。
+
 ## 最小验证与路线对照
 
 **同一产物在 CI 验收一次。部署只确认产物、就绪、短关键路径和回退；不再重跑 CI。未改变的组件不构建、不切换、不进行业务回归。** 成功证据在输入不变且仍适用时复用；故障先定位，只复验失败项。用户暂停全量验证时不得自行恢复。
@@ -46,7 +135,7 @@ CSS 精确映射页面：入口样式只检查首页，登录样式只检查登�
 ## 启用方式（另需生产授权）
 
 1. 审查候选代码。当前分支未生成正式合格 runtime artifact；不得把本地工具测试或旧生产镜像冒充它。
-2. 按最新项目 Instructions 只读核对生产版本、实际 Compose entry、镜像和配置。旧 `/opt/eduk12-new/deploy/compose.sh` 当前不支持 overlay，新执行器默认拒绝。
+2. 按最新项目 Instructions 只读核对生产版本、实际 Compose entry、镜像和配置。PR #254 工具已于 2026-10-09 安装，入口现支持持久 overlay；仍需当次核对实际入口哈希和部署记录，不能按历史状态假定。
 3. 保留原 entry 字节和回退记录；参照 `compose-overlay.example.sh` 在授权后适配持久 image overlay。不得修改卷、数据库、TLS、备份或清理配置。记录新的 entry SHA256。
 4. 配置需要 `environment/project/entry/entrySha256/state/overlayProtocol/baseHead/baseImages/url/oldReady/configurationFingerprint`；B 另需 `backendReadyUrl/authProbeUrl`。配置指纹使用 `executor.configuration_fingerprint(actual_compose_config, plan.changed)`；baseImages 至少绑定 frontend/backend/worker 实际 IDs。需要能读取 exact base/head 的 Git checkout，不能把服务器的非 Git source export 直接当 checkout。
 5. 取得正式 scoped Actions ZIP。用 `qualify.py --plan ... --config ... --archive ... --artifact-id ... --run-id ... --output ...` 核对来源，提取并加载已核验 tar，核对镜像 ID。先运行 `executor.py --config ... --plan ... --receipt ...` 查看计划；批准后使用 `--apply --archive ...`。
@@ -56,6 +145,6 @@ CSS 精确映射页面：入口样式只检查首页，登录样式只检查登�
 
 目标 A 15–25 分钟、B 20–40 分钟、已有合格产物紧急修复 10–20 分钟，均从开发/本地验收完成后计时，**尚未实测整路线，不作承诺**。排队、下载、执行、并行和返工分别记录，不累加重叠时间。`release-checks.json` 保存编译/相关检查/runtime 阶段状态与秒数；`events.json` 保存切换、就绪、完成和回退原因。
 
-按照本轮用户的最小验证要求，不跑新的全量/业务 CI、不做整应用路线计时；追加部署仅安装工具/适配入口，不切换未修改的业务组件；验证结果与未完成限制见 [validation-20261009.md](validation-20261009.md)，历史根因见 [audit-20261009.md](audit-20261009.md)。冷构建、artifact 下载、证据时效、旧入口适配仍是预算阻塞项，不以无关验证弥补。
+按照本轮用户的最小验证要求，不跑新的全量/业务 CI、不做整应用路线计时；追加部署仅安装工具/适配入口，不切换未修改的业务组件；验证结果与未完成限制见 [validation-20261009.md](validation-20261009.md)，历史根因见 [audit-20261009.md](audit-20261009.md)。冷构建、artifact 下载、证据时效和连接稳定性仍是可能的预算阻塞项，不以无关验证弥补。
 
 旧 `release-verify-local.sh`、`release-candidate-checklist-v1.md` 和 `docs/ci-runner-policy.md` 的 exact-run-only 应用发布要求，以本规则正式生效后的 A/B 路线为入口；其数据、安全、科学和恢复约束仍有效。`training-completion.py` 为固定 PR248 的历史特例，不作为新产物复用入口。
