@@ -14,6 +14,9 @@ model User {
   scalePublicationAudits ScalePublicationAudit[]
   id                                  String                           @id @default(uuid())
   username                            String                           @unique
+  // Existing accounts retain their legacy identity; new legacy registrations are TRAINING.
+  accountDomain                       String                           @default("TRAINING") @map("account_domain")
+  campusAccount                       CampusAccount?
   passwordHash                        String                           @map("password_hash")
   role                                UserRole                         @default(STUDENT)
   platformRole                        PlatformRole                     @default(STANDARD) @map("platform_role")
@@ -2492,4 +2495,14 @@ model LegacyImportIdMap {
   @@unique([entity, legacyId])
   @@index([batchId])
   @@map("_legacy_import_id_map")
+}
+
+// Huischool login aliases are disjoint from legacy User.username.
+model CampusAccount {
+  userId          String   @id @map("user_id")
+  loginName       String   @map("login_name")
+  normalizedLogin String   @unique(map: "campus_accounts_normalized_login_key") @map("normalized_login")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@map("campus_accounts")
 }
