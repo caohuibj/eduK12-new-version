@@ -2577,3 +2577,34 @@ model CampusAdmissionIncident {
   @@index([organizationId, classUnitId, resolvedAt], map: "campus_admission_incidents_class_idx")
   @@map("campus_admission_incidents")
 }
+
+// TOTP secrets are encrypted at rest with a dedicated CAMPUS MFA key.
+model CampusMfaCredential {
+  userId        String    @id @map("user_id")
+  secretCipher  String    @map("secret_cipher")
+  enabled       Boolean   @default(false)
+  lastUsedStep  BigInt    @default(-1) @map("last_used_step")
+  enabledAt     DateTime? @map("enabled_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("campus_mfa_credentials")
+}
+model CampusMfaChallenge {
+  id           String    @id
+  userId       String    @map("user_id")
+  challengeHash String   @unique(map: "campus_mfa_challenges_digest_key") @map("challenge_hash")
+  tokenVersion Int       @map("token_version")
+  failedCount  Int       @default(0) @map("failed_count")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt   DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, expiresAt], map: "campus_mfa_challenges_user_idx")
+  @@map("campus_mfa_challenges")
+}
+model CampusMfaRecoveryCode {
+  userId      String    @map("user_id")
+  codeHash    String    @map("code_hash")
+  usedAt      DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([userId, codeHash])
+  @@map("campus_mfa_recovery_codes")
+}
