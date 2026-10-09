@@ -1,5 +1,5 @@
 /* Approved course workspace layout; the assessment runner and school edition keep their own surfaces. */
-.hui-training.hui-app--standard.training-workspace-shell { --training-paper:#f8f5ee; --training-surface:#fffdf9; --training-ink:#1f403b; --training-muted:#71817a; --training-bamboo:#1f4d3b; --training-border:#dce3d8; }
+.hui-training.hui-app--standard.training-workspace-shell { --training-paper:#f8f5ee; --training-surface:#fffdf9; --training-ink:#1f403b; --training-muted:#60736a; --training-bamboo:#1f4d3b; --training-border:#dce3d8; }
 .hui-training.hui-app--standard.training-workspace-shell .hui-app-header { position:static; display:flex; flex-wrap:nowrap; justify-content:flex-start; gap:38px; padding:16px max(24px,calc((100vw - 1192px)/2)); min-height:76px; box-shadow:none; }
 .hui-training.hui-app--standard.training-workspace-shell .hui-brand { flex:none; min-height:40px; }
 .hui-training.hui-app--standard.training-workspace-shell .hui-navigation { display:flex; flex:none; align-items:center; gap:26px; width:auto; height:auto; position:static; padding:0; border:0; background:transparent; }
@@ -28,7 +28,7 @@
 .hui-training.hui-app--standard.training-workspace-shell .training-course-text small { font-size:13px; }
 .hui-training .training-course-card-bottom { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:auto; padding-top:10px; font-size:12px; }
 .hui-training .training-course-card-bottom > span:last-child { display:inline-flex; align-items:center; gap:6px; font-weight:600; }
-.hui-training.hui-app--standard.training-workspace-shell .training-bottom-line { font:12px/1.6 'PingFang SC',sans-serif; letter-spacing:0; margin:36px 0 0; color:#8b968d; }
+.hui-training.hui-app--standard.training-workspace-shell .training-bottom-line { font:12px/1.6 'PingFang SC',sans-serif; letter-spacing:0; margin:36px 0 0; color:var(--training-muted); }
 .hui-training.hui-app--standard.training-workspace-shell .training-detail { width:100%; margin:0; }
 .hui-training.hui-app--standard.training-workspace-shell .training-back { min-height:32px; margin-bottom:12px; font-size:12px; }
 .hui-training.hui-app--standard.training-workspace-shell .training-detail-header { display:grid; grid-template-columns:minmax(0,1fr) 280px; align-items:center; gap:12px 24px; padding:0; margin-bottom:24px; }
