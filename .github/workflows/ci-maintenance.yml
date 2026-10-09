@@ -28,6 +28,9 @@ jobs:
           node-version: '24.21.0'
       - name: CI routing and attachment invariants
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
+      - name: Release policy and fail-closed executor contracts
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/release -p 'test_*.py' -v
       - name: Host launcher and existing monitoring guards
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
@@ -56,6 +59,7 @@ jobs:
       - name: Real isolated Docker launcher and failed-task cleanup
         run: |
           docker pull node:24.21.0-bookworm-slim
+          CI=true GITHUB_ACTIONS=true python3 -B server-version/scripts/release/ci-container-rehearsal.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup

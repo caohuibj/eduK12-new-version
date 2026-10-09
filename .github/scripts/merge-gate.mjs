@@ -10,6 +10,11 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (['A','B'].includes(scope.application_route)) {
+    let p; try { p = JSON.parse(scope.release_plan || '{}'); } catch { p = {}; }
+    return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
+  }
+  if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
   if (dependencies) checks.push('maintenance','backend','backend-regression','frontend-build','frontend','docker');
@@ -41,11 +46,17 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (['A','B'].includes(scope.application_route)) {
+    let p;try {p=JSON.parse(scope.release_plan);}catch {}
+    if (!p || p.route !== scope.application_route || !Array.isArray(p.changed) || !p.changed.length || !Array.isArray(p.required) || !p.required.includes('compatibility') || !p.required.includes('rollback') || !p.required.includes('readiness') || (p.route === 'B' && !p.required.includes('login-contracts'))) failed.push('scope');
+    return [...new Set(failed)];
+  }
+  if (scope.application_route && scope.application_route !== 'legacy') failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
-  const requiresCodeql = ['platform','dependencies','frontend','content-frontend'].includes(scope.scenario);
+  const requiresCodeql = ['platform','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
   if ((scope.scenario === 'dependencies' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false'))
       || (scope.maintenance !== String(scope.scenario === 'maintenance'))
       || (scope.scenario === 'maintenance' && (scope.codeql !== 'false' || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
@@ -66,6 +77,7 @@ export function failedChecks(needs, draft) {
     || scope.media_selection !== JSON.stringify(selected)
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
     || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'true'));
+  if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
     if (!failed.includes('scope')) failed.unshift('scope');
@@ -76,6 +88,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = JSON.parse(process.env.NEEDS_JSON);
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {
+    const {plan,toolingOnly}=await import('../../server-version/scripts/release/policy.mjs');
+    const p=JSON.parse(needs.scope.outputs.release_plan);
+    const actual=plan(p.base,p.head);
+    if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
+    if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+  }
   console.log(JSON.stringify({ required: requiredChecks(needs, draft), failed }));
   if (failed.length) process.exit(1);
 }

@@ -1,3 +1,5 @@
+> Application release amendment: `docs/release/README.md` is the canonical A/B/C release policy. Exact file/content admission, selected success checks, component-bound official artifacts and independent DR states supersede older application-only exact-run/full-count statements below. Scientific, full-platform, maintenance, deletion and recovery safety contracts remain in force. New executor production enablement is not authorized by this document.
+
 # CI scenarios, topology and validation
 
 GitHub Actions coordinates all jobs. `merge gate / ready PR` is the stable required
@@ -86,7 +88,7 @@ all three are mandatory for a successful aggregated browser job. Matrix inputs
 are validated against an exact list; missing or duplicated groups fail closed.
 Browser evidence artifact names include the group to prevent collisions.
 
-Only proven-unaffected checks are skipped; no cross-commit CI evidence is reused.
+Only proven-unaffected checks are skipped. Scoped application evidence may be reused only under the formally implemented input-binding and official artifact rules in `docs/release/README.md`; legacy scientific/full-platform consumers retain exact-run evidence.
 The exact-run artifact contract and isolation checks below remain authoritative.
 
 ### Hosted critical-path and dependency-download policy (2026-10-09)
@@ -116,8 +118,7 @@ SHA, run ID, lockfile, build kind and content digest. Consumers fail closed on a
 missing or mismatched artifact. No latest-success or cross-run fallback exists.
 Ordinary production and UI-lab builds have distinct names and manifests. In heavy
 `speed` runs, both production and UI-lab builds run in parallel on GitHub,
-so compilation does not delay Mac checks or hosted browser consumers. Light and
-medium builds remain local. The initial producer probe measured 44 seconds for
+so compilation does not delay Mac checks or hosted browser consumers. Historical note: the former light/medium-local producer description is obsolete; all current workflows use hosted Ubuntu. The initial producer probe measured 44 seconds for
 the hosted UI-lab job while the Mac production build took several minutes; final
 run measurements remain authoritative. Native
 `node_modules` are never transferred between Mac ARM and Linux x64.
@@ -135,8 +136,7 @@ persistent volumes are rejected. Ports must be free between scenarios. Existing
 fixture guards, test assertions and individual evidence remain mandatory. Standalone
 media workflows invoke the same composite scenario actions as grouped validation.
 
-Pure UI uses a minimal lockfile-pinned Playwright runtime, without backend packages,
-PostgreSQL, Redis or Docker on Mac. Hosted Chromium retains canonical/staff/classroom
+Historical note: the following Mac/economy topology describes retired runners; current jobs use hosted Ubuntu. Pure UI still uses a minimal pinned Playwright runtime without backend installation. Hosted Chromium retains canonical/staff/classroom
 screenshots, interaction and legacy-dialog checks; Firefox and WebKit retain their
 complete interaction and legacy-dialog suites. AppShell remains explicitly gated on Mac. In speed mode all three visual engines run
 on GitHub; economy and medium routes keep visual acceptance on Mac. The QA round 3 component browser flow runs on Mac

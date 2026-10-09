@@ -398,7 +398,8 @@ test('actual Git diffs select different documentation, presentation, content, fr
       ['server-version/frontend/src/pages/__tests__/Teacher.test.tsx','frontend-test',false],
       ['server-version/frontend/src/modules/cognitive/core/runner.ts','platform',true],
       ['server-version/backend/prisma/schema.prisma','platform',true],
-      ['.github/workflows/ci.yml','platform',true],
+      ['.github/workflows/ci.yml','release-tooling',true],
+      ['.github/workflows/unknown.yml','platform',true],
     ]) {
       git('reset','--hard',base);
       const path=join(fixture,file);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,'fixture\n');
@@ -409,6 +410,12 @@ test('actual Git diffs select different documentation, presentation, content, fr
         CI_MAC_LIGHT_ENABLED:'false',CI_FORCE_FULL:'false',GITHUB_OUTPUT:''},
       }).trim());
       assert.equal(output.scenario,scenario,file);assert.equal(output.codeql,codeql,file);
+      if(scenario==='release-tooling'){
+        assert.deepEqual(JSON.parse(output.release_plan).changed,[]);
+        assert.equal(output.frontend_build,false);assert.equal(output.ui_required,false);
+        assert.equal(output.media_selection,'[]');
+        for(const k of Object.keys(acceptanceFor([])))assert.equal(output[k],false,k);
+      }
       const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));
       const needs={scope:{result:'success',outputs}};
       for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
