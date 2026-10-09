@@ -438,3 +438,20 @@ test('the existing learning-motivation JSON uses Scale checks without admitting 
   assert.equal(classifyChanges([regular],true).content,false);
   assert.equal(acceptanceFor([file]).ops,false);
 });
+
+
+test('guidance documents use only documentation gate; mixed or nonregular changes do not',()=>{
+  const files=['AGENTS.md','docs/release/README.md','.github/PULL_REQUEST_TEMPLATE.md'];
+  const entries=files.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  assert.equal(classifyChanges(entries).documentation,true);
+  for(const extra of ['.github/workflows/ci.yml','server-version/backend/src/controllers/authController.ts','docs/release/unknown.md'])
+    assert.equal(classifyChanges([...entries,{file:extra,status:'M',oldMode:'100644',newMode:'100644'}]).documentation,false,extra);
+  for(const bad of [{status:'D',newMode:'000000'},{newMode:'100755'},{newMode:'120000'}])
+    assert.equal(classifyChanges([{...entries[0],...bad}]).documentation,false);
+  const outputs=scopeOutputs('false','false','false',{scenario:'documentation',documentation:'true',codeql:'false'});
+  const needs={scope:{result:'success',outputs},documentation:{result:'success'}};
+  assert.deepEqual(requiredChecks(needs,false),['scope','documentation']);
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for(const bad of ['failure','cancelled','skipped',undefined])
+    assert.ok(failedChecks({...needs,documentation:{result:bad}},false).includes('documentation'));
+});
