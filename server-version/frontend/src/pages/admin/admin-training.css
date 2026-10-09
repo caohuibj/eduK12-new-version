@@ -57,3 +57,6 @@
 .hui-training-admin-content .staff-badge--success { background: #e8eee5; color: var(--training-bamboo); }
 .hui-training-admin-content .staff-course-card__heading { flex-wrap: wrap; gap: 8px; }
 .hui-training-admin-content .staff-course-card__heading h2 { flex: 1 1 180px; }
+
+/* Loading and helper text also need contrast on the training paper surface. */
+.hui-training-admin-content .text-gray-500 { color: var(--training-muted); }
