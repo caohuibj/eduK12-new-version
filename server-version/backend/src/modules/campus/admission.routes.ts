@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { registrationRateLimit, withRegistrationAdmission } from '../../middleware/registrationAdmission'
@@ -10,6 +10,8 @@ import {
   CampusAdmissionError, replaceCampusRoster, issueCampusActivationCodes,
   registerCampusStudent, setCampusRegistrationWindow, readCampusClassSummary,
   approveCampusClass, readCampusStudentStatus,
+  createCampusAdmissionIncident, resolveCampusAdmissionIncident,
+  quarantineCampusStudent,
 } from './admission.service'
 
 const router=Router()
@@ -29,6 +31,8 @@ const register=z.object({
 const wrap=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try { return await fn(req,res) }
   catch (e) {
+    if (e instanceof ZodError)
+      return res.status(400).json({code:'BAD_REQUEST',message:'请求内容格式不正确',data:null})
     if (e instanceof CampusAdmissionError)
       return res.status(e.statusCode).json({code:e.code,message:'校园操作暂不可用，请核实信息或联系学校',data:null})
     throw e
@@ -73,5 +77,34 @@ router.post('/organizations/:organizationId/classes/:classUnitId/approve',authen
   const body=z.object({expectedRosterVersion:z.number().int().nonnegative()}).strict().parse(req.body)
   return success(res,await approveCampusClass({actor:req.user!,...params,...body}))
 }))
+
+
+router.post('/organizations/:organizationId/classes/:classUnitId/incidents',
+  authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
+    const params=classParams.parse(req.params)
+    const body=z.object({
+      reason:z.enum(['SUSPECTED_REGISTRATION_TAKEOVER','ELIGIBILITY_DISPUTE','OTHER_REGISTRATION_ERROR']),
+    }).strict().parse(req.body)
+    return success(res,await createCampusAdmissionIncident({actor:req.user!,...params,...body}))
+  })
+)
+
+router.post('/organizations/:organizationId/classes/:classUnitId/incidents/:incidentId/resolve',
+  authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
+    const params=classParams.extend({incidentId:ids}).parse(req.params)
+    const body=z.object({
+      resolution:z.enum(['VERIFIED_CORRECT','STUDENT_QUARANTINED','ROSTER_CORRECTED']),
+    }).strict().parse(req.body)
+    return success(res,await resolveCampusAdmissionIncident({actor:req.user!,...params,...body}))
+  })
+)
+
+router.post('/organizations/:organizationId/classes/:classUnitId/quarantine',
+  authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
+    const params=classParams.parse(req.params)
+    const body=z.object({studentNumber:z.string().min(2).max(40)}).strict().parse(req.body)
+    return success(res,await quarantineCampusStudent({actor:req.user!,...params,...body}))
+  })
+)
 
 export default router

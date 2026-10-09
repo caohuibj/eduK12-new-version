@@ -307,6 +307,6 @@ export default function SchoolApp(){
         </>}
       </section>}
     </main>
-    <footer className="hs-footer">Huischool · 林间见心 · 校园心理健康　|　教育支持而非医学诊断</footer>
+    <footer className="hs-footer">Huischool · 林间见心 · 校园心理健康 | 教育支持而非医学诊断</footer>
   </div>
 }

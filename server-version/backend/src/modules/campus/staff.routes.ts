@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
@@ -16,6 +16,7 @@ const rate=createRedisRateLimiter({name:'campus-staff-invite-claim',limit:30,win
 const response=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try{return await fn(req,res)}
   catch(e){
+    if(e instanceof ZodError)return res.status(400).json({code:'BAD_REQUEST',message:'请求信息格式不正确',data:null})
     if(e instanceof CampusAdmissionError)return res.status(e.statusCode).json({code:e.code,message:'校园成员操作暂不可用',data:null})
     throw e
   }
