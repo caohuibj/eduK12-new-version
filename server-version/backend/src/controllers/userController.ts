@@ -192,6 +192,7 @@ export const userController = {
           isActive: true,
           createdAt: true,
           mustChangePassword: true,
+          accountDomain: true,
         }
       })
 

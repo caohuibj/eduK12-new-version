@@ -91,7 +91,7 @@ export async function completeSchoolStudentRecovery(input:{
    if(!record)deny('RECOVERY_UNAVAILABLE',404)
    const user=await tx.user.findUnique({where:{id:record.userId}})
    if(!user||user.accountDomain!=='SCHOOL'||!user.isActive||user.isFrozen
-     ||user.role!=='STUDENT')deny('RECOVERY_UNAVAILABLE',404)
+     ||user.role!=='STUDENT')throw new CampusAdmissionError('RECOVERY_UNAVAILABLE',404)
    if(normalizedNewLogin){
      await tx.campusAccount.update({where:{userId:user.id},data:{
        loginName:input.newLogin!.trim(),normalizedLogin:normalizedNewLogin,
@@ -207,7 +207,7 @@ export async function approveSchoolMfaReset(input:{
    if(!original[0]?.valid)deny('MFA_RESET_REQUESTER_REVOKED',403)
    const target=await tx.user.findUnique({where:{id:request.targetUserId}})
    if(!target||target.accountDomain!=='SCHOOL'||target.isFrozen||!target.isActive)
-     deny('MFA_RESET_TARGET_UNAVAILABLE',404)
+     throw new CampusAdmissionError('MFA_RESET_TARGET_UNAVAILABLE',404)
    const targetMembership=await tx.organizationMembership.findFirst({
      where:{organizationId:input.organizationId,userId:target.id,validUntil:null},
    })

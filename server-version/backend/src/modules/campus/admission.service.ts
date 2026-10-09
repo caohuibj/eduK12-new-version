@@ -467,9 +467,9 @@ export async function quarantineCampusStudent(input:{
         AND "student_no_digest"=${eligibilityDigest} FOR UPDATE
     `
     const userId=elig[0]?.userId
-    if(!userId)fail('STUDENT_QUARANTINE_UNAVAILABLE',404)
+    if(!userId)throw new CampusAdmissionError('STUDENT_QUARANTINE_UNAVAILABLE',404)
     const account=await tx.user.findUnique({where:{id:userId}})
-    if(!account||account.accountDomain!=='SCHOOL')fail('STUDENT_QUARANTINE_UNAVAILABLE',404)
+    if(!account||account.accountDomain!=='SCHOOL')throw new CampusAdmissionError('STUDENT_QUARANTINE_UNAVAILABLE',404)
     await tx.user.update({where:{id:userId},data:{isFrozen:true,tokenVersion:{increment:1}}})
     await tx.$executeRaw`
       UPDATE "campus_student_enrollments" SET "status"='QUARANTINED'
