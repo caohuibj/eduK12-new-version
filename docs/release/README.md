@@ -21,6 +21,64 @@
 
 普通可回退界面的非关键缺陷可上线后修订。阻塞项集中于产物/版本错误、相关门禁真实失败、越权登录、不可逆数据缺少保护、服务持续不可用及无法回退。每个必需检查必须对应具体故障，不能因“以前执行过”或“更放心”追加。
 
+## 本机、GitHub、服务器的明确分工
+
+正式自动检查的默认主要位置是 GitHub；本机用于设计确认、复现/定位和提前处理环境问题，服务器用于安装同一合格产物并确认运行状态。不是三个地方各跑一轮。当前本机证据没有自动接纳通道，不能既要求本机先整验再跑正式 CI，也不能把本机结果伪装成 GitHub 门禁成功。
+
+| 内容 | 本机 | GitHub CI（主要自动验证位置） | 服务器安装 |
+|---|---|---|---|
+| 完整差异与路线 | 冻结修改范围，说明受影响项 | 根据完整差异正式分类；所选项汇总到稳定合并门禁 | 核对获准计划、实际旧版本和同一产物，拒绝范围不符 |
+| 普通 CSS / 布局 | 确认修改效果；提前发现布局、定位器和浏览器工具问题 | 构建变化的前端一次；检查实际产物与受影响页面；不启动后端、登录权限、科学回归、DB / 附件恢复 | 只安装前端；版本、就绪、一条受影响短流程和回退 |
+| 前端交互 | 复现改动交互，定位失败项 | 仅相应页面/契约；正式响应式与无障碍验收绑定实际候选产物 | 不重复响应式、无障碍或完整页面验收 |
+| 登录身份修复 | 复现身份错误；只为定位运行相关失败用例 | 相关既有登录契约；正确/错误密码、错误身份拒绝且不建会话及受影响旧入口；真实隔离 API 权限边界 | 版本、就绪、短认证边界和回退；不重跑账号生命周期 |
+| 编译与镜像 | 不要求正式 CI 前再完整构建；开发预览不算可部署产物 | 只构建变化组件一次，扫描实际镜像，保存摘要与来源证据 | 取用同一产物；禁止重新构建 |
+| 发布工具修改 | 阅读/定位修改；不启动应用验证 | 分类、门禁、证据、就绪重试、失败/回退和安全重复执行的隔离验证 | 安装版本、入口兼容、回退文件；不重跑工具单元测试 |
+| 文档修改 | 内容审阅 | 文档精确范围与格式、合并汇总；无业务依赖安装/构建/验收 | 不需要安装或业务检查 |
+| 数据 / 评分 / 恢复程序修改 | 明确影响与保护需求 | 只做实际相关迁移、科学契约或恢复验证；无法证明范围时保守处理 | 执行该变更必需的数据保护、版本和运行确认；普通发布不借此追加完整灾备 |
+| 完整灾备 / 定期性能 | 不作为普通发布额外验收 | 独立任务，仅实际相关程序变化时进入发布阻塞链 | 独立状态；不阻塞普通 A/B 的应用完成 |
+
+失败先看该阶段的日志，只复验受影响项。相同输入已有正式合格证据时按已实现的规则复用；没有支持的证据不能自行跳过门禁。轻量 CI 约 5 分钟未结束时说明具体排队/下载/执行项；不能用超时作理由追加整套测试。
+
+### 已实现与仍需落实的边界
+
+- 已实现：A/B 与旧平台整套消费者互斥、变化组件构建、官方产物供服务器复用、服务器不构建/不重跑 CI、有限就绪等待及明确回退；只有工具变化时使用工具门禁。完整应用路线耗时仍未实测。
+- 文档快路线在 PR #256：精确指导文档不再误入工具路线，文档分类与合并汇总不安装工具依赖；尚未合并，不能声称已在 main 生效。
+- 尚未落实：A/B 的候选作业仍将构建、扫描、页面验收和 Compose 演练串在一起；作业重试没有完整的阶段独立复用。前端变化目前仍统一跑 lint、应用/认知类型检查及依赖审计，CSS-only 尚未细化到只消费其相关输入。
+- 下一步限于上述已有执行器：按每个检查消费的组件/依赖/配置/工具输入拆分和失效；CSS-only 不启动无关类型或科学检查，依赖审计只在其输入变化或无适用正式证据时执行。Compose 回退演练保留；将其正式复用条件落实前，不宣称已经免除当前候选要求。不得为拆分而再次引入另一套全量检查。
+
+以上分工是目标规则；“尚未落实”项不能用文档代替程序改动，也不能据此伪造必需成功状态。本次只补充规则说明，不启动 CI、业务构建或生产验收。
+
+## 历史固定 22 项到底是什么
+
+原始记录：2026-10-09 的 [手动完整 CI 运行 37888127045](https://github.com/caohuibj/eduK12-new-version/actions/runs/37888127045)。该次共有下列 22 个成功作业；其余跳过项不计入此表。服务器历史 `release-20261009-5f2c67a5/complete-release.py` 实际写死 `len(ci['selectedJobs']) == 22`，并另外强制数据库/附件联合恢复。**22 是该历史发布的作业数量，不是 GitHub main 的 22 个必需状态，也不是所有改动必须做的 22 种检查。** 2026-10-09 只读核对的 active ruleset `23665026 / PR` 仅要求 `merge gate / ready PR`，并要求分支跟上 main；该汇总门按差异要求所选检查成功。
+
+| 编号 | 历史成功作业（GitHub 原名） | 今后适用范围 / 具体目的 |
+|---|---|---|
+| 1 | `classify changed content` | 所有 PR：完整差异路由，防止错误进入轻量路线 |
+| 2 | `mini program / foundation contract and page smoke` | 小程序及其直接共享契约变化，普通培训站 CSS 不适用 |
+| 3 | `codeql (javascript/typescript SAST)` | 所选路线相关可执行代码；纯 CSS/文档不因历史数量追加 |
+| 4 | `maintenance / attachment deduplication, indexes and protected cleanup` | 备份/去重/保护清理相关程序变化，不适用于普通 UI |
+| 5 | `frontend (lint + types + full tests + build) / frontend checks` | 按前端受影响契约拆分；不因 CSS 修改跑全部测试 |
+| 6 | `docker (compose config + production builds) / production image build and scan` | 变化组件一次构建/实际镜像扫描；部署配置检查只在相关变化时选取 |
+| 7 | `backend regression (isolated job database) / backend regression (isolated job database)` | 实际受影响后端契约；窄登录修复取相关契约，不追加完整生命周期 |
+| 8 | `backend (migrate + build + performance gate) / backend (migrate + build + performance gate)` | 拆成后端构建、迁移、性能；只选相关项，CSS 不适用 |
+| 9 | `frontend artifacts / release consumers early / build` | 与正式前端构建合并，同一产物供消费者使用，不重复编译 |
+| 10 | `frontend artifacts / release consumers early / UI-lab artifact` | UI-lab 消费者实际相关时；普通应用发布不默认额外生成 |
+| 11 | `accept-perf / Scale + Cognitive + SJT fresh accounting` | 相关评分/科学/性能变化或独立周期任务 |
+| 12 | `accept-ops / runtime-recovery` | 恢复/运行基础设施变化；普通 UI 不跑恢复演练 |
+| 13 | `accept-ui (chromium) / chromium frontend acceptance` | 相应页面/交互变化；与第 16 项相同断言合并，避免重复 |
+| 14 | `accept-visual (webkit) / webkit frontend acceptance` | WebKit 特有行为、相关兼容风险；不默认全部页面矩阵 |
+| 15 | `accept-visual (firefox) / firefox frontend acceptance` | Firefox 特有行为、相关兼容风险；不默认全部页面矩阵 |
+| 16 | `accept-visual (chromium) / chromium frontend acceptance` | 相应视觉页面；同一 Chromium 消费同一候选产物，避免重复第 13 项断言 |
+| 17 | `browser (seeded Situational Bundle + static visual acceptance) / products / seeded browser acceptance` | 相关测评产品流程变化 |
+| 18 | `browser (seeded Situational Bundle + static visual acceptance) / security / seeded browser acceptance` | 相关认证/权限边界变化 |
+| 19 | `browser (seeded Situational Bundle + static visual acceptance) / foundation / seeded browser acceptance` | 相关基础业务流程变化 |
+| 20 | `accept-media / images-video` | 图片/视频上传、播放或媒体契约变化 |
+| 21 | `accept-media / cognitive-situational` | 认知/情境测评媒体流程变化 |
+| 22 | `merge gate / ready PR` | 所有 PR：汇总所选必需项；不重复测试，不按成功数量判断 |
+
+构建合并不取消实际产物扫描；跨浏览器和断言消重需基于具体影响与输入。上表是拆分适用性，不代表旧完整工作流已全部完成细化。混合改动取所需项并集，未知项保守处理，不用标题/标签/行数降低风险。
+
 ## 最小验证与路线对照
 
 **同一产物在 CI 验收一次。部署只确认产物、就绪、短关键路径和回退；不再重跑 CI。未改变的组件不构建、不切换、不进行业务回归。** 成功证据在输入不变且仍适用时复用；故障先定位，只复验失败项。用户暂停全量验证时不得自行恢复。
