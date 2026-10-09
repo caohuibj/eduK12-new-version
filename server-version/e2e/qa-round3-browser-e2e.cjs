@@ -21,7 +21,7 @@ const fixture = { attempt: {
   currentItem: { id: 'unit-1', type: 'SCALE', definitionHash: 'local-r3-definition', scaleAssessmentId: 'r3-browser-scale-attempt', scale: { id: 'scale-1', name: '本地三题量表', definition } },
 } }
 esbuild.buildSync({ entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')], outfile: path.join(output, 'fixture.js'),
-  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: { 'process.env.NODE_ENV': '"production"' } })
+  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: { 'process.env.NODE_ENV': '"production"', 'import.meta.env.DEV': 'false' } })
 const html = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><link rel="stylesheet" href="/fixture.css"><div id="root"></div><script id="fixture" type="application/json">' +
   JSON.stringify(fixture).replace(/</g, '\\u003c') + '</script><script src="/fixture.js"></script></html>'
 const server = http.createServer(async (req, res) => {
