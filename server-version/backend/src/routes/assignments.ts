@@ -1,10 +1,40 @@
 import { Router } from 'express'
+import { prisma } from '../config/database'
+import { notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { assignmentController } from '../controllers/assignmentController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
+const hideCampusTask = async (
+  req: import('express').Request,res: import('express').Response,
+  next: import('express').NextFunction,id: string
+) => {
+  try{
+    const record=await prisma.assignment.findUnique({
+      where:{id},select:{course:{select:{courseType:true}}},
+    })
+    if(record?.course.courseType==='CAMPUS_ACTIVITY')return notFound(res,'资源不存在')
+    next()
+  }catch(err){next(err)}
+}
+router.param('id',hideCampusTask)
+const hideCampusCreation = async (
+  req:import('express').Request,res:import('express').Response,
+  next:import('express').NextFunction
+)=>{
+  try{
+    if(typeof req.body?.courseId==='string'){
+      const course=await prisma.course.findUnique({
+        where:{id:req.body.courseId},select:{courseType:true},
+      })
+      if(course?.courseType==='CAMPUS_ACTIVITY')return notFound(res,'课程不存在')
+    }
+    next()
+  }catch(err){next(err)}
+}
+
 
 // A keyed submission creates both a mutable row and an immutable receipt.
 // Bound the write rate per authenticated student before it reaches Prisma.
@@ -24,7 +54,7 @@ router.get('/tags', authenticate, assignmentController.getTags)
 
 // 作业列表和详情
 router.get('/', authenticate, assignmentController.list)
-router.post('/', authenticate, requireTeacher, assignmentController.create)
+router.post('/', authenticate, requireTeacher, hideCampusCreation, assignmentController.create)
 router.get('/:id', authenticate, assignmentController.detail)
 router.put('/:id', authenticate, requireTeacher, assignmentController.update)
 router.delete('/:id', authenticate, requireTeacher, assignmentController.delete)

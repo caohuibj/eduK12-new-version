@@ -1,5 +1,7 @@
 import { boundedUpload, uploadPrincipalRateLimit, acceptedImageTypes, withUploadAdmission } from '../middleware/uploadAdmission'
 import { Router } from 'express'
+import { prisma } from '../config/database'
+import { notFound } from '../utils/response'
 import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
@@ -8,6 +10,34 @@ import { config } from '../config'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
 const router = Router()
+const hideCampusTask = async (
+  req: import('express').Request,res: import('express').Response,
+  next: import('express').NextFunction,id: string
+) => {
+  try{
+    const record=await prisma.checkin.findUnique({
+      where:{id},select:{course:{select:{courseType:true}}},
+    })
+    if(record?.course.courseType==='CAMPUS_ACTIVITY')return notFound(res,'资源不存在')
+    next()
+  }catch(err){next(err)}
+}
+router.param('id',hideCampusTask)
+const hideCampusCreation = async (
+  req:import('express').Request,res:import('express').Response,
+  next:import('express').NextFunction
+)=>{
+  try{
+    if(typeof req.body?.courseId==='string'){
+      const course=await prisma.course.findUnique({
+        where:{id:req.body.courseId},select:{courseType:true},
+      })
+      if(course?.courseType==='CAMPUS_ACTIVITY')return notFound(res,'课程不存在')
+    }
+    next()
+  }catch(err){next(err)}
+}
+
 
 // Share the same per-student budget as assignment submissions so a client
 // cannot multiply receipt growth across the two endpoints.
@@ -77,7 +107,7 @@ router.get('/my', authenticate, checkinController.myCheckins)
 router.get('/tags', authenticate, checkinController.getTags)
 
 router.get('/', authenticate, checkinController.list)
-router.post('/', authenticate, requireTeacher, checkinController.create)
+router.post('/', authenticate, requireTeacher, hideCampusCreation, checkinController.create)
 
 // 特定路由必须在 /:id 之前
 router.get('/:id/my-submission', authenticate, requireRole(UserRole.STUDENT), checkinController.mySubmission)
