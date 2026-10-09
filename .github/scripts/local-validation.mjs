@@ -18,7 +18,7 @@ export function adapterOnly(base,head) {
  if(!records.length||records.some(line=>{const m=/^:(000000|100644) 100644 [a-f0-9]{40} [a-f0-9]{40} ([AM])\t(.+)$/.exec(line);return !m||!adapterFiles.has(m[3])||(m[2]==='M'&&m[1]!=='100644');}))return false;
  // Changing unrelated classification/permission logic cannot use this receipt.
  const stripPolicy=t=>t.replace(" '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',\n",'');
- const stripScope=t=>t.replace(", 'AGENTS.md', 'docs/release/README.md', '.github/PULL_REQUEST_TEMPLATE.md'",'').replace('const releaseTools = !result.documentation && !dependencies','const releaseTools = !dependencies');
+ const stripScope=t=>t.replace(", 'AGENTS.md', 'docs/release/README.md', '.github/PULL_REQUEST_TEMPLATE.md'",'').replace('const releaseTools = !result.documentation && !dependencies','const releaseTools = !dependencies').replace('// Exact engineering/guidance documents only; other scientific/publication\n// and deployment behavior paths keep their existing domain/platform checks.','// Ordinary engineering documentation only; scientific/publication/runbook\n// documents keep their existing domain or platform validation.');
  for(const [file,strip] of [['server-version/scripts/release/policy.mjs',stripPolicy],['.github/scripts/content-scope.mjs',stripScope]]) {
   if(!records.some(r=>r.endsWith('\t'+file)))continue;
   if(strip(git('show',base+':'+file))!==strip(git('show',head+':'+file)))return false;
@@ -96,6 +96,7 @@ async function main() {
   console.log('Local signing identity configured; no checks were run.');return;
  }
  const base=process.env.CI_BASE_SHA||git('merge-base','origin/main','HEAD'),head=git('rev-parse','HEAD');
+ if(mode==='plan') {console.log(JSON.stringify({check:args[0],commands:recipe(args[0],base,head)},null,2));return;}
  if(mode==='verify') {const p=fromEnvironment(base,head);console.log(JSON.stringify({accepted:p.checks.map(c=>c.check)}));return;}
  if(mode==='ci') {
   const check=args[0],p=fromEnvironment(base,head);
@@ -105,6 +106,7 @@ async function main() {
  if(mode==='run') {
   const check=args[0],output=args[1];if(!output)throw Error('Specify an evidence output outside the tracked tree');
   if(git('status','--porcelain','--untracked-files=normal'))throw Error('Commit changed inputs before running the formal check');
+  if(args[2]==='--integration-only' && JSON.stringify(recipe(check,base,head))!==JSON.stringify([['node','--test','.github/scripts/local-validation.integration.test.mjs']]))throw Error('Expected integration-only checks; refusing an expanded test plan');
   const before=binding(check,base,head);const record=runCommands(check,base,head);
   if(before!==record.binding||git('status','--porcelain','--untracked-files=normal'))throw Error('Inputs changed during validation');
   const payload={schema:1,repository:REPO,head,base,branch:git('branch','--show-current'),completedAt:new Date().toISOString(),checks:[record]};

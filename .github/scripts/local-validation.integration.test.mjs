@@ -40,11 +40,15 @@ test('workflows admit only docs/tool evidence and do not change application qual
   assert.equal(block(ci),block(before),'Unrelated job changed: '+job);
  }
 });
-test('adapter-only diff selects new integration checks, not prior contracts or Python suites',()=>fixture(({base,head})=>{
+test('adapter-only diff selects new integration checks, not prior contracts or Python suites',()=>{
+ const base=process.env.CI_BASE_SHA||git('merge-base','origin/main','HEAD');
+ assert.equal(adapterOnly(base,git('rev-parse','HEAD')),true,'Real frozen scope must not expand checks');
+ fixture(({base,head})=>{
  assert.equal(adapterOnly(base,head),true);assert.deepEqual(recipe('release-tools',base,head),[['node','--test','.github/scripts/local-validation.integration.test.mjs']]);
  fs.writeFileSync('server-version/scripts/release/policy.mjs','export const authority=2;\n');git('add','.');git('commit','-m','authority changed');
  assert.equal(adapterOnly(base,git('rev-parse','HEAD')),false);assert.ok(recipe('release-tools',base,git('rev-parse','HEAD'))[0].includes('server-version/scripts/release/policy.test.mjs'));
-}));
+ });
+});
 test('same-branch CI consumes local tool evidence without spawning tests; stale proof stops',()=>fixture(({base,head})=>{
  const signed=proof('release-tools',base,head);const accepted=invoke('release-tools',base,signed);
  assert.equal(accepted.status,0,accepted.stderr);assert.match(accepted.stdout,/REUSED local check/);
