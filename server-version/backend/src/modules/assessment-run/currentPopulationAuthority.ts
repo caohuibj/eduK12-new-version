@@ -35,6 +35,56 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
       AND student_class.organization_id=org.id AND ${currentWindowSql(Prisma.sql`student_class`)} AND ${currentWindowSql(Prisma.sql`staff_class`)}
     ))
    )
+   -- A campus respondent may only use a published Run while its Activity is
+   -- OPEN and every STUDENT actor remains independently approved and selected.
+   -- No original training Run is affected by this product-domain predicate.
+   AND (org.product_domain<>'SCHOOL' OR (
+    EXISTS(SELECT 1 FROM campus_activity_runs ar
+      JOIN campus_activities activity ON activity.course_id=ar.course_id
+        AND activity.organization_id=ar.organization_id
+      WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
+        AND activity.status='OPEN')
+    AND EXISTS(
+      SELECT 1 FROM assessment_run_actor_snapshots student_actor
+      WHERE student_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
+        AND student_actor.actor_role='STUDENT')
+    AND NOT EXISTS(
+      SELECT 1 FROM assessment_run_actor_snapshots student_actor
+      WHERE student_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
+        AND student_actor.actor_role='STUDENT'
+        AND NOT EXISTS(
+          SELECT 1 FROM campus_activity_runs ar
+          JOIN campus_activities activity ON activity.course_id=ar.course_id
+            AND activity.organization_id=ar.organization_id AND activity.status='OPEN'
+          JOIN campus_activity_participants member ON member.course_id=ar.course_id
+            AND member.organization_id=ar.organization_id AND member.status='ACTIVE'
+            AND member.membership_id=student_actor.membership_id
+          JOIN organization_memberships membership ON membership.id=member.membership_id
+            AND membership.organization_id=member.organization_id
+            AND membership.user_id=student_actor.user_id
+            AND ${currentWindowSql(Prisma.sql`membership`)}
+          JOIN campus_student_enrollments enrollment ON enrollment.user_id=student_actor.user_id
+            AND enrollment.organization_id=member.organization_id AND enrollment.status='APPROVED'
+          JOIN campus_class_admissions admission ON admission.organization_id=enrollment.organization_id
+            AND admission.class_unit_id=enrollment.class_unit_id AND admission.status='APPROVED'
+          JOIN organization_student_class_assignments class_assignment
+            ON class_assignment.organization_id=member.organization_id
+            AND class_assignment.membership_id=member.membership_id
+            AND class_assignment.class_unit_id=enrollment.class_unit_id
+            AND ${currentWindowSql(Prisma.sql`class_assignment`)}
+          JOIN users campus_student ON campus_student.id=student_actor.user_id
+            AND campus_student.account_domain='SCHOOL'
+            AND campus_student.is_active=TRUE AND campus_student.is_frozen=FALSE
+          WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
+        )
+    )
+    AND NOT EXISTS(
+      SELECT 1 FROM assessment_run_actor_snapshots foreign_actor
+      JOIN users actor_user ON actor_user.id=foreign_actor.user_id
+      WHERE foreign_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
+        AND actor_user.account_domain<>'SCHOOL'
+    )
+   ))
    AND (relation.snapshot_payload->'facts'->>'courseId' IS NULL OR EXISTS (
     SELECT 1 FROM courses course JOIN course_students student ON student.course_id=course.id AND student.status IN ('ACTIVE','APPROVED')
     WHERE course.id=relation.snapshot_payload->'facts'->>'courseId' AND course.status='PUBLISHED' AND course.ended_at IS NULL
