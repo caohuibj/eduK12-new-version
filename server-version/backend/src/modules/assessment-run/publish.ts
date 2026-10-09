@@ -443,13 +443,24 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     pairs = await resolveClassPairs(tx, organizationId, subjectRole, respondentRole)
     const target = track.requestedPolicy.targetPolicy
     if (target?.mode === 'COURSE_TEACHER') {
-      const course = await tx.course.findUnique({ where: { id: target.courseId! }, select: { creatorId: true, status: true, endedAt: true, students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
+      const course = await tx.course.findUnique({ where: { id: target.courseId! }, select: { creatorId: true, status: true, endedAt: true, courseType: true,
+        students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
       const students = new Set(course?.students.map(student => student.studentId) ?? [])
-      pairs = !course || course.status !== 'PUBLISHED' || course.endedAt ? [] : pairs.filter(pair => pair.subject.userId === course.creatorId && students.has(pair.respondent.userId)).map(pair => ({ ...pair, facts: { ...pair.facts, courseId: target.courseId! } }))
-    } else if (target) pairs = pairs.filter(pair => pair.subject.provenanceKind === 'ORG_MEMBER'
-      && matchesClassTarget(target, pair.subject.membershipId, String(pair.facts.staffRole)))
+      pairs = !course || course.courseType === 'CAMPUS_ACTIVITY'
+        || course.status !== 'PUBLISHED' || course.endedAt ? [] : pairs.filter(pair => {
+          const teacher = pair.subject.actorRole === 'TEACHER' ? pair.subject : pair.respondent
+          const student = pair.subject.actorRole === 'STUDENT' ? pair.subject : pair.respondent
+          return teacher.actorRole === 'TEACHER' && student.actorRole === 'STUDENT'
+            && teacher.userId === course.creatorId && students.has(student.userId)
+        }).map(pair => ({ ...pair, facts: { ...pair.facts, courseId: target.courseId! } }))
+    } else if (target) pairs = pairs.filter(pair => {
+      const teacher = pair.subject.actorRole === 'TEACHER' ? pair.subject : pair.respondent
+      return teacher.actorRole === 'TEACHER'
+        && teacher.provenanceKind === 'ORG_MEMBER'
+        && matchesClassTarget(target, teacher.membershipId, String(pair.facts.staffRole))
+    })
     if (relationshipKind === 'COURSE_TEACHER_STUDENT') {
-      const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false,
+      const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' },
         ...(target?.mode === 'COURSE_TEACHER' ? { id: target.courseId } : {}) },
         select: { id: true, creatorId: true, students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
       pairs = pairs.flatMap(pair => courses.filter(course => {
