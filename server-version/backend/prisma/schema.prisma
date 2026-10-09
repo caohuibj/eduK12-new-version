@@ -2626,3 +2626,37 @@ model CampusStaffInvitation {
   @@index([organizationId, expiresAt], map: "campus_staff_invitations_org_idx")
   @@map("campus_staff_invitations")
 }
+
+// One-time restricted student credential recovery. The requester performs
+// offline identity verification; only the hash of the bearer code is retained.
+model CampusStudentRecovery {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  classUnitId      String    @map("class_unit_id")
+  userId           String    @map("user_id")
+  tokenHash        String    @unique(map: "campus_student_recoveries_token_hash_key") @map("token_hash")
+  requestedById    String    @map("requested_by_id")
+  reasonCode       String    @map("reason_code")
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt           DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, userId], map: "campus_student_recoveries_scope_idx")
+  @@map("campus_student_recoveries")
+}
+
+// Lost both authenticator and recovery codes: two different current school
+// administrators independently approve, then invalidate all existing sessions.
+model CampusMfaResetRequest {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  targetUserId   String    @map("target_user_id")
+  requestedById  String    @map("requested_by_id")
+  approvedById   String?   @map("approved_by_id")
+  status         String    @default("PENDING")
+  reasonCode     String    @map("reason_code")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  decidedAt      DateTime? @map("decided_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, targetUserId, status], map: "campus_mfa_resets_target_idx")
+  @@map("campus_mfa_reset_requests")
+}
