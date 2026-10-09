@@ -2,6 +2,25 @@
 
 本文件是新发布路线的统一入口，实现位于 `server-version/scripts/release/`。生产启用须有当次用户授权；文档本身不自动赋予部署权限。本轮用户已追加快速合并及部署授权，实际结果另行记录。
 
+## 规则位置与每次开工方式
+
+仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。
+
+每次开发/发布先给短执行清单：**修改范围 → 检查发现的具体故障 → 主要执行位置 → 输入一致的复用证据 → 时间预算**。不引入额外审批轮次或新验收机制。
+
+| 阶段 | 最小执行范围与主要位置 | 预算/停止规则 |
+|---|---|---|
+| 开发 | 只检查改动及直接影响契约；提前处理连接/权限/工具/定位器，保留代码、依赖、配置、参数和工具绑定证据 | 冻结前说明预算；额外优化不纳入当前发布 |
+| GitHub | 只运行实际差异对应门禁；选择该检查唯一主要位置，正式支持的同输入合格证据可复用 | 轻量路线约 5 分钟仍未结束时指出具体等待项；定位，不追加完整检查 |
+| 服务器 | 使用同一产物；核对版本、就绪、一条受影响短流程和回退；不重新构建或重跑 CI | 约一分钟就绪截止及短观察；持续错误回退 |
+| 完成 | 上述通过即完成；完整回归、灾备和性能独立报告 | 不等待无关恢复任务才能宣布应用完成 |
+
+本地→GitHub 自动证据接纳尚未实现；当前正式机制核验官方 CI artifact 并供部署及适用的 artifact 复用。不得假称本地证明已经被 GitHub 接纳，或伪造必需成功状态。对此缺口先明确执行位置，不默认本地与 GitHub各跑完整一轮；后续正式实现另限范围，当前不扩展自动化。
+
+5 分钟是等待项报告/定位阈值，并非当前自动作业终止值；现有工具 CI 作业上限仍为 8 分钟。完整 A/B 时间目标仍待实际需要时实测。
+
+普通可回退界面的非关键缺陷可上线后修订。阻塞项集中于产物/版本错误、相关门禁真实失败、越权登录、不可逆数据缺少保护、服务持续不可用及无法回退。每个必需检查必须对应具体故障，不能因“以前执行过”或“更放心”追加。
+
 ## 最小验证与路线对照
 
 **同一产物在 CI 验收一次。部署只确认产物、就绪、短关键路径和回退；不再重跑 CI。未改变的组件不构建、不切换、不进行业务回归。** 成功证据在输入不变且仍适用时复用；故障先定位，只复验失败项。用户暂停全量验证时不得自行恢复。
@@ -46,7 +65,7 @@ CSS 精确映射页面：入口样式只检查首页，登录样式只检查登�
 ## 启用方式（另需生产授权）
 
 1. 审查候选代码。当前分支未生成正式合格 runtime artifact；不得把本地工具测试或旧生产镜像冒充它。
-2. 按最新项目 Instructions 只读核对生产版本、实际 Compose entry、镜像和配置。旧 `/opt/eduk12-new/deploy/compose.sh` 当前不支持 overlay，新执行器默认拒绝。
+2. 按最新项目 Instructions 只读核对生产版本、实际 Compose entry、镜像和配置。PR #254 工具已于 2026-10-09 安装，入口现支持持久 overlay；仍需当次核对实际入口哈希和部署记录，不能按历史状态假定。
 3. 保留原 entry 字节和回退记录；参照 `compose-overlay.example.sh` 在授权后适配持久 image overlay。不得修改卷、数据库、TLS、备份或清理配置。记录新的 entry SHA256。
 4. 配置需要 `environment/project/entry/entrySha256/state/overlayProtocol/baseHead/baseImages/url/oldReady/configurationFingerprint`；B 另需 `backendReadyUrl/authProbeUrl`。配置指纹使用 `executor.configuration_fingerprint(actual_compose_config, plan.changed)`；baseImages 至少绑定 frontend/backend/worker 实际 IDs。需要能读取 exact base/head 的 Git checkout，不能把服务器的非 Git source export 直接当 checkout。
 5. 取得正式 scoped Actions ZIP。用 `qualify.py --plan ... --config ... --archive ... --artifact-id ... --run-id ... --output ...` 核对来源，提取并加载已核验 tar，核对镜像 ID。先运行 `executor.py --config ... --plan ... --receipt ...` 查看计划；批准后使用 `--apply --archive ...`。
@@ -56,6 +75,6 @@ CSS 精确映射页面：入口样式只检查首页，登录样式只检查登�
 
 目标 A 15–25 分钟、B 20–40 分钟、已有合格产物紧急修复 10–20 分钟，均从开发/本地验收完成后计时，**尚未实测整路线，不作承诺**。排队、下载、执行、并行和返工分别记录，不累加重叠时间。`release-checks.json` 保存编译/相关检查/runtime 阶段状态与秒数；`events.json` 保存切换、就绪、完成和回退原因。
 
-按照本轮用户的最小验证要求，不跑新的全量/业务 CI、不做整应用路线计时；追加部署仅安装工具/适配入口，不切换未修改的业务组件；验证结果与未完成限制见 [validation-20261009.md](validation-20261009.md)，历史根因见 [audit-20261009.md](audit-20261009.md)。冷构建、artifact 下载、证据时效、旧入口适配仍是预算阻塞项，不以无关验证弥补。
+按照本轮用户的最小验证要求，不跑新的全量/业务 CI、不做整应用路线计时；追加部署仅安装工具/适配入口，不切换未修改的业务组件；验证结果与未完成限制见 [validation-20261009.md](validation-20261009.md)，历史根因见 [audit-20261009.md](audit-20261009.md)。冷构建、artifact 下载、证据时效和连接稳定性仍是可能的预算阻塞项，不以无关验证弥补。
 
 旧 `release-verify-local.sh`、`release-candidate-checklist-v1.md` 和 `docs/ci-runner-policy.md` 的 exact-run-only 应用发布要求，以本规则正式生效后的 A/B 路线为入口；其数据、安全、科学和恢复约束仍有效。`training-completion.py` 为固定 PR248 的历史特例，不作为新产物复用入口。
