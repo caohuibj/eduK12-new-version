@@ -19,6 +19,8 @@ export const registrationRateLimit: RequestHandler = async (req, res, next) => {
   if (typeof req.body?.username === 'string') budgets.push(['account', normalized(req.body.username), registrationBudgets.account])
   if (req.body?.courseCode !== undefined) budgets.push(['course', normalized(req.body.courseCode), registrationBudgets.resource])
   if (req.body?.teacherCode !== undefined) budgets.push(['teacher', normalized(req.body.teacherCode), registrationBudgets.teacherCode])
+  if (req.body?.activationCode !== undefined) budgets.push(['campus-code', normalized(req.body.activationCode), registrationBudgets.resource])
+  if (req.body?.inviteCode !== undefined) budgets.push(['campus-staff-invite', normalized(req.body.inviteCode), registrationBudgets.resource])
   for (const [kind, value, limit] of budgets) {
     const result = await cacheService.consumeRateLimit(`ratelimit:registration:${kind}:${digest(value)}`, limit, 900)
     if (!result) { res.setHeader('Retry-After', '2'); res.status(503).json({ code: -1, message: '注册服务暂时不可用，请稍后重试' }); return }
