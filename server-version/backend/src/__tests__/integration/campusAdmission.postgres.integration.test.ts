@@ -132,7 +132,11 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
     expect(await db.organizationMembership.count({
       where:{organizationId:f.org,userId:{in:[first.userId,second.userId]},validUntil:null},
     })).toBe(2)
-    expect(await db.organizationStudentClassAssignment.count()).toBeGreaterThanOrEqual(0)
+    const classAssignments=await db.$queryRaw<Array<{n:number}>>`
+      SELECT COUNT(*)::int AS "n" FROM "organization_student_class_assignments"
+      WHERE "organization_id"=${f.org} AND "class_unit_id"=${f.classId}
+    `
+    expect(classAssignments[0]?.n).toBe(2)
     await expect(approveCampusClass({
       actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
       expectedRosterVersion:roster.rosterVersion,
