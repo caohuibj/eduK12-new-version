@@ -76,6 +76,17 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
     WHERE "organization_id" = ${identity[0].organizationId} AND "id" = ${identity[0].runId}
     FOR SHARE
   `
+  // SCHOOL Activity pause/closure must serialize with START admission. This
+  // SHARE lock conflicts with Activity's FOR UPDATE transition lock; current
+  // population is rechecked under these fences after any wait.
+  await tx.$queryRaw`
+    SELECT a."course_id" FROM "campus_activity_runs" ar
+    JOIN "campus_activities" a ON a."course_id"=ar."course_id"
+      AND a."organization_id"=ar."organization_id"
+    WHERE ar."organization_id"=${identity[0].organizationId}
+      AND ar."run_id"=${identity[0].runId}
+    FOR SHARE OF a
+  `
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",
