@@ -2514,6 +2514,7 @@ model CampusClassAdmission {
   classUnitId      String    @id @map("class_unit_id")
   organizationId   String    @map("organization_id")
   rosterVersion    Int       @default(0) @map("roster_version")
+  rosterExpectedCount Int    @default(0) @map("roster_expected_count")
   status           String    @default("DRAFT")
   windowOpensAt    DateTime? @map("window_opens_at") @db.Timestamptz(6)
   windowClosesAt   DateTime? @map("window_closes_at") @db.Timestamptz(6)
@@ -2534,7 +2535,9 @@ model CampusStudentEligibility {
   claimedUserId     String?   @unique(map: "campus_student_eligibilities_claimed_user_key") @map("claimed_user_id")
   status            String    @default("VALID")
   createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  @@unique([organizationId, studentNoDigest], map: "campus_student_eligibilities_org_digest_key")
+  // Partial UNIQUE(status=VALID) is created by SQL migration to retain
+  // archived quarantined episode rows for the same school student number.
+  @@index([organizationId, studentNoDigest], map: "campus_student_eligibilities_org_digest_lookup_idx")
   @@index([organizationId, classUnitId, rosterVersion], map: "campus_student_eligibilities_class_idx")
   @@map("campus_student_eligibilities")
 }

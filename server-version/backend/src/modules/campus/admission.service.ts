@@ -130,7 +130,7 @@ export async function replaceCampusRoster(input: {
     const claimed = await tx.$queryRaw<Array<{ count: number }>>`
       SELECT COUNT(*)::int AS "count" FROM "campus_student_eligibilities"
       WHERE "organization_id"=${input.organizationId} AND "class_unit_id"=${input.classUnitId}
-        AND "claimed_user_id" IS NOT NULL
+        AND "status"='VALID' AND "claimed_user_id" IS NOT NULL
     `
     if (claimed[0]?.count) fail('ROSTER_HAS_REGISTRATIONS')
     const version = row.rosterVersion + 1
@@ -160,6 +160,7 @@ export async function replaceCampusRoster(input: {
         "student_no_digest", "key_version", "roster_version", "status"
       ) VALUES ${Prisma.join(rows)}
       ON CONFLICT ("organization_id", "student_no_digest")
+      WHERE ("status"='VALID')
       DO UPDATE SET "status"='VALID', "roster_version"=EXCLUDED."roster_version"
       WHERE "campus_student_eligibilities"."claimed_user_id" IS NULL
         AND "campus_student_eligibilities"."class_unit_id"=EXCLUDED."class_unit_id"
@@ -172,7 +173,7 @@ export async function replaceCampusRoster(input: {
     `
     await tx.$executeRaw`
       UPDATE "campus_class_admissions"
-      SET "roster_version"=${version}, "status"='DRAFT',
+      SET "roster_version"=${version}, "roster_expected_count"=${digests.length}, "status"='DRAFT',
           "window_opens_at"=NULL, "window_closes_at"=NULL,
           "updated_at"=statement_timestamp()
       WHERE "class_unit_id"=${input.classUnitId}
@@ -326,10 +327,11 @@ export async function readCampusClassSummary(input: {
 }) {
   await assertCampusClassRead(input.actor,input.organizationId)
   const rows=await prisma.$queryRaw<Array<{
-    status:string; rosterVersion:number; eligibleCount:number
+    status:string; rosterVersion:number; rosterExpectedCount:number; eligibleCount:number
     registeredCount:number; unresolvedIncidents:number
   }>>`
     SELECT a."status",a."roster_version" AS "rosterVersion",
+      a."roster_expected_count" AS "rosterExpectedCount",
       (SELECT COUNT(*)::int FROM "campus_student_eligibilities" e
        WHERE e."class_unit_id"=a."class_unit_id" AND e."status"='VALID'
          AND e."roster_version"=a."roster_version") AS "eligibleCount",
@@ -354,8 +356,10 @@ export async function approveCampusClass(input: {
   return prisma.$transaction(async tx=>{
     const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
     if (row.status!=='CLOSED' || row.rosterVersion!==input.expectedRosterVersion) fail('APPROVAL_PRECONDITION_FAILED')
-    const numbers=await tx.$queryRaw<Array<{ eligible:number; registered:number; unresolved:number }>>`
+    const numbers=await tx.$queryRaw<Array<{ eligible:number; registered:number; unresolved:number; expected:number }>>`
       SELECT
+        (SELECT "roster_expected_count" FROM "campus_class_admissions" a
+         WHERE a."class_unit_id"=${input.classUnitId} AND a."organization_id"=${input.organizationId}) AS "expected",
         (SELECT COUNT(*)::int FROM "campus_student_eligibilities" e
          WHERE e."class_unit_id"=${input.classUnitId} AND e."status"='VALID'
          AND e."roster_version"=${row.rosterVersion}) AS "eligible",
@@ -366,7 +370,8 @@ export async function approveCampusClass(input: {
          WHERE i."class_unit_id"=${input.classUnitId} AND i."resolved_at" IS NULL) AS "unresolved"
     `
     const v=numbers[0]
-    if(!v || v.eligible===0 || v.eligible!==v.registered || v.unresolved!==0) fail('CLASS_NOT_READY')
+    if(!v || v.expected===0 || v.eligible!==v.expected
+      || v.eligible!==v.registered || v.unresolved!==0) fail('CLASS_NOT_READY')
     const members=await tx.$queryRaw<Array<{ id:string; userId:string }>>`
       INSERT INTO "organization_memberships" ("id","organization_id","user_id","org_role")
       SELECT gen_random_uuid()::text,s."organization_id",s."user_id",'MEMBER'
@@ -490,13 +495,25 @@ export async function quarantineCampusStudent(input:{
     const elig=await tx.$queryRaw<Array<{id:string;userId:string|null}>>`
       SELECT "id","claimed_user_id" AS "userId" FROM "campus_student_eligibilities"
       WHERE "organization_id"=${input.organizationId} AND "class_unit_id"=${input.classUnitId}
-        AND "student_no_digest"=${eligibilityDigest} FOR UPDATE
+        AND "student_no_digest"=${eligibilityDigest} AND "status"='VALID' FOR UPDATE
     `
     const userId=elig[0]?.userId
     if(!userId)throw new CampusAdmissionError('STUDENT_QUARANTINE_UNAVAILABLE',404)
     const account=await tx.user.findUnique({where:{id:userId}})
     if(!account||account.accountDomain!=='SCHOOL')throw new CampusAdmissionError('STUDENT_QUARANTINE_UNAVAILABLE',404)
     await tx.user.update({where:{id:userId},data:{isFrozen:true,tokenVersion:{increment:1}}})
+    // Freeze original identity/FINAL linkage and void only current
+    // eligibility. All unused class codes are invalidated immediately.
+    await tx.$executeRaw`
+      UPDATE "campus_student_eligibilities" SET "status"='VOID'
+      WHERE "id"=${elig[0].id} AND "status"='VALID'
+    `
+    await tx.$executeRaw`
+      UPDATE "campus_activation_codes" SET "revoked_at"=statement_timestamp()
+      WHERE "organization_id"=${input.organizationId}
+        AND "class_unit_id"=${input.classUnitId}
+        AND "revoked_at" IS NULL AND "consumed_at" IS NULL
+    `
     await tx.$executeRaw`
       UPDATE "campus_student_enrollments" SET "status"='QUARANTINED'
       WHERE "user_id"=${userId}
