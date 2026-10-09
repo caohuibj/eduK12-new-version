@@ -3,6 +3,7 @@ import './school.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
+type SchoolAccess={orgRole:string|null;canGovern:boolean;personas:string[];capabilities:string[];explicitDenies:string[]}
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Summary={status:string;rosterVersion:number;eligibleCount:number;registeredCount:number;unresolvedIncidents:number}
 type Envelope<T>={code:number|string;message:string;data:T}
@@ -67,6 +68,7 @@ export default function SchoolApp(){
   const [mfaUri,setMfaUri]=useState('')
   const [recoveryCodes,setRecoveryCodes]=useState<string[]>([])
   const [orgs,setOrgs]=useState<CampusOrg[]>([])
+  const [access,setAccess]=useState<SchoolAccess|null>(null)
   const [units,setUnits]=useState<Unit[]>([])
   const [gradeName,setGradeName]=useState('')
   const [className,setClassName]=useState('')
@@ -95,7 +97,7 @@ export default function SchoolApp(){
     void api<{list:CampusOrg[]}>('/organizations').then(data=>{
       const list=data.list??[]
       setOrgs(list)
-      if(!schoolId&&list.length)setSchoolId(list[0].id)
+      if(list.length)setSchoolId(prev=>prev||list[0].id)
     }).catch(()=>setOrgs([]))
     if(user.role==='STUDENT'){
       void api<{status:string}>('/my-status').then(result=>setStudentStatus(result.status))
@@ -104,10 +106,16 @@ export default function SchoolApp(){
   },[user])
   useEffect(()=>{
     if(!user||!schoolId)return
-    setClassId('');setUnits([]);setSummary(null);setIssuedCodes([])
+    setClassId('');setUnits([]);setSummary(null);setIssuedCodes([]);setAccess(null)
+    void api<{access:SchoolAccess}>(`/organizations/${schoolId}/context`)
+      .then(data=>setAccess(data.access)).catch(()=>setAccess(null))
     void api<{list:Unit[]}>(`/organizations/${schoolId}/units`)
       .then(result=>setUnits(result.list??[])).catch(()=>setUnits([]))
   },[schoolId,user])
+  const schoolAdmin=access?.orgRole==='ORG_ADMIN' && access.canGovern===true
+  const psychologyStaff=!!access?.personas.includes('COUNSELOR')
+    && !!access?.capabilities.includes('PSYCHOLOGY_STAFF')
+    && !access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','CLASS_APPROVE','ORGANIZATION_GOVERNANCE'].includes(x))
   const notify=(message:string)=>{setNotice(message);setError('')}
   const run=async(work:()=>Promise<void>)=>{
     setError('');setNotice('');setWorking(true)
@@ -293,29 +301,32 @@ export default function SchoolApp(){
             <label className="hs-field"><span>当前学校</span><select value={schoolId} onChange={e=>setSchoolId(e.target.value)}>
               <option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}
             </select></label>
-            <div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
+            {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
             <div>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}>
               <option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
-              <button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></div></div>
+              <button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></div></div>}
             <label className="hs-field"><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}>
               <option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
             </select></label>
           </section>
           {schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
-            <p>注册链接：<code className="hs-break">{joinUrl}</code></p>
+            {schoolAdmin&&<p>注册链接：<code className="hs-break">{joinUrl}</code></p>}
             {summary&&<p>状态：{summary.status} · 名册 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
             <button onClick={()=>void loadSummary()} disabled={working}>刷新班级状态</button>
-            <label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span>
+            {schoolAdmin&&<><label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span>
               <textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label>
             <button disabled={working||!roster.trim()} onClick={()=>void saveRoster()}>更新资格名册</button>
             <div className="hs-actions"><button disabled={working} onClick={()=>void issueCodes()}>批量生成一次性激活码</button>
               <label className="hs-field"><span>注册截止时间</span><input type="datetime-local" value={windowEnd} onChange={e=>setWindowEnd(e.target.value)}/></label>
               <button disabled={working||!windowEnd} onClick={()=>void actionWindow('OPEN')}>开启注册</button>
-              <button disabled={working} onClick={()=>void actionWindow('CLOSE')}>关闭注册</button>
-              <button className="hs-primary" disabled={working||!summary} onClick={()=>void approve()}>心理教师整班审批</button></div>
-            {issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
+              <button disabled={working} onClick={()=>void actionWindow('CLOSE')}>关闭注册</button></div></>}
+            {psychologyStaff&&<button className="hs-primary"
+              disabled={working||!summary||summary.status!=='CLOSED'
+                ||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0}
+              onClick={()=>void approve()}>心理教师 · 确认整班身份审批</button>}
+            {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}
-          {schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
+          {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
               <label><input type="checkbox" checked={staffPsych} onChange={e=>setStaffPsych(e.target.checked)}/> 心理专业权限</label>
