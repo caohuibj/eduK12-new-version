@@ -76,7 +76,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   const authorized=input.activityId?activityRows.filter(a=>a.courseId===input.activityId):activityRows
   const ids=authorized.map(a=>a.courseId)
   if(!ids.length)return {list:[],total:0,page:input.page,hasMore:false,truncated:activityRows.length>200}
-  const [assignments,checkins,linkedRuns,assigned]=await Promise.all([
+  const [assignments,checkins,linkedRuns]=await Promise.all([
     prisma.assignment.findMany({
       where:{courseId:{in:ids},status:'PUBLISHED'},
       select:{id:true,courseId:true,title:true,deadline:true,tags:true,
@@ -94,8 +94,10 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       JOIN "assessment_runs" r ON r."id"=ar."run_id" AND r."status"='PUBLISHED'
       WHERE ar."course_id" IN (${ids.length?Prisma.join(ids):Prisma.sql`NULL`})
     `,
-    listAssignedRunTasks(actor.userId),
   ])
+  const assigned=await listAssignedRunTasks(actor.userId,{
+    runIds:linkedRuns.map(link=>link.runId),
+  })
   const runMap=new Map(linkedRuns.map(r=>[r.runId,r.courseId]))
   const activityMap=new Map(authorized.map(a=>[a.courseId,a]))
   const tasks:Array<{

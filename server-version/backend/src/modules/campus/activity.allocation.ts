@@ -22,7 +22,7 @@ export async function allocateCampusActivityParticipants(input:{
   })).digest('hex')
   return prisma.$transaction(async tx=>{
     const {activity,context}=await lockAndAssertCampusActivityEditor(tx,input)
-    if(!['DRAFT','SUBMITTED'].includes(activity.status)
+    if(activity.status!=='DRAFT'
       ||activity.version!==input.expectedVersion)deny('ACTIVITY_ALLOCATION_FROZEN')
     const prior=await tx.$queryRaw<Array<{requestHash:string;allocatedCount:number}>>`
       SELECT "request_hash" AS "requestHash","allocated_count" AS "allocatedCount"

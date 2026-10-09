@@ -153,7 +153,11 @@ export async function readAssessmentRunProduct(
 }
 
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
-export async function listAssignedRunTasks(userId: string) {
+export async function listAssignedRunTasks(userId: string, options?: { runIds?: string[] }) {
+  if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
+  const runScope=options?.runIds
+    ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
+    : Prisma.empty
   const list = await prisma.$queryRaw<Array<{
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
@@ -191,6 +195,7 @@ export async function listAssignedRunTasks(userId: string) {
       AND ca."id" = e."runtime_binding_ref" AND ca."user_id" = ${userId}
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
+      ${runScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
