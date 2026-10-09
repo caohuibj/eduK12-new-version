@@ -6,6 +6,7 @@ import {
   replaceCampusRoster, setCampusRegistrationWindow, issueCampusActivationCodes,
   registerCampusStudent, approveCampusClass, readCampusClassSummary,
   assertCampusPsychologyStaff, quarantineCampusStudent,
+  createCampusAdmissionIncident, resolveCampusAdmissionIncident,listCampusAdmissionIncidents,
   digestCampusStudentNumber,
 } from '../../modules/campus/admission.service'
 import { issueSchoolStudentRecovery, completeSchoolStudentRecovery } from '../../modules/campus/recovery.service'
@@ -172,6 +173,29 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
     }})).toBe(1)
     await expect(registerCampusStudent({...input,organizationId:schoolA.org,classUnitId:schoolA.classId,
       activationCode:codes[0]+'x'})).rejects.toMatchObject({code:'CAMPUS_REGISTRATION_UNAVAILABLE'})
+  })
+
+  it('allows psychology officers to list and resolve blocking admission incidents',async()=>{
+    const f=await school()
+    await replaceCampusRoster({actor:f.admin,organizationId:f.org,
+      classUnitId:f.classId,studentNumbers:[studentNo('inc')],
+    })
+    const created=await createCampusAdmissionIncident({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      reason:'ELIGIBILITY_DISPUTE',
+    })
+    const visible=await listCampusAdmissionIncidents({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+    })
+    expect(visible.map(item=>item.id)).toContain(created.incidentId)
+    const ended=await resolveCampusAdmissionIncident({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      incidentId:created.incidentId,resolution:'VERIFIED_CORRECT',
+    })
+    expect(ended.resolved).toBe(true)
+    expect(await listCampusAdmissionIncidents({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+    })).toHaveLength(0)
   })
 
   it('quarantines suspected takeover without transferring or deleting FINAL ownership',async()=>{

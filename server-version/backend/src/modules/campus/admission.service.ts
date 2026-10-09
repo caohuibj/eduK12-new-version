@@ -444,6 +444,17 @@ export async function createCampusAdmissionIncident(input: {
     return {incidentId:record.id,status:'OPEN' as const}
   })
 }
+export async function listCampusAdmissionIncidents(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string
+}) {
+  await assertCampusRecoveryAuthority(input.actor,input.organizationId)
+  return prisma.campusAdmissionIncident.findMany({
+    where:{organizationId:input.organizationId,classUnitId:input.classUnitId,resolvedAt:null},
+    select:{id:true,reason:true,createdAt:true},
+    take:100,orderBy:[{createdAt:'desc'},{id:'desc'}],
+  })
+}
+
 export async function resolveCampusAdmissionIncident(input:{
   actor:AuthenticatedPrincipal;organizationId:string;classUnitId:string;incidentId:string;
   resolution:'VERIFIED_CORRECT'|'STUDENT_QUARANTINED'|'ROSTER_CORRECTED'

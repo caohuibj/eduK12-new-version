@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './school.css'
+import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -50,9 +51,9 @@ const SchoolMark=()=>(
 export default function SchoolApp(){
   const [user,setUser]=useState<CampusUser|null>(null)
   const [loading,setLoading]=useState(true)
-  const [screen,setScreen]=useState<'home'|'login'|'register'|'staff'|'mfa'|'workspace'>(()=>
+  const [screen,setScreen]=useState<'home'|'login'|'register'|'staff'|'recover'|'mfa'|'workspace'>(()=>
     window.location.pathname==='/register'?'register':
-      window.location.pathname==='/staff/register'?'staff':'home')
+      window.location.pathname==='/staff/register'?'staff':window.location.pathname==='/recover'?'recover':'home')
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [username,setUsername]=useState('')
@@ -237,6 +238,7 @@ export default function SchoolApp(){
         <p>Huischool 与培训版账号相互独立。</p>
         <form onSubmit={e=>void signIn(e)}>{field('校园用户名',username,setUsername)}{field('密码',password,setPassword,'password')}<button className="hs-primary" disabled={working}>登录</button></form>
         <button className="hs-link" onClick={()=>setScreen('register')}>使用班级激活码注册</button>
+        <button className="hs-link" onClick={()=>setScreen('recover')}>忘记校园账号或密码</button>
       </section>}
       {!loading&&!user&&screen==='register'&&<section className="hs-panel hs-narrow">
         <h1>学生半匿名注册</h1><p>请从班级提供的专属注册链接进入，输入学号和随机激活码。账号需等待心理教师完成整班审批。</p>
@@ -250,6 +252,8 @@ export default function SchoolApp(){
           <button className="hs-primary" disabled={working}>提交注册</button>
         </form>
       </section>}
+      {!loading&&!user&&screen==='recover'&&<SchoolStudentRecovery api={api}
+        onComplete={()=>{setScreen('login');notify('校园密码已更新，请重新登录。')}}/>}
       {!loading&&!user&&screen==='staff'&&<section className="hs-panel hs-narrow">
         <h1>教职员工独立注册</h1><p>仅限获得学校管理员一次性邀请码的人员。培训版账号不能直接登录校园版。</p>
         <form onSubmit={e=>void registerStaff(e)}>
@@ -326,6 +330,8 @@ export default function SchoolApp(){
               onClick={()=>void approve()}>心理教师 · 确认整班身份审批</button>}
             {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}
+          {(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
+            <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>

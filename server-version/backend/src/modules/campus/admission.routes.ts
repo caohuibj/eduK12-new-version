@@ -11,6 +11,7 @@ import {
   registerCampusStudent, setCampusRegistrationWindow, readCampusClassSummary,
   approveCampusClass, readCampusStudentStatus,
   createCampusAdmissionIncident, resolveCampusAdmissionIncident,
+  listCampusAdmissionIncidents,
   quarantineCampusStudent,
 } from './admission.service'
 
@@ -78,6 +79,14 @@ router.post('/organizations/:organizationId/classes/:classUnitId/approve',authen
   return success(res,await approveCampusClass({actor:req.user!,...params,...body}))
 }))
 
+
+router.get('/organizations/:organizationId/classes/:classUnitId/incidents',
+  authenticateSchool,wrap(async(req,res)=>{
+    const params=classParams.parse(req.params)
+    const list=await listCampusAdmissionIncidents({actor:req.user!,...params})
+    return success(res,{list})
+  })
+)
 
 router.post('/organizations/:organizationId/classes/:classUnitId/incidents',
   authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
