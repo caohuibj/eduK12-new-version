@@ -40,7 +40,8 @@ export const userController = {
       const { role, keyword } = req.query
       const { page, pageSize, skip } = getPaginationParams(req)
 
-      let where: any = {}
+      // Legacy user management must not enumerate SCHOOL identities.
+      let where: any = { accountDomain: { not: 'SCHOOL' } }
 
       if (role && role !== 'all') {
         where.role = role
@@ -95,7 +96,7 @@ export const userController = {
   async approveTeacher(req: Request, res: Response) {
     try {
       const { id } = req.params
-      const user = await prisma.user.findUnique({ where: { id } })
+      const user = await prisma.user.findFirst({ where: { id, accountDomain: { not: 'SCHOOL' } } })
       if (!user) {
         return notFound(res, '用户不存在')
       }
@@ -163,6 +164,7 @@ export const userController = {
           isActive: true,
           createdAt: true,
           mustChangePassword: true,
+          accountDomain: true,
         }
       })
 
@@ -190,6 +192,7 @@ export const userController = {
           isActive: true,
           createdAt: true,
           mustChangePassword: true,
+          accountDomain: true,
         }
       })
 
@@ -197,7 +200,9 @@ export const userController = {
         return notFound(res, '用户不存在')
       }
 
-      return success(res, user)
+      if (user.accountDomain === 'SCHOOL') return notFound(res, '用户不存在')
+      const { accountDomain: _accountDomain, ...legacyProfile } = user
+      return success(res, legacyProfile)
     } catch (err) {
       logger.error('获取用户详情错误', err)
       return error(res, Messages.COMMON.FAILED)
@@ -247,7 +252,7 @@ export const userController = {
         where: { id }
       })
 
-      if (!user) {
+      if (!user || user.accountDomain === 'SCHOOL') {
         return notFound(res, '用户不存在')
       }
 

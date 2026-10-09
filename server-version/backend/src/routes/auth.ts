@@ -8,6 +8,16 @@ import { requirePositiveAccountExtension } from '../middleware/accountExtensionV
 import { registrationRateLimit, withRegistrationAdmission } from '../middleware/registrationAdmission'
 
 const router = Router()
+// A school-origin browser must not create legacy training sessions on the
+// Huischool hostname. Product authority still comes from accountDomain/JWT.
+router.use((req,res,next)=>{
+  const host=String(req.headers.host??'').split(':')[0].toLowerCase()
+  const origin=String(req.headers.origin??'').toLowerCase()
+  if(host==='school.eduk12.top'||origin==='https://school.eduk12.top') {
+    return res.status(403).json({code:-1,message:'校园版请使用独立账号入口'})
+  }
+  next()
+})
 
 // 公开接口
 router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(authController.login))

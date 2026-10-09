@@ -13,6 +13,7 @@ type TargetRow = {
   username: string
   role: UserRole
   platformRole: PlatformRole
+  accountDomain: string
   isActive: boolean
   isFrozen: boolean
   expiresAt: Date | null
@@ -53,6 +54,7 @@ export async function assertTeacherCourseResetPreflight(input: {
           status: { in: ['ACTIVE', 'APPROVED'] },
           student: {
             role: UserRole.STUDENT,
+            accountDomain: { not: 'SCHOOL' },
             platformRole: PlatformRole.STANDARD,
             isActive: true,
             isFrozen: false,
@@ -121,6 +123,7 @@ export async function resetEnrolledStudentPassword(input: {
 
       const targets = await tx.$queryRaw<TargetRow[]>`
         SELECT "id", "username", "role",
+               "account_domain" AS "accountDomain",
                "platform_role"::text AS "platformRole",
                "is_active" AS "isActive",
                "is_frozen" AS "isFrozen",
@@ -133,6 +136,7 @@ export async function resetEnrolledStudentPassword(input: {
       if (
         !target
         || target.role !== UserRole.STUDENT
+        || target.accountDomain === 'SCHOOL'
         || target.platformRole !== PlatformRole.STANDARD
         || !target.isActive
         || target.isFrozen

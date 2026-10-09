@@ -14,6 +14,9 @@ model User {
   scalePublicationAudits ScalePublicationAudit[]
   id                                  String                           @id @default(uuid())
   username                            String                           @unique
+  // Existing accounts retain their legacy identity; new legacy registrations are TRAINING.
+  accountDomain                       String                           @default("TRAINING") @map("account_domain")
+  campusAccount                       CampusAccount?
   passwordHash                        String                           @map("password_hash")
   role                                UserRole                         @default(STUDENT)
   platformRole                        PlatformRole                     @default(STANDARD) @map("platform_role")
@@ -108,6 +111,7 @@ model User {
 // append-only audit trigger remain authoritative in the handwritten migrations.
 model Organization {
   homeroomDeliveryEnabled Boolean @default(true) @map("homeroom_delivery_enabled")
+  productDomain String @default("LEGACY") @map("product_domain")
   id              String    @id
   name            String
   status          String    @default("ACTIVE")
@@ -2492,4 +2496,170 @@ model LegacyImportIdMap {
   @@unique([entity, legacyId])
   @@index([batchId])
   @@map("_legacy_import_id_map")
+}
+
+// Huischool login aliases are disjoint from legacy User.username.
+model CampusAccount {
+  userId          String   @id @map("user_id")
+  loginName       String   @map("login_name")
+  normalizedLogin String   @unique(map: "campus_accounts_normalized_login_key") @map("normalized_login")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@map("campus_accounts")
+}
+
+// Campus admissions use handwritten multi-column FKs/partial indexes in SQL
+// migrations, because OrganizationUnit is intentionally SQL-owned.
+model CampusClassAdmission {
+  classUnitId      String    @id @map("class_unit_id")
+  organizationId   String    @map("organization_id")
+  rosterVersion    Int       @default(0) @map("roster_version")
+  rosterExpectedCount Int    @default(0) @map("roster_expected_count")
+  status           String    @default("DRAFT")
+  windowOpensAt    DateTime? @map("window_opens_at") @db.Timestamptz(6)
+  windowClosesAt   DateTime? @map("window_closes_at") @db.Timestamptz(6)
+  approvedAt       DateTime? @map("approved_at") @db.Timestamptz(6)
+  approvedByUserId String?   @map("approved_by_user_id")
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@index([organizationId, status], map: "campus_class_admissions_org_status_idx")
+  @@map("campus_class_admissions")
+}
+
+model CampusStudentEligibility {
+  id                String    @id
+  organizationId    String    @map("organization_id")
+  classUnitId       String    @map("class_unit_id")
+  studentNoDigest   String    @map("student_no_digest")
+  keyVersion        Int       @default(1) @map("key_version")
+  rosterVersion     Int       @map("roster_version")
+  claimedUserId     String?   @unique(map: "campus_student_eligibilities_claimed_user_key") @map("claimed_user_id")
+  status            String    @default("VALID")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Partial UNIQUE(status=VALID) is created by SQL migration to retain
+  // archived quarantined episode rows for the same school student number.
+  @@index([organizationId, studentNoDigest], map: "campus_student_eligibilities_org_digest_lookup_idx")
+  @@index([organizationId, classUnitId, rosterVersion], map: "campus_student_eligibilities_class_idx")
+  @@map("campus_student_eligibilities")
+}
+
+model CampusActivationCode {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  classUnitId    String    @map("class_unit_id")
+  rosterVersion  Int       @map("roster_version")
+  codeDigest     String    @unique(map: "campus_activation_codes_digest_key") @map("code_digest")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt     DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedUserId String?   @map("consumed_user_id")
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, expiresAt], map: "campus_activation_codes_class_idx")
+  @@map("campus_activation_codes")
+}
+
+model CampusStudentEnrollment {
+  userId          String    @id @map("user_id")
+  organizationId  String    @map("organization_id")
+  classUnitId     String    @map("class_unit_id")
+  eligibilityId   String    @unique(map: "campus_student_enrollments_eligibility_key") @map("eligibility_id")
+  rosterVersion   Int       @map("roster_version")
+  status          String    @default("PENDING_CLASS_APPROVAL")
+  approvedAt      DateTime? @map("approved_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, status], map: "campus_student_enrollments_class_idx")
+  @@map("campus_student_enrollments")
+}
+
+model CampusAdmissionIncident {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  classUnitId     String    @map("class_unit_id")
+  reason          String
+  resolvedAt      DateTime? @map("resolved_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, resolvedAt], map: "campus_admission_incidents_class_idx")
+  @@map("campus_admission_incidents")
+}
+
+// TOTP secrets are encrypted at rest with a dedicated CAMPUS MFA key.
+model CampusMfaCredential {
+  userId        String    @id @map("user_id")
+  secretCipher  String    @map("secret_cipher")
+  enabled       Boolean   @default(false)
+  lastUsedStep  BigInt    @default(-1) @map("last_used_step")
+  enabledAt     DateTime? @map("enabled_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("campus_mfa_credentials")
+}
+model CampusMfaChallenge {
+  id           String    @id
+  userId       String    @map("user_id")
+  challengeHash String   @unique(map: "campus_mfa_challenges_digest_key") @map("challenge_hash")
+  tokenVersion Int       @map("token_version")
+  failedCount  Int       @default(0) @map("failed_count")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt   DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, expiresAt], map: "campus_mfa_challenges_user_idx")
+  @@map("campus_mfa_challenges")
+}
+model CampusMfaRecoveryCode {
+  userId      String    @map("user_id")
+  codeHash    String    @map("code_hash")
+  usedAt      DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([userId, codeHash])
+  @@map("campus_mfa_recovery_codes")
+}
+
+// Staff onboarding is a separate, once-only SCHOOL invitation; it never adds
+// a legacy training account to a school or reuses training credentials.
+model CampusStaffInvitation {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  tokenHash      String    @unique(map: "campus_staff_invitations_token_hash_key") @map("token_hash")
+  persona        String
+  adminRole      Boolean   @default(false) @map("admin_role")
+  psychologyStaff Boolean  @default(false) @map("psychology_staff")
+  invitedByUserId String   @map("invited_by_user_id")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt     DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String? @map("consumed_by_user_id")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, expiresAt], map: "campus_staff_invitations_org_idx")
+  @@map("campus_staff_invitations")
+}
+
+// One-time restricted student credential recovery. The requester performs
+// offline identity verification; only the hash of the bearer code is retained.
+model CampusStudentRecovery {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  classUnitId      String    @map("class_unit_id")
+  userId           String    @map("user_id")
+  tokenHash        String    @unique(map: "campus_student_recoveries_token_hash_key") @map("token_hash")
+  requestedById    String    @map("requested_by_id")
+  reasonCode       String    @map("reason_code")
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt           DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, classUnitId, userId], map: "campus_student_recoveries_scope_idx")
+  @@map("campus_student_recoveries")
+}
+
+// Lost both authenticator and recovery codes: two different current school
+// administrators independently approve, then invalidate all existing sessions.
+model CampusMfaResetRequest {
+  id             String    @id
+  organizationId String    @map("organization_id")
+  targetUserId   String    @map("target_user_id")
+  requestedById  String    @map("requested_by_id")
+  approvedById   String?   @map("approved_by_id")
+  status         String    @default("PENDING")
+  reasonCode     String    @map("reason_code")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
+  decidedAt      DateTime? @map("decided_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId, targetUserId, status], map: "campus_mfa_resets_target_idx")
+  @@map("campus_mfa_reset_requests")
 }

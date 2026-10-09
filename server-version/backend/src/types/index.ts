@@ -3,11 +3,14 @@ import { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, Submissi
 export { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, SubmissionStatus }
 
 export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
+export type AccountDomain = 'LEGACY' | 'TRAINING' | 'SCHOOL'
 
 // JWT is a credential, not an authority snapshot. Legacy role remains in the
 // token for compatibility, but protected authorization must use the current
 // database principal hydrated by auth middleware.
 export interface JwtPayload {
+  accountDomain?: AccountDomain // Historical legacy tokens omit this claim.
+  mfaVerifiedAt?: number // Server-signed, only after verified TOTP/recovery
   userId: string
   username: string
   role: UserRole
@@ -16,6 +19,7 @@ export interface JwtPayload {
 }
 
 export interface AuthenticatedPrincipal {
+  accountDomain?: AccountDomain // Current DB authority; optional for pre-PR1 test fixtures.
   userId: string
   username: string
   role: UserRole

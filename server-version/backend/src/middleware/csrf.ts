@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { csrfTokensMatch, getCsrfCookie, getCsrfHeader } from '../utils/authCookies'
+import { csrfTokensMatch, getCsrfCookie, getSchoolCsrfCookie, getCsrfHeader } from '../utils/authCookies'
 import { forbidden } from '../utils/response'
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
@@ -19,7 +19,7 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
     return next()
   }
 
-  if (!csrfTokensMatch(getCsrfCookie(req), getCsrfHeader(req))) {
+  if (!csrfTokensMatch(req.path.startsWith('/campus/') ? getSchoolCsrfCookie(req) : getCsrfCookie(req), getCsrfHeader(req))) {
     return forbidden(res, 'CSRF 校验失败')
   }
 

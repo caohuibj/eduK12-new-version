@@ -143,6 +143,7 @@ async function list(req: Request, res: Response, parentsOnly: boolean) {
     await accountActor(prisma, req.user!.userId)
     const { keyword, page, pageSize } = querySchema.parse(req.query)
     const where = {
+      accountDomain: { not: 'SCHOOL' as const },
       ...(parentsOnly ? { role: 'PARENT' as const } : {}),
       ...(keyword
         ? {
@@ -259,7 +260,7 @@ parentAccountsRouter.post('/:id/reset-password', budget, async (req, res) => {
           await accountActor(tx, actorUserId)
           const rows = await tx.$queryRaw<
             Array<{ id: string }>
-          >`SELECT id FROM users WHERE id=${req.params.id} AND role='PARENT' FOR UPDATE`
+          >`SELECT id FROM users WHERE id=${req.params.id} AND role='PARENT' AND account_domain <> 'SCHOOL' FOR UPDATE`
           if (!rows[0])
             throw new AccountAuthorityError(
               'PARENT_ACCOUNT_NOT_FOUND',

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { reportingFail } from './types'
 
@@ -12,6 +12,23 @@ export async function individualSubjectScope(input: IndividualScopeInput): Promi
   const context = await resolveOrganizationAccessContext(input,input.tx)
   if (!context?.membershipId || context.explicitDenies.some(d => ['*', 'REPORT_READ', 'REPORT_MEMBER_READ', 'ORG_INDIVIDUAL_REPORT_V1'].includes(d))) return hidden()
   if (context.organizationStatus !== 'ACTIVE') reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
+  // SCHOOL sensitive individual reporting is professional and relationship-scoped.
+  // Neither ORG_ADMIN nor class TEACHER can inherit psychological report access.
+  if (context.productDomain === 'SCHOOL') {
+    if (!contextHasCapability(context,'PSYCHOLOGY_STAFF')
+      || !context.personas.includes('COUNSELOR')) return hidden()
+    return Prisma.sql`m.user_id <> ${input.principal.userId}
+      AND m.valid_from <= statement_timestamp()
+      AND (m.valid_until IS NULL OR m.valid_until > statement_timestamp())
+      AND EXISTS (
+        SELECT 1 FROM organization_counselor_client_relationships r
+        WHERE r.organization_id = m.organization_id
+          AND r.counselor_membership_id = ${context.membershipId}
+          AND r.client_membership_id = m.id
+          AND r.valid_from <= statement_timestamp()
+          AND (r.valid_until IS NULL OR r.valid_until > statement_timestamp())
+      )`
+  }
   const manager = context.capabilities.includes('PSYCHOLOGY_STAFF')
   if (!manager && !context.personas.some(p => p === 'TEACHER' || p === 'COUNSELOR')) return hidden()
   return Prisma.sql`m.user_id <> ${input.principal.userId} AND (
