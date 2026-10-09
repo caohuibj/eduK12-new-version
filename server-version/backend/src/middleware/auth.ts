@@ -6,6 +6,7 @@ import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken, getSchoolSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
+import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
 
 // Extend Express Request
 declare global {
@@ -49,6 +50,12 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL'
       : principal!.accountDomain === 'SCHOOL' || payload.accountDomain === 'SCHOOL') {
       return unauthorized(res, '账号不属于当前产品')
+    }
+
+    // Role elevation invalidates password-only SCHOOL sessions immediately.
+    if (school && await schoolAccountNeedsMfa(principal!.userId)
+      && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
+      return unauthorized(res, '需要完成双因素认证')
     }
 
     // JWT proves possession of a session credential. Current database state is

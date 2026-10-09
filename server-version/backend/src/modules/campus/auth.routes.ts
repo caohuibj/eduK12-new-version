@@ -6,6 +6,8 @@ import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie } from '../../utils/authCookies'
 import { authenticateSchool } from '../../middleware/auth'
+import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
 import {
   loginRateLimit, withLoginAccountFailureThrottle, recordLoginFailure,
   clearLoginFailures, withLoginPasswordVerification,
@@ -58,26 +60,11 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     })
     if (!match) return failedLogin(req, res)
 
-    // Until mandatory privileged TOTP is provisioned, no SCHOOL management
-    // bearer token may be issued on the strength of a password alone.
-    const privileged = await prisma.$queryRaw<Array<{ privileged: boolean }>>`
-      SELECT (
-        ${match.user.role}::text <> 'STUDENT'
-        OR EXISTS (
-          SELECT 1 FROM "organization_memberships" m
-          WHERE m."user_id" = ${match.userId}
-            AND m."valid_until" IS NULL AND m."org_role" = 'ORG_ADMIN'
-        )
-        OR EXISTS (
-          SELECT 1 FROM "organization_capability_grants" c
-          JOIN "organization_memberships" m ON m."id" = c."membership_id"
-          WHERE m."user_id" = ${match.userId}
-            AND m."valid_until" IS NULL AND c."revoked_at" IS NULL
-            AND c."capability" IN ('PSYCHOLOGY_STAFF', 'PARENT_REPORT_DISCLOSURE', 'REPORT_MEMBER_EXPORT')
-        )
-      ) AS "privileged"
-    `
-    if (privileged[0]?.privileged) return forbidden(res, '高权限账户需完成双因素认证')
+    if (await schoolAccountNeedsMfa(match.userId)) {
+      const state = await beginSchoolMfaChallenge(req,res,match.userId,match.user.tokenVersion)
+      await clearLoginFailures(req)
+      return success(res,state,'请完成动态验证码验证')
+    }
 
     await clearLoginFailures(req)
     const u = match.user
@@ -98,6 +85,63 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
     return res.status(503).json({ code: -1, message: '登录服务暂时不可用' })
   }
 }))
+
+const mfaLimiter=createRedisRateLimiter({name:'campus-mfa-challenge',limit:25,windowSeconds:900})
+const mfaCode=z.object({code:z.string().min(6).max(80)}).strict()
+const pending=(req:Request)=>getPendingChallenge(req)
+
+router.post('/mfa/setup',mfaLimiter,async(req,res)=>{
+  try {
+    const raw=pending(req)
+    if(!raw)return unauthorized(res,'二次验证已失效，请重新输入密码')
+    const result=await startSchoolMfaEnrollment(raw)
+    if(!result)return forbidden(res,'无法开始验证器绑定')
+    return success(res,result,'请使用验证器扫码后确认')
+  }catch{return res.status(503).json({code:-1,message:'验证器绑定暂不可用'})}
+})
+router.post('/mfa/confirm',mfaLimiter,async(req,res)=>{
+  try {
+    const raw=pending(req),parsed=mfaCode.safeParse(req.body)
+    if(!raw||!parsed.success)return unauthorized(res,'二次验证已失效')
+    const result=await finishSchoolMfa(req,res,raw,parsed.data.code,'ENROLL')
+    if(!result)return unauthorized(res,'动态验证码错误或已使用')
+    return success(res,result,'双因素认证已启用')
+  }catch{return res.status(503).json({code:-1,message:'双因素认证暂不可用'})}
+})
+router.post('/mfa/verify',mfaLimiter,async(req,res)=>{
+  try {
+    const raw=pending(req),parsed=mfaCode.safeParse(req.body)
+    if(!raw||!parsed.success)return unauthorized(res,'二次验证已失效')
+    const result=await finishSchoolMfa(req,res,raw,parsed.data.code,'VERIFY')
+    if(!result)return unauthorized(res,'动态验证码错误或已使用')
+    return success(res,result,'验证成功')
+  }catch{return res.status(503).json({code:-1,message:'双因素认证暂不可用'})}
+})
+router.post('/mfa/recovery',mfaLimiter,async(req,res)=>{
+  try {
+    const raw=pending(req),parsed=mfaCode.safeParse(req.body)
+    if(!raw||!parsed.success)return unauthorized(res,'二次验证已失效')
+    const result=await finishSchoolMfa(req,res,raw,parsed.data.code,'RECOVERY')
+    if(!result)return unauthorized(res,'恢复码无效或已使用')
+    return success(res,result,'恢复码已使用，请及时更新验证器')
+  }catch{return res.status(503).json({code:-1,message:'账户恢复暂不可用'})}
+})
+router.post('/mfa/step-up',authenticateSchool,mfaLimiter,async(req,res)=>{
+  try {
+    const parsed=mfaCode.safeParse(req.body)
+    if(!parsed.success)return unauthorized(res,'动态验证码格式无效')
+    const accepted=await verifySchoolTotpStepUp(req.user!.userId,parsed.data.code)
+    if(!accepted)return unauthorized(res,'动态验证码错误或已使用')
+    const user=await prisma.user.findUnique({where:{id:req.user!.userId}})
+    if(!user||user.accountDomain!=='SCHOOL')return unauthorized(res)
+    setSchoolSessionCookie(req,res,generateToken({
+      accountDomain:'SCHOOL',mfaVerifiedAt:Math.floor(Date.now()/1000),
+      userId:user.id,username:user.username,role:user.role,
+      tokenVersion:user.tokenVersion,mustChangePassword:user.mustChangePassword,
+    }))
+    return success(res,{stepUp:true},'已重新验证')
+  }catch{return res.status(503).json({code:-1,message:'动态验证暂不可用'})}
+})
 
 router.get('/me', authenticateSchool, async (req, res) => {
   const account = await prisma.campusAccount.findUnique({

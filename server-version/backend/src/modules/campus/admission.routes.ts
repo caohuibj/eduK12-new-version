@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
+import { requireRecentSchoolMfa } from './mfa.middleware'
 import { registrationRateLimit, withRegistrationAdmission } from '../../middleware/registrationAdmission'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success } from '../../utils/response'
@@ -44,30 +45,30 @@ router.get('/my-status',authenticateSchool,wrap(async(req,res)=>
   success(res,await readCampusStudentStatus(req.user!))
 ))
 
-router.post('/organizations/:organizationId/classes/:classUnitId/roster',authenticateSchool,wrap(async(req,res)=>{
+router.post('/organizations/:organizationId/classes/:classUnitId/roster',authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
   const params=classParams.parse(req.params)
   const input=z.object({studentNumbers:z.array(z.string()).min(1).max(5000)}).strict().parse(req.body)
   return success(res,await replaceCampusRoster({actor:req.user!,...params,studentNumbers:input.studentNumbers}))
 }))
 
-router.post('/organizations/:organizationId/classes/:classUnitId/codes',authenticateSchool,wrap(async(req,res)=>{
+router.post('/organizations/:organizationId/classes/:classUnitId/codes',authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
   const params=classParams.parse(req.params)
   const data=z.object({count:z.number().int().min(1).max(500),ttlMinutes:z.number().int().min(5).max(10080)}).strict().parse(req.body)
   return success(res,await issueCampusActivationCodes({actor:req.user!,...params,...data}))
 }))
 
-router.post('/organizations/:organizationId/classes/:classUnitId/window',authenticateSchool,wrap(async(req,res)=>{
+router.post('/organizations/:organizationId/classes/:classUnitId/window',authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
   const params=classParams.parse(req.params)
   const body=z.object({action:z.enum(['OPEN','CLOSE']),closesAt:z.string().datetime().optional()}).strict().parse(req.body)
   return success(res,await setCampusRegistrationWindow({actor:req.user!,...params,action:body.action,closesAt:body.closesAt?new Date(body.closesAt):undefined}))
 }))
 
-router.get('/organizations/:organizationId/classes/:classUnitId/summary',authenticateSchool,wrap(async(req,res)=>{
+router.get('/organizations/:organizationId/classes/:classUnitId/summary',authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
   const params=classParams.parse(req.params)
   return success(res,await readCampusClassSummary({actor:req.user!,...params}))
 }))
 
-router.post('/organizations/:organizationId/classes/:classUnitId/approve',authenticateSchool,wrap(async(req,res)=>{
+router.post('/organizations/:organizationId/classes/:classUnitId/approve',authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
   const params=classParams.parse(req.params)
   const body=z.object({expectedRosterVersion:z.number().int().nonnegative()}).strict().parse(req.body)
   return success(res,await approveCampusClass({actor:req.user!,...params,...body}))
