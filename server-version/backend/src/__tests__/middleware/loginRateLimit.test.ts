@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createHash } from 'node:crypto'
 
 const { mockCacheService } = vi.hoisted(() => ({
   mockCacheService: {
@@ -56,6 +57,16 @@ describe('login Redis rate limits', () => {
     vi.useRealTimers()
     if (ORIGINAL_NODE_ENV === undefined) delete process.env.NODE_ENV
     else process.env.NODE_ENV = ORIGINAL_NODE_ENV
+  })
+
+  it('keeps legacy Redis keys stable and isolates school usernames', () => {
+    const legacy = getLoginRateLimitContext(makeReq(), 'shared-user')
+    const schoolReq = Object.assign(makeReq(), { originalUrl: '/api/campus/auth/login' })
+    const school = getLoginRateLimitContext(schoolReq, 'shared-user')
+    expect(legacy.accountKey).toBe('auth:login:account:' +
+      createHash('sha256').update('shared-user').digest('hex'))
+    expect(school.accountKey).not.toBe(legacy.accountKey)
+    expect(school.globalFailureKey).not.toBe(legacy.globalFailureKey)
   })
 
   it('uses one account-wide key in addition to the account+IP key', () => {

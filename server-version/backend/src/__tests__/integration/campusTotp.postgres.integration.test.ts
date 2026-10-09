@@ -8,8 +8,8 @@ import {
   completeSchoolMfa, totpAt, verifySchoolTotpStepUp,
 } from '../../modules/campus/mfa.service'
 
-const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
-const suite=URL?describe:describe.skip
+const DB_URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
+const suite=DB_URL?describe:describe.skip
 let db:PrismaClient
 function secretFromBase32(value:string):Buffer {
   const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
@@ -34,7 +34,7 @@ function challengeCookie(cookies:string[]):string {
 suite('Huischool TOTP challenge and recovery replay — isolated PostgreSQL',()=>{
   beforeAll(async()=>{
     process.env.CAMPUS_MFA_ENCRYPTION_KEY='34'.repeat(32)
-    db=new PrismaClient({datasources:{db:{url:URL!}}})
+    db=new PrismaClient({datasources:{db:{url:DB_URL!}}})
     await db.$connect()
   })
   afterAll(async()=>{await db?.$disconnect()})
