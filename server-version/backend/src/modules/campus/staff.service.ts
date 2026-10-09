@@ -79,7 +79,8 @@ export async function registerCampusStaff(input:{
           WHERE m."organization_id"=${invitation.organizationId}
             AND m."user_id"=${invitation.invitedByUserId}
             AND m."org_role"='ORG_ADMIN'
-            AND m."valid_until" IS NULL
+            AND m."valid_from"<=statement_timestamp()
+            AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
         ) AS "valid"
       `
       if(!issuer[0]?.valid)fail('CAMPUS_INVITE_UNAVAILABLE',404)

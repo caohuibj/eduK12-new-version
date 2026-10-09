@@ -5,6 +5,7 @@ import { organizationController } from '../organization/organization.controller'
 import { organizationAdminController } from '../organization/organization.admin.controller'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { guardCampusCapabilityGrant } from './capabilityGuard'
+import { requireCampusClassRead } from './classRead.middleware'
 
 // Reuse the existing Organization structure and relationship services, never
 // the legacy /api/organizations entrypoint or its training session cookie.
@@ -12,7 +13,7 @@ const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 router.get('/organizations',authenticateSchool,organizationController.listAccessible)
 router.get('/organizations/:organizationId/context',authenticateSchool,organizationController.readContext)
-router.get('/organizations/:organizationId/units',authenticateSchool,requireOrganizationGovernance,organizationAdminController.listUnits)
+router.get('/organizations/:organizationId/units',authenticateSchool,requireCampusClassRead,organizationAdminController.listUnits)
 router.post('/organizations/:organizationId/units',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.createUnit)
 router.delete('/organizations/:organizationId/units/:unitId',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.deleteUnit)
 router.get('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireOrganizationGovernance,organizationAdminController.listStaffClassAssignments)

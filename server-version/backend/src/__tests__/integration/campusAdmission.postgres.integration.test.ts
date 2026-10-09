@@ -86,6 +86,9 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
       actor:f.admin,organizationId:f.org,classUnitId:f.classId,studentNumbers:[n1,n2],
     })
     expect(roster).toMatchObject({eligibleCount:2,status:'DRAFT'})
+    await expect(readCampusClassSummary({
+      actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+    })).resolves.toMatchObject({eligibleCount:2,registeredCount:0,status:'DRAFT'})
     const closesAt=new Date(Date.now()+40*60_000)
     await setCampusRegistrationWindow({
       actor:f.admin,organizationId:f.org,classUnitId:f.classId,action:'OPEN',closesAt,

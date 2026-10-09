@@ -79,6 +79,22 @@ export async function assertCampusPsychologyStaff(actor: AuthenticatedPrincipal,
 /** A recovery officer is a current SCHOOL admin or separately authorized
  * psychology staff member; homeroom/teacher/course ownership never qualify.
  */
+/** Class names and aggregate admission counts: current counselors may read
+ * to complete whole-class approvals, but cannot mutate rosters/codes.
+ */
+export async function assertCampusClassRead(actor: AuthenticatedPrincipal, organizationId: string) {
+  if (actor.accountDomain !== 'SCHOOL') fail('CAMPUS_ACCOUNT_REQUIRED', 403)
+  const context=await resolveOrganizationAccessContext({principal:actor,organizationId})
+  if (!context?.membershipId || context.productDomain!=='SCHOOL'
+    || context.organizationStatus!=='ACTIVE'
+    || context.explicitDenies.some(x=>['*','ORGANIZATION_GOVERNANCE','PSYCHOLOGY_STAFF','CLASS_APPROVE'].includes(x))
+    || !(context.orgRole==='ORG_ADMIN'
+      || (context.personas.includes('COUNSELOR') && contextHasCapability(context,'PSYCHOLOGY_STAFF')))) {
+    fail('CAMPUS_CLASS_READ_REQUIRED',403)
+  }
+  return context
+}
+
 export async function assertCampusRecoveryAuthority(actor: AuthenticatedPrincipal, organizationId: string) {
   if (actor.accountDomain !== 'SCHOOL') fail('CAMPUS_ACCOUNT_REQUIRED', 403)
   const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
@@ -308,8 +324,7 @@ export async function registerCampusStudent(input: {
 export async function readCampusClassSummary(input: {
   actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
 }) {
-  const context=await assertCampusGovernance(input.actor,input.organizationId)
-  if (!context.membershipId) fail('CAMPUS_GOVERNANCE_REQUIRED',403)
+  await assertCampusClassRead(input.actor,input.organizationId)
   const rows=await prisma.$queryRaw<Array<{
     status:string; rosterVersion:number; eligibleCount:number
     registeredCount:number; unresolvedIncidents:number
