@@ -27,9 +27,9 @@ export async function resetPasswordForPlatformAdmin(req: Request, res: Response,
       return await credentialAdmission.run(async () => {
         const target = await prisma.user.findUnique({
           where: { id: targetUserId },
-          select: { id: true, username: true },
+          select: { id: true, username: true, accountDomain: true },
         })
-        if (!target) return notFound(res, '用户不存在')
+        if (!target || target.accountDomain === 'SCHOOL') return notFound(res, '用户不存在')
 
         const temporaryPassword = generateTempPassword()
         const passwordHash = await hashPassword(temporaryPassword)

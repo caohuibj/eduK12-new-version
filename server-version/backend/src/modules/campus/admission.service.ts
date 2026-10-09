@@ -69,7 +69,8 @@ export async function assertCampusPsychologyStaff(actor: AuthenticatedPrincipal,
   const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
   if (!context?.membershipId || context.organizationStatus !== 'ACTIVE'
     || context.explicitDenies.some(x => ['*', 'PSYCHOLOGY_STAFF', 'CLASS_APPROVE'].includes(x))
-    || !context.capabilities.includes('PSYCHOLOGY_STAFF')) {
+    || !context.capabilities.includes('PSYCHOLOGY_STAFF')
+    || !context.personas.includes('COUNSELOR')) {
     fail('PSYCHOLOGY_STAFF_REQUIRED', 403)
   }
   return context!

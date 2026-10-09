@@ -118,6 +118,7 @@ export const organizationController = {
     try {
       const { page, pageSize, offset } = parsePage(req)
       const { userId, platformRole } = req.user
+      const viewerDomain = req.user.accountDomain === 'SCHOOL' ? 'SCHOOL' : 'LEGACY'
       let rows: AccessibleOrganizationRow[]
       let totals: Array<{ count: number }>
 
@@ -137,11 +138,12 @@ export const organizationController = {
              AND m."user_id" = ${userId}
              AND m."valid_from" <= statement_timestamp()
              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+            WHERE o."product_domain" = ${viewerDomain}
             ORDER BY o."name", o."id"
             LIMIT ${pageSize} OFFSET ${offset}
           `,
           prisma.$queryRaw<Array<{ count: number }>>`
-            SELECT COUNT(*)::int AS "count" FROM "organizations"
+            SELECT COUNT(*)::int AS "count" FROM "organizations" WHERE "product_domain" = ${viewerDomain}
           `,
         ])
       } else {
@@ -157,6 +159,7 @@ export const organizationController = {
             FROM "organization_memberships" m
             JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
+              AND o."product_domain" = ${viewerDomain}
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
             ORDER BY o."name", o."id"
@@ -165,7 +168,9 @@ export const organizationController = {
           prisma.$queryRaw<Array<{ count: number }>>`
             SELECT COUNT(*)::int AS "count"
             FROM "organization_memberships" m
+            JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
+              AND o."product_domain" = ${viewerDomain}
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
           `,
