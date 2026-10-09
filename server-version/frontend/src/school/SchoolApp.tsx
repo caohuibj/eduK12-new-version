@@ -43,7 +43,25 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
 )
 const SchoolMark=()=>(
   <div className="hs-brand" aria-label="Huischool 校园心理健康">
-    <div className="hs-brand-seed" aria-hidden="true">林</div>
+    <svg className="hs-brand-icon" viewBox="0 0 96 96" focusable="false" aria-hidden="true">
+      <defs>
+        <linearGradient id="huischool-forest" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#709D75"/>
+          <stop offset="1" stopColor="#356957"/>
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="92" height="92" rx="19" fill="#F3F7F1"/>
+      <circle cx="76" cy="19" r="9" fill="#E1B96B" opacity=".9"/>
+      <path d="M23 75V39M73 75V37" stroke="#356957" strokeWidth="6" strokeLinecap="round"/>
+      <path d="M7 42C9 27 16 18 27 20C35 9 51 13 54 27C60 39 48 49 36 48C26 54 12 51 7 42Z" fill="url(#huischool-forest)"/>
+      <path d="M46 41C43 25 51 14 64 16C73 7 86 16 85 30C96 43 83 52 72 49C63 53 49 50 46 41Z" fill="#356957"/>
+      <path d="M30 39C36 36 41 36 48 39M48 39C55 35 61 35 68 38" fill="none" stroke="#F3F7F1" strokeWidth="7" strokeLinecap="round"/>
+      <path d="M30 43V55M66 43V55" stroke="#F3F7F1" strokeWidth="5" strokeLinecap="round"/>
+      <path d="M49 77V58" stroke="#547E5D" strokeWidth="3.5" strokeLinecap="round"/>
+      <path d="M47 67C34 69 35 55 44 57C49 59 49 64 47 67Z" fill="#83AE8C"/>
+      <path d="M50 64C53 52 65 54 60 61C58 64 54 65 50 64Z" fill="#E1B96B"/>
+      <path d="M14 79C32 75 61 78 82 79" stroke="#A8C5AA" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    </svg>
     <div><strong>Huischool</strong><small>林间见心 · 校园心理健康</small></div>
   </div>
 )
