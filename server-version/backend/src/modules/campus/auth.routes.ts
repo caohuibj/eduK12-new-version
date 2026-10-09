@@ -7,6 +7,7 @@ import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie } from '../../utils/authCookies'
 import { authenticateSchool } from '../../middleware/auth'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
 import {
   loginRateLimit, withLoginAccountFailureThrottle, recordLoginFailure,
@@ -159,14 +160,15 @@ router.post('/logout', authenticateSchool, (req, res) => {
   return success(res, null, '退出成功')
 })
 
-router.post('/change-password', authenticateSchool, async (req, res) => {
+router.post('/change-password', authenticateSchool, passwordChangeRateLimit, withPasswordChangeAdmission(async (req, res) => {
   const parsed = changeSchema.safeParse(req.body)
   if (!parsed.success || parsed.data.oldPassword === parsed.data.newPassword) {
     return res.status(400).json({ code: -1, message: '密码格式不符合要求' })
   }
   const user = await prisma.user.findUnique({ where: { id: req.user!.userId } })
   if (!user || user.accountDomain !== 'SCHOOL') return unauthorized(res)
-  const verified = await withLoginPasswordVerification(() => comparePassword(parsed.data.oldPassword, user.passwordHash))
+  // The admission wrapper covers both verification and the subsequent hash.
+  const verified = await comparePassword(parsed.data.oldPassword, user.passwordHash)
   if (!verified) return unauthorized(res, '当前密码错误')
   const passwordHash = await hashPassword(parsed.data.newPassword)
   const updated = await prisma.user.updateMany({
@@ -176,6 +178,6 @@ router.post('/change-password', authenticateSchool, async (req, res) => {
   if (updated.count !== 1) return res.status(409).json({ code: -1, message: '账号状态已改变，请重新登录' })
   clearSchoolSessionCookie(req, res)
   return success(res, null, '密码已修改，请重新登录')
-})
+}))
 
 export default router
