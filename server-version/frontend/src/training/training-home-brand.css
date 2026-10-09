@@ -1,0 +1,24 @@
+.hui-training .training-home-brand {
+  display: inline-flex; align-items: center; gap: 13px; flex: none;
+  color: #1f4d3b; font-family: Georgia, 'Times New Roman', serif;
+  font-size: 31px; font-weight: 600; letter-spacing: -.035em; line-height: 1; white-space: nowrap;
+}
+.hui-training .training-home-brand-symbol { display: block; width: 110px; height: 66px; flex: none; object-fit: contain; }
+.hui-training .training-home-brand-type small { display: block; color: #567463; font-family: 'PingFang SC', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: .32em; margin-top: 9px; line-height: 1; }
+.hui-training .training-portal .training-portal-header { min-height: 70px; gap: 18px; }
+.hui-training .training-portal .training-portal-copy h1 { color: #1f4d3b; }
+.hui-training .training-portal .training-card-arrow { background: #1f4d3b; }
+.hui-training .training-portal .training-role-card--trainer .training-card-arrow { background: #b76750; }
+.hui-training .training-portal .training-portal-accent { background: #e67c63; }
+@media(max-width:620px) {
+  .hui-training .training-home-brand { gap: 7px; font-size: 21px; }
+  .hui-training .training-home-brand-symbol { width: 66px; height: 43px; }
+  .hui-training .training-home-brand-type small { font-size: 8px; margin-top: 7px; letter-spacing: .25em; }
+  .hui-training .training-portal .training-portal-header { min-height: 52px; gap: 10px; }
+}
+@media(max-width:360px) {
+  .hui-training .training-home-brand { font-size: 19px; gap: 5px; }
+  .hui-training .training-home-brand-symbol { width: 52px; height: 38px; }
+  .hui-training .training-portal .training-portal-header { gap: 6px; }
+  .hui-training .training-portal-login { padding-inline: 7px; }
+}

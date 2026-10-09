@@ -99,7 +99,7 @@ const TeacherRegister: React.FC = () => {
 
   if (!teacherCode) {
     return (
-      <AuthShell tone="teacher" title="教师账号注册" description="需要先完成教师邀请码验证" backTo={authLink("/teacher/login")} backLabel="返回邀请码验证">
+      <AuthShell tone="teacher" title="教师账号注册" description="需要先完成教师邀请码验证" registrationStep="verify" backTo={authLink("/teacher/login")} backLabel={training ? "返回注册码验证" : "返回邀请码验证"}>
         <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           <strong className="block mb-1">无效的访问</strong>
           <span>{training ? '请先验证培训师注册码，再创建账号。' : '请先验证教师邀请码，再创建账号。'}</span>
@@ -113,7 +113,7 @@ const TeacherRegister: React.FC = () => {
 
   if (submitted) {
     return (
-      <AuthShell tone="teacher" title="教师账号注册" description="注册信息已提交" backTo={authLink("/teacher/account-login")} backLabel="返回教师登录">
+      <AuthShell tone="teacher" title="教师账号注册" description="注册信息已提交" registrationStep="submitted" backTo={authLink("/teacher/account-login")} backLabel="返回教师登录">
         <div className="text-center py-2">
           <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-xl font-bold text-gray-800 mb-2">已提交，等待管理员审核</h2>
@@ -129,8 +129,10 @@ const TeacherRegister: React.FC = () => {
   }
 
   return (
-    <AuthShell tone="teacher" title="教师账号注册" description="设置您的教师登录账号" backTo={authLink("/teacher/login")} backLabel="返回邀请码验证">
-      <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
+    <AuthShell tone="teacher" title="教师账号注册" description="设置您的教师登录账号" backTo={authLink("/teacher/login")} backLabel={training ? "返回注册码验证" : "返回邀请码验证"}>
+      {training ? <div className="training-auth-verified" role="status">
+        <CheckCircle size={18} aria-hidden="true" /><span>注册码已验证，完成注册后失效。</span>
+      </div> : <div className="p-4 mb-5 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center space-x-2 text-green-700">
           <CheckCircle className="w-5 h-5" aria-hidden="true" />
           <span className="font-medium">{training ? '培训师注册码验证成功' : '教师码验证成功'}</span>
@@ -138,7 +140,7 @@ const TeacherRegister: React.FC = () => {
         <p className="text-sm text-green-600 mt-1">
           {training ? '请设置您的培训师账号信息，注册完成后该注册码失效' : '请设置您的教师账号信息，设置完成后该教师码将失效'}
         </p>
-      </div>
+      </div>}
 
       {error && (
         <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -231,6 +233,10 @@ const TeacherRegister: React.FC = () => {
         </button>
       </form>
 
+      {training && <div className="training-auth-register-entry">
+        <span>已有培训师账号？</span>
+        <Link to={authLink("/teacher/account-login")} className="text-action hover:underline font-medium">已有账号，去登录</Link>
+      </div>}
       <div className="hui-auth-note">
         <strong>账号说明</strong>
         <div>{training ? '注册码仅用于首次注册。账号经平台管理员审核后可以登录，有效期为1年。' : '提交后教师码即失效。账号需管理员审核通过后才能登录，有效期为1年。'}</div>

@@ -19,6 +19,7 @@ import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } fr
 const loginSchema = z.object({
   username: z.string().min(1, '用户名不能为空').max(320),
   password: z.string().min(1, '密码不能为空').max(PASSWORD_MAX_LENGTH),
+  expectedRole: z.enum(['STUDENT', 'TEACHER']).optional(),
 }).strict()
 
 // Precomputed synthetic cost-10 hash, matching hashPassword. Never authenticate
@@ -64,7 +65,7 @@ export const authController = {
       const result = loginSchema.safeParse(req.body)
       if (!result.success) return failedLogin()
 
-      const { username, password } = result.data
+      const { username, password, expectedRole } = result.data
       req.body = result.data
       const user = await withLoginPasswordVerification(async () => {
         const current = await prisma.user.findUnique({ where: { username } })
@@ -76,6 +77,14 @@ export const authController = {
         return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
       })
       if (!user) return failedLogin()
+
+      // Verify the entrance against authoritative account data before issuing a session.
+      // Omitted entrance preserves the existing general login contract.
+      if (expectedRole && user.role !== expectedRole) {
+        return error(res, expectedRole === 'STUDENT'
+          ? '此账号不是学员账号，请使用对应身份的登录入口。'
+          : '此账号不是培训师账号，请使用对应身份的登录入口。', -1, 403)
+      }
 
       await clearLoginFailures(req)
       const token = generateToken({

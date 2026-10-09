@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck, UserRound } from 'lucide-react'
 import './auth-shell.css'
 import TrainingBrand from '../../training/TrainingBrand'
+import { useAuthLinks } from '../app-shell/useAuthLinks'
 import { isTrainingHost } from '../../training/context'
+import '../../training/training-auth-refresh.css'
 
 export type AuthTone = 'student' | 'teacher' | 'parent' | 'admin'
 
@@ -49,6 +51,7 @@ type AuthShellProps = {
   heroTitle?: string
   heroDescription?: string
   heroBullets?: readonly string[]
+  registrationStep?: 'verify' | 'account' | 'submitted'
 }
 
 export default function AuthShell({
@@ -62,25 +65,44 @@ export default function AuthShell({
   heroTitle,
   heroDescription,
   heroBullets,
+  registrationStep,
 }: AuthShellProps) {
+  const { pathname } = useLocation()
+  const authLink = useAuthLinks()
   const preset = toneContent[tone]
-  const Icon = preset.Icon
   const training = isTrainingHost() && (tone === 'student' || tone === 'teacher')
+  const Icon = training ? (tone === 'student' ? UserRound : GraduationCap) : preset.Icon
   const trainingRole = tone === 'student' ? '学员' : '培训师'
-  const copy = (value: string) => training ? value.replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
+  const copy = (value: string) => training ? value.replace(/教师邀请码|教师码/g, '培训师注册码').replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
   const displayHeroTitle = training ? (tone === 'student' ? '循着课程，慢慢向前。' : '以所学，启发更多人。') : (heroTitle ?? preset.heroTitle)
   const displayHeroDescription = training
     ? (tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
     : (heroDescription ?? preset.heroDescription)
+  const registration = training && ['/student/course-login', '/student/register', '/teacher/login', '/teacher/register'].includes(pathname)
+  const accountStep = registrationStep ? registrationStep !== 'verify' : pathname.endsWith('/register')
+  const submitted = registrationStep === 'submitted'
+  const showAuthModes = training && ['/student/login', '/student/course-login', '/student/register', '/teacher/account-login', '/teacher/login', '/teacher/register'].includes(pathname)
   const bullets = training ? [] : (heroBullets ?? preset.bullets)
 
+  const backControl = onBack ? (
+    <button type="button" className="hui-auth-back hui-auth-back--button" onClick={onBack}>
+      <ArrowLeft size={18} aria-hidden="true" />{training ? copy(backLabel) : backLabel}
+    </button>
+  ) : (
+    <Link to={backTo} className="hui-auth-back"><ArrowLeft size={18} aria-hidden="true" />{training ? (backLabel === '返回入口' ? '返回首页' : copy(backLabel)) : backLabel}</Link>
+  )
+
   return (
-    <div className={`hui-auth-page hui-auth-page--${tone}${training ? ' hui-auth-page--training' : ''}`}>
-      <aside className="hui-auth-hero" aria-label="Huisurvey 介绍">
+    <div className={`hui-auth-page hui-auth-page--${tone}${training ? ` hui-auth-page--training training-auth-refresh${accountStep && !submitted ? ' training-auth-account-step' : ''}` : ''}`}>
+      {training && <header className="training-auth-header">
+        <Link to="/" className="hui-auth-brand" title="返回培训首页"><TrainingBrand /></Link>
+        {backControl}
+      </header>}
+      <aside className="hui-auth-hero" aria-label={training ? "Huitraining 介绍" : "Huisurvey 介绍"}>
         <div className="hui-auth-hero__inner">
-          <Link to="/" className="hui-auth-brand" aria-label={training ? undefined : '返回 Huisurvey 入口'} title={training ? '返回培训入口' : undefined}>
-            {training ? <TrainingBrand /> : <><span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong></>}
-          </Link>
+          {!training && <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
+            <span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong>
+          </Link>}
 
           <div className="hui-auth-hero__copy">
             <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? `${trainingRole}入口` : preset.label}</span>
@@ -96,15 +118,15 @@ export default function AuthShell({
 
       <section className="hui-auth-stage">
         <div className="hui-auth-stage__inner">
-          {onBack ? (
-            <button type="button" className="hui-auth-back hui-auth-back--button" onClick={onBack}>
-              <ArrowLeft size={18} aria-hidden="true" />{backLabel}
-            </button>
-          ) : (
-            <Link to={backTo} className="hui-auth-back"><ArrowLeft size={18} aria-hidden="true" />{backLabel}</Link>
-          )}
+          {!training && backControl}
 
           <div className="hui-auth-card">
+            {showAuthModes && <nav className="training-auth-mode-switch" aria-label={`${trainingRole}账号入口`}>
+              <Link to={authLink(tone === 'student' ? '/student/login' : '/teacher/account-login')}
+                aria-current={!registration ? 'page' : undefined}>登录</Link>
+              <Link to={authLink(tone === 'student' ? '/student/course-login' : '/teacher/login')}
+                aria-current={registration ? 'page' : undefined}>注册</Link>
+            </nav>}
             <header className="hui-auth-card__header">
               <span className="hui-auth-card__icon" aria-hidden="true"><Icon size={23} /></span>
               <div>
@@ -112,12 +134,23 @@ export default function AuthShell({
                 <p>{copy(description)}</p>
               </div>
             </header>
+            {registration && <ol className="training-auth-steps" aria-label="注册步骤">
+              <li aria-current={!accountStep ? 'step' : undefined} className={!accountStep ? 'is-current' : 'is-complete'}>
+                <span>{accountStep ? '✓' : '1'}</span>{tone === 'student' ? '验证课程码' : '验证注册码'}
+              </li>
+              <li aria-current={accountStep && !submitted ? 'step' : undefined} className={submitted ? 'is-complete' : accountStep ? 'is-current' : ''}>
+                <span>{submitted ? '✓' : '2'}</span>{submitted ? '等待审核' : '创建账号'}
+              </li>
+            </ol>}
             <div className="hui-auth-card__body">{children}</div>
           </div>
 
-          <p className="hui-auth-stage__tagline">{training ? '学有所思，行有所获。' : 'Better Assessment. Healthier Students. Brighter Schools.'}</p>
+          {!training && <p className="hui-auth-stage__tagline">Better Assessment. Healthier Students. Brighter Schools.</p>}
         </div>
       </section>
+      {training && <footer className="training-auth-footer">
+        <span>© {new Date().getFullYear()} Huitraining</span><span>让学习，更有回响。</span>
+      </footer>}
     </div>
   )
 }

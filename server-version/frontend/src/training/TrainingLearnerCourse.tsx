@@ -90,15 +90,14 @@ export default function TrainingLearnerCourse() {
   const retryAssessments = () => { setAssessments(null); setAssessmentRevision(value => value + 1) }
 
   return <div className="training-detail">
-    <Link className="training-back" to="/student"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
+    <Link className="training-back" to="/student"><ArrowLeft size={16} aria-hidden="true" />我的课程</Link>
     {courseLoading || (course && course.id !== courseId) ? <p className="training-status" role="status">正在读取课程…</p>
       : courseError || !course ? <div className="training-message" role="alert">课程暂时不可用：{courseError || '无权访问这门课程'}<button type="button" onClick={retry}>重试</button></div>
         : <>
           <header className="training-detail-header">
-            <p className="training-eyebrow">学员 · 课程学习</p>
             <h1>{course.title}</h1>
-            {course.description && <p>{course.description}</p>}
           </header>
+          <div className={`training-course-layout ${course.description ? '' : 'training-course-layout--full'}`}><div className="training-course-work">
           <nav className="training-section-switch" aria-label="课程任务类别">
             {([
               ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'],
@@ -158,8 +157,10 @@ export default function TrainingLearnerCourse() {
                       </div>
                     </article>)}</div>}
                   <p className="training-science-note">测评是否可以开始、继续或查看反馈，以测评实际规则及当前授权为准。</p>
-                </>}
+
+        </>}
           </section>}
+</div>{course.description && <aside className="training-course-sidebar"><section className="training-side-panel"><h2>课程说明</h2><p>{course.description}</p></section></aside>}</div>
         </>}
   </div>
 }

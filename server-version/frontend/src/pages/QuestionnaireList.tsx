@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import React, { useEffect, useRef, useState } from 'react'
@@ -262,7 +263,7 @@ const QuestionnaireList: React.FC = () => {
           <Link to="/questionnaire-products/new" className="text-action hover:text-action/80">创建第一个问卷</Link>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className={`overflow-hidden rounded-lg bg-white shadow ${isTrainingHost() ? "training-record-table" : ""}`}>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -278,7 +279,7 @@ const QuestionnaireList: React.FC = () => {
               <tbody className="divide-y divide-gray-200 bg-white">
                 {questionnaires.map(questionnaire => (
                   <tr key={questionnaire.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
+                    <td data-label="问卷信息" className="px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{questionnaire.name}</div>
                         <div className="text-sm text-gray-500">{questionnaire.code}</div>
@@ -287,17 +288,17 @@ const QuestionnaireList: React.FC = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(questionnaire.status)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label="状态" className="px-6 py-4 whitespace-nowrap">{getStatusBadge(questionnaire.status)}</td>
+                    <td data-label="统计" className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         <div className="flex items-center gap-1"><Layers className="h-4 w-4" aria-hidden="true" />{questionnaire.scaleCount} 个量表</div>
                         <div className="mt-1 flex items-center gap-1"><FileText className="h-4 w-4" aria-hidden="true" />{questionnaire.totalItems} 题</div>
                         <div className="mt-1 flex items-center gap-1"><Users className="h-4 w-4" aria-hidden="true" />{questionnaire._count.assessments} 测评</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{questionnaire.creator.nickname || questionnaire.creator.username}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(questionnaire.createdAt).toLocaleDateString('zh-CN')}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td data-label="创建者" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{questionnaire.creator.nickname || questionnaire.creator.username}</td>
+                    <td data-label="创建时间" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(questionnaire.createdAt).toLocaleDateString('zh-CN')}</td>
+                    <td data-label="操作" className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <Link
                           to={`/questionnaires/${questionnaire.id}`}

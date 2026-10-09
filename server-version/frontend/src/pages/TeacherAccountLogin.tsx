@@ -93,12 +93,13 @@ const TeacherAccountLogin: React.FC = () => {
         </button>
       </form>
 
-      <div className="mt-6 pt-6 border-t text-center">
-        <p className="text-sm text-gray-500 mb-2">{training ? '还没有培训师账号？' : '还没有教师账号？'}</p>
+      <div className={training ? "training-auth-register-entry" : "mt-6 pt-6 border-t text-center"}>
+        <span className="text-sm text-gray-500">{training ? '还没有培训师账号？' : '还没有教师账号？'}</span>
         <Link to={authLink("/teacher/login")} className="text-action hover:underline font-medium">
           {training ? '使用培训师注册码注册' : '使用教师码注册'}
         </Link>
       </div>
+      {training && <div className="hui-auth-note">首次注册需使用管理员提供的注册码，账号审核通过后即可登录。</div>}
     </AuthShell>
   )
 }

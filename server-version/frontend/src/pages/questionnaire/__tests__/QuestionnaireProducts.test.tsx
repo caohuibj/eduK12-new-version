@@ -70,6 +70,18 @@ describe('questionnaire draft feedback', () => {
     await act(async () => { resolveOld({ code: 0, data: row('迟到的旧问卷') }); await oldRequest })
     expect(screen.getByLabelText('测评名称')).toHaveValue('当前问卷')
   })
+  it('offers publication for a saved draft while preserving the revision guard', async () => {
+    const row = { name: '待发布测评', status: 'DRAFT', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, status: 'PUBLISHED', revision: 8 } })
+    mount('saved')
+    const publish = await screen.findByRole('button', { name: '发布组合测评' })
+    expect(publish.closest('section')).toHaveAttribute('aria-label', '正式发布')
+    await userEvent.setup().click(publish)
+    expect(api.post).toHaveBeenCalledWith('/questionnaire-products/saved/publish', { revision: 7 })
+    await waitFor(() => expect(screen.queryByRole('button', { name: '发布组合测评' })).not.toBeInTheDocument())
+  })
+
   it('identifies and focuses an empty name without sending a request', async () => {
     mount()
     fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
@@ -106,16 +118,41 @@ describe('questionnaire draft feedback', () => {
     expect(screen.getByLabelText('截止时间')).toHaveFocus()
     expect(api.post).not.toHaveBeenCalled()
   })
-  it('keeps incomplete local dates editable and rejects calendar rollover before creating a draft', async () => {
+  it('rejects a deadline earlier than the opening time before saving', async () => {
+    mount()
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '时间校验' } })
+    fireEvent.change(screen.getByLabelText('开始时间'), { target: { value: '2026-10-20T09:00' } })
+    fireEvent.change(screen.getByLabelText('截止时间'), { target: { value: '2026-10-19T18:00' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('截止时间不能早于开始时间')
+    expect(screen.getByLabelText('截止时间')).toHaveFocus()
+    expect(api.post).not.toHaveBeenCalled()
+  })
+
+  it('blocks publication and hides stale checks after editing delivery settings', async () => {
+    const row = { name: '投放测评', status: 'DRAFT', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { revision: 7, ok: true, checks: [] } })
+    mount('saved')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: '发布前自检' }))
+    await screen.findByRole('heading', { name: '当前草稿自检通过' })
+    fireEvent.change(screen.getByLabelText('开始时间'), { target: { value: '2026-10-20T09:00' } })
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+    expect(screen.queryByRole('heading', { name: '当前草稿自检通过' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '保存投放设置' })).toBeEnabled()
+  })
+
+  it('rejects incomplete and invalid calendar dates before creating a public draft', async () => {
     const user = userEvent.setup()
     mount()
     await user.type(screen.getByLabelText('测评名称'), '公开问卷')
     await user.selectOptions(screen.getByLabelText('投放方式'), 'GENERAL')
     fireEvent.change(screen.getByLabelText('截止时间'), { target: { value: '2026-02' } })
-    expect(screen.getByLabelText('截止时间')).toHaveValue('2026-02')
-    fireEvent.change(screen.getByLabelText('截止时间'), { target: { value: '2026-02-31 23:59' } })
+    expect(screen.getByLabelText('截止时间')).toHaveValue('')
+    fireEvent.change(screen.getByLabelText('截止时间'), { target: { value: '2026-02-31T23:59' } })
     await user.click(screen.getByRole('button', { name: '创建草稿' }))
-    expect(screen.getByRole('alert')).toHaveTextContent('截止时间无效')
+    expect(screen.getByRole('alert')).toHaveTextContent('公开问卷需要设置截止时间')
     expect(screen.getByLabelText('截止时间')).toHaveFocus()
     expect(api.post).not.toHaveBeenCalled()
   })

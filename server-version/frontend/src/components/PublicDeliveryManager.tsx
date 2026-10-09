@@ -61,10 +61,11 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
       <p>已使用 {link.usedCount} 次 / 最大次数：{link.maxUses || '不限'} · {publicLinkStatus(link)}</p>
       <div className="flex gap-3"><button disabled={busy} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>
     </article>})}
-    {canCreate ? <div className="flex flex-wrap gap-3 items-end">
-      <label className="grid gap-1">有效期<LocalDateTimeInput value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>
-      <label className="grid gap-1">最大参与次数（0 表示不限）<input type="number" min="0" max="2147483647" step="1" value={maxUses} onChange={e=>setMaxUses(e.target.value)} disabled={busy} className="border rounded px-3 py-2" /></label>
+    {canCreate ? <div className="public-delivery-create flex flex-wrap gap-3 items-end">
+      <label className="grid gap-1">有效期<LocalDateTimeInput picker value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="input border rounded px-3 py-2" /></label>
+      <label className="grid gap-1">最大参与次数（0 表示不限）<input type="number" min="0" max="2147483647" step="1" value={maxUses} onChange={e=>setMaxUses(e.target.value)} disabled={busy} className="input border rounded px-3 py-2" /></label>
       <button disabled={busy} className="btn-primary" onClick={()=>void create()}>生成新链接</button>
+      <p className="public-delivery-timezone w-full text-sm text-gray-600">日期和时间按当前设备时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）设置。</p>
       {maximumExpiry && <p className="w-full text-sm text-gray-600">测评截止：{new Date(maximumExpiry).toLocaleString()}</p>}
     </div> : <p>发布后才能生成匿名链接。</p>}
   </section>

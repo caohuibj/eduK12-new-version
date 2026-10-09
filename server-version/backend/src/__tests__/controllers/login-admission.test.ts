@@ -19,7 +19,7 @@ import { authController } from '../../controllers/authController'
 
 const user = { id: 'student', username: 'student', role: 'STUDENT', passwordHash: 'test-hash',
   isActive: true, isFrozen: false, expiresAt: null, tokenVersion: 1, mustChangePassword: false }
-const request = (body = { username: 'student', password: 'secret-password-1' }) => ({ body }) as any
+const request = (body: Record<string, unknown> = { username: 'student', password: 'secret-password-1' }) => ({ body }) as any
 const response = () => {
   const res: any = { code: 200, setHeader: vi.fn() }
   res.status = vi.fn((code: number) => { res.code = code; return res })
@@ -139,6 +139,44 @@ describe('bounded login execution and failure classification', () => {
     expect(mocks.withLoginPasswordVerification).not.toHaveBeenCalled()
     expect(mocks.findUnique).not.toHaveBeenCalled()
     expect(mocks.comparePassword).not.toHaveBeenCalled()
+  })
+
+  it.each(['TEACHER', 'ADMIN', 'PARENT'])('does not issue a session for %s through the learner entrance', async (role) => {
+    mocks.findUnique.mockResolvedValue({ ...user, role, teacherApproved: true })
+    const res = response()
+    await authController.login(request({ username: 'student', password: 'secret-password-1', expectedRole: 'STUDENT' }), res)
+    expect(res.code).toBe(403)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: '此账号不是学员账号，请使用对应身份的登录入口。' }))
+    expect(mocks.generateToken).not.toHaveBeenCalled()
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+    expect(mocks.recordLoginFailure).not.toHaveBeenCalled()
+  })
+
+  it('allows a learner through the learner entrance', async () => {
+    const req = request({ username: 'student', password: 'secret-password-1', expectedRole: 'STUDENT' })
+    const res = response()
+    await authController.login(req, res)
+    expect(res.code).toBe(200)
+    expect(mocks.setSessionCookie).toHaveBeenCalledWith(req, res, 'test-only-session')
+  })
+
+  it('keeps the general trainer login compatible', async () => {
+    mocks.findUnique.mockResolvedValue({ ...user, role: 'TEACHER', teacherApproved: true })
+    const req = request()
+    const res = response()
+    await authController.login(req, res)
+    expect(res.code).toBe(200)
+    expect(mocks.setSessionCookie).toHaveBeenCalledWith(req, res, 'test-only-session')
+  })
+
+  it('does not disclose an entrance mismatch when the password is wrong', async () => {
+    mocks.findUnique.mockResolvedValue({ ...user, role: 'TEACHER', teacherApproved: true })
+    mocks.comparePassword.mockResolvedValue(false)
+    const res = response()
+    await authController.login(request({ username: 'student', password: 'wrong', expectedRole: 'STUDENT' }), res)
+    expect(res.code).toBe(401)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: '用户名或密码错误' }))
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
   })
 
   it('preserves successful credentials, token version and cookie delivery', async () => {

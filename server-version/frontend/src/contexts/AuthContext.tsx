@@ -7,7 +7,7 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react'
-import { authApi } from '../api/auth'
+import { authApi, type LoginRequest } from '../api/auth'
 import {
   clearReauthReturn,
   isAuthPath,
@@ -24,7 +24,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string) => Promise<void>
+  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole']) => Promise<void>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
   setUser: (user: User | null) => void
@@ -228,13 +228,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [replaceIdentity])
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole']) => {
     const requestEpoch = ++authEpochRef.current
     localLoginPending.current = requestEpoch
     try {
       await authApi.csrf()
       if (requestEpoch !== authEpochRef.current) return
-      const response = await authApi.login({ username, password })
+      const response = await authApi.login({ username, password, ...(expectedRole ? { expectedRole } : {}) })
       if (requestEpoch !== authEpochRef.current) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()

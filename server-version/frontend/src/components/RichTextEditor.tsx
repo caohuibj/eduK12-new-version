@@ -67,9 +67,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ]
 
   return (
-    <div className={`border rounded-lg overflow-hidden ${isFocused ? 'border-action ring-1 ring-action' : 'border-gray-300'}`}>
+    <div className={`hui-rich-editor border rounded-lg overflow-hidden ${isFocused ? 'border-action ring-1 ring-action' : 'border-gray-300'}`}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 px-3 py-2 bg-gray-50 border-b border-gray-200">
+      <div className="hui-rich-editor__toolbar flex flex-wrap items-center gap-1 px-3 py-2 bg-gray-50 border-b border-gray-200">
         {toolbarButtons.map((btn, index) => (
           <button
             key={index}

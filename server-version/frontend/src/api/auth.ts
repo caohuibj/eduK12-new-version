@@ -4,6 +4,7 @@ import type { User } from '../types'
 export interface LoginRequest {
   username: string
   password: string
+  expectedRole?: 'STUDENT' | 'TEACHER'
 }
 
 export interface LoginData {

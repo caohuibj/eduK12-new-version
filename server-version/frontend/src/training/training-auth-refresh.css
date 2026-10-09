@@ -1,0 +1,286 @@
+/* Training authentication shares the homepage's landscape, identity, and surfaces. */
+.hui-training .hui-auth-page--training.training-auth-refresh {
+  --auth-ink: #1f4d3b;
+  --auth-muted: #596b60;
+  --auth-line: #cbd6ca;
+  --auth-primary: #1f4d3b;
+  --auth-primary-hover: #173d31;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+  grid-template-rows: auto 1fr auto;
+  gap: 0 clamp(32px, 5vw, 80px);
+  min-height: 100dvh;
+  padding: clamp(18px, 2.7vh, 27px) clamp(24px, 4.5vw, 78px) 18px;
+  background: #faf8f3;
+  color: #1f4d3b;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url('./training-landscape-v2.webp') center / cover no-repeat;
+}
+.hui-training .training-auth-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 70px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-brand {
+  padding: 6px 12px 6px 6px;
+  border-radius: 12px;
+  background: rgb(253 251 247 / 74%);
+  color: #1f4d3b;
+  letter-spacing: normal;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-back {
+  flex: none;
+  padding: 0 14px;
+  border: 1px solid rgb(75 105 83 / 30%);
+  border-radius: 8px;
+  background: rgb(253 251 247 / 82%);
+  color: #365044;
+  font-size: 13px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero { background: transparent; border: 0; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero__inner {
+  width: min(100%, 540px);
+  margin: auto;
+  padding: 0;
+  gap: 0;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero__copy {
+  display: grid;
+  gap: 20px;
+  padding: clamp(28px, 3vw, 40px);
+  border: 1px solid rgb(255 254 249 / 55%);
+  border-radius: 18px;
+  background: rgb(253 251 247 / 70%);
+  backdrop-filter: blur(5px);
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-eyebrow {
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  background: transparent;
+  letter-spacing: .12em;
+  color: #36594c;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero__title {
+  color: #1f4d3b;
+  font-family: var(--training-serif);
+  font-size: clamp(38px, 3.8vw, 56px);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: .025em;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-title-line { display: block; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero__description {
+  max-width: 25em;
+  color: #4e6255;
+  font-size: 16px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-stage { background: transparent; padding: 36px 0; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-stage__inner { width: 100%; gap: 0; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card {
+  padding: 28px;
+  border: 1px solid rgb(255 254 249 / 65%);
+  border-radius: 18px;
+  background: rgb(253 251 247 / 92%);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 16px 48px rgb(30 54 43 / 10%);
+}
+.hui-training .training-auth-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid #d8dfd4;
+  border-radius: 10px;
+  background: rgb(232 237 226 / 70%);
+}
+.hui-training .training-auth-mode-switch a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 7px;
+  color: #54695b;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.hui-training .training-auth-mode-switch a[aria-current="page"] { background: #1f4d3b; color: #fffdf8; }
+.hui-training .training-auth-mode-switch a:not([aria-current]):hover { background: rgb(255 255 255 / 70%); }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__header { gap: 14px; margin-bottom: 22px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__header h1 {
+  color: #1f4d3b;
+  font-family: var(--training-serif);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .02em;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__header p { color: #596b60; font-size: 13px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__icon { color: #365d49; background: #e8eee1; border-radius: 12px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body form { gap: 16px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body form > :not([hidden]) { margin-block: 0; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body :is(input,select,textarea) {
+  min-height: 48px;
+  border-radius: 8px;
+  border-color: #cbd6ca;
+  background: rgb(255 254 251 / 88%);
+  font-size: 14px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body :is(input,select,textarea):focus {
+  border-color: #1f4d3b;
+  box-shadow: 0 0 0 3px rgb(31 77 59 / 12%);
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body input[aria-invalid="true"] { border-color: #b54e3d; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body :is(.btn-primary,.btn-secondary) { min-height: 48px; border-radius: 8px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body label { color: #365044; font-size: 13px; font-weight: 600; }
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-note {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: rgb(232 238 225 / 72%);
+  color: #526650;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-note p { margin: 4px 0 0; }
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #d8dfd4;
+  font-size: 13px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry :is(span,p) { margin: 0; color: #596b60; }
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry a {
+  padding-block: 10px;
+  color: #1f4d3b;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid #d8dfd4;
+  color: #6b786a;
+  font-size: 12px;
+  list-style: none;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-steps li { display: flex; align-items: center; gap: 8px; }
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-steps li > span {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid #cbd6ca;
+  border-radius: 50%;
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-steps :is(.is-current,.is-complete) { color: #1f4d3b; font-weight: 600; }
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-steps .is-current > span { background: #1f4d3b; color: white; border-color: #1f4d3b; }
+.hui-training .training-auth-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #365044;
+  font-size: 11px;
+}
+.hui-training .training-auth-footer span { padding: 6px 10px; border-radius: 5px; background: rgb(253 251 247 / 78%); }
+.hui-training .hui-auth-page--training.training-auth-refresh :is(a,button,input,select,textarea):focus-visible { outline: 3px solid #416c52; outline-offset: 3px; }
+@media (max-width: 900px) {
+  .hui-training .hui-auth-page--training.training-auth-refresh { grid-template-columns: 1fr; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-hero { display: none; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-stage__inner { width: min(100%, 460px); }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-stage { padding-block: 30px; align-items: center; }
+}
+@media (max-width: 620px) {
+  .hui-training .hui-auth-page--training.training-auth-refresh { padding: 16px 18px 12px; }
+  .hui-training .training-auth-header { min-height: 52px; gap: 12px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-brand { padding: 5px 7px 5px 3px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-wordmark.training-wordmark--mountain { font-size: 21px; gap: 7px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-brand-icon { width: 66px; height: 43px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-back { padding-inline: 10px; font-size: 12px; gap: 4px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-back svg { width: 15px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-stage { padding-block: 18px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card { padding: 22px 20px; border-radius: 14px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__header { gap: 12px; margin-bottom: 18px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__header h1 { font-size: 25px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__icon { width: 40px; height: 40px; flex-basis: 40px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body :is(input,select,textarea) { font-size: 16px; }
+  .hui-training .training-auth-mode-switch { margin-bottom: 20px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry { gap: 8px; font-size: 12px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry a { text-align: right; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-note { padding: 10px 12px; margin-top: 14px; }
+  .hui-training .training-auth-footer { font-size: 10px; gap: 8px; }
+  .hui-training .training-auth-footer span { padding-inline: 6px; }
+}
+@media (max-width: 380px) {
+  .hui-training .hui-auth-page--training.training-auth-refresh { padding-inline: 14px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-wordmark.training-wordmark--mountain { font-size: 19px; gap: 5px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-brand-icon { width: 52px; height: 38px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-back { padding-inline: 7px; }
+  .hui-training .training-auth-footer span:last-child { display: none; }
+}
+
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body .btn-primary {
+  background: var(--auth-primary) !important;
+  border-color: var(--auth-primary);
+}
+.hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-card__body .btn-primary:hover:not(:disabled) {
+  background: var(--auth-primary-hover) !important;
+}
+
+.hui-training .hui-auth-page--training.training-auth-refresh .training-auth-verified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 11px 12px;
+  border: 1px solid #cbd9c7;
+  border-radius: 8px;
+  background: rgb(232 238 225 / 72%);
+  color: #365a42;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.hui-training .training-auth-verified svg { flex: none; }
+@media (min-width: 651px) {
+  .hui-training .training-auth-account-step.training-auth-refresh .hui-auth-card__body form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hui-training .training-auth-account-step.training-auth-refresh .hui-auth-card__body form > button { grid-column: 1 / -1; }
+  .hui-training .training-auth-account-step.training-auth-refresh .hui-auth-card { padding: 26px; }
+  .hui-training .training-auth-account-step.training-auth-refresh .hui-auth-stage { padding-block: 24px; }
+  .hui-training .training-auth-account-step .training-auth-mode-switch { margin-bottom: 20px; }
+}
+@media (min-width: 901px) {
+  .hui-training .hui-auth-page--training.training-auth-account-step { grid-template-columns: minmax(0, 1fr) minmax(0, 520px); }
+}
+
+@media (max-width: 360px) {
+  .hui-training .training-auth-header { gap: 8px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-wordmark.training-wordmark--mountain { font-size: 18px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-brand-icon { width: 46px; height: 36px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-back { padding-inline: 5px; font-size: 11px; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry { flex-direction: column; align-items: flex-start; gap: 0; }
+  .hui-training .hui-auth-page--training.training-auth-refresh .training-auth-register-entry a { text-align: left; }
+}

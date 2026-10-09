@@ -82,28 +82,23 @@ export default function TrainingTrainerCourse() {
   const displayedAssessments = assessments.rows.filter(item => cognitiveEnabled || item.kind !== 'COGNITIVE')
 
   return <div className="training-detail training-trainer-course">
-    <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />返回我的课程</Link>
+    <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />我的课程</Link>
     {(courseLoading && !course) || (course && course.id !== courseId) ? <p role="status" className="training-status">正在读取课程…</p>
       : courseError || !course ? <div role="alert" className="training-message">无法读取课程：{courseError || '请确认课程状态'}<button type="button" onClick={retry}>重试</button></div>
-        : !owned ? <div role="alert" className="training-message">当前账号不是这门课程的创建者，无法在培训版管理此课程。<Link to="/dashboard">返回我的课程</Link></div>
+        : !owned ? <div role="alert" className="training-message">当前账号不是这门课程的创建者，无法在培训版管理此课程。<Link to="/dashboard">我的课程</Link></div>
           : <>
             <header className="training-detail-header">
-              <p className="training-eyebrow">培训师 · 课程管理</p>
               <h1>{course.title}</h1>
-              {course.description && <p>{course.description}</p>}
               <div className="training-course-meta">
                 <span>{course.studentCount ?? 0} 名学员</span>
                 <span>课程状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span>
-                <span>课程码：<strong>{code}</strong></span>
-                <button type="button" onClick={() => void copyCode()}><Copy size={16} aria-hidden="true" />复制</button>
               </div>
               {codeNotice && <p role="status" className="training-code-notice">{codeNotice}</p>}
-              <div className="training-trainer-shortcuts">
-                <Link to={'/courses/' + encoded + '/students'}>管理学员 <ArrowRight size={15} aria-hidden="true" /></Link>
-                <Link to={'/assessment-workbench?courseId=' + encoded}>查看培训结果 <ArrowRight size={15} aria-hidden="true" /></Link>
-              </div>
+
+              <div className="training-course-code-panel"><small>课程码 · 邀请学员</small><div><strong>{code}</strong><button type="button" onClick={() => void copyCode()}><Copy size={16} aria-hidden="true" />复制</button></div></div>
             </header>
-            <TrainingCourseSettings course={course} onUpdated={retry} />
+            <div className="training-mobile-course-actions"><Link to={'/courses/' + encoded + '/students'}>管理学员</Link><Link to={'/assessment-workbench?courseId=' + encoded}>培训结果</Link><a href="#training-course-settings">课程设置 ↓</a></div>
+            <div className="training-course-layout"><div className="training-course-work">
             <nav className="training-section-switch" aria-label="课程管理内容">
               {([
                 ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'],
@@ -162,6 +157,10 @@ export default function TrainingTrainerCourse() {
                       </article>
                     })}</div>}
             </section>}
+</div><aside className="training-course-sidebar"><section className="training-side-panel"><h2>课程管理</h2>              <div className="training-trainer-shortcuts">
+                <Link to={'/courses/' + encoded + '/students'}>管理学员 <ArrowRight size={15} aria-hidden="true" /></Link>
+                <Link to={'/assessment-workbench?courseId=' + encoded}>查看培训结果 <ArrowRight size={15} aria-hidden="true" /></Link>
+              </div></section><section className="training-side-panel" id="training-course-settings"><h2>课程说明</h2><p>{course.description || '管理本课程的作业、打卡与测评。'}</p><TrainingCourseSettings course={course} onUpdated={retry} /></section></aside></div>
           </>}
   </div>
 }
