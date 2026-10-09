@@ -49,7 +49,7 @@ const digest = (value: string): string => crypto.createHash('sha256').update(val
 const clientIp = (req: Request): string => req.ip || req.socket.remoteAddress || 'unknown'
 
 export const getLoginRateLimitContext = (req: Request, username?: string): LoginRateLimitContext => {
-  const normalizedUsername = (username || '').trim().toLowerCase()
+  const normalizedUsername = (req.originalUrl.startsWith('/api/campus/') ? 'school:' : 'legacy:') + (username || '').trim().toLowerCase()
   const accountKey = `auth:login:account:${digest(normalizedUsername || 'invalid')}`
   return {
     accountKey,

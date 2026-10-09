@@ -42,6 +42,7 @@ import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 // 导入路由
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
+import campusAuthRoutes from './modules/campus/auth.routes'
 import userRoutes from './routes/users'
 import courseRoutes from './routes/courses'
 import assignmentRoutes from './routes/assignments'
@@ -230,6 +231,7 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)
 app.use('/api/parent-accounts', parentAccountsRouter)
