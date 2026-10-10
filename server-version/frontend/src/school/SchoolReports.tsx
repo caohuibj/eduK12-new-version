@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 
 type ParentLinks = {list:Array<{id:string;status:string}>}
@@ -133,24 +133,35 @@ export function SchoolParentReports({api}: {api:SchoolApi}) {
   const [detail,setDetail]=useState<ReadParentReport|null>(null)
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
+  // Every new child/report request invalidates older sensitive data replies.
+  // A late response must never populate a different child's report panel.
+  const epoch=useRef(0)
   useEffect(()=>{
     let active=true
     void api<ChildList>('/reports/parent/children').then(d=>{if(active)setChildren(d)})
       .catch(e=>{if(active)setError(reason(e,'家长报告尚未开放'))})
-    return ()=>{active=false}
+    return ()=>{active=false;epoch.current+=1}
   },[api])
   const selectChild=async(next:string)=>{
+    const token=++epoch.current
     setChild(next);setReports(null);setDetail(null);setError('');setBusy(true)
-    try{setReports(await api<ParentReportList>('/reports/parent/children/'+next+'/reports'))}
-    catch(e){setError(reason(e,'无法读取当前孩子的报告'))}
-    finally{setBusy(false)}
+    try{
+      const result=await api<ParentReportList>('/reports/parent/children/'+next+'/reports')
+      if(token===epoch.current)setReports(result)
+    }
+    catch(e){if(token===epoch.current)setError(reason(e,'无法读取当前孩子的报告'))}
+    finally{if(token===epoch.current)setBusy(false)}
   }
   const read=async(artifactId:string)=>{
     if(!child)return
+    const token=++epoch.current
     setDetail(null);setError('');setBusy(true)
-    try{setDetail(await api<ReadParentReport>('/reports/parent/children/'+child+'/reports/'+artifactId))}
-    catch(e){setError(reason(e,'这份报告的授权可能已撤销'))}
-    finally{setBusy(false)}
+    try{
+      const result=await api<ReadParentReport>('/reports/parent/children/'+child+'/reports/'+artifactId)
+      if(token===epoch.current)setDetail(result)
+    }
+    catch(e){if(token===epoch.current)setError(reason(e,'这份报告的授权可能已撤销'))}
+    finally{if(token===epoch.current)setBusy(false)}
   }
   return <section className="hs-panel">
     <h2>获准查看的家长反馈</h2>
