@@ -69,21 +69,29 @@ export async function registerCampusStaff(input:{
       `
       const invitation=invitations[0]
       if(!invitation)fail('CAMPUS_INVITE_UNAVAILABLE',404)
-      // An invitation issued by an already-revoked administrator cannot be
-      // converted into a future school account by the possessor of its token.
-      const issuer=await tx.$queryRaw<Array<{valid:boolean}>>`
-        SELECT EXISTS(
-          SELECT 1 FROM "organization_memberships" m
-          JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
-            AND u."is_active"=TRUE AND u."is_frozen"=FALSE
-          WHERE m."organization_id"=${invitation.organizationId}
-            AND m."user_id"=${invitation.invitedByUserId}
-            AND m."org_role"='ORG_ADMIN'
-            AND m."valid_from"<=statement_timestamp()
-            AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-        ) AS "valid"
-      `
-      if(!issuer[0]?.valid)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      // A still-current ORG_ADMIN row is NOT authority after an explicit
+      // governance deny, suspension, freeze, role change or expiry. Check the
+      // same live authority used to issue the invite, inside the claim txn.
+      // This applies to ALL invitations, especially those carrying ADMIN or
+      // PSYCHOLOGY_STAFF elevation. No historical invite bypass is allowed.
+      const issuer=await tx.user.findUnique({
+        where:{id:invitation.invitedByUserId},
+        select:{role:true,accountDomain:true,isActive:true,isFrozen:true,expiresAt:true,platformRole:true},
+      })
+      if(!issuer||issuer.accountDomain!=='SCHOOL'
+        ||(issuer.role!==UserRole.ADMIN&&issuer.role!==UserRole.TEACHER)
+        ||!issuer.isActive||issuer.isFrozen
+        ||(issuer.expiresAt&&issuer.expiresAt<=new Date()))
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      const authority=await resolveOrganizationAccessContext({
+        principal:{userId:invitation.invitedByUserId,platformRole:issuer.platformRole},
+        organizationId:invitation.organizationId,
+      },tx)
+      if(!authority||authority.productDomain!=='SCHOOL'
+        ||authority.organizationStatus!=='ACTIVE'
+        ||authority.orgRole!=='ORG_ADMIN'||!authority.membershipId
+        ||!authority.canGovern)
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
       const user=await tx.user.create({data:{
         username:'huischool_'+randomUUID().replace(/-/g,''),
         passwordHash,accountDomain:'SCHOOL',
