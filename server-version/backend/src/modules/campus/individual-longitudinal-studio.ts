@@ -10,7 +10,8 @@ import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail,type ReportingIndividualLongitudinalSpecV1 } from '../reporting/types'
 import { campusStudentReference } from './studentReference'
 
-type IndividualSource={runId:string;trackId:string;runName:string;resource:{family:string;key:string;version:string}}
+type IndividualSource={runId:string;trackId:string;runName:string;publishedAt:string;
+  resource:{family:string;key:string;version:string}}
 type AuthorizedSubject={userId:string}
 const hidden=():never=>reportingFail('CAMPUS_LONGITUDINAL_NOT_FOUND','campus longitudinal report unavailable',404)
 
@@ -191,12 +192,16 @@ export async function generateCampusIndividualLongitudinal(input:{
   const options=await permittedSources(input.actor,input.organizationId,input.subjectReference)
   const selected=input.sources.map(s=>options.sources.find(a=>sourceKey(a)===sourceKey(s)))
   if(selected.some(s=>!s))return hidden()
-  const safe=selected as IndividualSource[]
+  const safe=(selected as IndividualSource[])
+    .sort((a,b)=>Date.parse(a.publishedAt)-Date.parse(b.publishedAt)
+      ||sourceKey(a).localeCompare(sourceKey(b)))
+  if(safe.some(s=>!Number.isFinite(Date.parse(s.publishedAt))))return hidden()
   const definition=await reviewedSpec(input.specId)
   assertCampusLongitudinalComparability({spec:definition,sources:safe})
   const result=await generateIndividualLongitudinal({
     principal:options.principal,organizationId:input.organizationId,
-    subjectUserId:options.subjectUserId,sources:input.sources,
+    subjectUserId:options.subjectUserId,
+    sources:safe.map(s=>({runId:s.runId,trackId:s.trackId})),
     specId:input.specId,
     referenceResolutionMode:'ORIGINAL',
   })
