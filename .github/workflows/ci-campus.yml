@@ -5,8 +5,12 @@ on:
       plan:
         type: string
         required: true
+      pr_number:
+        type: number
+        required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   candidate:
     runs-on: ubuntu-24.04
@@ -14,6 +18,7 @@ jobs:
     env:
       CI: 'true'
       PLAN: ${{ inputs.plan }}
+      CI_PR_NUMBER: ${{ inputs.pr_number }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,14 +35,23 @@ jobs:
           if(p.head!==head||JSON.stringify(p)!==JSON.stringify(campusPlan(changedEntries(p.base,head),p.base,head)))throw Error('campus plan mismatch');
           writeFileSync('campus-plan.json',JSON.stringify(p,null,2));
           JS
+      - id: reuse
+        name: verify official same-input completed phases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/campus-reuse.py
       - uses: docker/setup-buildx-action@v3
+        if: steps.reuse.outputs.reused != 'true'
       - name: compile each changed component once; scoped contracts on isolated PostgreSQL
+        if: steps.reuse.outputs.reused != 'true'
         run: python3 -B .github/scripts/campus-candidate.py
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        if: steps.reuse.outputs.reused != 'true'
         with:
           version: v0.70.0
           cache: false
       - name: scan actual runtime images with existing thresholds
+        if: steps.reuse.outputs.reused != 'true'
         run: |
           for component in $(node -e 'console.log(JSON.parse(require("fs").readFileSync("campus-plan.json")).changed.join(" "))'); do
             trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output campus-evidence/scan-$component.json eduk12-campus-$component:${{ github.sha }}

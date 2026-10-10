@@ -4,9 +4,10 @@ const back='server-version/backend/src/';
 export const campusFiles=new Set([
  ...['SchoolApp.tsx','SchoolMark.tsx','SchoolMark.test.tsx','SchoolParentPortal.tsx','SchoolParentPortal.test.tsx','SchoolEntryMfa.test.tsx','SchoolLanding.tsx','SchoolLanding.test.tsx','SchoolWorkspace.test.tsx','SchoolWorkspaceShell.tsx','SchoolWorkspaceShell.test.tsx','school-navigation.ts','school-features.ts','school-landing.css','school-workspace.css','huischool-a1-emblem.svg','huischool-wordmark.svg','huischool-campus-sunlight.png'].map(p=>front+p),
  back+'modules/campus/admission.routes.ts',back+'modules/campus/registration-code.ts',back+'__tests__/campus/registration-code.test.ts',back+'__tests__/integration/campusRegistrationCode.postgres.integration.test.ts',
+ '.github/scripts/campus-reuse.py','.github/scripts/test_campus_reuse.py','.github/scripts/campus-reuse-request.json',
  '.github/scripts/campus-scope.mjs','.github/scripts/campus-scope.test.mjs','.github/scripts/campus-candidate.py','.github/scripts/campus-browser.mjs','.github/workflows/ci-campus.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
- 'docs/release/campus-ci.md',
+ 'docs/release/campus-ci.md','docs/release/README.md',
 ]);
 export function admitsCampus(entries){
  return entries.length>0 && entries.some(e=>e.file.startsWith(front)||e.file===back+'modules/campus/registration-code.ts') && entries.every(e=>campusFiles.has(e.file)&&e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')));

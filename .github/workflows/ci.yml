@@ -287,7 +287,9 @@ jobs:
 
       - name: campus routing and fail-closed merge contracts
         if: steps.scope.outputs.application_route == 'campus' && github.event_name == 'pull_request'
-        run: node --test .github/scripts/campus-scope.test.mjs
+        run: |
+          node --test .github/scripts/campus-scope.test.mjs
+          python3 -B -m unittest discover -s .github/scripts -p test_campus_reuse.py
 
   maintenance:
     needs: scope
@@ -717,6 +719,7 @@ jobs:
     uses: ./.github/workflows/ci-campus.yml
     with:
       plan: ${{ needs.scope.outputs.campus_plan }}
+      pr_number: ${{ github.event.pull_request.number }}
 
   merge-gate:
     name: merge gate / ready PR

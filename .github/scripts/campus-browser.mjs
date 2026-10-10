@@ -12,13 +12,13 @@ const server=createServer((req,res)=>{
  const file=existsSync(path)&&extname(path)?path:join(root,'index.html');
  res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'})[extname(file)]||'application/octet-stream');res.end(readFileSync(file));
 });await new Promise(r=>server.listen(3189,'127.0.0.1',r));
-const browser=await chromium.launch({headless:true,args:['--host-resolver-rules=MAP school.localhost 127.0.0.1']});
+const browser=await chromium.launch({headless:true,args:['--host-resolver-rules=MAP school.eduk12.top 127.0.0.1']});
 const evidence=[];mkdirSync('campus-evidence/screenshots',{recursive:true});
 try{
  for(const [width,height] of [[1440,900],[768,1024],[390,844],[820,1180],[1024,1366]]){
   const page=await browser.newPage({viewport:{width,height}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/api/**',route=>route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({code:'UNAUTHENTICATED',data:null,message:'请登录'})}));
-  await page.goto('http://school.localhost:3189/');await page.getByRole('heading',{name:'在更好的环境中 看见每一个独特的你'}).waitFor();
+  await page.goto('http://school.eduk12.top:3189/');await page.getByRole('heading',{name:'在更好的环境中 看见每一个独特的你'}).waitFor();
   await page.locator('.hs-campus-art').evaluate(img=>img.decode());await page.locator('.hs-brand img').all().then(imgs=>Promise.all(imgs.map(i=>i.evaluate(img=>img.decode()))));
   const bounds=await page.evaluate(()=>{const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right}};return {copy:box('.hs-landing-copy'),cards:box('.hs-feature-strip'),overflow:document.documentElement.scrollWidth>innerWidth}});
   assert.equal(bounds.overflow,false);
@@ -34,4 +34,4 @@ try{
   assert.deepEqual(errors,[]);evidence.push({width,height,bounds,status:'success'});await page.close();
  }
  writeFileSync('campus-evidence/browser.json',JSON.stringify({head:plan.head,component:plan.components.frontend,evidence,api:'synthetic unauthenticated browser fixture; PostgreSQL authority tested independently'},null,2));
-}finally{await browser.close();await new Promise(r=>server.close(r));}
+}catch(error){const page=browser.contexts().flatMap(c=>c.pages()).at(-1);if(page){await page.screenshot({path:'campus-evidence/browser-failure.png'});writeFileSync('campus-evidence/browser-failure.json',JSON.stringify({url:page.url(),text:await page.locator('body').innerText(),error:String(error)},null,2));}throw error;}finally{await browser.close();await new Promise(r=>server.close(r));}
