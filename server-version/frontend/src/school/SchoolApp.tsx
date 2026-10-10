@@ -6,6 +6,7 @@ import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
+import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer } from './SchoolReports'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -328,7 +329,9 @@ export default function SchoolApp(){
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
             <SchoolStudentTasks api={api}/>
+            <SchoolStudentFeedback api={api}/>
             <SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>
+            <SchoolStudentReportConsent api={api}/>
             <SchoolPeerConsent api={api} role="STUDENT"/>
           </>:
             <section className="hs-panel"><h2>我的校园活动</h2>
@@ -371,6 +374,10 @@ export default function SchoolApp(){
           {schoolId&&access&&<SchoolActivityManager
             key={schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
+          {psychologyStaff&&schoolId
+            &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
+            &&!access?.explicitDenies.some(x=>['*','REPORT_READ','PARENT_REPORT_DISCLOSURE'].includes(x))
+            &&<SchoolReportOfficer key={schoolId} api={api} organizationId={schoolId}/>}
           {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
@@ -383,6 +390,7 @@ export default function SchoolApp(){
           <SchoolParentLinks api={api} role="PARENT"/>
           <SchoolPeerConsent api={api} role="PARENT"/>
           <SchoolParentTasks api={api}/>
+          <SchoolParentReports api={api}/>
           <section className="hs-panel">
             <h2>校园家校支持</h2>
             <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
