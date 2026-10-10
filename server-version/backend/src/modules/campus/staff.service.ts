@@ -78,7 +78,8 @@ export async function registerCampusStaff(input:{
         where:{id:invitation.invitedByUserId},
         select:{role:true,accountDomain:true,isActive:true,isFrozen:true,expiresAt:true,platformRole:true},
       })
-      if(!issuer||issuer.accountDomain!=='SCHOOL'
+      if(!issuer)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(issuer.accountDomain!=='SCHOOL'
         ||(issuer.role!==UserRole.ADMIN&&issuer.role!==UserRole.TEACHER)
         ||!issuer.isActive||issuer.isFrozen
         ||(issuer.expiresAt&&issuer.expiresAt<=new Date()))
@@ -87,17 +88,20 @@ export async function registerCampusStaff(input:{
         principal:{userId:invitation.invitedByUserId,platformRole:issuer.platformRole},
         organizationId:invitation.organizationId,
       },tx)
-      if(!authority||authority.productDomain!=='SCHOOL'
+      if(!authority)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(authority.productDomain!=='SCHOOL'
         ||authority.organizationStatus!=='ACTIVE'
         ||authority.orgRole!=='ORG_ADMIN'||!authority.membershipId
         ||!authority.canGovern)
         fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(!authority.membershipId)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      const issuerMembershipId=authority.membershipId
       // A previous governance revocation permanently invalidates invitations
       // issued before it, even if the denial is later lifted. A replacement
       // administrator membership must not resurrect an old bearer code.
       const [issuerMembership,revokedSinceInvite]=await Promise.all([
         tx.organizationMembership.findUnique({
-          where:{id:authority.membershipId},select:{validFrom:true},
+          where:{id:issuerMembershipId},select:{validFrom:true},
         }),
         tx.organizationAccessDeny.findFirst({
           where:{
