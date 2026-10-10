@@ -12,6 +12,9 @@ import {
 } from '../../modules/campus/activity.service'
 import { allocateCampusActivityParticipants } from '../../modules/campus/activity.allocation'
 import { addCampusActivityTask,listCampusStudentTasks } from '../../modules/campus/activity.tasks'
+import { assignmentController } from '../../controllers/assignmentController'
+import { checkinController } from '../../controllers/checkinController'
+import type { Request, Response } from 'express'
 import { createCampusActivityRunDraft } from '../../modules/campus/activity.runs'
 import { campusRunParticipantScope } from '../../modules/campus/activity.runScope'
 import { hasActiveCourseMembership } from '../../utils/courseAccess'
@@ -170,6 +173,81 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
     const resumed=await changeCampusActivityStatus({...state,action:'RESUME',expectedVersion:4})
     expect(resumed.status).toBe('OPEN')
     await changeCampusActivityStatus({...state,action:'CLOSE',expectedVersion:5})
+    expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
+  })
+
+  it('does not disclose CAMPUS Activity assignments, checkins or tags to a legacy platform ADMIN',async()=>{
+    const f=await fixture()
+    const activity=await createCampusActivity({
+      actor:f.admin,organizationId:f.organizationId,
+      title:'校内敏感活动',purpose:'STUDENT_WELLBEING',
+    })
+    const school={
+      actor:f.admin,organizationId:f.organizationId,courseId:activity.id,
+    }
+    const assignment=await addCampusActivityTask({
+      ...school,kind:'READING',title:'校内课程专属阅读',
+    })
+    const checkin=await addCampusActivityTask({
+      ...school,kind:'CHECKIN',title:'校内活动记录',
+    })
+    const campusTag='campus-private-'+randomUUID().slice(0,8)
+    await db.checkin.update({where:{id:checkin.id},data:{tags:[campusTag]}})
+    const legacy=await db.user.create({data:{
+      username:userName('legacy_admin_'),passwordHash:'synthetic-only',
+      accountDomain:'LEGACY',role:UserRole.ADMIN,
+    }})
+    const request={
+      user:{userId:legacy.id,username:legacy.username,role:legacy.role,
+        accountDomain:'LEGACY',platformRole:'STANDARD'},
+      query:{},
+    } as unknown as Request
+    const readResponse=()=>{
+      let value:any
+      const res={
+        json(payload:any){value=payload;return res},
+        status(_code:number){return res},
+      } as unknown as Response
+      return {res,read:()=>value}
+    }
+    const ar=readResponse()
+    await assignmentController.list(request,ar.res)
+    expect(ar.read().code).toBe(0)
+    expect(ar.read().data.list.some((x:{id:string})=>x.id===assignment.id)).toBe(false)
+    const cr=readResponse()
+    await checkinController.list(request,cr.res)
+    expect(cr.read().code).toBe(0)
+    expect(cr.read().data.list.some((x:{id:string})=>x.id===checkin.id)).toBe(false)
+    const at=readResponse()
+    await assignmentController.getTags(request,at.res)
+    expect(at.read().data.tags).not.toContain('CAMPUS_READING')
+    const ct=readResponse()
+    await checkinController.getTags(request,ct.res)
+    expect(ct.read().data.tags).not.toContain(campusTag)
+  })
+
+  it('cannot open an Activity using frozen identities or revoked STUDENT persona',async()=>{
+    const f=await fixture()
+    const activity=await createCampusActivity({
+      actor:f.admin,organizationId:f.organizationId,
+      title:'验证成员状态',purpose:'STUDENT_WELLBEING',
+    })
+    const state={actor:f.admin,organizationId:f.organizationId,courseId:activity.id}
+    await addCampusActivityTask({...state,kind:'ASSIGNMENT',title:'练习'})
+    await allocateCampusActivityParticipants({
+      ...state,classUnitIds:[f.classUnitId],
+      requestKey:'freeze-'+randomUUID(),expectedVersion:activity.version,
+    })
+    const submitted=await changeCampusActivityStatus({
+      ...state,action:'SUBMIT',expectedVersion:activity.version,
+    })
+    await db.user.update({where:{id:f.student.userId},data:{
+      isFrozen:true,tokenVersion:{increment:1},
+    }})
+    await expect(changeCampusActivityStatus({
+      ...state,action:'OPEN',expectedVersion:submitted.version,
+    })).rejects.toMatchObject({code:'ACTIVITY_NOT_READY'})
+    expect(await hasActiveCourseMembership(activity.id,f.student.userId)).toBe(false)
     expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
   })
 
