@@ -6,7 +6,7 @@ import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
-import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer } from './SchoolReports'
+import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer, SchoolDisclosureOfficers } from './SchoolReports'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -378,6 +378,7 @@ export default function SchoolApp(){
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','PARENT_REPORT_DISCLOSURE'].includes(x))
             &&<SchoolReportOfficer key={schoolId} api={api} organizationId={schoolId}/>}
+          {schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={schoolId} api={api} organizationId={schoolId}/>}
           {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
