@@ -1,0 +1,155 @@
+/* A-1 public homepage. Account permissions and workspaces keep their existing styles. */
+.hs-skip-link { position:absolute;top:8px;left:16px;z-index:50;transform:translateY(-160%);padding:12px 18px;background:#fff;color:#214f3d;border-radius:8px; }
+.hs-skip-link:focus { transform:none; }
+.hs-public-header { position:relative;z-index:10;min-height:88px;display:flex;align-items:center;gap:28px;padding:14px max(32px,calc((100vw - 1240px)/2));background:#fffffcf2;border-bottom:1px solid #d6e3d4; }
+.hs-app .hs-home-link { border:0;background:transparent;padding:0;min-height:48px;flex:none; }
+.hs-public-header .hs-brand { gap:10px; }
+.hs-public-header .hs-brand-icon { width:66px;height:48px;background:transparent;box-shadow:none;border-radius:0;mix-blend-mode:normal; }
+.hs-public-header .hs-brand strong { font-size:29px; }
+.hs-public-nav { display:flex;align-items:center;gap:26px;margin-left:auto; }
+.hs-public-nav a,.hs-public-nav button { font-size:14px;font-weight:600;white-space:nowrap;color:#355b4b;text-decoration:none; }
+.hs-app .hs-public-nav>button { background:transparent;border:0;padding:10px 0;border-radius:0; }
+.hs-public-nav a { padding:12px 0; }
+.hs-public-nav [aria-current=page] { box-shadow:inset 0 -2px #356957; }
+.hs-public-nav a:hover { color:#173f2e; }
+.hs-header-actions { display:flex;gap:12px;align-items:center;flex:none; }
+.hs-app .hs-header-actions>button { min-width:88px;min-height:44px;border-radius:24px;padding:9px 18px; }
+.hs-navigation-toggle { display:none; }
+.hs-main.hs-main-landing { width:100%;margin:0;padding:0; }
+.hs-landing-hero {
+ --hs-glass:rgba(255,255,242,.64);
+ position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:flex-start;gap:24px;
+ height:calc(100svh - 88px);min-height:620px;max-height:980px;
+ padding:clamp(24px,6svh,54px) max(40px,calc((100vw - 1200px)/2)) 36px;
+ overflow:hidden;background:#f5f8ec;
+}
+.hs-campus-art { position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 90%; }
+.hs-landing-hero:before { content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#f8faee66 0%,#f8faee20 45%,transparent 70%); }
+.hs-landing-copy { width:100%;max-width:620px;padding:26px 32px;background:var(--hs-glass);backdrop-filter:blur(2px);border-radius:18px; }
+.hs-app .hs-landing-copy h1 { font-family:'Songti SC','STSong','Noto Serif CJK SC',serif;font-size:clamp(40px,4vw,58px);font-weight:700;line-height:1.35;letter-spacing:.025em;margin:0 0 20px;color:#183f30; }
+.hs-landing-copy h1 span { display:block;white-space:nowrap; }
+.hs-landing-copy>p { font-size:20px;letter-spacing:.06em;color:#315843;margin:0 0 28px;line-height:1.7;font-weight:500; }
+.hs-hero-actions { display:flex;gap:18px;align-items:center; }
+.hs-app .hs-hero-actions button,.hs-hero-actions>a { display:inline-flex;justify-content:center;align-items:center;gap:9px;min-height:54px;min-width:174px;padding:12px 25px;border-radius:30px;font-size:17px;font-weight:600;text-decoration:none; }
+.hs-hero-actions>a { color:#356957;border:1px solid #77a48b;background:#fffffbb8; }
+.hs-hero-actions>a:hover { background:#edf5e7; }
+.hs-feature-strip { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;padding:8px;background:var(--hs-glass);backdrop-filter:blur(2px);border:1px solid #ffffff70;border-radius:20px;box-shadow:0 8px 36px #244b3510;scroll-margin-top:20px;flex:none; }
+.hs-feature { display:block;padding:20px 12px;text-align:center;min-width:0;min-height:142px;text-decoration:none;color:#183f30;border-radius:12px;transition:background .09s,box-shadow .09s,color .09s; }
+.hs-feature+.hs-feature { border-left:1px solid #dbe6d58c; }
+.hs-feature svg { display:block;margin:0 auto 11px;color:#28573d; }
+.hs-app .hs-feature h2 { font-size:18px;font-weight:650;margin:0 0 5px;line-height:1.5;color:#1d4631; }
+.hs-feature p { font-size:14px;line-height:1.6;color:#214730;margin:0;font-weight:500; }
+.hs-feature:focus-visible { background:rgba(247,255,236,.96);outline:2px solid #356957;outline-offset:-2px; }
+.hs-feature:active { background:rgba(239,248,222,.80); }
+@media(hover:hover) { .hs-feature:hover { background:rgba(247,255,236,.96);box-shadow:inset 0 0 0 2px #578b6599,0 4px 16px #244b3526; } }
+.hs-section-kicker { color:#5c8066;letter-spacing:.1em;font-size:13px;font-weight:600;margin:0 0 13px; }
+.hs-app:has(.hs-public-header) .hs-footer { background:#f3f7f1; }
+.hs-join-login { margin:28px 0 20px;text-align:center;font-size:14px;color:#627661; }
+.hs-app .hs-join-login button { border:0;background:transparent;text-decoration:underline;min-height:44px;padding:8px;color:#356957; }
+.hs-app .hs-auth-back { display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:8px 0;margin:0 0 16px;font-weight:500;font-size:14px; }
+.hs-main:focus { outline:none; }
+.hs-feature-blank { min-height:60vh; }
+/* Shared public account layout; the same campus artwork remains a separate layer. */
+.hs-main.hs-main-auth { position:relative;isolation:isolate;width:100%;margin:0;min-height:calc(100svh - 145px);padding:40px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px; }
+.hs-main-auth:before { content:'';position:absolute;inset:0;z-index:-2;background:#edf4dc url('./huischool-campus-sunlight.png') center 65% / cover no-repeat; }
+.hs-main-auth:after { content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#f4f8e966,#f4f8e926); }
+.hs-code-page { width:100%;max-width:520px; }
+.hs-main-auth .hs-panel,.hs-code-panel { width:100%;max-width:520px;margin:0;padding:34px 38px;background:rgba(255,255,242,.88);backdrop-filter:blur(5px);border:1px solid #ffffffc2;border-radius:22px;box-shadow:0 12px 40px #254b351a; }
+.hs-app .hs-main-auth h1 { font-family:'Songti SC','STSong',serif;font-size:30px;font-weight:650;line-height:1.45;margin:0 0 12px;color:#183f30; }
+.hs-main-auth .hs-section-kicker { color:#537258;font-size:13px;line-height:1.6;margin:0 0 8px; }
+.hs-code-intro,.hs-main-auth .hs-auth-intro { color:#49634d;font-size:15px;line-height:1.8;margin:0 0 24px; }
+.hs-main-auth form { display:flex;flex-direction:column;gap:18px; }
+.hs-main-auth .hs-field { margin:0;gap:8px; }
+.hs-main-auth .hs-field input { min-height:50px;font-size:16px;background:#fffffbd9;border-color:#9eb9a2; }
+.hs-main-auth input::placeholder { color:#738374;font-weight:400; }
+.hs-main-auth form>.hs-primary { display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:50px;border-radius:12px;margin:4px 0 0; }
+.hs-code-help,.hs-main-auth .hs-auth-help { color:#586f58;font-size:13px;line-height:1.8;margin:18px 0 0; }
+.hs-code-panel .hs-join-login,.hs-auth-switch { display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2px;padding-top:14px;border-top:1px solid #b6c9ac80;margin:22px 0 0;font-size:14px;color:#526a53; }
+.hs-app .hs-auth-switch button { background:transparent;border:0;padding:8px;color:#285740;text-decoration:underline;min-height:44px; }
+.hs-app .hs-main-auth .hs-recovery-link { display:block;margin:4px auto 0;min-height:44px;padding:8px;font-size:13px;color:#526a53; }
+.hs-main-auth>.hs-alert,.hs-main-auth>.hs-message { width:100%;max-width:520px;margin:0; }
+.hs-app .hs-main-auth .hs-auth-back { width:100%;max-width:520px;margin:0;background:#fffff2b8;padding:10px 16px;border-radius:12px; }
+.hs-visually-hidden {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+.hs-recruit-blank {
+  min-height:60vh;
+}
+@media(max-width:1100px) {
+ .hs-public-header { gap:16px;padding:14px 28px; }
+ .hs-public-nav { gap:18px; }
+ .hs-public-header .hs-brand strong { font-size:26px; }
+ .hs-header-actions { gap:8px; }
+ .hs-app .hs-header-actions>button { min-width:76px; }
+ .hs-landing-hero { padding-left:40px;padding-right:40px; }
+}
+@media(max-width:1000px) {
+ .hs-public-header { min-height:76px;padding:12px 28px;gap:20px; }
+ .hs-header-actions { margin-left:auto; }
+ .hs-public-nav { display:none;position:absolute;left:20px;right:20px;top:calc(100% + 6px);margin-left:0;padding:16px;background:#fffef9;border:1px solid #d1dfca;border-radius:15px;box-shadow:0 14px 40px #20432c18;flex-direction:column;align-items:stretch;gap:3px; }
+ .hs-public-nav-open { display:flex; }
+ .hs-public-nav a,.hs-app .hs-public-nav>button { padding:12px 15px;min-height:44px;text-align:left;border-radius:8px; }
+ .hs-public-nav [aria-current=page] { background:#edf3e6;box-shadow:none; }
+ .hs-navigation-toggle { display:block; }
+ .hs-app .hs-navigation-toggle>.hs-menu-toggle { display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;border:0;background:transparent;padding:8px; }
+ .hs-landing-hero { height:auto;min-height:0;max-height:none;padding:28px 32px;gap:32px;background:#edf4dc; }
+ .hs-campus-art { top:0;object-position:78% center; }
+ .hs-landing-hero:before { background:linear-gradient(180deg,#f9fbea20 0%,transparent 75%,#edf4dc 100%); }
+ .hs-landing-copy { padding:24px;max-width:650px; }
+ .hs-app .hs-landing-copy h1 { font-size:46px;line-height:1.35;margin-bottom:18px; }
+ .hs-landing-copy>p { font-size:18px;margin-bottom:24px; }
+ .hs-feature-strip { grid-template-columns:repeat(2,minmax(0,1fr));padding:8px; }
+ .hs-feature { padding:18px 8px;min-height:120px; }
+ .hs-feature+.hs-feature { border-left:0; }
+ .hs-feature:nth-child(even) { border-left:1px solid #dbe6d58c; }
+ .hs-feature:nth-child(n+3) { border-top:1px solid #dbe6d58c; }
+ .hs-feature svg { width:29px;height:29px;margin-bottom:8px; }
+ .hs-app .hs-feature h2 { font-size:17px; }
+ .hs-feature p { font-size:13px; }
+ .hs-main.hs-main-auth { min-height:calc(100svh - 133px);padding:36px 24px; }
+}
+/* Portrait tablets share the same left and right edges for both glass panels. */
+@media(min-width:601px) and (max-width:1100px) and (orientation:portrait) {
+ .hs-landing-copy { max-width:none; }
+}
+@media(max-width:600px) {
+ .hs-public-header { min-height:68px;padding:10px 12px;gap:8px; }
+ .hs-public-header .hs-brand { gap:5px; }
+ .hs-public-header .hs-brand-icon { width:42px;height:34px; }
+ .hs-public-header .hs-brand strong { font-size:22px; }
+ .hs-header-actions { gap:4px; }
+ .hs-app .hs-header-actions>.hs-login-entry { min-width:44px;min-height:44px;padding:8px 5px;border:0;background:transparent;font-size:13px; }
+ .hs-app .hs-header-actions>.hs-register-entry { min-width:52px;min-height:44px;padding:8px 9px;font-size:13px; }
+ .hs-public-nav { left:12px;right:12px; }
+ .hs-landing-hero { padding:18px 16px;gap:24px; }
+ .hs-campus-art { object-position:75% center; }
+ .hs-landing-copy { padding:20px 8px 18px;border-radius:16px; }
+ .hs-app .hs-landing-copy h1 { font-size:clamp(25px,7.8vw,34px);line-height:1.45;letter-spacing:.01em;margin-bottom:16px; }
+ .hs-landing-copy>p { font-size:13px;letter-spacing:.025em;margin-bottom:22px; }
+ .hs-hero-actions { gap:12px; }
+ .hs-app .hs-hero-actions button,.hs-hero-actions>a { min-width:0;flex:1;min-height:48px;font-size:15px;padding:10px 16px; }
+ .hs-feature-strip { padding:6px;border-radius:16px; }
+ .hs-feature { padding:14px 4px;min-height:102px; }
+ .hs-feature svg { width:26px;height:26px;margin-bottom:6px; }
+ .hs-app .hs-feature h2 { font-size:15px;margin-bottom:3px; }
+ .hs-feature p { font-size:11px;white-space:nowrap; }
+ .hs-join-login { margin:16px 0 12px; }
+ .hs-app:has(.hs-public-header) .hs-footer { font-size:11px;padding:18px 12px; }
+ .hs-main.hs-main-auth { min-height:calc(100svh - 121px);padding:24px 16px; }
+ .hs-main-auth .hs-panel,.hs-code-panel { padding:26px 22px;border-radius:18px; }
+ .hs-app .hs-main-auth h1 { font-size:26px; }
+ .hs-code-intro,.hs-main-auth .hs-auth-intro { font-size:14px;margin-bottom:22px; }
+ .hs-main-auth:before { background-position:72% center; }
+ .hs-code-help,.hs-main-auth .hs-auth-help { font-size:12px; }
+
+}
+@media(max-width:360px) { .hs-public-header .hs-brand strong { font-size:19px; } .hs-public-header .hs-brand-icon { width:34px; } .hs-public-header { gap:6px; } }
+@media(prefers-reduced-motion:reduce) { .hs-feature { transition:none; } }

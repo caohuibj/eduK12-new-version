@@ -1,0 +1,73 @@
+name: Campus scoped candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+      pr_number:
+        type: number
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      CI_PR_NUMBER: ${{ inputs.pr_number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: freeze and recheck the exact campus plan
+        run: |
+          node --input-type=module <<'JS'
+          import {writeFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';
+          import {campusPlan} from './.github/scripts/campus-scope.mjs';import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          if(p.head!==head||JSON.stringify(p)!==JSON.stringify(campusPlan(changedEntries(p.base,head),p.base,head)))throw Error('campus plan mismatch');
+          writeFileSync('campus-plan.json',JSON.stringify(p,null,2));
+          JS
+      - id: reuse
+        name: verify official same-input completed phases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/campus-reuse.py
+      - uses: docker/setup-buildx-action@v3
+        if: steps.reuse.outputs.reused != 'true'
+      - name: compile each changed component once; scoped contracts on isolated PostgreSQL
+        if: steps.reuse.outputs.reused != 'true'
+        run: python3 -B .github/scripts/campus-candidate.py
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        if: steps.reuse.outputs.reused != 'true'
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan actual runtime images with existing thresholds
+        if: steps.reuse.outputs.reused != 'true'
+        run: |
+          for component in $(node -e 'console.log(JSON.parse(require("fs").readFileSync("campus-plan.json")).changed.join(" "))'); do
+            trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output campus-evidence/scan-$component.json eduk12-campus-$component:${{ github.sha }}
+          done
+      - name: install the pinned candidate browser
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: responsive layout and entry interactions on compiled candidate
+        run: node .github/scripts/campus-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: campus-candidate-${{ github.sha }}
+          path: |
+            campus-plan.json
+            campus-evidence/
+          if-no-files-found: error
+          retention-days: 3

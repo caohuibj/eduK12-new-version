@@ -25,4 +25,16 @@ describe('Huischool independent parent onboarding',()=>{
     })
     expect(api.mock.calls.every(([path])=>path.startsWith('/'))).toBe(true)
   })
+  it('carries a verified code into the original guardian-consented registration',async()=>{
+    const api=vi.fn(async()=>({status:'PENDING_STUDENT_CONFIRMATION'})),complete=vi.fn()
+    render(<SchoolParentRegistration api={api as SchoolApi} onRegistered={complete} resolvedInviteCode="abcdefghijklmnopqrstuvwx"/>)
+    expect(screen.getByRole('heading',{name:'创建家长账号'})).toBeInTheDocument()
+    expect(screen.queryByLabelText('一次性亲子邀请码（15 分钟内有效）')).not.toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('自选校园用户名'),{target:{value:'test.parent'}})
+    fireEvent.change(screen.getByLabelText('自选密码'),{target:{value:'SyntheticPassword123'}})
+    fireEvent.click(screen.getByRole('checkbox'));fireEvent.click(screen.getByRole('button',{name:'创建独立校园家长账号'}))
+    await waitFor(()=>expect(complete).toHaveBeenCalledOnce())
+    expect(api).toHaveBeenCalledWith('/parents/register','POST',{inviteCode:'abcdefghijklmnopqrstuvwx',username:'test.parent',password:'SyntheticPassword123',guardianAcknowledged:true})
+  })
+
 })

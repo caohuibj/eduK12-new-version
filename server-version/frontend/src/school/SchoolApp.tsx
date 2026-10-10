@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import './school.css'
-import { SchoolMark, SchoolHeroMark } from './SchoolMark'
+import './school-workspace.css'
+import { SchoolMark } from './SchoolMark'
+import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
+import { schoolNavigation, workspacePage, workspacePath } from './school-navigation'
+import { schoolFeatures } from './school-features'
+import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
@@ -55,13 +60,17 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
   </label>
 )
 export default function SchoolApp(){
+  const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
   const [user,setUser]=useState<CampusUser|null>(null)
   const [loading,setLoading]=useState(true)
-  const [screen,setScreen]=useState<'home'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
-    window.location.pathname==='/register'?'register':
-      window.location.pathname==='/staff/register'?'staff':
-      window.location.pathname==='/parent/register'?'parent':
-      window.location.pathname==='/recover'?'recover':'home')
+  const [screen,setScreen]=useState<'home'|'code'|'recruit'|'feature'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
+    ['/register','/staff/register','/parent/register'].includes(window.location.pathname)?'code':
+      window.location.pathname==='/recover'?'recover':
+      schoolFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'home')
+  const activeFeature=schoolFeatures.find(feature=>feature.path===window.location.pathname)
+  const [focusPublic,setFocusPublic]=useState(false)
+  const [staffRole,setStaffRole]=useState<'TEACHER'|'COUNSELOR'|'ADMIN'>('TEACHER')
+  const [landingSection,setLandingSection]=useState<string|null>(null)
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [username,setUsername]=useState('')
@@ -103,6 +112,27 @@ export default function SchoolApp(){
   }
   useEffect(()=>{void refresh()},[])
   useEffect(()=>{
+    const pop=()=>{
+      const query=new URLSearchParams(window.location.search)
+      const organizationId=query.get('organizationId')
+      if(organizationId)setSchoolId(organizationId)
+      setClassId(query.get('classUnitId')??'');setSummary(null);setIssuedCodes([])
+      setPage(workspacePage(window.location.pathname));setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+    }
+    window.addEventListener('popstate',pop)
+    return()=>window.removeEventListener('popstate',pop)
+  },[])
+  const navigateWorkspace=(id:string)=>{
+    const query=new URLSearchParams()
+    if(schoolId)query.set('organizationId',schoolId)
+    if(classId)query.set('classUnitId',classId)
+    const suffix=query.size?'?'+query.toString():''
+    window.history.pushState(null,'',workspacePath(id)+suffix)
+    setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+  }
+
+  useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | Huischool`:'Huischool';return()=>{document.title=previous}},[screen,activeFeature])
+  useEffect(()=>{
     if(!user){setCampusParentReportEnabled(false);return}
     let live=true
     void api<{parentReportsEnabled:boolean}>('/reports/availability')
@@ -127,7 +157,7 @@ export default function SchoolApp(){
   },[user])
   useEffect(()=>{
     if(!user||!schoolId)return
-    setClassId('');setUnits([]);setSummary(null);setIssuedCodes([]);setAccess(null)
+    setClassId(new URLSearchParams(window.location.search).get('organizationId')===schoolId?new URLSearchParams(window.location.search).get('classUnitId')??'':'');setUnits([]);setSummary(null);setIssuedCodes([]);setAccess(null)
     void api<{access:SchoolAccess}>(`/organizations/${schoolId}/context`)
       .then(data=>setAccess(data.access)).catch(()=>setAccess(null))
     void api<{list:Unit[]}>(`/organizations/${schoolId}/units`)
@@ -186,7 +216,7 @@ export default function SchoolApp(){
     // Do not claim logout or clear the UI on a failed server-side revocation.
     await api('/auth/logout','POST',{})
     setUser(null);setSummary(null);setIssuedCodes([]);setRecoveryCodes([])
-    setScreen('home');notify('已退出校园账号')
+    window.history.replaceState(null,'','/');setPage('overview');setScreen('home');notify('已退出校园账号')
   })
   const stepUp=()=>run(async()=>{
     await api('/auth/mfa/step-up','POST',{code:stepUpCode})
@@ -203,7 +233,20 @@ export default function SchoolApp(){
   const loadSummary=()=>run(async()=>{
     setSummary(await api<Summary>(`/organizations/${schoolId}/classes/${classId}/summary`))
   })
+  const changeSchool=(id:string)=>{
+    const query=new URLSearchParams(window.location.search)
+    if(id)query.set('organizationId',id)
+    else query.delete('organizationId')
+    query.delete('classUnitId')
+    window.history.replaceState(null,'',window.location.pathname+(query.size?'?'+query.toString():''))
+    setSchoolId(id)
+  }
   const changeClass=async(id:string)=>{
+    const query=new URLSearchParams(window.location.search)
+    if(schoolId)query.set('organizationId',schoolId)
+    if(id)query.set('classUnitId',id)
+    else query.delete('classUnitId')
+    window.history.replaceState(null,'',window.location.pathname+'?'+query.toString())
     setClassId(id);setSummary(null);setIssuedCodes([]);setNewInvite('')
   }
   const joinUrl=classId?`${window.location.origin}/register?organizationId=${encodeURIComponent(schoolId)}&classUnitId=${encodeURIComponent(classId)}`:''
@@ -235,41 +278,74 @@ export default function SchoolApp(){
     setNewInvite(result.inviteCode);notify('人员邀请码仅显示一次，请通过独立安全渠道交付。')
   })
 
-  return <div className="hs-app">
-    <header className="hs-header">
-      <SchoolMark/>
+  // Public forms use server-controlled identity, permissions and MFA.
+  const goPublic=(next:'home'|'code'|'recruit'|'login')=>{
+    if(window.location.pathname.startsWith('/workspace')||schoolFeatures.some(feature=>feature.path===window.location.pathname))window.history.replaceState(null,'','/')
+    setError('');setNotice('');setLandingSection(null);setFocusPublic(true);setScreen(next)
+    if(next==='code'){setInviteCode('');setActivationCode('');setPassword('')}
+    window.scrollTo({top:0,behavior:'instant'})
+  }
+  const codeResolved=(entry:SchoolRegistrationEntry,code:string)=>{
+    setError('');setNotice('');setFocusPublic(true)
+    if(entry.kind==='STUDENT'){
+      setSchoolId(entry.organizationId);setClassId(entry.classUnitId);setActivationCode(code);setScreen('register')
+    }else if(entry.kind==='PARENT'){setInviteCode(code);setScreen('parent')}
+    else{setInviteCode(code);setStaffRole(entry.role);setScreen('staff')}
+  }
+  const explore=(id:string)=>{goPublic('home');setLandingSection(id)}
+  useEffect(()=>{
+    if(loading||screen!=='home'||!landingSection)return
+    const target=document.getElementById(landingSection)
+    target?.scrollIntoView({behavior:'instant',block:'start'})
+    target?.focus({preventScroll:true})
+    setLandingSection(null)
+  },[loading,screen,landingSection])
+  useEffect(()=>{
+    if(!focusPublic||loading)return
+    const heading=document.querySelector<HTMLElement>('#hs-main h1')
+    heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true})
+    setFocusPublic(false)
+  },[focusPublic,screen,loading])
+  const publicHome=!user&&screen==='home'
+  const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
+
+  return <div className={`hs-app${user?' hs-workspace':''}`}>
+    <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
+    {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
+      onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome}/>:<header className="hs-header">
+      <a href="/workspace" className="hs-workspace-brand" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('overview')}}><SchoolMark/></a>
       <nav aria-label="校园导航">
-        {user?<><span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button></>:
-          <><button onClick={()=>setScreen('login')}>登录</button><button className="hs-primary" onClick={()=>setScreen('register')}>学生注册</button><button onClick={()=>setScreen('parent')}>家长注册</button></>}
+        <span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button>
       </nav>
-    </header>
-    <main className="hs-main">
+    </header>}
+    <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
       {loading?<p>正在核对校园会话…</p>:null}
-      {!loading&&screen==='home'&&!user&&<section className="hs-hero">
-        <div className="hs-hero-copy">
-          <p className="hs-eyebrow">林间见心 · CAMPUS MENTAL HEALTH</p>
-          <h1>让每一个生命都被看见与支持</h1>
-          <p>校园心理健康、学习适应、师生关系与家校支持。学生可以使用班级分发的限时激活码，创建不要求真实姓名、电话或邮箱的校园账号。</p>
-          <div className="hs-actions"><button className="hs-primary" onClick={()=>setScreen('register')}>我是学生 · 注册</button><button onClick={()=>setScreen('login')}>已有账号 · 登录</button><button onClick={()=>setScreen('staff')}>教职员工邀请码</button><button onClick={()=>setScreen('parent')}>家长独立注册</button></div>
-        </div>
-        <SchoolHeroMark/>
+      {!loading&&publicHome&&<SchoolLanding onJoin={()=>goPublic('recruit')}/>}
+      {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
+      {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
+        <h1 className="hs-visually-hidden">{activeFeature.title}</h1>
       </section>}
+      {!loading&&!user&&screen==='recruit'&&<section className="hs-recruit-blank" aria-label="学校招募页面"><h1 className="hs-visually-hidden">学校招募</h1></section>}
+      {!loading&&!user&&['register','staff','parent'].includes(screen)&&<button className="hs-auth-back" type="button" onClick={()=>goPublic('code')}>← 更换注册码</button>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
+        <p className="hs-section-kicker">欢迎回到 Huischool</p>
         <h1>校园账号登录</h1>
-        <p>Huischool 与培训版账号相互独立。</p>
-        <form onSubmit={e=>void signIn(e)}>{field('校园用户名',username,setUsername)}{field('密码',password,setPassword,'password')}<button className="hs-primary" disabled={working}>登录</button></form>
-        <button className="hs-link" onClick={()=>setScreen('register')}>使用班级激活码注册</button>
-        <button className="hs-link" onClick={()=>setScreen('recover')}>忘记校园账号或密码</button>
+        <p className="hs-auth-intro">使用校园用户名和密码登录，进入你的校园空间。</p>
+        <form onSubmit={e=>void signIn(e)}>
+          <label className="hs-field"><span>用户名</span><input value={username} onChange={e=>setUsername(e.target.value)} autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="请输入校园用户名" required/></label>
+          <label className="hs-field"><span>密码</span><input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="请输入密码" required/></label>
+          <button className="hs-primary" disabled={working}>{working?'正在登录…':'登录'}</button>
+        </form>
+        <p className="hs-auth-help">请使用校园账号；需要安全验证时，登录后会继续引导。</p>
+        <div className="hs-auth-switch"><span>还没有校园账号？</span><button type="button" onClick={()=>goPublic('code')}>使用注册码注册</button></div>
+        <button type="button" className="hs-link hs-recovery-link" onClick={()=>setScreen('recover')}>忘记校园账号或密码</button>
       </section>}
       {!loading&&!user&&screen==='register'&&<section className="hs-panel hs-narrow">
-        <h1>学生半匿名注册</h1><p>请从班级提供的专属注册链接进入，输入学号和随机激活码。账号需等待心理教师完成整班审批。</p>
+        <h1>创建学生账号</h1><p>注册码已确认。填写学号，设置你的用户名和密码。</p>
         <form onSubmit={e=>void registerStudent(e)}>
-          {field('学校识别码',schoolId,setSchoolId)}
-          {field('班级识别码',classId,setClassId)}
           {field('学号（仅用于资格验证）',studentNo,setStudentNo)}
-          {field('一次性激活码',activationCode,setActivationCode)}
           {field('自选登录名',username,setUsername)}
           {field('自选密码',password,setPassword,'password')}
           <button className="hs-primary" disabled={working}>提交注册</button>
@@ -277,12 +353,12 @@ export default function SchoolApp(){
       </section>}
       {!loading&&!user&&screen==='recover'&&<SchoolStudentRecovery api={api}
         onComplete={()=>{setScreen('login');notify('校园密码已更新，请重新登录。')}}/>}
-      {!loading&&!user&&screen==='parent'&&<SchoolParentRegistration api={api}
+      {!loading&&!user&&screen==='parent'&&<SchoolParentRegistration api={api} resolvedInviteCode={inviteCode}
         onRegistered={()=>{setScreen('login');notify('校园家长账号已建立，请等待孩子确认后再参与家校测评。')}}/>}
       {!loading&&!user&&screen==='staff'&&<section className="hs-panel hs-narrow">
-        <h1>教职员工独立注册</h1><p>仅限获得学校管理员一次性邀请码的人员。培训版账号不能直接登录校园版。</p>
+        <h1>{staffRole==='ADMIN'?'创建学校管理员账号':staffRole==='COUNSELOR'?'创建心理教师账号':'创建教师账号'}</h1>
+        <p>注册码已确认。设置你的校园用户名和密码。</p>
         <form onSubmit={e=>void registerStaff(e)}>
-          {field('学校人员邀请码',inviteCode,setInviteCode)}
           {field('自选校园用户名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="hs-primary" disabled={working}>创建校园账号</button>
@@ -305,10 +381,10 @@ export default function SchoolApp(){
         <div className="hs-secret">{recoveryCodes.map(code=><code key={code}>{code}</code>)}</div>
         <button className="hs-primary" onClick={()=>{setRecoveryCodes([]);void refresh()}}>已妥善保存，进入校园</button>
       </section>}
-      {!loading&&user&&screen==='workspace'&&recoveryCodes.length===0&&<section>
-        <p className="hs-eyebrow">HUISCHOOL · 校园工作台</p>
-        <h1>欢迎，{user.username}</h1>
-        {(user.role==='TEACHER'||user.role==='ADMIN')&&<section className="hs-panel">
+      {!loading&&user&&screen==='workspace'&&recoveryCodes.length===0&&<SchoolWorkspaceShell page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
+        {page==='overview'&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
+        {page==='account'&&<section className="hs-panel"><h2>校园账号</h2><p>用户名：{user.username}</p><p>你使用的是独立校园账号。可用功能由学校授权决定。</p></section>}
+        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className="hs-panel">
           <h2>敏感操作二次验证</h2>
           <p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p>
           <div className="hs-actions">
@@ -322,31 +398,22 @@ export default function SchoolApp(){
         </section>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
-            <SchoolStudentTasks api={api}/>
-            <SchoolStudentFeedback api={api}/>
-            <SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>
-            {campusParentReportEnabled?<SchoolStudentReportConsent api={api}/>:<p>家长版报告分享暂未开放；亲子关系和家长观察任务不受影响。</p>}
-            <SchoolPeerConsent api={api} role="STUDENT"/>
+            {page==='tasks'&&<SchoolStudentTasks api={api}/>}
+            {page==='feedback'&&<SchoolStudentFeedback api={api}/>}
+            {page==='family'&&<SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>}
+            {page==='sharing'&&campusParentReportEnabled&&<SchoolStudentReportConsent api={api}/>}
+            {page==='peer'&&<SchoolPeerConsent api={api} role="STUDENT"/>}
           </>:
-            <section className="hs-panel"><h2>我的校园活动</h2>
-              <p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':
-                '目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p>
-              <p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p>
-            </section>:
+            null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
-          <section className="hs-panel"><h2>学校与班级</h2>
-            <label className="hs-field"><span>当前学校</span><select value={schoolId} onChange={e=>setSchoolId(e.target.value)}>
-              <option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}
-            </select></label>
+          {page==='classes'&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
             <div>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}>
               <option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
               <button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></div></div>}
-            <label className="hs-field"><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}>
-              <option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
-            </select></label>
-          </section>
-          {schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
+            {!schoolAdmin&&<p>选择学校和班级后，可进入你已获授权的校园功能。</p>}
+          </section>}
+          {page==='admission'&&schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
             {schoolAdmin&&<p>注册链接：<code className="hs-break">{joinUrl}</code></p>}
             {summary&&<p>状态：{summary.status} · 名册预期 {summary.rosterExpectedCount} · 当前资格 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
             <button onClick={()=>void loadSummary()} disabled={working}>刷新班级状态</button>
@@ -363,33 +430,33 @@ export default function SchoolApp(){
               onClick={()=>void approve()}>心理教师 · 确认整班身份审批</button>}
             {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}
-          {(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
+          {page==='recovery'&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
-          {(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={schoolId} api={api} organizationId={schoolId}/>}
-          {schoolAdmin&&schoolId&&<SchoolRelationships key={schoolId} api={api} organizationId={schoolId} classes={units}/>}
-          {schoolId&&access&&<SchoolActivityManager
-            key={schoolId} api={api} organizationId={schoolId}
+          {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
+          {page==='activities'&&schoolId&&access&&<SchoolActivityManager
+            key={'SchoolActivityManager:'+schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
-          {(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
+          {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupReports key={schoolId} api={api} organizationId={schoolId}/>}
-          {(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
+            &&<SchoolGroupReports key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='group-trends'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupLongitudinal key={schoolId} api={api} organizationId={schoolId}/>}
-          {psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
+            &&<SchoolGroupLongitudinal key={'SchoolGroupLongitudinal:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='protected-reports'&&psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
             &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_PROTECTED_FEEDBACK_V1'].includes(x))
-            &&<SchoolProtectedReportStudio key={schoolId} api={api} organizationId={schoolId}/>}
-          {psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
+            &&<SchoolProtectedReportStudio key={'SchoolProtectedReportStudio:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='individual-trends'&&psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
             &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_INDIVIDUAL_REPORT_V1'].includes(x))
-            &&<SchoolIndividualLongitudinalStudio key={schoolId} api={api} organizationId={schoolId}/>}
-          {psychologyStaff&&schoolId&&<SchoolProfessionalReports key={schoolId} api={api} organizationId={schoolId}/>}
-          {campusParentReportEnabled&&psychologyStaff&&schoolId
+            &&<SchoolIndividualLongitudinalStudio key={'SchoolIndividualLongitudinalStudio:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='professional-reports'&&psychologyStaff&&schoolId&&<SchoolProfessionalReports key={'SchoolProfessionalReports:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='report-review'&&campusParentReportEnabled&&psychologyStaff&&schoolId
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','PARENT_REPORT_DISCLOSURE'].includes(x))
-            &&<SchoolReportOfficer key={schoolId} api={api} organizationId={schoolId}/>}
-          {campusParentReportEnabled&&schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={schoolId} api={api} organizationId={schoolId}/>}
-          {!campusParentReportEnabled&&(schoolAdmin||psychologyStaff)&&<p>家长版报告披露尚未正式开放，需完成逐资源科学审核后单独启用。</p>}
-          {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
+            &&<SchoolReportOfficer key={'SchoolReportOfficer:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='report-officers'&&campusParentReportEnabled&&schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={'SchoolDisclosureOfficers:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='report-review'&&!campusParentReportEnabled&&(schoolAdmin||psychologyStaff)&&<p>家长版报告披露尚未正式开放，需完成逐资源科学审核后单独启用。</p>}
+          {page==='staff'&&schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
               <label><input type="checkbox" checked={staffPsych} onChange={e=>setStaffPsych(e.target.checked)}/> 心理专业权限</label>
@@ -398,17 +465,18 @@ export default function SchoolApp(){
             {newInvite&&<div className="hs-secret"><p>仅显示一次的邀请码：</p><code>{newInvite}</code></div>}
           </section>}
         </>:<div>
-          <SchoolParentLinks api={api} role="PARENT"/>
-          <SchoolPeerConsent api={api} role="PARENT"/>
-          <SchoolParentTasks api={api}/>
-          {campusParentReportEnabled?<SchoolParentReports api={api}/>:<p>校园家长版解释性报告尚未开放。亲子确认不授予孩子的敏感心理结果。</p>}
-          <section className="hs-panel">
+          {page==='family'&&<SchoolParentLinks api={api} role="PARENT"/>}
+          {page==='peer'&&<SchoolPeerConsent api={api} role="PARENT"/>}
+          {page==='tasks'&&<SchoolParentTasks api={api}/>}
+          {page==='parent-reports'&&campusParentReportEnabled&&<SchoolParentReports api={api}/>}
+          {page==='family'&&<section className="hs-panel">
             <h2>校园家校支持</h2>
             <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
-          </section>
+          </section>}
         </div>}
-      </section>}
+        {['admission','recovery'].includes(page)&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
+      </SchoolWorkspaceShell>}
     </main>
-    <footer className="hs-footer">Huischool · 林间见心 · 校园心理健康 | 教育支持而非医学诊断</footer>
+    <footer className="hs-footer">Huischool · 科学支持 · 专业陪伴 · 健康成长</footer>
   </div>
 }

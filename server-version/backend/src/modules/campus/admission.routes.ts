@@ -3,6 +3,8 @@ import { z, ZodError } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { registrationRateLimit, withRegistrationAdmission } from '../../middleware/registrationAdmission'
+import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { resolveCampusRegistrationCode, CampusRegistrationCodeError } from './registration-code'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { success } from '../../utils/response'
 import { hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
@@ -34,11 +36,22 @@ const wrap=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   catch (e) {
     if (e instanceof ZodError)
       return res.status(400).json({code:'BAD_REQUEST',message:'请求内容格式不正确',data:null})
+    if (e instanceof CampusRegistrationCodeError)
+      return res.status(e.statusCode).json({code:e.code,message:e.message,data:null})
     if (e instanceof CampusAdmissionError)
       return res.status(e.statusCode).json({code:e.code,message:'校园操作暂不可用，请核实信息或联系学校',data:null})
     throw e
   }
 })
+
+const discoveryRate=createRedisRateLimiter({name:'campus-registration-code',limit:20,windowSeconds:900,
+  key:req=>typeof req.body?.code==='string'?req.body.code.trim().slice(0,64):'INVALID'})
+// Preserve coarse NAT/global budgets; the small budget is per code, not per school IP.
+router.post('/registration/resolve',registrationRateLimit,discoveryRate,withRegistrationAdmission(wrap(async(req,res)=>{
+  const input=z.object({code:z.string().trim().min(24).max(64).regex(/^[A-Za-z0-9_-]+$/)}).strict().safeParse(req.body)
+  if(!input.success)throw new CampusRegistrationCodeError()
+  return success(res,await resolveCampusRegistrationCode(input.data.code))
+}),false))
 
 router.post('/register',registrationRateLimit,withRegistrationAdmission(wrap(async(req,res)=>{
   const data=register.parse(req.body)
