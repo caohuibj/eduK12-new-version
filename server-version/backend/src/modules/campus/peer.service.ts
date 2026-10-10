@@ -1,4 +1,4 @@
-import { randomInt,randomUUID } from 'node:crypto'
+import { createHmac,randomInt,randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
@@ -8,6 +8,21 @@ import { appendAudit } from '../organization/service'
 type Tx=Prisma.TransactionClient
 export const CAMPUS_PEER_CONSENT_VERSION='HUISCHOOL_PEER_V1'
 export const CAMPUS_PEER_MIN_COHORT=5
+/** Course-scoped pseudonym, deliberately not a login name or real-world
+ * identity. A student can share their own code in class to let an assigned
+ * observer identify the consenting target without account disclosure.
+ */
+const activityPeerAlias=(organizationId:string,courseId:string,membershipId:string)=>{
+  const hex=process.env.CAMPUS_ELIGIBILITY_HMAC_KEY
+  if(!hex||!/^[a-fA-F0-9]{64}$/.test(hex))
+    throw new CampusActivityError('CAMPUS_PEER_KEY_NOT_CONFIGURED',503)
+  return '林-'+createHmac('sha256',Buffer.from(hex,'hex'))
+    .update('HUISCHOOL:PEER_ALIAS:v1\\0')
+    .update(organizationId).update('\\0')
+    .update(courseId).update('\\0')
+    .update(membershipId).digest('hex').slice(0,10).toUpperCase()
+}
+
 const fail=(code:string,statusCode=403):never=>{throw new CampusActivityError(code,statusCode)}
 export const campusPeerDisclosure=()=>({
   version:CAMPUS_PEER_CONSENT_VERSION,
@@ -257,9 +272,9 @@ export async function myCampusPeerTargets(input:{
   const eligible=await prisma.$transaction(tx=>
     eligibleStudents(tx,input.organizationId,input.courseId))
   if(!eligible.some(x=>x.userId===input.actor.userId))fail('CAMPUS_PEER_NOT_ELIGIBLE')
-  const rows=await prisma.$queryRaw<Array<{assignmentId:string;peerAlias:string}>>`
+  const rows=await prisma.$queryRaw<Array<{assignmentId:string;subjectMembershipId:string}>>`
     SELECT peer."id" AS "assignmentId",
-      ('同学 ' || row_number() OVER (ORDER BY peer."id")) AS "peerAlias"
+      peer."subject_membership_id" AS "subjectMembershipId"
     FROM "campus_peer_assignments" peer
     JOIN "organization_memberships" respondent ON respondent."id"=peer."respondent_membership_id"
       AND respondent."organization_id"=peer."organization_id"
@@ -284,7 +299,14 @@ export async function myCampusPeerTargets(input:{
       AND (respondent."valid_until" IS NULL OR respondent."valid_until">statement_timestamp())
     ORDER BY peer."id" LIMIT 4
   `
-  return {list:rows}
+  return {
+    ownAlias:activityPeerAlias(input.organizationId,input.courseId,
+      eligible.find(e=>e.userId===input.actor.userId)!.membershipId),
+    list:rows.map(row=>({
+      assignmentId:row.assignmentId,
+      peerAlias:activityPeerAlias(input.organizationId,input.courseId,row.subjectMembershipId),
+    })),
+  }
 }
 export async function myPeerConsentState(actor:AuthenticatedPrincipal,organizationId:string,courseId:string){
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')fail('CAMPUS_STUDENT_REQUIRED')

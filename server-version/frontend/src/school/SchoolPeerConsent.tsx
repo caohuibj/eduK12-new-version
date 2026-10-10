@@ -19,6 +19,9 @@ export function SchoolPeerConsent({api,role}:{
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
+  const [peerCodes,setPeerCodes]=useState<Record<string,{
+    ownAlias:string;list:Array<{assignmentId:string;peerAlias:string}>
+  }>>({})
   const load=async()=>{
     if(role==='STUDENT'){
       const result=await api<{list:StudentOpportunity[];policy:Disclosure}>('/my/peer-opportunities')
@@ -57,6 +60,23 @@ export function SchoolPeerConsent({api,role}:{
       <h3>{item.title}</h3>
       <p>本人：{item.assented?'已同意':'尚未同意'}；
         监护人：{item.guardianConsented?'已同意':'尚未确认'}。</p>
+      {item.assented&&item.guardianConsented&&<div>
+        <button disabled={busy} onClick={()=>void act(async()=>{
+          const r=await api<{ownAlias:string;list:Array<{assignmentId:string;peerAlias:string}>}>(
+            `/organizations/${item.organizationId}/activities/${item.courseId}/peer-targets`)
+          setPeerCodes(current=>({...current,[item.courseId]:r}))
+          setNotice('同伴代号仅用于本次活动，请核对后向获分配的同学评价。')
+        })}>查看活动代号与随机分配</button>
+        {peerCodes[item.courseId]&&<div className="hs-secret">
+          <p>你的活动代号：<strong>{peerCodes[item.courseId].ownAlias}</strong>。
+            如学校允许，在班级内用此代号确认自己的身份，不要交流校园登录密码。</p>
+          <p>需要你观察的同学代号：
+            {peerCodes[item.courseId].list.length
+              ?peerCodes[item.courseId].list.map(x=>x.peerAlias).join('、')
+              :'尚未分配或当前同意已撤销。'}
+          </p>
+        </div>}
+      </div>}
       {!item.assented?<button disabled={busy} onClick={()=>void act(async()=>{
         if(!window.confirm('你确认自愿参加吗？作答不会自动向同学、普通教师或家长公开。'))return
         await api(`/organizations/${item.organizationId}/activities/${item.courseId}/peer-consent`,

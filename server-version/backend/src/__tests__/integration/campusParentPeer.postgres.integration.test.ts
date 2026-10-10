@@ -190,9 +190,13 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
     expect(pairs).toHaveLength(10)
     expect(pairs.every(row=>row.subjectId!==row.respondentId&&
       row.classId===f.classUnitId)).toBe(true)
-    expect((await myCampusPeerTargets({
+    const assignedPeers=await myCampusPeerTargets({
       actor:f.students[0],organizationId:f.organizationId,courseId:f.courseId,
-    })).list).toHaveLength(2)
+    })
+    expect(assignedPeers.list).toHaveLength(2)
+    expect(assignedPeers.ownAlias).toMatch(/^林-[A-F0-9]{10}$/)
+    expect(assignedPeers.list.every(x=>/^林-[A-F0-9]{10}$/.test(x.peerAlias)
+      && x.peerAlias!==assignedPeers.ownAlias)).toBe(true)
     await guardianPeerConsent({actor:parentAccounts[0],organizationId:f.organizationId,
       courseId:f.courseId,relationshipId:links[0],action:'WITHDRAW'})
     const remain=await db.$queryRaw<Array<{count:number}>>`
