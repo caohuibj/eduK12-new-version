@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { ParentPortalError } from '../../modules/parent-portal/contracts'
 
 const state = vi.hoisted(() => ({
-  config: { parentPortalEnabled: true },
+  config: { campusParentReportEnabled: true },
   parent: {
     children: vi.fn(), reports: vi.fn(), readReport: vi.fn(),
     studentReportOptions: vi.fn(), reportConsentPreview: vi.fn(),
@@ -81,7 +81,7 @@ describe('Huischool governed report HTTP surface', () => {
   })
   beforeEach(() => {
     vi.clearAllMocks()
-    state.config.parentPortalEnabled = true
+    state.config.campusParentReportEnabled = true
     state.parent.children.mockResolvedValue({ list: [] })
     state.parent.reports.mockResolvedValue({ list: [] })
     state.parent.readReport.mockResolvedValue({ audience: 'PARENT', mode: 'COMPLETION_ONLY', blocks: [] })
@@ -98,7 +98,7 @@ describe('Huischool governed report HTTP surface', () => {
     expect(state.parent.children).not.toHaveBeenCalled()
   })
   it('remains closed while the reviewed parent portal feature is disabled', async () => {
-    state.config.parentPortalEnabled = false
+    state.config.campusParentReportEnabled = false
     const response = await request('/reports/parent/children')
     expect(response.status).toBe(404)
     expect(response.headers.get('cache-control')).toBe('no-store')
