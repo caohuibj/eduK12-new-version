@@ -9,6 +9,7 @@ import { CampusActivityError } from './activity.service'
 import {
   studentPeerConsent,guardianPeerConsent,allocateCampusPeers,
   myCampusPeerTargets,myPeerConsentState,guardianPeerRequests,campusPeerDisclosure,
+  campusPeerOpportunities,
 } from './peer.service'
 
 const router=Router()
@@ -40,6 +41,9 @@ router.post('/organizations/:organizationId/activities/:courseId/peer-consent',
     const body=z.object({action:z.enum(['ASSENT','WITHDRAW'])}).strict().parse(req.body)
     return success(res,await studentPeerConsent({actor:req.user!,...path.parse(req.params),...body}))
   }))
+router.get('/my/peer-opportunities',authenticateSchool,wrap(async(req,res)=>
+  success(res,await campusPeerOpportunities(req.user!))
+))
 router.get('/guardian/peer-consent-requests',authenticateSchool,wrap(async(req,res)=>
   success(res,await guardianPeerRequests(req.user!))
 ))
