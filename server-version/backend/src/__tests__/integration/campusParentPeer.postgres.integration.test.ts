@@ -3,6 +3,7 @@ import { describe,it,expect,beforeAll,afterAll } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
 import { integrationDatabaseUrl } from './integration-env'
 import { createOrganizationUnit } from '../../modules/organization/structure'
+import { LINK_CONSENT_VERSION } from '../../modules/parent-portal/contracts'
 import {
   replaceCampusRoster,setCampusRegistrationWindow,issueCampusActivationCodes,
   registerCampusStudent,approveCampusClass,
@@ -135,11 +136,13 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
     const pending=await readCampusParentLinks(f.students[0])
     expect(pending.list).toHaveLength(1)
     expect(pending.list[0].status).toBe('PENDING')
-    expect(await db.parentReportDisclosureGrant.count({where:{
-      parentUserId:alias.userId,
-    }})).toBe(0)
+    const reportGrants=await db.$queryRaw<Array<{count:number}>>`
+      SELECT COUNT(*)::int AS "count" FROM "parent_report_disclosure_grants"
+      WHERE "parent_user_id"=${alias.userId}
+    `
+    expect(reportGrants[0]?.count).toBe(0)
     await approveCampusParentLink(f.students[0],pending.list[0].id,
-      'PARENT_STUDENT_LINK_V1')
+      LINK_CONSENT_VERSION)
     const approved=await readCampusParentLinks(principal(alias.user))
     expect(approved.list[0].status).toBe('ACTIVE')
     await revokeCampusParentLink(f.students[0],pending.list[0].id,
@@ -163,7 +166,7 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
       const relationships=await readCampusParentLinks(student)
       links.push(relationships.list[0].id)
       await approveCampusParentLink(student,relationships.list[0].id,
-        'PARENT_STUDENT_LINK_V1')
+        LINK_CONSENT_VERSION)
       await studentPeerConsent({actor:student,organizationId:f.organizationId,
         courseId:f.courseId,action:'ASSENT'})
     }
