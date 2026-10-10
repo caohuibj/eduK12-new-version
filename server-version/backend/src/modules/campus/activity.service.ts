@@ -110,6 +110,11 @@ export async function listCampusActivities(input:{
   return prisma.$transaction(async tx=>{
     const ctx=await currentSchoolContext(tx,input.actor,input.organizationId)
     const admin=isSchoolAdmin(ctx)
+    // A former class teacher/counselor must not keep seeing activity titles
+    // simply because they remain the historical owner/collaborator.
+    if(!admin && !await canPrepareActivity(tx,ctx)){
+      return {list:[],hasMore:false,page:input.page}
+    }
     const offset=(input.page-1)*input.pageSize
     const rows=await tx.$queryRaw<Array<CampusActivityRow&{participantCount:number;runCount:number}>>`
       SELECT a."course_id" AS "courseId",a."organization_id" AS "organizationId",
@@ -226,16 +231,34 @@ export async function changeCampusActivityStatus(input:{
         SELECT
           (SELECT COUNT(*)::int FROM "campus_activity_participants" p
             WHERE p."course_id"=${a.courseId} AND p."status"='ACTIVE') AS "selected",
-          (SELECT COUNT(*)::int FROM "campus_activity_participants" p
+          (SELECT COUNT(DISTINCT p."membership_id")::int FROM "campus_activity_participants" p
             JOIN "organization_memberships" m ON m."id"=p."membership_id"
               AND m."organization_id"=p."organization_id"
             JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
               AND e."organization_id"=p."organization_id" AND e."status"='APPROVED'
             JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
               AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
+            JOIN "organization_student_class_assignments" sc
+              ON sc."organization_id"=m."organization_id"
+              AND sc."membership_id"=m."id" AND sc."class_unit_id"=e."class_unit_id"
+              AND sc."valid_from"<=statement_timestamp()
+              AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
+            JOIN "organization_persona_grants" pg
+              ON pg."organization_id"=m."organization_id"
+              AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+              AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
+            JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
+              AND u."role"='STUDENT' AND u."is_active"=TRUE
+              AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
+            JOIN "organizations" org ON org."id"=m."organization_id"
+              AND org."status"='ACTIVE' AND org."product_domain"='SCHOOL'
             WHERE p."course_id"=${a.courseId} AND p."status"='ACTIVE'
               AND m."valid_from"<=statement_timestamp()
               AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+              AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" d
+                WHERE d."organization_id"=m."organization_id"
+                  AND d."user_id"=m."user_id" AND d."lifted_at" IS NULL
+                  AND d."permission" IN ('*','ACTIVITY_READ','RUN_START'))
           ) AS "current",
           ((SELECT COUNT(*) FROM "assignments" t WHERE t."course_id"=${a.courseId}
              AND t."status"='PUBLISHED')

@@ -40,6 +40,10 @@ export async function hasActiveCourseMembership(courseId: string, studentId: str
         AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
       JOIN "campus_class_admissions" ca ON ca."class_unit_id"=e."class_unit_id"
         AND ca."organization_id"=e."organization_id" AND ca."status"='APPROVED'
+      JOIN "organization_persona_grants" pg
+        ON pg."organization_id"=m."organization_id"
+        AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+        AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
       JOIN "organization_student_class_assignments" sc
         ON sc."membership_id"=m."id" AND sc."organization_id"=m."organization_id"
         AND sc."class_unit_id"=e."class_unit_id"
@@ -47,6 +51,7 @@ export async function hasActiveCourseMembership(courseId: string, studentId: str
         AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
       JOIN "users" u ON u."id"=m."user_id" AND u."role"='STUDENT'
         AND u."account_domain"='SCHOOL' AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+        AND u."must_change_password"=FALSE
       WHERE p."course_id"=${courseId} AND p."status"='ACTIVE'
         AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
           WHERE d."organization_id"=o."id" AND d."user_id"=${studentId}

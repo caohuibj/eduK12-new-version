@@ -21,6 +21,7 @@ export async function campusRunParticipantScope(tx:Prisma.TransactionClient,inpu
           AND m."user_id"=${input.actorUserId}
           AND m."org_role"='ORG_ADMIN' AND u."account_domain"='SCHOOL'
           AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+      AND u."must_change_password"=FALSE
           AND m."valid_from"<=statement_timestamp()
           AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
       ) AS "admin"
@@ -43,6 +44,10 @@ export async function campusRunParticipantScope(tx:Prisma.TransactionClient,inpu
       AND m."id"=p."membership_id"
       AND m."valid_from"<=statement_timestamp()
       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" pg
+      ON pg."organization_id"=m."organization_id"
+      AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+      AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
     JOIN "campus_student_enrollments" e ON e."organization_id"=m."organization_id"
       AND e."user_id"=m."user_id" AND e."status"='APPROVED'
     JOIN "campus_class_admissions" ca ON ca."organization_id"=e."organization_id"
