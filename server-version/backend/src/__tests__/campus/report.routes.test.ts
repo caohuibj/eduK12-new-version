@@ -19,6 +19,7 @@ const state = vi.hoisted(() => ({
   group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
   longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
+  groupLongitudinal: {catalog:vi.fn(),generate:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -34,6 +35,10 @@ vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
+}))
+vi.mock('../../modules/campus/group-longitudinal-studio',()=>({
+  listCampusGroupLongitudinalCatalog:state.groupLongitudinal.catalog,
+  generateCampusFixedGroupLongitudinal:state.groupLongitudinal.generate,
 }))
 vi.mock('../../modules/campus/individual-longitudinal-studio',()=>({
   listCampusIndividualLongitudinalCatalog:state.longitudinal.catalog,
@@ -126,6 +131,8 @@ describe('Huischool governed report HTTP surface', () => {
     state.longitudinal.catalog.mockResolvedValue({subjects:[],specs:[],truncated:false})
     state.longitudinal.sources.mockResolvedValue({sources:[],truncated:false})
     state.longitudinal.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-ABCDEF123456',status:'AVAILABLE',note:'已生成'})
+    state.groupLongitudinal.catalog.mockResolvedValue({sources:[],specs:[],truncated:false})
+    state.groupLongitudinal.generate.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_LONGITUDINAL',state:'WITHHELD',metrics:{},limitations:[]})
   })
 
   it('reports feature availability without leaking a parent report when disabled',async()=>{
@@ -385,6 +392,49 @@ describe('Huischool governed report HTTP surface', () => {
       actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
     })
     expect(result.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('requires recent SCHOOL MFA and CSRF for fixed-group longitudinal generation',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,
+      analysisKind:'REPEATED_COHORT',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    expect((await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN'})).status).toBe(403)
+    expect((await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN','x-recent-school-mfa':'true','X-CSRF-Token':'wrong'})).status).toBe(403)
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('prohibits direct subgroup selectors, memberIds and unvalidated longitudinal modes',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,analysisKind:'MATCHED_LONGITUDINAL',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    const headers={'x-school-role':'ADMIN','x-recent-school-mfa':'true'}
+    for(const untrusted of [
+      {...body,cohortSelector:{schemaVersion:2,clauses:[{kind:'MEMBERSHIP_IDS',membershipIds:[CHILD]}]}},
+      {...body,mode:'PAIRWISE'},
+      {...body,sources:[{runId:CHILD,trackId:ARTIFACT}]},
+      {...body,subjectUserId:CHILD},
+    ])expect((await request('/reports/groups/longitudinal','POST',untrusted,headers)).status).toBe(400)
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('routes longitudinal group catalog before the generic two-segment historical read',async()=>{
+    const response=await request('/reports/groups/longitudinal/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.groupLongitudinal.catalog).toHaveBeenCalledWith(
+      expect.objectContaining({accountDomain:'SCHOOL'}),CHILD)
+    expect(state.group.read).not.toHaveBeenCalled()
+  })
+  it('accepts only whole-group source IDs on controlled longitudinal POST',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,
+      analysisKind:'REPEATED_COHORT',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    const response=await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({kind:'SCHOOL_LONGITUDINAL',state:'WITHHELD'})
+    expect(state.groupLongitudinal.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),...body,
+    })
   })
 
 })
