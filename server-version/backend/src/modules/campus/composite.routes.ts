@@ -141,8 +141,16 @@ async function readCampusCognitiveChild(req:Request,res:Response,next:NextFuncti
     // bands and professional interpretations. SCHOOL has no approved student
     // metric narratives; keep the child visible only as a completion receipt.
     if(payload.status==='COMPLETED'){
-      const {result,score,metrics,qualityFlags,reference,references,report,singleTaskReport,...safe}=payload
-      return success(res,{...safe,feedbackDeferred:true})
+      return success(res,{
+        sessionId:payload.sessionId,
+        status:'COMPLETED' as const,
+        deliveryMode:'FINAL_ONLY' as const,
+        testType:payload.testType,
+        engineVersion:payload.engineVersion,
+        definitionHash:payload.definitionHash,
+        finishedAt:payload.finishedAt,
+        feedbackDeferred:true,
+      })
     }
     return success(res,payload)
   }catch(error){return next(error)}
