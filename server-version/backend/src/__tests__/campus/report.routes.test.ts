@@ -183,6 +183,33 @@ describe('Huischool governed report HTTP surface', () => {
     expect(response.status).toBe(404)
     expect(await response.json()).toMatchObject({ data: null })
   })
+  it('withholds unreviewed campus student longitudinal numbers on list and deep links', async () => {
+    // The shared participant projection may have released numeric values under
+    // an older disclosure contract; SCHOOL needs an additional science gate.
+    state.participant.list.mockResolvedValue({
+      list: [{id:ARTIFACT, projection:{waves:[{ordinal:1,metrics:{wellbeing:{state:'present',value:42}}}],
+        comparisons:[{metrics:{wellbeing:{delta:12}}}]}}],
+    })
+    state.participant.read.mockResolvedValue({
+      waves:[{ordinal:1,metrics:{wellbeing:{value:42}}}],
+      comparisons:[{metrics:{wellbeing:{delta:12}}}],
+    })
+    const listed = await request('/reports/student/longitudinal',
+      'GET', undefined, {'x-school-role':'STUDENT'})
+    expect(listed.status).toBe(200)
+    const payload = (await listed.json()).data
+    expect(payload).toMatchObject({
+      list:[], releaseState:'WITHHELD_SCIENTIFIC_REVIEW',
+    })
+    expect(JSON.stringify(payload)).not.toMatch(/"value":42|"delta":12/)
+
+    const detail = await request('/reports/student/longitudinal/'+ARTIFACT,
+      'GET', undefined, {'x-school-role':'STUDENT'})
+    expect(detail.status).toBe(404)
+    expect((await detail.json()).data).toBeNull()
+    expect(state.participant.list).not.toHaveBeenCalled()
+    expect(state.participant.read).not.toHaveBeenCalled()
+  })
   it('does not show student feedback before class approval', async () => {
     state.studentStatus.mockResolvedValue({ status: 'PENDING_CLASS_APPROVAL' })
     const response = await request('/reports/student/longitudinal', 'GET', undefined, { 'x-school-role': 'STUDENT' })

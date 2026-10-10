@@ -10,7 +10,6 @@ import { parentPublisher } from '../parent-portal/publisher'
 import { ReportingError } from '../reporting/types'
 import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
-import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
@@ -134,19 +133,28 @@ router.post('/reports/longitudinal',requireRecentSchoolMfa,mutationBudget,guarde
   return generateCampusIndividualLongitudinal({actor:req.user!,...values})
 }))
 
-// Self-only. The existing participant engine checks current membership,
-// authoritative SELF observations and frozen-vs-current disclosure contracts.
+// The shared participant longitudinal projection returns numeric metric values,
+// reference trajectories and deltas. It is valid for independently released
+// audiences, but SCHOOL has no reviewed exact-instrument student narratives yet.
+// Keep both list and deep-link reads fail-closed until a future explicit
+// instrument/version/age/content sign-off is implemented. Do not weaken the
+// TRAINING participant engine or expose previously generated artifacts here.
 router.get('/reports/student/longitudinal', guarded(async req => {
   if (req.user!.role !== 'STUDENT' || (await readCampusStudentStatus(req.user!)).status !== 'APPROVED') {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
-  return listParticipantLongitudinal(req.user!.userId)
+  return {
+    list: [], truncated: false,
+    releaseState: 'WITHHELD_SCIENTIFIC_REVIEW' as const,
+    message: '校园学生纵向数值解释尚未完成逐工具的独立科学与适龄审核，因此暂不开放。',
+  }
 }))
 router.get('/reports/student/longitudinal/:artifactId', guarded(async req => {
   if (req.user!.role !== 'STUDENT' || (await readCampusStudentStatus(req.user!)).status !== 'APPROVED') {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
-  return readParticipantLongitudinal(req.user!.userId, id.parse(req.params.artifactId))
+  id.parse(req.params.artifactId)
+  throw new ParentPortalError('CAMPUS_STUDENT_LONGITUDINAL_UNREVIEWED', 404)
 }))
 
 // The existing respondent projection is the only authority for each
