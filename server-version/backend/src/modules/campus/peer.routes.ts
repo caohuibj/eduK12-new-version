@@ -35,7 +35,7 @@ router.get('/peer-consent/policy',authenticateSchool,wrap(async(_req,res)=>
 ))
 router.get('/organizations/:organizationId/activities/:courseId/peer-consent',
   authenticateSchool,wrap(async(req,res)=>
-    success(res,await myPeerConsentState(req.user!,...path.parse(req.params)))))
+    success(res,await myPeerConsentState(req.user!,path.parse(req.params).organizationId,path.parse(req.params).courseId))))
 router.post('/organizations/:organizationId/activities/:courseId/peer-consent',
   authenticateSchool,limiter,wrap(async(req,res)=>{
     const body=z.object({action:z.enum(['ASSENT','WITHDRAW'])}).strict().parse(req.body)

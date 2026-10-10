@@ -83,7 +83,7 @@ export async function registerCampusParent(input:{
         FOR UPDATE
       `
       const invite=invites[0]
-      if(!invite?.organizationId)refuse()
+      if(!invite?.organizationId)throw new CampusAdmissionError('CAMPUS_PARENT_LINK_UNAVAILABLE',404)
       await assertCurrentChild(tx,invite.organizationId,invite.studentUserId)
       const child=await tx.user.findUnique({where:{id:invite.studentUserId}})
       if(!child||child.accountDomain!=='SCHOOL')refuse()
@@ -194,7 +194,7 @@ export async function claimAdditionalCampusChild(actor:AuthenticatedPrincipal,co
   await prisma.$transaction(async tx=>{
     const invite=await tx.parentInviteCode.findUnique({where:{codeHash:hash}})
     if(!invite?.organizationId||invite.courseId||invite.status!=='ACTIVE'
-      ||invite.expiresAt<=new Date())refuse()
+      ||invite.expiresAt<=new Date())throw new CampusAdmissionError('CAMPUS_PARENT_LINK_UNAVAILABLE',404)
     await assertCurrentChild(tx,invite.organizationId,invite.studentUserId)
   })
   return parentPortalService.claim(actor,code)

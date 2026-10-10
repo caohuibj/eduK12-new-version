@@ -73,7 +73,7 @@ export async function studentPeerConsent(input:{
     if(input.action==='ASSENT' && activity.status!=='OPEN')fail('CAMPUS_PEER_ACTIVITY_NOT_OPEN',409)
     const eligible=await eligibleStudents(tx,input.organizationId,input.courseId)
     const member=eligible.find(row=>row.userId===input.actor.userId)
-    if(!member)fail('CAMPUS_PEER_NOT_ELIGIBLE')
+    if(!member)throw new CampusActivityError('CAMPUS_PEER_NOT_ELIGIBLE',403)
     if(input.action==='ASSENT'){
       await tx.$executeRaw`
         INSERT INTO "campus_peer_consents"(
@@ -274,7 +274,7 @@ export async function myPeerConsentState(actor:AuthenticatedPrincipal,organizati
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')fail('CAMPUS_STUDENT_REQUIRED')
   const members=await prisma.$transaction(tx=>eligibleStudents(tx,organizationId,courseId))
   const member=members.find(x=>x.userId===actor.userId)
-  if(!member)fail('CAMPUS_PEER_NOT_ELIGIBLE')
+  if(!member)throw new CampusActivityError('CAMPUS_PEER_NOT_ELIGIBLE',403)
   const rows=await prisma.$queryRaw<Array<{assented:boolean;guardian:boolean;withdrawn:boolean}>>`
     SELECT "assented_at" IS NOT NULL AS "assented",
       "guardian_consented_at" IS NOT NULL AS "guardian",
