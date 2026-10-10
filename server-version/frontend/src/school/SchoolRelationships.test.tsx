@@ -67,4 +67,43 @@ describe('Huischool admin relationship management UI',()=>{
       ))
     }finally{window.confirm=confirm}
   })
+  it('keeps the audit reason scoped to the exact case being ended',async()=>{
+    const case1='00000000-0000-4000-8000-000000000011'
+    const case2='00000000-0000-4000-8000-000000000012'
+    const api=vi.fn(async(path:string,method='GET',payload?:unknown)=>{
+      if(path===`/organizations/${org}/relationship-directory?classUnitId=${cls}`)
+        return {...directory,clientRelationships:[
+          {id:case1,counselorMembershipId:counselor,clientMembershipId:student,studentReference:'林-AAAA'},
+          {id:case2,counselorMembershipId:counselor,clientMembershipId:student,studentReference:'林-BBBB'},
+        ]}
+      if(path.endsWith('/end')&&method==='POST')return {ended:true}
+      throw Error('unexpected '+path)
+    })
+    const confirm=window.confirm
+    window.confirm=vi.fn(()=>true)
+    try{
+      render(<SchoolRelationships api={api as unknown as SchoolApi} organizationId={org}
+        classes={[{id:cls,name:'一班',unitKind:'CLASS'}]}/>)
+      fireEvent.change(screen.getByLabelText('选择班级'),{target:{value:cls}})
+      fireEvent.click(screen.getByRole('button',{name:'经二次验证读取关系'}))
+      await screen.findByText(/学生 林-AAAA/)
+      const inputs=screen.getAllByLabelText('结束关系原因（记录到审计）')
+      const buttons=screen.getAllByRole('button',{name:'终止个案关系'})
+      expect(buttons[0]).toBeDisabled()
+      expect(buttons[1]).toBeDisabled()
+      fireEvent.change(inputs[0],{target:{value:'完成本次个案支持'}})
+      expect(buttons[0]).toBeEnabled()
+      expect(buttons[1]).toBeDisabled()
+      fireEvent.click(buttons[0])
+      await waitFor(()=>expect(api).toHaveBeenCalledWith(
+        `/organizations/${org}/counselor-client-relationships/${case1}/end`,'POST',
+        {reason:'完成本次个案支持'},
+      ))
+      expect(api).not.toHaveBeenCalledWith(
+        `/organizations/${org}/counselor-client-relationships/${case2}/end`,
+        'POST',expect.anything(),
+      )
+    }finally{window.confirm=confirm}
+  })
+
 })

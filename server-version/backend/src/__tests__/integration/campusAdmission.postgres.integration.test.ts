@@ -11,7 +11,7 @@ import {
   digestCampusStudentNumber,
 } from '../../modules/campus/admission.service'
 import { issueSchoolStudentRecovery, completeSchoolStudentRecovery } from '../../modules/campus/recovery.service'
-import { appointCampusCounselorClient, endCampusCounselorClient, readCampusRelationshipDirectory } from '../../modules/campus/relationships.service'
+import { appointCampusCounselorClient, endCampusCounselorClient, readCampusRelationshipDirectory, assignCampusStaffClass, endCampusStaffClass } from '../../modules/campus/relationships.service'
 import { createOrganizationUnit } from '../../modules/organization/structure'
 import { forceResetPasswordBySystemAdmin } from '../../services/accountAuthorityService'
 import { setUserActiveState } from '../../services/userLifecycleService'
@@ -197,6 +197,29 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
       organizationId:f.org,membershipId:member.id,persona:'CLIENT',revokedAt:null,
     }})
     expect(active.persona).toBe('CLIENT')
+    // A dual-role administrator may have both a COUNSELOR persona and an
+    // explicit psychology grant, but must never appoint themselves a case.
+    const administrator=await db.organizationMembership.findFirstOrThrow({
+      where:{organizationId:f.org,userId:f.admin.userId,validUntil:null},
+    })
+    await db.organizationPersonaGrant.create({data:{
+      id:randomUUID(),organizationId:f.org,membershipId:administrator.id,
+      persona:'COUNSELOR',grantedByUserId:f.admin.userId,
+    }})
+    await db.organizationCapabilityGrant.create({data:{
+      id:randomUUID(),organizationId:f.org,membershipId:administrator.id,
+      capability:'PSYCHOLOGY_STAFF',grantedByUserId:f.admin.userId,
+    }})
+    await expect(appointCampusCounselorClient({
+      actor:f.admin,organizationId:f.org,
+      counselorMembershipId:administrator.id,clientMembershipId:member.id,
+    })).rejects.toMatchObject({code:'CAMPUS_CASE_SELF_APPOINTMENT',statusCode:403})
+    const cases=await db.$queryRaw<Array<{id:string}>>`
+      SELECT id FROM organization_counselor_client_relationships
+      WHERE organization_id=${f.org} AND counselor_membership_id=${administrator.id}
+        AND client_membership_id=${member.id} AND valid_until IS NULL
+    `
+    expect(cases).toHaveLength(0)
     const professional={
       principal:{userId:f.counselor.userId,platformRole:'STANDARD' as const},
       organizationId:f.org,subjectUserId:student.userId,
@@ -206,6 +229,44 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
       relationshipId:relationship.id,reason:'合成案例关系已结束'})
     await expect(assertIndividualLongitudinalAccess(professional))
       .rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
+  })
+
+
+  it('records audited school teacher-to-class appointments and end events atomically',async()=>{
+    const f=await school()
+    const teacher=await db.user.create({data:{
+      username:'school_class_teacher_'+randomUUID().replace(/-/g,''),
+      passwordHash:'synthetic-fixture',accountDomain:'SCHOOL',
+      role:UserRole.TEACHER,teacherApproved:true,
+    }})
+    const membership=await db.organizationMembership.create({data:{
+      id:randomUUID(),organizationId:f.org,userId:teacher.id,orgRole:'MEMBER',
+    }})
+    await db.organizationPersonaGrant.create({data:{
+      id:randomUUID(),organizationId:f.org,membershipId:membership.id,
+      persona:'TEACHER',grantedByUserId:f.admin.userId,
+    }})
+    const assigned=await assignCampusStaffClass({
+      actor:f.admin,organizationId:f.org,membershipId:membership.id,
+      classUnitId:f.classId,staffRole:'HOMEROOM',
+    })
+    expect(assigned).toMatchObject({membershipId:membership.id,classUnitId:f.classId,
+      staffRole:'HOMEROOM'})
+    await expect(endCampusStaffClass({
+      actor:f.admin,organizationId:f.org,assignmentId:assigned.id,
+    })).resolves.toMatchObject({id:assigned.id})
+    const history=await db.$queryRaw<Array<{action:string;actorId:string}>>`
+      SELECT action,actor_user_id AS "actorId" FROM organization_governance_audits
+      WHERE organization_id=${f.org} AND target_id=${assigned.id}
+        AND action IN ('CAMPUS_STAFF_CLASS_ASSIGNED','CAMPUS_STAFF_CLASS_ENDED')
+    `
+    expect(new Set(history.map(x=>x.action))).toEqual(new Set([
+      'CAMPUS_STAFF_CLASS_ASSIGNED','CAMPUS_STAFF_CLASS_ENDED',
+    ]))
+    expect(history.every(x=>x.actorId===f.admin.userId)).toBe(true)
+    await expect(endCampusStaffClass({
+      actor:f.admin,organizationId:f.org,assignmentId:assigned.id,
+    })).rejects.toMatchObject({code:'CAMPUS_STAFF_CLASS_NOT_FOUND',statusCode:404})
   })
 
   it('rejects another school, wrong class and stale activation codes without consuming eligibility',async()=>{

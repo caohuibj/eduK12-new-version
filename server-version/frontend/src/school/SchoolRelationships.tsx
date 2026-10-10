@@ -21,7 +21,7 @@ export function SchoolRelationships({api,organizationId,classes}:{
   const [staffRole,setStaffRole]=useState<StaffAssignment['staffRole']>('TEACHING')
   const [counselor,setCounselor]=useState('')
   const [student,setStudent]=useState('')
-  const [reason,setReason]=useState('')
+  const [endReasons,setEndReasons]=useState<Record<string,string>>({})
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
   const [error,setError]=useState('')
@@ -36,7 +36,7 @@ export function SchoolRelationships({api,organizationId,classes}:{
     finally{setBusy(false)}
   }
   const onClass=(id:string)=>{
-    setClassUnitId(id);setDirectory(null);setStudent('');setTeacher('');setCounselor('')
+    setClassUnitId(id);setDirectory(null);setStudent('');setTeacher('');setCounselor('');setEndReasons({})
     setNotice('');setError('')
   }
   const staff=directory?.staff??[]
@@ -127,13 +127,13 @@ export function SchoolRelationships({api,organizationId,classes}:{
           <article key={a.id} className="hs-task-card">
             <p>{staffName(a.counselorMembershipId)} · 学生 {a.studentReference}</p>
             <label className="hs-field"><span>结束关系原因（记录到审计）</span>
-              <input value={reason} onChange={e=>setReason(e.target.value)} maxLength={200}/>
+              <input value={endReasons[a.id]??''} onChange={e=>setEndReasons(current=>({...current,[a.id]:e.target.value}))} maxLength={200}/>
             </label>
-            <button disabled={busy||reason.trim().length<4} onClick={()=>void act(async()=>{
+            <button disabled={busy||(endReasons[a.id]?.trim().length??0)<4} onClick={()=>void act(async()=>{
               if(!window.confirm('确认结束此个案关系并停止未来专业报告访问？'))return
               await api('/organizations/'+organizationId+'/counselor-client-relationships/'+a.id+'/end',
-                'POST',{reason:reason.trim()})
-              setReason('');await load()
+                'POST',{reason:endReasons[a.id].trim()})
+              setEndReasons(current=>{const next={...current};delete next[a.id];return next});await load()
               setNotice('个案关系已终止，专业报告的新请求必须重新通过当前关系校验。')
             })}>终止个案关系</button>
           </article>)}</div>}

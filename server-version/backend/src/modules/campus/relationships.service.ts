@@ -4,6 +4,8 @@ import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext } from '../organization/access'
 import { appendAudit } from '../organization/service'
+import { assertCurrentMembershipPersona } from '../organization/classRelationships'
+import { OrganizationDomainError } from '../organization/types'
 import { CampusAdmissionError } from './admission.service'
 import { campusStudentReference } from './studentReference'
 
@@ -127,8 +129,8 @@ export async function appointCampusCounselorClient(input:{
   try{
     return await prisma.$transaction(async tx=>{
       await schoolGovernor(tx,input.actor,input.organizationId)
-      const counselor=await tx.$queryRaw<Array<{id:string}>>`
-        SELECT m.id FROM organization_memberships m
+      const counselor=await tx.$queryRaw<Array<{id:string;userId:string}>>`
+        SELECT m.id,m.user_id AS "userId" FROM organization_memberships m
         JOIN users u ON u.id=m.user_id AND u.account_domain='SCHOOL'
           AND u.is_active=TRUE AND u.is_frozen=FALSE
         JOIN organization_persona_grants p ON p.organization_id=m.organization_id
@@ -144,6 +146,9 @@ export async function appointCampusCounselorClient(input:{
         LIMIT 1 FOR SHARE OF m
       `
       if(!counselor.length)deny('CAMPUS_COUNSELOR_NOT_ELIGIBLE')
+      // A dual-role school administrator must never grant themselves a new
+      // CLIENT relationship and thereby expand their own sensitive report scope.
+      if(counselor[0].userId===input.actor.userId)deny('CAMPUS_CASE_SELF_APPOINTMENT')
       const student=await tx.$queryRaw<Array<{userId:string}>>`
         SELECT m.user_id AS "userId" FROM organization_memberships m
         JOIN users u ON u.id=m.user_id AND u.account_domain='SCHOOL'
@@ -215,5 +220,80 @@ export async function endCampusCounselorClient(input:{
       targetType:'COUNSELOR_CLIENT_RELATIONSHIP',targetId:input.relationshipId,
       domainEventId:randomUUID(),payload:{reason:input.reason}})
     return {ended:true}
+  })
+}
+
+export async function assignCampusStaffClass(input:{
+  actor:AuthenticatedPrincipal;organizationId:string
+  membershipId:string;classUnitId:string;staffRole:'HOMEROOM'|'TEACHING'
+}){
+  try{
+    return await prisma.$transaction(async tx=>{
+      await schoolGovernor(tx,input.actor,input.organizationId)
+      try{
+        await assertCurrentMembershipPersona(tx,{
+          organizationId:input.organizationId,membershipId:input.membershipId,persona:'TEACHER',
+        })
+      }catch(error){
+        if(error instanceof OrganizationDomainError)deny('CAMPUS_TEACHER_MEMBERSHIP_REQUIRED')
+        throw error
+      }
+      const classes=await tx.$queryRaw<Array<{id:string}>>`
+        SELECT id FROM organization_units
+        WHERE organization_id=${input.organizationId} AND id=${input.classUnitId}
+          AND unit_kind='CLASS' LIMIT 1 FOR SHARE
+      `
+      if(!classes.length)deny('CAMPUS_CLASS_NOT_FOUND',404)
+      const id=randomUUID()
+      const rows=await tx.$queryRaw<Array<{
+        id:string;organizationId:string;membershipId:string;classUnitId:string;staffRole:string
+      }>>`
+        INSERT INTO organization_staff_class_assignments(
+          id,organization_id,membership_id,class_unit_id,staff_role
+        ) VALUES (
+          ${id},${input.organizationId},${input.membershipId},${input.classUnitId},${input.staffRole}
+        ) RETURNING id,organization_id AS "organizationId",
+          membership_id AS "membershipId",class_unit_id AS "classUnitId",staff_role AS "staffRole"
+      `
+      await appendAudit(tx,{
+        organizationId:input.organizationId,actorUserId:input.actor.userId,
+        action:'CAMPUS_STAFF_CLASS_ASSIGNED',targetType:'STAFF_CLASS_ASSIGNMENT',targetId:id,
+        domainEventId:randomUUID(),
+        payload:{membershipId:input.membershipId,classUnitId:input.classUnitId,staffRole:input.staffRole},
+      })
+      return rows[0]
+    })
+  }catch(error:any){
+    if(error instanceof CampusAdmissionError)throw error
+    if(error?.code==='P2002'||error?.meta?.code==='23505')
+      deny('CAMPUS_STAFF_CLASS_CONFLICT',409)
+    throw error
+  }
+}
+
+export async function endCampusStaffClass(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;assignmentId:string
+}){
+  return prisma.$transaction(async tx=>{
+    await schoolGovernor(tx,input.actor,input.organizationId)
+    const rows=await tx.$queryRaw<Array<{
+      id:string;organizationId:string;membershipId:string;classUnitId:string;staffRole:string
+    }>>`
+      UPDATE organization_staff_class_assignments
+      SET valid_until=statement_timestamp()
+      WHERE organization_id=${input.organizationId} AND id=${input.assignmentId}
+        AND valid_until IS NULL
+      RETURNING id,organization_id AS "organizationId",membership_id AS "membershipId",
+        class_unit_id AS "classUnitId",staff_role AS "staffRole"
+    `
+    if(!rows.length)deny('CAMPUS_STAFF_CLASS_NOT_FOUND',404)
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actor.userId,
+      action:'CAMPUS_STAFF_CLASS_ENDED',targetType:'STAFF_CLASS_ASSIGNMENT',
+      targetId:input.assignmentId,domainEventId:randomUUID(),
+      payload:{membershipId:rows[0].membershipId,classUnitId:rows[0].classUnitId,
+        staffRole:rows[0].staffRole},
+    })
+    return rows[0]
   })
 }

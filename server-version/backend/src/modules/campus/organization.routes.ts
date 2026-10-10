@@ -11,7 +11,7 @@ import { requireRecentSchoolMfa } from './mfa.middleware'
 import { guardCampusCapabilityGrant } from './capabilityGuard'
 import { requireCampusClassRead } from './classRead.middleware'
 import { CampusAdmissionError } from './admission.service'
-import { readCampusRelationshipDirectory, appointCampusCounselorClient, endCampusCounselorClient } from './relationships.service'
+import { readCampusRelationshipDirectory, appointCampusCounselorClient, endCampusCounselorClient, assignCampusStaffClass, endCampusStaffClass } from './relationships.service'
 
 // Reuse the existing Organization structure and relationship services, never
 // the legacy /api/organizations entrypoint or its training session cookie.
@@ -23,8 +23,6 @@ router.get('/organizations/:organizationId/units',authenticateSchool,requireCamp
 router.post('/organizations/:organizationId/units',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.createUnit)
 router.delete('/organizations/:organizationId/units/:unitId',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.deleteUnit)
 router.get('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireOrganizationGovernance,organizationAdminController.listStaffClassAssignments)
-router.post('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.assignStaff)
-router.post('/organizations/:organizationId/staff-class-assignments/:assignmentId/end',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.endStaffAssignment)
 
 // Narrow campus-only officer discovery. Never return the student membership
 // register merely to support assignment of a reporting disclosure capability.
@@ -70,6 +68,25 @@ const relations=(handler:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,re
     throw error
   }
 })
+// SCHOOL teacher/class mutations must record their governance actor atomically;
+// legacy organization routines retain their original semantics.
+router.post('/organizations/:organizationId/staff-class-assignments',
+  authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,
+  relations(req=>{
+    const organizationId=relationId.parse(req.params.organizationId)
+    const body=z.object({
+      membershipId:relationId,classUnitId:relationId,staffRole:z.enum(['HOMEROOM','TEACHING']),
+    }).strict().parse(req.body)
+    return assignCampusStaffClass({actor:req.user!,organizationId,...body})
+  }))
+router.post('/organizations/:organizationId/staff-class-assignments/:assignmentId/end',
+  authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,
+  relations(req=>{
+    const organizationId=relationId.parse(req.params.organizationId)
+    const assignmentId=relationId.parse(req.params.assignmentId)
+    z.object({}).strict().parse(req.body)
+    return endCampusStaffClass({actor:req.user!,organizationId,assignmentId})
+  }))
 router.get('/organizations/:organizationId/relationship-directory',
   authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,
   relations(req=>{

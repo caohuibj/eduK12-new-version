@@ -15,7 +15,7 @@ vi.mock('../../modules/organization/service',()=>({appendAudit:state.audit}))
 vi.mock('../../modules/campus/studentReference',()=>({
   campusStudentReference:state.reference,
 }))
-import { readCampusRelationshipDirectory, appointCampusCounselorClient } from '../../modules/campus/relationships.service'
+import { readCampusRelationshipDirectory, appointCampusCounselorClient, assignCampusStaffClass, endCampusStaffClass } from '../../modules/campus/relationships.service'
 
 const actor={userId:'school-admin',accountDomain:'SCHOOL',role:'ADMIN',platformRole:'STANDARD'}
 const org='00000000-0000-4000-8000-000000000001'
@@ -61,7 +61,7 @@ describe('Huischool role and counseling relationship authority',()=>{
     expect(queries).not.toContain('campus_accounts student_alias')
   })
   it('atomically provisions CLIENT only for a current counselor with psychology grant and approved student',async()=>{
-    state.read.mockResolvedValueOnce([{id:'counselor-1'}])
+    state.read.mockResolvedValueOnce([{id:'counselor-1',userId:'counselor-user'}])
       .mockResolvedValueOnce([{userId:'student-a'}])
     const result=await appointCampusCounselorClient({actor:actor as any,organizationId:org,
       counselorMembershipId:'counselor-1',clientMembershipId:'student-1'})
@@ -86,4 +86,54 @@ describe('Huischool role and counseling relationship authority',()=>{
     expect(state.personaWrite).not.toHaveBeenCalled()
     expect(state.write).not.toHaveBeenCalled()
   })
+  it('blocks a dual-role ORG_ADMIN from appointing their own counseling scope',async()=>{
+    state.read.mockResolvedValueOnce([{id:'admin-m',userId:actor.userId}])
+    await expect(appointCampusCounselorClient({
+      actor:actor as any,organizationId:org,
+      counselorMembershipId:'admin-m',clientMembershipId:'student-1',
+    })).rejects.toMatchObject({code:'CAMPUS_CASE_SELF_APPOINTMENT',statusCode:403})
+    expect(state.personaWrite).not.toHaveBeenCalled()
+    expect(state.write).not.toHaveBeenCalled()
+    expect(state.audit).not.toHaveBeenCalled()
+  })
+  it('records classroom assignment and revocation with the initiating school governor',async()=>{
+    state.read.mockResolvedValueOnce([
+      {orgStatus:'ACTIVE',membershipCurrent:true,personaCurrent:true},
+    ]).mockResolvedValueOnce([{id:'class-1'}])
+      .mockResolvedValueOnce([{
+        id:'assignment-1',organizationId:org,membershipId:'teacher-1',
+        classUnitId:'class-1',staffRole:'TEACHING',
+      }])
+    const result=await assignCampusStaffClass({
+      actor:actor as any,organizationId:org,
+      membershipId:'teacher-1',classUnitId:'class-1',staffRole:'TEACHING',
+    })
+    expect(result).toMatchObject({id:'assignment-1'})
+    expect(state.audit).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({
+      action:'CAMPUS_STAFF_CLASS_ASSIGNED',actorUserId:actor.userId,
+      payload:{membershipId:'teacher-1',classUnitId:'class-1',staffRole:'TEACHING'},
+    }))
+    state.read.mockResolvedValueOnce([{
+      id:'assignment-1',organizationId:org,membershipId:'teacher-1',
+      classUnitId:'class-1',staffRole:'TEACHING',
+    }])
+    await expect(endCampusStaffClass({
+      actor:actor as any,organizationId:org,assignmentId:'assignment-1',
+    })).resolves.toMatchObject({id:'assignment-1'})
+    expect(state.audit).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({
+      action:'CAMPUS_STAFF_CLASS_ENDED',actorUserId:actor.userId,
+      targetId:'assignment-1',
+    }))
+  })
+  it('refuses classroom assignment when the teacher does not have a current TEACHER persona',async()=>{
+    state.read.mockResolvedValueOnce([
+      {orgStatus:'ACTIVE',membershipCurrent:true,personaCurrent:false},
+    ])
+    await expect(assignCampusStaffClass({
+      actor:actor as any,organizationId:org,
+      membershipId:'non-teacher',classUnitId:'class-1',staffRole:'TEACHING',
+    })).rejects.toMatchObject({code:'CAMPUS_TEACHER_MEMBERSHIP_REQUIRED',statusCode:403})
+    expect(state.audit).not.toHaveBeenCalled()
+  })
+
 })
