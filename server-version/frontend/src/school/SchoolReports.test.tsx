@@ -1,0 +1,62 @@
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { SchoolParentReports, SchoolStudentReportConsent, SchoolStudentFeedback } from './SchoolReports'
+import type { SchoolApi } from './SchoolRecovery'
+
+const CHILD_A='00000000-0000-4000-8000-000000000001'
+const CHILD_B='00000000-0000-4000-8000-000000000002'
+const ARTIFACT='00000000-0000-4000-8000-000000000003'
+
+describe('Huischool report privacy and lifecycle UI', () => {
+  it('never displays a report solely from an ACTIVE relationship',async()=>{
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/reports/parent/children')return {list:[{childId:CHILD_A,relationshipId:'link-a'}],hasMore:false}
+      if(path.includes('/reports/parent/children/'+CHILD_A+'/reports'))return {list:[],hasMore:false}
+      throw new Error('unexpected call '+path)
+    })
+    render(<SchoolParentReports api={api as SchoolApi}/>)
+    const child=await screen.findByRole('button',{name:'孩子 1 的获准反馈'})
+    expect(screen.queryByText('私密个人分数')).not.toBeInTheDocument()
+    fireEvent.click(child)
+    expect(await screen.findByText('该孩子目前没有完成全部单份授权步骤的家长报告。')).toBeInTheDocument()
+    expect(api.mock.calls.every(([path])=>path.startsWith('/reports/parent/'))).toBe(true)
+  })
+  it('clears a previous child report immediately when selecting another child',async()=>{
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/reports/parent/children')return {list:[
+        {childId:CHILD_A,relationshipId:'link-a'}, {childId:CHILD_B,relationshipId:'link-b'},
+      ]}
+      if(path==='/reports/parent/children/'+CHILD_A+'/reports')return {list:[{id:ARTIFACT,title:'孩子甲的反馈',mode:'EDUCATIONAL_SUMMARY'}]}
+      if(path==='/reports/parent/children/'+CHILD_B+'/reports')return {list:[]}
+      if(path==='/reports/parent/children/'+CHILD_A+'/reports/'+ARTIFACT)return {
+        audience:'PARENT',title:'孩子甲的反馈',mode:'EDUCATIONAL_SUMMARY',summary:'仅用于受控查看的内容',blocks:[],
+      }
+      throw Error('unexpected call '+path)
+    })
+    render(<SchoolParentReports api={api as SchoolApi}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'孩子 1 的获准反馈'}))
+    fireEvent.click(await screen.findByRole('button',{name:'查看已授权反馈'}))
+    expect(await screen.findByText('仅用于受控查看的内容')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'孩子 2 的获准反馈'}))
+    expect(screen.queryByText('仅用于受控查看的内容')).not.toBeInTheDocument()
+    expect(await screen.findByText('该孩子目前没有完成全部单份授权步骤的家长报告。')).toBeInTheDocument()
+  })
+  it('students cannot share a report merely because the parent link is active',async()=>{
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/parent-links')return {list:[{id:'link-1',status:'ACTIVE'}]}
+      if(path==='/reports/relationships/link-1/options')return {list:[],truncated:false}
+      throw Error('unexpected call '+path)
+    })
+    render(<SchoolStudentReportConsent api={api as SchoolApi}/>)
+    const button=await screen.findByRole('button',{name:'查看第 1 位已关联家长的可分享报告'})
+    fireEvent.click(button)
+    expect(await screen.findByText('目前没有经过审核且允许分享的家长版报告。')).toBeInTheDocument()
+    expect(api.mock.calls.every(([path])=>path==='/parent-links'||path.startsWith('/reports/relationships/'))).toBe(true)
+  })
+  it('does not invent scientific explanations for an unpublished longitudinal feedback',async()=>{
+    const api=vi.fn(async()=>({list:[],truncated:false}))
+    render(<SchoolStudentFeedback api={api as SchoolApi}/>)
+    expect(await screen.findByText(/目前没有已生成且适合向你展示的纵向反馈/)).toBeInTheDocument()
+    expect(screen.queryByText(/诊断结果：/)).not.toBeInTheDocument()
+  })
+})
