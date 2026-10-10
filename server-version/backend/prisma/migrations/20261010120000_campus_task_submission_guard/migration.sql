@@ -30,8 +30,13 @@ BEGIN
       AND sc."class_unit_id"=e."class_unit_id"
       AND sc."valid_from"<=statement_timestamp()
       AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" pg
+      ON pg."organization_id"=m."organization_id"
+      AND pg."membership_id"=m."id" AND pg."persona"='STUDENT'
+      AND pg."revoked_at" IS NULL AND pg."granted_at"<=statement_timestamp()
     JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
-      AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+      AND u."role"='STUDENT' AND u."is_active"=TRUE
+      AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
     WHERE p."course_id"=p_course_id AND p."status"='ACTIVE'
       AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id"=o."id" AND d."user_id"=p_student_id
