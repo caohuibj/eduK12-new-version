@@ -12,7 +12,7 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
-import { readRespondentRunSummary } from '../reporting/respondentSummary'
+import { readCampusStudentFeedback } from './student-feedback'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
 import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
@@ -142,7 +142,7 @@ router.get('/reports/student/executions/:executionId', guarded(async req => {
     || (await readCampusStudentStatus(req.user!)).status !== 'APPROVED') {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
-  return readRespondentRunSummary(req.user!.userId, id.parse(req.params.executionId))
+  return readCampusStudentFeedback(req.user!.userId, id.parse(req.params.executionId))
 }))
 
 // Counselor's professional reports are separately authorized from parent
