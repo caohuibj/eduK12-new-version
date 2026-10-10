@@ -18,6 +18,7 @@ const state = vi.hoisted(() => ({
   respondentSummary: vi.fn(),
   group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
   protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
+  longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -32,6 +33,11 @@ vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
+}))
+vi.mock('../../modules/campus/individual-longitudinal-studio',()=>({
+  listCampusIndividualLongitudinalCatalog:state.longitudinal.catalog,
+  listCampusIndividualLongitudinalSources:state.longitudinal.sources,
+  generateCampusIndividualLongitudinal:state.longitudinal.generate,
 }))
 vi.mock('../../modules/campus/protected-report-studio',()=>({
   listCampusProtectedReportCatalog:state.protectedStudio.catalog,
@@ -116,6 +122,9 @@ describe('Huischool governed report HTTP surface', () => {
     state.group.read.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
     state.protectedStudio.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
     state.protectedStudio.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-123456789ABC',status:'WITHHELD'})
+    state.longitudinal.catalog.mockResolvedValue({subjects:[],specs:[],truncated:false})
+    state.longitudinal.sources.mockResolvedValue({sources:[],truncated:false})
+    state.longitudinal.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-ABCDEF123456',status:'AVAILABLE',note:'已生成'})
   })
 
   it('reports feature availability without leaking a parent report when disabled',async()=>{
@@ -335,6 +344,46 @@ describe('Huischool governed report HTTP surface', () => {
     expect(state.protectedStudio.generate).toHaveBeenCalledWith({
       actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
     })
+  })
+
+  it('protects clinical longitudinal generation with school MFA and CSRF',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',
+      specId:ARTIFACT,sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const without=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER'})
+    expect(without.status).toBe(403)
+    const forged=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true',
+        'X-CSRF-Token':'not-school-token'})
+    expect(forged.status).toBe(403)
+    expect(state.longitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('rejects extraneous subjectUserId, age claims or browser-supplied scoring data',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',specId:ARTIFACT,
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const header={'x-school-role':'TEACHER','x-recent-school-mfa':'true'}
+    for(const invalid of [
+      {...body,subjectUserId:'hidden-student'},
+      {...body,sourceScores:{metric:3}},
+      {...body,sources:[{runId:CHILD,trackId:ARTIFACT}]},
+      {...body,subjectReference:'school_login_name'},
+    ]){
+      expect((await request('/reports/longitudinal','POST',invalid,header)).status).toBe(400)
+    }
+    expect(state.longitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('passes valid pseudonym-only longitudinal request to server-authoritative scope',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',specId:ARTIFACT,
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const result=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true'})
+    expect(result.status).toBe(200)
+    expect((await result.json()).data).toMatchObject({
+      status:'AVAILABLE',subjectReference:'林-ABCDEF123456'})
+    expect(state.longitudinal.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
+    })
+    expect(result.headers.get('cache-control')).toBe('no-store')
   })
 
 })
