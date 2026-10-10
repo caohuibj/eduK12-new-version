@@ -2,7 +2,7 @@ import { beforeEach,describe,expect,it,vi } from 'vitest'
 
 const mock=vi.hoisted(()=>({
   context:vi.fn(),query:vi.fn(),spec:vi.fn(),listSpecs:vi.fn(),listSources:vi.fn(),
-  generate:vi.fn(),read:vi.fn(),
+  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:mock.query}}))
 vi.mock('../../modules/organization/access',()=>({
@@ -15,6 +15,7 @@ vi.mock('../../modules/reporting/discovery',()=>({
   listOrganizationReportingSources:mock.listSources,
 }))
 vi.mock('../../modules/reporting/spec',()=>({getPublishedReportingSpec:mock.spec}))
+vi.mock('../../modules/reporting/cohort',()=>({readReportingCohort:mock.cohort}))
 vi.mock('../../modules/reporting/service',()=>({generateOrganizationGroupAnalysis:mock.generate}))
 vi.mock('../../modules/reporting/pr4Service',()=>({readOrganizationReportingArtifact:mock.read}))
 
@@ -51,6 +52,9 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     mock.spec.mockResolvedValue({definition})
     mock.generate.mockResolvedValue({artifactId:artifact})
     mock.read.mockResolvedValue(content)
+    mock.cohort.mockResolvedValue({organizationId:org,sourceRunId:run,sourceTrackId:track,
+      selector:{kind:'RUN_TRACK_SUBJECTS'},eligibleN:10,
+      members:Array.from({length:10},(_,i)=>({userId:'campus-user-'+i}))})
     mock.listSpecs.mockResolvedValue({list:[{specId:spec,specKey:'school-group',
       version:1,analysisKind:'GROUP',metricIds:['wellbeing'],privacy:{
         minimumCohortN:10,minimumContributorN:10,
@@ -141,7 +145,8 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     }
   })
   it('rejects wrong audience for existing artifact and re-checks historical source',async()=>{
-    mock.query.mockResolvedValueOnce([{specId:spec,runId:run,trackId:track}])
+    mock.query.mockResolvedValueOnce([{specId:spec,runId:run,trackId:track,
+      cohortSnapshotId:'frozen-whole-cohort'}])
       .mockResolvedValueOnce([{total:10,respondents:10,allSelfStudents:true,
         runReady:true,activityReady:true}])
     const result=await readCampusGroupReport({
@@ -149,6 +154,29 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     })
     expect(result.state).toBe('READY')
     expect(mock.read).toHaveBeenCalledTimes(1)
+  })
+  it('rejects a historic filtered 10-person cohort from a larger Run despite adequate metric N',async()=>{
+    mock.query.mockResolvedValueOnce([{specId:spec,runId:run,trackId:track,
+      cohortSnapshotId:'filtered-population'}])
+      .mockResolvedValueOnce([{total:15,respondents:15,allSelfStudents:true,
+        runReady:true,activityReady:true}])
+    mock.cohort.mockResolvedValueOnce({organizationId:org,sourceRunId:run,
+      sourceTrackId:track,selector:{kind:'FILTERED_RUN_TRACK_SUBJECTS'},
+      eligibleN:10,members:Array.from({length:10},(_,i)=>({userId:'student-'+i}))})
+    await expect(readCampusGroupReport({
+      actor:admin as any,organizationId:org,artifactId:artifact,
+    })).rejects.toMatchObject({code:'CAMPUS_GROUP_REPORT_NOT_FOUND',statusCode:404})
+    expect(mock.read).not.toHaveBeenCalled()
+  })
+  it('refuses an old partial cohort even if its selector is spelled as whole-Run',async()=>{
+    mock.query.mockResolvedValueOnce([{specId:spec,runId:run,trackId:track,
+      cohortSnapshotId:'incomplete-whole-cohort'}])
+      .mockResolvedValueOnce([{total:12,respondents:12,allSelfStudents:true,
+        runReady:true,activityReady:true}])
+    await expect(readCampusGroupReport({
+      actor:admin as any,organizationId:org,artifactId:artifact,
+    })).rejects.toMatchObject({statusCode:404})
+    expect(mock.read).not.toHaveBeenCalled()
   })
   it('catalog is bounded, exposes no student identities, and omits unreviewed low-floor plans',async()=>{
     mock.listSpecs.mockResolvedValueOnce({list:[

@@ -10,6 +10,8 @@
 - Only independently reviewed `PUBLISHED` GROUP specs with `minimumCohortN`, `minimumContributorN`, and **each** `minimumMetricN` ≥ 10 can generate a school group projection.
 - A partial contributor set, missing metric data, insufficient N or missing published `MEAN` is **WITHHELD**, with no count or individual indicator. Ready projection includes **only one-decimal means**, static caveats and opaque artifact ID; no SD, distribution cells, exact N, member identity, raw answers, response timestamps or diagnostic/cut-off claims.
 - The workbench deliberately does **not** publish results to subjects, parents, teachers, or external school audiences. The floor of 10 and a 24-hour delay are **provisional additional engineering protections**, not evidence of anonymity against overlapping cohorts or repeated queries. Independent school-privacy review is still required before wider disclosure.
+- Existing GROUP reports are **re-read only after integrity checking their stored frozen cohort**. An artifact from a filtered `FILTERED_RUN_TRACK_SUBJECTS` selector, smaller member population, wrong Organization, Run or Track is refused, **including when an ORG_ADMIN would otherwise bypass the ordinary fixed-population test**.
+- **Professional PROTECTED_FEEDBACK studio**: current SCHOOL counselor persona + explicit psychology grant, current `CLIENT` case relationship, an approved active SCHOOL STUDENT with a closed associated Activity/Run, a published independently reviewed protected feedback spec with respondent, contributor and metric floors >=5. Frontend receives an opaque `林-` reference only; the server alone resolves the internal user and submits a frozen `subjectUserId` to the existing official reporting engine. The generation reply conveys availability/withheld only, not a score or a rater identity. This is counselor-only and is **not** parent or teacher release approval.
 - This does not introduce a new scorer, trust raw answers, open Cognitive Organization Run, or change TRAINING reporting.
 
 ## Scientific content publication gate — *no auto-approval*
@@ -50,7 +52,7 @@ Audience strings above are **unreviewed content examples, not the released conte
 
 ## Remaining PR5 work after the first group-studio tranche
 
-- Governed **protected-feedback** and **individual/group longitudinal** campus generation UI, with source/professional relationship and source-review policies; never expose raw respondent IDs to general staff.
+- Governed **individual/group longitudinal** campus generation UI, with the current subject's professional relationship, comparability and source-review policies; never expose raw respondent IDs to general staff. PROTECTED_FEEDBACK professional generation now exists, but its wider release or science qualification is still gated.
 - Exact instrument selections, licensing/evidence dossiers, independently reviewed student/parent/teacher/counselor textual feedback and actual sign-off; populate production registries only after review, keep unapproved report UI honest.
 - Prove or explicitly withhold student→teacher privacy-safe release under repeated/differencing attacks; maintain no student→parent automatic disclosure.
 - Final independent pilot acceptance matrix and evidence, separate from the requested coding PR and separate from production deployment.

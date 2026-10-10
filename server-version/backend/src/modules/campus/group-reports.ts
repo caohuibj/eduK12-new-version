@@ -3,6 +3,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import { listOrganizationReportingSources, listPublishedReportingSpecs } from '../reporting/discovery'
 import { getPublishedReportingSpec } from '../reporting/spec'
+import { readReportingCohort } from '../reporting/cohort'
 import { generateOrganizationGroupAnalysis } from '../reporting/service'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail } from '../reporting/types'
@@ -43,7 +44,7 @@ export function assertReviewedCampusGroupSpec(input:{
 /** Avoid pre-close/time-window differencing and single-person cohorts. */
 async function assertCampusWholeRunSource(input:{
   organizationId:string;runId:string;trackId:string
-}):Promise<void>{
+}):Promise<number>{
   const rows=await prisma.$queryRaw<Array<{
     total:number;respondents:number;allSelfStudents:boolean;runReady:boolean;activityReady:boolean
   }>>`
@@ -81,6 +82,7 @@ async function assertCampusWholeRunSource(input:{
     reportingFail('CAMPUS_GROUP_SOURCE_WITHHELD',
       'school aggregate is unavailable until the whole approved cohort and release delay are satisfied',409)
   }
+  return row.total
 }
 
 type SafeMetric={state:'present';validN?:number;missingN?:number;aggregations?:{mean?:unknown}}
@@ -178,8 +180,10 @@ export async function readCampusGroupReport(input:{
   actor:AuthenticatedPrincipal;organizationId:string;artifactId:string
 }){
   const principal=await requireCampusGroupManager(input.actor,input.organizationId)
-  const target=await prisma.$queryRaw<Array<{specId:string;runId:string;trackId:string}>>`
-    SELECT a.spec_id AS "specId",
+  const target=await prisma.$queryRaw<Array<{
+    specId:string;runId:string;trackId:string;cohortSnapshotId:string|null
+  }>>`
+    SELECT a.spec_id AS "specId",a.cohort_snapshot_id AS "cohortSnapshotId",
       a.artifact_payload->'source'->>'runId' AS "runId",
       a.artifact_payload->'source'->>'trackId' AS "trackId"
     FROM reporting_analysis_artifacts a
@@ -189,8 +193,19 @@ export async function readCampusGroupReport(input:{
   `
   if(!target[0]?.specId||!target[0]?.runId||!target[0]?.trackId)hidden()
   await reviewedSpec(target[0].specId)
-  await assertCampusWholeRunSource({organizationId:input.organizationId,
+  const size=await assertCampusWholeRunSource({organizationId:input.organizationId,
     runId:target[0].runId,trackId:target[0].trackId})
+  // An unrelated reporting route may previously have created an arbitrary
+  // subgroup cohort. Trusted managers bypass ordinary fixed-population
+  // disclosure checks, so the SCHOOL wrapper must independently reject that
+  // historical artifact and require the exact frozen Run/Track population.
+  if(!target[0].cohortSnapshotId)return hidden()
+  const cohort=await readReportingCohort(target[0].cohortSnapshotId)
+  if(cohort.organizationId!==input.organizationId
+    ||cohort.sourceRunId!==target[0].runId ||cohort.sourceTrackId!==target[0].trackId
+    ||cohort.selector.kind!=='RUN_TRACK_SUBJECTS'
+    ||cohort.eligibleN!==size ||cohort.members.length!==size
+    ||new Set(cohort.members.map(member=>member.userId)).size!==size)return hidden()
   const report=await readOrganizationReportingArtifact({
     principal,organizationId:input.organizationId,artifactId:input.artifactId,
   })
