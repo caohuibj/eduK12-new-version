@@ -15,7 +15,7 @@ import { reportingFail } from '../reporting/types'
 export const CAMPUS_GROUP_MIN_N = 10
 const hidden = ():never=>reportingFail('CAMPUS_GROUP_REPORT_NOT_FOUND','school report unavailable',404)
 
-async function requireCampusGroupManager(actor:AuthenticatedPrincipal, organizationId:string){
+export async function requireCampusGroupManager(actor:AuthenticatedPrincipal, organizationId:string){
   if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))hidden()
   const c=await resolveOrganizationAccessContext({principal:actor,organizationId})
   if(!c)return hidden()
@@ -106,7 +106,7 @@ export async function assertCampusNoGroupDifferencing(input:{
     )
     SELECT old.eligible_n AS "priorN",
       (SELECT COUNT(*)::int FROM jsonb_array_elements(old.members) member
-        JOIN current_members current ON current.user_id=member->>'userId') AS "shared",
+        JOIN current_members cm ON cm.user_id=member->>'userId') AS "shared",
       (SELECT COUNT(*)::int FROM current_members) AS "currentN"
     FROM reporting_analysis_artifacts artifact
     JOIN reporting_cohort_snapshots old ON old.id=artifact.cohort_snapshot_id
