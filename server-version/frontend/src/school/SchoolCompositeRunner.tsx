@@ -125,12 +125,15 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
       <button onClick={onFinished}>返回我的校园活动</button>
     </div>:
     child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&state&&cognitiveClient?
-      <CognitiveRunner campus={{
-        sessionId:child.cognitiveSession.sessionId,
-        api:cognitiveClient,
-        onCompleted:()=>{void childFinished()},
-        onExit:()=>{setChild(null)},
-      }}/>:
+      <MemoryRouter key={child.cognitiveSession.sessionId}
+        initialEntries={['/campus/cognitive/sessions/'+encodeURIComponent(child.cognitiveSession.sessionId)]}>
+        <CognitiveRunner campus={{
+          sessionId:child.cognitiveSession.sessionId,
+          api:cognitiveClient,
+          onCompleted:()=>{void childFinished()},
+          onExit:()=>{setChild(null)},
+        }}/>
+      </MemoryRouter>:
     child?.type==='SITUATIONAL'&&child.situationalAttemptId&&state&&situationalClient?
       <MemoryRouter initialEntries={['/relational/situational/attempts/'+child.situationalAttemptId]}>
         <SituationalRunner campus={{

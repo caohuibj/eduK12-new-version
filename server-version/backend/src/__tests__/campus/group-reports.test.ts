@@ -2,9 +2,12 @@ import { beforeEach,describe,expect,it,vi } from 'vitest'
 
 const mock=vi.hoisted(()=>({
   context:vi.fn(),query:vi.fn(),spec:vi.fn(),listSpecs:vi.fn(),listSources:vi.fn(),
-  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),
+  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),lock:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:mock.query}}))
+vi.mock('../../modules/campus/report-release-lock',()=>({
+  withCampusReportReleaseLock:(organizationId:string,fn:()=>Promise<unknown>)=>mock.lock(organizationId,fn),
+}))
 vi.mock('../../modules/organization/access',()=>({
   resolveOrganizationAccessContext:mock.context,
   contextHasCapability:(ctx:any,key:string)=>ctx.capabilities.includes(key)
@@ -47,6 +50,7 @@ const source={runId:run,trackId:track,runName:'班级学习支持测评',runStat
 describe('Huischool internal group reporting privacy boundary',()=>{
   beforeEach(()=>{
     vi.clearAllMocks()
+    mock.lock.mockImplementation((_org:string,fn:()=>Promise<unknown>)=>fn())
     mock.context.mockResolvedValue(active)
     mock.query.mockResolvedValue([{total:10,respondents:10,
       allSelfStudents:true,runReady:true,activityReady:true}])
@@ -129,6 +133,7 @@ describe('Huischool internal group reporting privacy boundary',()=>{
       userId:'school-admin',platformRole:'STANDARD',
     },organizationId:org,artifactId:artifact})
     expect(result.state).toBe('READY')
+    expect(mock.lock).toHaveBeenCalledWith(org,expect.any(Function))
     expect(result.metrics).toEqual({wellbeing:{mean:3.5}})
     expect(JSON.stringify(result)).not.toMatch(/eligibleN|validN|resultContributorN|median|distribution|studentUserId|username/)
   })
@@ -147,6 +152,8 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     expect(sql).toContain('JOIN reporting_series_waves wave')
     expect(sql).toContain('GROUP BY old.id')
     expect(sql).toContain("IS DISTINCT FROM 'RUN_TRACK_SUBJECTS'")
+    expect(sql).toContain("old.source_run_id IS DISTINCT FROM")
+    expect(sql).toContain("old.source_track_id IS DISTINCT FROM")
     expect(sql).toContain('LIMIT 101')
   })
   it('withholds cross-kind historical longitudinal partial-overlap aggregates',async()=>{

@@ -1,9 +1,12 @@
 import { beforeEach,describe,expect,it,vi } from 'vitest'
 const m=vi.hoisted(()=>({
   query:vi.fn(),guard:vi.fn(),diff:vi.fn(),
-  sources:vi.fn(),specs:vi.fn(),published:vi.fn(),generate:vi.fn(),read:vi.fn(),
+  sources:vi.fn(),specs:vi.fn(),published:vi.fn(),generate:vi.fn(),read:vi.fn(),lock:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:m.query}}))
+vi.mock('../../modules/campus/report-release-lock',()=>({
+  withCampusReportReleaseLock:(organizationId:string,fn:()=>Promise<unknown>)=>m.lock(organizationId,fn),
+}))
 vi.mock('../../modules/campus/group-reports',()=>({
   requireCampusGroupManager:m.guard,assertCampusNoGroupDifferencing:m.diff,
   CAMPUS_GROUP_MIN_N:10,
@@ -54,6 +57,7 @@ const projection={kind:'REPEATED_COHORT',state:'present',
 describe('school fixed-population longitudinal differential defenses',()=>{
   beforeEach(()=>{
     vi.clearAllMocks()
+    m.lock.mockImplementation((_org:string,fn:()=>Promise<unknown>)=>fn())
     m.guard.mockResolvedValue({userId:actor.userId,platformRole:'STANDARD'})
     m.diff.mockResolvedValue(undefined)
     m.query.mockResolvedValue(actors())
@@ -111,6 +115,21 @@ describe('school fixed-population longitudinal differential defenses',()=>{
     expect(projectCampusFixedGroupLongitudinal({artifactId:'a',projection:partial},10).state)
       .toBe('WITHHELD')
   })
+  it('blocks numeric release when a new overlap appears after longitudinal artifact commit',async()=>{
+    m.diff.mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(Object.assign(new Error('overlap after commit'),{
+        code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD',statusCode:409,
+      }))
+    await expect(generateCampusFixedGroupLongitudinal({
+      actor:actor as any,organizationId:org,specId,
+      analysisKind:'REPEATED_COHORT',
+      sources:[{runId:r1,trackId:t1},{runId:r2,trackId:t2}],
+    })).rejects.toMatchObject({code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD'})
+    expect(m.generate).toHaveBeenCalledTimes(1)
+    expect(m.diff).toHaveBeenCalledTimes(3)
+    expect(m.lock).toHaveBeenCalledWith(org,expect.any(Function))
+  })
   it('delegates to canonical frozen series, never accepting cohortSelector from browser',async()=>{
     const result=await generateCampusFixedGroupLongitudinal({
       actor:actor as any,organizationId:org,specId,analysisKind:'REPEATED_COHORT',
@@ -121,7 +140,8 @@ describe('school fixed-population longitudinal differential defenses',()=>{
       specId,sources:[{runId:r1,trackId:t1},{runId:r2,trackId:t2}],
       cohortStrategy:'BASELINE_FIXED',analysisKind:'REPEATED_COHORT',
     })
-    expect(m.diff).toHaveBeenCalledTimes(2)
+    expect(m.diff).toHaveBeenCalledTimes(4)
+    expect(m.lock).toHaveBeenCalledWith(org,expect.any(Function))
     expect(result.state).toBe('READY')
     expect(JSON.stringify(result)).not.toContain('student-')
     expect(m.read).toHaveBeenCalledWith(expect.objectContaining({artifactId:'group-long-1'}))

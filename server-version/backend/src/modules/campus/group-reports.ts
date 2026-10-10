@@ -8,6 +8,7 @@ import { readReportingCohort } from '../reporting/cohort'
 import { generateOrganizationGroupAnalysis } from '../reporting/service'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail } from '../reporting/types'
+import { withCampusReportReleaseLock } from './report-release-lock'
 
 /** PR5 first tranche: INTERNAL school-only, whole frozen SELF/STUDENT Run.
  * This route never publishes peer/teacher ratings or longitudinal comparisons.
@@ -131,7 +132,7 @@ export async function assertCampusNoGroupDifferencing(input:{
       FROM historical_cohorts historic
       JOIN reporting_cohort_snapshots old ON old.id=historic.cohort_id
         AND old.organization_id=${input.organizationId}
-      WHERE (old.source_run_id<>${input.runId} OR old.source_track_id<>${input.trackId}
+      WHERE (old.source_run_id IS DISTINCT FROM ${input.runId} OR old.source_track_id IS DISTINCT FROM ${input.trackId}
         OR old.selector->>'kind' IS DISTINCT FROM 'RUN_TRACK_SUBJECTS')
       GROUP BY old.id
       ORDER BY MAX(historic.generated_at) DESC, old.id DESC
@@ -228,63 +229,71 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
 export async function generateCampusGroupReport(input:{
   actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string;specId:string
 }){
-  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
-  await reviewedSpec(input.specId)
-  await assertCampusWholeRunSource(input)
-  await assertCampusNoGroupDifferencing(input)
-  // No cohortSelector option exists here. Arbitrary filters must never become
-  // a child- or teacher-targeted reporting tool.
-  const result=await generateOrganizationGroupAnalysis({
-    principal,organizationId:input.organizationId,
-    runId:input.runId,trackId:input.trackId,specId:input.specId,
-  })
-  const authorized=await readOrganizationReportingArtifact({
-    principal,organizationId:input.organizationId,artifactId:result.artifactId,
-  })
-  await assertCampusNoGroupDifferencing(input)
+  // Deny unprivileged callers before opening an extra PostgreSQL connection.
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return projectCampusGroupReport(authorized)
+  return withCampusReportReleaseLock(input.organizationId, async () => {
+    const principal=await requireCampusGroupManager(input.actor,input.organizationId)
+    await reviewedSpec(input.specId)
+    await assertCampusWholeRunSource(input)
+    await assertCampusNoGroupDifferencing(input)
+    // No cohortSelector option exists here. Arbitrary filters must never become
+    // a child- or teacher-targeted reporting tool.
+    const result=await generateOrganizationGroupAnalysis({
+      principal,organizationId:input.organizationId,
+      runId:input.runId,trackId:input.trackId,specId:input.specId,
+    })
+    const authorized=await readOrganizationReportingArtifact({
+      principal,organizationId:input.organizationId,artifactId:result.artifactId,
+    })
+    await assertCampusNoGroupDifferencing(input)
+    await requireCampusGroupManager(input.actor,input.organizationId)
+    return projectCampusGroupReport(authorized)
+  })
 }
 
 export async function readCampusGroupReport(input:{
   actor:AuthenticatedPrincipal;organizationId:string;artifactId:string
 }){
-  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
-  const target=await prisma.$queryRaw<Array<{
-    specId:string;runId:string;trackId:string;cohortSnapshotId:string|null
-  }>>`
-    SELECT a.spec_id AS "specId",a.cohort_snapshot_id AS "cohortSnapshotId",
-      a.artifact_payload->'source'->>'runId' AS "runId",
-      a.artifact_payload->'source'->>'trackId' AS "trackId"
-    FROM reporting_analysis_artifacts a
-    WHERE a.id=${input.artifactId} AND a.organization_id=${input.organizationId}
-      AND a.analysis_kind='GROUP' AND a.policy_domain='ORG_GROUP_REPORT_V1'
-    LIMIT 1
-  `
-  if(!target[0]?.specId||!target[0]?.runId||!target[0]?.trackId)hidden()
-  await reviewedSpec(target[0].specId)
-  const size=await assertCampusWholeRunSource({organizationId:input.organizationId,
-    runId:target[0].runId,trackId:target[0].trackId})
-  // An unrelated reporting route may previously have created an arbitrary
-  // subgroup cohort. Trusted managers bypass ordinary fixed-population
-  // disclosure checks, so the SCHOOL wrapper must independently reject that
-  // historical artifact and require the exact frozen Run/Track population.
-  if(!target[0].cohortSnapshotId)return hidden()
-  const cohort=await readReportingCohort(target[0].cohortSnapshotId)
-  if(cohort.organizationId!==input.organizationId
-    ||cohort.sourceRunId!==target[0].runId ||cohort.sourceTrackId!==target[0].trackId
-    ||cohort.selector.kind!=='RUN_TRACK_SUBJECTS'
-    ||cohort.eligibleN!==size ||cohort.members.length!==size
-    ||new Set(cohort.members.map(member=>member.userId)).size!==size)return hidden()
-  await assertCampusNoGroupDifferencing({
-    organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
-  })
-  const report=await readOrganizationReportingArtifact({
-    principal,organizationId:input.organizationId,artifactId:input.artifactId,
-  })
-  await assertCampusNoGroupDifferencing({
-    organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
-  })
+  // Deny unprivileged callers before opening an extra PostgreSQL connection.
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return projectCampusGroupReport(report)
+  return withCampusReportReleaseLock(input.organizationId, async () => {
+    const principal=await requireCampusGroupManager(input.actor,input.organizationId)
+    const target=await prisma.$queryRaw<Array<{
+      specId:string;runId:string;trackId:string;cohortSnapshotId:string|null
+    }>>`
+      SELECT a.spec_id AS "specId",a.cohort_snapshot_id AS "cohortSnapshotId",
+        a.artifact_payload->'source'->>'runId' AS "runId",
+        a.artifact_payload->'source'->>'trackId' AS "trackId"
+      FROM reporting_analysis_artifacts a
+      WHERE a.id=${input.artifactId} AND a.organization_id=${input.organizationId}
+        AND a.analysis_kind='GROUP' AND a.policy_domain='ORG_GROUP_REPORT_V1'
+      LIMIT 1
+    `
+    if(!target[0]?.specId||!target[0]?.runId||!target[0]?.trackId)hidden()
+    await reviewedSpec(target[0].specId)
+    const size=await assertCampusWholeRunSource({organizationId:input.organizationId,
+      runId:target[0].runId,trackId:target[0].trackId})
+    // An unrelated reporting route may previously have created an arbitrary
+    // subgroup cohort. Trusted managers bypass ordinary fixed-population
+    // disclosure checks, so the SCHOOL wrapper must independently reject that
+    // historical artifact and require the exact frozen Run/Track population.
+    if(!target[0].cohortSnapshotId)return hidden()
+    const cohort=await readReportingCohort(target[0].cohortSnapshotId)
+    if(cohort.organizationId!==input.organizationId
+      ||cohort.sourceRunId!==target[0].runId ||cohort.sourceTrackId!==target[0].trackId
+      ||cohort.selector.kind!=='RUN_TRACK_SUBJECTS'
+      ||cohort.eligibleN!==size ||cohort.members.length!==size
+      ||new Set(cohort.members.map(member=>member.userId)).size!==size)return hidden()
+    await assertCampusNoGroupDifferencing({
+      organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
+    })
+    const report=await readOrganizationReportingArtifact({
+      principal,organizationId:input.organizationId,artifactId:input.artifactId,
+    })
+    await assertCampusNoGroupDifferencing({
+      organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
+    })
+    await requireCampusGroupManager(input.actor,input.organizationId)
+    return projectCampusGroupReport(report)
+  })
 }

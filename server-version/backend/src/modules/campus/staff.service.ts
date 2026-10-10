@@ -8,7 +8,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { CampusAdmissionError, assertCampusGovernance } from './admission.service'
 
 const digest=(value:string)=>createHash('sha256').update('school-staff-invite:v1:'+value).digest('hex')
-const fail=(code:string,statusCode=409):never=>{throw new CampusAdmissionError(code,statusCode)}
+function fail(code:string,statusCode=409):never { throw new CampusAdmissionError(code,statusCode) }
 const normalizedLogin=(raw:string)=>{
   const name=raw.trim().toLowerCase()
   if(!/^[a-z0-9_.-]{4,32}$/.test(name))fail('STAFF_LOGIN_INVALID',400)
@@ -55,11 +55,11 @@ export async function registerCampusStaff(input:{
     return await prisma.$transaction(async tx=>{
       const invitations=await tx.$queryRaw<Array<{
         id:string;organizationId:string;persona:'TEACHER'|'COUNSELOR'
-        adminRole:boolean;psychologyStaff:boolean;invitedByUserId:string
+        adminRole:boolean;psychologyStaff:boolean;invitedByUserId:string;createdAt:Date
       }>>`
         SELECT i."id",i."organization_id" AS "organizationId",i."persona",
           i."admin_role" AS "adminRole",i."psychology_staff" AS "psychologyStaff",
-          i."invited_by_user_id" AS "invitedByUserId"
+          i."invited_by_user_id" AS "invitedByUserId",i."created_at" AS "createdAt"
         FROM "campus_staff_invitations" i
         JOIN "organizations" o ON o."id"=i."organization_id" AND o."product_domain"='SCHOOL'
           AND o."status"='ACTIVE'
@@ -69,21 +69,52 @@ export async function registerCampusStaff(input:{
       `
       const invitation=invitations[0]
       if(!invitation)fail('CAMPUS_INVITE_UNAVAILABLE',404)
-      // An invitation issued by an already-revoked administrator cannot be
-      // converted into a future school account by the possessor of its token.
-      const issuer=await tx.$queryRaw<Array<{valid:boolean}>>`
-        SELECT EXISTS(
-          SELECT 1 FROM "organization_memberships" m
-          JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
-            AND u."is_active"=TRUE AND u."is_frozen"=FALSE
-          WHERE m."organization_id"=${invitation.organizationId}
-            AND m."user_id"=${invitation.invitedByUserId}
-            AND m."org_role"='ORG_ADMIN'
-            AND m."valid_from"<=statement_timestamp()
-            AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
-        ) AS "valid"
-      `
-      if(!issuer[0]?.valid)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      // A still-current ORG_ADMIN row is NOT authority after an explicit
+      // governance deny, suspension, freeze, role change or expiry. Check the
+      // same live authority used to issue the invite, inside the claim txn.
+      // This applies to ALL invitations, especially those carrying ADMIN or
+      // PSYCHOLOGY_STAFF elevation. No historical invite bypass is allowed.
+      const issuer=await tx.user.findUnique({
+        where:{id:invitation.invitedByUserId},
+        select:{role:true,accountDomain:true,isActive:true,isFrozen:true,expiresAt:true,platformRole:true},
+      })
+      if(!issuer)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(issuer.accountDomain!=='SCHOOL'
+        ||(issuer.role!==UserRole.ADMIN&&issuer.role!==UserRole.TEACHER)
+        ||!issuer.isActive||issuer.isFrozen
+        ||(issuer.expiresAt&&issuer.expiresAt<=new Date()))
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      const authority=await resolveOrganizationAccessContext({
+        principal:{userId:invitation.invitedByUserId,platformRole:issuer.platformRole},
+        organizationId:invitation.organizationId,
+      },tx)
+      if(!authority)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(authority.productDomain!=='SCHOOL'
+        ||authority.organizationStatus!=='ACTIVE'
+        ||authority.orgRole!=='ORG_ADMIN'||!authority.membershipId
+        ||!authority.canGovern)
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      if(!authority.membershipId)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      const issuerMembershipId=authority.membershipId
+      // A previous governance revocation permanently invalidates invitations
+      // issued before it, even if the denial is later lifted. A replacement
+      // administrator membership must not resurrect an old bearer code.
+      const [issuerMembership,revokedSinceInvite]=await Promise.all([
+        tx.organizationMembership.findUnique({
+          where:{id:issuerMembershipId},select:{validFrom:true},
+        }),
+        tx.organizationAccessDeny.findFirst({
+          where:{
+            organizationId:invitation.organizationId,
+            userId:invitation.invitedByUserId,
+            permission:{in:['*','ORGANIZATION_GOVERNANCE']},
+            deniedAt:{gte:invitation.createdAt},
+          },
+          select:{id:true},
+        }),
+      ])
+      if(!issuerMembership||issuerMembership.validFrom>invitation.createdAt||revokedSinceInvite)
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
       const user=await tx.user.create({data:{
         username:'huischool_'+randomUUID().replace(/-/g,''),
         passwordHash,accountDomain:'SCHOOL',
