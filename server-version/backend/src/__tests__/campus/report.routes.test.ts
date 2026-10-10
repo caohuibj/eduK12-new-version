@@ -17,6 +17,7 @@ const state = vi.hoisted(() => ({
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
   group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -31,6 +32,10 @@ vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
   generateCampusGroupReport:state.group.generate,
   readCampusGroupReport:state.group.read,
+}))
+vi.mock('../../modules/campus/protected-report-studio',()=>({
+  listCampusProtectedReportCatalog:state.protectedStudio.catalog,
+  generateCampusProtectedReport:state.protectedStudio.generate,
 }))
 vi.mock('../../modules/campus/professional-reports', () => ({
   listCampusProfessionalReports: state.professional.list,
@@ -109,6 +114,8 @@ describe('Huischool governed report HTTP surface', () => {
     state.group.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
     state.group.generate.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
     state.group.read.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
+    state.protectedStudio.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
+    state.protectedStudio.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-123456789ABC',status:'WITHHELD'})
   })
 
   it('reports feature availability without leaking a parent report when disabled',async()=>{
@@ -275,6 +282,58 @@ describe('Huischool governed report HTTP surface', () => {
     expect(state.group.read).toHaveBeenCalledWith({
       actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),
       organizationId:CHILD,artifactId:ARTIFACT,
+    })
+  })
+
+  it('does not expose protected case discovery to an unauthenticated/training identity',async()=>{
+    const response=await request('/reports/protected/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-user':'','x-training-user':'training-therapist'})
+    expect(response.status).toBe(401)
+    expect(state.protectedStudio.catalog).not.toHaveBeenCalled()
+  })
+  it('requires SCHOOL step-up and exact CSRF for pseudonymous professional generation',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    expect((await request('/reports/protected','POST',body,
+      {'x-school-role':'TEACHER'})).status).toBe(403)
+    expect((await request('/reports/protected','POST',body,{
+      'x-school-role':'TEACHER','x-recent-school-mfa':'true',
+      'X-CSRF-Token':'wrong',
+    })).status).toBe(403)
+    expect(state.protectedStudio.generate).not.toHaveBeenCalled()
+  })
+  it('rejects exact student IDs, arbitrary metrics or unauthorized audience in request',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    const headers={'x-school-role':'TEACHER','x-recent-school-mfa':'true'}
+    const bad=await request('/reports/protected','POST',{
+      ...body,subjectUserId:'student-private-id',
+    },headers)
+    expect(bad.status).toBe(400)
+    const badRef=await request('/reports/protected','POST',{
+      ...body,subjectReference:'student-private-id',
+    },headers)
+    expect(badRef.status).toBe(400)
+    const badAudience=await request('/reports/protected','POST',{
+      ...body,audience:'PARENT',
+    },headers)
+    expect(badAudience.status).toBe(400)
+    expect(state.protectedStudio.generate).not.toHaveBeenCalled()
+  })
+  it('passes only a school-scoped subject reference to the authoritative professional generator',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    const response=await request('/reports/protected','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({
+      subjectReference:'林-123456789ABC',status:'WITHHELD',
+    })
+    expect(state.protectedStudio.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
     })
   })
 

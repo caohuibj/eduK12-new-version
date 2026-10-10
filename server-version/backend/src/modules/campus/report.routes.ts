@@ -14,6 +14,7 @@ import { listParticipantLongitudinal, readParticipantLongitudinal } from '../rep
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readRespondentRunSummary } from '../reporting/respondentSummary'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -75,6 +76,24 @@ router.get('/reports/groups/:organizationId/:artifactId', guarded(req=>
   readCampusGroupReport({actor:req.user!,
     organizationId:id.parse(req.params.organizationId),
     artifactId:id.parse(req.params.artifactId)})))
+
+// A counselor can discover only current CLIENT-scoped, approved SCHOOL
+// students by a pseudonymous reference. Protected generation delegates to
+// the existing immutable result engine; no raw score goes into this request.
+router.get('/reports/protected/catalog',guarded(req=>{
+  const q=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusProtectedReportCatalog(req.user!,q.organizationId)
+}))
+router.post('/reports/protected',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const data=z.object({
+    organizationId:id,runId:id,trackId:id,
+    subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+    relationshipKind:z.string().trim().min(1).max(120),
+    perspective:z.enum(['SELF_REPORT','OBSERVER_REPORT','RELATIONAL_EXPERIENCE']),
+    specId:id,
+  }).strict().parse(req.body)
+  return generateCampusProtectedReport({actor:req.user!,...data})
+}))
 
 // Self-only. The existing participant engine checks current membership,
 // authoritative SELF observations and frozen-vs-current disclosure contracts.
