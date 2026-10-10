@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
 
@@ -10,6 +10,7 @@ type SchoolTask={
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
+type StudentFinalFeedback={mode:string;state:'WITHHELD'|'COMPLETED'|'READY';metrics?:Record<string,number|null>}
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
   mySubmission?:{content?:string|null;status:string}|null
@@ -32,7 +33,10 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const [execution,setExecution]=useState<CampusExecutionRef|null>(null)
+  const [feedback,setFeedback]=useState<{executionId:string;title:string;data:StudentFinalFeedback}|null>(null)
+  const feedbackEpoch=useRef(0)
   const load=async(targetPage=page)=>{
+    feedbackEpoch.current+=1;setFeedback(null)
     const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25')
     setItems(result);setPage(targetPage)
   }
@@ -52,6 +56,16 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       setSelected(task);setDetails(d);setAnswer(d.mySubmission?.content??'')
     }catch(err){setError(err instanceof Error?err.message:'活动材料不可访问')}
     finally{setBusy(false)}
+  }
+  const showFeedback=async(task:SchoolTask)=>{
+    const token=++feedbackEpoch.current
+    setFeedback(null);setError('')
+    try{
+      const data=await api<StudentFinalFeedback>('/reports/student/executions/'+task.id)
+      if(token===feedbackEpoch.current)setFeedback({executionId:task.id,title:task.title,data})
+    }catch(err){
+      if(token===feedbackEpoch.current)setError(err instanceof Error?err.message:'该测评目前没有允许查看的个人反馈')
+    }
   }
   const submit=async()=>{
     if(!selected || !details)return
@@ -93,7 +107,9 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
                     consentPurpose:task.consentPurpose,
                     consentVisibility:task.consentVisibility})
                 }}>开始／继续官方测评</button>:
-              <p>测评已完成或暂未开放。报告需经独立授权后才可查看。</p>:
+              task.status==='COMPLETED'?
+                <button disabled={busy} onClick={()=>void showFeedback(task)}>查看我的测评反馈</button>:
+                <p>测评目前不可作答。符合授权与科学规则的反馈才可查看。</p>:
             task.href&&task.status!=='EXPIRED'&&<button disabled={busy}
               onClick={()=>void showTask(task)}>查看{task.kind==='READING'?'阅读材料':'活动任务'}</button>}
         </article>)}
@@ -103,6 +119,21 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       <span>第 {page} 页 · 共 {items.total} 个任务</span>
       <button disabled={!items.hasMore||busy} onClick={()=>void load(page+1)}>下一页</button>
       {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
+    </div>}
+    {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
+      <h3>{feedback.title} · 我的反馈</h3>
+      {feedback.data.state==='COMPLETED'&&
+        <p>你的作答已完成。当前测评仅允许展示完成状态，不提供分数或诊断。</p>}
+      {feedback.data.state==='WITHHELD'&&
+        <p>当前反馈暂不适合公开，或尚未达到科学与隐私披露条件。如有疑问，可联系学校心理教师。</p>}
+      {feedback.data.state==='READY'&&<>
+        <p>下面是这份测评明确允许你查看的记录。分数不能说明你“好”或“不好”，也不能代替专业判断。</p>
+        {Object.entries(feedback.data.metrics??{}).map(([metric,value])=>
+          <p key={metric}>{metric}：{typeof value==='number'&&Number.isFinite(value)
+            ?value.toLocaleString('zh-CN',{maximumFractionDigits:3})
+            :'暂没有可以展示的结果'}</p>)}
+      </>}
+      <button onClick={()=>{feedbackEpoch.current+=1;setFeedback(null)}}>关闭我的反馈</button>
     </div>}
     {execution&&<SchoolCompositeRunner api={api} execution={execution}
       onExit={()=>setExecution(null)}

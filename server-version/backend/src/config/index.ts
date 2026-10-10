@@ -44,6 +44,7 @@ const configSchema = z.object({
   // Cognitive 模块开关（严格 true/false，Milestone D 完整验收前默认 false）
   cognitiveModuleEnabled: z.boolean(),
   parentPortalEnabled: z.boolean(),
+  campusParentReportEnabled: z.boolean(),
   miniClassroomEnabled: z.boolean(),
   miniAssessmentEnabled: z.boolean(),
   // 材料授权总开关。默认 true：空 grant 表等于今天的 creatorId 隔离，打开不会突然暴露材料。
@@ -210,6 +211,7 @@ const rawConfig = {
   // Cognitive 模块开关（严格解析；Milestone D 完整验收前默认 false，避免提前污染生产）
   cognitiveModuleEnabled: parseBooleanEnv('COGNITIVE_MODULE_ENABLED', false),
   parentPortalEnabled: parseBooleanEnv('PARENT_PORTAL_ENABLED', false),
+  campusParentReportEnabled: parseBooleanEnv('CAMPUS_PARENT_REPORT_ENABLED', false),
   miniClassroomEnabled: parseBooleanEnv('MINI_CLASSROOM_ENABLED', false),
   miniAssessmentEnabled: parseBooleanEnv('MINI_ASSESSMENT_ENABLED', false),
   materialGrantsEnabled: parseBooleanEnv('MATERIAL_GRANTS_ENABLED', true),

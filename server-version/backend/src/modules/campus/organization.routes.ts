@@ -1,4 +1,8 @@
 import { Router } from 'express'
+import { z } from 'zod'
+import { prisma } from '../../config/database'
+import { asyncHandler } from '../../middleware/asyncHandler'
+import { success } from '../../utils/response'
 import { authenticateSchool } from '../../middleware/auth'
 import { requireOrganizationGovernance } from '../organization/access'
 import { organizationController } from '../organization/organization.controller'
@@ -19,6 +23,36 @@ router.delete('/organizations/:organizationId/units/:unitId',authenticateSchool,
 router.get('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireOrganizationGovernance,organizationAdminController.listStaffClassAssignments)
 router.post('/organizations/:organizationId/staff-class-assignments',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.assignStaff)
 router.post('/organizations/:organizationId/staff-class-assignments/:assignmentId/end',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationAdminController.endStaffAssignment)
+
+// Narrow campus-only officer discovery. Never return the student membership
+// register merely to support assignment of a reporting disclosure capability.
+router.get('/organizations/:organizationId/disclosure-officers',authenticateSchool,requireOrganizationGovernance,
+  asyncHandler(async(req,res)=>{
+    const organizationId=z.string().uuid().parse(req.params.organizationId)
+    const rows=await prisma.$queryRaw<Array<{
+      membershipId:string;displayName:string;hasPsychology:boolean;hasDisclosure:boolean;
+    }>>`
+      SELECT m.id AS "membershipId",ca.login_name AS "displayName",
+        EXISTS(SELECT 1 FROM organization_capability_grants cap
+          WHERE cap.organization_id=m.organization_id AND cap.membership_id=m.id
+            AND cap.capability='PSYCHOLOGY_STAFF' AND cap.revoked_at IS NULL) AS "hasPsychology",
+        EXISTS(SELECT 1 FROM organization_capability_grants cap
+          WHERE cap.organization_id=m.organization_id AND cap.membership_id=m.id
+            AND cap.capability='PARENT_REPORT_DISCLOSURE' AND cap.revoked_at IS NULL) AS "hasDisclosure"
+      FROM organization_memberships m
+      JOIN users u ON u.id=m.user_id AND u.account_domain='SCHOOL' AND u.role IN ('TEACHER','ADMIN')
+        AND u.is_active=true AND u.is_frozen=false
+      JOIN campus_accounts ca ON ca.user_id=m.user_id
+      JOIN organization_persona_grants persona ON persona.organization_id=m.organization_id
+        AND persona.membership_id=m.id AND persona.persona='COUNSELOR' AND persona.revoked_at IS NULL
+      WHERE m.organization_id=${organizationId}
+        AND m.valid_from<=statement_timestamp()
+        AND (m.valid_until IS NULL OR m.valid_until>statement_timestamp())
+      ORDER BY ca.login_name,m.id LIMIT 101
+    `
+    return success(res,{list:rows.slice(0,100),hasMore:rows.length>100})
+  }))
+
 router.post('/organizations/:organizationId/memberships/:membershipId/capabilities',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,guardCampusCapabilityGrant,organizationController.grantCapability)
 router.post('/organizations/:organizationId/memberships/:membershipId/capabilities/revoke',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationController.revokeCapability)
 export default router

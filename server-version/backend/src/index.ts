@@ -51,6 +51,7 @@ import campusRecoveryRoutes from './modules/campus/recovery.routes'
 import campusActivityRoutes from './modules/campus/activity.routes'
 import campusActivityRunRoutes from './modules/campus/activity.run.routes'
 import campusParentRoutes from './modules/campus/parent.routes'
+import campusReportRoutes from './modules/campus/report.routes'
 import campusPeerRoutes from './modules/campus/peer.routes'
 import campusCompositeRoutes from './modules/campus/composite.routes'
 import userRoutes from './routes/users'
@@ -250,6 +251,7 @@ app.use('/api/campus', campusRecoveryRoutes)
 app.use('/api/campus', campusActivityRoutes)
 app.use('/api/campus', campusActivityRunRoutes)
 app.use('/api/campus', campusParentRoutes)
+app.use('/api/campus', campusReportRoutes)
 app.use('/api/campus', campusPeerRoutes)
 app.use('/api/campus', campusCompositeRoutes)
 app.use('/api/parent-links', parentLinksRouter)

@@ -4,6 +4,29 @@ import { SchoolStudentTasks } from './SchoolStudentTasks'
 import type { SchoolApi } from './SchoolRecovery'
 
 describe('Huischool student tasks remain inside the campus account realm',()=>{
+  it('reads only the published respondent contract for a completed campus FINAL',async()=>{
+    const executionId='00000000-0000-4000-8000-000000000042'
+    const api=vi.fn(async(path:string)=>{
+      if(path.startsWith('/my/activity-tasks'))return {
+        list:[{id:executionId,activityId:'campus-act',activityTitle:'学习与心理支持',
+          kind:'MEASUREMENT',title:'我的学习状态',status:'COMPLETED',href:null,deadline:null}],
+        total:1,page:1,hasMore:false,truncated:false,
+      }
+      if(path==='/reports/student/executions/'+executionId)return {
+        schemaVersion:1,mode:'INDIVIDUAL_SUMMARY',state:'READY',metrics:{score:3.5,invalid:null},
+      }
+      throw Error('unexpected path '+path)
+    })
+    render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'查看我的测评反馈'}))
+    const panel=await screen.findByRole('region',{name:'获准的个人测评反馈'})
+    expect(panel).toHaveTextContent('score：3.5')
+    expect(panel).toHaveTextContent('不能代替专业判断')
+    expect(api).toHaveBeenCalledWith('/reports/student/executions/'+executionId)
+    expect(screen.queryByText(/原始答卷/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'关闭我的反馈'}))
+    expect(screen.queryByRole('region',{name:'获准的个人测评反馈'})).not.toBeInTheDocument()
+  })
   it('shows only server-authorized tasks and submits through campus path',async()=>{
     const execute=vi.fn(async(path:string,method:string='GET')=>{
       if(path.startsWith('/my/activity-tasks'))return {
