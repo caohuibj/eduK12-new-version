@@ -9,7 +9,7 @@ import { hasActiveCourseMembership } from '../../utils/courseAccess'
 import { assignmentController } from '../../controllers/assignmentController'
 import { checkinController } from '../../controllers/checkinController'
 import { allocateCampusActivityParticipants, revokeCampusActivityParticipant } from './activity.allocation'
-import { addCampusActivityTask, listCampusStudentTasks } from './activity.tasks'
+import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks } from './activity.tasks'
 import {
   CampusActivityError, createCampusActivity, listCampusActivities,readCampusActivity,
   updateCampusActivity, addCampusActivityCollaborator, changeCampusActivityStatus,
@@ -118,6 +118,9 @@ router.post('/organizations/:organizationId/activities/:courseId/tasks',
     }))
   }))
 
+router.get('/my/parent-run-tasks',authenticateSchool,wrap(async(req,res)=>
+  success(res,await listCampusParentRunTasks(req.user!))
+))
 router.get('/my/activity-tasks',authenticateSchool,wrap(async(req,res)=>{
   const query=z.object({
     page:z.coerce.number().int().min(1).default(1),

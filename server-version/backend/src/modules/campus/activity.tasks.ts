@@ -156,3 +156,58 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     hasMore:offset+input.pageSize<tasks.length,
     truncated:activityRows.length>200||assigned.truncated}
 }
+
+/** One bounded parent inbox. Uses the same canonical Run population gate as
+ * student tasks; returns no subject name, sensitive scores or FINAL artefacts.
+ */
+export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
+  if(actor.accountDomain!=='SCHOOL'||actor.role!=='PARENT')
+    deny('CAMPUS_PARENT_REQUIRED',403)
+  const links=await prisma.$queryRaw<Array<{
+    organizationId:string;courseId:string;runId:string;activityTitle:string
+  }>>`
+    SELECT ar."organization_id" AS "organizationId",
+      ar."course_id" AS "courseId",ar."run_id" AS "runId",
+      course."title" AS "activityTitle"
+    FROM "campus_activity_runs" ar
+    JOIN "campus_activities" a ON a."course_id"=ar."course_id"
+      AND a."organization_id"=ar."organization_id" AND a."status"='OPEN'
+    JOIN "courses" course ON course."id"=a."course_id"
+      AND course."course_type"='CAMPUS_ACTIVITY'
+    JOIN "organizations" o ON o."id"=ar."organization_id"
+      AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
+    JOIN "assessment_runs" r ON r."id"=ar."run_id"
+      AND r."organization_id"=ar."organization_id" AND r."status"='PUBLISHED'
+    WHERE EXISTS (
+      SELECT 1 FROM "parent_student_relationships" link
+      JOIN "campus_student_enrollments" e ON e."user_id"=link."student_user_id"
+        AND e."organization_id"=ar."organization_id" AND e."status"='APPROVED'
+      JOIN "campus_activity_participants" selected ON selected."course_id"=ar."course_id"
+        AND selected."organization_id"=ar."organization_id" AND selected."status"='ACTIVE'
+      JOIN "organization_memberships" m ON m."id"=selected."membership_id"
+        AND m."organization_id"=ar."organization_id"
+        AND m."user_id"=link."student_user_id"
+        AND m."valid_from"<=statement_timestamp()
+        AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+      WHERE link."parent_user_id"=${actor.userId}
+        AND link."status"='ACTIVE' AND link."approved_at" IS NOT NULL
+        AND link."revoked_at" IS NULL
+    )
+    ORDER BY ar."created_at" DESC LIMIT 101
+  `
+  const indexed=links.slice(0,100)
+  if(!indexed.length)return {list:[],truncated:links.length>100}
+  const tasks=await listAssignedRunTasks(actor.userId,{runIds:indexed.map(l=>l.runId)})
+  const byRun=new Map(indexed.map(l=>[l.runId,l]))
+  const list=tasks.list.filter(t=>byRun.has(t.runId)).map(t=>{
+    const activity=byRun.get(t.runId)!
+    return {
+      executionId:t.executionId,runId:t.runId,
+      organizationId:activity.organizationId,activityId:activity.courseId,
+      activityTitle:activity.activityTitle,runTitle:t.runName,
+      status:t.status,deadline:t.deadline?.toISOString()??null,
+      // No child identifiers, reports, psychometric scores or raw responses.
+    }
+  })
+  return {list,truncated:links.length>100||tasks.truncated}
+}
