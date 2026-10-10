@@ -170,7 +170,7 @@ export function SchoolParentReports({api}: {api:SchoolApi}) {
     {!children?<p>正在核对家长版报告权限…</p>:children.list.length===0?
       <p>目前没有可申请查看报告的有效亲子关系。</p>:
       <div className="hs-actions">{children.list.map((row,i)=>
-        <button key={row.relationshipId} disabled={busy} aria-pressed={child===row.childId}
+        <button key={row.relationshipId} aria-pressed={child===row.childId}
           onClick={()=>void selectChild(row.childId)}>孩子 {i+1} 的获准反馈</button>)}</div>}
     {reports&&<div className="hs-task-list">{reports.list.length===0?
       <p>该孩子目前没有完成全部单份授权步骤的家长报告。</p>:
