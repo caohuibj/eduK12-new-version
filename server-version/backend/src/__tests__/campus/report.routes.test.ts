@@ -14,6 +14,7 @@ const state = vi.hoisted(() => ({
   publisher: { list: vi.fn(), templates: vi.fn(), preview: vi.fn(), publish: vi.fn() },
   studentStatus: vi.fn(),
   participant: { list: vi.fn(), read: vi.fn() },
+  professional: { list: vi.fn(), read: vi.fn() },
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -22,6 +23,10 @@ vi.mock('../../modules/campus/admission.service', () => ({ readCampusStudentStat
 vi.mock('../../modules/reporting/participantService', () => ({
   listParticipantLongitudinal: state.participant.list,
   readParticipantLongitudinal: state.participant.read,
+}))
+vi.mock('../../modules/campus/professional-reports', () => ({
+  listCampusProfessionalReports: state.professional.list,
+  readCampusProfessionalReport: state.professional.read,
 }))
 vi.mock('../../middleware/auth', () => ({
   authenticateSchool: (req: any, res: any, next: any) => {
@@ -90,6 +95,8 @@ describe('Huischool governed report HTTP surface', () => {
     state.studentStatus.mockResolvedValue({ status: 'APPROVED' })
     state.participant.list.mockResolvedValue({ list: [] })
     state.participant.read.mockResolvedValue({ metrics: {} })
+    state.professional.list.mockResolvedValue({ list: [] })
+    state.professional.read.mockResolvedValue({ projection:{kind:'PROTECTED_FEEDBACK',state:'suppressed'} })
   })
 
   it('never accepts a legacy/training credential as a campus session', async () => {
@@ -137,6 +144,15 @@ describe('Huischool governed report HTTP surface', () => {
     }, { 'x-school-role': 'STUDENT' })
     expect(response.status).toBe(400)
     expect(state.parent.acceptReportConsent).not.toHaveBeenCalled()
+  })
+  it('requires the live counselor relationship on every professional detail read', async () => {
+    state.professional.read.mockRejectedValue(new ParentPortalError('CAMPUS_REPORT_NOT_FOUND',404))
+    const response = await request('/reports/professional/organizations/'+CHILD+'/artifacts/'+ARTIFACT,'GET',undefined,{'x-school-role':'TEACHER'})
+    expect(response.status).toBe(404)
+    expect(await response.json()).toMatchObject({data:null})
+    expect(state.professional.read).toHaveBeenCalledWith(expect.objectContaining({
+      userId:'school-parent',accountDomain:'SCHOOL',
+    }),CHILD,ARTIFACT)
   })
   it('rejects officer disclosure grants without a recent CAMPUS TOTP step-up', async () => {
     const response = await request('/reports/relationships/' + LINK + '/artifacts/' + ARTIFACT + '/grants', 'POST', {
