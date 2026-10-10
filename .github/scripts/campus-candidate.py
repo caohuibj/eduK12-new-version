@@ -39,9 +39,12 @@ with tempfile.TemporaryDirectory(prefix='campus-ci-') as temp:
   phase(component+'-compile',lambda:run(args+['--target','build','-t',builder,context]))
   if component=='frontend':
    changed=[e['file'].removeprefix(context+'/') for e in p['changes'] if e['file'].startswith(context+'/') and e['file'].endswith(('.ts','.tsx'))]
-   cmd='npx eslint '+' '.join(changed)+' && npx tsc -p tsconfig.app.json --noEmit && npm audit --audit-level=high && npx vitest run '+' '.join(frontend_tests)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-tests.json'
-   phase('frontend-contracts',lambda:run(['docker','run','--rm','-v',str(evidence.resolve())+':/evidence',builder,'sh','-ec',cmd],900))
+   config=Path(temp)/'tsconfig.campus.json';config.write_text(json.dumps({'extends':'./tsconfig.app.json','include':['src/school/SchoolApp.tsx','src/vite-env.d.ts','src/test/setup.ts']+frontend_tests,'references':[]}))
+   cmd='npx eslint '+' '.join(changed)+' && npx tsc -p tsconfig.campus.json --noEmit && npm audit --audit-level=high && npx vitest run '+' '.join(frontend_tests)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-tests.json'
+   phase('frontend-contracts',lambda:run(['docker','run','--rm','-v',str(evidence.resolve())+':/evidence','-v',str(config)+':/app/tsconfig.campus.json:ro',builder,'sh','-ec',cmd],900))
    report=json.loads((evidence/'frontend-tests.json').read_text());assert report['success'] and report['numPendingTests']==0 and report['numTotalTests']>0
+   for test in frontend_tests:
+    suite=next(x for x in report['testResults'] if x['name'].endswith(test));assert suite['assertionResults'] and all(x['status']=='passed' for x in suite['assertionResults'])
   else:
    resources=[]
    try:

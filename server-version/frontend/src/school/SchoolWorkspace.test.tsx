@@ -17,7 +17,7 @@ it('keeps teacher task panels unique when organization context loads',async()=>{
   render(<SchoolApp/> )
   await screen.findByRole('heading',{name:'欢迎，示例教师'})
   expect(screen.queryByRole('heading',{name:'我的学生观察任务'})).not.toBeInTheDocument()
-  fireEvent.click(await screen.findByRole('link',{name:'学生观察任务',exact:true}))
+  fireEvent.click(await screen.findByRole('link',{name:'学生观察任务'}))
   await screen.findByRole('heading',{name:'我的学生观察任务'})
   expect(window.location.pathname).toBe('/workspace/tasks')
   await screen.findByText('目前没有可作答的教师观察任务。请确认任教关系、活动状态和测评发布情况。')

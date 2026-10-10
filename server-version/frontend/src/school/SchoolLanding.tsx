@@ -74,7 +74,7 @@ export function SchoolLanding({ onJoin }: { onJoin: () => void }) {
 }
 
 export function SchoolCodeRegistration({ api, onResolved, onLogin }: {
-  api: <T>(path: string, method?: string, payload?: unknown) => Promise<T>
+  api: (path: string, method?: string, payload?: unknown) => Promise<SchoolRegistrationEntry>
   onResolved: (entry: SchoolRegistrationEntry, code: string) => void
   onLogin: () => void
 }) {
@@ -88,7 +88,7 @@ export function SchoolCodeRegistration({ api, onResolved, onLogin }: {
     const attempt = ++sequence.current
     setBusy(true); setError('')
     try {
-      const entry = await api<SchoolRegistrationEntry>('/registration/resolve', 'POST', { code: code.trim() })
+      const entry = await api('/registration/resolve', 'POST', { code: code.trim() })
       if (attempt === sequence.current) onResolved(entry, code.trim())
     } catch (cause) {
       if (attempt === sequence.current) setError(cause instanceof Error ? cause.message : '注册码暂不可用，请核实或联系学校')
