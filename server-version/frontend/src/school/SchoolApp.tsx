@@ -3,6 +3,9 @@ import './school.css'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
+import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
+import { SchoolParentTasks } from './SchoolParentTasks'
+import { SchoolPeerConsent } from './SchoolPeerConsent'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL'}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -71,9 +74,11 @@ const SchoolMark=()=>(
 export default function SchoolApp(){
   const [user,setUser]=useState<CampusUser|null>(null)
   const [loading,setLoading]=useState(true)
-  const [screen,setScreen]=useState<'home'|'login'|'register'|'staff'|'recover'|'mfa'|'workspace'>(()=>
+  const [screen,setScreen]=useState<'home'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
     window.location.pathname==='/register'?'register':
-      window.location.pathname==='/staff/register'?'staff':window.location.pathname==='/recover'?'recover':'home')
+      window.location.pathname==='/staff/register'?'staff':
+      window.location.pathname==='/parent/register'?'parent':
+      window.location.pathname==='/recover'?'recover':'home')
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [username,setUsername]=useState('')
@@ -121,7 +126,10 @@ export default function SchoolApp(){
       if(list.length)setSchoolId(prev=>prev||list[0].id)
     }).catch(()=>setOrgs([]))
     if(user.role==='STUDENT'){
-      void api<{status:string}>('/my-status').then(result=>setStudentStatus(result.status))
+      void api<{status:string;organizationId:string|null}>('/my-status').then(result=>{
+        setStudentStatus(result.status)
+        if(result.organizationId)setSchoolId(old=>old||result.organizationId!)
+      })
         .catch(()=>setStudentStatus('暂时无法读取当前状态'))
     }
   },[user])
@@ -240,7 +248,7 @@ export default function SchoolApp(){
       <SchoolMark/>
       <nav aria-label="校园导航">
         {user?<><span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button></>:
-          <><button onClick={()=>setScreen('login')}>登录</button><button className="hs-primary" onClick={()=>setScreen('register')}>学生注册</button></>}
+          <><button onClick={()=>setScreen('login')}>登录</button><button className="hs-primary" onClick={()=>setScreen('register')}>学生注册</button><button onClick={()=>setScreen('parent')}>家长注册</button></>}
       </nav>
     </header>
     <main className="hs-main">
@@ -251,7 +259,7 @@ export default function SchoolApp(){
         <p className="hs-eyebrow">林间见心 · CAMPUS MENTAL HEALTH</p>
         <h1>让每一个生命都被看见与支持</h1>
         <p>校园心理健康、学习适应、师生关系与家校支持。学生可以使用班级分发的限时激活码，创建不要求真实姓名、电话或邮箱的校园账号。</p>
-        <div className="hs-actions"><button className="hs-primary" onClick={()=>setScreen('register')}>我是学生 · 注册</button><button onClick={()=>setScreen('login')}>已有账号 · 登录</button><button onClick={()=>setScreen('staff')}>教职员工邀请码</button></div>
+        <div className="hs-actions"><button className="hs-primary" onClick={()=>setScreen('register')}>我是学生 · 注册</button><button onClick={()=>setScreen('login')}>已有账号 · 登录</button><button onClick={()=>setScreen('staff')}>教职员工邀请码</button><button onClick={()=>setScreen('parent')}>家长独立注册</button></div>
       </section>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
         <h1>校园账号登录</h1>
@@ -274,6 +282,8 @@ export default function SchoolApp(){
       </section>}
       {!loading&&!user&&screen==='recover'&&<SchoolStudentRecovery api={api}
         onComplete={()=>{setScreen('login');notify('校园密码已更新，请重新登录。')}}/>}
+      {!loading&&!user&&screen==='parent'&&<SchoolParentRegistration api={api}
+        onRegistered={()=>{setScreen('login');notify('校园家长账号已建立，请等待孩子确认后再参与家校测评。')}}/>}
       {!loading&&!user&&screen==='staff'&&<section className="hs-panel hs-narrow">
         <h1>教职员工独立注册</h1><p>仅限获得学校管理员一次性邀请码的人员。培训版账号不能直接登录校园版。</p>
         <form onSubmit={e=>void registerStaff(e)}>
@@ -303,7 +313,7 @@ export default function SchoolApp(){
       {!loading&&user&&screen==='workspace'&&recoveryCodes.length===0&&<section>
         <p className="hs-eyebrow">HUISCHOOL · 校园工作台</p>
         <h1>欢迎，{user.username}</h1>
-        {user.role!=='STUDENT'&&<section className="hs-panel">
+        {(user.role==='TEACHER'||user.role==='ADMIN')&&<section className="hs-panel">
           <h2>敏感操作二次验证</h2>
           <p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p>
           <div className="hs-actions">
@@ -316,7 +326,11 @@ export default function SchoolApp(){
           </div>
         </section>}
         {user.role==='STUDENT'?
-          studentStatus==='APPROVED'?<SchoolStudentTasks api={api}/>:
+          studentStatus==='APPROVED'?<>
+            <SchoolStudentTasks api={api}/>
+            <SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>
+            <SchoolPeerConsent api={api} role="STUDENT"/>
+          </>:
             <section className="hs-panel"><h2>我的校园活动</h2>
               <p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':
                 '目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p>
@@ -365,12 +379,15 @@ export default function SchoolApp(){
               <button disabled={working} onClick={()=>void invite()}>生成邀请</button></div>
             {newInvite&&<div className="hs-secret"><p>仅显示一次的邀请码：</p><code>{newInvite}</code></div>}
           </section>}
-        </>:<section className="hs-panel">
-          <h2>家长校园入口</h2>
-          <p>家长只可使用经过学校确认的独立校园账号和亲子关系，查看明确授权的内容。
-            不得使用培训版账号或直接继承学生敏感心理报告。</p>
-          <p>家校测评的具体权限、活动关系和报告披露按后续正式授权流程执行。</p>
-        </section>}
+        </>:<div>
+          <SchoolParentLinks api={api} role="PARENT"/>
+          <SchoolPeerConsent api={api} role="PARENT"/>
+          <SchoolParentTasks api={api}/>
+          <section className="hs-panel">
+            <h2>校园家校支持</h2>
+            <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
+          </section>
+        </div>}
       </section>}
     </main>
     <footer className="hs-footer">Huischool · 林间见心 · 校园心理健康 | 教育支持而非医学诊断</footer>
