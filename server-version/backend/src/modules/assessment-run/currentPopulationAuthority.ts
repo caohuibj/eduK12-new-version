@@ -23,6 +23,31 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
      SELECT 1 FROM parent_student_relationships parent_link WHERE parent_link.id=relation.relationship_ref
       AND parent_link.status='ACTIVE' AND parent_link.approved_at IS NOT NULL
     ))
+    OR (relation.relationship_kind='STUDENT_PEER' AND EXISTS (
+     SELECT 1 FROM campus_peer_assignments peer
+     JOIN campus_peer_consents subject_consent ON subject_consent.course_id=peer.course_id
+      AND subject_consent.organization_id=peer.organization_id
+      AND subject_consent.membership_id=peer.subject_membership_id
+      AND subject_consent.withdrawn_at IS NULL AND subject_consent.guardian_consented_at IS NOT NULL
+      AND subject_consent.consent_version='HUISCHOOL_PEER_V1'
+     JOIN campus_peer_consents respondent_consent ON respondent_consent.course_id=peer.course_id
+      AND respondent_consent.organization_id=peer.organization_id
+      AND respondent_consent.membership_id=peer.respondent_membership_id
+      AND respondent_consent.withdrawn_at IS NULL AND respondent_consent.guardian_consented_at IS NOT NULL
+      AND respondent_consent.consent_version='HUISCHOOL_PEER_V1'
+     JOIN parent_student_relationships subject_guardian ON subject_guardian.id=subject_consent.guardian_relationship_id
+      AND subject_guardian.student_user_id=subject.user_id
+      AND subject_guardian.status='ACTIVE' AND subject_guardian.approved_at IS NOT NULL AND subject_guardian.revoked_at IS NULL
+     JOIN parent_student_relationships respondent_guardian ON respondent_guardian.id=respondent_consent.guardian_relationship_id
+      AND respondent_guardian.student_user_id=respondent.user_id
+      AND respondent_guardian.status='ACTIVE' AND respondent_guardian.approved_at IS NOT NULL AND respondent_guardian.revoked_at IS NULL
+     WHERE peer.id=relation.relationship_ref AND peer.organization_id=org.id
+       AND peer.subject_membership_id=subject.membership_id
+       AND peer.respondent_membership_id=respondent.membership_id
+       AND peer.status='ACTIVE'
+       AND subject.actor_role='STUDENT' AND respondent.actor_role='STUDENT'
+       AND subject.user_id<>respondent.user_id
+    ))
     OR (relation.relationship_kind='COUNSELOR_CLIENT' AND EXISTS (
      SELECT 1 FROM organization_counselor_client_relationships client_link WHERE client_link.id=relation.relationship_ref
       AND client_link.organization_id=org.id AND ${currentWindowSql(Prisma.sql`client_link`)}
