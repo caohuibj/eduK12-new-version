@@ -121,9 +121,10 @@ router.post('/organizations/:organizationId/activities/:courseId/tasks',
     }))
   }))
 
-router.get('/my/teacher-run-tasks',authenticateSchool,wrap(async(req,res)=>
-  success(res,await listCampusTeacherRunTasks(req.user!))
-))
+router.get('/my/teacher-run-tasks',authenticateSchool,wrap(async(req,res)=>{
+  const query=z.object({organizationId:uuid}).strict().parse(req.query)
+  return success(res,await listCampusTeacherRunTasks(req.user!,query.organizationId))
+}))
 router.get('/my/student-reference',authenticateSchool,wrap(async(req,res)=>{
   if(req.user?.accountDomain!=='SCHOOL'||req.user.role!=='STUDENT')
     throw new CampusActivityError('CAMPUS_STUDENT_REQUIRED',403)
