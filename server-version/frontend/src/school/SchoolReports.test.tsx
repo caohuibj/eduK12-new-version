@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
-import { SchoolParentReports, SchoolStudentReportConsent, SchoolStudentFeedback } from './SchoolReports'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { SchoolParentReports, SchoolStudentReportConsent, SchoolStudentFeedback, SchoolDisclosureOfficers } from './SchoolReports'
 import type { SchoolApi } from './SchoolRecovery'
 
 const CHILD_A='00000000-0000-4000-8000-000000000001'
@@ -59,4 +59,26 @@ describe('Huischool report privacy and lifecycle UI', () => {
     expect(await screen.findByText(/目前没有已生成且适合向你展示的纵向反馈/)).toBeInTheDocument()
     expect(screen.queryByText(/诊断结果：/)).not.toBeInTheDocument()
   })
+  it('cannot grant parent disclosure to a person without psychology capability',async()=>{
+    const api=vi.fn(async()=>({list:[{membershipId:'one',displayName:'校园心理老师',hasPsychology:false,hasDisclosure:false}]}))
+    render(<SchoolDisclosureOfficers api={api as SchoolApi} organizationId={CHILD_A}/>)
+    expect(await screen.findByRole('button',{name:'授予专项披露能力'})).toBeDisabled()
+    expect(api).toHaveBeenCalledTimes(1)
+  })
+  it('admin issues only an explicit PARENT_REPORT_DISCLOSURE grant',async()=>{
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    const api=vi.fn(async(path:string,method='GET',payload?:unknown)=>{
+      if(method==='POST') {
+        expect(path).toBe('/organizations/'+CHILD_A+'/memberships/staff-one/capabilities')
+        expect(payload).toEqual({capability:'PARENT_REPORT_DISCLOSURE'})
+        return {}
+      }
+      return {list:[{membershipId:'staff-one',displayName:'学校心理教师',hasPsychology:true,hasDisclosure:false}]}
+    })
+    render(<SchoolDisclosureOfficers api={api as SchoolApi} organizationId={CHILD_A}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'授予专项披露能力'}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(expect.stringContaining('/memberships/staff-one/capabilities'),'POST',{capability:'PARENT_REPORT_DISCLOSURE'}))
+    confirm.mockRestore()
+  })
+
 })
