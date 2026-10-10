@@ -13,6 +13,7 @@ import {
 import { allocateCampusActivityParticipants } from '../../modules/campus/activity.allocation'
 import { addCampusActivityTask,listCampusStudentTasks } from '../../modules/campus/activity.tasks'
 import { assignmentController } from '../../controllers/assignmentController'
+import { courseController } from '../../controllers/courseController'
 import { checkinController } from '../../controllers/checkinController'
 import type { Request, Response } from 'express'
 import { createCampusActivityRunDraft } from '../../modules/campus/activity.runs'
@@ -117,6 +118,19 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
       courseCode:userName('legacy_'),
     }})
     expect(old.courseType).toBe('LEGACY_COURSE')
+    // New training Course created through its existing public service route
+    // must be tagged TRAINING_COURSE without relabelling any historical row.
+    let payload:any
+    const reply={
+      status(_code:number){return reply},
+      json(body:any){payload=body;return reply},
+    } as unknown as Response
+    await courseController.create({
+      user:{userId:legacyUser.id,username:legacyUser.username,role:legacyUser.role,
+        accountDomain:'LEGACY'},body:{title:'新培训课程'},query:{},
+    } as unknown as Request,reply)
+    expect(payload?.code).toBe(0)
+    expect(payload.data.courseType).toBe('TRAINING_COURSE')
     const f=await fixture()
     await expect(db.course.create({data:{
       title:'Forbidden training',creatorId:f.admin.userId,
