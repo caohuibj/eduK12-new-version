@@ -11,6 +11,7 @@ import type { SchoolApi } from './SchoolRecovery'
 
 export type CampusExecutionRef={
   organizationId:string;courseId:string;runId:string;executionId:string
+  consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
   api:SchoolApi;execution:CampusExecutionRef
@@ -21,6 +22,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [done,setDone]=useState(false)
+  const [consentAccepted,setConsentAccepted]=useState(false)
   const prefix=`/organizations/${execution.organizationId}/activities/${execution.courseId}/runs/${execution.runId}/executions/${execution.executionId}`
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   const load=useCallback(async(id:string)=>{
@@ -31,6 +33,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
   const start=async()=>{
     setBusy(true);setError('')
     try{
+      // Only the respondent may accept a frozen observer Run consent; a
+      // student's/guardian's activity association never implies consent.
+      if(execution.consentRequired&&!consentAccepted)
+        throw new Error('请先阅读并明确同意本次观察测评使用范围')
+      if(execution.consentRequired){
+        await api(prefix+'/consent/accept','POST',{})
+      }
       const result=await api<{
         state:'STARTED'|'IN_PROGRESS';runtimeBindingKind?:string;runtimeBindingRef?:string
       }>(prefix+'/start','POST',{})
@@ -119,8 +128,21 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
         }
         setChild(item)
       }}
-    />:<button className="hs-primary" disabled={busy} onClick={()=>void start()}>
-      {busy?'正在核对正式测评…':'开始或继续正式测评'}
-    </button>}
+    />:<div>
+      {execution.consentRequired&&<div className="hs-panel">
+        <h3>本次受控观察测评的知情同意</h3>
+        <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>
+        <p>可见性政策：{execution.consentVisibility||'仅限经授权人员'}</p>
+        <p>是否可披露任何个人心理报告仍由独立的报告政策决定，拒绝同意不会触发作答。</p>
+        <label className="hs-consent"><input type="checkbox"
+          checked={consentAccepted} onChange={e=>setConsentAccepted(e.target.checked)}/>
+          <span>我已阅读本次测评的用途与可见性说明，自愿同意作答。</span>
+        </label>
+      </div>}
+      <button className="hs-primary" disabled={busy||(!!execution.consentRequired&&!consentAccepted)}
+        onClick={()=>void start()}>
+        {busy?'正在核对正式测评…':'开始或继续正式测评'}
+      </button>
+    </div>}
   </section>
 }

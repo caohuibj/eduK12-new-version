@@ -111,6 +111,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     id:string;activityId:string;activityTitle:string;kind:CampusTaskType|'MEASUREMENT'
     title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
     deadline:string|null;href:string|null
+    consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
   }>=[]
   for(const t of assignments){
     const activity=activityMap.get(t.courseId)
@@ -143,6 +144,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       e.status==='EXPIRED'?'EXPIRED':'UNAVAILABLE'
     tasks.push({id:e.executionId,activityId:courseId,activityTitle:activity.title,
       kind:'MEASUREMENT',title:e.runName,status,
+      consentRequired:e.consentRequired,consentPurpose:e.consentPurpose,
+      consentVisibility:e.consentVisibility,
       deadline:e.deadline?.toISOString()??null,
       href:status==='PENDING'||status==='IN_PROGRESS'
         ?`/organizations/${activity.organizationId}/activities/${courseId}/runs/${e.runId}/executions/${e.executionId}`:null})
@@ -206,6 +209,8 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       organizationId:activity.organizationId,activityId:activity.courseId,
       activityTitle:activity.activityTitle,runTitle:t.runName,
       status:t.status,deadline:t.deadline?.toISOString()??null,
+      consentRequired:t.consentRequired,consentPurpose:t.consentPurpose,
+      consentVisibility:t.consentVisibility,
       // No child identifiers, reports, psychometric scores or raw responses.
     }
   })

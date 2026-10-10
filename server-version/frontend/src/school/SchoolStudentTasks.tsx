@@ -7,6 +7,7 @@ type SchoolTask={
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
   deadline:string|null;href:string|null
+  consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
 type TaskDetails={
@@ -87,7 +88,10 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
                   const parts=task.href!.match(/^\/organizations\/([^/]+)\/activities\/([^/]+)\/runs\/([^/]+)\/executions\/([^/]+)$/)
                   if(!parts){setError('正式测评路径无效，请刷新后重试');return}
                   setExecution({organizationId:parts[1],courseId:parts[2],
-                    runId:parts[3],executionId:parts[4]})
+                    runId:parts[3],executionId:parts[4],
+                    consentRequired:task.consentRequired,
+                    consentPurpose:task.consentPurpose,
+                    consentVisibility:task.consentVisibility})
                 }}>开始／继续官方测评</button>:
               <p>测评已完成或暂未开放。报告需经独立授权后才可查看。</p>:
             task.href&&task.status!=='EXPIRED'&&<button disabled={busy}
