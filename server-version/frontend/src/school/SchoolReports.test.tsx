@@ -41,6 +41,30 @@ describe('Huischool report privacy and lifecycle UI', () => {
     expect(screen.queryByText('仅用于受控查看的内容')).not.toBeInTheDocument()
     expect(await screen.findByText('该孩子目前没有完成全部单份授权步骤的家长报告。')).toBeInTheDocument()
   })
+  it('discards a delayed former child response after switching to another child',async()=>{
+    let finishOld:((value:any)=>void)|undefined
+    const oldReport=new Promise(resolve=>{finishOld=resolve})
+    const api=vi.fn(async(path:string)=>{
+      if(path==='/reports/parent/children')return {list:[
+        {childId:CHILD_A,relationshipId:'link-a'},{childId:CHILD_B,relationshipId:'link-b'},
+      ]}
+      if(path==='/reports/parent/children/'+CHILD_A+'/reports')return {
+        list:[{id:ARTIFACT,title:'旧孩子报告入口',mode:'EDUCATIONAL_SUMMARY'}],
+      }
+      if(path==='/reports/parent/children/'+CHILD_A+'/reports/'+ARTIFACT)return oldReport
+      if(path==='/reports/parent/children/'+CHILD_B+'/reports')return {list:[]}
+      throw Error('unexpected path '+path)
+    })
+    render(<SchoolParentReports api={api as SchoolApi}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'孩子 1 的获准反馈'}))
+    fireEvent.click(await screen.findByRole('button',{name:'查看已授权反馈'}))
+    // Child selector remains usable while the first child's detail is pending.
+    fireEvent.click(screen.getByRole('button',{name:'孩子 2 的获准反馈'}))
+    expect(await screen.findByText('该孩子目前没有完成全部单份授权步骤的家长报告。')).toBeInTheDocument()
+    finishOld?.({audience:'PARENT',title:'旧报告',mode:'EDUCATIONAL_SUMMARY',summary:'不得重现的旧私密内容',blocks:[]})
+    await waitFor(()=>expect(screen.queryByText('不得重现的旧私密内容')).not.toBeInTheDocument())
+    expect(screen.queryByText('旧报告')).not.toBeInTheDocument()
+  })
   it('students cannot share a report merely because the parent link is active',async()=>{
     const api=vi.fn(async(path:string)=>{
       if(path==='/parent-links')return {list:[{id:'link-1',status:'ACTIVE'}]}
