@@ -13,11 +13,12 @@ const hidden = (): never => reportingFail('CAMPUS_REPORT_NOT_FOUND', 'campus rep
 async function context(actor: AuthenticatedPrincipal, organizationId: string) {
   if (actor.accountDomain !== 'SCHOOL') hidden()
   const access = await resolveOrganizationAccessContext({ principal: actor, organizationId })
-  if (!access || access.productDomain !== 'SCHOOL' || !access.membershipId
+  if (!access) return hidden()
+  if (access.productDomain !== 'SCHOOL' || !access.membershipId
     || access.organizationStatus !== 'ACTIVE'
     || !access.personas.includes('COUNSELOR')
     || !contextHasCapability(access, 'PSYCHOLOGY_STAFF')
-    || access.explicitDenies.some(d => ['*','REPORT_READ','REPORT_MEMBER_READ'].includes(d))) hidden()
+    || access.explicitDenies.some(d => ['*','REPORT_READ','REPORT_MEMBER_READ'].includes(d))) return hidden()
   return access
 }
 
