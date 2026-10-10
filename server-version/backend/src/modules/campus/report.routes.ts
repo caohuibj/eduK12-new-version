@@ -11,6 +11,7 @@ import { ReportingError } from '../reporting/types'
 import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
+import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -65,6 +66,13 @@ router.get('/reports/student/longitudinal/:artifactId', guarded(async req => {
   }
   return readParticipantLongitudinal(req.user!.userId, id.parse(req.params.artifactId))
 }))
+
+// Counselor's professional reports are separately authorized from parent
+// publication and do not become visible when a student report is shared.
+router.get('/reports/professional/organizations/:organizationId/artifacts', guarded(req =>
+  listCampusProfessionalReports(req.user!, id.parse(req.params.organizationId))))
+router.get('/reports/professional/organizations/:organizationId/artifacts/:artifactId', guarded(req =>
+  readCampusProfessionalReport(req.user!, id.parse(req.params.organizationId), id.parse(req.params.artifactId))))
 
 // Do not imply a parent educational template has been approved simply because
 // a parent link exists. The existing explicit publication/consent/grant chain
