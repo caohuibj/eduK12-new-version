@@ -197,10 +197,11 @@ describe('Huischool governed report HTTP surface', () => {
     const listed = await request('/reports/student/longitudinal',
       'GET', undefined, {'x-school-role':'STUDENT'})
     expect(listed.status).toBe(200)
-    expect((await listed.json()).data).toMatchObject({
+    const payload = (await listed.json()).data
+    expect(payload).toMatchObject({
       list:[], releaseState:'WITHHELD_SCIENTIFIC_REVIEW',
     })
-    expect(await listed.clone().text()).not.toMatch(/"value":42|"delta":12/)
+    expect(JSON.stringify(payload)).not.toMatch(/"value":42|"delta":12/)
 
     const detail = await request('/reports/student/longitudinal/'+ARTIFACT,
       'GET', undefined, {'x-school-role':'STUDENT'})
