@@ -39,6 +39,40 @@ export const currentOfficerSourceSql = Prisma.sql`
    AND (source_deny.permission IN ('*','REPORT_READ','REPORT_MEMBER_READ','PARENT_REPORT_DISCLOSURE') OR source_deny.permission=a.policy_domain)
  )
  AND (
+
+  (
+   EXISTS(SELECT 1 FROM organizations school_org
+     WHERE school_org.id=officer.organization_id AND school_org.product_domain='SCHOOL')
+   AND EXISTS(SELECT 1 FROM organization_capability_grants school_cap
+     WHERE school_cap.organization_id=officer.organization_id AND school_cap.membership_id=officer.id
+       AND school_cap.capability='PSYCHOLOGY_STAFF' AND school_cap.revoked_at IS NULL)
+   AND EXISTS(SELECT 1 FROM organization_persona_grants school_persona
+     WHERE school_persona.organization_id=officer.organization_id AND school_persona.membership_id=officer.id
+       AND school_persona.persona='COUNSELOR' AND school_persona.revoked_at IS NULL)
+   AND NOT EXISTS(SELECT 1 FROM organization_access_denies professional_deny
+     WHERE professional_deny.organization_id=officer.organization_id AND professional_deny.user_id=officer.user_id
+       AND professional_deny.lifted_at IS NULL AND professional_deny.permission='PSYCHOLOGY_STAFF')
+   AND EXISTS(
+     SELECT 1 FROM organization_counselor_client_relationships current_relation
+     JOIN organization_memberships child_member
+       ON child_member.organization_id=current_relation.organization_id
+       AND child_member.id=current_relation.client_membership_id
+       AND child_member.user_id=g.student_user_id
+       AND child_member.valid_from<=statement_timestamp()
+       AND (child_member.valid_until IS NULL OR child_member.valid_until>statement_timestamp())
+     JOIN organization_persona_grants child_persona
+       ON child_persona.organization_id=child_member.organization_id
+       AND child_persona.membership_id=child_member.id
+       AND child_persona.persona='CLIENT' AND child_persona.revoked_at IS NULL
+     WHERE current_relation.organization_id=officer.organization_id
+       AND current_relation.counselor_membership_id=officer.id
+       AND current_relation.valid_from<=statement_timestamp()
+       AND (current_relation.valid_until IS NULL OR current_relation.valid_until>statement_timestamp())
+   )
+  )
+  OR (
+   NOT EXISTS(SELECT 1 FROM organizations school_org WHERE school_org.id=officer.organization_id AND school_org.product_domain='SCHOOL')
+   AND (
   EXISTS (SELECT 1 FROM organization_capability_grants source_cap WHERE source_cap.organization_id=officer.organization_id AND source_cap.membership_id=officer.id AND source_cap.capability='PSYCHOLOGY_STAFF' AND source_cap.revoked_at IS NULL)
   OR (a.analysis_kind='PROTECTED_FEEDBACK' AND officer.org_role='ORG_ADMIN')
   OR (
@@ -62,6 +96,8 @@ export const currentOfficerSourceSql = Prisma.sql`
     WHERE relation.organization_id=officer.organization_id AND relation.counselor_membership_id=officer.id
      AND (CASE WHEN a.analysis_kind='PROTECTED_FEEDBACK' THEN relation.valid_until IS NULL AND subject_m.valid_until IS NULL
       ELSE subject_m.valid_from<=statement_timestamp() AND (subject_m.valid_until IS NULL OR subject_m.valid_until>statement_timestamp()) AND relation.valid_from<=statement_timestamp() AND (relation.valid_until IS NULL OR relation.valid_until>statement_timestamp()) END)
+   )
+  )
    )
   )
  )
