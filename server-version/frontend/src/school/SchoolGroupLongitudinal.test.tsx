@@ -53,7 +53,8 @@ describe('Huischool internal fixed-population group trends',()=>{
     }))
     render(<SchoolGroupLongitudinal api={api as unknown as SchoolApi}
       organizationId={org}/>)
-    (await screen.findAllByRole('checkbox')).forEach(x=>fireEvent.click(x))
+    const checkboxes=await screen.findAllByRole('checkbox')
+    checkboxes.forEach(x=>fireEvent.click(x))
     fireEvent.change(screen.getByLabelText('纵向分析科学方案'),{target:{value:spec}})
     expect(screen.getByRole('button',{
       name:'经近期动态验证码核对后生成固定群体分析',
