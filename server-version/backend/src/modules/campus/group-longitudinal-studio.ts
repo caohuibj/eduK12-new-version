@@ -7,6 +7,7 @@ import { generateAutomaticLongitudinal } from '../reporting/longitudinal-planner
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail,type ReportingAnalysisSpecDefinitionV1 } from '../reporting/types'
 import { requireCampusGroupManager,assertCampusNoGroupDifferencing,CAMPUS_GROUP_MIN_N } from './group-reports'
+import { withCampusReportReleaseLock } from './report-release-lock'
 
 type Source={runId:string;trackId:string;runName:string;publishedAt:string|null;
   resource:{family:string;key:string;version:string}}
@@ -178,37 +179,46 @@ export async function generateCampusFixedGroupLongitudinal(input:{
   specId:string;analysisKind:'REPEATED_COHORT'|'MATCHED_LONGITUDINAL'
   sources:Pair[]
 }){
-  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
-  const catalog=await listOrganizationReportingSources({
-    principal,organizationId:input.organizationId,page:1,pageSize:100,
+  return withCampusReportReleaseLock(input.organizationId, async () => {
+    const principal=await requireCampusGroupManager(input.actor,input.organizationId)
+    const catalog=await listOrganizationReportingSources({
+      principal,organizationId:input.organizationId,page:1,pageSize:100,
+    })
+    const selected=input.sources.map(id=>catalog.list.find(row=>identity(row)===identity(id)))
+    if(selected.some(s=>!s))return deny()
+    const sorted=(selected as Source[]).sort((a,b)=>Date.parse(a.publishedAt??'')-Date.parse(b.publishedAt??'')
+      ||identity(a).localeCompare(identity(b)))
+    if(sorted.some(s=>!s.publishedAt||!Number.isFinite(Date.parse(s.publishedAt))))return deny()
+    const spec=await getPublishedReportingSpec(input.specId)
+    if(spec.definition.analysisKind!=='REPEATED_COHORT'
+      &&spec.definition.analysisKind!=='MATCHED_LONGITUDINAL')return deny()
+    if(spec.definition.analysisKind!==input.analysisKind)return deny()
+    assertCampusGroupComparability({spec:spec.definition,sources:sorted})
+    const exact=sorted.map(s=>({runId:s.runId,trackId:s.trackId}))
+    const cohortSize=await assertCampusFixedLongitudinalPopulation({
+      organizationId:input.organizationId,sources:exact,
+    })
+    for(const source of exact)await assertCampusNoGroupDifferencing({
+      organizationId:input.organizationId,...source,
+    })
+    const result=await generateAutomaticLongitudinal({
+      principal,organizationId:input.organizationId,specId:input.specId,
+      sources:exact,cohortStrategy:'BASELINE_FIXED',
+      analysisKind:input.analysisKind,
+      ...(input.analysisKind==='MATCHED_LONGITUDINAL'?{mode:'FULL_CASE' as const}:{}),
+    })
+    const authorized=await readOrganizationReportingArtifact({
+      principal,organizationId:input.organizationId,artifactId:result.artifactId,
+    })
+    await assertCampusFixedLongitudinalPopulation({organizationId:input.organizationId,sources:exact})
+    // The second wave-by-wave check must occur AFTER the canonical artifact is
+    // persisted, still under the same school-level cross-kind release lock.
+    // Otherwise simultaneous GROUP and LONGITUDINAL callers can each observe
+    // an empty/compatible history and leak overlapping nonidentical means.
+    for(const source of exact)await assertCampusNoGroupDifferencing({
+      organizationId:input.organizationId,...source,
+    })
+    await requireCampusGroupManager(input.actor,input.organizationId)
+    return projectCampusFixedGroupLongitudinal(authorized,cohortSize)
   })
-  const selected=input.sources.map(id=>catalog.list.find(row=>identity(row)===identity(id)))
-  if(selected.some(s=>!s))return deny()
-  const sorted=(selected as Source[]).sort((a,b)=>Date.parse(a.publishedAt??'')-Date.parse(b.publishedAt??'')
-    ||identity(a).localeCompare(identity(b)))
-  if(sorted.some(s=>!s.publishedAt||!Number.isFinite(Date.parse(s.publishedAt))))return deny()
-  const spec=await getPublishedReportingSpec(input.specId)
-  if(spec.definition.analysisKind!=='REPEATED_COHORT'
-    &&spec.definition.analysisKind!=='MATCHED_LONGITUDINAL')return deny()
-  if(spec.definition.analysisKind!==input.analysisKind)return deny()
-  assertCampusGroupComparability({spec:spec.definition,sources:sorted})
-  const exact=sorted.map(s=>({runId:s.runId,trackId:s.trackId}))
-  const cohortSize=await assertCampusFixedLongitudinalPopulation({
-    organizationId:input.organizationId,sources:exact,
-  })
-  for(const source of exact)await assertCampusNoGroupDifferencing({
-    organizationId:input.organizationId,...source,
-  })
-  const result=await generateAutomaticLongitudinal({
-    principal,organizationId:input.organizationId,specId:input.specId,
-    sources:exact,cohortStrategy:'BASELINE_FIXED',
-    analysisKind:input.analysisKind,
-    ...(input.analysisKind==='MATCHED_LONGITUDINAL'?{mode:'FULL_CASE' as const}:{}),
-  })
-  const authorized=await readOrganizationReportingArtifact({
-    principal,organizationId:input.organizationId,artifactId:result.artifactId,
-  })
-  await assertCampusFixedLongitudinalPopulation({organizationId:input.organizationId,sources:exact})
-  await requireCampusGroupManager(input.actor,input.organizationId)
-  return projectCampusFixedGroupLongitudinal(authorized,cohortSize)
 }
