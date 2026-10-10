@@ -16,6 +16,7 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
+  group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -26,6 +27,11 @@ vi.mock('../../modules/reporting/participantService', () => ({
   readParticipantLongitudinal: state.participant.read,
 }))
 vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunSummary: state.respondentSummary }))
+vi.mock('../../modules/campus/group-reports',()=>({
+  listCampusGroupReportCatalog:state.group.catalog,
+  generateCampusGroupReport:state.group.generate,
+  readCampusGroupReport:state.group.read,
+}))
 vi.mock('../../modules/campus/professional-reports', () => ({
   listCampusProfessionalReports: state.professional.list,
   readCampusProfessionalReport: state.professional.read,
@@ -100,6 +106,9 @@ describe('Huischool governed report HTTP surface', () => {
     state.professional.list.mockResolvedValue({ list: [] })
     state.professional.read.mockResolvedValue({ projection:{kind:'PROTECTED_FEEDBACK',state:'suppressed'} })
     state.respondentSummary.mockResolvedValue({ schemaVersion:1, mode:'COMPLETION_ONLY', state:'COMPLETED' })
+    state.group.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
+    state.group.generate.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
+    state.group.read.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
   })
 
   it('reports feature availability without leaking a parent report when disabled',async()=>{
@@ -222,4 +231,51 @@ describe('Huischool governed report HTTP surface', () => {
     expect(response.status).toBe(404)
     expect(await response.json()).toMatchObject({ data: null })
   })
+  it('does not permit TRAINING or unauthenticated group reporting',async()=>{
+    const response=await request('/reports/groups/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-user':'','x-training-user':'training-admin'})
+    expect(response.status).toBe(401)
+    expect(state.group.catalog).not.toHaveBeenCalled()
+  })
+  it('denies school group generation without recent TOTP or matching CSRF',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK}
+    const missing=await request('/reports/groups','POST',body,{'x-school-role':'ADMIN'})
+    expect(missing.status).toBe(403)
+    const forged=await request('/reports/groups','POST',body,{
+      'x-school-role':'ADMIN','x-recent-school-mfa':'true','X-CSRF-Token':'wrong',
+    })
+    expect(forged.status).toBe(403)
+    expect(state.group.generate).not.toHaveBeenCalled()
+  })
+  it('disallows arbitrary membership selection and subject-targeted filters in school aggregate POST',async()=>{
+    const response=await request('/reports/groups','POST',{
+      organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK,
+      cohortSelector:{schemaVersion:2,clauses:[{kind:'MEMBERSHIP_IDS',membershipIds:[CHILD]}],combine:'ALL'},
+    },{'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(400)
+    expect(state.group.generate).not.toHaveBeenCalled()
+  })
+  it('accepts only whole-source arguments in the authorized school report path',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK}
+    const response=await request('/reports/groups','POST',body,{
+      'x-school-role':'ADMIN','x-recent-school-mfa':'true',
+    })
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({state:'WITHHELD',metrics:{}})
+    expect(state.group.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),
+      ...body,
+    })
+    expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+  it('reads an old group artifact only through fresh current school authorization',async()=>{
+    const response=await request('/reports/groups/'+CHILD+'/'+ARTIFACT,'GET',
+      undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.group.read).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),
+      organizationId:CHILD,artifactId:ARTIFACT,
+    })
+  })
+
 })
