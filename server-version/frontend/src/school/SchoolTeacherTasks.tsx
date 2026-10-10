@@ -13,24 +13,25 @@ type Inbox={list:TeacherRunTask[];truncated:boolean}
 /** Observers never receive student login names, responses or individual
  * psychological results. Execution rights remain with the canonical Run.
  */
-export function SchoolTeacherTasks({api}:{api:SchoolApi}) {
+export function SchoolTeacherTasks({api,organizationId}:{api:SchoolApi;organizationId:string}) {
+  const inboxPath='/my/teacher-run-tasks?organizationId='+encodeURIComponent(organizationId)
   const [inbox,setInbox]=useState<Inbox|null>(null)
   const [active,setActive]=useState<CampusExecutionRef|null>(null)
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const refresh=async()=>{
     setBusy(true);setError('')
-    try{setInbox(await api<Inbox>('/my/teacher-run-tasks'))}
+    try{setInbox(await api<Inbox>(inboxPath))}
     catch(e){setError(e instanceof Error?e.message:'教师观察任务暂不可读取')}
     finally{setBusy(false)}
   }
   useEffect(()=>{
     let live=true
-    void api<Inbox>('/my/teacher-run-tasks')
+    void api<Inbox>(inboxPath)
       .then(data=>{if(live)setInbox(data)})
       .catch(e=>{if(live)setError(e instanceof Error?e.message:'教师观察任务暂不可读取')})
     return ()=>{live=false}
-  },[api])
+  },[api,inboxPath])
   return <section className="hs-panel">
     <h2>我的学生观察任务</h2>
     <p>仅显示学校正式发布、本人当前任教班级内的观察测评。
