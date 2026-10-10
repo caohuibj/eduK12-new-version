@@ -99,9 +99,12 @@ router.use('/reports/officer', (_req, res, next) => config.campusParentReportEna
   ? next()
   : res.status(404).json({ code: 'PARENT_PORTAL_DISABLED', message: '校园家长报告尚未开放', data: null }))
 
-router.get('/reports/parent/children', guarded(req => {
+router.get('/reports/parent/children', guarded(async req => {
   const q = pagination.parse(req.query)
-  return parentPortalService.children(req.user!, q.page, q.pageSize)
+  const data = await parentPortalService.children(req.user!, q.page, q.pageSize)
+  // Legacy parent DTOs may include the student's internal username. It is
+  // never a SCHOOL parent reporting field or a legitimate identity mapping.
+  return { ...data, list: data.list.map(({ childId, relationshipId }) => ({ childId, relationshipId })) }
 }))
 router.get('/reports/parent/children/:childId/reports', guarded(req => {
   const q = pagination.parse(req.query)

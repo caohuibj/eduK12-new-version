@@ -114,6 +114,17 @@ describe('Huischool governed report HTTP surface', () => {
     expect(response.headers.get('cache-control')).toBe('no-store')
     expect(state.parent.children).not.toHaveBeenCalled()
   })
+  it('never exposes a child's internal account alias in the SCHOOL parent DTO', async () => {
+    state.parent.children.mockResolvedValue({
+      list:[{childId:CHILD,relationshipId:LINK,displayName:'internal-private-login'}],
+      page:1,pageSize:20,hasMore:false,
+    })
+    const response = await request('/reports/parent/children')
+    expect(response.status).toBe(200)
+    const data=(await response.json()).data
+    expect(data.list).toEqual([{childId:CHILD,relationshipId:LINK}])
+    expect(JSON.stringify(data)).not.toMatch(/internal-private-login|displayName|username/)
+  })
   it('passes authenticated SCHOOL parent identity to the existing per-grant read policy', async () => {
     const response = await request('/reports/parent/children/' + CHILD + '/reports/' + ARTIFACT)
     expect(response.status).toBe(200)
