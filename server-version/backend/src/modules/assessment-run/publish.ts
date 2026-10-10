@@ -445,7 +445,7 @@ const resolveParentPairs = async (tx: Tx, organizationId: string, subjectRole: R
   return pairs
 }
 
-const resolveSchoolPeerPairs=async (tx:Tx,organizationId:string):Promise<PopulationPair[]>=>{
+const resolveSchoolPeerPairs=async (tx:Tx,organizationId:string,runId:string):Promise<PopulationPair[]>=>{
   const rows=await tx.$queryRaw<Array<{
     id:string;classUnitId:string
     subjectUserId:string;subjectMembershipId:string;subjectPersonaGrantId:string
@@ -459,6 +459,8 @@ const resolveSchoolPeerPairs=async (tx:Tx,organizationId:string):Promise<Populat
       respondent."id" AS "respondentMembershipId",
       rp."id" AS "respondentPersonaGrantId"
     FROM "campus_peer_assignments" peer
+    JOIN "campus_activity_runs" run_link ON run_link."organization_id"=peer."organization_id"
+      AND run_link."course_id"=peer."course_id" AND run_link."run_id"=${runId}
     JOIN "campus_activities" a ON a."organization_id"=peer."organization_id"
       AND a."course_id"=peer."course_id" AND a."status"='OPEN'
     JOIN "organization_memberships" subject ON subject."id"=peer."subject_membership_id"
@@ -559,7 +561,7 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     if(campusSelected===null||subjectRole!=='STUDENT'||respondentRole!=='STUDENT')
       throw new RunPublishError('CAMPUS_PEER_SCOPE_REQUIRED',
         'Peer Run requires two SCHOOL student actors and an Activity',403)
-    pairs=await resolveSchoolPeerPairs(tx,organizationId)
+    pairs=await resolveSchoolPeerPairs(tx,organizationId,track.runId)
   } else if (relationshipKind === 'PARENT_CHILD') {
     pairs = await resolveParentPairs(tx, organizationId, subjectRole, respondentRole)
   } else {
