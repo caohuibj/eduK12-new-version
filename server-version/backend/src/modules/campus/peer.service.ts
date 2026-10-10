@@ -243,14 +243,15 @@ export async function myCampusPeerTargets(input:{
     eligibleStudents(tx,input.organizationId,input.courseId))
   if(!eligible.some(x=>x.userId===input.actor.userId))fail('CAMPUS_PEER_NOT_ELIGIBLE')
   const rows=await prisma.$queryRaw<Array<{assignmentId:string;peerAlias:string}>>`
-    SELECT peer."id" AS "assignmentId",alias."login_name" AS "peerAlias"
+    SELECT peer."id" AS "assignmentId",
+      ('同学 ' || row_number() OVER (ORDER BY peer."id")) AS "peerAlias"
     FROM "campus_peer_assignments" peer
     JOIN "organization_memberships" respondent ON respondent."id"=peer."respondent_membership_id"
       AND respondent."organization_id"=peer."organization_id"
       AND respondent."user_id"=${input.actor.userId}
     JOIN "organization_memberships" subject ON subject."id"=peer."subject_membership_id"
       AND subject."organization_id"=peer."organization_id"
-    JOIN "campus_accounts" alias ON alias."user_id"=subject."user_id"
+    -- Do not send another child's SCHOOL login identifier to peers.
     JOIN "campus_activities" a ON a."course_id"=peer."course_id" AND a."status"='OPEN'
     JOIN "campus_peer_consents" sconsent ON sconsent."course_id"=peer."course_id"
       AND sconsent."membership_id"=peer."subject_membership_id"
