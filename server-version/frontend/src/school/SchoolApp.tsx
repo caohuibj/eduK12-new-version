@@ -382,7 +382,7 @@ export default function SchoolApp(){
           </section>}
           {(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
-          {user.role==='TEACHER'&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={schoolId} api={api} organizationId={schoolId}/>}
+          {(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={schoolId} api={api} organizationId={schoolId}/>}
           {schoolAdmin&&schoolId&&<SchoolRelationships key={schoolId} api={api} organizationId={schoolId} classes={units}/>}
           {schoolId&&access&&<SchoolActivityManager
             key={schoolId} api={api} organizationId={schoolId}
