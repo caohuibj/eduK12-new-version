@@ -119,7 +119,7 @@ export function projectCampusGroupReport(input:{
     limitations:[
       '仅用于学校内部支持性研究与群体改善，不用于个人诊断、教师绩效或学生评价者追踪。',
       '仅展示完整样本的有限均值，隐藏人数、方差、分布和精确原始结果。',
-      ...(Array.isArray(p?.evidence?.limitations)?p.evidence.limitations.filter(x=>typeof x==='string').slice(0,5):[]),
+      '请使用正式科学方案手册解释指标；当前投影不提供常模、临床阈值或因果结论。',
     ],
   }
 }
