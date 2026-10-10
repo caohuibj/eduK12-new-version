@@ -13,7 +13,7 @@ type EligibleTeacherExecution={
  * path. The eligibility query requires a live teacher->class->student chain.
  * The canonical task reader independently rechecks present Run authority.
  */
-export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal) {
+export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, organizationId: string) {
   if(actor.accountDomain!=='SCHOOL'||actor.role!=='TEACHER')
     throw new CampusActivityError('CAMPUS_TEACHER_REQUIRED',403)
   const candidates=await prisma.$queryRaw<EligibleTeacherExecution[]>`
@@ -54,7 +54,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal) {
       AND teacher_user.is_active=TRUE AND teacher_user.is_frozen=FALSE
     JOIN users student_user ON student_user.id=student.user_id AND student_user.account_domain='SCHOOL'
       AND student_user.is_active=TRUE AND student_user.is_frozen=FALSE
-    WHERE EXISTS (
+    WHERE org.id=${organizationId} AND EXISTS (
       SELECT 1 FROM campus_student_enrollments enrollment
       JOIN campus_class_admissions admission ON admission.organization_id=enrollment.organization_id
         AND admission.class_unit_id=enrollment.class_unit_id AND admission.status='APPROVED'
