@@ -10,6 +10,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'campus') return ['scope','campus','codeql'];
   if (['A','B'].includes(scope.application_route)) {
     let p; try { p = JSON.parse(scope.release_plan || '{}'); } catch { p = {}; }
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
@@ -46,6 +47,11 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'campus') {
+    let p;try{p=JSON.parse(scope.campus_plan);}catch{}
+    if(!p||p.schema!==1||p.route!=='campus'||scope.scenario!=='campus'||scope.codeql!=='true'||!Array.isArray(p.changed)||!p.changed.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['campus-contracts','candidate-browser','runtime-scans','sast'])||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (['A','B'].includes(scope.application_route)) {
     let p;try {p=JSON.parse(scope.release_plan);}catch {}
     if (!p || p.route !== scope.application_route || !Array.isArray(p.changed) || !p.changed.length || !Array.isArray(p.required) || !p.required.includes('compatibility') || !p.required.includes('rollback') || !p.required.includes('readiness') || (p.route === 'B' && !p.required.includes('login-contracts'))) failed.push('scope');
@@ -94,6 +100,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const actual=plan(p.base,p.head);
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
     if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+  }
+  if(needs.scope?.outputs?.application_route==='campus'){
+    const {campusPlan}=await import('./campus-scope.mjs');const {changedEntries}=await import('./content-scope.mjs');
+    const p=JSON.parse(needs.scope.outputs.campus_plan);
+    if(JSON.stringify(campusPlan(changedEntries(p.base,p.head),p.base,p.head))!==JSON.stringify(p))failed.push('recomputed-campus-plan');
   }
   console.log(JSON.stringify({ required: requiredChecks(needs, draft), failed }));
   if (failed.length) process.exit(1);

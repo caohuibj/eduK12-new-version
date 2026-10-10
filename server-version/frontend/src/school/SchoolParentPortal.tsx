@@ -4,10 +4,10 @@ import type { SchoolApi } from './SchoolRecovery'
 type ParentLink={id:string;status:string;approvedAt:string|null}
 type ParentLinks={list:ParentLink[];truncated:boolean;canApprove:boolean}
 type Consent={version:string;text:string;reminder:string}
-export function SchoolParentRegistration({api,onRegistered}:{
-  api:SchoolApi;onRegistered:()=>void
+export function SchoolParentRegistration({api,onRegistered,resolvedInviteCode}:{
+  api:SchoolApi;onRegistered:()=>void;resolvedInviteCode?:string
 }){
-  const [inviteCode,setInviteCode]=useState('')
+  const [inviteCode,setInviteCode]=useState(resolvedInviteCode??'')
   const [username,setUsername]=useState('')
   const [password,setPassword]=useState('')
   const [ack,setAck]=useState(false)
@@ -22,13 +22,13 @@ export function SchoolParentRegistration({api,onRegistered}:{
     finally{setBusy(false)}
   }
   return <section className="hs-panel hs-narrow">
-    <h1>家长校园账号注册</h1>
+    <h1>{resolvedInviteCode?'创建家长账号':'家长校园账号注册'}</h1>
     <p>由孩子在校园平台生成单次邀请码。家长需创建独立的校园账号，
       不能沿用培训版账号。注册后还需要孩子确认，才会激活亲子关系。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     <form onSubmit={event=>void submit(event)}>
-      <label className="hs-field"><span>一次性亲子邀请码（15 分钟内有效）</span>
-        <input value={inviteCode} required onChange={e=>setInviteCode(e.target.value)} autoComplete="off"/></label>
+      {!resolvedInviteCode&&<label className="hs-field"><span>一次性亲子邀请码（15 分钟内有效）</span>
+        <input value={inviteCode} required onChange={e=>setInviteCode(e.target.value)} autoComplete="off"/></label>}
       <label className="hs-field"><span>自选校园用户名</span>
         <input value={username} required onChange={e=>setUsername(e.target.value)} autoComplete="off"/></label>
       <label className="hs-field"><span>自选密码</span>
