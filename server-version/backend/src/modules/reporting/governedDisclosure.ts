@@ -3,12 +3,30 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { validateResultDisclosureContract, type ResultAudience } from '../assessment-policy/result-disclosure'
 import { resolveHistoricalRelationalEntry } from '../assessment-run/registeredResources'
-import { resolveOrganizationAccessContext } from '../organization/access'
+import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import type { ReportingPrincipal } from './authorization'
 import { getPublishedReportingSpec } from './spec'
 import { reportingFail, type ReportingArtifactRecord } from './types'
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
+
+
+/** SCHOOL professional disclosure needs both a live counseling persona and
+ * an explicit, non-denied psychology capability. Do not promote ORG_ADMIN
+ * or a former counselor from organizational/group reporting to private data.
+ * Historical LEGACY behavior remains unchanged.
+ */
+export function reportingAudienceForContext(context: Pick<
+  OrganizationAccessContext, 'productDomain' | 'personas' | 'capabilities' | 'explicitDenies'
+>): ResultAudience {
+  const professional = context.productDomain === 'SCHOOL'
+    ? context.personas.includes('COUNSELOR')
+      && context.capabilities.includes('PSYCHOLOGY_STAFF')
+      && !context.explicitDenies.some(d => ['*', 'PSYCHOLOGY_STAFF'].includes(d))
+    : context.capabilities.includes('PSYCHOLOGY_STAFF') || context.personas.includes('COUNSELOR')
+  return professional ? 'PROFESSIONAL'
+    : context.personas.includes('TEACHER') ? 'TEACHER' : 'ORGANIZATION'
+}
 
 /** Legacy source runtimes retain their native policy; declared Run contracts only narrow it. */
 export async function governedArtifactMetrics(input: { artifact: ReportingArtifactRecord; principal: ReportingPrincipal; individual?: boolean; tx?: Prisma.TransactionClient }) {
@@ -33,8 +51,7 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   if (tracks.some(t => !t.policy?.resultDisclosure)) return hidden()
   const context = await resolveOrganizationAccessContext({ organizationId: artifact.organizationId, principal },input.tx)
   if (!context?.membershipId || context.organizationStatus !== 'ACTIVE' || context.explicitDenies.some(d => ['*', 'REPORT_READ'].includes(d))) return hidden()
-  const audience: ResultAudience = context.capabilities.includes('PSYCHOLOGY_STAFF') || context.personas.includes('COUNSELOR') ? 'PROFESSIONAL'
-    : context.personas.includes('TEACHER') ? 'TEACHER' : 'ORGANIZATION'
+  const audience = reportingAudienceForContext(context)
   const spec = await getPublishedReportingSpec(artifact.specId,input.tx)
   let allowed = spec.definition.metricRules.map(r => r.metricId)
   for (const track of tracks) {
