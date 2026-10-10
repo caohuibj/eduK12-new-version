@@ -168,6 +168,21 @@ const prepareTracks = async (
     requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles')
     requireSingle(track.requestedPolicy.relationshipKinds, 'relationshipKinds')
     requireSingle(track.requestedPolicy.perspectives, 'perspectives')
+    if(track.requestedPolicy.relationshipKinds.includes('STUDENT_PEER')){
+      // Never publish individual peer scorecards or target identifiable peers
+      // outside a research-reviewed group-level, explicit opt-in protocol.
+      if(track.requestedPolicy.relationshipKinds.length!==1
+        || track.requestedPolicy.analysisMode!=='COHORT_AGGREGATE'
+        || track.requestedPolicy.minimumRespondents===null
+        || track.requestedPolicy.minimumRespondents<5
+        || resourcePolicy.analysisMode!=='COHORT_AGGREGATE'
+        || resourcePolicy.minimumRespondents===null
+        || resourcePolicy.minimumRespondents<5
+        || !track.requestedPolicy.perspectives.every(x=>x==='OBSERVER_REPORT'||x==='RELATIONAL_EXPERIENCE')){
+        throw new RunPublishError('CAMPUS_PEER_PRIVACY_POLICY',
+          'Peer assessments require published aggregate-only content and privacy floor >= 5',409)
+      }
+    }
     if (track.resourceFamily === 'COGNITIVE') {
       throw new RunPublishError('RUN_RESOURCE_UNSUPPORTED', 'COGNITIVE does not use the relational assignment bridge in PR2 V1', 409)
     }
@@ -430,6 +445,73 @@ const resolveParentPairs = async (tx: Tx, organizationId: string, subjectRole: R
   return pairs
 }
 
+const resolveSchoolPeerPairs=async (tx:Tx,organizationId:string):Promise<PopulationPair[]>=>{
+  const rows=await tx.$queryRaw<Array<{
+    id:string;classUnitId:string
+    subjectUserId:string;subjectMembershipId:string;subjectPersonaGrantId:string
+    respondentUserId:string;respondentMembershipId:string;respondentPersonaGrantId:string
+  }>>`
+    SELECT peer."id",peer."class_unit_id" AS "classUnitId",
+      subject."user_id" AS "subjectUserId",
+      subject."id" AS "subjectMembershipId",
+      sp."id" AS "subjectPersonaGrantId",
+      respondent."user_id" AS "respondentUserId",
+      respondent."id" AS "respondentMembershipId",
+      rp."id" AS "respondentPersonaGrantId"
+    FROM "campus_peer_assignments" peer
+    JOIN "campus_activities" a ON a."organization_id"=peer."organization_id"
+      AND a."course_id"=peer."course_id" AND a."status"='OPEN'
+    JOIN "organization_memberships" subject ON subject."id"=peer."subject_membership_id"
+      AND subject."organization_id"=peer."organization_id"
+      AND ${currentWindowSql(Prisma.sql`subject`)}
+    JOIN "organization_memberships" respondent ON respondent."id"=peer."respondent_membership_id"
+      AND respondent."organization_id"=peer."organization_id"
+      AND ${currentWindowSql(Prisma.sql`respondent`)}
+    JOIN "organization_persona_grants" sp ON sp."membership_id"=subject."id"
+      AND sp."organization_id"=subject."organization_id"
+      AND sp."persona"='STUDENT' AND sp."revoked_at" IS NULL
+    JOIN "organization_persona_grants" rp ON rp."membership_id"=respondent."id"
+      AND rp."organization_id"=respondent."organization_id"
+      AND rp."persona"='STUDENT' AND rp."revoked_at" IS NULL
+    JOIN "campus_student_enrollments" se ON se."user_id"=subject."user_id"
+      AND se."organization_id"=peer."organization_id"
+      AND se."class_unit_id"=peer."class_unit_id" AND se."status"='APPROVED'
+    JOIN "campus_student_enrollments" re ON re."user_id"=respondent."user_id"
+      AND re."organization_id"=peer."organization_id"
+      AND re."class_unit_id"=peer."class_unit_id" AND re."status"='APPROVED'
+    JOIN "campus_class_admissions" ca ON ca."organization_id"=peer."organization_id"
+      AND ca."class_unit_id"=peer."class_unit_id" AND ca."status"='APPROVED'
+    JOIN "campus_peer_consents" sc ON sc."course_id"=peer."course_id"
+      AND sc."membership_id"=subject."id" AND sc."withdrawn_at" IS NULL
+      AND sc."guardian_consented_at" IS NOT NULL
+      AND sc."consent_version"='HUISCHOOL_PEER_V1'
+    JOIN "campus_peer_consents" rc ON rc."course_id"=peer."course_id"
+      AND rc."membership_id"=respondent."id" AND rc."withdrawn_at" IS NULL
+      AND rc."guardian_consented_at" IS NOT NULL
+      AND rc."consent_version"='HUISCHOOL_PEER_V1'
+    JOIN "parent_student_relationships" sg ON sg."id"=sc."guardian_relationship_id"
+      AND sg."student_user_id"=subject."user_id"
+      AND sg."status"='ACTIVE' AND sg."approved_at" IS NOT NULL AND sg."revoked_at" IS NULL
+    JOIN "parent_student_relationships" rg ON rg."id"=rc."guardian_relationship_id"
+      AND rg."student_user_id"=respondent."user_id"
+      AND rg."status"='ACTIVE' AND rg."approved_at" IS NOT NULL AND rg."revoked_at" IS NULL
+    WHERE peer."organization_id"=${organizationId} AND peer."status"='ACTIVE'
+    ORDER BY peer."id" LIMIT 1501
+  `
+  if(rows.length>1500)throw new RunPublishError('CAMPUS_PEER_POPULATION_TOO_LARGE',
+    'Campus peer run is larger than the safely bounded pool',409)
+  return rows.map(row=>({
+    subject:actorFromMember({userId:row.subjectUserId,
+      membershipId:row.subjectMembershipId,personaGrantId:row.subjectPersonaGrantId},'STUDENT'),
+    respondent:actorFromMember({userId:row.respondentUserId,
+      membershipId:row.respondentMembershipId,personaGrantId:row.respondentPersonaGrantId},'STUDENT'),
+    relationshipKind:'STUDENT_PEER' as const,relationshipRef:row.id,
+    scopeClassUnitIds:[row.classUnitId],
+    facts:{peerAssignmentId:row.id,classUnitId:row.classUnitId,
+      source:'explicit-opt-in-guardian-consented-peer'},
+  }))
+}
+
 const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack,
   campusSelected: Set<string>|null = null): Promise<PopulationPair[]> => {
   const subjectRole = requireSingle(track.requestedPolicy.subjectRoles, 'subjectRoles') as RunActorRole
@@ -473,6 +555,11 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     }
   } else if (relationshipKind === 'COUNSELOR_CLIENT') {
     pairs = await resolveCounselorPairs(tx, organizationId, subjectRole, respondentRole)
+  } else if(relationshipKind==='STUDENT_PEER'){
+    if(campusSelected===null||subjectRole!=='STUDENT'||respondentRole!=='STUDENT')
+      throw new RunPublishError('CAMPUS_PEER_SCOPE_REQUIRED',
+        'Peer Run requires two SCHOOL student actors and an Activity',403)
+    pairs=await resolveSchoolPeerPairs(tx,organizationId)
   } else if (relationshipKind === 'PARENT_CHILD') {
     pairs = await resolveParentPairs(tx, organizationId, subjectRole, respondentRole)
   } else {
@@ -507,6 +594,13 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     pairs=pairs.filter(pair=>
       domainAllowed.has(pair.subject.userId)
       && domainAllowed.has(pair.respondent.userId))
+  }
+  if(relationshipKind==='STUDENT_PEER'){
+    const distinct=new Set(pairs.map(p=>p.respondent.userId))
+    const subjects=new Set(pairs.map(p=>p.subject.userId))
+    if(distinct.size<5||subjects.size<5)
+      throw new RunPublishError('CAMPUS_PEER_PRIVACY_FLOOR',
+        'Peer Run requires at least five independently consenting student observers and subjects',409)
   }
   const unique = new Map<string, PopulationPair>()
   for (const pair of pairs) {

@@ -33,7 +33,12 @@ export const validateOrganizationRelationalSnapshot = (
     relationalFail('RELATIONAL_RELATIONSHIP_REF', `${kind} requires frozen relationshipRef`)
   }
   const roles = pair(snapshot.subjectRole, snapshot.respondentRole)
-  if (kind === 'PARENT_CHILD') {
+  if (kind === 'STUDENT_PEER') {
+    if(snapshot.subjectRole!=='STUDENT'||snapshot.respondentRole!=='STUDENT')
+      relationalFail('RELATIONAL_PEER_ROLE','STUDENT_PEER requires two distinct students')
+    if(!snapshot.facts.peerAssignmentId||snapshot.facts.peerAssignmentId!==snapshot.relationshipRef)
+      relationalFail('RELATIONAL_PEER_BINDING','STUDENT_PEER needs a frozen authorized assignment ID')
+  } else if (kind === 'PARENT_CHILD') {
     if (!(roles.has('PARENT') && roles.has('STUDENT'))) relationalFail('RELATIONAL_RELATIONSHIP_ROLE', 'PARENT_CHILD requires PARENT + STUDENT')
   } else if (kind === 'CLASS_TEACHER_STUDENT' || kind === 'COURSE_TEACHER_STUDENT') {
     if (!(roles.has('TEACHER') && roles.has('STUDENT'))) relationalFail('RELATIONAL_RELATIONSHIP_ROLE', `${kind} requires TEACHER + STUDENT`)
