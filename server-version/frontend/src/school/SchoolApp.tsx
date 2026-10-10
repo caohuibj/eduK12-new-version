@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './school.css'
+import { SchoolMark, SchoolHeroMark } from './SchoolMark'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
@@ -53,31 +54,6 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
       autoComplete={type==='password'?'off':'off'} required />
   </label>
 )
-const SchoolMark=()=>(
-  <div className="hs-brand" aria-label="Huischool 校园心理健康">
-    <svg className="hs-brand-icon" viewBox="0 0 96 96" focusable="false" aria-hidden="true">
-      <defs>
-        <linearGradient id="huischool-forest" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#709D75"/>
-          <stop offset="1" stopColor="#356957"/>
-        </linearGradient>
-      </defs>
-      <rect x="2" y="2" width="92" height="92" rx="19" fill="#F3F7F1"/>
-      <circle cx="76" cy="19" r="9" fill="#E1B96B" opacity=".9"/>
-      <path d="M23 75V39M73 75V37" stroke="#356957" strokeWidth="6" strokeLinecap="round"/>
-      <path d="M7 42C9 27 16 18 27 20C35 9 51 13 54 27C60 39 48 49 36 48C26 54 12 51 7 42Z" fill="url(#huischool-forest)"/>
-      <path d="M46 41C43 25 51 14 64 16C73 7 86 16 85 30C96 43 83 52 72 49C63 53 49 50 46 41Z" fill="#356957"/>
-      <path d="M30 39C36 36 41 36 48 39M48 39C55 35 61 35 68 38" fill="none" stroke="#F3F7F1" strokeWidth="7" strokeLinecap="round"/>
-      <path d="M30 43V55M66 43V55" stroke="#F3F7F1" strokeWidth="5" strokeLinecap="round"/>
-      <path d="M49 77V58" stroke="#547E5D" strokeWidth="3.5" strokeLinecap="round"/>
-      <path d="M47 67C34 69 35 55 44 57C49 59 49 64 47 67Z" fill="#83AE8C"/>
-      <path d="M50 64C53 52 65 54 60 61C58 64 54 65 50 64Z" fill="#E1B96B"/>
-      <path d="M14 79C32 75 61 78 82 79" stroke="#A8C5AA" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    </svg>
-    <div><strong>Huischool</strong><small>林间见心 · 校园心理健康</small></div>
-  </div>
-)
-
 export default function SchoolApp(){
   const [user,setUser]=useState<CampusUser|null>(null)
   const [loading,setLoading]=useState(true)
@@ -272,10 +248,13 @@ export default function SchoolApp(){
       {notice&&<p className="hs-message" role="status">{notice}</p>}
       {loading?<p>正在核对校园会话…</p>:null}
       {!loading&&screen==='home'&&!user&&<section className="hs-hero">
-        <p className="hs-eyebrow">林间见心 · CAMPUS MENTAL HEALTH</p>
-        <h1>让每一个生命都被看见与支持</h1>
-        <p>校园心理健康、学习适应、师生关系与家校支持。学生可以使用班级分发的限时激活码，创建不要求真实姓名、电话或邮箱的校园账号。</p>
-        <div className="hs-actions"><button className="hs-primary" onClick={()=>setScreen('register')}>我是学生 · 注册</button><button onClick={()=>setScreen('login')}>已有账号 · 登录</button><button onClick={()=>setScreen('staff')}>教职员工邀请码</button><button onClick={()=>setScreen('parent')}>家长独立注册</button></div>
+        <div className="hs-hero-copy">
+          <p className="hs-eyebrow">林间见心 · CAMPUS MENTAL HEALTH</p>
+          <h1>让每一个生命都被看见与支持</h1>
+          <p>校园心理健康、学习适应、师生关系与家校支持。学生可以使用班级分发的限时激活码，创建不要求真实姓名、电话或邮箱的校园账号。</p>
+          <div className="hs-actions"><button className="hs-primary" onClick={()=>setScreen('register')}>我是学生 · 注册</button><button onClick={()=>setScreen('login')}>已有账号 · 登录</button><button onClick={()=>setScreen('staff')}>教职员工邀请码</button><button onClick={()=>setScreen('parent')}>家长独立注册</button></div>
+        </div>
+        <SchoolHeroMark/>
       </section>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
         <h1>校园账号登录</h1>
