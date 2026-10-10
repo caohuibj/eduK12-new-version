@@ -251,6 +251,43 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
     expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
   })
 
+  it('rejects delayed Assignment and Checkin submissions after STUDENT persona revocation',async()=>{
+    const f=await fixture()
+    const activity=await createCampusActivity({
+      actor:f.admin,organizationId:f.organizationId,
+      title:'身份撤销提交验证',purpose:'STUDENT_WELLBEING',
+    })
+    const state={actor:f.admin,organizationId:f.organizationId,courseId:activity.id}
+    const assignment=await addCampusActivityTask({
+      ...state,kind:'ASSIGNMENT',title:'校园练习',
+    })
+    const checkin=await addCampusActivityTask({
+      ...state,kind:'CHECKIN',title:'每日记录',
+    })
+    await allocateCampusActivityParticipants({
+      ...state,classUnitIds:[f.classUnitId],
+      requestKey:'revoked-persona-'+randomUUID(),expectedVersion:1,
+    })
+    await changeCampusActivityStatus({...state,action:'SUBMIT',expectedVersion:1})
+    await changeCampusActivityStatus({...state,action:'OPEN',expectedVersion:2})
+    const studentGrant=await db.organizationPersonaGrant.findFirstOrThrow({
+      where:{organizationId:f.organizationId,membershipId:f.studentMember,persona:'STUDENT',revokedAt:null},
+    })
+    await db.organizationPersonaGrant.update({
+      where:{id:studentGrant.id},data:{revokedAt:new Date()},
+    })
+    expect(await hasActiveCourseMembership(activity.id,f.student.userId)).toBe(false)
+    expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
+    await expect(db.submission.create({data:{
+      assignmentId:assignment.id,studentId:f.student.userId,
+      content:'This write must be rejected',status:'SUBMITTED',
+    }})).rejects.toThrow()
+    await expect(db.checkinSubmission.create({data:{
+      checkinId:checkin.id,studentId:f.student.userId,
+      content:'This check-in must be rejected',
+    }})).rejects.toThrow()
+  })
+
   it('creates canonical Run drafts atomically, but forbids publication before governing Activity OPEN',async()=>{
     const f=await fixture()
     const a=await createCampusActivity({
