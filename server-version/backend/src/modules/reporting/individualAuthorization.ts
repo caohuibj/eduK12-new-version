@@ -22,6 +22,11 @@ export async function individualSubjectScope(input: IndividualScopeInput): Promi
       AND (m.valid_until IS NULL OR m.valid_until > statement_timestamp())
       AND EXISTS (
         SELECT 1 FROM organization_counselor_client_relationships r
+        JOIN organization_persona_grants client_persona
+          ON client_persona.organization_id = r.organization_id
+          AND client_persona.membership_id = r.client_membership_id
+          AND client_persona.persona = 'CLIENT'
+          AND client_persona.revoked_at IS NULL
         WHERE r.organization_id = m.organization_id
           AND r.counselor_membership_id = ${context.membershipId}
           AND r.client_membership_id = m.id
