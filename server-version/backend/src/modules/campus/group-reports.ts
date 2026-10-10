@@ -86,11 +86,12 @@ async function assertCampusWholeRunSource(input:{
   return row.total
 }
 
-/** Prevent two differently constituted school GROUP artifacts from being
- * released as differencing oracles. This bound is intentionally conservative:
+/** Prevent differently constituted school GROUP and longitudinal artifacts from
+ * being combined as differencing oracles. This bound is intentionally conservative:
  * a different Run can be compared only when its contributor identities are
- * identical. Raw membership values never leave SQL and the server response
- * remains a constant withholding error. The guard is repeated after generate.
+ * identical across all previously released GROUP/REPEATED/MATCHED reports.
+ * Frozen membership stays inside SQL and the withholding error is constant.
+ * The guard is repeated after generate.
  */
 export async function assertCampusNoGroupDifferencing(input:{
   organizationId:string;runId:string;trackId:string
@@ -104,19 +105,46 @@ export async function assertCampusNoGroupDifferencing(input:{
         AND subject.run_id=execution.run_id AND subject.id=execution.subject_actor_snapshot_id
       WHERE execution.organization_id=${input.organizationId}
         AND execution.run_id=${input.runId} AND execution.track_id=${input.trackId}
+    ),
+    historical_cohorts AS (
+      -- A released school GROUP is one privacy disclosure. Each frozen Wave in
+      -- a released longitudinal artifact is also a disclosure of that cohort.
+      -- Query by frozen cohort identity, not current class membership.
+      SELECT artifact.cohort_snapshot_id AS cohort_id, artifact.generated_at
+      FROM reporting_analysis_artifacts artifact
+      WHERE artifact.organization_id=${input.organizationId}
+        AND artifact.analysis_kind='GROUP'
+        AND artifact.cohort_snapshot_id IS NOT NULL
+      UNION ALL
+      SELECT wave.cohort_snapshot_id AS cohort_id, artifact.generated_at
+      FROM reporting_analysis_artifacts artifact
+      JOIN reporting_analysis_artifact_waves aw
+        ON aw.organization_id=artifact.organization_id AND aw.artifact_id=artifact.id
+      JOIN reporting_series_waves wave
+        ON wave.organization_id=aw.organization_id AND wave.series_id=aw.series_id
+        AND wave.id=aw.wave_id
+      WHERE artifact.organization_id=${input.organizationId}
+        AND artifact.analysis_kind IN ('REPEATED_COHORT','MATCHED_LONGITUDINAL')
+    ),
+    previous_distinct_cohorts AS (
+      SELECT old.id AS cohort_id, MAX(historic.generated_at) AS last_generated_at
+      FROM historical_cohorts historic
+      JOIN reporting_cohort_snapshots old ON old.id=historic.cohort_id
+        AND old.organization_id=${input.organizationId}
+      WHERE (old.source_run_id<>${input.runId} OR old.source_track_id<>${input.trackId}
+        OR old.selector->>'kind' IS DISTINCT FROM 'RUN_TRACK_SUBJECTS')
+      GROUP BY old.id
+      ORDER BY MAX(historic.generated_at) DESC, old.id DESC
+      LIMIT 101
     )
     SELECT old.eligible_n AS "priorN",
       (SELECT COUNT(*)::int FROM jsonb_array_elements(old.members) member
         JOIN current_members cm ON cm.user_id=member->>'userId') AS "shared",
       (SELECT COUNT(*)::int FROM current_members) AS "currentN"
-    FROM reporting_analysis_artifacts artifact
-    JOIN reporting_cohort_snapshots old ON old.id=artifact.cohort_snapshot_id
-      AND old.organization_id=artifact.organization_id
-    WHERE artifact.organization_id=${input.organizationId}
-      AND artifact.analysis_kind='GROUP'
-      AND (old.source_run_id<>${input.runId} OR old.source_track_id<>${input.trackId}
-        OR old.selector->>'kind'<>'RUN_TRACK_SUBJECTS')
-    ORDER BY artifact.generated_at DESC, artifact.id DESC LIMIT 101
+    FROM previous_distinct_cohorts prior
+    JOIN reporting_cohort_snapshots old ON old.id=prior.cohort_id
+      AND old.organization_id=${input.organizationId}
+    ORDER BY prior.last_generated_at DESC, old.id DESC
   `)
   if(prior.length>100 || prior.some(p=>p.shared>0
     &&(p.priorN!==p.currentN||p.shared!==p.currentN))){

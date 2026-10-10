@@ -142,7 +142,28 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     const sql=mock.query.mock.calls[0][0].strings.join('')
     expect(sql).toContain('jsonb_array_elements(old.members)')
     expect(sql).toContain("artifact.analysis_kind='GROUP'")
+    expect(sql).toContain("artifact.analysis_kind IN ('REPEATED_COHORT','MATCHED_LONGITUDINAL')")
+    expect(sql).toContain('JOIN reporting_analysis_artifact_waves aw')
+    expect(sql).toContain('JOIN reporting_series_waves wave')
+    expect(sql).toContain('GROUP BY old.id')
+    expect(sql).toContain("IS DISTINCT FROM 'RUN_TRACK_SUBJECTS'")
     expect(sql).toContain('LIMIT 101')
+  })
+  it('withholds cross-kind historical longitudinal partial-overlap aggregates',async()=>{
+    // The mock represents a previously disclosed frozen longitudinal Wave of
+    // 10 students and a new 10-student GROUP cohort differing by one member.
+    // No individual members should be serialized in the rejection.
+    mock.query.mockReset().mockResolvedValueOnce([{priorN:10,shared:9,currentN:10}])
+    await expect(assertCampusNoGroupDifferencing({
+      organizationId:org,runId:run,trackId:track,
+    })).rejects.toMatchObject({
+      code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD',statusCode:409,
+    })
+    const sql=mock.query.mock.calls[0][0].strings.join('')
+    expect(sql).toContain("'MATCHED_LONGITUDINAL'")
+    expect(sql).toContain("'REPEATED_COHORT'")
+    expect(sql).toContain('wave.cohort_snapshot_id')
+    expect(sql).not.toContain('LIMIT 1000')
   })
   it('allows disjoint or exactly identical populations only, never a narrow override',async()=>{
     for(const rows of [
