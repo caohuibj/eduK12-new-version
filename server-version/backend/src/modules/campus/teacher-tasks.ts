@@ -14,7 +14,7 @@ type EligibleTeacherExecution={
  * The canonical task reader independently rechecks present Run authority.
  */
 export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, organizationId: string) {
-  if(actor.accountDomain!=='SCHOOL'||actor.role!=='TEACHER')
+  if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))
     throw new CampusActivityError('CAMPUS_TEACHER_REQUIRED',403)
   const candidates=await prisma.$queryRaw<EligibleTeacherExecution[]>`
     SELECT e.id AS "executionId",e.run_id AS "runId",
