@@ -17,8 +17,9 @@ const hidden = ():never=>reportingFail('CAMPUS_GROUP_REPORT_NOT_FOUND','school r
 async function requireCampusGroupManager(actor:AuthenticatedPrincipal, organizationId:string){
   if(actor.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(actor.role))hidden()
   const c=await resolveOrganizationAccessContext({principal:actor,organizationId})
-  if(!c || c.productDomain!=='SCHOOL' || c.organizationStatus!=='ACTIVE' || !c.membershipId
-    || c.explicitDenies.some(d=>['*','REPORT_READ','ORG_GROUP_REPORT_V1','PSYCHOLOGY_STAFF'].includes(d)))hidden()
+  if(!c)return hidden()
+  if(c.productDomain!=='SCHOOL' || c.organizationStatus!=='ACTIVE' || !c.membershipId
+    || c.explicitDenies.some(d=>['*','REPORT_READ','ORG_GROUP_REPORT_V1','PSYCHOLOGY_STAFF'].includes(d)))return hidden()
   // School governance may read non-identifying GROUP reports, never individual
   // results. A professional is distinct from an ordinary TEACHER persona.
   if(c.orgRole!=='ORG_ADMIN'
@@ -126,6 +127,9 @@ export function projectCampusGroupReport(input:{
 
 async function reviewedSpec(specId:string){
   const spec=await getPublishedReportingSpec(specId)
+  if(spec.definition.analysisKind!=='GROUP'){
+    return reportingFail('CAMPUS_GROUP_REVIEW_REQUIRED','not an approved campus GROUP analysis',409)
+  }
   assertReviewedCampusGroupSpec(spec.definition)
   return spec
 }
