@@ -4,10 +4,7 @@ import type {SchoolApi} from './SchoolRecovery'
 
 const m=vi.hoisted(()=>({entry:vi.fn(),cognitive:vi.fn()}))
 vi.mock('../components/FinalCompositeAssessment',()=>({
-  default:({onEnterCognitive}:any)=><button onClick={()=>onEnterCognitive({
-    id:'slot-cognitive-1',type:'COGNITIVE',
-    cognitiveSession:{sessionId:'cognitive-session-1'},
-  })}>进入冻结认知子测评</button>,
+  default:({onEnterCognitive}:any)=><button onClick={()=>onEnterCognitive(m.entry())}>进入冻结认知子测评</button>,
 }))
 vi.mock('../modules/cognitive/pages/CognitiveRunner',()=>({
   CognitiveRunner:({campus}:any)=>{
@@ -34,6 +31,8 @@ const childPath=parentPath+'/items/slot-cognitive-1/cognitive/cognitive-session-
 
 describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoints',()=>{
   it('loads existing frozen slot and returns to parent after FINAl without training credentials',async()=>{
+    m.entry.mockReturnValue({id:'slot-cognitive-1',type:'COGNITIVE',
+      cognitiveSession:{sessionId:'cognitive-session-1'}})
     const submitted=vi.fn()
     const api=vi.fn(async(path:string,method='GET',payload?:unknown)=>{
       if(path==='/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start'&&method==='POST')
@@ -67,6 +66,7 @@ describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoi
     await waitFor(()=>expect(screen.getByRole('button',{name:'进入冻结认知子测评'})).toBeInTheDocument())
   })
   it('does not start a child when the frozen session binding is absent',async()=>{
+    m.entry.mockReturnValue({id:'slot-cognitive-1',type:'COGNITIVE'})
     const api=vi.fn(async(path:string)=>{
       if(path.endsWith('/start'))return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}
       if(path===parentPath)return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'}
