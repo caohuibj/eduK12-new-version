@@ -3,6 +3,8 @@ import './school.css'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
+import { SchoolTeacherTasks } from './SchoolTeacherTasks'
+import { SchoolRelationships } from './SchoolRelationships'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
@@ -109,6 +111,7 @@ export default function SchoolApp(){
   const [staffAdmin,setStaffAdmin]=useState(false)
   const [newInvite,setNewInvite]=useState('')
   const [studentStatus,setStudentStatus]=useState('')
+  const [campusParentReportEnabled,setCampusParentReportEnabled]=useState(false)
   const [working,setWorking]=useState(false)
 
   const refresh=async()=>{
@@ -119,6 +122,14 @@ export default function SchoolApp(){
     finally{setLoading(false)}
   }
   useEffect(()=>{void refresh()},[])
+  useEffect(()=>{
+    if(!user){setCampusParentReportEnabled(false);return}
+    let live=true
+    void api<{parentReportsEnabled:boolean}>('/reports/availability')
+      .then(status=>{if(live)setCampusParentReportEnabled(status.parentReportsEnabled===true)})
+      .catch(()=>{if(live)setCampusParentReportEnabled(false)})
+    return ()=>{live=false}
+  },[user])
   useEffect(()=>{
     if(!user)return
     void api<{list:CampusOrg[]}>('/organizations').then(data=>{
@@ -331,7 +342,7 @@ export default function SchoolApp(){
             <SchoolStudentTasks api={api}/>
             <SchoolStudentFeedback api={api}/>
             <SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>
-            <SchoolStudentReportConsent api={api}/>
+            {campusParentReportEnabled?<SchoolStudentReportConsent api={api}/>:<p>家长版报告分享暂未开放；亲子关系和家长观察任务不受影响。</p>}
             <SchoolPeerConsent api={api} role="STUDENT"/>
           </>:
             <section className="hs-panel"><h2>我的校园活动</h2>
@@ -371,15 +382,18 @@ export default function SchoolApp(){
           </section>}
           {(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
+          {user.role==='TEACHER'&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks api={api}/>}
+          {schoolAdmin&&schoolId&&<SchoolRelationships key={schoolId} api={api} organizationId={schoolId} classes={units}/>}
           {schoolId&&access&&<SchoolActivityManager
             key={schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
           {psychologyStaff&&schoolId&&<SchoolProfessionalReports key={schoolId} api={api} organizationId={schoolId}/>}
-          {psychologyStaff&&schoolId
+          {campusParentReportEnabled&&psychologyStaff&&schoolId
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','PARENT_REPORT_DISCLOSURE'].includes(x))
             &&<SchoolReportOfficer key={schoolId} api={api} organizationId={schoolId}/>}
-          {schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={schoolId} api={api} organizationId={schoolId}/>}
+          {campusParentReportEnabled&&schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={schoolId} api={api} organizationId={schoolId}/>}
+          {!campusParentReportEnabled&&(schoolAdmin||psychologyStaff)&&<p>家长版报告披露尚未正式开放，需完成逐资源科学审核后单独启用。</p>}
           {schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
             <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
@@ -392,7 +406,7 @@ export default function SchoolApp(){
           <SchoolParentLinks api={api} role="PARENT"/>
           <SchoolPeerConsent api={api} role="PARENT"/>
           <SchoolParentTasks api={api}/>
-          <SchoolParentReports api={api}/>
+          {campusParentReportEnabled?<SchoolParentReports api={api}/>:<p>校园家长版解释性报告尚未开放。亲子确认不授予孩子的敏感心理结果。</p>}
           <section className="hs-panel">
             <h2>校园家校支持</h2>
             <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
