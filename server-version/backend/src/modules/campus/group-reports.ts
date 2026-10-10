@@ -85,6 +85,45 @@ async function assertCampusWholeRunSource(input:{
   return row.total
 }
 
+/** Prevent two differently constituted school GROUP artifacts from being
+ * released as differencing oracles. This bound is intentionally conservative:
+ * a different Run can be compared only when its contributor identities are
+ * identical. Raw membership values never leave SQL and the server response
+ * remains a constant withholding error. The guard is repeated after generate.
+ */
+export async function assertCampusNoGroupDifferencing(input:{
+  organizationId:string;runId:string;trackId:string
+}):Promise<void>{
+  const prior=await prisma.$queryRaw<Array<{priorN:number;shared:number;currentN:number}>>(Prisma.sql`
+    WITH current_members AS (
+      SELECT DISTINCT subject.user_id AS user_id
+      FROM assessment_run_executions execution
+      JOIN assessment_run_actor_snapshots subject
+        ON subject.organization_id=execution.organization_id
+        AND subject.run_id=execution.run_id AND subject.id=execution.subject_actor_snapshot_id
+      WHERE execution.organization_id=${input.organizationId}
+        AND execution.run_id=${input.runId} AND execution.track_id=${input.trackId}
+    )
+    SELECT old.eligible_n AS "priorN",
+      (SELECT COUNT(*)::int FROM jsonb_array_elements(old.members) member
+        JOIN current_members current ON current.user_id=member->>'userId') AS "shared",
+      (SELECT COUNT(*)::int FROM current_members) AS "currentN"
+    FROM reporting_analysis_artifacts artifact
+    JOIN reporting_cohort_snapshots old ON old.id=artifact.cohort_snapshot_id
+      AND old.organization_id=artifact.organization_id
+    WHERE artifact.organization_id=${input.organizationId}
+      AND artifact.analysis_kind='GROUP'
+      AND (old.source_run_id<>${input.runId} OR old.source_track_id<>${input.trackId}
+        OR old.selector->>'kind'<>'RUN_TRACK_SUBJECTS')
+    ORDER BY artifact.generated_at DESC, artifact.id DESC LIMIT 101
+  `)
+  if(prior.length>100 || prior.some(p=>p.shared>0
+    &&(p.priorN!==p.currentN||p.shared!==p.currentN))){
+    reportingFail('CAMPUS_GROUP_DIFFERENCING_WITHHELD',
+      'overlapping populations require independent privacy adjudication',409)
+  }
+}
+
 type SafeMetric={state:'present';validN?:number;missingN?:number;aggregations?:{mean?:unknown}}
 type GroupProjection={
   kind?:string;state?:string;eligibleN?:number;resultContributorN?:number;
@@ -163,6 +202,7 @@ export async function generateCampusGroupReport(input:{
   const principal=await requireCampusGroupManager(input.actor,input.organizationId)
   await reviewedSpec(input.specId)
   await assertCampusWholeRunSource(input)
+  await assertCampusNoGroupDifferencing(input)
   // No cohortSelector option exists here. Arbitrary filters must never become
   // a child- or teacher-targeted reporting tool.
   const result=await generateOrganizationGroupAnalysis({
@@ -172,6 +212,7 @@ export async function generateCampusGroupReport(input:{
   const authorized=await readOrganizationReportingArtifact({
     principal,organizationId:input.organizationId,artifactId:result.artifactId,
   })
+  await assertCampusNoGroupDifferencing(input)
   await requireCampusGroupManager(input.actor,input.organizationId)
   return projectCampusGroupReport(authorized)
 }
@@ -206,8 +247,14 @@ export async function readCampusGroupReport(input:{
     ||cohort.selector.kind!=='RUN_TRACK_SUBJECTS'
     ||cohort.eligibleN!==size ||cohort.members.length!==size
     ||new Set(cohort.members.map(member=>member.userId)).size!==size)return hidden()
+  await assertCampusNoGroupDifferencing({
+    organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
+  })
   const report=await readOrganizationReportingArtifact({
     principal,organizationId:input.organizationId,artifactId:input.artifactId,
+  })
+  await assertCampusNoGroupDifferencing({
+    organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
   })
   await requireCampusGroupManager(input.actor,input.organizationId)
   return projectCampusGroupReport(report)
