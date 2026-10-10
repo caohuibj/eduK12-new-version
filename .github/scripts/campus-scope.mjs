@@ -1,5 +1,4 @@
 import {execFileSync} from 'node:child_process';
-import {pathToFileURL} from 'node:url';
 const front='server-version/frontend/src/school/';
 const back='server-version/backend/src/';
 export const campusFiles=new Set([
@@ -29,8 +28,4 @@ export function campusPlan(entries,base,head){
 
  const changed=['frontend','backend'].filter(c=>entries.some(e=>e.file.startsWith('server-version/'+c+'/')));
  return {schema:1,route:'campus',base,head,changed,changes:entries,components:Object.fromEntries(changed.map(c=>[c,git('rev-parse',head+':server-version/'+c)])),required:['campus-contracts','candidate-browser','runtime-scans','sast']};
-}
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- const {changedEntries}=await import('./content-scope.mjs');
- const [base,head='HEAD']=process.argv.slice(2);console.log(JSON.stringify(campusPlan(changedEntries(base,head),base,git('rev-parse',head))));
 }
