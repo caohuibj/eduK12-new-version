@@ -179,6 +179,7 @@ export async function generateCampusFixedGroupLongitudinal(input:{
   specId:string;analysisKind:'REPEATED_COHORT'|'MATCHED_LONGITUDINAL'
   sources:Pair[]
 }){
+  await requireCampusGroupManager(input.actor,input.organizationId)
   return withCampusReportReleaseLock(input.organizationId, async () => {
     const principal=await requireCampusGroupManager(input.actor,input.organizationId)
     const catalog=await listOrganizationReportingSources({
