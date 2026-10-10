@@ -81,6 +81,7 @@ export async function assertCampusFixedLongitudinalPopulation(input:{
     if(!population||population.size!==base.size
       ||[...population].some(userId=>!base.has(userId)))return deny()
   }
+  return base.size
 }
 
 export function assertCampusGroupComparability(input:{spec:Specs;sources:Source[]}){
@@ -187,11 +188,14 @@ export async function generateCampusFixedGroupLongitudinal(input:{
     ||identity(a).localeCompare(identity(b)))
   if(sorted.some(s=>!s.publishedAt||!Number.isFinite(Date.parse(s.publishedAt))))return deny()
   const spec=await getPublishedReportingSpec(input.specId)
-  if(spec.definition.analysisKind!==input.analysisKind
-    ||!['REPEATED_COHORT','MATCHED_LONGITUDINAL'].includes(spec.definition.analysisKind))return deny()
+  if(spec.definition.analysisKind!=='REPEATED_COHORT'
+    &&spec.definition.analysisKind!=='MATCHED_LONGITUDINAL')return deny()
+  if(spec.definition.analysisKind!==input.analysisKind)return deny()
   assertCampusGroupComparability({spec:spec.definition,sources:sorted})
   const exact=sorted.map(s=>({runId:s.runId,trackId:s.trackId}))
-  await assertCampusFixedLongitudinalPopulation({organizationId:input.organizationId,sources:exact})
+  const cohortSize=await assertCampusFixedLongitudinalPopulation({
+    organizationId:input.organizationId,sources:exact,
+  })
   for(const source of exact)await assertCampusNoGroupDifferencing({
     organizationId:input.organizationId,...source,
   })
@@ -206,16 +210,5 @@ export async function generateCampusFixedGroupLongitudinal(input:{
   })
   await assertCampusFixedLongitudinalPopulation({organizationId:input.organizationId,sources:exact})
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return projectCampusFixedGroupLongitudinal(authorized,
-    await (async()=>{
-      const count=await prisma.$queryRaw<Array<{n:number}>>(Prisma.sql`
-        SELECT COUNT(DISTINCT subject.user_id)::int AS n
-        FROM assessment_run_executions e
-        JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id
-          AND subject.organization_id=e.organization_id AND subject.run_id=e.run_id
-        WHERE e.organization_id=${input.organizationId}
-          AND e.run_id=${exact[0].runId} AND e.track_id=${exact[0].trackId}
-      `)
-      return count[0]?.n??0
-    })())
+  return projectCampusFixedGroupLongitudinal(authorized,cohortSize)
 }
