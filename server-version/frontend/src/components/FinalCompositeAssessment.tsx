@@ -42,6 +42,9 @@ export interface FinalCompositeAssessmentProps {
   onEnterCognitive: (item: CompositeCurrentItem) => void
   onEnterSituational: (item: CompositeCurrentItem) => void
   onRestart?: () => Promise<void> | void
+  /** School-only canonical Run transport; the legacy API remains unchanged. */
+  campusMode?: boolean
+  campusVideoLoader?: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
 }
 
 const parseOptions = (options: unknown): FormOption[] => {
@@ -68,7 +71,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, campusMode=false, campusVideoLoader }) => {
   const item = state.currentItem
   const [sectionIndex, setSectionIndex] = useState(0)
   const [scaleIndex, setScaleIndex] = useState(0)
@@ -107,17 +110,25 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     }
     const publicCapability = recoveryToken || (typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${state.id}`) || '')
     if (publicMode && !publicCapability) throw new Error('缺少综合测评恢复凭据')
-    const response = await sessionFetch(path, publicMode ? { headers: { 'X-Recovery-Token': publicCapability } } : undefined)
+    const schoolPath=campusMode
+      ? path.replace('/api/composite-assessments/attempts/', '/api/campus/composite-attempts/')
+      : path
+    const response = await sessionFetch(schoolPath, publicMode ? { headers: { 'X-Recovery-Token': publicCapability } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
-  }, [item, publicMode, recoveryToken, sectionId, state.id])
+  }, [item, publicMode, recoveryToken, sectionId, state.id, campusMode])
 
   const loadCompositeVideoCapability = useCallback(async (path: string) => {
+    if(campusMode){
+      if(!campusVideoLoader)throw new Error('校园视觉测评尚无视频授权客户端')
+      return campusVideoLoader(path.replace(
+        '/api/composite-assessments/attempts/','/api/campus/composite-attempts/'))
+    }
     if (!publicMode) return requestAssessmentVideoCapabilities(path)
     const publicCapability = recoveryToken || (typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${state.id}`) || '')
     if (!publicCapability) throw new Error('缺少综合测评恢复凭据')
     return requestAssessmentVideoCapabilities(path, { headers: { 'X-Recovery-Token': publicCapability } })
-  }, [publicMode, recoveryToken, state.id])
+  }, [publicMode, recoveryToken, state.id, campusMode, campusVideoLoader])
 
   useEffect(() => {
     setSectionIndex(0)

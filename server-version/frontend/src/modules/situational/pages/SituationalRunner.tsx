@@ -85,16 +85,29 @@ type VideoGateState = {
   message?: string
 }
 
-const SituationalRunner: React.FC = () => {
-  const { instrumentKey, attemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
+export interface SchoolEmbeddedSituationalProps {
+  attemptId:string
+  parentAttemptId:string
+  compositeItemId:string
+  client:SituationalRunnerClient
+  onCompleted:()=>void
+}
+const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({campus}) => {
+  const { instrumentKey, attemptId:routeAttemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
+  const attemptId=campus?.attemptId||routeAttemptId
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-  const routeContext = useMemo(() => resolveSituationalRunnerRouteContext({
-    pathname: location.pathname,
-    searchParams,
-    attemptId,
-  }), [attemptId, location.pathname, searchParams])
+  const routeContext = useMemo(() => {
+    const normal=resolveSituationalRunnerRouteContext({
+      pathname:location.pathname,searchParams,attemptId,
+    })
+    if(!campus)return normal
+    return {...normal,embedded:true,publicMode:false,
+      compositeAttemptId:campus.parentAttemptId,
+      compositeItemId:campus.compositeItemId,
+      completionPath:'',returnTo:'',recoveryStorageKey:null}
+  },[attemptId,location.pathname,searchParams,campus?.parentAttemptId,campus?.compositeItemId])
   const {
     publicMode,
     embedded,
@@ -108,6 +121,7 @@ const SituationalRunner: React.FC = () => {
     return window.sessionStorage.getItem(recoveryStorageKey) || ''
   }, [recoveryStorageKey])
   const client = useMemo<SituationalRunnerClient | null>(() => {
+    if(campus)return campus.client
     if (embedded) {
       if (!compositeAttemptId || !compositeItemId) return null
       return publicMode
@@ -115,7 +129,7 @@ const SituationalRunner: React.FC = () => {
         : embeddedSituationalApi(compositeAttemptId, compositeItemId)
     }
     return situationalApi
-  }, [compositeAttemptId, compositeItemId, embedded, publicMode, recoveryToken])
+  }, [compositeAttemptId, compositeItemId, embedded, publicMode, recoveryToken, campus?.client])
 
   const [data, setData] = useState<SituationalAttemptResponse | null>(null)
   const [continuousInputs, setContinuousInputs] = useState<Record<string, number>>({})
@@ -174,7 +188,8 @@ const SituationalRunner: React.FC = () => {
         const next = apiDataOrThrow(response)
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
-          navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
+          if(campus)campus.onCompleted()
+          else navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
           return
         }
         const meta = await ensureSituationalDraft(next.attempt)
@@ -462,7 +477,8 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       if (next.attempt.status !== 'COMPLETED') return false
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id)).catch(() => undefined)
-      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
+      if(campus)campus.onCompleted()
+      else navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       return true
     } catch {
       return false
@@ -545,7 +561,8 @@ const SituationalRunner: React.FC = () => {
       const next = apiDataOrThrow(response)
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
-      navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
+      if(campus)campus.onCompleted()
+      else navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${data.attempt.id}/result`, { replace: true })
       void next
     } catch (reason) {
       if (String((reason as { code?: unknown })?.code ?? '') === TERMINAL_RECOVERED_CODE) return
@@ -567,7 +584,7 @@ const SituationalRunner: React.FC = () => {
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => campus ? campus.onCompleted() : navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
 
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
