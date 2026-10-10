@@ -11,6 +11,7 @@ import {
   digestCampusStudentNumber,
 } from '../../modules/campus/admission.service'
 import { issueSchoolStudentRecovery, completeSchoolStudentRecovery } from '../../modules/campus/recovery.service'
+import { appointCampusCounselorClient, endCampusCounselorClient, readCampusRelationshipDirectory } from '../../modules/campus/relationships.service'
 import { createOrganizationUnit } from '../../modules/organization/structure'
 import { forceResetPasswordBySystemAdmin } from '../../services/accountAuthorityService'
 import { setUserActiveState } from '../../services/userLifecycleService'
@@ -151,6 +152,60 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
       actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
       expectedRosterVersion:roster.rosterVersion,
     })).rejects.toMatchObject({code:'APPROVAL_PRECONDITION_FAILED'})
+  })
+
+  it('commissions a currently approved pupil as a counselor CLIENT with scoped, revocable authority',async()=>{
+    const f=await school(),number=studentNo('client')
+    const roster=await replaceCampusRoster({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,studentNumbers:[number],
+    })
+    await setCampusRegistrationWindow({actor:f.admin,organizationId:f.org,classUnitId:f.classId,
+      action:'OPEN',closesAt:new Date(Date.now()+40*60_000)})
+    const codes=await issueCampusActivationCodes({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,count:1,ttlMinutes:30,
+    })
+    const student=await registerCampusStudent({
+      organizationId:f.org,classUnitId:f.classId,studentNumber:number,
+      activationCode:codes.codes[0],username:name('campus_case'),password:'StudentTest123',
+    })
+    const counselor=await db.organizationMembership.findFirstOrThrow({
+      where:{organizationId:f.org,userId:f.counselor.userId,validUntil:null},
+    })
+    await expect(appointCampusCounselorClient({
+      actor:f.admin,organizationId:f.org,counselorMembershipId:counselor.id,
+      clientMembershipId:randomUUID(),
+    })).rejects.toMatchObject({code:'CAMPUS_CLIENT_NOT_APPROVED'})
+    await setCampusRegistrationWindow({actor:f.admin,organizationId:f.org,
+      classUnitId:f.classId,action:'CLOSE'})
+    await approveCampusClass({actor:f.counselor,organizationId:f.org,classUnitId:f.classId,
+      expectedRosterVersion:roster.rosterVersion})
+    const member=await db.organizationMembership.findFirstOrThrow({
+      where:{organizationId:f.org,userId:student.userId,validUntil:null},
+    })
+    const relationship=await appointCampusCounselorClient({
+      actor:f.admin,organizationId:f.org,
+      counselorMembershipId:counselor.id,clientMembershipId:member.id,
+    })
+    expect(relationship).toMatchObject({status:'ACTIVE'})
+    expect(relationship.studentReference).toMatch(/^林-[0-9A-F]{12}$/)
+    const directory=await readCampusRelationshipDirectory({
+      actor:f.admin,organizationId:f.org,classUnitId:f.classId,
+    })
+    expect(directory.students).toEqual([{membershipId:member.id,reference:relationship.studentReference}])
+    expect(JSON.stringify(directory.students)).not.toContain('campus_case')
+    const active=await db.organizationPersonaGrant.findFirstOrThrow({where:{
+      organizationId:f.org,membershipId:member.id,persona:'CLIENT',revokedAt:null,
+    }})
+    expect(active.persona).toBe('CLIENT')
+    const professional={
+      principal:{userId:f.counselor.userId,platformRole:'STANDARD' as const},
+      organizationId:f.org,subjectUserId:student.userId,
+    }
+    await expect(assertIndividualLongitudinalAccess(professional)).resolves.toBeUndefined()
+    await endCampusCounselorClient({actor:f.admin,organizationId:f.org,
+      relationshipId:relationship.id,reason:'合成案例关系已结束'})
+    await expect(assertIndividualLongitudinalAccess(professional))
+      .rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
   })
 
   it('rejects another school, wrong class and stale activation codes without consuming eligibility',async()=>{
