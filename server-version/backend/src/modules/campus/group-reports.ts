@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
