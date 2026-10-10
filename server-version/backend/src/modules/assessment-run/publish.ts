@@ -492,6 +492,22 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
         actor.provenanceKind==='ORG_MEMBER' && campusSelected.has(actor.membershipId))
     })())
   ))
+  if (campusSelected!==null && pairs.length>0) {
+    // PR1 accounts are separate per product. Parent/student or teacher/student
+    // relationships cannot authorize a LEGACY training account as a campus
+    // subject/respondent merely because the relationship once existed.
+    // Filter once in batch before any immutable Episode/assignment is frozen.
+    const actorIds=[...new Set(pairs.flatMap(pair=>
+      [pair.subject.userId,pair.respondent.userId]))]
+    const scopedAccounts=await tx.user.findMany({
+      where:{id:{in:actorIds},accountDomain:'SCHOOL',isActive:true,isFrozen:false},
+      select:{id:true},
+    })
+    const domainAllowed=new Set(scopedAccounts.map(user=>user.id))
+    pairs=pairs.filter(pair=>
+      domainAllowed.has(pair.subject.userId)
+      && domainAllowed.has(pair.respondent.userId))
+  }
   const unique = new Map<string, PopulationPair>()
   for (const pair of pairs) {
     const key = `${pair.subject.userId}:${pair.subject.membershipId ?? pair.relationshipRef}:${pair.respondent.userId}:${pair.respondent.membershipId ?? pair.relationshipRef}`
