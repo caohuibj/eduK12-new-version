@@ -12,7 +12,11 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
-import { readRespondentRunSummary } from '../reporting/respondentSummary'
+import { readCampusStudentFeedback } from './student-feedback'
+import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
+import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
+import { listCampusGroupLongitudinalCatalog,generateCampusFixedGroupLongitudinal } from './group-longitudinal-studio'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -57,6 +61,79 @@ router.get('/reports/availability', guarded(async () => ({
   parentReportsEnabled: config.campusParentReportEnabled,
 })))
 
+// Internal school GROUP workbench: never teacher-rating release, raw rows or
+// arbitrary subgroup selectors. School governance or current psychology staff
+// only. Generation requires recent SCHOOL TOTP and the existing abuse budget.
+router.get('/reports/groups/catalog', guarded(req => {
+  const q=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusGroupReportCatalog(req.user!,q.organizationId)
+}))
+router.post('/reports/groups', requireRecentSchoolMfa, mutationBudget, guarded(req => {
+  const body=z.object({
+    organizationId:id,runId:id,trackId:id,specId:id,
+  }).strict().parse(req.body)
+  return generateCampusGroupReport({actor:req.user!,...body})
+}))
+// Whole frozen population at every Wave, never a per-student or per-teacher
+// subgroup. Group longitudinal also cannot use a browser-provided selector.
+router.get('/reports/groups/longitudinal/catalog',guarded(req=>{
+  const values=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusGroupLongitudinalCatalog(req.user!,values.organizationId)
+}))
+router.post('/reports/groups/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const values=z.object({
+    organizationId:id,specId:id,
+    analysisKind:z.enum(['REPEATED_COHORT','MATCHED_LONGITUDINAL']),
+    sources:z.array(z.object({runId:id,trackId:id}).strict()).min(2).max(4),
+  }).strict().parse(req.body)
+  return generateCampusFixedGroupLongitudinal({actor:req.user!,...values})
+}))
+router.get('/reports/groups/:organizationId/:artifactId', guarded(req=>
+  readCampusGroupReport({actor:req.user!,
+    organizationId:id.parse(req.params.organizationId),
+    artifactId:id.parse(req.params.artifactId)})))
+
+// A counselor can discover only current CLIENT-scoped, approved SCHOOL
+// students by a pseudonymous reference. Protected generation delegates to
+// the existing immutable result engine; no raw score goes into this request.
+router.get('/reports/protected/catalog',guarded(req=>{
+  const q=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusProtectedReportCatalog(req.user!,q.organizationId)
+}))
+router.post('/reports/protected',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const data=z.object({
+    organizationId:id,runId:id,trackId:id,
+    subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+    relationshipKind:z.string().trim().min(1).max(120),
+    perspective:z.enum(['SELF_REPORT','OBSERVER_REPORT','RELATIONAL_EXPERIENCE']),
+    specId:id,
+  }).strict().parse(req.body)
+  return generateCampusProtectedReport({actor:req.user!,...data})
+}))
+
+// Professional longitudinal observations must be reviewed against exact
+// metric/version comparability, current CLIENT and approved SCHOOL membership.
+// No username, subjectUserId or raw metric is accepted from the browser.
+router.get('/reports/longitudinal/catalog',guarded(req=>{
+  const query=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusIndividualLongitudinalCatalog(req.user!,query.organizationId)
+}))
+router.get('/reports/longitudinal/sources',guarded(req=>{
+  const query=z.object({
+    organizationId:id,
+    subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+  }).strict().parse(req.query)
+  return listCampusIndividualLongitudinalSources({actor:req.user!,...query})
+}))
+router.post('/reports/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const values=z.object({
+    organizationId:id,subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+    specId:id,
+    sources:z.array(z.object({runId:id,trackId:id}).strict()).min(2).max(8),
+  }).strict().parse(req.body)
+  return generateCampusIndividualLongitudinal({actor:req.user!,...values})
+}))
+
 // Self-only. The existing participant engine checks current membership,
 // authoritative SELF observations and frozen-vs-current disclosure contracts.
 router.get('/reports/student/longitudinal', guarded(async req => {
@@ -80,7 +157,7 @@ router.get('/reports/student/executions/:executionId', guarded(async req => {
     || (await readCampusStudentStatus(req.user!)).status !== 'APPROVED') {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
-  return readRespondentRunSummary(req.user!.userId, id.parse(req.params.executionId))
+  return readCampusStudentFeedback(req.user!.userId, id.parse(req.params.executionId))
 }))
 
 // Counselor's professional reports are separately authorized from parent

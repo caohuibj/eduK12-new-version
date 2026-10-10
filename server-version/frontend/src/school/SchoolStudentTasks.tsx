@@ -10,7 +10,7 @@ type SchoolTask={
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
-type StudentFinalFeedback={mode:string;state:'WITHHELD'|'COMPLETED'|'READY';metrics?:Record<string,number|null>}
+type StudentFinalFeedback={mode:string;state:'WITHHELD'|'COMPLETED'|'READY';message?:string}
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
   mySubmission?:{content?:string|null;status:string}|null
@@ -135,13 +135,9 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
         <p>你的作答已完成。当前测评仅允许展示完成状态，不提供分数或诊断。</p>}
       {feedback.data.state==='WITHHELD'&&
         <p>当前反馈暂不适合公开，或尚未达到科学与隐私披露条件。如有疑问，可联系学校心理教师。</p>}
-      {feedback.data.state==='READY'&&<>
-        <p>下面是这份测评明确允许你查看的记录。分数不能说明你“好”或“不好”，也不能代替专业判断。</p>
-        {Object.entries(feedback.data.metrics??{}).map(([metric,value])=>
-          <p key={metric}>{metric}：{typeof value==='number'&&Number.isFinite(value)
-            ?value.toLocaleString('zh-CN',{maximumFractionDigits:3})
-            :'暂没有可以展示的结果'}</p>)}
-      </>}
+      {feedback.data.state==='READY'&&
+        <p>结果已经生成，但针对学生的逐工具解释尚未完成科学与适龄内容审核，因此这里不会直接展示指标代码、分数或诊断推论。</p>}
+      {feedback.data.message&&<p className="hs-multiline">{feedback.data.message}</p>}
       <button onClick={()=>{feedbackEpoch.current+=1;setFeedback(null)}}>关闭我的反馈</button>
     </div>}
     {execution&&<SchoolCompositeRunner api={api} execution={execution}

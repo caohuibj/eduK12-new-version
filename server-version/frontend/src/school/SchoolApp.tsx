@@ -5,6 +5,10 @@ import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolTeacherTasks } from './SchoolTeacherTasks'
 import { SchoolRelationships } from './SchoolRelationships'
+import { SchoolGroupReports } from './SchoolGroupReports'
+import { SchoolProtectedReportStudio } from './SchoolProtectedReportStudio'
+import { SchoolIndividualLongitudinalStudio } from './SchoolIndividualLongitudinalStudio'
+import { SchoolGroupLongitudinal } from './SchoolGroupLongitudinal'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
@@ -387,6 +391,18 @@ export default function SchoolApp(){
           {schoolId&&access&&<SchoolActivityManager
             key={schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
+          {(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
+            &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
+            &&<SchoolGroupReports key={schoolId} api={api} organizationId={schoolId}/>}
+          {(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
+            &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
+            &&<SchoolGroupLongitudinal key={schoolId} api={api} organizationId={schoolId}/>}
+          {psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
+            &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_PROTECTED_FEEDBACK_V1'].includes(x))
+            &&<SchoolProtectedReportStudio key={schoolId} api={api} organizationId={schoolId}/>}
+          {psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
+            &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_INDIVIDUAL_REPORT_V1'].includes(x))
+            &&<SchoolIndividualLongitudinalStudio key={schoolId} api={api} organizationId={schoolId}/>}
           {psychologyStaff&&schoolId&&<SchoolProfessionalReports key={schoolId} api={api} organizationId={schoolId}/>}
           {campusParentReportEnabled&&psychologyStaff&&schoolId
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')

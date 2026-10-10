@@ -16,6 +16,10 @@ const state = vi.hoisted(() => ({
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
   respondentSummary: vi.fn(),
+  group: {catalog:vi.fn(),generate:vi.fn(),read:vi.fn()},
+  protectedStudio: {catalog:vi.fn(),generate:vi.fn()},
+  longitudinal: {catalog:vi.fn(),sources:vi.fn(),generate:vi.fn()},
+  groupLongitudinal: {catalog:vi.fn(),generate:vi.fn()},
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -26,6 +30,25 @@ vi.mock('../../modules/reporting/participantService', () => ({
   readParticipantLongitudinal: state.participant.read,
 }))
 vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunSummary: state.respondentSummary }))
+vi.mock('../../modules/campus/student-feedback', () => ({ readCampusStudentFeedback: state.respondentSummary }))
+vi.mock('../../modules/campus/group-reports',()=>({
+  listCampusGroupReportCatalog:state.group.catalog,
+  generateCampusGroupReport:state.group.generate,
+  readCampusGroupReport:state.group.read,
+}))
+vi.mock('../../modules/campus/group-longitudinal-studio',()=>({
+  listCampusGroupLongitudinalCatalog:state.groupLongitudinal.catalog,
+  generateCampusFixedGroupLongitudinal:state.groupLongitudinal.generate,
+}))
+vi.mock('../../modules/campus/individual-longitudinal-studio',()=>({
+  listCampusIndividualLongitudinalCatalog:state.longitudinal.catalog,
+  listCampusIndividualLongitudinalSources:state.longitudinal.sources,
+  generateCampusIndividualLongitudinal:state.longitudinal.generate,
+}))
+vi.mock('../../modules/campus/protected-report-studio',()=>({
+  listCampusProtectedReportCatalog:state.protectedStudio.catalog,
+  generateCampusProtectedReport:state.protectedStudio.generate,
+}))
 vi.mock('../../modules/campus/professional-reports', () => ({
   listCampusProfessionalReports: state.professional.list,
   readCampusProfessionalReport: state.professional.read,
@@ -100,6 +123,16 @@ describe('Huischool governed report HTTP surface', () => {
     state.professional.list.mockResolvedValue({ list: [] })
     state.professional.read.mockResolvedValue({ projection:{kind:'PROTECTED_FEEDBACK',state:'suppressed'} })
     state.respondentSummary.mockResolvedValue({ schemaVersion:1, mode:'COMPLETION_ONLY', state:'COMPLETED' })
+    state.group.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
+    state.group.generate.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
+    state.group.read.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_GROUP',state:'WITHHELD',metrics:{},limitations:[]})
+    state.protectedStudio.catalog.mockResolvedValue({specs:[],sources:[],truncated:false})
+    state.protectedStudio.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-123456789ABC',status:'WITHHELD'})
+    state.longitudinal.catalog.mockResolvedValue({subjects:[],specs:[],truncated:false})
+    state.longitudinal.sources.mockResolvedValue({sources:[],truncated:false})
+    state.longitudinal.generate.mockResolvedValue({artifactId:ARTIFACT,subjectReference:'林-ABCDEF123456',status:'AVAILABLE',note:'已生成'})
+    state.groupLongitudinal.catalog.mockResolvedValue({sources:[],specs:[],truncated:false})
+    state.groupLongitudinal.generate.mockResolvedValue({artifactId:ARTIFACT,kind:'SCHOOL_LONGITUDINAL',state:'WITHHELD',metrics:{},limitations:[]})
   })
 
   it('reports feature availability without leaking a parent report when disabled',async()=>{
@@ -222,4 +255,186 @@ describe('Huischool governed report HTTP surface', () => {
     expect(response.status).toBe(404)
     expect(await response.json()).toMatchObject({ data: null })
   })
+  it('does not permit TRAINING or unauthenticated group reporting',async()=>{
+    const response=await request('/reports/groups/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-user':'','x-training-user':'training-admin'})
+    expect(response.status).toBe(401)
+    expect(state.group.catalog).not.toHaveBeenCalled()
+  })
+  it('denies school group generation without recent TOTP or matching CSRF',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK}
+    const missing=await request('/reports/groups','POST',body,{'x-school-role':'ADMIN'})
+    expect(missing.status).toBe(403)
+    const forged=await request('/reports/groups','POST',body,{
+      'x-school-role':'ADMIN','x-recent-school-mfa':'true','X-CSRF-Token':'wrong',
+    })
+    expect(forged.status).toBe(403)
+    expect(state.group.generate).not.toHaveBeenCalled()
+  })
+  it('disallows arbitrary membership selection and subject-targeted filters in school aggregate POST',async()=>{
+    const response=await request('/reports/groups','POST',{
+      organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK,
+      cohortSelector:{schemaVersion:2,clauses:[{kind:'MEMBERSHIP_IDS',membershipIds:[CHILD]}],combine:'ALL'},
+    },{'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(400)
+    expect(state.group.generate).not.toHaveBeenCalled()
+  })
+  it('accepts only whole-source arguments in the authorized school report path',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,specId:LINK}
+    const response=await request('/reports/groups','POST',body,{
+      'x-school-role':'ADMIN','x-recent-school-mfa':'true',
+    })
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({state:'WITHHELD',metrics:{}})
+    expect(state.group.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),
+      ...body,
+    })
+    expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+  it('reads an old group artifact only through fresh current school authorization',async()=>{
+    const response=await request('/reports/groups/'+CHILD+'/'+ARTIFACT,'GET',
+      undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.group.read).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),
+      organizationId:CHILD,artifactId:ARTIFACT,
+    })
+  })
+
+  it('does not expose protected case discovery to an unauthenticated/training identity',async()=>{
+    const response=await request('/reports/protected/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-user':'','x-training-user':'training-therapist'})
+    expect(response.status).toBe(401)
+    expect(state.protectedStudio.catalog).not.toHaveBeenCalled()
+  })
+  it('requires SCHOOL step-up and exact CSRF for pseudonymous professional generation',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    expect((await request('/reports/protected','POST',body,
+      {'x-school-role':'TEACHER'})).status).toBe(403)
+    expect((await request('/reports/protected','POST',body,{
+      'x-school-role':'TEACHER','x-recent-school-mfa':'true',
+      'X-CSRF-Token':'wrong',
+    })).status).toBe(403)
+    expect(state.protectedStudio.generate).not.toHaveBeenCalled()
+  })
+  it('rejects exact student IDs, arbitrary metrics or unauthorized audience in request',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    const headers={'x-school-role':'TEACHER','x-recent-school-mfa':'true'}
+    const bad=await request('/reports/protected','POST',{
+      ...body,subjectUserId:'student-private-id',
+    },headers)
+    expect(bad.status).toBe(400)
+    const badRef=await request('/reports/protected','POST',{
+      ...body,subjectReference:'student-private-id',
+    },headers)
+    expect(badRef.status).toBe(400)
+    const badAudience=await request('/reports/protected','POST',{
+      ...body,audience:'PARENT',
+    },headers)
+    expect(badAudience.status).toBe(400)
+    expect(state.protectedStudio.generate).not.toHaveBeenCalled()
+  })
+  it('passes only a school-scoped subject reference to the authoritative professional generator',async()=>{
+    const body={organizationId:CHILD,runId:CHILD,trackId:ARTIFACT,
+      subjectReference:'林-123456789ABC',relationshipKind:'CLASS_TEACHER_STUDENT',
+      perspective:'OBSERVER_REPORT',specId:LINK}
+    const response=await request('/reports/protected','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({
+      subjectReference:'林-123456789ABC',status:'WITHHELD',
+    })
+    expect(state.protectedStudio.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
+    })
+  })
+
+  it('protects clinical longitudinal generation with school MFA and CSRF',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',
+      specId:ARTIFACT,sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const without=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER'})
+    expect(without.status).toBe(403)
+    const forged=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true',
+        'X-CSRF-Token':'not-school-token'})
+    expect(forged.status).toBe(403)
+    expect(state.longitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('rejects extraneous subjectUserId, age claims or browser-supplied scoring data',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',specId:ARTIFACT,
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const header={'x-school-role':'TEACHER','x-recent-school-mfa':'true'}
+    for(const invalid of [
+      {...body,subjectUserId:'hidden-student'},
+      {...body,sourceScores:{metric:3}},
+      {...body,sources:[{runId:CHILD,trackId:ARTIFACT}]},
+      {...body,subjectReference:'school_login_name'},
+    ]){
+      expect((await request('/reports/longitudinal','POST',invalid,header)).status).toBe(400)
+    }
+    expect(state.longitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('passes valid pseudonym-only longitudinal request to server-authoritative scope',async()=>{
+    const body={organizationId:CHILD,subjectReference:'林-ABCDEF123456',specId:ARTIFACT,
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:CHILD}]}
+    const result=await request('/reports/longitudinal','POST',body,
+      {'x-school-role':'TEACHER','x-recent-school-mfa':'true'})
+    expect(result.status).toBe(200)
+    expect((await result.json()).data).toMatchObject({
+      status:'AVAILABLE',subjectReference:'林-ABCDEF123456'})
+    expect(state.longitudinal.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'TEACHER'}),...body,
+    })
+    expect(result.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('requires recent SCHOOL MFA and CSRF for fixed-group longitudinal generation',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,
+      analysisKind:'REPEATED_COHORT',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    expect((await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN'})).status).toBe(403)
+    expect((await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN','x-recent-school-mfa':'true','X-CSRF-Token':'wrong'})).status).toBe(403)
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('prohibits direct subgroup selectors, memberIds and unvalidated longitudinal modes',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,analysisKind:'MATCHED_LONGITUDINAL',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    const headers={'x-school-role':'ADMIN','x-recent-school-mfa':'true'}
+    for(const untrusted of [
+      {...body,cohortSelector:{schemaVersion:2,clauses:[{kind:'MEMBERSHIP_IDS',membershipIds:[CHILD]}]}},
+      {...body,mode:'PAIRWISE'},
+      {...body,sources:[{runId:CHILD,trackId:ARTIFACT}]},
+      {...body,subjectUserId:CHILD},
+    ])expect((await request('/reports/groups/longitudinal','POST',untrusted,headers)).status).toBe(400)
+    expect(state.groupLongitudinal.generate).not.toHaveBeenCalled()
+  })
+  it('routes longitudinal group catalog before the generic two-segment historical read',async()=>{
+    const response=await request('/reports/groups/longitudinal/catalog?organizationId='+CHILD,
+      'GET',undefined,{'x-school-role':'ADMIN'})
+    expect(response.status).toBe(200)
+    expect(state.groupLongitudinal.catalog).toHaveBeenCalledWith(
+      expect.objectContaining({accountDomain:'SCHOOL'}),CHILD)
+    expect(state.group.read).not.toHaveBeenCalled()
+  })
+  it('accepts only whole-group source IDs on controlled longitudinal POST',async()=>{
+    const body={organizationId:CHILD,specId:ARTIFACT,
+      analysisKind:'REPEATED_COHORT',
+      sources:[{runId:CHILD,trackId:ARTIFACT},{runId:LINK,trackId:ARTIFACT}]}
+    const response=await request('/reports/groups/longitudinal','POST',body,
+      {'x-school-role':'ADMIN','x-recent-school-mfa':'true'})
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({kind:'SCHOOL_LONGITUDINAL',state:'WITHHELD'})
+    expect(state.groupLongitudinal.generate).toHaveBeenCalledWith({
+      actor:expect.objectContaining({accountDomain:'SCHOOL',role:'ADMIN'}),...body,
+    })
+  })
+
 })
