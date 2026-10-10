@@ -5,6 +5,7 @@ import { SchoolActivityManager } from './SchoolActivityManager'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolTeacherTasks } from './SchoolTeacherTasks'
 import { SchoolRelationships } from './SchoolRelationships'
+import { SchoolGroupReports } from './SchoolGroupReports'
 import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
@@ -387,6 +388,9 @@ export default function SchoolApp(){
           {schoolId&&access&&<SchoolActivityManager
             key={schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
+          {(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
+            &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
+            &&<SchoolGroupReports key={schoolId} api={api} organizationId={schoolId}/>}
           {psychologyStaff&&schoolId&&<SchoolProfessionalReports key={schoolId} api={api} organizationId={schoolId}/>}
           {campusParentReportEnabled&&psychologyStaff&&schoolId
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
