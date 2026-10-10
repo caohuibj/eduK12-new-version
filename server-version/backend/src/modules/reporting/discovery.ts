@@ -188,8 +188,13 @@ export async function listProtectedReportingSources(input: {
 }) {
   await assertOrganizationReportingWorkspaceAccess(input)
   const context = await resolveProtectedFeedbackManagerContext(input)
-  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
-  const teacher = context.personas.includes('TEACHER')
+  // In SCHOOL a psychology capability is required just to enter this workflow;
+  // it does NOT turn the counselor into a school-wide subject enumerator.
+  // Dual TEACHER+COUNSELOR personas must use the current CLIENT relationship,
+  // never the broader same-class teacher path. LEGACY semantics are unchanged.
+  const school = context.productDomain === 'SCHOOL'
+  const organizationManager = !school && (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF'))
+  const teacher = !school && context.personas.includes('TEACHER')
   const counselor = context.personas.includes('COUNSELOR')
   const rows = await prisma.$queryRaw<Array<{
     runId: string
