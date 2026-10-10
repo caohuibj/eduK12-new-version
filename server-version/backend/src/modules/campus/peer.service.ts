@@ -71,8 +71,23 @@ export async function studentPeerConsent(input:{
   return prisma.$transaction(async tx=>{
     const activity=await lockSchoolActivity(tx,input.organizationId,input.courseId)
     if(input.action==='ASSENT' && activity.status!=='OPEN')fail('CAMPUS_PEER_ACTIVITY_NOT_OPEN',409)
-    const eligible=await eligibleStudents(tx,input.organizationId,input.courseId)
-    const member=eligible.find(row=>row.userId===input.actor.userId)
+    // WITHDRAW must remain available after a school PAUSE/CLOSE, class move
+    // or access revocation. Do not require active participation in order
+    // to withdraw consent. ASSENT still requires a fully live, OPEN activity.
+    const member=input.action==='ASSENT'
+      ?(await eligibleStudents(tx,input.organizationId,input.courseId))
+        .find(row=>row.userId===input.actor.userId)
+      :(await tx.$queryRaw<Array<{membershipId:string}>>`
+        SELECT c."membership_id" AS "membershipId"
+        FROM "campus_peer_consents" c
+        JOIN "organization_memberships" m
+          ON m."organization_id"=c."organization_id"
+          AND m."id"=c."membership_id"
+        WHERE c."course_id"=${input.courseId}
+          AND c."organization_id"=${input.organizationId}
+          AND m."user_id"=${input.actor.userId}
+        LIMIT 1 FOR UPDATE OF c
+      `)[0]
     if(!member)throw new CampusActivityError('CAMPUS_PEER_NOT_ELIGIBLE',403)
     if(input.action==='ASSENT'){
       await tx.$executeRaw`
