@@ -9,6 +9,7 @@ import { parentPortalService } from '../parent-portal/service'
 import { parentPublisher } from '../parent-portal/publisher'
 import { ReportingError } from '../reporting/types'
 import { readCampusStudentStatus } from './admission.service'
+import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 
 /**
@@ -103,7 +104,7 @@ router.post('/reports/relationships/:relationshipId/artifacts/:artifactId/consen
     b.commandKey, b.consentVersion, b.publicationHash,
   )
 }))
-router.post('/reports/relationships/:relationshipId/artifacts/:artifactId/grants', mutationBudget, guarded(req => {
+router.post('/reports/relationships/:relationshipId/artifacts/:artifactId/grants', requireRecentSchoolMfa, mutationBudget, guarded(req => {
   const b = z.object({ commandKey, consentId: id }).strict().parse(req.body)
   return parentPortalService.grantReport(
     req.user!, id.parse(req.params.relationshipId), id.parse(req.params.artifactId), b.consentId, b.commandKey,
@@ -129,7 +130,7 @@ router.post('/reports/officer/artifacts/:artifactId/preview', mutationBudget, gu
   }).strict().parse(req.body)
   return parentPublisher.preview(req.user!, id.parse(req.params.artifactId), b.templateKey, b.templateVersion)
 }))
-router.post('/reports/officer/artifacts/:artifactId/publish', mutationBudget, guarded(req => {
+router.post('/reports/officer/artifacts/:artifactId/publish', requireRecentSchoolMfa, mutationBudget, guarded(req => {
   const b = z.object({
     templateKey: z.string().min(1).max(128), templateVersion: z.string().min(1).max(128),
     previewHash: z.string().regex(/^[a-f0-9]{64}$/),
