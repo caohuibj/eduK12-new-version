@@ -203,5 +203,16 @@ suite('Campus parent identity / peer consent and cohort constraints — isolated
     expect(remain[0]?.count).toBeLessThan(10)
     expect((await guardianPeerRequests(parentAccounts[0])).list).toHaveLength(1)
     expect((await campusPeerOpportunities(f.students[0])).list).toHaveLength(1)
+    // A school pause must NOT trap previously granted pupil consent.
+    await changeCampusActivityStatus({
+      actor:f.admin,organizationId:f.organizationId,courseId:f.courseId,
+      action:'PAUSE',expectedVersion:3,
+    })
+    await expect(studentPeerConsent({
+      actor:f.students[0],organizationId:f.organizationId,courseId:f.courseId,
+      action:'WITHDRAW',
+    })).resolves.toMatchObject({state:'WITHDRAWN'})
+    const pupil=await db.user.findUniqueOrThrow({where:{id:f.students[0].userId}})
+    expect(pupil.accountDomain).toBe('SCHOOL')
   })
 })
