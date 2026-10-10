@@ -30,6 +30,12 @@ vi.mock('../../middleware/auth', () => ({
     next()
   },
 }))
+vi.mock('../../modules/campus/mfa.middleware', () => ({
+  requireRecentSchoolMfa: (req: any, res: any, next: any) => {
+    if (req.headers['x-recent-school-mfa'] !== 'true') return res.status(403).json({ code: 403, data: null })
+    next()
+  },
+}))
 vi.mock('../../middleware/redisRateLimit', () => ({
   createRedisRateLimiter: () => (_req: any, _res: any, next: any) => next(),
 }))
@@ -131,6 +137,21 @@ describe('Huischool governed report HTTP surface', () => {
     }, { 'x-school-role': 'STUDENT' })
     expect(response.status).toBe(400)
     expect(state.parent.acceptReportConsent).not.toHaveBeenCalled()
+  })
+  it('rejects officer disclosure grants without a recent CAMPUS TOTP step-up', async () => {
+    const response = await request('/reports/relationships/' + LINK + '/artifacts/' + ARTIFACT + '/grants', 'POST', {
+      commandKey:'0123456789abcdef', consentId:CHILD,
+    }, { 'x-school-role':'TEACHER' })
+    expect(response.status).toBe(403)
+    expect(state.parent.grantReport).not.toHaveBeenCalled()
+  })
+  it('rejects report publication without a recent CAMPUS TOTP step-up', async () => {
+    const response = await request('/reports/officer/artifacts/' + ARTIFACT + '/publish', 'POST', {
+      templateKey:'parent-report-availability',templateVersion:'1.0.0',
+      previewHash:'a'.repeat(64),expectedVersion:0,commandKey:'0123456789abcdef',
+    }, { 'x-school-role':'ADMIN' })
+    expect(response.status).toBe(403)
+    expect(state.publisher.publish).not.toHaveBeenCalled()
   })
   it('preserves an officer source/permission denial on the school reporting endpoint', async () => {
     state.publisher.list.mockRejectedValue(new ParentPortalError('PARENT_RESOURCE_NOT_FOUND', 404))
