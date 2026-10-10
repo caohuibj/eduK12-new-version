@@ -40,6 +40,8 @@
     "campus_mfa_recovery_codes": "RUNTIME_RW",
     "campus_mfa_reset_requests": "RUNTIME_RW",
     "campus_parent_registrations": "RUNTIME_RW",
+    "campus_peer_assignments": "RUNTIME_RW",
+    "campus_peer_consents": "RUNTIME_RW",
     "campus_staff_invitations": "RUNTIME_RW",
     "campus_student_eligibilities": "RUNTIME_RW",
     "campus_student_enrollments": "RUNTIME_RW",
