@@ -34,10 +34,11 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
   const db=input.tx??prisma
   const directSource = artifact.analysisKind === 'GROUP' ? artifact.artifactPayload.source
     : artifact.analysisKind === 'PROTECTED_FEEDBACK' ? { runId: artifact.sourceRunId, trackId: artifact.sourceTrackId } : null
-  const tracks = await db.$queryRaw<Array<{ family: string; key: string; version: string; policy: any; hash: string; closedAt: Date | null }>>`
+  const tracks = await db.$queryRaw<Array<{ family: string; key: string; version: string; policy: any; hash: string; closedAt: Date | null; productDomain: string }>>`
     SELECT t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
-      t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash,r.closed_at AS "closedAt"
+      t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash,r.closed_at AS "closedAt",org.product_domain AS "productDomain"
     FROM assessment_run_tracks t JOIN assessment_runs r ON r.id=t.run_id AND r.organization_id=t.organization_id
+    JOIN organizations org ON org.id=r.organization_id
     WHERE t.organization_id=${artifact.organizationId}
       AND ((t.run_id=${directSource?.runId ?? null} AND t.id=${directSource?.trackId ?? null}) OR EXISTS (
         SELECT 1 FROM reporting_series_waves w JOIN reporting_analysis_artifact_waves aw
@@ -46,7 +47,12 @@ export async function governedArtifactMetrics(input: { artifact: ReportingArtifa
       ))
   `
   if (!tracks.length) return hidden()
-  if (!tracks.some(t => t.policy?.resultDisclosure)) return null
+  if (!tracks.some(t => t.policy?.resultDisclosure)) {
+    // Legacy projections may use their historic reporting policy, but SCHOOL
+    // can never interpret a missing content-owned disclosure contract as full access.
+    if (tracks.some(t => t.productDomain === 'SCHOOL')) return hidden()
+    return null
+  }
   // A mixed legacy/governed series cannot use the legacy path to widen disclosure.
   if (tracks.some(t => !t.policy?.resultDisclosure)) return hidden()
   const context = await resolveOrganizationAccessContext({ organizationId: artifact.organizationId, principal },input.tx)
