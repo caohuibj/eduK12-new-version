@@ -316,3 +316,61 @@ export function SchoolReportOfficer({api,organizationId}: {api:SchoolApi;organiz
     </div>}
   </section>
 }
+
+type DisclosureOfficer = {
+  membershipId:string;displayName:string;hasPsychology:boolean;hasDisclosure:boolean
+}
+type DisclosureOfficers = {list:DisclosureOfficer[];hasMore:boolean}
+
+/** Governance only. The actual grant/revoke API enforces independent school
+ * domain, current ORG_ADMIN, recent TOTP and prohibition of self-grant.
+ */
+export function SchoolDisclosureOfficers({api,organizationId}: {api:SchoolApi;organizationId:string}) {
+  const [officers,setOfficers]=useState<DisclosureOfficers|null>(null)
+  const [busy,setBusy]=useState(false)
+  const [error,setError]=useState('')
+  const [notice,setNotice]=useState('')
+  const reload=async()=>{
+    const value=await api<DisclosureOfficers>('/organizations/'+organizationId+'/disclosure-officers')
+    setOfficers(value)
+  }
+  useEffect(()=>{
+    let active=true
+    setOfficers(null);setError('');setNotice('')
+    void api<DisclosureOfficers>('/organizations/'+organizationId+'/disclosure-officers')
+      .then(value=>{if(active)setOfficers(value)})
+      .catch(e=>{if(active)setError(reason(e,'无法核对心理教师名单'))})
+    return ()=>{active=false}
+  },[api,organizationId])
+  const change=async(officer:DisclosureOfficer)=>{
+    const grant=!officer.hasDisclosure
+    if(grant&&!officer.hasPsychology)return
+    if(!window.confirm(grant?'确认向此心理教师授予家长报告逐份披露能力？此授权不自动向家长开放任何报告。':'确认立即撤销此心理教师的家长报告披露能力？已获批的家长访问将重新校验。'))return
+    setError('');setNotice('');setBusy(true)
+    try{
+      const prefix='/organizations/'+organizationId+'/memberships/'+officer.membershipId+'/capabilities'
+      await api(prefix+(grant?'':'/revoke'),'POST',{capability:'PARENT_REPORT_DISCLOSURE'})
+      await reload()
+      setNotice(grant?'已授予专项披露能力；仍需要当前合法个案关系、审核发布和学生单份同意。':'专项披露能力已撤销；新读取需要重新通过权限校验。')
+    }catch(e){setError(reason(e,'权限操作未完成，请检查近期 TOTP 验证和当前学校授权'))}
+    finally{setBusy(false)}
+  }
+  return <section className="hs-panel">
+    <h2>学校管理员 · 家长报告披露人员授权</h2>
+    <p>只有当前受聘的校园心理教师可候选。管理员必须完成近期 TOTP 验证；不能给自己的账号追加敏感能力。授权仅提供操作资格，不赋予对所有学生的报告阅读权。</p>
+    {error&&<p className="hs-alert" role="alert">{error}</p>}
+    {notice&&<p className="hs-message" role="status">{notice}</p>}
+    {!officers?<p>正在读取当前心理教师名单…</p>:officers.list.length===0?
+      <p>当前没有已登记的校园心理教师。</p>:
+      <div className="hs-task-list">{officers.list.map(officer=><article className="hs-task-card" key={officer.membershipId}>
+        <h3>{officer.displayName}</h3>
+        <p>{officer.hasPsychology?'持有心理专业能力':'尚未授予心理专业能力'}</p>
+        <p>{officer.hasDisclosure?'已有家长报告逐份披露能力':'没有家长报告披露能力'}</p>
+        <button disabled={busy||(!officer.hasPsychology&&!officer.hasDisclosure)}
+          onClick={()=>void change(officer)}>
+          {officer.hasDisclosure?'撤销披露能力':'授予专项披露能力'}
+        </button>
+      </article>)}</div>}
+    {officers?.hasMore&&<p>可管理人员超过当前列表范围，请先调整学校成员安排。</p>}
+  </section>
+}
