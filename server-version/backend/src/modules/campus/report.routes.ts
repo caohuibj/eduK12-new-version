@@ -16,6 +16,7 @@ import { readCampusStudentFeedback } from './student-feedback'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
 import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
+import { listCampusGroupLongitudinalCatalog,generateCampusFixedGroupLongitudinal } from './group-longitudinal-studio'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -72,6 +73,20 @@ router.post('/reports/groups', requireRecentSchoolMfa, mutationBudget, guarded(r
     organizationId:id,runId:id,trackId:id,specId:id,
   }).strict().parse(req.body)
   return generateCampusGroupReport({actor:req.user!,...body})
+}))
+// Whole frozen population at every Wave, never a per-student or per-teacher
+// subgroup. Group longitudinal also cannot use a browser-provided selector.
+router.get('/reports/groups/longitudinal/catalog',guarded(req=>{
+  const values=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusGroupLongitudinalCatalog(req.user!,values.organizationId)
+}))
+router.post('/reports/groups/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const values=z.object({
+    organizationId:id,specId:id,
+    analysisKind:z.enum(['REPEATED_COHORT','MATCHED_LONGITUDINAL']),
+    sources:z.array(z.object({runId:id,trackId:id}).strict()).min(2).max(4),
+  }).strict().parse(req.body)
+  return generateCampusFixedGroupLongitudinal({actor:req.user!,...values})
 }))
 router.get('/reports/groups/:organizationId/:artifactId', guarded(req=>
   readCampusGroupReport({actor:req.user!,
