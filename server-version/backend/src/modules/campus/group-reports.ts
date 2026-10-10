@@ -228,7 +228,10 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
 
 export async function generateCampusGroupReport(input:{
   actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string;specId:string
-}){  return withCampusReportReleaseLock(input.organizationId, async () => {
+}){
+  // Deny unprivileged callers before opening an extra PostgreSQL connection.
+  await requireCampusGroupManager(input.actor,input.organizationId)
+  return withCampusReportReleaseLock(input.organizationId, async () => {
     const principal=await requireCampusGroupManager(input.actor,input.organizationId)
     await reviewedSpec(input.specId)
     await assertCampusWholeRunSource(input)
@@ -250,7 +253,10 @@ export async function generateCampusGroupReport(input:{
 
 export async function readCampusGroupReport(input:{
   actor:AuthenticatedPrincipal;organizationId:string;artifactId:string
-}){  return withCampusReportReleaseLock(input.organizationId, async () => {
+}){
+  // Deny unprivileged callers before opening an extra PostgreSQL connection.
+  await requireCampusGroupManager(input.actor,input.organizationId)
+  return withCampusReportReleaseLock(input.organizationId, async () => {
     const principal=await requireCampusGroupManager(input.actor,input.organizationId)
     const target=await prisma.$queryRaw<Array<{
       specId:string;runId:string;trackId:string;cohortSnapshotId:string|null
