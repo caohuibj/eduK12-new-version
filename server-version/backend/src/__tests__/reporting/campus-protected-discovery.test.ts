@@ -37,7 +37,7 @@ describe('SCHOOL protected source discovery is not an all-student directory',()=
     const [strings,...args]=mocks.query.mock.calls[0]
     const sql=strings.join('')
     expect(sql).toContain('organization_counselor_client_relationships')
-    expect(sql).toContain('relation.counselor_membership_id')
+    expect(sql).toContain('relation."counselor_membership_id"')
     // The ORG_ADMIN and TEACHER shortcut booleans are both false for SCHOOL.
     // Only the separately checked CLIENT relation may enumerate a subject.
     expect(args.filter(x=>x===false)).toHaveLength(2)
