@@ -12,6 +12,7 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
+import { readRespondentRunSummary } from '../reporting/respondentSummary'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -65,6 +66,17 @@ router.get('/reports/student/longitudinal/:artifactId', guarded(async req => {
     throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
   }
   return readParticipantLongitudinal(req.user!.userId, id.parse(req.params.artifactId))
+}))
+
+// The existing respondent projection is the only authority for each
+// completed FINAL. It checks the exact respondent, published resources,
+// current campus population and the content-owned disclosure contract.
+router.get('/reports/student/executions/:executionId', guarded(async req => {
+  if (req.user!.role !== 'STUDENT'
+    || (await readCampusStudentStatus(req.user!)).status !== 'APPROVED') {
+    throw new ParentPortalError('CAMPUS_REPORT_NOT_FOUND', 404)
+  }
+  return readRespondentRunSummary(req.user!.userId, id.parse(req.params.executionId))
 }))
 
 // Counselor's professional reports are separately authorized from parent

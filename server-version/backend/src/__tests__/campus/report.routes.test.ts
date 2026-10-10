@@ -15,6 +15,7 @@ const state = vi.hoisted(() => ({
   studentStatus: vi.fn(),
   participant: { list: vi.fn(), read: vi.fn() },
   professional: { list: vi.fn(), read: vi.fn() },
+  respondentSummary: vi.fn(),
 }))
 vi.mock('../../config', () => ({ config: state.config }))
 vi.mock('../../modules/parent-portal/service', () => ({ parentPortalService: state.parent }))
@@ -24,6 +25,7 @@ vi.mock('../../modules/reporting/participantService', () => ({
   listParticipantLongitudinal: state.participant.list,
   readParticipantLongitudinal: state.participant.read,
 }))
+vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunSummary: state.respondentSummary }))
 vi.mock('../../modules/campus/professional-reports', () => ({
   listCampusProfessionalReports: state.professional.list,
   readCampusProfessionalReport: state.professional.read,
@@ -97,6 +99,7 @@ describe('Huischool governed report HTTP surface', () => {
     state.participant.read.mockResolvedValue({ metrics: {} })
     state.professional.list.mockResolvedValue({ list: [] })
     state.professional.read.mockResolvedValue({ projection:{kind:'PROTECTED_FEEDBACK',state:'suppressed'} })
+    state.respondentSummary.mockResolvedValue({ schemaVersion:1, mode:'COMPLETION_ONLY', state:'COMPLETED' })
   })
 
   it('never accepts a legacy/training credential as a campus session', async () => {
@@ -130,6 +133,28 @@ describe('Huischool governed report HTTP surface', () => {
     const response = await request('/reports/student/longitudinal', 'GET', undefined, { 'x-school-role': 'STUDENT' })
     expect(response.status).toBe(404)
     expect(state.participant.list).not.toHaveBeenCalled()
+  })
+  it('allows an approved campus student to read only their own contracted FINAL summary', async () => {
+    const response = await request('/reports/student/executions/'+ARTIFACT,
+      'GET', undefined, { 'x-school-role':'STUDENT' })
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toMatchObject({ mode:'COMPLETION_ONLY', state:'COMPLETED' })
+    expect(state.respondentSummary).toHaveBeenCalledWith('school-parent', ARTIFACT)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+  it('does not invoke a FINAL respondent result for a pending student', async () => {
+    state.studentStatus.mockResolvedValue({ status:'PENDING_CLASS_APPROVAL' })
+    const response = await request('/reports/student/executions/'+ARTIFACT,
+      'GET', undefined, { 'x-school-role':'STUDENT' })
+    expect(response.status).toBe(404)
+    expect(state.respondentSummary).not.toHaveBeenCalled()
+  })
+  it('preserves an authority revocation when the source result is no longer readable', async () => {
+    state.respondentSummary.mockRejectedValue(new ParentPortalError('PARENT_RESOURCE_NOT_FOUND',404))
+    const response = await request('/reports/student/executions/'+ARTIFACT,
+      'GET', undefined, { 'x-school-role':'STUDENT' })
+    expect(response.status).toBe(404)
+    expect((await response.json()).data).toBeNull()
   })
   it('refuses consent mutation without matching SCHOOL CSRF', async () => {
     const response = await request('/reports/relationships/' + LINK + '/artifacts/' + ARTIFACT + '/consent', 'POST', {
