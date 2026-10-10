@@ -41,6 +41,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes}: {
   const [title,setTitle]=useState('')
   const [purpose,setPurpose]=useState<(typeof purposeOptions)[number][0]>('STUDENT_WELLBEING')
   const [classId,setClassId]=useState('')
+  const [peersPerRespondent,setPeersPerRespondent]=useState(1)
   const [taskTitle,setTaskTitle]=useState('')
   const [taskContent,setTaskContent]=useState('')
   const [taskKind,setTaskKind]=useState<'ASSIGNMENT'|'READING'|'CHECKIN'>('READING')
@@ -228,6 +229,24 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes}: {
           <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
         <button disabled={busy||!runTitle.trim()} onClick={newRun}>创建 Run 草稿</button>
       </>}
+      {isAdmin&&selected.status==='OPEN'&&<section className="hs-panel">
+        <h3>自愿同伴互评 · 安全抽样</h3>
+        <p>仅允许已批准的同班学生，并要求学生本人及其有效监护人分别完成知情同意。
+          同学身份不自评，至少五人达到隐私阈值；测量资源必须支持群体汇总分析，个人结果不自动披露。</p>
+        <label className="hs-field"><span>随机评价人数（每名参与者）</span>
+          <select value={peersPerRespondent} onChange={e=>setPeersPerRespondent(Number(e.target.value))}>
+            <option value="1">每人评价 1 位同学</option><option value="2">每人评价 2 位同学</option>
+            <option value="3">每人评价 3 位同学</option>
+          </select></label>
+        <p>请在上方先选定班级，并确保至少五名学生及监护人同意。</p>
+        <button disabled={busy||!classId} onClick={()=>void execute(async()=>{
+          if(!window.confirm('确认同班、至少五名学生及监护人已自愿同意，并按群体研究使用？'))return
+          const r=await api<{cohortSize:number;assignments:number}>(path+'/peer-allocations',
+            'POST',{classUnitId:classId,peersPerRespondent})
+          setNotice('已为 '+r.cohortSize+' 人生成 '+r.assignments+
+            ' 组非自评关系。任何测评作答仍需正式 Run 及科学政策。')
+        })}>按同意记录随机生成非自评配对</button>
+      </section>}
       <h3>关联测评</h3>
       {selected.runs.length===0?<p>暂无测评。可先使用阅读与练习内容。</p>:
         <div className="hs-actions">{selected.runs.map(r=>
