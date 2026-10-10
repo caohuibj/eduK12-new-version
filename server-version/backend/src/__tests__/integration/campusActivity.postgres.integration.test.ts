@@ -26,7 +26,8 @@ const DB_URL=integrationDatabaseUrl(
 )
 const suite=DB_URL?describe:describe.skip
 let db:PrismaClient
-const userName=(prefix:string)=>prefix+randomUUID().replace(/-/g,'')
+// PR1校园登录别名最长32位；合成fixture不可把完整UUID拼到前缀后导致注册拒绝。
+const userName=(prefix:string)=>prefix+randomUUID().replace(/-/g,'').slice(0,32-prefix.length)
 const actor=(u:{id:string;username:string;role:UserRole}):AuthenticatedPrincipal=>({
   userId:u.id,username:u.username,role:u.role,platformRole:'STANDARD',
   tokenVersion:0,mustChangePassword:false,accountDomain:'SCHOOL',

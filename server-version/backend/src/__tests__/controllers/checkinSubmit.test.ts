@@ -5,6 +5,7 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     checkin: { findUnique: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
+    $queryRaw: vi.fn(),
     checkinSubmission: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     checkinSubmissionIdempotencyReceipt: { findFirst: vi.fn(), create: vi.fn() },
     storedAsset: { findMany: vi.fn() },
@@ -50,6 +51,7 @@ const makeRes = () => {
 describe('logged-in checkin submit endTime', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockPrisma.$queryRaw.mockResolvedValue([{ allowed:false }])
     mockPrisma.courseStudent.findFirst.mockResolvedValue({ id: 'membership-1' })
     mockPrisma.storedAsset.findMany.mockResolvedValue([])
     mockPrisma.assetReference.deleteMany.mockResolvedValue({ count: 0 })

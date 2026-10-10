@@ -24,7 +24,8 @@ import type { AuthenticatedPrincipal } from '../../types'
 const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL')
 const suite=URL?describe:describe.skip
 let db:PrismaClient
-const label=(prefix:string)=>prefix+randomUUID().replace(/-/g,'')
+// PR1校园登录别名最长32位；合成fixture不可把完整UUID拼到前缀后导致注册拒绝。
+const label=(prefix:string)=>prefix+randomUUID().replace(/-/g,'').slice(0,32-prefix.length)
 const principal=(u:{id:string;role:UserRole;username:string}):AuthenticatedPrincipal=>({
   userId:u.id,role:u.role,username:u.username,
   accountDomain:'SCHOOL',platformRole:'STANDARD',tokenVersion:0,mustChangePassword:false,
