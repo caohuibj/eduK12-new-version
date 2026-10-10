@@ -8,7 +8,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { CampusAdmissionError, assertCampusGovernance } from './admission.service'
 
 const digest=(value:string)=>createHash('sha256').update('school-staff-invite:v1:'+value).digest('hex')
-const fail=(code:string,statusCode=409):never=>{throw new CampusAdmissionError(code,statusCode)}
+function fail(code:string,statusCode=409):never { throw new CampusAdmissionError(code,statusCode) }
 const normalizedLogin=(raw:string)=>{
   const name=raw.trim().toLowerCase()
   if(!/^[a-z0-9_.-]{4,32}$/.test(name))fail('STAFF_LOGIN_INVALID',400)
