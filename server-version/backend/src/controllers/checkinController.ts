@@ -458,6 +458,9 @@ export const checkinController = {
         }
       }
 
+      // The legacy training API must never enumerate SCHOOL Activity work.
+      where.course = { ...where.course, courseType: { not: 'CAMPUS_ACTIVITY' } }
+
       // 并行查询数据和总数
       const [checkins, total] = await Promise.all([
         prisma.checkin.findMany({
@@ -1522,6 +1525,7 @@ export const checkinController = {
         where.course = { creatorId: userId }
       }
 
+      where.course = { ...where.course, courseType: { not: 'CAMPUS_ACTIVITY' } }
       const checkins = await prisma.checkin.findMany({
         where,
         select: { tags: true }

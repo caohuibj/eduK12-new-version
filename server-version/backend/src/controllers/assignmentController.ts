@@ -214,6 +214,12 @@ export const assignmentController = {
         }
       }
 
+      // The old training list is not an Activity discovery API. Global
+      // platform ADMIN must not enumerate school-only assignments or tags.
+      // Merge the filter with the student enrollment predicate, rather than
+      // overwriting that predicate.
+      where.course = { ...where.course, courseType: { not: 'CAMPUS_ACTIVITY' } }
+
       // 并行查询数据和总数
       const [assignments, total] = await Promise.all([
         prisma.assignment.findMany({
@@ -1237,6 +1243,7 @@ export const assignmentController = {
         where.courseId = { in: courseIds }
       }
 
+      where.course = { ...where.course, courseType: { not: 'CAMPUS_ACTIVITY' } }
       const assignments = await prisma.assignment.findMany({
         where,
         select: { tags: true }
