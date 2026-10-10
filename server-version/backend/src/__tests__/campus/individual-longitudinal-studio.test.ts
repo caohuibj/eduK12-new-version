@@ -123,7 +123,7 @@ describe('Huischool current-CLIENT individual longitudinal studio',()=>{
     })
     expect(x.sources).toEqual([source2,source1])
     expect(JSON.stringify(x)).not.toContain('student-1')
-    const scopeSql=m.query.mock.calls[1][0].join('')
+    const scopeSql=m.query.mock.calls[1][0].strings.join('')
     expect(scopeSql).toContain("run.status='CLOSED'")
     expect(scopeSql).toContain("activity.status='CLOSED'")
     expect(scopeSql).toContain("execution.status='COMPLETED'")

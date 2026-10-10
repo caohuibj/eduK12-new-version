@@ -67,7 +67,7 @@ describe('school fixed-population longitudinal differential defenses',()=>{
     const actual=await assertCampusFixedLongitudinalPopulation({organizationId:org,
       sources:[{runId:r1,trackId:t1},{runId:r2,trackId:t2}]})
     expect(actual).toBe(10)
-    const sql=m.query.mock.calls[0][0].join('')
+    const sql=m.query.mock.calls[0][0].strings.join('')
     expect(sql).toContain('campus_activity_runs')
     expect(sql).toContain("run.status='CLOSED'")
     expect(sql).toContain("activity.status='CLOSED'")

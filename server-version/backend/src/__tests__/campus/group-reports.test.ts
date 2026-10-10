@@ -139,7 +139,7 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     })).rejects.toMatchObject({
       code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD',statusCode:409,
     })
-    const sql=mock.query.mock.calls[0][0].join('')
+    const sql=mock.query.mock.calls[0][0].strings.join('')
     expect(sql).toContain('jsonb_array_elements(old.members)')
     expect(sql).toContain("artifact.analysis_kind='GROUP'")
     expect(sql).toContain('LIMIT 101')
