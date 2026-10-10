@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { SchoolParentReports, SchoolStudentReportConsent, SchoolStudentFeedback } from './SchoolReports'
 import type { SchoolApi } from './SchoolRecovery'
 
