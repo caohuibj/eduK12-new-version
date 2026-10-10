@@ -15,6 +15,7 @@ import { listCampusProfessionalReports, readCampusProfessionalReport } from './p
 import { readRespondentRunSummary } from '../reporting/respondentSummary'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
+import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -93,6 +94,29 @@ router.post('/reports/protected',requireRecentSchoolMfa,mutationBudget,guarded(r
     specId:id,
   }).strict().parse(req.body)
   return generateCampusProtectedReport({actor:req.user!,...data})
+}))
+
+// Professional longitudinal observations must be reviewed against exact
+// metric/version comparability, current CLIENT and approved SCHOOL membership.
+// No username, subjectUserId or raw metric is accepted from the browser.
+router.get('/reports/longitudinal/catalog',guarded(req=>{
+  const query=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusIndividualLongitudinalCatalog(req.user!,query.organizationId)
+}))
+router.get('/reports/longitudinal/sources',guarded(req=>{
+  const query=z.object({
+    organizationId:id,
+    subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+  }).strict().parse(req.query)
+  return listCampusIndividualLongitudinalSources({actor:req.user!,...query})
+}))
+router.post('/reports/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+  const values=z.object({
+    organizationId:id,subjectReference:z.string().regex(/^林-[A-F0-9]{12}$/),
+    specId:id,
+    sources:z.array(z.object({runId:id,trackId:id}).strict()).min(2).max(8),
+  }).strict().parse(req.body)
+  return generateCampusIndividualLongitudinal({actor:req.user!,...values})
 }))
 
 // Self-only. The existing participant engine checks current membership,
