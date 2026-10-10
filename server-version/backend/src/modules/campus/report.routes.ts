@@ -68,14 +68,14 @@ router.get('/reports/student/longitudinal/:artifactId', guarded(async req => {
 
 // Do not imply a parent educational template has been approved simply because
 // a parent link exists. The existing explicit publication/consent/grant chain
-// and PARENT_PORTAL_ENABLED gate remain mandatory.
-router.use('/reports/parent', (_req, res, next) => config.parentPortalEnabled
+// and independent CAMPUS_PARENT_REPORT_ENABLED gate remain mandatory.
+router.use('/reports/parent', (_req, res, next) => config.campusParentReportEnabled
   ? next()
   : res.status(404).json({ code: 'PARENT_PORTAL_DISABLED', message: '校园家长报告尚未开放', data: null }))
-router.use('/reports/relationships', (_req, res, next) => config.parentPortalEnabled
+router.use('/reports/relationships', (_req, res, next) => config.campusParentReportEnabled
   ? next()
   : res.status(404).json({ code: 'PARENT_PORTAL_DISABLED', message: '校园家长报告尚未开放', data: null }))
-router.use('/reports/officer', (_req, res, next) => config.parentPortalEnabled
+router.use('/reports/officer', (_req, res, next) => config.campusParentReportEnabled
   ? next()
   : res.status(404).json({ code: 'PARENT_PORTAL_DISABLED', message: '校园家长报告尚未开放', data: null }))
 
