@@ -55,11 +55,11 @@ export async function registerCampusStaff(input:{
     return await prisma.$transaction(async tx=>{
       const invitations=await tx.$queryRaw<Array<{
         id:string;organizationId:string;persona:'TEACHER'|'COUNSELOR'
-        adminRole:boolean;psychologyStaff:boolean;invitedByUserId:string
+        adminRole:boolean;psychologyStaff:boolean;invitedByUserId:string;createdAt:Date
       }>>`
         SELECT i."id",i."organization_id" AS "organizationId",i."persona",
           i."admin_role" AS "adminRole",i."psychology_staff" AS "psychologyStaff",
-          i."invited_by_user_id" AS "invitedByUserId"
+          i."invited_by_user_id" AS "invitedByUserId",i."created_at" AS "createdAt"
         FROM "campus_staff_invitations" i
         JOIN "organizations" o ON o."id"=i."organization_id" AND o."product_domain"='SCHOOL'
           AND o."status"='ACTIVE'
@@ -91,6 +91,25 @@ export async function registerCampusStaff(input:{
         ||authority.organizationStatus!=='ACTIVE'
         ||authority.orgRole!=='ORG_ADMIN'||!authority.membershipId
         ||!authority.canGovern)
+        fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      // A previous governance revocation permanently invalidates invitations
+      // issued before it, even if the denial is later lifted. A replacement
+      // administrator membership must not resurrect an old bearer code.
+      const [issuerMembership,revokedSinceInvite]=await Promise.all([
+        tx.organizationMembership.findUnique({
+          where:{id:authority.membershipId},select:{validFrom:true},
+        }),
+        tx.organizationAccessDeny.findFirst({
+          where:{
+            organizationId:invitation.organizationId,
+            userId:invitation.invitedByUserId,
+            permission:{in:['*','ORGANIZATION_GOVERNANCE']},
+            deniedAt:{gte:invitation.createdAt},
+          },
+          select:{id:true},
+        }),
+      ])
+      if(!issuerMembership||issuerMembership.validFrom>invitation.createdAt||revokedSinceInvite)
         fail('CAMPUS_INVITE_UNAVAILABLE',404)
       const user=await tx.user.create({data:{
         username:'huischool_'+randomUUID().replace(/-/g,''),
