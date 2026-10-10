@@ -32,10 +32,23 @@ describe('Huischool school-only aggregate workbench',()=>{
     const confirm=window.confirm;window.confirm=vi.fn(()=>true)
     try{
       render(<SchoolGroupReports api={api as unknown as SchoolApi} organizationId={org}/>)
-      expect(await screen.findByText(/尚无.*科学/)).not.toBeInTheDocument()
-    }catch(error){
-      // No expectation of an optional empty-state paragraph in a full catalog.
-      if(!(error instanceof Error))throw error
+      fireEvent.change(await screen.findByLabelText('选择正式校园测评来源'),{
+        target:{value:run+':'+track},
+      })
+      fireEvent.change(screen.getByLabelText('选择经过正式审核的群体分析方案'),{
+        target:{value:spec},
+      })
+      fireEvent.click(screen.getByRole('button',{name:'通过二次验证生成受限群体摘要'}))
+      const region=await screen.findByRole('region',{name:'校内群体受限投影'})
+      expect(region).toHaveTextContent('3.5')
+      expect(region).not.toHaveTextContent('student-private-login')
+      await waitFor(()=>expect(api).toHaveBeenCalledWith('/reports/groups','POST',{
+        organizationId:org,runId:run,trackId:track,specId:spec,
+      }))
+      fireEvent.click(screen.getByRole('button',{name:'按最新权限重新核对报告'}))
+      await waitFor(()=>expect(api).toHaveBeenCalledWith('/reports/groups/'+org+'/'+artifact))
+      expect(await screen.findByText('数据暂不符合披露条件')).toBeInTheDocument()
+      expect(screen.getByRole('region',{name:'校内群体受限投影'})).not.toHaveTextContent('3.5')
     }finally{window.confirm=confirm}
   })
   it('renders suppressed group without counts, roster or values',async()=>{
