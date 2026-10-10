@@ -1,4 +1,5 @@
 import { matchesClassTarget } from '../assessment-policy/target'
+import { campusRunParticipantScope } from '../campus/activity.runScope'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -167,6 +168,21 @@ const prepareTracks = async (
     requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles')
     requireSingle(track.requestedPolicy.relationshipKinds, 'relationshipKinds')
     requireSingle(track.requestedPolicy.perspectives, 'perspectives')
+    if(track.requestedPolicy.relationshipKinds.includes('STUDENT_PEER')){
+      // Never publish individual peer scorecards or target identifiable peers
+      // outside a research-reviewed group-level, explicit opt-in protocol.
+      if(track.requestedPolicy.relationshipKinds.length!==1
+        || track.requestedPolicy.analysisMode!=='COHORT_AGGREGATE'
+        || track.requestedPolicy.minimumRespondents===null
+        || track.requestedPolicy.minimumRespondents<5
+        || resourcePolicy.analysisMode!=='COHORT_AGGREGATE'
+        || resourcePolicy.minimumRespondents===null
+        || resourcePolicy.minimumRespondents<5
+        || !track.requestedPolicy.perspectives.every(x=>x==='OBSERVER_REPORT'||x==='RELATIONAL_EXPERIENCE')){
+        throw new RunPublishError('CAMPUS_PEER_PRIVACY_POLICY',
+          'Peer assessments require published aggregate-only content and privacy floor >= 5',409)
+      }
+    }
     if (track.resourceFamily === 'COGNITIVE') {
       throw new RunPublishError('RUN_RESOURCE_UNSUPPORTED', 'COGNITIVE does not use the relational assignment bridge in PR2 V1', 409)
     }
@@ -429,7 +445,77 @@ const resolveParentPairs = async (tx: Tx, organizationId: string, subjectRole: R
   return pairs
 }
 
-const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack): Promise<PopulationPair[]> => {
+const resolveSchoolPeerPairs=async (tx:Tx,organizationId:string,runId:string):Promise<PopulationPair[]>=>{
+  const rows=await tx.$queryRaw<Array<{
+    id:string;classUnitId:string
+    subjectUserId:string;subjectMembershipId:string;subjectPersonaGrantId:string
+    respondentUserId:string;respondentMembershipId:string;respondentPersonaGrantId:string
+  }>>`
+    SELECT peer."id",peer."class_unit_id" AS "classUnitId",
+      subject."user_id" AS "subjectUserId",
+      subject."id" AS "subjectMembershipId",
+      sp."id" AS "subjectPersonaGrantId",
+      respondent."user_id" AS "respondentUserId",
+      respondent."id" AS "respondentMembershipId",
+      rp."id" AS "respondentPersonaGrantId"
+    FROM "campus_peer_assignments" peer
+    JOIN "campus_activity_runs" run_link ON run_link."organization_id"=peer."organization_id"
+      AND run_link."course_id"=peer."course_id" AND run_link."run_id"=${runId}
+    JOIN "campus_activities" a ON a."organization_id"=peer."organization_id"
+      AND a."course_id"=peer."course_id" AND a."status"='OPEN'
+    JOIN "organization_memberships" subject ON subject."id"=peer."subject_membership_id"
+      AND subject."organization_id"=peer."organization_id"
+      AND ${currentWindowSql(Prisma.sql`subject`)}
+    JOIN "organization_memberships" respondent ON respondent."id"=peer."respondent_membership_id"
+      AND respondent."organization_id"=peer."organization_id"
+      AND ${currentWindowSql(Prisma.sql`respondent`)}
+    JOIN "organization_persona_grants" sp ON sp."membership_id"=subject."id"
+      AND sp."organization_id"=subject."organization_id"
+      AND sp."persona"='STUDENT' AND sp."revoked_at" IS NULL
+    JOIN "organization_persona_grants" rp ON rp."membership_id"=respondent."id"
+      AND rp."organization_id"=respondent."organization_id"
+      AND rp."persona"='STUDENT' AND rp."revoked_at" IS NULL
+    JOIN "campus_student_enrollments" se ON se."user_id"=subject."user_id"
+      AND se."organization_id"=peer."organization_id"
+      AND se."class_unit_id"=peer."class_unit_id" AND se."status"='APPROVED'
+    JOIN "campus_student_enrollments" re ON re."user_id"=respondent."user_id"
+      AND re."organization_id"=peer."organization_id"
+      AND re."class_unit_id"=peer."class_unit_id" AND re."status"='APPROVED'
+    JOIN "campus_class_admissions" ca ON ca."organization_id"=peer."organization_id"
+      AND ca."class_unit_id"=peer."class_unit_id" AND ca."status"='APPROVED'
+    JOIN "campus_peer_consents" sc ON sc."course_id"=peer."course_id"
+      AND sc."membership_id"=subject."id" AND sc."withdrawn_at" IS NULL
+      AND sc."guardian_consented_at" IS NOT NULL
+      AND sc."consent_version"='HUISCHOOL_PEER_V1'
+    JOIN "campus_peer_consents" rc ON rc."course_id"=peer."course_id"
+      AND rc."membership_id"=respondent."id" AND rc."withdrawn_at" IS NULL
+      AND rc."guardian_consented_at" IS NOT NULL
+      AND rc."consent_version"='HUISCHOOL_PEER_V1'
+    JOIN "parent_student_relationships" sg ON sg."id"=sc."guardian_relationship_id"
+      AND sg."student_user_id"=subject."user_id"
+      AND sg."status"='ACTIVE' AND sg."approved_at" IS NOT NULL AND sg."revoked_at" IS NULL
+    JOIN "parent_student_relationships" rg ON rg."id"=rc."guardian_relationship_id"
+      AND rg."student_user_id"=respondent."user_id"
+      AND rg."status"='ACTIVE' AND rg."approved_at" IS NOT NULL AND rg."revoked_at" IS NULL
+    WHERE peer."organization_id"=${organizationId} AND peer."status"='ACTIVE'
+    ORDER BY peer."id" LIMIT 1501
+  `
+  if(rows.length>1500)throw new RunPublishError('CAMPUS_PEER_POPULATION_TOO_LARGE',
+    'Campus peer run is larger than the safely bounded pool',409)
+  return rows.map(row=>({
+    subject:actorFromMember({userId:row.subjectUserId,
+      membershipId:row.subjectMembershipId,personaGrantId:row.subjectPersonaGrantId},'STUDENT'),
+    respondent:actorFromMember({userId:row.respondentUserId,
+      membershipId:row.respondentMembershipId,personaGrantId:row.respondentPersonaGrantId},'STUDENT'),
+    relationshipKind:'STUDENT_PEER' as const,relationshipRef:row.id,
+    scopeClassUnitIds:[row.classUnitId],
+    facts:{peerAssignmentId:row.id,classUnitId:row.classUnitId,
+      source:'explicit-opt-in-guardian-consented-peer'},
+  }))
+}
+
+const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack,
+  campusSelected: Set<string>|null = null): Promise<PopulationPair[]> => {
   const subjectRole = requireSingle(track.requestedPolicy.subjectRoles, 'subjectRoles') as RunActorRole
   const respondentRole = requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles') as RunActorRole
   const relationshipKind = requireSingle(track.requestedPolicy.relationshipKinds, 'relationshipKinds') as RelationalRelationshipKindV1
@@ -443,13 +529,24 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     pairs = await resolveClassPairs(tx, organizationId, subjectRole, respondentRole)
     const target = track.requestedPolicy.targetPolicy
     if (target?.mode === 'COURSE_TEACHER') {
-      const course = await tx.course.findUnique({ where: { id: target.courseId! }, select: { creatorId: true, status: true, endedAt: true, students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
+      const course = await tx.course.findUnique({ where: { id: target.courseId! }, select: { creatorId: true, status: true, endedAt: true, courseType: true,
+        students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
       const students = new Set(course?.students.map(student => student.studentId) ?? [])
-      pairs = !course || course.status !== 'PUBLISHED' || course.endedAt ? [] : pairs.filter(pair => pair.subject.userId === course.creatorId && students.has(pair.respondent.userId)).map(pair => ({ ...pair, facts: { ...pair.facts, courseId: target.courseId! } }))
-    } else if (target) pairs = pairs.filter(pair => pair.subject.provenanceKind === 'ORG_MEMBER'
-      && matchesClassTarget(target, pair.subject.membershipId, String(pair.facts.staffRole)))
+      pairs = !course || course.courseType === 'CAMPUS_ACTIVITY'
+        || course.status !== 'PUBLISHED' || course.endedAt ? [] : pairs.filter(pair => {
+          const teacher = pair.subject.actorRole === 'TEACHER' ? pair.subject : pair.respondent
+          const student = pair.subject.actorRole === 'STUDENT' ? pair.subject : pair.respondent
+          return teacher.actorRole === 'TEACHER' && student.actorRole === 'STUDENT'
+            && teacher.userId === course.creatorId && students.has(student.userId)
+        }).map(pair => ({ ...pair, facts: { ...pair.facts, courseId: target.courseId! } }))
+    } else if (target) pairs = pairs.filter(pair => {
+      const teacher = pair.subject.actorRole === 'TEACHER' ? pair.subject : pair.respondent
+      return teacher.actorRole === 'TEACHER'
+        && teacher.provenanceKind === 'ORG_MEMBER'
+        && matchesClassTarget(target, teacher.membershipId, String(pair.facts.staffRole))
+    })
     if (relationshipKind === 'COURSE_TEACHER_STUDENT') {
-      const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false,
+      const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' },
         ...(target?.mode === 'COURSE_TEACHER' ? { id: target.courseId } : {}) },
         select: { id: true, creatorId: true, students: { where: { status: { in: ['ACTIVE', 'APPROVED'] } }, select: { studentId: true } } } })
       pairs = pairs.flatMap(pair => courses.filter(course => {
@@ -460,6 +557,11 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
     }
   } else if (relationshipKind === 'COUNSELOR_CLIENT') {
     pairs = await resolveCounselorPairs(tx, organizationId, subjectRole, respondentRole)
+  } else if(relationshipKind==='STUDENT_PEER'){
+    if(campusSelected===null||subjectRole!=='STUDENT'||respondentRole!=='STUDENT')
+      throw new RunPublishError('CAMPUS_PEER_SCOPE_REQUIRED',
+        'Peer Run requires two SCHOOL student actors and an Activity',403)
+    pairs=await resolveSchoolPeerPairs(tx,organizationId,track.runId)
   } else if (relationshipKind === 'PARENT_CHILD') {
     pairs = await resolveParentPairs(tx, organizationId, subjectRole, respondentRole)
   } else {
@@ -473,7 +575,35 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
   pairs = pairs.filter((pair) => (
     selectorAllows(track.subjectSelector, subjectFilter, pair.subject, pair)
     && selectorAllows(track.respondentSelector, respondentFilter, pair.respondent, pair)
+    && (campusSelected===null||(()=>{
+      const students=[pair.subject,pair.respondent].filter(actor=>actor.actorRole==='STUDENT')
+      return students.length>0 && students.every(actor =>
+        actor.provenanceKind==='ORG_MEMBER' && campusSelected.has(actor.membershipId))
+    })())
   ))
+  if (campusSelected!==null && pairs.length>0) {
+    // PR1 accounts are separate per product. Parent/student or teacher/student
+    // relationships cannot authorize a LEGACY training account as a campus
+    // subject/respondent merely because the relationship once existed.
+    // Filter once in batch before any immutable Episode/assignment is frozen.
+    const actorIds=[...new Set(pairs.flatMap(pair=>
+      [pair.subject.userId,pair.respondent.userId]))]
+    const scopedAccounts=await tx.user.findMany({
+      where:{id:{in:actorIds},accountDomain:'SCHOOL',isActive:true,isFrozen:false},
+      select:{id:true},
+    })
+    const domainAllowed=new Set(scopedAccounts.map(user=>user.id))
+    pairs=pairs.filter(pair=>
+      domainAllowed.has(pair.subject.userId)
+      && domainAllowed.has(pair.respondent.userId))
+  }
+  if(relationshipKind==='STUDENT_PEER'){
+    const distinct=new Set(pairs.map(p=>p.respondent.userId))
+    const subjects=new Set(pairs.map(p=>p.subject.userId))
+    if(distinct.size<5||subjects.size<5)
+      throw new RunPublishError('CAMPUS_PEER_PRIVACY_FLOOR',
+        'Peer Run requires at least five independently consenting student observers and subjects',409)
+  }
   const unique = new Map<string, PopulationPair>()
   for (const pair of pairs) {
     const key = `${pair.subject.userId}:${pair.subject.membershipId ?? pair.relationshipRef}:${pair.respondent.userId}:${pair.respondent.membershipId ?? pair.relationshipRef}`
@@ -755,6 +885,10 @@ export const publishAssessmentRun = async (input: {
 
     const timeRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const verifiedAt = timeRows[0].now.toISOString()
+    const campusSelected=await campusRunParticipantScope(tx,{
+      organizationId:input.organizationId,runId:input.runId,
+      actorUserId:input.actorUserId,publish:true,
+    })
     const actorCache = new Map<string, string>()
     let executionCount = 0
 
@@ -767,7 +901,7 @@ export const publishAssessmentRun = async (input: {
         SET "frozen_resource_policy" = ${frozenPolicyJson}::jsonb, "resource_policy_hash" = ${policyHash}
         WHERE "id" = ${track.id} AND "run_id" = ${input.runId}
       `
-      const pairs = await resolvePairs(tx, input.organizationId, track)
+      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
       const perspective = requireSingle(track.requestedPolicy.perspectives, 'perspectives')
       for (const pair of pairs) {
@@ -872,9 +1006,13 @@ export const previewAssessmentRun = async (input: {
     if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
     }
+    const campusSelected=await campusRunParticipantScope(tx,{
+      organizationId:input.organizationId,runId:input.runId,
+      actorUserId:input.actorUserId,publish:false,
+    })
     const tracks = []
     for (const track of prepared) {
-      const pairs = await resolvePairs(tx, input.organizationId, track)
+      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', 'Track resolved no eligible actor pairs', 409)
       for (const pair of pairs) assertPublisherScope(authority, input.actorUserId, pair, track.resourcePolicy)
       tracks.push({ trackId: track.id, executionCount: pairs.length, subjectCount: new Set(pairs.map(pair => actorCacheKey(pair.subject))).size, respondentCount: new Set(pairs.map(pair => actorCacheKey(pair.respondent))).size, resourcePolicy: track.resourcePolicy })

@@ -18,6 +18,7 @@ import {
   type RunStartClaimRecord,
 } from './startClaim'
 import { loadRunExecutionStartAdmission } from './startAdmission'
+import { assertCurrentRunStartAuthority } from './startAuthority'
 import { freezeRunExecutionScientificProvenance, freezeRunExecutionScientificProvenanceInTransaction } from './scientificProvenance'
 import {
   productionRunRuntimeAdapterRegistry,
@@ -186,6 +187,22 @@ const startTransactionalComposite = async (input: {
 
   if (admission.assignment.status !== 'OPEN') {
     throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN', 'STARTED assignment has no authoritative runtime attempt', 409)
+  }
+  // A claim can be accepted while an Activity is OPEN, then wait for the
+  // runtime transaction while the school pauses it or revokes a student.
+  // Re-check current PR1 membership, class approval and PR2 Activity gates
+  // **under the second transaction's locks** before creating any attempt.
+  // Idempotent reconciliation of an already-created attempt remains above.
+  await assertCurrentRunStartAuthority(tx, input.executionId)
+  const state=await tx.$queryRaw<Array<{runStatus:string}>>`
+    SELECT r."status" AS "runStatus"
+    FROM "assessment_run_executions" e
+    JOIN "assessment_runs" r ON r."id"=e."run_id"
+      AND r."organization_id"=e."organization_id"
+    WHERE e."id"=${input.executionId}
+  `
+  if(state[0]?.runStatus!=='PUBLISHED'){
+    throw new RunStartExecutionError('RUN_NOT_STARTABLE','Run was closed after START claim',409)
   }
   const repository = createSqlRelationalAssignmentRepository(tx as any)
   const relational = createRelationalAssessmentService(repository)

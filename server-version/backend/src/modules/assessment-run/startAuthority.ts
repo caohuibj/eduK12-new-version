@@ -84,6 +84,38 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       FROM "parent_student_relationships" WHERE "id" = ${relationship.ref} FOR SHARE
     `
     valid = rows[0]?.valid ?? false
+  } else if(relationship.kind==='STUDENT_PEER'){
+    const peers=await tx.$queryRaw<Array<{id:string}>>`
+      SELECT peer."id" FROM "campus_peer_assignments" peer
+      JOIN "campus_peer_consents" subject_consent
+        ON subject_consent."course_id"=peer."course_id"
+        AND subject_consent."organization_id"=peer."organization_id"
+        AND subject_consent."membership_id"=peer."subject_membership_id"
+        AND subject_consent."withdrawn_at" IS NULL
+        AND subject_consent."guardian_consented_at" IS NOT NULL
+        AND subject_consent."consent_version"='HUISCHOOL_PEER_V1'
+      JOIN "campus_peer_consents" respondent_consent
+        ON respondent_consent."course_id"=peer."course_id"
+        AND respondent_consent."organization_id"=peer."organization_id"
+        AND respondent_consent."membership_id"=peer."respondent_membership_id"
+        AND respondent_consent."withdrawn_at" IS NULL
+        AND respondent_consent."guardian_consented_at" IS NOT NULL
+        AND respondent_consent."consent_version"='HUISCHOOL_PEER_V1'
+      JOIN "parent_student_relationships" sg
+        ON sg."id"=subject_consent."guardian_relationship_id"
+        AND sg."status"='ACTIVE' AND sg."approved_at" IS NOT NULL
+        AND sg."revoked_at" IS NULL
+      JOIN "parent_student_relationships" rg
+        ON rg."id"=respondent_consent."guardian_relationship_id"
+        AND rg."status"='ACTIVE' AND rg."approved_at" IS NOT NULL
+        AND rg."revoked_at" IS NULL
+      WHERE peer."id"=${relationship.ref}
+        AND peer."organization_id"=${envelope.organizationId}
+        AND peer."status"='ACTIVE'
+        AND peer."id"=${relationship.facts.peerAssignmentId}
+      FOR SHARE OF peer,subject_consent,respondent_consent,sg,rg
+    `
+    valid=peers.length===1
   } else if (relationship.kind === 'COUNSELOR_CLIENT') {
     const rows = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_counselor_client_relationships"

@@ -124,7 +124,7 @@ export const courseController = {
         return success(res, cached)
       }
 
-      let where: any = {}
+      let where: any = { courseType: { not: 'CAMPUS_ACTIVITY' } }
 
       if (status !== 'all') {
         where.status = status
@@ -234,6 +234,7 @@ export const courseController = {
           description,
           courseCode,
           creatorId: userId,
+          courseType: 'TRAINING_COURSE',
           status: CourseStatus.PUBLISHED,
           ...(isLibrary ? { isLibrary: true, isRecruiting: false } : {}),
         },
@@ -522,7 +523,7 @@ export const courseController = {
         where: { courseCode }
       })
 
-      if (!course) {
+      if (!course || course.courseType === 'CAMPUS_ACTIVITY') {
         return error(res, '课程号不存在')
       }
 
@@ -541,6 +542,7 @@ export const courseController = {
         if (
           !lockedCourse
           || lockedCourse.courseCode !== courseCode
+          || lockedCourse.courseType === 'CAMPUS_ACTIVITY'
           || !isCourseJoinable(lockedCourse)
         ) {
           throw new CourseNotJoinableError(
@@ -600,7 +602,7 @@ export const courseController = {
           status: {
             in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]
           },
-          course: { isLibrary: false },
+          course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } },
         },
         include: {
           course: {
@@ -660,7 +662,7 @@ export const courseController = {
         }
       })
 
-      if (!course) {
+      if (!course || course.courseType === 'CAMPUS_ACTIVITY') {
         return error(res, '课程码无效')
       }
 
@@ -1191,6 +1193,7 @@ export const courseController = {
           description: originalCourse.description,
           courseCode: newCourseCode,
           creatorId: userId!,
+          courseType: 'TRAINING_COURSE',
           status: CourseStatus.DRAFT,
           isRecruiting: true,
         },
@@ -1628,6 +1631,7 @@ export const courseController = {
           description: originalCourse.description,
           courseCode: newCourseCode,
           creatorId: userId!,
+          courseType: 'TRAINING_COURSE',
           status: CourseStatus.DRAFT,
           isRecruiting: true,
         },

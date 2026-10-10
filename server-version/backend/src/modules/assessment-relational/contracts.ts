@@ -17,6 +17,9 @@ const RELATIONSHIP_KINDS = new Set<RelationalRelationshipKindV1>([
   'COURSE_TEACHER_STUDENT',
   'CLASS_TEACHER_STUDENT',
   'COUNSELOR_CLIENT',
+  // Only explicitly released peer-eligible resources may use this kind;
+  // Run publishing independently enforces school, guardian, and cohort policy.
+  'STUDENT_PEER',
 ])
 const PERSPECTIVES = new Set<RelationalPerspectiveV1>([
   'SELF_REPORT',

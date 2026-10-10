@@ -11,6 +11,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     checkinSubmission: { findMany: vi.fn() },
     assetReference: { deleteMany: vi.fn() },
     courseStudent: { findMany: vi.fn(), findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+    $queryRaw: vi.fn(),
     courseShare: { findMany: vi.fn() },
   },
 }))
@@ -43,6 +44,7 @@ const makeRes = () => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([{ allowed:false }])
   mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
 })
 
@@ -256,7 +258,9 @@ describe('course isLibrary', () => {
       user: { userId: 'student-1', role: UserRole.STUDENT },
     }) as any, res)
     expect(mockPrisma.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ course: { isLibrary: false } }),
+      where: expect.objectContaining({
+        course: expect.objectContaining({isLibrary:false,courseType:{not:'CAMPUS_ACTIVITY'}}),
+      }),
     }))
   })
 

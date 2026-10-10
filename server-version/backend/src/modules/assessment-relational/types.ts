@@ -3,6 +3,7 @@ export type RelationalActorRoleV1 = 'STUDENT' | 'TEACHER' | 'PARENT' | 'COUNSELO
 export type RelationalRelationshipKindV1 =
   | 'SELF'
   | 'PARENT_CHILD'
+  | 'STUDENT_PEER'
   | 'COURSE_TEACHER_STUDENT'
   | 'CLASS_TEACHER_STUDENT'
   | 'COUNSELOR_CLIENT'

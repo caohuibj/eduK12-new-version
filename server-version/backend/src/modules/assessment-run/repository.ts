@@ -69,11 +69,14 @@ export async function createAssessmentRunDraft(input: {
   name: string
   createdByUserId: string
   intakeDeadline?: Date | null
+  // Campus Activity transaction may atomically bind the Run, never orphaning
+  // a draft on an interrupted binding.
+  tx?: Tx
 }): Promise<AssessmentRunRecord> {
   const name = input.name.trim()
   if (!name) throw new AssessmentRunRepositoryError('RUN_NAME_REQUIRED', 'Run name is required', 400)
   const id = randomUUID()
-  const rows = await prisma.$queryRaw<AssessmentRunRecord[]>`
+  const rows = await (input.tx ?? prisma).$queryRaw<AssessmentRunRecord[]>`
     INSERT INTO "assessment_runs" (
       "id", "organization_id", "name", "created_by_user_id", "intake_deadline"
     ) VALUES (
