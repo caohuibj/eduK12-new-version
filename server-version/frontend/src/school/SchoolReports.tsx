@@ -374,3 +374,96 @@ export function SchoolDisclosureOfficers({api,organizationId}: {api:SchoolApi;or
     {officers?.hasMore&&<p>可管理人员超过当前列表范围，请先调整学校成员安排。</p>}
   </section>
 }
+
+
+type ProfessionalList = {list:Array<{
+  artifactId:string;subjectAlias:string;analysisKind:'PROTECTED_FEEDBACK'|'INDIVIDUAL_LONGITUDINAL';
+  generatedAt:string
+}>;hasMore:boolean}
+type ProfessionalProjection = {
+  kind:'PROTECTED_FEEDBACK'|'INDIVIDUAL_LONGITUDINAL';state?:string
+  metrics?:Record<string,{state:string;aggregations?:Record<string,unknown>}>
+  waves?:Array<{ordinal:number;metrics:Record<string,{state:string;value?:number}>}>
+  comparisons?:Array<{fromOrdinal:number;toOrdinal:number;metrics:Record<string,{
+    comparability:{level:string;allowedOperations?:string[]};delta?:number
+  }>}>
+  limitations?:string[]
+}
+type ProfessionalDetail = {artifactId:string;generatedAt:string;projection:ProfessionalProjection}
+
+/** Current CLIENT-scoped professional index and read-only scientific results.
+ * No raw responses, rater identities, direct exports or student labels.
+ */
+export function SchoolProfessionalReports({api,organizationId}: {api:SchoolApi;organizationId:string}) {
+  const [reports,setReports]=useState<ProfessionalList|null>(null)
+  const [detail,setDetail]=useState<ProfessionalDetail|null>(null)
+  const [selected,setSelected]=useState<string|null>(null)
+  const [busy,setBusy]=useState(false)
+  const [error,setError]=useState('')
+  useEffect(()=>{
+    let active=true
+    setReports(null);setDetail(null);setSelected(null);setError('')
+    void api<ProfessionalList>('/reports/professional/organizations/'+organizationId+'/artifacts')
+      .then(data=>{if(active)setReports(data)})
+      .catch(e=>{if(active)setError(reason(e,'当前没有专业报告读取权限'))})
+    return ()=>{active=false}
+  },[api,organizationId])
+  const read=async(artifactId:string)=>{
+    setSelected(artifactId);setDetail(null);setError('');setBusy(true)
+    try{
+      const data=await api<ProfessionalDetail>('/reports/professional/organizations/'+organizationId+'/artifacts/'+artifactId)
+      setDetail(data)
+    }catch(e){setError(reason(e,'报告权限已变化，请重新检查专业关系和当前学校'))}
+    finally{setBusy(false)}
+  }
+  const projection=detail?.projection
+  return <section className="hs-panel">
+    <h2>心理专业人员 · 已获授权的专业报告</h2>
+    <p>仅当前合法的专业关系与专项心理能力可读取。这里只呈现已有科学规则允许的汇总指标；不显示被评价者的原始回答或互评身份。</p>
+    {error&&<p className="hs-alert" role="alert">{error}</p>}
+    {!reports?<p>正在核对授权个案和报告…</p>:reports.list.length===0?
+      <p>当前没有符合权限与科学发布条件的专业报告。</p>:
+      <div className="hs-task-list">{reports.list.map(r=><article className="hs-task-card" key={r.artifactId}>
+        <h3>学生编号：{r.subjectAlias}</h3>
+        <p>{r.analysisKind==='PROTECTED_FEEDBACK'?'多评价者保护性反馈':'个人纵向测评'}</p>
+        <small>{new Date(r.generatedAt).toLocaleDateString('zh-CN')}</small>
+        <button disabled={busy} aria-pressed={selected===r.artifactId}
+          onClick={()=>void read(r.artifactId)}>核实权限并查看专业投影</button>
+      </article>)}</div>}
+    {reports?.hasMore&&<p>只显示最近 20 项，请按具体个案确认后再查看历史记录。</p>}
+    {projection&&<div className="hs-task-detail">
+      <h3>{projection.kind==='PROTECTED_FEEDBACK'?'多主体专业反馈':'个人纵向专业记录'}</h3>
+      <p>以下数值需结合对应测量手册和科学资格解释，不能单凭结果形成诊断、因果结论或对学生贴标签。</p>
+      {projection.kind==='PROTECTED_FEEDBACK'&&<div className="hs-task-list">
+        {projection.state==='suppressed'?<p>当前样本未达到保护规则，群体指标已被抑制。</p>:
+          Object.entries(projection.metrics??{}).map(([metricId,metric])=><article className="hs-task-card" key={metricId}>
+            <h3>指标：{metricId}</h3>
+            {metric.state==='suppressed'?<p>该指标未满足披露阈值。</p>:
+              Object.entries(metric.aggregations??{})
+                .filter(([,value])=>typeof value==='number'&&Number.isFinite(value))
+                .map(([aggregation,value])=><p key={aggregation}>{aggregation}：{Number(value).toLocaleString('zh-CN',{maximumFractionDigits:3})}</p>)}
+          </article>)}
+      </div>}
+      {projection.kind==='INDIVIDUAL_LONGITUDINAL'&&<div className="hs-task-list">
+        {(projection.waves??[]).map(w=><article className="hs-task-card" key={w.ordinal}>
+          <h3>第 {w.ordinal} 次测量</h3>
+          {Object.entries(w.metrics).map(([metricId,metric])=><p key={metricId}>
+            {metricId}：{metric.state==='present'&&typeof metric.value==='number'&&Number.isFinite(metric.value)
+              ?metric.value.toLocaleString('zh-CN',{maximumFractionDigits:3}):'数据不可用'}
+          </p>)}
+        </article>)}
+      </div>}
+      {projection.kind==='INDIVIDUAL_LONGITUDINAL'&&projection.comparisons?.map((c,i)=>
+        <div key={i}><h3>第 {c.fromOrdinal} 次至第 {c.toOrdinal} 次</h3>
+          {Object.entries(c.metrics).map(([metric,metricValue])=><p key={metric}>
+            {metric}：{metricValue.comparability.level}；{
+              metricValue.comparability.allowedOperations?.includes('NUMERIC_DELTA')
+              &&typeof metricValue.delta==='number'&&Number.isFinite(metricValue.delta)
+                ?'可比变化量 '+metricValue.delta.toLocaleString('zh-CN',{maximumFractionDigits:3})
+                :'不能据此计算可信变化量'}</p>)}
+        </div>)}
+      {projection.limitations?.map((limit,i)=><p key={i}>{limit}</p>)}
+      <button onClick={()=>{setDetail(null);setSelected(null)}}>关闭当前报告</button>
+    </div>}
+  </section>
+}
