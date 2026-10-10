@@ -252,6 +252,16 @@ export async function myCampusPeerTargets(input:{
       AND subject."organization_id"=peer."organization_id"
     JOIN "campus_accounts" alias ON alias."user_id"=subject."user_id"
     JOIN "campus_activities" a ON a."course_id"=peer."course_id" AND a."status"='OPEN'
+    JOIN "campus_peer_consents" sconsent ON sconsent."course_id"=peer."course_id"
+      AND sconsent."membership_id"=peer."subject_membership_id"
+      AND sconsent."withdrawn_at" IS NULL AND sconsent."guardian_consented_at" IS NOT NULL
+    JOIN "campus_peer_consents" rconsent ON rconsent."course_id"=peer."course_id"
+      AND rconsent."membership_id"=peer."respondent_membership_id"
+      AND rconsent."withdrawn_at" IS NULL AND rconsent."guardian_consented_at" IS NOT NULL
+    JOIN "parent_student_relationships" sg ON sg."id"=sconsent."guardian_relationship_id"
+      AND sg."status"='ACTIVE' AND sg."revoked_at" IS NULL
+    JOIN "parent_student_relationships" rg ON rg."id"=rconsent."guardian_relationship_id"
+      AND rg."status"='ACTIVE' AND rg."revoked_at" IS NULL
     WHERE peer."organization_id"=${input.organizationId}
       AND peer."course_id"=${input.courseId} AND peer."status"='ACTIVE'
       AND respondent."valid_from"<=statement_timestamp()
@@ -294,4 +304,57 @@ export async function guardianPeerRequests(actor:AuthenticatedPrincipal){
     ORDER BY c."course_id" LIMIT 50
   `
   return {list:rows,policy:campusPeerDisclosure()}
+}
+
+/** One batched student inbox projection for voluntary peer activities. No
+ * classmates' names or responses are exposed before consent or allocation.
+ */
+export async function campusPeerOpportunities(actor:AuthenticatedPrincipal){
+  if(actor.accountDomain!=='SCHOOL'||actor.role!=='STUDENT')
+    fail('CAMPUS_STUDENT_REQUIRED')
+  const rows=await prisma.$queryRaw<Array<{
+    courseId:string;organizationId:string;title:string;assented:boolean;guardianConsented:boolean
+  }>>`
+    SELECT a."course_id" AS "courseId",
+      a."organization_id" AS "organizationId",course."title",
+      (c."assented_at" IS NOT NULL AND c."withdrawn_at" IS NULL) AS "assented",
+      (c."guardian_consented_at" IS NOT NULL AND c."withdrawn_at" IS NULL
+        AND guardian."status"='ACTIVE' AND guardian."revoked_at" IS NULL) AS "guardianConsented"
+    FROM "campus_activity_participants" p
+    JOIN "campus_activities" a ON a."course_id"=p."course_id"
+      AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
+    JOIN "courses" course ON course."id"=a."course_id"
+    JOIN "organizations" o ON o."id"=a."organization_id"
+      AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
+    JOIN "organization_memberships" m ON m."id"=p."membership_id"
+      AND m."organization_id"=p."organization_id" AND m."user_id"=${actor.userId}
+      AND m."valid_from"<=statement_timestamp()
+      AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+    JOIN "campus_student_enrollments" e ON e."user_id"=m."user_id"
+      AND e."organization_id"=m."organization_id" AND e."status"='APPROVED'
+    JOIN "campus_class_admissions" ca ON ca."organization_id"=e."organization_id"
+      AND ca."class_unit_id"=e."class_unit_id" AND ca."status"='APPROVED'
+    JOIN "organization_student_class_assignments" sc ON sc."membership_id"=m."id"
+      AND sc."organization_id"=m."organization_id" AND sc."class_unit_id"=e."class_unit_id"
+      AND sc."valid_from"<=statement_timestamp()
+      AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" pg ON pg."membership_id"=m."id"
+      AND pg."organization_id"=m."organization_id" AND pg."persona"='STUDENT'
+      AND pg."revoked_at" IS NULL
+    JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
+      AND u."role"='STUDENT' AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+    LEFT JOIN "campus_peer_consents" c ON c."organization_id"=m."organization_id"
+      AND c."course_id"=a."course_id" AND c."membership_id"=m."id"
+    LEFT JOIN "parent_student_relationships" guardian
+      ON guardian."id"=c."guardian_relationship_id"
+      AND guardian."student_user_id"=m."user_id"
+    WHERE p."status"='ACTIVE'
+      AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
+        WHERE deny."organization_id"=m."organization_id" AND deny."user_id"=m."user_id"
+          AND deny."lifted_at" IS NULL
+          AND deny."permission" IN ('*','ACTIVITY_READ','RUN_START','PEER_ASSESS'))
+    ORDER BY a."created_at" DESC LIMIT 51
+  `
+  return {list:rows.slice(0,50),truncated:rows.length>50,
+    policy:campusPeerDisclosure()}
 }
