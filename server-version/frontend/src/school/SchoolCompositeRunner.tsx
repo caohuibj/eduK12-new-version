@@ -1,6 +1,9 @@
 import { useCallback,useMemo,useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
+import type { CognitiveSessionApi } from '../modules/cognitive/api'
+import type { CognitiveSession } from '../modules/cognitive/types'
 import SituationalRunner from '../modules/situational/pages/SituationalRunner'
 import type { SituationalRunnerClient, SituationalFinalSubmitPayload } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
@@ -83,6 +86,30 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
           startPath(id)+'/scenes/'+encodeURIComponent(sceneKey)+'/video-sources'),
     }
   },[api,child?.id,child?.situationalAttemptId,state?.id])
+  // Only the existing frozen Composite child session is eligible. No
+  // /api/cognitive training credential, standalone start or raw score endpoint.
+  const cognitiveClient=useMemo<CognitiveSessionApi|null>(()=>{
+    if(!state||!child?.cognitiveSession?.sessionId||child.type!=='COGNITIVE')return null
+    const attemptId=state.id,itemId=child.id
+    const location=(sessionId:string)=>'/composite-attempts/'+encodeURIComponent(attemptId)
+      +'/items/'+encodeURIComponent(itemId)+'/cognitive/'+encodeURIComponent(sessionId)
+    const loadBlob=async(path:string)=>{
+      const response=await fetch('/api/campus'+path,{credentials:'same-origin'})
+      if(!response.ok)throw new Error('校园认知测评素材不可访问')
+      return response.blob()
+    }
+    return {
+      getSession:async(sessionId)=>wrapped(await api<CognitiveSession>(location(sessionId))),
+      submitFinal:async(sessionId,payload)=>wrapped(await api<{
+        completed:boolean;feedbackDeferred:boolean;replayed:boolean
+      }>(location(sessionId)+'/submit','POST',payload)),
+      loadAsset:(sessionId,assetId)=>loadBlob(location(sessionId)+'/assets/'+encodeURIComponent(assetId)+'/content'),
+      issueVideoCapabilities:async(sessionId,videoKey)=>wrapped(await api<AssessmentVideoCapabilitySources>(
+        location(sessionId)+'/video-capabilities','POST',{videoKey})),
+      appendTrial:async()=>{throw new Error('校园认知测评只支持一次性 FINAL 提交')},
+      completeSession:async()=>{throw new Error('校园认知测评只支持一次性 FINAL 提交')},
+    }
+  },[api,child?.id,child?.type,child?.cognitiveSession?.sessionId,state?.id])
   const childFinished=async()=>{
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
@@ -97,6 +124,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
       <p>已收到正式完成确认。报告是否可查看由独立披露政策决定。</p>
       <button onClick={onFinished}>返回我的校园活动</button>
     </div>:
+    child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&state&&cognitiveClient?
+      <CognitiveRunner campus={{
+        sessionId:child.cognitiveSession.sessionId,
+        api:cognitiveClient,
+        onCompleted:()=>{void childFinished()},
+        onExit:()=>{setChild(null)},
+      }}/>:
     child?.type==='SITUATIONAL'&&child.situationalAttemptId&&state&&situationalClient?
       <MemoryRouter initialEntries={['/relational/situational/attempts/'+child.situationalAttemptId]}>
         <SituationalRunner campus={{
@@ -120,7 +154,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
       onReload={()=>load(state.id)}
       onExit={onExit}
       onCompleted={()=>setDone(true)}
-      onEnterCognitive={()=>setError('校园 Run 的认知适配器未正式启用，不能通过非正式入口作答。')}
+      onEnterCognitive={item=>{
+        if(!item.cognitiveSession?.sessionId){
+          setError('认知子测评缺少经过冻结的会话，请联系学校')
+          return
+        }
+        setChild(item)
+      }}
       onEnterSituational={item=>{
         if(!item.situationalAttemptId){
           setError('嵌入情境测评缺少冻结实例，请联系学校')
