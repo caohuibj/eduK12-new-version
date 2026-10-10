@@ -13,6 +13,7 @@ import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listParticipantLongitudinal, readParticipantLongitudinal } from '../reporting/participantService'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readRespondentRunSummary } from '../reporting/respondentSummary'
+import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -56,6 +57,24 @@ router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); ne
 router.get('/reports/availability', guarded(async () => ({
   parentReportsEnabled: config.campusParentReportEnabled,
 })))
+
+// Internal school GROUP workbench: never teacher-rating release, raw rows or
+// arbitrary subgroup selectors. School governance or current psychology staff
+// only. Generation requires recent SCHOOL TOTP and the existing abuse budget.
+router.get('/reports/groups/catalog', guarded(req => {
+  const q=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusGroupReportCatalog(req.user!,q.organizationId)
+}))
+router.post('/reports/groups', requireRecentSchoolMfa, mutationBudget, guarded(req => {
+  const body=z.object({
+    organizationId:id,runId:id,trackId:id,specId:id,
+  }).strict().parse(req.body)
+  return generateCampusGroupReport({actor:req.user!,...body})
+}))
+router.get('/reports/groups/:organizationId/:artifactId', guarded(req=>
+  readCampusGroupReport({actor:req.user!,
+    organizationId:id.parse(req.params.organizationId),
+    artifactId:id.parse(req.params.artifactId)})))
 
 // Self-only. The existing participant engine checks current membership,
 // authoritative SELF observations and frozen-vs-current disclosure contracts.
