@@ -124,8 +124,8 @@ router.post('/reports/relationships/:relationshipId/artifacts/:artifactId/revoke
 }))
 
 router.get('/reports/officer/artifacts', guarded(req => {
-  const q = pagination.parse(req.query)
-  return parentPublisher.list(req.user!, id.parse(req.query.organizationId), q.page, q.pageSize)
+  const q = pagination.extend({ organizationId: id }).parse(req.query)
+  return parentPublisher.list(req.user!, q.organizationId, q.page, q.pageSize)
 }))
 router.get('/reports/officer/artifacts/:artifactId/templates', guarded(req =>
   parentPublisher.templates(req.user!, id.parse(req.params.artifactId))))
