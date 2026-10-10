@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
+import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
 
 type SchoolTask={
   id:string;activityId:string;activityTitle:string
@@ -29,6 +30,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const [notice,setNotice]=useState('')
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
+  const [execution,setExecution]=useState<CampusExecutionRef|null>(null)
   const load=async(targetPage=page)=>{
     const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25')
     setItems(result);setPage(targetPage)
@@ -79,7 +81,15 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
           <h3>{task.title}</h3>
           <p>状态：{captions[task.status]}{task.deadline?
             ' · 截止 '+new Date(task.deadline).toLocaleDateString('zh-CN'):''}</p>
-          {task.kind==='MEASUREMENT'?<p>正式测评须使用相应的受控测验入口，不能通过旧培训课程进入。</p>:
+          {task.kind==='MEASUREMENT'?
+              task.href&&['PENDING','IN_PROGRESS'].includes(task.status)?
+                <button disabled={busy} onClick={()=>{
+                  const parts=task.href!.match(/^\/organizations\/([^/]+)\/activities\/([^/]+)\/runs\/([^/]+)\/executions\/([^/]+)$/)
+                  if(!parts){setError('正式测评路径无效，请刷新后重试');return}
+                  setExecution({organizationId:parts[1],courseId:parts[2],
+                    runId:parts[3],executionId:parts[4]})
+                }}>开始／继续官方测评</button>:
+              <p>测评已完成或暂未开放。报告需经独立授权后才可查看。</p>:
             task.href&&task.status!=='EXPIRED'&&<button disabled={busy}
               onClick={()=>void showTask(task)}>查看{task.kind==='READING'?'阅读材料':'活动任务'}</button>}
         </article>)}
@@ -90,6 +100,9 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       <button disabled={!items.hasMore||busy} onClick={()=>void load(page+1)}>下一页</button>
       {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
     </div>}
+    {execution&&<SchoolCompositeRunner api={api} execution={execution}
+      onExit={()=>setExecution(null)}
+      onFinished={()=>{setExecution(null);void load(page)}}/>}
     {selected&&details&&<div className="hs-task-detail">
       <h3>{details.title}</h3>
       {details.description&&<p>{details.description}</p>}
