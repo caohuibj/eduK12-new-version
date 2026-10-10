@@ -15,7 +15,7 @@ import { createOrganizationUnit } from '../../modules/organization/structure'
 import { forceResetPasswordBySystemAdmin } from '../../services/accountAuthorityService'
 import { setUserActiveState } from '../../services/userLifecycleService'
 import { comparePassword } from '../../utils/password'
-import { individualSubjectScope } from '../../modules/reporting/individualAuthorization'
+import { individualSubjectScope, assertIndividualLongitudinalAccess } from '../../modules/reporting/individualAuthorization'
 import { resolveProtectedFeedbackManagerContext } from '../../modules/reporting/protectedFeedback'
 import { guardCampusCapabilityGrant } from '../../modules/campus/capabilityGuard'
 import type { Request, Response, NextFunction } from 'express'
@@ -338,6 +338,38 @@ suite('Huischool PR1 admission, account isolation and recovery — isolated Post
     })).rejects.toMatchObject({code:'REPORT_NOT_FOUND'})
   })
 
+
+  it('revoking the SCHOOL CLIENT persona immediately denies a direct longitudinal report ID (real PostgreSQL)',async()=>{
+    const f=await school()
+    const student=await db.user.create({data:{
+      username:'campus_private_client_'+randomUUID().replace(/-/g,''),
+      accountDomain:'SCHOOL',role:UserRole.STUDENT,passwordHash:'synthetic-fixture',
+    }})
+    const member=await db.organizationMembership.create({data:{
+      id:randomUUID(),organizationId:f.org,userId:student.id,orgRole:'MEMBER',
+    }})
+    const client=await db.organizationPersonaGrant.create({data:{
+      id:randomUUID(),organizationId:f.org,membershipId:member.id,
+      persona:'CLIENT',grantedByUserId:f.admin.userId,
+    }})
+    const counselor=await db.organizationMembership.findFirstOrThrow({
+      where:{organizationId:f.org,userId:f.counselor.userId,validUntil:null},
+    })
+    await db.$executeRaw`
+      INSERT INTO organization_counselor_client_relationships
+        (id,organization_id,counselor_membership_id,client_membership_id)
+      VALUES (${randomUUID()},${f.org},${counselor.id},${member.id})
+    `
+    const input={
+      principal:{userId:f.counselor.userId,platformRole:'STANDARD' as const},
+      organizationId:f.org,subjectUserId:student.id,
+    }
+    await expect(assertIndividualLongitudinalAccess(input)).resolves.toBeUndefined()
+    await db.organizationPersonaGrant.update({
+      where:{id:client.id},data:{revokedAt:new Date()},
+    })
+    await expect(assertIndividualLongitudinalAccess(input)).rejects.toMatchObject({code:'REPORT_NOT_FOUND',statusCode:404})
+  })
 
   it('honors an explicit PSYCHOLOGY_STAFF deny even if the original grant remains active',async()=>{
     const f=await school()
