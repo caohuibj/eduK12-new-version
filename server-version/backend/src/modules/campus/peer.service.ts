@@ -353,7 +353,7 @@ export async function campusPeerOpportunities(actor:AuthenticatedPrincipal){
         WHERE deny."organization_id"=m."organization_id" AND deny."user_id"=m."user_id"
           AND deny."lifted_at" IS NULL
           AND deny."permission" IN ('*','ACTIVITY_READ','RUN_START','PEER_ASSESS'))
-    ORDER BY a."created_at" DESC LIMIT 51
+    ORDER BY a."course_id" DESC LIMIT 51
   `
   return {list:rows.slice(0,50),truncated:rows.length>50,
     policy:campusPeerDisclosure()}

@@ -1,6 +1,6 @@
 import { useCallback,useMemo,useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
+import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import SituationalRunner from '../modules/situational/pages/SituationalRunner'
 import type { SituationalRunnerClient, SituationalFinalSubmitPayload } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
