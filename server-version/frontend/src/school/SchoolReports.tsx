@@ -236,7 +236,7 @@ export function SchoolReportOfficer({api,organizationId}: {api:SchoolApi;organiz
       ])
       setTemplates(tools.list)
       setConsents(approved.list)
-      setChoice(tools.list[0]?.key+':'+tools.list[0]?.version||'')
+      setChoice(tools.list.length ? tools.list[0].key+':'+tools.list[0].version : '')
     }catch(e){setError(reason(e,'没有合法的报告发布或披露权限'))}
     finally{setBusy(false)}
   }
