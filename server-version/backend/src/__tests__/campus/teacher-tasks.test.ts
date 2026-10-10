@@ -23,15 +23,15 @@ describe('Huischool teacher observer task boundary',()=>{
     mocks.reference.mockReturnValue('林-AB12C3D4E5F6')
   })
   it('refuses TRAINING and non-teacher personas before any SQL discovery',async()=>{
-    await expect(listCampusTeacherRunTasks({...actor,accountDomain:'TRAINING'} as any))
+    await expect(listCampusTeacherRunTasks({...actor,accountDomain:'TRAINING'} as any,'school-a'))
       .rejects.toMatchObject({statusCode:403})
-    await expect(listCampusTeacherRunTasks({...actor,role:'PARENT'} as any))
+    await expect(listCampusTeacherRunTasks({...actor,role:'PARENT'} as any,'school-a'))
       .rejects.toMatchObject({statusCode:403})
     expect(mocks.query).not.toHaveBeenCalled()
     expect(mocks.official).not.toHaveBeenCalled()
   })
   it('uses live school/class/teacher/approved-student constraints and only projects aliases',async()=>{
-    const result=await listCampusTeacherRunTasks(actor as any)
+    const result=await listCampusTeacherRunTasks(actor as any,'school-a')
     expect(result.list).toEqual([{
       executionId:'exec-a',runId:'run-a',organizationId:'school-a',
       activityId:'activity-a',activityTitle:'学习适应',runTitle:'教师观察',
@@ -48,6 +48,7 @@ describe('Huischool teacher observer task boundary',()=>{
       "enrollment.status='APPROVED'",
       "selected.status='ACTIVE'","organization_access_denies",
     ])expect(sql).toContain(expression)
+    expect(sql).toContain('org.id=')
     expect(mocks.official).toHaveBeenCalledWith('teacher-a',{runIds:['run-a']})
     expect(JSON.stringify(result)).not.toMatch(/PRIVATE_LOGIN_NAME|subjectUserId|student-a|reportAttemptId/)
   })
@@ -57,7 +58,7 @@ describe('Huischool teacher observer task boundary',()=>{
       {...task,executionId:'other'},
       {...task,organizationId:'school-b'},
     ],truncated:false})
-    const result=await listCampusTeacherRunTasks(actor as any)
+    const result=await listCampusTeacherRunTasks(actor as any,'school-a')
     expect(result.list).toEqual([])
   })
 })
