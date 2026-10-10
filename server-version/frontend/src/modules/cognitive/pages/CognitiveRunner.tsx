@@ -4,7 +4,7 @@ import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-
 import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress } from '../../../components/assessment-shell'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { cognitiveApi, publicCognitiveApi } from '../api'
+import { cognitiveApi, publicCognitiveApi, type CognitiveSessionApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { cognitiveInputNotice, resolveCognitiveReadinessProfile } from '../core/readiness'
 import { useCognitiveSession } from '../core/useCognitiveSession'
@@ -42,17 +42,28 @@ const LoadingContent = ({ message }: { message: string }) => (
  * exact-version runner selection, timed stimuli, media disclosure, local trial
  * persistence and FINAL construction remain Cognitive-owned.
  */
-const CognitiveRunner: React.FC = () => {
-  const { sessionId } = useParams<{ sessionId: string }>()
+export type CampusCognitiveRunnerBinding = {
+  sessionId: string
+  api: CognitiveSessionApi
+  onCompleted: () => void
+  onExit: () => void
+}
+
+/** Reuse the unchanged frozen trial runner while injecting a SCHOOL-only,
+ * parent-slot-scoped transport. Campus never navigates to legacy auth/routes.
+ */
+export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }> = ({ campus }) => {
+  const params = useParams<{ sessionId: string }>()
+  const sessionId = campus?.sessionId ?? params.sessionId
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-  const isPublic = isPublicAssessmentPath(location.pathname)
-  const relationalMode = location.pathname.startsWith('/relational/cognitive/')
+  const isPublic = !campus && isPublicAssessmentPath(location.pathname)
+  const relationalMode = Boolean(campus) || location.pathname.startsWith('/relational/cognitive/')
   const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
   const sessionApi = useMemo(
-    () => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
-    [isPublic, recoveryToken]
+    () => campus?.api ?? (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
+    [campus?.api, isPublic, recoveryToken]
   )
   const controller = useCognitiveSession(sessionId ?? '', sessionApi, { aggregateOnly: relationalMode })
   const { state } = controller
@@ -129,6 +140,7 @@ const CognitiveRunner: React.FC = () => {
   const total = typeof totalValue === 'number' && Number.isFinite(totalValue) ? totalValue : 0
 
   const handleRestart = async () => {
+    if (campus) return // Parent owns immutable child lifecycle and recovery.
     setRestarting(true)
     setRestartError(null)
     try {
@@ -147,16 +159,18 @@ const CognitiveRunner: React.FC = () => {
     }
   }
 
-  const cognitiveFallback = isPublic ? '/' : relationalMode ? '/relational/tasks' : '/student/cognitive'
-  const parentTarget = parentReturnTo(
+  const cognitiveFallback = campus ? '/school' : isPublic ? '/' : relationalMode ? '/relational/tasks' : '/student/cognitive'
+  const parentTarget = campus ? cognitiveFallback : parentReturnTo(
     searchParams.get('returnTo'),
     isPublic,
     cognitiveFallback,
   )
-  const hasParentReturn = parentTarget !== cognitiveFallback
+  const hasParentReturn = Boolean(campus) || parentTarget !== cognitiveFallback
+  const leaveParent = () => { if (campus) campus.onExit(); else navigate(parentTarget) }
+  const leaveList = () => { if (campus) campus.onExit(); else navigate(cognitiveFallback) }
   const recoveryActions = (
     <div className="flex flex-wrap justify-center gap-3">
-      <button onClick={() => navigate(parentTarget)} className="btn-secondary">
+      <button onClick={leaveParent} className="btn-secondary">
         {hasParentReturn ? '返回上层测评' : '返回列表'}
       </button>
       {!hasParentReturn ? (
@@ -174,6 +188,16 @@ const CognitiveRunner: React.FC = () => {
   ) : null
 
   if (state.status === 'COMPLETED') {
+    // The campus transport returns a completion-only acknowledgement. All
+    // student scores stay behind independent scientific publication gates.
+    if (campus) return (
+      <AssessmentShell
+        title="校园认知测评已完成"
+        actions={<button onClick={campus.onCompleted} className="btn-primary">返回校园活动</button>}
+      >
+        <p role="status" className="text-center text-slate-600">正式作答已提交并确认；是否开放解释性报告取决于独立科学审核。</p>
+      </AssessmentShell>
+    )
     if (sessionId) {
       const returnTo = searchParams.get('returnTo')
       const target = parentReturnTo(
@@ -233,7 +257,7 @@ const CognitiveRunner: React.FC = () => {
         <AssessmentShell
           title="认知测评"
           interactionReadiness={{ state: 'blocked', message: '该冻结任务类型或 engineVersion 没有可用的前端支持契约。' }}
-          actions={<button onClick={() => navigate(cognitiveFallback)} className="btn-secondary">返回列表</button>}
+          actions={<button onClick={leaveList} className="btn-secondary">返回列表</button>}
         >
           <p className="text-center text-slate-600">该测评类型或版本暂不支持，请联系老师处理。</p>
         </AssessmentShell>
@@ -355,7 +379,7 @@ const CognitiveRunner: React.FC = () => {
       <AssessmentShell
         title="认知测评"
         interactionReadiness={{ state: 'blocked', message: '该测评类型或版本暂不支持。' }}
-        actions={<button onClick={() => navigate(isPublic ? '/' : '/student/cognitive')} className="btn-secondary">返回列表</button>}
+        actions={<button onClick={leaveList} className="btn-secondary">返回列表</button>}
       >
         <p className="text-center text-slate-600">请联系老师处理。</p>
       </AssessmentShell>
