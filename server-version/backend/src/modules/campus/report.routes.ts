@@ -52,6 +52,10 @@ const guarded = (operation: (req: Request) => Promise<unknown>) =>
 
 router.use(authenticateSchool)
 router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
+// Public to any authenticated SCHOOL role; no report, identity or student data.
+router.get('/reports/availability', guarded(async () => ({
+  parentReportsEnabled: config.campusParentReportEnabled,
+})))
 
 // Self-only. The existing participant engine checks current membership,
 // authoritative SELF observations and frozen-vs-current disclosure contracts.

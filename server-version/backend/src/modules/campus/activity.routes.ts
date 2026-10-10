@@ -10,6 +10,9 @@ import { assignmentController } from '../../controllers/assignmentController'
 import { checkinController } from '../../controllers/checkinController'
 import { allocateCampusActivityParticipants, revokeCampusActivityParticipant } from './activity.allocation'
 import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks } from './activity.tasks'
+import { listCampusTeacherRunTasks } from './teacher-tasks'
+import { readCampusStudentStatus } from './admission.service'
+import { campusStudentReference } from './studentReference'
 import {
   CampusActivityError, createCampusActivity, listCampusActivities,readCampusActivity,
   updateCampusActivity, addCampusActivityCollaborator, changeCampusActivityStatus,
@@ -118,6 +121,18 @@ router.post('/organizations/:organizationId/activities/:courseId/tasks',
     }))
   }))
 
+router.get('/my/teacher-run-tasks',authenticateSchool,wrap(async(req,res)=>{
+  const query=z.object({organizationId:uuid}).strict().parse(req.query)
+  return success(res,await listCampusTeacherRunTasks(req.user!,query.organizationId))
+}))
+router.get('/my/student-reference',authenticateSchool,wrap(async(req,res)=>{
+  if(req.user?.accountDomain!=='SCHOOL'||req.user.role!=='STUDENT')
+    throw new CampusActivityError('CAMPUS_STUDENT_REQUIRED',403)
+  const status=await readCampusStudentStatus(req.user)
+  if(status.status!=='APPROVED'||!status.organizationId)
+    throw new CampusActivityError('CAMPUS_STUDENT_NOT_APPROVED',403)
+  return success(res,{reference:campusStudentReference(status.organizationId,req.user.userId)})
+}))
 router.get('/my/parent-run-tasks',authenticateSchool,wrap(async(req,res)=>
   success(res,await listCampusParentRunTasks(req.user!))
 ))

@@ -102,6 +102,17 @@ describe('Huischool governed report HTTP surface', () => {
     state.respondentSummary.mockResolvedValue({ schemaVersion:1, mode:'COMPLETION_ONLY', state:'COMPLETED' })
   })
 
+  it('reports feature availability without leaking a parent report when disabled',async()=>{
+    state.config.campusParentReportEnabled=false
+    const disabled=await request('/reports/availability')
+    expect(disabled.status).toBe(200)
+    expect((await disabled.json()).data).toEqual({parentReportsEnabled:false})
+    expect(disabled.headers.get('cache-control')).toBe('no-store')
+    state.config.campusParentReportEnabled=true
+    const enabled=await request('/reports/availability')
+    expect((await enabled.json()).data).toEqual({parentReportsEnabled:true})
+    expect(state.parent.children).not.toHaveBeenCalled()
+  })
   it('never accepts a legacy/training credential as a campus session', async () => {
     const response = await request('/reports/parent/children', 'GET', undefined, { 'x-school-user': '', 'x-training-user': 'training-parent' })
     expect(response.status).toBe(401)

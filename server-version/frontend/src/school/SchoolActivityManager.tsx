@@ -68,6 +68,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes}: {
   const fetchDetail=async(courseId:string)=>{
     const data=await api<Detail>(base+'/'+courseId)
     setSelected(data)
+    setClassId('')
     setActiveRun(null);setResources([]);setPreview(null)
   }
   useEffect(()=>{
@@ -238,7 +239,14 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes}: {
             <option value="1">每人评价 1 位同学</option><option value="2">每人评价 2 位同学</option>
             <option value="3">每人评价 3 位同学</option>
           </select></label>
-        <p>请在上方先选定班级，并确保至少五名学生及监护人同意。</p>
+        <label className="hs-field"><span>本次互评分配班级</span>
+          <select value={classId} onChange={event=>setClassId(event.target.value)}>
+            <option value="">请选择本活动内已获批准的班级</option>
+            {classes.filter(unit=>unit.unitKind==='CLASS').map(unit=>
+              <option key={unit.id} value={unit.id}>{unit.name}</option>)}
+          </select>
+        </label>
+        <p>请选定本活动内已获批、至少五名学生及其监护人自愿同意的班级。</p>
         <button disabled={busy||!classId} onClick={()=>void execute(async()=>{
           if(!window.confirm('确认同班、至少五名学生及监护人已自愿同意，并按群体研究使用？'))return
           const r=await api<{cohortSize:number;assignments:number}>(path+'/peer-allocations',

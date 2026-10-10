@@ -3,6 +3,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail } from '../reporting/types'
+import { campusStudentReference } from './studentReference'
 
 const hidden = (): never => reportingFail('CAMPUS_REPORT_NOT_FOUND', 'campus report not found', 404)
 
@@ -28,9 +29,9 @@ async function context(actor: AuthenticatedPrincipal, organizationId: string) {
 export async function listCampusProfessionalReports(actor: AuthenticatedPrincipal, organizationId: string) {
   const access = await context(actor, organizationId)
   const rows = await prisma.$queryRaw<Array<{
-    id:string;generatedAt:Date;subjectAlias:string;analysisKind:string;
+    id:string;generatedAt:Date;subjectUserId:string;analysisKind:string;
   }>>`
-    SELECT a.id,a.generated_at AS "generatedAt",student_alias.login_name AS "subjectAlias",
+    SELECT a.id,a.generated_at AS "generatedAt",u.id AS "subjectUserId",
       a.analysis_kind AS "analysisKind"
     FROM reporting_analysis_artifacts a
     JOIN reporting_analysis_specs spec ON spec.id=a.spec_id AND spec.status='PUBLISHED'
@@ -38,7 +39,6 @@ export async function listCampusProfessionalReports(actor: AuthenticatedPrincipa
     JOIN users u ON u.id=COALESCE(a.subject_user_id,a.artifact_payload->'source'->>'subjectUserId')
       AND u.account_domain='SCHOOL' AND u.role='STUDENT' AND u.is_active=true AND u.is_frozen=false
       AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
-    JOIN campus_accounts student_alias ON student_alias.user_id=u.id
     JOIN organization_memberships student_m ON student_m.organization_id=a.organization_id
       AND student_m.user_id=u.id
       AND student_m.valid_from<=statement_timestamp()
@@ -61,7 +61,7 @@ export async function listCampusProfessionalReports(actor: AuthenticatedPrincipa
   `
   return {
     list: rows.slice(0,20).map(row=>({
-      artifactId:row.id,subjectAlias:row.subjectAlias,
+      artifactId:row.id,subjectAlias:campusStudentReference(organizationId,row.subjectUserId),
       analysisKind:row.analysisKind,generatedAt:row.generatedAt.toISOString(),
     })),
     hasMore: rows.length>20,
