@@ -29,6 +29,7 @@ vi.mock('../../modules/reporting/participantService', () => ({
   readParticipantLongitudinal: state.participant.read,
 }))
 vi.mock('../../modules/reporting/respondentSummary', () => ({ readRespondentRunSummary: state.respondentSummary }))
+vi.mock('../../modules/campus/student-feedback', () => ({ readCampusStudentFeedback: state.respondentSummary }))
 vi.mock('../../modules/campus/group-reports',()=>({
   listCampusGroupReportCatalog:state.group.catalog,
   generateCampusGroupReport:state.group.generate,
