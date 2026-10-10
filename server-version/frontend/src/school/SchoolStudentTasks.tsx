@@ -33,6 +33,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const [execution,setExecution]=useState<CampusExecutionRef|null>(null)
+  const [studentReference,setStudentReference]=useState<string|null>(null)
   const [feedback,setFeedback]=useState<{executionId:string;title:string;data:StudentFinalFeedback}|null>(null)
   const feedbackEpoch=useRef(0)
   const load=async(targetPage=page)=>{
@@ -46,6 +47,13 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       .then(result=>{if(active)setItems(result)})
       .catch(err=>{if(active)setError(err instanceof Error?err.message:'活动待办暂不可用')})
     return ()=>{active=false}
+  },[api])
+  useEffect(()=>{
+    let live=true
+    void api<{reference:string}>('/my/student-reference')
+      .then(data=>{if(live)setStudentReference(data.reference)})
+      .catch(()=>{if(live)setStudentReference(null)})
+    return ()=>{live=false}
   },[api])
   const showTask=async(task:SchoolTask)=>{
     if(!['READING','ASSIGNMENT','CHECKIN'].includes(task.kind))return
@@ -84,6 +92,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     <h2>我的校园活动</h2>
     <p>这里只显示学校已开放、并且当前允许你参加的活动。
       心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
+    {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
     <button disabled={busy} onClick={()=>void load(page).catch(err=>
