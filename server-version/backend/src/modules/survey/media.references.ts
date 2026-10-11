@@ -37,7 +37,7 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const byId=new Map(assets.map(a=>[a.id,a]))
   for(const image of refs){
     if(!image.altText?.trim())fail(400,'研究图片必须提供可阅读替代文字')
-    if(image.rightsStatus==='unknown'||!image.rightsNote?.trim())
+    if(!['self_authored','authorized'].includes(image.rightsStatus)||!image.rightsNote?.trim())
       fail(403,'研究图片必须提供明确的原创或授权依据')
     const a=byId.get(image.asset.assetId)
     if(!a||a.sizeBytes<=0||a.sizeBytes>surveyMaxImageBytes

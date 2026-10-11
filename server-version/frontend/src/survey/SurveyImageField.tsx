@@ -12,6 +12,7 @@ export function SurveyImageField({projectId,image,onChange}:{
   const base='/api/survey/projects/'+encodeURIComponent(projectId)+'/assets'
   useEffect(()=>{
     let mounted=true
+    if(typeof globalThis.fetch!=='function')return()=>{mounted=false}
     void fetch(base,{credentials:'same-origin'}).then(async r=>{
       if(!r.ok)throw new Error('素材库无权访问')
       return r.json() as Promise<Envelope<{assets:Stored[]}>>

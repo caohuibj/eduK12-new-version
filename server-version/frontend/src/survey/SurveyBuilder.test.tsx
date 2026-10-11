@@ -59,6 +59,16 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(state.items[0].reverse).toBe(true)
     expect(state.items[0].dimensionKeys).toEqual([state.dimensions[0].dimensionKey])
   })
+  it('configures a research-only SJT question as bounded multi-select without writing JSON',()=>{
+    render(<SjtHost/>)
+    fireEvent.click(screen.getByRole('button',{name:'增加构念'}))
+    fireEvent.click(screen.getByRole('button',{name:'增加问题'}))
+    fireEvent.change(screen.getByLabelText('作答方式'),{target:{value:'MULTIPLE'}})
+    const state=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraft
+    expect(state.questions[0].responseType).toBe('MULTIPLE')
+    expect(state.questions[0].minSelections).toBe(1)
+    expect(state.questions[0].maxSelections).toBe(2)
+  })
   it('records nonuniform contribution weights per SJT option and construct',()=>{
     render(<SjtHost/>)
     fireEvent.click(screen.getByRole('button',{name:'增加构念'}))
