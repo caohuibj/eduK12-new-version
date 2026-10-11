@@ -10,7 +10,7 @@ const isRefusal=(value:Answer|undefined):value is Refusal=>
     &&value._surveyRefusal===true
 export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:ResearchDraft;
   onSimulate:(answers:Record<string,string|number|string[]>)=>void;
-  onValidateForm:(answers:Record<string,Answer>)=>void}){
+  onValidateForm?:(answers:Record<string,Answer>)=>void}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
   useEffect(()=>{setAnswers({})},[draft.id])
   const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
@@ -103,7 +103,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:Researc
     {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
       onClick={simulate}>
       计算当前研究性模拟得分</button>}
-    {draft.kind==='FORM'&&<><button type="button" className="btn-secondary"
+    {draft.kind==='FORM'&&onValidateForm&&<><button type="button" className="btn-secondary"
       onClick={()=>onValidateForm(sanitizeFormAnswers(
         (draft.definition as FormDraft).pages.flatMap(p=>p.questions),answers))}>
       按正式 FINAL 规则试提交（不保存数据）</button>
