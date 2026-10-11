@@ -194,6 +194,18 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     })
     expect(recoveredDraft.status).toBe(200)
     expect(recoveredDraft.data.data).toMatchObject({status:'DRAFT',revision:2})
+    const frozenDraftId=randomUUID()
+    await db.surveyProject.create({data:{
+      id:frozenDraftId,ownerUserId:userId,title:'冻结后尚未开放',
+      description:'',collectionMode:'LINKED_WAVES',status:'DRAFT',
+      firstPublishedAt:new Date(),
+    }})
+    const invalidArchive=await http('/api/survey/projects/'+frozenDraftId+'/archive',{
+      method:'POST',headers,body:JSON.stringify({revision:0}),
+    })
+    expect(invalidArchive.status).toBe(409)
+    expect((await db.surveyProject.findUniqueOrThrow({where:{id:frozenDraftId}})).status)
+      .toBe('DRAFT')
   })
 
 
