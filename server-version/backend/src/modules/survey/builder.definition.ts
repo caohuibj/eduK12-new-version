@@ -219,6 +219,9 @@ export const validateSurveyDraft=(
         }else if(q.rows.length)err(issues,path+'.rows','只有矩阵题包含行编码')
         if(q.type==='CONSTANT_SUM'&&q.total===undefined)
           err(issues,path+'.total','恒定总和题必须设定目标总值（允许 0）')
+        if(q.type==='CONSTANT_SUM'&&q.integerOnly&&q.total!==undefined&&
+          !Number.isSafeInteger(q.total))
+          err(issues,path+'.total','整数恒定总和题必须使用安全整数目标总值')
         if(q.type!=='CONSTANT_SUM'&&q.total!==undefined)
           err(issues,path+'.total','只有恒定总和题可以设定目标总值')
         if(q.type==='TIME'&&!q.timeZone)

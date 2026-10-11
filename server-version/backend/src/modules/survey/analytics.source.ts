@@ -375,7 +375,9 @@ export async function loadSurveySource(input:{
               title:frozen.title,prompt:r.prompt,options:r.options,
               definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
               publicationVersion:publication.version,
-              instrumentRevision:frozen.draftRevision})
+              instrumentRevision:frozen.draftRevision,
+              ...(r.timeZone?{timeZone:r.timeZone}:{}),
+            })
         }
       }
     }
