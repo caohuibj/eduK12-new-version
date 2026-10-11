@@ -44,6 +44,8 @@ x-app-environment: &app-environment
   CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
   CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
   TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
+  SURVEY_PUBLIC_IP_LIMIT: ${SURVEY_PUBLIC_IP_LIMIT:-5000}
+  SURVEY_PUBLIC_WINDOW_SECONDS: ${SURVEY_PUBLIC_WINDOW_SECONDS:-900}
   # Conservative pre-measurement defaults. Final 4C4G pool/admission values
   # must be set from the production measurement pass; these are not certified optima.
   UNIT_SUBMIT_ADMISSION_LIMIT: ${UNIT_SUBMIT_ADMISSION_LIMIT:-7}
