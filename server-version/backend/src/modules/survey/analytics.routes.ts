@@ -49,7 +49,7 @@ surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
   const projectId=id.parse(req.params.pid),input=measurement.parse(req.body)
   const source=await loadSurveySource({
     actorUserId:req.user!.userId,projectId,
-    waveIds:[input.baselineWaveId,input.followupWaveId],maxFinals:250,
+    waveIds:[input.baselineWaveId,input.followupWaveId],maxFinals:250,includeWideSchema:true,
   })
   if(source.collectionMode!=='LINKED_WAVES')
     throw new service.SurveyAnalyticsError(409,'此研究未启用跨波次身份关联')
