@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
+import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
 
 type Refusal={_surveyRefusal:true}
-type Answer=string|number|string[]|Refusal|null
+type Answer=ProfessionalAnswer
 const refusal=():Refusal=>({_surveyRefusal:true})
 const isRefusal=(value:Answer|undefined):value is Refusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
@@ -62,10 +63,12 @@ export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:Researc
         value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
         disabled={isRefusal(answers[q.itemKey])}
         onChange={e=>choose(q.itemKey,e.target.value)}/>}
-      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="flex gap-2 items-center text-sm">
+      {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="flex gap-2 items-center text-sm">
         <input type="checkbox" checked={isRefusal(answers[q.itemKey])}
           onChange={e=>choose(q.itemKey,e.target.checked?refusal():null)}/>不愿回答（独立于未作答）
       </label>}
+      {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
+        <ProfessionalFormAnswer question={q} answers={answers} prefix="preview" onAnswer={choose}/>}
       {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
         type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}

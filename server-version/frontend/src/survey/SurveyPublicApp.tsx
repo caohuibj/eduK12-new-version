@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
+import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
@@ -12,7 +13,8 @@ type Choice={optionKey:string;label:string}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
-  maxLength?:number;minSelections?:number;maxSelections?:number}
+  maxLength?:number;minSelections?:number;maxSelections?:number;
+  total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC'}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
@@ -40,7 +42,7 @@ const readSingleResume=(id:string):SingleResume|null=>{
     return saved
   }catch{return null}
 }
-type Answer=string|number|string[]|{_surveyRefusal:true}|null
+type Answer=ProfessionalAnswer
 const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
   !!answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer
   &&answer._surveyRefusal===true
@@ -95,11 +97,13 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
           checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
           onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
+      {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
+        <ProfessionalFormAnswer question={q} answers={answer} prefix={unit.instrumentKey} onAnswer={onChange}/>}
       {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
         disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
-      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="block my-3 text-sm">
+      {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="block my-3 text-sm">
         <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
           onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
         我选择不回答这一题（REFUSED）
