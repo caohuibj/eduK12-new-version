@@ -7,6 +7,7 @@ import {
 } from './identity.service'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
+import { allocateResearchFlowOnAdmission } from './flow.assignment'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
@@ -154,8 +155,10 @@ export async function startLinkedWave(input:{
     // Project-scoped credential remains valid at the moment of admission.
     // Revocation cannot commit between the admission credential check and
     // its newly allocated Attempt; preserve Project -> Wave -> Person locks.
+    // Exclusive from the start: taking SHARE and later promoting to UPDATE
+    // for an encrypted group assignment can deadlock across T2/T3 requests.
     await tx.$queryRaw`SELECT id FROM survey_participants
-      WHERE id=${identity.participantId} AND project_id=${project.id} FOR SHARE`
+      WHERE id=${identity.participantId} AND project_id=${project.id} FOR UPDATE`
     const live=await tx.surveyParticipant.findFirst({where:{
       id:identity.participantId,projectId:project.id,status:'ACTIVE',
       credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
@@ -178,6 +181,11 @@ export async function startLinkedWave(input:{
       participantId:identity.participantId,attemptId:row.id,
       consentVersion:wave.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
+      attemptId:row.id,participantId:identity.participantId,
+      researchCode:input.researchCode,accessCredential:input.accessCredential,
+    })
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
   })
 }
@@ -202,6 +210,10 @@ export async function startSingleUnlinkedWave(input:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
       attemptId:row.id,consentVersion:wave.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
+      attemptId:row.id,participantId:null,accessCredential:proof.accessCredential,
+    })
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       accessCredential:proof.accessCredential}
   })

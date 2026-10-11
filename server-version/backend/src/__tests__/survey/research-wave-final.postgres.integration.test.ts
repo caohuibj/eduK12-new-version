@@ -11,6 +11,7 @@ import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/surv
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
+import { describeSurveyWaveItemPaged } from '../../modules/survey/analytics.paged'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
@@ -879,6 +880,15 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
     const source=await loadSurveySource({actorUserId:ownerId,projectId,
       waveIds:[w.id],includeWideSchema:true})
+    // Item paging must never materialize all unrelated V2 questions or scores.
+    const projected=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],maxFinals:1,pageMode:true,stableIdCursor:true,
+      includeWideSchema:true,includeAttendance:false,
+      selectRaw:{instrumentKey:unit.instrumentKey,itemKey:'rank'},selectScore:false})
+    expect(projected.completeAttempts).toBe(1)
+    expect(projected.raw.map(r=>r.itemKey)).toEqual(['rank'])
+    expect(projected.scores).toEqual([])
+    expect(projected.codebook.some(r=>r.itemKey==='choice:other')).toBe(true)
     const other=source.raw.find(r=>r.itemKey==='choice:other')
     expect(other?.value).toBe('个人敏感自由文字')
     expect(source.codebook.find(row=>row.itemKey==='choice:other'))
@@ -887,6 +897,28 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       .toMatchObject({formSchemaVersion:2,valueEncoding:'JSON_STRING_ARRAY'})
     expect(source.codebook.find(row=>row.itemKey==='total'))
       .toMatchObject({formSchemaVersion:2,valueEncoding:'JSON_NUMBER_OBJECT'})
+    // PR4 page aggregation must understand PR2's typed Form V2 encodings.
+    const rankPaged=await describeSurveyWaveItemPaged({
+      actorUserId:ownerId,projectId,waveId:w.id,
+      instrumentKey:unit.instrumentKey,itemKey:'rank',
+    })
+    expect(rankPaged).toMatchObject({analysisFinalCount:1,respondentN:1,complete:true})
+    expect(rankPaged.frequencies).toContainEqual({value:'b@rank1',count:1})
+    const totalPaged=await describeSurveyWaveItemPaged({
+      actorUserId:ownerId,projectId,waveId:w.id,
+      instrumentKey:unit.instrumentKey,itemKey:'total',
+    })
+    expect(totalPaged).toMatchObject({analysisFinalCount:1,respondentN:1,
+      frequencies:[],numericMean:null})
+    const sliderPaged=await describeSurveyWaveItemPaged({
+      actorUserId:ownerId,projectId,waveId:w.id,
+      instrumentKey:unit.instrumentKey,itemKey:'slider',
+    })
+    expect(sliderPaged).toMatchObject({analysisFinalCount:1,respondentN:1,numericMean:2})
+    await expect(describeSurveyWaveItemPaged({
+      actorUserId:ownerId,projectId,waveId:w.id,
+      instrumentKey:unit.instrumentKey,itemKey:'choice:other',
+    })).rejects.toThrow(/敏感自由文本/)
     expect(rawLongExport(projectId,source,w.id).csv).toContain('个人敏感自由文字')
     const token=generateToken({
       userId:ownerId,username:'synthetic-researcher',role:'STUDENT',

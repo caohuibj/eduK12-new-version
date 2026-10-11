@@ -6,6 +6,9 @@ import { retainSurveyMedia } from './media.references'
 import { assertSurveyDraft, surveyKindSchema } from './builder.definition'
 import { compileResearchScale, compileResearchSjt } from './builder.compiler'
 import { SurveyWaveError } from './waves.service'
+import { compileSurveyFlow,SurveyFlowError,type FrozenSurveyFlow } from './flow.definition'
+import { compileGroupQuotaPolicy,compileCheckpointPolicy,
+  type SurveyGroupQuotaPolicy,type SurveyCheckpointPolicy } from './operations.definition'
 
 /** Stored data contract for PR3 anonymous Wave runtime adapter.
  * This is a frozen research-only definition, NOT a formal scale/SJT
@@ -32,6 +35,9 @@ export interface ResearchFrozenPublication {
   linkageNoticeConfirmed:boolean
   consentDigest:string
   units:ResearchFrozenUnit[]
+  flow?:FrozenSurveyFlow
+  quotaPolicy?:SurveyGroupQuotaPolicy
+  checkpointPolicy?:SurveyCheckpointPolicy
   runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
@@ -117,6 +123,25 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return compileFrozenResearchUnit(draft!)
     })
+    let frozenFlow:FrozenSurveyFlow|undefined
+    if(wave.flowDefinition){
+      try{
+        frozenFlow=compileSurveyFlow(wave.flowDefinition,units,
+          project.collectionMode as ResearchFrozenPublication['collectionMode'])
+      }catch(e){
+        if(e instanceof SurveyFlowError)stop('冻结 Flow 结构未通过校验：'+
+          e.issues.slice(0,5).map(i=>i.path+': '+i.message).join('；'))
+        throw e
+      }
+    }
+    let quotaPolicy:SurveyGroupQuotaPolicy|undefined
+    let checkpointPolicy:SurveyCheckpointPolicy|undefined
+    try{
+      quotaPolicy=compileGroupQuotaPolicy(wave.quotaPolicy,frozenFlow)
+      checkpointPolicy=compileCheckpointPolicy(wave.checkpointPolicy)
+    }catch(e){
+      stop(e instanceof Error?e.message:'研究运营设置未通过冻结校验')
+    }
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
@@ -124,7 +149,10 @@ export async function freezeResearchWaveDraft(input:{
       linkageNoticeConfirmed:wave.linkageNoticeConfirmed,
       consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion,
         linkedConfirmed:wave.linkageNoticeConfirmed}),
-      units,runtimeStatus:'SURVEY_FINAL_V1',
+      units,...(frozenFlow?{flow:frozenFlow}:{}),
+      ...(quotaPolicy?{quotaPolicy}:{}),
+      ...(checkpointPolicy?{checkpointPolicy}:{}),
+      runtimeStatus:'SURVEY_FINAL_V1',
     }
     const serial=JSON.stringify(snapshot)
     if(Buffer.byteLength(serial,'utf8')>4000000)stop('波次研究内容超出安全体积')
@@ -139,6 +167,14 @@ export async function freezeResearchWaveDraft(input:{
       compiledSnapshot:JSON.parse(serial) as Prisma.InputJsonValue,
       consentVersion:wave.consentVersion,purpose:'RESEARCH_ONLY',
     }})
+    if(quotaPolicy){
+      await tx.surveyExperimentQuotaBucket.createMany({data:
+        Object.entries(quotaPolicy.groupLimits).map(([groupKey,maxAssigned])=>({
+          id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
+          groupKey,maxAssigned,assignedCount:0,
+        })),
+      })
+    }
     const changed=await tx.surveyWave.updateMany({
       where:{id:input.waveId,projectId:input.projectId,status:'DRAFT',
         publicationId:null,revision:input.revision},

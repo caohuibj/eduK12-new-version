@@ -4,6 +4,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
+import type { SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -20,6 +21,7 @@ export interface ResearchRawCodebook {
   timeZone?:'Asia/Shanghai'|'UTC'
   valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
   formSchemaVersion?:1|2
+  flowDigest?:string
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -27,6 +29,8 @@ export interface ResearchRawObservation {
   instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;
   itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
+  flowDigest?:string|null;experimentGroup?:string|null;
+  shownBlocks?:string|null;flowTermination?:string|null
 }
 export interface SurveySourceProjection {
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
@@ -44,8 +48,8 @@ export interface SurveySourceProjection {
   codebook:ResearchRawCodebook[]
   attendance:{researchCode:string;waveId:string;status:string}[]
 }
-const denied=():never=>{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
-const invalid=(message:string):never=>{throw new SurveyAnalyticsError(409,message)}
+function denied():never{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
+function invalid(message:string):never{throw new SurveyAnalyticsError(409,message)}
 const cleanValue=(v:AnswerPrimitive):string|number|null=>{
   if(v===null||v===undefined)return null
   if(typeof v==='number'||typeof v==='string')return v
@@ -61,7 +65,7 @@ const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEn
   type==='RANK_ORDER'||type==='MULTIPLE'||type==='MATRIX_MULTIPLE'||type==='SJT_MULTIPLE'
     ?'JSON_STRING_ARRAY':type==='CONSTANT_SUM'?'JSON_NUMBER_OBJECT':
     type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
-const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
+const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,onlyItemKey?:string):Array<{
   itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
   timeZone?:'Asia/Shanghai'|'UTC'
 }>=>{
@@ -74,6 +78,10 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
     for(const page of draft.pages)for(const q of page.questions){
+      if(onlyItemKey&&q.itemKey!==onlyItemKey
+        &&!(q.otherOptionKey&&q.itemKey+':other'===onlyItemKey)
+        &&!((q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE')
+          &&q.rows.some(row=>q.itemKey+':'+row.rowKey===onlyItemKey)))continue
       const options=q.options.map(o=>({code:o.optionKey,label:o.label}))
       if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
         const value=values[q.itemKey]
@@ -81,28 +89,35 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
           ?value as Record<string,string|string[]>:{}
         for(const row of q.rows){
           const key=q.itemKey+':'+row.rowKey
+          if(onlyItemKey&&key!==onlyItemKey)continue
           output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:q.type,options,
             value:cleanValue(normalized[row.rowKey]??null),
             missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
       }else{
-        add(q.itemKey,q.prompt,q.type,options,q.timeZone)
-        if(q.otherOptionKey)
+        if(!onlyItemKey||onlyItemKey===q.itemKey)
+          add(q.itemKey,q.prompt,q.type,options,q.timeZone)
+        if(q.otherOptionKey&&(!onlyItemKey||onlyItemKey===q.itemKey+':other'))
           add(q.itemKey+':other',q.prompt+'／其他填写','OTHER_TEXT',[])
       }
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
-    for(const q of draft.items)add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.items)if(!onlyItemKey||q.itemKey===onlyItemKey)
+      add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
   }else {
     const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.questions)if(!onlyItemKey||q.questionKey===onlyItemKey)
+      add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
   }
   return output
 }
 const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;completedAt:string;sourceFinalHash:string
 }):FrozenScoreObservation[]=>{
+  if(unit.notExecuted)return frozenScoreColumns(meta.projectId,meta.waveId,meta.waveOrdinal,frozen)
+    .map(column=>({...meta,sourceVerified:true,measurement:column.measurement,
+      value:null,missingReason:'NOT_SHOWN' as MissingReason}))
   const privateResult=unit.privateScoring as
     |{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null;status:string}[]}
     |null
@@ -169,6 +184,15 @@ export async function loadSurveySource(input:{
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
   completedFrom?:Date;completedBefore?:Date
   pageMode?:boolean
+  /** Internal analytics only: paginate by unique ID to avoid Timestamptz(6)
+   * precision loss when final timestamps pass through JavaScript Date(3).
+   * Signed PR2 export cursors intentionally retain their legacy ordering. */
+  stableIdCursor?:boolean
+  /** Only internal paged analyses: project exactly the selected variable from
+   * each verified FINAL, instead of rejecting an otherwise valid high-item
+   * study against the 25k intermediate-row cap. No public raw API shortcut. */
+  selectRaw?:false|{instrumentKey:string;itemKey:string}
+  selectScore?:false|{instrumentKey:string;scoreKey:string}
   /** Paired score aggregation does not need longitudinal attendance matrices. */
   includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
@@ -230,14 +254,19 @@ export async function loadSurveySource(input:{
       throw new SurveyAnalyticsError(409,'分批期间 FINAL 样本数量已变化，请重新开始完整导出')
     const finalWhere:Prisma.SurveyWaveFinalWhereInput={
       ...sourceWhere,
-      ...(input.afterFinal?{AND:[{OR:[
-        {completedAt:{gt:input.afterFinal.completedAt}},
-        {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
-      ]}]}:{}),
+      ...(input.afterFinal?input.stableIdCursor
+        ?{id:{gt:input.afterFinal.id}}
+        :{AND:[{OR:[
+          {completedAt:{gt:input.afterFinal.completedAt}},
+          {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
+        ]}]}:{}),
     }
     const headers=await tx.surveyWaveFinal.findMany({
       where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
-      orderBy:[{completedAt:'asc'},{id:'asc'}],take:max+1,
+      orderBy:input.stableIdCursor
+        ?[{id:'asc' as const}]
+        :[{completedAt:'asc' as const},{id:'asc' as const}],
+      take:max+1,
     })
     if(headers.length>max&&!input.pageMode)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')
@@ -349,6 +378,7 @@ export async function loadSurveySource(input:{
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
             ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+            ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
@@ -371,22 +401,44 @@ export async function loadSurveySource(input:{
         ||canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
         invalid('研究 FINAL 加密内容或摘要无法验证')
       if(result.units.length!==snapshot.units.length)invalid('研究 FINAL 子任务数与冻结定义不一致')
+      if(snapshot.flow){
+        const trace=result.executionTrace
+        if(!trace||trace.schemaVersion!==1||trace.flowDigest!==snapshot.flow.flowDigest
+          ||trace.clientPresentation!=='VERIFIED_SUBMISSION'||!attempt.flowAssignmentCipher)
+          invalid('研究 Flow 来源及展示审计不可核验')
+        const assigned=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
+        if(assigned.flowDigest!==snapshot.flow.flowDigest||
+          trace.assignmentDigest!==canonicalHash(assigned)||
+          trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)
+          invalid('研究流程实际执行轨迹与 Attempt 分组不一致')
+      }else if(result.executionTrace)invalid('旧版 FINAL 不允许伪造 Flow 审计数据')
       const meta={
         projectId:input.projectId,waveId:wave.id,waveOrdinal:wave.ordinal,
         attemptId:attempt.id,researchCode:attempt.participant?.researchCode??null,
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
       }
+      const flowTrace=result.executionTrace
+      const flowData=flowTrace?{
+        flowDigest:flowTrace.flowDigest,experimentGroup:flowTrace.groupKey,
+        shownBlocks:JSON.stringify(flowTrace.shownBlocks),
+        flowTermination:flowTrace.termination,
+      }:{}
       for(let i=0;i<snapshot.units.length;i++){
         const frozen=snapshot.units[i],unit=result.units[i]
         if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
           ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
           invalid('研究 FINAL 组件来源与冻结定义不一致')
-        scores.push(...scoresFrom(frozen,unit,meta))
-        for(const r of rawItems(frozen,unit)){
+        if(input.selectScore!==false&&(!input.selectScore||
+          frozen.instrumentKey===input.selectScore.instrumentKey))
+          scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
+            score.measurement.scoreKey===input.selectScore.scoreKey))
+        if(input.selectRaw!==false&&(!input.selectRaw||
+          frozen.instrumentKey===input.selectRaw.instrumentKey)){
+          for(const r of rawItems(frozen,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
-          raw.push({...meta,sourceVerified:true,kind:frozen.kind,
+          raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
             value:r.value,missingReason:r.missingReason})
@@ -401,12 +453,16 @@ export async function loadSurveySource(input:{
               ...(r.timeZone?{timeZone:r.timeZone}:{}),
               valueEncoding:answerValueEncoding(r.responseType),
               ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+              ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
             })
+          }
         }
       }
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
-      sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
+      sourceRevision:project.sourceRevision,
+      completeAttempts:input.pageMode?finals.length:
+        new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})

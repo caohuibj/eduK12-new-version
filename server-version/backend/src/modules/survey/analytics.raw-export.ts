@@ -10,7 +10,7 @@ export interface SurveyRawExport {
     schemaVersion:1;format:SurveyRawFormat;projectId:string;waveIds:string[];
     sourceDigest:string;codebookDigest:string;rowCount:number;
     columnCount:number;cutOff:string;dataDigest:string
-    formulaGuard:'EXCEL_APOSTROPHE_PREFIX'
+    formulaGuard:'EXCEL_APOSTROPHE_PREFIX';flowDigests?:string[]
   }
 }
 const attemptCode=surveyAttemptCode
@@ -33,6 +33,7 @@ function prepare(projectId:string,source:SurveySourceProjection,format:SurveyRaw
   const csv=tableToCsv(columns,rows,25000)
   const codebook=[...dictionary].sort((a,b)=>a.waveOrdinal-b.waveOrdinal||a.columnKey.localeCompare(b.columnKey))
   const waves=[...new Set(codebook.map(c=>c.waveId))].sort()
+  const flowDigests=[...new Set(codebook.flatMap(c=>c.flowDigest?[c.flowDigest]:[]))].sort()
   return {csv,codebook,manifest:{
     schemaVersion:1,format,projectId,waveIds:waves,cutOff:source.cutOff,
     sourceDigest:canonicalHash(rows.map((row,i)=>({
@@ -42,16 +43,21 @@ function prepare(projectId:string,source:SurveySourceProjection,format:SurveyRaw
     codebookDigest:canonicalHash(codebook),
     rowCount:rows.length,columnCount:columns.length,
     dataDigest:canonicalHash(csv),formulaGuard:'EXCEL_APOSTROPHE_PREFIX',
+    ...(flowDigests.length?{flowDigests}:{}),
   }}
 }
 export function rawLongExport(projectId:string,source:SurveySourceProjection,waveId?:string):SurveyRawExport{
   check(projectId,source)
   const rows=ordered(source,waveId)
+  const hasFlow=source.codebook.some(c=>c.flowDigest&&(!waveId||c.waveId===waveId))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
-    'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash']
+    'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash',
+    ...(hasFlow?['flow_digest','experiment_group','shown_blocks','flow_termination']:[])]
   const mapped=rows.map(r=>[
     displayCode(r),r.waveId,r.waveOrdinal,r.publicationVersion,r.instrumentKey,r.itemKey,r.columnKey,
     r.value,r.missingReason,r.sourceFinalHash,
+    ...(hasFlow?[r.flowDigest??null,r.experimentGroup??null,
+      r.shownBlocks??null,r.flowTermination??null]:[]),
   ])
   // Long includes source-backed participation and attrition even when a Wave
   // has no FINAL. Synthetic rows carry no answer or frozen FINAL hash.
@@ -70,7 +76,8 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
       if(status==='COMPLETED')continue
       mapped.push([code,variable.waveId,variable.waveOrdinal,variable.publicationVersion,
         variable.instrumentKey,variable.itemKey,variable.columnKey,null,
-        status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null])
+        status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null,
+        ...(hasFlow?[variable.flowDigest??null,null,null,null]:[])])
     }
   }
   return prepare(projectId,source,waveId?'WAVE':'RAW_LONG',cols,mapped,dictionary)
@@ -84,6 +91,19 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
   // The frozen publication codebook includes variables from Waves with zero
   // completed FINAL; deriving columns only from observed answers drops those Waves.
   const columnIds=[...byColumn.keys()].sort()
+  const flowWaves=[...new Map(source.codebook.filter(x=>x.flowDigest)
+    .map(x=>[x.waveId,{waveId:x.waveId,ordinal:x.waveOrdinal,flowDigest:x.flowDigest!}])).values()]
+    .sort((a,b)=>a.ordinal-b.ordinal||a.waveId.localeCompare(b.waveId))
+  const perWaveFlow=new Map<string,{digest:string;group:string|null;shown:string|null;termination:string|null}>()
+  for(const row of rows)if(row.researchCode&&row.flowDigest){
+    const id=row.researchCode+':'+row.waveId
+    const value={digest:row.flowDigest,group:row.experimentGroup??null,
+      shown:row.shownBlocks??null,termination:row.flowTermination??null}
+    const old=perWaveFlow.get(id)
+    if(old&&JSON.stringify(old)!==JSON.stringify(value))
+      throw new Error('Conflicting participant Flow traces within one immutable Wave')
+    perWaveFlow.set(id,value)
+  }
   if(columnIds.length>255)throw new Error('Wide export exceeds 255 value/absence pairs; use Raw Long')
   const byCode=new Map<string,Map<string,{value:string|number|null;missingReason:string|null}>>()
   const attendance=new Map(source.attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
@@ -109,8 +129,15 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
       const status=attendance.get(code+':'+waveId)
       return [null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':
         status&&status!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+    }),...flowWaves.flatMap(w=>{
+      const row=perWaveFlow.get(code+':'+w.waveId)
+      return [row?.digest??null,row?.group??null,row?.shown??null,row?.termination??null]
     })])
-  const wideHeaders=['research_code',...columnIds.flatMap(col=>[col,col+'__missing'])]
+  const wideHeaders=['research_code',...columnIds.flatMap(col=>[col,col+'__missing']),
+    ...flowWaves.flatMap(w=>{
+      const prefix='W'+String(w.ordinal).padStart(3,'0')+'__FLOW__'
+      return [prefix+'digest',prefix+'group',prefix+'shown_blocks',prefix+'termination']
+    })]
   return prepare(projectId,source,'RAW_WIDE',wideHeaders,matrix,
     columnIds.map(k=>{
       const row=byColumn.get(k);if(!row)throw new Error('Missing item Codebook')

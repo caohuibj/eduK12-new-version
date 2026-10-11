@@ -5,6 +5,9 @@ import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
+import { compileGroupQuotaPolicy,compileCheckpointPolicy,
+  groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
 
 type Tx=Prisma.TransactionClient
 export class SurveyWaveError extends Error {
@@ -78,9 +81,18 @@ type WaveInput={
   opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
   quotaStarts?:number|null;allowNewParticipants?:boolean;
   linkageNoticeConfirmed?:boolean
+  flowDefinition?:unknown|null
+  quotaPolicy?:unknown|null
+  checkpointPolicy?:unknown|null
 }
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
+  const flowDefinition=input.flowDefinition===undefined||input.flowDefinition===null
+    ?null:parseSurveyFlowDraft(input.flowDefinition)
+  const quotaPolicy=input.quotaPolicy===undefined||input.quotaPolicy===null
+    ?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
+  const checkpointPolicy=input.checkpointPolicy===undefined||input.checkpointPolicy===null
+    ?null:surveyCheckpointPolicySchema.parse(input.checkpointPolicy)
   return prisma.$transaction(async tx=>{
     // Acquire the strongest project lock first. SHARE -> UPDATE promotion
     // can deadlock when two creators concurrently allocate the next ordinal.
@@ -93,6 +105,9 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         ||existing.generalText!==(input.generalText??'')
         ||existing.linkageNoticeConfirmed!==(input.linkageNoticeConfirmed===true)
         ||JSON.stringify(existing.instrumentIds)!==JSON.stringify(input.instrumentIds)
+        ||canonicalHash(existing.flowDefinition)!==canonicalHash(flowDefinition)
+        ||canonicalHash(existing.quotaPolicy)!==canonicalHash(quotaPolicy)
+        ||canonicalHash(existing.checkpointPolicy)!==canonicalHash(checkpointPolicy)
         ||!exactDate(existing.opensAt,input.opensAt)
         ||!exactDate(existing.closesAt,input.closesAt)
         ||!exactDate(existing.finishUntil,input.finishUntil)
@@ -110,6 +125,9 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
       consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
       linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
       instrumentIds:input.instrumentIds,
+      flowDefinition:flowDefinition===null?Prisma.DbNull:flowDefinition as Prisma.InputJsonValue,
+      quotaPolicy:quotaPolicy===null?Prisma.DbNull:quotaPolicy as Prisma.InputJsonValue,
+      checkpointPolicy:checkpointPolicy===null?Prisma.DbNull:checkpointPolicy as Prisma.InputJsonValue,
       status:'DRAFT',
       opensAt:input.opensAt?new Date(input.opensAt):null,
       closesAt:input.closesAt?new Date(input.closesAt):null,
@@ -125,6 +143,12 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
 type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
 export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
   ensureWindow(input)
+  const requestedFlow=input.flowDefinition===undefined?undefined:
+    input.flowDefinition===null?null:parseSurveyFlowDraft(input.flowDefinition)
+  const requestedQuota=input.quotaPolicy===undefined?undefined:
+    input.quotaPolicy===null?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
+  const requestedCheckpoint=input.checkpointPolicy===undefined?undefined:
+    input.checkpointPolicy===null?null:surveyCheckpointPolicySchema.parse(input.checkpointPolicy)
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,true)
     const old=await ownWave(tx,pid,wid)
@@ -134,6 +158,9 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',publicationId:null,revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
+        ...(requestedFlow===undefined?{}:{flowDefinition:requestedFlow===null?Prisma.DbNull:requestedFlow as Prisma.InputJsonValue}),
+        ...(requestedQuota===undefined?{}:{quotaPolicy:requestedQuota===null?Prisma.DbNull:requestedQuota as Prisma.InputJsonValue}),
+        ...(requestedCheckpoint===undefined?{}:{checkpointPolicy:requestedCheckpoint===null?Prisma.DbNull:requestedCheckpoint as Prisma.InputJsonValue}),
         linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
         opensAt:input.opensAt?new Date(input.opensAt):null,
         closesAt:input.closesAt?new Date(input.closesAt):null,
@@ -160,6 +187,35 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
+  let compiledFlow:import('./flow.definition').FrozenSurveyFlow|undefined
+  if(input.wave.flowDefinition){
+    try{
+      const compiled=compileSurveyFlow(input.wave.flowDefinition,input.drafts.map(d=>({
+        instrumentKey:d.instrumentKey,kind:d.kind,
+        displayDefinition:d.definition,
+      })) as import('./publication.service').ResearchFrozenUnit[],
+      input.project.collectionMode as 'SINGLE_UNLINKED'|'LINKED_WAVES')
+      compiledFlow=compiled
+      checks.push({key:'flow',ok:true,issues:[],digest:compiled.flowDigest})
+    }catch(e){
+      checks.push({key:'flow',ok:false,issues:e instanceof SurveyFlowError
+        ?e.issues.map(i=>i.path+': '+i.message):[String(e)]})
+    }
+  }
+  if(input.wave.quotaPolicy){
+    try{
+      compileGroupQuotaPolicy(input.wave.quotaPolicy,compiledFlow)
+      checks.push({key:'quota',ok:true,issues:[]})
+    }catch(e){checks.push({key:'quota',ok:false,
+      issues:[e instanceof Error?e.message:'实验条件配额定义不可用']})}
+  }
+  if(input.wave.checkpointPolicy){
+    try{
+      compileCheckpointPolicy(input.wave.checkpointPolicy)
+      checks.push({key:'checkpoint',ok:true,issues:[]})
+    }catch(e){checks.push({key:'checkpoint',ok:false,
+      issues:[e instanceof Error?e.message:'Checkpoint 定义不可用']})}
+  }
   try{
     await prisma.$transaction(async tx=>{
       await ownProject(tx,uid,pid,false)
@@ -195,7 +251,9 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
-    ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)&&checks.every(c=>c.ok),
+    ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
+      (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
+      (input.wave.checkpointPolicy?1:0)&&checks.every(c=>c.ok),
     publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
     reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
       ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'

@@ -12,6 +12,13 @@ type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;res
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
 type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
+type BoundedVariable={instrumentKey:string;itemKey:string;prompt:string;
+  responseType:string;columnKey:string;kind:string}
+type BoundedItem={analysisFinalCount:number;respondentN:number;prompt:string;
+  itemKey:string;instrumentKey:string;responseType:string;
+  frequencies:{value:string;count:number}[];missingByReason:Record<string,number>;
+  numericMean:number|null;numericSampleSd:number|null;
+  complete:true;sourceCutOff:string;note:string}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
   meanPairedChange:number|null;comparability:'COMPARABLE'|'NOT_COMPARABLE';reason?:string}
 type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Array<{
@@ -69,6 +76,9 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [baseline,setBaseline]=useState(''),[followup,setFollowup]=useState('')
   const [paired,setPaired]=useState<Matched|null>(null)
   const [itemStats,setItemStats]=useState<WaveItems|null>(null)
+  const [boundedVariables,setBoundedVariables]=useState<BoundedVariable[]>([])
+  const [boundedItemKey,setBoundedItemKey]=useState('')
+  const [boundedItem,setBoundedItem]=useState<BoundedItem|null>(null)
   const [metricKey,setMetricKey]=useState(''),[metricInstrument,setMetricInstrument]=useState('')
   const [pairedScore,setPairedScore]=useState<PairedScore|null>(null)
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
@@ -93,6 +103,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
     if(ordered[1])setFollowup(ordered[1].id)
     setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
+    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -139,6 +150,23 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       setMetricKey(result.descriptiveScores[0].scoreKey)
       setMetricInstrument(result.descriptiveScores[0].instrumentKey)
     }
+  })
+  const openBoundedDictionary=()=>void execute(async()=>{
+    const result=await api<{variables:BoundedVariable[]}>(
+      base+'/analytics/waves/'+waveId+'/items/dictionary')
+    setBoundedVariables(result.variables)
+    setBoundedItemKey(result.variables[0]?.columnKey??'')
+    setBoundedItem(null)
+    setMessage('已读取该波次冻结的变量字典。单题可处理最多 6000 份有效 FINAL，超过会明确报错。')
+  })
+  const loadBoundedItem=()=>void execute(async()=>{
+    const variable=boundedVariables.find(v=>v.columnKey===boundedItemKey)
+    if(!variable)throw new Error('请先选择一个冻结研究变量')
+    const result=await api<BoundedItem>(
+      base+'/analytics/waves/'+waveId+'/items/paged','POST',{
+        instrumentKey:variable.instrumentKey,itemKey:variable.itemKey,
+      })
+    setBoundedItem(result)
   })
   const compareScore=()=>void execute(async()=>{
     const score=await api<PairedScore>(base+'/analytics/paired-scores','POST',{
@@ -276,11 +304,42 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('');setBoundedVariables([]);setBoundedItem(null)}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
             查看此波次题目频数与探索性得分</button>
+        </div>
+        <div className="border-t pt-4 space-y-3">
+          <h4 className="font-medium text-sm">大样本单题统计（至多 6000 份有效 FINAL）</h4>
+          <p className="text-xs text-slate-600">先读取冻结变量字典，再选择一个非敏感题目。
+            后台按 200 份分页，仅累积受控频数、缺失和数值统计；全部页校验通过后才返回结果。
+            本入口不自动展示敏感自由文本。</p>
+          <button type="button" className="btn-secondary" disabled={busy||!waveId}
+            onClick={openBoundedDictionary}>读取当前波次变量字典</button>
+          {boundedVariables.length>0&&<div className="flex flex-wrap gap-2 items-end">
+            <label className="block text-sm flex-1 min-w-[180px]">选择冻结变量
+              <select className="input block w-full" aria-label="大样本题目" value={boundedItemKey}
+                onChange={e=>{setBoundedItemKey(e.target.value);setBoundedItem(null)}}>
+                {boundedVariables.map(q=><option key={q.columnKey} value={q.columnKey}>
+                  {q.instrumentKey} · {q.prompt}（{q.itemKey}）</option>)}
+              </select>
+            </label>
+            <button type="button" className="btn-secondary" disabled={busy||!boundedItemKey}
+              onClick={loadBoundedItem}>计算本题完整分批统计</button>
+          </div>}
+          {boundedItem&&<div className="border rounded-lg p-3 text-sm space-y-2">
+            <p className="font-medium">{boundedItem.prompt}</p>
+            <p>有效分析 FINAL N={boundedItem.analysisFinalCount}，本题有效回答 N={boundedItem.respondentN}，
+              均值={boundedItem.numericMean?.toFixed(2)??'—'}，
+              SD={boundedItem.numericSampleSd?.toFixed(2)??'—'}</p>
+            {boundedItem.frequencies.length>0&&<p>选项频数：
+              {boundedItem.frequencies.map(row=>row.value+'：'+row.count).join('；')}</p>}
+            {Object.keys(boundedItem.missingByReason).length>0&&<p>缺失：
+              {Object.entries(boundedItem.missingByReason).map(([why,count])=>why+'：'+count).join('；')}</p>}
+            <p className="text-xs text-slate-500">已核对全部有效 FINAL ·
+              数据截止 {new Date(boundedItem.sourceCutOff).toLocaleString('zh-CN')} · {boundedItem.note}</p>
+          </div>}
         </div>
         {itemStats&&<div className="space-y-4">
           <p className="text-xs">{itemStats.note}</p>

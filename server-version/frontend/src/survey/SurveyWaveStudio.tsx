@@ -1,8 +1,12 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
+import type { FlowDraft } from './flow.client'
+import type { FormDraft } from './builder.types'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
-type Instrument={id:string;title:string;kind:string;status:string}
+type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
+type InstrumentDetails=Instrument&{definition:FormDraft|Record<string,unknown>}
 type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type Wave={
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
@@ -11,7 +15,20 @@ type Wave={
   opensAt:string|null;closesAt:string|null;finishUntil:string|null;
   quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean;
   hardStopAt:string|null
+  flowDefinition?:FlowDraft|null
+  quotaPolicy?:{schemaVersion:1;groupLimits:Record<string,number>}|null
+  checkpointPolicy?:{schemaVersion:1;enabled:true;ttlHours:number}|null
 }
+type FlowCounts={starts:number;assigned:number;completedFinal:number;analysisIncluded:number;
+  qualityExcluded:number;withdrawn:number;screenedOut:number;inProgress:number}
+type FlowAnalytics={flowDigest:string;asOf:string;total:FlowCounts;
+  groups:{groupKey:string;counts:FlowCounts}[];
+  quotaReservations:{groupKey:string;maxAssigned:number;everAssigned:number;available:number}[];
+  category?:{instrumentKey:string;itemKey:string;counts:Record<string,number>};
+  score?:{instrumentKey:string;scoreKey:string;minGroupN:number;suppressedGroups:number;
+    groups:{groupKey:string;respondentN:number;scoreValidN:number;
+      mean:number|null;sampleSd:number|null}[];note:string};
+  limits:{complete:boolean;maxAttempts:number;noTruncation:boolean}}
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
 const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
@@ -39,6 +56,9 @@ const message=(e:unknown)=>e instanceof Error?e.message:'研究波次操作失�
 const initial=()=>({
   title:'',consentText:'',generalText:'',linkageNoticeConfirmed:false,instrumentIds:[] as string[],
   opensAt:'',closesAt:'',quotaStarts:'',allowNewParticipants:false,
+  flowDefinition:null as FlowDraft|null,
+  quotaPolicy:null as {schemaVersion:1;groupLimits:Record<string,number>}|null,
+  checkpointPolicy:null as {schemaVersion:1;enabled:true;ttlHours:number}|null,
 })
 type FormState=ReturnType<typeof initial>
 const localTime=(raw:string|null)=>{
@@ -49,12 +69,16 @@ const localTime=(raw:string|null)=>{
 export function SurveyWaveStudio({projectId}:{projectId:string}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
+  const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
   const [wavePage,setWavePage]=useState(1),[toolPage,setToolPage]=useState(1)
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
+  const [flowAnalytics,setFlowAnalytics]=useState<FlowAnalytics|null>(null)
+  const [categoryKey,setCategoryKey]=useState('')
+  const [scoreSelection,setScoreSelection]=useState('')
   const refresh=async(nextWavePage=wavePage,nextToolPage=toolPage)=>{
     const [waveList,instrumentList,projectDetails]=await Promise.all([
       surveyApi<{list:Wave[]}>(path+'/waves?page='+nextWavePage),
@@ -64,7 +88,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
     setWavePage(nextWavePage);setToolPage(nextToolPage)
   }
-  useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial())
+  useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
     void refresh().catch(e=>setError(message(e)))
   },[projectId])
   const act=async(action:()=>Promise<void>)=>{
@@ -73,7 +97,12 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
   }
   const select=(wave:Wave)=>void act(async()=>{
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
-    setEditing(detail);setReady(null);setShareLink('')
+    // Resolve selected draft identities by ID; a research may select tools
+    // from several pages of the paginated library.
+    const selected=await Promise.all(detail.instrumentIds.map(id=>
+      surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
+    setDetails(previous=>({...previous,...Object.fromEntries(selected.map(item=>[item.id,item]))}))
+    setEditing(detail);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('');setScoreSelection('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
       linkageNoticeConfirmed:detail.linkageNoticeConfirmed,
@@ -81,6 +110,9 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
       opensAt:localTime(detail.opensAt),closesAt:localTime(detail.closesAt),
       quotaStarts:detail.quotaStarts===null?'':String(detail.quotaStarts),
       allowNewParticipants:detail.allowNewParticipants,
+      flowDefinition:detail.flowDefinition??null,
+      quotaPolicy:detail.quotaPolicy??null,
+      checkpointPolicy:detail.checkpointPolicy??null,
     })
   })
   const payload=()=>{
@@ -94,6 +126,9 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
       closesAt:stop?.toISOString()||null,
       quotaStarts:form.quotaStarts?Number(form.quotaStarts):null,
       allowNewParticipants:form.allowNewParticipants,
+      flowDefinition:form.flowDefinition,
+      quotaPolicy:form.quotaPolicy,
+      checkpointPolicy:form.checkpointPolicy,
     }
   }
   const save=(e:FormEvent)=>{e.preventDefault();void act(async()=>{
@@ -101,7 +136,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     const wave=editing
       ?await surveyApi<Wave>(path+'/waves/'+editing.id,'PATCH',{...body,revision:editing.revision})
       :await surveyApi<Wave>(path+'/waves','POST',{...body,requestId:crypto.randomUUID()})
-    await refresh();setEditing(wave);setReady(null)
+    await refresh();setEditing(wave);setReady(null);setFlowAnalytics(null)
     setNotice('波次草稿已保存；冻结定义和正式开放需要分别确认')
   })}
   const preflight=()=>{if(!editing)return;void act(async()=>{
@@ -122,7 +157,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
       })
       if(result.researchUrl)setShareLink(result.researchUrl)
       const fresh=await surveyApi<Wave>(path+'/waves/'+wave.id)
-      setEditing(fresh);await refresh();setReady(null)
+      setEditing(fresh);await refresh();setReady(null);setFlowAnalytics(null)
       setNotice(operation==='prepare'?'已冻结此波次的研究定义，下一步可正式开放':
         operation==='open'?'已创建一次性招募链接，请通过受控渠道交付':
           '波次状态已更新')
@@ -153,9 +188,55 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         :'招募链接已撤销，现有研究参与者仍可凭私人凭证恢复合法作答。')
     })
   }
-  const toggle=(id:string,checked:boolean)=>setForm(old=>({
-    ...old,instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
-  }))
+  const loadFlowAnalytics=()=>{
+    if(!editing)return
+    void act(async()=>{
+      const category=categoryKey?(()=>{
+        const [instrumentKey,itemKey]=categoryKey.split(':')
+        return {instrumentKey,itemKey}
+      })():undefined
+      const score=scoreSelection?(()=>{
+        const [instrumentKey,scoreKey]=scoreSelection.split(':')
+        return {instrumentKey,scoreKey}
+      })():undefined
+      const data=await surveyApi<FlowAnalytics>(
+        path+'/analytics/waves/'+editing.id+'/flow-cohort','POST',
+        {...(category?{category}:{}),...(score?{score}:{})})
+      setFlowAnalytics(data)
+      setNotice('已读取受控 Flow 样本统计。若包含实验分组，小样本详情仍不可公开转发。')
+    })
+  }
+  const toggle=(id:string,checked:boolean)=>{
+    setForm(old=>({...old,
+      instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
+    }))
+    if(checked&&!details[id]){
+      void surveyApi<InstrumentDetails>(path+'/instruments/'+id)
+        .then(item=>setDetails(previous=>({...previous,[id]:item})))
+        .catch(e=>setError(message(e)))
+    }
+  }
+  const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
+  const flowQuestions:FormQuestionInfo[]=Object.values(details)
+    .filter(d=>d.kind==='FORM').flatMap(d=>{
+      const form=d.definition as FormDraft
+      return (form.pages??[]).flatMap(p=>p.questions.map(q=>({
+        instrumentKey:d.instrumentKey,itemKey:q.itemKey,prompt:q.prompt,type:q.type,
+        options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
+      })))
+    })
+  const flowMetrics=Object.values(details)
+    .filter(d=>form.instrumentIds.includes(d.id)&&['SCALE','SJT'].includes(d.kind))
+    .flatMap(d=>{
+      const def=d.definition as {
+        dimensions?:{dimensionKey:string;label:string}[];
+        metrics?:{metricKey:string;label:string}[];
+      }
+      const list=d.kind==='SCALE'
+        ?(def.dimensions??[]).map(x=>({key:x.dimensionKey,label:x.label}))
+        :(def.metrics??[]).map(x=>({key:x.metricKey,label:x.label}))
+      return list.map(x=>({instrumentKey:d.instrumentKey,scoreKey:x.key,label:x.label}))
+    })
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
       <p className="text-sm text-slate-600">
@@ -230,6 +311,42 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               onClick={()=>void act(()=>refresh(wavePage,toolPage+1))}>工具下一页</button>
           </div>
           </fieldset>
+          <SurveyFlowStudio value={form.flowDefinition}
+            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition}))}
+            tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
+            collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/>
+          <fieldset className="border rounded-xl p-4 space-y-2">
+            <legend className="text-sm font-semibold">实验组条件配额（可选）</legend>
+            <label className="text-sm flex gap-2">
+              <input type="checkbox" checked={!!form.quotaPolicy} disabled={!form.flowDefinition?.experiment}
+                onChange={e=>setForm(prev=>({...prev,quotaPolicy:e.target.checked
+                  ?{schemaVersion:1,groupLimits:Object.fromEntries(
+                    (prev.flowDefinition?.experiment?.groups??[]).map(g=>[g.groupKey,100]))}:null}))}/>
+              首次准入时按实验组原子占用名额</label>
+            {form.quotaPolicy&&form.flowDefinition?.experiment?.groups.map(g=>
+              <label key={g.groupKey} className="block text-xs">组别 {g.groupKey} 最大入场数（1–10000）
+                <input className="input block w-full" type="number" min={1} max={10000}
+                  value={form.quotaPolicy?.groupLimits[g.groupKey]??''}
+                  onChange={e=>setForm(prev=>({...prev,quotaPolicy:prev.quotaPolicy?{
+                    ...prev.quotaPolicy,groupLimits:{...prev.quotaPolicy.groupLimits,[g.groupKey]:Number(e.target.value)}}:null}))}/>
+              </label>)}
+            <p className="text-xs text-slate-500">入场配额与有效 FINAL 样本量不同；撤回及质量排除不自动返还名额。</p>
+          </fieldset>
+          <fieldset className="border rounded-xl p-4 space-y-2">
+            <legend className="text-sm font-semibold">加密临时保存（默认关闭）</legend>
+            <label className="flex gap-2 text-sm">
+              <input type="checkbox" checked={!!form.checkpointPolicy}
+                onChange={e=>setForm(prev=>({...prev,checkpointPolicy:e.target.checked
+                  ?{schemaVersion:1,enabled:true,ttlHours:24}:null}))}/>
+              允许参与者主动保存未完成答案（单次最多 64KB）</label>
+            {form.checkpointPolicy&&<label className="block text-xs">存档有效期（1–48小时）
+              <input className="input block w-full" type="number" min={1} max={48}
+                value={form.checkpointPolicy.ttlHours}
+                onChange={e=>setForm(prev=>({...prev,checkpointPolicy:prev.checkpointPolicy
+                  ?{...prev.checkpointPolicy,ttlHours:Number(e.target.value)}:null}))}/>
+            </label>}
+            <p className="text-xs text-slate-500">暂存不是 FINAL；完成、筛除及撤回时销毁，凭研究专用私密凭证跨设备恢复。</p>
+          </fieldset>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">计划开放时间<input type="datetime-local" className="input block w-full"
               value={form.opensAt} onChange={e=>setForm({...form,opensAt:e.target.value})}/></label>
@@ -272,6 +389,74 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               <button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
             </>}
           </div>
+          {editing.publicationId&&editing.flowDefinition&&<section className="border rounded-lg p-4 space-y-3">
+            <h4 className="font-semibold text-sm">Flow 实验样本与条件配额 · 受控统计</h4>
+            <p className="text-xs text-slate-600">统计必须由项目 Owner 持最近五分钟 TOTP 会话读取。
+              入场 Assigned、完成 FINAL、有效样本、质量排除和撤回是不同分母。最多 6000 Attempt；
+              不会将未读尾页冒充完整统计。</p>
+            <label className="block text-xs">单选 Form 分类变量（可选）
+              <select className="input block w-full" value={categoryKey}
+                onChange={e=>{setCategoryKey(e.target.value);setFlowAnalytics(null)}}>
+                <option value="">仅实验组别及总样本</option>
+                {flowQuestions.filter(q=>['SINGLE','LIKERT'].includes(q.type)&&
+                  flowTools.some(t=>form.instrumentIds.includes(t.id)&&t.instrumentKey===q.instrumentKey)).map(q=>
+                  <option key={q.instrumentKey+':'+q.itemKey} value={q.instrumentKey+':'+q.itemKey}>
+                    {q.instrumentKey} · {q.prompt}</option>)}
+              </select>
+            </label>
+            <label className="block text-xs">随机实验条件 × Scale/SJT 研究性指标（可选）
+              <select className="input block w-full" value={scoreSelection}
+                onChange={e=>{setScoreSelection(e.target.value);setFlowAnalytics(null)}}>
+                <option value="">仅查看人数与分类频数</option>
+                {flowMetrics.map(m=>
+                  <option key={m.instrumentKey+':'+m.scoreKey}
+                    value={m.instrumentKey+':'+m.scoreKey}>
+                    {m.instrumentKey} · {m.label}（{m.scoreKey}）</option>)}
+              </select>
+            </label>
+            <button className="btn-secondary" type="button" disabled={busy}
+              onClick={loadFlowAnalytics}>读取最新受控统计</button>
+            {flowAnalytics&&<div className="overflow-x-auto space-y-3">
+              <p className="text-xs break-all">Flow Digest：{flowAnalytics.flowDigest} · 截止
+                {new Date(flowAnalytics.asOf).toLocaleString('zh-CN')}</p>
+              <p className="text-sm">启动 {flowAnalytics.total.starts} · 已分配
+                {flowAnalytics.total.assigned} · 有效 FINAL {flowAnalytics.total.analysisIncluded} ·
+                质量排除 {flowAnalytics.total.qualityExcluded} · 撤回
+                {flowAnalytics.total.withdrawn} · 筛除 {flowAnalytics.total.screenedOut}</p>
+              <table className="w-full text-xs border-collapse"><thead><tr>
+                <th className="border p-2 text-left">条件组</th>
+                <th className="border p-2">已分配</th>
+                <th className="border p-2">有效 FINAL</th>
+                <th className="border p-2">排除</th>
+                <th className="border p-2">剩余名额</th>
+              </tr></thead><tbody>{flowAnalytics.groups.map(g=><tr key={g.groupKey}>
+                <td className="border p-2">{g.groupKey}</td>
+                <td className="border p-2">{g.counts.assigned}</td>
+                <td className="border p-2">{g.counts.analysisIncluded}</td>
+                <td className="border p-2">{g.counts.qualityExcluded}</td>
+                <td className="border p-2">{flowAnalytics.quotaReservations
+                  .find(q=>q.groupKey===g.groupKey)?.available??'无硬配额'}</td>
+              </tr>)}</tbody></table>
+              {flowAnalytics.score&&<div className="border-t pt-3 space-y-2">
+                <h5 className="font-medium text-sm">实验条件组 · {flowAnalytics.score.instrumentKey} /
+                  {flowAnalytics.score.scoreKey}</h5>
+                {flowAnalytics.score.groups.map(g=><p className="text-sm" key={g.groupKey}>
+                  {g.groupKey}：有效 FINAL N={g.respondentN}，有分数 N={g.scoreValidN}，
+                  M={g.mean?.toFixed(2)??'—'}，SD={g.sampleSd?.toFixed(2)??'—'}</p>)}
+                <p className="text-xs text-slate-600">未展示的小样本组 {flowAnalytics.score.suppressedGroups}；
+                  最少 {flowAnalytics.score.minGroupN} 份有效组别样本且达到同等有分数 N 才展示统计。
+                  {flowAnalytics.score.note}</p>
+              </div>}
+              {flowAnalytics.category&&<div className="text-xs">
+                <p className="font-medium">分类：{flowAnalytics.category.instrumentKey} /
+                  {flowAnalytics.category.itemKey}（仅有效 FINAL）</p>
+                {Object.entries(flowAnalytics.category.counts).map(([key,n])=>
+                  <span className="inline-block mr-3" key={key}>{key}: {n}</span>)}
+              </div>}
+              <p className="text-xs text-slate-500">此统计包含全部经过验证的样本范围，不含原始文本。
+                已撤回的分组身份不再可逆向关联，不应将历史配额数强行加总为当前分析 N。</p>
+            </div>}
+          </section>}
           {ready&&<div className="rounded-lg border p-3 space-y-2">
             <p className="font-semibold text-sm">{ready.ok?'结构预检通过':'结构预检失败'}</p>
             {ready.checks.map(c=><div key={c.key} className="text-sm">
