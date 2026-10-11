@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
+import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
@@ -54,13 +55,9 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
 }
 function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof}){
-  const visible=(q:Question)=>{
-    if(!q.displayIf)return true
-    const prior=answer[q.displayIf.itemKey]
-    return q.displayIf.operator==='INCLUDES'
-      ?Array.isArray(prior)&&prior.includes(q.displayIf.optionKey)
-      :prior===q.displayIf.optionKey
-  }
+  const shownFormKeys=unit.kind==='FORM'
+    ?visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],answer)
+    :null
   const choice=(q:Question,options:Choice[],kind:'SINGLE'|'MULTIPLE'|'MATRIX'|'LIKERT')=>
     kind==='MULTIPLE'?options.map(o=>{
       const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
@@ -75,7 +72,7 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
         checked={answer[q.itemKey]===o.optionKey}
         onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
   const item=(q:Question)=>{
-    if(!visible(q))return null
+    if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
     return <fieldset className="border rounded-lg p-4 my-4 bg-white" key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {q.image&&<SurveyParticipantImage image={q.image} proof={proof}/>}
@@ -222,23 +219,9 @@ export default function SurveyPublicApp(){
     // clear fields that are now hidden; the server repeats this validation.
     const payload=Object.fromEntries(task.units.map(unit=>{
       const original=answers[unit.instrumentKey]||{}
-      const cleaned:Record<string,Answer>={...original}
-      if(unit.kind==='FORM'){
-        const checked:Record<string,Answer>={}
-        for(const page of unit.pages||[])for(const q of page.questions){
-          const prior=q.displayIf?checked[q.displayIf.itemKey]:null
-          const shown=!q.displayIf||
-            (q.displayIf.operator==='INCLUDES'
-              ?Array.isArray(prior)&&prior.includes(q.displayIf.optionKey)
-              :prior===q.displayIf.optionKey)
-          if(!shown){
-            delete cleaned[q.itemKey]
-            for(const row of q.rows||[])delete cleaned[q.itemKey+':'+row.rowKey]
-          }
-          checked[q.itemKey]=shown?(cleaned[q.itemKey]??null):null
-        }
-      }
-      return [unit.instrumentKey,cleaned]
+      return [unit.instrumentKey,unit.kind==='FORM'
+        ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
+        :original]
     }))
     const final=await publicApi<{status:string}>(base+'/attempts/'+attemptId+'/final','POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
