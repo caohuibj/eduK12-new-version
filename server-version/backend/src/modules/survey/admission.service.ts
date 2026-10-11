@@ -26,20 +26,34 @@ async function projectPublic(tx:Tx,publicId:string){
   return project!
 }
 async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolean){
-  await tx.$queryRaw`SELECT id FROM "survey_waves" WHERE id=${waveId} AND project_id=${projectId} FOR UPDATE`
+  // Admission and project pause/close acquire locks in the same order:
+  // Project -> Wave. A committed PAUSE cannot race a newly created Attempt.
+  const [project]=await tx.$queryRaw<Array<{
+    ownerUserId:string;status:string;collectionMode:string
+  }>>`SELECT "owner_user_id" AS "ownerUserId","status","collection_mode" AS "collectionMode"
+    FROM "survey_projects" WHERE "id"=${projectId} FOR SHARE`
+  if(!project||project.status!=='ACTIVE')blocked('研究项目暂停或已结束')
+  await tx.$queryRaw`SELECT id FROM "survey_waves"
+    WHERE id=${waveId} AND project_id=${projectId} FOR UPDATE`
   const wave=await tx.surveyWave.findFirst({where:{id:waveId,projectId}})
   if(!wave||!wave.publicationId||wave.status!=='OPEN')
     blocked('研究波次尚未开放')
-  const project=await tx.surveyProject.findUniqueOrThrow({where:{id:projectId}})
-  if(project.status!=='ACTIVE')blocked('研究项目暂停或已结束')
   const now=new Date()
-  if(wave.opensAt&&wave.opensAt>now||wave.closesAt&&wave.closesAt<=now||wave.hardStopAt)
+  if((wave.opensAt&&wave.opensAt>now)||(wave.closesAt&&wave.closesAt<=now)||wave.hardStopAt)
     blocked('本波次未在允许的采集时间内')
-  const publisher=await tx.user.findFirst({where:{id:project.ownerUserId,accountDomain:'SURVEY',
-    isActive:true,isFrozen:false},select:{id:true}})
-  const grant=await tx.surveyResearcherGrant.findFirst({where:{userId:project.ownerUserId,status:'ACTIVE'}})
-  if(!publisher||!grant)blocked('研究发布者暂不可用')
-  if(linked&&project.collectionMode!=='LINKED_WAVES'||!linked&&project.collectionMode!=='SINGLE_UNLINKED')
+  const owners=await tx.$queryRaw<Array<{id:string}>>`
+    SELECT u.id FROM "users" u
+      JOIN "survey_researcher_grants" g ON g.user_id=u.id
+      JOIN "survey_mfa_credentials" m ON m.user_id=u.id
+    WHERE u.id=${project.ownerUserId} AND u.account_domain='SURVEY'
+      AND u.is_active AND NOT u.is_frozen
+      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+      AND g.status='ACTIVE' AND m.enabled
+    FOR SHARE OF u,g,m
+  `
+  if(!owners.length)blocked('研究发布者暂不可用')
+  if((linked&&project.collectionMode!=='LINKED_WAVES')||
+    (!linked&&project.collectionMode!=='SINGLE_UNLINKED'))
     blocked('此研究不是对应的匿名参与模式')
   return wave
 }
