@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyBuilder } from './SurveyBuilder'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
+import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string}
@@ -153,6 +154,7 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑器已加入开发分支；正式发布、匿名采集和统计仍属于后续开发阶段。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id}/></>}</>}
+      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id}/>
+          <SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/></>}</>}
     </main></div>
 }
