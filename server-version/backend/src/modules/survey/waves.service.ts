@@ -1,0 +1,157 @@
+import { randomUUID } from 'node:crypto'
+import { Prisma } from '@prisma/client'
+import { prisma } from '../../config/database'
+import { surveyKindSchema } from './builder.definition'
+import { previewResearchInstrument } from './builder.compiler'
+import { canonicalHash } from '../assessment-runtime/canonical'
+
+type Tx=Prisma.TransactionClient
+export class SurveyWaveError extends Error {
+  constructor(readonly statusCode:number,message:string){super(message)}
+}
+const fail=(status:number,message:string):never=>{throw new SurveyWaveError(status,message)}
+async function ownProject(tx:Tx,uid:string,pid:string,write:boolean){
+  const rows=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
+    SELECT p.id,p.status,p.collection_mode AS "collectionMode"
+    FROM "survey_projects" p
+    JOIN "users" u ON u.id=p.owner_user_id
+    JOIN "survey_researcher_grants" g ON g.user_id=u.id
+    JOIN "survey_mfa_credentials" m ON m.user_id=u.id
+    WHERE p.id=${pid} AND p.owner_user_id=${uid}
+      AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
+      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+      AND g.status='ACTIVE' AND m.enabled=TRUE
+    FOR SHARE OF p,u,g,m
+  `
+  if(!rows.length)fail(404,'研究项目不存在')
+  if(write&&!['DRAFT','ACTIVE'].includes(rows[0].status))fail(409,'当前项目状态禁止编辑波次')
+  return rows[0]
+}
+const ownWave=async(tx:Tx,pid:string,wid:string)=>{
+  const row=await tx.surveyWave.findFirst({where:{id:wid,projectId:pid}})
+  if(!row)fail(404,'研究波次不存在')
+  return row!
+}
+const ensureWindow=(input:{opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null})=>{
+  if(input.opensAt&&input.closesAt&&new Date(input.opensAt)>=new Date(input.closesAt))
+    fail(400,'波次结束时间必须晚于开始时间')
+  if(input.finishUntil&&input.closesAt&&new Date(input.finishUntil)<new Date(input.closesAt))
+    fail(400,'在途完成截止时间不能早于关闭入场的时间')
+}
+async function validateDraftRefs(tx:Tx,pid:string,ids:string[]){
+  if(new Set(ids).size!==ids.length)fail(400,'同一波次的研究工具不可重复')
+  if(!ids.length)return
+  const rows=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}},
+    select:{id:true,status:true}})
+  if(rows.length!==ids.length||rows.some(x=>x.status!=='DRAFT'))
+    fail(403,'有研究工具不属于当前项目或已归档')
+}
+export async function listWaves(uid:string,pid:string,page:number){
+  return prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,false)
+    const list=await tx.surveyWave.findMany({where:{projectId:pid},
+      orderBy:[{ordinal:'asc'}],take:25,skip:(page-1)*25,
+      select:{id:true,projectId:true,title:true,ordinal:true,status:true,revision:true,
+        opensAt:true,closesAt:true,quotaStarts:true,startsCount:true,allowNewParticipants:true,publicationId:true}})
+    return {page,pageSize:25,list}
+  })
+}
+export async function getWave(uid:string,pid:string,wid:string){
+  return prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,false)
+    return ownWave(tx,pid,wid)
+  })
+}
+type WaveInput={
+  requestId:string;title:string;consentText:string;instrumentIds:string[];
+  opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
+  quotaStarts?:number|null;allowNewParticipants?:boolean
+}
+export async function createWave(uid:string,pid:string,input:WaveInput){
+  ensureWindow(input)
+  return prisma.$transaction(async tx=>{
+    const project=await ownProject(tx,uid,pid,true)
+    // Serialize ordinal allocation against the owning project row.
+    await tx.$queryRaw`SELECT "id" FROM "survey_projects" WHERE "id"=${pid} FOR UPDATE`
+    const existing=await tx.surveyWave.findUnique({where:{id:input.requestId}})
+    if(existing){
+      if(existing.projectId!==pid||existing.title!==input.title)fail(409,'波次创建请求冲突')
+      return existing
+    }
+    await validateDraftRefs(tx,pid,input.instrumentIds)
+    const ordinal=await tx.surveyWave.aggregate({where:{projectId:pid},_max:{ordinal:true}})
+    const next=(ordinal._max.ordinal||0)+1
+    if(next>100)fail(400,'首版单项目最多 100 个波次')
+    const row=await tx.surveyWave.create({data:{
+      id:input.requestId,projectId:pid,ordinal:next,title:input.title,
+      consentText:input.consentText,consentVersion:1,
+      instrumentIds:input.instrumentIds,
+      status:'DRAFT',
+      opensAt:input.opensAt?new Date(input.opensAt):null,
+      closesAt:input.closesAt?new Date(input.closesAt):null,
+      finishUntil:input.finishUntil?new Date(input.finishUntil):null,
+      quotaStarts:input.quotaStarts??null,allowNewParticipants:input.allowNewParticipants??false,
+    }})
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,
+      projectId:pid,action:'WAVE_DRAFT_CREATED',
+      metadata:{waveId:row.id,ordinal:row.ordinal,collectionMode:project.collectionMode}}})
+    return row
+  })
+}
+type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
+export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
+  ensureWindow(input)
+  return prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,true)
+    const old=await ownWave(tx,pid,wid)
+    if(old.status!=='DRAFT'||old.revision!==input.revision)
+      fail(409,'仅能修改当前版本的未发布波次')
+    await validateDraftRefs(tx,pid,input.instrumentIds)
+    const changed=await tx.surveyWave.updateMany({
+      where:{id:wid,projectId:pid,status:'DRAFT',revision:input.revision},
+      data:{title:input.title,consentText:input.consentText,instrumentIds:input.instrumentIds,
+        opensAt:input.opensAt?new Date(input.opensAt):null,
+        closesAt:input.closesAt?new Date(input.closesAt):null,
+        finishUntil:input.finishUntil?new Date(input.finishUntil):null,
+        quotaStarts:input.quotaStarts??null,
+        allowNewParticipants:input.allowNewParticipants??false,
+        revision:{increment:1},updatedAt:new Date()},
+    })
+    if(changed.count!==1)fail(409,'另一个研究者会话已修改波次')
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,projectId:pid,
+      action:'WAVE_DRAFT_UPDATED',metadata:{waveId:wid,revision:input.revision+1}}})
+    return ownWave(tx,pid,wid)
+  })
+}
+export async function preflightWave(uid:string,pid:string,wid:string){
+  const input=await prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,false)
+    const wave=await ownWave(tx,pid,wid)
+    if(wave.status!=='DRAFT')fail(409,'发布后内容不可重新进行草稿预检')
+    const ids=Array.isArray(wave.instrumentIds)?wave.instrumentIds.filter((x):x is string=>typeof x==='string'):[]
+    if(ids.length!==(Array.isArray(wave.instrumentIds)?wave.instrumentIds.length:-1))fail(400,'工具引用格式错误')
+    await validateDraftRefs(tx,pid,ids)
+    const drafts=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}}})
+    return {wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
+  })
+  const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
+  if(input.wave.consentText.trim().length<20)
+    checks.push({key:'consent',ok:false,issues:['研究说明与知情同意至少需要 20 字']})
+  if(!input.selected.length)
+    checks.push({key:'instruments',ok:false,issues:['至少选择一个研究工具']})
+  for(const draft of input.drafts){
+    const compilation=previewResearchInstrument({
+      kind:surveyKindSchema.parse(draft.kind),instrumentKey:draft.instrumentKey,
+      title:draft.title,definition:draft.definition,
+    })
+    checks.push({key:draft.id,ok:compilation.ok,
+      issues:compilation.issues.map(issue=>issue.path+': '+issue.message),
+      digest:compilation.definitionDigest})
+  }
+  // This preflight is NOT a publish operation. It writes no Participant, Wave
+  // Attempt, public token or scientific catalog status.
+  return {projectId:pid,waveId:wid,revision:input.wave.revision,
+    selectionDigest:canonicalHash(input.selected),checks,
+    ok:checks.length===input.selected.length+1&&checks.every(c=>c.ok),
+    publicationReady:false,reason:'PR3 runtime adapter and anonymous FINAL not yet enabled'}
+}
