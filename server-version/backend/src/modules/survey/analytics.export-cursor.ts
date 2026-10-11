@@ -7,6 +7,7 @@ export interface SurveyExportCursor {
   cutOff:string;sourceRevision:number;page:number;issuedAt:number
   completedFrom:string|null;completedBefore:string|null
   freeTextIncluded:boolean
+  finalCount:number
 }
 const signer=()=>{
   const key=process.env.ASSET_SIGNING_SECRET
@@ -35,6 +36,7 @@ export function decodeSurveyExportCursor(raw:string,projectId:string,
       ||!Number.isFinite(Date.parse(token.after.completedAt))
       ||!Number.isFinite(Date.parse(token.cutOff))
       ||!Number.isSafeInteger(token.sourceRevision)||token.sourceRevision<0
+      ||!Number.isSafeInteger(token.finalCount)||token.finalCount<0
       ||!Number.isSafeInteger(token.page)||token.page<1||token.page>100
       ||!Number.isFinite(token.issuedAt)||token.issuedAt>Date.now()
       ||Date.now()-token.issuedAt>60*60*1000)fail()
