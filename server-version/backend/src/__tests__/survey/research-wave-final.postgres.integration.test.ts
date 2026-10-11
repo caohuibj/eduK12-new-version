@@ -5,17 +5,17 @@ import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
 import { transitionResearchProject } from '../../modules/survey/project-lifecycle'
-import { prepareWave,openWave } from '../../modules/survey/waves.publish'
+import { prepareWave,openWave,updateWaveEntryToken } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
-import { exportWide } from '../../modules/survey/analytics.export-format'
+import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
-import { withdrawLinkedResearchData } from '../../modules/survey/identity.service'
+import { withdrawLinkedResearchData,revokeLinkedResearchAccess,recoverLinkedResearchIdentity } from '../../modules/survey/identity.service'
 import { generateToken } from '../../utils/jwt'
 import type { Request } from 'express'
 
@@ -506,6 +506,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }])
     const raw=rawWideExport(projectId,source)
     const score=exportWide(projectId,source.scores,source.attendance,source.scoreColumns)
+    const rawLong=rawLongExport(projectId,source)
+    const scoreLong=exportLong(projectId,source.scores,source.attendance,source.scoreColumns)
+    for(const item of [rawLong,scoreLong]){
+      expect(item.manifest.rowCount).toBe(2)
+      expect(item.csv).toContain(person.researchCode)
+      expect(item.csv).toContain('ABANDONED')
+    }
     for(const result of [raw,score]){
       expect(result.manifest.rowCount).toBe(1)
       expect(result.manifest.columnCount).toBe(5)
@@ -542,6 +549,67 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(source.scoreColumns).toHaveLength(2)
     expect(rawWideExport(projectId,source).manifest.rowCount).toBe(2)
     expect(exportWide(projectId,source.scores,source.attendance,source.scoreColumns).manifest.rowCount).toBe(2)
+  })
+
+
+  it('rotates and revokes project-scoped recruitment without revoking the participant secret',async()=>{
+    const current=await wave('招募密钥管理',[toolIds.scale],true)
+    const open=await db.surveyWave.findUniqueOrThrow({where:{id:current.id}})
+    const rotated=await updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:open.revision,action:'ROTATE',
+    })
+    expect(rotated.entrySecret).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(rotated.researchUrl).toContain('#entry='+rotated.entrySecret)
+    expect(rotated.entrySecret).not.toBe(current.entrySecret)
+    await expect(joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:current.entrySecret,
+      consent:true,consentVersion:1,
+    })).rejects.toThrow()
+    const participant=await joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:rotated.entrySecret!,
+      consent:true,consentVersion:1,
+    })
+    const revoked=await updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:rotated.revision,action:'REVOKE',
+    })
+    expect(revoked.revoked).toBe(true)
+    await expect(joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:rotated.entrySecret!,
+      consent:true,consentVersion:1,
+    })).rejects.toThrow()
+    expect(await recoverLinkedResearchIdentity({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })).toHaveProperty('researchCode',participant.researchCode)
+    // Client is still able to request withdrawal after explicitly revoking
+    // future access. The revoked proof cannot read tasks or other answers.
+    await revokeLinkedResearchAccess({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    await expect(getOwnResearchTask({
+      publicId:current.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })).rejects.toThrow()
+    const withdrawn=await withdrawLinkedResearchData({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    expect(withdrawn).toMatchObject({status:'WITHDRAWN',excludedAttempts:1})
+    const attempt=await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:participant.attemptId}})
+    expect(attempt.status).toBe('WITHDRAWN')
+    const evidence=await db.surveyEvent.findMany({
+      where:{projectId,action:{in:['WAVE_ENTRY_TOKEN_ROTATED','WAVE_ENTRY_TOKEN_REVOKED',
+        'PARTICIPANT_ACCESS_REVOKED','PARTICIPANT_DATA_WITHDRAWAL']}},
+    })
+    expect(evidence.map(e=>e.action)).toEqual(expect.arrayContaining([
+      'WAVE_ENTRY_TOKEN_ROTATED','WAVE_ENTRY_TOKEN_REVOKED',
+      'PARTICIPANT_ACCESS_REVOKED','PARTICIPANT_DATA_WITHDRAWAL',
+    ]))
+    expect(JSON.stringify(evidence)).not.toContain(participant.accessCredential)
   })
 
 
