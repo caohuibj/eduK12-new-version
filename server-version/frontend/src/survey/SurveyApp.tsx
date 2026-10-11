@@ -145,7 +145,8 @@ export default function SurveyApp(){
         <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
           <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
           <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
-            <button className="btn-secondary" disabled={busy||!['DRAFT','CLOSED'].includes(p.status)&&!(p.status==='ARCHIVED'&&!p.firstPublishedAt)} onClick={()=>toggle(p)}>
+            <button className="btn-secondary" disabled={busy||(p.status==='DRAFT'&&!!p.firstPublishedAt)
+              ||(!['DRAFT','CLOSED'].includes(p.status)&&!(p.status==='ARCHIVED'&&!p.firstPublishedAt))} onClick={()=>toggle(p)}>
               {p.status==='CLOSED'?'结束后归档':p.status==='DRAFT'?'归档草稿':
                 p.status==='ARCHIVED'?(p.firstPublishedAt?'终态归档不可恢复':'恢复草稿'):'采集中不可归档'}</button></div>
         </article>)}</div>
