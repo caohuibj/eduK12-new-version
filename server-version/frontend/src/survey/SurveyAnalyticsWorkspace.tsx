@@ -61,7 +61,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [metricKey,setMetricKey]=useState(''),[metricInstrument,setMetricInstrument]=useState('')
   const [pairedScore,setPairedScore]=useState<PairedScore|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
-  const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
+  const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
+  const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
   const [error,setError]=useState(''),[ticket,setTicket]=useState<Ticket|null>(null)
   const base='/projects/'+projectId
   const reload=async()=>{
@@ -107,6 +108,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const createExport=()=>void execute(async()=>{
     const result=await api<Ticket>(base+'/exports','POST',{
       format,...(format==='RAW_WAVE'?{waveId}:{}),
+      ...(format.startsWith('RAW')?{includeFreeText}:{}),
     })
     setTicket(result)
     setMessage('加密数据已生成，可在十分钟有效期内按项目权限下载。')
@@ -229,6 +231,11 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
             onClick={createExport}>创建受控导出</button>
         </div>
+        {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <input type="checkbox" checked={includeFreeText}
+            onChange={e=>{setIncludeFreeText(e.target.checked);setTicket(null)}}/>
+          包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
+        </label>}
         {ticket&&<div className="border rounded-lg p-3 space-y-2">
           <p className="text-sm">导出 {ticket.format} · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>

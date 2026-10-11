@@ -10,7 +10,7 @@ export const surveyExportsRouter=Router()
 const pid=z.string().uuid(), eid=z.string().uuid()
 const create=z.object({
   format:z.enum(['RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE']),
-  waveId:pid.optional(),
+  waveId:pid.optional(),includeFreeText:z.boolean().optional(),
 }).strict()
 surveyExportsRouter.use(authenticateSurvey)
 surveyExportsRouter.use((req,res,next)=>{

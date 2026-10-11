@@ -249,6 +249,12 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(artifact.csv).toContain('research_code_or_attempt')
     expect(JSON.stringify(artifact)).not.toContain(link.accessCredential)
     expect((artifact.codebook as unknown[]).length).toBeGreaterThan(0)
+    expect((artifact.codebook as {responseType:string}[]).some(c=>c.responseType==='SHORT_TEXT')).toBe(false)
+    const explicit=await createSurveyExport(req(1),{
+      projectId,format:'RAW_WAVE',waveId:wave1,includeFreeText:true,
+    })
+    expect(explicit.manifest.selection.freeTextIncluded).toBe(true)
+    expect(explicit.manifest.selection.freeTextExcludedRows).toBe(0)
     await expect(downloadSurveyExport(req(1000),{projectId,exportId:grant.id}))
       .rejects.toThrow(/TOTP/)
   })

@@ -53,7 +53,7 @@ async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient
   if(!rows.length)fail(404,'无权限访问研究项目数据')
 }
 export async function createSurveyExport(req:Request,input:{
-  projectId:string;format:Format;waveId?:string;
+  projectId:string;format:Format;waveId?:string;includeFreeText?:boolean;
 }){
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
@@ -61,8 +61,18 @@ export async function createSurveyExport(req:Request,input:{
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250})
   if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
     fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
+  if(input.includeFreeText&&input.format.startsWith('SCORE'))
+    fail(400,'纯分数导出不适用自由文本选项')
+  const omittedFreeText=sources.raw.filter(r=>
+    ['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)).length
+  const included=input.includeFreeText===true
+  const projected=included||input.format.startsWith('SCORE')?sources:{
+    ...sources,
+    raw:sources.raw.filter(r=>!['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)),
+    codebook:sources.codebook.filter(r=>!['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)),
+  }
   let artifact:SurveyRawExport|BoundedResearchExport
-  try{artifact=artifactFor(input.format,input.projectId,sources,input.waveId)}
+  try{artifact=artifactFor(input.format,input.projectId,projected,input.waveId)}
   catch(e){fail(413,e instanceof Error?e.message:'研究数据超过安全导出上限')}
   const selectedVersions=[...new Map(sources.codebook.map(x=>[
     x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,
@@ -74,7 +84,8 @@ export async function createSurveyExport(req:Request,input:{
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
-      researchOnly:true,collectionMode:sources.collectionMode}}
+      researchOnly:true,collectionMode:sources.collectionMode,
+      freeTextIncluded:included,freeTextExcludedRows:included?0:omittedFreeText}}
   const value:SurveyExportArtifact={csv:artifact.csv,codebook:artifact.codebook,manifest}
   const encoded=JSON.stringify(value)
   if(Buffer.byteLength(encoded,'utf8')>maxBytes)
