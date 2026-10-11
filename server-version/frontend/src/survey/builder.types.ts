@@ -3,7 +3,7 @@ export type Option={optionKey:string;label:string;score?:number}
 export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
 export type SurveyImage={
   asset:{assetId:string;contentHash:string;mimeType:'image/png'|'image/jpeg'|'image/webp'};
-  altText:string;caption?:string
+  altText:string;caption?:string;rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string
 }
 export type FormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';

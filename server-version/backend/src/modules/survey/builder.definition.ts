@@ -17,6 +17,8 @@ export const surveyImageSchema=z.object({
   asset:assessmentStaticImageAssetIdentitySchema,
   altText:z.string().trim().min(1).max(300),
   caption:z.string().trim().max(1000).optional(),
+  rightsStatus:z.enum(['self_authored','authorized','unknown']).default('unknown'),
+  rightsNote:z.string().trim().max(2000).default(''),
 }).strict()
 const condition = z.object({
   itemKey:key, operator:z.enum(['EQUALS','INCLUDES']), optionKey:key,
@@ -136,6 +138,8 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
       page.questions.forEach((q,qi)=>{
         const path=`pages.${pi}.questions.${qi}`
         if(forPreview)requireText(q.prompt,path+'.prompt',issues)
+        if(forPreview&&q.image&&(q.image.rightsStatus==='unknown'||!q.image.rightsNote.trim()))
+          err(issues,path+'.image','研究图片须明确作者或使用许可来源，才可发布')
         unique(q.options.map(o=>o.optionKey),path+'.options',issues)
         unique(q.rows.map(o=>o.rowKey),path+'.rows',issues)
         if(['SINGLE','MULTIPLE','LIKERT','MATRIX'].includes(q.type)){
@@ -193,6 +197,8 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
     if(forPreview){
       requireText(d.title,'title',issues)
       requireText(d.stimulus,'stimulus',issues)
+      if(d.image&&(d.image.rightsStatus==='unknown'||!d.image.rightsNote.trim()))
+        err(issues,'image','共享场景图片须明确版权或使用许可依据')
       if(!d.metrics.length)err(issues,'metrics','至少一个测量构念')
       if(d.questions.length<2)err(issues,'questions','共享场景至少两道题目')
       requireText(d.author,'author',issues)

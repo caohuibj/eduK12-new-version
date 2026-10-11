@@ -22,7 +22,8 @@ export class SurveyMediaError extends Error{
   constructor(readonly statusCode:number,message:string){super(message)}
 }
 const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
-type ImageIdentity={asset:{assetId:string;contentHash:string;mimeType:string};altText:string;caption?:string}
+type ImageIdentity={asset:{assetId:string;contentHash:string;mimeType:string};altText:string;caption?:string;
+  rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string}
 type UnitDef={kind:SurveyKind;definition:unknown}
 export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.flatMap(({kind,definition})=>{
   if(kind==='FORM'){
@@ -48,6 +49,8 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const byId=new Map(assets.map(a=>[a.id,a]))
   for(const image of refs){
     if(!image.altText?.trim())fail(400,'研究图片必须提供可阅读替代文字')
+    if(image.rightsStatus==='unknown'||!image.rightsNote?.trim())
+      fail(403,'研究图片必须提供明确的原创或授权依据')
     const a=byId.get(image.asset.assetId)
     if(!a||a.sizeBytes<=0||a.sizeBytes>limit
       ||a.sha256!==image.asset.contentHash||a.mimeType!==image.asset.mimeType

@@ -42,7 +42,8 @@ export function SurveyImageField({projectId,image,onChange}:{
       setLibrary(xs=>[media,...xs.filter(x=>x.assetId!==media.assetId)])
       onChange({asset:{
         assetId:media.assetId,contentHash:media.contentHash,mimeType:media.mimeType,
-      },altText:file.name.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片'})
+      },altText:file.name.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片',
+        rightsStatus:'unknown',rightsNote:''})
     }catch(e){setError(e instanceof Error?e.message:'图片上传失败')}
     finally{setBusy(false)}
   }
@@ -61,7 +62,8 @@ export function SurveyImageField({projectId,image,onChange}:{
           const match=library.find(x=>x.assetId===e.target.value)
           onChange(match?{asset:{
             assetId:match.assetId,contentHash:match.contentHash,mimeType:match.mimeType,
-          },altText:match.originalName?.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片'}:undefined)
+          },altText:match.originalName?.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片',
+            rightsStatus:'unknown',rightsNote:''}:undefined)
         }}>
         <option value="">不使用图片</option>
         {library.map(a=><option key={a.assetId} value={a.assetId}>
@@ -78,6 +80,18 @@ export function SurveyImageField({projectId,image,onChange}:{
       <label className="text-sm block">图片说明（可选）
         <input className="input block w-full" maxLength={1000} value={image.caption||''}
           onChange={e=>onChange({...image,caption:e.target.value})}/></label>
+      <label className="text-sm block">图片版权状态
+        <select className="input block w-full" value={image.rightsStatus}
+          onChange={e=>onChange({...image,rightsStatus:e.target.value as SurveyImage['rightsStatus']})}>
+          <option value="unknown">未核实（不可发布）</option>
+          <option value="self_authored">项目研究者原创</option>
+          <option value="authorized">已取得本次研究展示授权</option>
+        </select></label>
+      <label className="text-sm block">版权／授权凭据说明（必填）
+        <textarea className="input block w-full" maxLength={2000} rows={2}
+          value={image.rightsNote}
+          onChange={e=>onChange({...image,rightsNote:e.target.value})}/>
+      </label>
       <button className="btn-secondary" type="button" onClick={()=>onChange(undefined)}>从此题移除图片引用</button>
     </div>}
   </fieldset>
