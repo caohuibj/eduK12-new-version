@@ -51,12 +51,14 @@ const audit=async(tx:Tx,uid:string,id:string,action:string)=>tx.surveyEvent.crea
 surveyProjectsRouter.use(authenticateSurvey)
 surveyProjectsRouter.get('/',handler(async(req)=>{
   const page=Math.min(1000,Math.max(1,Number(req.query.page)||1))
-  await prisma.$transaction(tx=>usable(tx,req.user!.userId))
-  const list=await prisma.surveyProject.findMany({
-    where:{ownerUserId:req.user!.userId},take:25,skip:(page-1)*25,
-    orderBy:[{updatedAt:'desc'},{id:'desc'}],
+  return prisma.$transaction(async tx=>{
+    await usable(tx,req.user!.userId)
+    const list=await tx.surveyProject.findMany({
+      where:{ownerUserId:req.user!.userId},take:25,skip:(page-1)*25,
+      orderBy:[{updatedAt:'desc'},{id:'desc'}],
+    })
+    return {page,pageSize:25,list}
   })
-  return {page,pageSize:25,list}
 }))
 surveyProjectsRouter.post('/',handler(async(req)=>{
   const input=create.parse(req.body),uid=req.user!.userId

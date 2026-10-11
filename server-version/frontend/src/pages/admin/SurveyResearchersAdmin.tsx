@@ -59,10 +59,10 @@ export default function SurveyResearchersAdmin(){
     <div className="grid gap-3">{list.map(person=><article className="rounded-lg border p-4" key={person.id}>
       <p><strong>{person.username}</strong> · {person.status}</p>
       <div className="flex flex-wrap gap-2 my-3">
-        {person.status==='ACTIVE'&&<button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/suspend',person.username)}>暂停资格</button>}
+        {['ACTIVE','PENDING_MFA'].includes(person.status)&&<button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/suspend',person.username)}>暂停资格</button>}
         {person.status==='SUSPENDED'&&<button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/restore',person.username)}>恢复资格</button>}
-        <button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/mfa-reset',person.username)}>重置 TOTP</button>
-        <button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations',person.username)}>密码重置邀请</button>
+        <button className="btn-secondary" disabled={busy||!password||person.status==='SUSPENDED'} onClick={()=>void act('/researchers/'+person.id+'/mfa-reset',person.username)}>重置 TOTP</button>
+        <button className="btn-secondary" disabled={busy||!password||person.status==='SUSPENDED'} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations',person.username)}>密码重置邀请</button>
       </div>
     </article>)}</div>
     {!list.length&&<p className="text-sm">暂无可见研究者，或您没有相应的管理授权。</p>}

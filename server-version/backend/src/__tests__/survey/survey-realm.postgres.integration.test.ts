@@ -11,7 +11,7 @@ import { csrfProtection } from '../../middleware/csrf'
 import { surveyProjectsRouter } from '../../modules/survey/projects.routes'
 import { issueSurveyCsrfToken } from '../../utils/authCookies'
 import { isActiveResearcher } from '../../modules/survey/authority'
-import { inviteResearcher, redeemResearcherInvite, authorizeAdmin } from '../../modules/survey/governance.service'
+import { inviteResearcher, redeemResearcherInvite, authorizeAdmin, invitePasswordReset, resetResearcherMfa, updateResearcherStatus } from '../../modules/survey/governance.service'
 import {
   startSurveyMfaEnrollment, completeSurveyMfa, totpAt, verifySurveyTotpStepUp,
 } from '../../modules/survey/mfa.service'
@@ -138,4 +138,24 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     expect(stale.status).toBe(409)
     await expect(db.user.update({where:{id:userId},data:{accountDomain:'TRAINING'}})).rejects.toThrow()
   })
+  it('suspended researcher cannot recover credentials or bypass mandatory MFA',async()=>{
+    await updateResearcherStatus(adminId,userId,'SUSPENDED')
+    expect(await isActiveResearcher(userId)).toBe(false)
+    await expect(invitePasswordReset(adminId,userId)).rejects.toThrow()
+    await expect(resetResearcherMfa(adminId,userId)).rejects.toThrow()
+    const resumed=await updateResearcherStatus(adminId,userId,'ACTIVE')
+    expect(resumed.status).toBe('ACTIVE')
+    expect(await isActiveResearcher(userId)).toBe(true)
+    const invitation=await inviteResearcher(adminId)
+    const newName='srev_'+randomUUID().slice(0,8)
+    await redeemResearcherInvite(requestStub().req,requestStub().res,invitation.token,newName,asPassword)
+    const a=await db.surveyAccount.findUniqueOrThrow({where:{normalizedLogin:newName}})
+    const suspended=await updateResearcherStatus(adminId,a.userId,'SUSPENDED')
+    expect(suspended.status).toBe('SUSPENDED')
+    const pending=await updateResearcherStatus(adminId,a.userId,'ACTIVE')
+    expect(pending.status).toBe('PENDING_MFA')
+    expect(await isActiveResearcher(a.userId)).toBe(false)
+    await expect(invitePasswordReset(adminId,a.userId)).resolves.toMatchObject({kind:'PASSWORD_RESET'})
+  })
+
 })

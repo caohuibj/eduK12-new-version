@@ -33,7 +33,7 @@ async function invite(actorId:string,kind:'INVITE'|'PASSWORD_RESET',targetId:str
     if(targetId){
       const user=await tx.user.findFirst({where:{id:targetId,accountDomain:'SURVEY'},select:{id:true}})
       const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
-      if(!user||!grant||grant.status!=='ACTIVE')throw new SurveyGovernanceError(404,'研究者不可签发恢复邀请')
+      if(!user||!grant||!['ACTIVE','PENDING_MFA'].includes(grant.status))throw new SurveyGovernanceError(404,'研究者不可签发恢复邀请')
     }
     await tx.surveyInvitation.create({data:{
       id,kind,tokenHash:digest(value),createdBy:actorId,targetUserId:targetId,
@@ -84,7 +84,7 @@ export async function redeemPasswordReset(req:Request,res:Response,raw:string,pa
     if(!inv)throw new SurveyGovernanceError(403,'恢复邀请无效或已使用')
     const current=await tx.user.findFirst({where:{id:inv.userId,accountDomain:'SURVEY'}})
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:inv.userId}})
-    if(!current||!current.isActive||current.isFrozen||grant?.status!=='ACTIVE')
+    if(!current||!current.isActive||current.isFrozen||!['ACTIVE','PENDING_MFA'].includes(grant?.status||''))
       throw new SurveyGovernanceError(403,'研究者资格不可恢复')
     const changed=await tx.user.update({where:{id:current.id},data:{
       passwordHash,tokenVersion:{increment:1},mustChangePassword:false,
@@ -125,15 +125,21 @@ export async function updateResearcherStatus(actorId:string,targetId:string,stat
     await assertCurrentSystemAdmin(tx,actorId)
     const account=await tx.surveyAccount.findUnique({where:{userId:targetId}})
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
-    if(!account||!grant||!['ACTIVE','SUSPENDED'].includes(grant.status))throw new SurveyGovernanceError(404,'研究者不可更改')
+    if(!account||!grant||!['ACTIVE','PENDING_MFA','SUSPENDED'].includes(grant.status))
+      throw new SurveyGovernanceError(404,'研究者不可更改')
+    if(status==='SUSPENDED'&&grant.status==='SUSPENDED')
+      throw new SurveyGovernanceError(409,'研究者已经暂停')
+    if(status==='ACTIVE'&&grant.status!=='SUSPENDED')
+      throw new SurveyGovernanceError(409,'研究者尚未暂停')
+    let nextStatus:'ACTIVE'|'PENDING_MFA'|'SUSPENDED'=status
     if(status==='ACTIVE'){
       const mfa=await tx.surveyMfaCredential.findUnique({where:{userId:targetId}})
-      if(!mfa?.enabled)throw new SurveyGovernanceError(409,'研究者尚未绑定双因素认证')
+      nextStatus=mfa?.enabled?'ACTIVE':'PENDING_MFA'
     }
-    await tx.surveyResearcherGrant.update({where:{userId:targetId},data:{status,updatedAt:new Date()}})
+    await tx.surveyResearcherGrant.update({where:{userId:targetId},data:{status:nextStatus,updatedAt:new Date()}})
     await tx.user.update({where:{id:targetId},data:{tokenVersion:{increment:1}}})
     await event(tx,actorId,status==='ACTIVE'?'RESEARCHER_RESTORED':'RESEARCHER_SUSPENDED',targetId)
-    return {id:targetId,status}
+    return {id:targetId,status:nextStatus}
   })
 }
 export async function resetResearcherMfa(actorId:string,targetId:string){
