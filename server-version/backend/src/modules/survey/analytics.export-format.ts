@@ -66,14 +66,15 @@ export const tableToCsv=(columns:string[],records:readonly (readonly unknown[])[
   return [columns.map(csvCell).join(','),...records.map(r=>r.map(csvCell).join(','))].join('\r\n')+'\r\n'
 }
 const safeName=(text:string)=>text.replace(/[^a-z0-9_]/gi,'_').slice(0,36)||'metric'
-const columnId=(o:FrozenScoreObservation):string=>
+type FrozenScoreColumn=Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>
+const columnId=(o:Pick<FrozenScoreColumn,'waveId'|'waveOrdinal'|'measurement'>):string=>
   'W'+String(o.waveOrdinal).padStart(3,'0')+'__'+safeName(o.measurement.instrumentKey)
   +'__'+safeName(o.measurement.scoreKey)+'__'+canonicalHash({
     instrumentKey:o.measurement.instrumentKey,scoreKey:o.measurement.scoreKey,
     scoringDigest:o.measurement.scoringDigest,responseSignature:o.measurement.responseSignature,
     respondentType:o.measurement.respondentType,unit:o.measurement.unit,
   }).slice(0,12)
-const codebookFor=(o:FrozenScoreObservation):ResearchExportCodebookRow=>({
+const codebookFor=(o:Pick<FrozenScoreColumn,'waveId'|'waveOrdinal'|'measurement'>):ResearchExportCodebookRow=>({
   column:columnId(o),waveId:o.waveId,ordinal:o.waveOrdinal,
   instrumentKey:o.measurement.instrumentKey,scoreKey:o.measurement.scoreKey,
   scoringDigest:o.measurement.scoringDigest,responseSignature:o.measurement.responseSignature,
@@ -124,11 +125,16 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
 /** WIDE is legitimate ONLY in LINKED_WAVES. Rows with no stable researchCode
  * are rejected rather than synthesizing a false shared identity. */
 export function exportWide(projectId:string,observations:readonly FrozenScoreObservation[],
-  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[]):BoundedResearchExport{
+  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[],
+  expectedColumns:readonly FrozenScoreColumn[]=[]):BoundedResearchExport{
   const source=sourceRows(projectId,observations)
   if(source.some(o=>!o.researchCode))
     throw new Error('Anonymous SINGLE_UNLINKED answers cannot be widened across waves')
+  if(expectedColumns.some(column=>column.projectId!==projectId))
+    throw new Error('Expected score columns must belong to the authorized project')
   const mapped=new Map<string,ResearchExportCodebookRow>()
+  // Frozen scorer definitions yield columns even if this Wave has zero FINALs.
+  for(const column of expectedColumns)mapped.set(columnId(column),codebookFor(column))
   for(const o of source)mapped.set(columnId(o),codebookFor(o))
   const codebook=[...mapped.values()].sort((a,b)=>a.ordinal-b.ordinal||a.column.localeCompare(b.column))
   const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing'])]
