@@ -21,6 +21,7 @@ export async function describeSurveyPairedScoresPaged(input:{
   let afterFinal:{id:string;completedAt:Date}|undefined
   let snapshotCutOff:Date|undefined
   let expectedSourceRevision:number|undefined
+  let expectedFinalCount:number|undefined
   const scores:FrozenScoreObservation[]=[]
   let columns:Awaited<ReturnType<typeof loadSurveySource>>['scoreColumns']=[]
   for(let page=0;page<MAX_PAGES;page++){
@@ -28,12 +29,14 @@ export async function describeSurveyPairedScoresPaged(input:{
       actorUserId:input.actorUserId,projectId:input.projectId,waveIds,
       maxFinals:PAGE_SIZE,pageMode:true,includeWideSchema:true,
       includeAttendance:false,afterFinal,snapshotCutOff,expectedSourceRevision,
+      expectedFinalCount,
     })
     if(chunk.collectionMode!=='LINKED_WAVES')
       throw new SurveyAnalyticsError(409,'独立匿名研究不支持按研究编号计算纵向配对')
     if(!snapshotCutOff){
       snapshotCutOff=new Date(chunk.cutOff)
       expectedSourceRevision=chunk.sourceRevision
+      expectedFinalCount=chunk.sourceFinalCount??undefined
       columns=chunk.scoreColumns
     }
     scores.push(...chunk.scores.filter(x=>
