@@ -106,7 +106,7 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
 }
 const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;completedAt:string;sourceFinalHash:string
-):FrozenScoreObservation[]=>{
+}):FrozenScoreObservation[]=>{
   if(unit.notExecuted)return frozenScoreColumns(meta.projectId,meta.waveId,meta.waveOrdinal,frozen)
     .map(column=>({...meta,sourceVerified:true,measurement:column.measurement,
       value:null,missingReason:'NOT_SHOWN' as MissingReason}))
