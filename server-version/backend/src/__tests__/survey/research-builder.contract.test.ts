@@ -167,6 +167,37 @@ describe('Survey research builder contracts without formal publication authority
     const rejected=validateSurveyDraft('SJT',d,true)
     expect(rejected.issues.some(i=>i.message.includes('24'))).toBe(true)
   })
+  it('imports multi-page Form V2 CSV via typed columns while rejecting professional types in V1',()=>{
+    const headers=['type','prompt','required','options','rows','min','max','step','total','time_zone']
+    const inputRows=[
+      {type:'DATE',prompt:'作答日期',required:'true'},
+      {type:'TIME',prompt:'作答时间',required:'true',time_zone:'Asia/Shanghai'},
+      {type:'RANK_ORDER',prompt:'偏好排序',required:'true',options:'甲||乙||丙'},
+      {type:'SLIDER',prompt:'评分',required:'true',min:'0',max:'10',step:'1'},
+      {type:'CONSTANT_SUM',prompt:'时间分配',required:'true',options:'读书||运动',total:'100'},
+      {type:'MATRIX_MULTIPLE',prompt:'课堂表现',required:'true',
+        options:'愿意||不愿意',rows:'讨论||实践'},
+    ]
+    const csv=[headers.join(','),...inputRows.map(row=>headers.map(h=>
+      (row as Record<string,string>)[h]??'').join(','))].join('\\n')
+    const batch={batchId:'c8b84321-4141-4444-8888-123456789012',format:'CSV' as const,
+      content:csv,pageKey:'second'}
+    const check=previewBulk(batch,'FORM',2)
+    expect(check.ok).toBe(true)
+    expect(check.items).toHaveLength(6)
+    expect(previewBulk(batch,'FORM',1).issues.some(x=>x.message.includes('升级'))).toBe(true)
+    const form:FormDraft={schemaVersion:2,pages:[
+      {pageKey:'first',title:'第一页',questions:[]},{pageKey:'second',title:'第二页',questions:[]},
+    ]}
+    const applied=applyBulk('FORM',form,batch,check.digest) as FormDraft
+    expect(applied.pages[0].questions).toHaveLength(0)
+    expect(applied.pages[1].questions).toHaveLength(6)
+    expect(applied.pages[1].questions.find(q=>q.type==='SLIDER')?.step).toBe(1)
+    expect(applied.pages[1].questions.find(q=>q.type==='TIME')?.timeZone).toBe('Asia/Shanghai')
+    expect(validateSurveyDraft('FORM',applied,true).issues).toHaveLength(0)
+    const legacy:FormDraft={schemaVersion:1,pages:form.pages}
+    expect(()=>applyBulk('FORM',legacy,batch,check.digest)).toThrow(BulkImportError)
+  })
   it('parses text/CSV with deterministic batch identifiers and rejects invalid portions',()=>{
     const form=initialSurveyDefinition('FORM')
     const batch={
