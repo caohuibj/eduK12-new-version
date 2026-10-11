@@ -184,6 +184,9 @@ export async function loadSurveySource(input:{
     const frozenWaves=input.includeWideSchema?await tx.surveyWave.findMany({
       where:{projectId:input.projectId,
         ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
+        // A prepared DRAFT is not a collected Wave; do not label future
+        // unreleased instruments as participant NO_WAVE / attrition.
+        status:{in:['OPEN','PAUSED','CLOSED']},
         publicationId:{not:null}},
       select:{id:true,ordinal:true,publicationId:true},
       orderBy:{ordinal:'asc'},take:101,
