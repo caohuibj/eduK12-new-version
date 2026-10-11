@@ -36,8 +36,13 @@ describe('Professional Survey Form input contracts',()=>{
     render(<Host question={{type:'CONSTANT_SUM',itemKey:'budget',prompt:'分配',options,
       total:5,integerOnly:true}}/>)
     fireEvent.change(screen.getByLabelText('分值：第二项'),{target:{value:'5'}})
+    expect(read().budget).toEqual({b:5})
+    expect(screen.getByText(/仍有 2 项未填写/)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('分值：第一项'),{target:{value:'0'}})
+    fireEvent.change(screen.getByLabelText('分值：第三项'),{target:{value:'0'}})
     expect(read().budget).toEqual({a:0,b:5,c:0})
-    expect(screen.getByText(/当前合计 5 \/ 目标 5/)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('分值：第一项'),{target:{value:''}})
+    expect(read().budget).toEqual({b:5,c:0})
   })
   it('supports matrix row multi-select with an explicit independent refusal',()=>{
     render(<Host question={{type:'MATRIX_MULTIPLE',itemKey:'matrix',prompt:'多选行',

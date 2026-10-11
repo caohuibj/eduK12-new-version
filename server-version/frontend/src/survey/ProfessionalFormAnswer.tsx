@@ -12,7 +12,6 @@ export type ProfessionalQuestion={
 }
 const refused=(value:ProfessionalAnswer|undefined):value is {_surveyRefusal:true}=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
-const toNumber=(raw:string):number|null=>raw.trim()===''?null:Number(raw)
 const asNumbers=(answer:ProfessionalAnswer|undefined):Record<string,number>=>
   answer&&typeof answer==='object'&&!Array.isArray(answer)&&!refused(answer)
     ?answer as Record<string,number>:{}
@@ -73,6 +72,7 @@ export function ProfessionalFormAnswer({question:q,answers,onAnswer,prefix}:{
   if(q.type==='CONSTANT_SUM'){
     const numbers=asNumbers(current)
     const sum=q.options.reduce((n,o)=>n+(numbers[o.optionKey]??0),0)
+    const incomplete=q.options.filter(o=>!Object.prototype.hasOwnProperty.call(numbers,o.optionKey)).length
     return <div className="space-y-2">
       {q.options.map(o=><label className="flex flex-wrap items-center gap-2 text-sm" key={o.optionKey}>
         <span className="flex-1">{o.label}</span>
@@ -80,15 +80,15 @@ export function ProfessionalFormAnswer({question:q,answers,onAnswer,prefix}:{
           min="0" step={q.integerOnly?'1':'any'} disabled={refused(current)}
           value={Object.prototype.hasOwnProperty.call(numbers,o.optionKey)?numbers[o.optionKey]:''}
           onChange={e=>{
-            const value=toNumber(e.target.value)
-            const next=Object.fromEntries(q.options.map(option=>[
-              option.optionKey,option.optionKey===o.optionKey?(value??0):(numbers[option.optionKey]??0),
-            ])) as Record<string,number>
-            onAnswer(q.itemKey,next)
+            const next={...numbers}
+            if(e.target.value==='')delete next[o.optionKey]
+            else next[o.optionKey]=Number(e.target.value)
+            onAnswer(q.itemKey,Object.keys(next).length?next:null)
           }}/>
       </label>)}
-      <p className={Math.abs(sum-(q.total??0))<1e-7?'text-sm':'text-sm text-amber-800'}
-        role="status">当前合计 {sum} / 目标 {q.total??0}</p>
+      <p className={!incomplete&&Math.abs(sum-(q.total??0))<1e-7?'text-sm':'text-sm text-amber-800'}
+        role="status">当前合计 {sum} / 目标 {q.total??0}
+        {incomplete>0&&`；仍有 ${incomplete} 项未填写，留空不等于 0`}</p>
     </div>
   }
   if(q.type==='MATRIX_MULTIPLE')return <div className="space-y-3">
