@@ -12,6 +12,7 @@ import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { exportWide } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
 import { withdrawLinkedResearchData } from '../../modules/survey/identity.service'
@@ -434,5 +435,80 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })).rejects.toThrow()
     await db.user.update({where:{id:ownerId},data:{expiresAt:null}})
   })
+  it('serializes simultaneous Wave creation without upgrading two shared project locks',async()=>{
+    const requests=Array.from({length:3},(_,i)=>({
+      requestId:randomUUID(),title:'并行创建波次 '+i,
+      consentText:consent,instrumentIds:[toolIds.scale],linkageNoticeConfirmed:true,
+    }))
+    const result=await Promise.all(requests.map(body=>createWave(ownerId,projectId,body)))
+    expect(new Set(result.map(w=>w.id)).size).toBe(3)
+    const ordinals=result.map(w=>w.ordinal).sort((a,b)=>a-b)
+    expect(ordinals[1]).toBe(ordinals[0]+1)
+    expect(ordinals[2]).toBe(ordinals[1]+1)
+    expect(await db.surveyWave.count({where:{id:{in:result.map(w=>w.id)}}})).toBe(3)
+  })
+  it('serializes an in-flight FINAL behind a committed Wave HARD_STOP',async()=>{
+    const w=await wave('紧急终止与提交并发',[toolIds.scale],true)
+    const person=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:person.attemptId,
+      researchCode:person.researchCode,accessCredential:person.accessCredential,
+    })
+    let finalized:Promise<boolean>|undefined
+    await db.$transaction(async tx=>{
+      // A second connection holds the Wave write lock. FINAL must not read a
+      // pre-stop Wave while completing its separate Attempt transaction.
+      await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${w.id} FOR UPDATE`
+      finalized=submitResearchFinal({
+        publicId:w.publicId,attemptId:person.attemptId,
+        researchCode:person.researchCode,accessCredential:person.accessCredential,
+        submissionId:randomUUID(),
+        answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+      }).then(()=>true,()=>false)
+      await new Promise(resolve=>setTimeout(resolve,100))
+      const stopped=new Date()
+      await tx.surveyWave.update({where:{id:w.id},data:{
+        status:'CLOSED',hardStopAt:stopped,finishUntil:stopped,
+        revision:{increment:1},
+      }})
+    })
+    expect(finalized).toBeDefined()
+    expect(await finalized).toBe(false)
+    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(0)
+    expect((await db.surveyWaveAttempt.findUniqueOrThrow({
+      where:{id:person.attemptId},
+    })).status).toBe('STARTED')
+  })
+  it('derives raw and score Wide variables from a frozen Wave with zero FINALs',async()=>{
+    const w=await wave('冻结变量但没有完成答卷',[toolIds.scale],true)
+    const person=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const source=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+    })
+    expect(source.completeAttempts).toBe(0)
+    expect(source.raw).toHaveLength(0)
+    expect(source.scores).toHaveLength(0)
+    expect(source.codebook.map(x=>x.itemKey).sort()).toEqual(['itemone','itemtwo'])
+    expect(source.scoreColumns.map(x=>x.measurement.scoreKey).sort()).toEqual(['motivation','strategy'])
+    expect(source.attendance).toMatchObject([{
+      researchCode:person.researchCode,waveId:w.id,status:'STARTED',
+    }])
+    const raw=rawWideExport(projectId,source)
+    const score=exportWide(projectId,source.scores,source.attendance,source.scoreColumns)
+    for(const result of [raw,score]){
+      expect(result.manifest.rowCount).toBe(1)
+      expect(result.manifest.columnCount).toBe(5)
+      expect(result.csv).toContain(person.researchCode)
+      expect(result.csv).toContain('"ABANDONED"')
+      expect(result.csv).not.toContain('"NO_WAVE"')
+    }
+  })
+
 
 })
