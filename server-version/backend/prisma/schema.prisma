@@ -2897,7 +2897,7 @@ model SurveyAttemptCheckpoint {
   projectId    String            @map("project_id")
   waveId       String            @map("wave_id")
   attemptId    String            @unique @map("attempt_id")
-  attempt      SurveyWaveAttempt @relation(fields:[attemptId],references:[id],onDelete:Cascade)
+  attempt      SurveyWaveAttempt @relation(fields:[attemptId,projectId,waveId],references:[id,projectId,waveId],onDelete:Cascade)
   definitionDigest String        @map("definition_digest")
   contentCipher String          @map("content_cipher")
   contentHash  String            @map("content_hash")
