@@ -6,7 +6,7 @@ import { assessmentRuntimeRouter } from './modules/mobile/assessment.routes'
 import { mobileRouter } from './modules/mobile/routes'
 import { parentLinksRouter, parentsRouter, parentPublicationRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
-import { surveyOriginGuard } from './modules/survey/originGuard'
+import { surveyOriginGuard, platformSurveyOriginGuard } from './modules/survey/originGuard'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
@@ -271,7 +271,7 @@ const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 }
 app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
-app.use('/api/platform/survey', surveyFeatureGuard, surveyPlatformRouter)
+app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)
