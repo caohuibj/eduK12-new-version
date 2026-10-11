@@ -4,6 +4,7 @@ type Target={id:string;name:string;kind:string;status:string;subjectUserId:strin
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
 type Run={eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
+type TeacherScale={id:string;key:string;version:string;title:string;hash:string}
 type Progress={runId:string;total:number;counts:Record<string,number>}
 type GroupReport={independentRespondents:number;minimumRespondents:number;
   distributions:Array<{itemKey:string;prompt:string;status:'READY'|'WITHHELD';
@@ -24,6 +25,8 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   const [events,setEvents]=useState<Event[]>([])
   const [runMap,setRunMap]=useState<Record<string,Run>>({})
   const [releasedForms,setReleasedForms]=useState<Form[]>([])
+  const [releasedScales,setReleasedScales]=useState<Record<string,TeacherScale[]>>({})
+  const [scaleChoice,setScaleChoice]=useState<Record<string,string>>({})
   const [formChoice,setFormChoice]=useState<Record<string,string>>({})
   const [progress,setProgress]=useState<Record<string,Progress>>({})
   const [reports,setReports]=useState<Record<string,GroupReport>>({})
@@ -45,7 +48,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   }
   useEffect(()=>{
     let alive=true
-    setTargets([]);setEvents([]);setRunMap({});setReports({});setReleasedForms([]);setNotice('')
+    setTargets([]);setEvents([]);setRunMap({});setReports({});setReleasedForms([]);setReleasedScales({});setNotice('')
     void Promise.all([
       api<{list:Target[]}>(base+'/evaluation-targets'),
       api<{list:Event[]}>(base+'/evaluation-events'),
@@ -94,6 +97,33 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
     setRunMap(old=>({...old,[event.id]:run}))
     return run
   }
+  const reloadScales=(event:Event)=>perform(async()=>{
+    const licensed=await api<{list:TeacherScale[]}>(
+      base+'/evaluation-events/'+event.id+'/run/released-scales')
+    setReleasedScales(previous=>({...previous,[event.id]:licensed.list}))
+    setNotice('已获取本校经过独立审核、具有有效授权的教师个人 Scale。')
+  })
+  const attachScale=(event:Event)=>perform(async()=>{
+    const selected=(releasedScales[event.id]??[]).find(
+      scale=>scale.id===scaleChoice[event.id])
+    if(!selected)throw new Error('请选择拥有学校授权的正式教师自评 Scale')
+    const run=runMap[event.id]??await fetchRun(event)
+    if(run.status!=='DRAFT')throw new Error('只允许对草稿任务增配 Scale')
+    await api(base+'/evaluation-events/'+event.id+'/run/tracks','POST',{
+      resource:{family:'SCALE',key:selected.key,version:selected.version},
+      subjectSelector:{kind:'ALL_CURRENT'},
+      respondentSelector:{kind:'ALL_CURRENT'},
+      requestedPolicy:{
+        subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],
+        relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
+        analysisMode:'INDIVIDUAL_ONLY',
+        visibilityPolicyKey:'HUITEACHER_ADULT_SELF_PILOT_V1',
+        minimumRespondents:null,
+      },
+    })
+    await fetchRun(event)
+    setNotice('已加入经过独立审核的教师个人 Scale。每位教师的正式得分仅向本人披露。')
+  })
   const attachForm=(event:Event)=>perform(async()=>{
     const form=releasedForms.find(f=>f.id===formChoice[event.id])
     if(!form)throw new Error('请先选择已经发布的 Teacher Form')
@@ -219,6 +249,24 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
       {runMap[event.id]&&<div>
         <p>标准 Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status}</p>
         {runMap[event.id].status==='DRAFT'&&<>
+          <div className="ht-inline"><button disabled={working} onClick={()=>reloadScales(event)}>
+            查询本校授权的教师自评 Scale
+          </button></div>
+          {(releasedScales[event.id]?.length??0)>0&&<div className="ht-inline">
+            <label className="ht-field"><span>正式教师个人 Scale（仅本人报告）</span>
+              <select value={scaleChoice[event.id]??''}
+                onChange={e=>setScaleChoice(old=>({...old,[event.id]:e.target.value}))}>
+                <option value="">选择已获学校授权的教师自评资源</option>
+                {(releasedScales[event.id]??[]).map(item=>
+                  <option key={item.id} value={item.id}>{item.title}（{item.version}）</option>)}
+              </select>
+            </label>
+            <button disabled={working||!scaleChoice[event.id]} onClick={()=>attachScale(event)}>
+              加入教师自评 Scale Track
+            </button>
+          </div>}
+          <p className="ht-muted">Scale 必须是已发布、独立审核且得到本校授权的教师自评资源。
+            学校可以发布任务，但不能读取被试个人分数。</p>
           <label className="ht-field"><span>向当前教师发布的 Form（不计分）</span>
             <select value={formChoice[event.id]??''}
               onChange={e=>setFormChoice(old=>({...old,[event.id]:e.target.value}))}>
