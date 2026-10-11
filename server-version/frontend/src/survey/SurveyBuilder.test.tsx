@@ -85,6 +85,31 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(result.questions[0].options[0].contributions[dimension]).toBe(3)
     expect(result.questions[0].options[1].contributions[dimension]).toBe(0)
   })
+  it('distinguishes literal REFUSED text from structured refusal and supports matrix row refusal',()=>{
+    const draft:ResearchDraft={
+      id:'refusal-preview',projectId:'test',instrumentKey:'instrument',kind:'FORM',
+      title:'拒答契约',revision:0,status:'DRAFT',createdAt:'',updatedAt:'',
+      definition:{schemaVersion:1,pages:[{pageKey:'page',title:'作答',questions:[
+        {itemKey:'message',type:'SHORT_TEXT',prompt:'自由文本',required:false,
+          allowRefusal:true,options:[],rows:[]},
+        {itemKey:'matrix',type:'MATRIX',prompt:'多行评价',required:false,
+          allowRefusal:true,options:[{optionKey:'low',label:'低'},{optionKey:'high',label:'高'}],
+          rows:[{rowKey:'first',label:'课堂参与'}]},
+      ]}]},
+    }
+    render(<ResearchPreview draft={draft} onSimulate={()=>{throw new Error('Form 不应评分')}}/>)
+    const field=screen.getByLabelText('自由文本')
+    const refusal=screen.getByRole('checkbox',{name:/不愿回答/})
+    fireEvent.change(field,{target:{value:'REFUSED'}})
+    expect(field).toHaveValue('REFUSED')
+    expect(refusal).not.toBeChecked()
+    fireEvent.click(refusal)
+    expect(refusal).toBeChecked()
+    expect(field).toBeDisabled()
+    fireEvent.click(refusal)
+    expect(refusal).not.toBeChecked()
+    expect(screen.getByRole('radio',{name:'不愿回答：课堂参与'})).toBeInTheDocument()
+  })
   it('offers preview of a form without creating real responses',()=>{
     const draft:ResearchDraft={
       id:'test',projectId:'test',instrumentKey:'instrument',kind:'FORM',title:'预览',
