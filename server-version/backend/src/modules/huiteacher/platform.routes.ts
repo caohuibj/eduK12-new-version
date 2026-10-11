@@ -9,6 +9,7 @@ import { forbidden, error, success } from '../../utils/response'
 import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
 import type { EducationProduct } from '../organization/educationProductAccess'
 import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicense.service'
+import { changeTeacherPersonalGrant,TeacherPersonalGrantError } from './personalScaleGrant.service'
 import {
   EducationProductGovernanceError, setEducationProductEntitlement,
   readEducationProductEntitlements, grantEducationProductAdmin, revokeEducationProductAdmin,
@@ -64,6 +65,7 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
     if(e instanceof z.ZodError)return error(res,'请求格式不合法',-1,400)
     if(e instanceof EducationProductGovernanceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof TeacherScaleLicenseError)return error(res,'教师量表资源或学校授权条件不满足',-1,e.statusCode)
+    if(e instanceof TeacherPersonalGrantError)return error(res,'个人量表授权条件不满足',-1,e.statusCode)
     next(e)
   }
 }
@@ -104,6 +106,23 @@ router.put('/organizations/:organizationId/teacher-scale-licenses/:resourceId',
     await adminStepUp(req,data.currentPassword)
     return changeTeacherScaleLicense({
       organizationId,resourceId,actorUserId:req.user!.userId,action:data.action,
+    })
+  }))
+// An explicit independent educational-person license; no fake Organization.
+const personalGrantSchema=z.object({
+  action:z.enum(['GRANT','REVOKE']),
+  expectedRevision:z.number().int().min(0).optional(),
+  currentPassword:password,
+}).strict()
+router.put('/personal-scale-grants/:teacherUserId/:resourceId',
+  handle(async req=>{
+    const userId=uuid.parse(req.params.teacherUserId)
+    const resourceId=uuid.parse(req.params.resourceId)
+    const body=personalGrantSchema.parse(req.body)
+    await adminStepUp(req,body.currentPassword)
+    return changeTeacherPersonalGrant({
+      actorUserId:req.user!.userId,teacherUserId:userId,resourceId,
+      action:body.action,expectedRevision:body.expectedRevision,
     })
   }))
 export default router
