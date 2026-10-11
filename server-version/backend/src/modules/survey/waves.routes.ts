@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import * as service from './waves.service'
+import * as publish from './waves.publish'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use(authenticateSurvey)
@@ -10,6 +11,7 @@ const id=z.string().uuid()
 const wave=z.object({
   title:z.string().trim().min(1).max(160),
   consentText:z.string().max(20000),
+  generalText:z.string().max(4000).optional(),
   instrumentIds:z.array(id).max(30).refine(a=>new Set(a).size===a.length),
   opensAt:z.string().datetime().nullable().optional(),
   closesAt:z.string().datetime().nullable().optional(),
@@ -37,3 +39,18 @@ surveyWavesRouter.patch('/:pid/waves/:wid',handle(req=>
   service.updateWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),update.parse(req.body))))
 surveyWavesRouter.post('/:pid/waves/:wid/preflight',handle(req=>
   service.preflightWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid))))
+
+const revision=z.object({revision:z.number().int().nonnegative()}).strict()
+surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>
+  publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
+    revision.parse(req.body).revision)))
+surveyWavesRouter.post('/:pid/waves/:wid/open',handle(req=>
+  publish.openWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
+    revision.parse(req.body).revision)))
+for(const [endpoint,transition] of [
+  ['pause','PAUSE'],['resume','RESUME'],['close','CLOSE'],['hard-stop','HARD_STOP'],
+] as const){
+  surveyWavesRouter.post('/:pid/waves/:wid/'+endpoint,handle(req=>
+    publish.transitionWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
+      revision.parse(req.body).revision,transition)))
+}

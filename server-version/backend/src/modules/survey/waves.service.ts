@@ -63,7 +63,7 @@ export async function getWave(uid:string,pid:string,wid:string){
   })
 }
 type WaveInput={
-  requestId:string;title:string;consentText:string;instrumentIds:string[];
+  requestId:string;title:string;consentText:string;generalText?:string;instrumentIds:string[];
   opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
   quotaStarts?:number|null;allowNewParticipants?:boolean
 }
@@ -84,7 +84,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     if(next>100)fail(400,'首版单项目最多 100 个波次')
     const row=await tx.surveyWave.create({data:{
       id:input.requestId,projectId:pid,ordinal:next,title:input.title,
-      consentText:input.consentText,consentVersion:1,
+      consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
       instrumentIds:input.instrumentIds,
       status:'DRAFT',
       opensAt:input.opensAt?new Date(input.opensAt):null,
@@ -109,7 +109,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     await validateDraftRefs(tx,pid,input.instrumentIds)
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',revision:input.revision},
-      data:{title:input.title,consentText:input.consentText,instrumentIds:input.instrumentIds,
+      data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
         opensAt:input.opensAt?new Date(input.opensAt):null,
         closesAt:input.closesAt?new Date(input.closesAt):null,
         finishUntil:input.finishUntil?new Date(input.finishUntil):null,

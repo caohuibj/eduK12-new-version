@@ -71,7 +71,7 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
     }})
     const updated=await tx.surveyWave.updateMany({
       where:{id:waveId,projectId,status:'DRAFT',revision},
-      data:{status:'OPEN',opensAt:open,closesAt:close,finishUntil:wave.finishUntil||close,
+      data:{status:'OPEN',opensAt:open,closesAt:close,finishUntil:wave.finishUntil||new Date(close.getTime()+2*3600000),
         revision:{increment:1},updatedAt:now},
     })
     if(updated.count!==1)fail('波次开放发生并发冲突')
