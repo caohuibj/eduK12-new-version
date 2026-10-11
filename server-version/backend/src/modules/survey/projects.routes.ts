@@ -109,8 +109,10 @@ surveyProjectsRouter.post('/:id/archive',handler(async(req)=>{
     const project=await own(tx,uid,id)
     // Unpublished drafts can be archived/reopened. A completed research
     // project is terminal, but remains accessible to its authorized owner.
-    if(!['DRAFT','CLOSED'].includes(project.status)||project.revision!==input.revision)
-      throw new ProjectError(409,'只能归档未采集草稿或已经结束的研究')
+    if(!['DRAFT','CLOSED'].includes(project.status)||project.revision!==input.revision
+      ||(project.status==='DRAFT'&&project.firstPublishedAt!==null)
+      ||(project.status==='CLOSED'&&project.firstPublishedAt===null))
+      throw new ProjectError(409,'只能归档尚未冻结发布的草稿或正式结束的研究')
     const result=await tx.surveyProject.updateMany({
       where:{id,ownerUserId:uid,status:project.status,revision:input.revision},
       data:{status:'ARCHIVED',revision:{increment:1},updatedAt:new Date()},
