@@ -10,7 +10,7 @@ import type { ResearchFrozenPublication } from './publication.service'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
-const blocked=(message:string):never=>{throw new SurveyWaveError(403,message)}
+function blocked(message='研究准入或个人凭证无效'): never {throw new SurveyWaveError(403,message)}
 const enabled=()=>{
   if(process.env.SURVEY_WORKSPACE_ENABLED!=='true'||process.env.SURVEY_PUBLICATION_ENABLED!=='true')
     blocked('Survey 匿名研究尚未启用')

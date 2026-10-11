@@ -19,7 +19,7 @@ type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:stri
 type Answer=string|number|string[]|null
 const safePattern=/^[a-f0-9-]{36}$/i
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
-const publicApi=async<T>(path:string,method='GET',body?:unknown):Promise<T>=>{
+const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   const result=await fetch('/api/public/survey'+path,{method,credentials:'omit',
     cache:'no-store',headers:{'Content-Type':'application/json'},
     ...(body===undefined?{}:{body:JSON.stringify(body)})})

@@ -8,7 +8,7 @@ import { SurveyWaveError } from './waves.service'
 type Tx=Prisma.TransactionClient
 const token=()=>randomBytes(32).toString('base64url')
 const hash=(x:string)=>createHash('sha256').update(x).digest('hex')
-const fail=(message:string):never=>{throw new SurveyWaveError(409,message)}
+function fail(message:string): never {throw new SurveyWaveError(409,message)}
 const enabled=()=>{if(process.env.SURVEY_PUBLICATION_ENABLED!=='true')
   fail('研究专用公开发布仍未完成正式验收，暂不可使用')}
 async function lockOwner(tx:Tx,userId:string,projectId:string){

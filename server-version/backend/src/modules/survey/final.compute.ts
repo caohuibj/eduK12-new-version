@@ -2,6 +2,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { scoreScale } from '../scale/scale-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
+import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -11,7 +12,7 @@ import type { SituationalResponse } from '../situational/situation-scoring'
 export class SurveyFinalValidationError extends Error {
   constructor(readonly path:string,message:string){super(message)}
 }
-const invalid=(path:string,message:string):never=>{throw new SurveyFinalValidationError(path,message)}
+function invalid(path:string,message:string): never {throw new SurveyFinalValidationError(path,message)}
 export type AnswerPrimitive=string|number|string[]|Record<string,string>|null
 export type AnswerMap=Record<string,AnswerPrimitive>
 export interface MissingItem {itemKey:string;reason:'NOT_SHOWN'|'SHOWN_MISSING'|'REFUSED'}
@@ -151,13 +152,13 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
     const channels=definition.scenes.flatMap(scene=>scene.channels
       .filter(channel=>channel.channelKey===q.questionKey)
       .map(channel=>({scene,channel})))
-    if(!choice||channels.length!==1)invalid('answers.'+q.questionKey,'冻结 SJT 问题定义不明确')
+    if(choice===null||channels.length!==1)invalid('answers.'+q.questionKey,'冻结 SJT 问题定义不明确')
     responses.push({sceneKey:channels[0].scene.sceneKey,channelKey:q.questionKey,responseValue:choice})
     raw[q.questionKey]=choice
   }
   const journey=deriveAuthoritativeSituationalTrajectory(definition,responses)
   if(!journey.reachedTerminal)invalid('answers','未完成情境要求的所有合法步骤')
-  const scores=scoreSituationalModel(definition,responses)
+  const scores=scoreSituationalModel(asLinearSituationDefinition(definition),responses)
   if(scores.quality.status==='invalid')invalid('scoring','情境数据无法生成受控研究结果')
   return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:scores}

@@ -6,7 +6,7 @@ type Tx=Prisma.TransactionClient
 export class ResearchIdentityError extends Error {
   constructor(readonly statusCode:number,message:string){super(message)}
 }
-const fail=(message='研究身份或进入凭证无效'):never=>{
+function fail(message='研究身份或进入凭证无效'): never {
   throw new ResearchIdentityError(403,message)
 }
 const sha256=(text:string)=>createHash('sha256').update(text).digest('hex')

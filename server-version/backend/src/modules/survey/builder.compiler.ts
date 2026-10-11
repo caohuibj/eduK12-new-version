@@ -6,6 +6,7 @@ import { scoreScale } from '../scale/scale-scoring'
 import { compileSjtTemplate, SjtTemplateError } from '../situational/authoring/template'
 import type { SituationalResponse } from '../situational/situation-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
+import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
 import {
   assertSurveyDraft, validateSurveyDraft, SurveyDraftError,
   type SurveyKind, type ScaleDraft, type SjtDraft, type FormDraft,
@@ -23,6 +24,7 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
     label:dimension.label,
     direction:dimension.direction,
     canonical:i===0,
+    displayPrecision:2,
     source:{
       type:'items' as const,
       items:d.items.filter(q=>q.dimensionKeys.includes(dimension.dimensionKey))
@@ -133,7 +135,7 @@ export function previewResearchInstrument(input:{
   const validation=validateSurveyDraft(input.kind,input.definition,true)
   if(!validation.definition||validation.issues.some(x=>x.severity==='error'))
     return {ok:false,issues:validation.issues,score:null}
-  const hash=canonicalHash({kind:input.kind,definition:validation.definition})
+  const hash=canonicalHash(JSON.parse(JSON.stringify({kind:input.kind,definition:validation.definition})))
   try{
     if(input.kind==='FORM'){
       const data=validation.definition as FormDraft
@@ -157,7 +159,7 @@ export function previewResearchInstrument(input:{
           sceneKey:scene.sceneKey,channelKey:channel.channelKey,
           responseValue:answers[channel.channelKey],
         })))
-    const score=Object.keys(answers).length?scoreSituationalModel(compiled.package.definition,values):null
+    const score=Object.keys(answers).length?scoreSituationalModel(asLinearSituationDefinition(compiled.package.definition),values):null
     return {ok:true,issues:[],kind:'SJT',definitionDigest:hash,
       scoringDigest:canonicalHash(compiled.package.definition.scoring),
       compilerDigest:compiled.contentDigest,

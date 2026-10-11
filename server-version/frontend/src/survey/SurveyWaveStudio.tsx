@@ -12,7 +12,7 @@ type Wave={
 }
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
-const surveyApi=async<T>(path:string,method='GET',body?:unknown):Promise<T>=>{
+const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   let token=''
   const cookies=document.cookie.split('; ')
   const csrfCookie=cookies.find(x=>x.startsWith('huisurvey_research_csrf='))

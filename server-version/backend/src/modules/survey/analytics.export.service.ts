@@ -14,7 +14,7 @@ import type { SurveyRawExport } from './analytics.raw-export'
 
 type Format='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 export type SurveyExportArtifact={csv:string;codebook:unknown;manifest:unknown}
-const fail=(status:number,message:string):never=>{throw new SurveyAnalyticsError(status,message)}
+function fail(status:number,message:string): never {throw new SurveyAnalyticsError(status,message)}
 const nowSeconds=()=>Math.floor(Date.now()/1000)
 /** A real signed Survey MFA session, not an X-header or the old Teacher role. */
 export function assertRecentSurveyMfa(req:Request):void{

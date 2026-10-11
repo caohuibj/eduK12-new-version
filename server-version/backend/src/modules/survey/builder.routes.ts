@@ -16,7 +16,7 @@ const create=z.object({
 const update=z.object({
   revision:z.number().int().nonnegative(),
   title:z.string().trim().min(1).max(200),
-  definition:z.unknown(),
+  definition:z.custom<Record<string,unknown>>(v=>v!==null&&typeof v==='object'&&!Array.isArray(v)),
 }).strict()
 const copy=z.object({
   requestId:id,instrumentKey:surveyKeySchema,

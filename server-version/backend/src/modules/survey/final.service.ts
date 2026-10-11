@@ -13,8 +13,8 @@ import type { ResearchFrozenPublication } from './publication.service'
 export class SurveyFinalError extends Error {
   constructor(readonly statusCode:number,message:string){super(message)}
 }
-const blocked=(message:string):never=>{throw new SurveyFinalError(403,message)}
-const invalid=(message:string):never=>{throw new SurveyFinalError(409,message)}
+function blocked(message:string): never {throw new SurveyFinalError(403,message)}
+function invalid(message:string): never {throw new SurveyFinalError(409,message)}
 const proofShape=/^[A-Za-z0-9_-]{43}$/
 export interface FinalInput {
   publicId:string
