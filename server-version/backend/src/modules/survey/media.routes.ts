@@ -1,0 +1,143 @@
+import { Prisma } from '@prisma/client'
+import type { Request,Response,NextFunction } from 'express'
+import { prisma } from '../../config/database'
+import {
+  boundedUpload,uploadPrincipalRateLimit,
+} from '../../middleware/uploadAdmission'
+import { authenticateSurvey } from '../../middleware/auth'
+import { storeAsset } from '../../services/assetStorage'
+import { serveAssessmentImageContent } from '../assessment-media/assessment-image-delivery'
+import { retainAssessmentAssetReferences } from '../assessment-media/assessment-asset'
+import { ASSESSMENT_STATIC_IMAGE_MIME_TYPES } from '../assessment-media/assessment-image'
+import type { SurveyDraft,SurveyKind } from './builder.definition'
+import type { FormDraft,SjtDraft } from './builder.definition'
+import { Router } from 'express'
+import { success,error } from '../../utils/response'
+import { z } from 'zod'
+
+type Tx=Prisma.TransactionClient
+const limit=2*1024*1024
+const types=[...ASSESSMENT_STATIC_IMAGE_MIME_TYPES]
+export class SurveyMediaError extends Error{
+  constructor(readonly statusCode:number,message:string){super(message)}
+}
+const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
+type ImageIdentity={asset:{assetId:string;contentHash:string;mimeType:string};altText:string;caption?:string}
+type UnitDef={kind:SurveyKind;definition:unknown}
+export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.flatMap(({kind,definition})=>{
+  if(kind==='FORM'){
+    const d=definition as FormDraft
+    return (d.pages||[]).flatMap(p=>(p.questions||[]).map(q=>q.image).filter(Boolean)) as ImageIdentity[]
+  }
+  if(kind==='SJT'){
+    const d=definition as SjtDraft
+    return d.image?[d.image as ImageIdentity]:[]
+  }
+  return []
+})
+
+export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:string,units:readonly UnitDef[]){
+  const refs=surveyImageRefs(units)
+  const ids=[...new Set(refs.map(r=>r.asset.assetId))]
+  if(!ids.length)return []
+  if(ids.length>30)fail(400,'单次研究发布最多引用 30 个静态图片')
+  const assets=await tx.storedAsset.findMany({where:{id:{in:ids},ownerId:userId,scopeId:projectId,
+    accessScope:'PRIVATE',deletedAt:null},select:{
+    id:true,mimeType:true,sha256:true,sizeBytes:true,
+  }})
+  const byId=new Map(assets.map(a=>[a.id,a]))
+  for(const image of refs){
+    if(!image.altText?.trim())fail(400,'研究图片必须提供可阅读替代文字')
+    const a=byId.get(image.asset.assetId)
+    if(!a||a.sizeBytes<=0||a.sizeBytes>limit
+      ||a.sha256!==image.asset.contentHash||a.mimeType!==image.asset.mimeType
+      ||!types.includes(a.mimeType as (typeof types)[number]))
+      fail(403,'研究图片缺少本项目授权或与上传时的文件摘要不一致')
+  }
+  return refs.map(r=>r.asset)
+}
+export async function retainSurveyMedia(tx:Tx,userId:string,projectId:string,publicationId:string,
+  units:readonly UnitDef[]){
+  const refs=await assertSurveyMediaOwned(tx,userId,projectId,units)
+  if(!refs.length)return
+  await retainAssessmentAssetReferences({
+    owner:{entityType:'SurveyResearchPublication',entityId:publicationId,field:'media'},
+    references:refs,db:tx,
+  })
+}
+
+const id=z.string().uuid()
+const router=Router()
+router.use(authenticateSurvey)
+const handle=(fn:(req:Request,res:Response)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
+  try{const result=await fn(req,res);if(!res.headersSent)success(res,result)}
+  catch(e){
+    if(e instanceof SurveyMediaError)error(res,e.message,-1,e.statusCode)
+    else if(e instanceof z.ZodError)error(res,'素材参数不合法',-1,400)
+    else next(e)
+  }
+}
+async function owner(tx:Tx,userId:string,projectId:string){
+  const rows=await tx.$queryRaw<Array<{id:string}>>`
+    SELECT p.id FROM survey_projects p
+      JOIN users u ON u.id=p.owner_user_id
+      JOIN survey_researcher_grants g ON g.user_id=u.id
+      JOIN survey_mfa_credentials m ON m.user_id=u.id
+    WHERE p.id=${projectId} AND p.owner_user_id=${userId}
+      AND p.status IN ('DRAFT','ACTIVE')
+      AND u.account_domain='SURVEY' AND u.is_active=TRUE AND NOT u.is_frozen
+      AND g.status='ACTIVE' AND m.enabled=TRUE
+    FOR SHARE OF p,u,g,m
+  `
+  if(!rows.length)fail(404,'研究素材库不可访问')
+}
+router.get('/:pid/assets',handle(async req=>{
+  const pid=id.parse(req.params.pid),uid=req.user!.userId
+  return prisma.$transaction(async tx=>{
+    await owner(tx,uid,pid)
+    const rows=await tx.storedAsset.findMany({where:{
+      ownerId:uid,scopeId:pid,accessScope:'PRIVATE',mimeType:{in:types},
+      deletedAt:null,sizeBytes:{lte:limit},
+    },orderBy:[{createdAt:'desc'},{id:'desc'}],take:40,
+    select:{id:true,sha256:true,mimeType:true,originalName:true,sizeBytes:true}})
+    return {assets:rows.map(r=>({assetId:r.id,contentHash:r.sha256,
+      mimeType:r.mimeType,originalName:r.originalName,sizeBytes:r.sizeBytes}))}
+  })
+}))
+router.post('/:pid/assets',uploadPrincipalRateLimit,
+  boundedUpload('image',limit,types,async(req,res)=>{
+    const projectId=id.parse(req.params.pid),userId=req.user!.userId
+    await prisma.$transaction(tx=>owner(tx,userId,projectId))
+    const file=req.file
+    if(!file||!file.buffer.length)return error(res,'请选择 PNG/JPEG/WebP 图片',-1,400)
+    const stored=await storeAsset({
+      buffer:file.buffer,originalName:file.originalname,
+      mimeType:(file as typeof file & {detectedMimeType:string}).detectedMimeType,
+      ownerId:userId,accessScope:'PRIVATE',scopeId:projectId,
+      initialReference:{entityType:'SurveyProject',entityId:projectId,field:'image-library'},
+    })
+    return success(res,{assetId:stored.id,contentHash:stored.sha256,
+      mimeType:stored.mimeType,originalName:stored.originalName,sizeBytes:stored.sizeBytes})
+  }))
+router.get('/:pid/assets/:assetId/preview',async(req,res,next)=>{
+  try{
+    const projectId=id.parse(req.params.pid),userId=req.user!.userId
+    const asset=await prisma.$transaction(async tx=>{
+      await owner(tx,userId,projectId)
+      const item=await tx.storedAsset.findFirst({where:{id:id.parse(req.params.assetId),
+        ownerId:userId,scopeId:projectId,accessScope:'PRIVATE',deletedAt:null,sizeBytes:{lte:limit}},
+        select:{id:true,sha256:true,mimeType:true}})
+      if(!item||!types.includes(item.mimeType as (typeof types)[number]))fail(404,'研究图片不可用')
+      return item!
+    })
+    res.setHeader('Cache-Control','no-store')
+    res.setHeader('Referrer-Policy','no-referrer')
+    return await serveAssessmentImageContent({reference:{
+      assetId:asset.id,contentHash:asset.sha256,mimeType:asset.mimeType as (typeof types)[number],
+    },res})
+  }catch(e){
+    if(e instanceof SurveyMediaError)return error(res,e.message,-1,e.statusCode)
+    next(e)
+  }
+})
+export const surveyMediaRouter=router
