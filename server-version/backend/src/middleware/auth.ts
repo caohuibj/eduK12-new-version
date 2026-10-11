@@ -3,7 +3,7 @@ import { verifyToken } from '../utils/jwt'
 import { AuthenticatedPrincipal, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
-import { getSessionToken, getSchoolSessionToken } from '../utils/authCookies'
+import { getSessionToken, getSchoolSessionToken, getSurveySessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
@@ -21,9 +21,9 @@ const loadPrincipal = async (userId: string) => {
   return measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId))
 }
 
-const authenticateProduct = async (req: Request, res: Response, next: NextFunction, school: boolean) => {
+const authenticateProduct = async (req: Request, res: Response, next: NextFunction, product: 'LEGACY' | 'SCHOOL' | 'SURVEY') => {
   try {
-    const token = school ? getSchoolSessionToken(req) : getSessionToken(req)
+    const token = product === 'SCHOOL' ? getSchoolSessionToken(req) : product === 'SURVEY' ? getSurveySessionToken(req) : getSessionToken(req)
     if (!token) {
       return unauthorized(res, '缺少认证令牌')
     }
@@ -46,16 +46,30 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
 
     // A domain mismatch cannot be fixed by a client-supplied hostname or
     // JWT role. Historical JWTs without an audience remain legacy-only.
-    if (school
+    if (product === 'SCHOOL'
       ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL'
-      : principal!.accountDomain === 'SCHOOL' || payload.accountDomain === 'SCHOOL') {
+      : product === 'SURVEY'
+        ? principal!.accountDomain !== 'SURVEY' || payload.accountDomain !== 'SURVEY'
+        : !['LEGACY', 'TRAINING'].includes(principal!.accountDomain)
+          || (payload.accountDomain !== undefined && !['LEGACY', 'TRAINING'].includes(payload.accountDomain))) {
       return unauthorized(res, '账号不属于当前产品')
     }
 
     // Role elevation invalidates password-only SCHOOL sessions immediately.
-    if (school && await schoolAccountNeedsMfa(principal!.userId)
+    if (product === 'SCHOOL' && await schoolAccountNeedsMfa(principal!.userId)
       && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
       return unauthorized(res, '需要完成双因素认证')
+    }
+
+    if (product === 'SURVEY') {
+      const now = Math.floor(Date.now() / 1000)
+      if (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > now || now - payload.mfaVerifiedAt > 7 * 86400) {
+        return unauthorized(res, '请完成 Survey 双因素认证')
+      }
+      const surveyGrant = await import('../modules/survey/authority')
+      if (!await surveyGrant.isActiveResearcher(principal!.userId)) {
+        return forbidden(res, '研究者资格不可用')
+      }
     }
 
     // JWT proves possession of a session credential. Current database state is
@@ -70,6 +84,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/auth/logout',
       '/api/auth/csrf',
       '/api/campus/auth/change-password',
+      '/api/survey/auth/change-password',
     ])
     if (
       principal!.mustChangePassword &&
@@ -83,8 +98,9 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, false)
-export const authenticateSchool = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, true)
+export const authenticate = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'LEGACY')
+export const authenticateSurvey = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'SURVEY')
+export const authenticateSchool = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'SCHOOL')
 
 // 可选认证中间件 - 有有效且未停用的 token 才挂上当前数据库 principal；公开入口不因冻结账号 401。
 export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
@@ -95,7 +111,7 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
 
       if (payload) {
         const principal = await loadPrincipal(payload.userId)
-        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && principal!.accountDomain !== 'SCHOOL' && payload.accountDomain !== 'SCHOOL') {
+        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))) {
           req.user = toRequestPrincipal(principal!)
         }
       }

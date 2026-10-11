@@ -94,7 +94,7 @@ export async function forceResetPasswordBySystemAdmin(input: {
       SELECT "id", "username"
       FROM "users"
       WHERE "id" = ${input.targetUserId}
-        AND "account_domain" <> 'SCHOOL'
+        AND "account_domain" IN ('LEGACY','TRAINING')
       FOR UPDATE
     `
     const target = targets[0]

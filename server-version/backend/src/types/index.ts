@@ -3,7 +3,7 @@ import { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, Submissi
 export { UserRole, CourseStatus, CourseStudentStatus, AssignmentStatus, SubmissionStatus }
 
 export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
-export type AccountDomain = 'LEGACY' | 'TRAINING' | 'SCHOOL'
+export type AccountDomain = 'LEGACY' | 'TRAINING' | 'SCHOOL' | 'SURVEY'
 
 // JWT is a credential, not an authority snapshot. Legacy role remains in the
 // token for compatibility, but protected authorization must use the current
