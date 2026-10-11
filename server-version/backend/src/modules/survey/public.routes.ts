@@ -10,6 +10,9 @@ import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
 import { resolveSurveyPublicId } from './public-project'
 import * as admission from './admission.service'
+import { surveyImageRefs } from './media.routes'
+import { serveAssessmentImageContent,AssessmentImageDeliveryError } from '../assessment-media/assessment-image-delivery'
+import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/assessment-image'
 
 export const publicSurveyRouter=Router()
 publicSurveyRouter.use((_req,res,next)=>{
@@ -77,3 +80,35 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/withdraw-data',handle(
     attemptId:id.parse(req.params.attemptId),accessCredential:params.accessCredential,
   })
 }))
+
+/** POST because participant recovery credentials must never appear in URL,
+ * query parameters or referer; response bytes are never publicly cacheable.
+ */
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
+  async(req,res,next)=>{
+    try{
+      const params=proof.parse(req.body)
+      const own=await admission.verifiedSurveyAttempt({
+        publicId:id.parse(req.params.publicId),
+        attemptId:id.parse(req.params.attemptId),
+        ...params,
+      })
+      if(!['STARTED','COMPLETED'].includes(own.status))return res.status(404).end()
+      const assetId=id.parse(req.params.assetId)
+      const refs=surveyImageRefs(own.compiledSnapshot.units.map(u=>({
+        kind:u.kind,definition:u.displayDefinition,
+      })))
+      const frozen=refs.find(x=>x.asset.assetId===assetId)
+      if(!frozen)return res.status(404).end()
+      res.setHeader('Cache-Control','private, no-store, max-age=0')
+      res.setHeader('X-Content-Type-Options','nosniff')
+      return await serveAssessmentImageContent({
+        reference:frozen.asset as AssessmentStaticImageAssetIdentityV1,res,
+      })
+    }catch(e){
+      if(e instanceof z.ZodError||e instanceof SurveyWaveError
+        ||e instanceof ResearchIdentityError||e instanceof AssessmentImageDeliveryError)
+        return res.status(404).end()
+      next(e)
+    }
+  })
