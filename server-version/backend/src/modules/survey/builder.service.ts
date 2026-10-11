@@ -4,6 +4,7 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { previewResearchInstrument, type PreviewAnswers } from './builder.compiler'
 import { previewBulk, applyBulk, type BulkInput } from './builder.import'
+import { dryRunSurveyForm, SurveyFinalValidationError } from './final.compute'
 
 import {
   surveyKindSchema, surveyKeySchema, assertSurveyDraft, initialSurveyDefinition,
@@ -167,6 +168,22 @@ export async function simulateSurveyDraft(userId:string,projectId:string,id:stri
       kind:surveyKindSchema.parse(row.kind),instrumentKey:row.instrumentKey,
       title:row.title,definition:row.definition,answers,
     })}
+  })
+}
+/** Researcher-only authoritative Form answer validation against the saved draft. */
+export async function dryRunFormDraft(userId:string,projectId:string,id:string,answers:unknown){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,false)
+    const row=await findDraft(tx,projectId,id)
+    if(row.kind!=='FORM')fail(400,'此入口只用于 Form 草稿')
+    try{
+      const result=dryRunSurveyForm(row.definition,answers)
+      return {id,revision:row.revision,ok:true,issues:[],...result}
+    }catch(e){
+      if(e instanceof SurveyFinalValidationError)
+        return {id,revision:row.revision,ok:false,issues:[{path:e.path,message:e.message,severity:'error' as const}],rawAnswers:{},missing:[]}
+      throw e
+    }
   })
 }
 export async function previewSurveyImport(userId:string,projectId:string,id:string,input:BulkInput){

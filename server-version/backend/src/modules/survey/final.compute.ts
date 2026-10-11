@@ -40,6 +40,8 @@ const safeObject=(value:unknown,path:string):AnswerMap=>{
   if(!value||typeof value!=='object'||Array.isArray(value))invalid(path,'回答必须是题目到值的对象')
   const o=value as Record<string,unknown>
   if(Object.keys(o).length>500)invalid(path,'本轮提交的题目数量超限')
+  if(Buffer.byteLength(JSON.stringify(o),'utf8')>512000)
+    invalid(path,'单份工具提交不能超过 500 KB，请缩短答案')
   return o as AnswerMap
 }
 const optionValue=(value:unknown,choices:string[],path:string,required:boolean):string|null=>{
@@ -124,6 +126,19 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
         if(typeof value!=='number'||!Number.isFinite(value)
           ||(q.min!==undefined&&value<q.min)||(q.max!==undefined&&value>q.max))
           invalid(path,'数值超出允许范围或格式错误')
+        if(q.integerOnly&&!Number.isSafeInteger(value))
+          invalid(path,'请填写有效整数')
+        if(q.precision!==undefined){
+          const factor=10**q.precision
+          if(Math.abs(Math.round(value*factor)-value*factor)>1e-7)
+            invalid(path,`此题最多允许 ${q.precision} 位小数`)
+        }
+        if(q.step!==undefined){
+          // The HTML number input anchors step to min when it is configured.
+          const steps=(value-(q.min??0))/q.step
+          if(!Number.isFinite(steps)||Math.abs(steps-Math.round(steps))>1e-7)
+            invalid(path,`数值必须以 ${q.step} 为步长`)
+        }
         normalized[q.itemKey]=value
       }
     }else{
@@ -142,6 +157,14 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   }
   return {instrumentKey:unit.instrumentKey,kind:'FORM',sourceDigest:unit.sourceDigest,
     scoringDigest:null,rawAnswers:normalized,missing,privateScoring:null}
+}
+/** No Attempt, participant, FINAL or quota writes. Shares the exact frozen Form validator. */
+export function dryRunSurveyForm(definition:unknown,answers:unknown){
+  const normalized=assertSurveyDraft('FORM',definition,true) as FormDraft
+  const unit={kind:'FORM',instrumentKey:'preview',sourceDigest:'dry-run',
+    displayDefinition:normalized} as ResearchFrozenUnit
+  const result=formResult(unit,safeObject(answers,'answers'))
+  return {rawAnswers:result.rawAnswers,missing:result.missing}
 }
 const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   const display=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft

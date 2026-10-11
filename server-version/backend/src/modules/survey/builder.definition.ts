@@ -23,6 +23,10 @@ export const surveyImageSchema=z.object({
 const condition = z.object({
   itemKey:key, operator:z.enum(['EQUALS','INCLUDES']), optionKey:key,
 }).strict()
+export const SURVEY_FORM_MAX_ANSWER_FIELDS=500
+/** Count wire-level keys; each MATRIX row is one key before FINAL normalization. */
+export const formAnswerFieldCount=(form:FormDraft)=>form.pages.reduce((sum,page)=>
+  sum+page.questions.reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0),0)
 export const formQuestionSchema=z.object({
   itemKey:key,
   type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX']),
@@ -33,6 +37,9 @@ export const formQuestionSchema=z.object({
   options:z.array(option).max(30).default([]),
   rows:z.array(z.object({rowKey:key,label}).strict()).max(40).default([]),
   min:z.number().finite().optional(),max:z.number().finite().optional(),
+  integerOnly:z.boolean().optional(),
+  step:z.number().finite().positive().max(1000000000).optional(),
+  precision:z.number().int().min(0).max(8).optional(),
   maxLength:z.number().int().min(1).max(10000).optional(),
   displayIf:condition.optional(),
 }).strict()
@@ -135,6 +142,10 @@ export const validateSurveyDraft=(
     const d=definition as FormDraft
     const items=d.pages.flatMap(p=>p.questions)
     if(items.length>300)err(issues,'pages','单份 Form 最多包含 300 道题目')
+    // A legacy immutable publication may predate this authoring budget.
+    // Runtime still checks its actual submitted key count independently.
+    if(!allowLegacyFrozenConditionOperators&&formAnswerFieldCount(d)>SURVEY_FORM_MAX_ANSWER_FIELDS)
+      err(issues,'pages',`问卷最多允许 ${SURVEY_FORM_MAX_ANSWER_FIELDS} 个作答字段；矩阵每行占一个字段。请删减矩阵行后再保存或发布`)
     unique(d.pages.map(p=>p.pageKey),'pages',issues)
     unique(items.map(q=>q.itemKey),'items',issues)
     if(forPreview&&!items.length)err(issues,'pages','至少添加一道题目')
@@ -158,8 +169,17 @@ export const validateSurveyDraft=(
         }else if(q.rows.length)err(issues,path+'.rows','只有矩阵题包含行编码')
         if(q.min!==undefined&&q.max!==undefined&&q.min>q.max)
           err(issues,path,'最小数值不能大于最大数值')
-        if(q.type!=='NUMBER'&&(q.min!==undefined||q.max!==undefined))
-          err(issues,path,'数值范围仅可用于数值题')
+        if(q.type!=='NUMBER'&&(q.min!==undefined||q.max!==undefined||
+          q.integerOnly!==undefined||q.step!==undefined||q.precision!==undefined))
+          err(issues,path,'数值约束仅可用于数值题')
+        if(q.type==='NUMBER'){
+          if(q.integerOnly&&q.precision!==undefined&&q.precision!==0)
+            err(issues,path+'.precision','整数题精度必须为 0')
+          if(q.integerOnly&&q.step!==undefined&&!Number.isSafeInteger(q.step))
+            err(issues,path+'.step','整数题步长必须是正整数')
+          if(q.integerOnly&&[q.min,q.max].some(v=>v!==undefined&&!Number.isSafeInteger(v)))
+            err(issues,path,'整数题的上下界必须为安全整数')
+        }
         if(q.displayIf){
           const previous=previously.get(q.displayIf.itemKey)
           if(!previous||!['SINGLE','MULTIPLE','LIKERT'].includes(previous.type))

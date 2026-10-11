@@ -61,6 +61,10 @@ surveyBuilderRouter.post('/:pid/instruments/:iid/preview',handle(req=>{
   if(Object.keys(data.answers).length>240)throw new BulkImportError([{line:1,message:'预览作答超过题目数量上限'}])
   return service.simulateSurveyDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),data.answers)
 }))
+const formDryRun=z.object({answers:z.record(z.unknown())}).strict()
+surveyBuilderRouter.post('/:pid/instruments/:iid/form-dry-run',handle(req=>
+  service.dryRunFormDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),
+    formDryRun.parse(req.body).answers)))
 surveyBuilderRouter.post('/:pid/instruments/:iid/bulk-import/preview',handle(req=>
   service.previewSurveyImport(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),bulkInputSchema.parse(req.body))))
 const applyInput=z.object({
