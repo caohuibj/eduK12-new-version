@@ -31,7 +31,7 @@ export interface SurveySourceProjection {
   sourceRevision:number
   cutOff:string
   /** Only set on explicitly paged reads; no silent truncation on legacy reads. */
-  nextFinalCursor:{id:string;completedAt:string}|null
+  nextFinalCursor?:{id:string;completedAt:string}|null
   scores:FrozenScoreObservation[]
   /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
