@@ -4,6 +4,7 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import { SurveyDraftError, surveyKindSchema, surveyKeySchema } from './builder.definition'
 import * as service from './builder.service'
+import { bulkInputSchema, BulkImportError } from './builder.import'
 
 export const surveyBuilderRouter=Router()
 surveyBuilderRouter.use(authenticateSurvey)
@@ -28,6 +29,8 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     if(e instanceof z.ZodError)return error(res,'输入不符合研究工具结构规范',-1,400)
     if(e instanceof SurveyDraftError)return res.status(400).json({code:'SURVEY_DRAFT_INVALID',
       message:'研究工具包含待修正字段',data:{issues:e.issues}})
+    if(e instanceof BulkImportError)return res.status(400).json({code:'SURVEY_IMPORT_INVALID',
+      message:'批量导入包含错误',data:{issues:e.issues}})
     if(e instanceof service.SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
@@ -46,3 +49,20 @@ surveyBuilderRouter.post('/:pid/instruments/:iid/archive',handle(req=>
   service.archiveDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),archive.parse(req.body).revision)))
 surveyBuilderRouter.post('/:pid/instruments/:iid/validate',handle(req=>
   service.validateDraftForPreview(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid))))
+
+const simulation=z.object({
+  answers:z.record(z.union([z.string().max(2000),z.number().finite()])),
+}).strict()
+surveyBuilderRouter.post('/:pid/instruments/:iid/preview',handle(req=>{
+  const data=simulation.parse(req.body)
+  if(Object.keys(data.answers).length>240)throw new BulkImportError([{line:1,message:'预览作答超过题目数量上限'}])
+  return service.simulateSurveyDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),data.answers)
+}))
+surveyBuilderRouter.post('/:pid/instruments/:iid/bulk-import/preview',handle(req=>
+  service.previewSurveyImport(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),bulkInputSchema.parse(req.body))))
+const applyInput=z.object({
+  revision:z.number().int().nonnegative(),digest:z.string().regex(/^[a-f0-9]{64}$/),
+  batch:bulkInputSchema,
+}).strict()
+surveyBuilderRouter.post('/:pid/instruments/:iid/bulk-import/apply',handle(req=>
+  service.applySurveyImport(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),applyInput.parse(req.body))))

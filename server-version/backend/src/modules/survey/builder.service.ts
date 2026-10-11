@@ -2,9 +2,12 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { previewResearchInstrument, type PreviewAnswers } from './builder.compiler'
+import { previewBulk, applyBulk, type BulkInput } from './builder.import'
+
 import {
   surveyKindSchema, surveyKeySchema, assertSurveyDraft, initialSurveyDefinition,
-  validateSurveyDraft, type SurveyKind, type SurveyDraft,
+  type SurveyKind, type SurveyDraft,
 } from './builder.definition'
 
 type Tx=Prisma.TransactionClient
@@ -147,8 +150,49 @@ export async function validateDraftForPreview(userId:string,projectId:string,id:
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
     const kind=surveyKindSchema.parse(row.kind)
-    const result=validateSurveyDraft(kind,row.definition,true)
-    return {id,kind,revision:row.revision,ok:result.issues.every(i=>i.severity!=='error'),
-      issues:result.issues,digest:result.digest,definition:result.definition}
+    const result=previewResearchInstrument({
+      kind,instrumentKey:row.instrumentKey,title:row.title,definition:row.definition,
+    })
+    return {id,kind,revision:row.revision,...result}
+  })
+}
+
+/** Researcher-only simulated scoring: produces no SurveyParticipant or FINAL rows. */
+export async function simulateSurveyDraft(userId:string,projectId:string,id:string,answers:PreviewAnswers) {
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,false)
+    const row=await findDraft(tx,projectId,id)
+    return {id,revision:row.revision,...previewResearchInstrument({
+      kind:surveyKindSchema.parse(row.kind),instrumentKey:row.instrumentKey,
+      title:row.title,definition:row.definition,answers,
+    })}
+  })
+}
+export async function previewSurveyImport(userId:string,projectId:string,id:string,input:BulkInput){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,false)
+    const row=await findDraft(tx,projectId,id)
+    if(row.status!=='DRAFT'||row.kind==='SJT')fail(409,'只有 Form/Scale 草稿支持此批量导入')
+    return {revision:row.revision,...previewBulk(input,row.kind as 'FORM'|'SCALE')}
+  })
+}
+export async function applySurveyImport(userId:string,projectId:string,id:string,input:{
+  revision:number;digest:string;batch:BulkInput
+}){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,true)
+    const row=await findDraft(tx,projectId,id)
+    if(row.kind==='SJT'||row.status!=='DRAFT'||row.revision!==input.revision)
+      fail(409,'导入前草稿已变化，请重新预览')
+    const definition=applyBulk(row.kind as 'FORM'|'SCALE',row.definition,input.batch,input.digest)
+    const changed=await tx.surveyInstrumentDraft.updateMany({
+      where:{id,projectId,status:'DRAFT',revision:input.revision},
+      data:{definition:persistable(definition),revision:{increment:1},updatedAt:new Date()},
+    })
+    if(changed.count!==1)fail(409,'导入过程中草稿已被其他会话修改')
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,
+      action:'INSTRUMENT_BULK_IMPORTED',
+      metadata:{instrumentId:id,revision:input.revision+1,batchDigest:input.digest}}})
+    return publicRow(await findDraft(tx,projectId,id))
   })
 }
