@@ -67,6 +67,10 @@ export async function submitResearchFinal(input:FinalInput){
       invalid('提交时研究冻结版本已经发生变化')
     if(attempt.participantId){
       if(!input.researchCode)blocked('需再次提供本人研究编号与私密凭证')
+      // Serialize this committed FINAL decision against REVOKE_ACCESS and
+      // WITHDRAW_DATA. A cached pre-transaction credential check is insufficient.
+      await tx.$queryRaw`SELECT id FROM survey_participants
+        WHERE id=${attempt.participantId} AND project_id=${known.projectId} FOR SHARE`
       const person=await tx.surveyParticipant.findFirst({where:{
         id:attempt.participantId,projectId:known.projectId,
         researchCode:input.researchCode,status:'ACTIVE',
