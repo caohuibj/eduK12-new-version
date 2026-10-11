@@ -30,6 +30,8 @@ export async function getOwnResearchTask(input:{
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
             min:q.min,max:q.max,integerOnly:q.integerOnly,step:q.step,precision:q.precision,
+            total:q.total,minSelections:q.minSelections,maxSelections:q.maxSelections,
+            timeZone:q.timeZone,textValidation:q.textValidation,
             maxLength:q.maxLength,displayIf:q.displayIf,
           }))}))}
     }

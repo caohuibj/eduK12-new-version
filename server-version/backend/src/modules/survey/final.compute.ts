@@ -202,11 +202,11 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       }else{
         if(typeof value!=='string')invalid(path,'日期/时间回答必须是 ISO 格式字符串')
         if(q.type==='DATE'){
-          if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)||value.startsWith('0000-')||
+          if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||value.startsWith('0000-')||
             Number.isNaN(Date.parse(value+'T00:00:00.000Z'))||
             !new Date(value+'T00:00:00.000Z').toISOString().startsWith(value+'T'))
             invalid(path,'日期必须是有效的 YYYY-MM-DD')
-        }else if(!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value))
+        }else if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(value))
           invalid(path,'时间必须是 24 小时 HH:mm 格式')
         normalized[q.itemKey]=value
       }
@@ -217,9 +217,9 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       }else{
         if(typeof value!=='string'||value.length>(q.maxLength??(q.type==='SHORT_TEXT'?300:10000)))
           invalid(path,'文本回答格式或长度不合法')
-        if(q.textValidation==='EMAIL'&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value))
+        if(q.textValidation==='EMAIL'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
           invalid(path,'请填写有效电子邮箱格式')
-        if(q.textValidation==='DIGITS'&&!/^\\d+$/.test(value))
+        if(q.textValidation==='DIGITS'&&!/^\d+$/.test(value))
           invalid(path,'文本只能包含数字')
         if(q.textValidation==='ALPHANUMERIC'&&!/^[a-z0-9]+$/i.test(value))
           invalid(path,'文本只能包含英文字母及数字')

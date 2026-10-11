@@ -17,6 +17,7 @@ export interface ResearchRawCodebook {
   definitionDigest:string;scoringDigest:string|null
   publicationVersion:number
   instrumentRevision:number
+  timeZone?:'Asia/Shanghai'|'UTC'
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -55,27 +56,30 @@ const missingFrom=(unit:FrozenUnitResult,key:string):MissingReason|null=>{
   return row?.reason??null
 }
 const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
-  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null
+  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
+  timeZone?:'Asia/Shanghai'|'UTC'
 }>=>{
   const values=unit.rawAnswers
-  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null}>=[]
-  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[])=>{
+  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;timeZone?:'Asia/Shanghai'|'UTC'}>=[]
+  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[],timeZone?:'Asia/Shanghai'|'UTC')=>{
     const value=cleanValue(values[key]??null)
-    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key)})
+    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key),timeZone})
   }
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
     for(const page of draft.pages)for(const q of page.questions){
       const options=q.options.map(o=>({code:o.optionKey,label:o.label}))
-      if(q.type==='MATRIX'){
+      if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
         const value=values[q.itemKey]
-        const normalized=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,string>:{}
+        const normalized=value&&typeof value==='object'&&!Array.isArray(value)
+          ?value as Record<string,string|string[]>:{}
         for(const row of q.rows){
           const key=q.itemKey+':'+row.rowKey
-          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:'MATRIX',options,
-            value:normalized[row.rowKey]??null,missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
+          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:q.type,options,
+            value:cleanValue(normalized[row.rowKey]??null),
+            missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
-      }else add(q.itemKey,q.prompt,q.type,options)
+      }else add(q.itemKey,q.prompt,q.type,options,q.timeZone)
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
@@ -322,6 +326,7 @@ export async function loadSurveySource(input:{
             responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options,
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
+            ...(item.timeZone?{timeZone:item.timeZone}:{}),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
