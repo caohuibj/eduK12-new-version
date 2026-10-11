@@ -32,17 +32,12 @@ async function fillAnswers(page){
       const radios=field.locator('input[type="radio"]')
       const names=await radios.evaluateAll(elements=>[...new Set(elements.map(x=>x.getAttribute('name')).filter(Boolean))])
       for(const name of names){
-        const group=field.locator('input[type="radio"]').filter({hasNot:page.locator('nonsense-selector-that-never-matches')})
         const same=field.locator('input[type="radio"][name="'+name.replace(/["\\]/g,'')+'"]')
         if(await same.count()&&!(await same.first().isChecked())){
           await same.first().check();changed=true
         }
-        void group
       }
       const checks=field.locator('input[type="checkbox"]')
-      if(!names.length&&await checks.count()&&!(await checks.first().isChecked())){
-        await checks.first().check();changed=true
-      }
       const number=field.locator('input[type="number"]')
       if(await number.count()&&!(await number.first().inputValue())){
         await number.first().fill(await number.first().getAttribute('min')||'1');changed=true
@@ -50,6 +45,10 @@ async function fillAnswers(page){
       const text=field.locator('textarea')
       if(await text.count()&&!(await text.first().inputValue())){
         await text.first().fill('用于检验 Survey 的匿名研究任务');changed=true
+      }
+      if(!names.length&&!(await number.count())&&!(await text.count())
+        &&await checks.count()&&!(await checks.first().isChecked())){
+        await checks.first().check();changed=true
       }
     }
     if(!changed)break
