@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { pairedDescriptive, summarizeWaveScores, type FrozenScoreObservation } from '../../modules/survey/analytics.cohorts'
-import { exportLong, exportWide, protectCsvCell, tableToCsv } from '../../modules/survey/analytics.export-format'
+import { exportLong, exportWide, protectCsvCell, tableToCsv, surveyAttemptCode } from '../../modules/survey/analytics.export-format'
 import { describeWave,describeWaveGroups } from '../../modules/survey/analytics.descriptive'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import type { SurveySourceProjection } from '../../modules/survey/analytics.source'
@@ -18,6 +18,17 @@ const data=()=>[
   observed('R-A','T2',2,13),observed('R-B','T2',2,14),observed('R-D','T2',2,8),
 ]
 describe('Survey longitudinal export and matched descriptive contracts',()=>{
+  it('exports pseudonymous SCORE_LONG attempt codes, never internal Attempt PKs',()=>{
+    const record=observed('R-A','T1',1,10)
+    const score=exportLong(project,[record])
+    const pseudonym=surveyAttemptCode(record.attemptId)
+    expect(pseudonym).toMatch(/^A-[A-F0-9]{20}$/)
+    expect(score.csv).toContain(pseudonym)
+    expect(score.csv).not.toContain('"'+record.attemptId+'"')
+    const anonymous=exportLong(project,[{...record,researchCode:null}])
+    expect(anonymous.csv).toContain(pseudonym)
+    expect(anonymous.csv).not.toContain(record.attemptId)
+  })
   it('uses real matched participants, not difference of all-wave means',()=>{
     const d=pairedDescriptive({projectId:project,baselineWaveId:'T1',followupWaveId:'T2',
       instrumentKey:'motivation',scoreKey:'total',observations:data()})
