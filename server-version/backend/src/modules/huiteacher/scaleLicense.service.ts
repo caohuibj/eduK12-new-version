@@ -29,7 +29,8 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
     id:string;scaleId:string;definitionHash:string;resourceKey:string;
     status:string;entry:Record<string,any>;entryHash:string;
     createdByUserId:string;reviewedByUserId:string|null;
-    scaleStatus:string;scaleHash:string;scaleDefinition:unknown
+    reviewedAt:Date|null;publishedAt:Date|null;
+    scaleCreatorId:string;scaleStatus:string;scaleHash:string;scaleDefinition:unknown
   }>>`
     SELECT r."id",r."scale_id" AS "scaleId",
       r."definition_hash" AS "definitionHash",
@@ -37,6 +38,9 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
       r."entry",r."entry_hash" AS "entryHash",
       r."created_by_user_id" AS "createdByUserId",
       r."reviewed_by_user_id" AS "reviewedByUserId",
+      r."reviewed_at" AS "reviewedAt",
+      r."published_at" AS "publishedAt",
+      scale."creator_id" AS "scaleCreatorId",
       scale."status" AS "scaleStatus",scale."definition_hash" AS "scaleHash",
       scale."definition" AS "scaleDefinition"
     FROM "registered_assessment_resources" r
@@ -49,7 +53,9 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
   `
   const r=rows[0]
   if(!r||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
-    ||!r.reviewedByUserId||r.reviewedByUserId===r.createdByUserId
+    ||!r.reviewedByUserId||!r.reviewedAt||!r.publishedAt
+    ||r.reviewedByUserId===r.createdByUserId
+    ||r.reviewedByUserId===r.scaleCreatorId
     ||canonicalHash(r.entry)!==r.entryHash
     ||r.entry?.applicability?.resourceKind!=='SCALE'
     ||r.entry?.applicability?.resourceKey!==ref.key
@@ -177,10 +183,23 @@ export async function listTeacherScaleCatalog(input:{
       resource."entry"->>'title' AS "title",
       resource."entry_hash" AS "hash"
     FROM "education_teacher_scale_licenses" license
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=license."organization_id"
+      AND entitlement."product"='HUITEACHER'
+      AND entitlement."status"='ACTIVE'
     JOIN "registered_assessment_resources" resource
       ON resource."id"=license."resource_id"
       AND resource."status"='PUBLISHED'
       AND resource."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND resource."reviewed_by_user_id" IS NOT NULL
+      AND resource."reviewed_at" IS NOT NULL
+      AND resource."published_at" IS NOT NULL
+      AND resource."reviewed_by_user_id"<>resource."created_by_user_id"
+    JOIN "scales" scale
+      ON scale."id"=resource."scale_id"
+      AND scale."status"='PUBLISHED'
+      AND scale."definition_hash"=resource."definition_hash"
+      AND resource."reviewed_by_user_id"<>scale."creator_id"
     WHERE license."organization_id"=${input.organizationId}
       AND license."status"='ACTIVE'
     ORDER BY resource."created_at" DESC,resource."id"

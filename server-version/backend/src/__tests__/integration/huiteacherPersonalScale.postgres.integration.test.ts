@@ -173,7 +173,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       key:resource.resource_key,version:resource.resource_version}
     await expect(assertTeacherScaleRunUse(db,{
       organizationId:school.id,runId:draft.runId,resource:ref,
-    })).rejects.toThrow()
+    })).rejects.toMatchObject({code:'HUITEACHER_SCALE_NOT_LICENSED_FOR_RUN'})
     await expect(addTeacherRunTrack({...scope,resource:ref,
       subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},
       requestedPolicy:{
@@ -182,7 +182,9 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
         analysisMode:'INDIVIDUAL_ONLY',minimumRespondents:null,
         visibilityPolicyKey:'HUITEACHER_ADULT_SELF_PILOT_V1',
       },
-    })).rejects.toThrow()
+    })).rejects.toMatchObject({
+      code:'HUITEACHER_SCALE_NOT_LICENSED_FOR_RUN',
+    })
     const licensed=await changeTeacherScaleLicense({
       organizationId:school.id,resourceId:resource.id,actorUserId:admin.id,
       action:'GRANT',
