@@ -246,11 +246,13 @@ export default function SurveyPublicApp(){
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
     })
     if(final.status!=='COMPLETED')throw new Error('作答尚未完成提交')
+    // FINAL is authoritative even if the subsequent General request fails.
+    // Never keep a local draft after the server accepted completion.
+    clearLocalSurveyDraft(publicId,attemptId)
     const generalResult=await publicApi<General>(base+'/attempts/'+attemptId+'/general','POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),
     })
-    clearLocalSurveyDraft(publicId,attemptId)
     setGeneral(generalResult)
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
