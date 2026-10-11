@@ -106,9 +106,14 @@ function finalArtifact(format:'LONG'|'WIDE',projectId:string,cols:string[],rows:
     exportedAt:new Date().toISOString(),
   }}
 }
-export function exportLong(projectId:string,observations:readonly FrozenScoreObservation[]):BoundedResearchExport{
+export function exportLong(projectId:string,observations:readonly FrozenScoreObservation[],
+  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[],
+  expectedColumns:readonly FrozenScoreColumn[]=[]):BoundedResearchExport{
   const source=sourceRows(projectId,observations)
+  if(expectedColumns.some(column=>column.projectId!==projectId))
+    throw new Error('Expected score columns must belong to the authorized project')
   const codes=new Map<string,ResearchExportCodebookRow>()
+  for(const column of expectedColumns)codes.set(columnId(column),codebookFor(column))
   const columns=['research_code_or_attempt','wave_id','wave_ordinal','attempt_id',
     'column','instrument_key','score_key','scoring_digest','response_signature',
     'value','missing_reason','source_final_hash']
@@ -120,6 +125,21 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
       o.measurement.scoringDigest,o.measurement.responseSignature,
       o.value,o.missingReason,o.sourceFinalHash]
   })
+  const present=new Set(source.filter(o=>o.researchCode)
+    .map(o=>o.researchCode+':'+columnId(o)))
+  const participation=new Map(attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
+  for(const code of new Set(attendance.map(a=>a.researchCode))){
+    for(const expected of expectedColumns){
+      const column=columnId(expected)
+      if(present.has(code+':'+column))continue
+      const status=participation.get(code+':'+expected.waveId)
+      if(status==='COMPLETED')continue
+      data.push([code,expected.waveId,expected.waveOrdinal,null,
+        column,expected.measurement.instrumentKey,expected.measurement.scoreKey,
+        expected.measurement.scoringDigest,expected.measurement.responseSignature,
+        null,status?'ABANDONED':'NO_WAVE',null])
+    }
+  }
   return finalArtifact('LONG',projectId,columns,data,source,[...codes.values()])
 }
 /** WIDE is legitimate ONLY in LINKED_WAVES. Rows with no stable researchCode
