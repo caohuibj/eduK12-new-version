@@ -117,6 +117,10 @@ export async function describeSurveyFlowOperations(req:Request,input:{
             fail(409,'研究分组与此 Wave 的冻结 Flow 来源不一致')
           group=assignment.groupKey
         }
+        if(row.status!=='WITHDRAWN'&&row.excludedAt===null
+          &&row.participant?.status!=='WITHDRAWN'
+          &&!row.flowAssignmentCipher)
+          fail(409,'正在参与或已经完成的 Flow Attempt 缺少持久化实验分配')
         const status={...row,hasAssignment:!!row.flowAssignmentCipher,
           hasFinal:!!row.final}
         increase(global,status)

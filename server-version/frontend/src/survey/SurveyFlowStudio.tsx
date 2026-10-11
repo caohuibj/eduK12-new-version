@@ -9,11 +9,11 @@ type FieldChoice={id:string;label:string;field:FlowField;
 const defaultValue=(field:FieldChoice)=>field.kind==='number'?0:field.kind==='boolean'?true:
   field.options[0]?.key??''
 const defaultPredicate=(fields:FieldChoice[]):FlowCondition=>({
-  op:'EQUALS',field:fields[0]?.field??{source:'EMBEDDED',key:'placeholder'},
+  op:fields[0]?.kind==='choices'?'INCLUDES':'EQUALS',field:fields[0]?.field??{source:'EMBEDDED',key:'placeholder'},
   value:fields[0]?defaultValue(fields[0]):'',
 })
 const itemField=(x:FormQuestionInfo):FieldChoice|null=>{
-  const kind=['SINGLE','LIKERT'].includes(x.type)?'choice':
+  const kind:FieldChoice['kind']|null=['SINGLE','LIKERT'].includes(x.type)?'choice':
     x.type==='MULTIPLE'?'choices':['NUMBER','SLIDER'].includes(x.type)?'number':
     ['SHORT_TEXT','LONG_TEXT','DATE','TIME'].includes(x.type)?'text':null
   return kind?{id:'A:'+x.instrumentKey+':'+x.itemKey,
@@ -220,7 +220,7 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
       <button className="btn-secondary" type="button" disabled={value.embeddedData.length>=30}
         onClick={()=>apply({...value,embeddedData:[...value.embeddedData,{
           key:researchKey('var'),source:'STATIC',type:'STRING',value:''}]})}>增加静态变量</button>
-      <p className="text-xs text-slate-500">材料可使用 {{'{变量编码}'}} 插入上述静态值。纯文本替换，不执行脚本或读取其他用户数据。</p>
+      <p className="text-xs text-slate-500">材料可使用 <code>{'{{变量编码}}'}</code> 插入上述静态值。纯文本替换，不执行脚本或读取其他用户数据。</p>
     </fieldset>
     <fieldset className="space-y-3">
       <legend className="font-medium text-sm">按顺序执行的研究块（最多 64 个）</legend>

@@ -1,9 +1,10 @@
 import { z } from 'zod'
 import type { FrozenSurveyFlow } from './flow.definition'
+import { surveyKeySchema } from './builder.definition'
 
 export const groupQuotaPolicySchema=z.object({
   schemaVersion:z.literal(1),
-  groupLimits:z.record(z.number().int().min(1).max(10000)),
+  groupLimits:z.record(surveyKeySchema,z.number().int().min(1).max(10000)),
 }).strict()
 export type SurveyGroupQuotaPolicy=z.infer<typeof groupQuotaPolicySchema>
 export const surveyCheckpointPolicySchema=z.object({
