@@ -159,8 +159,14 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
           const previous=previously.get(q.displayIf.itemKey)
           if(!previous||!['SINGLE','MULTIPLE','LIKERT'].includes(previous.type))
             err(issues,path+'.displayIf','条件只能引用此前的单选、多选或 Likert 题目')
-          else if(!previous.options.some(o=>o.optionKey===q.displayIf!.optionKey))
-            err(issues,path+'.displayIf.optionKey','引用的选项已不存在')
+          else {
+            if(!previous.options.some(o=>o.optionKey===q.displayIf!.optionKey))
+              err(issues,path+'.displayIf.optionKey','引用的选项已不存在')
+            if(previous.type==='MULTIPLE'
+              ?q.displayIf.operator!=='INCLUDES'
+              :q.displayIf.operator!=='EQUALS')
+              err(issues,path+'.displayIf.operator','多选条件必须使用 INCLUDES，单选/Likert 条件必须使用 EQUALS')
+          }
         }
         previously.set(q.itemKey,q)
       })
