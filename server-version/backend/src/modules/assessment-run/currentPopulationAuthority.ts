@@ -63,8 +63,40 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
    -- A campus respondent may only use a published Run while its Activity is
    -- OPEN and every STUDENT actor remains independently approved and selected.
    -- No original training Run is affected by this product-domain predicate.
+   -- Shared education identity does not imply that every School-domain Run
+   -- belongs to Huischool. Teacher Form Runs use a different authorized event
+   -- and must not depend on psychology enrollment or a Campus Activity.
    AND (org.product_domain<>'SCHOOL' OR (
-    EXISTS(SELECT 1 FROM campus_activity_runs ar
+    EXISTS(
+      SELECT 1 FROM huiteacher_evaluation_run_links h
+      JOIN huiteacher_evaluation_events event
+        ON event.organization_id=h.organization_id AND event.id=h.event_id
+        AND event.status='OPEN'
+      JOIN education_product_entitlements entitlement
+        ON entitlement.organization_id=h.organization_id
+        AND entitlement.product='HUITEACHER' AND entitlement.status='ACTIVE'
+      JOIN users teacher_respondent ON teacher_respondent.id=respondent.user_id
+        AND teacher_respondent.account_domain='SCHOOL'
+        AND teacher_respondent.is_active=TRUE
+        AND teacher_respondent.is_frozen=FALSE
+      JOIN users teacher_subject ON teacher_subject.id=subject.user_id
+        AND teacher_subject.account_domain='SCHOOL'
+        AND teacher_subject.is_active=TRUE AND teacher_subject.is_frozen=FALSE
+      WHERE h.organization_id=org.id AND h.run_id=x.run_id
+        AND relation.relationship_kind='SELF'
+        AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
+        AND subject.user_id=respondent.user_id
+        AND NOT EXISTS (
+          SELECT 1 FROM organization_access_denies deny
+          WHERE deny.organization_id=org.id
+            AND deny.user_id=respondent.user_id AND deny.lifted_at IS NULL
+            AND deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')
+        )
+    )
+   ) OR (
+    NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
+      WHERE h.organization_id=org.id AND h.run_id=x.run_id)
+    AND EXISTS(SELECT 1 FROM campus_activity_runs ar
       JOIN campus_activities activity ON activity.course_id=ar.course_id
         AND activity.organization_id=ar.organization_id
       WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
