@@ -44,8 +44,8 @@ const rawChallenge=(cookies:string[])=>{
   if(!found)throw new Error('missing MFA cookie')
   return decodeURIComponent(found.split(';')[0].split('=')[1])
 }
-const jwt=(uid:string)=>generateToken({
-  userId:uid,username:'integration',role:'STUDENT',accountDomain:'SURVEY',tokenVersion:0,
+const jwt=(uid:string,tokenVersion=0)=>generateToken({
+  userId:uid,username:'integration',role:'STUDENT',accountDomain:'SURVEY',tokenVersion,
   mfaVerifiedAt:Math.floor(Date.now()/1000),
 })
 const http=async(path:string,opts:RequestInit={})=>{
@@ -161,7 +161,10 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
   it('archives completed research without allowing an old participant study to be reopened',async()=>{
     const csrf=await http('/api/survey/auth/csrf')
     const token=csrf.data.data.csrfToken as string
-    const headers={Cookie:'huisurvey_research_session='+jwt(userId)+'; huisurvey_research_csrf='+token,
+    // An earlier MFA/governance test suspended and restored this Researcher,
+    // incrementing tokenVersion. Never reuse a JWT revoked by that workflow.
+    const activeVersion=(await db.user.findUniqueOrThrow({where:{id:userId}})).tokenVersion
+    const headers={Cookie:'huisurvey_research_session='+jwt(userId,activeVersion)+'; huisurvey_research_csrf='+token,
       'X-CSRF-Token':token,'Content-Type':'application/json'}
     const projectId=randomUUID()
     await db.surveyProject.create({data:{
