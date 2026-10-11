@@ -102,6 +102,32 @@ describe('Survey RESEARCH_ONLY authoritative FINAL',()=>{
     expect(()=>computeSurveyFinal(unmarked,{researchinstrument:{subject:'REFUSED'}}))
       .toThrow(SurveyFinalValidationError)
   })
+  it('compiles a controlled two-selection SJT with stable aggregate scorer keys',()=>{
+    const multiple: SjtDraft=structuredClone(sjt)
+    multiple.questions[0].responseType='MULTIPLE'
+    multiple.questions[0].minSelections=2
+    multiple.questions[0].maxSelections=2
+    multiple.questions[0].options.push({
+      optionKey:'athree',label:'先写下讨论重点',contributions:{effort:1,support:2},
+    })
+    const published=snapshot(frozen('SJT',multiple))
+    const joined=computeSurveyFinal(published,{researchinstrument:{
+      first:['aone','athree'],second:'bone',
+    }})
+    const score=joined.units[0].privateScoring as {metrics:{key:string;value:number|null}[]}
+    expect(score.metrics.find(x=>x.key==='effort')?.value).toBe(6)
+    expect(score.metrics.find(x=>x.key==='support')?.value).toBe(5)
+    expect(joined.units[0].rawAnswers.first).toEqual(['aone','athree'])
+    for(const invalidChoice of [['aone'],['aone','aone'],['aone','invalid'],['aone','atwo','athree']]){
+      expect(()=>computeSurveyFinal(published,{researchinstrument:{
+        first:invalidChoice,second:'bone',
+      }})).toThrow(SurveyFinalValidationError)
+    }
+    const reorder=computeSurveyFinal(published,{researchinstrument:{
+      first:['athree','aone'],second:'bone',
+    }})
+    expect(reorder.units[0].rawAnswers.first).toEqual(['aone','athree'])
+  })
   it('forbids missing or non-frozen tools and deliberately cannot produce a personalized report',()=>{
     const frozenUnit=frozen('FORM',form)
     expect(()=>computeSurveyFinal(snapshot(frozenUnit),{})).toThrow(SurveyFinalValidationError)

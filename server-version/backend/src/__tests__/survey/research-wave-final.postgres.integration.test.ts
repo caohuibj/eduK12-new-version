@@ -245,17 +245,30 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     await updateDraft(ownerId,projectId,toolIds.form,{
       revision:formBefore.revision,title:formBefore.title,definition:withRefusal,
     })
-    const w3=await wave('T3 再测',[toolIds.form,toolIds.scale])
+    const sjtBefore=await getDraft(ownerId,projectId,toolIds.sjt)
+    const sjtChanged=structuredClone(sjtBefore.definition) as unknown as SjtDraft
+    sjtChanged.questions[0].responseType='MULTIPLE'
+    sjtChanged.questions[0].minSelections=2
+    sjtChanged.questions[0].maxSelections=2
+    sjtChanged.questions[0].options.push({
+      optionKey:'athree',label:'先记下要点',contributions:{effort:1,support:2},
+    })
+    await updateDraft(ownerId,projectId,toolIds.sjt,{
+      revision:sjtBefore.revision,title:sjtBefore.title,definition:sjtChanged,
+    })
+    const w3=await wave('T3 再测',[toolIds.form,toolIds.scale,toolIds.sjt])
     const started=await startLinkedWave({
       publicId,waveId:w3.id,...link,consent:true,consentVersion:1,
     })
     const task=await getOwnResearchTask({publicId,attemptId:started.attemptId,...link})
-    expect(task.units.map(u=>u.kind)).toEqual(['FORM','SCALE'])
+    expect(task.units.map(u=>u.kind)).toEqual(['FORM','SCALE','SJT'])
+    expect((task.units[2] as {questions:{responseType:string}[]}).questions[0].responseType).toBe('MULTIPLE')
     const general=await submitResearchFinal({
       publicId,attemptId:started.attemptId,...link,submissionId:randomUUID(),
       answers:{
         [task.units[0].instrumentKey]:{subject:'math',reflection:'REFUSED'},
         [task.units[1].instrumentKey]:{itemone:'o5',itemtwo:'o5'},
+        [task.units[2].instrumentKey]:{first:['aone','athree'],second:'bone'},
       },
     })
     expect(general.status).toBe('COMPLETED')

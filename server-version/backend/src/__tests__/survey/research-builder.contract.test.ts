@@ -91,6 +91,27 @@ describe('Survey research builder contracts without formal publication authority
     expect(r.score.metrics.find(m=>m.key==='support')?.value).toBe(3)
     expect(r.participantReport).toBe('GENERAL_ONLY')
   })
+  it('previews SJT multi-select through official model scoring rather than a new parallel scorer',()=>{
+    const d=sjt()
+    d.questions[0].responseType='MULTIPLE'
+    d.questions[0].minSelections=2
+    d.questions[0].maxSelections=2
+    d.questions[0].options.push({
+      optionKey:'athree',label:'整理讨论要点',contributions:{effort:1,support:2},
+    })
+    const result=previewResearchInstrument({kind:'SJT',instrumentKey:'sjt-multi',
+      title:'课堂讨论',definition:d,answers:{first:['aone','athree'],second:'bone'}})
+    expect(result.ok).toBe(true)
+    if(!result.ok||!result.score||!('metrics' in result.score))
+      throw new Error('multi-select compiled scorer unavailable')
+    expect(result.score.metrics.find(m=>m.key==='effort')?.value).toBe(6)
+    expect(result.score.metrics.find(m=>m.key==='support')?.value).toBe(5)
+    d.questions[0].maxSelections=3
+    d.questions[0].options.push({optionKey:'afour',label:'提出疑问',contributions:{effort:2,support:0}})
+    d.questions[0].options.push({optionKey:'afive',label:'联系同伴',contributions:{effort:0,support:1}})
+    const rejected=validateSurveyDraft('SJT',d,true)
+    expect(rejected.issues.some(i=>i.message.includes('24'))).toBe(true)
+  })
   it('parses text/CSV with deterministic batch identifiers and rejects invalid portions',()=>{
     const form=initialSurveyDefinition('FORM')
     const batch={
