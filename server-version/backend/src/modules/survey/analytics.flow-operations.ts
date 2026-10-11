@@ -103,6 +103,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       categorySummary.set(special,0)
     const attemptsWithFinal:string[]=[]
     const groupByAttempt=new Map<string,string>()
+    const assignmentsByAttempt=new Map<string,SurveyFlowAssignment>()
     const groupsByCategory=new Map<string,Map<string,number>>()
     const scoreGroups=new Map<string,ScoreAccumulator>()
     if(categories.length)for(const group of frozen.flow.experiment?.groups??[])
@@ -126,6 +127,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       if(!rows.length)break
       for(const row of rows){
         let group:string|null=null
+        let assignmentForRow:SurveyFlowAssignment|undefined
         if(row.flowAssignmentCipher){
           const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(
             row.flowAssignmentCipher)
@@ -135,6 +137,9 @@ export async function describeSurveyFlowOperations(req:Request,input:{
               g=>g.groupKey===assignment.groupKey)))
             fail(409,'研究分组与此 Wave 的冻结 Flow 来源不一致')
           group=assignment.groupKey
+          assignmentForRow=assignment
+          if(frozen.flow.experiment&&group===null)
+            fail(409,'冻结实验组的参与记录缺少可信分组')
         }
         if(row.status!=='WITHDRAWN'&&row.excludedAt===null
           &&row.participant?.status!=='WITHDRAWN'
@@ -153,6 +158,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           &&row.sampleReview?.verdict!=='EXCLUDED'){
           attemptsWithFinal.push(row.id)
           if(group)groupByAttempt.set(row.id,group)
+          if(assignmentForRow)assignmentsByAttempt.set(row.id,assignmentForRow)
         }
       }
       processed+=rows.length
@@ -177,10 +183,24 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           if(result.definitionDigest!==final.definitionDigest||
             canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
             fail(409,'统计源 FINAL 的完整性校验失败')
+          const assigned=assignmentsByAttempt.get(final.attemptId)
+          const trace=result.executionTrace
+          if(!assigned||!trace||trace.schemaVersion!==1||
+            trace.flowDigest!==frozen.flow.flowDigest||
+            trace.assignmentDigest!==canonicalHash(assigned)||
+            trace.groupKey!==assigned.groupKey||
+            trace.experimentKey!==assigned.experimentKey||
+            trace.clientPresentation!=='VERIFIED_SUBMISSION'||
+            result.units.length!==frozen.units.length)
+            fail(409,'冻结 Flow 分组、执行轨迹与 FINAL 计分来源不一致')
           const group=groupByAttempt.get(final.attemptId)
           if(input.score&&group){
             const unit=result.units.find(u=>u.instrumentKey===input.score!.instrumentKey)
-            if(unit&&unit.kind!=='FORM'&&!unit.notExecuted){
+            const frozenUnit=frozen.units.find(u=>u.instrumentKey===input.score!.instrumentKey)
+            if(unit&&frozenUnit&&unit.kind===frozenUnit.kind
+              &&unit.kind!=='FORM'&&!unit.notExecuted
+              &&unit.sourceDigest===frozenUnit.sourceDigest
+              &&unit.scoringDigest===frozenUnit.scoringDigest){
               const metrics=unit.privateScoring as
                 |{scores?:{key:string;value:number|null}[];
                   metrics?:{key:string;value:number|null}[]}|null

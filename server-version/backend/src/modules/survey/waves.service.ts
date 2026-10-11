@@ -5,7 +5,7 @@ import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { compileSurveyFlow,surveyFlowDraftSchema,SurveyFlowError } from './flow.definition'
+import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
 import { compileGroupQuotaPolicy,compileCheckpointPolicy,
   groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
 
@@ -88,7 +88,7 @@ type WaveInput={
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
   const flowDefinition=input.flowDefinition===undefined||input.flowDefinition===null
-    ?null:surveyFlowDraftSchema.parse(input.flowDefinition)
+    ?null:parseSurveyFlowDraft(input.flowDefinition)
   const quotaPolicy=input.quotaPolicy===undefined||input.quotaPolicy===null
     ?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
   const checkpointPolicy=input.checkpointPolicy===undefined||input.checkpointPolicy===null
@@ -144,7 +144,7 @@ type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
 export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
   ensureWindow(input)
   const requestedFlow=input.flowDefinition===undefined?undefined:
-    input.flowDefinition===null?null:surveyFlowDraftSchema.parse(input.flowDefinition)
+    input.flowDefinition===null?null:parseSurveyFlowDraft(input.flowDefinition)
   const requestedQuota=input.quotaPolicy===undefined?undefined:
     input.quotaPolicy===null?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
   const requestedCheckpoint=input.checkpointPolicy===undefined?undefined:

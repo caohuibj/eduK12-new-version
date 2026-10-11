@@ -82,6 +82,10 @@ function guardFlowShape(input:unknown){
   }
   visit(input,0)
 }
+export function parseSurveyFlowDraft(input:unknown):SurveyFlowDraft{
+  guardFlowShape(input)
+  return surveyFlowDraftSchema.parse(input)
+}
 export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUnit[],
   collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'):FrozenSurveyFlow{
   guardFlowShape(input)
