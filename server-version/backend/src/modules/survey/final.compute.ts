@@ -16,7 +16,7 @@ export class SurveyFinalValidationError extends Error {
 function invalid(path:string,message:string): never {throw new SurveyFinalValidationError(path,message)}
 /** Explicit refusal must not collide with participant-provided free text. */
 export type ExplicitSurveyRefusal={_surveyRefusal:true}
-export type AnswerPrimitive=string|number|string[]|Record<string,string>|ExplicitSurveyRefusal|null
+export type AnswerPrimitive=string|number|string[]|Record<string,string|number|string[]>|ExplicitSurveyRefusal|null
 const isRefusal=(value:unknown):value is ExplicitSurveyRefusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)
   &&Object.keys(value).length===1&&(value as ExplicitSurveyRefusal)._surveyRefusal===true
@@ -58,7 +58,7 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
   const valid=new Set(d.pages.flatMap(p=>p.questions.map(q=>q.itemKey)))
   const matrixSubkeys=new Set(d.pages.flatMap(p=>p.questions
-    .filter(q=>q.type==='MATRIX')
+    .filter(q=>q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE')
     .flatMap(q=>q.rows.map(r=>q.itemKey+':'+r.rowKey))))
   const permitted=new Set([...valid,...matrixSubkeys])
   for(const answerKey of Object.keys(answers))if(!permitted.has(answerKey))
@@ -82,7 +82,7 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       continue
     }
     const value=answers[q.itemKey]
-    if(q.type!=='MATRIX'&&isRefusal(value)){
+    if(q.type!=='MATRIX'&&q.type!=='MATRIX_MULTIPLE'&&isRefusal(value)){
       if(!q.allowRefusal)invalid(path,'此题未声明允许明确拒答')
       missing.push({itemKey:q.itemKey,reason:'REFUSED'})
       previous[q.itemKey]=null
@@ -101,11 +101,47 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
           new Set(value).size!==value.length||value.some(x=>!q.options.some(o=>o.optionKey===x)))
           invalid(path,'多选内容必须为无重复的有效选项')
         if(q.required&&!value.length)invalid(path,'必答多选题没有选择')
+        if(value.length&&((q.minSelections!==undefined&&value.length<q.minSelections)||
+          (q.maxSelections!==undefined&&value.length>q.maxSelections)))
+          invalid(path,'多选题选择数量不在规定范围内')
         normalized[q.itemKey]=value
       }
-    }else if(q.type==='MATRIX'){
+    }else if(q.type==='RANK_ORDER'){
+      if(value===undefined||value===null){
+        if(q.required)invalid(path,'必答排序题未完成')
+        missing.push({itemKey:q.itemKey,reason:'SHOWN_MISSING'})
+      }else{
+        const codes=q.options.map(o=>o.optionKey)
+        if(!Array.isArray(value)||value.length!==codes.length||
+          value.some(x=>typeof x!=='string'||!codes.includes(x))||
+          new Set(value).size!==value.length)
+          invalid(path,'排序必须包含每个选项且不可重复')
+        normalized[q.itemKey]=value
+      }
+    }else if(q.type==='CONSTANT_SUM'){
+      if(value===undefined||value===null){
+        if(q.required)invalid(path,'必答恒定总和题未完成')
+        missing.push({itemKey:q.itemKey,reason:'SHOWN_MISSING'})
+      }else{
+        if(typeof value!=='object'||Array.isArray(value)||isRefusal(value))
+          invalid(path,'恒定总和题必须提交选项到数值的对象')
+        const numbers=value as Record<string,unknown>
+        const codes=q.options.map(o=>o.optionKey)
+        if(Object.keys(numbers).length!==codes.length||
+          Object.keys(numbers).some(k=>!codes.includes(k)))
+          invalid(path,'恒定总和题必须为每个选项提交一个数值')
+        const values=codes.map(k=>numbers[k])
+        if(values.some(v=>typeof v!=='number'||!Number.isFinite(v)||v<0||
+          (q.integerOnly&&!Number.isSafeInteger(v))))
+          invalid(path,'恒定总和题必须是非负的有效数值')
+        const sum=(values as number[]).reduce((a,b)=>a+b,0)
+        if(!Number.isFinite(sum)||Math.abs(sum-(q.total??NaN))>1e-7)
+          invalid(path,'各选项之和必须等于规定总值')
+        normalized[q.itemKey]=Object.fromEntries(codes.map(k=>[k,numbers[k] as number]))
+      }
+    }else if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
       if(value!==undefined)invalid(path,'矩阵题请按独立行提交，不能提交未经验证的汇总字段')
-      const rows:Record<string,string>={}
+      const rows:Record<string,string|string[]>={}
       for(const row of q.rows){
         const rowKey=q.itemKey+':'+row.rowKey
         if(isRefusal(answers[rowKey])){
@@ -113,12 +149,30 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
           missing.push({itemKey:rowKey,reason:'REFUSED'})
           continue
         }
-        const v=optionValue(answers[rowKey],q.options.map(x=>x.optionKey),path+'.'+row.rowKey,q.required)
-        if(v!==null)rows[row.rowKey]=v
-        else missing.push({itemKey:rowKey,reason:'SHOWN_MISSING'})
+        if(q.type==='MATRIX_MULTIPLE'){
+          const selected=answers[rowKey]
+          if(selected===undefined||selected===null){
+            if(q.required)invalid(path+'.'+row.rowKey,'必答矩阵多选行未完成')
+            missing.push({itemKey:rowKey,reason:'SHOWN_MISSING'})
+          }else{
+            const codes=q.options.map(o=>o.optionKey)
+            if(!Array.isArray(selected)||selected.some(x=>typeof x!=='string'||!codes.includes(x))||
+              new Set(selected).size!==selected.length||selected.length>codes.length)
+              invalid(path+'.'+row.rowKey,'矩阵多选行包含无效或重复选项')
+            if(q.required&&!selected.length)invalid(path+'.'+row.rowKey,'必答矩阵行不能空选')
+            if(selected.length&&((q.minSelections!==undefined&&selected.length<q.minSelections)||
+               (q.maxSelections!==undefined&&selected.length>q.maxSelections)))
+              invalid(path+'.'+row.rowKey,'矩阵行选择数量不在规定范围内')
+            rows[row.rowKey]=selected
+          }
+        }else{
+          const v=optionValue(answers[rowKey],q.options.map(x=>x.optionKey),path+'.'+row.rowKey,q.required)
+          if(v!==null)rows[row.rowKey]=v
+          else missing.push({itemKey:rowKey,reason:'SHOWN_MISSING'})
+        }
       }
       normalized[q.itemKey]=rows
-    }else if(q.type==='NUMBER'){
+    }else if(q.type==='NUMBER'||q.type==='SLIDER'){
       if(value===undefined||value===null||value===''){
         if(q.required)invalid(path,'必答数值题未完成')
         missing.push({itemKey:q.itemKey,reason:'SHOWN_MISSING'})
@@ -141,6 +195,21 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
         }
         normalized[q.itemKey]=value
       }
+    }else if(q.type==='DATE'||q.type==='TIME'){
+      if(value===undefined||value===null||value===''){
+        if(q.required)invalid(path,'必答日期/时间题未完成')
+        missing.push({itemKey:q.itemKey,reason:'SHOWN_MISSING'})
+      }else{
+        if(typeof value!=='string')invalid(path,'日期/时间回答必须是 ISO 格式字符串')
+        if(q.type==='DATE'){
+          if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)||value.startsWith('0000-')||
+            Number.isNaN(Date.parse(value+'T00:00:00.000Z'))||
+            !new Date(value+'T00:00:00.000Z').toISOString().startsWith(value+'T'))
+            invalid(path,'日期必须是有效的 YYYY-MM-DD')
+        }else if(!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value))
+          invalid(path,'时间必须是 24 小时 HH:mm 格式')
+        normalized[q.itemKey]=value
+      }
     }else{
       if(value===undefined||value===null||value===''){
         if(q.required)invalid(path,'必答文本题未完成')
@@ -148,6 +217,12 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       }else{
         if(typeof value!=='string'||value.length>(q.maxLength??(q.type==='SHORT_TEXT'?300:10000)))
           invalid(path,'文本回答格式或长度不合法')
+        if(q.textValidation==='EMAIL'&&!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value))
+          invalid(path,'请填写有效电子邮箱格式')
+        if(q.textValidation==='DIGITS'&&!/^\\d+$/.test(value))
+          invalid(path,'文本只能包含数字')
+        if(q.textValidation==='ALPHANUMERIC'&&!/^[a-z0-9]+$/i.test(value))
+          invalid(path,'文本只能包含英文字母及数字')
         normalized[q.itemKey]=value
       }
     }
