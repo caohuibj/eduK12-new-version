@@ -15,6 +15,7 @@ import { surveyMimeTypes,surveyMaxImageBytes,SurveyMediaError } from './media.re
 type Tx=Prisma.TransactionClient
 const limit=surveyMaxImageBytes
 const types=surveyMimeTypes
+const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
 const id=z.string().uuid()
 const router=Router()
 router.use(authenticateSurvey)
