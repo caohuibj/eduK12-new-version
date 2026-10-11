@@ -126,6 +126,31 @@ export async function describeSurveyWaveItemPaged(input:{
             ||new Set(values).size!==values.length)
             throw new SurveyAnalyticsError(409,'冻结多选题的响应选项与 Codebook 不一致')
           for(const item of values)frequencies.set(item,(frequencies.get(item)??0)+1)
+        }else if(responseType==='RANK_ORDER'){
+          let order:unknown
+          try{order=JSON.parse(row.value)}catch{
+            throw new SurveyAnalyticsError(409,'冻结排序题回答不是合法 JSON')
+          }
+          if(!Array.isArray(order)||order.length!==optionCodes.length
+            ||order.some(v=>typeof v!=='string'||!allowed.has(v))
+            ||new Set(order).size!==order.length)
+            throw new SurveyAnalyticsError(409,'冻结排序题的选项排列与 Codebook 不一致')
+          order.forEach((value,rank)=>{
+            const key=String(value)+'@rank'+(rank+1)
+            frequencies.set(key,(frequencies.get(key)??0)+1)
+          })
+        }else if(responseType==='CONSTANT_SUM'){
+          let allocations:unknown
+          try{allocations=JSON.parse(row.value)}catch{
+            throw new SurveyAnalyticsError(409,'冻结恒定总和题回答不是合法 JSON')
+          }
+          if(!allocations||typeof allocations!=='object'||Array.isArray(allocations)
+            ||Object.keys(allocations).length!==optionCodes.length
+            ||Object.entries(allocations).some(([key,value])=>
+              !allowed.has(key)||typeof value!=='number'||!Number.isFinite(value)||value<0))
+            throw new SurveyAnalyticsError(409,'冻结恒定总和题的数值分配与 Codebook 不一致')
+          // Structured allocation has no single categorical value or scalar
+          // mean; report its validated respondent N without fake frequencies.
         }else if(allowed.has(row.value)){
           frequencies.set(row.value,(frequencies.get(row.value)??0)+1)
         }else throw new SurveyAnalyticsError(409,'冻结选项编码与 Codebook 不一致')
