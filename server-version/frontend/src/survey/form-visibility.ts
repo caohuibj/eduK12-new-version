@@ -6,6 +6,7 @@ export type ConditionalFormItem={
   itemKey:string
   displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
   rows?:readonly {rowKey:string}[]
+  otherOptionKey?:string
 }
 export function visibleFormKeys<T extends ConditionalFormItem>(
   questions:readonly T[],answers:Record<string,unknown>
@@ -30,9 +31,19 @@ export function sanitizeFormAnswers<T>(
   const visible=visibleFormKeys(questions,answers)
   const cleaned={...answers}
   for(const question of questions){
-    if(visible.has(question.itemKey))continue
-    delete cleaned[question.itemKey]
-    for(const row of question.rows??[])delete cleaned[question.itemKey+':'+row.rowKey]
+    const otherKey=question.itemKey+':other'
+    if(!visible.has(question.itemKey)){
+      delete cleaned[question.itemKey]
+      for(const row of question.rows??[])delete cleaned[question.itemKey+':'+row.rowKey]
+      if(question.otherOptionKey)delete cleaned[otherKey]
+      continue
+    }
+    if(question.otherOptionKey){
+      const answer=cleaned[question.itemKey]
+      const selected=answer===question.otherOptionKey||
+        (Array.isArray(answer)&&answer.includes(question.otherOptionKey))
+      if(!selected)delete cleaned[otherKey]
+    }
   }
   return cleaned
 }

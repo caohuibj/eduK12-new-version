@@ -13,6 +13,7 @@ export type FormQuestion={
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;
   timeZone?:'Asia/Shanghai'|'UTC';textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
+  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[];
   displayIf?:Condition
 }
 export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
