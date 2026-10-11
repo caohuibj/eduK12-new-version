@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { pairedDescriptive, summarizeWaveScores, type FrozenScoreObservation } from '../../modules/survey/analytics.cohorts'
 import { exportLong, exportWide, protectCsvCell, tableToCsv } from '../../modules/survey/analytics.export-format'
 import { describeWave } from '../../modules/survey/analytics.descriptive'
+import { rawWideExport } from '../../modules/survey/analytics.raw-export'
 import type { SurveySourceProjection } from '../../modules/survey/analytics.source'
 
 const project='study-a'
@@ -67,6 +68,56 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     expect(noT2).toContain(',"","NO_WAVE"')
     expect(noT1).toContain(',"","NO_WAVE"')
   })
+  it('preserves zero-FINAL T2 columns and ABANDONED versus NO_WAVE in both Wide formats',()=>{
+    const dictionary=(waveId:string,ordinal:number)=>{
+      const columnKey='W'+String(ordinal).padStart(3,'0')+'__scale__itemone__abcdef1234567890'
+      return {
+        columnKey,waveId,waveOrdinal:ordinal,instrumentKey:'motivation',itemKey:'itemone',
+        kind:'SCALE' as const,responseType:'LIKERT',title:'学习动机',prompt:'我愿意学习',
+        options:[{code:'five',label:'非常同意'}],definitionDigest:'a'.repeat(64),
+        scoringDigest:'b'.repeat(64),publicationVersion:ordinal,instrumentRevision:0,
+      }
+    }
+    const t1=dictionary('T1',1),t2=dictionary('T2',2)
+    const attendance=[
+      {researchCode:'R-A',waveId:'T1',status:'COMPLETED'},
+      {researchCode:'R-A',waveId:'T2',status:'STARTED'},
+      {researchCode:'R-B',waveId:'T2',status:'STARTED'},
+    ]
+    const one=observed('R-A','T1',1,10)
+    const source:SurveySourceProjection={
+      projectId:project,collectionMode:'LINKED_WAVES',completeAttempts:1,
+      sourceRevision:0,cutOff:'2026-10-11T00:00:00Z',
+      scores:[one],
+      scoreColumns:[
+        {projectId:project,waveId:'T1',waveOrdinal:1,measurement:metric},
+        {projectId:project,waveId:'T2',waveOrdinal:2,measurement:metric},
+      ],
+      raw:[{
+        projectId:project,waveId:'T1',waveOrdinal:1,attemptId:one.attemptId,
+        researchCode:'R-A',sourceFinalHash:one.sourceFinalHash,
+        instrumentKey:'motivation',kind:'SCALE',responseType:'LIKERT',
+        itemKey:'itemone',columnKey:t1.columnKey,publicationVersion:1,
+        value:'five',missingReason:null,completedAt:one.completedAt,sourceVerified:true,
+      }],
+      codebook:[t1,t2],attendance,
+    }
+    const raw=rawWideExport(project,source)
+    const score=exportWide(project,source.scores,source.attendance,source.scoreColumns)
+    for(const result of [raw,score]){
+      expect(result.manifest.rowCount).toBe(2)
+      expect(result.manifest.columnCount).toBe(5)
+      expect(result.codebook).toHaveLength(2)
+      const first=result.csv.split('\\r\\n').find(row=>row.startsWith('"R-A",'))
+      const late=result.csv.split('\\r\\n').find(row=>row.startsWith('"R-B",'))
+      expect(first).toContain('"ABANDONED"')
+      expect(late).toContain('"NO_WAVE"')
+      expect(late).toContain('"ABANDONED"')
+    }
+    expect(()=>exportWide(project,source.scores,source.attendance,[
+      {projectId:'foreign-project',waveId:'T2',waveOrdinal:2,measurement:metric},
+    ])).toThrow(/authorized project/)
+  })
   it('protects quoted text and dangerous spreadsheet formulas',()=>{
     expect(protectCsvCell('=HYPERLINK("https://evil.example")')).toMatch(/^'/)
     expect(protectCsvCell('  -10+2')).toMatch(/^'/)
@@ -96,7 +147,7 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     const source:SurveySourceProjection={
       projectId:project,collectionMode:'LINKED_WAVES',
       completeAttempts:2,sourceRevision:0,cutOff:'2026-10-11T00:00:00Z',
-      scores:[],raw:[raw('A','["a","b"]'),raw('B','["b"]')],
+      scores:[],scoreColumns:[],raw:[raw('A','["a","b"]'),raw('B','["b"]')],
       codebook:[codebook],attendance:[],
     }
     const desc=describeWave(source,'T1')
