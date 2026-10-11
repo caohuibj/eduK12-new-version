@@ -68,12 +68,12 @@ async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDr
   await updateDraft(ownerId,projectId,id,{revision:0,title:kind+' 自编研究',definition})
   return id
 }
-async function wave(title:string,ids:string[]){
+async function wave(title:string,ids:string[],allowNewParticipants=false){
   const w=await createWave(ownerId,projectId,{
     requestId:randomUUID(),title,consentText:consent,
     generalText:'感谢完成本轮研究。本研究结果将汇总分析，不提供个人诊断。',
     linkageNoticeConfirmed:true,
-    instrumentIds:ids,
+    instrumentIds:ids,allowNewParticipants,
   })
   const prepared=await prepareWave(ownerId,projectId,w.id,w.revision)
   expect(prepared.runtimeReady).toBe(true)
@@ -357,6 +357,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       requestId:randomUUID(),title:'T4 有限名额',
       consentText:consent,generalText:'谢谢参与',
       instrumentIds:[toolIds.scale],linkageNoticeConfirmed:true,quotaStarts:1,
+      allowNewParticipants:true,
     })
     await prepareWave(ownerId,projectId,created.id,created.revision)
     const frozen=await getWave(ownerId,projectId,created.id)
@@ -386,7 +387,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }})).toBe(1)
   })
   it('serializes project PAUSE before linked recruitment and rejects expired publisher access',async()=>{
-    const fresh=await wave('T5 项目状态并发验证',[toolIds.scale])
+    const fresh=await wave('T5 项目状态并发验证',[toolIds.scale],true)
     let racing:ReturnType<typeof joinLinkedStudy>|undefined
     await db.$transaction(async tx=>{
       await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${projectId} FOR UPDATE`
