@@ -41,6 +41,7 @@ const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量
 export function SurveyBuilder({projectId}:{projectId:string}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const [instruments,setInstruments]=useState<Summary[]>([])
+  const [instrumentPage,setInstrumentPage]=useState(1)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
@@ -48,9 +49,9 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('TEXT')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
-  const refreshList=useCallback(async()=>{
-    const r=await api<{list:Summary[]}>(prefix)
-    setInstruments(r.list)
+  const refreshList=useCallback(async(page=1)=>{
+    const r=await api<{list:Summary[]}>(prefix+'?page='+page)
+    setInstruments(r.list);setInstrumentPage(page)
   },[prefix])
   useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null);void refreshList().catch(e=>{
     setError(e instanceof Error?e.message:'研究工具列表无法加载')})},[refreshList])
@@ -70,7 +71,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     const item=await api<ResearchDraft>(prefix,'POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),kind:newKind,title:newTitle.trim(),
     })
-    await refreshList();setActive(item);setDirty(false);setPreview(null);setBulk(null);setNewTitle('')
+    await refreshList(1);setActive(item);setDirty(false);setPreview(null);setBulk(null);setNewTitle('')
     setNotice('已创建研究专用草稿，尚未进入正式测评目录')
   })}
   const change=(definition:Definition)=>{
@@ -82,7 +83,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       revision:snapshot.revision,title:snapshot.title,definition:snapshot.definition,
     })
     setActive(updated);setDirty(false);setPreview(null);setBulk(null);setUndo(null)
-    await refreshList();setNotice('草稿已保存；发布冻结将在研究波次阶段执行')
+    await refreshList(instrumentPage);setNotice('草稿已保存；发布冻结将在研究波次阶段执行')
   })}
   const validate=()=>{if(!active||dirty)return;void run(async()=>{
     const result=await api<Preview>(prefix+'/'+active.id+'/validate','POST',{})
@@ -117,14 +118,14 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       revision:active.revision,digest:bulk.result.digest,batch:bulk.batch,
     })
     setUndo(before);setActive(updated);setDirty(false);setBulk(null);setPreview(null)
-    await refreshList();setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
+    await refreshList(instrumentPage);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
   })}
   const undoImport=()=>{if(!active||!undo)return;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+active.id,'PATCH',{
       revision:active.revision,title:undo.title,definition:undo.definition,
     })
     setUndo(null);setActive(updated);setPreview(null);setDirty(false)
-    await refreshList();setNotice('已撤销上一批导入')
+    await refreshList(instrumentPage);setNotice('已撤销上一批导入')
   })}
   return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
@@ -146,6 +147,13 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       <nav aria-label="当前项目研究工具" className="space-y-2">
         <h3 className="font-semibold text-sm">工具列表</h3>
         {!instruments.length&&<p className="text-xs text-slate-500">暂无工具草稿</p>}
+        <div className="flex items-center justify-between gap-2 text-xs mb-3">
+          <button type="button" className="btn-secondary" disabled={busy||instrumentPage<=1}
+            onClick={()=>void run(()=>refreshList(instrumentPage-1))}>上一页</button>
+          <span>第 {instrumentPage} 页</span>
+          <button type="button" className="btn-secondary" disabled={busy||instruments.length<25}
+            onClick={()=>void run(()=>refreshList(instrumentPage+1))}>下一页</button>
+        </div>
         {instruments.map(item=><button type="button" key={item.id}
           className={'block w-full text-left rounded-lg border p-3 '+(active?.id===item.id?'border-sky-700 bg-sky-50':'bg-white')}
           onClick={()=>void select(item.id)} disabled={busy}>
