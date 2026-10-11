@@ -4,7 +4,7 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import * as service from './waves.service'
 import * as publish from './waves.publish'
-import { surveyFlowDraftSchema } from './flow.definition'
+import { SurveyFlowError } from './flow.definition'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
@@ -20,7 +20,7 @@ const wave=z.object({
   finishUntil:z.string().datetime().nullable().optional(),
   quotaStarts:z.number().int().min(1).nullable().optional(),
   allowNewParticipants:z.boolean().optional(),
-  flowDefinition:surveyFlowDraftSchema.nullable().optional(),
+  flowDefinition:z.unknown().nullable().optional(),
 }).strict()
 const create=wave.extend({requestId:id})
 const update=wave.extend({revision:z.number().int().nonnegative()})
@@ -29,6 +29,7 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
   catch(e){
     if(e instanceof z.ZodError)return error(res,'研究波次参数格式不合法',-1,400)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof SurveyFlowError)return error(res,e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；'),-1,400)
     next(e)
   }
 }

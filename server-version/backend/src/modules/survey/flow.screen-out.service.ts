@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize } from '../../services/instrumentFinalSubmit'
+import { prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize,validateSubmissionId } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { verifiedSurveyAttempt } from './admission.service'
 import { ensureSurveyFlowAssignment } from './flow.assignment'
@@ -15,6 +15,7 @@ import type { ResearchFrozenPublication } from './publication.service'
 export async function screenOutResearchAttempt(input:FinalInput){
   if(process.env.SURVEY_PUBLICATION_ENABLED!=='true')
     throw new SurveyFinalError(403,'研究参与未开放')
+  validateSubmissionId(input.submissionId)
   const own=await verifiedSurveyAttempt(input)
   if(!own.compiledSnapshot.flow)
     throw new SurveyFinalError(400,'当前冻结研究没有资格筛除流程')

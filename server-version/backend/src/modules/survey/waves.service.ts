@@ -5,7 +5,7 @@ import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { compileSurveyFlow,surveyFlowDraftSchema,SurveyFlowError } from './flow.definition'
+import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
 
 type Tx=Prisma.TransactionClient
 export class SurveyWaveError extends Error {
@@ -84,7 +84,7 @@ type WaveInput={
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
   const flowDefinition=input.flowDefinition===undefined||input.flowDefinition===null
-    ?null:surveyFlowDraftSchema.parse(input.flowDefinition)
+    ?null:parseSurveyFlowDraft(input.flowDefinition)
   return prisma.$transaction(async tx=>{
     // Acquire the strongest project lock first. SHARE -> UPDATE promotion
     // can deadlock when two creators concurrently allocate the next ordinal.
@@ -132,7 +132,7 @@ type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
 export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
   ensureWindow(input)
   const requestedFlow=input.flowDefinition===undefined?undefined:
-    input.flowDefinition===null?null:surveyFlowDraftSchema.parse(input.flowDefinition)
+    input.flowDefinition===null?null:parseSurveyFlowDraft(input.flowDefinition)
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,true)
     const old=await ownWave(tx,pid,wid)
