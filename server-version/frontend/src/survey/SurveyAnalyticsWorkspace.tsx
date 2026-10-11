@@ -410,7 +410,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             disabled={busy||!batchDownloaded} onClick={()=>createExport(ticket.nextCursor!)}>
             当前批次已下载，生成下一批</button>}
           {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
-            逐批合并同名字段，不将不同批次作为独立研究波次。</p>
+            逐批合并同名字段，不将不同批次作为独立研究波次。</p>}
         </div>}
       </div>
     </>}
