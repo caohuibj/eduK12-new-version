@@ -4,8 +4,9 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
 import {listSampleQuality,setSampleQuality} from './sample-quality.service'
+import {describeSurveyPairedScoresPaged} from './analytics.paged'
 import { loadSurveySource } from './analytics.source'
-import { describeWave,describePairedScores,describeWaveGroups } from './analytics.descriptive'
+import { describeWave,describeWaveGroups } from './analytics.descriptive'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -76,13 +77,8 @@ surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async 
   catch(e){throw new service.SurveyAnalyticsError(409,
     e instanceof Error?e.message:'此分组无法计算')}
 }))
-surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
-  const projectId=id.parse(req.params.pid),input=measurement.parse(req.body)
-  const source=await loadSurveySource({
-    actorUserId:req.user!.userId,projectId,
-    waveIds:[input.baselineWaveId,input.followupWaveId],maxFinals:250,includeWideSchema:true,
-  })
-  if(source.collectionMode!=='LINKED_WAVES')
-    throw new service.SurveyAnalyticsError(409,'此研究未启用跨波次身份关联')
-  return describePairedScores(source,input)
-}))
+surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>
+  describeSurveyPairedScoresPaged({
+    actorUserId:req.user!.userId,
+    projectId:id.parse(req.params.pid),...measurement.parse(req.body),
+  })))
