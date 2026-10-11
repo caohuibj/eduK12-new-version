@@ -171,9 +171,9 @@ export function SurveyBuilder({projectId}:{projectId:string}){
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
       {active.status==='DRAFT'&&<>
-        {active.kind==='FORM'&&<ResearchFormEditor value={active.definition as FormDraft} onChange={change}/>}
+        {active.kind==='FORM'&&<ResearchFormEditor value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
         {active.kind==='SCALE'&&<ResearchScaleEditor value={active.definition as ScaleDraft} onChange={change}/>}
-        {active.kind==='SJT'&&<ResearchSjtEditor value={active.definition as SjtDraft} onChange={change}/>}
+        {active.kind==='SJT'&&<ResearchSjtEditor value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
       </>}
       {active.kind!=='SJT'&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>

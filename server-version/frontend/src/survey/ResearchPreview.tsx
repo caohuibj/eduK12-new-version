@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion } from './builder.types'
+import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 
 type Answer=string|number|string[]
 export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number|string[]>)=>void}){
@@ -11,10 +11,17 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
     const selection=answers[q.displayIf.itemKey]
     return Array.isArray(selection)?selection.includes(q.displayIf.optionKey):selection===q.displayIf.optionKey
   }
+  const picture=(image?:SurveyImage)=>image&&<figure className="my-3">
+    <img className="max-h-72 object-contain max-w-full rounded border"
+      loading="lazy" alt={image.altText}
+      src={'/api/survey/projects/'+draft.projectId+'/assets/'+image.asset.assetId+'/preview'}/>
+    {image.caption&&<figcaption className="text-xs mt-1">{image.caption}</figcaption>}
+  </figure>
   const question=(q:FormQuestion)=>{
     if(!visible(q))return null
     return <fieldset key={q.itemKey} className="border rounded-lg p-3 my-3 bg-white">
       <legend className="font-medium text-sm">{q.prompt||'未填写题干'} {q.required?'*':''}</legend>
+      {picture(q.image)}
       {['SINGLE','LIKERT'].includes(q.type)&&q.options.map(o=><label key={o.optionKey} className="flex gap-2 items-center my-2">
         <input type="radio" checked={answers[q.itemKey]===o.optionKey} name={q.itemKey}
           onChange={()=>choose(q.itemKey,o.optionKey)}/>{o.label||'未填写选项'}</label>)}
@@ -55,6 +62,7 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
           onChange={()=>choose(q.itemKey,o.optionKey)}/> {o.label}</label>)}
     </fieldset>)}
     {draft.kind==='SJT'&&<><div className="font-semibold">{(draft.definition as SjtDraft).stimulus}</div>
+      {picture((draft.definition as SjtDraft).image)}
       {(draft.definition as SjtDraft).questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">
         <legend>{q.prompt||'未填写题干'} {q.responseType==='MULTIPLE'?'（可多选）':''}</legend>
         {q.responseType==='MULTIPLE'&&<p className="text-xs">

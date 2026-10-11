@@ -1,6 +1,8 @@
 import type { SjtDraft } from './builder.types'
 import { researchKey } from './builder.types'
-export function ResearchSjtEditor({value,onChange}:{value:SjtDraft;onChange:(next:SjtDraft)=>void}){
+import { SurveyImageField } from './SurveyImageField'
+export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
+  onChange:(next:SjtDraft)=>void;projectId:string}){
   const changeQuestion=(i:number,fn:(q:SjtDraft['questions'][number])=>SjtDraft['questions'][number])=>
     onChange({...value,questions:value.questions.map((q,index)=>i===index?fn(q):q)})
   const newContributions=()=>Object.fromEntries(value.metrics.map(m=>[m.metricKey,0]))
@@ -12,6 +14,8 @@ export function ResearchSjtEditor({value,onChange}:{value:SjtDraft;onChange:(nex
       <label className="block text-sm">场景描述
         <textarea className="input block w-full" rows={5} value={value.stimulus}
           onChange={e=>onChange({...value,stimulus:e.target.value})}/></label>
+      <SurveyImageField projectId={projectId} image={value.image}
+        onChange={image=>onChange({...value,image})}/>
       <label className="block text-sm">参与者类型
         <select className="input block" value={value.respondentType}
           onChange={e=>onChange({...value,respondentType:e.target.value as SjtDraft['respondentType']})}>

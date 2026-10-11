@@ -1,11 +1,13 @@
 import type { FormDraft, FormQuestion } from './builder.types'
 import { choiceTypes, newOption, newQuestion, researchKey } from './builder.types'
+import { SurveyImageField } from './SurveyImageField'
 
 const types:Record<FormQuestion['type'],string>={
   SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',
   NUMBER:'数值',LIKERT:'Likert',MATRIX:'矩阵',
 }
-export function ResearchFormEditor({value,onChange}:{value:FormDraft;onChange:(next:FormDraft)=>void}){
+export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
+  onChange:(next:FormDraft)=>void;projectId:string}){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>
     onChange({...value,pages:value.pages.map((p,i)=>i===index?update(p):p)})
   const setQuestion=(pi:number,qi:number,update:(q:FormQuestion)=>FormQuestion)=>
@@ -65,6 +67,8 @@ export function ResearchFormEditor({value,onChange}:{value:FormDraft;onChange:(n
               允许明确选择「不愿回答」（单独记为 REFUSED）
             </label>
           </div>
+          <SurveyImageField projectId={projectId} image={q.image}
+            onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
           {choiceTypes.has(q.type)&&<div className="space-y-2">
             <p className="text-sm font-medium">选项</p>
             {q.options.map((o,oi)=><div className="flex gap-2" key={o.optionKey}>
