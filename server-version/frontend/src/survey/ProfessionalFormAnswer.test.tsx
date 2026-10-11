@@ -45,7 +45,7 @@ describe('Professional Survey Form input contracts',()=>{
       maxSelections:2,allowRefusal:true}}/>)
     const rows=screen.getAllByRole('group')
     expect(rows.length).toBeGreaterThanOrEqual(2)
-    fireEvent.click(screen.getByRole('checkbox',{name:'第一项'}))
+    fireEvent.click(screen.getAllByRole('checkbox',{name:'第一项'})[0])
     const answer=read()['matrix:r1']
     expect(answer).toEqual(['a'])
     fireEvent.click(screen.getAllByRole('checkbox',{name:'不愿回答本行'})[1])
