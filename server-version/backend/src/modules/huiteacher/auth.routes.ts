@@ -29,7 +29,7 @@ const changeSchema = z.object({
   oldPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
   newPassword: z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
 }).strict()
-const DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbHu2ZPql.a'
+const DUMMY_HASH = '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'
 const router = Router()
 router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next() })
 
