@@ -36,6 +36,12 @@ async function main(){
     const membership=await tx.organizationMembership.create({data:{
       id:randomUUID(),organizationId:org.id,userId:user.id,orgRole:'ORG_ADMIN',
     }})
+    // New SCHOOL organizations need an explicit Huischool entitlement.
+    // Teacher is never activated by registering a school account.
+    await tx.educationProductEntitlement.create({data:{
+      organizationId:org.id,product:'HUISCHOOL',status:'ACTIVE',
+      grantedByUserId:user.id,
+    }})
     await appendAudit(tx,{
       organizationId:org.id,actorUserId:user.id,
       action:'CAMPUS_BOOTSTRAP_INITIAL_ADMIN',targetType:'MEMBERSHIP',
