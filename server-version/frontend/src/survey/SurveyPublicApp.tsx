@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import type { SurveyImage } from './builder.types'
+import type { SurveyPublicImage } from './builder.types'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
@@ -7,10 +7,10 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[]}
 type Choice={optionKey:string;label:string}
-type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyImage;required:boolean;
+type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;maxLength?:number;minSelections?:number;maxSelections?:number}
-type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyImage;
+type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];

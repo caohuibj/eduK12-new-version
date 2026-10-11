@@ -5,6 +5,7 @@ export type SurveyImage={
   asset:{assetId:string;contentHash:string;mimeType:'image/png'|'image/jpeg'|'image/webp'};
   altText:string;caption?:string;rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string
 }
+export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 export type FormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
   prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];

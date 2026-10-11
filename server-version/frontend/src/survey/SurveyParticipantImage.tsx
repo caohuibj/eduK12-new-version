@@ -1,5 +1,5 @@
 import { useEffect,useState } from 'react'
-import type { SurveyImage } from './builder.types'
+import type { SurveyPublicImage } from './builder.types'
 
 export type SurveyImageProof={
   publicId:string;attemptId:string;accessCredential:string;researchCode?:string
@@ -8,7 +8,7 @@ export type SurveyImageProof={
  * bytes without ever putting the secret in URL, query or browser history.
  */
 export function SurveyParticipantImage({image,proof}:{
-  image:SurveyImage;proof:SurveyImageProof
+  image:SurveyPublicImage;proof:SurveyImageProof
 }){
   const [url,setUrl]=useState(''),[error,setError]=useState('')
   useEffect(()=>{
