@@ -35,3 +35,6 @@
 .ht-app .space-y-2>*+*{margin-top:.5rem}
 .ht-app .ht-muted{font-size:.88rem;color:var(--ht-quiet);line-height:1.7}
 .ht-app .ht-panel article{max-width:100%}
+.ht-app .ht-event-list{display:grid;gap:.7rem}
+.ht-app .ht-event{padding:1.15rem;background:#fffaf6;border:1px solid var(--ht-line);border-radius:10px}
+.ht-app .ht-event strong{display:inline-block;margin-right:.8rem}
