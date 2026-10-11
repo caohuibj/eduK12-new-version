@@ -37,7 +37,11 @@ const readSingleResume=(id:string):SingleResume|null=>{
     return saved
   }catch{return null}
 }
-type Answer=string|number|string[]|null
+type Answer=string|number|string[]|{_surveyRefusal:true}|null
+const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
+  !!answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer
+  &&answer._surveyRefusal===true
+const refusal=():{_surveyRefusal:true}=>({_surveyRefusal:true})
 const safePattern=/^[a-f0-9-]{36}$/i
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
 const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
@@ -89,21 +93,21 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
         {q.allowRefusal&&<td className="text-center"><input type="radio"
           aria-label={'不愿回答：'+row.label}
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
-          checked={answer[q.itemKey+':'+row.rowKey]==='REFUSED'}
-          onChange={()=>onChange(q.itemKey+':'+row.rowKey,'REFUSED')}/></td>}</tr>)}</tbody></table></div>}
+          checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
+          onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max}
-        aria-label={q.prompt} value={answer[q.itemKey]==='REFUSED'?'':answer[q.itemKey]??''}
-        disabled={answer[q.itemKey]==='REFUSED'}
+        aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
+        disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
       {q.allowRefusal&&q.type!=='MATRIX'&&<label className="block my-3 text-sm">
-        <input type="checkbox" checked={answer[q.itemKey]==='REFUSED'}
-          onChange={e=>onChange(q.itemKey,e.target.checked?'REFUSED':null)}/>
+        <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
+          onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
         我选择不回答这一题（REFUSED）
       </label>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full" aria-label={q.prompt}
         rows={q.type==='SHORT_TEXT'?2:5} maxLength={q.maxLength??(q.type==='SHORT_TEXT'?300:10000)}
-        value={answer[q.itemKey]==='REFUSED'?'':String(answer[q.itemKey]??'')}
-        disabled={answer[q.itemKey]==='REFUSED'}
+        value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
+        disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value)}/>}
     </fieldset>
   }
