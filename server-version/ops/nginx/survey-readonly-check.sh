@@ -21,5 +21,18 @@ actual="$(nginx -T 2>&1)" || {
 if ! printf '%s\n' "$actual" | grep -Eq 'server_name[[:space:]]+survey\.eduk12\.top([[:space:];]|$)'; then
   echo 'BLOCKED: no explicit survey.eduk12.top server_name in Nginx effective config'; exit 24;
 fi
-echo 'Survey HTTPS endpoint and Nginx host declaration observed.'
-echo 'Additional production acceptance: compare live backend image/Compose revision and verify /api/survey/auth/capabilities with approved flags.'
+printf '%s\n' '[Survey] Read-only Product/API route check:'
+# A healthy SPA root is insufficient: require backend JSON through actual Host.
+capabilities="$(curl --fail --silent --show-error --max-time 10 --header 'Accept: application/json' \
+  "https://$domain/api/survey/auth/capabilities")" || {
+  echo 'BLOCKED: Survey backend capabilities not served at the public Host'; exit 25;
+}
+if ! printf '%s\n' "$capabilities" | grep -Eq '"code"[[:space:]]*:[[:space:]]*0'; then
+  echo 'BLOCKED: public /api/survey route did not return a Survey API success'; exit 26;
+fi
+if ! printf '%s\n' "$capabilities" | grep -Eq '"analytics"[[:space:]]*:[[:space:]]*(true|false)' \
+  || ! printf '%s\n' "$capabilities" | grep -Eq '"publication"[[:space:]]*:[[:space:]]*(true|false)'; then
+  echo 'BLOCKED: expected Survey capability keys missing'; exit 27;
+fi
+echo 'Survey TLS, Nginx declaration and capabilities route observed (read-only).'
+echo 'Activation still requires approved backend flags, same release image and negative cross-origin checks.'
