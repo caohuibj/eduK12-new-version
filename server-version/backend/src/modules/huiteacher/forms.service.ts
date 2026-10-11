@@ -118,6 +118,9 @@ export async function publishHuiteacherForm(input:{
     if(row.status!=='DRAFT'||row.revision!==input.expectedRevision)
       fail('HUITEACHER_FORM_REVISION_CHANGED')
     const result=validate(row.definition,true)
+    // Survey research media assets are intentionally unavailable in Teacher.
+    if(result.definition.pages.some(p=>p.questions.some(q=>q.image)))
+      fail('HUITEACHER_FORM_IMAGE_REQUIRES_SEPARATE_LICENSED_ASSET',403)
     if(result.digest!==row.definitionDigest)fail('HUITEACHER_FORM_DIGEST_MISMATCH')
     const updated=await tx.huiteacherFormInstrument.updateMany({where:{
       id:row.id,organizationId:row.organizationId,
