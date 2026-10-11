@@ -20,7 +20,9 @@ export async function getOwnResearchTask(input:{
     throw new SurveyWaveError(403,'研究作答已经关闭')
   const units=own.compiledSnapshot.units.map(unit=>{
     if(unit.kind==='FORM'){
-      const d=assertSurveyDraft('FORM',unit.displayDefinition,true) as FormDraft
+      // Published definitions are immutable; do not retroactively invalidate an
+      // older Wave solely for an operator combination newly restricted in Builder.
+      const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
       return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,
           questions:page.questions.map(q=>({
