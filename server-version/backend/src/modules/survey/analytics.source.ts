@@ -6,6 +6,8 @@ import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publicatio
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
+import type { ScaleDefinitionV2 } from '../scale/scale-definition'
+import type { SituationDefinitionV2 } from '../situational/situation-branching'
 import { SurveyAnalyticsError } from './analytics.read'
 
 export interface ResearchRawCodebook {
@@ -29,6 +31,8 @@ export interface SurveySourceProjection {
   sourceRevision:number
   cutOff:string
   scores:FrozenScoreObservation[]
+  /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
+  scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
   raw:ResearchRawObservation[]
   codebook:ResearchRawCodebook[]
   attendance:{researchCode:string;waveId:string;status:string}[]
@@ -105,6 +109,28 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
     missingReason:(typeof r.value==='number'&&Number.isFinite(r.value)?null:'SHOWN_MISSING') as MissingReason|null,
   }))
 }
+/** The authoritative score variable list is part of the frozen scorer, not
+ * inferred from whichever participants happened to finish a Wave.
+ */
+function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen:ResearchFrozenUnit):
+  SurveySourceProjection['scoreColumns'] {
+  const keys=frozen.kind==='SCALE'
+    ?(frozen.compiledDefinition as ScaleDefinitionV2).scoring.scores.map(score=>score.key)
+    :frozen.kind==='SJT'
+      ?(frozen.compiledDefinition as SituationDefinitionV2).scoring.publishedMetrics.map(metric=>metric.key)
+      :[]
+  return keys.map(scoreKey=>({
+    projectId,waveId,waveOrdinal:ordinal,
+    measurement:{
+      instrumentKey:frozen.instrumentKey,scoreKey,scoringDigest:frozen.scoringDigest||'',
+      responseSignature:frozen.sourceDigest,
+      respondentType:frozen.kind==='SCALE'
+        ?(frozen.displayDefinition as ScaleDraft).respondentType
+        :(frozen.displayDefinition as SjtDraft).respondentType,
+      unit:null,
+    },
+  }))
+}
 const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:string)=>
   'W'+String(waveOrdinal).padStart(3,'0')+'__'
     +(instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
@@ -115,7 +141,9 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
  * No arbitrary project administrator inherits the raw-data grant.
  */
 export async function loadSurveySource(input:{
-  actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number
+  actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
+  /** Only Wide exports need the schema of Waves with no completed FINAL. */
+  includeWideSchema?:boolean
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -151,18 +179,33 @@ export async function loadSurveySource(input:{
     if(headers.length>max)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')
     const ids=headers.map(row=>row.id)
-    const publicationIds=[...new Set(headers.map(row=>row.publicationId))]
-    if(ids.length){
-      const [cipher]=await tx.$queryRaw<Array<{bytes:bigint}>>`
+    // A Wave may have STARTED attempts but no FINAL. Only Wide exports need
+    // its frozen schema to distinguish ABANDONED from NO_WAVE.
+    const frozenWaves=input.includeWideSchema?await tx.surveyWave.findMany({
+      where:{projectId:input.projectId,
+        ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
+        publicationId:{not:null}},
+      select:{id:true,ordinal:true,publicationId:true},
+      orderBy:{ordinal:'asc'},take:101,
+    }):[]
+    if(frozenWaves.length>100)
+      throw new SurveyAnalyticsError(413,'本次宽表波次数量超出安全上限')
+    const publicationIds=[...new Set([
+      ...headers.map(row=>row.publicationId),
+      ...frozenWaves.flatMap(w=>w.publicationId?[w.publicationId]:[]),
+    ])]
+    // Both byte budgets apply before loading any potentially large JSON or
+    // encrypted FINAL. The Publication budget counts each frozen id once.
+    if(ids.length||publicationIds.length){
+      const cipherBytes=ids.length?(await tx.$queryRaw<Array<{bytes:bigint}>>`
         SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint AS "bytes"
         FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)})
-      `
-      const [frozen]=await tx.$queryRaw<Array<{bytes:bigint}>>`
+      `)[0]?.bytes??0n:0n
+      const frozenBytes=publicationIds.length?(await tx.$queryRaw<Array<{bytes:bigint}>>`
         SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint AS "bytes"
         FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)})
-      `
-      if(!cipher||!frozen||cipher.bytes>BigInt(8*1024*1024)
-        ||frozen.bytes>BigInt(8*1024*1024))
+      `)[0]?.bytes??0n:0n
+      if(cipherBytes>BigInt(8*1024*1024)||frozenBytes>BigInt(8*1024*1024))
         throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
     }
     // Stage 2: fetch bounded bytes, and load each frozen Publication only
@@ -175,6 +218,19 @@ export async function loadSurveySource(input:{
       where:{id:{in:publicationIds}},
     }):[]
     const publicationById=new Map(publications.map(row=>[row.id,row]))
+    // Validate each immutable Publication once per RepeatableRead snapshot.
+    // Never reserialize its entire frozen JSON for every participant FINAL.
+    const verifiedSnapshots=new Map<string,ResearchFrozenPublication>()
+    for(const publication of publications){
+      const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+      if(publication.projectId!==input.projectId
+        ||snapshot.schemaVersion!==1||snapshot.purpose!=='RESEARCH_ONLY'
+        ||snapshot.projectId!==input.projectId||snapshot.runtimeStatus!=='SURVEY_FINAL_V1'
+        ||!Array.isArray(snapshot.units)||!snapshot.units.length
+        ||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+        invalid('冻结研究发布定义摘要不匹配')
+      verifiedSnapshots.set(publication.id,snapshot)
+    }
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
     const attendanceRows=await tx.surveyWaveAttempt.findMany({
@@ -194,7 +250,34 @@ export async function loadSurveySource(input:{
       .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
     // Row projection remains bounded independently from the ciphertext budget.
     const codebook=new Map<string,ResearchRawCodebook>()
+    const scoreColumns:SurveySourceProjection['scoreColumns']=[]
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
+    // Build expected variables from every selected frozen Wave, not only
+    // the sample that completed FINAL. This also covers entire empty Waves.
+    for(const wave of frozenWaves){
+      const publication=publicationById.get(wave.publicationId!)
+      const snapshot=publication&&verifiedSnapshots.get(publication.id)
+      if(!publication||!snapshot||snapshot.waveId!==wave.id)invalid('冻结波次来源缺失')
+      for(const frozen of snapshot.units){
+        const empty:FrozenUnitResult={
+          instrumentKey:frozen.instrumentKey,kind:frozen.kind,
+          sourceDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
+          rawAnswers:{},missing:[],privateScoring:null,
+        }
+        for(const item of rawItems(frozen,empty)){
+          const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,item.itemKey,frozen.sourceDigest)
+          if(codebook.has(columnKey))invalid('冻结研究变量编码重复')
+          codebook.set(columnKey,{
+            columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
+            instrumentKey:frozen.instrumentKey,itemKey:item.itemKey,kind:frozen.kind,
+            responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options,
+            definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
+            publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
+          })
+        }
+        scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
+      }
+    }
     for(const final of finals){
       const wave=final.wave,attempt=final.attempt
       const publication=publicationById.get(final.publicationId)
@@ -204,9 +287,9 @@ export async function loadSurveySource(input:{
         ||publication.projectId!==input.projectId||final.definitionDigest!==publication.definitionDigest)
         invalid('研究 FINAL 的项目、波次或发布来源不一致')
       if(attempt.participant?.status==='WITHDRAWN')continue
-      const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
-      if(canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==final.definitionDigest)
-        invalid('冻结研究发布定义摘要不匹配')
+      const snapshot=verifiedSnapshots.get(publication.id)
+      if(!snapshot||snapshot.waveId!==wave.id)
+        invalid('研究 FINAL 的冻结发布来源不一致')
       const result=decryptUnifiedRuntimePayload<SurveyComputedFinal>(final.resultsCipher)
       if(result.schemaVersion!==1||result.definitionDigest!==final.definitionDigest
         ||canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
@@ -245,6 +328,6 @@ export async function loadSurveySource(input:{
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
       cutOff:project.sourceCutOff.toISOString(),
-      scores,raw,codebook:[...codebook.values()],attendance}
+      scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
