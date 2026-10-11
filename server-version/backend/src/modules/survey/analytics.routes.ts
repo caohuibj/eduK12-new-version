@@ -7,6 +7,7 @@ import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sam
 import {describeSurveyPairedScoresPaged} from './analytics.paged'
 import { loadSurveySource } from './analytics.source'
 import { describeWave,describeWaveGroups } from './analytics.descriptive'
+import { describeSurveyFlowOperations } from './analytics.flow-operations'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -45,6 +46,19 @@ surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(re
     projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
     ...review.parse(req.body)})))
 
+const flowCohortInput=z.object({
+  category:z.object({
+    instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+    itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  }).strict().optional(),
+}).strict()
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/flow-cohort',wrap(req=>{
+  const details=flowCohortInput.parse(req.body)
+  return describeSurveyFlowOperations(req,{
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+    ...details,
+  })
+}))
 surveyAnalyticsRouter.get('/:pid/analytics/overview',wrap(req=>
   service.waveOverview(req.user!.userId,id.parse(req.params.pid))))
 surveyAnalyticsRouter.post('/:pid/analytics/paired-counts',wrap(req=>{
