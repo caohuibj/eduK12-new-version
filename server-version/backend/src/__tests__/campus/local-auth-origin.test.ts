@@ -1,5 +1,5 @@
 import express, { type Request, type Response, type NextFunction } from 'express'
-import type { Server } from 'node:http'
+import { request as httpRequest, type Server } from 'node:http'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // The router's real origin guard runs before an explicitly synthetic controller.
@@ -75,15 +75,29 @@ describe('legacy authentication campus origin guard', () => {
     const headers: Record<string, string> = {}
     if (host) headers.Host = host
     if (origin) headers.Origin = origin
-    const response = await fetch(endpoint, { method: 'POST', headers })
+    // Use the wire HTTP client: fetch/Undici can replace a supplied Host.
+    const response = await new Promise<{ status: number; setCookie?: string[]; body: Record<string, unknown> }>((resolve, reject) => {
+      const request = httpRequest(endpoint, { method: 'POST', headers }, res => {
+        let body = ''
+        res.setEncoding('utf8')
+        res.on('data', chunk => { body += chunk })
+        res.on('end', () => {
+          try { resolve({ status: res.statusCode!, setCookie: res.headers['set-cookie'], body: JSON.parse(body) }) }
+          catch (error) { reject(error) }
+        })
+        res.on('error', reject)
+      })
+      request.on('error', reject)
+      request.end()
+    })
     expect(response.status).toBe(status)
     if (status === 403) {
       expect(state.reached).not.toHaveBeenCalled()
-      expect(response.headers.get('set-cookie')).toBeNull()
-      expect((await response.json()).message).toContain('校园版请使用独立账号入口')
+      expect(response.setCookie).toBeUndefined()
+      expect(response.body.message).toContain('校园版请使用独立账号入口')
     } else {
       expect(state.reached).toHaveBeenCalledOnce()
-      expect((await response.json()).controllerReached).toBe(true)
+      expect(response.body.controllerReached).toBe(true)
     }
   })
 })
