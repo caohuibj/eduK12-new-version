@@ -4,7 +4,7 @@
  */
 export type MissingReason =
   | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'NO_WAVE'
-  | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN'
+  | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN' | 'QUALITY_EXCLUDED'
 export interface SurveyMeasurementIdentity {
   instrumentKey:string
   scoreKey:string
