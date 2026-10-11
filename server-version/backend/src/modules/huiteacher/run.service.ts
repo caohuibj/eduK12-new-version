@@ -99,7 +99,10 @@ export async function publishTeacherRun(input:Key&{expectedVersion:number}){
 }
 export async function progressTeacherRun(input:Key){
   const link=await activeLink(input)
-  return readAssessmentRunProgress(input.organizationId,link.runId)
+  const progress=await readAssessmentRunProgress(input.organizationId,link.runId)
+  // Manager dashboard receives only aggregate states, never individual
+  // execution IDs, runtime binding refs, or sortable respondent timestamps.
+  return {runId:progress.runId,total:progress.total,counts:progress.counts}
 }
 export async function closeTeacherRun(input:Key){
   const link=await activeLink(input)

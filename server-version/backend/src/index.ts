@@ -63,6 +63,7 @@ import huiteacherEvaluationRoutes from './modules/huiteacher/evaluation.routes'
 import huiteacherFormsRoutes from './modules/huiteacher/forms.routes'
 import huiteacherRunRoutes from './modules/huiteacher/run.routes'
 import huiteacherFormRuntimeRoutes from './modules/huiteacher/formRuntime.routes'
+import huiteacherGroupReportRoutes from './modules/huiteacher/groupReport.routes'
 import platformEducationRoutes from './modules/huiteacher/platform.routes'
 import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
@@ -298,6 +299,7 @@ app.use('/api/huiteacher',huiteacherEvaluationRoutes)
 app.use('/api/huiteacher',huiteacherFormsRoutes)
 app.use('/api/huiteacher',huiteacherRunRoutes)
 app.use('/api/huiteacher',huiteacherFormRuntimeRoutes)
+app.use('/api/huiteacher',huiteacherGroupReportRoutes)
 app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
