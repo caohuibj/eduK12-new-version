@@ -32,12 +32,12 @@ BEGIN
       AND e."status"='ACTIVE'
     WHERE o."id"=NEW."organization_id" AND o."product_domain"='SCHOOL'
       AND o."status"='ACTIVE'
-  ) OR NOT EXISTS (
+  ) OR (NEW."status"='ACTIVE' AND NOT EXISTS (
     SELECT 1 FROM "registered_assessment_resources" r
     WHERE r."id"=NEW."resource_id"
       AND r."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
       AND r."status"='PUBLISHED'
-  ) THEN
+  )) THEN
     RAISE EXCEPTION 'Teacher Scale licensing requires released adult-self resource and enabled school'
       USING ERRCODE='23514';
   END IF;
