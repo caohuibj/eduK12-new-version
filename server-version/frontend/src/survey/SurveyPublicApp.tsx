@@ -184,7 +184,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
-      {unit.image&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
+      {unit.image&&proof&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
       {unit.questions?.map(q=>item({itemKey:q.questionKey,
         type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
         prompt:q.prompt,options:q.options,required:true,
