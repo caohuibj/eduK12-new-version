@@ -316,7 +316,7 @@ export default function SurveyPublicApp(){
           ?'多波次研究：同一研究编号的回答将在本研究内关联。无需登录或提供真实姓名。'
           :'独立匿名研究：本次作答不与其他波次关联，无需登录或提供真实姓名。'}</p>
       </section>
-      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&<section className="bg-white rounded-xl border p-5">
+      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>
         <p className="text-sm my-2">公开研究编号不是登录密码，必须同时提供本人私密恢复凭证。</p>
         <form onSubmit={recover} className="grid gap-3">
@@ -348,7 +348,7 @@ export default function SurveyPublicApp(){
         <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
           停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
         </button>}
-      {!task&&!general&&<section className="bg-white rounded-xl border p-5">
+      {!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
         {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
