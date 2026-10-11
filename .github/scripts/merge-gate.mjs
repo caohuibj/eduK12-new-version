@@ -10,6 +10,10 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'homepage-copy') {
+    let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
+    return ['scope',...(!draft ? ['homepage-copy',...(p?.toolsChanged ? ['codeql'] : [])] : [])];
+  }
   if (scope.application_route === 'campus') return ['scope','campus','codeql'];
   if (['A','B'].includes(scope.application_route)) {
     let p; try { p = JSON.parse(scope.release_plan || '{}'); } catch { p = {}; }
@@ -47,6 +51,15 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'homepage-copy') {
+    let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
+    if (!p || p.schema!==1 || p.route!=='homepage-copy' || scope.scenario!=='homepage-copy'
+      || JSON.stringify(p.changed)!==JSON.stringify(['frontend']) || !Array.isArray(p.pages) || !p.pages.length
+      || typeof p.toolsChanged!=='boolean' || !/^[a-f0-9]{40}$/.test(p.base||'') || !/^[a-f0-9]{40}$/.test(p.head||'')
+      || JSON.stringify(p.required)!==JSON.stringify(['copy-boundary','frontend-candidate','runtime-scan','homepage-browser',...(p.toolsChanged?['sast']:[])])
+      || Object.keys(acceptanceJobs).some(k=>scope[k]!=='false')) failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.application_route === 'campus') {
     let p;try{p=JSON.parse(scope.campus_plan);}catch{}
     if(!p||p.schema!==1||p.route!=='campus'||scope.scenario!=='campus'||scope.codeql!=='true'||!Array.isArray(p.changed)||!p.changed.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['campus-contracts','candidate-browser','runtime-scans','sast'])||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
@@ -105,6 +118,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const {campusPlan}=await import('./campus-scope.mjs');const {changedEntries}=await import('./content-scope.mjs');
     const p=JSON.parse(needs.scope.outputs.campus_plan);
     if(JSON.stringify(campusPlan(changedEntries(p.base,p.head),p.base,p.head))!==JSON.stringify(p))failed.push('recomputed-campus-plan');
+  }
+  if (needs.scope?.outputs?.application_route==='homepage-copy') {
+    const {homepageCopyPlan}=await import('./homepage-copy-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.homepage_copy_plan);
+    const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if (p.head!==head || JSON.stringify(homepageCopyPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p)) failed.push('recomputed-homepage-copy-plan');
   }
   console.log(JSON.stringify({ required: requiredChecks(needs, draft), failed }));
   if (failed.length) process.exit(1);
