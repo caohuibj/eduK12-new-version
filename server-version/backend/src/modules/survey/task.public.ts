@@ -33,6 +33,9 @@ export async function getOwnResearchTask(input:{
     return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
       stimulus:d.stimulus,scenarioTitle:d.title,
       questions:d.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,
+        responseType:q.responseType??'SINGLE',
+        minSelections:q.responseType==='MULTIPLE'?(q.minSelections??1):undefined,
+        maxSelections:q.responseType==='MULTIPLE'?(q.maxSelections??q.options.length):undefined,
         options:q.options.map(o=>({optionKey:o.optionKey,label:o.label}))}))}
   })
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,

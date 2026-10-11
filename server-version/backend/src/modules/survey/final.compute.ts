@@ -3,6 +3,7 @@ import { scoreScale } from '../scale/scale-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
 import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
+import { resolveSurveySjtAnswer } from './sjt-selection'
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -157,15 +158,18 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效 SJT 题目')
   const definition=unit.compiledDefinition as SituationDefinitionV2
   const responses:SituationalResponse[]=[]
-  const raw:Record<string,string>={}
+  const raw:Record<string,string|string[]>={}
   for(const q of display.questions){
-    const choice=optionValue(answers[q.questionKey],q.options.map(o=>o.optionKey),'answers.'+q.questionKey,true)
+    let chosen:{scorerOptionKey:string;frozenResponse:string|string[]}
+    try{chosen=resolveSurveySjtAnswer(q,answers[q.questionKey])}
+    catch(e){invalid('answers.'+q.questionKey,e instanceof Error?e.message:'不合法的情境选择')}
+    const choice=chosen.scorerOptionKey
     const channels=definition.scenes.flatMap(scene=>scene.channels
       .filter(channel=>channel.channelKey===q.questionKey)
       .map(channel=>({scene,channel})))
     if(choice===null||channels.length!==1)invalid('answers.'+q.questionKey,'冻结 SJT 问题定义不明确')
     responses.push({sceneKey:channels[0].scene.sceneKey,channelKey:q.questionKey,responseValue:choice})
-    raw[q.questionKey]=choice
+    raw[q.questionKey]=chosen.frozenResponse
   }
   const journey=deriveAuthoritativeSituationalTrajectory(definition,responses)
   if(!journey.reachedTerminal)invalid('answers','未完成情境要求的所有合法步骤')

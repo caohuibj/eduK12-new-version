@@ -7,6 +7,7 @@ import { compileSjtTemplate, SjtTemplateError } from '../situational/authoring/t
 import type { SituationalResponse } from '../situational/situation-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
+import { expandedSurveySjtOptions,resolveSurveySjtAnswer } from './sjt-selection'
 import {
   assertSurveyDraft, validateSurveyDraft, SurveyDraftError,
   type SurveyKind, type ScaleDraft, type SjtDraft, type FormDraft,
@@ -71,6 +72,8 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
 
 export function compileResearchSjt(instrumentKey:string,input:unknown) {
   const d=assertSurveyDraft('SJT',input,true) as SjtDraft
+  const optionsByQuestion=new Map(d.questions.map(q=>[q.questionKey,expandedSurveySjtOptions(q)]))
+  const scorerOptions=(q:SjtDraft['questions'][number])=>optionsByQuestion.get(q.questionKey)!
   const template={
     templateVersion:'sjt-upload-v1' as const,
     instrumentKey:'research-'+canonicalHash(instrumentKey).slice(0,24),
@@ -91,10 +94,10 @@ export function compileResearchSjt(instrumentKey:string,input:unknown) {
       kind:'CORE' as const,purpose:'BEHAVIOR_TENDENCY' as const,
       required:true,order:0,
     })),
-    options:d.questions.flatMap(q=>q.options.map(o=>({
+    options:d.questions.flatMap(q=>scorerOptions(q).map(o=>({
       questionKey:q.questionKey,optionKey:o.optionKey,label:o.label,
     }))),
-    transitions:d.questions.flatMap((q,index)=>q.options.map(o=>({
+    transitions:d.questions.flatMap((q,index)=>scorerOptions(q).map(o=>({
       nodeKey:q.questionKey,optionKey:o.optionKey,
       nextNodeKey:d.questions[index+1]?.questionKey||'END',bridgeText:'',
     }))),
@@ -106,13 +109,13 @@ export function compileResearchSjt(instrumentKey:string,input:unknown) {
       nodeKey:q.questionKey,metricKey:m.metricKey,
       applicability:'OPPORTUNITY' as const,
     }))),
-    scores:d.questions.flatMap(q=>q.options.flatMap(o=>d.metrics.map(m=>({
+    scores:d.questions.flatMap(q=>scorerOptions(q).flatMap(o=>d.metrics.map(m=>({
       nodeKey:q.questionKey,optionKey:o.optionKey,metricKey:m.metricKey,
       contribution:o.contributions[m.metricKey],
     })))),
     // The scientific report is not exposed to participants. PR3 enforces a
     // separate, General-only participant response projection.
-    feedback:d.questions.flatMap(q=>q.options.map(o=>({
+    feedback:d.questions.flatMap(q=>scorerOptions(q).map(o=>({
       questionKey:q.questionKey,optionKey:o.optionKey,
       kind:'ACTION' as const,text:'仅记录研究选择，不构成正确或错误的个人评价。',
     }))),
@@ -128,7 +131,7 @@ export function compileResearchSjt(instrumentKey:string,input:unknown) {
     throw error
   }
 }
-export type PreviewAnswers=Record<string,string|number>
+export type PreviewAnswers=Record<string,string|number|string[]>
 export function previewResearchInstrument(input:{
   kind:SurveyKind;instrumentKey:string;title:string;definition:unknown;answers?:PreviewAnswers
 }){
@@ -152,12 +155,16 @@ export function previewResearchInstrument(input:{
     }
     const compiled=compileResearchSjt(input.instrumentKey,input.definition)
     const answers=input.answers||{}
+    const authored=input.definition as SjtDraft
+    const normalizedResponses=Object.fromEntries(authored.questions
+      .filter(q=>Object.prototype.hasOwnProperty.call(answers,q.questionKey))
+      .map(q=>[q.questionKey,resolveSurveySjtAnswer(q,answers[q.questionKey]).scorerOptionKey]))
     const values:SituationalResponse[]=compiled.package.definition.scenes
       .flatMap(scene=>scene.channels
-        .filter(channel=>Object.prototype.hasOwnProperty.call(answers,channel.channelKey))
+        .filter(channel=>Object.prototype.hasOwnProperty.call(normalizedResponses,channel.channelKey))
         .map(channel=>({
           sceneKey:scene.sceneKey,channelKey:channel.channelKey,
-          responseValue:answers[channel.channelKey],
+          responseValue:normalizedResponses[channel.channelKey],
         })))
     const score=Object.keys(answers).length?scoreSituationalModel(asLinearSituationDefinition(compiled.package.definition),values):null
     return {ok:true,issues:[],kind:'SJT',definitionDigest:hash,

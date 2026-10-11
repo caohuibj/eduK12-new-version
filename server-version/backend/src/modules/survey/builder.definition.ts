@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { expandedSurveySjtOptions } from './sjt-selection'
 
 /** Survey-only research drafts, never platform scientific publication definitions. */
 export const surveyKindSchema = z.enum(['FORM','SCALE','SJT'])
@@ -62,6 +63,9 @@ export const sjtDraftSchema=z.object({
   }).strict()).max(20),
   questions:z.array(z.object({
     questionKey:key,prompt:note,
+    responseType:z.enum(['SINGLE','MULTIPLE']).optional(),
+    minSelections:z.number().int().min(1).max(6).optional(),
+    maxSelections:z.number().int().min(1).max(6).optional(),
     options:z.array(z.object({
       optionKey:key,label,
       contributions:z.record(key,z.number().finite().min(-100000).max(100000)),
@@ -194,6 +198,16 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
     d.questions.forEach((q,i)=>{
       const path=`questions.${i}`
       unique(q.options.map(o=>o.optionKey),path+'.options',issues)
+      if(q.responseType==='MULTIPLE'){
+        const min=q.minSelections??1,max=q.maxSelections??q.options.length
+        if(min>max||max>q.options.length||q.options.length>6)
+          err(issues,path+'.maxSelections','多选限 2–6 个选项，最少/最多选择必须有效')
+        // Reuse official SINGLE_CHOICE scorer with a bounded deterministic
+        // enumeration of legal combinations; never add ad-hoc score logic.
+        try{expandedSurveySjtOptions(q)}
+        catch(e){err(issues,path+'.options',e instanceof Error?e.message:'多选组合无效')}
+      }else if(q.minSelections!==undefined||q.maxSelections!==undefined)
+        err(issues,path,'单选题不得配置多选次数')
       if(forPreview)requireText(q.prompt,path+'.prompt',issues)
       if(forPreview&&q.options.length<2)err(issues,path+'.options','至少两个选项')
       q.options.forEach((o,j)=>{
