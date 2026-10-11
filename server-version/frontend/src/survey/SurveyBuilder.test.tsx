@@ -19,7 +19,7 @@ const sjt=():SjtDraft=>({
 })
 function FormHost(){
   const [state,setState]=useState<FormDraft>({schemaVersion:1,pages:[]})
-  return <><ResearchFormEditor value={state} onChange={setState}/>
+  return <><ResearchFormEditor value={state} onChange={setState} projectId="11111111-1111-4111-8111-111111111111"/>
     <output data-testid="form-state">{JSON.stringify(state)}</output></>
 }
 function ScaleHost(){
@@ -29,7 +29,7 @@ function ScaleHost(){
 }
 function SjtHost(){
   const [state,setState]=useState(sjt())
-  return <><ResearchSjtEditor value={state} onChange={setState}/>
+  return <><ResearchSjtEditor value={state} onChange={setState} projectId="11111111-1111-4111-8111-111111111111"/>
     <output data-testid="sjt-state">{JSON.stringify(state)}</output></>
 }
 describe('Survey Research Builder editing widgets',()=>{

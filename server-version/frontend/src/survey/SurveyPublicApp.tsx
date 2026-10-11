@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import type { SurveyImage } from './builder.types'
+import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[]}
 type Choice={optionKey:string;label:string}
-type Question={itemKey:string;questionKey?:string;type:string;prompt:string;required:boolean;
+type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;maxLength?:number;minSelections?:number;maxSelections?:number}
-type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;
+type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];
@@ -46,8 +48,8 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
   return envelope.data
 }
-function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>;
-  onChange:(name:string,value:Answer)=>void}){
+function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,Answer>;
+  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof}){
   const visible=(q:Question)=>{
     if(!q.displayIf)return true
     const prior=answer[q.displayIf.itemKey]
@@ -72,6 +74,7 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
     if(!visible(q))return null
     return <fieldset className="border rounded-lg p-4 my-4 bg-white" key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
+      {q.image&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
@@ -111,6 +114,7 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
+      {unit.image&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
       {unit.questions?.map(q=>item({itemKey:q.questionKey,
         type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
         prompt:q.prompt,options:q.options,required:true,
@@ -348,6 +352,9 @@ export default function SurveyPublicApp(){
         <div className="bg-white border rounded-xl p-4"><h3 className="font-semibold">本轮研究作答</h3>
           <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p></div>
         {task.units.map(unit=><TaskForm key={unit.instrumentKey} unit={unit}
+          proof={{publicId,attemptId,accessCredential,
+            ...(info.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
+          }}
           answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>({
             ...previous,[unit.instrumentKey]:{...(previous[unit.instrumentKey]||{}),[key]:value},
           }))}/>)}
