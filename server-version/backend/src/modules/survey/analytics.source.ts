@@ -18,6 +18,7 @@ export interface ResearchRawCodebook {
   publicationVersion:number
   instrumentRevision:number
   timeZone?:'Asia/Shanghai'|'UTC'
+  valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -55,6 +56,10 @@ const missingFrom=(unit:FrozenUnitResult,key:string):MissingReason|null=>{
   const row=unit.missing.find(x=>x.itemKey===key)
   return row?.reason??null
 }
+const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEncoding']>=>
+  type==='RANK_ORDER'||type==='MULTIPLE'||type==='MATRIX_MULTIPLE'||type==='SJT_MULTIPLE'
+    ?'JSON_STRING_ARRAY':type==='CONSTANT_SUM'?'JSON_NUMBER_OBJECT':
+    type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
 const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
   itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
   timeZone?:'Asia/Shanghai'|'UTC'
@@ -79,7 +84,11 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
             value:cleanValue(normalized[row.rowKey]??null),
             missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
-      }else add(q.itemKey,q.prompt,q.type,options,q.timeZone)
+      }else{
+        add(q.itemKey,q.prompt,q.type,options,q.timeZone)
+        if(q.otherOptionKey)
+          add(q.itemKey+':other',q.prompt+'／其他填写','OTHER_TEXT',[])
+      }
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
@@ -327,6 +336,7 @@ export async function loadSurveySource(input:{
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
+            valueEncoding:answerValueEncoding(item.responseType),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
@@ -377,6 +387,7 @@ export async function loadSurveySource(input:{
               publicationVersion:publication.version,
               instrumentRevision:frozen.draftRevision,
               ...(r.timeZone?{timeZone:r.timeZone}:{}),
+              valueEncoding:answerValueEncoding(r.responseType),
             })
         }
       }
