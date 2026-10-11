@@ -2814,6 +2814,7 @@ model SurveyWave {
   revision        Int           @default(0)
   consentText     String        @map("consent_text")
   consentVersion  Int           @default(1) @map("consent_version")
+  instrumentIds   Json          @default("[]") @map("instrument_ids")
   opensAt         DateTime?     @map("opens_at") @db.Timestamptz(6)
   closesAt        DateTime?     @map("closes_at") @db.Timestamptz(6)
   finishUntil     DateTime?     @map("finish_until") @db.Timestamptz(6)

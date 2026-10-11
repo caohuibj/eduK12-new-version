@@ -21,7 +21,7 @@ CREATE TABLE "survey_publications" (
   "id" TEXT PRIMARY KEY,
   "project_id" TEXT NOT NULL REFERENCES "survey_projects"("id") ON DELETE RESTRICT,
   "definition_digest" TEXT NOT NULL CHECK ("definition_digest" ~ '^[0-9a-f]{64}$'),
-  "compiled_snapshot" JSONB NOT NULL CHECK (jsonb_typeof("compiled_snapshot")='object'),
+  "compiled_snapshot" JSONB NOT NULL CHECK (jsonb_typeof("compiled_snapshot")='object' AND octet_length("compiled_snapshot"::text)<=4194304),
   "consent_version" INTEGER NOT NULL CHECK ("consent_version">0),
   "purpose" TEXT NOT NULL DEFAULT 'RESEARCH_ONLY' CHECK ("purpose"='RESEARCH_ONLY'),
   "version" INTEGER NOT NULL CHECK ("version">0),
@@ -39,6 +39,7 @@ CREATE TABLE "survey_waves" (
   "revision" INTEGER NOT NULL DEFAULT 0 CHECK ("revision">=0),
   "consent_text" TEXT NOT NULL CHECK (length("consent_text")<=20000),
   "consent_version" INTEGER NOT NULL DEFAULT 1 CHECK ("consent_version">0),
+  "instrument_ids" JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof("instrument_ids")='array' AND jsonb_array_length("instrument_ids")<=30),
   "opens_at" TIMESTAMPTZ(6),
   "closes_at" TIMESTAMPTZ(6),
   "finish_until" TIMESTAMPTZ(6),
@@ -127,3 +128,20 @@ CREATE TRIGGER survey_publication_frozen BEFORE UPDATE OR DELETE ON "survey_publ
   FOR EACH ROW EXECUTE FUNCTION survey_frozen_immutable();
 CREATE TRIGGER survey_consent_frozen BEFORE UPDATE OR DELETE ON "survey_consents"
   FOR EACH ROW EXECUTE FUNCTION survey_frozen_immutable();
+
+-- Once a Wave has frozen material, its definition and consent cannot change
+-- in place; administration may only pause/close admission or extend finish.
+CREATE OR REPLACE FUNCTION survey_wave_published_guard() RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  IF OLD."publication_id" IS NOT NULL
+    AND (NEW."publication_id" IS DISTINCT FROM OLD."publication_id"
+      OR NEW."consent_text" IS DISTINCT FROM OLD."consent_text"
+      OR NEW."consent_version" IS DISTINCT FROM OLD."consent_version"
+      OR NEW."instrument_ids" IS DISTINCT FROM OLD."instrument_ids") THEN
+    RAISE EXCEPTION 'Published Survey wave definition is immutable' USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
+END; $$;
+CREATE TRIGGER survey_wave_published_guard BEFORE UPDATE OF
+  "publication_id","consent_text","consent_version","instrument_ids" ON "survey_waves"
+  FOR EACH ROW EXECUTE FUNCTION survey_wave_published_guard();
