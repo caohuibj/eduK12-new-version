@@ -132,6 +132,7 @@ export async function submitResearchFinal(input:FinalInput){
       data:{status:'COMPLETED',completedAt:receipt.completedAt},
     })
     if(updated.count!==1)invalid('作答状态变更发生冲突')
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
       generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}

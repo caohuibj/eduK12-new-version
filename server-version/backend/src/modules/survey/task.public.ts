@@ -65,6 +65,9 @@ export async function getOwnResearchTask(input:{
   })
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
     definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY',units,
+    ...(own.compiledSnapshot.checkpointPolicy?{
+      checkpointPolicy:{enabled:true,ttlHours:own.compiledSnapshot.checkpointPolicy.ttlHours},
+    }:{}),
     ...(assignment&&own.compiledSnapshot.flow?{
       flow:buildSurveyFlowPublicProjection(own.compiledSnapshot.flow,assignment),
     }:{}),}

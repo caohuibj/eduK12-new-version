@@ -76,6 +76,7 @@ export async function screenOutResearchAttempt(input:FinalInput){
       id:own.attemptId,projectId:own.projectId,status:'STARTED',
     },data:{status:'SCREENED_OUT',completedAt:now}})
     if(updated.count!==1)throw new SurveyFinalError(409,'重复结束作答请求')
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:own.attemptId}})
     await tx.surveyEvent.create({data:{
       id:randomUUID(),actorUserId:null,projectId:own.projectId,
       action:'SURVEY_FLOW_SCREENED_OUT',

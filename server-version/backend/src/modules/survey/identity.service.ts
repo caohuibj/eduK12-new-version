@@ -205,6 +205,8 @@ export async function withdrawLinkedResearchData(input:{
       projectId:input.projectId,participantId:participant.participantId,
       excludedAt:null,status:{in:['STARTED','COMPLETED','SCREENED_OUT']},
     },data:{excludedAt:when,status:'WITHDRAWN',flowAssignmentCipher:null}})
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId:input.projectId,
+      attempt:{participantId:participant.participantId}}})
     // An already-created export may still contain withdrawn responses.
     // Revoke future downloads atomically with the participant exclusion.
     await tx.surveyExportTicket.updateMany({where:{
@@ -242,6 +244,7 @@ export async function withdrawSingleResearchAttempt(input:{
     await tx.surveyWaveAttempt.update({where:{id:attempt.id},data:{
       status:'WITHDRAWN',excludedAt:new Date(),flowAssignmentCipher:null,
     }})
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
     await tx.surveyExportTicket.updateMany({where:{
       projectId:project.id,status:'READY',
     },data:{status:'REVOKED'}})
