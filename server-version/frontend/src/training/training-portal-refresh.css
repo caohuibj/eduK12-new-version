@@ -33,7 +33,7 @@
 }
 .hui-training .training-portal .training-home-brand {
   padding: 6px 12px 6px 6px;
-  background: rgb(253 251 247 / 70%);
+  background: transparent;
   border-radius: 12px;
 }
 .hui-training .training-portal-actions { display: flex; gap: 12px; }
@@ -193,13 +193,13 @@
   border-radius: 5px;
 }
 .hui-training .training-portal :is(a,button):focus-visible { outline: 3px solid #255242; outline-offset: 4px; }
-/* The header switches the same two role entries between login and registration. */
-.hui-training .training-portal-login[aria-pressed="true"] {
+/* Preserve the primary login action on the unified entrance. */
+.hui-training .training-portal-login--primary {
   border-color: #1f4d3b;
   background: #1f4d3b;
   color: #fffdf8;
 }
-.hui-training .training-portal-login[aria-pressed="true"]:hover { background: #173d31; }
+.hui-training .training-portal-login--primary:hover { background: #173d31; }
 .hui-training .training-role-cards { position: relative; padding-top: 36px; }
 .hui-training .training-role-mode {
   grid-column: 1 / -1;

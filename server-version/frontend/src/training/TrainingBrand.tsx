@@ -1,4 +1,4 @@
-import bookMountainSymbol from './training-book-mountain.webp'
+import bookMountainSymbol from './training-book-mountain.svg'
 import './training-brand.css'
 
 /** Shared training identity: an open book, mountains, and H as the learning path. */

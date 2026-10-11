@@ -113,15 +113,15 @@ const TeacherRegister: React.FC = () => {
 
   if (submitted) {
     return (
-      <AuthShell tone="teacher" title="教师账号注册" description="注册信息已提交" registrationStep="submitted" backTo={authLink("/teacher/account-login")} backLabel="返回教师登录">
+      <AuthShell tone="teacher" title="教师账号注册" description="注册信息已提交" registrationStep="submitted" backTo={authLink(training ? "/login" : "/teacher/account-login")} backLabel={training ? "返回登录" : "返回教师登录"}>
         <div className="text-center py-2">
           <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-xl font-bold text-gray-800 mb-2">已提交，等待管理员审核</h2>
           <p className="text-gray-600 mb-6 text-sm leading-7">
             账号已创建。管理员在「用户管理」中点通过后，即可用刚才设置的用户名和密码登录。
           </p>
-          <Link to={authLink("/teacher/account-login")} className="btn-primary inline-flex w-full items-center justify-center">
-            {training ? '前往培训师登录' : '前往教师登录'}
+          <Link to={authLink(training ? "/login" : "/teacher/account-login")} className="btn-primary inline-flex w-full items-center justify-center">
+            {training ? '前往登录' : '前往教师登录'}
           </Link>
         </div>
       </AuthShell>
@@ -235,7 +235,7 @@ const TeacherRegister: React.FC = () => {
 
       {training && <div className="training-auth-register-entry">
         <span>已有培训师账号？</span>
-        <Link to={authLink("/teacher/account-login")} className="text-action hover:underline font-medium">已有账号，去登录</Link>
+        <Link to={authLink(training ? "/login" : "/teacher/account-login")} className="text-action hover:underline font-medium">已有账号，去登录</Link>
       </div>}
       <div className="hui-auth-note">
         <strong>账号说明</strong>

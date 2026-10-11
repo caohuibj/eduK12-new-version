@@ -78,6 +78,13 @@ export const authController = {
       })
       if (!user || user.accountDomain === 'SCHOOL') return failedLogin()
 
+      // This flag is set only by the dedicated server-side training entrance.
+      // Resolve authority before issuing any cookie; never trust a client role.
+      if (res.locals?.trainingEntrance && (
+        (user.role !== UserRole.STUDENT && user.role !== UserRole.TEACHER)
+        || !['TRAINING', 'LEGACY'].includes(user.accountDomain)
+      )) return failedLogin()
+
       // Verify the entrance against authoritative account data before issuing a session.
       // Omitted entrance preserves the existing general login contract.
       if (expectedRole && user.role !== expectedRole) {

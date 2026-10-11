@@ -52,6 +52,7 @@ type AuthShellProps = {
   heroDescription?: string
   heroBullets?: readonly string[]
   registrationStep?: 'verify' | 'account' | 'submitted'
+  trainingUnified?: boolean
 }
 
 export default function AuthShell({
@@ -66,22 +67,24 @@ export default function AuthShell({
   heroDescription,
   heroBullets,
   registrationStep,
+  trainingUnified = false,
 }: AuthShellProps) {
   const { pathname } = useLocation()
   const authLink = useAuthLinks()
   const preset = toneContent[tone]
   const training = isTrainingHost() && (tone === 'student' || tone === 'teacher')
-  const Icon = training ? (tone === 'student' ? UserRound : GraduationCap) : preset.Icon
+  const Icon = training ? (trainingUnified ? BookOpenCheck : tone === 'student' ? UserRound : GraduationCap) : preset.Icon
   const trainingRole = tone === 'student' ? '学员' : '培训师'
+  const trainingHeroLines = trainingUnified ? ['让学习，', '更有回响。'] : tone === 'student' ? ['循着课程，', '慢慢向前。'] : ['以所学，', '启发更多人。']
   const copy = (value: string) => training ? value.replace(/教师邀请码|教师码/g, '培训师注册码').replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
   const displayHeroTitle = training ? (tone === 'student' ? '循着课程，慢慢向前。' : '以所学，启发更多人。') : (heroTitle ?? preset.heroTitle)
   const displayHeroDescription = training
-    ? (tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
+    ? (trainingUnified ? '学习与教学，从一个账号开始。' : tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
     : (heroDescription ?? preset.heroDescription)
-  const registration = training && ['/student/course-login', '/student/register', '/teacher/login', '/teacher/register'].includes(pathname)
-  const accountStep = registrationStep ? registrationStep !== 'verify' : pathname.endsWith('/register')
+  const registration = training && ['/register', '/student/course-login', '/student/register', '/teacher/login', '/teacher/register'].includes(pathname)
+  const accountStep = registrationStep ? registrationStep !== 'verify' : ['/student/register', '/teacher/register'].includes(pathname)
   const submitted = registrationStep === 'submitted'
-  const showAuthModes = training && ['/student/login', '/student/course-login', '/student/register', '/teacher/account-login', '/teacher/login', '/teacher/register'].includes(pathname)
+  const showAuthModes = training && ['/login', '/register', '/student/login', '/student/course-login', '/student/register', '/teacher/account-login', '/teacher/login', '/teacher/register'].includes(pathname)
   const bullets = training ? [] : (heroBullets ?? preset.bullets)
 
   const backControl = onBack ? (
@@ -105,8 +108,8 @@ export default function AuthShell({
           </Link>}
 
           <div className="hui-auth-hero__copy">
-            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? `${trainingRole}入口` : preset.label}</span>
-            <p className="hui-auth-hero__title">{training ? <>{(tone === 'student' ? ['循着课程，', '慢慢向前。'] : ['以所学，', '启发更多人。']).map(line => <span className="training-auth-title-line" key={line}>{line}</span>)}</> : displayHeroTitle}</p>
+            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? (trainingUnified ? '培训账号入口' : `${trainingRole}入口`) : preset.label}</span>
+            <p className="hui-auth-hero__title">{training ? <>{trainingHeroLines.map(line => <span className="training-auth-title-line" key={line}>{line}</span>)}</> : displayHeroTitle}</p>
             <p className="hui-auth-hero__description">{displayHeroDescription}</p>
           </div>
 
@@ -121,10 +124,10 @@ export default function AuthShell({
           {!training && backControl}
 
           <div className="hui-auth-card">
-            {showAuthModes && <nav className="training-auth-mode-switch" aria-label={`${trainingRole}账号入口`}>
-              <Link to={authLink(tone === 'student' ? '/student/login' : '/teacher/account-login')}
+            {showAuthModes && <nav className="training-auth-mode-switch" aria-label="培训账号入口">
+              <Link to={authLink('/login')}
                 aria-current={!registration ? 'page' : undefined}>登录</Link>
-              <Link to={authLink(tone === 'student' ? '/student/course-login' : '/teacher/login')}
+              <Link to={authLink('/register')}
                 aria-current={registration ? 'page' : undefined}>注册</Link>
             </nav>}
             <header className="hui-auth-card__header">
@@ -136,7 +139,7 @@ export default function AuthShell({
             </header>
             {registration && <ol className="training-auth-steps" aria-label="注册步骤">
               <li aria-current={!accountStep ? 'step' : undefined} className={!accountStep ? 'is-current' : 'is-complete'}>
-                <span>{accountStep ? '✓' : '1'}</span>{tone === 'student' ? '验证课程码' : '验证注册码'}
+                <span>{accountStep ? '✓' : '1'}</span>{!trainingUnified && tone === 'student' ? '验证课程码' : '验证注册码'}
               </li>
               <li aria-current={accountStep && !submitted ? 'step' : undefined} className={submitted ? 'is-complete' : accountStep ? 'is-current' : ''}>
                 <span>{submitted ? '✓' : '2'}</span>{submitted ? '等待审核' : '创建账号'}

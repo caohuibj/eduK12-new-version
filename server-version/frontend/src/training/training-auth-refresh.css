@@ -35,7 +35,7 @@
 .hui-training .hui-auth-page--training.training-auth-refresh .hui-auth-brand {
   padding: 6px 12px 6px 6px;
   border-radius: 12px;
-  background: rgb(253 251 247 / 74%);
+  background: transparent;
   color: #1f4d3b;
   letter-spacing: normal;
 }

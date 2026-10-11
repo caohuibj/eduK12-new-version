@@ -21,6 +21,9 @@ import StudentRegister from './pages/student/StudentRegister'
 // Admin/Teacher Pages
 const CourseList = React.lazy(() => import('./pages/CourseList'))
 const TrainingPortal = React.lazy(() => import('./training/TrainingPortal'))
+const TrainingLogin = React.lazy(() => import('./training/TrainingLogin'))
+const TrainingRegister = React.lazy(() => import('./training/TrainingRegister'))
+const TrainingAuthRedirect = React.lazy(() => import('./training/TrainingAuthRedirect'))
 const TrainingLearnerHome = React.lazy(() => import('./training/TrainingLearnerHome'))
 const TrainingTrainerHome = React.lazy(() => import('./training/TrainingTrainerHome'))
 const TrainingLearnerCourse = React.lazy(() => import('./training/TrainingLearnerCourse'))
@@ -210,6 +213,9 @@ function AppRoutes() {
             }
           />
 
+          <Route path="/login" element={isTrainingHost() ? <TrainingLogin /> : <Navigate to="/" replace />} />
+          <Route path="/register" element={isTrainingHost() ? <TrainingRegister /> : <Navigate to="/" replace />} />
+
           {/* Admin Login - no auth check to allow switching accounts */}
           <Route
             path="/admin/login"
@@ -219,7 +225,7 @@ function AppRoutes() {
           {/* Teacher Login/Register - no auth check to allow switching accounts */}
           <Route
             path="/teacher/login"
-            element={<TeacherLogin />}
+            element={isTrainingHost() ? <TrainingAuthRedirect to="/register" /> : <TeacherLogin />}
           />
           <Route
             path="/teacher/register"
@@ -227,18 +233,18 @@ function AppRoutes() {
           />
           <Route
             path="/teacher/account-login"
-            element={<TeacherAccountLogin />}
+            element={isTrainingHost() ? <TrainingAuthRedirect to="/login" /> : <TeacherAccountLogin />}
           />
           <Route path="/parent/login" element={<ParentLogin />} />
 
           {/* Student Login/Register - no auth check to allow switching accounts */}
           <Route
             path="/student/login"
-            element={<StudentLogin />}
+            element={isTrainingHost() ? <TrainingAuthRedirect to="/login" /> : <StudentLogin />}
           />
           <Route
             path="/student/course-login"
-            element={<StudentCourseLogin />}
+            element={isTrainingHost() ? <TrainingAuthRedirect to="/register" /> : <StudentCourseLogin />}
           />
           <Route
             path="/student/register"

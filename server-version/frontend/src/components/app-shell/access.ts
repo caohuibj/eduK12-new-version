@@ -1,10 +1,11 @@
 import { matchPath } from 'react-router-dom'
 import type { User } from '../../types'
+import { isTrainingHost } from '../../training/context'
 
 export type Role = User['role']
 export type ShellMode = 'standard' | 'focused' | 'public' | 'display'
 export const homeFor = (role?: Role) => role === 'STUDENT' ? '/student' : role === 'PARENT' ? '/parent' : role ? '/dashboard' : '/'
-export const loginFor = (role?: Role) => role === 'ADMIN' ? '/admin/login' : role === 'TEACHER' ? '/teacher/account-login' : role === 'PARENT' ? '/parent/login' : '/student/login'
+export const loginFor = (role?: Role) => isTrainingHost() ? '/login' : role === 'ADMIN' ? '/admin/login' : role === 'TEACHER' ? '/teacher/account-login' : role === 'PARENT' ? '/parent/login' : '/student/login'
 export const isPublicAssessmentPath = (pathname: string) => pathname.startsWith('/public/')
 
 // Presentation metadata only; route guards and API authorization remain authoritative.
@@ -18,7 +19,7 @@ const focusedPaths = [
   '/relational/attempts/:attemptId', '/relational/cognitive/sessions/:sessionId',
   '/relational/composite/situational/:attemptId',
 ]
-export const isAuthPath = (pathname: string) => /^\/(admin\/login|teacher\/(login|account-login|register)|student\/(login|course-login|register)|parent\/login)$/.test(pathname)
+export const isAuthPath = (pathname: string) => /^\/(login|register|admin\/login|teacher\/(login|account-login|register)|student\/(login|course-login|register)|parent\/login)$/.test(pathname)
 export function shellModeFor(pathname: string): ShellMode {
   if (pathname.startsWith('/bigscreen/')) return 'display'
   if (pathname !== '/student/situational/history' && focusedPaths.some((path) => matchPath(path, pathname))) return 'focused'

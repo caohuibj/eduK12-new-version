@@ -23,10 +23,10 @@ describe('training authentication shell', () => {
   })
 
   it.each([
-    ['/student/login', '/student/login', '/student/course-login', 'student', '登录'],
-    ['/student/course-login', '/student/login', '/student/course-login', 'student', '注册'],
-    ['/teacher/account-login', '/teacher/account-login', '/teacher/login', 'teacher', '登录'],
-    ['/teacher/login', '/teacher/account-login', '/teacher/login', 'teacher', '注册'],
+    ['/student/login', '/login', '/register', 'student', '登录'],
+    ['/student/course-login', '/login', '/register', 'student', '注册'],
+    ['/teacher/account-login', '/login', '/register', 'teacher', '登录'],
+    ['/teacher/login', '/login', '/register', 'teacher', '注册'],
   ] as const)('keeps %s mode navigation consistent and preserves the return destination', (path, loginPath, registerPath, tone, selected) => {
     render(<MemoryRouter initialEntries={[`${path}?returnTo=%2Fstudent%2Fcourses%2Fcourse-1`]}>
       <AuthShell tone={tone} title="账号入口" description="测试"><input aria-label="账号" /></AuthShell>
