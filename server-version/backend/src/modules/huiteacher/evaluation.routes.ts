@@ -7,6 +7,7 @@ import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
   createHuiteacherTarget,listHuiteacherTargets,archiveHuiteacherTarget,
   createHuiteacherEvent,listHuiteacherEvents,transitionHuiteacherEvent,HuiteacherEvaluationError,
+  createHuiteacherEventRunDraft,readHuiteacherEventRun,
 } from './evaluation.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -79,4 +80,23 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/transitio
       eventId:id.parse(req.params.eventId),...body,
     }))
   }))
+router.post('/organizations/:organizationId/evaluation-events/:eventId/run',
+  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  handler(async(req,res)=>{
+    const data=z.object({
+      name:z.string().trim().min(1).max(200),
+      intakeDeadline:z.string().datetime().nullable().optional(),
+    }).strict().parse(req.body)
+    return success(res,await createHuiteacherEventRunDraft({
+      organizationId:id.parse(req.params.organizationId),
+      eventId:id.parse(req.params.eventId),actorUserId:req.user!.userId,
+      name:data.name,intakeDeadline:data.intakeDeadline?new Date(data.intakeDeadline):null,
+    }))
+  }))
+router.get('/organizations/:organizationId/evaluation-events/:eventId/run',
+  authenticateHuiteacher,requireTeacherProductAdmin,handler(async(req,res)=>
+    success(res,await readHuiteacherEventRun({
+      organizationId:id.parse(req.params.organizationId),
+      eventId:id.parse(req.params.eventId),actorUserId:req.user!.userId,
+    }))))
 export default router

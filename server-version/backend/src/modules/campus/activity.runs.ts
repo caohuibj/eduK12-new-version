@@ -88,7 +88,11 @@ export async function bindCampusActivityRun(input:{
       !(context.orgRole==='ORG_ADMIN'&&context.canGovern))deny('ACTIVITY_RUN_OWNER_REQUIRED',403)
     const duplicates=await tx.$queryRaw<Array<{id:string}>>`
       SELECT "run_id" AS "id" FROM "campus_activity_runs"
-      WHERE "run_id"=${input.runId} LIMIT 1
+      WHERE "run_id"=${input.runId}
+      UNION ALL
+      SELECT "run_id" AS "id" FROM "huiteacher_evaluation_run_links"
+      WHERE "run_id"=${input.runId}
+      LIMIT 1
     `
     if(duplicates.length)deny('ACTIVITY_RUN_ALREADY_BOUND')
     await tx.$executeRaw`

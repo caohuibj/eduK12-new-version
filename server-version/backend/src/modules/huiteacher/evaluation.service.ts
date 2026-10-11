@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { createAssessmentRunDraft } from '../assessment-run/repository'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 
@@ -171,5 +172,77 @@ export async function transitionHuiteacherEvent(input:{
       targetId:event.id,domainEventId:randomUUID(),
       payload:{from:event.status,to:status,version:input.expectedVersion+1}})
     return {id:event.id,status,version:input.expectedVersion+1}
+  })
+}
+
+/**
+ * Reuse canonical Assessment Run with an atomic product-bound draft.
+ * Do not allow a caller-supplied arbitrary runId: School-owned Runs and their
+ * FINAL are never promoted to Teacher by ID reuse.
+ */
+export async function createHuiteacherEventRunDraft(input:{
+  organizationId:string;actorUserId:string;eventId:string;name:string;
+  intakeDeadline?:Date|null
+}){
+  const name=input.name.trim()
+  if(!name||name.length>200)fail('HUITEACHER_RUN_NAME_INVALID',400)
+  if(input.intakeDeadline&&!Number.isFinite(input.intakeDeadline.getTime()))
+    fail('HUITEACHER_RUN_DATE_INVALID',400)
+  return prisma.$transaction(async tx=>{
+    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
+    const events=await tx.$queryRaw<Array<{id:string;status:string;targetId:string}>>`
+      SELECT event."id",event."status",event."target_id" AS "targetId"
+      FROM "huiteacher_evaluation_events" event
+      JOIN "huiteacher_evaluation_targets" target
+        ON target."id"=event."target_id"
+        AND target."organization_id"=event."organization_id"
+        AND target."status"='ACTIVE'
+      WHERE event."organization_id"=${input.organizationId}
+        AND event."id"=${input.eventId}
+      FOR UPDATE OF event
+    `
+    if(!events.length)fail('HUITEACHER_EVENT_NOT_FOUND',404)
+    if(events[0].status!=='DRAFT')fail('HUITEACHER_RUN_EVENT_NOT_DRAFT')
+    const existing=await tx.huiteacherEvaluationRunLink.findUnique({
+      where:{organizationId_eventId:{
+        organizationId:input.organizationId,eventId:input.eventId,
+      }},
+      select:{runId:true},
+    })
+    if(existing)fail('HUITEACHER_EVENT_RUN_EXISTS')
+    const run=await createAssessmentRunDraft({
+      tx,organizationId:input.organizationId,createdByUserId:input.actorUserId,
+      name,intakeDeadline:input.intakeDeadline??null,
+    })
+    await tx.huiteacherEvaluationRunLink.create({data:{
+      organizationId:input.organizationId,eventId:input.eventId,
+      runId:run.id,boundByUserId:input.actorUserId,
+    }})
+    await appendAudit(tx,{organizationId:input.organizationId,actorUserId:input.actorUserId,
+      action:'HUITEACHER_CANONICAL_RUN_CREATED',targetType:'RUN',
+      targetId:run.id,domainEventId:randomUUID(),
+      payload:{eventId:input.eventId,runVersion:run.version,runStatus:run.status},
+    })
+    return {eventId:input.eventId,runId:run.id,status:run.status,version:run.version}
+  })
+}
+
+export async function readHuiteacherEventRun(input:{
+  organizationId:string;actorUserId:string;eventId:string
+}){
+  return prisma.$transaction(async tx=>{
+    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
+    const link=await tx.huiteacherEvaluationRunLink.findUnique({
+      where:{organizationId_eventId:{
+        organizationId:input.organizationId,eventId:input.eventId,
+      }},select:{eventId:true,runId:true,createdAt:true},
+    })
+    if(!link)fail('HUITEACHER_EVENT_RUN_NOT_FOUND',404)
+    const run=await tx.$queryRaw<Array<{status:string;version:number;name:string}>>`
+      SELECT "status","version","name" FROM "assessment_runs"
+      WHERE "id"=${link.runId} AND "organization_id"=${input.organizationId}
+    `
+    if(!run.length)fail('HUITEACHER_EVENT_RUN_NOT_FOUND',404)
+    return {...link,...run[0]}
   })
 }
