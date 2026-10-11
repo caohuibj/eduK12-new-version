@@ -85,7 +85,7 @@ const parseCsvRows=(content:string):Array<{cells:string[];sourceLine:number}>=>{
 }
 const parseCsv=(content:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
   const rows:ImportRow[]=[],issues:ImportIssue[]=[]
-  let matrix:string[][]
+  let matrix:Array<{cells:string[];sourceLine:number}>
   try{matrix=parseCsvRows(content)}catch(error){return {rows,issues:[{line:1,message:error instanceof Error?error.message:'CSV 格式错误'}]}}
   if(!matrix.length)return {rows,issues:[{line:1,message:'CSV 为空'}]}
   const header=matrix[0].cells.map(s=>clean(s).toLowerCase())
