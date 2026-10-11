@@ -139,7 +139,7 @@ export default function SurveyApp(){
         <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
           <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
           <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
-            <button className="btn-secondary" disabled={busy} disabled={busy||!['DRAFT','ARCHIVED'].includes(p.status)} onClick={()=>toggle(p)}>
+            <button className="btn-secondary" disabled={busy||!['DRAFT','ARCHIVED'].includes(p.status)} onClick={()=>toggle(p)}>
               {p.status==='DRAFT'?'归档':p.status==='ARCHIVED'?'恢复':'采集中不可归档'}</button></div>
         </article>)}</div>{projects.length===0&&<p>尚无研究项目。可以先创建研究草稿。</p>}
       </section><section className="bg-white rounded-xl border p-6 my-4">

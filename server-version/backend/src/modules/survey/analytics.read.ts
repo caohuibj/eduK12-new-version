@@ -31,7 +31,8 @@ export async function waveOverview(actorUserId:string,projectId:string){
       SELECT w.id,w.ordinal,w.title,w.status,
         COUNT(swa.id)::int AS starts,
         COUNT(sf.id) FILTER (
-          WHERE swa.status='COMPLETED' AND swa.excluded_at IS NULL
+          WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
+            AND swa.excluded_at IS NULL
         )::int AS "finalCompleted",
         COUNT(DISTINCT sp.research_code) FILTER (
           WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
@@ -52,7 +53,7 @@ export async function waveOverview(actorUserId:string,projectId:string){
       LIMIT 100
     `
     return {projectId,collectionMode:project.collectionMode,source:'IMMUTABLE_SURVEY_FINAL_ONLY',
-      note:'完成数是权威 Composite FINAL 的答卷数，不代表唯一自然人数；未运行的波次不应推测完成。',
+      note:'完成数是权威 Survey FINAL 的答卷数，不代表唯一自然人数；未运行的波次不应推测完成。',
       waves:waveRows.map(w=>({
         ...w,
         uniqueLinkedCodes:project.collectionMode==='LINKED_WAVES'?w.uniqueLinkedCodes:null,
