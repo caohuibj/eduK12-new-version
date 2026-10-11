@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
+import { assertSurveyMediaOwned } from './media.routes'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
@@ -138,6 +139,18 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
+  try{
+    await prisma.$transaction(async tx=>{
+      await ownProject(tx,uid,pid,false)
+      await assertSurveyMediaOwned(tx,uid,pid,input.drafts.map(d=>({
+        kind:surveyKindSchema.parse(d.kind),definition:d.definition,
+      })))
+    })
+    checks.push({key:'media',ok:true,issues:[]})
+  }catch(e){
+    checks.push({key:'media',ok:false,
+      issues:[e instanceof Error?e.message:'研究图片身份或授权不可用']})
+  }
   const hasConsent=input.wave.consentText.trim().length>=20
   checks.push({key:'consent',ok:hasConsent,
     issues:hasConsent?[]:['研究说明与知情同意至少需要 20 字']})
@@ -161,7 +174,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
-    ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?3:2)&&checks.every(c=>c.ok),
+    ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)&&checks.every(c=>c.ok),
     publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
     reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
       ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'

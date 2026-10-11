@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { retainSurveyMedia } from './media.routes'
 import { assertSurveyDraft, surveyKindSchema } from './builder.definition'
 import { compileResearchScale, compileResearchSjt } from './builder.compiler'
 import { SurveyWaveError } from './waves.service'
@@ -130,6 +131,8 @@ export async function freezeResearchWaveDraft(input:{
     const digest=canonicalHash(JSON.parse(serial))
     const version=(await tx.surveyPublication.aggregate({where:{projectId:input.projectId},_max:{version:true}}))._max.version||0
     const publicationId=randomUUID()
+    await retainSurveyMedia(tx,input.actorUserId,input.projectId,publicationId,
+      rows.map(r=>({kind:surveyKindSchema.parse(r.kind),definition:r.definition})))
     await tx.surveyPublication.create({data:{
       id:publicationId,projectId:input.projectId,
       version:version+1,definitionDigest:digest,

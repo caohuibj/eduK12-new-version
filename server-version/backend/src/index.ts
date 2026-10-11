@@ -10,6 +10,7 @@ import { surveyOriginGuard } from './modules/survey/originGuard'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
+import { surveyMediaRouter } from './modules/survey/media.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
 import { surveyAnalyticsRouter } from './modules/survey/analytics.routes'
 import { surveyExportsRouter } from './modules/survey/analytics.export.routes'
@@ -259,6 +260,7 @@ const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
+app.use('/api/survey/projects', surveyMediaRouter)
 app.use('/api/survey/projects', surveyWavesRouter)
 app.use('/api/survey/projects', surveyAnalyticsRouter)
 app.use('/api/survey/projects', surveyExportsRouter)

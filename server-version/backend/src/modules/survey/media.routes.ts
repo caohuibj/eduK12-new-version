@@ -9,7 +9,7 @@ import { storeAsset } from '../../services/assetStorage'
 import { serveAssessmentImageContent } from '../assessment-media/assessment-image-delivery'
 import { retainAssessmentAssetReferences } from '../assessment-media/assessment-asset'
 import { ASSESSMENT_STATIC_IMAGE_MIME_TYPES } from '../assessment-media/assessment-image'
-import type { SurveyDraft,SurveyKind } from './builder.definition'
+import type { SurveyKind } from './builder.definition'
 import type { FormDraft,SjtDraft } from './builder.definition'
 import { Router } from 'express'
 import { success,error } from '../../utils/response'
@@ -86,6 +86,7 @@ async function owner(tx:Tx,userId:string,projectId:string){
     WHERE p.id=${projectId} AND p.owner_user_id=${userId}
       AND p.status IN ('DRAFT','ACTIVE')
       AND u.account_domain='SURVEY' AND u.is_active=TRUE AND NOT u.is_frozen
+      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       AND g.status='ACTIVE' AND m.enabled=TRUE
     FOR SHARE OF p,u,g,m
   `
