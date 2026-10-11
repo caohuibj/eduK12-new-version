@@ -1,19 +1,13 @@
 name: Survey PR1 isolated PostgreSQL
+# Original PR1 diagnostic is manual only. Final READY regression will
+# execute and assert all required Survey suites once against the final SHA.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - '.github/workflows/ci-survey-pr1.yml'
-      - 'server-version/backend/src/modules/survey/**'
-      - 'server-version/backend/src/middleware/auth.ts'
-      - 'server-version/backend/src/__tests__/survey/**'
-      - 'server-version/backend/prisma/schema.prisma'
-      - 'server-version/backend/prisma/migrations/20261011110000_survey_researcher_realm/**'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   survey-pr1:
-    if: github.head_ref == 'feat/survey-research-platform-v1' && github.event.pull_request.draft
+    if: github.ref_name == 'feat/survey-research-platform-v1'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
