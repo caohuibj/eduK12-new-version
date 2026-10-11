@@ -1,0 +1,170 @@
+import { canonicalHash } from '../assessment-runtime/canonical'
+import {
+  validateScaleDefinition, type ScaleDefinitionV2,
+} from '../scale/scale-definition'
+import { scoreScale } from '../scale/scale-scoring'
+import { compileSjtTemplate, SjtTemplateError } from '../situational/authoring/template'
+import { scoreSituational, type SituationalResponse } from '../situational/situation-scoring'
+import {
+  assertSurveyDraft, validateSurveyDraft, SurveyDraftError,
+  type SurveyKind, type ScaleDraft, type SjtDraft, type FormDraft,
+  type Issue,
+} from './builder.definition'
+
+const disclaimer='研究者自编探索性工具。结果用于本项目科研记录，无常模或诊断效力；被试只接收获准的通用反馈。'
+
+/** The canonical score engine is the same ScaleDefinitionV2 and scoreScale used by production. */
+export function compileResearchScale(title:string,input:unknown):ScaleDefinitionV2 {
+  const d=assertSurveyDraft('SCALE',input,true) as ScaleDraft
+  const scores=d.dimensions.map((dimension,i)=>({
+    key:dimension.dimensionKey,
+    type:'dimension' as const,
+    label:dimension.label,
+    direction:dimension.direction,
+    canonical:i===0,
+    source:{
+      type:'items' as const,
+      items:d.items.filter(q=>q.dimensionKeys.includes(dimension.dimensionKey))
+        .map(q=>({itemCode:q.itemKey,weight:1})),
+      aggregation:d.aggregation,
+    },
+  }))
+  const definition:ScaleDefinitionV2={
+    schemaVersion:2,respondentType:d.respondentType,
+    source:{title},license:{status:'self_authored',redistribution:'allowed'},
+    display:{randomizeItems:false},
+    responseSets:[{key:'research_options',options:d.responseOptions.map(x=>({
+      value:x.optionKey,label:x.label,score:x.score,
+    }))}],
+    items:d.items.map((q,i)=>({
+      itemCode:q.itemKey,content:q.prompt,type:'single',required:q.required,
+      sortOrder:i,responseSetKey:'research_options',randomizeOptions:false,
+    })),
+    scoring:{
+      scoringVersion:'survey-research-v1',
+      itemRules:d.items.map(q=>({itemCode:q.itemKey,transform:{type:q.reverse?'reverse' as const:'identity' as const}})),
+      defaultMissingPolicy:{type:'complete_required'},
+      scores,
+    },
+    report:{
+      reportVersion:'survey-private-score-v1',
+      primaryScoreKeys:d.dimensions.slice(0,1).map(x=>x.dimensionKey),
+      scoreOrder:d.dimensions.map(x=>x.dimensionKey),
+      interpretations:d.dimensions.map(x=>({
+        scoreKey:x.dimensionKey,headline:x.label,
+        source:{type:'score_only' as const},summary:'研究探索性得分，不对被试作诊断或常模解释。',
+        bands:[],guidance:[],
+      })),
+      limitations:['未经研究样本验证的描述性分数；不提供常模和诊断解释。'],
+      disclaimer,
+    },
+    referencePolicy:{type:'none'},
+  }
+  const result=validateScaleDefinition(definition,{instrumentClass:'CUSTOM_DESCRIPTIVE'})
+  const errors=result.issues.filter(issue=>issue.severity==='error')
+  if(errors.length)throw new SurveyDraftError(errors)
+  return result.definition!
+}
+
+export function compileResearchSjt(instrumentKey:string,input:unknown) {
+  const d=assertSurveyDraft('SJT',input,true) as SjtDraft
+  const template={
+    templateVersion:'sjt-upload-v1' as const,
+    instrumentKey:'research-'+canonicalHash(instrumentKey).slice(0,24),
+    instrumentVersion:'0.1.0',
+    title:d.title,
+    respondentType:d.respondentType,
+    entryNodeKey:d.questions[0].questionKey,
+    author:d.author||'研究者自编',
+    sourceNote:d.sourceNote||'探索性自编研究情境',
+    disclaimer,
+    licenseStatus:'self_authored' as const,
+    redistribution:d.redistribution,
+    nodes:d.questions.map(q=>({
+      nodeKey:q.questionKey,motherSceneKey:d.scenarioKey,title:d.title,stimulus:d.stimulus,
+    })),
+    questions:d.questions.map(q=>({
+      nodeKey:q.questionKey,questionKey:q.questionKey,prompt:q.prompt,
+      kind:'CORE' as const,purpose:'BEHAVIOR_TENDENCY' as const,
+      required:true,order:0,
+    })),
+    options:d.questions.flatMap(q=>q.options.map(o=>({
+      questionKey:q.questionKey,optionKey:o.optionKey,label:o.label,
+    }))),
+    transitions:d.questions.flatMap((q,index)=>q.options.map(o=>({
+      nodeKey:q.questionKey,optionKey:o.optionKey,
+      nextNodeKey:d.questions[index+1]?.questionKey||'END',bridgeText:'',
+    }))),
+    metrics:d.metrics.map((metric,i)=>({
+      metricKey:metric.metricKey,label:metric.label,
+      construct:metric.metricKey,role:i===0?'primary' as const:'secondary' as const,
+    })),
+    opportunities:d.questions.flatMap(q=>d.metrics.map(m=>({
+      nodeKey:q.questionKey,metricKey:m.metricKey,
+      applicability:'OPPORTUNITY' as const,
+    }))),
+    scores:d.questions.flatMap(q=>q.options.flatMap(o=>d.metrics.map(m=>({
+      nodeKey:q.questionKey,optionKey:o.optionKey,metricKey:m.metricKey,
+      contribution:o.contributions[m.metricKey],
+    })))),
+    // The scientific report is not exposed to participants. PR3 enforces a
+    // separate, General-only participant response projection.
+    feedback:d.questions.flatMap(q=>q.options.map(o=>({
+      questionKey:q.questionKey,optionKey:o.optionKey,
+      kind:'ACTION' as const,text:'仅记录研究选择，不构成正确或错误的个人评价。',
+    }))),
+    comparisons:[],
+    cases:[],
+  }
+  try{
+    return compileSjtTemplate(template)
+  }catch(error){
+    if(error instanceof SjtTemplateError)throw new SurveyDraftError(error.issues.map(x=>({
+      path:x.path,message:x.message,severity:'error' as const,
+    })))
+    throw error
+  }
+}
+export type PreviewAnswers=Record<string,string|number>
+export function previewResearchInstrument(input:{
+  kind:SurveyKind;instrumentKey:string;title:string;definition:unknown;answers?:PreviewAnswers
+}){
+  const validation=validateSurveyDraft(input.kind,input.definition,true)
+  if(!validation.definition||validation.issues.some(x=>x.severity==='error'))
+    return {ok:false,issues:validation.issues,score:null}
+  const hash=canonicalHash({kind:input.kind,definition:validation.definition})
+  try{
+    if(input.kind==='FORM'){
+      const data=validation.definition as FormDraft
+      return {ok:true,issues:[],kind:'FORM',definitionDigest:hash,
+        pageCount:data.pages.length,questionCount:data.pages.flatMap(x=>x.questions).length,
+        score:null,participantReport:'GENERAL_ONLY'}
+    }
+    if(input.kind==='SCALE'){
+      const compiled=compileResearchScale(input.title,input.definition)
+      const score=input.answers?scoreScale(compiled,input.answers):null
+      return {ok:true,issues:[],kind:'SCALE',definitionDigest:hash,
+        scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled,
+        score,participantReport:'GENERAL_ONLY'}
+    }
+    const compiled=compileResearchSjt(input.instrumentKey,input.definition)
+    const answers=input.answers||{}
+    const values:SituationalResponse[]=compiled.package.definition.scenes
+      .flatMap(scene=>scene.channels
+        .filter(channel=>Object.prototype.hasOwnProperty.call(answers,channel.channelKey))
+        .map(channel=>({
+          sceneKey:scene.sceneKey,channelKey:channel.channelKey,
+          responseValue:answers[channel.channelKey],
+        })))
+    const score=Object.keys(answers).length?scoreSituational(compiled.package.definition,values):null
+    return {ok:true,issues:[],kind:'SJT',definitionDigest:hash,
+      scoringDigest:canonicalHash(compiled.package.definition.scoring),
+      compilerDigest:compiled.contentDigest,
+      compiledDefinition:compiled.package.definition,
+      score,participantReport:'GENERAL_ONLY'}
+  }catch(error){
+    if(error instanceof SurveyDraftError)return {ok:false,issues:error.issues,score:null}
+    const issues:Issue[]=[{path:'definition',message:'研究工具未能通过编译，请核对完整题目与计分定义',severity:'error'}]
+    return {ok:false,issues,score:null}
+  }
+}
