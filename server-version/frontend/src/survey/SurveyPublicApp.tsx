@@ -260,6 +260,7 @@ export default function SurveyPublicApp(){
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
       })
       setRevoked(true);setHome(null);setTask(null);setGeneral(null)
+      setSelectedWave(null);setAgreed(false);setProofReceived(false)
       setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
     })
   }
