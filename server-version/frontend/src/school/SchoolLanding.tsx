@@ -35,8 +35,10 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
     <nav className={`hs-public-nav${open ? ' hs-public-nav-open' : ''}`} id="hs-public-navigation" aria-label="校园导航">
       <button type="button" onClick={() => act(onHome)} aria-current={home ? 'page' : undefined}>首页</button>
       <a href="#hs-features" onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>
+      <a href="/about" aria-current={window.location.pathname === '/about' ? 'page' : undefined} onClick={() => setOpen(false)}>了解更多</a>
+      <a href="/join" aria-current={window.location.pathname === '/join' ? 'page' : undefined} onClick={() => setOpen(false)}>立即加入</a>
     </nav>
-    <div className="hs-header-actions" aria-label="校园账号入口">
+    <div className="hs-header-actions" role="group" aria-label="校园账号入口">
       <button type="button" className="hs-login-entry" onClick={() => act(onLogin)}>登录</button>
       <button type="button" className="hs-register-entry hs-primary" onClick={() => act(onRegister)}>注册</button>
     </div>
@@ -49,7 +51,7 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
   </header>
 }
 
-export function SchoolLanding({ onJoin }: { onJoin: () => void }) {
+export function SchoolLanding() {
   return <>
     <section className="hs-landing-hero" aria-labelledby="hs-landing-title">
       <img className="hs-campus-art" src={campusArtwork} width="1536" height="1024" fetchPriority="high"
@@ -58,8 +60,8 @@ export function SchoolLanding({ onJoin }: { onJoin: () => void }) {
         <h1 id="hs-landing-title"><span>在更好的环境中</span><span>看见每一个独特的你</span></h1>
         <p>科学支持 · 专业陪伴 · 健康成长</p>
         <div className="hs-hero-actions">
-          <button className="hs-primary" type="button" onClick={onJoin}>立即加入</button>
-          <a href="#hs-features">了解更多 <ArrowRight size={18} aria-hidden="true" /></a>
+          <a className="hs-primary" href="/join">立即加入</a>
+          <a href="/about">了解更多 <ArrowRight size={18} aria-hidden="true" /></a>
         </div>
       </div>
       <section id="hs-features" className="hs-feature-strip" aria-label="校园成长支持" tabIndex={-1}>

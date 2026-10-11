@@ -5,6 +5,8 @@ import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
 import { canReadSchoolClasses, schoolNavigation, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
+import { SchoolFeaturePage } from './SchoolFeaturePage'
+import { SchoolJoinPage, SchoolAboutPage } from './SchoolProjectPages'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
@@ -63,10 +65,12 @@ export default function SchoolApp(){
   const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
   const [user,setUser]=useState<CampusUser|null>(null)
   const [loading,setLoading]=useState(true)
-  const [screen,setScreen]=useState<'home'|'code'|'recruit'|'feature'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
+  const [screen,setScreen]=useState<'home'|'code'|'join'|'about'|'feature'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
     ['/register','/staff/register','/parent/register'].includes(window.location.pathname)?'code':
       window.location.pathname==='/login'?'login':
       window.location.pathname==='/recover'?'recover':
+      window.location.pathname==='/join'?'join':
+      window.location.pathname==='/about'?'about':
       schoolFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'home')
   const activeFeature=schoolFeatures.find(feature=>feature.path===window.location.pathname)
   const [focusPublic,setFocusPublic]=useState(false)
@@ -132,7 +136,7 @@ export default function SchoolApp(){
     setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
   }
 
-  useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | Huischool`:'Huischool';return()=>{document.title=previous}},[screen,activeFeature])
+  useEffect(()=>{const previous=document.title;document.title=screen==='join'?'立即加入 | Huischool':screen==='about'?'了解更多 | Huischool':screen==='feature'&&activeFeature?`${activeFeature.title} | Huischool`:'Huischool';return()=>{document.title=previous}},[screen,activeFeature])
   useEffect(()=>{
     if(!user){setCampusParentReportEnabled(false);return}
     let live=true
@@ -284,8 +288,8 @@ export default function SchoolApp(){
   })
 
   // Public forms use server-controlled identity, permissions and MFA.
-  const goPublic=(next:'home'|'code'|'recruit'|'login')=>{
-    if(window.location.pathname.startsWith('/workspace')||schoolFeatures.some(feature=>feature.path===window.location.pathname))window.history.replaceState(null,'','/')
+  const goPublic=(next:'home'|'code'|'login')=>{
+    if(window.location.pathname.startsWith('/workspace')||['/join','/about'].includes(window.location.pathname)||schoolFeatures.some(feature=>feature.path===window.location.pathname))window.history.replaceState(null,'','/')
     setError('');setNotice('');setLandingSection(null);setFocusPublic(true);setScreen(next)
     if(next==='code'){setInviteCode('');setActivationCode('');setPassword('')}
     window.scrollTo({top:0,behavior:'instant'})
@@ -297,7 +301,7 @@ export default function SchoolApp(){
     }else if(entry.kind==='PARENT'){setInviteCode(code);setScreen('parent')}
     else{setInviteCode(code);setStaffRole(entry.role);setScreen('staff')}
   }
-  const explore=(id:string)=>{goPublic('home');setLandingSection(id)}
+  const explore=(id:string)=>{goPublic('home');setFocusPublic(false);setLandingSection(id)}
   useEffect(()=>{
     if(loading||screen!=='home'||!landingSection)return
     const target=document.getElementById(landingSection)
@@ -312,6 +316,8 @@ export default function SchoolApp(){
     setFocusPublic(false)
   },[focusPublic,screen,loading])
   const publicHome=!user&&screen==='home'
+  const publicFeature=!user&&screen==='feature'
+  const publicProject=!user&&['join','about'].includes(screen)
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
   return <div className={`hs-app${user?' hs-workspace':''}`}>
@@ -323,16 +329,15 @@ export default function SchoolApp(){
         <span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button>
       </nav>
     </header>}
-    <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>
+    <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':(publicFeature||publicProject)?' hs-main-topic':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
       {loading?<p>正在核对校园会话…</p>:null}
-      {!loading&&publicHome&&<SchoolLanding onJoin={()=>goPublic('recruit')}/>}
+      {!loading&&publicHome&&<SchoolLanding/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
-      {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
-        <h1 className="hs-visually-hidden">{activeFeature.title}</h1>
-      </section>}
-      {!loading&&!user&&screen==='recruit'&&<section className="hs-recruit-blank" aria-label="学校招募页面"><h1 className="hs-visually-hidden">学校招募</h1></section>}
+      {!loading&&publicFeature&&activeFeature&&<SchoolFeaturePage key={activeFeature.path} path={activeFeature.path}/>}
+      {!loading&&!user&&screen==='join'&&<SchoolJoinPage/>}
+      {!loading&&!user&&screen==='about'&&<SchoolAboutPage/>}
       {!loading&&!user&&['register','staff','parent'].includes(screen)&&<button className="hs-auth-back" type="button" onClick={()=>goPublic('code')}>← 更换注册码</button>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
         <p className="hs-section-kicker">欢迎回到 Huischool</p>

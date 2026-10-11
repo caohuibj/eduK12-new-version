@@ -37,8 +37,8 @@
 .hs-feature { display:block;padding:20px 12px;text-align:center;min-width:0;min-height:142px;text-decoration:none;color:#183f30;border-radius:12px;transition:background .09s,box-shadow .09s,color .09s; }
 .hs-feature+.hs-feature { border-left:1px solid #dbe6d58c; }
 .hs-feature svg { display:block;margin:0 auto 11px;color:#28573d; }
-.hs-app .hs-feature h2 { font-size:18px;font-weight:650;margin:0 0 5px;line-height:1.5;color:#1d4631; }
-.hs-feature p { font-size:14px;line-height:1.6;color:#214730;margin:0;font-weight:500; }
+.hs-app .hs-feature h2 { font-size:18px;font-weight:650;margin:0 0 5px;line-height:1.5;color:#183f30; }
+.hs-feature p { font-size:14px;line-height:1.6;color:#183f30;margin:0;font-weight:500; }
 .hs-feature:focus-visible { background:rgba(247,255,236,.96);outline:2px solid #356957;outline-offset:-2px; }
 .hs-feature:active { background:rgba(239,248,222,.80); }
 @media(hover:hover) { .hs-feature:hover { background:rgba(247,255,236,.96);box-shadow:inset 0 0 0 2px #578b6599,0 4px 16px #244b3526; } }
@@ -153,3 +153,8 @@
 }
 @media(max-width:360px) { .hs-public-header .hs-brand strong { font-size:19px; } .hs-public-header .hs-brand-icon { width:34px; } .hs-public-header { gap:6px; } }
 @media(prefers-reduced-motion:reduce) { .hs-feature { transition:none; } }
+
+/* Project pages share public navigation and keep the original homepage CTA style. */
+.hs-public-nav a{min-height:44px;display:flex;align-items:center}
+.hs-hero-actions>a.hs-primary{background:#356957;color:#fff;border-color:#356957}
+.hs-hero-actions>a.hs-primary:hover{background:#285740}
