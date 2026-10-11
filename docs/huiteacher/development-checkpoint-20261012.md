@@ -68,3 +68,16 @@ Respect actual `AGENTS.md` and `docs/release/README.md`, read current HEAD and f
 - Continue remaining PR4–PR6 on the **same branch only if authorized**; no formal PR, Actions trigger, CI, merge, server write until the user's next explicit permission for each relevant action.
 
 _Last historical checkpoint (before Form runtime) was superseded by this document. Git commits preserve the exact source chronology._
+
+## Mainline drift detected after PR3 source commits
+
+**Read-only GitHub comparison on 2026-10-12:** `main@935a6d5cd7d0acfe1b4b84b5c247cf6d3da6586c` is ahead of the Teacher branch's merge base by 38 commits. Teacher branch is still a SINGLE feature branch; no merge/rebase performed and no Huiteacher PR/CI run created.
+
+The exact path intersection between latest main and the Teacher branch was:
+- `server-version/backend/prisma/schema.prisma`: new Survey models and Teacher entitlement/Scale models need additive schema reconciliation.
+- `server-version/backend/src/index.ts`: new Survey router mounts and Teacher router mounts must both survive.
+- `server-version/frontend/src/survey/SurveyPublicApp.tsx`: latest Survey participant Flow UI and Teacher's optional-proof `TaskForm` extension must be combined, without exposing Survey research credentials on the Teacher hostname.
+
+**Indirect affected dependency:** main changed `survey/final.compute.ts` and its Flow machinery; PR2 Teacher Form V2 consumes `dryRunSurveyForm`, so after later main synchronization only its affected normalizer/conditional-validation contract needs re-verification (not another unrelated survey full regression). Current main still exports that helper with the same visible basic signature as this feature baseline.
+
+**Next synchronization constraint:** Do not blindly overwrite those three paths with one side's branch content. Re-read current main and actual AGENTS/release checks when freezing the candidate, perform a deliberate narrowly scoped reconciliation, preserve all routes/models and revalidate only changed authoritative contracts. User's active instruction is still **no CI, no formal PR, no merge or deployment**.
