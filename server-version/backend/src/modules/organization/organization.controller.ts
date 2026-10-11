@@ -130,7 +130,17 @@ export const organizationController = {
               o."name",
               o."status",
               m."id" AS "membershipId",
-              m."org_role" AS "orgRole",
+              CASE WHEN o."product_domain"='SCHOOL'
+                AND m."org_role"='ORG_ADMIN'
+                AND NOT EXISTS(
+                  SELECT 1 FROM "education_product_role_grants" epa
+                  WHERE epa."organization_id"=o."id"
+                    AND epa."membership_id"=m."id"
+                    AND epa."product"='HUISCHOOL'
+                    AND epa."role"='PRODUCT_ADMIN'
+                    AND epa."revoked_at" IS NULL
+                ) THEN 'MEMBER'
+              ELSE m."org_role" END AS "orgRole",
               o."created_at" AS "createdAt"
             FROM "organizations" o
             LEFT JOIN "organization_memberships" m
@@ -164,7 +174,17 @@ export const organizationController = {
               o."name",
               o."status",
               m."id" AS "membershipId",
-              m."org_role" AS "orgRole",
+              CASE WHEN o."product_domain"='SCHOOL'
+                AND m."org_role"='ORG_ADMIN'
+                AND NOT EXISTS(
+                  SELECT 1 FROM "education_product_role_grants" epa
+                  WHERE epa."organization_id"=o."id"
+                    AND epa."membership_id"=m."id"
+                    AND epa."product"='HUISCHOOL'
+                    AND epa."role"='PRODUCT_ADMIN'
+                    AND epa."revoked_at" IS NULL
+                ) THEN 'MEMBER'
+              ELSE m."org_role" END AS "orgRole",
               o."created_at" AS "createdAt"
             FROM "organization_memberships" m
             JOIN "organizations" o ON o."id" = m."organization_id"

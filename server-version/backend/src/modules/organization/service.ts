@@ -363,6 +363,38 @@ export async function resumeOrganization(input: {
   })
 }
 
+/** Sync Huischool's *product* admin grant with School-governed role changes.
+ * Shared ORG_ADMIN alone must never authorize psychology business.
+ * Teacher-only organizations have no HUISCHOOL entitlement and are unaffected.
+ */
+async function syncHuischoolProductAdmin(tx:Tx,input:{
+  organizationId:string;membershipId:string;actorUserId:string;granted:boolean
+}) {
+  const entitlement=await tx.educationProductEntitlement.findUnique({
+    where:{organizationId_product:{
+      organizationId:input.organizationId,product:'HUISCHOOL',
+    }},select:{status:true},
+  })
+  if(entitlement?.status!=='ACTIVE')return
+  const existing=await tx.educationProductRoleGrant.findFirst({
+    where:{organizationId:input.organizationId,membershipId:input.membershipId,
+      product:'HUISCHOOL',role:'PRODUCT_ADMIN',revokedAt:null},
+    select:{id:true},
+  })
+  if(input.granted&&!existing) {
+    await tx.educationProductRoleGrant.create({data:{
+      id:randomUUID(),organizationId:input.organizationId,
+      membershipId:input.membershipId,product:'HUISCHOOL',
+      role:'PRODUCT_ADMIN',grantedByUserId:input.actorUserId,
+    }})
+  } else if (!input.granted&&existing) {
+    await tx.educationProductRoleGrant.update({
+      where:{id:existing.id},
+      data:{revokedAt:new Date(),revokedByUserId:input.actorUserId},
+    })
+  }
+}
+
 export async function createMembership(input: {
   organizationId: string
   userId: string
@@ -405,6 +437,12 @@ export async function createMembership(input: {
       `
       if (input.persona)
         await tx.$executeRaw`INSERT INTO organization_persona_grants(id,organization_id,membership_id,persona,granted_by_user_id) VALUES(${randomUUID()},${input.organizationId},${membershipId},${input.persona},${input.meta.actorUserId})`
+      if (input.orgRole === 'ORG_ADMIN') {
+        await syncHuischoolProductAdmin(tx,{
+          organizationId:input.organizationId,membershipId,
+          actorUserId:input.meta.actorUserId,granted:true,
+        })
+      }
       await appendAudit(tx, {
         organizationId: input.organizationId,
         actorUserId: input.meta.actorUserId,
@@ -527,6 +565,10 @@ export async function setMembershipRole(input: {
           "org_role" AS "orgRole", "valid_from" AS "validFrom", "valid_until" AS "validUntil",
           "ended_by_user_id" AS "endedByUserId", "end_reason" AS "endReason"
       `
+      await syncHuischoolProductAdmin(tx,{
+        organizationId:input.organizationId,membershipId:input.membershipId,
+        actorUserId:input.meta.actorUserId,granted:input.orgRole==='ORG_ADMIN',
+      })
       await appendAudit(tx, {
         organizationId: input.organizationId,
         actorUserId: input.meta.actorUserId,
