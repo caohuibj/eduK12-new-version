@@ -252,7 +252,12 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         <p>仅提供满足隐私保护的选项分布；个人答案、原始文本和作答身份不可见。</p>
         {reports[event.id].distributions.map(item=><article key={item.itemKey}>
           <h4>{item.prompt}</h4>
-          {item.status==='WITHHELD'?<p>该题结果因小单元或来源限制而隐藏。</p>:
+          {item.status==='WITHHELD'?<p>{
+            item.reason==='PRIVATE_FREE_TEXT'?'开放性文字属于原始评价证据，默认不向管理者披露。':
+            item.reason==='AGGREGATION_NOT_RELEASED'?'该题型尚无正式合规的群体统计规则，暂不发布数值摘要。':
+            item.reason==='SMALL_CELL'?'选择分布存在可识别的小单元，因此隐藏整道题的统计。':
+            '该题因数据来源或权限保护暂不显示。'
+          }</p>:
             <div className="ht-units">{item.cells?.map(cell=>
               <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count}</span>)}</div>}
         </article>)}

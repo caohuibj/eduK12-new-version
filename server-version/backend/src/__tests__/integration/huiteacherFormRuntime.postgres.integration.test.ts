@@ -84,7 +84,12 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
           {itemKey:'q2',type:'SHORT_TEXT',prompt:'补充建议',
             required:false,options:[],rows:[],maxLength:200},
           {itemKey:'q3',type:'LIKERT',prompt:'团队支持',
-            required:true,options:[{optionKey:'a',label:'不足'},{optionKey:'b',label:'充分'}],rows:[]}],
+            required:true,options:[{optionKey:'a',label:'不足'},{optionKey:'b',label:'充分'}],rows:[]},
+          {itemKey:'q4',type:'MULTIPLE',prompt:'实际使用的反馈渠道',
+            required:true,options:[{optionKey:'a',label:'线上'},{optionKey:'b',label:'线下'}],
+            rows:[],minSelections:1,maxSelections:2},
+          {itemKey:'q5',type:'NUMBER',prompt:'本月活动次数',
+            required:false,options:[],rows:[]}],
       }]},
     })
     const form=await db.huiteacherFormInstrument.findUniqueOrThrow({where:{id:draft.id}})
@@ -140,11 +145,11 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     const task=await readOwnHuiteacherFormTask({
       actorUserId:participants[0].id,attemptId:started.runtimeBindingRef,
     })
-    expect(task.pages[0].questions).toHaveLength(3)
+    expect(task.pages[0].questions).toHaveLength(5)
     expect(task.reportMode).toBe('COMPLETION_ONLY')
     const submissionId=randomUUID()
     const input={actorUserId:participants[0].id,attemptId:started.runtimeBindingRef,
-      submissionId,answers:{q1:'b',q2:'建议继续支持',q3:'b'} }
+      submissionId,answers:{q1:'b',q2:'建议继续支持',q3:'b',q4:['a']} }
     const completed=await submitOwnHuiteacherFormFinal(input)
     expect(completed.idempotent).toBe(false)
     expect((await submitOwnHuiteacherFormFinal(input)).idempotent).toBe(true)
@@ -187,7 +192,7 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
       const value=await submitOwnHuiteacherFormFinal({
         actorUserId:respondent.id,attemptId:next.runtimeBindingRef,
         submissionId:randomUUID(),
-        answers:{q1:index===8?'a':'b',q3:'b'},
+        answers:{q1:index===8?'a':'b',q3:'b',q4:[index<4?'a':'b']},
       })
       expect(value.status).toBe('COMPLETED')
     }
@@ -206,8 +211,14 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     expect(safeCell?.status).toBe('READY')
     if(safeCell?.status!=='READY')throw Error('safe cohort unexpectedly masked')
     expect(safeCell.cells?.find(x=>x.key==='b')?.count).toBe(10)
-    // No raw text item or traceable respondent identity is reportable.
-    expect(report.distributions.some(x=>x.itemKey==='q2')).toBe(false)
+    const choice=report.distributions.find(x=>x.itemKey==='q4')
+    expect(choice?.status).toBe('READY')
+    if(choice?.status!=='READY')throw Error('multiple-choice selection was masked')
+    expect(choice.cells?.find(x=>x.key==='a')?.count).toBe(5)
+    expect(choice.cells?.find(x=>x.key==='b')?.count).toBe(5)
+    // No raw text item or numeric raw responses are reportable.
+    expect(report.distributions.find(x=>x.itemKey==='q2')?.reason).toBe('PRIVATE_FREE_TEXT')
+    expect(report.distributions.find(x=>x.itemKey==='q5')?.reason).toBe('AGGREGATION_NOT_RELEASED')
     expect(JSON.stringify(report)).not.toContain('建议继续支持')
     await expect(readTeacherFormGroupReport({
       ...key,actorUserId:participants[0].id,formId:draft.id,
