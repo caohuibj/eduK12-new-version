@@ -18,6 +18,8 @@ import {
   finishSurveyMfa, verifySurveyTotpStepUp,
 } from './mfa.service'
 
+import { redeemResearcherInvite, redeemPasswordReset, SurveyGovernanceError } from './governance.service'
+
 export const surveyAuthRouter=Router()
 surveyAuthRouter.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const loginInput=z.object({
@@ -120,3 +122,31 @@ surveyAuthRouter.post('/change-password',authenticateSurvey,passwordChangeRateLi
     return success(res,{changed:true},'密码已修改，请重新登录')
   }catch{return unavailable(res)}
 }))
+
+const claimInput=z.object({
+  token:z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+  username:z.string().trim().min(4).max(32).regex(/^[a-zA-Z0-9_.-]+$/),
+  password:z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
+}).strict()
+const resetInput=z.object({
+  token:z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+  password:z.string().min(8).max(PASSWORD_MAX_LENGTH).refine(isValidPassword),
+}).strict()
+const claimLimit=createRedisRateLimiter({name:'survey-invitation-claim',limit:12,windowSeconds:900})
+surveyAuthRouter.post('/claim',claimLimit,async(req,res)=>{
+  const parsed=claimInput.safeParse(req.body)
+  if(!parsed.success)return forbidden(res,'邀请不可用或输入不合法')
+  try{return success(res,await redeemResearcherInvite(req,res,parsed.data.token,parsed.data.username,parsed.data.password))}
+  catch(e){if(e instanceof SurveyGovernanceError)return forbidden(res,'邀请已失效')
+    if((e as {code?:string}).code==='P2002')return forbidden(res,'此登录名不可用')
+    return unavailable(res)
+  }
+})
+surveyAuthRouter.post('/reset-password',claimLimit,async(req,res)=>{
+  const parsed=resetInput.safeParse(req.body)
+  if(!parsed.success)return forbidden(res,'恢复邀请不可用')
+  try{return success(res,await redeemPasswordReset(req,res,parsed.data.token,parsed.data.password))}
+  catch(e){if(e instanceof SurveyGovernanceError)return forbidden(res,'恢复邀请已失效')
+    return unavailable(res)
+  }
+})
