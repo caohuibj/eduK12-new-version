@@ -72,6 +72,50 @@ describe('Form V2 frozen answer contract',()=>{
         .toThrow(SurveyFinalValidationError)
     }
   })
+  it('enforces selected other-text and exclusive multi-select across dry-run and frozen FINAL',()=>{
+    const choiceForm:FormDraft={schemaVersion:2,pages:[{pageKey:'page',title:'类别',questions:[
+      {itemKey:'single',type:'SINGLE',prompt:'身份',required:true,rows:[],
+        options:[{optionKey:'standard',label:'标准'},{optionKey:'other',label:'其他'}],
+        otherOptionKey:'other',otherMaxLength:15},
+      {itemKey:'multiple',type:'MULTIPLE',prompt:'途径',required:true,rows:[],
+        options:[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'},
+          {optionKey:'other',label:'其他'},{optionKey:'none',label:'没有'}],
+        otherOptionKey:'other',exclusiveOptionKeys:['none'],minSelections:1,maxSelections:3},
+    ]}]}
+    expect(validateSurveyDraft('FORM',choiceForm,true).issues).toEqual([])
+    const valid={single:'other','single:other':'私下说明',
+      multiple:['a','other'],'multiple:other':'另有一种'}
+    const preview=dryRunSurveyForm(choiceForm,valid)
+    const official=computeSurveyFinal(snapshot(choiceForm),{form:valid})
+    expect(preview.rawAnswers).toEqual(official.units[0].rawAnswers)
+    expect(preview.rawAnswers['single:other']).toBe('私下说明')
+    expect(preview.rawAnswers['multiple:other']).toBe('另有一种')
+    const neutral=dryRunSurveyForm(choiceForm,{single:'standard',multiple:['none']})
+    expect(neutral.missing).toContainEqual({itemKey:'single:other',reason:'NOT_SHOWN'})
+    expect(neutral.missing).toContainEqual({itemKey:'multiple:other',reason:'NOT_SHOWN'})
+    for(const bad of [
+      {...valid,'single:other':''},
+      {...valid,'single:other':'x'.repeat(16)},
+      {...valid,single:'standard'},
+      {...valid,multiple:['none','a']},
+      {...valid,multiple:['none','other']},
+      {...valid,'multiple:other':''},
+      {...valid,multiple:['a']},
+      {...valid,multiple:['other','other']},
+    ]){
+      expect(()=>dryRunSurveyForm(choiceForm,bad)).toThrow(SurveyFinalValidationError)
+      expect(()=>computeSurveyFinal(snapshot(choiceForm),{form:bad}))
+        .toThrow(SurveyFinalValidationError)
+    }
+    const invalid=structuredClone(choiceForm)
+    invalid.pages[0].questions[1].exclusiveOptionKeys=['removed']
+    expect(validateSurveyDraft('FORM',invalid,true).issues.some(i=>
+      i.path.includes('exclusiveOptionKeys'))).toBe(true)
+    invalid.pages[0].questions[1].exclusiveOptionKeys=['none']
+    invalid.schemaVersion=1
+    expect(validateSurveyDraft('FORM',invalid,true).issues.some(i=>
+      i.path.includes('otherOptionKey'))).toBe(true)
+  })
   it('exports typed JSON arrays and object values without conflating zero and missing',()=>{
     const source:SurveySourceProjection={
       projectId:'project',collectionMode:'LINKED_WAVES',completeAttempts:1,sourceRevision:1,
