@@ -158,6 +158,10 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
  * Survey records, verifies the encrypted FINAL hash, and projects minimum data.
  * No arbitrary project administrator inherits the raw-data grant.
  */
+/** Exclusive safe upper bound after PostgreSQL microseconds round-trip through JS Date. */
+export function surveyExclusiveSnapshotCutOff(timestamp:Date):Date {
+  return new Date(timestamp.getTime()+1)
+}
 export async function loadSurveySource(input:{
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
   /** Only Wide exports need the schema of Waves with no completed FINAL. */
@@ -197,7 +201,13 @@ export async function loadSurveySource(input:{
     }
     // Stage 1: select only small identifiers; never deserialize full encrypted
     // FINALs and large Publication JSON before applying the memory budget.
-    const cutOff=input.snapshotCutOff||project.sourceCutOff
+    // PostgreSQL timestamptz(6) carries microseconds, but Prisma's JS Date
+    // retains only whole milliseconds. Round the transaction timestamp UP to
+    // the following millisecond for the exclusive cutoff; otherwise a valid
+    // FINAL committed earlier in this same millisecond can disappear.
+    // RepeatableRead still pins the first-page snapshot, and the existing
+    // exact count/revision guards detect later cross-request commits.
+    const cutOff=input.snapshotCutOff??surveyExclusiveSnapshotCutOff(project.sourceCutOff)
     if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
     const sourceWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,

@@ -13,10 +13,13 @@ const pages=[
     displayIf:{itemKey:'source',operator:'EQUALS' as const,optionKey:'yes'},
   }]},
 ]
-function Host(){
+function Host({conditional=true}:{conditional?:boolean}){
   const [pageIndex,setPageIndex]=useState(0)
   const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
-  return <><TaskForm unit={{kind:'FORM',instrumentKey:'form',title:'分页研究问卷',pages}}
+  const formPages=conditional?pages:pages.map(p=>({
+    ...p,questions:p.questions.map(q=>({...q,displayIf:undefined})),
+  }))
+  return <><TaskForm unit={{kind:'FORM',instrumentKey:'form',title:'分页研究问卷',pages:formPages}}
     proof={{publicId:'project',attemptId:'attempt',accessCredential:'secret'}}
     pageIndex={pageIndex} onPageChange={setPageIndex} answer={answers}
     onChange={(key,value)=>setAnswers(a=>({...a,[key]:value}))}/>
@@ -28,10 +31,13 @@ describe('Survey real participant Form paging',()=>{
     render(<Host/>)
     expect(screen.getByText('第一页')).toBeInTheDocument()
     expect(screen.queryByText('第二页')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'下一页'}))
-    expect(screen.getByRole('alert')).toHaveTextContent('先回答这一题')
+    // The next page is conditional: until the source answer is 'yes',
+    // Next is disabled rather than misleadingly claiming a page exists.
+    expect(screen.getByRole('button',{name:'下一页'})).toBeDisabled()
+    expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.getByTestId('page-number')).toHaveTextContent('0')
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(screen.getByRole('button',{name:'下一页'})).toBeEnabled()
     fireEvent.click(screen.getByRole('button',{name:'下一页'}))
     expect(screen.getByText('第二页')).toBeInTheDocument()
     expect(screen.queryByText('第一页')).not.toBeInTheDocument()
@@ -40,6 +46,16 @@ describe('Survey real participant Form paging',()=>{
     fireEvent.click(screen.getByRole('button',{name:'上一页'}))
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByTestId('page-answers')).toHaveTextContent('坚持完成')
+  })
+  it('blocks moving to an unconditional next page until the current required answer is present',()=>{
+    render(<Host conditional={false}/>)
+    expect(screen.getByRole('button',{name:'下一页'})).toBeEnabled()
+    fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+    expect(screen.getByRole('alert')).toHaveTextContent('先回答这一题')
+    expect(screen.getByTestId('page-number')).toHaveTextContent('0')
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+    expect(screen.getByTestId('page-number')).toHaveTextContent('1')
   })
   it('skips conditional pages entirely when their predicates are false',()=>{
     render(<Host/>)
