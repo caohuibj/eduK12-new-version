@@ -162,7 +162,8 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               checked={q.integerOnly===true} onChange={e=>setQuestion(pi,qi,x=>({...x,integerOnly:e.target.checked}))}/>
               每项必须为整数</label>
           </div>}
-          {['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&<div className="grid sm:grid-cols-2 gap-3">
+          {value.schemaVersion===2&&['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&
+            <div className="grid sm:grid-cols-2 gap-3">
             {(['minSelections','maxSelections'] as const).map(k=><label className="block text-sm" key={k}>
               {k==='minSelections'?'最少选择':'最多选择'}（留空不限）
               <input className="input block w-full" type="number" min="1" max="30" step="1"
@@ -177,7 +178,8 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
           {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<label className="block text-sm">字数上限
             <input className="input block" type="number" min="1" max="10000" value={q.maxLength??''}
               onChange={e=>setQuestion(pi,qi,x=>({...x,maxLength:e.target.value===''?undefined:Number(e.target.value)}))}/></label>}
-          {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<label className="block text-sm">输入格式
+          {value.schemaVersion===2&&['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&
+            <label className="block text-sm">输入格式
             <select className="input block" value={q.textValidation??''}
               onChange={e=>setQuestion(pi,qi,x=>({...x,
                 textValidation:e.target.value?e.target.value as 'EMAIL'|'DIGITS'|'ALPHANUMERIC':undefined}))}>

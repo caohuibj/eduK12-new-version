@@ -211,6 +211,10 @@ export const validateSurveyDraft=(
           err(issues,path+'.image','研究图片须明确作者或使用许可来源，才可发布')
         if(d.schemaVersion===1&&formQuestionRegistry[q.type].version>1)
           err(issues,path+'.type','专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义')
+        if(d.schemaVersion===1&&(q.minSelections!==undefined||q.maxSelections!==undefined||
+          q.textValidation!==undefined||q.otherOptionKey!==undefined||
+          q.otherMaxLength!==undefined||q.exclusiveOptionKeys!==undefined))
+          err(issues,path+'.schemaVersion','新的选项与文本校验规则只允许在 Form V2 中配置')
         unique(q.options.map(o=>o.optionKey),path+'.options',issues)
         unique(q.rows.map(o=>o.rowKey),path+'.rows',issues)
         if(q.otherOptionKey!==undefined){
