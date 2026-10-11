@@ -44,7 +44,16 @@ export async function submitResearchFinal(input:FinalInput){
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
-    await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${input.attemptId} FOR UPDATE`
+    // Match Project -> Wave -> Attempt ordering used by pause/close/hard-stop.
+    // The Wave SHARE lock serializes the FINAL decision with HARD_STOP's
+    // Wave UPDATE; a stop committed before this lock must reject the FINAL.
+    await tx.$queryRaw`SELECT id FROM survey_projects
+      WHERE id=${known.projectId} FOR SHARE`
+    await tx.$queryRaw`SELECT id FROM survey_waves
+      WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
+    await tx.$queryRaw`SELECT id FROM survey_wave_attempts
+      WHERE id=${input.attemptId} AND project_id=${known.projectId}
+        AND wave_id=${known.waveId} FOR UPDATE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:known.projectId,waveId:known.waveId,
     },include:{wave:{include:{publication:true}}}})
