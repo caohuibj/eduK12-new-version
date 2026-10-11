@@ -107,6 +107,9 @@ describe('Survey research builder contracts without formal publication authority
       throw new Error('multi-select compiled scorer unavailable')
     expect(result.score.metrics.find(m=>m.key==='effort')?.value).toBe(6)
     expect(result.score.metrics.find(m=>m.key==='support')?.value).toBe(5)
+    // 5 choices with 1..3 selections yield 5+10+10=25 combinations,
+    // exceeding the 24-option bounded Survey-only SJT adapter.
+    d.questions[0].minSelections=1
     d.questions[0].maxSelections=3
     d.questions[0].options.push({optionKey:'afour',label:'提出疑问',contributions:{effort:2,support:0}})
     d.questions[0].options.push({optionKey:'afive',label:'联系同伴',contributions:{effort:0,support:1}})
