@@ -5,6 +5,9 @@ type Event={id:string;targetId:string;kind:string;title:string;status:string;ver
 type Run={eventId:string;runId:string;status:string;version:number;name?:string}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type Progress={runId:string;total:number;counts:Record<string,number>}
+type GroupReport={independentRespondents:number;minimumRespondents:number;
+  distributions:Array<{itemKey:string;prompt:string;status:'READY'|'WITHHELD';
+    reason?:string;cells?:Array<{key:string;label:string;count:number}>}>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
   ACTIVITY:'其他活动',ARTIFACT:'教学成果或方案',PROJECT:'改进项目',
@@ -23,6 +26,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   const [releasedForms,setReleasedForms]=useState<Form[]>([])
   const [formChoice,setFormChoice]=useState<Record<string,string>>({})
   const [progress,setProgress]=useState<Record<string,Progress>>({})
+  const [reports,setReports]=useState<Record<string,GroupReport>>({})
   const [targetName,setTargetName]=useState('')
   const [targetKind,setTargetKind]=useState('PERSON')
   const [subjectUserId,setSubjectUserId]=useState('')
@@ -41,7 +45,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   }
   useEffect(()=>{
     let alive=true
-    setTargets([]);setEvents([]);setRunMap({});setReleasedForms([]);setNotice('')
+    setTargets([]);setEvents([]);setRunMap({});setReports({});setReleasedForms([]);setNotice('')
     void Promise.all([
       api<{list:Target[]}>(base+'/evaluation-targets'),
       api<{list:Event[]}>(base+'/evaluation-events'),
@@ -128,6 +132,23 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
     const report=await api<Progress>(base+'/evaluation-events/'+event.id+'/run/progress')
     setProgress(old=>({...old,[event.id]:report}))
   })
+  const closeRun=(event:Event)=>perform(async()=>{
+    if(event.status!=='OPEN')throw new Error('必须在活动开放时结束已发布 Run')
+    await api(base+'/evaluation-events/'+event.id+'/run/close','POST',{})
+    await fetchRun(event);setNotice('已关闭 Run；完成中的任务可能继续提交，请等待剩余任务结束。')
+  })
+  const cancelRun=(event:Event)=>perform(async()=>{
+    if(!window.confirm('取消已发布 Run 会停止未开始的任务。确认取消？'))return
+    await api(base+'/evaluation-events/'+event.id+'/run/cancel','POST',{})
+    await fetchRun(event);setNotice('Run 已取消。')
+  })
+  const readGroup=(event:Event)=>perform(async()=>{
+    const formId=formChoice[event.id]||releasedForms[0]?.id
+    if(!formId)throw new Error('请先选择报告对应的发布表单')
+    const report=await api<GroupReport>(
+      base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report')
+    setReports(previous=>({...previous,[event.id]:report}))
+  })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
     const result=await api<{status:string;version:number}>(
       base+'/evaluation-events/'+event.id+'/transition','POST',{
@@ -179,7 +200,10 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建标准 Run 草稿</button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')} disabled={working}>开放评价活动</button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
-        {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')} disabled={working}>结束活动</button>}
+        {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
+          disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>
+          结束活动
+        </button>}
       </div>
       {runMap[event.id]&&<div>
         <p>标准 Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status}</p>
@@ -202,10 +226,36 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
             </button>
           </div>
         </>}
-        {runMap[event.id].status==='PUBLISHED'&&
-          <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>}
+        {runMap[event.id].status==='PUBLISHED'&&<>
+          <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>
+          <button onClick={()=>closeRun(event)} disabled={working||event.status!=='OPEN'}>关闭 Run</button>
+          <button onClick={()=>cancelRun(event)} disabled={working||event.status!=='OPEN'}>取消 Run</button>
+        </>}
+        {event.status==='CLOSED'&&runMap[event.id].status==='CLOSED'&&
+          <div className="ht-inline">
+            <label className="ht-field"><span>报告对应 Form</span><select
+              value={formChoice[event.id]??''}
+              onChange={e=>setFormChoice(old=>({...old,[event.id]:e.target.value}))}>
+              <option value="">选择已发布表单</option>
+              {releasedForms.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
+            </select></label>
+            <button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>
+              查看受保护的学校群体报告
+            </button>
+          </div>}
         {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
           {progress[event.id].total} · 进行中 {progress[event.id].counts.IN_PROGRESS??0}</p>}
+      </div>}
+      {reports[event.id]&&<div className="ht-report" aria-label="学校调查群体报告">
+        <p><strong>不同有效参与者：{reports[event.id].independentRespondents}</strong>
+          （隐私下限 {reports[event.id].minimumRespondents}）</p>
+        <p>仅提供满足隐私保护的选项分布；个人答案、原始文本和作答身份不可见。</p>
+        {reports[event.id].distributions.map(item=><article key={item.itemKey}>
+          <h4>{item.prompt}</h4>
+          {item.status==='WITHHELD'?<p>该题结果因小单元或来源限制而隐藏。</p>:
+            <div className="ht-units">{item.cells?.map(cell=>
+              <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count}</span>)}</div>}
+        </article>)}
       </div>}
     </article>)}</div>
 <p className="ht-muted">Form-only 使用正式发布版本、标准 Run 和加密 FINAL；没有计分规则，不产生 Scale 得分。低于最小样本量的群体报告保持抑制。</p>

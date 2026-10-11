@@ -158,6 +158,20 @@ export async function transitionHuiteacherEvent(input:{
     const from=input.action==='OPEN'?'DRAFT':input.action==='CLOSE'?'OPEN':null
     if((from&&event.status!==from)||input.action==='CANCEL'&&!['DRAFT','OPEN'].includes(event.status))
       fail('HUITEACHER_EVENT_INVALID_TRANSITION')
+    const relatedRun=await tx.$queryRaw<Array<{status:string}>>`
+      SELECT run."status" FROM "huiteacher_evaluation_run_links" link
+      JOIN "assessment_runs" run
+        ON run."organization_id"=link."organization_id"
+        AND run."id"=link."run_id"
+      WHERE link."organization_id"=${input.organizationId}
+        AND link."event_id"=${input.eventId}
+      FOR SHARE OF run
+    `
+    const run=relatedRun[0]
+    if(input.action==='CLOSE'&&run&&run.status!=='CLOSED')
+      fail('HUITEACHER_RUN_MUST_CLOSE_FIRST')
+    if(input.action==='CANCEL'&&run&&!['DRAFT','CANCELLED'].includes(run.status))
+      fail('HUITEACHER_RUN_MUST_CANCEL_FIRST')
     const now=new Date()
     const status=input.action==='OPEN'?'OPEN':input.action==='CLOSE'?'CLOSED':'CANCELLED'
     const changed=await tx.huiteacherEvaluationEvent.updateMany({
