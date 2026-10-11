@@ -131,10 +131,15 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     wave1=w.id;publicId=w.publicId;entrySecret=w.entrySecret
     const info=await getPublicResearchInfo(publicId)
     expect(info.waves.some(item=>item.id===wave1)).toBe(true)
-    link=await joinLinkedStudy({
+    const enrolled=await joinLinkedStudy({
       publicId,waveId:wave1,entryToken:entrySecret,
       consentVersion:1,consent:true,
     })
+    // Preserve only the code and its private proof for future Waves. The
+    // enrollment response also contains T1 attemptId, which must never
+    // override the explicit T2/T3 attemptId in later object spreads.
+    link={researchCode:enrolled.researchCode,accessCredential:enrolled.accessCredential}
+    expect(enrolled.attemptId).toMatch(/^[a-f0-9-]{36}$/i)
     expect(link.researchCode).toMatch(/^R-[A-Z0-9]{8,32}$/)
     expect(link.accessCredential).toMatch(/^[A-Za-z0-9_-]{43}$/)
     expect(link.accessCredential).not.toBe(link.researchCode)
