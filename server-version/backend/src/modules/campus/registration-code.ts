@@ -26,6 +26,8 @@ export async function resolveCampusRegistrationCode(raw: string): Promise<Campus
       SELECT c.organization_id AS "organizationId",c.class_unit_id AS "classUnitId"
       FROM campus_activation_codes c
       JOIN organizations o ON o.id=c.organization_id AND o.product_domain='SCHOOL' AND o.status='ACTIVE'
+      JOIN education_product_entitlements ent ON ent.organization_id=o.id
+        AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
       JOIN campus_class_admissions a ON a.organization_id=c.organization_id AND a.class_unit_id=c.class_unit_id
         AND a.status='OPEN' AND a.window_closes_at>statement_timestamp() AND a.roster_version=c.roster_version
       WHERE c.code_digest=${hash(code)} AND c.expires_at>statement_timestamp()
@@ -34,6 +36,8 @@ export async function resolveCampusRegistrationCode(raw: string): Promise<Campus
     prisma.$queryRaw<Array<{ available: boolean }>>`
       SELECT TRUE AS available FROM parent_invite_codes i
       JOIN organizations o ON o.id=i.organization_id AND o.product_domain='SCHOOL' AND o.status='ACTIVE'
+      JOIN education_product_entitlements ent ON ent.organization_id=o.id
+        AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
       JOIN users u ON u.id=i.student_user_id AND u.account_domain='SCHOOL' AND u.role='STUDENT'
         AND u.is_active=TRUE AND u.is_frozen=FALSE AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       JOIN campus_student_enrollments e ON e.user_id=u.id AND e.organization_id=o.id AND e.status='APPROVED'
@@ -50,6 +54,8 @@ export async function resolveCampusRegistrationCode(raw: string): Promise<Campus
     prisma.$queryRaw<Array<{ persona: string; adminRole: boolean }>>`
       SELECT DISTINCT i.id,i.persona,i.admin_role AS "adminRole" FROM campus_staff_invitations i
       JOIN organizations o ON o.id=i.organization_id AND o.product_domain='SCHOOL' AND o.status='ACTIVE'
+      JOIN education_product_entitlements ent ON ent.organization_id=o.id
+        AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
       JOIN users u ON u.id=i.invited_by_user_id AND u.account_domain='SCHOOL' AND u.role IN ('ADMIN','TEACHER')
         AND u.is_active=TRUE AND u.is_frozen=FALSE AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       JOIN organization_memberships m ON m.user_id=u.id AND m.organization_id=o.id AND m.org_role='ORG_ADMIN'

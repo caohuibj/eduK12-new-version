@@ -56,6 +56,8 @@ export async function lockSchoolActivity(tx:Tx,organizationId:string,courseId:st
     JOIN "courses" c ON c."id"=a."course_id" AND c."organization_id"=a."organization_id"
     JOIN "organizations" o ON o."id"=a."organization_id"
       AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
+    JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+      AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
     WHERE a."course_id"=${courseId} AND a."organization_id"=${organizationId}
       AND c."course_type"='CAMPUS_ACTIVITY'
     FOR UPDATE OF a

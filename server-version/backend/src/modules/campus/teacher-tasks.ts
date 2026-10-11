@@ -34,6 +34,8 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       AND activity.course_id=ar.course_id AND activity.status='OPEN'
     JOIN courses course ON course.id=activity.course_id AND course.course_type='CAMPUS_ACTIVITY'
     JOIN organizations org ON org.id=ar.organization_id AND org.status='ACTIVE' AND org.product_domain='SCHOOL'
+    JOIN education_product_entitlements ent ON ent.organization_id=org.id
+      AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
     JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
       AND run.status='PUBLISHED'
     JOIN organization_memberships teacher ON teacher.id=r.membership_id

@@ -50,6 +50,8 @@ async function admissionForUpdate(tx: Tx, orgId: string, classId: string): Promi
       "window_closes_at" AS "windowClosesAt"
     FROM "campus_class_admissions"
     WHERE "class_unit_id" = ${classId} AND "organization_id" = ${orgId}
+      AND EXISTS(SELECT 1 FROM "education_product_entitlements" e
+        WHERE e."organization_id"=${orgId} AND e."product"='HUISCHOOL' AND e."status"='ACTIVE')
     FOR UPDATE
   `
   return rows[0] ?? fail('CLASS_ADMISSION_NOT_FOUND', 404)

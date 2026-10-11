@@ -30,7 +30,7 @@ declare global {
   }
 }
 
-type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string }
+type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string; huischoolEntitled: boolean }
 type MembershipRow = { id: string; orgRole: OrganizationRole }
 type PersonaRow = { persona: OrganizationPersona }
 type CapabilityRow = { capability: OrganizationCapability }
@@ -43,7 +43,11 @@ export async function resolveOrganizationAccessContext(input: {
   const db=tx??prisma
   const organizations = await db.$queryRaw<OrgRow[]>`
     SELECT o."id", o."status", o."product_domain" AS "productDomain",
-           u."account_domain" AS "viewerDomain"
+           u."account_domain" AS "viewerDomain",
+           EXISTS (SELECT 1 FROM "education_product_entitlements" entitlement
+             WHERE entitlement."organization_id"=o."id"
+               AND entitlement."product"='HUISCHOOL'
+               AND entitlement."status"='ACTIVE') AS "huischoolEntitled"
     FROM "organizations" o
     JOIN "users" u ON u."id" = ${input.principal.userId}
     WHERE o."id" = ${input.organizationId}
@@ -54,6 +58,8 @@ export async function resolveOrganizationAccessContext(input: {
   // Fail closed even for legacy SYSTEM_ADMIN: bootstrap is a separate
   // audited operation, not an implicit right to SCHOOL member/report data.
   if ((organization.productDomain === 'SCHOOL') !== (organization.viewerDomain === 'SCHOOL')) return null
+  // The SCHOOL identity realm no longer implies Huischool psychology access.
+  if (organization.productDomain === 'SCHOOL' && !organization.huischoolEntitled) return null
 
   const [memberships, denyRows] = await Promise.all([
     db.$queryRaw<MembershipRow[]>`

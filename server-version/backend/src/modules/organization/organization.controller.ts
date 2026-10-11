@@ -139,11 +139,21 @@ export const organizationController = {
              AND m."valid_from" <= statement_timestamp()
              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
             WHERE o."product_domain" = ${viewerDomain}
+            AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
             ORDER BY o."name", o."id"
             LIMIT ${pageSize} OFFSET ${offset}
           `,
           prisma.$queryRaw<Array<{ count: number }>>`
-            SELECT COUNT(*)::int AS "count" FROM "organizations" WHERE "product_domain" = ${viewerDomain}
+            SELECT COUNT(*)::int AS "count" FROM "organizations" o WHERE o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
           `,
         ])
       } else {
@@ -160,6 +170,11 @@ export const organizationController = {
             JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
               AND o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
             ORDER BY o."name", o."id"
@@ -171,6 +186,11 @@ export const organizationController = {
             JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
               AND o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
           `,
