@@ -614,6 +614,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
         completedAt:new Date(first.nextFinalCursor!.completedAt)},
       snapshotCutOff:new Date(first.cutOff),
       expectedSourceRevision:first.sourceRevision,
+      expectedFinalCount:first.sourceFinalCount??undefined,
     })
     expect(second.completeAttempts).toBe(1)
     expect(second.nextFinalCursor).toBeNull()
