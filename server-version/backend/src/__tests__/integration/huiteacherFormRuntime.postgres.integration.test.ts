@@ -6,7 +6,8 @@ import { createHuiteacherForm,updateHuiteacherForm,publishHuiteacherForm } from 
 import { createHuiteacherTarget,createHuiteacherEvent,
   createHuiteacherEventRunDraft,transitionHuiteacherEvent,readHuiteacherEventRun,
 } from '../../modules/huiteacher/evaluation.service'
-import { addTeacherRunTrack,previewTeacherRun,publishTeacherRun } from '../../modules/huiteacher/run.service'
+import { addTeacherRunTrack,previewTeacherRun,publishTeacherRun,closeTeacherRun } from '../../modules/huiteacher/run.service'
+import { readTeacherFormGroupReport } from '../../modules/huiteacher/groupReport.service'
 import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
 import { readOwnHuiteacherFormTask,submitOwnHuiteacherFormFinal } from '../../modules/huiteacher/formFinal.service'
 import { productionRunResourceAuthorityRegistry } from '../../modules/assessment-run/resourceAuthority'
@@ -81,7 +82,9 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
         questions:[{itemKey:'q1',type:'LIKERT',prompt:'工作中的支持',
           required:true,options:[{optionKey:'a',label:'不足'},{optionKey:'b',label:'充分'}],rows:[]},
           {itemKey:'q2',type:'SHORT_TEXT',prompt:'补充建议',
-            required:false,options:[],rows:[],maxLength:200}],
+            required:false,options:[],rows:[],maxLength:200},
+          {itemKey:'q3',type:'LIKERT',prompt:'团队支持',
+            required:true,options:[{optionKey:'a',label:'不足'},{optionKey:'b',label:'充分'}],rows:[]}],
       }]},
     })
     const form=await db.huiteacherFormInstrument.findUniqueOrThrow({where:{id:draft.id}})
@@ -137,11 +140,11 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     const task=await readOwnHuiteacherFormTask({
       actorUserId:participants[0].id,attemptId:started.runtimeBindingRef,
     })
-    expect(task.pages[0].questions).toHaveLength(2)
+    expect(task.pages[0].questions).toHaveLength(3)
     expect(task.reportMode).toBe('COMPLETION_ONLY')
     const submissionId=randomUUID()
     const input={actorUserId:participants[0].id,attemptId:started.runtimeBindingRef,
-      submissionId,answers:{q1:'b',q2:'建议继续支持'} }
+      submissionId,answers:{q1:'b',q2:'建议继续支持',q3:'b'} }
     const completed=await submitOwnHuiteacherFormFinal(input)
     expect(completed.idempotent).toBe(false)
     expect((await submitOwnHuiteacherFormFinal(input)).idempotent).toBe(true)
@@ -161,5 +164,53 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
       WHERE "id"=${executionId}
     `
     expect(rows[0].status).toBe('COMPLETED')
+    // Full cohort only: report must remain unavailable while the survey
+    // is open and until every eligible Run task has reached authoritative FINAL.
+    await expect(readTeacherFormGroupReport({
+      ...key,formId:draft.id,
+    })).rejects.toThrow()
+    for(const [index,respondent] of participants.slice(1).entries()){
+      const entries=await db.$queryRaw<Array<{id:string}>>`
+        SELECT e."id" FROM "assessment_run_executions" e
+        JOIN "assessment_run_actor_snapshots" actor
+          ON actor."id"=e."respondent_actor_snapshot_id"
+          AND actor."organization_id"=e."organization_id"
+          AND actor."run_id"=e."run_id"
+        WHERE e."run_id"=${created.runId} AND actor."user_id"=${respondent.id}
+        LIMIT 1
+      `
+      expect(entries).toHaveLength(1)
+      const next=await startAssessmentRunExecution({
+        executionId:entries[0].id,actorUserId:respondent.id,
+      })
+      if(next.state!=='STARTED')throw Error('RUN START did not create Teacher Form')
+      const value=await submitOwnHuiteacherFormFinal({
+        actorUserId:respondent.id,attemptId:next.runtimeBindingRef,
+        submissionId:randomUUID(),
+        answers:{q1:index===8?'a':'b',q3:'b'},
+      })
+      expect(value.status).toBe('COMPLETED')
+    }
+    const closed=await closeTeacherRun(key)
+    expect(closed.status).toBe('CLOSED')
+    await transitionHuiteacherEvent({
+      organizationId:organization.id,actorUserId:admin.id,eventId:event.id,
+      action:'CLOSE',expectedVersion:2,
+    })
+    const report=await readTeacherFormGroupReport({...key,formId:draft.id})
+    expect(report.independentRespondents).toBe(10)
+    expect(report.reportMode).toBe('FORM_DESCRIPTIVE_AGGREGATE')
+    const smallCell=report.distributions.find(x=>x.itemKey==='q1')
+    expect(smallCell?.status).toBe('WITHHELD')
+    const safeCell=report.distributions.find(x=>x.itemKey==='q3')
+    expect(safeCell?.status).toBe('READY')
+    if(safeCell?.status!=='READY')throw Error('safe cohort unexpectedly masked')
+    expect(safeCell.cells?.find(x=>x.key==='b')?.count).toBe(10)
+    // No raw text item or traceable respondent identity is reportable.
+    expect(report.distributions.some(x=>x.itemKey==='q2')).toBe(false)
+    expect(JSON.stringify(report)).not.toContain('建议继续支持')
+    await expect(readTeacherFormGroupReport({
+      ...key,actorUserId:participants[0].id,formId:draft.id,
+    })).rejects.toThrow()
   })
 })
