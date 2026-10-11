@@ -29,7 +29,7 @@ export const formAnswerFieldCount=(form:FormDraft)=>form.pages.reduce((sum,page)
   sum+page.questions.reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0),0)
 /** Conservative maximum serialized answer bytes before an instrument is published.
  * JSON may expand control characters to 6 ASCII bytes per UTF-16 code unit.
- * This protects both simple large free-text forms and dense matrix multi-select.
+ * This protects both large free-text forms and dense V1 matrix responses.
  */
 export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
   const quote=(value:string)=>Buffer.byteLength(JSON.stringify(value),'utf8')
@@ -41,16 +41,12 @@ export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
     const valueBytes=()=>{
       if(q.type==='SHORT_TEXT'||q.type==='LONG_TEXT')
         return 2+6*(q.maxLength??(q.type==='SHORT_TEXT'?300:10000))
-      if(q.type==='MULTIPLE'||q.type==='RANK_ORDER')return allOptions
-      if(q.type==='CONSTANT_SUM')return 2+q.options.reduce((n,o)=>n+quote(o.optionKey)+32,0)
-      if(q.type==='DATE')return 12
-      if(q.type==='TIME')return 7
-      if(q.type==='NUMBER'||q.type==='SLIDER')return 30
+      if(q.type==='MULTIPLE')return allOptions
+      if(q.type==='NUMBER')return 30
       return option
     }
-    if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
-      for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+
-        (q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
+    if(q.type==='MATRIX'){
+      for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+option+2
     }else bytes+=quote(q.itemKey)+valueBytes()+2
   }
   return bytes
