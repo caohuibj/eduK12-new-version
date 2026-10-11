@@ -11,6 +11,7 @@ const id=z.string().uuid()
 const wave=z.object({
   title:z.string().trim().min(1).max(160),
   consentText:z.string().max(20000),
+  linkageNoticeConfirmed:z.boolean().optional(),
   generalText:z.string().max(4000).optional(),
   instrumentIds:z.array(id).max(30).refine(a=>new Set(a).size===a.length),
   opensAt:z.string().datetime().nullable().optional(),

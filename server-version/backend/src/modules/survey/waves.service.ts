@@ -65,7 +65,8 @@ export async function getWave(uid:string,pid:string,wid:string){
 type WaveInput={
   requestId:string;title:string;consentText:string;generalText?:string;instrumentIds:string[];
   opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
-  quotaStarts?:number|null;allowNewParticipants?:boolean
+  quotaStarts?:number|null;allowNewParticipants?:boolean;
+  linkageNoticeConfirmed?:boolean
 }
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
@@ -85,6 +86,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     const row=await tx.surveyWave.create({data:{
       id:input.requestId,projectId:pid,ordinal:next,title:input.title,
       consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
+      linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
       instrumentIds:input.instrumentIds,
       status:'DRAFT',
       opensAt:input.opensAt?new Date(input.opensAt):null,
@@ -110,6 +112,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
+        linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
         opensAt:input.opensAt?new Date(input.opensAt):null,
         closesAt:input.closesAt?new Date(input.closesAt):null,
         finishUntil:input.finishUntil?new Date(input.finishUntil):null,
@@ -125,14 +128,14 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
 }
 export async function preflightWave(uid:string,pid:string,wid:string){
   const input=await prisma.$transaction(async tx=>{
-    await ownProject(tx,uid,pid,false)
+    const project=await ownProject(tx,uid,pid,false)
     const wave=await ownWave(tx,pid,wid)
     if(wave.status!=='DRAFT')fail(409,'发布后内容不可重新进行草稿预检')
     const ids=Array.isArray(wave.instrumentIds)?wave.instrumentIds.filter((x):x is string=>typeof x==='string'):[]
     if(ids.length!==(Array.isArray(wave.instrumentIds)?wave.instrumentIds.length:-1))fail(400,'工具引用格式错误')
     await validateDraftRefs(tx,pid,ids)
     const drafts=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}}})
-    return {wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
+    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
   const hasConsent=input.wave.consentText.trim().length>=20
@@ -140,6 +143,11 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     issues:hasConsent?[]:['研究说明与知情同意至少需要 20 字']})
   checks.push({key:'instruments',ok:input.selected.length>0,
     issues:input.selected.length?[]:['至少选择一个研究工具']})
+  if(input.project.collectionMode==='LINKED_WAVES'){
+    const linkedConfirmed=input.wave.linkageNoticeConfirmed===true
+    checks.push({key:'linkage_disclosure',ok:linkedConfirmed,
+      issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
+  }
   for(const draft of input.drafts){
     const compilation=previewResearchInstrument({
       kind:surveyKindSchema.parse(draft.kind),instrumentKey:draft.instrumentKey,
@@ -153,7 +161,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
-    ok:checks.length===input.selected.length+2&&checks.every(c=>c.ok),
+    ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?3:2)&&checks.every(c=>c.ok),
     publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
     reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
       ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'

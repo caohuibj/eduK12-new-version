@@ -10,7 +10,7 @@ const frozen=(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDraft|SjtDraft
   })
 const snapshot=(unit:ReturnType<typeof frozen>):ResearchFrozenPublication=>({
   schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'project',waveId:'wave',
-  collectionMode:'LINKED_WAVES',consentVersion:1,consentDigest:'consent-hash',
+  collectionMode:'LINKED_WAVES',consentVersion:1,linkageNoticeConfirmed:true,consentDigest:'consent-hash',
   runtimeStatus:'SURVEY_FINAL_V1',units:[unit],
 })
 const form:FormDraft={schemaVersion:1,pages:[{pageKey:'pageone',title:'科目与体验',questions:[

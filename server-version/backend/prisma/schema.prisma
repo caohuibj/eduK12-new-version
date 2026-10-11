@@ -2815,6 +2815,7 @@ model SurveyWave {
   revision        Int           @default(0)
   consentText     String        @map("consent_text")
   consentVersion  Int           @default(1) @map("consent_version")
+  linkageNoticeConfirmed Boolean @default(false) @map("linkage_notice_confirmed")
   generalText     String        @default("") @map("general_text")
   hardStopAt      DateTime?     @map("hard_stop_at") @db.Timestamptz(6)
   instrumentIds   Json          @default("[]") @map("instrument_ids")

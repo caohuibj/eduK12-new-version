@@ -2,11 +2,11 @@ import { useEffect,useState,type FormEvent } from 'react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string}
-type Project={id:string;status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
+type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type Wave={
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
   revision:number;instrumentIds:string[];publicationId:string|null;
-  consentText:string;generalText:string;consentVersion:number;
+  consentText:string;generalText:string;consentVersion:number;linkageNoticeConfirmed:boolean;
   opensAt:string|null;closesAt:string|null;finishUntil:string|null;
   quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean
 }
@@ -35,7 +35,7 @@ const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
 }
 const message=(e:unknown)=>e instanceof Error?e.message:'研究波次操作失败'
 const initial=()=>({
-  title:'',consentText:'',generalText:'',instrumentIds:[] as string[],
+  title:'',consentText:'',generalText:'',linkageNoticeConfirmed:false,instrumentIds:[] as string[],
   opensAt:'',closesAt:'',quotaStarts:'',allowNewParticipants:false,
 })
 type FormState=ReturnType<typeof initial>
@@ -72,6 +72,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     setEditing(detail);setReady(null);setShareLink('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
+      linkageNoticeConfirmed:detail.linkageNoticeConfirmed,
       instrumentIds:detail.instrumentIds,
       opensAt:localTime(detail.opensAt),closesAt:localTime(detail.closesAt),
       quotaStarts:detail.quotaStarts===null?'':String(detail.quotaStarts),
@@ -83,6 +84,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     const stop=form.closesAt?new Date(form.closesAt):null
     return {
       title:form.title,consentText:form.consentText,generalText:form.generalText,
+      linkageNoticeConfirmed:form.linkageNoticeConfirmed,
       instrumentIds:form.instrumentIds,
       opensAt:start?.toISOString()||null,
       closesAt:stop?.toISOString()||null,
@@ -175,6 +177,16 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
           <label className="block text-sm">参与说明与知情同意
             <textarea className="input block w-full" rows={6} required minLength={20}
               value={form.consentText} onChange={e=>setForm({...form,consentText:e.target.value})}/></label>
+          {project?.collectionMode==='LINKED_WAVES'&&<div className="rounded-lg border border-amber-300 bg-amber-50 p-3">
+            <p className="text-sm font-semibold">跨时间点可关联研究的必要告知</p>
+            <p className="text-sm my-2">本项目会用随机研究编号关联同一参与者在 T1、T2、T3 等不同时间点的作答。
+              研究编号不等于真实姓名，但此模式属于项目内可关联的假名化研究，而非完全不可关联的匿名。
+              被试须保留本人私密恢复凭证，并了解撤回和数据保留政策。未成年人还应按研究规定核对适用同意。</p>
+            <label className="flex gap-2 text-sm items-start"><input type="checkbox"
+              checked={form.linkageNoticeConfirmed}
+              onChange={e=>setForm({...form,linkageNoticeConfirmed:e.target.checked})}/>
+              我已将跨波次关联、研究编号、参加自愿性及撤回说明明确写入本轮知情同意材料，并将在正式提交前供被试确认。</label>
+          </div>}
           <label className="block text-sm">通用完成反馈（不显示个人分数）
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>

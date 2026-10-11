@@ -28,6 +28,7 @@ export interface ResearchFrozenPublication {
   waveId:string
   collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   consentVersion:number
+  linkageNoticeConfirmed:boolean
   consentDigest:string
   units:ResearchFrozenUnit[]
   runtimeStatus:'SURVEY_FINAL_V1'
@@ -91,6 +92,8 @@ export async function freezeResearchWaveDraft(input:{
     if(wave.revision!==input.revision||wave.status!=='DRAFT'||wave.publicationId)
       stop('波次已经冻结或被其他编辑会话修改')
     if(wave.consentText.trim().length<20)stop('知情同意信息至少需要 20 字')
+    if(project.collectionMode==='LINKED_WAVES'&&!wave.linkageNoticeConfirmed)
+      stop('跨波次研究需先确认已明确告知研究编号会关联历次作答')
     const ids=Array.isArray(wave.instrumentIds)?wave.instrumentIds:[]
     if(!ids.length||ids.length>30||ids.some(id=>typeof id!=='string')||new Set(ids).size!==ids.length)
       stop('波次必须准确选择 1–30 个不同研究工具')
@@ -117,7 +120,9 @@ export async function freezeResearchWaveDraft(input:{
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
       consentVersion:wave.consentVersion,
-      consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion}),
+      linkageNoticeConfirmed:wave.linkageNoticeConfirmed,
+      consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion,
+        linkedConfirmed:wave.linkageNoticeConfirmed}),
       units,runtimeStatus:'SURVEY_FINAL_V1',
     }
     const serial=JSON.stringify(snapshot)

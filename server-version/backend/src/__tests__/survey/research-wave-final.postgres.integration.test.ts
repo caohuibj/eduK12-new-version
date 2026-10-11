@@ -69,6 +69,7 @@ async function wave(title:string,ids:string[]){
   const w=await createWave(ownerId,projectId,{
     requestId:randomUUID(),title,consentText:consent,
     generalText:'感谢完成本轮研究。本研究结果将汇总分析，不提供个人诊断。',
+    linkageNoticeConfirmed:true,
     instrumentIds:ids,
   })
   const prepared=await prepareWave(ownerId,projectId,w.id,w.revision)
