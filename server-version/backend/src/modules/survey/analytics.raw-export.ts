@@ -63,7 +63,9 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
     throw new Error('RAW_WIDE requires project-local pseudonymous Linked Waves')
   const rows=ordered(source)
   const byColumn=new Map(source.codebook.map(x=>[x.columnKey,x]))
-  const columnIds=[...new Set(rows.map(r=>r.columnKey))].sort()
+  // The frozen publication codebook includes variables from Waves with zero
+  // completed FINAL; deriving columns only from observed answers drops those Waves.
+  const columnIds=[...byColumn.keys()].sort()
   if(columnIds.length>255)throw new Error('Wide export exceeds 255 value/absence pairs; use Raw Long')
   const byCode=new Map<string,Map<string,{value:string|number|null;missingReason:string|null}>>()
   const attendance=new Map(source.attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
