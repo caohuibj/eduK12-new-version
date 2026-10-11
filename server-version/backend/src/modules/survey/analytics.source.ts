@@ -30,6 +30,8 @@ export interface SurveySourceProjection {
   completeAttempts:number
   sourceRevision:number
   cutOff:string
+  /** Only set on explicitly paged reads; no silent truncation on legacy reads. */
+  nextFinalCursor:{id:string;completedAt:string}|null
   scores:FrozenScoreObservation[]
   /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
@@ -146,6 +148,10 @@ export async function loadSurveySource(input:{
   includeWideSchema?:boolean
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
   completedFrom?:Date;completedBefore?:Date
+  pageMode?:boolean
+  afterFinal?:{id:string;completedAt:Date}
+  snapshotCutOff?:Date
+  expectedSourceRevision?:number
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -163,29 +169,43 @@ export async function loadSurveySource(input:{
       FOR SHARE OF p,u,g,m
     `
     if(!project)denied()
+    if(input.expectedSourceRevision!==undefined
+       &&project.sourceRevision!==input.expectedSourceRevision)
+      throw new SurveyAnalyticsError(409,'研究样本或项目版本在分批分析期间变化，请重新开始')
     if(input.waveIds?.length){
       const ownerWaves=await tx.surveyWave.count({where:{projectId:input.projectId,id:{in:input.waveIds}}})
       if(ownerWaves!==new Set(input.waveIds).size)denied()
     }
     // Stage 1: select only small identifiers; never deserialize full encrypted
     // FINALs and large Publication JSON before applying the memory budget.
-    const finalWhere={
+    const cutOff=input.snapshotCutOff||project.sourceCutOff
+    if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
+    const finalWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,
       ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
-      ...(input.completedFrom||input.completedBefore?{completedAt:{
+      completedAt:{
         ...(input.completedFrom?{gte:input.completedFrom}:{}),
-        ...(input.completedBefore?{lt:input.completedBefore}:{}),
-      }}:{}),
-      attempt:{status:'COMPLETED' as const,excludedAt:null,
+        lt:input.completedBefore&&input.completedBefore<cutOff
+          ?input.completedBefore:cutOff,
+      },
+      ...(input.afterFinal?{AND:[{OR:[
+        {completedAt:{gt:input.afterFinal.completedAt}},
+        {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
+      ]}]}:{}),
+      attempt:{status:'COMPLETED',excludedAt:null,
         OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]},
     }
     const headers=await tx.surveyWaveFinal.findMany({
-      where:finalWhere,select:{id:true,publicationId:true},
+      where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
       orderBy:[{completedAt:'asc'},{id:'asc'}],take:max+1,
     })
-    if(headers.length>max)
+    if(headers.length>max&&!input.pageMode)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')
-    const ids=headers.map(row=>row.id)
+    const selectedHeaders=input.pageMode?headers.slice(0,max):headers
+    const last=selectedHeaders.at(-1)
+    const nextFinalCursor=input.pageMode&&headers.length>max&&last
+      ?{id:last.id,completedAt:last.completedAt.toISOString()}:null
+    const ids=selectedHeaders.map(row=>row.id)
     // A Wave may have STARTED attempts but no FINAL. Only Wide exports need
     // its frozen schema to distinguish ABANDONED from NO_WAVE.
     const frozenWaves=input.includeWideSchema?await tx.surveyWave.findMany({
@@ -201,7 +221,7 @@ export async function loadSurveySource(input:{
     if(frozenWaves.length>100)
       throw new SurveyAnalyticsError(413,'本次宽表波次数量超出安全上限')
     const publicationIds=[...new Set([
-      ...headers.map(row=>row.publicationId),
+      ...selectedHeaders.map(row=>row.publicationId),
       ...frozenWaves.flatMap(w=>w.publicationId?[w.publicationId]:[]),
     ])]
     // Both byte budgets apply before loading any potentially large JSON or
@@ -340,7 +360,7 @@ export async function loadSurveySource(input:{
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
-      cutOff:project.sourceCutOff.toISOString(),
+      cutOff:cutOff.toISOString(),nextFinalCursor,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
