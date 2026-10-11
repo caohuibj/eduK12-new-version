@@ -118,7 +118,8 @@ export async function createSurveyExport(req:Request,input:{
     {waveId:x.waveId,instrumentKey:x.instrumentKey,
       publicationVersion:x.publicationVersion,
       instrumentRevision:x.instrumentRevision,
-      definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest},
+      definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest,
+      formSchemaVersion:x.formSchemaVersion??null},
   ] as const)).values()]
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
     generatedAt:new Date().toISOString(),timeZone:'UTC',

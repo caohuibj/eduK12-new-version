@@ -19,6 +19,7 @@ export interface ResearchRawCodebook {
   instrumentRevision:number
   timeZone?:'Asia/Shanghai'|'UTC'
   valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
+  formSchemaVersion?:1|2
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -337,6 +338,7 @@ export async function loadSurveySource(input:{
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
+            ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
@@ -388,6 +390,7 @@ export async function loadSurveySource(input:{
               instrumentRevision:frozen.draftRevision,
               ...(r.timeZone?{timeZone:r.timeZone}:{}),
               valueEncoding:answerValueEncoding(r.responseType),
+              ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
             })
         }
       }
