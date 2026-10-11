@@ -32,7 +32,8 @@ async function invite(actorId:string,kind:'INVITE'|'PASSWORD_RESET',targetId:str
     await assertCurrentSystemAdmin(tx,actorId)
     if(targetId){
       const user=await tx.user.findFirst({where:{id:targetId,accountDomain:'SURVEY'},select:{id:true}})
-      if(!user)throw new SurveyGovernanceError(404,'研究者不存在')
+      const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
+      if(!user||!grant||grant.status!=='ACTIVE')throw new SurveyGovernanceError(404,'研究者不可签发恢复邀请')
     }
     await tx.surveyInvitation.create({data:{
       id,kind,tokenHash:digest(value),createdBy:actorId,targetUserId:targetId,
@@ -82,7 +83,9 @@ export async function redeemPasswordReset(req:Request,res:Response,raw:string,pa
     `
     if(!inv)throw new SurveyGovernanceError(403,'恢复邀请无效或已使用')
     const current=await tx.user.findFirst({where:{id:inv.userId,accountDomain:'SURVEY'}})
-    if(!current||!current.isActive||current.isFrozen)throw new SurveyGovernanceError(403,'研究者资格不可恢复')
+    const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:inv.userId}})
+    if(!current||!current.isActive||current.isFrozen||grant?.status!=='ACTIVE')
+      throw new SurveyGovernanceError(403,'研究者资格不可恢复')
     const changed=await tx.user.update({where:{id:current.id},data:{
       passwordHash,tokenVersion:{increment:1},mustChangePassword:false,
     }})
@@ -137,7 +140,8 @@ export async function resetResearcherMfa(actorId:string,targetId:string){
   return prisma.$transaction(async tx=>{
     await assertCurrentSystemAdmin(tx,actorId)
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
-    if(!grant||grant.status==='REVOKED')throw new SurveyGovernanceError(404,'研究者不存在')
+    if(!grant||!['ACTIVE','PENDING_MFA'].includes(grant.status))
+      throw new SurveyGovernanceError(409,'已暂停或撤销的研究者不能通过重置双因素认证获得新资格')
     await tx.surveyMfaChallenge.deleteMany({where:{userId:targetId}})
     await tx.surveyMfaRecoveryCode.deleteMany({where:{userId:targetId}})
     await tx.surveyMfaCredential.deleteMany({where:{userId:targetId}})
