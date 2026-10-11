@@ -6,6 +6,7 @@ export interface SurveyExportCursor {
   after:{id:string;completedAt:string}
   cutOff:string;sourceRevision:number;page:number;issuedAt:number
   completedFrom:string|null;completedBefore:string|null
+  freeTextIncluded:boolean
 }
 const signer=()=>{
   const key=process.env.ASSET_SIGNING_SECRET
