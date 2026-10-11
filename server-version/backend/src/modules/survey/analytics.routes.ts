@@ -8,8 +8,8 @@ import { describeWave,describePairedScores,describeWaveGroups } from './analytic
 
 
 export const surveyAnalyticsRouter=Router()
-surveyAnalyticsRouter.use(authenticateSurvey)
-surveyAnalyticsRouter.use((_req,res,next)=>{
+surveyAnalyticsRouter.use('/:pid/analytics',authenticateSurvey)
+surveyAnalyticsRouter.use('/:pid/analytics',(_req,res,next)=>{
   if(process.env.SURVEY_ANALYTICS_ENABLED!=='true')
     return res.status(404).json({code:-1,message:'研究分析仍未完成正式验收',data:null})
   res.setHeader('Cache-Control','no-store')
