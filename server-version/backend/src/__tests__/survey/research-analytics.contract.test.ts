@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { pairedDescriptive, summarizeWaveScores, type FrozenScoreObservation } from '../../modules/survey/analytics.cohorts'
 import { exportLong, exportWide, protectCsvCell, tableToCsv } from '../../modules/survey/analytics.export-format'
+import { describeWave } from '../../modules/survey/analytics.descriptive'
+import type { SurveySourceProjection } from '../../modules/survey/analytics.source'
 
 const project='study-a'
 const metric={instrumentKey:'motivation',scoreKey:'total',scoringDigest:'a'.repeat(64),
@@ -62,4 +64,39 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     expect(output).toContain('hello""\nworld')
     expect(()=>tableToCsv(['a'],[['x','y']])).toThrow()
   })
+  it('counts SJT multi-select choices independently from exact response combinations',()=>{
+    const codebook={
+      columnKey:'W001__sjt__first__aabb',waveId:'T1',waveOrdinal:1,
+      instrumentKey:'sjt',itemKey:'first',kind:'SJT' as const,
+      responseType:'SJT_MULTIPLE',title:'团队合作',
+      prompt:'你会采取哪些行动？',
+      options:[{code:'a',label:'倾听'},{code:'b',label:'支持'}],
+      definitionDigest:'d'.repeat(64),scoringDigest:'e'.repeat(64),
+      publicationVersion:1,instrumentRevision:0,
+    }
+    const raw=(attemptId:string,value:string)=>({
+      projectId:project,waveId:'T1',waveOrdinal:1,attemptId,
+      researchCode:'R-'+attemptId,sourceFinalHash:'f'.repeat(64),
+      instrumentKey:'sjt',kind:'SJT' as const,responseType:'SJT_MULTIPLE',
+      itemKey:'first',columnKey:codebook.columnKey,publicationVersion:1,
+      value,missingReason:null,completedAt:'2026-10-11T00:00:00Z',sourceVerified:true as const,
+    })
+    const source:SurveySourceProjection={
+      projectId:project,collectionMode:'LINKED_WAVES',
+      completeAttempts:2,sourceRevision:0,cutOff:'2026-10-11T00:00:00Z',
+      scores:[],raw:[raw('A','["a","b"]'),raw('B','["b"]')],
+      codebook:[codebook],attendance:[],
+    }
+    const desc=describeWave(source,'T1')
+    expect(desc.items[0]).toMatchObject({
+      respondentN:2,responseType:'SJT_MULTIPLE',
+      frequencies:[{value:'a',count:1},{value:'b',count:2}],
+      combinationFrequencies:[
+        {value:'["a","b"]',count:1},{value:'["b"]',count:1},
+      ],
+    })
+    source.raw[0]={...source.raw[0],value:'["a","a"]'}
+    expect(()=>describeWave(source,'T1')).toThrow(/duplicate|重复|invalid/)
+  })
+
 })
