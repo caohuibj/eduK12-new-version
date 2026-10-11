@@ -378,7 +378,8 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               <select className="input block w-full" value={categoryKey}
                 onChange={e=>{setCategoryKey(e.target.value);setFlowAnalytics(null)}}>
                 <option value="">仅实验组别及总样本</option>
-                {flowQuestions.filter(q=>['SINGLE','LIKERT'].includes(q.type)).map(q=>
+                {flowQuestions.filter(q=>['SINGLE','LIKERT'].includes(q.type)&&
+                  flowTools.some(t=>form.instrumentIds.includes(t.id)&&t.instrumentKey===q.instrumentKey)).map(q=>
                   <option key={q.instrumentKey+':'+q.itemKey} value={q.instrumentKey+':'+q.itemKey}>
                     {q.instrumentKey} · {q.prompt}</option>)}
               </select>

@@ -155,8 +155,10 @@ export async function startLinkedWave(input:{
     // Project-scoped credential remains valid at the moment of admission.
     // Revocation cannot commit between the admission credential check and
     // its newly allocated Attempt; preserve Project -> Wave -> Person locks.
+    // Exclusive from the start: taking SHARE and later promoting to UPDATE
+    // for an encrypted group assignment can deadlock across T2/T3 requests.
     await tx.$queryRaw`SELECT id FROM survey_participants
-      WHERE id=${identity.participantId} AND project_id=${project.id} FOR SHARE`
+      WHERE id=${identity.participantId} AND project_id=${project.id} FOR UPDATE`
     const live=await tx.surveyParticipant.findFirst({where:{
       id:identity.participantId,projectId:project.id,status:'ACTIVE',
       credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,

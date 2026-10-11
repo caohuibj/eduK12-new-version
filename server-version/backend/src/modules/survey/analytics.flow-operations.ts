@@ -86,6 +86,11 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     if(categories.length)for(const special of ['NOT_SHOWN','SHOWN_MISSING','REFUSED'])
       categorySummary.set(special,0)
     const attemptsWithFinal:string[]=[]
+    const groupByAttempt=new Map<string,string>()
+    const groupsByCategory=new Map<string,Map<string,number>>()
+    if(categories.length)for(const group of frozen.flow.experiment?.groups??[])
+      groupsByCategory.set(group.groupKey,new Map([...categories,
+        'NOT_SHOWN','SHOWN_MISSING','REFUSED'].map(category=>[category,0])))
     let after:{startedAt:Date;id:string}|null=null
     let processed=0
     while(true){
@@ -124,6 +129,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           &&!row.excludedAt&&row.participant?.status!=='WITHDRAWN'
           &&row.sampleReview?.verdict!=='EXCLUDED'){
           attemptsWithFinal.push(row.id)
+          if(group)groupByAttempt.set(row.id,group)
         }
       }
       processed+=rows.length
@@ -154,6 +160,12 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           const category=typeof answer==='string'&&categories.includes(answer)
             ?answer:missing??'SHOWN_MISSING'
           categorySummary.set(category,(categorySummary.get(category)??0)+1)
+          const group=groupByAttempt.get(final.attemptId)
+          if(group){
+            const counts=groupsByCategory.get(group)
+            if(!counts)fail(409,'存在未声明的研究实验组')
+            counts!.set(category,(counts!.get(category)??0)+1)
+          }
           wanted.delete(final.attemptId)
         }
       }
@@ -182,7 +194,10 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       }))??[],
       ...(input.category?{
         category:{...input.category,denominator:'ANALYSIS_INCLUDED_FINAL',
-          counts:Object.fromEntries(categorySummary)},
+          counts:Object.fromEntries(categorySummary),
+          byExperimentGroup:[...groupsByCategory].map(([groupKey,counts])=>({
+            groupKey,counts:Object.fromEntries(counts),
+          }))},
       }:{}),
       limits:{maxAttempts:MAX_ATTEMPTS,pageSize:PAGE,
         complete:true,noTruncation:true,rawAnswersIncluded:false},

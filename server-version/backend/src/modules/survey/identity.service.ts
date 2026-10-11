@@ -131,12 +131,17 @@ export async function revokeLinkedResearchAccess(input:{
 }):Promise<{revoked:true}>{
   const identity=await recoverLinkedResearchIdentity(input)
   return prisma.$transaction(async tx=>{
-    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE`
+    // Revocation takes the same project-wide serialization lock as withdrawal
+    // to avoid an Attempt -> participant checkpoint save lock inversion.
+    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR UPDATE`
     const changed=await tx.surveyParticipant.updateMany({where:{
       id:identity.participantId,projectId:input.projectId,status:'ACTIVE',
       credentialHash:sha256(input.accessCredential),credentialRevokedAt:null,
     },data:{status:'REVOKED',credentialRevokedAt:new Date()}})
     if(changed.count!==1)return fail()
+    // Partial answers must not outlive credential revocation.
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId:input.projectId,
+      attempt:{participantId:identity.participantId}}})
     // Retain a withdrawal-only proof. The prior secret can no longer read
     // any task, General or history, but still proves data-withdrawal authority.
     await tx.surveyEvent.create({data:{
