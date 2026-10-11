@@ -17,7 +17,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
   }
   const setQuestion=(pi:number,qi:number,update:(q:FormQuestion)=>FormQuestion)=>
     setPage(pi,page=>({...page,questions:page.questions.map((q,i)=>i===qi?update(q):q)}))
-  const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0)
+  const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1),0)
   const move=(pi:number,qi:number,by:number)=>{
     setPage(pi,page=>{const questions=page.questions.slice(),other=qi+by
       if(other>=0&&other<questions.length)[questions[qi],questions[other]]=[questions[other],questions[qi]]
