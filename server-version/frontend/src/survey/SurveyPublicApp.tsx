@@ -92,6 +92,7 @@ export default function SurveyPublicApp(){
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
+  const [withdrawn,setWithdrawn]=useState(false)
   const base='/r/'+publicId
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
@@ -118,7 +119,7 @@ export default function SurveyPublicApp(){
     setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
   })
-  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null)}
+  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false)}
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -158,7 +159,28 @@ export default function SurveyPublicApp(){
     }
   })}
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId)return;void run(async()=>{
-    const payload=Object.fromEntries(Object.entries(answers).map(([k,v])=>[k,v]))
+    // Match the frozen conditional form. An earlier selection change must
+    // clear fields that are now hidden; the server repeats this validation.
+    const payload=Object.fromEntries(task.units.map(unit=>{
+      const original=answers[unit.instrumentKey]||{}
+      const cleaned:Record<string,Answer>={...original}
+      if(unit.kind==='FORM'){
+        const checked:Record<string,Answer>={}
+        for(const page of unit.pages||[])for(const q of page.questions){
+          const prior=q.displayIf?checked[q.displayIf.itemKey]:null
+          const shown=!q.displayIf||
+            (q.displayIf.operator==='INCLUDES'
+              ?Array.isArray(prior)&&prior.includes(q.displayIf.optionKey)
+              :prior===q.displayIf.optionKey)
+          if(!shown){
+            delete cleaned[q.itemKey]
+            for(const row of q.rows||[])delete cleaned[q.itemKey+':'+row.rowKey]
+          }
+          checked[q.itemKey]=shown?(cleaned[q.itemKey]??null):null
+        }
+      }
+      return [unit.instrumentKey,cleaned]
+    }))
     const final=await publicApi<{status:string}>(base+'/attempts/'+attemptId+'/final','POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
@@ -172,6 +194,27 @@ export default function SurveyPublicApp(){
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
+  const withdraw=()=>{if(!general)return
+    if(!window.confirm(
+      '确认申请撤回本研究可定位的数据吗？后续统计和新导出将排除这些记录；此前合法保存的研究资料仍须按研究说明处理，已下载的外部副本无法自动追回。'
+    ))return
+    void run(async()=>{
+      if(info?.project.collectionMode==='LINKED_WAVES'){
+        await publicApi(base+'/withdraw-linked','POST',{
+          researchCode:researchCode.trim().toUpperCase(),
+          accessCredential:accessCredential.trim(),
+        })
+      }else{
+        await publicApi(base+'/attempts/'+attemptId+'/withdraw-data','POST',{
+          accessCredential:accessCredential.trim(),
+        })
+      }
+      setWithdrawn(true);setGeneral(null);setTask(null);setHome(null)
+      setResearchCode('');setAccessCredential('')
+      setNotice('已记录撤回请求。相关回答将从后续统计和新导出排除；物理删除与历史留存按研究说明处理。')
+    })
+  }
+
   const returnHome=()=>void run(async()=>{
     const data=await publicApi<{waves:Wave[]}>(base+'/enter','POST',{
       researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
@@ -186,6 +229,9 @@ export default function SurveyPublicApp(){
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
       {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
+      {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
+        您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
+      </p>}
       {info&&<><section className="bg-white rounded-xl border p-5">
         <h2 className="text-xl font-semibold">{info.project.name}</h2>
         <p className="my-3 whitespace-pre-wrap">{info.project.description}</p>
@@ -252,8 +298,12 @@ export default function SurveyPublicApp(){
         <p className="whitespace-pre-wrap">{general.text}</p>
         <p className="text-sm text-slate-600">{general.disclaimer}</p>
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
-        {info.project.collectionMode==='LINKED_WAVES'&&<button className="btn-secondary"
-          disabled={busy} onClick={returnHome}>返回我的研究波次</button>}
+        <div className="flex flex-wrap gap-3">
+          {info.project.collectionMode==='LINKED_WAVES'&&<button className="btn-secondary"
+            disabled={busy} onClick={returnHome}>返回我的研究波次</button>}
+          <button className="btn-secondary" type="button" disabled={busy} onClick={withdraw}>
+            申请撤回本研究数据（排除未来统计）</button>
+        </div>
       </section>}
       </>}
     </main></div>
