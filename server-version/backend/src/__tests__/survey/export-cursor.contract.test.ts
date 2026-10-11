@@ -11,7 +11,8 @@ describe('Survey bounded export continuation proof',()=>{
         after:{id:'11111111-1111-4111-8111-111111111111',
           completedAt:'2026-10-11T08:00:00.000Z'},
         cutOff:'2026-10-11T09:00:00.000Z',sourceRevision:5,
-        page:1,issuedAt:Date.now(),completedFrom:null,completedBefore:null}
+        page:1,issuedAt:Date.now(),completedFrom:null,completedBefore:null,
+        freeTextIncluded:false}
       const serialized=encodeSurveyExportCursor(cursor)
       expect(decodeSurveyExportCursor(serialized,'a','RAW_WAVE','b')).toEqual(cursor)
       expect(()=>decodeSurveyExportCursor(serialized,'wrong','RAW_WAVE','b')).toThrow()
