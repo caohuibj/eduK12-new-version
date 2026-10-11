@@ -71,7 +71,8 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
       SELECT 1 FROM huiteacher_evaluation_run_links h
       JOIN huiteacher_evaluation_events event
         ON event.organization_id=h.organization_id AND event.id=h.event_id
-        AND event.status='OPEN'
+        AND event.status IN ('OPEN','CLOSED')
+        AND (event.status='OPEN' OR x.status='COMPLETED')
       JOIN education_product_entitlements entitlement
         ON entitlement.organization_id=h.organization_id
         AND entitlement.product='HUITEACHER' AND entitlement.status='ACTIVE'
@@ -86,6 +87,31 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
         AND relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
+        -- A scored Teacher Scale needs an ACTIVE exact tenant license for
+        -- START/unfinished execution. A finished respondent's own report
+        -- remains readable from its verified frozen source after license
+        -- retirement, provided their product/membership rights remain active.
+        AND (NOT EXISTS (
+          SELECT 1 FROM assessment_run_tracks scale_track
+          WHERE scale_track.organization_id=x.organization_id
+            AND scale_track.run_id=x.run_id AND scale_track.id=x.track_id
+            AND scale_track.resource_family='SCALE'
+            AND scale_track.resource_key LIKE 'teacher-scale:%:INDIVIDUAL'
+        ) OR x.status='COMPLETED' OR EXISTS (
+          SELECT 1 FROM assessment_run_tracks scale_track
+          JOIN registered_assessment_resources registered
+            ON registered.resource_key=scale_track.resource_key
+            AND registered.resource_version=scale_track.resource_version
+            AND registered.status='PUBLISHED'
+          JOIN education_teacher_scale_licenses license
+            ON license.resource_id=registered.id
+            AND license.organization_id=x.organization_id
+            AND license.status='ACTIVE'
+          WHERE scale_track.organization_id=x.organization_id
+            AND scale_track.run_id=x.run_id AND scale_track.id=x.track_id
+            AND scale_track.resource_family='SCALE'
+            AND scale_track.resource_key LIKE 'teacher-scale:%:INDIVIDUAL'
+        ))
         AND NOT EXISTS (
           SELECT 1 FROM organization_access_denies deny
           WHERE deny.organization_id=org.id
