@@ -64,18 +64,28 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
   const rows=ordered(source)
   const byColumn=new Map(source.codebook.map(x=>[x.columnKey,x]))
   const columnIds=[...new Set(rows.map(r=>r.columnKey))].sort()
-  if(columnIds.length>511)throw new Error('Wide export exceeds 511 variables; use Raw Long')
-  const byCode=new Map<string,Map<string,string|number|null>>()
+  if(columnIds.length>255)throw new Error('Wide export exceeds 255 value/absence pairs; use Raw Long')
+  const byCode=new Map<string,Map<string,{value:string|number|null;missingReason:string|null}>>()
+  const attendance=new Map(source.attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
   for(const r of rows){
     const participant=r.researchCode!
-    const values=byCode.get(participant)||new Map<string,string|number|null>()
+    const values=byCode.get(participant)||new Map<string,{value:string|number|null;missingReason:string|null}>()
     if(values.has(r.columnKey))throw new Error('Duplicate participant/wave/variable in frozen FINAL')
-    values.set(r.columnKey,r.missingReason?null:r.value)
+    values.set(r.columnKey,{value:r.missingReason?null:r.value,missingReason:r.missingReason})
     byCode.set(participant,values)
   }
+  // Every value is paired with an explicit missing-reason field. A missing
+  // wave is NOT a numeric zero or the same as an abandoned attempt.
   const matrix=[...byCode].sort(([a],[b])=>a.localeCompare(b)).map(([code,values])=>
-    [code,...columnIds.map(col=>values.get(col)??null)])
-  return prepare(projectId,source,'RAW_WIDE',['research_code',...columnIds],matrix,
+    [code,...columnIds.flatMap(col=>{
+      const present=values.get(col)
+      if(present)return [present.value,present.missingReason]
+      const waveId=byColumn.get(col)!.waveId
+      const status=attendance.get(code+':'+waveId)
+      return [null,status&&status!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+    })])
+  const wideHeaders=['research_code',...columnIds.flatMap(col=>[col,col+'__missing'])]
+  return prepare(projectId,source,'RAW_WIDE',wideHeaders,matrix,
     columnIds.map(k=>{
       const row=byColumn.get(k);if(!row)throw new Error('Missing item Codebook')
       return row

@@ -28,6 +28,7 @@ export interface SurveySourceProjection {
   scores:FrozenScoreObservation[]
   raw:ResearchRawObservation[]
   codebook:ResearchRawCodebook[]
+  attendance:{researchCode:string;waveId:string;status:string}[]
 }
 const denied=():never=>{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
 const invalid=(message:string):never=>{throw new SurveyAnalyticsError(409,message)}
@@ -143,6 +144,23 @@ export async function loadSurveySource(input:{
     })
     if(finals.length>max)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次或使用后续流式导出')
+    // A linked participant may have STARTED but not FINAL at T2. Preserve
+    // that distinction from NO_WAVE without decrypting incomplete answers.
+    const attendanceRows=await tx.surveyWaveAttempt.findMany({
+      where:{
+        projectId:input.projectId,
+        ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
+        participantId:{not:null},
+      },
+      select:{waveId:true,status:true,excludedAt:true,
+        participant:{select:{researchCode:true,status:true}}},
+      take:5001,
+    })
+    if(attendanceRows.length>5000)
+      throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
+    const attendance=attendanceRows.filter(row=>
+      row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
+      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
     const codebook=new Map<string,ResearchRawCodebook>()
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
     for(const final of finals){
@@ -186,6 +204,6 @@ export async function loadSurveySource(input:{
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,cutOff:new Date().toISOString(),
-      scores,raw,codebook:[...codebook.values()]}
+      scores,raw,codebook:[...codebook.values()],attendance}
   })
 }
