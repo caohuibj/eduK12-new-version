@@ -52,6 +52,7 @@ export async function submitResearchFinal(input:FinalInput){
       blocked('作答记录不属于此研究入口')
     const wave=attempt.wave
     const publication=wave.publication
+    if(!publication)blocked('冻结研究版本已失效')
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
