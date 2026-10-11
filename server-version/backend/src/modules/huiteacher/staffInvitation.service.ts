@@ -61,6 +61,17 @@ async function accept(tx:Tx,input:{
   const invite=rows[0]
   if(!invite)fail('HUITEACHER_INVITATION_UNAVAILABLE',404)
   await authorizedInviter(tx,invite.organizationId,invite.invitedByUserId)
+  // In a dual-product school, only the shared school identity registrar may
+  // create new staff membership. A Teacher admin cannot mint psychology-school
+  // membership via a Teacher-only invite. Existing staff already reuse User ID
+  // and school membership after the Teacher product is activated.
+  const schoolEntitlement=await tx.educationProductEntitlement.findUnique({
+    where:{organizationId_product:{
+      organizationId:invite.organizationId,product:'HUISCHOOL',
+    }},select:{status:true},
+  })
+  if(schoolEntitlement?.status==='ACTIVE')
+    fail('HUITEACHER_SHARED_SCHOOL_ONBOARDING_REQUIRED',403)
   let userId=input.actorUserId
   if(userId){
     const user=await tx.user.findUnique({where:{id:userId},
