@@ -23,6 +23,8 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     const score=exportLong(project,[record])
     const pseudonym=surveyAttemptCode(record.attemptId)
     expect(pseudonym).toMatch(/^A-[A-F0-9]{20}$/)
+    expect(score.csv.split('\r\n')[0]).toContain('"attempt_code"')
+    expect(score.csv.split('\r\n')[0]).not.toContain('"attempt_id"')
     expect(score.csv).toContain(pseudonym)
     expect(score.csv).not.toContain('"'+record.attemptId+'"')
     const anonymous=exportLong(project,[{...record,researchCode:null}])
