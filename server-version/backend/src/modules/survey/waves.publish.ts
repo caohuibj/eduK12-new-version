@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { freezeResearchWaveDraft, type ResearchFrozenPublication } from './publication.service'
-import { SurveyWaveError } from './waves.service'
+import { SurveyWaveError,MAX_WAVE_FINISH_GRACE_MS } from './waves.service'
 
 type Tx=Prisma.TransactionClient
 const token=()=>randomBytes(32).toString('base64url')
@@ -64,6 +64,9 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
     const open=wave.opensAt||now,close=wave.closesAt||new Date(now.getTime()+30*86400000)
     if(close<=now||close<=open)fail('波次采集时间窗无效')
     if(close.getTime()-now.getTime()>365*86400000)fail('单次公开链接不允许超过一年')
+    const finishUntil=wave.finishUntil||new Date(close.getTime()+MAX_WAVE_FINISH_GRACE_MS)
+    if(finishUntil<close||finishUntil.getTime()-close.getTime()>MAX_WAVE_FINISH_GRACE_MS)
+      fail('在途作答最迟不得超过本轮招募结束后两小时')
     const publicId=project.publicId||randomUUID()
     const expiresAt=close
     await tx.surveyEntryToken.create({data:{
@@ -71,7 +74,7 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
     }})
     const updated=await tx.surveyWave.updateMany({
       where:{id:waveId,projectId,status:'DRAFT',revision},
-      data:{status:'OPEN',opensAt:open,closesAt:close,finishUntil:wave.finishUntil||new Date(close.getTime()+2*3600000),
+      data:{status:'OPEN',opensAt:open,closesAt:close,finishUntil,
         revision:{increment:1},updatedAt:now},
     })
     if(updated.count!==1)fail('波次开放发生并发冲突')

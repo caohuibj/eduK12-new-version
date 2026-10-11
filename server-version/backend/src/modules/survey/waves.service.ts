@@ -33,12 +33,20 @@ const ownWave=async(tx:Tx,pid:string,wid:string)=>{
   if(!row)fail(404,'研究波次不存在')
   return row!
 }
+export const MAX_WAVE_FINISH_GRACE_MS=2*60*60*1000
 const ensureWindow=(input:{opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null})=>{
-  if(input.opensAt&&input.closesAt&&new Date(input.opensAt)>=new Date(input.closesAt))
-    fail(400,'波次结束时间必须晚于开始时间')
-  if(input.finishUntil&&input.closesAt&&new Date(input.finishUntil)<new Date(input.closesAt))
-    fail(400,'在途完成截止时间不能早于关闭入场的时间')
+  const open=input.opensAt?new Date(input.opensAt):null
+  const close=input.closesAt?new Date(input.closesAt):null
+  const finish=input.finishUntil?new Date(input.finishUntil):null
+  if([open,close,finish].some(d=>d!==null&&!Number.isFinite(d.getTime())))
+    fail(400,'采集时间必须是有效日期')
+  if(open&&close&&open>=close)fail(400,'波次结束时间必须晚于开始时间')
+  if(finish&&!close)fail(400,'指定在途截止时间时须明确设置采集结束时间')
+  if(finish&&close&&(finish<close||finish.getTime()-close.getTime()>MAX_WAVE_FINISH_GRACE_MS))
+    fail(400,'在途完成截止必须在采集结束后两小时内')
 }
+const exactDate=(left:Date|null,right:string|null|undefined)=>
+  (left?.toISOString()??null)===(right?new Date(right).toISOString():null)
 async function validateDraftRefs(tx:Tx,pid:string,ids:string[]){
   if(new Set(ids).size!==ids.length)fail(400,'同一波次的研究工具不可重复')
   if(!ids.length)return
@@ -77,7 +85,18 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     await tx.$queryRaw`SELECT "id" FROM "survey_projects" WHERE "id"=${pid} FOR UPDATE`
     const existing=await tx.surveyWave.findUnique({where:{id:input.requestId}})
     if(existing){
-      if(existing.projectId!==pid||existing.title!==input.title)fail(409,'波次创建请求冲突')
+      if(existing.projectId!==pid||existing.status!=='DRAFT'||existing.publicationId
+        ||existing.revision!==0||existing.title!==input.title
+        ||existing.consentText!==input.consentText
+        ||existing.generalText!==(input.generalText??'')
+        ||existing.linkageNoticeConfirmed!==(input.linkageNoticeConfirmed===true)
+        ||JSON.stringify(existing.instrumentIds)!==JSON.stringify(input.instrumentIds)
+        ||!exactDate(existing.opensAt,input.opensAt)
+        ||!exactDate(existing.closesAt,input.closesAt)
+        ||!exactDate(existing.finishUntil,input.finishUntil)
+        ||existing.quotaStarts!==(input.quotaStarts??null)
+        ||existing.allowNewParticipants!==(input.allowNewParticipants??false))
+        fail(409,'同一波次创建请求 ID 已用于不同内容')
       return existing
     }
     await validateDraftRefs(tx,pid,input.instrumentIds)
@@ -107,11 +126,11 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,true)
     const old=await ownWave(tx,pid,wid)
-    if(old.status!=='DRAFT'||old.revision!==input.revision)
+    if(old.status!=='DRAFT'||old.publicationId!==null||old.revision!==input.revision)
       fail(409,'仅能修改当前版本的未发布波次')
     await validateDraftRefs(tx,pid,input.instrumentIds)
     const changed=await tx.surveyWave.updateMany({
-      where:{id:wid,projectId:pid,status:'DRAFT',revision:input.revision},
+      where:{id:wid,projectId:pid,status:'DRAFT',publicationId:null,revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
         linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
         opensAt:input.opensAt?new Date(input.opensAt):null,
