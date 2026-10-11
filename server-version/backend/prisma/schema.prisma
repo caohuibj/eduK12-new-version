@@ -3144,3 +3144,28 @@ model EducationTeacherScaleLicense {
   @@index([resourceId,status,organizationId],map:"education_teacher_scale_licenses_active_resources_idx")
   @@map("education_teacher_scale_licenses")
 }
+
+// PR3 Teacher personal credential: one SCHOOL education account with a
+// product-scoped personal license, no synthetic Organization.
+model HuiteacherPersonalScaleGrant {
+  userId          String    @map("user_id")
+  resourceId      String    @map("resource_id")
+  status          String    @default("ACTIVE")
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revision        Int       @default(1)
+  @@id([userId, resourceId])
+  @@index([resourceId, status], map: "huiteacher_personal_scale_grants_resource_idx")
+  @@map("huiteacher_personal_scale_grants")
+}
+
+model HuiteacherPersonalScaleAttempt {
+  assessmentId   String    @id @map("assessment_id")
+  userId         String    @map("user_id")
+  resourceId     String    @map("resource_id")
+  definitionHash String    @map("definition_hash")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, createdAt(sort: Desc)], map: "huiteacher_personal_scale_attempts_user_time_idx")
+  @@map("huiteacher_personal_scale_attempts")
+}
