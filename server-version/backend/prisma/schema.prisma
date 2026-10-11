@@ -3066,3 +3066,23 @@ model HuiteacherEvaluationEvent {
   @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_evaluation_events_target_idx")
   @@map("huiteacher_evaluation_events")
 }
+
+// Teacher-owned, unscored V2 Form versions; published definitions are frozen
+// in PostgreSQL. Existing Survey validators own the definition semantics.
+model HuiteacherFormInstrument {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  title           String
+  status          String   @default("DRAFT")
+  revision        Int      @default(1)
+  definition      Json
+  definitionDigest String  @map("definition_digest")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  publishedAt     DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_form_instruments_org_id_key")
+  @@index([organizationId,status,createdAt(sort:Desc)],map:"huiteacher_forms_org_status_idx")
+  @@map("huiteacher_form_instruments")
+}
