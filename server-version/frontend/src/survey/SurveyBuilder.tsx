@@ -104,7 +104,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   const archive=()=>{if(!active)return;void run(async()=>{
     await api(prefix+'/'+active.id+'/archive','POST',{revision:active.revision})
     setActive(null);setDirty(false);setPreview(null);setBulk(null)
-    await refreshList();setNotice('草稿已归档')
+    await refreshList(instrumentPage);setNotice('草稿已归档')
   })}
   const bulkPreview=()=>{if(!active||dirty)return;void run(async()=>{
     const batch:BulkBatch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText}
