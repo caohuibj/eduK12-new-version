@@ -2798,6 +2798,7 @@ model SurveyPublication {
   version         Int
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   waves           SurveyWave[]
+  finals          SurveyWaveFinal[]
   @@unique([projectId,version],map:"survey_publications_project_version_key")
   @@index([projectId,createdAt],map:"survey_publications_project_idx")
   @@map("survey_publications")
@@ -2814,6 +2815,8 @@ model SurveyWave {
   revision        Int           @default(0)
   consentText     String        @map("consent_text")
   consentVersion  Int           @default(1) @map("consent_version")
+  generalText     String        @default("") @map("general_text")
+  hardStopAt      DateTime?     @map("hard_stop_at") @db.Timestamptz(6)
   instrumentIds   Json          @default("[]") @map("instrument_ids")
   opensAt         DateTime?     @map("opens_at") @db.Timestamptz(6)
   closesAt        DateTime?     @map("closes_at") @db.Timestamptz(6)
@@ -2824,6 +2827,7 @@ model SurveyWave {
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
   attempts        SurveyWaveAttempt[]
+  finals          SurveyWaveFinal[]
   entryTokens     SurveyEntryToken[]
   consents        SurveyConsent[]
   @@unique([projectId,ordinal],map:"survey_waves_project_ordinal_key")
@@ -2860,6 +2864,7 @@ model SurveyWaveAttempt {
   completedAt    DateTime?     @map("completed_at") @db.Timestamptz(6)
   excludedAt     DateTime?     @map("excluded_at") @db.Timestamptz(6)
   consents       SurveyConsent[]
+  final          SurveyWaveFinal?
   @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
   @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
   @@index([projectId,waveId,status],map:"survey_attempts_project_wave_status_idx")
@@ -2892,4 +2897,25 @@ model SurveyConsent {
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   @@index([projectId,waveId,createdAt],map:"survey_consents_project_wave_idx")
   @@map("survey_consents")
+}
+
+// Survey-specific FINAL persistence, backed by shared canonical FINAL hashing,
+// AES-GCM unified encryption and production Scale/SJT scoring implementations.
+model SurveyWaveFinal {
+  id              String           @id
+  attemptId       String           @unique @map("attempt_id")
+  attempt         SurveyWaveAttempt @relation(fields:[attemptId],references:[id],onDelete:Restrict)
+  projectId       String           @map("project_id")
+  waveId          String           @map("wave_id")
+  wave            SurveyWave       @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  publicationId   String           @map("publication_id")
+  publication     SurveyPublication @relation(fields:[publicationId],references:[id],onDelete:Restrict)
+  submissionId    String           @map("submission_id")
+  payloadHash     String           @map("payload_hash")
+  definitionDigest String          @map("definition_digest")
+  resultsCipher   String           @map("results_cipher")
+  resultsHash     String           @map("results_hash")
+  completedAt     DateTime         @default(now()) @map("completed_at") @db.Timestamptz(6)
+  @@index([projectId,waveId,completedAt],map:"survey_finals_project_wave_time_idx")
+  @@map("survey_wave_finals")
 }
