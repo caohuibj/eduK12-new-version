@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
-import {listSampleQuality,setSampleQuality} from './sample-quality.service'
+import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sample-quality.service'
 import {describeSurveyPairedScoresPaged} from './analytics.paged'
 import { loadSurveySource } from './analytics.source'
 import { describeWave,describeWaveGroups } from './analytics.descriptive'
@@ -36,6 +36,9 @@ const review=z.object({
 surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts',wrap(req=>
   listSampleQuality(req.user!.userId,id.parse(req.params.pid),
     Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts/:attemptId/history',wrap(req=>
+  listSampleQualityHistory(req.user!.userId,id.parse(req.params.pid),
+    id.parse(req.params.attemptId),Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
 surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(req=>
   setSampleQuality({actorUserId:req.user!.userId,
     projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
