@@ -3,7 +3,8 @@ import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
-import { createWave,getWave } from '../../modules/survey/waves.service'
+import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
+import { transitionResearchProject } from '../../modules/survey/project-lifecycle'
 import { prepareWave,openWave } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
@@ -141,6 +142,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })
     expect(participant.credentialHash).not.toContain(link.accessCredential)
     expect(participant.id).not.toBe(link.researchCode)
+    expect(await db.surveyWaveAttempt.count({where:{waveId:wave1}})).toBe(1)
+    expect((await db.surveyWave.findUniqueOrThrow({where:{id:wave1}})).startsCount).toBe(1)
   })
   it('finalizes one parent attempt and recovers idempotently without personalized report',async()=>{
     const input={publicId,waveId:wave1,...link,consent:true,consentVersion:1}
@@ -148,6 +151,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const same=await startLinkedWave(input)
     expect(same.attemptId).toBe(started.attemptId)
     expect(same.recovered).toBe(true)
+    expect(started.recovered).toBe(true)
+    expect((await db.surveyWave.findUniqueOrThrow({where:{id:wave1}})).startsCount).toBe(1)
     const task=await getOwnResearchTask({publicId,attemptId:started.attemptId,...link})
     expect(task.units.map(x=>x.kind)).toEqual(['FORM','SCALE','SJT'])
     expect(JSON.stringify(task)).not.toContain('contributions')
@@ -345,6 +350,70 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(remaining.completeAttempts).toBe(0)
     expect(remaining.raw).toHaveLength(0)
     expect(remaining.scores).toHaveLength(0)
+  })
+
+  it('atomically reserves exactly one T4 parent Attempt when last research slot is contested',async()=>{
+    const created=await createWave(ownerId,projectId,{
+      requestId:randomUUID(),title:'T4 有限名额',
+      consentText:consent,generalText:'谢谢参与',
+      instrumentIds:[toolIds.scale],linkageNoticeConfirmed:true,quotaStarts:1,
+    })
+    await prepareWave(ownerId,projectId,created.id,created.revision)
+    const frozen=await getWave(ownerId,projectId,created.id)
+    await expect(updateWave(ownerId,projectId,created.id,{
+      revision:frozen.revision,title:frozen.title,consentText:frozen.consentText,
+      instrumentIds:[toolIds.scale],linkageNoticeConfirmed:true,
+    })).rejects.toThrow(/发布|版本/)
+    const opened=await openWave(ownerId,projectId,created.id,frozen.revision)
+    const requests=await Promise.allSettled(Array.from({length:2},()=>joinLinkedStudy({
+      publicId:opened.publicId,waveId:created.id,entryToken:opened.entrySecret,
+      consentVersion:1,consent:true,
+    })))
+    const winners=requests.filter((r):r is PromiseFulfilledResult<Awaited<ReturnType<typeof joinLinkedStudy>>>=>r.status==='fulfilled')
+    expect(winners).toHaveLength(1)
+    expect(requests.filter(r=>r.status==='rejected')).toHaveLength(1)
+    const identity=winners[0].value
+    const recovered=await startLinkedWave({
+      publicId:opened.publicId,waveId:created.id,
+      researchCode:identity.researchCode,accessCredential:identity.accessCredential,
+      consentVersion:1,consent:true,
+    })
+    expect(recovered).toMatchObject({attemptId:identity.attemptId,recovered:true})
+    expect((await db.surveyWave.findUniqueOrThrow({where:{id:created.id}})).startsCount).toBe(1)
+    expect(await db.surveyWaveAttempt.count({where:{waveId:created.id}})).toBe(1)
+    expect(await db.surveyParticipant.count({where:{
+      projectId,researchCode:identity.researchCode,
+    }})).toBe(1)
+  })
+  it('serializes project PAUSE before linked recruitment and rejects expired publisher access',async()=>{
+    const fresh=await wave('T5 项目状态并发验证',[toolIds.scale])
+    let racing:ReturnType<typeof joinLinkedStudy>|undefined
+    await db.$transaction(async tx=>{
+      await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${projectId} FOR UPDATE`
+      racing=joinLinkedStudy({
+        publicId:fresh.publicId,waveId:fresh.id,entryToken:fresh.entrySecret,
+        consentVersion:1,consent:true,
+      })
+      // Recruitment waits for the project lock and cannot commit a new Attempt
+      // after PAUSED was committed.
+      await new Promise(resolve=>setTimeout(resolve,75))
+      await tx.surveyProject.update({where:{id:projectId},data:{
+        status:'PAUSED',revision:{increment:1},
+      }})
+    })
+    if(!racing)throw new Error('Recruitment admission task not started')
+    await expect(racing).rejects.toThrow()
+    expect(await db.surveyWaveAttempt.count({where:{waveId:fresh.id}})).toBe(0)
+    const current=await db.surveyProject.findUniqueOrThrow({where:{id:projectId}})
+    await transitionResearchProject({
+      actorUserId:ownerId,projectId,revision:current.revision,action:'RESUME',
+    })
+    await db.user.update({where:{id:ownerId},data:{expiresAt:new Date(Date.now()-60000)}})
+    await expect(joinLinkedStudy({
+      publicId:fresh.publicId,waveId:fresh.id,entryToken:fresh.entrySecret,
+      consentVersion:1,consent:true,
+    })).rejects.toThrow()
+    await db.user.update({where:{id:ownerId},data:{expiresAt:null}})
   })
 
 })
