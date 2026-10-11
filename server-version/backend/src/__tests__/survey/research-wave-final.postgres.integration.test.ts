@@ -5,17 +5,17 @@ import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
 import { transitionResearchProject } from '../../modules/survey/project-lifecycle'
-import { prepareWave,openWave } from '../../modules/survey/waves.publish'
+import { prepareWave,openWave,updateWaveEntryToken } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
-import { exportWide } from '../../modules/survey/analytics.export-format'
+import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
-import { withdrawLinkedResearchData } from '../../modules/survey/identity.service'
+import { withdrawLinkedResearchData,revokeLinkedResearchAccess,recoverLinkedResearchIdentity } from '../../modules/survey/identity.service'
 import { generateToken } from '../../utils/jwt'
 import type { Request } from 'express'
 
@@ -278,7 +278,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const general=await submitResearchFinal({
       publicId,attemptId:started.attemptId,...link,submissionId:randomUUID(),
       answers:{
-        [task.units[0].instrumentKey]:{subject:'math',reflection:'REFUSED'},
+        [task.units[0].instrumentKey]:{subject:'math',reflection:{_surveyRefusal:true}},
         [task.units[1].instrumentKey]:{itemone:'o5',itemtwo:'o5'},
         [task.units[2].instrumentKey]:{first:['aone','athree'],second:'bone'},
       },
@@ -506,6 +506,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }])
     const raw=rawWideExport(projectId,source)
     const score=exportWide(projectId,source.scores,source.attendance,source.scoreColumns)
+    const rawLong=rawLongExport(projectId,source)
+    const scoreLong=exportLong(projectId,source.scores,source.attendance,source.scoreColumns)
+    for(const item of [rawLong,scoreLong]){
+      expect(item.manifest.rowCount).toBe(2)
+      expect(item.csv).toContain(person.researchCode)
+      expect(item.csv).toContain('ABANDONED')
+    }
     for(const result of [raw,score]){
       expect(result.manifest.rowCount).toBe(1)
       expect(result.manifest.columnCount).toBe(5)
@@ -542,6 +549,155 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(source.scoreColumns).toHaveLength(2)
     expect(rawWideExport(projectId,source).manifest.rowCount).toBe(2)
     expect(exportWide(projectId,source.scores,source.attendance,source.scoreColumns).manifest.rowCount).toBe(2)
+  })
+
+
+  it('rotates and revokes project-scoped recruitment without revoking the participant secret',async()=>{
+    const current=await wave('招募密钥管理',[toolIds.scale],true)
+    const open=await db.surveyWave.findUniqueOrThrow({where:{id:current.id}})
+    const rotated=await updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:open.revision,action:'ROTATE',
+    })
+    expect(rotated.entrySecret).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    await expect(updateWaveEntryToken({
+      actorUserId:randomUUID(),projectId,waveId:current.id,
+      revision:rotated.revision,action:'ROTATE',
+    })).rejects.toThrow()
+    await expect(updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:open.revision,action:'ROTATE',
+    })).rejects.toThrow()
+    expect(rotated.researchUrl).toContain('#entry='+rotated.entrySecret)
+    expect(rotated.entrySecret).not.toBe(current.entrySecret)
+    await expect(joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:current.entrySecret,
+      consent:true,consentVersion:1,
+    })).rejects.toThrow()
+    const participant=await joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:rotated.entrySecret!,
+      consent:true,consentVersion:1,
+    })
+    const revoked=await updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:rotated.revision,action:'REVOKE',
+    })
+    expect(revoked.revoked).toBe(true)
+    await expect(joinLinkedStudy({
+      publicId:current.publicId,waveId:current.id,entryToken:rotated.entrySecret!,
+      consent:true,consentVersion:1,
+    })).rejects.toThrow()
+    expect(await recoverLinkedResearchIdentity({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })).toHaveProperty('researchCode',participant.researchCode)
+    // Client is still able to request withdrawal after explicitly revoking
+    // future access. The revoked proof cannot read tasks or other answers.
+    await revokeLinkedResearchAccess({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    await expect(getOwnResearchTask({
+      publicId:current.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })).rejects.toThrow()
+    const withdrawn=await withdrawLinkedResearchData({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    expect(withdrawn).toMatchObject({status:'WITHDRAWN',excludedAttempts:1})
+    const attempt=await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:participant.attemptId}})
+    expect(attempt.status).toBe('WITHDRAWN')
+    const evidence=await db.surveyEvent.findMany({
+      where:{projectId,action:{in:['WAVE_ENTRY_TOKEN_ROTATED','WAVE_ENTRY_TOKEN_REVOKED',
+        'PARTICIPANT_ACCESS_REVOKED','PARTICIPANT_DATA_WITHDRAWAL']}},
+    })
+    expect(evidence.map(e=>e.action)).toEqual(expect.arrayContaining([
+      'WAVE_ENTRY_TOKEN_ROTATED','WAVE_ENTRY_TOKEN_REVOKED',
+      'PARTICIPANT_ACCESS_REVOKED','PARTICIPANT_DATA_WITHDRAWAL',
+    ]))
+    expect(JSON.stringify(evidence)).not.toContain(participant.accessCredential)
+  })
+
+
+  it('bounds one-Wave FINAL exports by half-open completion window and records selection',async()=>{
+    const w=await wave('单波次分段导出',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+      submissionId:randomUUID(),
+      answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+    })
+    const future=new Date(Date.now()+60_000)
+    const included=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+      completedBefore:future,
+    })
+    expect(included.completeAttempts).toBe(1)
+    const excluded=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+      completedFrom:future,
+    })
+    expect(excluded.completeAttempts).toBe(0)
+    expect(excluded.codebook).toHaveLength(2)
+    const token=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+token},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const ticket=await createSurveyExport(req,{
+      projectId,format:'RAW_WAVE',waveId:w.id,completedBefore:future.toISOString(),
+    })
+    expect(ticket.manifest.selection.completedBefore).toBe(future.toISOString())
+    expect(ticket.manifest.completedFinalCount).toBe(1)
+    await expect(createSurveyExport(req,{
+      projectId,format:'SCORE_LONG',completedBefore:future.toISOString(),
+    })).rejects.toThrow(/单波次/)
+  })
+
+
+  it('does not commit a FINAL against a credential revoked during the transaction',async()=>{
+    const w=await wave('撤销凭证与提交串行验证',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const person=await db.surveyParticipant.findFirstOrThrow({
+      where:{projectId,researchCode:participant.researchCode},
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    let pending:Promise<boolean>|undefined
+    await db.$transaction(async tx=>{
+      await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${person.id} FOR UPDATE`
+      pending=submitResearchFinal({
+        publicId:w.publicId,attemptId:participant.attemptId,
+        researchCode:participant.researchCode,
+        accessCredential:participant.accessCredential,
+        submissionId:randomUUID(),
+        answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+      }).then(()=>true,()=>false)
+      await new Promise(resolve=>setTimeout(resolve,90))
+      await tx.surveyParticipant.update({where:{id:person.id},
+        data:{status:'REVOKED',credentialRevokedAt:new Date()}})
+    })
+    expect(pending).toBeDefined()
+    expect(await pending).toBe(false)
+    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
   })
 
 

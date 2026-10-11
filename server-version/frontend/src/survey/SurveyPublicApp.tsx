@@ -37,7 +37,11 @@ const readSingleResume=(id:string):SingleResume|null=>{
     return saved
   }catch{return null}
 }
-type Answer=string|number|string[]|null
+type Answer=string|number|string[]|{_surveyRefusal:true}|null
+const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
+  !!answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer
+  &&answer._surveyRefusal===true
+const refusal=():{_surveyRefusal:true}=>({_surveyRefusal:true})
 const safePattern=/^[a-f0-9-]{36}$/i
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
 const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
@@ -89,21 +93,21 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
         {q.allowRefusal&&<td className="text-center"><input type="radio"
           aria-label={'不愿回答：'+row.label}
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
-          checked={answer[q.itemKey+':'+row.rowKey]==='REFUSED'}
-          onChange={()=>onChange(q.itemKey+':'+row.rowKey,'REFUSED')}/></td>}</tr>)}</tbody></table></div>}
+          checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
+          onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max}
-        aria-label={q.prompt} value={answer[q.itemKey]==='REFUSED'?'':answer[q.itemKey]??''}
-        disabled={answer[q.itemKey]==='REFUSED'}
+        aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
+        disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
       {q.allowRefusal&&q.type!=='MATRIX'&&<label className="block my-3 text-sm">
-        <input type="checkbox" checked={answer[q.itemKey]==='REFUSED'}
-          onChange={e=>onChange(q.itemKey,e.target.checked?'REFUSED':null)}/>
+        <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
+          onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
         我选择不回答这一题（REFUSED）
       </label>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full" aria-label={q.prompt}
         rows={q.type==='SHORT_TEXT'?2:5} maxLength={q.maxLength??(q.type==='SHORT_TEXT'?300:10000)}
-        value={answer[q.itemKey]==='REFUSED'?'':String(answer[q.itemKey]??'')}
-        disabled={answer[q.itemKey]==='REFUSED'}
+        value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
+        disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value)}/>}
     </fieldset>
   }
@@ -135,7 +139,7 @@ export default function SurveyPublicApp(){
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
-  const [withdrawn,setWithdrawn]=useState(false)
+  const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
   const base='/r/'+publicId
@@ -164,7 +168,7 @@ export default function SurveyPublicApp(){
     setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
   })
-  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false)}
+  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false);setRevoked(false)}
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -249,7 +253,19 @@ export default function SurveyPublicApp(){
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
-  const withdraw=()=>{if(!general)return
+  const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
+    if(!window.confirm('确认撤销此研究编号的未来访问权限？撤销后无法读取波次或回执，但凭编号和原始密钥仍可申请撤回历史研究数据。'))return
+    void run(async()=>{
+      await publicApi(base+'/revoke-access','POST',{
+        researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
+      })
+      setRevoked(true);setHome(null);setTask(null);setGeneral(null)
+      setSelectedWave(null);setAgreed(false);setProofReceived(false)
+      setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
+    })
+  }
+  const withdraw=()=>{if(!general&&!revoked
+    &&!(info?.project.collectionMode==='LINKED_WAVES'&&researchCode&&accessCredential))return
     if(!window.confirm(
       '确认申请撤回本研究可定位的数据吗？后续统计和新导出将排除这些记录；此前合法保存的研究资料仍须按研究说明处理，已下载的外部副本无法自动追回。'
     ))return
@@ -286,6 +302,10 @@ export default function SurveyPublicApp(){
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
       {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
+      {revoked&&!withdrawn&&<section className="border p-4 rounded-lg bg-white">
+        <p role="status">访问已撤销；仍可申请撤回研究数据。</p>
+        <button type="button" className="btn-secondary" disabled={busy} onClick={withdraw}>申请排除历史研究数据</button>
+      </section>}
       {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
         您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
       </p>}
@@ -296,7 +316,7 @@ export default function SurveyPublicApp(){
           ?'多波次研究：同一研究编号的回答将在本研究内关联。无需登录或提供真实姓名。'
           :'独立匿名研究：本次作答不与其他波次关联，无需登录或提供真实姓名。'}</p>
       </section>
-      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&<section className="bg-white rounded-xl border p-5">
+      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>
         <p className="text-sm my-2">公开研究编号不是登录密码，必须同时提供本人私密恢复凭证。</p>
         <form onSubmit={recover} className="grid gap-3">
@@ -306,6 +326,8 @@ export default function SurveyPublicApp(){
             value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
           <button className="btn-primary" disabled={busy||!researchCode||!accessCredential}>读取我的波次任务</button>
         </form>
+        <button type="button" className="btn-secondary mt-3" disabled={busy||!researchCode||!accessCredential}
+          onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button>
       </section>}
       {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className="bg-white rounded-xl border-2 border-teal-600 p-5">
         <h3 className="font-semibold text-lg">请保存研究身份</h3>
@@ -322,7 +344,11 @@ export default function SurveyPublicApp(){
           <button className="btn-secondary" type="button" disabled={busy} onClick={resumeSingle}>
             恢复本次作答／查看已完成回执</button>
         </section>}
-      {!task&&!general&&<section className="bg-white rounded-xl border p-5">
+      {home&&!task&&!general&&info.project.collectionMode==='LINKED_WAVES'&&
+        <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+          停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
+        </button>}
+      {!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
         {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
@@ -366,8 +392,11 @@ export default function SurveyPublicApp(){
         <p className="text-sm text-slate-600">{general.disclaimer}</p>
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         <div className="flex flex-wrap gap-3">
-          {info.project.collectionMode==='LINKED_WAVES'&&<button className="btn-secondary"
-            disabled={busy} onClick={returnHome}>返回我的研究波次</button>}
+          {info.project.collectionMode==='LINKED_WAVES'&&<>
+            <button className="btn-secondary" disabled={busy} onClick={returnHome}>返回我的研究波次</button>
+            <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+              只撤销未来访问（保留研究数据）</button>
+          </>}
           <button className="btn-secondary" type="button" disabled={busy} onClick={withdraw}>
             申请撤回本研究数据（排除未来统计）</button>
         </div>

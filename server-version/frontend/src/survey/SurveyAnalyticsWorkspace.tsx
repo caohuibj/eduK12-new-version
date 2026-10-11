@@ -6,13 +6,17 @@ type WaveSummary={id:string;ordinal:number;title:string;status:string;
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
 type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
-type ItemStat={itemKey:string;instrumentKey:string;prompt:string;respondentN:number;
+type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;respondentN:number;
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
 type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
   meanPairedChange:number|null;comparability:'COMPARABLE'|'NOT_COMPARABLE';reason?:string}
+type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Array<{
+  optionCode:string;optionLabel:string;respondentN:number;scoreValidN:number;
+  mean:number|null;sampleSd:number|null
+}>}
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   manifest:{rowCount:number;columnCount:number}}
@@ -61,7 +65,10 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [itemStats,setItemStats]=useState<WaveItems|null>(null)
   const [metricKey,setMetricKey]=useState(''),[metricInstrument,setMetricInstrument]=useState('')
   const [pairedScore,setPairedScore]=useState<PairedScore|null>(null)
+  const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
+  const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
+  const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
   const [error,setError]=useState(''),[ticket,setTicket]=useState<Ticket|null>(null)
@@ -72,7 +79,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const ordered=res.waves
     if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
     if(ordered[1])setFollowup(ordered[1].id)
-    setItemStats(null);setPairedScore(null)
+    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -89,7 +96,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   })
   const loadItems=()=>void execute(async()=>{
     const result=await api<WaveItems>(base+'/analytics/waves/'+waveId+'/items')
-    setItemStats(result);setPairedScore(null)
+    setItemStats(result);setPairedScore(null);setGroupResult(null)
     if(result.descriptiveScores[0]){
       setMetricKey(result.descriptiveScores[0].scoreKey)
       setMetricInstrument(result.descriptiveScores[0].instrumentKey)
@@ -102,6 +109,14 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     })
     setPairedScore(score)
   })
+  const compareGroups=()=>void execute(async()=>{
+    const [groupInstrumentKey,groupItemKey]=groupItem.split(':')
+    const [scoreInstrumentKey,scoreKey]=groupScore.split(':')
+    const result=await api<GroupResult>(base+'/analytics/waves/'+waveId+'/group-scores','POST',{
+      groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey,
+    })
+    setGroupResult(result)
+  })
   const stepUp=(e:FormEvent)=>{e.preventDefault();void execute(async()=>{
     await api('/auth/mfa/step-up','POST',{code:otp.trim()})
     setOtp('');setMessage('已完成最新 TOTP 二次认证；敏感导出仅在接下来的五分钟内有效。')
@@ -110,6 +125,10 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const result=await api<Ticket>(base+'/exports','POST',{
       format,...(format==='RAW_WAVE'?{waveId}:{}),
       ...(format.startsWith('RAW')?{includeFreeText}:{}),
+      ...(format==='RAW_WAVE'?{
+        ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
+        ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
+      }:{}),
     })
     setTicket(result)
     setMessage('加密数据已生成，可在十分钟有效期内按项目权限下载。')
@@ -160,7 +179,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setItemStats(null)}}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
@@ -189,6 +208,34 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             </p>)}
           </div>}
         </div>}
+        {itemStats&&itemStats.items.some(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
+          &&itemStats.descriptiveScores.length>0&&
+          <div className="border-t pt-3 space-y-3">
+            <h4 className="font-medium">Form 分组变量 · 描述性量表得分比较</h4>
+            <p className="text-xs">仅使用本项目冻结的单选/量表回答，不展示少于 5 份完成回答的分组。</p>
+            <select className="input block w-full" aria-label="选择 Form 分组题"
+              value={groupItem} onChange={e=>{setGroupItem(e.target.value);setGroupResult(null)}}>
+              <option value="">选择 Form 分组题</option>
+              {itemStats.items.filter(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
+                .map(q=><option key={q.instrumentKey+':'+q.itemKey}
+                  value={q.instrumentKey+':'+q.itemKey}>{q.prompt}</option>)}
+            </select>
+            <select className="input block w-full" aria-label="选择组内描述性计分"
+              value={groupScore} onChange={e=>{setGroupScore(e.target.value);setGroupResult(null)}}>
+              <option value="">选择需要比较的研究性得分</option>
+              {itemStats.descriptiveScores.map(q=><option key={q.instrumentKey+':'+q.scoreKey}
+                value={q.instrumentKey+':'+q.scoreKey}>{q.instrumentKey} / {q.scoreKey}</option>)}
+            </select>
+            <button type="button" className="btn-secondary" disabled={busy||!groupItem||!groupScore}
+              onClick={compareGroups}>计算受控分组描述</button>
+            {groupResult&&<div className="text-sm space-y-2">
+              {groupResult.groups.map(g=><p key={g.optionCode}>{g.optionLabel}：
+                N={g.respondentN}，得分有效 N={g.scoreValidN}，
+                M={g.mean?.toFixed(2)??'—'}，SD={g.sampleSd?.toFixed(2)??'—'}</p>)}
+              <p>未展示的小样本组：{groupResult.suppressedGroups}；最低单组样本数：{groupResult.minGroupN}</p>
+              <p className="text-xs">{groupResult.note}</p>
+            </div>}
+          </div>}
         {itemStats&&overview.collectionMode==='LINKED_WAVES'&&itemStats.descriptiveScores.length>0&&
         <div className="border-t pt-3 space-y-3">
           <h4 className="font-medium">可比较指标的配对平均变化</h4>
@@ -213,7 +260,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       </div>
       <div className="border rounded-xl p-4 space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。当前交互式导出每次最多处理 250 份 FINAL，且生成文件总量不超过 2MB。大样本请分波次导出。</p>
+        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。当前交互式导出每次最多处理 250 份 FINAL，且生成文件总量不超过 2MB。大样本可对单波次按完成时间分段，分段仍遵守同样的安全上限。</p>
         <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
@@ -231,6 +278,13 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             <select className="input block" value={waveId} onChange={e=>setWaveId(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
+          {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
+            <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
+              value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);setTicket(null)}}/></label>
+            <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
+              value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);setTicket(null)}}/></label>
+            <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
+          </div>}
           <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
             onClick={createExport}>创建受控导出</button>
         </div>

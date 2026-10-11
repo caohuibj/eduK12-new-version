@@ -1,4 +1,5 @@
 import { useEffect,useState,type FormEvent } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string}
@@ -47,18 +48,20 @@ const localTime=(raw:string|null)=>{
 export function SurveyWaveStudio({projectId}:{projectId:string}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
+  const [wavePage,setWavePage]=useState(1),[toolPage,setToolPage]=useState(1)
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
-  const refresh=async()=>{
+  const refresh=async(nextWavePage=wavePage,nextToolPage=toolPage)=>{
     const [waveList,instrumentList,projectDetails]=await Promise.all([
-      surveyApi<{list:Wave[]}>(path+'/waves'),
-      surveyApi<{list:Instrument[]}>(path+'/instruments'),
+      surveyApi<{list:Wave[]}>(path+'/waves?page='+nextWavePage),
+      surveyApi<{list:Instrument[]}>(path+'/instruments?page='+nextToolPage),
       surveyApi<Project>(path),
     ])
     setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
+    setWavePage(nextWavePage);setToolPage(nextToolPage)
   }
   useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial())
     void refresh().catch(e=>setError(message(e)))
@@ -136,6 +139,19 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         action==='resume'?'研究项目已恢复':'研究项目已结束，历史已完成研究数据仍保留。')
     })
   }
+  const entryToken=(action:'rotate'|'revoke')=>{
+    if(!editing||!['OPEN','PAUSED'].includes(editing.status))return
+    if(action==='revoke'&&!window.confirm('撤销本波次全部已签发的招募链接？已有参与者的个人恢复凭证不会被撤销。'))return
+    void act(async()=>{
+      const result=await surveyApi<{researchUrl?:string;revoked?:boolean}>(
+        path+'/waves/'+editing.id+'/entry-token/'+action,'POST',{revision:editing.revision})
+      setShareLink(result.researchUrl||'')
+      const fresh=await surveyApi<Wave>(path+'/waves/'+editing.id)
+      setEditing(fresh);await refresh()
+      setNotice(action==='rotate'?'已轮换招募链接：旧链接立即失效，请保存下方新链接。'
+        :'招募链接已撤销，现有研究参与者仍可凭私人凭证恢复合法作答。')
+    })
+  }
   const toggle=(id:string,checked:boolean)=>setForm(old=>({
     ...old,instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
   }))
@@ -167,6 +183,13 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         <button className="btn-secondary w-full" type="button" onClick={()=>{
           setEditing(null);setForm(initial());setReady(null);setShareLink('')
         }}>新建波次</button>
+        <div className="flex items-center justify-between text-xs gap-2">
+          <button type="button" className="btn-secondary" disabled={busy||wavePage<=1}
+            onClick={()=>void act(()=>refresh(wavePage-1,toolPage))}>上一页</button>
+          <span>波次第 {wavePage} 页</span>
+          <button type="button" className="btn-secondary" disabled={busy||waves.length<25}
+            onClick={()=>void act(()=>refresh(wavePage+1,toolPage))}>下一页</button>
+        </div>
         {waves.map(w=><button type="button" key={w.id} disabled={busy}
           className={'block w-full rounded-lg border text-left p-3 '+(w.id===editing?.id?'bg-sky-50 border-sky-700':'bg-white')}
           onClick={()=>select(w)}><strong className="block text-sm">{'T'+w.ordinal+' · '+w.title}</strong>
@@ -198,6 +221,13 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
                 onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
             {!tools.filter(t=>t.status==='DRAFT').length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
+          <div className="flex items-center justify-between text-xs gap-2">
+            <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
+              onClick={()=>void act(()=>refresh(wavePage,toolPage-1))}>工具上一页</button>
+            <span>研究工具第 {toolPage} 页，已选择 {form.instrumentIds.length} 项</span>
+            <button type="button" className="btn-secondary" disabled={busy||tools.length<25}
+              onClick={()=>void act(()=>refresh(wavePage,toolPage+1))}>工具下一页</button>
+          </div>
           </fieldset>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">计划开放时间<input type="datetime-local" className="input block w-full"
@@ -229,6 +259,10 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
             {editing.status==='OPEN'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('pause')}>暂停新参与</button>}
             {editing.status==='PAUSED'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('resume')}>恢复开放</button>}
             {['OPEN','PAUSED'].includes(editing.status)&&<>
+              <button type="button" className="btn-secondary" disabled={busy}
+                onClick={()=>entryToken('rotate')}>轮换招募链接</button>
+              <button type="button" className="btn-secondary" disabled={busy}
+                onClick={()=>entryToken('revoke')}>撤销全部招募链接</button>
               <button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('close')}>结束招募</button>
               <button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
             </>}
@@ -243,6 +277,9 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
           {shareLink&&<div className="rounded-lg border p-3">
             <p>本次开放的一次性招募链接（只显示本次）：</p>
             <code className="block break-all text-sm my-3">{shareLink}</code>
+            <div className="w-fit border rounded-lg bg-white p-3">
+              <QRCodeSVG value={shareLink} size={168}/>
+            </div>
             <button type="button" className="btn-secondary" onClick={()=>void navigator.clipboard.writeText(shareLink)}>
               复制研究链接</button>
             <p className="text-xs mt-2">链接中包含招募能力，勿上传到公开日志。被试的私密恢复凭证并不在此链接中。</p>

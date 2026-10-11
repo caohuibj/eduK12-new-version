@@ -102,22 +102,43 @@ surveyProjectsRouter.patch('/:id',handler(async(req)=>{
     return own(tx,uid,id)
   })
 }))
-for(const [action,from,to] of [['archive','DRAFT','ARCHIVED'],['restore','ARCHIVED','DRAFT']] as const){
-  surveyProjectsRouter.post('/:id/'+action,handler(async(req)=>{
-    const uid=req.user!.userId,id=projectId.parse(req.params.id),input=rev.parse(req.body)
-    return prisma.$transaction(async tx=>{
-      await usable(tx,uid)
-      await own(tx,uid,id)
-      const result=await tx.surveyProject.updateMany({
-        where:{id,ownerUserId:uid,status:from,revision:input.revision},
-        data:{status:to,revision:{increment:1},updatedAt:new Date()},
-      })
-      if(result.count!==1)throw new ProjectError(409,'项目状态已变化')
-      await audit(tx,uid,id,'PROJECT_'+to)
-      return own(tx,uid,id)
+surveyProjectsRouter.post('/:id/archive',handler(async(req)=>{
+  const uid=req.user!.userId,id=projectId.parse(req.params.id),input=rev.parse(req.body)
+  return prisma.$transaction(async tx=>{
+    await usable(tx,uid)
+    const project=await own(tx,uid,id)
+    // Unpublished drafts can be archived/reopened. A completed research
+    // project is terminal, but remains accessible to its authorized owner.
+    if(!['DRAFT','CLOSED'].includes(project.status)||project.revision!==input.revision
+      ||(project.status==='DRAFT'&&project.firstPublishedAt!==null)
+      ||(project.status==='CLOSED'&&project.firstPublishedAt===null))
+      throw new ProjectError(409,'只能归档尚未冻结发布的草稿或正式结束的研究')
+    const result=await tx.surveyProject.updateMany({
+      where:{id,ownerUserId:uid,status:project.status,revision:input.revision},
+      data:{status:'ARCHIVED',revision:{increment:1},updatedAt:new Date()},
     })
-  }))
-}
+    if(result.count!==1)throw new ProjectError(409,'项目状态发生并发变化')
+    await audit(tx,uid,id,'PROJECT_ARCHIVED')
+    return own(tx,uid,id)
+  })
+}))
+surveyProjectsRouter.post('/:id/restore',handler(async(req)=>{
+  const uid=req.user!.userId,id=projectId.parse(req.params.id),input=rev.parse(req.body)
+  return prisma.$transaction(async tx=>{
+    await usable(tx,uid)
+    const project=await own(tx,uid,id)
+    if(project.status!=='ARCHIVED'||project.revision!==input.revision
+      ||project.firstPublishedAt!==null)
+      throw new ProjectError(409,'已发布或已结束的研究归档后不能重新开启')
+    const changed=await tx.surveyProject.updateMany({
+      where:{id,ownerUserId:uid,status:'ARCHIVED',revision:input.revision,firstPublishedAt:null},
+      data:{status:'DRAFT',revision:{increment:1},updatedAt:new Date()},
+    })
+    if(changed.count!==1)throw new ProjectError(409,'项目状态发生并发变化')
+    await audit(tx,uid,id,'PROJECT_DRAFT_RESTORED')
+    return own(tx,uid,id)
+  })
+}))
 
 for(const [endpoint,action] of [['pause','PAUSE'],['resume','RESUME'],['close','CLOSE']] as const){
   surveyProjectsRouter.post('/:id/'+endpoint,handler(req=>

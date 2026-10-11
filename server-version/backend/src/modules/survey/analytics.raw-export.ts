@@ -53,9 +53,27 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
     displayCode(r),r.waveId,r.waveOrdinal,r.publicationVersion,r.instrumentKey,r.itemKey,r.columnKey,
     r.value,r.missingReason,r.sourceFinalHash,
   ])
-  const keys=new Set(rows.map(r=>r.columnKey))
-  return prepare(projectId,source,waveId?'WAVE':'RAW_LONG',cols,mapped,
-    source.codebook.filter(c=>keys.has(c.columnKey)))
+  // Long includes source-backed participation and attrition even when a Wave
+  // has no FINAL. Synthetic rows carry no answer or frozen FINAL hash.
+  const dictionary=source.codebook.filter(c=>waveId===undefined||c.waveId===waveId)
+  if(source.collectionMode==='LINKED_WAVES'){
+    const present=new Set(rows.filter(x=>x.researchCode)
+      .map(x=>x.researchCode+':'+x.columnKey))
+    const attendance=new Map(source.attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
+    const participants=[...new Set(source.attendance.map(a=>a.researchCode))].sort()
+    // Reject before allocating millions of synthetic longitudinal cells.
+    if(participants.length*dictionary.length+rows.length>25000)
+      throw new Error('Long format exceeds 25000 bounded rows; narrow the Wave selection')
+    for(const code of participants)for(const variable of dictionary){
+      if(present.has(code+':'+variable.columnKey))continue
+      const status=attendance.get(code+':'+variable.waveId)
+      if(status==='COMPLETED')continue
+      mapped.push([code,variable.waveId,variable.waveOrdinal,variable.publicationVersion,
+        variable.instrumentKey,variable.itemKey,variable.columnKey,null,
+        status?'ABANDONED':'NO_WAVE',null])
+    }
+  }
+  return prepare(projectId,source,waveId?'WAVE':'RAW_LONG',cols,mapped,dictionary)
 }
 export function rawWideExport(projectId:string,source:SurveySourceProjection):SurveyRawExport{
   check(projectId,source)

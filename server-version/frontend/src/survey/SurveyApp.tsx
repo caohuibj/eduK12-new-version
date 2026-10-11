@@ -6,7 +6,7 @@ import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string}
-type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
+type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number;firstPublishedAt?:string|null}
 const cookie=(name:string)=>document.cookie.split('; ').find(x=>x.startsWith(name+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -37,11 +37,15 @@ export default function SurveyApp(){
   const [invite,setInvite]=useState(readInvite),[uri,setUri]=useState(''),[recovery,setRecovery]=useState<string[]>([])
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
+  const [projectPage,setProjectPage]=useState(1)
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const work=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('')
     try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求失败')}finally{setBusy(false)}}
-  const loadProjects=useCallback(async()=>{const r=await api<{list:Project[]}>('/projects');setProjects(r.list)},[])
+  const loadProjects=useCallback(async(page=1)=>{
+    const r=await api<{list:Project[]}>('/projects?page='+page)
+    setProjects(r.list);setProjectPage(page)
+  },[])
   const refresh=useCallback(async()=>{
     try{
       const me=await api<Researcher>('/auth/me')
@@ -78,18 +82,18 @@ export default function SurveyApp(){
   })
   const createProject=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
-    await loadProjects();choose(p);setNotice('研究草稿已创建')
+    await loadProjects(1);choose(p);setNotice('研究草稿已创建')
   })}
   const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
-    choose(p);await loadProjects();setNotice('研究草稿已保存')
+    choose(p);await loadProjects(projectPage);setNotice('研究草稿已保存')
   })}
   const toggle=(p:Project)=>void work(async()=>{
-    const action=p.status==='DRAFT'?'archive':'restore'
+    const action=p.status==='ARCHIVED'?'restore':'archive'
     const result=await api<Project>('/projects/'+p.id+'/'+action,'POST',{revision:p.revision})
-    await loadProjects();if(selected?.id===p.id)choose(result)
+    await loadProjects(projectPage);if(selected?.id===p.id)choose(result)
   })
   const field=(label:string,value:string,change:(value:string)=>void,type='text')=>
     <label className="block my-3 text-sm">{label}<input className="input block mt-1 w-full" required
@@ -141,9 +145,19 @@ export default function SurveyApp(){
         <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
           <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
           <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
-            <button className="btn-secondary" disabled={busy||!['DRAFT','ARCHIVED'].includes(p.status)} onClick={()=>toggle(p)}>
-              {p.status==='DRAFT'?'归档':p.status==='ARCHIVED'?'恢复':'采集中不可归档'}</button></div>
-        </article>)}</div>{projects.length===0&&<p>尚无研究项目。可以先创建研究草稿。</p>}
+            <button className="btn-secondary" disabled={busy||(p.status==='DRAFT'&&!!p.firstPublishedAt)
+              ||(!['DRAFT','CLOSED'].includes(p.status)&&!(p.status==='ARCHIVED'&&!p.firstPublishedAt))} onClick={()=>toggle(p)}>
+              {p.status==='CLOSED'?'结束后归档':p.status==='DRAFT'?'归档草稿':
+                p.status==='ARCHIVED'?(p.firstPublishedAt?'终态归档不可恢复':'恢复草稿'):'采集中不可归档'}</button></div>
+        </article>)}</div>
+        <div className="flex items-center gap-4 mt-4 text-sm">
+          <button type="button" className="btn-secondary" disabled={busy||projectPage<=1}
+            onClick={()=>void work(()=>loadProjects(projectPage-1))}>上一页</button>
+          <span>项目第 {projectPage} 页</span>
+          <button type="button" className="btn-secondary" disabled={busy||projects.length<25}
+            onClick={()=>void work(()=>loadProjects(projectPage+1))}>下一页</button>
+        </div>
+        {projects.length===0&&projectPage===1&&<p>尚无研究项目。可以先创建研究草稿。</p>}
       </section><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
         <form onSubmit={selected?save:createProject}>{field('研究名称',title,setTitle)}
@@ -153,7 +167,7 @@ export default function SurveyApp(){
           </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
-        </form><p className="text-sm text-slate-500 mt-4">研究工具编辑器已加入开发分支；正式发布、匿名采集和统计仍属于后续开发阶段。</p>
+        </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
       </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id}/>
           <SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/></>}</>}
     </main></div>

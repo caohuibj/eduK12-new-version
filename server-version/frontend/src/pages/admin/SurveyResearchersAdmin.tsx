@@ -26,15 +26,17 @@ async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>
 }
 export default function SurveyResearchersAdmin(){
   const [list,setList]=useState<Researcher[]>([]),[pending,setPending]=useState<Invitation[]>([])
+  const [researcherPage,setResearcherPage]=useState(1),[invitationPage,setInvitationPage]=useState(1)
   const [password,setPassword]=useState('')
   const [link,setLink]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
-  const refresh=async()=>{
+  const refresh=async(researcher=researcherPage,invitation=invitationPage)=>{
     const [researchers,invitations]=await Promise.all([
-      platformApi<{list:Researcher[]}>('/researchers'),
-      platformApi<{list:Invitation[]}>('/researcher-invitations'),
+      platformApi<{list:Researcher[]}>('/researchers?page='+researcher),
+      platformApi<{list:Invitation[]}>('/researcher-invitations?page='+invitation),
     ])
     setList(researchers.list);setPending(invitations.list)
+    setResearcherPage(researcher);setInvitationPage(invitation)
   }
   useEffect(()=>{void refresh().catch(e=>setError(e instanceof Error?e.message:'研究者列表暂不可用'))},[])
   const act=async(path:string,actorName?:string)=>{
@@ -47,7 +49,7 @@ export default function SurveyResearchersAdmin(){
         setLink('https://survey.eduk12.top/'+endpoint+'#token='+result.token)
         setNotice('一次性邀请仅在本次操作显示，请通过受控渠道交付。')
       }else setNotice(actorName?actorName+' 的资格已更新':'操作成功')
-      await refresh()
+      await refresh(1,1)
     }catch(e){setError(e instanceof Error?e.message:'操作失败')}finally{setBusy(false)}
   }
   return <ProductPage><div className="max-w-4xl mx-auto space-y-5">
@@ -77,7 +79,14 @@ export default function SurveyResearchersAdmin(){
             void act('/researcher-invitations/'+inv.id+'/revoke')
         }}>撤销未领取邀请</button>}
     </article>)}</div>
-    {!pending.length&&<p className="text-sm text-gray-500">目前没有未领取的研究者邀请。</p>}
+    {!pending.length&&invitationPage===1&&<p className="text-sm text-gray-500">目前没有未领取的研究者邀请。</p>}
+    <div className="flex items-center gap-3 text-sm">
+      <button type="button" className="btn-secondary" disabled={busy||invitationPage<=1}
+        onClick={()=>void refresh(researcherPage,invitationPage-1).catch(e=>setError(String(e)))}>邀请上一页</button>
+      <span>邀请第 {invitationPage} 页</span>
+      <button type="button" className="btn-secondary" disabled={busy||pending.length<25}
+        onClick={()=>void refresh(researcherPage,invitationPage+1).catch(e=>setError(String(e)))}>邀请下一页</button>
+    </div>
     <h2 className="text-xl font-semibold">已邀请及激活的研究者</h2>
     <div className="grid gap-3">{list.map(person=><article className="rounded-lg border p-4" key={person.id}>
       <p><strong>{person.username}</strong> · {person.status}</p>
@@ -88,6 +97,13 @@ export default function SurveyResearchersAdmin(){
         <button className="btn-secondary" disabled={busy||!password||person.status==='SUSPENDED'} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations',person.username)}>密码重置邀请</button>
       </div>
     </article>)}</div>
-    {!list.length&&<p className="text-sm">暂无可见研究者，或您没有相应的管理授权。</p>}
+    {!list.length&&researcherPage===1&&<p className="text-sm">暂无可见研究者，或您没有相应的管理授权。</p>}
+    <div className="flex items-center gap-3 text-sm">
+      <button type="button" className="btn-secondary" disabled={busy||researcherPage<=1}
+        onClick={()=>void refresh(researcherPage-1,invitationPage).catch(e=>setError(String(e)))}>研究者上一页</button>
+      <span>研究者第 {researcherPage} 页</span>
+      <button type="button" className="btn-secondary" disabled={busy||list.length<25}
+        onClick={()=>void refresh(researcherPage+1,invitationPage).catch(e=>setError(String(e)))}>研究者下一页</button>
+    </div>
   </div></ProductPage>
 }

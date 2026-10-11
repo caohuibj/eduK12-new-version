@@ -93,14 +93,18 @@ describe('Survey RESEARCH_ONLY authoritative FINAL',()=>{
     withRefusal.pages[0].questions[0].allowRefusal=true
     withRefusal.pages[0].questions[1].allowRefusal=true
     const pub=snapshot(frozen('FORM',withRefusal))
-    const refused=computeSurveyFinal(pub,{researchinstrument:{subject:'REFUSED'}})
+    const refused=computeSurveyFinal(pub,{researchinstrument:{subject:{_surveyRefusal:true}}})
     expect(refused.units[0].missing).toContainEqual({itemKey:'subject',reason:'REFUSED'})
     expect(refused.units[0].missing).toContainEqual({itemKey:'reflection',reason:'NOT_SHOWN'})
-    const shown=computeSurveyFinal(pub,{researchinstrument:{subject:'math',reflection:'REFUSED'}})
+    const shown=computeSurveyFinal(pub,{researchinstrument:{subject:'math',reflection:{_surveyRefusal:true}}})
     expect(shown.units[0].missing).toContainEqual({itemKey:'reflection',reason:'REFUSED'})
     const unmarked=snapshot(frozen('FORM',form))
-    expect(()=>computeSurveyFinal(unmarked,{researchinstrument:{subject:'REFUSED'}}))
+    expect(()=>computeSurveyFinal(unmarked,{researchinstrument:{subject:{_surveyRefusal:true}}}))
       .toThrow(SurveyFinalValidationError)
+    // Literal free text is data, never a sentinel for refused participation.
+    const literal=computeSurveyFinal(pub,{researchinstrument:{subject:'math',reflection:'REFUSED'}})
+    expect(literal.units[0].rawAnswers.reflection).toBe('REFUSED')
+    expect(literal.units[0].missing).not.toContainEqual({itemKey:'reflection',reason:'REFUSED'})
   })
   it('compiles a controlled two-selection SJT with stable aggregate scorer keys',()=>{
     const multiple: SjtDraft=structuredClone(sjt)

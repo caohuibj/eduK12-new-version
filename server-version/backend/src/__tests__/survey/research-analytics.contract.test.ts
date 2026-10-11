@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { pairedDescriptive, summarizeWaveScores, type FrozenScoreObservation } from '../../modules/survey/analytics.cohorts'
 import { exportLong, exportWide, protectCsvCell, tableToCsv } from '../../modules/survey/analytics.export-format'
-import { describeWave } from '../../modules/survey/analytics.descriptive'
-import { rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { describeWave,describeWaveGroups } from '../../modules/survey/analytics.descriptive'
+import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import type { SurveySourceProjection } from '../../modules/survey/analytics.source'
 
 const project='study-a'
@@ -104,6 +104,14 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     }
     const raw=rawWideExport(project,source)
     const score=exportWide(project,source.scores,source.attendance,source.scoreColumns)
+    const longRaw=rawLongExport(project,source)
+    const longScore=exportLong(project,source.scores,source.attendance,source.scoreColumns)
+    for(const long of [longRaw,longScore]){
+      expect(long.manifest.rowCount).toBe(4)
+      expect(long.csv).toContain('NO_WAVE')
+      expect(long.csv).toContain('ABANDONED')
+      expect(long.codebook).toHaveLength(2)
+    }
     for(const result of [raw,score]){
       expect(result.manifest.rowCount).toBe(2)
       expect(result.manifest.columnCount).toBe(5)
@@ -117,6 +125,62 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     expect(()=>exportWide(project,source.scores,source.attendance,[
       {projectId:'foreign-project',waveId:'T2',waveOrdinal:2,measurement:metric},
     ])).toThrow(/authorized project/)
+  })
+  it('refuses apparent measurement comparability without any matched respondent',()=>{
+    const rows=[observed('R-C','T1',1,7),observed('R-D','T2',2,9)]
+    const columns=[
+      {projectId:project,waveId:'T1',measurement:metric},
+      {projectId:project,waveId:'T2',
+        measurement:{...metric,responseSignature:'different'}},
+    ]
+    const result=pairedDescriptive({
+      projectId:project,baselineWaveId:'T1',followupWaveId:'T2',
+      instrumentKey:'motivation',scoreKey:'total',observations:rows,
+      expectedColumns:columns,
+    })
+    expect(result).toMatchObject({matchedN:0,comparability:'NOT_COMPARABLE',
+      meanPairedChange:null})
+    expect(result.reason).toMatch(/没有共同/)
+  })
+  it('suppresses small Form categories while grouping verified scores',()=>{
+    const dictionary={
+      columnKey:'W001__form__cohort',waveId:'T1',waveOrdinal:1,instrumentKey:'demographics',
+      itemKey:'cohort',kind:'FORM' as const,responseType:'SINGLE',
+      title:'安全分组',prompt:'研究组别',options:[
+        {code:'a',label:'A组'},{code:'b',label:'B组'},{code:'c',label:'C组'}],
+      definitionDigest:'a'.repeat(64),scoringDigest:null,
+      publicationVersion:1,instrumentRevision:0,
+    }
+    const raw=Array.from({length:12},(_,i)=>({
+      projectId:project,waveId:'T1',waveOrdinal:1,attemptId:'P'+i,
+      researchCode:'R-'+i,sourceFinalHash:'f'.repeat(64),
+      instrumentKey:'demographics',kind:'FORM' as const,responseType:'SINGLE',
+      itemKey:'cohort',columnKey:dictionary.columnKey,publicationVersion:1,
+      value:i<5?'a':i<10?'b':'c',missingReason:null,
+      completedAt:'2026-10-11T00:00:00Z',sourceVerified:true as const,
+    }))
+    const scores=raw.map((r,i)=>({
+      projectId:project,waveId:'T1',waveOrdinal:1,attemptId:r.attemptId,
+      researchCode:r.researchCode,sourceFinalHash:r.sourceFinalHash,sourceVerified:true as const,
+      measurement:metric,value:i<5?1:i<10?3:5,missingReason:null,
+      completedAt:r.completedAt,
+    }))
+    const source:SurveySourceProjection={
+      projectId:project,collectionMode:'LINKED_WAVES',completeAttempts:12,
+      sourceRevision:0,cutOff:'2026-10-11T00:00:00Z',
+      raw,codebook:[dictionary],scores,scoreColumns:[],attendance:[],
+    }
+    const grouped=describeWaveGroups(source,{waveId:'T1',groupInstrumentKey:'demographics',
+      groupItemKey:'cohort',scoreInstrumentKey:'motivation',scoreKey:'total'})
+    expect(grouped.groups).toHaveLength(2)
+    expect(grouped.groups).toMatchObject([
+      {optionCode:'a',respondentN:5,mean:1},
+      {optionCode:'b',respondentN:5,mean:3},
+    ])
+    expect(grouped.suppressedGroups).toBe(1)
+    expect(grouped.groups.some(g=>g.optionCode==='c')).toBe(false)
+    expect(()=>describeWaveGroups(source,{waveId:'T1',groupInstrumentKey:'demographics',
+      groupItemKey:'not-a-group',scoreInstrumentKey:'motivation',scoreKey:'total'})).toThrow()
   })
   it('protects quoted text and dangerous spreadsheet formulas',()=>{
     expect(protectCsvCell('=HYPERLINK("https://evil.example")')).toMatch(/^'/)

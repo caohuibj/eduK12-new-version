@@ -144,6 +144,8 @@ export async function loadSurveySource(input:{
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
   /** Only Wide exports need the schema of Waves with no completed FINAL. */
   includeWideSchema?:boolean
+  /** Half-open FINAL completion-time slice for bounded per-wave exports. */
+  completedFrom?:Date;completedBefore?:Date
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -170,6 +172,10 @@ export async function loadSurveySource(input:{
     const finalWhere={
       projectId:input.projectId,
       ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
+      ...(input.completedFrom||input.completedBefore?{completedAt:{
+        ...(input.completedFrom?{gte:input.completedFrom}:{}),
+        ...(input.completedBefore?{lt:input.completedBefore}:{}),
+      }}:{}),
       attempt:{status:'COMPLETED' as const,excludedAt:null},
     }
     const headers=await tx.surveyWaveFinal.findMany({
