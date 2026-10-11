@@ -2992,3 +2992,18 @@ model EducationProductRoleGrant {
   @@index([membershipId, product, revokedAt], map: "education_product_role_grants_membership_idx")
   @@map("education_product_role_grants")
 }
+
+// One-use Teacher school invitation: reuses users/campus_accounts, no new
+// credentials realm. Handwritten SQL governs FKs, expiry and consume pair.
+model EducationTeacherStaffInvitation {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  tokenHash        String    @unique(map: "education_teacher_staff_invitations_token_hash_key") @map("token_hash")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt       DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String?   @map("consumed_by_user_id")
+  @@index([organizationId, expiresAt], map: "education_teacher_staff_invitations_org_idx")
+  @@map("education_teacher_staff_invitations")
+}
