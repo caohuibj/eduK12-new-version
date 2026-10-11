@@ -8,7 +8,7 @@ import { SurveyWaveError } from './waves.service'
 
 /** Stored data contract for PR3 anonymous Wave runtime adapter.
  * This is a frozen research-only definition, NOT a formal scale/SJT
- * publication and NOT yet a public executable research link.
+ * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
   draftId:string
@@ -19,6 +19,7 @@ export interface ResearchFrozenUnit {
   sourceDigest:string
   scoringDigest:string|null
   compiledDefinition:unknown
+  displayDefinition:unknown
 }
 export interface ResearchFrozenPublication {
   schemaVersion:1
@@ -29,7 +30,7 @@ export interface ResearchFrozenPublication {
   consentVersion:number
   consentDigest:string
   units:ResearchFrozenUnit[]
-  runtimeStatus:'ACTIVATION_BLOCKED_UNTIL_FINAL_ADAPTER'
+  runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
 
@@ -42,28 +43,27 @@ export function compileFrozenResearchUnit(draft:{
   if(kind==='FORM'){
     return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind,title:draft.title,
       draftRevision:draft.revision,sourceDigest,scoringDigest:null,
-      compiledDefinition:normalized}
+      compiledDefinition:normalized,displayDefinition:normalized}
   }
   if(kind==='SCALE'){
     const compiled=compileResearchScale(draft.title,normalized)
     return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind,title:draft.title,
       draftRevision:draft.revision,sourceDigest,
-      scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled}
+      scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled,displayDefinition:normalized}
   }
   const sjt=compileResearchSjt(draft.instrumentKey,normalized)
   return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind,title:draft.title,
     draftRevision:draft.revision,sourceDigest,
     scoringDigest:canonicalHash(sjt.package.definition.scoring),
-    compiledDefinition:sjt.package.definition}
+    compiledDefinition:sjt.package.definition,displayDefinition:normalized}
 }
 
-/** Prepare one immutable research publication, but deliberately do not open
- * admission until the PR3 FORM/Scale/SJT FINAL adapter is actually implemented.
- * The Wave remains DRAFT and public join requires OPEN + project ACTIVE.
+/** Freeze one immutable research publication. OPEN admission is a separate
+ * authenticated action and remains fail-closed behind SURVEY_PUBLICATION_ENABLED.
  */
 export async function freezeResearchWaveDraft(input:{
   actorUserId:string;projectId:string;waveId:string;revision:number
-}):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:false}> {
+}):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:true}> {
   return prisma.$transaction(async tx=>{
     // Lock project first so concurrent freezes share one exact publication sequence.
     const locked=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
@@ -118,7 +118,7 @@ export async function freezeResearchWaveDraft(input:{
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
       consentVersion:wave.consentVersion,
       consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion}),
-      units,runtimeStatus:'ACTIVATION_BLOCKED_UNTIL_FINAL_ADAPTER',
+      units,runtimeStatus:'SURVEY_FINAL_V1',
     }
     const serial=JSON.stringify(snapshot)
     if(Buffer.byteLength(serial,'utf8')>4000000)stop('波次研究内容超出安全体积')
@@ -147,8 +147,8 @@ export async function freezeResearchWaveDraft(input:{
       id:randomUUID(),actorUserId:input.actorUserId,projectId:input.projectId,
       action:'WAVE_RESEARCH_DEFINITION_FROZEN',
       metadata:{waveId:input.waveId,publicationId,definitionDigest:digest,
-        runtimeReady:false,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
+        runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
-    return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:false}
+    return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })
 }
