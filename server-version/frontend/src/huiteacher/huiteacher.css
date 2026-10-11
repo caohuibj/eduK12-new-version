@@ -25,3 +25,13 @@
 .ht-empty{color:var(--ht-quiet)}.ht-secret{background:#fff1df;border:1px solid #e7c6a4;border-radius:8px;padding:1rem;max-width:100%;overflow-wrap:anywhere}.ht-wrap{overflow-wrap:anywhere}
 .ht-welcome{font-size:.9rem}.ht-notice{background:var(--ht-paper);max-width:850px;margin:1rem auto;padding:1rem;border-left:3px solid var(--ht-copper);border-radius:5px}.ht-footer{padding:2rem;text-align:center;color:var(--ht-quiet);font-size:.82rem}
 @media(max-width:900px){.ht-four{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.ht-topbar{align-items:flex-start;flex-direction:column}.ht-topbar nav{width:100%}.ht-four{grid-template-columns:1fr}.ht-hero{padding:3rem 1rem}.ht-form-panel{margin:1.5rem auto}}
+
+/* Shared Survey Form V2 authoring controls inside Teacher's distinct theme. */
+.ht-app .input{border:1px solid #d9c9bf;border-radius:7px;background:#fff;color:var(--ht-ink);padding:.5rem;font:inherit;max-width:100%}
+.ht-app .btn-secondary{background:#fffdf9;color:var(--ht-ink);border:1px solid var(--ht-line);border-radius:7px;padding:.45rem .75rem}
+.ht-app .space-y-5>*+*{margin-top:1.25rem}
+.ht-app .space-y-4>*+*{margin-top:1rem}
+.ht-app .space-y-3>*+*{margin-top:.75rem}
+.ht-app .space-y-2>*+*{margin-top:.5rem}
+.ht-app .ht-muted{font-size:.88rem;color:var(--ht-quiet);line-height:1.7}
+.ht-app .ht-panel article{max-width:100%}
