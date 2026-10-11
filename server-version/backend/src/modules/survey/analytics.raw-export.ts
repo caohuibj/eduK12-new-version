@@ -70,7 +70,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
       if(status==='COMPLETED')continue
       mapped.push([code,variable.waveId,variable.waveOrdinal,variable.publicationVersion,
         variable.instrumentKey,variable.itemKey,variable.columnKey,null,
-        status?'ABANDONED':'NO_WAVE',null])
+        status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null])
     }
   }
   return prepare(projectId,source,waveId?'WAVE':'RAW_LONG',cols,mapped,dictionary)
@@ -107,7 +107,8 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
       if(present)return [present.value,present.missingReason]
       const waveId=byColumn.get(col)!.waveId
       const status=attendance.get(code+':'+waveId)
-      return [null,status&&status!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+      return [null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':
+        status&&status!=='COMPLETED'?'ABANDONED':'NO_WAVE']
     })])
   const wideHeaders=['research_code',...columnIds.flatMap(col=>[col,col+'__missing'])]
   return prepare(projectId,source,'RAW_WIDE',wideHeaders,matrix,
