@@ -2,6 +2,7 @@ import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { surveyPublicRateLimits } from './public-rate.config'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
@@ -22,18 +23,9 @@ publicSurveyRouter.use((_req,res,next)=>{
 })
 // A deliberately simple NAT-friendly ceiling, rather than separate quotas for
 // every public action. Redis fail-closed and per-attempt FINAL authority remain.
-const publicPositiveInt=(name:string,fallback:number,max:number)=>{
-  const raw=process.env[name]
-  if(raw===undefined||raw==='')return fallback
-  const value=Number(raw)
-  if(!Number.isSafeInteger(value)||value<1||value>max)
-    throw new Error(name+' must be a positive integer <= '+max)
-  return value
-}
 publicSurveyRouter.use(createRedisRateLimiter({
   name:'survey-public-entry',
-  limit:publicPositiveInt('SURVEY_PUBLIC_IP_LIMIT',5000,100000),
-  windowSeconds:publicPositiveInt('SURVEY_PUBLIC_WINDOW_SECONDS',900,3600),
+  ...surveyPublicRateLimits(),
 }))
 const id=z.string().uuid(), secret=z.string().regex(/^[A-Za-z0-9_-]{43}$/)
 const code=z.string().regex(/^R-[A-Z0-9]{8,32}$/)
