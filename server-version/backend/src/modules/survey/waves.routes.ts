@@ -5,6 +5,7 @@ import { success, error } from '../../utils/response'
 import * as service from './waves.service'
 import * as publish from './waves.publish'
 import { surveyFlowDraftSchema } from './flow.definition'
+import { groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
@@ -21,6 +22,8 @@ const wave=z.object({
   quotaStarts:z.number().int().min(1).nullable().optional(),
   allowNewParticipants:z.boolean().optional(),
   flowDefinition:surveyFlowDraftSchema.nullable().optional(),
+  quotaPolicy:groupQuotaPolicySchema.nullable().optional(),
+  checkpointPolicy:surveyCheckpointPolicySchema.nullable().optional(),
 }).strict()
 const create=wave.extend({requestId:id})
 const update=wave.extend({revision:z.number().int().nonnegative()})
