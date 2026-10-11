@@ -225,7 +225,8 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       {preview?.ok&&!dirty&&<div>
         <button type="button" className="btn-secondary" onClick={()=>setShowPreview(x=>!x)}>
           {showPreview?'收起模拟作答':'展开模拟作答'}</button>
-        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}/>
+        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}
+            errorPath={answerReview?.issues[0]?.path}/>
           {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
             <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
             {answerReview.issues.map((issue,i)=><p role="alert" className="text-red-700 text-sm" key={i}>
