@@ -4,7 +4,6 @@ import { prisma } from '../../config/database'
 import { hashPassword } from '../../utils/password'
 import { appendAudit } from '../organization/service'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
-import { resolveEducationProductMemberScope, type EducationProduct } from '../organization/educationProductAccess'
 import type { AuthenticatedPrincipal } from '../../types'
 
 type Tx = Prisma.TransactionClient
@@ -44,7 +43,7 @@ export function digestCampusStudentNumber(organizationId: string, studentNumber:
 }
 const digestCode = (code: string) => createHash('sha256').update(code).digest('hex')
 
-async function admissionForUpdate(tx: Tx, orgId: string, classId: string, product: EducationProduct = 'HUISCHOOL'): Promise<AdmissionRow> {
+async function admissionForUpdate(tx: Tx, orgId: string, classId: string): Promise<AdmissionRow> {
   const rows = await tx.$queryRaw<AdmissionRow[]>`
     SELECT "class_unit_id" AS "classUnitId", "organization_id" AS "organizationId",
       "roster_version" AS "rosterVersion", "status",
@@ -52,7 +51,7 @@ async function admissionForUpdate(tx: Tx, orgId: string, classId: string, produc
     FROM "campus_class_admissions"
     WHERE "class_unit_id" = ${classId} AND "organization_id" = ${orgId}
       AND EXISTS(SELECT 1 FROM "education_product_entitlements" e
-        WHERE e."organization_id"=${orgId} AND e."product"=${product} AND e."status"='ACTIVE')
+        WHERE e."organization_id"=${orgId} AND e."product"='HUISCHOOL' AND e."status"='ACTIVE')
     FOR UPDATE
   `
   return rows[0] ?? fail('CLASS_ADMISSION_NOT_FOUND', 404)
@@ -64,18 +63,6 @@ export async function assertCampusGovernance(actor: AuthenticatedPrincipal, orga
   const context = await resolveOrganizationAccessContext({ principal: actor, organizationId })
   if (!context?.canGovern || !context.membershipId) fail('CAMPUS_GOVERNANCE_REQUIRED', 403)
   return context!
-}
-
-/** Same class-admission records serve Teacher-only schools without granting
- * access to any Huischool psychology feature or administrator capability. */
-async function assertEducationClassGovernance(actor: AuthenticatedPrincipal, organizationId: string, product: EducationProduct) {
-  if (product === 'HUISCHOOL') return assertCampusGovernance(actor, organizationId)
-  if (actor.accountDomain !== 'SCHOOL') fail('EDUCATION_ACCOUNT_REQUIRED', 403)
-  const member = await resolveEducationProductMemberScope({
-    actorUserId: actor.userId, organizationId, product: 'HUITEACHER',
-  })
-  if (!member?.productAdmin) fail('HUITEACHER_GOVERNANCE_REQUIRED', 403)
-  return member
 }
 
 /** Psychological staff approval must not be implied by ORG_ADMIN. */
@@ -124,10 +111,10 @@ export async function assertCampusRecoveryAuthority(actor: AuthenticatedPrincipa
 }
 
 export async function replaceCampusRoster(input: {
-  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string; product?: EducationProduct
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
   studentNumbers: string[]
 }) {
-  await assertEducationClassGovernance(input.actor, input.organizationId, input.product ?? 'HUISCHOOL')
+  await assertCampusGovernance(input.actor, input.organizationId)
   const nums = input.studentNumbers.map(normalizeNo)
   if (!nums.length || nums.length > 5000 || new Set(nums).size !== nums.length) {
     fail('ROSTER_SIZE_OR_DUPLICATES', 400)
@@ -140,7 +127,7 @@ export async function replaceCampusRoster(input: {
       VALUES (${input.classUnitId}, ${input.organizationId})
       ON CONFLICT ("class_unit_id") DO NOTHING
     `
-    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId, input.product ?? 'HUISCHOOL')
+    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId)
     if (row.status === 'OPEN' || row.status === 'APPROVED') fail('ROSTER_FROZEN')
     const claimed = await tx.$queryRaw<Array<{ count: number }>>`
       SELECT COUNT(*)::int AS "count" FROM "campus_student_eligibilities"
@@ -203,12 +190,12 @@ export async function replaceCampusRoster(input: {
 }
 
 export async function setCampusRegistrationWindow(input: {
-  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string; product?: EducationProduct
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
   action: 'OPEN' | 'CLOSE'; closesAt?: Date
 }) {
-  await assertEducationClassGovernance(input.actor, input.organizationId, input.product ?? 'HUISCHOOL')
+  await assertCampusGovernance(input.actor, input.organizationId)
   return prisma.$transaction(async tx => {
-    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId, input.product ?? 'HUISCHOOL')
+    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId)
     if (input.action === 'OPEN') {
       if (!['DRAFT', 'CLOSED'].includes(row.status)
         || !input.closesAt || input.closesAt <= new Date()
@@ -238,14 +225,14 @@ export async function setCampusRegistrationWindow(input: {
 }
 
 export async function issueCampusActivationCodes(input: {
-  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string; product?: EducationProduct
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
   count: number; ttlMinutes: number
 }) {
-  await assertEducationClassGovernance(input.actor, input.organizationId, input.product ?? 'HUISCHOOL')
+  await assertCampusGovernance(input.actor, input.organizationId)
   if (!Number.isInteger(input.count) || input.count < 1 || input.count > 500
     || !Number.isInteger(input.ttlMinutes) || input.ttlMinutes < 5 || input.ttlMinutes > 10080) fail('CODE_BATCH_INVALID',400)
   return prisma.$transaction(async tx => {
-    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId, input.product ?? 'HUISCHOOL')
+    const row = await admissionForUpdate(tx, input.organizationId, input.classUnitId)
     if (!['DRAFT','OPEN'].includes(row.status)) fail('CODE_WINDOW_CLOSED')
     const expiry = new Date(Math.min(
       Date.now()+input.ttlMinutes*60_000,
@@ -274,7 +261,7 @@ export async function issueCampusActivationCodes(input: {
 }
 
 export async function registerCampusStudent(input: {
-  organizationId: string; classUnitId: string; product?: EducationProduct; studentNumber: string
+  organizationId: string; classUnitId: string; studentNumber: string
   activationCode: string; username: string; password: string
 }) {
   const normalizedLogin=normalizeLogin(input.username)
@@ -285,7 +272,7 @@ export async function registerCampusStudent(input: {
   const passwordHash=await hashPassword(input.password)
   try {
     return await prisma.$transaction(async tx => {
-      const row=await admissionForUpdate(tx, input.organizationId, input.classUnitId, input.product ?? 'HUISCHOOL')
+      const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
       if (row.status!=='OPEN' || !row.windowClosesAt || row.windowClosesAt<=new Date()) fail('CAMPUS_REGISTRATION_UNAVAILABLE')
       const codes=await tx.$queryRaw<CodeRow[]>`
         SELECT "id", "roster_version" AS "rosterVersion" FROM "campus_activation_codes"
@@ -338,11 +325,9 @@ export async function registerCampusStudent(input: {
 }
 
 export async function readCampusClassSummary(input: {
-  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string; product?: EducationProduct
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
 }) {
-  await (input.product === 'HUITEACHER'
-    ? assertEducationClassGovernance(input.actor, input.organizationId, 'HUITEACHER')
-    : assertCampusClassRead(input.actor, input.organizationId))
+  await assertCampusClassRead(input.actor,input.organizationId)
   const rows=await prisma.$queryRaw<Array<{
     status:string; rosterVersion:number; rosterExpectedCount:number; eligibleCount:number
     registeredCount:number; unresolvedIncidents:number
@@ -366,14 +351,12 @@ export async function readCampusClassSummary(input: {
 }
 
 export async function approveCampusClass(input: {
-  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string; product?: EducationProduct
+  actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
   expectedRosterVersion: number
 }) {
-  const context=await (input.product === 'HUITEACHER'
-    ? assertEducationClassGovernance(input.actor, input.organizationId, 'HUITEACHER')
-    : assertCampusPsychologyStaff(input.actor, input.organizationId))
+  const context=await assertCampusPsychologyStaff(input.actor,input.organizationId)
   return prisma.$transaction(async tx=>{
-    const row=await admissionForUpdate(tx, input.organizationId, input.classUnitId, input.product ?? 'HUISCHOOL')
+    const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
     if (row.status!=='CLOSED' || row.rosterVersion!==input.expectedRosterVersion) fail('APPROVAL_PRECONDITION_FAILED')
     const numbers=await tx.$queryRaw<Array<{ eligible:number; registered:number; unresolved:number; expected:number }>>`
       SELECT
