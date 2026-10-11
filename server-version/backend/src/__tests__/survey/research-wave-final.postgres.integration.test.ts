@@ -278,7 +278,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const general=await submitResearchFinal({
       publicId,attemptId:started.attemptId,...link,submissionId:randomUUID(),
       answers:{
-        [task.units[0].instrumentKey]:{subject:'math',reflection:'REFUSED'},
+        [task.units[0].instrumentKey]:{subject:'math',reflection:{_surveyRefusal:true}},
         [task.units[1].instrumentKey]:{itemone:'o5',itemtwo:'o5'},
         [task.units[2].instrumentKey]:{first:['aone','athree'],second:'bone'},
       },
