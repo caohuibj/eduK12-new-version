@@ -18,7 +18,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
   useEffect(()=>{setAnswers({});setPageIndex(0)},[draft.id,draft.revision])
   useEffect(()=>{
     if(draft.kind!=='FORM'||!errorPath)return
-    const key=errorPath.match(/^answers\\.([a-z][a-z0-9_-]*)/i)?.[1]
+    const key=errorPath.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
     if(!key)return
     const index=(draft.definition as FormDraft).pages.findIndex(p=>p.questions.some(q=>q.itemKey===key))
     if(index>=0)setPageIndex(index)
