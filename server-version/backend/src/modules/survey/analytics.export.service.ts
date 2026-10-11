@@ -82,7 +82,7 @@ export async function createSurveyExport(req:Request,input:{
       publicationVersion:x.publicationVersion,
       instrumentRevision:x.instrumentRevision,
       definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest},
-  ])).values()]
+  ] as const)).values()]
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,

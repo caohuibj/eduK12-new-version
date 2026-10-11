@@ -166,6 +166,12 @@ export async function loadSurveySource(input:{
     const attendance=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
       .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
+    // Bound decrypted response material independently of the number of
+    // completed FINALs. 30 nested instruments * 300 items otherwise yields
+    // millions of in-memory rows under the 250-attempt limit.
+    const cipherBytes=finals.reduce((n,f)=>n+Buffer.byteLength(f.resultsCipher,'utf8'),0)
+    if(cipherBytes>8*1024*1024)
+      throw new SurveyAnalyticsError(413,'研究原始答案超出单次安全读取预算，请缩小波次范围')
     const codebook=new Map<string,ResearchRawCodebook>()
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
     for(const final of finals){
@@ -196,6 +202,8 @@ export async function loadSurveySource(input:{
         scores.push(...scoresFrom(frozen,unit,meta))
         for(const r of rawItems(frozen,unit)){
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
+          if(raw.length>=25000)
+            throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
           raw.push({...meta,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
