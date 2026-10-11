@@ -29,7 +29,7 @@ const currentSchool=async(tx:Transaction,organizationId:string)=>{
 /** Product subscription changes are deliberate and exclusively platform-governed. */
 export async function setEducationProductEntitlement(input:{
   actorUserId:string;organizationId:string;product:EducationProduct
-  action:ProductAction;expectedRevision?:number
+  action:ProductAction;expectedRevision?:number;initialSchoolAdminMembershipId?:string
 }){
   return prisma.$transaction(async tx=>{
     await assertCurrentSystemAdmin(tx,input.actorUserId)
@@ -45,6 +45,50 @@ export async function setEducationProductEntitlement(input:{
     if(existing?.status===wanted){
       return {organizationId:input.organizationId,product:input.product,status:wanted,revision:existing.revision,unchanged:true}
     }
+    // Activating Huischool on a Teacher-only school requires a separately
+    // designated School administrator. Shared ORG_ADMIN is insufficient.
+    let initialSchoolAdminId:string|null=null
+    if(input.action==='ACTIVATE'&&input.product==='HUISCHOOL'){
+      const granted=await tx.$queryRaw<Array<{id:string}>>`
+        SELECT grant_row."id" FROM "education_product_role_grants" grant_row
+        JOIN "organization_memberships" m ON m."id"=grant_row."membership_id"
+          AND m."organization_id"=grant_row."organization_id"
+          AND m."org_role"='ORG_ADMIN'
+          AND m."valid_from"<=statement_timestamp()
+          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+        JOIN "users" u ON u."id"=m."user_id"
+          AND u."account_domain"='SCHOOL'
+          AND u."role" IN ('TEACHER','ADMIN')
+          AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+          AND u."must_change_password"=FALSE
+          AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
+        WHERE grant_row."organization_id"=${input.organizationId}
+          AND grant_row."product"='HUISCHOOL'
+          AND grant_row."role"='PRODUCT_ADMIN' AND grant_row."revoked_at" IS NULL
+        LIMIT 1
+      `
+      if(!granted.length){
+        if(!input.initialSchoolAdminMembershipId)
+          refuse('HUISCHOOL_INITIAL_ADMIN_REQUIRED','必须指定心理健康产品的独立管理员')
+        const eligible=await tx.$queryRaw<Array<{id:string}>>`
+          SELECT m."id" FROM "organization_memberships" m
+          JOIN "users" u ON u."id"=m."user_id"
+            AND u."account_domain"='SCHOOL'
+            AND u."role" IN ('TEACHER','ADMIN')
+            AND u."is_active"=TRUE AND u."is_frozen"=FALSE
+            AND u."must_change_password"=FALSE
+            AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
+          WHERE m."id"=${input.initialSchoolAdminMembershipId}
+            AND m."organization_id"=${input.organizationId}
+            AND m."org_role"='ORG_ADMIN'
+            AND m."valid_from"<=statement_timestamp()
+            AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+          FOR SHARE OF m
+        `
+        if(!eligible.length)refuse('HUISCHOOL_INITIAL_ADMIN_INELIGIBLE')
+        initialSchoolAdminId=eligible[0].id
+      }
+    }
     const changedAt=new Date()
     const record=existing
       ?await tx.educationProductEntitlement.update({
@@ -55,6 +99,18 @@ export async function setEducationProductEntitlement(input:{
       :await tx.educationProductEntitlement.create({
         data:{...key,status:'ACTIVE',grantedByUserId:input.actorUserId},
       })
+    if(initialSchoolAdminId){
+      const role=await tx.educationProductRoleGrant.create({data:{
+        id:randomUUID(),organizationId:input.organizationId,
+        membershipId:initialSchoolAdminId,product:'HUISCHOOL',
+        role:'PRODUCT_ADMIN',grantedByUserId:input.actorUserId,
+      }})
+      await appendAudit(tx,{organizationId:input.organizationId,
+        actorUserId:input.actorUserId,action:'HUISCHOOL_INITIAL_ADMIN_GRANTED',
+        targetType:'MEMBERSHIP',targetId:initialSchoolAdminId,
+        domainEventId:randomUUID(),payload:{roleGrantId:role.id},
+      })
+    }
     await appendAudit(tx,{
       organizationId:input.organizationId,actorUserId:input.actorUserId,
       action:'EDUCATION_PRODUCT_'+input.action,targetType:'EDUCATION_PRODUCT',

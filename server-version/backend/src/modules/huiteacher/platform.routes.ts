@@ -23,6 +23,7 @@ const limiter=createRedisRateLimiter({
 const password=z.string().min(1).max(128)
 const entitlementInput=z.object({
   action:z.enum(['ACTIVATE','SUSPEND']),expectedRevision:z.number().int().min(0).optional(),
+  initialSchoolAdminMembershipId:z.string().uuid().optional(),
   currentPassword:password,
 }).strict()
 const grantInput=z.object({membershipId:uuid,currentPassword:password}).strict()
@@ -75,6 +76,7 @@ router.put('/organizations/:organizationId/products/:product',handle(async req=>
   return setEducationProductEntitlement({
     actorUserId:req.user!.userId,organizationId:id,product:p,
     action:input.action,expectedRevision:input.expectedRevision,
+    initialSchoolAdminMembershipId:input.initialSchoolAdminMembershipId,
   })
 }))
 router.post('/organizations/:organizationId/teacher-admins',handle(async req=>{
