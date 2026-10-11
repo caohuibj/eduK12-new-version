@@ -668,4 +668,37 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
 
+  it('does not commit a FINAL against a credential revoked during the transaction',async()=>{
+    const w=await wave('撤销凭证与提交串行验证',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const person=await db.surveyParticipant.findFirstOrThrow({
+      where:{projectId,researchCode:participant.researchCode},
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    let pending:Promise<boolean>|undefined
+    await db.$transaction(async tx=>{
+      await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${person.id} FOR UPDATE`
+      pending=submitResearchFinal({
+        publicId:w.publicId,attemptId:participant.attemptId,
+        researchCode:participant.researchCode,
+        accessCredential:participant.accessCredential,
+        submissionId:randomUUID(),
+        answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+      }).then(()=>true,()=>false)
+      await new Promise(resolve=>setTimeout(resolve,90))
+      await tx.surveyParticipant.update({where:{id:person.id},
+        data:{status:'REVOKED',credentialRevokedAt:new Date()}})
+    })
+    expect(pending).toBeDefined()
+    expect(await pending).toBe(false)
+    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
+  })
+
+
 })
