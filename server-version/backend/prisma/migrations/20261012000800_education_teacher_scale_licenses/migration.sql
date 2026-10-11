@@ -25,14 +25,14 @@ CREATE INDEX "education_teacher_scale_licenses_active_resources_idx"
   ON "education_teacher_scale_licenses"("resource_id","status","organization_id");
 CREATE OR REPLACE FUNCTION guard_teacher_scale_license() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-  IF NOT EXISTS (
+  IF NEW."status"='ACTIVE' AND (NOT EXISTS (
     SELECT 1 FROM "organizations" o
     JOIN "education_product_entitlements" e
       ON e."organization_id"=o."id" AND e."product"='HUITEACHER'
       AND e."status"='ACTIVE'
     WHERE o."id"=NEW."organization_id" AND o."product_domain"='SCHOOL'
       AND o."status"='ACTIVE'
-  ) OR (NEW."status"='ACTIVE' AND NOT EXISTS (
+  ) OR NOT EXISTS (
     SELECT 1 FROM "registered_assessment_resources" r
     WHERE r."id"=NEW."resource_id"
       AND r."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'

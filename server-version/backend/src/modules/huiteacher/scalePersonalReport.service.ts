@@ -91,7 +91,9 @@ export async function readTeacherPersonalScaleReport(input:{
   if(current.mode!=='INDIVIDUAL_SUMMARY'||current.state!=='READY')
     return {kind:'HUITEACHER_PERSONAL_DESCRIPTION' as const,
       state:'WITHHELD' as const,mode:current.mode}
-  const metrics=Object.entries(current.metrics).map(([key,value])=>{
+  const projection=('metrics' in current && current.metrics
+    &&typeof current.metrics==='object')?current.metrics:{}
+  const metrics=Object.entries(projection).map(([key,value])=>{
     const score=def.scoring.scores.find(s=>s.key===key)
     if(!score)denied()
     const wording=def.report.interpretations.find(i=>i.scoreKey===key

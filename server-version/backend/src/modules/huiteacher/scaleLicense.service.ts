@@ -44,6 +44,7 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
       AND r."resource_version"=${ref.version}
       AND r."status"='PUBLISHED'
     LIMIT 1
+    FOR SHARE OF r,scale
   `
   const r=rows[0]
   if(!r||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
@@ -150,6 +151,7 @@ export async function assertTeacherScaleRunUse(db:Db,input:{
       AND license."resource_id"=${entry.id}
       AND license."status"='ACTIVE'
     LIMIT 1
+    FOR SHARE OF license,ent,event
   `
   if(!licenses.length)deny('HUITEACHER_SCALE_NOT_LICENSED_FOR_RUN',403)
 }

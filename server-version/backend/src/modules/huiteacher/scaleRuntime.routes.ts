@@ -22,8 +22,9 @@ const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>
       code:'HUITEACHER_SCALE_INPUT_INVALID',message:'教师个人测评参数无效',data:null,
     })
     const known=e as {statusCode?:number;code?:string}
-    if(known&&Number.isInteger(known.statusCode)&&known.statusCode!>=400
-      &&known.statusCode!<500)return res.status(known.statusCode!).json({
+    if(known&&typeof known.statusCode==='number'
+      &&known.statusCode>=400&&known.statusCode<500)
+      return res.status(known.statusCode).json({
       code:known.code??'HUITEACHER_SCALE_UNAVAILABLE',
       message:'教师个人测评资格、资源或状态不满足要求',data:null,
     })
