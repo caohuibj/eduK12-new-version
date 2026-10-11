@@ -56,6 +56,7 @@ import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
 import campusAuthRoutes from './modules/campus/auth.routes'
 import huiteacherAuthRoutes from './modules/huiteacher/auth.routes'
+import huiteacherAdmissionRoutes from './modules/huiteacher/admission.routes'
 import platformEducationRoutes from './modules/huiteacher/platform.routes'
 import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
@@ -284,6 +285,7 @@ const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 }
 app.use('/api/huiteacher',huiteacherFeatureGuard,huiteacherOriginGuard)
 app.use('/api/huiteacher/auth',huiteacherAuthRoutes)
+app.use('/api/huiteacher',huiteacherAdmissionRoutes)
 app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
