@@ -51,6 +51,12 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
       AND track."run_id"=execution."run_id"
       AND track."resource_family"='SCALE'
       AND track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+    JOIN "users" actual_respondent
+      ON actual_respondent."id"=${input.actorUserId}
+      AND actual_respondent."account_domain"='SCHOOL'
+      AND actual_respondent."role" IN ('TEACHER','ADMIN')
+      AND actual_respondent."teacher_approved"=TRUE
+      AND actual_respondent."is_active"=TRUE AND actual_respondent."is_frozen"=FALSE
     JOIN "assessment_run_actor_snapshots" actor
       ON actor."organization_id"=execution."organization_id"
       AND actor."run_id"=execution."run_id"
@@ -114,6 +120,12 @@ router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>{
       ON registered."resource_key"=track."resource_key"
       AND registered."resource_version"=track."resource_version"
       AND registered."status" IN ('PUBLISHED','RETIRED')
+    JOIN "users" current_actor
+      ON current_actor."id"=${userId}
+      AND current_actor."account_domain"='SCHOOL'
+      AND current_actor."role" IN ('TEACHER','ADMIN')
+      AND current_actor."teacher_approved"=TRUE
+      AND current_actor."is_active"=TRUE AND current_actor."is_frozen"=FALSE
     JOIN "assessment_run_actor_snapshots" respondent
       ON respondent."organization_id"=e."organization_id"
       AND respondent."run_id"=e."run_id"
@@ -145,12 +157,22 @@ router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>{
       AND persona."membership_id"=m."id"
       AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
     WHERE e."status" IN ('ASSIGNED','STARTED','COMPLETED')
+      AND (e."status"='COMPLETED' OR
+        (event."status"='OPEN' AND run."status"='PUBLISHED'
+          AND registered."status"='PUBLISHED'
+          AND EXISTS (
+            SELECT 1 FROM "education_teacher_scale_licenses" license
+            WHERE license."organization_id"=e."organization_id"
+              AND license."resource_id"=registered."id"
+              AND license."status"='ACTIVE'
+          )
+        ))
       AND NOT EXISTS(
         SELECT 1 FROM "organization_access_denies" deny
         WHERE deny."organization_id"=org."id" AND deny."user_id"=${userId}
           AND deny."lifted_at" IS NULL
           AND deny."permission" IN ('*','EDUCATION_ACCESS',
-            'HUITEACHER_ACCESS','PARTICIPANT_REPORT_READ')
+            'HUITEACHER_ACCESS','RUN_START')
       )
     ORDER BY e."created_at" DESC,e."id" DESC LIMIT 101
   `

@@ -98,8 +98,9 @@ export async function readTeacherPersonalScaleReport(input:{
     if(!score)denied()
     const wording=def.report.interpretations.find(i=>i.scoreKey===key
       &&i.source.type==='score_only')
-    return {key,label:score.label,value,precision:score.displayPrecision,
-      direction:score.direction,
+    const safeValue=typeof value==='number'&&Number.isFinite(value)?value:null
+    return {key,label:score.label,value:safeValue,
+      precision:score.displayPrecision,direction:score.direction,
       ...(wording?{headline:wording.headline,summary:wording.summary,
         guidance:wording.guidance.map(g=>({category:g.category,text:g.text}))}:{})
     }

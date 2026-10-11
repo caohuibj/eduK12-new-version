@@ -93,8 +93,11 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
         <strong>{item.title}</strong> <span className="ht-tag">{item.status}</span>
         <p>{item.eventTitle}</p>
         <div className="ht-inline">
-          {item.status!=='COMPLETED'&&<button type="button" disabled={loading}
-            onClick={()=>open(item)}>进入本人自评</button>}
+          {item.status!=='COMPLETED'&&item.runStatus==='PUBLISHED'&&
+            <button type="button" disabled={loading}
+              onClick={()=>open(item)}>进入本人自评</button>}
+          {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'&&
+            <p className="ht-muted">任务已结束或不再接受新的 START，不能重新开始。</p>}
           {item.status==='COMPLETED'&&<button type="button" disabled={loading}
             onClick={()=>showReport(item)}>查看本人反馈</button>}
         </div>
