@@ -11,6 +11,10 @@ import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
+import { generateToken } from '../../utils/jwt'
+import type { Request } from 'express'
+
 import type { FormDraft,ScaleDraft,SjtDraft } from '../../modules/survey/builder.definition'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL')
@@ -221,4 +225,29 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     await db.surveyMfaCredential.create({data:{userId:foreign.id,enabled:true,secretCipher:'synthetic'}})
     await expect(loadSurveySource({actorUserId:foreign.id,projectId})).rejects.toThrow()
   })
+  it('requires fresh Survey TOTP for bounded raw exports and verifies encrypted tickets on download',async()=>{
+    const token=(secondsOld:number)=>generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,
+      mfaVerifiedAt:Math.floor(Date.now()/1000)-secondsOld,
+    })
+    const req=(secondsOld:number)=>({
+      headers:{cookie:'huisurvey_research_session='+token(secondsOld)},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,accountDomain:'SURVEY'},
+    }) as unknown as Request
+    await expect(createSurveyExport(req(900),{projectId,format:'RAW_WAVE',waveId:wave1}))
+      .rejects.toThrow(/TOTP/)
+    const grant=await createSurveyExport(req(1),{projectId,format:'RAW_WAVE',waveId:wave1})
+    expect(grant.status).toBe('READY')
+    expect(grant.manifest.rowCount).toBeGreaterThan(0)
+    const artifact=await downloadSurveyExport(req(1),{projectId,exportId:grant.id})
+    expect(artifact.format).toBe('RAW_WAVE')
+    expect(artifact.csv).toContain('research_code_or_attempt')
+    expect(JSON.stringify(artifact)).not.toContain(link.accessCredential)
+    expect((artifact.codebook as unknown[]).length).toBeGreaterThan(0)
+    await expect(downloadSurveyExport(req(1000),{projectId,exportId:grant.id}))
+      .rejects.toThrow(/TOTP/)
+  })
+
 })
