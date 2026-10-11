@@ -253,7 +253,7 @@ export default function SurveyPublicApp(){
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
-  const revokeAccess=()=>{if(!general||info?.project.collectionMode!=='LINKED_WAVES')return
+  const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
     if(!window.confirm('确认撤销此研究编号的未来访问权限？撤销后无法读取波次或回执，但凭编号和原始密钥仍可申请撤回历史研究数据。'))return
     void run(async()=>{
       await publicApi(base+'/revoke-access','POST',{
@@ -343,6 +343,10 @@ export default function SurveyPublicApp(){
           <button className="btn-secondary" type="button" disabled={busy} onClick={resumeSingle}>
             恢复本次作答／查看已完成回执</button>
         </section>}
+      {home&&!task&&!general&&info.project.collectionMode==='LINKED_WAVES'&&
+        <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+          停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
+        </button>}
       {!task&&!general&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
         {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
