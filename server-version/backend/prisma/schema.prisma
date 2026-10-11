@@ -2937,6 +2937,9 @@ model SurveySampleReview {
   reviewerId String            @map("reviewed_by")
   revision   Int               @default(1)
   reviewedAt DateTime          @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+  // Prisma needs an explicit unique tuple for this composite 1:1 relation.
+  // attemptId is also the PK; the composite index preserves scope FK shape.
+  @@unique([attemptId,projectId,waveId],map:"survey_sample_reviews_attempt_scope_unique")
   @@index([projectId,waveId,verdict],map:"survey_sample_reviews_scope_idx")
   @@map("survey_sample_reviews")
 }
