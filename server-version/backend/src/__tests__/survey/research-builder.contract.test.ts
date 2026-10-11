@@ -94,6 +94,7 @@ describe('Survey research builder contracts without formal publication authority
   it('previews SJT multi-select through official model scoring rather than a new parallel scorer',()=>{
     const d=sjt()
     d.questions[0].responseType='MULTIPLE'
+    d.questions[0].aggregationPolicy='SUM'
     d.questions[0].minSelections=2
     d.questions[0].maxSelections=2
     d.questions[0].options.push({

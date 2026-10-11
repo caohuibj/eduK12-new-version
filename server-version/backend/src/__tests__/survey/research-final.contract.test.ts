@@ -105,6 +105,7 @@ describe('Survey RESEARCH_ONLY authoritative FINAL',()=>{
   it('compiles a controlled two-selection SJT with stable aggregate scorer keys',()=>{
     const multiple: SjtDraft=structuredClone(sjt)
     multiple.questions[0].responseType='MULTIPLE'
+    multiple.questions[0].aggregationPolicy='SUM'
     multiple.questions[0].minSelections=2
     multiple.questions[0].maxSelections=2
     multiple.questions[0].options.push({

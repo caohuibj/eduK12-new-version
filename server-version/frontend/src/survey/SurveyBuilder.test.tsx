@@ -68,6 +68,10 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(state.questions[0].responseType).toBe('MULTIPLE')
     expect(state.questions[0].minSelections).toBe(1)
     expect(state.questions[0].maxSelections).toBe(2)
+    expect(state.questions[0].aggregationPolicy).toBeUndefined()
+    fireEvent.change(screen.getByLabelText('多选计分聚合规则'),{target:{value:'MEAN'}})
+    const configured=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraft
+    expect(configured.questions[0].aggregationPolicy).toBe('MEAN')
   })
   it('records nonuniform contribution weights per SJT option and construct',()=>{
     render(<SjtHost/>)

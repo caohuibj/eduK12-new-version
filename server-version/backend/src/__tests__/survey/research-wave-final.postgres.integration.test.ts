@@ -248,6 +248,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const sjtBefore=await getDraft(ownerId,projectId,toolIds.sjt)
     const sjtChanged=structuredClone(sjtBefore.definition) as unknown as SjtDraft
     sjtChanged.questions[0].responseType='MULTIPLE'
+    sjtChanged.questions[0].aggregationPolicy='SUM'
     sjtChanged.questions[0].minSelections=2
     sjtChanged.questions[0].maxSelections=2
     sjtChanged.questions[0].options.push({
