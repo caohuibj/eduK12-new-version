@@ -51,7 +51,7 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
 /** Single stable project-local pseudonym, backed by a separate 256-bit proof. */
 export async function createLinkedResearchIdentity(input:{
   projectId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean
-}):Promise<{researchCode:string;accessCredential:string;participantId:string}>{
+}):Promise<{researchCode:string;accessCredential:string}>{
   if(!input.consent)return fail('需要先同意研究内跨波次关联说明')
   const secret=opaque(),participantId=randomUUID(),researchCode=code()
   await prisma.$transaction(async tx=>{
@@ -68,7 +68,7 @@ export async function createLinkedResearchIdentity(input:{
       participantId,consentVersion:input.consentVersion,accepted:true,
     }})
   })
-  return {researchCode,accessCredential:secret,participantId}
+  return {researchCode,accessCredential:secret}
 }
 
 /** Recovery never accepts the publicly displayable research code alone. */

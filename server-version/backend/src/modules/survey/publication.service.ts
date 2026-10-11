@@ -122,7 +122,7 @@ export async function freezeResearchWaveDraft(input:{
     }
     const serial=JSON.stringify(snapshot)
     if(Buffer.byteLength(serial,'utf8')>4000000)stop('波次研究内容超出安全体积')
-    const digest=canonicalHash(snapshot)
+    const digest=canonicalHash(JSON.parse(serial))
     const version=(await tx.surveyPublication.aggregate({where:{projectId:input.projectId},_max:{version:true}}))._max.version||0
     const publicationId=randomUUID()
     await tx.surveyPublication.create({data:{
