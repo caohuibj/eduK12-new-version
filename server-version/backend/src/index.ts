@@ -6,6 +6,10 @@ import { assessmentRuntimeRouter } from './modules/mobile/assessment.routes'
 import { mobileRouter } from './modules/mobile/routes'
 import { parentLinksRouter, parentsRouter, parentPublicationRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
+import { surveyOriginGuard } from './modules/survey/originGuard'
+import { surveyAuthRouter } from './modules/survey/auth.routes'
+import { surveyProjectsRouter } from './modules/survey/projects.routes'
+import { surveyPlatformRouter } from './modules/survey/platform.routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
 import { createRedisRateLimiter } from './middleware/redisRateLimit'
@@ -242,6 +246,14 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
+  if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
+  next()
+}
+app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
+app.use('/api/survey/auth', surveyAuthRouter)
+app.use('/api/survey/projects', surveyProjectsRouter)
+app.use('/api/platform/survey', surveyFeatureGuard, surveyPlatformRouter)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)
