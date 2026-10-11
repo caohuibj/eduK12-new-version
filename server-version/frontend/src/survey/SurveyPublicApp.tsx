@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
+import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
@@ -140,6 +141,14 @@ export default function SurveyPublicApp(){
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
   const base='/r/'+publicId
+  // Only the already-authorized local browser tab may recover unfinished answers.
+  useEffect(()=>{
+    if(!task||task.status!=='STARTED'||!attemptId)return
+    const timeout=window.setTimeout(()=>{
+      saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers)
+    },450)
+    return ()=>window.clearTimeout(timeout)
+  },[publicId,attemptId,task,answers])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
     // Recruitment capability stays in memory, not browser history/Referrer.
@@ -173,7 +182,16 @@ export default function SurveyPublicApp(){
     setAttemptId(id)
     setSubmissionId(crypto.randomUUID())
     setTask(data)
-    setAnswers({})
+    if(data.status==='COMPLETED'){
+      clearLocalSurveyDraft(publicId,id)
+      setAnswers({})
+    }else{
+      const saved=restoreLocalSurveyDraft<Record<string,Record<string,Answer>>>(
+        publicId,id,data.definitionDigest,
+      )
+      setAnswers(saved||{})
+      if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
+    }
     if(data.status==='COMPLETED'){
       const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',{
         ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -232,6 +250,7 @@ export default function SurveyPublicApp(){
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),
     })
+    clearLocalSurveyDraft(publicId,attemptId)
     setGeneral(generalResult)
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
@@ -242,6 +261,7 @@ export default function SurveyPublicApp(){
       await publicApi(base+'/revoke-access','POST',{
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
       })
+      if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
       setRevoked(true);setHome(null);setTask(null);setGeneral(null)
       setSelectedWave(null);setAgreed(false);setProofReceived(false)
       setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
@@ -263,6 +283,7 @@ export default function SurveyPublicApp(){
           accessCredential:accessCredential.trim(),
         })
       }
+      if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
       setWithdrawn(true);setGeneral(null);setTask(null);setHome(null)
       setSingleResume(null)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* storage unavailable */}
@@ -359,7 +380,9 @@ export default function SurveyPublicApp(){
       </section>}
       {task&&!general&&<form className="space-y-5" onSubmit={submit}>
         <div className="bg-white border rounded-xl p-4"><h3 className="font-semibold">本轮研究作答</h3>
-          <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p></div>
+          <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
+          <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
+            关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</p></div>
         {task.units.map(unit=><TaskForm key={unit.instrumentKey} unit={unit}
           proof={{publicId,attemptId,accessCredential,
             ...(info.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
