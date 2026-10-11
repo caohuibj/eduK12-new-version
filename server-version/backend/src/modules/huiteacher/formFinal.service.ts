@@ -134,10 +134,7 @@ async function exactFormScope(tx:Tx,input:{
       "completed_at" AS "completedAt"
     FROM "huiteacher_form_attempts"
     WHERE "id"=${input.attemptId}
-      AND "run_execution_id"=(
-        SELECT "id" FROM "assessment_run_executions"
-        WHERE "id"=${first?Prisma.sql`(SELECT "run_execution_id" FROM "huiteacher_form_attempts" WHERE "id"=${input.attemptId})`:Prisma.sql`''`}
-      )
+
     ${input.lock?Prisma.sql`FOR UPDATE`:Prisma.empty}
   `)
   const attempt=attempts[0]
@@ -224,7 +221,11 @@ export async function submitOwnHuiteacherFormFinal(input:{
       SELECT "status","respondent_user_id" AS "respondentUserId"
       FROM "relational_assessment_assignments"
       WHERE "id"=${scope.relationalAssignmentId}
-        AND "policy_domain"='ORGANIZATION_RUN' FOR UPDATE
+        AND "policy_domain"='ORGANIZATION_RUN'
+        AND "relationship_kind"='SELF'
+        AND "subject_user_id"=${input.actorUserId}
+        AND "respondent_user_id"=${input.actorUserId}
+      FOR UPDATE
     `
     if(status[0]?.status!=='STARTED'
       ||status[0].respondentUserId!==input.actorUserId)
