@@ -22,6 +22,7 @@ type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;wa
   completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
+  nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number}}
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
 const kindOptions:Record<ExportFormat,string>={
@@ -71,6 +72,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
   const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
+  const [exportWaveId,setExportWaveId]=useState(''),[batchDownloaded,setBatchDownloaded]=useState(false)
   const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
@@ -147,17 +149,19 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     await api('/auth/mfa/step-up','POST',{code:otp.trim()})
     setOtp('');setMessage('已完成最新 TOTP 二次认证；敏感导出仅在接下来的五分钟内有效。')
   })}
-  const createExport=()=>void execute(async()=>{
+  const createExport=(cursor?:string)=>void execute(async()=>{
     const result=await api<Ticket>(base+'/exports','POST',{
-      format,...(format==='RAW_WAVE'?{waveId}:{}),
+      format,...(format==='RAW_WAVE'?{waveId}:
+        (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
       ...(format.startsWith('RAW')?{includeFreeText}:{}),
       ...(format==='RAW_WAVE'?{
         ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
         ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
       }:{}),
+      ...(cursor?{cursor}:{}),
     })
-    setTicket(result)
-    setMessage('加密数据已生成，可在十分钟有效期内按项目权限下载。')
+    setTicket(result);setBatchDownloaded(false)
+    setMessage('第 '+(result.pageNumber||1)+' 批加密数据已生成；逐批下载并保留 Manifest。')
   })
   const download=()=>{if(!ticket)return;void execute(async()=>{
     const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
@@ -165,7 +169,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
     downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
-    setMessage('已生成 CSV、变量编码字典和来源 Manifest。请妥善保管研究编号与自由文本。')
+    setBatchDownloaded(true)
+    setMessage('已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
   })}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
@@ -328,7 +333,15 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                 overview.collectionMode==='LINKED_WAVES'||!kind.includes('WIDE'))
                 .map(([kind,label])=><option key={kind} value={kind}>{label}</option>)}
             </select></label>
-          {format==='RAW_WAVE'&&<label className="text-sm">波次
+          {['RAW_LONG','SCORE_LONG'].includes(format)&&
+             <label className="text-sm">大样本可选单波次分批导出
+               <select className="input block" value={exportWaveId}
+                 onChange={e=>{setExportWaveId(e.target.value);setTicket(null)}}>
+                 <option value="">全部波次（≤250 FINAL）</option>
+                 {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
+               </select>
+             </label>}
+           {format==='RAW_WAVE'&&<label className="text-sm">波次
             <select className="input block" value={waveId} onChange={e=>setWaveId(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
@@ -340,7 +353,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
           </div>}
           <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
-            onClick={createExport}>创建受控导出</button>
+            onClick={()=>createExport()}>创建受控导出</button>
         </div>
         {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
           <input type="checkbox" checked={includeFreeText}
@@ -348,11 +361,16 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
         </label>}
         {ticket&&<div className="border rounded-lg p-3 space-y-2">
-          <p className="text-sm">导出 {ticket.format} · {ticket.manifest.rowCount} 行 ·
+          <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
           <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
-            下载 CSV、Codebook 与 Manifest</button>
+            下载当前批次 CSV、Codebook 与 Manifest</button>
+          {ticket.nextCursor&&<button className="btn-secondary" type="button"
+            disabled={busy||!batchDownloaded} onClick={()=>createExport(ticket.nextCursor!)}>
+            当前批次已下载，生成下一批</button>}
+          {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
+            逐批合并同名字段，不将不同批次作为独立研究波次。</p>
         </div>}
       </div>
     </>}
