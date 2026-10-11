@@ -47,3 +47,9 @@
 .ht-app .ht-personal-metric{margin:1rem 0;padding:1rem;border:1px solid var(--ht-line);border-radius:10px;background:var(--ht-paper)}
 .ht-app .ht-personal-metric strong{font-size:1.6rem;color:var(--ht-copper)}
 .ht-app .ht-personal-metric h5{font-size:1rem;margin:.2rem 0 .8rem}
+
+/* Personal teacher Scale: same education account, no personal school. */
+.ht-app .ht-scale-item{padding:1rem;margin:1rem 0;border:1px solid var(--ht-line);border-radius:9px}
+.ht-app .ht-scale-item legend{font-weight:600;max-width:100%;padding:0 .5rem}
+.ht-app .ht-scale-item label{display:flex;gap:.55rem;align-items:center;margin:.7rem 0}
+.ht-app .ht-personal-report{padding:1rem;margin-top:1rem;border-top:1px solid var(--ht-line);line-height:1.7}

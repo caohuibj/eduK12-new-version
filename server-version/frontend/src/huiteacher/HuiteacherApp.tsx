@@ -4,6 +4,7 @@ import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
+import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -237,7 +238,7 @@ export default function HuiteacherApp(){
           {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
             <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>
            :<button onClick={joinStaff} disabled={working||!inviteCode}>使用已有教师账号加入</button>}</div>
-        {me.organizations.length===0?<p className="ht-empty">目前没有已开通 Huiteacher 的学校授权。教师个人发展能力将在后续阶段接入。</p>:
+        {me.organizations.length===0?<p className="ht-empty">当前没有开通 Huiteacher 的学校任务授权。具有个人测评许可时，仍可使用下方个人自主测评工作台。</p>:
           <label className="ht-field"><span>当前学校</span><select value={selectedOrg} onChange={e=>setSelectedOrg(e.target.value)}>
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
           </select></label>}
@@ -279,6 +280,7 @@ export default function HuiteacherApp(){
         key={'targets:'+org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
       {org?.productAdmin&&<HuiteacherFormStudio
         key={org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
+      {me.role!=='STUDENT'&&<HuiteacherPersonalSelf api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyFormTasks api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
       <section className="ht-panel"><h2>后续功能模块</h2>
