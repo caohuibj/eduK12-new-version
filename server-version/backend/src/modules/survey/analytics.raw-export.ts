@@ -1,5 +1,5 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { protectCsvCell,tableToCsv } from './analytics.export-format'
+import { protectCsvCell,tableToCsv,surveyAttemptCode } from './analytics.export-format'
 import type { SurveySourceProjection,ResearchRawObservation,ResearchRawCodebook } from './analytics.source'
 
 export type SurveyRawFormat='WAVE'|'RAW_LONG'|'RAW_WIDE'
@@ -13,7 +13,7 @@ export interface SurveyRawExport {
     formulaGuard:'EXCEL_APOSTROPHE_PREFIX'
   }
 }
-const attemptCode=(uuid:string)=>'A-'+canonicalHash(uuid).slice(0,20).toUpperCase()
+const attemptCode=surveyAttemptCode
 const check=(projectId:string,source:SurveySourceProjection)=>{
   if(source.projectId!==projectId||
     source.raw.some(x=>x.projectId!==projectId||x.sourceVerified!==true))
