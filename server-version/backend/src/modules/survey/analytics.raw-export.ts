@@ -47,10 +47,10 @@ function prepare(projectId:string,source:SurveySourceProjection,format:SurveyRaw
 export function rawLongExport(projectId:string,source:SurveySourceProjection,waveId?:string):SurveyRawExport{
   check(projectId,source)
   const rows=ordered(source,waveId)
-  const cols=['research_code_or_attempt','wave_id','wave_ordinal','instrument_key',
-    'item_key','variable_code','value','missing_reason','source_final_hash']
+  const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
+    'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash']
   const mapped=rows.map(r=>[
-    displayCode(r),r.waveId,r.waveOrdinal,r.instrumentKey,r.itemKey,r.columnKey,
+    displayCode(r),r.waveId,r.waveOrdinal,r.publicationVersion,r.instrumentKey,r.itemKey,r.columnKey,
     r.value,r.missingReason,r.sourceFinalHash,
   ])
   const keys=new Set(rows.map(r=>r.columnKey))

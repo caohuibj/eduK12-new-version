@@ -242,6 +242,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const grant=await createSurveyExport(req(1),{projectId,format:'RAW_WAVE',waveId:wave1})
     expect(grant.status).toBe('READY')
     expect(grant.manifest.rowCount).toBeGreaterThan(0)
+    expect(grant.manifest.selectedVersions.length).toBeGreaterThan(0)
+    expect(grant.manifest.sourceCutOff).toMatch(/^\d{4}-\d\d-\d\dT/)
     const artifact=await downloadSurveyExport(req(1),{projectId,exportId:grant.id})
     expect(artifact.format).toBe('RAW_WAVE')
     expect(artifact.csv).toContain('research_code_or_attempt')

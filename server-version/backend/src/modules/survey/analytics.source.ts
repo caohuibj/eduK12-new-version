@@ -13,12 +13,14 @@ export interface ResearchRawCodebook {
   itemKey:string;kind:'FORM'|'SCALE'|'SJT';title:string;prompt:string;
   options:{code:string;label:string}[];
   definitionDigest:string;scoringDigest:string|null
+  publicationVersion:number
+  instrumentRevision:number
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
   researchCode:string|null;sourceFinalHash:string;
   instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';
-  itemKey:string;columnKey:string;value:string|number|null;
+  itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
 }
 export interface SurveySourceProjection {
@@ -106,7 +108,7 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
   'W'+String(waveOrdinal).padStart(3,'0')+'__'
     +(instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
     +'__'+(itemKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
-    +'__'+hash.slice(0,10)
+    +'__'+hash.slice(0,16)
 /** A single transaction locks current User/Grant/Owner, reads exactly finalized
  * Survey records, verifies the encrypted FINAL hash, and projects minimum data.
  * No arbitrary project administrator inherits the raw-data grant.
@@ -116,8 +118,9 @@ export async function loadSurveySource(input:{
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
-    const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'}>>`
-      SELECT p.collection_mode AS "collectionMode" FROM "survey_projects" p
+    const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date}>>`
+      SELECT p.collection_mode AS "collectionMode", transaction_timestamp() AS "sourceCutOff"
+      FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
       JOIN "survey_mfa_credentials" m ON m.user_id=u.id
@@ -193,17 +196,21 @@ export async function loadSurveySource(input:{
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           raw.push({...meta,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,
+            publicationVersion:publication.version,
             value:r.value,missingReason:r.missingReason})
           if(!codebook.has(columnKey))
             codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
               instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
               title:frozen.title,prompt:r.prompt,options:r.options,
-              definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest})
+              definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
+              publicationVersion:publication.version,
+              instrumentRevision:frozen.draftRevision})
         }
       }
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
-      completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,cutOff:new Date().toISOString(),
+      completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
+      cutOff:project.sourceCutOff.toISOString(),
       scores,raw,codebook:[...codebook.values()],attendance}
-  })
+  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }

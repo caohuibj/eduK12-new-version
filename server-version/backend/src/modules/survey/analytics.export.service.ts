@@ -64,7 +64,18 @@ export async function createSurveyExport(req:Request,input:{
   let artifact:SurveyRawExport|BoundedResearchExport
   try{artifact=artifactFor(input.format,input.projectId,sources,input.waveId)}
   catch(e){fail(413,e instanceof Error?e.message:'研究数据超过安全导出上限')}
-  const value:SurveyExportArtifact={csv:artifact.csv,codebook:artifact.codebook,manifest:artifact.manifest}
+  const selectedVersions=[...new Map(sources.codebook.map(x=>[
+    x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,
+    {waveId:x.waveId,instrumentKey:x.instrumentKey,
+      publicationVersion:x.publicationVersion,
+      instrumentRevision:x.instrumentRevision,
+      definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest},
+  ])).values()]
+  const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
+    completedFinalCount:sources.completeAttempts,selectedVersions,
+    selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
+      researchOnly:true,collectionMode:sources.collectionMode}}
+  const value:SurveyExportArtifact={csv:artifact.csv,codebook:artifact.codebook,manifest}
   const encoded=JSON.stringify(value)
   if(Buffer.byteLength(encoded,'utf8')>maxBytes)
     fail(413,'本次导出超过 2MB 的单请求上限，请缩小波次范围')
@@ -84,7 +95,7 @@ export async function createSurveyExport(req:Request,input:{
       action:'RESEARCH_EXPORT_CREATED',metadata:{exportId:id,format:input.format,
         rowCount:artifact.manifest.rowCount,expiresAt:expiresAt.toISOString()}}})
   })
-  return {id,status:'READY' as const,format:input.format,expiresAt,manifest:artifact.manifest}
+  return {id,status:'READY' as const,format:input.format,expiresAt,manifest}
 }
 export async function downloadSurveyExport(req:Request,input:{projectId:string;exportId:string}){
   assertRecentSurveyMfa(req)
