@@ -57,7 +57,7 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
   return envelope.data
 }
-function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{unit:Unit;answer:Record<string,Answer>;
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof;
   pageIndex:number;onPageChange:(next:number)=>void}){
   const [pageError,setPageError]=useState('')
