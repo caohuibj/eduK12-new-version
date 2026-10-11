@@ -142,6 +142,10 @@ export async function startLinkedWave(input:{
   return prisma.$transaction(async tx=>{
     const wave=await openWaveLocked(tx,project.id,input.waveId,true)
     // Project-scoped credential remains valid at the moment of admission.
+    // Revocation cannot commit between the admission credential check and
+    // its newly allocated Attempt; preserve Project -> Wave -> Person locks.
+    await tx.$queryRaw`SELECT id FROM survey_participants
+      WHERE id=${identity.participantId} AND project_id=${project.id} FOR SHARE`
     const live=await tx.surveyParticipant.findFirst({where:{
       id:identity.participantId,projectId:project.id,status:'ACTIVE',
       credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
