@@ -17,7 +17,7 @@ def phase(name,fn):
  finally:
   results['phases'].append({'name':name,'status':status,'seconds':round(time.monotonic()-start,2)})
   (evidence/'checks.json').write_text(json.dumps(results,indent=2))
-backend_tests=['src/__tests__/campus/registration-code.test.ts','src/__tests__/campus/mfa-totp.contract.test.ts','src/__tests__/integration/campusRegistrationCode.postgres.integration.test.ts','src/__tests__/integration/campusAuthRealm.postgres.integration.test.ts','src/__tests__/integration/campusTotp.postgres.integration.test.ts','src/__tests__/integration/campusAdmission.postgres.integration.test.ts','src/__tests__/integration/campusParentPeer.postgres.integration.test.ts','src/__tests__/integration/campusStaffInviteGovernance.postgres.integration.test.ts','src/__tests__/middleware/csrf.test.ts']
+backend_tests=['src/__tests__/campus/local-auth-origin.test.ts','src/__tests__/campus/registration-code.test.ts','src/__tests__/campus/mfa-totp.contract.test.ts','src/__tests__/integration/campusRegistrationCode.postgres.integration.test.ts','src/__tests__/integration/campusAuthRealm.postgres.integration.test.ts','src/__tests__/integration/campusTotp.postgres.integration.test.ts','src/__tests__/integration/campusAdmission.postgres.integration.test.ts','src/__tests__/integration/campusParentPeer.postgres.integration.test.ts','src/__tests__/integration/campusStaffInviteGovernance.postgres.integration.test.ts','src/__tests__/middleware/csrf.test.ts']
 frontend_tests=['src/school/'+f for f in ['SchoolMark.test.tsx','SchoolLanding.test.tsx','SchoolParentPortal.test.tsx','SchoolWorkspace.test.tsx','SchoolWorkspaceShell.test.tsx','SchoolEntryMfa.test.tsx']]
 with tempfile.TemporaryDirectory(prefix='campus-ci-') as temp:
  for component in p['changed']:
