@@ -30,7 +30,7 @@ describe('training presentation and course-first entry', () => {
     expect(screen.queryByRole('navigation', { name: '培训账号入口' })).toBeNull()
     expect(screen.queryByText('登录账号')).toBeNull()
     expect(screen.queryByText('注册账号')).toBeNull()
-    expect(screen.getByRole('heading', { name: /让学习，.*更有回响。/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /以学习为径，.*见更远的天地。/ })).toBeInTheDocument()
     expect(screen.getByText('Huitraining')).toBeInTheDocument()
     expect(screen.queryByText('我是学员')).toBeNull()
     expect(screen.queryByText('我是培训师')).toBeNull()
