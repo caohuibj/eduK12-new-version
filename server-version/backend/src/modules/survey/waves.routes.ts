@@ -4,6 +4,7 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import * as service from './waves.service'
 import * as publish from './waves.publish'
+import { surveyFlowDraftSchema } from './flow.definition'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
@@ -19,6 +20,7 @@ const wave=z.object({
   finishUntil:z.string().datetime().nullable().optional(),
   quotaStarts:z.number().int().min(1).nullable().optional(),
   allowNewParticipants:z.boolean().optional(),
+  flowDefinition:surveyFlowDraftSchema.nullable().optional(),
 }).strict()
 const create=wave.extend({requestId:id})
 const update=wave.extend({revision:z.number().int().nonnegative()})

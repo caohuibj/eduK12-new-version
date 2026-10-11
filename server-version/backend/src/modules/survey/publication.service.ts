@@ -6,6 +6,7 @@ import { retainSurveyMedia } from './media.references'
 import { assertSurveyDraft, surveyKindSchema } from './builder.definition'
 import { compileResearchScale, compileResearchSjt } from './builder.compiler'
 import { SurveyWaveError } from './waves.service'
+import { compileSurveyFlow,type FrozenSurveyFlow } from './flow.definition'
 
 /** Stored data contract for PR3 anonymous Wave runtime adapter.
  * This is a frozen research-only definition, NOT a formal scale/SJT
@@ -32,6 +33,7 @@ export interface ResearchFrozenPublication {
   linkageNoticeConfirmed:boolean
   consentDigest:string
   units:ResearchFrozenUnit[]
+  flow?:FrozenSurveyFlow
   runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
@@ -117,6 +119,8 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return compileFrozenResearchUnit(draft!)
     })
+    const frozenFlow=wave.flowDefinition?compileSurveyFlow(wave.flowDefinition,units,
+      project.collectionMode as ResearchFrozenPublication['collectionMode']):undefined
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
@@ -124,7 +128,7 @@ export async function freezeResearchWaveDraft(input:{
       linkageNoticeConfirmed:wave.linkageNoticeConfirmed,
       consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion,
         linkedConfirmed:wave.linkageNoticeConfirmed}),
-      units,runtimeStatus:'SURVEY_FINAL_V1',
+      units,...(frozenFlow?{flow:frozenFlow}:{}),runtimeStatus:'SURVEY_FINAL_V1',
     }
     const serial=JSON.stringify(snapshot)
     if(Buffer.byteLength(serial,'utf8')>4000000)stop('波次研究内容超出安全体积')
