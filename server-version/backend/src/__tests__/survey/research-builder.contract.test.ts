@@ -25,7 +25,7 @@ const scale=():ScaleDraft=>({
 const sjt=():SjtDraft=>({
   schemaVersion:1,respondentType:'student_self_report',scenarioKey:'sceneone',
   title:'课堂讨论情境',stimulus:'同学们围绕一个问题展开讨论，你希望参与。',
-  author:'项目研究者',sourceNote:'研究自编内容',redistribution:'allowed',
+  author:'项目研究者',sourceNote:'研究自编内容',licenseStatus:'self_authored',redistribution:'allowed',
   metrics:[{metricKey:'effort',label:'投入',direction:'descriptive'},
     {metricKey:'support',label:'支持',direction:'descriptive'}],
   questions:[
@@ -78,6 +78,9 @@ describe('Survey research builder contracts without formal publication authority
     expect(preview.participantReport).toBe('GENERAL_ONLY')
   })
   it('compiles shared-stimulus two-question SJT with nonuniform multi-construct weights',()=>{
+    const invalidSource=sjt()
+    invalidSource.licenseStatus='unknown'
+    expect(validateSurveyDraft('SJT',invalidSource,true).issues.some(x=>x.path==='licenseStatus')).toBe(true)
     const compiled=compileResearchSjt('sjtstudy',sjt())
     expect(compiled.package.definition.scoring.model?.modelKey).toBe('AUTHOR_KEY_SUM')
     const r=previewResearchInstrument({kind:'SJT',instrumentKey:'sjtstudy',

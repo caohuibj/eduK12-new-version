@@ -45,7 +45,7 @@ const scale:ScaleDraft={
 const sjt:SjtDraft={
   schemaVersion:1,respondentType:'student_self_report',scenarioKey:'sceneone',
   title:'课堂互动情境',stimulus:'你发现课堂中出现新的讨论机会。',
-  author:'课题负责人',sourceNote:'本人原创探索性场景',redistribution:'allowed',
+  author:'课题负责人',sourceNote:'本人原创探索性场景',licenseStatus:'self_authored',redistribution:'allowed',
   metrics:[{metricKey:'effort',label:'投入',direction:'descriptive'},
     {metricKey:'support',label:'互助',direction:'descriptive'}],
   questions:[

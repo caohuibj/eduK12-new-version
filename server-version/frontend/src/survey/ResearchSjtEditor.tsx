@@ -17,7 +17,28 @@ export function ResearchSjtEditor({value,onChange}:{value:SjtDraft;onChange:(nex
           onChange={e=>onChange({...value,respondentType:e.target.value as SjtDraft['respondentType']})}>
           <option value="student_self_report">学生</option><option value="teacher_self_report">教师</option>
         </select></label>
-      <p className="text-xs text-slate-600">PR2 复用现有 SJT 编译器的学生/教师执行契约。其他研究参与者类型须在 PR3 运行时适配确认后才能发布。</p>
+      <p className="text-xs text-slate-600">当前使用原有 SJT 编译器的学生/教师单选执行契约。多选与其他研究对象的自编 SJT 尚不支持发布，不能以不同对象身份代替。</p>
+      <h4 className="font-semibold text-sm">内容来源、研究展示许可</h4>
+      <label className="block text-sm">作者或授权来源
+        <input className="input block w-full" value={value.author}
+          onChange={e=>onChange({...value,author:e.target.value})}/></label>
+      <label className="block text-sm">原创/授权依据记录（不放入被试报告）
+        <textarea className="input block w-full" rows={2} value={value.sourceNote}
+          onChange={e=>onChange({...value,sourceNote:e.target.value})}/></label>
+      <label className="block text-sm">权属声明
+        <select className="input block w-full" value={value.licenseStatus??'unknown'}
+          onChange={e=>onChange({...value,licenseStatus:e.target.value as SjtDraft['licenseStatus']})}>
+          <option value="unknown">尚未确认，不允许冻结发布</option>
+          <option value="self_authored">研究者原创</option>
+          <option value="authorized">已取得明确授权</option>
+        </select></label>
+      <label className="block text-sm">研究链接中的展示与分发权
+        <select className="input block w-full" value={value.redistribution}
+          onChange={e=>onChange({...value,redistribution:e.target.value as SjtDraft['redistribution']})}>
+          <option value="unknown">尚未核实</option>
+          <option value="restricted">限制展示，不允许公开研究发布</option>
+          <option value="allowed">已授权在本研究中展示</option>
+        </select></label>
     </section>
     <section className="bg-white border rounded-xl p-4 space-y-3">
       <h3 className="font-semibold">测量构念与评分贡献</h3>

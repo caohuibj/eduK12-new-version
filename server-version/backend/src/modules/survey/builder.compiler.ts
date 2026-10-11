@@ -81,7 +81,7 @@ export function compileResearchSjt(instrumentKey:string,input:unknown) {
     author:d.author||'研究者自编',
     sourceNote:d.sourceNote||'探索性自编研究情境',
     disclaimer,
-    licenseStatus:'self_authored' as const,
+    licenseStatus:d.licenseStatus??'unknown',
     redistribution:d.redistribution,
     nodes:d.questions.map(q=>({
       nodeKey:q.questionKey,motherSceneKey:d.scenarioKey,title:d.title,stimulus:d.stimulus,

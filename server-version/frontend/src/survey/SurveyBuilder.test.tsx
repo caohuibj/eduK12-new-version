@@ -14,7 +14,7 @@ const scale=():ScaleDraft=>({
 })
 const sjt=():SjtDraft=>({
   schemaVersion:1,respondentType:'student_self_report',scenarioKey:'scene',
-  title:'',stimulus:'',author:'自编',sourceNote:'研究探索',redistribution:'allowed',
+  title:'',stimulus:'',author:'自编',sourceNote:'研究探索',licenseStatus:'self_authored',redistribution:'allowed',
   metrics:[],questions:[],
 })
 function FormHost(){

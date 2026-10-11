@@ -40,7 +40,7 @@ const scale:ScaleDraft={
 const sjt:SjtDraft={
   schemaVersion:1,respondentType:'student_self_report',scenarioKey:'sceneone',
   title:'课堂交流',stimulus:'同学邀请你参加讨论，你会如何回应？',
-  author:'项目研究者',sourceNote:'项目自编情境',redistribution:'allowed',
+  author:'项目研究者',sourceNote:'项目自编情境',licenseStatus:'self_authored',redistribution:'allowed',
   metrics:[{metricKey:'effort',label:'学习投入',direction:'descriptive'},
     {metricKey:'support',label:'互助倾向',direction:'descriptive'}],
   questions:[

@@ -21,6 +21,15 @@ export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:
       {value.dimensions.map((dim,i)=><div className="flex items-center gap-3" key={dim.dimensionKey}>
         <input className="input flex-1" aria-label={'维度 '+(i+1)} value={dim.label}
           onChange={e=>onChange({...value,dimensions:value.dimensions.map(x=>x.dimensionKey===dim.dimensionKey?{...x,label:e.target.value}:x)})}/>
+        <select className="input" aria-label={'维度方向 '+(i+1)} value={dim.direction}
+          onChange={e=>onChange({...value,dimensions:value.dimensions.map(x=>
+            x.dimensionKey===dim.dimensionKey?{...x,direction:e.target.value as ScaleDraft['dimensions'][number]['direction']}:x)})}>
+          <option value="descriptive">仅描述</option>
+          <option value="higher_is_more">越高代表越多</option>
+          <option value="higher_is_better">越高越好（研究性定义）</option>
+          <option value="higher_is_worse">越高越差（研究性定义）</option>
+          <option value="bipolar">双极方向</option>
+        </select>
         <button type="button" className="btn-secondary" onClick={()=>onChange({...value,
           dimensions:value.dimensions.filter(x=>x.dimensionKey!==dim.dimensionKey),
           items:value.items.map(x=>({...x,dimensionKeys:x.dimensionKeys.filter(k=>k!==dim.dimensionKey)}))})}>删除</button>

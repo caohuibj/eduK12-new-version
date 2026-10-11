@@ -17,6 +17,7 @@ export type ScaleDraft={
 export type SjtDraft={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';
   scenarioKey:string;title:string;stimulus:string;author:string;sourceNote:string;
+  licenseStatus?:'self_authored'|'authorized'|'unknown';
   redistribution:'allowed'|'restricted'|'unknown';
   metrics:{metricKey:string;label:string;direction:'descriptive'}[];
   questions:{questionKey:string;prompt:string;options:{
