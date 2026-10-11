@@ -35,7 +35,8 @@ async function authorizedProject(tx:Tx,userId:string,projectId:string,write:bool
   `
   const project=rows[0]
   if(!project)fail(404,'研究项目不存在')
-  if(write&&project.status!=='DRAFT')fail(409,'仅可编辑未归档的研究项目')
+  if(write&&!['DRAFT','ACTIVE'].includes(project.status))
+    fail(409,'仅可为草稿或采集中项目编制新的研究工具')
   return project
 }
 async function findDraft(tx:Tx,projectId:string,id:string){

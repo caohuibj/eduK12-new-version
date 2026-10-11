@@ -154,5 +154,8 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
     ok:checks.length===input.selected.length+2&&checks.every(c=>c.ok),
-    publicationReady:false,reason:'PR3 runtime adapter and anonymous FINAL not yet enabled'}
+    publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
+    reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
+      ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'
+      :'公开采集未开启；需要最终 CI 和部署授权'}
 }

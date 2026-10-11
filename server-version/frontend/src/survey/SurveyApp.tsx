@@ -4,7 +4,7 @@ import { SurveyBuilder } from './SurveyBuilder'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string}
-type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;revision:number}
+type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 const cookie=(name:string)=>document.cookie.split('; ').find(x=>x.startsWith(name+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -137,9 +137,10 @@ export default function SurveyApp(){
       {!loading&&user&&screen==='work'&&<><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
         <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
-          <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{p.status==='DRAFT'?'草稿':'已归档'} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
+          <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
           <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
-            <button className="btn-secondary" disabled={busy} onClick={()=>toggle(p)}>{p.status==='DRAFT'?'归档':'恢复'}</button></div>
+            <button className="btn-secondary" disabled={busy} disabled={busy||!['DRAFT','ARCHIVED'].includes(p.status)} onClick={()=>toggle(p)}>
+              {p.status==='DRAFT'?'归档':p.status==='ARCHIVED'?'恢复':'采集中不可归档'}</button></div>
         </article>)}</div>{projects.length===0&&<p>尚无研究项目。可以先创建研究草稿。</p>}
       </section><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
@@ -148,7 +149,7 @@ export default function SurveyApp(){
           <label className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
             <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
           </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
-          <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||selected?.status==='ARCHIVED'}>{selected?'保存修改':'创建研究'}</button>
+          <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑器已加入开发分支；正式发布、匿名采集和统计仍属于后续开发阶段。</p>
       </section>{selected&&<SurveyBuilder key={selected.id} projectId={selected.id}/>}</>}
