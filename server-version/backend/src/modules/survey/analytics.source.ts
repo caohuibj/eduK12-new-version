@@ -137,18 +137,44 @@ export async function loadSurveySource(input:{
       const ownerWaves=await tx.surveyWave.count({where:{projectId:input.projectId,id:{in:input.waveIds}}})
       if(ownerWaves!==new Set(input.waveIds).size)denied()
     }
-    const finals=await tx.surveyWaveFinal.findMany({
-      where:{
-        projectId:input.projectId,
-        ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
-        attempt:{status:'COMPLETED',excludedAt:null},
-      },
-      orderBy:[{completedAt:'asc'},{id:'asc'}],
-      take:max+1,
-      include:{attempt:{include:{participant:true}},wave:true,publication:true},
+    // Stage 1: select only small identifiers; never deserialize full encrypted
+    // FINALs and large Publication JSON before applying the memory budget.
+    const finalWhere={
+      projectId:input.projectId,
+      ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
+      attempt:{status:'COMPLETED' as const,excludedAt:null},
+    }
+    const headers=await tx.surveyWaveFinal.findMany({
+      where:finalWhere,select:{id:true,publicationId:true},
+      orderBy:[{completedAt:'asc'},{id:'asc'}],take:max+1,
     })
-    if(finals.length>max)
-      throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次或使用后续流式导出')
+    if(headers.length>max)
+      throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')
+    const ids=headers.map(row=>row.id)
+    const publicationIds=[...new Set(headers.map(row=>row.publicationId))]
+    if(ids.length){
+      const [cipher]=await tx.$queryRaw<Array<{bytes:bigint}>>`
+        SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint AS "bytes"
+        FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)})
+      `
+      const [frozen]=await tx.$queryRaw<Array<{bytes:bigint}>>`
+        SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint AS "bytes"
+        FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)})
+      `
+      if(!cipher||!frozen||cipher.bytes>BigInt(8*1024*1024)
+        ||frozen.bytes>BigInt(8*1024*1024))
+        throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
+    }
+    // Stage 2: fetch bounded bytes, and load each frozen Publication only
+    // once regardless of how many participant FINALs reference it.
+    const finals=ids.length?await tx.surveyWaveFinal.findMany({
+      where:{id:{in:ids}},orderBy:[{completedAt:'asc'},{id:'asc'}],
+      include:{attempt:{include:{participant:true}},wave:true},
+    }):[]
+    const publications=publicationIds.length?await tx.surveyPublication.findMany({
+      where:{id:{in:publicationIds}},
+    }):[]
+    const publicationById=new Map(publications.map(row=>[row.id,row]))
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
     const attendanceRows=await tx.surveyWaveAttempt.findMany({
@@ -166,16 +192,13 @@ export async function loadSurveySource(input:{
     const attendance=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
       .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
-    // Bound decrypted response material independently of the number of
-    // completed FINALs. 30 nested instruments * 300 items otherwise yields
-    // millions of in-memory rows under the 250-attempt limit.
-    const cipherBytes=finals.reduce((n,f)=>n+Buffer.byteLength(f.resultsCipher,'utf8'),0)
-    if(cipherBytes>8*1024*1024)
-      throw new SurveyAnalyticsError(413,'研究原始答案超出单次安全读取预算，请缩小波次范围')
+    // Row projection remains bounded independently from the ciphertext budget.
     const codebook=new Map<string,ResearchRawCodebook>()
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
     for(const final of finals){
-      const wave=final.wave,attempt=final.attempt,publication=final.publication
+      const wave=final.wave,attempt=final.attempt
+      const publication=publicationById.get(final.publicationId)
+      if(!publication)invalid('研究 FINAL 的不可变发布来源缺失')
       if(wave.projectId!==input.projectId||attempt.projectId!==input.projectId
         ||attempt.waveId!==wave.id||wave.publicationId!==publication.id
         ||publication.projectId!==input.projectId||final.definitionDigest!==publication.definitionDigest)
