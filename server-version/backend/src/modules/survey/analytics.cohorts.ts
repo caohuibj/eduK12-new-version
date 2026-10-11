@@ -48,6 +48,7 @@ const distinct=(xs:string[])=>new Set(xs).size===xs.length
 export function pairedDescriptive(input:{
   projectId:string;baselineWaveId:string;followupWaveId:string;
   instrumentKey:string;scoreKey:string;observations:readonly FrozenScoreObservation[]
+  expectedColumns?:readonly Pick<FrozenScoreObservation,'projectId'|'waveId'|'measurement'>[]
 }):PairedDescriptive {
   const {projectId,baselineWaveId,followupWaveId,instrumentKey,scoreKey,observations}=input
   if(baselineWaveId===followupWaveId)throw new Error('Paired waves must be distinct')
@@ -71,12 +72,26 @@ export function pairedDescriptive(input:{
   const before=new Set(eligibleA.map(o=>o.researchCode!))
   const after=new Set(eligibleB.map(o=>o.researchCode!))
   const candidates=[...before].filter(code=>after.has(code))
+  // Comparability is first a property of the immutable frozen measurements,
+  // not something inferred solely from whatever participants finished.
   let comparable=true
+  const frozen=input.expectedColumns||[]
+  if(frozen.some(x=>x.projectId!==projectId))
+    throw new Error('Measurement dictionaries must belong to this project')
+  if(frozen.length){
+    const metric=(waveId:string)=>frozen.filter(x=>x.waveId===waveId
+      &&x.measurement.instrumentKey===instrumentKey&&x.measurement.scoreKey===scoreKey)
+    const baselineMetric=metric(baselineWaveId),followupMetric=metric(followupWaveId)
+    if(baselineMetric.length!==1||followupMetric.length!==1
+      ||!measurementMatches(baselineMetric[0].measurement,followupMetric[0].measurement))
+      comparable=false
+  }
   for(const code of candidates){
     const a=early.get(code)!,b=late.get(code)!
     if(!measurementMatches(a.measurement,b.measurement)){comparable=false;break}
   }
   const matched=candidates.length
+  if(matched===0)comparable=false
   const changes=comparable?candidates.map(code=>late.get(code)!.value!-early.get(code)!.value!):[]
   // A wave's complete sample and a truly paired sample have distinct denominators.
   return {
@@ -86,7 +101,9 @@ export function pairedDescriptive(input:{
     lateJoinN:eligibleB.filter(o=>!before.has(o.researchCode!)).length,
     meanPairedChange:comparable&&matched?changes.reduce((n,x)=>n+x,0)/matched:null,
     comparability:comparable?'COMPARABLE':'NOT_COMPARABLE',
-    ...(!comparable?{reason:'评分、响应编码、研究视角或测量单位不同，不能自动计算变化'}:{}),
+    ...(!comparable?{reason:matched===0
+      ?'两个波次没有共同的有效配对样本，无法计算或证明可比较的变化'
+      :'评分、响应编码、研究视角或测量单位不同，不能自动计算变化'}:{}),
   }
 }
 export interface WaveSummary {
