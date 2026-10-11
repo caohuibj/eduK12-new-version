@@ -38,7 +38,7 @@ export async function setUserActiveState(input: {
       const targets = await tx.$queryRaw<UserStateRow[]>`
         SELECT "id", "is_active" AS "isActive"
         FROM "users"
-        WHERE "id" = ${input.targetUserId} AND "account_domain" <> 'SCHOOL'
+        WHERE "id" = ${input.targetUserId} AND "account_domain" IN ('LEGACY','TRAINING')
         FOR UPDATE
       `
       const target = targets[0]
@@ -59,7 +59,7 @@ export async function setUserActiveState(input: {
         SET "is_active" = ${input.isActive},
             "token_version" = "token_version" + 1,
             "updated_at" = transaction_timestamp()
-        WHERE "id" = ${input.targetUserId} AND "account_domain" <> 'SCHOOL'
+        WHERE "id" = ${input.targetUserId} AND "account_domain" IN ('LEGACY','TRAINING')
         RETURNING "id", "is_active" AS "isActive"
       `
       return rows[0]

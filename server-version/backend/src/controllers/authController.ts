@@ -76,7 +76,7 @@ export const authController = {
         // Recheck expiry after queued hashing; dummy success must stay a failure.
         return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
       })
-      if (!user || user.accountDomain === 'SCHOOL') return failedLogin()
+      if (!user || !['LEGACY','TRAINING'].includes(user.accountDomain)) return failedLogin()
 
       // This flag is set only by the dedicated server-side training entrance.
       // Resolve authority before issuing any cookie; never trust a client role.

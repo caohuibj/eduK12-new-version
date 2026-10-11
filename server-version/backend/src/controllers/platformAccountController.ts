@@ -29,7 +29,7 @@ export async function resetPasswordForPlatformAdmin(req: Request, res: Response,
           where: { id: targetUserId },
           select: { id: true, username: true, accountDomain: true },
         })
-        if (!target || target.accountDomain === 'SCHOOL') return notFound(res, '用户不存在')
+        if (!target || !['LEGACY','TRAINING'].includes(target.accountDomain)) return notFound(res, '用户不存在')
 
         const temporaryPassword = generateTempPassword()
         const passwordHash = await hashPassword(temporaryPassword)

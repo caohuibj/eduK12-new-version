@@ -1,0 +1,76 @@
+name: Survey PR1 isolated PostgreSQL
+# Original PR1 diagnostic is manual only. Final READY regression will
+# execute and assert all required Survey suites once against the final SHA.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  survey-pr1:
+    if: github.ref_name == 'feat/survey-research-platform-v1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CI: 'true'
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      PR26_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      SURVEY_MFA_ENCRYPTION_KEY: 4545454545454545454545454545454545454545454545454545454545454545
+      REDIS_URL: redis://localhost:6379
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: prepare native build dependencies
+        run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: install exactly locked backend deps
+        run: npm ci
+      - name: generate Prisma client and migrate disposable PostgreSQL
+        run: |
+          npx prisma generate
+          npm run db:migrate:guarded
+      - name: focused Survey realm, TOTP, project ACL and affected campus realm tests
+        run: |
+          npm test -- \
+            src/__tests__/survey/survey-realm.postgres.integration.test.ts \
+            src/__tests__/integration/campusAuthRealm.postgres.integration.test.ts \
+            --no-file-parallelism --reporter=default --reporter=json \
+            --outputFile=/tmp/eduk12-survey-pr1.json
+      - name: reject skipped, missing or failed required suites
+        run: |
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-survey-pr1.json \
+            src/__tests__/survey/survey-realm.postgres.integration.test.ts \
+            src/__tests__/integration/campusAuthRealm.postgres.integration.test.ts

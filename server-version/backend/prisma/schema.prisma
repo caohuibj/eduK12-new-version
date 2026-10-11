@@ -2668,3 +2668,275 @@ model CampusMfaResetRequest {
   @@index([organizationId, targetUserId, status], map: "campus_mfa_resets_target_idx")
   @@map("campus_mfa_reset_requests")
 }
+
+
+//// Survey researcher realm — handwritten SQL migrations own FKs and checks.
+//// Kept separate from existing legacy/campus account identities.
+model SurveyAccount {
+  userId          String   @id @map("user_id")
+  loginName       String   @map("login_name")
+  normalizedLogin String   @unique @map("normalized_login")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@map("survey_accounts")
+}
+model SurveyResearcherGrant {
+  userId    String   @id @map("user_id")
+  status    String   @default("PENDING_MFA")
+  grantedBy String   @map("granted_by")
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("survey_researcher_grants")
+}
+model SurveyInvitation {
+  id            String    @id
+  kind          String    @default("INVITE")
+  tokenHash     String    @unique @map("token_hash")
+  createdBy     String    @map("created_by")
+  targetUserId  String?   @map("target_user_id")
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  claimedAt     DateTime? @map("claimed_at") @db.Timestamptz(6)
+  claimedUserId String?   @map("claimed_user_id")
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([expiresAt, claimedAt, revokedAt], map: "survey_invitations_validity_idx")
+  @@map("survey_invitations")
+}
+model SurveyMfaCredential {
+  userId       String    @id @map("user_id")
+  secretCipher String    @map("secret_cipher")
+  enabled      Boolean   @default(false)
+  lastUsedStep BigInt    @default(-1) @map("last_used_step")
+  enabledAt    DateTime? @map("enabled_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("survey_mfa_credentials")
+}
+model SurveyMfaChallenge {
+  id           String    @id
+  userId       String    @map("user_id")
+  challengeHash String   @unique @map("challenge_hash")
+  tokenVersion Int       @map("token_version")
+  failedCount  Int       @default(0) @map("failed_count")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt   DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, expiresAt], map: "survey_mfa_challenges_user_idx")
+  @@map("survey_mfa_challenges")
+}
+model SurveyMfaRecoveryCode {
+  userId    String    @map("user_id")
+  codeHash  String    @map("code_hash")
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([userId, codeHash])
+  @@map("survey_mfa_recovery_codes")
+}
+model SurveyProject {
+  instruments    SurveyInstrumentDraft[]
+  waves          SurveyWave[]
+  publications   SurveyPublication[]
+  participants   SurveyParticipant[]
+  entryTokens    SurveyEntryToken[]
+  id             String   @id
+  ownerUserId    String   @map("owner_user_id")
+  title          String
+  description    String   @default("")
+  collectionMode String   @map("collection_mode")
+  status         String   @default("DRAFT")
+  publicId       String?  @unique @map("public_id")
+  firstPublishedAt DateTime? @map("first_published_at") @db.Timestamptz(6)
+  revision       Int      @default(0)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@index([ownerUserId, status, updatedAt, id], map: "survey_projects_owner_status_idx")
+  @@map("survey_projects")
+}
+model SurveyEvent {
+  id            String   @id
+  actorUserId   String?  @map("actor_user_id")
+  targetUserId  String?  @map("target_user_id")
+  projectId     String?  @map("project_id")
+  action        String
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([actorUserId, createdAt], map: "survey_events_actor_idx")
+  @@index([projectId, createdAt], map: "survey_events_project_idx")
+  @@map("survey_events")
+}
+
+
+// Project-scoped research-only authoring. Freezing occurs in PR3; never
+// grant access to the legacy scale/SJT publication registry through this row.
+model SurveyInstrumentDraft {
+  id           String        @id
+  projectId    String        @map("project_id")
+  project      SurveyProject @relation(fields:[projectId], references:[id], onDelete:Restrict)
+  instrumentKey String       @map("instrument_key")
+  kind         String
+  title        String
+  definition   Json
+  revision     Int           @default(0)
+  status       String        @default("DRAFT")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([projectId, instrumentKey], map:"survey_instruments_project_key_uniq")
+  @@index([projectId, status, updatedAt, id], map:"survey_instruments_project_status_idx")
+  @@map("survey_instrument_drafts")
+}
+
+
+
+// PR3 design: Survey research-only frozen publication and wave lineage.
+// Old anonymous_study_* tables remain unmodified and are not double-written.
+model SurveyPublication {
+  id              String        @id
+  projectId       String        @map("project_id")
+  project         SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
+  definitionDigest String       @map("definition_digest")
+  compiledSnapshot Json         @map("compiled_snapshot")
+  consentVersion  Int           @map("consent_version")
+  purpose         String        @default("RESEARCH_ONLY")
+  version         Int
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  waves           SurveyWave[]
+  finals          SurveyWaveFinal[]
+  @@unique([projectId,version],map:"survey_publications_project_version_key")
+  @@index([projectId,createdAt],map:"survey_publications_project_idx")
+  @@map("survey_publications")
+}
+model SurveyWave {
+  id              String        @id
+  projectId       String        @map("project_id")
+  project         SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
+  publicationId   String?       @map("publication_id")
+  publication     SurveyPublication? @relation(fields:[publicationId],references:[id],onDelete:Restrict)
+  ordinal         Int
+  title           String
+  status          String        @default("DRAFT")
+  revision        Int           @default(0)
+  consentText     String        @map("consent_text")
+  consentVersion  Int           @default(1) @map("consent_version")
+  linkageNoticeConfirmed Boolean @default(false) @map("linkage_notice_confirmed")
+  generalText     String        @default("") @map("general_text")
+  hardStopAt      DateTime?     @map("hard_stop_at") @db.Timestamptz(6)
+  instrumentIds   Json          @default("[]") @map("instrument_ids")
+  opensAt         DateTime?     @map("opens_at") @db.Timestamptz(6)
+  closesAt        DateTime?     @map("closes_at") @db.Timestamptz(6)
+  finishUntil     DateTime?     @map("finish_until") @db.Timestamptz(6)
+  quotaStarts     Int?          @map("quota_starts")
+  startsCount     Int           @default(0) @map("starts_count")
+  allowNewParticipants Boolean @default(false) @map("allow_new_participants")
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  attempts        SurveyWaveAttempt[]
+  finals          SurveyWaveFinal[]
+  entryTokens     SurveyEntryToken[]
+  consents        SurveyConsent[]
+  @@unique([projectId,ordinal],map:"survey_waves_project_ordinal_key")
+  @@index([projectId,status,opensAt],map:"survey_waves_project_status_idx")
+  @@map("survey_waves")
+}
+model SurveyParticipant {
+  id                String        @id
+  projectId         String        @map("project_id")
+  project           SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
+  researchCode      String        @map("research_code")
+  credentialHash    String        @map("credential_hash")
+  credentialRevokedAt DateTime?   @map("credential_revoked_at") @db.Timestamptz(6)
+  status            String        @default("ACTIVE")
+  consentVersion    Int           @default(1) @map("consent_version")
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  attempts          SurveyWaveAttempt[]
+  consents          SurveyConsent[]
+  @@unique([projectId,researchCode],map:"survey_participants_project_code_key")
+  @@unique([projectId,credentialHash],map:"survey_participants_project_credential_key")
+  @@map("survey_participants")
+}
+model SurveyWaveAttempt {
+  id             String        @id
+  projectId      String        @map("project_id")
+  waveId         String        @map("wave_id")
+  wave           SurveyWave    @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  participantId  String?       @map("participant_id")
+  participant    SurveyParticipant? @relation(fields:[participantId],references:[id],onDelete:Restrict)
+  sessionHash    String?       @map("session_hash")
+  runtimeAttemptId String?     @unique @map("runtime_attempt_id")
+  status         String        @default("STARTED")
+  startedAt      DateTime      @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt    DateTime?     @map("completed_at") @db.Timestamptz(6)
+  excludedAt     DateTime?     @map("excluded_at") @db.Timestamptz(6)
+  consents       SurveyConsent[]
+  final          SurveyWaveFinal?
+  @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
+  @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
+  @@index([projectId,waveId,status],map:"survey_attempts_project_wave_status_idx")
+  @@map("survey_wave_attempts")
+}
+model SurveyEntryToken {
+  id           String        @id
+  projectId    String        @map("project_id")
+  project      SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
+  waveId       String        @map("wave_id")
+  wave         SurveyWave    @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  tokenHash    String        @unique @map("token_hash")
+  expiresAt    DateTime      @map("expires_at") @db.Timestamptz(6)
+  revokedAt    DateTime?     @map("revoked_at") @db.Timestamptz(6)
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([projectId,waveId,expiresAt],map:"survey_entry_tokens_project_wave_idx")
+  @@map("survey_entry_tokens")
+}
+model SurveyConsent {
+  id            String        @id
+  projectId     String        @map("project_id")
+  waveId        String        @map("wave_id")
+  wave          SurveyWave    @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  participantId String?       @map("participant_id")
+  participant   SurveyParticipant? @relation(fields:[participantId],references:[id],onDelete:Restrict)
+  attemptId     String?       @map("attempt_id")
+  attempt       SurveyWaveAttempt? @relation(fields:[attemptId],references:[id],onDelete:Restrict)
+  consentVersion Int          @map("consent_version")
+  accepted      Boolean
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([projectId,waveId,createdAt],map:"survey_consents_project_wave_idx")
+  @@map("survey_consents")
+}
+
+// Survey-specific FINAL persistence, backed by shared canonical FINAL hashing,
+// AES-GCM unified encryption and production Scale/SJT scoring implementations.
+model SurveyWaveFinal {
+  id              String           @id
+  attemptId       String           @unique @map("attempt_id")
+  attempt         SurveyWaveAttempt @relation(fields:[attemptId],references:[id],onDelete:Restrict)
+  projectId       String           @map("project_id")
+  waveId          String           @map("wave_id")
+  wave            SurveyWave       @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  publicationId   String           @map("publication_id")
+  publication     SurveyPublication @relation(fields:[publicationId],references:[id],onDelete:Restrict)
+  submissionId    String           @map("submission_id")
+  payloadHash     String           @map("payload_hash")
+  definitionDigest String          @map("definition_digest")
+  resultsCipher   String           @map("results_cipher")
+  resultsHash     String           @map("results_hash")
+  completedAt     DateTime         @default(now()) @map("completed_at") @db.Timestamptz(6)
+  @@index([projectId,waveId,completedAt],map:"survey_finals_project_wave_time_idx")
+  @@map("survey_wave_finals")
+}
+
+
+
+// Short-lived encrypted research exports. The platform admin cannot inherit
+// Owner raw-data permissions; every download revalidates current grant + MFA.
+model SurveyExportTicket {
+  id               String   @id
+  projectId        String   @map("project_id")
+  actorUserId      String   @map("actor_user_id")
+  format           String
+  status           String   @default("READY")
+  sourceDigest     String   @map("source_digest")
+  artifactCipher   String   @map("artifact_cipher")
+  artifactHash     String   @map("artifact_hash")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime @map("expires_at") @db.Timestamptz(6)
+  @@index([projectId,actorUserId,createdAt],map:"survey_exports_project_actor_idx")
+  @@index([expiresAt],map:"survey_exports_expires_idx")
+  @@map("survey_export_tickets")
+}

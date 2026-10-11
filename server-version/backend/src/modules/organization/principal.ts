@@ -6,7 +6,7 @@ export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
 export interface CurrentPrincipal {
   userId: string
   username: string
-  accountDomain: 'LEGACY' | 'TRAINING' | 'SCHOOL'
+  accountDomain: 'LEGACY' | 'TRAINING' | 'SCHOOL' | 'SURVEY'
   role: UserRole
   platformRole: PlatformRole
   tokenVersion: number

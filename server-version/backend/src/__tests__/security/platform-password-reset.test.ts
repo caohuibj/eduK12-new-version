@@ -8,7 +8,7 @@ import { platformAccountController } from '../../controllers/platformAccountCont
 import { AccountAuthorityError } from '../../services/accountAuthorityService'
 const response = () => { const res: any = { statusCode: 200 }; res.status = vi.fn((code: number) => { res.statusCode = code; return res }); res.json = vi.fn(); return res }
 describe('platform reset authorizes current database role before expensive work', () => {
- beforeEach(() => { vi.clearAllMocks(); m.actor.mockResolvedValue([{ platformRole: 'STANDARD' }]); m.target.mockResolvedValue({ id: 'target', username: 'synthetic' }); m.hash.mockResolvedValue('hash'); m.handoff.mockResolvedValue('/private/admin-reset.json'); m.reset.mockResolvedValue({ id: 'target' }) })
+ beforeEach(() => { vi.clearAllMocks(); m.actor.mockResolvedValue([{ platformRole: 'STANDARD' }]); m.target.mockResolvedValue({ id: 'target', username: 'synthetic', accountDomain: 'TRAINING' }); m.hash.mockResolvedValue('hash'); m.handoff.mockResolvedValue('/private/admin-reset.json'); m.reset.mockResolvedValue({ id: 'target' }) })
  it('rejects an ordinary or revoked admin without lookup, hashing, or handoff', async () => {
    const res = response()
    await platformAccountController.resetPassword({ user: { userId: 'actor', platformRole: 'SYSTEM_ADMIN' }, params: { id: 'target' } } as any, res)
@@ -25,4 +25,17 @@ describe('platform reset authorizes current database role before expensive work'
    await platformAccountController.resetPassword({ user: { userId: 'actor' }, params: { id: 'target' } } as any, res)
    expect(res.statusCode).toBe(403); expect(m.remove).toHaveBeenCalledWith('/private/admin-reset.json')
  })
+  it('cannot reset a SURVEY account through the legacy platform credential handoff', async () => {
+    m.actor.mockResolvedValue([{ platformRole: 'SYSTEM_ADMIN' }])
+    m.target.mockResolvedValue({ id: 'survey', username: 'survey_mock', accountDomain: 'SURVEY' })
+    const res=response()
+    await platformAccountController.resetPassword({
+      user: { userId:'actor' }, params:{id:'survey'},
+    } as any,res)
+    expect(res.statusCode).toBe(404)
+    expect(m.hash).not.toHaveBeenCalled()
+    expect(m.handoff).not.toHaveBeenCalled()
+    expect(m.reset).not.toHaveBeenCalled()
+  })
+
 })

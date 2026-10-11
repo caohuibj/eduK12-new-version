@@ -6,6 +6,16 @@ import { assessmentRuntimeRouter } from './modules/mobile/assessment.routes'
 import { mobileRouter } from './modules/mobile/routes'
 import { parentLinksRouter, parentsRouter, parentPublicationRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
+import { surveyOriginGuard, platformSurveyOriginGuard } from './modules/survey/originGuard'
+import { surveyAuthRouter } from './modules/survey/auth.routes'
+import { surveyProjectsRouter } from './modules/survey/projects.routes'
+import { surveyBuilderRouter } from './modules/survey/builder.routes'
+import { surveyMediaRouter } from './modules/survey/media.routes'
+import { surveyWavesRouter } from './modules/survey/waves.routes'
+import { surveyAnalyticsRouter } from './modules/survey/analytics.routes'
+import { surveyExportsRouter } from './modules/survey/analytics.export.routes'
+import { publicSurveyRouter } from './modules/survey/public.routes'
+import { surveyPlatformRouter } from './modules/survey/platform.routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
 import { createRedisRateLimiter } from './middleware/redisRateLimit'
@@ -34,6 +44,7 @@ import { cacheService } from './services/cacheService'
 import { closeQueues, exportQueue, imageQueue, videoQueue } from './config/queue'
 import { prismaPoolMetricLines, createQueueMetricSampler } from './services/resourceMetrics'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
+import { cleanupExpiredSurveyExportTickets } from './modules/survey/analytics.export.service'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
@@ -242,6 +253,25 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
+  if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
+  next()
+}
+app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
+app.use('/api/survey/auth', surveyAuthRouter)
+app.use('/api/survey/projects', surveyBuilderRouter)
+app.use('/api/survey/projects', surveyMediaRouter)
+app.use('/api/survey/projects', surveyWavesRouter)
+app.use('/api/survey/projects', surveyAnalyticsRouter)
+app.use('/api/survey/projects', surveyExportsRouter)
+const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
+  if(process.env.SURVEY_WORKSPACE_ENABLED!=='true'||process.env.SURVEY_PUBLICATION_ENABLED!=='true')
+    return res.status(404).json({code:-1,message:'Survey 研究采集尚未启用',data:null})
+  next()
+}
+app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
+app.use('/api/survey/projects', surveyProjectsRouter)
+app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)
@@ -396,6 +426,9 @@ const startServer = async (): Promise<void> => {
   exportCleanupTimer = setInterval(() => {
     void cleanupStaleUploadDirectories()
     void cleanupStalePublicUploadAssets().catch(err => logger.warn('过期上传暂存清理失败', err))
+    void cleanupExpiredSurveyExportTickets().then((removed)=>{
+      if(removed)logger.info('过期 Survey 加密数据导出凭据已清除',{removed})
+    }).catch(e=>logger.warn('Survey 导出凭据清理失败',e))
     void cleanupExpiredExportArtifacts().then((result) => {
       if (result.deletedArtifacts > 0 || result.invalidPaths > 0) {
         logger.info('过期导出产物清理完成', result)

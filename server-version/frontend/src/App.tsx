@@ -41,6 +41,7 @@ const LegacyArchive = React.lazy(() => import('./pages/admin/LegacyArchive'))
 const ReportingContent = React.lazy(() => import('./pages/admin/ReportingContent'))
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
 const AdminTrainingWorkspace = React.lazy(() => import('./pages/admin/AdminTrainingWorkspace'))
+const SurveyResearchersAdmin = React.lazy(() => import('./pages/admin/SurveyResearchersAdmin'))
 const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
@@ -405,6 +406,7 @@ function AppRoutes() {
             }
           />
           <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
+          <Route path="/admin/survey-researchers" element={<RelationalProtectedRoute><SurveyResearchersAdmin /></RelationalProtectedRoute>} />
           <Route path="/admin/bundle-authoring" element={<ProtectedRoute roles={['ADMIN']}><BundleAuthoring /></ProtectedRoute>} />
           <Route path="/bundle-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProductDetail /></ProtectedRoute>} />
           <Route
