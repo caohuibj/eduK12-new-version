@@ -40,6 +40,7 @@ const missingMeanings:Record<MissingReason,string>={
   ABANDONED:'已启动但没有完成 FINAL',
   NOT_COMPARABLE:'来源测量或计分版本不可比较',
   WITHDRAWN:'数据已依研究规定被撤回/排除',
+  QUALITY_EXCLUDED:'科研人员审计标记为不纳入当前有效分析',
 }
 const threatPrefix=/^[\s\u200B\u200C\u200D\u202A-\u202E\uFEFF]*[=+@-]/
 /** Stable study-local pseudonym. Never serialize internal Attempt PKs into researcher files. */
@@ -142,7 +143,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
       data.push([code,expected.waveId,expected.waveOrdinal,null,
         column,expected.measurement.instrumentKey,expected.measurement.scoreKey,
         expected.measurement.scoringDigest,expected.measurement.responseSignature,
-        null,status?'ABANDONED':'NO_WAVE',null])
+        null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null])
     }
   }
   return finalArtifact('LONG',projectId,columns,data,source,[...codes.values()])
@@ -182,7 +183,8 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
       const value=record.get(c.column)
       if(value)return [value.value,value.missingReason??(value.value===null?'SHOWN_MISSING':null)]
       const state=participation.get(code+':'+c.waveId)
-      return [null,state&&state!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+      return [null,state==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':
+        state&&state!=='COMPLETED'?'ABANDONED':'NO_WAVE']
     })])
   return finalArtifact('WIDE',projectId,columns,rows,source,codebook)
 }
