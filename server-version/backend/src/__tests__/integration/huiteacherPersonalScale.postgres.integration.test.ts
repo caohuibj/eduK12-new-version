@@ -28,6 +28,7 @@ import { submitScaleAssessmentFinal } from '../../modules/scale/scale-final-subm
 import { decryptFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { finalizeCompositeAttemptIfReady } from '../../modules/composite/composite.service'
 import { readTeacherPersonalScaleReport } from '../../modules/huiteacher/scalePersonalReport.service'
+import { teacherPilotContentIssues } from '../../modules/huiteacher/teacherPilotContent'
 import { resolveEducationProductMemberScope } from '../../modules/organization/educationProductAccess'
 
 const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL',
@@ -104,6 +105,8 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     }]
     definition.report.primaryScoreKeys=['support']
     definition.report.scoreOrder=['support']
+    expect(teacherPilotContentIssues(definition))
+      .toContain('TEACHER_ADULT_REPORT_QC_REQUIRED')
     definition.report.audienceContract={
       schemaVersion:1,respondent:'ADULT_SELF',audience:'teacher',
       locale:'zh-CN',
@@ -121,6 +124,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
         {category:'strategy',text:'选出一个现实可行的需求，尝试与团队约定下一步行动。'},
       ],
     }]
+    expect(teacherPilotContentIssues(definition)).toEqual([])
     const definitionHash=hashScaleDefinition(definition)
     const scale=await db.scale.create({data:{
       code:'teacher_self_'+randomUUID().replace(/-/g,''),
