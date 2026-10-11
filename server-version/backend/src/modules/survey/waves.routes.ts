@@ -42,6 +42,14 @@ surveyWavesRouter.post('/:pid/waves/:wid/preflight',handle(req=>
   service.preflightWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid))))
 
 const revision=z.object({revision:z.number().int().nonnegative()}).strict()
+for(const [name,action] of [['rotate','ROTATE'],['revoke','REVOKE']] as const){
+  surveyWavesRouter.post('/:pid/waves/:wid/entry-token/'+name,handle(req=>
+    publish.updateWaveEntryToken({
+      actorUserId:req.user!.userId,
+      projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+      revision:revision.parse(req.body).revision,action,
+    })))
+}
 surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>
   publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
     revision.parse(req.body).revision)))
