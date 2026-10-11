@@ -3169,3 +3169,14 @@ model HuiteacherPersonalScaleAttempt {
   @@index([userId, createdAt(sort: Desc)], map: "huiteacher_personal_scale_attempts_user_time_idx")
   @@map("huiteacher_personal_scale_attempts")
 }
+
+// Prevent repeated exact Form report releases to changing respondent sets.
+model HuiteacherGroupDisclosureLedger {
+  organizationId   String   @map("organization_id")
+  definitionDigest String   @map("definition_digest")
+  populationDigest String   @map("population_digest")
+  firstRunId       String   @map("first_run_id")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([organizationId, definitionDigest])
+  @@map("huiteacher_group_disclosure_ledgers")
+}
