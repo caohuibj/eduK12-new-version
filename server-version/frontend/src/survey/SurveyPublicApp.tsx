@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
+import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
@@ -14,7 +15,8 @@ type Question={itemKey:string;questionKey?:string;type:string;prompt:string;imag
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;minSelections?:number;maxSelections?:number;
-  total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC'}
+  total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
+  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
@@ -89,7 +91,10 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
         return q.options.some(opt=>!Number.isFinite(numbers[opt.optionKey]))||
           Math.abs(q.options.reduce((n,opt)=>n+numbers[opt.optionKey],0)-(q.total??0))>1e-7
       })()
-      if(empty||rankInvalid||totalInvalid){
+      const otherInvalid=hasSelectedOther(q,answer[q.itemKey])&&
+        (typeof answer[q.itemKey+':other']!=='string'||
+          !(answer[q.itemKey+':other'] as string).trim())
+      if(empty||rankInvalid||totalInvalid||otherInvalid){
         setPageError('请先完成当前页的必答题：'+q.prompt)
         document.getElementById('survey-answer-'+unit.instrumentKey+'-'+q.itemKey)?.focus()
         return
@@ -107,8 +112,8 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
         <input type="checkbox" checked={selected.includes(o.optionKey)}
           disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
             &&selected.length>=q.maxSelections}
-          onChange={e=>onChange(q.itemKey,e.target.checked?[...selected,o.optionKey]:
-            selected.filter(s=>s!==o.optionKey))}/> {o.label}</label>
+          onChange={e=>onChange(q.itemKey,toggleFormMultiple(
+            selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
         checked={answer[q.itemKey]===o.optionKey}
@@ -122,6 +127,8 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
+      {unit.kind==='FORM'&&['SINGLE','MULTIPLE'].includes(q.type)&&q.otherOptionKey&&
+        <FormChoiceExtras question={q} answers={answer} onChange={onChange}/>}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full text-sm">
         <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}
           {q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
@@ -473,9 +480,13 @@ export default function SurveyPublicApp(){
           proof={{publicId,attemptId,accessCredential,
             ...(info.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
           }}
-          answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>({
-            ...previous,[unit.instrumentKey]:{...(previous[unit.instrumentKey]||{}),[key]:value},
-          }))}/>)}
+          answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>{
+            const next={...(previous[unit.instrumentKey]||{}),[key]:value}
+            const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
+              .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
+            if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
+            return {...previous,[unit.instrumentKey]:next}
+          })}/>)}
         <button className="btn-primary" disabled={busy||!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],

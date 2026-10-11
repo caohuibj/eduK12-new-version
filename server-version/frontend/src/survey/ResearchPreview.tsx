@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
+import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
 
 type Refusal={_surveyRefusal:true}
 type Answer=ProfessionalAnswer
@@ -23,7 +24,16 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
     const index=(draft.definition as FormDraft).pages.findIndex(p=>p.questions.some(q=>q.itemKey===key))
     if(index>=0)setPageIndex(index)
   },[draft,errorPath])
-  const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
+  const choose=(key:string,value:Answer)=>setAnswers(old=>{
+    const next={...old,[key]:value}
+    if(draft.kind==='FORM'){
+      const question=(draft.definition as FormDraft).pages.flatMap(p=>p.questions)
+        .find(q=>q.itemKey===key&&q.otherOptionKey)
+      if(question&&!hasSelectedOther(question,value))
+        delete next[question.itemKey+':other']
+    }
+    return next
+  })
   const visible=draft.kind==='FORM'
     ?visibleFormKeys((draft.definition as FormDraft).pages.flatMap(p=>p.questions),answers)
     :null
@@ -59,9 +69,12 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
         const current=Array.isArray(answers[q.itemKey])?answers[q.itemKey] as string[]:[]
         return <label key={o.optionKey} className="flex gap-2 my-2 items-center">
           <input type="checkbox" checked={current.includes(o.optionKey)}
-            onChange={e=>choose(q.itemKey,e.target.checked?[...current,o.optionKey]:current.filter(x=>x!==o.optionKey))}/>
+            onChange={e=>choose(q.itemKey,toggleFormMultiple(current,o.optionKey,e.target.checked,
+              q.exclusiveOptionKeys))}/>
           {o.label||'未填写选项'}</label>
       })}
+      {['SINGLE','MULTIPLE'].includes(q.type)&&q.otherOptionKey&&
+        <FormChoiceExtras question={q} answers={answers} onChange={choose}/>}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full border-collapse text-sm">
         <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}{q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
