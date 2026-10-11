@@ -123,8 +123,8 @@ export function previewBulk(input:BulkInput,kind:'FORM'|'SCALE'):{
         issues.push({line:i+1,message:'此题型不可声明选项'})
     }
   })
-  const digest=canonicalHash({kind,batchId:parsed.batchId,pageKey:parsed.pageKey??null,
-    dimensionKey:parsed.dimensionKey??null,items:extracted.rows})
+  const digest=canonicalHash(JSON.parse(JSON.stringify({kind,batchId:parsed.batchId,pageKey:parsed.pageKey??null,
+    dimensionKey:parsed.dimensionKey??null,items:extracted.rows})))
   return {ok:issues.length===0,issues,digest,items:extracted.rows,count:extracted.rows.length}
 }
 export function applyBulk(kind:'FORM'|'SCALE',definition:unknown,input:BulkInput,digest:string){

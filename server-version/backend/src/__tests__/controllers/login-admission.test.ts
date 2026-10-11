@@ -17,7 +17,7 @@ vi.mock('../../middleware/loginRateLimit', () => ({
 vi.mock('../../utils/logger', () => ({ logger: { error: vi.fn() } }))
 import { authController } from '../../controllers/authController'
 
-const user = { id: 'student', username: 'student', role: 'STUDENT', passwordHash: 'test-hash',
+const user = { id: 'student', username: 'student', role: 'STUDENT', accountDomain: 'TRAINING', passwordHash: 'test-hash',
   isActive: true, isFrozen: false, expiresAt: null, tokenVersion: 1, mustChangePassword: false }
 const request = (body: Record<string, unknown> = { username: 'student', password: 'secret-password-1' }) => ({ body }) as any
 const response = () => {
@@ -83,6 +83,15 @@ describe('bounded login execution and failure classification', () => {
     expect(mocks.recordLoginFailure).toHaveBeenCalledOnce()
     expect(mocks.generateToken).not.toHaveBeenCalled()
     expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+  })
+
+  it('rejects a valid SURVEY password through the Training/legacy login path', async () => {
+    mocks.findUnique.mockResolvedValue({ ...user, accountDomain: 'SURVEY' })
+    const res = response()
+    await authController.login(request(), res)
+    expect(res.code).toBe(401)
+    expect(mocks.setSessionCookie).not.toHaveBeenCalled()
+    expect(mocks.generateToken).not.toHaveBeenCalled()
   })
 
   it('keeps wrong-password verification and dummy worker outages in their existing error classes', async () => {
