@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { previewResearchInstrument, type PreviewAnswers } from './builder.compiler'
-import { previewBulk, applyBulk, type BulkInput } from './builder.import'
+import { previewBulk, applyBulk, BulkImportError, type BulkInput } from './builder.import'
 import { dryRunSurveyForm, SurveyFinalValidationError } from './final.compute'
 
 import {

@@ -93,6 +93,7 @@ export const formQuestionSchema=z.object({
   maxLength:z.number().int().min(1).max(10000).optional(),
   displayIf:condition.optional(),
 }).strict()
+export type FormQuestion=z.infer<typeof formQuestionSchema>
 export const formDraftSchema=z.object({
   schemaVersion:z.union([z.literal(1),z.literal(2)]),
   pages:z.array(z.object({
