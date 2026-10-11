@@ -38,6 +38,7 @@ export default function SurveyApp(){
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [projectPage,setProjectPage]=useState(1)
+  const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const work=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('')
@@ -54,6 +55,10 @@ export default function SurveyApp(){
     finally{setLoading(false)}
   },[initial,loadProjects])
   useEffect(()=>{document.title='Huisurvey · 观风知微';void refresh()},[refresh])
+  useEffect(()=>{
+    void api<{analytics:boolean;publication:boolean}>('/auth/capabilities')
+      .then(setAvailable).catch(()=>setAvailable(null))
+  },[])
   const login=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
     const r=await api<{enrolled:boolean}>('/auth/login','POST',{username,password})
     setEnrolled(r.enrolled);setScreen('mfa');setPassword('');setUri('');setCode('')
@@ -169,6 +174,10 @@ export default function SurveyApp(){
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
       </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id}/>
-          <SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/></>}</>}
+          {available?.analytics
+            ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
+            :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
+              研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
+            </section>}</>}</>}
     </main></div>
 }

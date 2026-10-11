@@ -10,7 +10,7 @@ export const surveyExportsRouter=Router()
 const pid=z.string().uuid(), eid=z.string().uuid()
 const create=z.object({
   format:z.enum(['RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE']),
-  waveId:pid.optional(),includeFreeText:z.boolean().optional(),
+  waveId:pid.optional(),includeFreeText:z.boolean().optional(),cursor:z.string().max(1300).optional(),
   completedFrom:z.string().datetime().optional(),completedBefore:z.string().datetime().optional(),
 }).strict()
 surveyExportsRouter.use('/:projectId/exports',authenticateSurvey)
@@ -29,10 +29,27 @@ const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,
     next(e)
   }
 }
+// Keep fresh export creation narrow, but permit bounded signed continuation.
+// All endpoints authenticate Survey first, so per-researcher budgets do not
+// collide behind a school's NAT. Invalid cursors are rejected before any data
+// read by decodeSurveyExportCursor; their request still consumes page budget.
+const researcherKey=(req:Request)=>req.user?.userId||req.ip||'unknown'
+const newExportLimit=createRedisRateLimiter({
+  name:'survey-export-create',limit:3,windowSeconds:900,key:researcherKey,
+})
+const pageExportLimit=createRedisRateLimiter({
+  name:'survey-export-page',limit:40,windowSeconds:900,key:researcherKey,
+})
+const downloadLimit=createRedisRateLimiter({
+  name:'survey-export-download',limit:40,windowSeconds:900,key:researcherKey,
+})
 surveyExportsRouter.post('/:projectId/exports',
-  createRedisRateLimiter({name:'survey-export-create',limit:3,windowSeconds:900}),
+  (req,res,next)=>{
+    const limiter=typeof req.body?.cursor==='string'?pageExportLimit:newExportLimit
+    return limiter(req,res,next)
+  },
   wrap(req=>createSurveyExport(req,{projectId:pid.parse(req.params.projectId),...create.parse(req.body)})))
 surveyExportsRouter.get('/:projectId/exports/:exportId/download',
-  createRedisRateLimiter({name:'survey-export-download',limit:20,windowSeconds:900}),
+  downloadLimit,
   wrap(req=>downloadSurveyExport(req,{projectId:pid.parse(req.params.projectId),
     exportId:eid.parse(req.params.exportId)})))

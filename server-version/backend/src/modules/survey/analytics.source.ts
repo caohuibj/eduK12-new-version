@@ -30,6 +30,10 @@ export interface SurveySourceProjection {
   completeAttempts:number
   sourceRevision:number
   cutOff:string
+  /** Only set on explicitly paged reads; no silent truncation on legacy reads. */
+  nextFinalCursor?:{id:string;completedAt:string}|null
+  /** Whole filtered cohort count, pinned for cross-request paging consistency. */
+  sourceFinalCount?:number|null
   scores:FrozenScoreObservation[]
   /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
@@ -146,6 +150,13 @@ export async function loadSurveySource(input:{
   includeWideSchema?:boolean
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
   completedFrom?:Date;completedBefore?:Date
+  pageMode?:boolean
+  /** Paired score aggregation does not need longitudinal attendance matrices. */
+  includeAttendance?:boolean
+  afterFinal?:{id:string;completedAt:Date}
+  snapshotCutOff?:Date
+  expectedSourceRevision?:number
+  expectedFinalCount?:number
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -163,28 +174,54 @@ export async function loadSurveySource(input:{
       FOR SHARE OF p,u,g,m
     `
     if(!project)denied()
+    if(input.expectedSourceRevision!==undefined
+       &&project.sourceRevision!==input.expectedSourceRevision)
+      throw new SurveyAnalyticsError(409,'研究样本或项目版本在分批分析期间变化，请重新开始')
     if(input.waveIds?.length){
       const ownerWaves=await tx.surveyWave.count({where:{projectId:input.projectId,id:{in:input.waveIds}}})
       if(ownerWaves!==new Set(input.waveIds).size)denied()
     }
     // Stage 1: select only small identifiers; never deserialize full encrypted
     // FINALs and large Publication JSON before applying the memory budget.
-    const finalWhere={
+    const cutOff=input.snapshotCutOff||project.sourceCutOff
+    if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
+    const sourceWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,
       ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
-      ...(input.completedFrom||input.completedBefore?{completedAt:{
+      completedAt:{
         ...(input.completedFrom?{gte:input.completedFrom}:{}),
-        ...(input.completedBefore?{lt:input.completedBefore}:{}),
-      }}:{}),
-      attempt:{status:'COMPLETED' as const,excludedAt:null},
+        lt:input.completedBefore&&input.completedBefore<cutOff
+          ?input.completedBefore:cutOff,
+      },
+      attempt:{status:'COMPLETED',excludedAt:null,
+        OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]},
+    }
+    // Cross-request RepeatableRead alone is not one database snapshot:
+    // a transaction started before cutOff could commit after page one. Fence
+    // that drift with an exact count over the whole bounded cohort.
+    const sourceFinalCount=input.pageMode
+      ?await tx.surveyWaveFinal.count({where:sourceWhere}):null
+    if(input.expectedFinalCount!==undefined
+      &&sourceFinalCount!==input.expectedFinalCount)
+      throw new SurveyAnalyticsError(409,'分批期间 FINAL 样本数量已变化，请重新开始完整导出')
+    const finalWhere:Prisma.SurveyWaveFinalWhereInput={
+      ...sourceWhere,
+      ...(input.afterFinal?{AND:[{OR:[
+        {completedAt:{gt:input.afterFinal.completedAt}},
+        {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
+      ]}]}:{}),
     }
     const headers=await tx.surveyWaveFinal.findMany({
-      where:finalWhere,select:{id:true,publicationId:true},
+      where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
       orderBy:[{completedAt:'asc'},{id:'asc'}],take:max+1,
     })
-    if(headers.length>max)
+    if(headers.length>max&&!input.pageMode)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')
-    const ids=headers.map(row=>row.id)
+    const selectedHeaders=input.pageMode?headers.slice(0,max):headers
+    const last=selectedHeaders.at(-1)
+    const nextFinalCursor=input.pageMode&&headers.length>max&&last
+      ?{id:last.id,completedAt:last.completedAt.toISOString()}:null
+    const ids=selectedHeaders.map(row=>row.id)
     // A Wave may have STARTED attempts but no FINAL. Only Wide exports need
     // its frozen schema to distinguish ABANDONED from NO_WAVE.
     const frozenWaves=input.includeWideSchema?await tx.surveyWave.findMany({
@@ -200,7 +237,7 @@ export async function loadSurveySource(input:{
     if(frozenWaves.length>100)
       throw new SurveyAnalyticsError(413,'本次宽表波次数量超出安全上限')
     const publicationIds=[...new Set([
-      ...headers.map(row=>row.publicationId),
+      ...selectedHeaders.map(row=>row.publicationId),
       ...frozenWaves.flatMap(w=>w.publicationId?[w.publicationId]:[]),
     ])]
     // Both byte budgets apply before loading any potentially large JSON or
@@ -242,13 +279,14 @@ export async function loadSurveySource(input:{
     }
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
-    const attendanceRows=await tx.surveyWaveAttempt.findMany({
+    const attendanceRows=input.includeAttendance===false?[]:await tx.surveyWaveAttempt.findMany({
       where:{
         projectId:input.projectId,
         ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
         participantId:{not:null},
       },
       select:{waveId:true,status:true,excludedAt:true,
+        sampleReview:{select:{verdict:true}},
         participant:{select:{researchCode:true,status:true}}},
       take:5001,
     })
@@ -256,7 +294,7 @@ export async function loadSurveySource(input:{
       throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
     const attendance=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
-      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
+      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status}))
     // Row projection remains bounded independently from the ciphertext budget.
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
@@ -338,7 +376,7 @@ export async function loadSurveySource(input:{
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
-      cutOff:project.sourceCutOff.toISOString(),
+      cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }

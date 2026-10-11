@@ -26,7 +26,7 @@ export async function waveOverview(actorUserId:string,projectId:string){
     const project=await authorized(tx,actorUserId,projectId)
     const waveRows=await tx.$queryRaw<Array<{
       id:string;ordinal:number;title:string;status:string;starts:number;
-      finalCompleted:number;uniqueLinkedCodes:number;excluded:number
+      finalCompleted:number;analysisIncluded:number;qualityExcluded:number;uniqueLinkedCodes:number;excluded:number
     }>>`
       SELECT w.id,w.ordinal,w.title,w.status,
         COUNT(swa.id)::int AS starts,
@@ -34,9 +34,18 @@ export async function waveOverview(actorUserId:string,projectId:string){
           WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
             AND swa.excluded_at IS NULL
         )::int AS "finalCompleted",
+        COUNT(sf.id) FILTER (WHERE swa.status='COMPLETED'
+          AND sf.id IS NOT NULL AND swa.excluded_at IS NULL
+          AND (review.verdict IS NULL OR review.verdict='INCLUDED')
+        )::int AS "analysisIncluded",
+        COUNT(sf.id) FILTER (WHERE swa.status='COMPLETED'
+          AND sf.id IS NOT NULL AND swa.excluded_at IS NULL
+          AND review.verdict='EXCLUDED'
+        )::int AS "qualityExcluded",
         COUNT(DISTINCT sp.research_code) FILTER (
           WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
             AND swa.excluded_at IS NULL AND sp.status IN ('ACTIVE','REVOKED')
+            AND (review.verdict IS NULL OR review.verdict='INCLUDED')
         )::int AS "uniqueLinkedCodes",
         COUNT(swa.id) FILTER (WHERE swa.excluded_at IS NOT NULL)::int AS excluded
       FROM "survey_waves" w
@@ -47,6 +56,8 @@ export async function waveOverview(actorUserId:string,projectId:string){
         AND sf.project_id=w.project_id AND sf.wave_id=w.id
         AND sf.publication_id=publication.id AND sf.definition_digest=publication.definition_digest
       LEFT JOIN "survey_participants" sp ON sp.id=swa.participant_id AND sp.project_id=w.project_id
+      LEFT JOIN survey_sample_reviews review ON review.attempt_id=swa.id
+        AND review.project_id=w.project_id AND review.wave_id=w.id
       WHERE w.project_id=${projectId}
       GROUP BY w.id,w.ordinal,w.title,w.status
       ORDER BY w.ordinal ASC
@@ -83,10 +94,12 @@ export async function matchedWaveCounts(input:{
       JOIN "survey_wave_finals" sf
         ON sf.attempt_id=a.id AND sf.project_id=a.project_id AND sf.wave_id=a.wave_id
           AND sf.publication_id=publication.id AND sf.definition_digest=publication.definition_digest
+      LEFT JOIN survey_sample_reviews review ON review.attempt_id=a.id
+        AND review.project_id=a.project_id AND review.wave_id=a.wave_id
       WHERE a.project_id=${input.projectId}
         AND a.wave_id IN (${Prisma.join([input.baselineWaveId,input.followupWaveId])})
         AND a.participant_id IS NOT NULL AND a.excluded_at IS NULL
-        AND a.status='COMPLETED'
+        AND a.status='COMPLETED' AND (review.verdict IS NULL OR review.verdict='INCLUDED')
     `
     const early=new Set(rows.filter(x=>x.waveId===input.baselineWaveId).map(x=>x.participantId))
     const later=new Set(rows.filter(x=>x.waveId===input.followupWaveId).map(x=>x.participantId))

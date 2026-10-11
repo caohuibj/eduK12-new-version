@@ -2866,6 +2866,8 @@ model SurveyWaveAttempt {
   excludedAt     DateTime?     @map("excluded_at") @db.Timestamptz(6)
   consents       SurveyConsent[]
   final          SurveyWaveFinal?
+  sampleReview   SurveySampleReview?
+  @@unique([id,projectId,waveId],map:"survey_attempts_id_project_wave_uniq")
   @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
   @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
   @@index([projectId,waveId,status],map:"survey_attempts_project_wave_status_idx")
@@ -2925,6 +2927,23 @@ model SurveyWaveFinal {
 
 // Short-lived encrypted research exports. The platform admin cannot inherit
 // Owner raw-data permissions; every download revalidates current grant + MFA.
+model SurveySampleReview {
+  attemptId  String            @id @map("attempt_id")
+  projectId  String            @map("project_id")
+  waveId     String            @map("wave_id")
+  attempt    SurveyWaveAttempt @relation(fields:[attemptId,projectId,waveId],references:[id,projectId,waveId],onDelete:Restrict)
+  verdict    String
+  reason     String
+  reviewerId String            @map("reviewed_by")
+  revision   Int               @default(1)
+  reviewedAt DateTime          @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+  // Prisma needs an explicit unique tuple for this composite 1:1 relation.
+  // attemptId is also the PK; the composite index preserves scope FK shape.
+  @@unique([attemptId,projectId,waveId],map:"survey_sample_reviews_attempt_scope_unique")
+  @@index([projectId,waveId,verdict],map:"survey_sample_reviews_scope_idx")
+  @@map("survey_sample_reviews")
+}
+
 model SurveyExportTicket {
   id               String   @id
   projectId        String   @map("project_id")

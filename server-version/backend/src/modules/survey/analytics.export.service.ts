@@ -9,6 +9,7 @@ import { loadSurveySource } from './analytics.source'
 import { rawLongExport,rawWideExport } from './analytics.raw-export'
 import { exportLong,exportWide } from './analytics.export-format'
 import { SurveyAnalyticsError } from './analytics.read'
+import {encodeSurveyExportCursor,decodeSurveyExportCursor,type SurveyExportCursor} from './analytics.export-cursor'
 import type { BoundedResearchExport } from './analytics.export-format'
 import type { SurveyRawExport } from './analytics.raw-export'
 
@@ -55,7 +56,7 @@ async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient
 }
 export async function createSurveyExport(req:Request,input:{
   projectId:string;format:Format;waveId?:string;includeFreeText?:boolean;
-  completedFrom?:string;completedBefore?:string;
+  completedFrom?:string;completedBefore?:string;cursor?:string;
 }){
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
@@ -66,9 +67,35 @@ export async function createSurveyExport(req:Request,input:{
   if((from&&!Number.isFinite(from.getTime()))||(before&&!Number.isFinite(before.getTime()))
     ||(from&&before&&from>=before))
     fail(400,'导出时段必须是开始早于结束的合法时间')
+  const paged=!!input.waveId&&['RAW_WAVE','RAW_LONG','SCORE_LONG'].includes(input.format)
+  if(input.cursor&&!paged)fail(400,'此格式必须选定单个波次才能继续分批导出')
+  const prior=input.cursor?decodeSurveyExportCursor(
+    input.cursor,input.projectId,input.format as SurveyExportCursor['format'],input.waveId!,
+  ):null
+  if(prior&&(prior.completedFrom!==(input.completedFrom??null)
+    ||prior.completedBefore!==(input.completedBefore??null)
+    ||prior.freeTextIncluded!==(input.includeFreeText===true)))
+    fail(400,'分批导出的时间筛选条件不能修改')
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
-    includeWideSchema:true,completedFrom:from,completedBefore:before})
+    includeWideSchema:true,completedFrom:from,completedBefore:before,
+    ...(paged?{pageMode:true,includeAttendance:!prior}:{}),
+    ...(prior?{afterFinal:{id:prior.after.id,completedAt:new Date(prior.after.completedAt)},
+      snapshotCutOff:new Date(prior.cutOff),expectedSourceRevision:prior.sourceRevision,
+      expectedFinalCount:prior.finalCount}:{}),
+  })
+  if(sources.nextFinalCursor&&prior?.page===100)
+    fail(413,'本次受控分批导出超过 25000 个 FINAL，请缩小采集范围')
+  const nextCursor=paged&&sources.nextFinalCursor?encodeSurveyExportCursor({
+    v:1,projectId:input.projectId,waveId:input.waveId!,
+    format:input.format as SurveyExportCursor['format'],after:sources.nextFinalCursor,
+    cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
+    finalCount:sources.sourceFinalCount??0,
+    page:(prior?.page??0)+1,issuedAt:Date.now(),
+    completedFrom:input.completedFrom??null,completedBefore:input.completedBefore??null,
+    freeTextIncluded:input.includeFreeText===true,
+  }):null
+  const pageNumber=paged?(prior?.page??0)+1:null
   if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
     fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
   if(input.includeFreeText&&input.format.startsWith('SCORE'))
@@ -93,6 +120,10 @@ export async function createSurveyExport(req:Request,input:{
       definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest},
   ] as const)).values()]
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
+    generatedAt:new Date().toISOString(),timeZone:'UTC',
+    sourceProjectRevision:sources.sourceRevision,
+    analysisPopulation:'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
+    batch:{pageNumber,hasNext:!!nextCursor,completionRowsOnlyAfterFirstPage:!!prior},
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
       researchOnly:true,collectionMode:sources.collectionMode,
@@ -125,7 +156,8 @@ export async function createSurveyExport(req:Request,input:{
       action:'RESEARCH_EXPORT_CREATED',metadata:{exportId:id,format:input.format,
         rowCount:artifact.manifest.rowCount,expiresAt:expiresAt.toISOString()}}})
   })
-  return {id,status:'READY' as const,format:input.format,expiresAt,manifest}
+  return {id,status:'READY' as const,format:input.format,expiresAt,manifest,
+    nextCursor,pageNumber}
 }
 export async function downloadSurveyExport(req:Request,input:{projectId:string;exportId:string}){
   assertRecentSurveyMfa(req)

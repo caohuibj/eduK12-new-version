@@ -1,0 +1,27 @@
+# OPTIONAL host-Nginx server blocks for survey.eduk12.top.
+# DO NOT include until TLS has been issued, upstream verified, and nginx -t
+# succeeds on the actual production host. No live configuration is changed here.
+# The canonical frontend Nginx itself proxies /api to the backend.
+server {
+    listen 80;
+    server_name survey.eduk12.top;
+    return 301 https://survey.eduk12.top$request_uri;
+}
+server {
+    listen 443 ssl http2;
+    server_name survey.eduk12.top;
+    ssl_certificate /etc/letsencrypt/live/survey.eduk12.top/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/survey.eduk12.top/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_timeout 1d;
+    location / {
+        proxy_pass http://eduk12_frontend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}

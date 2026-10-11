@@ -38,6 +38,10 @@ surveyPlatformRouter.post('/researchers/:id/suspend',handler(async req=>{
 surveyPlatformRouter.post('/researchers/:id/restore',handler(async req=>{
   await administrator(req);return governance.updateResearcherStatus(req.user!.userId,inviteId.parse(req.params.id),'ACTIVE')
 }))
+surveyPlatformRouter.post('/researchers/:id/revoke',handler(async req=>{
+  await administrator(req)
+  return governance.revokeResearcherPermanently(req.user!.userId,inviteId.parse(req.params.id))
+}))
 surveyPlatformRouter.post('/researchers/:id/mfa-reset',handler(async req=>{
   await administrator(req);return governance.resetResearcherMfa(req.user!.userId,inviteId.parse(req.params.id))
 }))

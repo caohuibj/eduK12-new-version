@@ -7,6 +7,7 @@ import { mobileRouter } from './modules/mobile/routes'
 import { parentLinksRouter, parentsRouter, parentPublicationRouter } from './modules/parent-portal/routes'
 import { anonymousStudyRouter, publicAnonymousStudyRouter } from './modules/anonymous-study/routes'
 import { surveyOriginGuard, platformSurveyOriginGuard } from './modules/survey/originGuard'
+import { validateSurveyStartupConfig } from './modules/survey/startup.config'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
@@ -257,6 +258,7 @@ const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
   if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
   next()
 }
+validateSurveyStartupConfig()
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)

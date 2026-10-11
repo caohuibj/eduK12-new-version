@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
+import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sample-quality.service'
+import {describeSurveyPairedScoresPaged} from './analytics.paged'
 import { loadSurveySource } from './analytics.source'
-import { describeWave,describePairedScores,describeWaveGroups } from './analytics.descriptive'
+import { describeWave,describeWaveGroups } from './analytics.descriptive'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -17,6 +19,7 @@ surveyAnalyticsRouter.use('/:pid/analytics',(_req,res,next)=>{
 })
 const id=z.string().uuid()
 const matched=z.object({baselineWaveId:id,followupWaveId:id}).strict()
+const qualityPage=z.coerce.number().int().min(1).max(1000).default(1)
 const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await fn(req))}
   catch(e){
@@ -25,6 +28,23 @@ const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,
     next(e)
   }
 }
+// Researcher review is an analysis policy: never update immutable FINAL rows.
+const review=z.object({
+  revision:z.number().int().nonnegative(),
+  verdict:z.enum(['INCLUDED','EXCLUDED']),
+  reason:z.string().trim().min(2).max(1000),
+}).strict()
+surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts',wrap(req=>
+  listSampleQuality(req.user!.userId,id.parse(req.params.pid),
+    qualityPage.parse(req.query.page))))
+surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts/:attemptId/history',wrap(req=>
+  listSampleQualityHistory(req.user!.userId,id.parse(req.params.pid),
+    id.parse(req.params.attemptId),qualityPage.parse(req.query.page))))
+surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(req=>
+  setSampleQuality({actorUserId:req.user!.userId,
+    projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
+    ...review.parse(req.body)})))
+
 surveyAnalyticsRouter.get('/:pid/analytics/overview',wrap(req=>
   service.waveOverview(req.user!.userId,id.parse(req.params.pid))))
 surveyAnalyticsRouter.post('/:pid/analytics/paired-counts',wrap(req=>{
@@ -61,13 +81,8 @@ surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async 
   catch(e){throw new service.SurveyAnalyticsError(409,
     e instanceof Error?e.message:'此分组无法计算')}
 }))
-surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
-  const projectId=id.parse(req.params.pid),input=measurement.parse(req.body)
-  const source=await loadSurveySource({
-    actorUserId:req.user!.userId,projectId,
-    waveIds:[input.baselineWaveId,input.followupWaveId],maxFinals:250,includeWideSchema:true,
-  })
-  if(source.collectionMode!=='LINKED_WAVES')
-    throw new service.SurveyAnalyticsError(409,'此研究未启用跨波次身份关联')
-  return describePairedScores(source,input)
-}))
+surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>
+  describeSurveyPairedScoresPaged({
+    actorUserId:req.user!.userId,
+    projectId:id.parse(req.params.pid),...measurement.parse(req.body),
+  })))

@@ -94,6 +94,9 @@ export default function SurveyResearchersAdmin(){
         {['ACTIVE','PENDING_MFA'].includes(person.status)&&<button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/suspend',person.username)}>暂停资格</button>}
         {person.status==='SUSPENDED'&&<button className="btn-secondary" disabled={busy||!password} onClick={()=>void act('/researchers/'+person.id+'/restore',person.username)}>恢复资格</button>}
         <button className="btn-secondary" disabled={busy||!password||person.status==='SUSPENDED'} onClick={()=>void act('/researchers/'+person.id+'/mfa-reset',person.username)}>重置 TOTP</button>
+        {person.status!=='REVOKED'&&<button className="btn-secondary" disabled={busy||!password}
+          onClick={()=>{if(window.confirm('永久撤销该研究者资格？此操作不可恢复，历史研究数据不会删除。'))void act('/researchers/'+person.id+'/revoke',person.username)}}>
+          永久撤销资格</button>}
         <button className="btn-secondary" disabled={busy||!password||person.status==='SUSPENDED'} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations',person.username)}>密码重置邀请</button>
       </div>
     </article>)}</div>

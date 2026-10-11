@@ -46,6 +46,12 @@ async function failedLogin(req:Request,res:Response) {
 }
 
 surveyAuthRouter.get('/csrf',(req,res)=>success(res,{csrfToken:issueSurveyCsrfToken(req,res)}))
+// Public capability descriptor contains no identity or research data. Flags are
+// server authoritative; the UI must not infer availability from route names.
+surveyAuthRouter.get('/capabilities',(_req,res)=>success(res,{
+  publication:process.env.SURVEY_PUBLICATION_ENABLED==='true',
+  analytics:process.env.SURVEY_ANALYTICS_ENABLED==='true',
+}))
 surveyAuthRouter.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,res)=>{
   try{
     const parsed=loginInput.safeParse(req.body)
