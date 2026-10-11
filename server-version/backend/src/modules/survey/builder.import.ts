@@ -13,7 +13,9 @@ export const bulkInputSchema=z.object({
 }).strict()
 export type BulkInput=z.infer<typeof bulkInputSchema>
 type ImportRow={type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
-  prompt:string;required:boolean;options:string[];rows:string[];dimensionKey?:string;reverse:boolean}
+  prompt:string;required:boolean;options:string[];rows:string[];dimensionKey?:string;reverse:boolean;
+  /** One-based physical source line, preserved through quoted multiline CSV. */
+  sourceLine:number}
 type ImportIssue={line:number;message:string}
 const types:Record<string,ImportRow['type']>={
   single:'SINGLE',choice:'SINGLE',select:'SINGLE',单选:'SINGLE',
@@ -32,6 +34,7 @@ const parseBoolean=(s:string,defaultValue:boolean):boolean|null=>{
 const parseText=(input:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
   const rows:ImportRow[]=[],issues:ImportIssue[]=[]
   const blocks=input.replace(/\r\n?/g,'\n').trim().split(/\n\s*\n/)
+  let startLine=1
   for(let i=0;i<blocks.length;i++){
     const lines=blocks[i].split('\n').map(clean).filter(Boolean)
     if(!lines.length)continue
@@ -40,15 +43,17 @@ const parseText=(input:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
     if(!prompt){issues.push({line:i+1,message:'缺少题干'});continue}
     const type=options.length?'SINGLE':'SHORT_TEXT'
     if(options.length===1)issues.push({line:i+1,message:'选择题至少需要两个选项'})
-    rows.push({type,prompt,required:true,options,rows:[],reverse:false})
+    rows.push({type,prompt,required:true,options,rows:[],reverse:false,sourceLine:startLine})
+    startLine+=blocks[i].split('\n').length+1
   }
   if(!rows.length)issues.push({line:1,message:'没有识别到可导入题目'})
   return {rows,issues}
 }
 /** Quoted CSV, including embedded commas/newlines and doubled quote escaping. */
-const parseCsvRows=(content:string):string[][]=>{
-  const rows:string[][]=[]
+const parseCsvRows=(content:string):Array<{cells:string[];sourceLine:number}>=>{
+  const rows:Array<{cells:string[];sourceLine:number}>=[]
   let line:string[]=[],field='',quoted=false
+  let currentLine=1,rowLine=1
   const s=content.replace(/^\uFEFF/,'')
   for(let i=0;i<s.length;i++){
     const c=s[i]
@@ -56,18 +61,26 @@ const parseCsvRows=(content:string):string[][]=>{
       if(c==='"'&&s[i+1]==='"'){field+='"';i++}
       else if(c==='"')quoted=false
       else field+=c
+      if(c==='\n')currentLine++
       continue
     }
     if(c==='"'){
       if(field)throw new Error('CSV 引号只能包裹完整单元格')
       quoted=true
     }else if(c===','){line.push(field);field=''}
-    else if(c==='\n'){line.push(field);rows.push(line);line=[];field=''}
-    else if(c==='\r'){if(s[i+1]==='\n')continue;line.push(field);rows.push(line);line=[];field=''}
+    else if(c==='\n'){
+      line.push(field);rows.push({cells:line,sourceLine:rowLine})
+      line=[];field='';currentLine++;rowLine=currentLine
+    }
+    else if(c==='\r'){
+      if(s[i+1]==='\n')continue
+      line.push(field);rows.push({cells:line,sourceLine:rowLine})
+      line=[];field='';currentLine++;rowLine=currentLine
+    }
     else field+=c
   }
   if(quoted)throw new Error('CSV 引号未闭合')
-  if(field||line.length){line.push(field);rows.push(line)}
+  if(field||line.length){line.push(field);rows.push({cells:line,sourceLine:rowLine})}
   return rows
 }
 const parseCsv=(content:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
@@ -75,26 +88,26 @@ const parseCsv=(content:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
   let matrix:string[][]
   try{matrix=parseCsvRows(content)}catch(error){return {rows,issues:[{line:1,message:error instanceof Error?error.message:'CSV 格式错误'}]}}
   if(!matrix.length)return {rows,issues:[{line:1,message:'CSV 为空'}]}
-  const header=matrix[0].map(s=>clean(s).toLowerCase())
+  const header=matrix[0].cells.map(s=>clean(s).toLowerCase())
   for(const required of ['type','prompt'])if(!header.includes(required))
     issues.push({line:1,message:'缺少必需表头：'+required})
   if(new Set(header).size!==header.length)issues.push({line:1,message:'表头不能重复'})
   if(issues.length)return {rows,issues}
   const field=(cells:string[],name:string)=>cells[header.indexOf(name)]??''
   for(let i=1;i<matrix.length;i++){
-    const cells=matrix[i]
+    const {cells,sourceLine}=matrix[i]
     if(cells.every(x=>!x.trim()))continue
     const type=types[clean(field(cells,'type')).toLowerCase()]
-    if(!type){issues.push({line:i+1,message:'未知题型'});continue}
+    if(!type){issues.push({line:sourceLine,message:'未知题型'});continue}
     const prompt=clean(field(cells,'prompt'))
-    if(!prompt){issues.push({line:i+1,message:'题干不能为空'});continue}
+    if(!prompt){issues.push({line:sourceLine,message:'题干不能为空'});continue}
     const required=parseBoolean(field(cells,'required'),true)
     const reverse=parseBoolean(field(cells,'reverse'),false)
-    if(required===null||reverse===null){issues.push({line:i+1,message:'required/reverse 应填 true 或 false'});continue}
+    if(required===null||reverse===null){issues.push({line:sourceLine,message:'required/reverse 应填 true 或 false'});continue}
     const options=splitOptions(field(cells,'options'))
     const matrixRows=splitOptions(field(cells,'rows'))
     rows.push({type,prompt,required,options,rows:matrixRows,
-      reverse,dimensionKey:clean(field(cells,'dimension'))||undefined})
+      reverse,dimensionKey:clean(field(cells,'dimension'))||undefined,sourceLine})
   }
   if(!rows.length)issues.push({line:1,message:'未识别有效数据行'})
   return {rows,issues}
@@ -108,19 +121,20 @@ export function previewBulk(input:BulkInput,kind:'FORM'|'SCALE'):{
   const issues=[...extracted.issues]
   if(extracted.rows.length>200)issues.push({line:1,message:'单次最多导入 200 道题'})
   extracted.rows.forEach((r,i)=>{
-    if(r.prompt.length>16000)issues.push({line:i+1,message:'题干超出最大长度'})
+    const line=r.sourceLine||i+1
+    if(r.prompt.length>16000)issues.push({line,message:'题干超出最大长度'})
     if(r.options.some(o=>o.length>2000)||r.rows.some(o=>o.length>2000))
-      issues.push({line:i+1,message:'选项或矩阵行超过最大长度'})
+      issues.push({line,message:'选项或矩阵行超过最大长度'})
     if(kind==='SCALE'){
-      if(!['SINGLE','LIKERT'].includes(r.type))issues.push({line:i+1,message:'量表仅支持单选/Likert 题块'})
-      if(r.options.length)issues.push({line:i+1,message:'量表使用共享选项组，CSV 不应重复声明选项'})
-      if(!r.required)issues.push({line:i+1,message:'首版描述性量表要求完整作答'})
+      if(!['SINGLE','LIKERT'].includes(r.type))issues.push({line,message:'量表仅支持单选/Likert 题块'})
+      if(r.options.length)issues.push({line,message:'量表使用共享选项组，CSV 不应重复声明选项'})
+      if(!r.required)issues.push({line,message:'首版描述性量表要求完整作答'})
     }else {
       if(['SINGLE','MULTIPLE','MATRIX','LIKERT'].includes(r.type)&&r.options.length<2)
-        issues.push({line:i+1,message:'选择题至少需要两项选项'})
-      if(r.type==='MATRIX'&&!r.rows.length)issues.push({line:i+1,message:'矩阵题必须包含行'})
+        issues.push({line,message:'选择题至少需要两项选项'})
+      if(r.type==='MATRIX'&&!r.rows.length)issues.push({line,message:'矩阵题必须包含行'})
       if(!['SINGLE','MULTIPLE','MATRIX','LIKERT'].includes(r.type)&&r.options.length)
-        issues.push({line:i+1,message:'此题型不可声明选项'})
+        issues.push({line,message:'此题型不可声明选项'})
     }
   })
   const digest=canonicalHash(JSON.parse(JSON.stringify({kind,batchId:parsed.batchId,pageKey:parsed.pageKey??null,
