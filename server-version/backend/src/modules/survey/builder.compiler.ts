@@ -4,7 +4,8 @@ import {
 } from '../scale/scale-definition'
 import { scoreScale } from '../scale/scale-scoring'
 import { compileSjtTemplate, SjtTemplateError } from '../situational/authoring/template'
-import { scoreSituational, type SituationalResponse } from '../situational/situation-scoring'
+import type { SituationalResponse } from '../situational/situation-scoring'
+import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import {
   assertSurveyDraft, validateSurveyDraft, SurveyDraftError,
   type SurveyKind, type ScaleDraft, type SjtDraft, type FormDraft,
@@ -156,7 +157,7 @@ export function previewResearchInstrument(input:{
           sceneKey:scene.sceneKey,channelKey:channel.channelKey,
           responseValue:answers[channel.channelKey],
         })))
-    const score=Object.keys(answers).length?scoreSituational(compiled.package.definition,values):null
+    const score=Object.keys(answers).length?scoreSituationalModel(compiled.package.definition,values):null
     return {ok:true,issues:[],kind:'SJT',definitionDigest:hash,
       scoringDigest:canonicalHash(compiled.package.definition.scoring),
       compilerDigest:compiled.contentDigest,
