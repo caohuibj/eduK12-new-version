@@ -3,6 +3,7 @@ import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
+import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -279,6 +280,7 @@ export default function HuiteacherApp(){
       {org?.productAdmin&&<HuiteacherFormStudio
         key={org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyFormTasks api={teacherApi}/>}
+      {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
       <section className="ht-panel"><h2>后续功能模块</h2>
         <p>教师自主测评、组织调查、课堂与教研观察、学生评教及纵向改进将按 PR2—PR6 的顺序接入。</p>
         <a href="https://school.eduk12.top" rel="noopener noreferrer">前往 Huischool（使用同一账号，需分别登录）</a>
