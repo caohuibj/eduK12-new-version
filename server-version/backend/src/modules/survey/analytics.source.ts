@@ -4,7 +4,6 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
-import { decryptUnifiedRuntimePayload as decryptSurveyAssignment } from '../assessment-runtime/security'
 import type { SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
@@ -385,7 +384,7 @@ export async function loadSurveySource(input:{
         if(!trace||trace.schemaVersion!==1||trace.flowDigest!==snapshot.flow.flowDigest
           ||trace.clientPresentation!=='VERIFIED_SUBMISSION'||!attempt.flowAssignmentCipher)
           invalid('研究 Flow 来源及展示审计不可核验')
-        const assigned=decryptSurveyAssignment<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
+        const assigned=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
         if(assigned.flowDigest!==snapshot.flow.flowDigest||
           trace.assignmentDigest!==canonicalHash(assigned)||
           trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)

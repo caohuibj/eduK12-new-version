@@ -7,6 +7,7 @@ import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
 import { screenOutResearchAttempt } from './flow.screen-out.service'
+import { SurveyAssignmentError } from './flow.assignment'
 import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
@@ -45,6 +46,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError)
       return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFinalValidationError)return error(res,e.path+'：'+e.message,-1,400)
+    if(e instanceof SurveyAssignmentError)return error(res,e.message,-1,409)
     next(e)
   }
 }

@@ -6,7 +6,7 @@ import { retainSurveyMedia } from './media.references'
 import { assertSurveyDraft, surveyKindSchema } from './builder.definition'
 import { compileResearchScale, compileResearchSjt } from './builder.compiler'
 import { SurveyWaveError } from './waves.service'
-import { compileSurveyFlow,type FrozenSurveyFlow } from './flow.definition'
+import { compileSurveyFlow,SurveyFlowError,type FrozenSurveyFlow } from './flow.definition'
 
 /** Stored data contract for PR3 anonymous Wave runtime adapter.
  * This is a frozen research-only definition, NOT a formal scale/SJT
@@ -119,8 +119,17 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return compileFrozenResearchUnit(draft!)
     })
-    const frozenFlow=wave.flowDefinition?compileSurveyFlow(wave.flowDefinition,units,
-      project.collectionMode as ResearchFrozenPublication['collectionMode']):undefined
+    let frozenFlow:FrozenSurveyFlow|undefined
+    if(wave.flowDefinition){
+      try{
+        frozenFlow=compileSurveyFlow(wave.flowDefinition,units,
+          project.collectionMode as ResearchFrozenPublication['collectionMode'])
+      }catch(e){
+        if(e instanceof SurveyFlowError)stop('冻结 Flow 结构未通过校验：'+
+          e.issues.slice(0,5).map(i=>i.path+': '+i.message).join('；'))
+        throw e
+      }
+    }
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],

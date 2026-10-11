@@ -79,7 +79,7 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
     const prior=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(current.flowAssignmentCipher)
     if(prior.schemaVersion!==1||prior.flowDigest!==flow.flowDigest
       ||prior.experimentKey!==(flow.experiment?.experimentKey??null)
-      ||(prior.groupKey&&!flow.experiment?.groups.some(g=>g.groupKey===prior.groupKey)))
+      ||(flow.experiment?(!prior.groupKey||!flow.experiment.groups.some(g=>g.groupKey===prior.groupKey)):prior.groupKey!==null))
       fail('作答已有的冻结实验分配与当前发布不一致')
     return prior
   }

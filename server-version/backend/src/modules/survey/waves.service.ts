@@ -115,7 +115,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
       consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
       linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
       instrumentIds:input.instrumentIds,
-      flowDefinition:flowDefinition as Prisma.InputJsonValue??Prisma.DbNull,
+      flowDefinition:flowDefinition===null?Prisma.DbNull:flowDefinition as Prisma.InputJsonValue,
       status:'DRAFT',
       opensAt:input.opensAt?new Date(input.opensAt):null,
       closesAt:input.closesAt?new Date(input.closesAt):null,
@@ -142,7 +142,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',publicationId:null,revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
-        ...(requestedFlow===undefined?{}:{flowDefinition:requestedFlow as Prisma.InputJsonValue??Prisma.DbNull}),
+        ...(requestedFlow===undefined?{}:{flowDefinition:requestedFlow===null?Prisma.DbNull:requestedFlow as Prisma.InputJsonValue}),
         linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
         opensAt:input.opensAt?new Date(input.opensAt):null,
         closesAt:input.closesAt?new Date(input.closesAt):null,

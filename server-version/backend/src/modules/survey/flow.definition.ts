@@ -175,7 +175,7 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       if(!b.termination||b.instrumentKey!==undefined||b.body!==undefined)
         error(issues,path,'END 必须声明终止类别，且不可执行工具或素材')
       if(!b.when)error(issues,path+'.when','END 必须包含明确条件，避免意外终止全部被试')
-      if(b.termination==='SCREEN_OUT'&&i===0)
+      if(b.termination==='SCREEN_OUT'&&![...visited].some(key=>unitMap.get(key)?.kind==='FORM'))
         error(issues,path,'筛除必须依据先前已收集的 Form 条件')
       terminalFound=!b.when // conditional END can be followed by another block
     }
