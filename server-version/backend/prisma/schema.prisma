@@ -3007,3 +3007,22 @@ model EducationTeacherStaffInvitation {
   @@index([organizationId, expiresAt], map: "education_teacher_staff_invitations_org_idx")
   @@map("education_teacher_staff_invitations")
 }
+
+// Only a Teacher school membership invitation, NOT a Huischool psychology
+// enrollment. A later Huischool rollout needs its own approved admission.
+model EducationTeacherStudentInvitation {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  classUnitId      String    @map("class_unit_id")
+  studentNoDigest  String    @map("student_no_digest")
+  tokenHash        String    @unique(map: "education_teacher_student_invites_token_key") @map("token_hash")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt       DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String?   @map("consumed_by_user_id")
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  @@index([organizationId, classUnitId, expiresAt], map: "education_teacher_student_invites_class_idx")
+  @@map("education_teacher_student_invitations")
+}
