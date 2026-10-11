@@ -197,7 +197,7 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
       })
     })
   }
-  return {definition,issues,digest:canonicalHash({kind,definition})}
+  return {definition,issues,digest:canonicalHash(JSON.parse(JSON.stringify({kind,definition})))}
 }
 export const assertSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false):SurveyDraft=>{
   const result=validateSurveyDraft(kind,input,forPreview)
