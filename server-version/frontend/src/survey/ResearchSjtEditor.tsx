@@ -84,6 +84,7 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
               onChange={e=>changeQuestion(i,x=>({
                 ...x,
                 responseType:e.target.value as 'SINGLE'|'MULTIPLE',
+                aggregationPolicy:undefined,
                 minSelections:e.target.value==='MULTIPLE'?1:undefined,
                 maxSelections:e.target.value==='MULTIPLE'?Math.min(2,x.options.length):undefined,
               }))}>
@@ -103,9 +104,19 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
             </label>
           </>}
         </div>
+        {q.responseType==='MULTIPLE'&&<label className="text-sm block">多选构念贡献聚合方式
+          <select className="input block w-full" aria-label="多选计分聚合规则"
+            value={q.aggregationPolicy??''}
+            onChange={e=>changeQuestion(i,x=>({...x,
+              aggregationPolicy:e.target.value===''?undefined:e.target.value as 'SUM'|'MEAN',
+            }))}>
+            <option value="">请选择；不设置不能发布</option>
+            <option value="SUM">SUM：所选贡献求和（选择数量可能影响得分）</option>
+            <option value="MEAN">MEAN：所选贡献平均（非标准常模）</option>
+          </select></label>}
         {q.responseType==='MULTIPLE'&&<p className="text-xs text-slate-600">
           每个选项可同时贡献多个构念。系统只编译不超过 24 个合法选择组合，
-          根据所选原选项的贡献求和，再交由既有 SJT AUTHOR_KEY_SUM 评分模型处理；
+          使用冻结的 SUM 或 MEAN 规则聚合，再交由既有 SJT AUTHOR_KEY_SUM 评分模型处理；
           超出上限会阻止正式发布，不修改历史评分算法。</p>}
         <textarea className="input w-full" aria-label={'情境问题 '+(i+1)} rows={2} value={q.prompt}
           onChange={e=>changeQuestion(i,x=>({...x,prompt:e.target.value}))}/>

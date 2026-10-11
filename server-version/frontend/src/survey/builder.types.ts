@@ -27,6 +27,7 @@ export type SjtDraft={
   metrics:{metricKey:string;label:string;direction:'descriptive'}[];
   questions:{questionKey:string;prompt:string;
     responseType?:'SINGLE'|'MULTIPLE';minSelections?:number;maxSelections?:number;
+    aggregationPolicy?:'SUM'|'MEAN';
     options:{
     optionKey:string;label:string;contributions:Record<string,number>
   }[]}[]

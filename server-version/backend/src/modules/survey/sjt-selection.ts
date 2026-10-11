@@ -12,6 +12,7 @@ const MAX_DERIVED_CHOICES = 24
  */
 export function expandedSurveySjtOptions(question:SurveySjtQuestion):SurveySjtOption[] {
   if (question.responseType !== 'MULTIPLE') return question.options
+  if(!question.aggregationPolicy)throw new Error('多选构念贡献尚未选择 SUM 或 MEAN 规则')
   const n = question.options.length
   const min = question.minSelections ?? 1
   const max = question.maxSelections ?? n
@@ -32,7 +33,9 @@ export function expandedSurveySjtOptions(question:SurveySjtQuestion):SurveySjtOp
       combinations.push({
         optionKey:'m'+canonicalHash({questionKey:question.questionKey,selectedKeys:keys}).slice(0,22),
         label:selected.map(o=>o.label).join('＋'),
-        contributions:scores,
+        contributions:Object.fromEntries(Object.entries(scores).map(([key,score])=>[
+          key,question.aggregationPolicy==='MEAN'?score/selected.length:score,
+        ])),
       })
       if(combinations.length>MAX_DERIVED_CHOICES)
         throw new Error('多选合法组合超过 24 种，请收紧最少／最多选项或拆题')
