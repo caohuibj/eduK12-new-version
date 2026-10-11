@@ -101,3 +101,55 @@ export function describePairedScores(source:SurveySourceProjection,input:{
     expectedColumns:source.scoreColumns,...input,
   })
 }
+
+
+/** Survey-only, project-scoped descriptive comparison. Group membership must
+ * come from one frozen Form categorical item; no free text, small-cell detail,
+ * causal attribution or access to other products is permitted.
+ */
+export function describeWaveGroups(source:SurveySourceProjection,input:{
+  waveId:string;groupInstrumentKey:string;groupItemKey:string;
+  scoreInstrumentKey:string;scoreKey:string
+}){
+  const {waveId,groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey}=input
+  const candidates=source.codebook.filter(c=>c.waveId===waveId&&c.kind==='FORM'
+    &&c.instrumentKey===groupInstrumentKey&&c.itemKey===groupItemKey
+    &&['SINGLE','LIKERT'].includes(c.responseType))
+  if(candidates.length!==1)throw new Error('分组变量必须是当前冻结 Form 的单选或 Likert 项')
+  const variable=candidates[0]
+  const allowed=new Map(variable.options.map(o=>[o.code,o.label]))
+  const answers=source.raw.filter(x=>x.waveId===waveId&&x.columnKey===variable.columnKey
+    &&x.missingReason===null&&typeof x.value==='string')
+  const scoreRows=source.scores.filter(s=>s.waveId===waveId
+    &&s.measurement.instrumentKey===scoreInstrumentKey
+    &&s.measurement.scoreKey===scoreKey)
+  if(!scoreRows.length)throw new Error('此波次暂无已完成的研究性计分指标')
+  const signatures=new Set(scoreRows.map(x=>[
+    x.measurement.scoringDigest,x.measurement.responseSignature,
+    x.measurement.respondentType,x.measurement.unit].join(':')))
+  if(signatures.size!==1)throw new Error('本波次包含不可混合的评分版本')
+  const scores=new Map(scoreRows.map(s=>[s.attemptId,s]))
+  const buckets=new Map<string,{attempts:Set<string>;numbers:number[]}>()
+  for(const answer of answers){
+    const code=answer.value as string
+    if(!allowed.has(code))throw new Error('已冻结的分组回答包含未知编码')
+    const bucket=buckets.get(code)||{attempts:new Set<string>(),numbers:[]}
+    if(bucket.attempts.has(answer.attemptId))throw new Error('重复的完成答卷分组标记')
+    bucket.attempts.add(answer.attemptId)
+    const score=scores.get(answer.attemptId)
+    if(score&&score.missingReason===null&&score.value!==null&&Number.isFinite(score.value))
+      bucket.numbers.push(score.value)
+    buckets.set(code,bucket)
+  }
+  const minGroupN=5
+  const groups=[...buckets].filter(([,b])=>b.attempts.size>=minGroupN)
+    .sort(([a],[b])=>a.localeCompare(b))
+    .map(([code,b])=>({
+      optionCode:code,optionLabel:allowed.get(code)!,
+      respondentN:b.attempts.size,scoreValidN:b.numbers.length,
+      mean:numeric(b.numbers).mean,sampleSd:numeric(b.numbers).sd,
+    }))
+  return {waveId,groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey,
+    minGroupN,groups,suppressedGroups:buckets.size-groups.length,
+    note:'仅对冻结的 Form 单选分组做描述性比较；少于 5 份答卷的小组不展示。组均值不能证明因果或诊断。'}
+}
