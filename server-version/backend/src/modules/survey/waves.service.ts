@@ -11,7 +11,7 @@ export class SurveyWaveError extends Error {
   constructor(readonly statusCode:number,message:string){super(message)}
 }
 const fail=(status:number,message:string):never=>{throw new SurveyWaveError(status,message)}
-async function ownProject(tx:Tx,uid:string,pid:string,write:boolean){
+async function ownProject(tx:Tx,uid:string,pid:string,write:boolean,lockForCreate=false){
   const rows=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
     SELECT p.id,p.status,p.collection_mode AS "collectionMode"
     FROM "survey_projects" p
@@ -22,7 +22,9 @@ async function ownProject(tx:Tx,uid:string,pid:string,write:boolean){
       AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
       AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       AND g.status='ACTIVE' AND m.enabled=TRUE
-    FOR SHARE OF p,u,g,m
+    ${lockForCreate
+      ?Prisma.sql`FOR UPDATE OF p FOR SHARE OF u,g,m`
+      :Prisma.sql`FOR SHARE OF p,u,g,m`}
   `
   if(!rows.length)fail(404,'研究项目不存在')
   if(write&&!['DRAFT','ACTIVE'].includes(rows[0].status))fail(409,'当前项目状态禁止编辑波次')
@@ -80,9 +82,9 @@ type WaveInput={
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
   return prisma.$transaction(async tx=>{
-    const project=await ownProject(tx,uid,pid,true)
-    // Serialize ordinal allocation against the owning project row.
-    await tx.$queryRaw`SELECT "id" FROM "survey_projects" WHERE "id"=${pid} FOR UPDATE`
+    // Acquire the strongest project lock first. SHARE -> UPDATE promotion
+    // can deadlock when two creators concurrently allocate the next ordinal.
+    const project=await ownProject(tx,uid,pid,true,true)
     const existing=await tx.surveyWave.findUnique({where:{id:input.requestId}})
     if(existing){
       if(existing.projectId!==pid||existing.status!=='DRAFT'||existing.publicationId
