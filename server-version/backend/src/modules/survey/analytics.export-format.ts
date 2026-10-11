@@ -125,6 +125,9 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
       o.measurement.scoringDigest,o.measurement.responseSignature,
       o.value,o.missingReason,o.sourceFinalHash]
   })
+  if(new Set(attendance.map(a=>a.researchCode)).size*expectedColumns.length
+    +source.length>10000)
+    throw new Error('Score Long exceeds 10000 bounded rows; narrow the Wave selection')
   const present=new Set(source.filter(o=>o.researchCode)
     .map(o=>o.researchCode+':'+columnId(o)))
   const participation=new Map(attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
