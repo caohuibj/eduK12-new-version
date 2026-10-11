@@ -1,5 +1,6 @@
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
+import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -161,6 +162,14 @@ const prepareTracks = async (
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
     await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId)
+    if(teacherFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+    })){
+      await prisma.$transaction(tx=>assertTeacherFormRunUse(tx,{
+        organizationId,runId,
+        ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+      }))
+    }
     registry.assertStartSupported(track.resourceFamily)
     const resourcePolicy = await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
     assertRunTrackNarrowing(resourcePolicy, track.requestedPolicy)
@@ -932,6 +941,14 @@ export const publishAssessmentRun = async (input: {
 
     for (const track of preparedTracks) {
       await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true)
+      if(teacherFormResourceId({
+        family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+      })){
+        await assertTeacherFormRunUse(tx,{
+          organizationId:input.organizationId,runId:input.runId,
+          ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+        })
+      }
       const frozenPolicyJson = JSON.stringify(track.resourcePolicy)
       const policyHash = canonicalHash(track.resourcePolicy)
       await tx.$executeRaw`

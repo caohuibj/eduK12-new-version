@@ -9,6 +9,7 @@ import {
   assertRunTrackNarrowing,type RunResourceRef,type RunTrackNarrowingRequest,
 } from '../assessment-run/resourceAuthority'
 import { assertRegisteredResourceUse } from '../assessment-run/registeredResources'
+import { teacherFormResourceId } from './formRunResource'
 import { assertCurrentRunManagerBoundary,assertCurrentRunPublisherBoundary } from '../assessment-run/resourceBoundary'
 
 export class HuiteacherRunError extends Error{
@@ -62,6 +63,8 @@ export async function addTeacherRunTrack(input:Key&{
   // Teacher products cannot silently recruit School psychological self-assessments.
   // Released content must explicitly permit a Teacher subject, and the request
   // can only narrow an exact frozen resource policy.
+  if(input.resource.family==='FORM'&&!teacherFormResourceId(input.resource))
+    fail('HUITEACHER_FORM_REQUIRES_TEACHER_RELEASE',403)
   if(!policy.subjectRoles.includes('TEACHER')
     ||!input.requestedPolicy.subjectRoles.includes('TEACHER'))
     fail('HUITEACHER_RESOURCE_TARGET_UNSUPPORTED',403)
