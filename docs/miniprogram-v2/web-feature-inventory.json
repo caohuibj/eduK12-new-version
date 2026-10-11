@@ -846,7 +846,7 @@
     {
       "webRoute": "/admin/survey-researchers",
       "roles": [
-        "ADMIN"
+        "AUTHENTICATED"
       ],
       "source": "server-version/frontend/src/App.tsx:409",
       "implementationType": "PENDING_PARITY_REVIEW",
