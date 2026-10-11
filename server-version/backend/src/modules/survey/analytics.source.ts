@@ -149,6 +149,8 @@ export async function loadSurveySource(input:{
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
   completedFrom?:Date;completedBefore?:Date
   pageMode?:boolean
+  /** Paired score aggregation does not need longitudinal attendance matrices. */
+  includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
   snapshotCutOff?:Date
   expectedSourceRevision?:number
@@ -263,7 +265,7 @@ export async function loadSurveySource(input:{
     }
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
-    const attendanceRows=await tx.surveyWaveAttempt.findMany({
+    const attendanceRows=input.includeAttendance===false?[]:await tx.surveyWaveAttempt.findMany({
       where:{
         projectId:input.projectId,
         ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
