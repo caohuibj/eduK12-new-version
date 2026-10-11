@@ -13,7 +13,9 @@ const router = Router()
 router.use((req,res,next)=>{
   const host=String(req.headers.host??'').split(':')[0].toLowerCase()
   const origin=String(req.headers.origin??'').toLowerCase()
-  if(host==='school.eduk12.top'||origin==='https://school.eduk12.top') {
+  const localSchool=process.env.NODE_ENV!=='production'
+    && (host==='school.localhost'||/^https?:\/\/school\.localhost(?::[0-9]+)?$/.test(origin))
+  if(host==='school.eduk12.top'||origin==='https://school.eduk12.top'||localSchool) {
     return res.status(403).json({code:-1,message:'校园版请使用独立账号入口'})
   }
   next()

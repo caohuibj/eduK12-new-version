@@ -3,7 +3,7 @@ import './school.css'
 import './school-workspace.css'
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
-import { schoolNavigation, workspacePage, workspacePath } from './school-navigation'
+import { canReadSchoolClasses, schoolNavigation, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
@@ -65,6 +65,7 @@ export default function SchoolApp(){
   const [loading,setLoading]=useState(true)
   const [screen,setScreen]=useState<'home'|'code'|'recruit'|'feature'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
     ['/register','/staff/register','/parent/register'].includes(window.location.pathname)?'code':
+      window.location.pathname==='/login'?'login':
       window.location.pathname==='/recover'?'recover':
       schoolFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'home')
   const activeFeature=schoolFeatures.find(feature=>feature.path===window.location.pathname)
@@ -159,9 +160,13 @@ export default function SchoolApp(){
     if(!user||!schoolId)return
     setClassId(new URLSearchParams(window.location.search).get('organizationId')===schoolId?new URLSearchParams(window.location.search).get('classUnitId')??'':'');setUnits([]);setSummary(null);setIssuedCodes([]);setAccess(null)
     void api<{access:SchoolAccess}>(`/organizations/${schoolId}/context`)
-      .then(data=>setAccess(data.access)).catch(()=>setAccess(null))
-    void api<{list:Unit[]}>(`/organizations/${schoolId}/units`)
-      .then(result=>setUnits(result.list??[])).catch(()=>setUnits([]))
+      .then(async data=>{
+        setAccess(data.access)
+        if(canReadSchoolClasses(data.access)){
+          const result=await api<{list:Unit[]}>(`/organizations/${schoolId}/units`)
+          setUnits(result.list??[])
+        }
+      }).catch(()=>{setAccess(null);setUnits([])})
   },[schoolId,user])
   const schoolAdmin=access?.orgRole==='ORG_ADMIN' && access.canGovern===true
   const psychologyStaff=!!access?.personas.includes('COUNSELOR')

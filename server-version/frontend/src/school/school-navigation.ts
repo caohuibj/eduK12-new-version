@@ -6,6 +6,12 @@ export const workspacePath=(id:string)=>id==='overview'?'/workspace':`/workspace
 export const workspaceHref=(id:string)=>{const source=new URLSearchParams(window.location.search);const query=new URLSearchParams();for(const name of ['organizationId','classUnitId']){const value=source.get(name);if(value)query.set(name,value)}return workspacePath(id)+(query.size?'?'+query.toString():'')}
 export const workspacePage=(path:string)=>path==='/workspace'||path==='/'?'overview':path.startsWith('/workspace/')?path.slice('/workspace/'.length):'overview'
 
+export function canReadSchoolClasses(access:SchoolAccess|null):boolean {
+ if(!access||access.explicitDenies.some(x=>['*','ORGANIZATION_GOVERNANCE','PSYCHOLOGY_STAFF','CLASS_APPROVE'].includes(x)))return false
+ return (access.orgRole==='ORG_ADMIN'&&access.canGovern)
+  ||(access.personas.includes('COUNSELOR')&&access.capabilities.includes('PSYCHOLOGY_STAFF'))
+}
+
 /** Presentation only: mounted features retain their existing API and capability gates. */
 export function schoolNavigation(role:string,status:string,access:SchoolAccess|null,parentReports:boolean):SchoolNavigationItem[]{
  const items:SchoolNavigationItem[]=[{id:'overview',label:'校园概览',group:'校园空间',description:'从这里进入你的校园功能。',icon:House}]
@@ -28,7 +34,7 @@ export function schoolNavigation(role:string,status:string,access:SchoolAccess|n
   if(access){
    if(access.personas.includes('TEACHER'))add('tasks','学生观察任务','校园活动','查看你的教师观察任务。',ClipboardList)
    add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)
-   add('classes','学校与班级','学校管理','查看学校和班级；管理员可维护年级与班级。',School)
+   if(canReadSchoolClasses(access))add('classes','学校与班级','学校管理','查看学校和班级；管理员可维护年级与班级。',School)
    if(admin||psych){
     add('admission','班级注册与审批','学校管理','处理注册进度、名册与班级审批。',ClipboardList)
     add('recovery','学生账号恢复','学校管理','依照既有流程协助学生恢复校园账号。',ShieldCheck)
