@@ -12,12 +12,11 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
   onChange:(next:FormDraft)=>void;projectId:string}){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
-    const upgraded=pages.some(p=>p.questions.some(q=>professionalTypes.has(q.type)))
-    onChange({...value,pages,schemaVersion:upgraded?2:value.schemaVersion})
+    onChange({...value,pages})
   }
   const setQuestion=(pi:number,qi:number,update:(q:FormQuestion)=>FormQuestion)=>
     setPage(pi,page=>({...page,questions:page.questions.map((q,i)=>i===qi?update(q):q)}))
-  const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1),0)
+  const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1)+(q.otherOptionKey?1:0),0)
   const move=(pi:number,qi:number,by:number)=>{
     setPage(pi,page=>{const questions=page.questions.slice(),other=qi+by
       if(other>=0&&other<questions.length)[questions[qi],questions[other]]=[questions[other],questions[qi]]
@@ -28,7 +27,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
     <div className="flex flex-wrap gap-2 items-center">
       <h3 className="font-semibold">Form 问卷页面 · V{value.schemaVersion}</h3>
       <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
-        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行计 1）</span>
+        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span>
       {value.schemaVersion===1&&<button type="button" className="btn-secondary"
         onClick={()=>onChange({...value,schemaVersion:2})}>
         升级为 Form V2（生成新冻结版本）</button>}
@@ -56,14 +55,21 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
               setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required,allowRefusal:old.allowRefusal}))
-            }}>{Object.entries(types).map(([kind,name])=><option key={kind} value={kind}>{name}</option>)}</select>
+            }}>{Object.entries(types).filter(([kind])=>value.schemaVersion===2||
+              !professionalTypes.has(kind as FormQuestion['type']))
+              .map(([kind,name])=><option key={kind} value={kind}>{name}</option>)}</select>
             <button type="button" className="btn-secondary" disabled={qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
             <button type="button" className="btn-secondary" disabled={qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
-            <button type="button" className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:[
-              ...p.questions.slice(0,qi+1),{...structuredClone(q),itemKey:researchKey('q'),
-                options:q.options.map(o=>({...o,optionKey:researchKey('o')})),
-                rows:q.rows.map(o=>({...o,rowKey:researchKey('r')}))},
-              ...p.questions.slice(qi+1)]}))}>复制</button>
+            <button type="button" className="btn-secondary" onClick={()=>{
+              const copiedOptions=q.options.map(o=>({...o,optionKey:researchKey('o')}))
+              const remap=new Map(q.options.map((o,i)=>[o.optionKey,copiedOptions[i].optionKey]))
+              const clone:FormQuestion={...structuredClone(q),itemKey:researchKey('q'),
+                options:copiedOptions,rows:q.rows.map(row=>({...row,rowKey:researchKey('r')})),
+                otherOptionKey:q.otherOptionKey?remap.get(q.otherOptionKey):undefined,
+                exclusiveOptionKeys:q.exclusiveOptionKeys?.map(key=>remap.get(key)!).filter(Boolean)}
+              setPage(pi,p=>({...p,questions:[
+                ...p.questions.slice(0,qi+1),clone,...p.questions.slice(qi+1)]}))
+            }}>复制</button>
             <button type="button" className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>删除</button>
           </div>
           <label className="block text-sm">题干
@@ -87,10 +93,41 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               <input className="input flex-1" aria-label={'选项 '+(oi+1)} value={o.label}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,options:x.options.map(a=>a.optionKey===o.optionKey?{...a,label:e.target.value}:a)}))}/>
               <button className="btn-secondary" type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
-                options:x.options.filter(a=>a.optionKey!==o.optionKey)}))}>删除</button>
+                options:x.options.filter(a=>a.optionKey!==o.optionKey),
+                otherOptionKey:x.otherOptionKey===o.optionKey?undefined:x.otherOptionKey,
+                otherMaxLength:x.otherOptionKey===o.optionKey?undefined:x.otherMaxLength,
+                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>删除</button>
             </div>)}
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
           </div>}
+          {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
+            <div className="border rounded-lg p-3 space-y-3">
+              <label className="block text-sm">其他，请填写（不选则不记录文本）
+                <select className="input block w-full" value={q.otherOptionKey??''}
+                  onChange={e=>setQuestion(pi,qi,x=>({...x,
+                    otherOptionKey:e.target.value||undefined,
+                    otherMaxLength:e.target.value?(x.otherMaxLength??300):undefined}))}>
+                  <option value="">不启用</option>
+                  {q.options.map(o=><option key={o.optionKey} value={o.optionKey}>
+                    {o.label||o.optionKey}</option>)}
+                </select>
+              </label>
+              {q.otherOptionKey&&<label className="block text-sm">其他文字长度上限
+                <input className="input block w-full" type="number" min="1" max="2000" step="1"
+                  value={q.otherMaxLength??300}
+                  onChange={e=>setQuestion(pi,qi,x=>({...x,otherMaxLength:Number(e.target.value)}))}/>
+              </label>}
+              {q.type==='MULTIPLE'&&<fieldset className="space-y-2">
+                <legend className="text-sm">互斥选项（选中后排除其他所有选项）</legend>
+                {q.options.map(o=><label className="flex items-center gap-2 text-sm" key={o.optionKey}>
+                  <input type="checkbox" checked={q.exclusiveOptionKeys?.includes(o.optionKey)??false}
+                    onChange={e=>setQuestion(pi,qi,x=>({...x,
+                      exclusiveOptionKeys:e.target.checked?
+                        [...(x.exclusiveOptionKeys??[]),o.optionKey]:
+                        (x.exclusiveOptionKeys??[]).filter(key=>key!==o.optionKey)}))}/>
+                  {o.label||o.optionKey}</label>)}
+              </fieldset>}
+            </div>}
           {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<div className="space-y-2">
             <p className="text-sm font-medium">矩阵行</p>
             {q.rows.map((row,ri)=><div key={row.rowKey} className="flex gap-2">
@@ -167,7 +204,8 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
           </div>}
         </article>
       })}
-      <div className="flex flex-wrap gap-2">{Object.entries(types).map(([type,title])=>
+      <div className="flex flex-wrap gap-2">{Object.entries(types).filter(([type])=>value.schemaVersion===2||
+        !professionalTypes.has(type as FormQuestion['type'])).map(([type,title])=>
         <button type="button" className="btn-secondary" key={type}
           onClick={()=>setPage(pi,p=>({...p,questions:[...p.questions,newQuestion(type as FormQuestion['type'])]}))}>
           + {title}</button>)}</div>
