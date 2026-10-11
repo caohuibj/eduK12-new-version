@@ -41,7 +41,7 @@ export function ResearchFormEditor({value,onChange}:{value:FormDraft;onChange:(n
             <select className="input" aria-label="选择题型" value={q.type} onChange={e=>{
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
-              setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required}))
+              setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required,allowRefusal:old.allowRefusal}))
             }}>{Object.entries(types).map(([kind,name])=><option key={kind} value={kind}>{name}</option>)}</select>
             <button type="button" className="btn-secondary" disabled={qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
             <button type="button" className="btn-secondary" disabled={qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
@@ -56,8 +56,15 @@ export function ResearchFormEditor({value,onChange}:{value:FormDraft;onChange:(n
             <textarea className="input w-full block" rows={2} value={q.prompt}
               onChange={e=>setQuestion(pi,qi,x=>({...x,prompt:e.target.value}))}/>
           </label>
-          <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
-            onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>
+          <div className="flex gap-4 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
+              onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={q.allowRefusal===true}
+                onChange={e=>setQuestion(pi,qi,x=>({...x,allowRefusal:e.target.checked}))}/>
+              允许明确选择「不愿回答」（单独记为 REFUSED）
+            </label>
+          </div>
           {choiceTypes.has(q.type)&&<div className="space-y-2">
             <p className="text-sm font-medium">选项</p>
             {q.options.map((o,oi)=><div className="flex gap-2" key={o.optionKey}>

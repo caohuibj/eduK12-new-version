@@ -88,6 +88,20 @@ describe('Survey RESEARCH_ONLY authoritative FINAL',()=>{
     expect(()=>computeSurveyFinal(pub,{researchinstrument:{first:'not-an-option',second:'bone'}}))
       .toThrow(SurveyFinalValidationError)
   })
+  it('distinguishes an explicit refusal from skipped, hidden and ordinary missing',()=>{
+    const withRefusal:FormDraft=structuredClone(form)
+    withRefusal.pages[0].questions[0].allowRefusal=true
+    withRefusal.pages[0].questions[1].allowRefusal=true
+    const pub=snapshot(frozen('FORM',withRefusal))
+    const refused=computeSurveyFinal(pub,{researchinstrument:{subject:'REFUSED'}})
+    expect(refused.units[0].missing).toContainEqual({itemKey:'subject',reason:'REFUSED'})
+    expect(refused.units[0].missing).toContainEqual({itemKey:'reflection',reason:'NOT_SHOWN'})
+    const shown=computeSurveyFinal(pub,{researchinstrument:{subject:'math',reflection:'REFUSED'}})
+    expect(shown.units[0].missing).toContainEqual({itemKey:'reflection',reason:'REFUSED'})
+    const unmarked=snapshot(frozen('FORM',form))
+    expect(()=>computeSurveyFinal(unmarked,{researchinstrument:{subject:'REFUSED'}}))
+      .toThrow(SurveyFinalValidationError)
+  })
   it('forbids missing or non-frozen tools and deliberately cannot produce a personalized report',()=>{
     const frozenUnit=frozen('FORM',form)
     expect(()=>computeSurveyFinal(snapshot(frozenUnit),{})).toThrow(SurveyFinalValidationError)

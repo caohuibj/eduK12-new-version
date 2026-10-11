@@ -19,6 +19,7 @@ export const formQuestionSchema=z.object({
   type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX']),
   prompt:note,
   required:z.boolean(),
+  allowRefusal:z.boolean().optional(),
   options:z.array(option).max(30).default([]),
   rows:z.array(z.object({rowKey:key,label}).strict()).max(40).default([]),
   min:z.number().finite().optional(),max:z.number().finite().optional(),

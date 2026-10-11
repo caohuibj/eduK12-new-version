@@ -34,6 +34,10 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full"
         aria-label={q.prompt||'文本回答'} rows={q.type==='SHORT_TEXT'?1:4}
         value={String(answers[q.itemKey]||'')} onChange={e=>choose(q.itemKey,e.target.value)}/>}
+      {q.allowRefusal&&<label className="flex gap-2 items-center text-sm">
+        <input type="checkbox" checked={answers[q.itemKey]==='REFUSED'}
+          onChange={e=>choose(q.itemKey,e.target.checked?'REFUSED':'')}/>不愿回答（独立于未作答）
+      </label>}
       {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
         type="number" min={q.min} max={q.max}
         value={answers[q.itemKey]??''} onChange={e=>choose(q.itemKey,e.target.value===''?'':Number(e.target.value))}/>}

@@ -6,7 +6,7 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[]}
 type Choice={optionKey:string;label:string}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;required:boolean;
-  options:Choice[];rows?:{rowKey:string;label:string}[];displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
+  options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;maxLength?:number}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;
   stimulus?:string;scenarioTitle?:string;
@@ -53,18 +53,32 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full text-sm">
-        <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}</tr></thead>
+        <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}
+          {q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{(q.rows||[]).map(row=><tr key={row.rowKey}><th scope="row">{row.label}</th>{q.options.map(o=><td className="text-center" key={o.optionKey}>
           <input type="radio" name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
             checked={answer[q.itemKey+':'+row.rowKey]===o.optionKey}
             onChange={()=>onChange(q.itemKey+':'+row.rowKey,o.optionKey)}/>
-        </td>)}</tr>)}</tbody></table></div>}
+        </td>)}
+        {q.allowRefusal&&<td className="text-center"><input type="radio"
+          aria-label={'不愿回答：'+row.label}
+          name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
+          checked={answer[q.itemKey+':'+row.rowKey]==='REFUSED'}
+          onChange={()=>onChange(q.itemKey+':'+row.rowKey,'REFUSED')}/></td>}</tr>)}</tbody></table></div>}
       {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max}
-        aria-label={q.prompt} value={answer[q.itemKey]??''}
+        aria-label={q.prompt} value={answer[q.itemKey]==='REFUSED'?'':answer[q.itemKey]??''}
+        disabled={answer[q.itemKey]==='REFUSED'}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
+      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="block my-3 text-sm">
+        <input type="checkbox" checked={answer[q.itemKey]==='REFUSED'}
+          onChange={e=>onChange(q.itemKey,e.target.checked?'REFUSED':null)}/>
+        我选择不回答这一题（REFUSED）
+      </label>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full" aria-label={q.prompt}
         rows={q.type==='SHORT_TEXT'?2:5} maxLength={q.maxLength??(q.type==='SHORT_TEXT'?300:10000)}
-        value={String(answer[q.itemKey]??'')} onChange={e=>onChange(q.itemKey,e.target.value)}/>}
+        value={answer[q.itemKey]==='REFUSED'?'':String(answer[q.itemKey]??'')}
+        disabled={answer[q.itemKey]==='REFUSED'}
+        onChange={e=>onChange(q.itemKey,e.target.value)}/>}
     </fieldset>
   }
   return <section className="border rounded-xl bg-slate-50 p-4 my-5">

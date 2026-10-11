@@ -3,7 +3,7 @@ export type Option={optionKey:string;label:string;score?:number}
 export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
 export type FormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
-  prompt:string;required:boolean;options:Option[];rows:{rowKey:string;label:string}[];
+  prompt:string;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;maxLength?:number;displayIf?:Condition
 }
 export type FormDraft={schemaVersion:1;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
@@ -34,7 +34,7 @@ export const researchKey=(prefix='k')=>prefix+crypto.randomUUID().replace(/-/g,'
 export const choiceTypes=new Set<FormQuestion['type']>(['SINGLE','MULTIPLE','LIKERT','MATRIX'])
 export const newOption=():Option=>({optionKey:researchKey('o'),label:'新选项'})
 export const newQuestion=(type:FormQuestion['type']):FormQuestion=>({
-  itemKey:researchKey('q'),type,prompt:'',required:true,
+  itemKey:researchKey('q'),type,prompt:'',required:true,allowRefusal:false,
   options:choiceTypes.has(type)?[newOption(),newOption()]:[],
   rows:type==='MATRIX'?[{rowKey:researchKey('r'),label:'第一行'}]:[],
 })

@@ -72,6 +72,12 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       continue
     }
     const value=answers[q.itemKey]
+    if(q.type!=='MATRIX'&&value==='REFUSED'){
+      if(!q.allowRefusal)invalid(path,'此题未声明允许明确拒答')
+      missing.push({itemKey:q.itemKey,reason:'REFUSED'})
+      previous[q.itemKey]=null
+      continue
+    }
     if(q.type==='SINGLE'||q.type==='LIKERT'){
       const v=optionValue(value,q.options.map(x=>x.optionKey),path,q.required)
       if(v===null)missing.push({itemKey:q.itemKey,reason:'SHOWN_MISSING'})
@@ -92,6 +98,11 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       const rows:Record<string,string>={}
       for(const row of q.rows){
         const rowKey=q.itemKey+':'+row.rowKey
+        if(answers[rowKey]==='REFUSED'){
+          if(!q.allowRefusal)invalid(path+'.'+row.rowKey,'此矩阵行未声明允许明确拒答')
+          missing.push({itemKey:rowKey,reason:'REFUSED'})
+          continue
+        }
         const v=optionValue(answers[rowKey],q.options.map(x=>x.optionKey),path+'.'+row.rowKey,q.required)
         if(v!==null)rows[row.rowKey]=v
         else missing.push({itemKey:rowKey,reason:'SHOWN_MISSING'})
