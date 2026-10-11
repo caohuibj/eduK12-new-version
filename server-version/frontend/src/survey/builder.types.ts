@@ -7,12 +7,16 @@ export type SurveyImage={
 }
 export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 export type FormQuestion={
-  itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
+  itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX'|
+    'DATE'|'TIME'|'RANK_ORDER'|'SLIDER'|'CONSTANT_SUM'|'MATRIX_MULTIPLE';
   prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
-  maxLength?:number;displayIf?:Condition
+  maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;
+  timeZone?:'Asia/Shanghai'|'UTC';textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
+  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[];
+  displayIf?:Condition
 }
-export type FormDraft={schemaVersion:1;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
+export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
 export type ScaleDraft={
   schemaVersion:1;respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];
@@ -41,10 +45,16 @@ export type ResearchDraft={
 }
 export type Issue={path:string;message:string;severity:'error'|'warning'}
 export const researchKey=(prefix='k')=>prefix+crypto.randomUUID().replace(/-/g,'').slice(0,18)
-export const choiceTypes=new Set<FormQuestion['type']>(['SINGLE','MULTIPLE','LIKERT','MATRIX'])
+export const choiceTypes=new Set<FormQuestion['type']>([
+  'SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
+export const professionalTypes=new Set<FormQuestion['type']>([
+  'DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
 export const newOption=():Option=>({optionKey:researchKey('o'),label:'新选项'})
 export const newQuestion=(type:FormQuestion['type']):FormQuestion=>({
   itemKey:researchKey('q'),type,prompt:'',required:true,allowRefusal:false,
   options:choiceTypes.has(type)?[newOption(),newOption()]:[],
-  rows:type==='MATRIX'?[{rowKey:researchKey('r'),label:'第一行'}]:[],
+  rows:['MATRIX','MATRIX_MULTIPLE'].includes(type)?[{rowKey:researchKey('r'),label:'第一行'}]:[],
+  ...(type==='TIME'?{timeZone:'Asia/Shanghai' as const}:{}),
+  ...(type==='SLIDER'?{min:0,max:100,step:1,precision:0}:{}),
+  ...(type==='CONSTANT_SUM'?{total:100,integerOnly:true}:{}),
 })

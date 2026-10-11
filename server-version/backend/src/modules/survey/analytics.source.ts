@@ -17,6 +17,9 @@ export interface ResearchRawCodebook {
   definitionDigest:string;scoringDigest:string|null
   publicationVersion:number
   instrumentRevision:number
+  timeZone?:'Asia/Shanghai'|'UTC'
+  valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
+  formSchemaVersion?:1|2
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -54,28 +57,39 @@ const missingFrom=(unit:FrozenUnitResult,key:string):MissingReason|null=>{
   const row=unit.missing.find(x=>x.itemKey===key)
   return row?.reason??null
 }
+const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEncoding']>=>
+  type==='RANK_ORDER'||type==='MULTIPLE'||type==='MATRIX_MULTIPLE'||type==='SJT_MULTIPLE'
+    ?'JSON_STRING_ARRAY':type==='CONSTANT_SUM'?'JSON_NUMBER_OBJECT':
+    type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
 const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
-  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null
+  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
+  timeZone?:'Asia/Shanghai'|'UTC'
 }>=>{
   const values=unit.rawAnswers
-  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null}>=[]
-  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[])=>{
+  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;timeZone?:'Asia/Shanghai'|'UTC'}>=[]
+  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[],timeZone?:'Asia/Shanghai'|'UTC')=>{
     const value=cleanValue(values[key]??null)
-    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key)})
+    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key),timeZone})
   }
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
     for(const page of draft.pages)for(const q of page.questions){
       const options=q.options.map(o=>({code:o.optionKey,label:o.label}))
-      if(q.type==='MATRIX'){
+      if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
         const value=values[q.itemKey]
-        const normalized=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,string>:{}
+        const normalized=value&&typeof value==='object'&&!Array.isArray(value)
+          ?value as Record<string,string|string[]>:{}
         for(const row of q.rows){
           const key=q.itemKey+':'+row.rowKey
-          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:'MATRIX',options,
-            value:normalized[row.rowKey]??null,missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
+          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:q.type,options,
+            value:cleanValue(normalized[row.rowKey]??null),
+            missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
-      }else add(q.itemKey,q.prompt,q.type,options)
+      }else{
+        add(q.itemKey,q.prompt,q.type,options,q.timeZone)
+        if(q.otherOptionKey)
+          add(q.itemKey+':other',q.prompt+'／其他填写','OTHER_TEXT',[])
+      }
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
@@ -144,6 +158,10 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
  * Survey records, verifies the encrypted FINAL hash, and projects minimum data.
  * No arbitrary project administrator inherits the raw-data grant.
  */
+/** Exclusive safe upper bound after PostgreSQL microseconds round-trip through JS Date. */
+export function surveyExclusiveSnapshotCutOff(timestamp:Date):Date {
+  return new Date(timestamp.getTime()+1)
+}
 export async function loadSurveySource(input:{
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
   /** Only Wide exports need the schema of Waves with no completed FINAL. */
@@ -183,7 +201,13 @@ export async function loadSurveySource(input:{
     }
     // Stage 1: select only small identifiers; never deserialize full encrypted
     // FINALs and large Publication JSON before applying the memory budget.
-    const cutOff=input.snapshotCutOff||project.sourceCutOff
+    // PostgreSQL timestamptz(6) carries microseconds, but Prisma's JS Date
+    // retains only whole milliseconds. Round the transaction timestamp UP to
+    // the following millisecond for the exclusive cutoff; otherwise a valid
+    // FINAL committed earlier in this same millisecond can disappear.
+    // RepeatableRead still pins the first-page snapshot, and the existing
+    // exact count/revision guards detect later cross-request commits.
+    const cutOff=input.snapshotCutOff??surveyExclusiveSnapshotCutOff(project.sourceCutOff)
     if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
     const sourceWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,
@@ -322,6 +346,9 @@ export async function loadSurveySource(input:{
             responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options,
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
+            ...(item.timeZone?{timeZone:item.timeZone}:{}),
+            valueEncoding:answerValueEncoding(item.responseType),
+            ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
@@ -370,7 +397,11 @@ export async function loadSurveySource(input:{
               title:frozen.title,prompt:r.prompt,options:r.options,
               definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
               publicationVersion:publication.version,
-              instrumentRevision:frozen.draftRevision})
+              instrumentRevision:frozen.draftRevision,
+              ...(r.timeZone?{timeZone:r.timeZone}:{}),
+              valueEncoding:answerValueEncoding(r.responseType),
+              ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+            })
         }
       }
     }

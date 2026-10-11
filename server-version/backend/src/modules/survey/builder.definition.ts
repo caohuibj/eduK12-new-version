@@ -26,10 +26,23 @@ const condition = z.object({
 export const SURVEY_FORM_MAX_ANSWER_FIELDS=500
 /** Count wire-level keys; each MATRIX row is one key before FINAL normalization. */
 export const formAnswerFieldCount=(form:FormDraft)=>form.pages.reduce((sum,page)=>
-  sum+page.questions.reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0),0)
+  sum+page.questions.reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1)
+    +(q.otherOptionKey?1:0),0),0)
+/** V2 question registry is fixed application code, never researcher-supplied scripts. */
+export const formQuestionRegistry={
+  SINGLE:{version:1,shape:'choice'},MULTIPLE:{version:1,shape:'choices'},
+  SHORT_TEXT:{version:1,shape:'text'},LONG_TEXT:{version:1,shape:'text'},
+  NUMBER:{version:1,shape:'number'},LIKERT:{version:1,shape:'choice'},
+  MATRIX:{version:1,shape:'row_choice'},
+  DATE:{version:2,shape:'date'},TIME:{version:2,shape:'time'},
+  RANK_ORDER:{version:2,shape:'ranking'},SLIDER:{version:2,shape:'number'},
+  CONSTANT_SUM:{version:2,shape:'option_numbers'},
+  MATRIX_MULTIPLE:{version:2,shape:'row_choices'},
+} as const
+export type FormQuestionType=keyof typeof formQuestionRegistry
 /** Conservative maximum serialized answer bytes before an instrument is published.
  * JSON may expand control characters to 6 ASCII bytes per UTF-16 code unit.
- * This protects both large free-text forms and dense V1 matrix responses.
+ * This protects both simple large free-text forms and dense matrix multi-select.
  */
 export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
   const quote=(value:string)=>Buffer.byteLength(JSON.stringify(value),'utf8')
@@ -41,19 +54,25 @@ export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
     const valueBytes=()=>{
       if(q.type==='SHORT_TEXT'||q.type==='LONG_TEXT')
         return 2+6*(q.maxLength??(q.type==='SHORT_TEXT'?300:10000))
-      if(q.type==='MULTIPLE')return allOptions
-      if(q.type==='NUMBER')return 30
+      if(q.type==='MULTIPLE'||q.type==='RANK_ORDER')return allOptions
+      if(q.type==='CONSTANT_SUM')return 2+q.options.reduce((n,o)=>n+quote(o.optionKey)+32,0)
+      if(q.type==='DATE')return 12
+      if(q.type==='TIME')return 7
+      if(q.type==='NUMBER'||q.type==='SLIDER')return 30
       return option
     }
-    if(q.type==='MATRIX'){
-      for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+option+2
+    if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
+      for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+
+        (q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
     }else bytes+=quote(q.itemKey)+valueBytes()+2
+    if(q.otherOptionKey)bytes+=quote(q.itemKey+':other')+2+6*(q.otherMaxLength??300)+2
   }
   return bytes
 }
 export const formQuestionSchema=z.object({
   itemKey:key,
-  type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX']),
+  type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX',
+    'DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE']),
   prompt:note,
   image:surveyImageSchema.optional(),
   required:z.boolean(),
@@ -64,11 +83,19 @@ export const formQuestionSchema=z.object({
   integerOnly:z.boolean().optional(),
   step:z.number().finite().positive().max(1000000000).optional(),
   precision:z.number().int().min(0).max(8).optional(),
+  total:z.number().finite().min(0).max(1000000).optional(),
+  minSelections:z.number().int().min(1).max(30).optional(),
+  maxSelections:z.number().int().min(1).max(30).optional(),
+  textValidation:z.enum(['EMAIL','DIGITS','ALPHANUMERIC']).optional(),
+  otherOptionKey:key.optional(),otherMaxLength:z.number().int().min(1).max(2000).optional(),
+  exclusiveOptionKeys:z.array(key).max(30).optional(),
+  timeZone:z.enum(['Asia/Shanghai','UTC']).optional(),
   maxLength:z.number().int().min(1).max(10000).optional(),
   displayIf:condition.optional(),
 }).strict()
+export type FormQuestion=z.infer<typeof formQuestionSchema>
 export const formDraftSchema=z.object({
-  schemaVersion:z.literal(1),
+  schemaVersion:z.union([z.literal(1),z.literal(2)]),
   pages:z.array(z.object({
     pageKey:key,title:label,
     questions:z.array(formQuestionSchema).max(80),
@@ -183,22 +210,71 @@ export const validateSurveyDraft=(
         if(forPreview)requireText(q.prompt,path+'.prompt',issues)
         if(forPreview&&q.image&&(q.image.rightsStatus==='unknown'||!q.image.rightsNote.trim()))
           err(issues,path+'.image','研究图片须明确作者或使用许可来源，才可发布')
+        if(d.schemaVersion===1&&formQuestionRegistry[q.type].version>1)
+          err(issues,path+'.type','专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义')
+        if(d.schemaVersion===1&&(q.minSelections!==undefined||q.maxSelections!==undefined||
+          q.textValidation!==undefined||q.otherOptionKey!==undefined||
+          q.otherMaxLength!==undefined||q.exclusiveOptionKeys!==undefined))
+          err(issues,path+'.schemaVersion','新的选项与文本校验规则只允许在 Form V2 中配置')
         unique(q.options.map(o=>o.optionKey),path+'.options',issues)
         unique(q.rows.map(o=>o.rowKey),path+'.rows',issues)
-        if(['SINGLE','MULTIPLE','LIKERT','MATRIX'].includes(q.type)){
+        if(q.otherOptionKey!==undefined){
+          if(d.schemaVersion!==2||!['SINGLE','MULTIPLE'].includes(q.type))
+            err(issues,path+'.otherOptionKey','其他文本只允许 Form V2 的单选或多选题')
+          if(!q.options.some(o=>o.optionKey===q.otherOptionKey))
+            err(issues,path+'.otherOptionKey','其他填写选项必须对应已有选项编码')
+        }else if(q.otherMaxLength!==undefined)
+          err(issues,path+'.otherMaxLength','请先设置其他填写选项')
+        if(q.exclusiveOptionKeys!==undefined){
+          if(d.schemaVersion!==2||q.type!=='MULTIPLE')
+            err(issues,path+'.exclusiveOptionKeys','互斥选项只允许 Form V2 多选题')
+          unique(q.exclusiveOptionKeys,path+'.exclusiveOptionKeys',issues)
+          for(const exclusive of q.exclusiveOptionKeys)
+            if(!q.options.some(o=>o.optionKey===exclusive))
+              err(issues,path+'.exclusiveOptionKeys','互斥选项编码不存在于本题')
+          if(q.exclusiveOptionKeys.length>0&&(q.minSelections??1)>1)
+            err(issues,path+'.minSelections','存在互斥选项时最少选择不能大于 1')
+        }
+        if(['SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)){
           if(forPreview&&q.options.length<2)err(issues,path+'.options','选择题至少需要两项有效选项')
           if(forPreview)q.options.forEach((o,oi)=>requireText(o.label,path+`.options.${oi}`,issues))
         }else if(q.options.length)err(issues,path+'.options','非选项题不应附带选项')
-        if(q.type==='MATRIX'){
+        if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
           if(forPreview&&!q.rows.length)err(issues,path+'.rows','矩阵题至少需要一行')
           if(forPreview)q.rows.forEach((o,oi)=>requireText(o.label,path+`.rows.${oi}`,issues))
         }else if(q.rows.length)err(issues,path+'.rows','只有矩阵题包含行编码')
+        if(q.type==='CONSTANT_SUM'&&q.total===undefined)
+          err(issues,path+'.total','恒定总和题必须设定目标总值（允许 0）')
+        if(q.type==='CONSTANT_SUM'&&q.integerOnly&&q.total!==undefined&&
+          !Number.isSafeInteger(q.total))
+          err(issues,path+'.total','整数恒定总和题必须使用安全整数目标总值')
+        if(q.type!=='CONSTANT_SUM'&&q.total!==undefined)
+          err(issues,path+'.total','只有恒定总和题可以设定目标总值')
+        if(q.type==='TIME'&&!q.timeZone)
+          err(issues,path+'.timeZone','时间题必须声明时区')
+        if(q.type!=='TIME'&&q.timeZone!==undefined)
+          err(issues,path+'.timeZone','时区仅适用于时间题')
+        if(!['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&
+          (q.minSelections!==undefined||q.maxSelections!==undefined))
+          err(issues,path+'.minSelections','选择数量限制仅适用于多选题')
+        if(['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&(
+          (q.minSelections!==undefined&&q.maxSelections!==undefined&&q.minSelections>q.maxSelections)||
+          (q.maxSelections!==undefined&&q.maxSelections>q.options.length)||
+          (q.minSelections!==undefined&&q.minSelections>q.options.length)))
+          err(issues,path+'.maxSelections','选择数量必须落在有效选项数量内')
+        if(!['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&q.textValidation!==undefined)
+          err(issues,path+'.textValidation','文本格式限制仅适用于文本题')
+        if(q.type==='SLIDER'&&(q.min===undefined||q.max===undefined))
+          err(issues,path,'滑块题必须声明上下界')
         if(q.min!==undefined&&q.max!==undefined&&q.min>q.max)
           err(issues,path,'最小数值不能大于最大数值')
-        if(q.type!=='NUMBER'&&(q.min!==undefined||q.max!==undefined||
-          q.integerOnly!==undefined||q.step!==undefined||q.precision!==undefined))
-          err(issues,path,'数值约束仅可用于数值题')
-        if(q.type==='NUMBER'){
+        if(!['NUMBER','SLIDER','CONSTANT_SUM'].includes(q.type)&&(
+          q.min!==undefined||q.max!==undefined||q.integerOnly!==undefined||
+          q.step!==undefined||q.precision!==undefined))
+          err(issues,path,'数值约束仅可用于数值题、滑块或恒定总和题')
+        if(q.type==='CONSTANT_SUM'&&(q.min!==undefined||q.max!==undefined||q.step!==undefined||q.precision!==undefined))
+          err(issues,path,'恒定总和题只允许整数约束和指定总和')
+        if(['NUMBER','SLIDER','CONSTANT_SUM'].includes(q.type)){
           if(q.integerOnly&&q.precision!==undefined&&q.precision!==0)
             err(issues,path+'.precision','整数题精度必须为 0')
           if(q.integerOnly&&q.step!==undefined&&!Number.isSafeInteger(q.step))

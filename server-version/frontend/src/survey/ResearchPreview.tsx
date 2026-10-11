@@ -1,22 +1,47 @@
 import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
+import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
+import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
 
 type Refusal={_surveyRefusal:true}
-type Answer=string|number|string[]|Refusal|null
+type Answer=ProfessionalAnswer
 const refusal=():Refusal=>({_surveyRefusal:true})
 const isRefusal=(value:Answer|undefined):value is Refusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
     &&value._surveyRefusal===true
-export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:ResearchDraft;
+export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{draft:ResearchDraft;
   onSimulate:(answers:Record<string,string|number|string[]>)=>void;
-  onValidateForm?:(answers:Record<string,Answer>)=>void}){
+  onValidateForm?:(answers:Record<string,Answer>)=>void;
+  errorPath?:string}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
-  useEffect(()=>{setAnswers({})},[draft.id])
-  const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
+  const [pageIndex,setPageIndex]=useState(0)
+  useEffect(()=>{setAnswers({});setPageIndex(0)},[draft.id,draft.revision])
+  useEffect(()=>{
+    if(draft.kind!=='FORM'||!errorPath)return
+    const key=errorPath.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
+    if(!key)return
+    const index=(draft.definition as FormDraft).pages.findIndex(p=>p.questions.some(q=>q.itemKey===key))
+    if(index>=0)setPageIndex(index)
+  },[draft,errorPath])
+  const choose=(key:string,value:Answer)=>setAnswers(old=>{
+    const next={...old,[key]:value}
+    if(draft.kind==='FORM'){
+      const question=(draft.definition as FormDraft).pages.flatMap(p=>p.questions)
+        .find(q=>q.itemKey===key&&q.otherOptionKey)
+      if(question&&!hasSelectedOther(question,value))
+        delete next[question.itemKey+':other']
+    }
+    return next
+  })
   const visible=draft.kind==='FORM'
     ?visibleFormKeys((draft.definition as FormDraft).pages.flatMap(p=>p.questions),answers)
     :null
+  const formPages=draft.kind==='FORM'
+    ?(draft.definition as FormDraft).pages.filter(page=>page.questions.some(q=>visible?.has(q.itemKey)))
+    :[]
+  const currentIndex=Math.min(pageIndex,Math.max(0,formPages.length-1))
+  const currentPage=formPages[currentIndex]
   const simulate=()=>{
     // Score simulation is only offered for SCALE / SJT, not Form refusal answers.
     const scoreAnswers:Record<string,string|number|string[]>={}
@@ -44,9 +69,12 @@ export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:Researc
         const current=Array.isArray(answers[q.itemKey])?answers[q.itemKey] as string[]:[]
         return <label key={o.optionKey} className="flex gap-2 my-2 items-center">
           <input type="checkbox" checked={current.includes(o.optionKey)}
-            onChange={e=>choose(q.itemKey,e.target.checked?[...current,o.optionKey]:current.filter(x=>x!==o.optionKey))}/>
+            onChange={e=>choose(q.itemKey,toggleFormMultiple(current,o.optionKey,e.target.checked,
+              q.exclusiveOptionKeys))}/>
           {o.label||'未填写选项'}</label>
       })}
+      {['SINGLE','MULTIPLE'].includes(q.type)&&q.otherOptionKey&&
+        <FormChoiceExtras question={q} answers={answers} onChange={choose}/>}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full border-collapse text-sm">
         <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}{q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
@@ -62,10 +90,12 @@ export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:Researc
         value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
         disabled={isRefusal(answers[q.itemKey])}
         onChange={e=>choose(q.itemKey,e.target.value)}/>}
-      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="flex gap-2 items-center text-sm">
+      {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="flex gap-2 items-center text-sm">
         <input type="checkbox" checked={isRefusal(answers[q.itemKey])}
           onChange={e=>choose(q.itemKey,e.target.checked?refusal():null)}/>不愿回答（独立于未作答）
       </label>}
+      {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
+        <ProfessionalFormAnswer question={q} answers={answers} prefix="preview" onAnswer={choose}/>}
       {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
         type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
@@ -76,8 +106,21 @@ export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:Researc
   return <section className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
     <div><h3 className="text-lg font-semibold">模拟作答（不保存正式数据）</h3>
       <p className="text-xs text-slate-600">预览仅用于检查内容、条件与研究计分，绝不产生正式研究被试或 FINAL。</p></div>
-    {draft.kind==='FORM'&&(draft.definition as FormDraft).pages.map(page=><div key={page.pageKey}>
-      <h4 className="font-semibold">{page.title}</h4>{page.questions.map(question)}</div>)}
+    {draft.kind==='FORM'&&<div>
+      <p className="text-sm" role="status">第 {currentPage?currentIndex+1:0} / {formPages.length} 页</p>
+      <progress className="w-full" max={Math.max(1,formPages.length)}
+        value={currentPage?currentIndex+1:0} aria-label="研究者表单预览进度"/>
+      {currentPage&&<div key={currentPage.pageKey}>
+        <h4 className="font-semibold">{currentPage.title}</h4>{currentPage.questions.map(question)}
+      </div>}
+      <nav className="flex justify-between mt-3 gap-2" aria-label="试答分页">
+        <button type="button" className="btn-secondary" disabled={currentIndex<=0}
+          onClick={()=>setPageIndex(Math.max(0,currentIndex-1))}>上一页</button>
+        <button type="button" className="btn-secondary"
+          disabled={!currentPage||currentIndex>=formPages.length-1}
+          onClick={()=>setPageIndex(currentIndex+1)}>下一页</button>
+      </nav>
+    </div>}
     {draft.kind==='SCALE'&&(draft.definition as ScaleDraft).items.map(q=><fieldset className="border rounded-lg bg-white p-3" key={q.itemKey}>
       <legend>{q.prompt||'未填写题干'}</legend>
       {(draft.definition as ScaleDraft).responseOptions.map(o=><label key={o.optionKey} className="block my-1">

@@ -836,6 +836,76 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
 
+  it('freezes, answers, audits and privacy-filters an actual V2 Form FINAL in PostgreSQL',async()=>{
+    const professional:FormDraft={schemaVersion:2,pages:[{pageKey:'formv2',title:'研究任务',questions:[
+      {itemKey:'date',type:'DATE',prompt:'日期',required:true,options:[],rows:[]},
+      {itemKey:'rank',type:'RANK_ORDER',prompt:'排序',required:true,rows:[],
+        options:[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]},
+      {itemKey:'slider',type:'SLIDER',prompt:'滑块',required:true,rows:[],
+        options:[],min:0,max:10,step:2,integerOnly:true},
+      {itemKey:'total',type:'CONSTANT_SUM',prompt:'总和',required:true,rows:[],
+        total:10,integerOnly:true,options:[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]},
+      {itemKey:'choice',type:'MULTIPLE',prompt:'选项',required:true,rows:[],
+        options:[{optionKey:'a',label:'A'},{optionKey:'other',label:'其他'},
+          {optionKey:'none',label:'无'}],
+        otherOptionKey:'other',otherMaxLength:100,exclusiveOptionKeys:['none']},
+    ]}]}
+    const iid=await instrument('FORM',professional)
+    const w=await wave('Form V2 真实 PostgreSQL 作答',[iid],true)
+    const person=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,consent:true,consentVersion:1,
+    })
+    const proof={publicId:w.publicId,attemptId:person.attemptId,
+      researchCode:person.researchCode,accessCredential:person.accessCredential}
+    const task=await getOwnResearchTask(proof)
+    const unit=task.units[0]
+    expect(unit.kind).toBe('FORM')
+    expect(JSON.stringify(unit)).toContain('otherOptionKey')
+    expect(JSON.stringify(unit)).not.toContain('privateScoring')
+    const baseline={
+      date:'2024-02-29',rank:['b','a'],slider:2,total:{a:0,b:10},
+      choice:['a','other'],'choice:other':'个人敏感自由文字',
+    }
+    await expect(submitResearchFinal({
+      ...proof,submissionId:randomUUID(),answers:{[unit.instrumentKey]:{
+        ...baseline,choice:['none','a'],
+      }},
+    })).rejects.toThrow()
+    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(0)
+    const complete=await submitResearchFinal({
+      ...proof,submissionId:randomUUID(),answers:{[unit.instrumentKey]:baseline},
+    })
+    expect(complete.status).toBe('COMPLETED')
+    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
+    const source=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],includeWideSchema:true})
+    const other=source.raw.find(r=>r.itemKey==='choice:other')
+    expect(other?.value).toBe('个人敏感自由文字')
+    expect(source.codebook.find(row=>row.itemKey==='choice:other'))
+      .toMatchObject({formSchemaVersion:2,responseType:'OTHER_TEXT',valueEncoding:'TEXT'})
+    expect(source.codebook.find(row=>row.itemKey==='rank'))
+      .toMatchObject({formSchemaVersion:2,valueEncoding:'JSON_STRING_ARRAY'})
+    expect(source.codebook.find(row=>row.itemKey==='total'))
+      .toMatchObject({formSchemaVersion:2,valueEncoding:'JSON_NUMBER_OBJECT'})
+    expect(rawLongExport(projectId,source,w.id).csv).toContain('个人敏感自由文字')
+    const token=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+token},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const defaultTicket=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
+    const safe=await downloadSurveyExport(req,{projectId,exportId:defaultTicket.id})
+    expect(safe.csv).not.toContain('个人敏感自由文字')
+    expect(JSON.stringify(safe.codebook)).not.toContain('OTHER_TEXT')
+    const explicitTicket=await createSurveyExport(req,{
+      projectId,format:'RAW_WAVE',waveId:w.id,includeFreeText:true,
+    })
+    const permitted=await downloadSurveyExport(req,{projectId,exportId:explicitTicket.id})
+    expect(permitted.csv).toContain('个人敏感自由文字')
+  })
   it('does not commit a FINAL against a credential revoked during the transaction',async()=>{
     const w=await wave('撤销凭证与提交串行验证',[toolIds.scale],true)
     const participant=await joinLinkedStudy({

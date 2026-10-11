@@ -49,6 +49,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   const [answerReview,setAnswerReview]=useState<{ok:boolean;issues:Issue[];
     missing:{itemKey:string;reason:string}[]}|null>(null)
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('TEXT')
+  const [bulkTargetPageKey,setBulkTargetPageKey]=useState('')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
   const refreshList=useCallback(async(page=1)=>{
@@ -67,6 +68,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并切换研究工具？'))return
       const r=await api<ResearchDraft>(prefix+'/'+id)
       setActive(r);setDirty(false);setBulk(null);setPreview(null);setShowPreview(false);setUndo(null)
+      setBulkTargetPageKey('')
     })
   }
   const create=(event:FormEvent)=>{event.preventDefault();void run(async()=>{
@@ -120,7 +122,8 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     await refreshList(instrumentPage);setNotice('草稿已归档')
   })}
   const bulkPreview=()=>{if(!active||dirty)return;void run(async()=>{
-    const batch:BulkBatch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText}
+    const batch:BulkBatch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText,
+      ...(active.kind==='FORM'&&bulkTargetPageKey?{pageKey:bulkTargetPageKey}:{})}
     const result=await api<BulkResult>(prefix+'/'+active.id+'/bulk-import/preview','POST',batch)
     setBulk({batch,result})
     setNotice(result.ok?'请检查以下题目，确认后再提交（不会提前写入数据）':'输入含错误，未写入任何题目')
@@ -198,10 +201,19 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       </>}
       {active.kind!=='SJT'&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>
-        <p className="text-xs text-slate-600">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；选项使用 || 分隔。量表需要先建立维度并使用共享选项。</p>
+        <p className="text-xs text-slate-600">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；Form V2 可导入 DATE/TIME/RANK_ORDER/SLIDER/CONSTANT_SUM/MATRIX_MULTIPLE，数值列 min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone；选项与矩阵行用 || 分隔。</p>
         <label className="text-sm">输入格式<select className="input block" value={bulkFormat} onChange={e=>{
           setBulkFormat(e.target.value as 'TEXT'|'CSV');setBulk(null)}}>
           <option value="TEXT">多行文本</option><option value="CSV">标准 CSV</option></select></label>
+        {active.kind==='FORM'&&(active.definition as FormDraft).pages.length>0&&
+          <label className="block text-sm">导入到指定分页
+            <select className="input block w-full" value={bulkTargetPageKey}
+              onChange={e=>{setBulkTargetPageKey(e.target.value);setBulk(null)}}>
+              <option value="">默认第一页</option>
+              {(active.definition as FormDraft).pages.map(page=>
+                <option key={page.pageKey} value={page.pageKey}>{page.title||page.pageKey}</option>)}
+            </select>
+          </label>}
         <textarea className="input block w-full" rows={7} value={bulkText} onChange={e=>{setBulkText(e.target.value);setBulk(null)}}
           placeholder={bulkFormat==='TEXT'?'今天上课我能集中注意力\nA. 从不\nB. 有时\nC. 经常\n\n今天我愿意主动提问\nA. 从不\nB. 有时\nC. 经常':'type,prompt,required,options,dimension\nSINGLE,今天我愿意提问,true,从不||有时||经常,'}/>
         <button type="button" className="btn-secondary" disabled={busy||dirty||!bulkText.trim()} onClick={bulkPreview}>解析并预览（不保存）</button>
@@ -225,7 +237,8 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       {preview?.ok&&!dirty&&<div>
         <button type="button" className="btn-secondary" onClick={()=>setShowPreview(x=>!x)}>
           {showPreview?'收起模拟作答':'展开模拟作答'}</button>
-        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}/>
+        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}
+            errorPath={answerReview?.issues[0]?.path}/>
           {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
             <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
             {answerReview.issues.map((issue,i)=><p role="alert" className="text-red-700 text-sm" key={i}>

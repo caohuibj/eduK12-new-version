@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
+import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
+import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 
@@ -12,7 +14,9 @@ type Choice={optionKey:string;label:string}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
-  maxLength?:number;minSelections?:number;maxSelections?:number}
+  maxLength?:number;minSelections?:number;maxSelections?:number;
+  total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
+  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
@@ -40,7 +44,7 @@ const readSingleResume=(id:string):SingleResume|null=>{
     return saved
   }catch{return null}
 }
-type Answer=string|number|string[]|{_surveyRefusal:true}|null
+type Answer=ProfessionalAnswer
 const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
   !!answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer
   &&answer._surveyRefusal===true
@@ -55,11 +59,52 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
   return envelope.data
 }
-function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,Answer>;
-  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof}){
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{unit:Unit;answer:Record<string,Answer>;
+  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof;
+  pageIndex:number;onPageChange:(next:number)=>void}){
+  const [pageError,setPageError]=useState('')
+
   const shownFormKeys=unit.kind==='FORM'
     ?visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],answer)
     :null
+  const visiblePages=unit.kind==='FORM'?(unit.pages||[])
+    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[]
+  const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
+  const activePage=visiblePages[currentIndex]
+  const nextPage=()=>{
+    if(!activePage||currentIndex>=visiblePages.length-1)return
+    for(const q of activePage.questions){
+      if(!shownFormKeys?.has(q.itemKey)||!q.required)continue
+      const keys=['MATRIX','MATRIX_MULTIPLE'].includes(q.type)
+        ?(q.rows||[]).map(row=>q.itemKey+':'+row.rowKey):[q.itemKey]
+      const empty=keys.some(key=>{
+        const value=answer[key]
+        return !isRefusal(value)&&(value===null||value===undefined||value===''||
+          (Array.isArray(value)&&value.length===0))
+      })
+      const rankInvalid=q.type==='RANK_ORDER'&&
+        (!Array.isArray(answer[q.itemKey])||(answer[q.itemKey] as string[]).length!==q.options.length)
+      const totalInvalid=q.type==='CONSTANT_SUM'&&(()=>{
+        const v=answer[q.itemKey]
+        if(!v||typeof v!=='object'||Array.isArray(v)||isRefusal(v))return true
+        const numbers=v as Record<string,number>
+        return q.options.some(opt=>!Number.isFinite(numbers[opt.optionKey]))||
+          Math.abs(q.options.reduce((n,opt)=>n+numbers[opt.optionKey],0)-(q.total??0))>1e-7
+      })()
+      const otherInvalid=hasSelectedOther(q,answer[q.itemKey])&&
+        (typeof answer[q.itemKey+':other']!=='string'||
+          !(answer[q.itemKey+':other'] as string).trim())
+      if(empty||rankInvalid||totalInvalid||otherInvalid){
+        setPageError('请先完成当前页的必答题：'+q.prompt)
+        document.getElementById('survey-answer-'+unit.instrumentKey+'-'+q.itemKey)?.focus()
+        return
+      }
+    }
+    setPageError('')
+    onPageChange(currentIndex+1)
+    window.requestAnimationFrame(()=>document.getElementById(
+      'survey-page-'+unit.instrumentKey)?.focus())
+  }
   const choice=(q:Question,options:Choice[],kind:'SINGLE'|'MULTIPLE'|'MATRIX'|'LIKERT')=>
     kind==='MULTIPLE'?options.map(o=>{
       const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
@@ -67,8 +112,8 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
         <input type="checkbox" checked={selected.includes(o.optionKey)}
           disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
             &&selected.length>=q.maxSelections}
-          onChange={e=>onChange(q.itemKey,e.target.checked?[...selected,o.optionKey]:
-            selected.filter(s=>s!==o.optionKey))}/> {o.label}</label>
+          onChange={e=>onChange(q.itemKey,toggleFormMultiple(
+            selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
         checked={answer[q.itemKey]===o.optionKey}
@@ -82,6 +127,8 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
+      {unit.kind==='FORM'&&['SINGLE','MULTIPLE'].includes(q.type)&&q.otherOptionKey&&
+        <FormChoiceExtras question={q} answers={answer} onChange={onChange}/>}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full text-sm">
         <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}
           {q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
@@ -95,11 +142,13 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
           checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
           onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
+      {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
+        <ProfessionalFormAnswer question={q} answers={answer} prefix={unit.instrumentKey} onAnswer={onChange}/>}
       {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
         disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
-      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="block my-3 text-sm">
+      {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="block my-3 text-sm">
         <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
           onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
         我选择不回答这一题（REFUSED）
@@ -113,8 +162,24 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
   }
   return <section className="border rounded-xl bg-slate-50 p-4 my-5">
     <h3 className="text-lg font-semibold">{unit.title}</h3>
-    {unit.kind==='FORM'&&unit.pages?.map(page=><div key={page.pageKey}>
-      <h4 className="mt-4 font-medium">{page.title}</h4>{page.questions.map(item)}</div>)}
+    {unit.kind==='FORM'&&<div>
+      <p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
+        （本研究所有页面完成后只提交一次正式答卷）</p>
+      <progress className="w-full" max={Math.max(1,visiblePages.length)}
+        value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/>
+      {activePage&&<div key={activePage.pageKey}>
+        <h4 className="mt-4 font-medium scroll-mt-5" id={'survey-page-'+unit.instrumentKey}
+          tabIndex={-1}>{activePage.title}</h4>
+        {activePage.questions.map(item)}
+      </div>}
+      {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}
+      <nav aria-label="问卷分页" className="flex justify-between gap-3 mt-4">
+        <button type="button" className="btn-secondary" disabled={currentIndex===0}
+          onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1))}}>上一页</button>
+        <button type="button" className="btn-secondary"
+          disabled={!activePage||currentIndex>=visiblePages.length-1} onClick={nextPage}>下一页</button>
+      </nav>
+    </div>}
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
@@ -137,11 +202,14 @@ export default function SurveyPublicApp(){
   const [proofReceived,setProofReceived]=useState(false),[home,setHome]=useState<Wave[]|null>(null)
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
+  const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
+  const taskState=useRef<Task|null>(null)
+  taskState.current=task
   const base='/r/'+publicId
   // Only the already-authorized local browser tab may recover unfinished answers.
   useEffect(()=>{
@@ -163,12 +231,25 @@ export default function SurveyPublicApp(){
     setError('');setNotice('');setBusy(true)
     try{await task()}catch(e){
       const message=parseError(e);setError(message)
-      // The server returns answers.<itemKey>[.<matrixRow>] on FINAL failure.
-      const itemKey=message.match(/answers\.([a-z][a-z0-9_-]*)/i)?.[1]
-      if(itemKey)window.requestAnimationFrame(()=>{
-        const target=document.querySelector<HTMLElement>('[id$="-'+itemKey+'"]')
-        target?.focus();target?.scrollIntoView({block:'center'})
-      })
+      // FINAL qualifies the failing Form by instrumentKey: different Forms
+      // may intentionally share copied itemKeys within the same Wave.
+      const location=message.match(/answers\.([a-z][a-z0-9_-]*)(?:\.([a-z][a-z0-9_-]*))?/i)
+      const instrumentKey=location?.[2]?location[1]:undefined
+      const itemKey=location?.[2]||location?.[1]
+      const targetUnit=itemKey?taskState.current?.units.find(unit=>unit.kind==='FORM'&&
+        (!instrumentKey||unit.instrumentKey===instrumentKey)&&unit.pages?.some(
+          page=>page.questions.some(q=>q.itemKey===itemKey))):undefined
+      if(targetUnit&&itemKey){
+        const current=answers[targetUnit.instrumentKey]||{}
+        const visible=visibleFormKeys(targetUnit.pages?.flatMap(p=>p.questions)||[],current)
+        const pages=targetUnit.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
+        const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
+        if(index>=0)setFormPages(prev=>({...prev,[targetUnit.instrumentKey]:index}))
+        window.setTimeout(()=>{
+          const target=document.getElementById('survey-answer-'+targetUnit.instrumentKey+'-'+itemKey)
+          target?.focus();target?.scrollIntoView({block:'center'})
+        },0)
+      }
     }finally{setBusy(false)}
   }
   const recover=(e:FormEvent)=>{e.preventDefault();void run(async()=>{
@@ -191,7 +272,7 @@ export default function SurveyPublicApp(){
     })
     setAttemptId(id)
     setSubmissionId(crypto.randomUUID())
-    setTask(data)
+    setTask(data);setFormPages({})
     if(data.status==='COMPLETED'){
       clearLocalSurveyDraft(publicId,id)
       setAnswers({})
@@ -396,13 +477,25 @@ export default function SurveyPublicApp(){
           <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
             关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</p></div>
         {task.units.map(unit=><TaskForm key={unit.instrumentKey} unit={unit}
+          pageIndex={formPages[unit.instrumentKey]??0}
+          onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
           proof={{publicId,attemptId,accessCredential,
             ...(info.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
           }}
-          answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>({
-            ...previous,[unit.instrumentKey]:{...(previous[unit.instrumentKey]||{}),[key]:value},
-          }))}/>)}
-        <button className="btn-primary" disabled={busy}>提交本轮正式回答</button>
+          answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>{
+            const next={...(previous[unit.instrumentKey]||{}),[key]:value}
+            const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
+              .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
+            if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
+            return {...previous,[unit.instrumentKey]:next}
+          })}/>)}
+        <button className="btn-primary" disabled={busy||!task.units.every(unit=>{
+          if(unit.kind!=='FORM')return true
+          const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
+            answers[unit.instrumentKey]||{})
+          const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
+          return (formPages[unit.instrumentKey]??0)>=pages.length-1
+        })}>提交本轮正式回答</button>
       </form>}
       {general&&<section className="bg-white border rounded-xl p-5 space-y-3">
         <h2 className="text-xl font-semibold">本轮回答已完成</h2>
