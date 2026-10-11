@@ -25,6 +25,9 @@ type FlowAnalytics={flowDigest:string;asOf:string;total:FlowCounts;
   groups:{groupKey:string;counts:FlowCounts}[];
   quotaReservations:{groupKey:string;maxAssigned:number;everAssigned:number;available:number}[];
   category?:{instrumentKey:string;itemKey:string;counts:Record<string,number>};
+  score?:{instrumentKey:string;scoreKey:string;minGroupN:number;suppressedGroups:number;
+    groups:{groupKey:string;respondentN:number;scoreValidN:number;
+      mean:number|null;sampleSd:number|null}[];note:string};
   limits:{complete:boolean;maxAttempts:number;noTruncation:boolean}}
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
@@ -75,6 +78,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
   const [shareLink,setShareLink]=useState('')
   const [flowAnalytics,setFlowAnalytics]=useState<FlowAnalytics|null>(null)
   const [categoryKey,setCategoryKey]=useState('')
+  const [scoreSelection,setScoreSelection]=useState('')
   const refresh=async(nextWavePage=wavePage,nextToolPage=toolPage)=>{
     const [waveList,instrumentList,projectDetails]=await Promise.all([
       surveyApi<{list:Wave[]}>(path+'/waves?page='+nextWavePage),
@@ -98,7 +102,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     const selected=await Promise.all(detail.instrumentIds.map(id=>
       surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
     setDetails(previous=>({...previous,...Object.fromEntries(selected.map(item=>[item.id,item]))}))
-    setEditing(detail);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('')
+    setEditing(detail);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('');setScoreSelection('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
       linkageNoticeConfirmed:detail.linkageNoticeConfirmed,
@@ -191,9 +195,13 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         const [instrumentKey,itemKey]=categoryKey.split(':')
         return {instrumentKey,itemKey}
       })():undefined
+      const score=scoreSelection?(()=>{
+        const [instrumentKey,scoreKey]=scoreSelection.split(':')
+        return {instrumentKey,scoreKey}
+      })():undefined
       const data=await surveyApi<FlowAnalytics>(
         path+'/analytics/waves/'+editing.id+'/flow-cohort','POST',
-        category?{category}:{})
+        {...(category?{category}:{}),...(score?{score}:{})})
       setFlowAnalytics(data)
       setNotice('已读取受控 Flow 样本统计。若包含实验分组，小样本详情仍不可公开转发。')
     })
@@ -216,6 +224,18 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         instrumentKey:d.instrumentKey,itemKey:q.itemKey,prompt:q.prompt,type:q.type,
         options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
       })))
+    })
+  const flowMetrics=Object.values(details)
+    .filter(d=>form.instrumentIds.includes(d.id)&&['SCALE','SJT'].includes(d.kind))
+    .flatMap(d=>{
+      const def=d.definition as {
+        dimensions?:{dimensionKey:string;label:string}[];
+        metrics?:{metricKey:string;label:string}[];
+      }
+      const list=d.kind==='SCALE'
+        ?(def.dimensions??[]).map(x=>({key:x.dimensionKey,label:x.label}))
+        :(def.metrics??[]).map(x=>({key:x.metricKey,label:x.label}))
+      return list.map(x=>({instrumentKey:d.instrumentKey,scoreKey:x.key,label:x.label}))
     })
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
@@ -384,6 +404,16 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
                     {q.instrumentKey} · {q.prompt}</option>)}
               </select>
             </label>
+            <label className="block text-xs">随机实验条件 × Scale/SJT 研究性指标（可选）
+              <select className="input block w-full" value={scoreSelection}
+                onChange={e=>{setScoreSelection(e.target.value);setFlowAnalytics(null)}}>
+                <option value="">仅查看人数与分类频数</option>
+                {flowMetrics.map(m=>
+                  <option key={m.instrumentKey+':'+m.scoreKey}
+                    value={m.instrumentKey+':'+m.scoreKey}>
+                    {m.instrumentKey} · {m.label}（{m.scoreKey}）</option>)}
+              </select>
+            </label>
             <button className="btn-secondary" type="button" disabled={busy}
               onClick={loadFlowAnalytics}>读取最新受控统计</button>
             {flowAnalytics&&<div className="overflow-x-auto space-y-3">
@@ -407,6 +437,16 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
                 <td className="border p-2">{flowAnalytics.quotaReservations
                   .find(q=>q.groupKey===g.groupKey)?.available??'无硬配额'}</td>
               </tr>)}</tbody></table>
+              {flowAnalytics.score&&<div className="border-t pt-3 space-y-2">
+                <h5 className="font-medium text-sm">实验条件组 · {flowAnalytics.score.instrumentKey} /
+                  {flowAnalytics.score.scoreKey}</h5>
+                {flowAnalytics.score.groups.map(g=><p className="text-sm" key={g.groupKey}>
+                  {g.groupKey}：有效 FINAL N={g.respondentN}，有分数 N={g.scoreValidN}，
+                  M={g.mean?.toFixed(2)??'—'}，SD={g.sampleSd?.toFixed(2)??'—'}</p>)}
+                <p className="text-xs text-slate-600">未展示的小样本组 {flowAnalytics.score.suppressedGroups}；
+                  最少 {flowAnalytics.score.minGroupN} 份有效组别样本且达到同等有分数 N 才展示统计。
+                  {flowAnalytics.score.note}</p>
+              </div>}
               {flowAnalytics.category&&<div className="text-xs">
                 <p className="font-medium">分类：{flowAnalytics.category.instrumentKey} /
                   {flowAnalytics.category.itemKey}（仅有效 FINAL）</p>

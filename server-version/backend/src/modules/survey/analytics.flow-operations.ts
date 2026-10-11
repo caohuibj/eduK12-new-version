@@ -36,8 +36,11 @@ const increase=(counts:Count,row:{hasAssignment:boolean;hasFinal:boolean;
   }
 }
 type FormCategory={instrumentKey:string;itemKey:string}
+type ScoreSelection={instrumentKey:string;scoreKey:string}
+type ScoreAccumulator={n:number;mean:number;m2:number}
+const emptyScore=():ScoreAccumulator=>({n:0,mean:0,m2:0})
 export async function describeSurveyFlowOperations(req:Request,input:{
-  projectId:string;waveId:string;category?:FormCategory;
+  projectId:string;waveId:string;category?:FormCategory;score?:ScoreSelection;
 }){
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
@@ -63,6 +66,19 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     if(!frozen.flow||frozen.waveId!==wave.id||
       canonicalHash(JSON.parse(JSON.stringify(frozen)))!==wave.publication.definitionDigest)
       fail(409,'当前波次未使用可核验的冻结 Survey Flow')
+    if(input.score){
+      if(!frozen.flow.experiment)
+        fail(409,'实验条件分组计分必须由已冻结的随机研究定义提供')
+      const selected=frozen.units.find(u=>u.instrumentKey===input.score?.instrumentKey)
+      if(!selected||!['SCALE','SJT'].includes(selected.kind))
+        fail(400,'实验组得分必须来自本波次冻结 Scale 或 SJT')
+      const scoring=(selected.compiledDefinition as {
+        scoring?:{scores?:{key:string}[];publishedMetrics?:{key:string}[]}
+      }).scoring
+      const keys=selected.kind==='SCALE'?scoring?.scores:scoring?.publishedMetrics
+      if(!keys?.some(x=>x.key===input.score?.scoreKey))
+        fail(400,'实验组统计指标不存在或未被研究冻结计分器发布')
+    }
     let categories:string[]=[]
     if(input.category){
       const unit=frozen.units.find(u=>u.instrumentKey===input.category?.instrumentKey)
@@ -88,6 +104,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     const attemptsWithFinal:string[]=[]
     const groupByAttempt=new Map<string,string>()
     const groupsByCategory=new Map<string,Map<string,number>>()
+    const scoreGroups=new Map<string,ScoreAccumulator>()
     if(categories.length)for(const group of frozen.flow.experiment?.groups??[])
       groupsByCategory.set(group.groupKey,new Map([...categories,
         'NOT_SHOWN','SHOWN_MISSING','REFUSED'].map(category=>[category,0])))
@@ -131,7 +148,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           increase(count,status)
           byGroup.set(group,count)
         }
-        if(categories.length&&row.final&&row.status==='COMPLETED'
+        if((categories.length||input.score)&&row.final&&row.status==='COMPLETED'
           &&!row.excludedAt&&row.participant?.status!=='WITHDRAWN'
           &&row.sampleReview?.verdict!=='EXCLUDED'){
           attemptsWithFinal.push(row.id)
@@ -144,7 +161,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       if(rows.length<PAGE)break
     }
     if(processed!==attempts)fail(409,'研究波次参与计数在读取期间不一致')
-    if(categories.length){
+    if(categories.length||input.score){
       const wanted=new Set(attemptsWithFinal)
       for(let start=0;start<attemptsWithFinal.length;start+=PAGE){
         const ids=attemptsWithFinal.slice(start,start+PAGE)
@@ -160,24 +177,44 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           if(result.definitionDigest!==final.definitionDigest||
             canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
             fail(409,'统计源 FINAL 的完整性校验失败')
+          const group=groupByAttempt.get(final.attemptId)
+          if(input.score&&group){
+            const unit=result.units.find(u=>u.instrumentKey===input.score!.instrumentKey)
+            if(unit&&unit.kind!=='FORM'&&!unit.notExecuted){
+              const metrics=unit.privateScoring as
+                |{scores?:{key:string;value:number|null}[];
+                  metrics?:{key:string;value:number|null}[]}|null
+              const score=(metrics?.scores??metrics?.metrics??[])
+                .find(x=>x.key===input.score!.scoreKey)
+              if(score&&typeof score.value==='number'&&Number.isFinite(score.value)){
+                const running=scoreGroups.get(group)??emptyScore()
+                running.n++
+                const delta=score.value-running.mean
+                running.mean+=delta/running.n
+                running.m2+=delta*(score.value-running.mean)
+                scoreGroups.set(group,running)
+              }
+            }
+          }
+          if(categories.length){
           const unit=result.units.find(u=>u.instrumentKey===input.category!.instrumentKey)
           const answer=unit?.rawAnswers[input.category!.itemKey]
           const missing=unit?.missing.find(x=>x.itemKey===input.category!.itemKey)?.reason
           const category=typeof answer==='string'&&categories.includes(answer)
             ?answer:missing??'SHOWN_MISSING'
           categorySummary.set(category,(categorySummary.get(category)??0)+1)
-          const group=groupByAttempt.get(final.attemptId)
           if(group){
             const counts=groupsByCategory.get(group)
             if(!counts)fail(409,'存在未声明的研究实验组')
             counts!.set(category,(counts!.get(category)??0)+1)
+          }
           }
           wanted.delete(final.attemptId)
         }
       }
       if(wanted.size)fail(409,'部分有效 FINAL 缺少来源；拒绝生成不完整分类统计')
       const sum=[...categorySummary.values()].reduce((a,b)=>a+b,0)
-      if(sum!==global.analysisIncluded)
+      if(categories.length&&sum!==global.analysisIncluded)
         fail(409,'Form 分类统计与有效 FINAL 样本分母不一致')
     }
     const assignmentReservations=wave.quotaBuckets.map(b=>({
@@ -198,6 +235,25 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       groups:frozen.flow.experiment?.groups.map(group=>({
         groupKey:group.groupKey,counts:byGroup.get(group.groupKey)??init(),
       }))??[],
+      ...(input.score?{
+        score:{
+          ...input.score,denominator:'ANALYSIS_INCLUDED_FINAL',
+          minGroupN:5,
+          groups:(frozen.flow.experiment?.groups??[]).flatMap(group=>{
+            const expected=byGroup.get(group.groupKey)?.analysisIncluded??0
+            const summary=scoreGroups.get(group.groupKey)??emptyScore()
+            if(expected<5||summary.n<5)return []
+            return [{groupKey:group.groupKey,respondentN:expected,scoreValidN:summary.n,
+              mean:summary.mean,sampleSd:summary.n>1?Math.sqrt(summary.m2/(summary.n-1)):null}]
+          }),
+          suppressedGroups:(frozen.flow.experiment?.groups??[]).filter(group=>{
+            const n=byGroup.get(group.groupKey)?.analysisIncluded??0
+            const valid=scoreGroups.get(group.groupKey)?.n??0
+            return n<5||valid<5
+          }).length,
+          note:'随机实验分组的受控描述统计；小于5份有效答案的组不显示均值，不构成因果推断。',
+        },
+      }:{}),
       ...(input.category?{
         category:{...input.category,denominator:'ANALYSIS_INCLUDED_FINAL',
           counts:Object.fromEntries(categorySummary),

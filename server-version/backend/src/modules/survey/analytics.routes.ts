@@ -46,11 +46,10 @@ surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(re
     projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
     ...review.parse(req.body)})))
 
+const key=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const flowCohortInput=z.object({
-  category:z.object({
-    instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-    itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-  }).strict().optional(),
+  category:z.object({instrumentKey:key,itemKey:key}).strict().optional(),
+  score:z.object({instrumentKey:key,scoreKey:key}).strict().optional(),
 }).strict()
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/flow-cohort',wrap(req=>{
   const details=flowCohortInput.parse(req.body)

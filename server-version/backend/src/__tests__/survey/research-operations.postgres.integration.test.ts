@@ -191,11 +191,15 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
     })).rejects.toThrow(/TOTP/)
     const count=await describeSurveyFlowOperations(researcherReq(),{
       projectId:project,waveId,category:{instrumentKey:'screening',itemKey:'eligible'},
+      score:{instrumentKey:'measure',scoreKey:'attitude'},
     })
     expect(count.limits).toMatchObject({complete:true,noTruncation:true})
     expect(count.total).toMatchObject({starts:2,assigned:2,completedFinal:1,
       analysisIncluded:1,screenedOut:1})
     expect(count.category?.counts).toMatchObject({yes:1,no:0})
+    expect(count.score?.groups).toEqual([])
+    expect(count.score).toMatchObject({minGroupN:5,suppressedGroups:2})
+    expect(JSON.stringify(count.score)).not.toContain('engagement')
     expect(count.groups.map(g=>g.counts.assigned).sort()).toEqual([1,1])
     expect(count.quotaReservations.reduce((sum,b)=>sum+b.everAssigned,0)).toBe(2)
   })
