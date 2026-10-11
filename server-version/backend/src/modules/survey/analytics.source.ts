@@ -259,8 +259,10 @@ export async function loadSurveySource(input:{
     // the sample that completed FINAL. This also covers entire empty Waves.
     for(const wave of frozenWaves){
       const publication=publicationById.get(wave.publicationId!)
-      const snapshot=publication&&verifiedSnapshots.get(publication.id)
-      if(!publication||!snapshot||snapshot.waveId!==wave.id)invalid('冻结波次来源缺失')
+      if(!publication)throw new SurveyAnalyticsError(409,'冻结波次来源缺失')
+      const snapshot=verifiedSnapshots.get(publication.id)
+      if(!snapshot||snapshot.waveId!==wave.id)
+        throw new SurveyAnalyticsError(409,'冻结波次定义摘要缺失')
       for(const frozen of snapshot.units){
         const empty:FrozenUnitResult={
           instrumentKey:frozen.instrumentKey,kind:frozen.kind,
@@ -284,7 +286,7 @@ export async function loadSurveySource(input:{
     for(const final of finals){
       const wave=final.wave,attempt=final.attempt
       const publication=publicationById.get(final.publicationId)
-      if(!publication)invalid('研究 FINAL 的不可变发布来源缺失')
+      if(!publication)throw new SurveyAnalyticsError(409,'研究 FINAL 的不可变发布来源缺失')
       if(wave.projectId!==input.projectId||attempt.projectId!==input.projectId
         ||attempt.waveId!==wave.id||wave.publicationId!==publication.id
         ||publication.projectId!==input.projectId||final.definitionDigest!==publication.definitionDigest)
@@ -292,7 +294,7 @@ export async function loadSurveySource(input:{
       if(attempt.participant?.status==='WITHDRAWN')continue
       const snapshot=verifiedSnapshots.get(publication.id)
       if(!snapshot||snapshot.waveId!==wave.id)
-        invalid('研究 FINAL 的冻结发布来源不一致')
+        throw new SurveyAnalyticsError(409,'研究 FINAL 的冻结发布来源不一致')
       const result=decryptUnifiedRuntimePayload<SurveyComputedFinal>(final.resultsCipher)
       if(result.schemaVersion!==1||result.definitionDigest!==final.definitionDigest
         ||canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
