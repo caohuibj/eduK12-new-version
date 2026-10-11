@@ -8,6 +8,7 @@ import {describeSurveyPairedScoresPaged,describeSurveyWaveItemPaged,describeSurv
 import { loadSurveySource } from './analytics.source'
 import { describeWave } from './analytics.descriptive'
 import { describeSurveyFlowOperations } from './analytics.flow-operations'
+import { assertRecentSurveyMfa } from './analytics.export.service'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -77,6 +78,7 @@ const itemRequest=z.object({
   itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(async req=>{
+  assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
     waveIds:[waveId],maxFinals:1,pageMode:true,includeWideSchema:true,
@@ -88,11 +90,13 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(asy
       columnKey:c.columnKey,definitionDigest:c.definitionDigest})),
   }
 }))
-surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>
-  describeSurveyWaveItemPaged({
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
+  assertRecentSurveyMfa(req)
+  return describeSurveyWaveItemPaged({
     actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),
     waveId:id.parse(req.params.wid),...itemRequest.parse(req.body),
-  })))
+  })
+}))
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
@@ -106,6 +110,7 @@ const groupRequest=z.object({
   scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async req=>{
+  assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const input=groupRequest.parse(req.body)
   try{
@@ -118,8 +123,10 @@ surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async 
       e instanceof Error?e.message:'此分组无法计算')
   }
 }))
-surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>
-  describeSurveyPairedScoresPaged({
+surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return describeSurveyPairedScoresPaged({
     actorUserId:req.user!.userId,
     projectId:id.parse(req.params.pid),...measurement.parse(req.body),
-  })))
+  })
+}))

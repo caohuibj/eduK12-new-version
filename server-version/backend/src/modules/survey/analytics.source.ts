@@ -48,8 +48,8 @@ export interface SurveySourceProjection {
   codebook:ResearchRawCodebook[]
   attendance:{researchCode:string;waveId:string;status:string}[]
 }
-const denied=():never=>{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
-const invalid=(message:string):never=>{throw new SurveyAnalyticsError(409,message)}
+function denied():never{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
+function invalid(message:string):never{throw new SurveyAnalyticsError(409,message)}
 const cleanValue=(v:AnswerPrimitive):string|number|null=>{
   if(v===null||v===undefined)return null
   if(typeof v==='number'||typeof v==='string')return v
@@ -65,7 +65,7 @@ const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEn
   type==='RANK_ORDER'||type==='MULTIPLE'||type==='MATRIX_MULTIPLE'||type==='SJT_MULTIPLE'
     ?'JSON_STRING_ARRAY':type==='CONSTANT_SUM'?'JSON_NUMBER_OBJECT':
     type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
-const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
+const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,onlyItemKey?:string):Array<{
   itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
   timeZone?:'Asia/Shanghai'|'UTC'
 }>=>{
@@ -78,6 +78,10 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
     for(const page of draft.pages)for(const q of page.questions){
+      if(onlyItemKey&&q.itemKey!==onlyItemKey
+        &&!(q.otherOptionKey&&q.itemKey+':other'===onlyItemKey)
+        &&!((q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE')
+          &&q.rows.some(row=>q.itemKey+':'+row.rowKey===onlyItemKey)))continue
       const options=q.options.map(o=>({code:o.optionKey,label:o.label}))
       if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
         const value=values[q.itemKey]
@@ -85,22 +89,26 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
           ?value as Record<string,string|string[]>:{}
         for(const row of q.rows){
           const key=q.itemKey+':'+row.rowKey
+          if(onlyItemKey&&key!==onlyItemKey)continue
           output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:q.type,options,
             value:cleanValue(normalized[row.rowKey]??null),
             missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
       }else{
-        add(q.itemKey,q.prompt,q.type,options,q.timeZone)
-        if(q.otherOptionKey)
+        if(!onlyItemKey||onlyItemKey===q.itemKey)
+          add(q.itemKey,q.prompt,q.type,options,q.timeZone)
+        if(q.otherOptionKey&&(!onlyItemKey||onlyItemKey===q.itemKey+':other'))
           add(q.itemKey+':other',q.prompt+'／其他填写','OTHER_TEXT',[])
       }
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
-    for(const q of draft.items)add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.items)if(!onlyItemKey||q.itemKey===onlyItemKey)
+      add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
   }else {
     const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.questions)if(!onlyItemKey||q.questionKey===onlyItemKey)
+      add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
   }
   return output
 }
@@ -426,8 +434,7 @@ export async function loadSurveySource(input:{
             score.measurement.scoreKey===input.selectScore.scoreKey))
         if(input.selectRaw!==false&&(!input.selectRaw||
           frozen.instrumentKey===input.selectRaw.instrumentKey)){
-          for(const r of rawItems(frozen,unit)){
-            if(input.selectRaw&&r.itemKey!==input.selectRaw.itemKey)continue
+          for(const r of rawItems(frozen,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')

@@ -11,7 +11,7 @@ import type { FormDraft,ScaleDraft,SjtDraft } from './builder.definition'
 export class SurveyCheckpointError extends Error{
   constructor(readonly statusCode:number,message:string){super(message)}
 }
-const fail=(status:number,message:string):never=>{throw new SurveyCheckpointError(status,message)}
+function fail(status:number,message:string):never{throw new SurveyCheckpointError(status,message)}
 type Proof={publicId:string;attemptId:string;accessCredential:string;researchCode?:string}
 type CheckpointAnswers=Record<string,Record<string,unknown>>
 const MAX_CHECKPOINT_BYTES=65536
@@ -48,7 +48,7 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
     if(unit.kind==='FORM'){
       const form=unit.displayDefinition as FormDraft
       for(const page of form.pages)for(const q of page.questions){
-        allowed.add(q.itemKey)
+        if(!['MATRIX','MATRIX_MULTIPLE'].includes(q.type))allowed.add(q.itemKey)
         for(const row of q.rows)allowed.add(q.itemKey+':'+row.rowKey)
         if(q.otherOptionKey)allowed.add(q.itemKey+':other')
       }

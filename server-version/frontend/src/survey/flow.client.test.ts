@@ -2,7 +2,7 @@ import { describe,expect,it } from 'vitest'
 import { evaluateClientFlowCondition,resolveClientSurveyFlow,
   type PublicFlow,type FlowPublicUnit } from './flow.client'
 const flow:PublicFlow={
-  schemaVersion:1,flowDigest:'frozen-digest',planDigest:'assigned-plan',
+  schemaVersion:1,flowDigest:'frozen-digest',
   selectedMaterial:{blockKey:'assigned_material',title:'教学实验',body:'积极材料'},
   embeddedData:[{key:'year',type:'NUMBER',value:2026}],
   blocks:[

@@ -230,6 +230,13 @@ jobs:
           src/__tests__/survey/survey-realm.postgres.integration.test.ts
           src/__tests__/survey/research-builder.postgres.integration.test.ts
           src/__tests__/survey/research-wave-final.postgres.integration.test.ts
+          src/__tests__/survey/research-form-runtime.contract.test.ts
+          src/__tests__/survey/research-form-v2.contract.test.ts
+          src/__tests__/survey/research-form-export-privacy.contract.test.ts
+          src/__tests__/survey/research-flow.contract.test.ts
+          src/__tests__/survey/research-flow.postgres.integration.test.ts
+          src/__tests__/survey/research-operations.contract.test.ts
+          src/__tests__/survey/research-operations.postgres.integration.test.ts
           src/__tests__/survey/research-sjt-multiselect.contract.test.ts
           src/__tests__/survey/research-public-boundary.contract.test.ts
           src/__tests__/survey/research-media.contract.test.ts

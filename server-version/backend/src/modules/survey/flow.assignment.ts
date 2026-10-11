@@ -18,7 +18,7 @@ export type SurveyFlowAssignment={
 export class SurveyAssignmentError extends Error{
   constructor(message:string){super(message)}
 }
-const fail=(message:string):never=>{throw new SurveyAssignmentError(message)}
+function fail(message:string):never{throw new SurveyAssignmentError(message)}
 export const chooseSurveyGroup=(flow:FrozenSurveyFlow,draw:(max:number)=>number=randomInt)=>{
   const groups=flow.experiment?.groups
   if(!groups)return null
@@ -44,6 +44,7 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
 }):Promise<SurveyFlowAssignment|null>{
   const flow=input.snapshot.flow
   if(!flow)return null
+  const experiment=flow.experiment
   const project=await tx.$queryRaw<Array<{id:string}>>`
     SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE
   `
@@ -78,14 +79,14 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   if(current.flowAssignmentCipher){
     const prior=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(current.flowAssignmentCipher)
     if(prior.schemaVersion!==1||prior.flowDigest!==flow.flowDigest
-      ||prior.experimentKey!==(flow.experiment?.experimentKey??null)
-      ||(flow.experiment?(!prior.groupKey||!flow.experiment.groups.some(g=>g.groupKey===prior.groupKey)):prior.groupKey!==null))
+      ||prior.experimentKey!==(experiment?.experimentKey??null)
+      ||(experiment?(!prior.groupKey||!experiment.groups.some(g=>g.groupKey===prior.groupKey)):prior.groupKey!==null))
       fail('作答已有的冻结实验分配与当前发布不一致')
     return prior
   }
   let groupKey:string|null=null
   let inheritedFromAttemptId:string|undefined
-  if(flow.experiment?.linkedPolicy==='KEEP_LINKED'&&input.participantId){
+  if(experiment?.linkedPolicy==='KEEP_LINKED'&&input.participantId){
     const old=await tx.surveyWaveAttempt.findMany({where:{
       projectId:input.projectId,participantId:input.participantId,
       flowAssignmentCipher:{not:null},id:{not:input.attemptId},
@@ -93,9 +94,9 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
       select:{id:true,flowAssignmentCipher:true},take:100})
     for(const item of old){
       const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(item.flowAssignmentCipher!)
-      if(assignment.schemaVersion!==1||assignment.experimentKey!==flow.experiment.experimentKey)
+      if(assignment.schemaVersion!==1||assignment.experimentKey!==experiment.experimentKey)
         continue
-      if(!assignment.groupKey||!flow.experiment.groups.some(g=>g.groupKey===assignment.groupKey))
+      if(!assignment.groupKey||!experiment.groups.some(g=>g.groupKey===assignment.groupKey))
         fail('保持分组要求沿用此前合法实验组；新波次的组别定义不一致')
       groupKey=assignment.groupKey
       inheritedFromAttemptId=item.id
@@ -108,11 +109,11 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   const policy=input.snapshot.quotaPolicy
   let quotaBucket:{groupKey:string;maxAssigned:number;assignedCount:number}|undefined
   if(policy){
-    if(!flow.experiment)fail('研究条件配额要求冻结的实验定义')
+    if(!experiment)fail('研究条件配额要求冻结的实验定义')
     const buckets=await tx.surveyExperimentQuotaBucket.findMany({where:{
       projectId:input.projectId,waveId:input.waveId,
     },select:{groupKey:true,maxAssigned:true,assignedCount:true}})
-    if(buckets.length!==flow.experiment.groups.length||
+    if(buckets.length!==experiment.groups.length||
       buckets.some(b=>policy.groupLimits[b.groupKey]!==b.maxAssigned))
       fail('实验配额计数器与冻结发布定义不一致')
     if(groupKey){
@@ -120,7 +121,7 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
       if(!quotaBucket||quotaBucket.assignedCount>=quotaBucket.maxAssigned)
         fail('既有研究实验组本轮名额已满，不允许随机改变纵向分组')
     }else{
-      const candidates=flow.experiment.groups.filter(g=>{
+      const candidates=experiment.groups.filter(g=>{
         const b=buckets.find(x=>x.groupKey===g.groupKey)
         return !!b&&b.assignedCount<b.maxAssigned
       })
@@ -146,9 +147,9 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   }else if(!groupKey)groupKey=chooseSurveyGroup(flow)
   const value:SurveyFlowAssignment={
     schemaVersion:1,flowDigest:flow.flowDigest,
-    experimentKey:flow.experiment?.experimentKey??null,groupKey,
+    experimentKey:experiment?.experimentKey??null,groupKey,
     algorithm:inheritedFromAttemptId?'LINKED_INHERIT_V1':
-      flow.experiment?(policy?'CRYPTO_QUOTA_WEIGHTED_V1':'CRYPTO_RANDOM_INT_V1'):'NO_EXPERIMENT',
+      experiment?(policy?'CRYPTO_QUOTA_WEIGHTED_V1':'CRYPTO_RANDOM_INT_V1'):'NO_EXPERIMENT',
     assignedAt:new Date().toISOString(),
     ...(inheritedFromAttemptId?{inheritedFromAttemptId}:{}),
   }

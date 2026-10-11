@@ -10,7 +10,7 @@ import type { SurveyComputedFinal } from './final.compute'
 import type { ResearchFrozenPublication } from './publication.service'
 import type { FormDraft } from './builder.definition'
 
-const fail=(code:number,message:string):never=>{throw new SurveyAnalyticsError(code,message)}
+function fail(code:number,message:string):never{throw new SurveyAnalyticsError(code,message)}
 const MAX_ATTEMPTS=6000
 const PAGE=200
 type Count={starts:number;assigned:number;completedFinal:number;analysisIncluded:number;
@@ -63,11 +63,12 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     },include:{publication:true,quotaBuckets:true}})
     if(!wave?.publication)fail(404,'研究波次或冻结定义不存在')
     const frozen=wave.publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    if(!frozen.flow||frozen.waveId!==wave.id||
+    const flow=frozen.flow
+    if(!flow||frozen.waveId!==wave.id||
       canonicalHash(JSON.parse(JSON.stringify(frozen)))!==wave.publication.definitionDigest)
       fail(409,'当前波次未使用可核验的冻结 Survey Flow')
     if(input.score){
-      if(!frozen.flow.experiment)
+      if(!flow.experiment)
         fail(409,'实验条件分组计分必须由已冻结的随机研究定义提供')
       const selected=frozen.units.find(u=>u.instrumentKey===input.score?.instrumentKey)
       if(!selected||!['SCALE','SJT'].includes(selected.kind))
@@ -106,7 +107,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     const assignmentsByAttempt=new Map<string,SurveyFlowAssignment>()
     const groupsByCategory=new Map<string,Map<string,number>>()
     const scoreGroups=new Map<string,ScoreAccumulator>()
-    if(categories.length)for(const group of frozen.flow.experiment?.groups??[])
+    if(categories.length)for(const group of flow.experiment?.groups??[])
       groupsByCategory.set(group.groupKey,new Map([...categories,
         'NOT_SHOWN','SHOWN_MISSING','REFUSED'].map(category=>[category,0])))
     // UUID keyset pagination avoids PostgreSQL microsecond → JS millisecond
@@ -131,14 +132,14 @@ export async function describeSurveyFlowOperations(req:Request,input:{
         if(row.flowAssignmentCipher){
           const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(
             row.flowAssignmentCipher)
-          if(assignment.schemaVersion!==1||assignment.flowDigest!==frozen.flow.flowDigest||
-            assignment.experimentKey!==(frozen.flow.experiment?.experimentKey??null)||
-            (assignment.groupKey!==null&&!frozen.flow.experiment?.groups.some(
+          if(assignment.schemaVersion!==1||assignment.flowDigest!==flow.flowDigest||
+            assignment.experimentKey!==(flow.experiment?.experimentKey??null)||
+            (assignment.groupKey!==null&&!flow.experiment?.groups.some(
               g=>g.groupKey===assignment.groupKey)))
             fail(409,'研究分组与此 Wave 的冻结 Flow 来源不一致')
           group=assignment.groupKey
           assignmentForRow=assignment
-          if(frozen.flow.experiment&&group===null)
+          if(flow.experiment&&group===null)
             fail(409,'冻结实验组的参与记录缺少可信分组')
         }
         if(row.status!=='WITHDRAWN'&&row.excludedAt===null
@@ -186,7 +187,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
           const assigned=assignmentsByAttempt.get(final.attemptId)
           const trace=result.executionTrace
           if(!assigned||!trace||trace.schemaVersion!==1||
-            trace.flowDigest!==frozen.flow.flowDigest||
+            trace.flowDigest!==flow.flowDigest||
             trace.assignmentDigest!==canonicalHash(assigned)||
             trace.groupKey!==assigned.groupKey||
             trace.experimentKey!==assigned.experimentKey||
@@ -242,31 +243,31 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       available:b.maxAssigned-b.assignedCount,
     })).sort((a,b)=>a.groupKey.localeCompare(b.groupKey))
     if(frozen.quotaPolicy&&(
-      assignmentReservations.length!==frozen.flow.experiment?.groups.length||
+      assignmentReservations.length!==flow.experiment?.groups.length||
       assignmentReservations.some(b=>frozen.quotaPolicy!.groupLimits[b.groupKey]!==b.maxAssigned)
     ))fail(409,'实验配额账本与冻结 Publication 不一致')
     return {
       projectId:input.projectId,waveId:wave.id,
       waveStatus:wave.status,publicationVersion:wave.publication.version,
-      definitionDigest:wave.publication.definitionDigest,flowDigest:frozen.flow.flowDigest,
+      definitionDigest:wave.publication.definitionDigest,flowDigest:flow.flowDigest,
       experimentalAssignment:'ENCRYPTED_ATTEMPT_LEVEL',
       asOf:project.sourceCutOff,sourceProjectRevision:project.revision,
       total:global,quotaReservations:assignmentReservations,
-      groups:frozen.flow.experiment?.groups.map(group=>({
+      groups:flow.experiment?.groups.map(group=>({
         groupKey:group.groupKey,counts:byGroup.get(group.groupKey)??init(),
       }))??[],
       ...(input.score?{
         score:{
           ...input.score,denominator:'ANALYSIS_INCLUDED_FINAL',
           minGroupN:5,
-          groups:(frozen.flow.experiment?.groups??[]).flatMap(group=>{
+          groups:(flow.experiment?.groups??[]).flatMap(group=>{
             const expected=byGroup.get(group.groupKey)?.analysisIncluded??0
             const summary=scoreGroups.get(group.groupKey)??emptyScore()
             if(expected<5||summary.n<5)return []
             return [{groupKey:group.groupKey,respondentN:expected,scoreValidN:summary.n,
               mean:summary.mean,sampleSd:summary.n>1?Math.sqrt(summary.m2/(summary.n-1)):null}]
           }),
-          suppressedGroups:(frozen.flow.experiment?.groups??[]).filter(group=>{
+          suppressedGroups:(flow.experiment?.groups??[]).filter(group=>{
             const n=byGroup.get(group.groupKey)?.analysisIncluded??0
             const valid=scoreGroups.get(group.groupKey)?.n??0
             return n<5||valid<5

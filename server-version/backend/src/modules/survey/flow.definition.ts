@@ -99,6 +99,8 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
   const allUnitKeys=units.map(unit=>unit.instrumentKey)
   strictKeys(allUnitKeys,'instruments',issues)
   strictKeys(flow.blocks.map(b=>b.blockKey),'flow.blocks',issues)
+  if(flow.experiment&&flow.blocks.some(b=>b.blockKey==='assigned_material'))
+    error(issues,'flow.blocks','assigned_material 是研究实验材料保留标识，不能由编制者重用')
   strictKeys(flow.embeddedData.map(d=>d.key),'flow.embeddedData',issues)
   const staticVars=new Map(flow.embeddedData.map(d=>[d.key,d]))
   flow.embeddedData.forEach((v,i)=>{
@@ -128,14 +130,18 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
     if(/\{\{|\}\}/.test(raw.replace(/\{\{[a-z][a-z0-9_-]*\}\}/g,'')))
       error(issues,path,'文案变量必须使用 {{变量编码}}，不允许执行表达式')
   }
+  flow.experiment?.groups.forEach((g,i)=>{
+    checkText(g.materialTitle,'flow.experiment.groups.'+i+'.materialTitle')
+    checkText(g.materialBody,'flow.experiment.groups.'+i+'.materialBody')
+  })
   const checkCondition=(condition:FlowCondition,at:number,depth:number,path:string)=>{
     totalPredicates++
     if(totalPredicates>64||depth>6){error(issues,path,'条件表达式节点或深度超过上限');return}
-    if(condition.op==='AND'||condition.op==='OR'){
+    if('terms' in condition){
       condition.terms.forEach((term,i)=>checkCondition(term,at,depth+1,path+'.terms.'+i))
       return
     }
-    if(condition.op==='NOT'){checkCondition(condition.term,at,depth+1,path+'.term');return}
+    if('term' in condition){checkCondition(condition.term,at,depth+1,path+'.term');return}
     const compare=condition.op
     const v=condition.value
     if(compare==='IS_MISSING'&&v!==undefined)
@@ -158,8 +164,9 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
         error(issues,path,'研究条件仅可引用已验证的 Form 答案');return
       }
       const form=unit.displayDefinition as FormDraft
+      const itemKey=condition.field.itemKey
       const item=form.pages.flatMap(p=>p.questions)
-        .find(q=>q.itemKey===condition.field.itemKey)
+        .find(q=>q.itemKey===itemKey)
       if(!item){error(issues,path,'被引用的表单题目不存在');return}
       if(['NUMBER','SLIDER'].includes(item.type))valueType='number'
       else if(item.type==='MULTIPLE')valueType='choices'
