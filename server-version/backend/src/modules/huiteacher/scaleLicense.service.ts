@@ -6,6 +6,7 @@ import { validateScaleDefinition,hashScaleDefinition } from '../scale/scale-defi
 import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { teacherPilotContentIssues } from './teacherPilotContent'
 
 export class TeacherScaleLicenseError extends Error {
   constructor(public readonly code:string,public readonly statusCode=409){
@@ -65,7 +66,8 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
   if(!def||checked.issues.some(x=>x.severity==='error')
     ||def.respondentType!=='teacher_self_report'
     ||def.license.status!=='self_authored'||def.license.redistribution!=='allowed'
-    ||def.referencePolicy.type!=='none'||hashScaleDefinition(def)!==r.definitionHash)
+    ||teacherPilotContentIssues(def).length>0
+    ||hashScaleDefinition(def)!==r.definitionHash)
     deny('HUITEACHER_SCALE_SOURCE_INVALID',403)
   return r
 }

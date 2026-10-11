@@ -104,12 +104,22 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     }]
     definition.report.primaryScoreKeys=['support']
     definition.report.scoreOrder=['support']
+    definition.report.audienceContract={
+      schemaVersion:1,respondent:'ADULT_SELF',audience:'teacher',
+      locale:'zh-CN',
+      qcReview:{reviewer:'synthetic-test-independent-editor',
+        reviewedAt:'2026-10-12T00:00:00.000Z',
+        basis:'Isolated fixture: a reader-facing pilot explanation and privacy check'},
+    }
     definition.report.interpretations=[{
       scoreKey:'support',headline:'你对支持资源的体验',
       source:{type:'score_only'},
-      summary:'这个结果仅反映这三道题的本次回答，可以帮助回顾日常工作体验。',
+      summary:'这三道题反映你最近一次填写问卷时对工作支持的主观感受。它们不能代表你所有的工作经历，也不能判断你是否是一位优秀教师。你可以回想某一次与同事协作或者寻求学校帮助的经历：当时真正帮助到你的是什么？哪些支持还不够具体？如果近期工作负担明显增加，可以把需要的时间、资源或者协作方式写下来，与信任的同事或学校沟通。再次测量前，也可以观察自己的工作环境是否发生了变化。',
       bands:[],
-      guidance:[{category:'reflection',text:'可以回想最近一次获得实际支持的情境。'}],
+      guidance:[
+        {category:'reflection',text:'回想最近一次获得实际支持的情境，记录哪种帮助起到了作用。'},
+        {category:'strategy',text:'选出一个现实可行的需求，尝试与团队约定下一步行动。'},
+      ],
     }]
     const definitionHash=hashScaleDefinition(definition)
     const scale=await db.scale.create({data:{

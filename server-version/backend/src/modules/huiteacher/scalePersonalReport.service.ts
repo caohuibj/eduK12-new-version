@@ -3,6 +3,7 @@ import { readRespondentRunSummary } from '../reporting/respondentSummary'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { hashScaleDefinition,validateScaleDefinition } from '../scale/scale-definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
+import { teacherPilotContentIssues } from './teacherPilotContent'
 
 export class TeacherScaleReportError extends Error{
   constructor(public readonly code:string,public readonly statusCode=404){
@@ -83,7 +84,8 @@ export async function readTeacherPersonalScaleReport(input:{
     ||hashScaleDefinition(def)!==record.definitionHash
     ||def.referencePolicy.type!=='none'
     ||def.license.status!=='self_authored'
-    ||def.license.redistribution!=='allowed')
+    ||def.license.redistribution!=='allowed'
+    ||teacherPilotContentIssues(def).length>0)
     denied()
   // This calls current population & respondent authority again and refuses
   // School data, unrecognized sources, and organization-facing projections.

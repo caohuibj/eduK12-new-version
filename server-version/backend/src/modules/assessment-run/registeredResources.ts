@@ -9,6 +9,7 @@ import { createRelationalProductRegistry, relationalProductRegistry, type Relati
 import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { reportingFail } from '../reporting/types'
 import { assertTeacherScaleRunUse } from '../huiteacher/scaleLicense.service'
+import { teacherPilotContentIssues } from '../huiteacher/teacherPilotContent'
 
 type Actor = { userId: string; platformRole: string }
 type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string; created_by_user_id: string; reviewed_by_user_id: string | null }
@@ -22,6 +23,9 @@ export function validateDescriptiveResourceScale(scale: { status: string; instru
   if (definition.license.status !== 'self_authored' || definition.license.redistribution !== 'allowed' || definition.respondentType !== expectedRespondent || !definition.scoring.scores.length) {
     reportingFail('RESOURCE_SCALE_INVALID', '当前注册入口仅支持允许再分发的原创自评计分量表', 409)
   }
+  if(expectedRespondent==='teacher_self_report'&&teacherPilotContentIssues(definition).length)
+    reportingFail('HUITEACHER_PILOT_CONTENT_UNQUALIFIED',
+      '教师自评资源缺少完整版本摘要、受众报告审核或必要的反思指导文案',409)
   if (hashScaleDefinition(definition) !== scale.definitionHash) reportingFail('RESOURCE_INTEGRITY', '量表定义与发布指纹不一致', 409)
   return definition
 }
