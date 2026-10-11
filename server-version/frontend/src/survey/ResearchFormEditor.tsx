@@ -1,15 +1,20 @@
 import type { FormDraft, FormQuestion } from './builder.types'
-import { choiceTypes, newOption, newQuestion, researchKey } from './builder.types'
+import { choiceTypes, professionalTypes, newOption, newQuestion, researchKey } from './builder.types'
 import { SurveyImageField } from './SurveyImageField'
 
 const types:Record<FormQuestion['type'],string>={
   SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',
   NUMBER:'数值',LIKERT:'Likert',MATRIX:'矩阵',
+  DATE:'日期',TIME:'时间',RANK_ORDER:'排序',SLIDER:'滑块',
+  CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
 export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
   onChange:(next:FormDraft)=>void;projectId:string}){
-  const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>
-    onChange({...value,pages:value.pages.map((p,i)=>i===index?update(p):p)})
+  const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
+    const pages=value.pages.map((p,i)=>i===index?update(p):p)
+    const upgraded=pages.some(p=>p.questions.some(q=>professionalTypes.has(q.type)))
+    onChange({...value,pages,schemaVersion:upgraded?2:value.schemaVersion})
+  }
   const setQuestion=(pi:number,qi:number,update:(q:FormQuestion)=>FormQuestion)=>
     setPage(pi,page=>({...page,questions:page.questions.map((q,i)=>i===qi?update(q):q)}))
   const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0)
@@ -21,9 +26,12 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
   }
   return <div className="space-y-5">
     <div className="flex flex-wrap gap-2 items-center">
-      <h3 className="font-semibold">Form 问卷页面</h3>
+      <h3 className="font-semibold">Form 问卷页面 · V{value.schemaVersion}</h3>
       <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
         role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行计 1）</span>
+      {value.schemaVersion===1&&<button type="button" className="btn-secondary"
+        onClick={()=>onChange({...value,schemaVersion:2})}>
+        升级为 Form V2（生成新冻结版本）</button>}
       <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
         {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+' 页',questions:[]}]})}>新增分页</button>
     </div>
@@ -83,7 +91,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
             </div>)}
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
           </div>}
-          {q.type==='MATRIX'&&<div className="space-y-2">
+          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<div className="space-y-2">
             <p className="text-sm font-medium">矩阵行</p>
             {q.rows.map((row,ri)=><div key={row.rowKey} className="flex gap-2">
               <input className="input flex-1" aria-label={'矩阵行 '+(ri+1)} value={row.label}
@@ -92,7 +100,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
             </div>)}
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
           </div>}
-          {q.type==='NUMBER'&&<div className="grid sm:grid-cols-2 gap-3">
+          {['NUMBER','SLIDER'].includes(q.type)&&<div className="grid sm:grid-cols-2 gap-3">
             <label className="text-sm inline-flex gap-2 items-center"><input type="checkbox"
               checked={q.integerOnly===true} onChange={e=>setQuestion(pi,qi,x=>({...x,
                 integerOnly:e.target.checked,precision:e.target.checked?0:x.precision,
@@ -109,9 +117,36 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               <input className="input block w-full" type="number" step="any" value={q[k]??''}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,[k]:e.target.value===''?undefined:Number(e.target.value)}))}/></label>)}
           </div>}
+          {q.type==='CONSTANT_SUM'&&<div className="grid sm:grid-cols-2 gap-3">
+            <label className="block text-sm">指定总和
+              <input className="input block w-full" type="number" min="0" step="any"
+                value={q.total??100} onChange={e=>setQuestion(pi,qi,x=>({...x,total:Number(e.target.value)}))}/></label>
+            <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"
+              checked={q.integerOnly===true} onChange={e=>setQuestion(pi,qi,x=>({...x,integerOnly:e.target.checked}))}/>
+              每项必须为整数</label>
+          </div>}
+          {['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&<div className="grid sm:grid-cols-2 gap-3">
+            {(['minSelections','maxSelections'] as const).map(k=><label className="block text-sm" key={k}>
+              {k==='minSelections'?'最少选择':'最多选择'}（留空不限）
+              <input className="input block w-full" type="number" min="1" max="30" step="1"
+                value={q[k]??''} onChange={e=>setQuestion(pi,qi,x=>({...x,
+                  [k]:e.target.value===''?undefined:Number(e.target.value)}))}/></label>)}
+          </div>}
+          {q.type==='TIME'&&<label className="block text-sm">研究时间时区
+            <select className="input block" value={q.timeZone??'Asia/Shanghai'}
+              onChange={e=>setQuestion(pi,qi,x=>({...x,timeZone:e.target.value as 'UTC'|'Asia/Shanghai'}))}>
+              <option value="Asia/Shanghai">中国标准时间（UTC+08:00）</option>
+              <option value="UTC">UTC</option></select></label>}
           {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<label className="block text-sm">字数上限
             <input className="input block" type="number" min="1" max="10000" value={q.maxLength??''}
               onChange={e=>setQuestion(pi,qi,x=>({...x,maxLength:e.target.value===''?undefined:Number(e.target.value)}))}/></label>}
+          {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<label className="block text-sm">输入格式
+            <select className="input block" value={q.textValidation??''}
+              onChange={e=>setQuestion(pi,qi,x=>({...x,
+                textValidation:e.target.value?e.target.value as 'EMAIL'|'DIGITS'|'ALPHANUMERIC':undefined}))}>
+              <option value="">不限制</option><option value="EMAIL">邮箱</option>
+              <option value="DIGITS">仅数字</option><option value="ALPHANUMERIC">英文字母与数字</option>
+            </select></label>}
           {previous.length>0&&<div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">显示条件
               <select className="input block w-full" value={q.displayIf?.itemKey||''}
