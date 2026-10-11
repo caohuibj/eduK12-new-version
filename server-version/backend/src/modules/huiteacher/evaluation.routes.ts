@@ -3,7 +3,7 @@ import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
-import { requireTeacherProductAdmin,requireTeacherProductMember,requireRecentTeacherMfa } from './authority'
+import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
   createHuiteacherTarget,listHuiteacherTargets,archiveHuiteacherTarget,
   createHuiteacherEvent,listHuiteacherEvents,transitionHuiteacherEvent,HuiteacherEvaluationError,
@@ -32,7 +32,7 @@ const handler=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,r
   }
 })
 router.get('/organizations/:organizationId/evaluation-targets',
-  authenticateHuiteacher,requireTeacherProductMember,handler(async(req,res)=>{
+  authenticateHuiteacher,requireTeacherProductAdmin,handler(async(req,res)=>{
     const organizationId=id.parse(req.params.organizationId)
     const query=z.object({cursor:id.optional()}).strict().parse(req.query)
     return success(res,await listHuiteacherTargets({
@@ -52,7 +52,7 @@ router.post('/organizations/:organizationId/evaluation-targets/:targetId/archive
     targetId:id.parse(req.params.targetId),
   }))))
 router.get('/organizations/:organizationId/evaluation-events',
-  authenticateHuiteacher,requireTeacherProductMember,handler(async(req,res)=>{
+  authenticateHuiteacher,requireTeacherProductAdmin,handler(async(req,res)=>{
     const organizationId=id.parse(req.params.organizationId)
     const query=z.object({targetId:id.optional(),cursor:id.optional()}).strict().parse(req.query)
     return success(res,await listHuiteacherEvents({

@@ -68,7 +68,7 @@ export async function listHuiteacherTargets(input:{
   organizationId:string;actorUserId:string;cursor?:string
 }){
   return prisma.$transaction(async tx=>{
-    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:false})
+    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
     const rows=await tx.huiteacherEvaluationTarget.findMany({where:{
       organizationId:input.organizationId,
       status:'ACTIVE',
@@ -131,7 +131,7 @@ export async function listHuiteacherEvents(input:{
   organizationId:string;actorUserId:string;targetId?:string;cursor?:string
 }){
   return prisma.$transaction(async tx=>{
-    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:false})
+    await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
     const rows=await tx.huiteacherEvaluationEvent.findMany({where:{
       organizationId:input.organizationId,...(input.targetId?{targetId:input.targetId}:{}),
       ...(input.cursor?{id:{gt:input.cursor}}:{}),
