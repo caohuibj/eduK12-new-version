@@ -2668,3 +2668,90 @@ model CampusMfaResetRequest {
   @@index([organizationId, targetUserId, status], map: "campus_mfa_resets_target_idx")
   @@map("campus_mfa_reset_requests")
 }
+
+
+//// Survey researcher realm — handwritten SQL migrations own FKs and checks.
+//// Kept separate from existing legacy/campus account identities.
+model SurveyAccount {
+  userId          String   @id @map("user_id")
+  loginName       String   @map("login_name")
+  normalizedLogin String   @unique @map("normalized_login")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@map("survey_accounts")
+}
+model SurveyResearcherGrant {
+  userId    String   @id @map("user_id")
+  status    String   @default("PENDING_MFA")
+  grantedBy String   @map("granted_by")
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("survey_researcher_grants")
+}
+model SurveyInvitation {
+  id            String    @id
+  kind          String    @default("INVITE")
+  tokenHash     String    @unique @map("token_hash")
+  createdBy     String    @map("created_by")
+  targetUserId  String?   @map("target_user_id")
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  claimedAt     DateTime? @map("claimed_at") @db.Timestamptz(6)
+  claimedUserId String?   @map("claimed_user_id")
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([expiresAt, claimedAt, revokedAt], map: "survey_invitations_validity_idx")
+  @@map("survey_invitations")
+}
+model SurveyMfaCredential {
+  userId       String    @id @map("user_id")
+  secretCipher String    @map("secret_cipher")
+  enabled      Boolean   @default(false)
+  lastUsedStep BigInt    @default(-1) @map("last_used_step")
+  enabledAt    DateTime? @map("enabled_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@map("survey_mfa_credentials")
+}
+model SurveyMfaChallenge {
+  id           String    @id
+  userId       String    @map("user_id")
+  challengeHash String   @unique @map("challenge_hash")
+  tokenVersion Int       @map("token_version")
+  failedCount  Int       @default(0) @map("failed_count")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt   DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, expiresAt], map: "survey_mfa_challenges_user_idx")
+  @@map("survey_mfa_challenges")
+}
+model SurveyMfaRecoveryCode {
+  userId    String    @map("user_id")
+  codeHash  String    @map("code_hash")
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([userId, codeHash])
+  @@map("survey_mfa_recovery_codes")
+}
+model SurveyProject {
+  id             String   @id
+  ownerUserId    String   @map("owner_user_id")
+  title          String
+  description    String   @default("")
+  collectionMode String   @map("collection_mode")
+  status         String   @default("DRAFT")
+  revision       Int      @default(0)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@index([ownerUserId, status, updatedAt, id], map: "survey_projects_owner_status_idx")
+  @@map("survey_projects")
+}
+model SurveyEvent {
+  id            String   @id
+  actorUserId   String?  @map("actor_user_id")
+  targetUserId  String?  @map("target_user_id")
+  projectId     String?  @map("project_id")
+  action        String
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([actorUserId, createdAt], map: "survey_events_actor_idx")
+  @@index([projectId, createdAt], map: "survey_events_project_idx")
+  @@map("survey_events")
+}
