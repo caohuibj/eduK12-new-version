@@ -72,6 +72,42 @@ describe('Form V2 frozen answer contract',()=>{
         .toThrow(SurveyFinalValidationError)
     }
   })
+  it('accepts an authored 150-question mixed V2 Form with three bounded pages',()=>{
+    const pages:Array<FormDraft['pages'][number]>=[]
+    const answers:Record<string,unknown>={}
+    for(let page=0;page<3;page++){
+      const questions:FormDraft['pages'][number]['questions']=[]
+      for(let qi=0;qi<50;qi++){
+        const n=page*50+qi,itemKey='item'+n
+        const common={itemKey,prompt:'研究题 '+n,required:true,rows:[]}
+        if(n%4===0){
+          questions.push({...common,type:'SINGLE',options:[
+            {optionKey:'a',label:'是'},{optionKey:'b',label:'否'}]})
+          answers[itemKey]='a'
+        }else if(n%4===1){
+          questions.push({...common,type:'DATE',options:[]})
+          answers[itemKey]='2024-02-29'
+        }else if(n%4===2){
+          questions.push({...common,type:'SHORT_TEXT',options:[],maxLength:50})
+          answers[itemKey]='普通描述'
+        }else{
+          questions.push({...common,type:'MATRIX_MULTIPLE',options:[
+            {optionKey:'a',label:'选择 A'},{optionKey:'b',label:'选择 B'}],
+            rows:[{rowKey:'first',label:'第一行'},{rowKey:'second',label:'第二行'}]})
+          answers[itemKey+':first']=['a']
+          answers[itemKey+':second']=['b']
+        }
+      }
+      pages.push({pageKey:'page'+page,title:'第 '+(page+1)+' 页',questions})
+    }
+    const data:FormDraft={schemaVersion:2,pages}
+    expect(data.pages.flatMap(p=>p.questions)).toHaveLength(150)
+    expect(validateSurveyDraft('FORM',data,true).issues).toHaveLength(0)
+    const submitted=computeSurveyFinal(snapshot(data),{form:answers})
+    expect(submitted.units[0].missing).toEqual([])
+    expect(submitted.units[0].rawAnswers['item0']).toBe('a')
+    expect(submitted.units[0].rawAnswers['item3']).toEqual({first:['a'],second:['b']})
+  })
   it('enforces selected other-text and exclusive multi-select across dry-run and frozen FINAL',()=>{
     const choiceForm:FormDraft={schemaVersion:2,pages:[{pageKey:'page',title:'类别',questions:[
       {itemKey:'single',type:'SINGLE',prompt:'身份',required:true,rows:[],
