@@ -32,6 +32,8 @@ export interface SurveySourceProjection {
   cutOff:string
   /** Only set on explicitly paged reads; no silent truncation on legacy reads. */
   nextFinalCursor?:{id:string;completedAt:string}|null
+  /** Whole filtered cohort count, pinned for cross-request paging consistency. */
+  sourceFinalCount?:number|null
   scores:FrozenScoreObservation[]
   /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
@@ -154,6 +156,7 @@ export async function loadSurveySource(input:{
   afterFinal?:{id:string;completedAt:Date}
   snapshotCutOff?:Date
   expectedSourceRevision?:number
+  expectedFinalCount?:number
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -182,7 +185,7 @@ export async function loadSurveySource(input:{
     // FINALs and large Publication JSON before applying the memory budget.
     const cutOff=input.snapshotCutOff||project.sourceCutOff
     if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
-    const finalWhere:Prisma.SurveyWaveFinalWhereInput={
+    const sourceWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,
       ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
       completedAt:{
@@ -190,12 +193,23 @@ export async function loadSurveySource(input:{
         lt:input.completedBefore&&input.completedBefore<cutOff
           ?input.completedBefore:cutOff,
       },
+      attempt:{status:'COMPLETED',excludedAt:null,
+        OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]},
+    }
+    // Cross-request RepeatableRead alone is not one database snapshot:
+    // a transaction started before cutOff could commit after page one. Fence
+    // that drift with an exact count over the whole bounded cohort.
+    const sourceFinalCount=input.pageMode
+      ?await tx.surveyWaveFinal.count({where:sourceWhere}):null
+    if(input.expectedFinalCount!==undefined
+      &&sourceFinalCount!==input.expectedFinalCount)
+      throw new SurveyAnalyticsError(409,'分批期间 FINAL 样本数量已变化，请重新开始完整导出')
+    const finalWhere:Prisma.SurveyWaveFinalWhereInput={
+      ...sourceWhere,
       ...(input.afterFinal?{AND:[{OR:[
         {completedAt:{gt:input.afterFinal.completedAt}},
         {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
       ]}]}:{}),
-      attempt:{status:'COMPLETED',excludedAt:null,
-        OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]},
     }
     const headers=await tx.surveyWaveFinal.findMany({
       where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
@@ -362,7 +376,7 @@ export async function loadSurveySource(input:{
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
-      cutOff:cutOff.toISOString(),nextFinalCursor,
+      cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
