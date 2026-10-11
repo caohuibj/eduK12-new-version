@@ -83,10 +83,10 @@ export async function getPublicResearchInfo(publicId:string){
       orderBy:{ordinal:'asc'},take:100,select:{
         id:true,title:true,ordinal:true,status:true,consentText:true,consentVersion:true,
         opensAt:true,closesAt:true,allowNewParticipants:true,
-      }})
+      }}):[]
     return {project:{name:project.title,description:project.description,
       collectionMode:project.collectionMode,status:project.status},
-      waves:project.status==='ACTIVE'?waves:[]}
+      waves}
   })
 }
 /** Opt-in pseudonymous T1 or late-join only, using a separate high-entropy
