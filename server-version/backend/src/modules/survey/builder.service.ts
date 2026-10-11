@@ -192,7 +192,18 @@ export async function previewSurveyImport(userId:string,projectId:string,id:stri
     const row=await findDraft(tx,projectId,id)
     if(row.status!=='DRAFT'||row.kind==='SJT')fail(409,'只有 Form/Scale 草稿支持此批量导入')
     const schemaVersion=row.kind==='FORM'?(row.definition as {schemaVersion:1|2}).schemaVersion:undefined
-    return {revision:row.revision,...previewBulk(input,row.kind as 'FORM'|'SCALE',schemaVersion)}
+    const kind=row.kind as 'FORM'|'SCALE'
+    const candidate=previewBulk(input,kind,schemaVersion)
+    if(!candidate.ok)return {revision:row.revision,...candidate}
+    // Dry-run the same bounded merge as Apply. This catches page capacity,
+    // stable-key collisions and the 500-field limit before researchers commit.
+    try{applyBulk(kind,row.definition,input,candidate.digest)}
+    catch(e){
+      if(e instanceof BulkImportError)return {revision:row.revision,...candidate,
+        ok:false,issues:e.issues}
+      throw e
+    }
+    return {revision:row.revision,...candidate}
   })
 }
 export async function applySurveyImport(userId:string,projectId:string,id:string,input:{
