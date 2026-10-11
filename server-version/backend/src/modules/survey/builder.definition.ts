@@ -26,7 +26,8 @@ const condition = z.object({
 export const SURVEY_FORM_MAX_ANSWER_FIELDS=500
 /** Count wire-level keys; each MATRIX row is one key before FINAL normalization. */
 export const formAnswerFieldCount=(form:FormDraft)=>form.pages.reduce((sum,page)=>
-  sum+page.questions.reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1),0),0)
+  sum+page.questions.reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1)
+    +(q.otherOptionKey?1:0),0),0)
 /** V2 question registry is fixed application code, never researcher-supplied scripts. */
 export const formQuestionRegistry={
   SINGLE:{version:1,shape:'choice'},MULTIPLE:{version:1,shape:'choices'},
@@ -64,6 +65,7 @@ export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
       for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+
         (q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
     }else bytes+=quote(q.itemKey)+valueBytes()+2
+    if(q.otherOptionKey)bytes+=quote(q.itemKey+':other')+2+6*(q.otherMaxLength??300)+2
   }
   return bytes
 }
@@ -85,6 +87,8 @@ export const formQuestionSchema=z.object({
   minSelections:z.number().int().min(1).max(30).optional(),
   maxSelections:z.number().int().min(1).max(30).optional(),
   textValidation:z.enum(['EMAIL','DIGITS','ALPHANUMERIC']).optional(),
+  otherOptionKey:key.optional(),otherMaxLength:z.number().int().min(1).max(2000).optional(),
+  exclusiveOptionKeys:z.array(key).max(30).optional(),
   timeZone:z.enum(['Asia/Shanghai','UTC']).optional(),
   maxLength:z.number().int().min(1).max(10000).optional(),
   displayIf:condition.optional(),
@@ -209,6 +213,21 @@ export const validateSurveyDraft=(
           err(issues,path+'.type','专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义')
         unique(q.options.map(o=>o.optionKey),path+'.options',issues)
         unique(q.rows.map(o=>o.rowKey),path+'.rows',issues)
+        if(q.otherOptionKey!==undefined){
+          if(d.schemaVersion!==2||!['SINGLE','MULTIPLE'].includes(q.type))
+            err(issues,path+'.otherOptionKey','其他文本只允许 Form V2 的单选或多选题')
+          if(!q.options.some(o=>o.optionKey===q.otherOptionKey))
+            err(issues,path+'.otherOptionKey','其他填写选项必须对应已有选项编码')
+        }else if(q.otherMaxLength!==undefined)
+          err(issues,path+'.otherMaxLength','请先设置其他填写选项')
+        if(q.exclusiveOptionKeys!==undefined){
+          if(d.schemaVersion!==2||q.type!=='MULTIPLE')
+            err(issues,path+'.exclusiveOptionKeys','互斥选项只允许 Form V2 多选题')
+          unique(q.exclusiveOptionKeys,path+'.exclusiveOptionKeys',issues)
+          for(const exclusive of q.exclusiveOptionKeys)
+            if(!q.options.some(o=>o.optionKey===exclusive))
+              err(issues,path+'.exclusiveOptionKeys','互斥选项编码不存在于本题')
+        }
         if(['SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)){
           if(forPreview&&q.options.length<2)err(issues,path+'.options','选择题至少需要两项有效选项')
           if(forPreview)q.options.forEach((o,oi)=>requireText(o.label,path+`.options.${oi}`,issues))
