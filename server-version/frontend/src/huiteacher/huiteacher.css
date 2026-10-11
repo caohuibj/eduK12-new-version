@@ -38,3 +38,7 @@
 .ht-app .ht-event-list{display:grid;gap:.7rem}
 .ht-app .ht-event{padding:1.15rem;background:#fffaf6;border:1px solid var(--ht-line);border-radius:10px}
 .ht-app .ht-event strong{display:inline-block;margin-right:.8rem}
+.ht-app .ht-task{border-top:1px solid var(--ht-line);margin-top:1.3rem;padding-top:1.5rem}
+.ht-app .ht-task fieldset{min-width:0;max-width:100%}
+.ht-app .ht-task table{min-width:480px}
+.ht-app .ht-task .overflow-x-auto{overflow-x:auto;max-width:100%}
