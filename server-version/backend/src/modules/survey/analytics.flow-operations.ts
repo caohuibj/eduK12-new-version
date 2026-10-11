@@ -91,15 +91,17 @@ export async function describeSurveyFlowOperations(req:Request,input:{
     if(categories.length)for(const group of frozen.flow.experiment?.groups??[])
       groupsByCategory.set(group.groupKey,new Map([...categories,
         'NOT_SHOWN','SHOWN_MISSING','REFUSED'].map(category=>[category,0])))
-    let after:{startedAt:Date;id:string}|null=null
+    // UUID keyset pagination avoids PostgreSQL microsecond → JS millisecond
+    // truncation that can repeat or skip adjacent concurrent Attempt rows.
+    // REPEATABLE READ fixes the cohort while walking this immutable keyset.
+    let afterId:string|undefined
     let processed=0
     while(true){
       const rows=await tx.surveyWaveAttempt.findMany({where:{
         projectId:input.projectId,waveId:wave.id,
-        ...(after?{OR:[{startedAt:{gt:after.startedAt}},
-          {startedAt:after.startedAt,id:{gt:after.id}}]}:{}),
-      },orderBy:[{startedAt:'asc'},{id:'asc'}],take:PAGE,select:{
-        id:true,startedAt:true,status:true,excludedAt:true,
+        ...(afterId?{id:{gt:afterId}}:{}),
+      },orderBy:[{id:'asc'}],take:PAGE,select:{
+        id:true,status:true,excludedAt:true,
         flowAssignmentCipher:true,participant:{select:{status:true}},
         final:{select:{id:true}},
         sampleReview:{select:{verdict:true}},
@@ -138,7 +140,7 @@ export async function describeSurveyFlowOperations(req:Request,input:{
       }
       processed+=rows.length
       if(processed>MAX_ATTEMPTS)fail(413,'统计波次读取发生超出限制的新增作答')
-      after={startedAt:rows[rows.length-1].startedAt,id:rows[rows.length-1].id}
+      afterId=rows[rows.length-1].id
       if(rows.length<PAGE)break
     }
     if(processed!==attempts)fail(409,'研究波次参与计数在读取期间不一致')

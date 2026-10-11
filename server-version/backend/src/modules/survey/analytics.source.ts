@@ -176,6 +176,10 @@ export async function loadSurveySource(input:{
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
   completedFrom?:Date;completedBefore?:Date
   pageMode?:boolean
+  /** Internal analytics only: paginate by unique ID to avoid Timestamptz(6)
+   * precision loss when final timestamps pass through JavaScript Date(3).
+   * Signed PR2 export cursors intentionally retain their legacy ordering. */
+  stableIdCursor?:boolean
   /** Paired score aggregation does not need longitudinal attendance matrices. */
   includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
@@ -237,14 +241,19 @@ export async function loadSurveySource(input:{
       throw new SurveyAnalyticsError(409,'分批期间 FINAL 样本数量已变化，请重新开始完整导出')
     const finalWhere:Prisma.SurveyWaveFinalWhereInput={
       ...sourceWhere,
-      ...(input.afterFinal?{AND:[{OR:[
-        {completedAt:{gt:input.afterFinal.completedAt}},
-        {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
-      ]}]}:{}),
+      ...(input.afterFinal?input.stableIdCursor
+        ?{id:{gt:input.afterFinal.id}}
+        :{AND:[{OR:[
+          {completedAt:{gt:input.afterFinal.completedAt}},
+          {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
+        ]}]}:{}),
     }
     const headers=await tx.surveyWaveFinal.findMany({
       where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
-      orderBy:[{completedAt:'asc'},{id:'asc'}],take:max+1,
+      orderBy:input.stableIdCursor
+        ?[{id:'asc' as const}]
+        :[{completedAt:'asc' as const},{id:'asc' as const}],
+      take:max+1,
     })
     if(headers.length>max&&!input.pageMode)
       throw new SurveyAnalyticsError(413,'此范围超过交互式数据上限，请缩小波次')

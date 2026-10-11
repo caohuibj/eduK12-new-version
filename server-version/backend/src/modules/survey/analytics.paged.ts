@@ -28,7 +28,7 @@ export async function describeSurveyPairedScoresPaged(input:{
   for(let page=0;page<MAX_PAGES;page++){
     const chunk=await loadSurveySource({
       actorUserId:input.actorUserId,projectId:input.projectId,waveIds,
-      maxFinals:PAGE_SIZE,pageMode:true,includeWideSchema:true,
+      maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,includeWideSchema:true,
       includeAttendance:false,afterFinal,snapshotCutOff,expectedSourceRevision,
       expectedFinalCount,
     })
@@ -82,7 +82,7 @@ export async function describeSurveyWaveItemPaged(input:{
   for(let page=0;page<MAX_PAGES;page++){
     const chunk=await loadSurveySource({
       actorUserId:input.actorUserId,projectId:input.projectId,
-      waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,
+      waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,
       includeWideSchema:true,includeAttendance:false,
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })
@@ -168,7 +168,7 @@ export async function describeSurveyWaveGroupsPaged(input:{
   for(let page=0;page<MAX_PAGES;page++){
     const chunk=await loadSurveySource({
       actorUserId:input.actorUserId,projectId:input.projectId,
-      waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,
+      waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,
       includeWideSchema:true,includeAttendance:false,
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })

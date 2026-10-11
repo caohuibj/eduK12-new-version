@@ -2,7 +2,8 @@ import {createHmac,timingSafeEqual} from 'node:crypto'
 import {SurveyAnalyticsError} from './analytics.read'
 const fail=():never=>{throw new SurveyAnalyticsError(400,'研究导出分页凭证无效或已过期')}
 export interface SurveyExportCursor {
-  v:1;projectId:string;waveId:string;format:'RAW_WAVE'|'RAW_LONG'|'SCORE_LONG'
+  /** V1: completedAt/ID (legacy); V2: stable UUID keyset, avoiding timestamp microsecond loss. */
+  v:1|2;projectId:string;waveId:string;format:'RAW_WAVE'|'RAW_LONG'|'SCORE_LONG'
   after:{id:string;completedAt:string}
   cutOff:string;sourceRevision:number;page:number;issuedAt:number
   completedFrom:string|null;completedBefore:string|null
@@ -30,7 +31,7 @@ export function decodeSurveyExportCursor(raw:string,projectId:string,
   if(supplied.length!==expected.length||!timingSafeEqual(supplied,expected))fail()
   try{
     const token=JSON.parse(Buffer.from(body,'base64url').toString('utf8')) as SurveyExportCursor
-    if(token.v!==1||token.projectId!==projectId||token.waveId!==waveId||
+    if((token.v!==1&&token.v!==2)||token.projectId!==projectId||token.waveId!==waveId||
       token.format!==format||!token.after||!token.after.id
       ||!/^[a-f0-9-]{36}$/i.test(token.after.id)
       ||!Number.isFinite(Date.parse(token.after.completedAt))

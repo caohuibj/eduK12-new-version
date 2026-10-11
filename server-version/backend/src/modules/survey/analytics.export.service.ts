@@ -80,7 +80,9 @@ export async function createSurveyExport(req:Request,input:{
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
     includeWideSchema:true,completedFrom:from,completedBefore:before,
-    ...(paged?{pageMode:true,includeAttendance:!prior}:{}),
+    ...(paged?{pageMode:true,
+      stableIdCursor:!prior||prior.v===2,
+      includeAttendance:!prior}:{}),
     ...(prior?{afterFinal:{id:prior.after.id,completedAt:new Date(prior.after.completedAt)},
       snapshotCutOff:new Date(prior.cutOff),expectedSourceRevision:prior.sourceRevision,
       expectedFinalCount:prior.finalCount}:{}),
@@ -88,7 +90,7 @@ export async function createSurveyExport(req:Request,input:{
   if(sources.nextFinalCursor&&prior?.page===100)
     fail(413,'本次受控分批导出超过 25000 个 FINAL，请缩小采集范围')
   const nextCursor=paged&&sources.nextFinalCursor?encodeSurveyExportCursor({
-    v:1,projectId:input.projectId,waveId:input.waveId!,
+    v:prior?.v??2,projectId:input.projectId,waveId:input.waveId!,
     format:input.format as SurveyExportCursor['format'],after:sources.nextFinalCursor,
     cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
     finalCount:sources.sourceFinalCount??0,
@@ -125,7 +127,10 @@ export async function createSurveyExport(req:Request,input:{
     generatedAt:new Date().toISOString(),timeZone:'UTC',
     sourceProjectRevision:sources.sourceRevision,
     analysisPopulation:'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
-    batch:{pageNumber,hasNext:!!nextCursor,completionRowsOnlyAfterFirstPage:!!prior},
+    batch:{pageNumber,hasNext:!!nextCursor,completionRowsOnlyAfterFirstPage:!!prior,
+      sourceOrdering:paged?(prior?.v===1?'COMPLETED_AT_AND_ID_V1':'FINAL_UUID_ID_V2')
+        :'COMPLETED_AT_AND_ID',
+    },
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
       researchOnly:true,collectionMode:sources.collectionMode,

@@ -15,6 +15,13 @@ describe('Survey bounded export continuation proof',()=>{
         freeTextIncluded:false,finalCount:22}
       const serialized=encodeSurveyExportCursor(cursor)
       expect(decodeSurveyExportCursor(serialized,'a','RAW_WAVE','b')).toEqual(cursor)
+      const v2={...cursor,v:2 as const}
+      const upgraded=encodeSurveyExportCursor(v2)
+      expect(decodeSurveyExportCursor(upgraded,'a','RAW_WAVE','b')).toEqual(v2)
+      expect(()=>decodeSurveyExportCursor(upgraded,'a','RAW_LONG','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...cursor,v:3 as unknown as 2,
+      }),'a','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized,'wrong','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized,'a','SCORE_LONG','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized.slice(0,-3)+'zzz','a','RAW_WAVE','b')).toThrow()
