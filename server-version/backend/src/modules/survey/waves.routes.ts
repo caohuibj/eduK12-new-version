@@ -6,7 +6,7 @@ import * as service from './waves.service'
 import * as publish from './waves.publish'
 
 export const surveyWavesRouter=Router()
-surveyWavesRouter.use(authenticateSurvey)
+surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
 const id=z.string().uuid()
 const wave=z.object({
   title:z.string().trim().min(1).max(160),
