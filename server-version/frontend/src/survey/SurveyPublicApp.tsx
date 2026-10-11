@@ -16,6 +16,24 @@ type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;
   questions?:{questionKey:string;prompt:string;options:Choice[]}[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'}
 type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:string}
+type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
+const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
+const readSingleResume=(id:string):SingleResume|null=>{
+  try{
+    const json=sessionStorage.getItem(singleStorageKey(id))
+    if(!json)return null
+    const saved=JSON.parse(json) as SingleResume
+    if(!/^[a-f0-9-]{36}$/i.test(saved.attemptId)
+      ||!/^[A-Za-z0-9_-]{43}$/.test(saved.accessCredential)
+      ||typeof saved.createdAt!=='number'
+      ||Date.now()-saved.createdAt>2*60*60*1000
+      ||saved.createdAt>Date.now()){
+      sessionStorage.removeItem(singleStorageKey(id))
+      return null
+    }
+    return saved
+  }catch{return null}
+}
 type Answer=string|number|string[]|null
 const safePattern=/^[a-f0-9-]{36}$/i
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
@@ -107,6 +125,8 @@ export default function SurveyPublicApp(){
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [withdrawn,setWithdrawn]=useState(false)
+  // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
+  const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
   const base='/r/'+publicId
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
@@ -149,6 +169,11 @@ export default function SurveyPublicApp(){
       setGeneral(result)
     }
   }
+  const resumeSingle=()=>{if(!singleResume)return;void run(async()=>{
+    setAccessCredential(singleResume.accessCredential)
+    await loadTask(singleResume.attemptId,'',singleResume.accessCredential)
+    setNotice('正在恢复本设备尚在有效期内的单次匿名研究作答。')
+  })}
   const start=()=>{if(!selectedWave||!agreed)return;void run(async()=>{
     const wave=selectedWave
     if(info?.project.collectionMode==='LINKED_WAVES'&&wave.attempt){
@@ -168,7 +193,12 @@ export default function SurveyPublicApp(){
           entryToken,consent:true,consentVersion:wave.consentVersion,
         })
       setAccessCredential(started.accessCredential)
-      setNotice('这是本次匿名回答的临时凭证。离开当前页面前请完成作答。')
+      const temp:SingleResume={attemptId:started.attemptId,
+        accessCredential:started.accessCredential,createdAt:Date.now()}
+      setSingleResume(temp)
+      try{sessionStorage.setItem(singleStorageKey(publicId),JSON.stringify(temp))}
+      catch{/* private-storage disabled: valid credentials remain in this tab memory */}
+      setNotice('本设备此标签页可在两小时内尝试恢复；离开或关闭标签前仍建议完成作答。它不会产生跨波次研究编号。')
       await loadTask(started.attemptId,'',started.accessCredential)
     }
   })}
@@ -224,6 +254,8 @@ export default function SurveyPublicApp(){
         })
       }
       setWithdrawn(true);setGeneral(null);setTask(null);setHome(null)
+      setSingleResume(null)
+      try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* storage unavailable */}
       setResearchCode('');setAccessCredential('')
       setNotice('已记录撤回请求。相关回答将从后续统计和新导出排除；物理删除与历史留存按研究说明处理。')
     })
@@ -272,6 +304,13 @@ export default function SurveyPublicApp(){
         <button className="btn-secondary mt-3" type="button" onClick={()=>setProofReceived(false)}>
           我已分别保存这两个凭证</button>
       </section>}
+      {info.project.collectionMode==='SINGLE_UNLINKED'&&singleResume&&!task&&!general&&
+        <section className="bg-white border rounded-xl p-4">
+          <h3 className="font-semibold">恢复本次单次匿名作答</h3>
+          <p className="text-sm my-2">仅此浏览器标签可尝试恢复短期作答；不建立跨波次身份。公共设备请在完成后关闭标签。</p>
+          <button className="btn-secondary" type="button" disabled={busy} onClick={resumeSingle}>
+            恢复本次作答／查看已完成回执</button>
+        </section>}
       {!task&&!general&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
         {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
