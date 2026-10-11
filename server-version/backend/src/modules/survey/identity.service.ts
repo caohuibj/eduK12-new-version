@@ -125,6 +125,10 @@ export async function withdrawLinkedResearchData(input:{
 }):Promise<{excludedAttempts:number;status:'WITHDRAWN';retention:'PENDING_REVIEW'}>{
   const participant=await recoverLinkedResearchIdentity(input)
   return prisma.$transaction(async tx=>{
+    // Lock the owning project before exclusion to serialize with any
+    // pending sensitive export ticket creation.
+    await tx.$queryRaw`SELECT id FROM "survey_projects"
+      WHERE id=${input.projectId} FOR UPDATE`
     await tx.$queryRaw`
       SELECT id FROM "survey_participants"
       WHERE "id"=${participant.participantId} AND "project_id"=${input.projectId}
@@ -148,6 +152,8 @@ export async function withdrawLinkedResearchData(input:{
     await tx.surveyExportTicket.updateMany({where:{
       projectId:input.projectId,status:'READY',
     },data:{status:'REVOKED'}})
+    await tx.surveyProject.update({where:{id:input.projectId},
+      data:{revision:{increment:1}}})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
       projectId:input.projectId,action:'PARTICIPANT_DATA_WITHDRAWAL',
       metadata:{excludedAttempts:excluded.count,retention:'PENDING_REVIEW'}}})
@@ -164,6 +170,8 @@ export async function withdrawSingleResearchAttempt(input:{
       publicId:input.publicId,collectionMode:'SINGLE_UNLINKED',
     },select:{id:true}})
     if(!project)fail()
+    await tx.$queryRaw`SELECT id FROM "survey_projects"
+      WHERE id=${project.id} FOR UPDATE`
     await tx.$queryRaw`
       SELECT id FROM survey_wave_attempts WHERE id=${input.attemptId}
         AND project_id=${project.id} FOR UPDATE
@@ -179,6 +187,8 @@ export async function withdrawSingleResearchAttempt(input:{
     await tx.surveyExportTicket.updateMany({where:{
       projectId:project.id,status:'READY',
     },data:{status:'REVOKED'}})
+    await tx.surveyProject.update({where:{id:project.id},
+      data:{revision:{increment:1}}})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
       projectId:project.id,action:'SINGLE_ATTEMPT_DATA_WITHDRAWAL',
       metadata:{waveId:attempt.waveId,retention:'PENDING_REVIEW'}}})

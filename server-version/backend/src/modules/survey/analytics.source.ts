@@ -26,6 +26,7 @@ export interface ResearchRawObservation {
 export interface SurveySourceProjection {
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   completeAttempts:number
+  sourceRevision:number
   cutOff:string
   scores:FrozenScoreObservation[]
   raw:ResearchRawObservation[]
@@ -118,8 +119,9 @@ export async function loadSurveySource(input:{
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
-    const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date}>>`
-      SELECT p.collection_mode AS "collectionMode", transaction_timestamp() AS "sourceCutOff"
+    const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
+      SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision",
+        transaction_timestamp() AS "sourceCutOff"
       FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
@@ -210,7 +212,7 @@ export async function loadSurveySource(input:{
       }
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
-      completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
+      sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
       cutOff:project.sourceCutOff.toISOString(),
       scores,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})

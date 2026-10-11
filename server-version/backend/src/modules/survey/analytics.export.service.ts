@@ -39,8 +39,8 @@ const artifactFor=(format:Format,projectId:string,source:Awaited<ReturnType<type
   return exportWide(projectId,source.scores)
 }
 async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient,uid:string,pid:string){
-  const rows=await tx.$queryRaw<Array<{id:string}>>`
-    SELECT p.id FROM "survey_projects" p
+  const rows=await tx.$queryRaw<Array<{id:string;revision:number}>>`
+    SELECT p.id,p.revision FROM "survey_projects" p
     JOIN "users" u ON u.id=p.owner_user_id
     JOIN "survey_researcher_grants" g ON g.user_id=u.id
     JOIN "survey_mfa_credentials" m ON m.user_id=u.id
@@ -51,6 +51,7 @@ async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient
     LIMIT 1 FOR SHARE OF p,u,g,m
   `
   if(!rows.length)fail(404,'无权限访问研究项目数据')
+  return rows[0]
 }
 export async function createSurveyExport(req:Request,input:{
   projectId:string;format:Format;waveId?:string;includeFreeText?:boolean;
@@ -96,7 +97,13 @@ export async function createSurveyExport(req:Request,input:{
   if(Buffer.byteLength(cipher,'utf8')>3900000)fail(413,'加密数据超过安全持久化预算')
   const id=randomUUID(),expiresAt=new Date(Date.now()+10*60000)
   await prisma.$transaction(async tx=>{
-    await guardedOwner(tx,uid,input.projectId)
+    const current=await guardedOwner(tx,uid,input.projectId)
+    // The source projection is acquired earlier in a separate transaction.
+    // Withdrawal bumps project revision while holding FOR UPDATE; either the
+    // ticket is inserted before withdrawal revokes it, or the stale source is
+    // rejected after the update. Never issue a READY stale-data artifact.
+    if(current.revision!==sources.sourceRevision)
+      fail(409,'研究数据授权或项目状态在导出期间发生变化，请重新生成')
     await tx.surveyExportTicket.create({data:{
       id,projectId:input.projectId,actorUserId:uid,format:input.format,status:'READY',
       sourceDigest:canonicalHash(sources.scores.map(s=>s.sourceFinalHash).concat(
