@@ -613,4 +613,51 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
 
+  it('bounds one-Wave FINAL exports by half-open completion window and records selection',async()=>{
+    const w=await wave('单波次分段导出',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+      submissionId:randomUUID(),
+      answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+    })
+    const future=new Date(Date.now()+60_000)
+    const included=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+      completedBefore:future,
+    })
+    expect(included.completeAttempts).toBe(1)
+    const excluded=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+      completedFrom:future,
+    })
+    expect(excluded.completeAttempts).toBe(0)
+    expect(excluded.codebook).toHaveLength(2)
+    const token=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+token},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const ticket=await createSurveyExport(req,{
+      projectId,format:'RAW_WAVE',waveId:w.id,completedBefore:future.toISOString(),
+    })
+    expect(ticket.manifest.selection.completedBefore).toBe(future.toISOString())
+    expect(ticket.manifest.completedFinalCount).toBe(1)
+    await expect(createSurveyExport(req,{
+      projectId,format:'SCORE_LONG',completedBefore:future.toISOString(),
+    })).rejects.toThrow(/单波次/)
+  })
+
+
 })
