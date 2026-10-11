@@ -161,7 +161,7 @@ const prepareTracks = async (
   const tracks = await readDraftTracks(runId, organizationId)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
-    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId)
+    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId, prisma, false, {organizationId,runId})
     if(teacherFormResourceId({
       family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
     })){
@@ -940,7 +940,7 @@ export const publishAssessmentRun = async (input: {
     let executionCount = 0
 
     for (const track of preparedTracks) {
-      await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true)
+      await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true, {organizationId:input.organizationId,runId:input.runId})
       if(teacherFormResourceId({
         family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
       })){

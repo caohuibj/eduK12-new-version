@@ -8,6 +8,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { createRelationalProductRegistry, relationalProductRegistry, type RelationalProductEntryV1 } from '../assessment-relational/product-registry'
 import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { reportingFail } from '../reporting/types'
+import { assertTeacherScaleRunUse } from '../huiteacher/scaleLicense.service'
 
 type Actor = { userId: string; platformRole: string }
 type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string; created_by_user_id: string; reviewed_by_user_id: string | null }
@@ -68,8 +69,7 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
     const isTeacher=mode==='TEACHER_INDIVIDUAL'
     const definition=validateDescriptiveResourceScale(scale,
       isTeacher?'teacher_self_report':'participant_self_report')
-    if(isTeacher && (definition.items.some(x=>Boolean(x.images)||Boolean(x.video))
-      || definition.responseSets.some(set=>set.options.some(opt=>Boolean(opt.images)||Boolean(opt.video)))))
+    if(isTeacher && definition.items.some(x=>Boolean(x.images)||Boolean(x.video)))
       reportingFail('RESOURCE_MEDIA_BRIDGE_NOT_RELEASED','教师版量表暂不支持没有独立跨域授权的图片或视频',409)
     const hash = hashScaleDefinition(definition)
     const key = isTeacher?`teacher-scale:${scale.id}:INDIVIDUAL`:`custom-scale:${scale.id}:${mode}`
@@ -173,8 +173,17 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
   return { entries: rows.slice(0, 100).map(checkedEntry), nextPage: rows.length > 100 ? page + 1 : null }
 }
 
-export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false) {
-  if (ref.family !== 'SCALE' || !(ref.key.startsWith('custom-scale:') || ref.key.startsWith('teacher-scale:'))) return
+export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
+  if (ref.family==='SCALE'&&ref.key.startsWith('teacher-scale:')){
+    if(!teacherRunScope) reportingFail('RESOURCE_TEACHER_RUN_SCOPE_REQUIRED',
+      '教师自评量表只能用于经授权的 Teacher 评价任务',403)
+    await assertTeacherScaleRunUse(db,{
+      organizationId:teacherRunScope.organizationId,runId:teacherRunScope.runId,
+      resource:ref,
+    })
+    return
+  }
+  if (ref.family !== 'SCALE' || !ref.key.startsWith('custom-scale:')) return
   const row = (await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.key} AND resource_version=${ref.version} ${lock ? Prisma.sql`FOR SHARE` : Prisma.empty}`))[0]
   if (lock && row) {
     // Serialize publication against retirement, source edits and material revocation.

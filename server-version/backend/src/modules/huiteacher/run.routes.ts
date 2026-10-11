@@ -6,7 +6,7 @@ import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
   HuiteacherRunError,addTeacherRunTrack,previewTeacherRun,publishTeacherRun,
-  progressTeacherRun,closeTeacherRun,cancelTeacherRun,
+  progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,
 } from './run.service'
 
 const router=Router()
@@ -56,6 +56,10 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
   }
 })
 const base='/organizations/:organizationId/evaluation-events/:eventId/run'
+router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductAdmin,
+  wrap(async(req,res)=>success(res,await listTeacherAvailableScales({
+    ...keys.parse(req.params),actorUserId:req.user!.userId,
+  }))))
 router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
   wrap(async(req,res)=>success(res,await addTeacherRunTrack({
     ...keys.parse(req.params),actorUserId:req.user!.userId,...track.parse(req.body),

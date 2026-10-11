@@ -10,6 +10,7 @@ import {
 } from '../assessment-run/resourceAuthority'
 import { assertRegisteredResourceUse } from '../assessment-run/registeredResources'
 import { teacherFormResourceId } from './formRunResource'
+import { teacherScaleResource,listTeacherScaleCatalog } from './scaleLicense.service'
 import { assertCurrentRunManagerBoundary,assertCurrentRunPublisherBoundary } from '../assessment-run/resourceBoundary'
 
 export class HuiteacherRunError extends Error{
@@ -76,11 +77,16 @@ export async function addTeacherRunTrack(input:Key&{
   // can only narrow an exact frozen resource policy.
   if(input.resource.family==='FORM'&&!teacherFormResourceId(input.resource))
     fail('HUITEACHER_FORM_REQUIRES_TEACHER_RELEASE',403)
+  if(input.resource.family==='SCALE'&&(!teacherScaleResource(input.resource)
+    ||input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'))
+    fail('HUITEACHER_PERSONAL_SCALE_RELEASE_REQUIRED',403)
+  if(!['FORM','SCALE'].includes(input.resource.family))
+    fail('HUITEACHER_RESOURCE_KIND_UNSUPPORTED',403)
   if(!policy.subjectRoles.includes('TEACHER')
     ||!input.requestedPolicy.subjectRoles.includes('TEACHER'))
     fail('HUITEACHER_RESOURCE_TARGET_UNSUPPORTED',403)
   assertRunTrackNarrowing(policy,input.requestedPolicy)
-  await assertRegisteredResourceUse(input.resource,input.actorUserId)
+  await assertRegisteredResourceUse(input.resource,input.actorUserId,prisma,false,{organizationId:input.organizationId,runId:link.runId})
   return addAssessmentRunTrackDraft({
     organizationId:input.organizationId,runId:link.runId,
     resource:input.resource,subjectSelector:input.subjectSelector,
@@ -127,4 +133,9 @@ export async function cancelTeacherRun(input:Key){
     ||!['DRAFT','PUBLISHED'].includes(link.runStatus))
     fail('HUITEACHER_RUN_CANCEL_FORBIDDEN')
   return cancelAssessmentRun({organizationId:input.organizationId,runId:link.runId})
+}
+
+export async function listTeacherAvailableScales(input:Key){
+  await activeLink(input)
+  return listTeacherScaleCatalog(input)
 }

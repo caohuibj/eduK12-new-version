@@ -8,6 +8,7 @@ import { comparePassword } from '../../utils/password'
 import { forbidden, error, success } from '../../utils/response'
 import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
 import type { EducationProduct } from '../organization/educationProductAccess'
+import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicense.service'
 import {
   EducationProductGovernanceError, setEducationProductEntitlement,
   readEducationProductEntitlements, grantEducationProductAdmin, revokeEducationProductAdmin,
@@ -62,6 +63,7 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
   catch(e){
     if(e instanceof z.ZodError)return error(res,'请求格式不合法',-1,400)
     if(e instanceof EducationProductGovernanceError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof TeacherScaleLicenseError)return error(res,'教师量表资源或学校授权条件不满足',-1,e.statusCode)
     next(e)
   }
 }
@@ -91,4 +93,17 @@ router.post('/organizations/:organizationId/teacher-admins/:grantId/revoke',hand
   await adminStepUp(req,input.currentPassword)
   return revokeEducationProductAdmin({actorUserId:req.user!.userId,organizationId:org,grantId})
 }))
+const licenseInput=z.object({
+  action:z.enum(['GRANT','REVOKE']),currentPassword:password,
+}).strict()
+router.put('/organizations/:organizationId/teacher-scale-licenses/:resourceId',
+  handle(async req=>{
+    const organizationId=uuid.parse(req.params.organizationId)
+    const resourceId=uuid.parse(req.params.resourceId)
+    const data=licenseInput.parse(req.body)
+    await adminStepUp(req,data.currentPassword)
+    return changeTeacherScaleLicense({
+      organizationId,resourceId,actorUserId:req.user!.userId,action:data.action,
+    })
+  }))
 export default router
