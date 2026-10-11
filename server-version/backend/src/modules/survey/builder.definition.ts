@@ -227,6 +227,8 @@ export const validateSurveyDraft=(
           for(const exclusive of q.exclusiveOptionKeys)
             if(!q.options.some(o=>o.optionKey===exclusive))
               err(issues,path+'.exclusiveOptionKeys','互斥选项编码不存在于本题')
+          if(q.exclusiveOptionKeys.length>0&&(q.minSelections??1)>1)
+            err(issues,path+'.minSelections','存在互斥选项时最少选择不能大于 1')
         }
         if(['SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)){
           if(forPreview&&q.options.length<2)err(issues,path+'.options','选择题至少需要两项有效选项')
