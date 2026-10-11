@@ -2,7 +2,7 @@ import { useEffect,useState } from 'react'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
-type Run={eventId:string;runId:string;status:string;version:number;name?:string}
+type Run={eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type Progress={runId:string;total:number;counts:Record<string,number>}
 type GroupReport={independentRespondents:number;minimumRespondents:number;
@@ -76,15 +76,18 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
     setEventTitle('');await refresh();setNotice('活动草稿已创建，可关联正式 Assessment Run。')
   })
   const createRun=(event:Event)=>perform(async()=>{
-    const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run','POST',{
-      name:event.title,
-    })
-    setRunMap(old=>({...old,[event.id]:run}))
+    await api(base+'/evaluation-events/'+event.id+'/run','POST',{name:event.title})
+    await fetchRun(event)
     setNotice('已原子建立活动专属 Assessment Run 草稿。请配置已发布 Form 的 Track。')
   })
   const inspectRun=(event:Event)=>perform(async()=>{
     const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
     setRunMap(old=>({...old,[event.id]:run}))
+  })
+  const reloadReleasedForms=()=>perform(async()=>{
+    const data=await api<{list:Form[]}>(base+'/forms')
+    setReleasedForms(data.list.filter(x=>x.status==='PUBLISHED'))
+    setNotice('已刷新本校已发布 Form；未完成授权的资源不会进入正式任务。')
   })
   const fetchRun=async(event:Event)=>{
     const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
@@ -191,14 +194,22 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         onChange={e=>setEventTitle(e.target.value)} maxLength={200}/></label>
       <button disabled={working||!eventTargetId||!eventTitle.trim()} onClick={addEvent}>创建活动草稿</button>
     </div>
-    <h3>近期活动</h3>
+    <div className="ht-inline"><h3>近期活动</h3>
+      <button type="button" disabled={working} onClick={reloadReleasedForms}>
+        刷新已发布表单
+      </button>
+    </div>
     <div className="ht-event-list">{events.map(event=><article key={event.id} className="ht-event">
       <strong>{event.title}</strong>
       <span className="ht-tag">{eventLabels[event.kind]??event.kind} · {event.status}</span>
       <div className="ht-inline">
         <button onClick={()=>inspectRun(event)} disabled={working}>查看 Run 关联</button>
         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建标准 Run 草稿</button>}
-        {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')} disabled={working}>开放评价活动</button>}
+        {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')}
+          disabled={working||runMap[event.id]?.status!=='DRAFT'
+            ||(runMap[event.id]?.trackCount??0)<1}>
+          开放评价活动
+        </button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
           disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>

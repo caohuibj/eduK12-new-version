@@ -106,10 +106,16 @@ suite('Huiteacher evaluation and Survey Form V2 contracts — isolated PostgreSQ
       organizationId:f.organizationId,runId:result.runId,
       actorUserId:f.adminUserId,
     })
-    expect((await transitionHuiteacherEvent({
+    // Do not allow an empty Run to OPEN: it would freeze all later Track
+    // configuration and leave the school activity permanently unusable.
+    await expect(transitionHuiteacherEvent({
       organizationId:f.organizationId,actorUserId:f.adminUserId,
       eventId:event.id,expectedVersion:1,action:'OPEN',
-    })).status).toBe('OPEN')
+    })).rejects.toThrow()
+    expect((await transitionHuiteacherEvent({
+      organizationId:f.organizationId,actorUserId:f.adminUserId,
+      eventId:event.id,expectedVersion:1,action:'CANCEL',
+    })).status).toBe('CANCELLED')
   })
 
   it('Form-only uses Survey V2 validation and freezes published answers',async()=>{

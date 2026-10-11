@@ -158,8 +158,8 @@ export async function transitionHuiteacherEvent(input:{
     const from=input.action==='OPEN'?'DRAFT':input.action==='CLOSE'?'OPEN':null
     if((from&&event.status!==from)||input.action==='CANCEL'&&!['DRAFT','OPEN'].includes(event.status))
       fail('HUITEACHER_EVENT_INVALID_TRANSITION')
-    const relatedRun=await tx.$queryRaw<Array<{status:string}>>`
-      SELECT run."status" FROM "huiteacher_evaluation_run_links" link
+    const relatedRun=await tx.$queryRaw<Array<{id:string;status:string}>>`
+      SELECT run."id",run."status" FROM "huiteacher_evaluation_run_links" link
       JOIN "assessment_runs" run
         ON run."organization_id"=link."organization_id"
         AND run."id"=link."run_id"
@@ -168,6 +168,17 @@ export async function transitionHuiteacherEvent(input:{
       FOR SHARE OF run
     `
     const run=relatedRun[0]
+    if(input.action==='OPEN'){
+      if(!run||run.status!=='DRAFT')
+        fail('HUITEACHER_EVENT_RUN_DRAFT_REQUIRED')
+      const tracks=await tx.$queryRaw<Array<{n:number}>>`
+        SELECT COUNT(*)::int AS n FROM "assessment_run_tracks"
+        WHERE "organization_id"=${input.organizationId}
+          AND "run_id"=${run.id}
+      `
+      if((tracks[0]?.n??0)<1)
+        fail('HUITEACHER_EVENT_TRACK_REQUIRED')
+    }
     if(input.action==='CLOSE'&&run&&run.status!=='CLOSED')
       fail('HUITEACHER_RUN_MUST_CLOSE_FIRST')
     if(input.action==='CANCEL'&&run&&!['DRAFT','CANCELLED'].includes(run.status))
@@ -257,6 +268,11 @@ export async function readHuiteacherEventRun(input:{
       WHERE "id"=${link.runId} AND "organization_id"=${input.organizationId}
     `
     if(!run.length)fail('HUITEACHER_EVENT_RUN_NOT_FOUND',404)
-    return {...link,...run[0]}
+    const tracks=await tx.$queryRaw<Array<{n:number}>>`
+      SELECT COUNT(*)::int AS n FROM "assessment_run_tracks"
+      WHERE "organization_id"=${input.organizationId}
+        AND "run_id"=${link.runId}
+    `
+    return {...link,...run[0],trackCount:tracks[0]?.n??0}
   })
 }
