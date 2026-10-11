@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { validateSurveyDraft } from '../survey/builder.definition'
+import { validateSurveyDraft,type FormDraft } from '../survey/builder.definition'
 import type { RunResourcePolicy,RunResourceRef } from '../assessment-run/resourceAuthority'
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
 
@@ -56,8 +56,8 @@ export async function resolvePublishedTeacherForm(ref:RunResourceRef,db:Db=prism
     deny('TEACHER_FORM_RESOURCE_INTEGRITY')
   // Teacher has no access to Survey project media. Do not permit authored
   // images whose attachment authority belongs to the Survey research realm.
-  if(validated.definition.kind!==undefined)deny('TEACHER_FORM_RESOURCE_KIND')
-  if(validated.definition.pages.some(page=>page.questions.some(q=>q.image)))
+  const form=validated.definition as FormDraft
+  if(form.pages.some(page=>page.questions.some(q=>q.image)))
     deny('TEACHER_FORM_MEDIA_UNSUPPORTED',403)
   return row
 }

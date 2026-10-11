@@ -3099,3 +3099,35 @@ model HuiteacherEvaluationRunLink {
   @@index([organizationId,runId],map:"huiteacher_run_links_run_idx")
   @@map("huiteacher_evaluation_run_links")
 }
+
+// Product-owned runtime identity is frozen by a canonical Run Execution.
+model HuiteacherFormAttempt {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  runId            String   @map("run_id")
+  runExecutionId   String   @unique(map:"huiteacher_form_attempts_execution_unique") @map("run_execution_id")
+  formId           String   @map("form_id")
+  respondentUserId String   @map("respondent_user_id")
+  definitionDigest String   @map("definition_digest")
+  status           String   @default("STARTED")
+  startedAt        DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz(6)
+  @@unique([organizationId,id],map:"huiteacher_form_attempts_org_id_unique")
+  @@index([organizationId,formId,status,startedAt],map:"huiteacher_form_attempts_org_form_idx")
+  @@map("huiteacher_form_attempts")
+}
+
+// Exactly one encrypted immutable FINAL; no secondary plaintext answers table.
+model HuiteacherFormFinal {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  attemptId        String   @unique(map:"huiteacher_form_finals_attempt_unique") @map("attempt_id")
+  submissionId     String   @map("submission_id")
+  definitionDigest String   @map("definition_digest")
+  payloadHash      String   @map("payload_hash")
+  resultsCipher    String   @map("results_cipher")
+  resultsHash      String   @map("results_hash")
+  completedAt      DateTime @default(now()) @map("completed_at") @db.Timestamptz(6)
+  @@index([organizationId,completedAt,id],map:"huiteacher_form_finals_org_time_idx")
+  @@map("huiteacher_form_finals")
+}
