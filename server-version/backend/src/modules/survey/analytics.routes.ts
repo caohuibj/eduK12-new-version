@@ -3,6 +3,9 @@ import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
+import { loadSurveySource } from './analytics.source'
+import { describeWave,describePairedScores } from './analytics.descriptive'
+
 
 export const surveyAnalyticsRouter=Router()
 surveyAnalyticsRouter.use(authenticateSurvey)
@@ -29,4 +32,26 @@ surveyAnalyticsRouter.post('/:pid/analytics/paired-counts',wrap(req=>{
   return service.matchedWaveCounts({
     actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),...params,
   })
+}))
+
+const measurement=z.object({
+  baselineWaveId:id,followupWaveId:id,
+  instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+}).strict()
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
+  const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
+  const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
+    waveIds:[waveId],maxFinals:250})
+  return describeWave(source,waveId)
+}))
+surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
+  const projectId=id.parse(req.params.pid),input=measurement.parse(req.body)
+  const source=await loadSurveySource({
+    actorUserId:req.user!.userId,projectId,
+    waveIds:[input.baselineWaveId,input.followupWaveId],maxFinals:250,
+  })
+  if(source.collectionMode!=='LINKED_WAVES')
+    throw new service.SurveyAnalyticsError(409,'此研究未启用跨波次身份关联')
+  return describePairedScores(source,input)
 }))
