@@ -257,6 +257,19 @@ const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
   if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
   next()
 }
+// Fail closed before registering Survey routes if a production operator enables
+// the product without its own MFA key. Never print the secret in error/logs.
+if (process.env.NODE_ENV === 'production') {
+  const workspace = process.env.SURVEY_WORKSPACE_ENABLED === 'true'
+  const publication = process.env.SURVEY_PUBLICATION_ENABLED === 'true'
+  const analytics = process.env.SURVEY_ANALYTICS_ENABLED === 'true'
+  if ((publication || analytics) && !workspace) {
+    throw new Error('Survey publication or analytics requires SURVEY_WORKSPACE_ENABLED=true')
+  }
+  if (workspace && !/^[0-9a-fA-F]{64}$/.test(process.env.SURVEY_MFA_ENCRYPTION_KEY || '')) {
+    throw new Error('SURVEY_MFA_ENCRYPTION_KEY must be 32 bytes of hex when Survey is enabled')
+  }
+}
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
