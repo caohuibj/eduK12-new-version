@@ -2,7 +2,8 @@ import { useEffect,useState,type FormEvent } from 'react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type WaveSummary={id:string;ordinal:number;title:string;status:string;
-  starts:number;finalCompleted:number;uniqueLinkedCodes:number|null;excluded:number}
+  starts:number;finalCompleted:number;analysisIncluded:number;qualityExcluded:number;
+  uniqueLinkedCodes:number|null;excluded:number}
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
 type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
@@ -17,6 +18,8 @@ type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Ar
   optionCode:string;optionLabel:string;respondentN:number;scoreValidN:number;
   mean:number|null;sampleSd:number|null
 }>}
+type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;waveId:string;
+  completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   manifest:{rowCount:number;columnCount:number}}
@@ -72,6 +75,9 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
   const [error,setError]=useState(''),[ticket,setTicket]=useState<Ticket|null>(null)
+  const [qualityRows,setQualityRows]=useState<QualityRow[]>([])
+  const [qualityPage,setQualityPage]=useState(1)
+  const [qualityReason,setQualityReason]=useState('')
   const base='/projects/'+projectId
   const reload=async()=>{
     const res=await api<Overview>(base+'/analytics/overview')
@@ -83,11 +89,31 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
-    void reload().catch(e=>setError(e instanceof Error?e.message:'研究分析尚不可用'))
+    setQualityRows([]);setQualityPage(1)
+    void Promise.all([reload(),loadQuality(1)])
+      .catch(e=>setError(e instanceof Error?e.message:'研究分析尚不可用'))
   },[projectId])
   const execute=async(fn:()=>Promise<void>)=>{
     setBusy(true);setError('');setMessage('')
     try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求未完成')}finally{setBusy(false)}
+  }
+  const loadQuality=async(page=qualityPage)=>{
+    const data=await api<{list:QualityRow[]}>(base+'/analytics/quality/attempts?page='+page)
+    setQualityRows(data.list);setQualityPage(page)
+  }
+  const markQuality=(row:QualityRow,verdict:'INCLUDED'|'EXCLUDED')=>{
+    if(qualityReason.trim().length<2)return
+    if(!window.confirm(verdict==='EXCLUDED'
+      ?'该决定会把此份 FINAL 从后续有效样本分析排除，但不删除原始答卷。确认？'
+      :'确认将该份记录重新纳入有效分析？原始 FINAL 保持不变。'))return
+    void execute(async()=>{
+      await api(base+'/analytics/quality/attempts/'+row.attemptId,'POST',{
+        revision:row.revision,verdict,reason:qualityReason.trim(),
+      })
+      setQualityReason('')
+      await Promise.all([reload(),loadQuality(qualityPage)])
+      setMessage('样本质量决定已记录审计，旧的未下载导出已失效。')
+    })
   }
   const compare=()=>void execute(async()=>{
     setPaired(await api<Matched>(base+'/analytics/paired-counts','POST',{
@@ -150,13 +176,41 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     {overview&&<><div className="overflow-x-auto"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
         <th className="p-2">已启动</th><th className="p-2">完成 FINAL</th>
-        <th className="p-2">研究编号数</th><th className="p-2">排除</th></tr></thead>
+        <th className="p-2">有效分析</th><th className="p-2">质量排除</th>
+        <th className="p-2">研究编号数</th><th className="p-2">撤回排除</th></tr></thead>
       <tbody>{overview.waves.map(w=><tr key={w.id} className="border-b">
         <th scope="row" className="p-2 text-left">T{w.ordinal} · {w.title}</th><td className="p-2 text-center">{w.status}</td>
         <td className="p-2 text-center">{w.starts}</td><td className="p-2 text-center">{w.finalCompleted}</td>
+        <td className="p-2 text-center">{w.analysisIncluded}</td>
+        <td className="p-2 text-center">{w.qualityExcluded}</td>
         <td className="p-2 text-center">{w.uniqueLinkedCodes??'不可关联'}</td>
         <td className="p-2 text-center">{w.excluded}</td></tr>)}</tbody></table></div>
-      <p className="text-xs text-slate-600">{overview.note}</p>
+      <p className="text-xs text-slate-600">{overview.note} 质量排除是可审计的分析政策，不修改加密原始 FINAL；参与者撤回另行处理。</p>
+      <section className="border rounded-xl p-4 space-y-3" aria-label="科研样本质量复核">
+        <h3 className="font-semibold">科研样本质量复核</h3>
+        <p className="text-xs text-slate-600">只列出本人项目已完成且未撤回的 FINAL。审核决定可恢复，必须注明理由并留痕。</p>
+        <label className="block text-sm">本次复核理由（必填）
+          <textarea className="input block w-full" maxLength={1000} value={qualityReason}
+            onChange={e=>setQualityReason(e.target.value)} placeholder="例如：注意力题未通过；或重新检查后符合纳入标准"/>
+        </label>
+        {qualityRows.map(row=><div className="flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
+          <div className="text-xs"><code>{row.attemptCode}</code>
+            <p>{row.researchCode??'独立匿名作答'} · {row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</p>
+            <p>{row.reason??'尚无人工质量复核'} · {new Date(row.completedAt).toLocaleString('zh-CN')}</p>
+          </div>
+          <button type="button" className="btn-secondary"
+            disabled={busy||qualityReason.trim().length<2}
+            onClick={()=>markQuality(row,row.verdict==='EXCLUDED'?'INCLUDED':'EXCLUDED')}>
+            {row.verdict==='EXCLUDED'?'恢复纳入':'排除有效样本'}</button>
+        </div>)}
+        <div className="flex gap-3 items-center text-sm">
+          <button className="btn-secondary" disabled={busy||qualityPage<=1}
+            onClick={()=>void execute(()=>loadQuality(qualityPage-1))}>上一页</button>
+          第 {qualityPage} 页
+          <button className="btn-secondary" disabled={busy||qualityRows.length<25}
+            onClick={()=>void execute(()=>loadQuality(qualityPage+1))}>下一页</button>
+        </div>
+      </section>
       {overview.collectionMode==='LINKED_WAVES'&&overview.waves.length>=2&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">纵向匹配 · 有效完成记录</h3>
         <div className="flex flex-wrap gap-3 items-end">
