@@ -29,7 +29,9 @@ export async function describeSurveyPairedScoresPaged(input:{
     const chunk=await loadSurveySource({
       actorUserId:input.actorUserId,projectId:input.projectId,waveIds,
       maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,includeWideSchema:true,
-      includeAttendance:false,afterFinal,snapshotCutOff,expectedSourceRevision,
+      includeAttendance:false,selectRaw:false,
+      selectScore:{instrumentKey:input.instrumentKey,scoreKey:input.scoreKey},
+      afterFinal,snapshotCutOff,expectedSourceRevision,
       expectedFinalCount,
     })
     if(chunk.collectionMode!=='LINKED_WAVES')
@@ -84,6 +86,8 @@ export async function describeSurveyWaveItemPaged(input:{
       actorUserId:input.actorUserId,projectId:input.projectId,
       waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,
       includeWideSchema:true,includeAttendance:false,
+      selectRaw:{instrumentKey:input.instrumentKey,itemKey:input.itemKey},
+      selectScore:false,
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })
     if(!snapshotCutOff){
@@ -195,6 +199,8 @@ export async function describeSurveyWaveGroupsPaged(input:{
       actorUserId:input.actorUserId,projectId:input.projectId,
       waveIds:[input.waveId],maxFinals:PAGE_SIZE,pageMode:true,stableIdCursor:true,
       includeWideSchema:true,includeAttendance:false,
+      selectRaw:{instrumentKey:input.groupInstrumentKey,itemKey:input.groupItemKey},
+      selectScore:{instrumentKey:input.scoreInstrumentKey,scoreKey:input.scoreKey},
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })
     if(!first){

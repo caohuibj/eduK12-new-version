@@ -22,6 +22,7 @@ CREATE TABLE "survey_attempt_checkpoints" (
   "project_id" TEXT NOT NULL,
   "wave_id" TEXT NOT NULL,
   "attempt_id" TEXT NOT NULL UNIQUE,
+  CONSTRAINT "survey_checkpoint_attempt_project_wave_uniq" UNIQUE ("attempt_id","project_id","wave_id"),
   "definition_digest" TEXT NOT NULL,
   "content_cipher" TEXT NOT NULL,
   "content_hash" TEXT NOT NULL,

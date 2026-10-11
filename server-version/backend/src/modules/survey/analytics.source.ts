@@ -180,6 +180,11 @@ export async function loadSurveySource(input:{
    * precision loss when final timestamps pass through JavaScript Date(3).
    * Signed PR2 export cursors intentionally retain their legacy ordering. */
   stableIdCursor?:boolean
+  /** Only internal paged analyses: project exactly the selected variable from
+   * each verified FINAL, instead of rejecting an otherwise valid high-item
+   * study against the 25k intermediate-row cap. No public raw API shortcut. */
+  selectRaw?:false|{instrumentKey:string;itemKey:string}
+  selectScore?:false|{instrumentKey:string;scoreKey:string}
   /** Paired score aggregation does not need longitudinal attendance matrices. */
   includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
@@ -415,8 +420,14 @@ export async function loadSurveySource(input:{
         if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
           ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
           invalid('研究 FINAL 组件来源与冻结定义不一致')
-        scores.push(...scoresFrom(frozen,unit,meta))
-        for(const r of rawItems(frozen,unit)){
+        if(input.selectScore!==false&&(!input.selectScore||
+          frozen.instrumentKey===input.selectScore.instrumentKey))
+          scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
+            score.measurement.scoreKey===input.selectScore.scoreKey))
+        if(input.selectRaw!==false&&(!input.selectRaw||
+          frozen.instrumentKey===input.selectRaw.instrumentKey)){
+          for(const r of rawItems(frozen,unit)){
+            if(input.selectRaw&&r.itemKey!==input.selectRaw.itemKey)continue
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
@@ -437,11 +448,14 @@ export async function loadSurveySource(input:{
               ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
               ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
             })
+          }
         }
       }
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
-      sourceRevision:project.sourceRevision,completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
+      sourceRevision:project.sourceRevision,
+      completeAttempts:input.pageMode?finals.length:
+        new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})

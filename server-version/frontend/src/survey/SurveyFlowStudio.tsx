@@ -176,12 +176,12 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
             <textarea className="input block w-full" rows={3} value={group.materialBody}
               onChange={e=>apply({...value,experiment:{...value.experiment!,
                 groups:value.experiment!.groups.map((g,j)=>j===i?{...g,materialBody:e.target.value}:g)}})}/></label>
-          <button type="button" className="btn-secondary text-xs" disabled={value.experiment.groups.length<=2}
+          <button type="button" className="btn-secondary text-xs" disabled={value.experiment!.groups.length<=2}
             onClick={()=>apply({...value,experiment:{...value.experiment!,
               groups:value.experiment!.groups.filter((_,j)=>i!==j)}})}>移除此组</button>
         </div>)}
         <div className="flex gap-2 flex-wrap">
-          <button className="btn-secondary" type="button" disabled={value.experiment.groups.length>=8}
+          <button className="btn-secondary" type="button" disabled={value.experiment!.groups.length>=8}
             onClick={()=>apply({...value,experiment:{...value.experiment!,
               groups:[...value.experiment!.groups,{groupKey:researchKey('g'),weight:1,
                 materialTitle:'中性材料',materialBody:''}]}})}>增加实验组</button>

@@ -2905,6 +2905,7 @@ model SurveyAttemptCheckpoint {
   expiresAt    DateTime          @map("expires_at") @db.Timestamptz(6)
   createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  @@unique([attemptId,projectId,waveId],map:"survey_checkpoint_attempt_project_wave_uniq")
   @@index([expiresAt],map:"survey_checkpoint_expiry_idx")
   @@index([projectId,waveId],map:"survey_checkpoint_project_wave_idx")
   @@map("survey_attempt_checkpoints")

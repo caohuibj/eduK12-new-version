@@ -90,13 +90,18 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
     }
     const ids=[await tool('FORM','screening',screening),
       await tool('SCALE','measure',scale)]
-    const wave=await createWave(owner,project,{
+    const waveRequest={
       requestId:randomUUID(),title:'配额与临时暂存实验',
       consentText:'本研究将随机分组；只有您主动选择保存时，未完成答案才会短时加密保存。',
       instrumentIds:ids,flowDefinition:draftFlow,
-      quotaPolicy:{schemaVersion:1,groupLimits:{condition_a:1,condition_b:1}},
+      quotaPolicy:{schemaVersion:1,groupLimits:{condition_b:1,condition_a:1}},
       checkpointPolicy:{schemaVersion:1,enabled:true,ttlHours:2},
+    }
+    const wave=await createWave(owner,project,waveRequest)
+    const replay=await createWave(owner,project,{...waveRequest,
+      quotaPolicy:{schemaVersion:1,groupLimits:{condition_a:1,condition_b:1}},
     })
+    expect(replay.id).toBe(wave.id)
     await prepareWave(owner,project,wave.id,wave.revision)
     const frozen=await getWave(owner,project,wave.id)
     const open=await openWave(owner,project,wave.id,frozen.revision)
@@ -164,6 +169,12 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
     await expect(saveSurveyCheckpoint(proof(first),{
       revision:2,answers:{screening:{unknown:'value'}},
     })).rejects.toThrow(/未授权/)
+    await expect(saveSurveyCheckpoint(proof(first),{
+      revision:2,answers:{screening:{eligible:{unexpected:{deep:'answer'}}}},
+    })).rejects.toThrow(/浅层/)
+    await expect(saveSurveyCheckpoint(proof(first),{
+      revision:2,answers:{screening:{eligible:Number.POSITIVE_INFINITY}},
+    })).rejects.toThrow(/浅层/)
   })
   it('purges checkpoints when FINAL or SCREENED_OUT, audits N and rejects stale MFA',async()=>{
     const done=await submitResearchFinal({...proof(first),submissionId:randomUUID(),

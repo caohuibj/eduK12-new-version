@@ -880,6 +880,15 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
     const source=await loadSurveySource({actorUserId:ownerId,projectId,
       waveIds:[w.id],includeWideSchema:true})
+    // Item paging must never materialize all unrelated V2 questions or scores.
+    const projected=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],maxFinals:1,pageMode:true,stableIdCursor:true,
+      includeWideSchema:true,includeAttendance:false,
+      selectRaw:{instrumentKey:unit.instrumentKey,itemKey:'rank'},selectScore:false})
+    expect(projected.completeAttempts).toBe(1)
+    expect(projected.raw.map(r=>r.itemKey)).toEqual(['rank'])
+    expect(projected.scores).toEqual([])
+    expect(projected.codebook.some(r=>r.itemKey==='choice:other')).toBe(true)
     const other=source.raw.find(r=>r.itemKey==='choice:other')
     expect(other?.value).toBe('个人敏感自由文字')
     expect(source.codebook.find(row=>row.itemKey==='choice:other'))

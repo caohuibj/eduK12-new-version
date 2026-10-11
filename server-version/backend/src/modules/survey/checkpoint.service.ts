@@ -15,6 +15,24 @@ const fail=(status:number,message:string):never=>{throw new SurveyCheckpointErro
 type Proof={publicId:string;attemptId:string;accessCredential:string;researchCode?:string}
 type CheckpointAnswers=Record<string,Record<string,unknown>>
 const MAX_CHECKPOINT_BYTES=65536
+/** Partial drafts are never graded on save, but their JSON shape must be shallow
+ * and valid. Unbounded nested values could overflow JSON.stringify or restore
+ * a malformed Form into the browser long before FINAL validation. */
+const safeCheckpointValue=(value:unknown):boolean=>{
+  if(value===null||typeof value==='string')return true
+  if(typeof value==='number')return Number.isFinite(value)
+  const strings=(v:unknown)=>Array.isArray(v)&&v.length<=500
+    &&v.every(x=>typeof x==='string')
+  if(strings(value))return true
+  if(!value||typeof value!=='object'||Array.isArray(value))return false
+  const entries=Object.entries(value)
+  if(entries.length===1&&entries[0][0]==='_surveyRefusal')
+    return entries[0][1]===true
+  return entries.length<=500&&entries.every(([key,item])=>
+    /^[a-z][a-z0-9_-]{0,79}$/.test(key)&&(
+      typeof item==='string'||typeof item==='number'&&Number.isFinite(item)
+      ||strings(item)))
+}
 const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):CheckpointAnswers=>{
   if(!raw||typeof raw!=='object'||Array.isArray(raw))
     fail(400,'临时答案必须按研究工具分组')
@@ -42,6 +60,8 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
     const keys=Object.keys(value as Record<string,unknown>)
     if(keys.length>500||keys.some(k=>!allowed.has(k)))
       fail(400,'Checkpoint 中含有未授权的题目编码')
+    if(keys.some(k=>!safeCheckpointValue((value as Record<string,unknown>)[k])))
+      fail(400,'Checkpoint 只能保存浅层的合法部分答案，不能包含嵌套对象或无效数值')
   }
   const encoded=JSON.stringify(raw)
   if(encoded===undefined||Buffer.byteLength(encoded,'utf8')>MAX_CHECKPOINT_BYTES)

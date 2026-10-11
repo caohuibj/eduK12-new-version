@@ -36,9 +36,10 @@ export type FlowPublicUnit={
 export function evaluateClientFlowCondition(condition:FlowCondition,
   checked:Record<string,Record<string,unknown>>,
   vars:Record<string,string|number|boolean>):boolean{
-  if(condition.op==='AND')return condition.terms.every(c=>evaluateClientFlowCondition(c,checked,vars))
-  if(condition.op==='OR')return condition.terms.some(c=>evaluateClientFlowCondition(c,checked,vars))
-  if(condition.op==='NOT')return !evaluateClientFlowCondition(condition.term,checked,vars)
+  if('terms' in condition)return condition.op==='AND'
+    ?condition.terms.every(c=>evaluateClientFlowCondition(c,checked,vars))
+    :condition.terms.some(c=>evaluateClientFlowCondition(c,checked,vars))
+  if('term' in condition)return !evaluateClientFlowCondition(condition.term,checked,vars)
   const raw=condition.field.source==='EMBEDDED'?vars[condition.field.key]:
     checked[condition.field.instrumentKey]?.[condition.field.itemKey]
   if(condition.op==='IS_MISSING')return raw===null||raw===undefined||raw===''||
