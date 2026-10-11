@@ -25,7 +25,7 @@ type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:Su
   items?:Question[];
   questions?:{questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';
     minSelections?:number;maxSelections?:number;options:Choice[]}[]}
-type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY';flow?:PublicFlow}
+type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY';flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
 type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:string}
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
@@ -205,6 +205,7 @@ export default function SurveyPublicApp(){
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [flowStep,setFlowStep]=useState(0),[screenedOut,setScreenedOut]=useState(false)
+  const [checkpointRevision,setCheckpointRevision]=useState(0)
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
@@ -274,7 +275,7 @@ export default function SurveyPublicApp(){
     })
     setAttemptId(id)
     setSubmissionId(crypto.randomUUID())
-    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false)
+    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false);setCheckpointRevision(0)
     if(data.status==='COMPLETED'){
       clearLocalSurveyDraft(publicId,id)
       setAnswers({})
@@ -284,6 +285,20 @@ export default function SurveyPublicApp(){
       )
       setAnswers(saved||{})
       if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
+      if(data.checkpointPolicy?.enabled){
+        try{
+          const remote=await publicApi<{revision:number;checkpoint:{
+            answers:Record<string,Record<string,Answer>>;updatedAt:string;expiresAt:string
+          }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
+            ...(code?{researchCode:code}:{}),accessCredential:secret,
+          })
+          setCheckpointRevision(remote.revision)
+          if(!saved&&remote.checkpoint){
+            setAnswers(remote.checkpoint.answers)
+            setNotice('已使用研究私密凭证恢复加密服务器存档；该暂存内容仍不是正式提交。')
+          }
+        }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
+      }
     }
     if(data.status==='COMPLETED'){
       const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',{
@@ -398,7 +413,7 @@ export default function SurveyPublicApp(){
     })
     if(screened){
       if(final.status!=='SCREENED_OUT')throw new Error('资格筛除未确认')
-      clearLocalSurveyDraft(publicId,attemptId)
+      clearLocalSurveyDraft(publicId,attemptId);setCheckpointRevision(0)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
       setSingleResume(null);setTask(null);setScreenedOut(true)
       setNotice('本轮研究筛选已结束。未生成正式 FINAL，未将筛选答案保存为正式测量记录。')
@@ -407,7 +422,7 @@ export default function SurveyPublicApp(){
     if(final.status!=='COMPLETED')throw new Error('作答尚未完成提交')
     // FINAL is authoritative even if the subsequent General request fails.
     // Never keep a local draft after the server accepted completion.
-    clearLocalSurveyDraft(publicId,attemptId)
+    clearLocalSurveyDraft(publicId,attemptId);setCheckpointRevision(0)
     const generalResult=await publicApi<General>(base+'/attempts/'+attemptId+'/general','POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),
@@ -416,6 +431,27 @@ export default function SurveyPublicApp(){
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
+  const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
+    void run(async()=>{
+      // Only the current route is eligible for a voluntary server checkpoint.
+      const enabled=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
+      const partial=Object.fromEntries(task.units.filter(unit=>
+        enabled===null||enabled.has(unit.instrumentKey)).map(unit=>{
+        const answer=answers[unit.instrumentKey]||{}
+        return [unit.instrumentKey,unit.kind==='FORM'
+          ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)??[],answer):answer]
+      }))
+      const saved=await publicApi<{revision:number;expiresAt:string}>(
+        base+'/attempts/'+attemptId+'/checkpoint/save','POST',{
+        ...(info?.project.collectionMode==='LINKED_WAVES'
+          ?{researchCode:researchCode.trim().toUpperCase()}:{}),
+        accessCredential:accessCredential.trim(),revision:checkpointRevision,answers:partial,
+      })
+      setCheckpointRevision(saved.revision)
+      setNotice('已加密暂存未完成答案，至 '+new Date(saved.expiresAt).toLocaleString('zh-CN')+
+        ' 有效。这不是正式 FINAL；另一设备更改后须重新读取以避免覆盖。')
+    })
+  }
   const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
     if(!window.confirm('确认撤销此研究编号的未来访问权限？撤销后无法读取波次或回执，但凭编号和原始密钥仍可申请撤回历史研究数据。'))return
     void run(async()=>{
@@ -544,6 +580,14 @@ export default function SurveyPublicApp(){
           <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
           <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
             关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</p></div>
+        {task.checkpointPolicy?.enabled&&<section className="bg-white border rounded-xl p-4 space-y-2">
+          <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
+            每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入研究 FINAL。</p>
+          <button type="button" className="btn-secondary" disabled={busy} onClick={saveCheckpoint}>
+            保存加密临时进度（第 {checkpointRevision+1} 版）</button>
+          <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
+            仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
+        </section>}
         {task.flow&&currentFlow?<>
           <p className="text-xs text-slate-500">研究流程 · 步骤 {Math.min(flowStep+1,currentFlow.blocks.length)} / {currentFlow.blocks.length}</p>
           {flowBlock?.kind==='MATERIAL'&&<section className="bg-white border rounded-xl p-5 space-y-3">
