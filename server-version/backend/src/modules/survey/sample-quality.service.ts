@@ -127,7 +127,8 @@ export async function listSampleQualityHistory(
         const detail=data as Record<string,unknown>
         if(!['INCLUDED','EXCLUDED'].includes(String(detail.verdict))
           ||!['INCLUDED','EXCLUDED'].includes(String(detail.previousVerdict))
-          ||typeof detail.reason!=='string'||!Number.isSafeInteger(detail.revision))
+          ||typeof detail.reason!=='string'||typeof detail.revision!=='number'
+          ||!Number.isSafeInteger(detail.revision))
           throw new SurveyAnalyticsError(409,'质量审核日志无法完整核验')
         return {reviewedAt:event.createdAt,reviewerId:event.actorUserId,
           previousVerdict:detail.previousVerdict,verdict:detail.verdict,
