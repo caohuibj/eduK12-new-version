@@ -97,3 +97,41 @@ export async function setSampleQuality(input:{
     return {attemptId:input.attemptId,verdict:input.verdict,revision,reason}
   })
 }
+
+/** Researcher-visible audit trail for one eligible FINAL. Show immutable event
+ * history rather than only the latest mutable review row. Never expose it to
+ * System Admin, other project owners, or public participants.
+ */
+export async function listSampleQualityHistory(
+  actorUserId:string,projectId:string,attemptId:string,page:number,
+){
+  return prisma.$transaction(async tx=>{
+    await owner(tx,actorUserId,projectId,false)
+    const eligible=await tx.surveyWaveAttempt.findFirst({
+      where:{id:attemptId,projectId,status:'COMPLETED',excludedAt:null,
+        final:{isNot:null}},select:{id:true},
+    })
+    if(!eligible)denied('质量审计记录不存在或已撤回')
+    const events=await tx.surveyEvent.findMany({
+      where:{projectId,action:'RESEARCH_SAMPLE_QUALITY_REVIEWED',
+        metadata:{path:['attemptId'],equals:attemptId}},
+      select:{actorUserId:true,createdAt:true,metadata:true},
+      orderBy:[{createdAt:'desc'},{id:'desc'}],
+      skip:(page-1)*25,take:25,
+    })
+    return {attemptCode:surveyAttemptCode(attemptId),page,pageSize:25,
+      list:events.map(event=>{
+        const data=event.metadata
+        if(!data||typeof data!=='object'||Array.isArray(data))
+          throw new SurveyAnalyticsError(409,'质量审核日志的结构无效')
+        const detail=data as Record<string,unknown>
+        if(!['INCLUDED','EXCLUDED'].includes(String(detail.verdict))
+          ||!['INCLUDED','EXCLUDED'].includes(String(detail.previousVerdict))
+          ||typeof detail.reason!=='string'||!Number.isSafeInteger(detail.revision))
+          throw new SurveyAnalyticsError(409,'质量审核日志无法完整核验')
+        return {reviewedAt:event.createdAt,reviewerId:event.actorUserId,
+          previousVerdict:detail.previousVerdict,verdict:detail.verdict,
+          reason:detail.reason,revision:detail.revision}
+      })}
+  })
+}
