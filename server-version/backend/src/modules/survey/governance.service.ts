@@ -111,10 +111,25 @@ export async function researcherList(actorId:string,page:number) {
     createdAt:account.createdAt,
   }))}
 }
+/** The administrator may list and revoke unclaimed invitations, never read
+ * their bearer token, password or the Researcher raw research data. */
+export async function unclaimedResearcherInvitations(actorId:string,page:number){
+  await assertCurrentSystemAdmin(prisma,actorId)
+  const invitations=await prisma.surveyInvitation.findMany({
+    where:{kind:'INVITE',claimedAt:null,revokedAt:null},
+    orderBy:[{createdAt:'desc'},{id:'desc'}],
+    skip:(page-1)*25,take:25,
+    select:{id:true,kind:true,createdBy:true,createdAt:true,expiresAt:true},
+  })
+  const now=new Date()
+  return {page,pageSize:25,list:invitations.map(row=>({
+    ...row,status:row.expiresAt<=now?'EXPIRED':'PENDING',
+  }))}
+}
 export async function revokeInvite(actorId:string,inviteId:string){
   return prisma.$transaction(async tx=>{
     await assertCurrentSystemAdmin(tx,actorId)
-    const changed=await tx.surveyInvitation.updateMany({where:{id:inviteId,claimedAt:null,revokedAt:null},data:{revokedAt:new Date()}})
+    const changed=await tx.surveyInvitation.updateMany({where:{id:inviteId,kind:'INVITE',claimedAt:null,revokedAt:null},data:{revokedAt:new Date()}})
     if(changed.count!==1)throw new SurveyGovernanceError(404,'邀请不可撤销')
     await event(tx,actorId,'RESEARCHER_INVITE_REVOKED',null,{invitationId:inviteId})
     return {revoked:true}

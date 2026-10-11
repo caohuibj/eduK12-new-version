@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ProductPage } from '../../components/product-ui'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
+type Invitation={id:string;kind:'INVITE';createdBy:string;createdAt:string;expiresAt:string;
+  status:'PENDING'|'EXPIRED'}
 const cookie=(key:string)=>document.cookie.split('; ').find(v=>v.startsWith(key+'='))?.split('=').slice(1).join('=')||''
 async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -23,10 +25,17 @@ async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>
   return envelope.data
 }
 export default function SurveyResearchersAdmin(){
-  const [list,setList]=useState<Researcher[]>([]),[password,setPassword]=useState('')
+  const [list,setList]=useState<Researcher[]>([]),[pending,setPending]=useState<Invitation[]>([])
+  const [password,setPassword]=useState('')
   const [link,setLink]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
-  const refresh=async()=>{const result=await platformApi<{list:Researcher[]}>('/researchers');setList(result.list)}
+  const refresh=async()=>{
+    const [researchers,invitations]=await Promise.all([
+      platformApi<{list:Researcher[]}>('/researchers'),
+      platformApi<{list:Invitation[]}>('/researcher-invitations'),
+    ])
+    setList(researchers.list);setPending(invitations.list)
+  }
   useEffect(()=>{void refresh().catch(e=>setError(e instanceof Error?e.message:'研究者列表暂不可用'))},[])
   const act=async(path:string,actorName?:string)=>{
     if(!password){setError('请输入当前系统管理员密码');return}
@@ -55,6 +64,20 @@ export default function SurveyResearchersAdmin(){
       <button className="btn-secondary" type="button" onClick={()=>void navigator.clipboard.writeText(link)}>复制链接</button>
       <p className="text-sm text-gray-500">邀请 7 天有效；不包含研究者密码。请勿存入公开日志或群聊。</p>
     </div>}
+    <h2 className="text-xl font-semibold">未领取的研究者邀请</h2>
+    <p className="text-sm text-gray-600">仅显示安全元数据。已签发令牌不会再次回显；过期邀请须重新签发。</p>
+    <div className="space-y-2">{pending.map(inv=><article className="border rounded-lg p-3" key={inv.id}>
+      <p className="text-sm">状态：{inv.status==='PENDING'?'待领取':'已过期'} ·
+        签发于 {new Date(inv.createdAt).toLocaleString('zh-CN')} ·
+        截止 {new Date(inv.expiresAt).toLocaleString('zh-CN')}</p>
+      <p className="text-xs font-mono break-all">{inv.id}</p>
+      {inv.status==='PENDING'&&<button className="btn-secondary" type="button"
+        disabled={busy||!password} onClick={()=>{
+          if(window.confirm('确认撤销此尚未领取的研究者邀请？原链接将立即失效。'))
+            void act('/researcher-invitations/'+inv.id+'/revoke')
+        }}>撤销未领取邀请</button>}
+    </article>)}</div>
+    {!pending.length&&<p className="text-sm text-gray-500">目前没有未领取的研究者邀请。</p>}
     <h2 className="text-xl font-semibold">已邀请及激活的研究者</h2>
     <div className="grid gap-3">{list.map(person=><article className="rounded-lg border p-4" key={person.id}>
       <p><strong>{person.username}</strong> · {person.status}</p>

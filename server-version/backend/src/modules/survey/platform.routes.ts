@@ -22,6 +22,9 @@ async function administrator(req:Request) {
 }
 surveyPlatformRouter.use(authenticate,limiter)
 surveyPlatformRouter.get('/researchers',handler(req=>governance.researcherList(req.user!.userId,Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+surveyPlatformRouter.get('/researcher-invitations',handler(req=>
+  governance.unclaimedResearcherInvitations(req.user!.userId,
+    Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
 surveyPlatformRouter.post('/researcher-invitations',handler(async req=>{
   await administrator(req)
   return governance.inviteResearcher(req.user!.userId)
