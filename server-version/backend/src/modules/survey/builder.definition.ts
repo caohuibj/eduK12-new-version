@@ -117,7 +117,12 @@ const requireText=(value:string,path:string,issues:Issue[])=>{
   if(!value.trim())issues.push({path,message:'请填写内容',severity:'error'})
 }
 const err=(issues:Issue[],path:string,message:string)=>issues.push({path,message,severity:'error'})
-export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false):{
+export const validateSurveyDraft=(
+  kind:SurveyKind,input:unknown,forPreview=false,
+  // Historical immutable Publications could contain operator pairs accepted
+  // before the v1.1 authoring check. Only their runtime projection opts in.
+  allowLegacyFrozenConditionOperators=false,
+):{
   definition?:SurveyDraft;issues:Issue[];digest?:string
 }=>{
   const parsed=surveyDraftSchemaFor(kind).safeParse(input)
@@ -162,9 +167,9 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
           else {
             if(!previous.options.some(o=>o.optionKey===q.displayIf!.optionKey))
               err(issues,path+'.displayIf.optionKey','引用的选项已不存在')
-            if(previous.type==='MULTIPLE'
+            if(!allowLegacyFrozenConditionOperators&&(previous.type==='MULTIPLE'
               ?q.displayIf.operator!=='INCLUDES'
-              :q.displayIf.operator!=='EQUALS')
+              :q.displayIf.operator!=='EQUALS'))
               err(issues,path+'.displayIf.operator','多选条件必须使用 INCLUDES，单选/Likert 条件必须使用 EQUALS')
           }
         }
@@ -248,8 +253,13 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
     err(issues,'definition','单份研究工具数据体积不能超过 480 KB')
   return {definition,issues,digest:canonicalHash(canonical)}
 }
-export const assertSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false):SurveyDraft=>{
-  const result=validateSurveyDraft(kind,input,forPreview)
+export const assertSurveyDraft=(
+  kind:SurveyKind,input:unknown,forPreview=false,
+  allowLegacyFrozenConditionOperators=false,
+):SurveyDraft=>{
+  const result=validateSurveyDraft(
+    kind,input,forPreview,allowLegacyFrozenConditionOperators,
+  )
   if(!result.definition||result.issues.some(i=>i.severity==='error'))
     throw new SurveyDraftError(result.issues)
   return result.definition
