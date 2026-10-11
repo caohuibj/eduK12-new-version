@@ -4,7 +4,7 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
 import { loadSurveySource } from './analytics.source'
-import { describeWave,describePairedScores } from './analytics.descriptive'
+import { describeWave,describePairedScores,describeWaveGroups } from './analytics.descriptive'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -44,6 +44,22 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
     waveIds:[waveId],maxFinals:250})
   return describeWave(source,waveId)
+}))
+const groupRequest=z.object({
+  groupInstrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  groupItemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  scoreInstrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+}).strict()
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async req=>{
+  const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
+  const input=groupRequest.parse(req.body)
+  const source=await loadSurveySource({
+    actorUserId:req.user!.userId,projectId,waveIds:[waveId],maxFinals:250,
+  })
+  try{return describeWaveGroups(source,{waveId,...input})}
+  catch(e){throw new service.SurveyAnalyticsError(409,
+    e instanceof Error?e.message:'此分组无法计算')}
 }))
 surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
   const projectId=id.parse(req.params.pid),input=measurement.parse(req.body)
