@@ -21,7 +21,7 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
           onChange={e=>onChange({...value,respondentType:e.target.value as SjtDraft['respondentType']})}>
           <option value="student_self_report">学生</option><option value="teacher_self_report">教师</option>
         </select></label>
-      <p className="text-xs text-slate-600">当前使用原有 SJT 编译器的学生/教师单选执行契约。多选与其他研究对象的自编 SJT 尚不支持发布，不能以不同对象身份代替。</p>
+      <p className="text-xs text-slate-600">SJT 允许学生/教师研究场景下受控单选，或最多 24 个合法组合的受控多选（需设置聚合规则）；其他研究对象类型尚不支持正式发布。</p>
       <h4 className="font-semibold text-sm">内容来源、研究展示许可</h4>
       <label className="block text-sm">作者或授权来源
         <input className="input block w-full" value={value.author}

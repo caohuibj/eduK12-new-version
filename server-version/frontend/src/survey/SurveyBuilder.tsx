@@ -46,6 +46,8 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [preview,setPreview]=useState<Preview|null>(null),[showPreview,setShowPreview]=useState(false)
+  const [answerReview,setAnswerReview]=useState<{ok:boolean;issues:Issue[];
+    missing:{itemKey:string;reason:string}[]}|null>(null)
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('TEXT')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
@@ -76,7 +78,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   })}
   const change=(definition:Definition)=>{
     setActive(old=>old?{...old,definition}:old)
-    setDirty(true);setPreview(null);setBulk(null);setUndo(null)
+    setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null)
   }
   const save=()=>{if(!active||!dirty)return;const snapshot=active;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+snapshot.id,'PATCH',{
@@ -94,6 +96,17 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     const r=await api<Preview>(prefix+'/'+active.id+'/preview','POST',{answers})
     setPreview(r);setNotice(r.ok?'已根据后台现有计分器模拟计算，不会生成正式答卷':'模拟未通过，请检查作答和规则')
   })}
+  const validateFormAnswers=(answers:Record<string,unknown>)=>{
+    if(!active||dirty||active.kind!=='FORM')return
+    void run(async()=>{
+      const result=await api<{ok:boolean;issues:Issue[];missing:{itemKey:string;reason:string}[]}>(
+        prefix+'/'+active.id+'/form-dry-run','POST',{answers})
+      setAnswerReview(result)
+      setNotice(result.ok?'正式 Form 校验通过；未产生正式答卷':'请修正高亮题目后再试提交')
+      const first=result.issues[0]?.path.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
+      if(first)window.requestAnimationFrame(()=>document.getElementById('survey-preview-'+first)?.focus())
+    })
+  }
   const duplicate=()=>{if(!active)return;void run(async()=>{
     const r=await api<ResearchDraft>(prefix+'/'+active.id+'/copy','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:active.title+'（副本）',
@@ -212,7 +225,14 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       {preview?.ok&&!dirty&&<div>
         <button type="button" className="btn-secondary" onClick={()=>setShowPreview(x=>!x)}>
           {showPreview?'收起模拟作答':'展开模拟作答'}</button>
-        {showPreview&&<ResearchPreview draft={active} onSimulate={simulate}/>}
+        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}/>
+          {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
+            <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
+            {answerReview.issues.map((issue,i)=><p role="alert" className="text-red-700 text-sm" key={i}>
+              {issue.path}：{issue.message}</p>)}
+            {answerReview.missing.length>0&&<p className="text-sm">缺失语义：
+              {answerReview.missing.map(row=>row.itemKey+' ('+row.reason+')').join('，')}</p>}
+          </div>}</>}
       </div>}
       </>}
       </div>

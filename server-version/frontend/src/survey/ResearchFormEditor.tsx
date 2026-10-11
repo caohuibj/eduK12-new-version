@@ -12,6 +12,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
     onChange({...value,pages:value.pages.map((p,i)=>i===index?update(p):p)})
   const setQuestion=(pi:number,qi:number,update:(q:FormQuestion)=>FormQuestion)=>
     setPage(pi,page=>({...page,questions:page.questions.map((q,i)=>i===qi?update(q):q)}))
+  const fieldCount=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0)
   const move=(pi:number,qi:number,by:number)=>{
     setPage(pi,page=>{const questions=page.questions.slice(),other=qi+by
       if(other>=0&&other<questions.length)[questions[qi],questions[other]]=[questions[other],questions[qi]]
@@ -21,6 +22,8 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
   return <div className="space-y-5">
     <div className="flex flex-wrap gap-2 items-center">
       <h3 className="font-semibold">Form 问卷页面</h3>
+      <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
+        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行计 1）</span>
       <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
         {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+' 页',questions:[]}]})}>新增分页</button>
     </div>
@@ -90,8 +93,20 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
           </div>}
           {q.type==='NUMBER'&&<div className="grid sm:grid-cols-2 gap-3">
+            <label className="text-sm inline-flex gap-2 items-center"><input type="checkbox"
+              checked={q.integerOnly===true} onChange={e=>setQuestion(pi,qi,x=>({...x,
+                integerOnly:e.target.checked,precision:e.target.checked?0:x.precision,
+                step:e.target.checked&&x.step!==undefined&&!Number.isInteger(x.step)?undefined:x.step}))}/>只允许整数</label>
+            <label className="block text-sm">步长（留空表示任意）
+              <input className="input block w-full" type="number" min="0" step="any"
+                value={q.step??''} onChange={e=>setQuestion(pi,qi,x=>({...x,
+                  step:e.target.value===''?undefined:Number(e.target.value)}))}/></label>
+            <label className="block text-sm">最大小数位（留空表示不限制）
+              <input className="input block w-full" type="number" min="0" max="8" step="1"
+                disabled={q.integerOnly} value={q.precision??''}
+                onChange={e=>setQuestion(pi,qi,x=>({...x,precision:e.target.value===''?undefined:Number(e.target.value)}))}/></label>
             {(['min','max'] as const).map(k=><label className="block text-sm" key={k}>{k==='min'?'最小值':'最大值'}
-              <input className="input block w-full" type="number" value={q[k]??''}
+              <input className="input block w-full" type="number" step="any" value={q[k]??''}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,[k]:e.target.value===''?undefined:Number(e.target.value)}))}/></label>)}
           </div>}
           {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<label className="block text-sm">字数上限

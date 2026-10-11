@@ -11,7 +11,8 @@ type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_U
 type Choice={optionKey:string;label:string}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
-  min?:number;max?:number;maxLength?:number;minSelections?:number;maxSelections?:number}
+  min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
+  maxLength?:number;minSelections?:number;maxSelections?:number}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
@@ -74,7 +75,8 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
         onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
   const item=(q:Question)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
-    return <fieldset className="border rounded-lg p-4 my-4 bg-white" key={q.itemKey}>
+    return <fieldset className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
+      id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {q.image&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
@@ -93,7 +95,7 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
           checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
           onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
-      {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max}
+      {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
         disabled={isRefusal(answer[q.itemKey])}
         onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
@@ -159,7 +161,15 @@ export default function SurveyPublicApp(){
   },[base,publicId])
   const run=async(task:()=>Promise<void>)=>{
     setError('');setNotice('');setBusy(true)
-    try{await task()}catch(e){setError(parseError(e))}finally{setBusy(false)}
+    try{await task()}catch(e){
+      const message=parseError(e);setError(message)
+      // The server returns answers.<itemKey>[.<matrixRow>] on FINAL failure.
+      const itemKey=message.match(/answers\.([a-z][a-z0-9_-]*)/i)?.[1]
+      if(itemKey)window.requestAnimationFrame(()=>{
+        const target=document.querySelector<HTMLElement>('[id$="-'+itemKey+'"]')
+        target?.focus();target?.scrollIntoView({block:'center'})
+      })
+    }finally{setBusy(false)}
   }
   const recover=(e:FormEvent)=>{e.preventDefault();void run(async()=>{
     const data=await publicApi<{waves:Wave[]}>(base+'/enter','POST',{

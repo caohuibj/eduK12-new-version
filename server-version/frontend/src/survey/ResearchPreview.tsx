@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
-import { visibleFormKeys } from './form-visibility'
+import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 
 type Refusal={_surveyRefusal:true}
 type Answer=string|number|string[]|Refusal|null
@@ -8,7 +8,9 @@ const refusal=():Refusal=>({_surveyRefusal:true})
 const isRefusal=(value:Answer|undefined):value is Refusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
     &&value._surveyRefusal===true
-export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number|string[]>)=>void}){
+export function ResearchPreview({draft,onSimulate,onValidateForm}:{draft:ResearchDraft;
+  onSimulate:(answers:Record<string,string|number|string[]>)=>void;
+  onValidateForm?:(answers:Record<string,Answer>)=>void}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
   useEffect(()=>{setAnswers({})},[draft.id])
   const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
@@ -31,7 +33,8 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
   </figure>
   const question=(q:FormQuestion)=>{
     if(visible&&!visible.has(q.itemKey))return null
-    return <fieldset key={q.itemKey} className="border rounded-lg p-3 my-3 bg-white">
+    return <fieldset key={q.itemKey} id={'survey-preview-'+q.itemKey} tabIndex={-1}
+      className="border rounded-lg p-3 my-3 bg-white scroll-mt-5">
       <legend className="font-medium text-sm">{q.prompt||'未填写题干'} {q.required?'*':''}</legend>
       {picture(q.image)}
       {['SINGLE','LIKERT'].includes(q.type)&&q.options.map(o=><label key={o.optionKey} className="flex gap-2 items-center my-2">
@@ -64,7 +67,7 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
           onChange={e=>choose(q.itemKey,e.target.checked?refusal():null)}/>不愿回答（独立于未作答）
       </label>}
       {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
-        type="number" min={q.min} max={q.max}
+        type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
         value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
         disabled={isRefusal(answers[q.itemKey])}
         onChange={e=>choose(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
@@ -100,6 +103,10 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
     {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
       onClick={simulate}>
       计算当前研究性模拟得分</button>}
-    {draft.kind==='FORM'&&<p className="text-xs">表单不自动诊断或计分。后续 PR3 的真实作答会由服务端严格验证分支与 FINAL。</p>}
+    {draft.kind==='FORM'&&onValidateForm&&<><button type="button" className="btn-secondary"
+      onClick={()=>onValidateForm(sanitizeFormAnswers(
+        (draft.definition as FormDraft).pages.flatMap(p=>p.questions),answers))}>
+      按正式 FINAL 规则试提交（不保存数据）</button>
+      <p className="text-xs">服务器检查必答、条件显隐、矩阵和拒答，不创建研究 Attempt 或 FINAL。</p></>}
   </section>
 }
