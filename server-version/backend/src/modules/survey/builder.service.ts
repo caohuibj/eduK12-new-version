@@ -191,7 +191,8 @@ export async function previewSurveyImport(userId:string,projectId:string,id:stri
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
     if(row.status!=='DRAFT'||row.kind==='SJT')fail(409,'只有 Form/Scale 草稿支持此批量导入')
-    return {revision:row.revision,...previewBulk(input,row.kind as 'FORM'|'SCALE')}
+    const schemaVersion=row.kind==='FORM'?(row.definition as {schemaVersion:1|2}).schemaVersion:undefined
+    return {revision:row.revision,...previewBulk(input,row.kind as 'FORM'|'SCALE',schemaVersion)}
   })
 }
 export async function applySurveyImport(userId:string,projectId:string,id:string,input:{
