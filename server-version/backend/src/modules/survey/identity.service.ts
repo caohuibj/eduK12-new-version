@@ -124,19 +124,21 @@ export async function revokeLinkedResearchAccess(input:{
   projectId:string;researchCode:string;accessCredential:string
 }):Promise<{revoked:true}>{
   const identity=await recoverLinkedResearchIdentity(input)
-  const changed=await prisma.surveyParticipant.updateMany({where:{
-    id:identity.participantId,projectId:input.projectId,status:'ACTIVE',
-    credentialHash:sha256(input.accessCredential),
-  },data:{status:'REVOKED',credentialRevokedAt:new Date()}})
-  if(changed.count!==1)return fail()
-  // Retain only a withdrawal-only proof: the old secret can never reopen
-  // completed task/General, but an affected participant can still request
-  // data exclusion without researcher intervention.
-  await prisma.surveyEvent.create({data:{
-    id:randomUUID(),projectId:input.projectId,
-    action:'PARTICIPANT_ACCESS_REVOKED',metadata:{participantId:identity.participantId},
-  }})
-  return {revoked:true}
+  return prisma.$transaction(async tx=>{
+    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE`
+    const changed=await tx.surveyParticipant.updateMany({where:{
+      id:identity.participantId,projectId:input.projectId,status:'ACTIVE',
+      credentialHash:sha256(input.accessCredential),credentialRevokedAt:null,
+    },data:{status:'REVOKED',credentialRevokedAt:new Date()}})
+    if(changed.count!==1)return fail()
+    // Retain a withdrawal-only proof. The prior secret can no longer read
+    // any task, General or history, but still proves data-withdrawal authority.
+    await tx.surveyEvent.create({data:{
+      id:randomUUID(),projectId:input.projectId,
+      action:'PARTICIPANT_ACCESS_REVOKED',metadata:{participantId:identity.participantId},
+    }})
+    return {revoked:true as const}
+  })
 }
 
 /** SINGLE_UNLINKED attempt proof, unrelated to a stable participant identity. */
