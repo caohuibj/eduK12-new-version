@@ -13,6 +13,9 @@ CREATE TABLE "survey_sample_reviews" (
     FOREIGN KEY ("attempt_id","project_id","wave_id")
     REFERENCES "survey_wave_attempts"("id","project_id","wave_id") ON DELETE RESTRICT
 );
+-- Required for Prisma's compound one-to-one relation, matching the scoped FK.
+CREATE UNIQUE INDEX "survey_sample_reviews_attempt_scope_unique"
+  ON "survey_sample_reviews"("attempt_id","project_id","wave_id");
 CREATE INDEX "survey_sample_reviews_scope_idx"
   ON "survey_sample_reviews"("project_id","wave_id","verdict");
 -- Survey Events continue to preserve old and new verdicts and the exact reason.
