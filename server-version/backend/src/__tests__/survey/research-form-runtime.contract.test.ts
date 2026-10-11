@@ -34,6 +34,14 @@ describe('Form authoring budget and authoritative preview',()=>{
     expect(()=>assertSurveyDraft('FORM',rejected,true)).toThrow()
     expect(()=>publication(rejected)).toThrow()
   })
+  it('rejects authoring a large free-text Form that cannot fit the submission cap',()=>{
+    const oversized:FormDraft={schemaVersion:1,pages:[{pageKey:'p',title:'文章',questions:
+      Array.from({length:9},(_,i)=>({itemKey:'essay'+i,type:'LONG_TEXT' as const,
+        prompt:'描述一次经历',required:false,rows:[],options:[],maxLength:10000}))}]}
+    expect(validateSurveyDraft('FORM',oversized,true).issues.some(i=>
+      i.path==='pages'&&i.message.includes('480 KB'))).toBe(true)
+    expect(()=>assertSurveyDraft('FORM',oversized,true)).toThrow()
+  })
   it('aligns decimal, step, integer, bounds and JSON type rejection with FINAL',()=>{
     const form:FormDraft={schemaVersion:1,pages:[{pageKey:'p',title:'数值',questions:[{
       itemKey:'num',type:'NUMBER',prompt:'数值',required:true,options:[],rows:[],
