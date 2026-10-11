@@ -13,6 +13,7 @@ import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
+import { withdrawLinkedResearchData } from '../../modules/survey/identity.service'
 import { generateToken } from '../../utils/jwt'
 import type { Request } from 'express'
 
@@ -318,6 +319,18 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(explicit.manifest.selection.freeTextExcludedRows).toBe(0)
     await expect(downloadSurveyExport(req(1000),{projectId,exportId:grant.id}))
       .rejects.toThrow(/TOTP/)
+  })
+
+  it('revokes outstanding encrypted export tickets upon linked data withdrawal',async()=>{
+    expect(await db.surveyExportTicket.count({where:{projectId,status:'READY'}})).toBeGreaterThan(0)
+    const result=await withdrawLinkedResearchData({projectId,...link})
+    expect(result.status).toBe('WITHDRAWN')
+    expect(result.excludedAttempts).toBe(3)
+    expect(await db.surveyExportTicket.count({where:{projectId,status:'READY'}})).toBe(0)
+    const remaining=await loadSurveySource({actorUserId:ownerId,projectId})
+    expect(remaining.completeAttempts).toBe(0)
+    expect(remaining.raw).toHaveLength(0)
+    expect(remaining.scores).toHaveLength(0)
   })
 
 })

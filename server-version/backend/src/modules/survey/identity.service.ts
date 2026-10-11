@@ -143,6 +143,11 @@ export async function withdrawLinkedResearchData(input:{
       projectId:input.projectId,participantId:participant.participantId,
       excludedAt:null,status:{in:['STARTED','COMPLETED']},
     },data:{excludedAt:when,status:'WITHDRAWN'}})
+    // An already-created export may still contain withdrawn responses.
+    // Revoke future downloads atomically with the participant exclusion.
+    await tx.surveyExportTicket.updateMany({where:{
+      projectId:input.projectId,status:'READY',
+    },data:{status:'REVOKED'}})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
       projectId:input.projectId,action:'PARTICIPANT_DATA_WITHDRAWAL',
       metadata:{excludedAttempts:excluded.count,retention:'PENDING_REVIEW'}}})
@@ -171,6 +176,9 @@ export async function withdrawSingleResearchAttempt(input:{
     await tx.surveyWaveAttempt.update({where:{id:attempt.id},data:{
       status:'WITHDRAWN',excludedAt:new Date(),
     }})
+    await tx.surveyExportTicket.updateMany({where:{
+      projectId:project.id,status:'READY',
+    },data:{status:'REVOKED'}})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
       projectId:project.id,action:'SINGLE_ATTEMPT_DATA_WITHDRAWAL',
       metadata:{waveId:attempt.waveId,retention:'PENDING_REVIEW'}}})

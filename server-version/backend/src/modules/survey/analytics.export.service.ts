@@ -63,9 +63,10 @@ export async function createSurveyExport(req:Request,input:{
     fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
   if(input.includeFreeText&&input.format.startsWith('SCORE'))
     fail(400,'纯分数导出不适用自由文本选项')
-  const omittedFreeText=sources.raw.filter(r=>
-    ['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)).length
-  const included=input.includeFreeText===true
+  const included=input.format.startsWith('RAW')&&input.includeFreeText===true
+  const omittedFreeText=input.format.startsWith('RAW')&&!included
+    ?sources.raw.filter(r=>['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)).length
+    :0
   const projected=included||input.format.startsWith('SCORE')?sources:{
     ...sources,
     raw:sources.raw.filter(r=>!['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)),
