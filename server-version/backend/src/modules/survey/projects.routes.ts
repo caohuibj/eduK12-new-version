@@ -4,6 +4,8 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { authenticateSurvey } from '../../middleware/auth'
+import { transitionResearchProject } from './project-lifecycle'
+import { SurveyWaveError } from './waves.service'
 import { success, error } from '../../utils/response'
 
 export const surveyProjectsRouter=Router()
@@ -27,6 +29,7 @@ const handler=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respon
   catch(e) {
     if(e instanceof z.ZodError)return error(res,'项目字段不合法',-1,400)
     if(e instanceof ProjectError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
 }
@@ -114,4 +117,12 @@ for(const [action,from,to] of [['archive','DRAFT','ARCHIVED'],['restore','ARCHIV
       return own(tx,uid,id)
     })
   }))
+}
+
+for(const [endpoint,action] of [['pause','PAUSE'],['resume','RESUME'],['close','CLOSE']] as const){
+  surveyProjectsRouter.post('/:id/'+endpoint,handler(req=>
+    transitionResearchProject({
+      actorUserId:req.user!.userId,projectId:projectId.parse(req.params.id),
+      revision:rev.parse(req.body).revision,action,
+    })))
 }
