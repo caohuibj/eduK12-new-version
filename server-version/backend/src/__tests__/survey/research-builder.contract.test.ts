@@ -179,7 +179,7 @@ describe('Survey research builder contracts without formal publication authority
         options:'愿意||不愿意',rows:'讨论||实践'},
     ]
     const csv=[headers.join(','),...inputRows.map(row=>headers.map(h=>
-      (row as Record<string,string>)[h]??'').join(','))].join('\\n')
+      (row as Record<string,string>)[h]??'').join(','))].join('\n')
     const batch={batchId:'c8b84321-4141-4444-8888-123456789012',format:'CSV' as const,
       content:csv,pageKey:'second'}
     const check=previewBulk(batch,'FORM',2)
