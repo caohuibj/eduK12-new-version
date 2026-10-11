@@ -55,12 +55,20 @@ async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient
 }
 export async function createSurveyExport(req:Request,input:{
   projectId:string;format:Format;waveId?:string;includeFreeText?:boolean;
+  completedFrom?:string;completedBefore?:string;
 }){
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
+  if((input.completedFrom||input.completedBefore)&&input.format!=='RAW_WAVE')
+    fail(400,'当前仅允许对单波次原始数据按完成时间分段下载')
+  const from=input.completedFrom?new Date(input.completedFrom):undefined
+  const before=input.completedBefore?new Date(input.completedBefore):undefined
+  if((from&&!Number.isFinite(from.getTime()))||(before&&!Number.isFinite(before.getTime()))
+    ||(from&&before&&from>=before))
+    fail(400,'导出时段必须是开始早于结束的合法时间')
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
-    includeWideSchema:true})
+    includeWideSchema:true,completedFrom:from,completedBefore:before})
   if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
     fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
   if(input.includeFreeText&&input.format.startsWith('SCORE'))
@@ -88,7 +96,9 @@ export async function createSurveyExport(req:Request,input:{
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
       researchOnly:true,collectionMode:sources.collectionMode,
-      freeTextIncluded:included,freeTextExcludedRows:included?0:omittedFreeText}}
+      freeTextIncluded:included,freeTextExcludedRows:included?0:omittedFreeText,
+      completedFrom:from?.toISOString()??null,completedBefore:before?.toISOString()??null,
+      bounds:'[completedFrom,completedBefore)',sliceBy:'SurveyWaveFinal.completedAt'}}
   const value:SurveyExportArtifact={csv:artifact.csv,codebook:artifact.codebook,manifest}
   const encoded=JSON.stringify(value)
   if(Buffer.byteLength(encoded,'utf8')>maxBytes)
