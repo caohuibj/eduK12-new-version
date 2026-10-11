@@ -13,6 +13,46 @@ export async function campusRunParticipantScope(tx:Prisma.TransactionClient,inpu
     WHERE "id"=${input.organizationId}
   `
   if(org[0]?.productDomain!=='SCHOOL')return null
+  // A Teacher-linked Run is never a Huischool activity, even though it shares
+  // the same education Organization. Verify Teacher entitlement, manager and
+  // event state before letting the canonical Run machinery continue.
+  const teacherLinks=await tx.$queryRaw<Array<{eventStatus:string;productAdmin:boolean}>>`
+    SELECT event."status" AS "eventStatus",
+      EXISTS(
+        SELECT 1 FROM "organization_memberships" m
+        JOIN "education_product_role_grants" grant_row
+          ON grant_row."organization_id"=m."organization_id"
+          AND grant_row."membership_id"=m."id"
+          AND grant_row."product"='HUITEACHER'
+          AND grant_row."role"='PRODUCT_ADMIN'
+          AND grant_row."revoked_at" IS NULL
+        WHERE m."organization_id"=link."organization_id"
+          AND m."user_id"=${input.actorUserId}
+          AND m."valid_from"<=statement_timestamp()
+          AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+      ) AS "productAdmin"
+    FROM "huiteacher_evaluation_run_links" link
+    JOIN "huiteacher_evaluation_events" event
+      ON event."organization_id"=link."organization_id"
+      AND event."id"=link."event_id"
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=link."organization_id"
+      AND entitlement."product"='HUITEACHER'
+      AND entitlement."status"='ACTIVE'
+    JOIN "organizations" school ON school."id"=link."organization_id"
+      AND school."status"='ACTIVE'
+    WHERE link."organization_id"=${input.organizationId}
+      AND link."run_id"=${input.runId}
+  `
+  const teacher=teacherLinks[0]
+  if(teacher){
+    if(!teacher.productAdmin || teacher.eventStatus==='CANCELLED'||teacher.eventStatus==='CLOSED')
+      throw new CampusActivityError('HUITEACHER_RUN_NOT_AUTHORIZED',403)
+    if(input.publish&&teacher.eventStatus!=='OPEN')
+      throw new CampusActivityError('HUITEACHER_RUN_EVENT_MUST_BE_OPEN',403)
+    return null
+  }
+
   const rows=await tx.$queryRaw<Array<{courseId:string;status:string;admin:boolean}>>`
     SELECT a."course_id" AS "courseId",a."status",
       EXISTS(
@@ -20,6 +60,13 @@ export async function campusRunParticipantScope(tx:Prisma.TransactionClient,inpu
         WHERE m."organization_id"=a."organization_id"
           AND m."user_id"=${input.actorUserId}
           AND m."org_role"='ORG_ADMIN' AND u."account_domain"='SCHOOL'
+          AND EXISTS(
+            SELECT 1 FROM "education_product_role_grants" g
+            WHERE g."organization_id"=m."organization_id"
+              AND g."membership_id"=m."id"
+              AND g."product"='HUISCHOOL'
+              AND g."role"='PRODUCT_ADMIN' AND g."revoked_at" IS NULL
+          )
           AND u."is_active"=TRUE AND u."is_frozen"=FALSE
       AND u."must_change_password"=FALSE
           AND m."valid_from"<=statement_timestamp()
