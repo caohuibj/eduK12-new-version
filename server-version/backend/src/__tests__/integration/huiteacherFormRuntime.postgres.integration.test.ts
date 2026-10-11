@@ -17,6 +17,7 @@ const URL=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL',
   'PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
 const suite=URL?describe:describe.skip
 let db:PrismaClient
+const previousEncryptionKey=process.env.DATA_ENCRYPTION_KEY
 const identity=async()=>{
   const id=randomUUID()
   return db.user.create({data:{
@@ -31,8 +32,14 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     db=new PrismaClient({datasources:{db:{url:URL!}}})
     await db.$connect()
     process.env.CAMPUS_MFA_ENCRYPTION_KEY='49'.repeat(32)
+    // Fixture-only key. Never depend on production data encryption material
+    // to verify one encrypted canonical FINAL in disposable PostgreSQL.
+    process.env.DATA_ENCRYPTION_KEY ||= '55'.repeat(32)
   })
-  afterAll(async()=>{await db?.$disconnect()})
+  afterAll(async()=>{
+    await db?.$disconnect()
+    if(previousEncryptionKey===undefined)delete process.env.DATA_ENCRYPTION_KEY
+  })
   it('shares one canonical task identity and cannot overwrite FINAL',async()=>{
     const admin=await identity()
     const organization=await db.organization.create({data:{
