@@ -4,6 +4,20 @@ import { verifyToken } from '../../utils/jwt'
 import { forbidden } from '../../utils/response'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 
+/** Read-only Teacher pages still require active enrollment in this product. */
+export async function requireTeacherProductMember(req:Request,res:Response,next:NextFunction){
+  if(!req.user||req.user.accountDomain!=='SCHOOL')return forbidden(res,'教育账号不可用')
+  const organizationId=req.params.organizationId
+  if(!organizationId)return forbidden(res,'必须指定学校')
+  try{
+    const scope=await resolveEducationProductMemberScope({
+      actorUserId:req.user.userId,organizationId,product:'HUITEACHER',
+    })
+    if(!scope)return forbidden(res,'学校尚未授权此账号使用 Huiteacher')
+    next()
+  }catch(e){next(e)}
+}
+
 /** Only current product administrators may mutate Teacher school structure. */
 export async function requireTeacherProductAdmin(req:Request,res:Response,next:NextFunction){
   if(!req.user||req.user.accountDomain!=='SCHOOL')return forbidden(res,'教育账号不可用')
