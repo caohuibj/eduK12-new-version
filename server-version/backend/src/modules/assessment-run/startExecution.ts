@@ -1,6 +1,8 @@
 import { Prisma } from '@prisma/client'
+import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
+import { resolvePublishedTeacherForm,teacherFormResourceRef,TEACHER_FORM_RUNTIME_KIND } from '../huiteacher/formRunResource'
 import { createSqlRelationalAssignmentRepository } from '../assessment-relational/repository'
 import { createRelationalAssessmentService } from '../assessment-relational/service'
 import {
@@ -232,6 +234,131 @@ const startTransactionalComposite = async (input: {
   return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
 })
 
+/**
+ * The existing Run CLAIM/Admission/Provenance contract is authoritative.
+ * This is a transactional FORM V2 runtime adapter, not a Survey Researcher
+ * attempt, a Composite Form-section approximation, or a second assignment.
+ */
+const startTransactionalTeacherForm = async (input:{
+  decision:Extract<RunStartClaimDecision,{kind:'ACQUIRED'|'RECOVER'}>
+  executionId:string;actorUserId:string;launch:LaunchEnvelope
+}):Promise<RunStartExecutionResult>=>prisma.$transaction(async tx=>{
+  await lockExecutionEnvelope(tx,input.executionId)
+  const rows=await tx.$queryRaw<Array<{state:string;claimGeneration:number}>>`
+    SELECT "state","claim_generation" AS "claimGeneration"
+    FROM "assessment_run_execution_start_claims"
+    WHERE "id"=${input.decision.claim.id} AND "execution_id"=${input.executionId}
+    FOR UPDATE
+  `
+  const claim=rows[0]
+  if(!claim||claim.claimGeneration!==input.decision.claim.claimGeneration
+    ||!['CLAIMED','DISPATCHED'].includes(claim.state))
+    throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form START ownership changed',409)
+  const admission=await loadRunExecutionStartAdmission({
+    tx,executionId:input.executionId,
+    actorUserId:input.actorUserId,admitted:true,
+  })
+  await freezeRunExecutionScientificProvenanceInTransaction(tx,input.executionId)
+
+  const existing=await tx.huiteacherFormAttempt.findUnique({
+    where:{runExecutionId:input.executionId},
+  })
+  const expectedRef=teacherFormResourceRef(
+    input.launch.runtimeTargetRef,
+    (await tx.$queryRaw<Array<{version:string}>>`
+      SELECT track."resource_version" AS "version"
+      FROM "assessment_run_executions" e
+      JOIN "assessment_run_tracks" track
+        ON track."organization_id"=e."organization_id"
+        AND track."run_id"=e."run_id" AND track."id"=e."track_id"
+      WHERE e."id"=${input.executionId} LIMIT 1
+    `)[0]?.version??'',
+  )
+  const form=await resolvePublishedTeacherForm(expectedRef,tx)
+  if(form.organizationId!==admission.execution.organizationId)
+    throw new RunStartExecutionError('RUN_CROSS_PRODUCT_FORM','Teacher Form does not belong to current school',403)
+  if(existing){
+    if(existing.formId!==form.id||existing.definitionDigest!==form.definitionDigest
+      ||existing.respondentUserId!==input.actorUserId
+      ||existing.organizationId!==admission.execution.organizationId
+      ||existing.runId!==admission.execution.runId
+      ||admission.assignment.status!=='STARTED')
+      throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH','Teacher Form START identity mismatch',409)
+    const nowRows=await tx.$queryRaw<Array<{now:Date}>>`SELECT transaction_timestamp() AS "now"`
+    await tx.$executeRaw`
+      UPDATE "assessment_run_execution_start_claims"
+      SET "state"='DISPATCHED',
+        "dispatched_at"=COALESCE("dispatched_at",${nowRows[0].now}),
+        "updated_at"=${nowRows[0].now}
+      WHERE "id"=${input.decision.claim.id}
+        AND "claim_generation"=${input.decision.claim.claimGeneration}
+    `
+    await attachBindingInTransaction(tx,{
+      executionId:input.executionId,claim:input.decision.claim,
+      binding:{runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,runtimeBindingRef:existing.id},
+    })
+    return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
+      runtimeBindingRef:existing.id,replayed:true}
+  }
+  if(admission.assignment.status!=='OPEN')
+    throw new RunStartExecutionError('RUN_START_OUTCOME_UNKNOWN','Teacher Form assignment not open',409)
+  // Revoked product grants or closed events are checked under START locks.
+  await assertCurrentRunStartAuthority(tx,input.executionId)
+  const runStatus=await tx.$queryRaw<Array<{status:string}>>`
+    SELECT r."status" FROM "assessment_runs" r
+    WHERE r."organization_id"=${admission.execution.organizationId}
+      AND r."id"=${admission.execution.runId}
+  `
+  if(runStatus[0]?.status!=='PUBLISHED')
+    throw new RunStartExecutionError('RUN_NOT_STARTABLE','Teacher assessment is not published',409)
+
+  const repository=createSqlRelationalAssignmentRepository(tx as any)
+  const relational=createRelationalAssessmentService(repository)
+  const started=await relational.start({
+    assignmentId:admission.assignment.assignmentId,actorUserId:input.actorUserId,
+  })
+  if(started.attemptIdentity.respondentUserId!==input.actorUserId
+    ||started.attemptIdentity.subjectUserId!==admission.attemptIdentity.subjectUserId
+    ||started.attemptIdentity.assignmentRef!==admission.attemptIdentity.assignmentRef)
+    throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH','frozen respondent assignment changed',409)
+
+  const attempt=await tx.huiteacherFormAttempt.create({data:{
+    id:randomUUID(),organizationId:admission.execution.organizationId,
+    runId:admission.execution.runId,runExecutionId:input.executionId,
+    formId:form.id,respondentUserId:input.actorUserId,
+    definitionDigest:form.definitionDigest,status:'STARTED',
+  }})
+  const nowRows=await tx.$queryRaw<Array<{now:Date}>>`SELECT transaction_timestamp() AS "now"`
+  const dispatched=await tx.$executeRaw`
+    UPDATE "assessment_run_execution_start_claims"
+    SET "state"='DISPATCHED',
+      "dispatched_at"=COALESCE("dispatched_at",${nowRows[0].now}),
+      "updated_at"=${nowRows[0].now}
+    WHERE "id"=${input.decision.claim.id}
+      AND "claim_generation"=${input.decision.claim.claimGeneration}
+      AND "state" IN ('CLAIMED','DISPATCHED')
+  `
+  if(Number(dispatched)!==1)
+    throw new RunStartExecutionError('RUN_START_FENCE_LOST','Teacher Form start claim was lost',409)
+  // No second runtime mutation: Run owns assignment and START state.
+  const bound=await tx.$executeRaw`
+    UPDATE "assessment_run_executions"
+    SET "runtime_binding_kind"=${TEACHER_FORM_RUNTIME_KIND},
+        "runtime_binding_ref"=${attempt.id},
+        "status"='STARTED',"started_at"=COALESCE("started_at",${nowRows[0].now}),
+        "updated_at"=${nowRows[0].now}
+    WHERE "id"=${input.executionId} AND "runtime_binding_ref" IS NULL
+      AND "status"='ASSIGNED'
+  `
+  if(Number(bound)!==1)
+    throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT','Teacher Form runtime binding conflict',409)
+  await markRunStartClaimCompleted(tx,{
+    claimId:input.decision.claim.id,generation:input.decision.claim.claimGeneration,
+  })
+  return {state:'STARTED' as const,runtimeBindingKind:TEACHER_FORM_RUNTIME_KIND,
+    runtimeBindingRef:attempt.id,replayed:false}
+})
+
 const recoverOrDispatchExternal = async (input: {
   decision: Extract<RunStartClaimDecision, { kind: 'ACQUIRED' | 'RECOVER' }>
   executionId: string
@@ -310,6 +437,10 @@ export const startAssessmentRunExecution = async (input: {
   const resourceRegistry = input.resourceRegistry ?? productionRunResourceAuthorityRegistry
   const resourceAdapter = resourceRegistry.assertStartSupported(launch.family)
   if (resourceAdapter.capabilities.transactionMode === 'TRANSACTIONAL_DB') {
+    if (launch.runtimeTargetKind===TEACHER_FORM_RUNTIME_KIND&&launch.family==='FORM')
+      return startTransactionalTeacherForm({
+        decision,executionId:input.executionId,actorUserId:input.actorUserId,launch,
+      })
     if (launch.runtimeTargetKind !== 'COMPOSITE') {
       throw new RunStartExecutionError('RUN_RUNTIME_TARGET_UNSUPPORTED', 'transactional Run adapter supports Composite runtime only', 409)
     }
