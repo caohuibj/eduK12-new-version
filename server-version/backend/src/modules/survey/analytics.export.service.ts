@@ -35,7 +35,7 @@ const artifactFor=(format:Format,projectId:string,source:Awaited<ReturnType<type
   }
   if(format==='RAW_LONG')return rawLongExport(projectId,source)
   if(format==='RAW_WIDE')return rawWideExport(projectId,source)
-  if(format==='SCORE_LONG')return exportLong(projectId,source.scores)
+  if(format==='SCORE_LONG')return exportLong(projectId,source.scores,source.attendance,source.scoreColumns)
   return exportWide(projectId,source.scores,source.attendance,source.scoreColumns)
 }
 async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient,uid:string,pid:string){
@@ -60,7 +60,7 @@ export async function createSurveyExport(req:Request,input:{
   const uid=req.user!.userId
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
-    includeWideSchema:input.format.endsWith('WIDE')})
+    includeWideSchema:true})
   if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
     fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
   if(input.includeFreeText&&input.format.startsWith('SCORE'))
