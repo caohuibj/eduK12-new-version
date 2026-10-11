@@ -220,9 +220,10 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
 export type FlowScalar=string|number|boolean|null|undefined
 export function evaluateFlowCondition(condition:FlowCondition,
   verified:Record<string,Record<string,unknown>>,staticValues:Record<string,FlowScalar>):boolean{
-  if(condition.op==='AND')return condition.terms.every(t=>evaluateFlowCondition(t,verified,staticValues))
-  if(condition.op==='OR')return condition.terms.some(t=>evaluateFlowCondition(t,verified,staticValues))
-  if(condition.op==='NOT')return !evaluateFlowCondition(condition.term,verified,staticValues)
+  if('terms' in condition)return condition.op==='AND'
+    ?condition.terms.every(t=>evaluateFlowCondition(t,verified,staticValues))
+    :condition.terms.some(t=>evaluateFlowCondition(t,verified,staticValues))
+  if('term' in condition)return !evaluateFlowCondition(condition.term,verified,staticValues)
   const raw=condition.field.source==='EMBEDDED'?staticValues[condition.field.key]:
     verified[condition.field.instrumentKey]?.[condition.field.itemKey]
   if(condition.op==='IS_MISSING')

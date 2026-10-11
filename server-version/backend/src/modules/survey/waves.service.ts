@@ -97,7 +97,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         ||existing.generalText!==(input.generalText??'')
         ||existing.linkageNoticeConfirmed!==(input.linkageNoticeConfirmed===true)
         ||JSON.stringify(existing.instrumentIds)!==JSON.stringify(input.instrumentIds)
-        ||JSON.stringify(existing.flowDefinition)!==JSON.stringify(flowDefinition)
+        ||canonicalHash(existing.flowDefinition)!==canonicalHash(flowDefinition)
         ||!exactDate(existing.opensAt,input.opensAt)
         ||!exactDate(existing.closesAt,input.closesAt)
         ||!exactDate(existing.finishUntil,input.finishUntil)
