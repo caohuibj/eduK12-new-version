@@ -74,7 +74,7 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
     for(const q of draft.items)add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
   }else {
     const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)add(q.questionKey,q.prompt,'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.questions)add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
   }
   return output
 }

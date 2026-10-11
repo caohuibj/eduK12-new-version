@@ -9,6 +9,8 @@ export interface ItemSummary {
   respondentN:number
   missingByReason:Record<string,number>
   frequencies:{value:string;count:number}[]
+  combinationFrequencies:{value:string;count:number}[]
+  responseType:string
   numericMean:number|null
   numericSampleSd:number|null
 }
@@ -38,6 +40,9 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     if(!codebook)throw new Error('Observation without frozen item dictionary')
     const missingByReason:Record<string,number>={}
     const frequencies=new Map<string,number>()
+    const combinations=new Map<string,number>()
+    const possible=new Set(codebook.options.map(o=>o.code))
+    const multi=codebook.responseType==='MULTIPLE'||codebook.responseType==='SJT_MULTIPLE'
     const values:number[]=[]
     for(const row of rows){
       if(row.missingReason){
@@ -47,14 +52,25 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
       if(row.value===null)continue
       if(typeof row.value==='number'&&Number.isFinite(row.value))values.push(row.value)
       else if(codebook.options.length&&typeof row.value==='string'){
-        // A multi-select is serialized JSON, not a numeric response score.
-        if(codebook.options.some(o=>o.code===row.value))
+        if(multi){
+          let selected:unknown
+          try{selected=JSON.parse(row.value)}catch{throw new Error('Frozen multi-choice response is not valid JSON')}
+          if(!Array.isArray(selected)||selected.some(x=>typeof x!=='string'||!possible.has(x))
+            ||new Set(selected).size!==selected.length)
+            throw new Error('Frozen multi-choice source contains invalid or duplicate options')
+          const normalized=[...selected].sort() as string[]
+          for(const item of normalized)frequencies.set(item,(frequencies.get(item)||0)+1)
+          const combination=JSON.stringify(normalized)
+          combinations.set(combination,(combinations.get(combination)||0)+1)
+        }else if(possible.has(row.value)){
           frequencies.set(row.value,(frequencies.get(row.value)||0)+1)
+        }
       }
     }
     const stats=numeric(values)
     items.push({columnKey:column,itemKey:codebook.itemKey,prompt:codebook.prompt,
-      instrumentKey:codebook.instrumentKey,kind:codebook.kind,
+      instrumentKey:codebook.instrumentKey,kind:codebook.kind,responseType:codebook.responseType,
+      combinationFrequencies:[...combinations].map(([value,count])=>({value,count})),
       respondentN:rows.filter(x=>x.value!==null&&!x.missingReason).length,
       missingByReason,
       frequencies:[...frequencies].map(([value,count])=>({value,count})),

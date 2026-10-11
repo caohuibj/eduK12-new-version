@@ -8,6 +8,7 @@ type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:numbe
 type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
 type ItemStat={itemKey:string;instrumentKey:string;prompt:string;respondentN:number;
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
+  combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
 type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
@@ -173,6 +174,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
               <th className="text-left p-2 font-normal">{q.prompt}</th>
               <td className="text-center">{q.respondentN}</td>
               <td className="text-xs p-2">{q.frequencies.map(c=>c.value+': '+c.count).join('；')}
+                {(q.combinationFrequencies?.length??0)>0&&<p>多选组合：
+                  {q.combinationFrequencies!.map(x=>x.value+': '+x.count).join('；')}</p>}
                 {Object.entries(q.missingByReason).length>0&&<p>缺失：{Object.entries(q.missingByReason).map(([k,v])=>k+': '+v).join('；')}</p>}</td>
               <td className="text-center">{q.numericMean===null?'—':q.numericMean.toFixed(2)}</td>
             </tr>)}</tbody>
