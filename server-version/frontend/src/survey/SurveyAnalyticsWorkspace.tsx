@@ -165,7 +165,9 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   })
   const download=()=>{if(!ticket)return;void execute(async()=>{
     const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
+    const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
+      +'_batch'+batchLabel+'_'+ticket.id.slice(0,8)
     downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
     downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
@@ -238,7 +240,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
@@ -319,7 +321,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       </div>
       <div className="border rounded-xl p-4 space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。当前交互式导出每次最多处理 250 份 FINAL，且生成文件总量不超过 2MB。大样本可对单波次按完成时间分段，分段仍遵守同样的安全上限。</p>
+        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。每批导出最多处理 250 份 FINAL、2MB；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；分批时请保留全部 CSV、Codebook、Manifest。</p>
         <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
@@ -342,7 +344,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                </select>
              </label>}
            {format==='RAW_WAVE'&&<label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>setWaveId(e.target.value)}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null)}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
           {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
