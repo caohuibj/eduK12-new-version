@@ -4,6 +4,8 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
+import { decryptUnifiedRuntimePayload as decryptSurveyAssignment } from '../assessment-runtime/security'
+import type { SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
@@ -20,6 +22,7 @@ export interface ResearchRawCodebook {
   timeZone?:'Asia/Shanghai'|'UTC'
   valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
   formSchemaVersion?:1|2
+  flowDigest?:string
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -27,6 +30,8 @@ export interface ResearchRawObservation {
   instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;
   itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
+  flowDigest?:string|null;experimentGroup?:string|null;
+  shownBlocks?:string|null;flowTermination?:string|null
 }
 export interface SurveySourceProjection {
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
@@ -102,7 +107,10 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
 }
 const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;completedAt:string;sourceFinalHash:string
-}):FrozenScoreObservation[]=>{
+):FrozenScoreObservation[]=>{
+  if(unit.notExecuted)return frozenScoreColumns(meta.projectId,meta.waveId,meta.waveOrdinal,frozen)
+    .map(column=>({...meta,sourceVerified:true,measurement:column.measurement,
+      value:null,missingReason:'NOT_SHOWN' as MissingReason}))
   const privateResult=unit.privateScoring as
     |{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null;status:string}[]}
     |null
@@ -349,6 +357,7 @@ export async function loadSurveySource(input:{
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
             ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+            ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
@@ -371,11 +380,28 @@ export async function loadSurveySource(input:{
         ||canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
         invalid('研究 FINAL 加密内容或摘要无法验证')
       if(result.units.length!==snapshot.units.length)invalid('研究 FINAL 子任务数与冻结定义不一致')
+      if(snapshot.flow){
+        const trace=result.executionTrace
+        if(!trace||trace.schemaVersion!==1||trace.flowDigest!==snapshot.flow.flowDigest
+          ||trace.clientPresentation!=='VERIFIED_SUBMISSION'||!attempt.flowAssignmentCipher)
+          invalid('研究 Flow 来源及展示审计不可核验')
+        const assigned=decryptSurveyAssignment<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
+        if(assigned.flowDigest!==snapshot.flow.flowDigest||
+          trace.assignmentDigest!==canonicalHash(assigned)||
+          trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)
+          invalid('研究流程实际执行轨迹与 Attempt 分组不一致')
+      }else if(result.executionTrace)invalid('旧版 FINAL 不允许伪造 Flow 审计数据')
       const meta={
         projectId:input.projectId,waveId:wave.id,waveOrdinal:wave.ordinal,
         attemptId:attempt.id,researchCode:attempt.participant?.researchCode??null,
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
       }
+      const flowTrace=result.executionTrace
+      const flowData=flowTrace?{
+        flowDigest:flowTrace.flowDigest,experimentGroup:flowTrace.groupKey,
+        shownBlocks:JSON.stringify(flowTrace.shownBlocks),
+        flowTermination:flowTrace.termination,
+      }:{}
       for(let i=0;i<snapshot.units.length;i++){
         const frozen=snapshot.units[i],unit=result.units[i]
         if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
@@ -386,7 +412,7 @@ export async function loadSurveySource(input:{
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
-          raw.push({...meta,sourceVerified:true,kind:frozen.kind,
+          raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
             value:r.value,missingReason:r.missingReason})
@@ -401,6 +427,7 @@ export async function loadSurveySource(input:{
               ...(r.timeZone?{timeZone:r.timeZone}:{}),
               valueEncoding:answerValueEncoding(r.responseType),
               ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+              ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
             })
         }
       }
