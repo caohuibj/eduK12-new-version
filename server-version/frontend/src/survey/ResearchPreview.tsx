@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react'
+import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion } from './builder.types'
+
+type Answer=string|number|string[]
+export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number>)=>void}){
+  const [answers,setAnswers]=useState<Record<string,Answer>>({})
+  useEffect(()=>{setAnswers({})},[draft.id])
+  const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
+  const visible=(q:FormQuestion)=>{
+    if(!q.displayIf)return true
+    const selection=answers[q.displayIf.itemKey]
+    return Array.isArray(selection)?selection.includes(q.displayIf.optionKey):selection===q.displayIf.optionKey
+  }
+  const question=(q:FormQuestion)=>{
+    if(!visible(q))return null
+    return <fieldset key={q.itemKey} className="border rounded-lg p-3 my-3 bg-white">
+      <legend className="font-medium text-sm">{q.prompt||'未填写题干'} {q.required?'*':''}</legend>
+      {['SINGLE','LIKERT'].includes(q.type)&&q.options.map(o=><label key={o.optionKey} className="flex gap-2 items-center my-2">
+        <input type="radio" checked={answers[q.itemKey]===o.optionKey} name={q.itemKey}
+          onChange={()=>choose(q.itemKey,o.optionKey)}/>{o.label||'未填写选项'}</label>)}
+      {q.type==='MULTIPLE'&&q.options.map(o=>{
+        const current=Array.isArray(answers[q.itemKey])?answers[q.itemKey] as string[]:[]
+        return <label key={o.optionKey} className="flex gap-2 my-2 items-center">
+          <input type="checkbox" checked={current.includes(o.optionKey)}
+            onChange={e=>choose(q.itemKey,e.target.checked?[...current,o.optionKey]:current.filter(x=>x!==o.optionKey))}/>
+          {o.label||'未填写选项'}</label>
+      })}
+      {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full border-collapse text-sm">
+        <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}</tr></thead>
+        <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
+          {q.options.map(o=><td className="text-center" key={o.optionKey}><input type="radio"
+            name={q.itemKey+':'+row.rowKey} checked={answers[q.itemKey+':'+row.rowKey]===o.optionKey}
+            onChange={()=>choose(q.itemKey+':'+row.rowKey,o.optionKey)}/></td>)}</tr>)}</tbody></table></div>}
+      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full"
+        aria-label={q.prompt||'文本回答'} rows={q.type==='SHORT_TEXT'?1:4}
+        value={String(answers[q.itemKey]||'')} onChange={e=>choose(q.itemKey,e.target.value)}/>}
+      {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
+        type="number" min={q.min} max={q.max}
+        value={answers[q.itemKey]??''} onChange={e=>choose(q.itemKey,e.target.value===''?'':Number(e.target.value))}/>}
+    </fieldset>
+  }
+  return <section className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
+    <div><h3 className="text-lg font-semibold">模拟作答（不保存正式数据）</h3>
+      <p className="text-xs text-slate-600">预览仅用于检查内容、条件与研究计分，绝不产生正式研究被试或 FINAL。</p></div>
+    {draft.kind==='FORM'&&(draft.definition as FormDraft).pages.map(page=><div key={page.pageKey}>
+      <h4 className="font-semibold">{page.title}</h4>{page.questions.map(question)}</div>)}
+    {draft.kind==='SCALE'&&(draft.definition as ScaleDraft).items.map(q=><fieldset className="border rounded-lg bg-white p-3" key={q.itemKey}>
+      <legend>{q.prompt||'未填写题干'}</legend>
+      {(draft.definition as ScaleDraft).responseOptions.map(o=><label key={o.optionKey} className="block my-1">
+        <input type="radio" name={q.itemKey} checked={answers[q.itemKey]===o.optionKey}
+          onChange={()=>choose(q.itemKey,o.optionKey)}/> {o.label}</label>)}
+    </fieldset>)}
+    {draft.kind==='SJT'&&<><div className="font-semibold">{(draft.definition as SjtDraft).stimulus}</div>
+      {(draft.definition as SjtDraft).questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">
+        <legend>{q.prompt||'未填写题干'}</legend>{q.options.map(o=><label key={o.optionKey} className="block my-2">
+          <input type="radio" name={q.questionKey} checked={answers[q.questionKey]===o.optionKey}
+            onChange={()=>choose(q.questionKey,o.optionKey)}/> {o.label}</label>)}</fieldset>)}</>}
+    {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
+      onClick={()=>onSimulate(Object.fromEntries(Object.entries(answers).filter((entry):entry is [string,string|number]=>typeof entry[1]!=='object')))}>
+      计算当前研究性模拟得分</button>}
+    {draft.kind==='FORM'&&<p className="text-xs">表单不自动诊断或计分。后续 PR3 的真实作答会由服务端严格验证分支与 FINAL。</p>}
+  </section>
+}
