@@ -29,7 +29,8 @@ export async function getOwnResearchTask(input:{
             itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
-            min:q.min,max:q.max,maxLength:q.maxLength,displayIf:q.displayIf,
+            min:q.min,max:q.max,integerOnly:q.integerOnly,step:q.step,precision:q.precision,
+            maxLength:q.maxLength,displayIf:q.displayIf,
           }))}))}
     }
     if(unit.kind==='SCALE'){
