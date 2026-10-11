@@ -36,7 +36,7 @@ export async function waveOverview(actorUserId:string,projectId:string){
         )::int AS "finalCompleted",
         COUNT(DISTINCT sp.research_code) FILTER (
           WHERE swa.status='COMPLETED' AND sf.id IS NOT NULL
-            AND swa.excluded_at IS NULL AND sp.status='ACTIVE'
+            AND swa.excluded_at IS NULL AND sp.status IN ('ACTIVE','REVOKED')
         )::int AS "uniqueLinkedCodes",
         COUNT(swa.id) FILTER (WHERE swa.excluded_at IS NOT NULL)::int AS excluded
       FROM "survey_waves" w
