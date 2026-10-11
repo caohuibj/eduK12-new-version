@@ -3,6 +3,8 @@ type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
 type Run={eventId:string;runId:string;status:string;version:number;name?:string}
+type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
+type Progress={runId:string;total:number;counts:Record<string,number>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
   ACTIVITY:'其他活动',ARTIFACT:'教学成果或方案',PROJECT:'改进项目',
@@ -18,6 +20,9 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   const [targets,setTargets]=useState<Target[]>([])
   const [events,setEvents]=useState<Event[]>([])
   const [runMap,setRunMap]=useState<Record<string,Run>>({})
+  const [releasedForms,setReleasedForms]=useState<Form[]>([])
+  const [formChoice,setFormChoice]=useState<Record<string,string>>({})
+  const [progress,setProgress]=useState<Record<string,Progress>>({})
   const [targetName,setTargetName]=useState('')
   const [targetKind,setTargetKind]=useState('PERSON')
   const [subjectUserId,setSubjectUserId]=useState('')
@@ -36,12 +41,13 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
   }
   useEffect(()=>{
     let alive=true
-    setTargets([]);setEvents([]);setRunMap({});setNotice('')
+    setTargets([]);setEvents([]);setRunMap({});setReleasedForms([]);setNotice('')
     void Promise.all([
       api<{list:Target[]}>(base+'/evaluation-targets'),
       api<{list:Event[]}>(base+'/evaluation-events'),
-    ]).then(([t,e])=>{
-      if(alive){setTargets(t.list);setEvents(e.list);setEventTargetId(t.list[0]?.id??'')}
+      api<{list:Form[]}>(base+'/forms'),
+    ]).then(([t,e,forms])=>{
+      if(alive){setTargets(t.list);setEvents(e.list);setReleasedForms(forms.list.filter(x=>x.status==='PUBLISHED'));setEventTargetId(t.list[0]?.id??'')}
     }).catch(e=>{if(alive)setNotice(e instanceof Error?e.message:'评价对象列表不可用')})
     return ()=>{alive=false}
   },[base,api])
@@ -70,11 +76,57 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
       name:event.title,
     })
     setRunMap(old=>({...old,[event.id]:run}))
-    setNotice('已原子建立此活动专属 Assessment Run 草稿；发布和真实 FINAL 尚未开放。')
+    setNotice('已原子建立活动专属 Assessment Run 草稿。请配置已发布 Form 的 Track。')
   })
   const inspectRun=(event:Event)=>perform(async()=>{
     const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
     setRunMap(old=>({...old,[event.id]:run}))
+  })
+  const fetchRun=async(event:Event)=>{
+    const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
+    setRunMap(old=>({...old,[event.id]:run}))
+    return run
+  }
+  const attachForm=(event:Event)=>perform(async()=>{
+    const form=releasedForms.find(f=>f.id===formChoice[event.id])
+    if(!form)throw new Error('请先选择已经发布的 Teacher Form')
+    const run=runMap[event.id]??await fetchRun(event)
+    if(run.status!=='DRAFT')throw new Error('只有草稿 Run 可以添加工具')
+    await api(base+'/evaluation-events/'+event.id+'/run/tracks','POST',{
+      resource:{family:'FORM',key:'huiteacher-form:'+form.id,
+        version:form.definitionDigest},
+      subjectSelector:{kind:'ALL_CURRENT'},
+      respondentSelector:{kind:'ALL_CURRENT'},
+      requestedPolicy:{
+        subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],
+        relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
+        analysisMode:'COHORT_AGGREGATE',
+        visibilityPolicyKey:'HUITEACHER_FORM_GROUP_V1',
+        minimumRespondents:10,
+      },
+    })
+    await fetchRun(event)
+    setNotice('教师群体 Form 已加入标准 Run；完成后只公开达到隐私阈值的群体描述统计。')
+  })
+  const previewRun=(event:Event)=>perform(async()=>{
+    const run=await fetchRun(event)
+    await api(base+'/evaluation-events/'+event.id+'/run/preview','POST',
+      {expectedVersion:run.version})
+    setNotice('本次 Run 的参与资格、版本及内容策略已完成预览。')
+  })
+  const publishRun=(event:Event)=>perform(async()=>{
+    const run=await fetchRun(event)
+    if(event.status!=='OPEN')throw new Error('请先开放评价活动')
+    if(!window.confirm('确认向本校当前符合资格的教师分配 Form 任务吗？'))return
+    const publication=await api<{executionCount:number;version:number}>(
+      base+'/evaluation-events/'+event.id+'/run/publish','POST',
+      {expectedVersion:run.version})
+    await fetchRun(event)
+    setNotice('标准 Run 已发布；共冻结 '+publication.executionCount+' 个作答任务。')
+  })
+  const readProgress=(event:Event)=>perform(async()=>{
+    const report=await api<Progress>(base+'/evaluation-events/'+event.id+'/run/progress')
+    setProgress(old=>({...old,[event.id]:report}))
   })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
     const result=await api<{status:string;version:number}>(
@@ -125,11 +177,37 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
       <div className="ht-inline">
         <button onClick={()=>inspectRun(event)} disabled={working}>查看 Run 关联</button>
         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建标准 Run 草稿</button>}
+        {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')} disabled={working}>开放评价活动</button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')} disabled={working}>结束活动</button>}
       </div>
-      {runMap[event.id]&&<p>标准 Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status}</p>}
+      {runMap[event.id]&&<div>
+        <p>标准 Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status}</p>
+        {runMap[event.id].status==='DRAFT'&&<>
+          <label className="ht-field"><span>向当前教师发布的 Form（不计分）</span>
+            <select value={formChoice[event.id]??''}
+              onChange={e=>setFormChoice(old=>({...old,[event.id]:e.target.value}))}>
+              <option value="">请选择正式已发布 Form</option>
+              {releasedForms.map(form=><option key={form.id} value={form.id}>
+                {form.title}</option>)}
+            </select>
+          </label>
+          <div className="ht-inline">
+            <button onClick={()=>attachForm(event)} disabled={working||!formChoice[event.id]}>
+              加入 Form Track
+            </button>
+            <button onClick={()=>previewRun(event)} disabled={working}>预览 Run</button>
+            <button onClick={()=>publishRun(event)} disabled={working||event.status!=='OPEN'}>
+              发布教师评价任务
+            </button>
+          </div>
+        </>}
+        {runMap[event.id].status==='PUBLISHED'&&
+          <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>}
+        {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
+          {progress[event.id].total} · 进行中 {progress[event.id].counts.IN_PROGRESS??0}</p>}
+      </div>}
     </article>)}</div>
-    <p className="ht-muted">本阶段为对象／活动与原子 Run 草稿管理。正式工具授权、任务分配、作答 FINAL、群体报告将在后续受控链路完成前保持关闭。</p>
+<p className="ht-muted">Form-only 使用正式发布版本、标准 Run 和加密 FINAL；没有计分规则，不产生 Scale 得分。低于最小样本量的群体报告保持抑制。</p>
   </section>
 }
