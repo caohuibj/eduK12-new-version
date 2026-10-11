@@ -19,6 +19,7 @@ surveyAnalyticsRouter.use('/:pid/analytics',(_req,res,next)=>{
 })
 const id=z.string().uuid()
 const matched=z.object({baselineWaveId:id,followupWaveId:id}).strict()
+const qualityPage=z.coerce.number().int().min(1).max(1000).default(1)
 const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await fn(req))}
   catch(e){
@@ -35,10 +36,10 @@ const review=z.object({
 }).strict()
 surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts',wrap(req=>
   listSampleQuality(req.user!.userId,id.parse(req.params.pid),
-    Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+    qualityPage.parse(req.query.page))))
 surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts/:attemptId/history',wrap(req=>
   listSampleQualityHistory(req.user!.userId,id.parse(req.params.pid),
-    id.parse(req.params.attemptId),Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+    id.parse(req.params.attemptId),qualityPage.parse(req.query.page))))
 surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(req=>
   setSampleQuality({actorUserId:req.user!.userId,
     projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
