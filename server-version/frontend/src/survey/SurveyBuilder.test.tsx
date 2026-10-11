@@ -43,7 +43,7 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(state.pages[0].questions[0].prompt).toBe('你喜欢哪门课？')
     expect(state.pages[0].questions[0].options).toHaveLength(2)
     const id=state.pages[0].questions[0].itemKey
-    fireEvent.click(screen.getByRole('button',{name:'+ 文本'}))
+    fireEvent.click(screen.getByRole('button',{name:'+ 短文本'}))
     const changed=JSON.parse(screen.getByTestId('form-state').textContent||'{}') as FormDraft
     expect(changed.pages[0].questions[0].itemKey).toBe(id)
     expect(changed.pages[0].questions[1].itemKey).not.toBe(id)
