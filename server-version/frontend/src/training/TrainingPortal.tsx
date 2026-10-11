@@ -16,9 +16,9 @@ export default function TrainingPortal() {
     </header>
     <section className="training-portal-main" aria-labelledby="training-title">
       <div className="training-portal-copy">
-        <p className="training-eyebrow">一段学习 · 一程生长</p>
-        <h1 id="training-title">让学习，<br />更有回响。</h1>
-        <p className="training-portal-description">从课程参与到专业成长，<br />每一步都有清晰的开始。</p>
+        <p className="training-eyebrow">书山问道 · 拾级而上</p>
+        <h1 id="training-title">以学习为径，<br />见更远的天地。</h1>
+        <p className="training-portal-description">从一门课程启程，<br />在探索中求知，在实践中成长。</p>
         <span className="training-portal-accent" aria-hidden="true" />
       </div>
     </section>

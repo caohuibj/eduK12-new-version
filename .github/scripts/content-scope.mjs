@@ -1,3 +1,4 @@
+import {homepageCopyPlan} from './homepage-copy-scope.mjs';
 import {campusPlan} from './campus-scope.mjs';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
@@ -223,12 +224,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const frontend = result.frontend === true && !frontendTest;
   const releaseTools = !result.documentation && !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
   const campus = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? campusPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const scenario = campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const copy = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? homepageCopyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
+  const scenario = copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
@@ -238,7 +240,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const codeql = Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  const output = { application_route:campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const output = { homepage_copy_plan:JSON.stringify(copy), application_route:copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
