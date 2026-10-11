@@ -2,6 +2,7 @@ import { useEffect,useState,type FormEvent } from 'react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string}
+type Project={id:string;status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type Wave={
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
   revision:number;instrumentIds:string[];publicationId:string|null;
@@ -46,16 +47,18 @@ const localTime=(raw:string|null)=>{
 export function SurveyWaveStudio({projectId}:{projectId:string}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
+  const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
   const refresh=async()=>{
-    const [waveList,instrumentList]=await Promise.all([
+    const [waveList,instrumentList,projectDetails]=await Promise.all([
       surveyApi<{list:Wave[]}>(path+'/waves'),
       surveyApi<{list:Instrument[]}>(path+'/instruments'),
+      surveyApi<Project>(path),
     ])
-    setWaves(waveList.list);setTools(instrumentList.list)
+    setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
   }
   useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial())
     void refresh().catch(e=>setError(message(e)))
@@ -119,6 +122,18 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
           '波次状态已更新')
     })
   }
+  const transitionProject=(action:'pause'|'resume'|'close')=>{
+    if(!project)return
+    if(action==='close'&&!window.confirm(
+      '确认永久结束本研究项目？将停止全部波次的新准入，已完成的 FINAL 仍按研究说明保留。'
+    ))return
+    void act(async()=>{
+      await surveyApi(path+'/'+action,'POST',{revision:project.revision})
+      await refresh()
+      setNotice(action==='pause'?'整个研究项目已暂停新准入':
+        action==='resume'?'研究项目已恢复':'研究项目已结束，历史已完成研究数据仍保留。')
+    })
+  }
   const toggle=(id:string,checked:boolean)=>setForm(old=>({
     ...old,instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
   }))
@@ -128,6 +143,20 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         波次正式发布后不能修改其题目、评分和同意内容，只能建立下一份冻结版本。</p></header>
     {error&&<p role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{error}</p>}
     {notice&&<p role="status" className="bg-teal-50 border-l-4 border-teal-600 p-3">{notice}</p>}
+    {project&&<div className="border rounded-lg bg-slate-50 p-3 space-y-3">
+      <div className="flex justify-between gap-3 flex-wrap items-center">
+        <p className="text-sm">整体研究状态：<strong>{project.status}</strong></p>
+        <div className="flex flex-wrap gap-2">
+          {project.status==='ACTIVE'&&<button type="button" className="btn-secondary"
+            disabled={busy} onClick={()=>transitionProject('pause')}>暂停整个研究</button>}
+          {project.status==='PAUSED'&&<button type="button" className="btn-secondary"
+            disabled={busy} onClick={()=>transitionProject('resume')}>恢复整个研究</button>}
+          {['ACTIVE','PAUSED'].includes(project.status)&&<button type="button" className="btn-secondary"
+            disabled={busy} onClick={()=>transitionProject('close')}>结束整个研究</button>}
+        </div>
+      </div>
+      <p className="text-xs text-slate-600">暂停停止新的研究参与者准入；已开始的合法答卷仍遵循有限的完成窗口。关闭研究不会物理删除既有数据。</p>
+    </div>}
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav aria-label="研究波次列表" className="space-y-2">
         <button className="btn-secondary w-full" type="button" onClick={()=>{
