@@ -231,23 +231,25 @@ export default function SurveyPublicApp(){
     setError('');setNotice('');setBusy(true)
     try{await task()}catch(e){
       const message=parseError(e);setError(message)
-      // The server returns answers.<itemKey>[.<matrixRow>] on FINAL failure.
-      const itemKey=message.match(/answers\.([a-z][a-z0-9_-]*)/i)?.[1]
-      if(itemKey&&taskState.current){
-        const match=taskState.current.units.find(unit=>unit.kind==='FORM'&&unit.pages?.some(
-          page=>page.questions.some(q=>q.itemKey===itemKey)))
-        if(match){
-          const current=answers[match.instrumentKey]||{}
-          const visible=visibleFormKeys(match.pages?.flatMap(p=>p.questions)||[],current)
-          const pages=match.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
-          const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
-          if(index>=0)setFormPages(prev=>({...prev,[match.instrumentKey]:index}))
-        }
+      // FINAL qualifies the failing Form by instrumentKey: different Forms
+      // may intentionally share copied itemKeys within the same Wave.
+      const location=message.match(/answers\.([a-z][a-z0-9_-]*)(?:\.([a-z][a-z0-9_-]*))?/i)
+      const instrumentKey=location?.[2]?location[1]:undefined
+      const itemKey=location?.[2]||location?.[1]
+      const targetUnit=itemKey?taskState.current?.units.find(unit=>unit.kind==='FORM'&&
+        (!instrumentKey||unit.instrumentKey===instrumentKey)&&unit.pages?.some(
+          page=>page.questions.some(q=>q.itemKey===itemKey))):undefined
+      if(targetUnit&&itemKey){
+        const current=answers[targetUnit.instrumentKey]||{}
+        const visible=visibleFormKeys(targetUnit.pages?.flatMap(p=>p.questions)||[],current)
+        const pages=targetUnit.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
+        const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
+        if(index>=0)setFormPages(prev=>({...prev,[targetUnit.instrumentKey]:index}))
+        window.setTimeout(()=>{
+          const target=document.getElementById('survey-answer-'+targetUnit.instrumentKey+'-'+itemKey)
+          target?.focus();target?.scrollIntoView({block:'center'})
+        },0)
       }
-      if(itemKey)window.setTimeout(()=>{
-        const target=document.querySelector<HTMLElement>('[id$="-'+itemKey+'"]')
-        target?.focus();target?.scrollIntoView({block:'center'})
-      },0)
     }finally{setBusy(false)}
   }
   const recover=(e:FormEvent)=>{e.preventDefault();void run(async()=>{

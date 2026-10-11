@@ -319,7 +319,14 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
     if(!Object.prototype.hasOwnProperty.call(input,unit.instrumentKey))
       invalid('answers.'+unit.instrumentKey,'缺少研究工具作答')
     const raw=safeObject(input[unit.instrumentKey],'answers.'+unit.instrumentKey)
-    if(unit.kind==='FORM')return formResult(unit,raw)
+    if(unit.kind==='FORM'){
+      try{return formResult(unit,raw)}
+      catch(e){
+        if(e instanceof SurveyFinalValidationError&&e.path.startsWith('answers.'))
+          invalid('answers.'+unit.instrumentKey+'.'+e.path.slice('answers.'.length),e.message)
+        throw e
+      }
+    }
     if(unit.kind==='SCALE')return scaleResult(unit,raw)
     if(unit.kind==='SJT')return sjtResult(unit,raw)
     return invalid('publication','未知研究内容类型')
