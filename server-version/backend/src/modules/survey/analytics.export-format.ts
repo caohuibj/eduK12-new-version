@@ -42,6 +42,8 @@ const missingMeanings:Record<MissingReason,string>={
   WITHDRAWN:'数据已依研究规定被撤回/排除',
 }
 const threatPrefix=/^[\s\u200B\u200C\u200D\u202A-\u202E\uFEFF]*[=+@-]/
+/** Stable study-local pseudonym. Never serialize internal Attempt PKs into researcher files. */
+export const surveyAttemptCode=(id:string)=>'A-'+canonicalHash(id).slice(0,20).toUpperCase()
 export const protectCsvCell=(raw:unknown):string=>{
   if(raw===null||raw===undefined)return ''
   if(typeof raw!=='string'&&typeof raw!=='number'&&typeof raw!=='boolean')
@@ -120,7 +122,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
   const data=source.map(o=>{
     const column=columnId(o)
     codes.set(column,codebookFor(o))
-    return [o.researchCode||o.attemptId,o.waveId,o.waveOrdinal,o.attemptId,
+    return [o.researchCode||surveyAttemptCode(o.attemptId),o.waveId,o.waveOrdinal,surveyAttemptCode(o.attemptId),
       column,o.measurement.instrumentKey,o.measurement.scoreKey,
       o.measurement.scoringDigest,o.measurement.responseSignature,
       o.value,o.missingReason,o.sourceFinalHash]
