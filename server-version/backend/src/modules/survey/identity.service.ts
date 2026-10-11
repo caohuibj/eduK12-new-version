@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { allocateResearchFlowOnAdmission } from './flow.assignment'
 
 type Tx=Prisma.TransactionClient
 export class ResearchIdentityError extends Error {
@@ -28,11 +29,12 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
     return fail('研究项目当前不接受新的多波次参与者')
   const rows=await tx.$queryRaw<Array<{
     waveId:string;ordinal:number;allowNewParticipants:boolean;
-    consentVersion:number;startsCount:number;quotaStarts:number|null
+    consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null
   }>>`
     SELECT w.id AS "waveId",w.ordinal,
       w.allow_new_participants AS "allowNewParticipants",
       w.consent_version AS "consentVersion",
+      w.publication_id AS "publicationId",
       w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts"
     FROM "survey_waves" w
     JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
@@ -93,6 +95,10 @@ export async function createLinkedResearchIdentity(input:{
       id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
       participantId,attemptId,consentVersion:input.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:input.projectId,waveId:input.waveId,
+      attemptId,participantId,researchCode,accessCredential:secret,
+    })
   })
   return {researchCode,accessCredential:secret,attemptId}
 }

@@ -7,6 +7,7 @@ import {
 } from './identity.service'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
+import { allocateResearchFlowOnAdmission } from './flow.assignment'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
@@ -178,6 +179,11 @@ export async function startLinkedWave(input:{
       participantId:identity.participantId,attemptId:row.id,
       consentVersion:wave.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
+      attemptId:row.id,participantId:identity.participantId,
+      researchCode:input.researchCode,accessCredential:input.accessCredential,
+    })
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
   })
 }
@@ -202,6 +208,10 @@ export async function startSingleUnlinkedWave(input:{
       id:randomUUID(),projectId:project.id,waveId:wave.id,
       attemptId:row.id,consentVersion:wave.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
+      attemptId:row.id,participantId:null,accessCredential:proof.accessCredential,
+    })
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       accessCredential:proof.accessCredential}
   })

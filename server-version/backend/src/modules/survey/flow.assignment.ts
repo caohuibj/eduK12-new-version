@@ -1,8 +1,8 @@
-import { randomInt } from 'node:crypto'
+import { randomInt,createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
-import { hashResearchCredential } from './identity.service'
+const hashResearchCredential=(raw:string)=>createHash('sha256').update(raw).digest('hex')
 import type { ResearchFrozenPublication } from './publication.service'
 import type { FrozenSurveyFlow } from './flow.definition'
 
@@ -11,7 +11,7 @@ export type SurveyFlowAssignment={
   flowDigest:string
   experimentKey:string|null
   groupKey:string|null
-  algorithm:'CRYPTO_RANDOM_INT_V1'|'LINKED_INHERIT_V1'|'NO_EXPERIMENT'
+  algorithm:'CRYPTO_RANDOM_INT_V1'|'CRYPTO_QUOTA_WEIGHTED_V1'|'LINKED_INHERIT_V1'|'NO_EXPERIMENT'
   assignedAt:string
   inheritedFromAttemptId?:string
 }
@@ -102,12 +102,53 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
       break
     }
   }
-  if(!groupKey)groupKey=chooseSurveyGroup(flow)
+  // A quota bucket represents assignment reservations, not number of FINALs.
+  // Wave admission already holds a Wave UPDATE lock; an atomic counter CAS
+  // also protects against legacy/parallel participant task reads.
+  const policy=input.snapshot.quotaPolicy
+  let quotaBucket:{groupKey:string;maxAssigned:number;assignedCount:number}|undefined
+  if(policy){
+    if(!flow.experiment)fail('研究条件配额要求冻结的实验定义')
+    const buckets=await tx.surveyExperimentQuotaBucket.findMany({where:{
+      projectId:input.projectId,waveId:input.waveId,
+    },select:{groupKey:true,maxAssigned:true,assignedCount:true}})
+    if(buckets.length!==flow.experiment.groups.length||
+      buckets.some(b=>policy.groupLimits[b.groupKey]!==b.maxAssigned))
+      fail('实验配额计数器与冻结发布定义不一致')
+    if(groupKey){
+      quotaBucket=buckets.find(b=>b.groupKey===groupKey)
+      if(!quotaBucket||quotaBucket.assignedCount>=quotaBucket.maxAssigned)
+        fail('既有研究实验组本轮名额已满，不允许随机改变纵向分组')
+    }else{
+      const candidates=flow.experiment.groups.filter(g=>{
+        const b=buckets.find(x=>x.groupKey===g.groupKey)
+        return !!b&&b.assignedCount<b.maxAssigned
+      })
+      if(!candidates.length)fail('本波次全部实验组名额已用尽')
+      const total=candidates.reduce((acc,g)=>acc+g.weight,0)
+      let draw=randomInt(total)
+      const picked=candidates.find(g=>{
+        if(draw<g.weight)return true
+        draw-=g.weight
+        return false
+      })
+      if(!picked)fail('条件实验分配无法在配额预算内完成')
+      groupKey=picked.groupKey
+      quotaBucket=buckets.find(b=>b.groupKey===groupKey)
+    }
+    if(!quotaBucket)fail('实验条件配额读取失败')
+    const updated=await tx.surveyExperimentQuotaBucket.updateMany({
+      where:{projectId:input.projectId,waveId:input.waveId,groupKey:quotaBucket.groupKey,
+        assignedCount:quotaBucket.assignedCount,maxAssigned:quotaBucket.maxAssigned},
+      data:{assignedCount:{increment:1}},
+    })
+    if(updated.count!==1)fail('本组名额正在由其他参与者领取，请重新进入')
+  }else if(!groupKey)groupKey=chooseSurveyGroup(flow)
   const value:SurveyFlowAssignment={
     schemaVersion:1,flowDigest:flow.flowDigest,
     experimentKey:flow.experiment?.experimentKey??null,groupKey,
     algorithm:inheritedFromAttemptId?'LINKED_INHERIT_V1':
-      flow.experiment?'CRYPTO_RANDOM_INT_V1':'NO_EXPERIMENT',
+      flow.experiment?(policy?'CRYPTO_QUOTA_WEIGHTED_V1':'CRYPTO_RANDOM_INT_V1'):'NO_EXPERIMENT',
     assignedAt:new Date().toISOString(),
     ...(inheritedFromAttemptId?{inheritedFromAttemptId}:{}),
   }
@@ -117,4 +158,24 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   })
   if(changed.count!==1)fail('同一研究作答在分组期间发生并发更改')
   return value
+}
+
+/** Admit first, allocate inside the same transaction before returning the
+ * participant's admission receipt. This makes group quotas meaningful before
+ * question presentation; failed reservations roll back the whole admission.
+ */
+export async function allocateResearchFlowOnAdmission(tx:Prisma.TransactionClient,input:{
+  publicationId:string;projectId:string;waveId:string;attemptId:string;
+  participantId:string|null;researchCode?:string;accessCredential:string;
+}){
+  const publication=await tx.surveyPublication.findFirst({where:{
+    id:input.publicationId,projectId:input.projectId,
+  },select:{definitionDigest:true,compiledSnapshot:true}})
+  if(!publication)fail('研究入场时冻结发布定义不可访问')
+  const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+  if(!snapshot.flow)return
+  if(snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId||
+    canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+    fail('研究入场时冻结发布定义未通过摘要校验')
+  await ensureSurveyFlowAssignment(tx,{...input,snapshot})
 }
