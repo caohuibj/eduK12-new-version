@@ -129,6 +129,13 @@ export async function revokeLinkedResearchAccess(input:{
     credentialHash:sha256(input.accessCredential),
   },data:{status:'REVOKED',credentialRevokedAt:new Date()}})
   if(changed.count!==1)return fail()
+  // Retain only a withdrawal-only proof: the old secret can never reopen
+  // completed task/General, but an affected participant can still request
+  // data exclusion without researcher intervention.
+  await prisma.surveyEvent.create({data:{
+    id:randomUUID(),projectId:input.projectId,
+    action:'PARTICIPANT_ACCESS_REVOKED',metadata:{participantId:identity.participantId},
+  }})
   return {revoked:true}
 }
 
@@ -142,6 +149,22 @@ export function freshUnlinkedSession(){
  * never be emitted in researcher lists, CSV or application logs. */
 export const hashResearchCredential=(secret:string)=>sha256(secret)
 
+/** Withdrawal authority deliberately differs from private-data read authority.
+ * A revoked credential retains its one-way hash ONLY so its former bearer can
+ * ask to exclude answers. No task, history or General endpoint accepts it.
+ */
+async function withdrawalIdentity(input:{projectId:string;researchCode:string;accessCredential:string}){
+  if(!/^R-[A-Z0-9]{8,32}$/.test(input.researchCode)
+    || !/^[A-Za-z0-9_-]{43}$/.test(input.accessCredential))fail()
+  const rows=await prisma.$queryRaw<Array<{participantId:string}>>`
+    SELECT id AS "participantId" FROM survey_participants
+    WHERE project_id=${input.projectId} AND research_code=${input.researchCode}
+      AND credential_hash=${sha256(input.accessCredential)}
+      AND status IN ('ACTIVE','REVOKED') LIMIT 1
+  `
+  if(!rows.length)fail()
+  return rows[0]
+}
 /** Data withdrawal is separate from merely revoking future access. Frozen
  * FINAL rows remain immutable; all future valid-sample stats/exports exclude
  * attempts marked withdrawn, with an audit trail and retention review.
@@ -149,7 +172,7 @@ export const hashResearchCredential=(secret:string)=>sha256(secret)
 export async function withdrawLinkedResearchData(input:{
   projectId:string;researchCode:string;accessCredential:string
 }):Promise<{excludedAttempts:number;status:'WITHDRAWN';retention:'PENDING_REVIEW'}>{
-  const participant=await recoverLinkedResearchIdentity(input)
+  const participant=await withdrawalIdentity(input)
   return prisma.$transaction(async tx=>{
     // Lock the owning project before exclusion to serialize with any
     // pending sensitive export ticket creation.
@@ -161,8 +184,9 @@ export async function withdrawLinkedResearchData(input:{
       FOR UPDATE
     `
     const current=await tx.surveyParticipant.findFirst({where:{
-      id:participant.participantId,projectId:input.projectId,status:'ACTIVE',
-      credentialHash:sha256(input.accessCredential),credentialRevokedAt:null,
+      id:participant.participantId,projectId:input.projectId,
+      status:{in:['ACTIVE','REVOKED']},
+      credentialHash:sha256(input.accessCredential),
     }})
     if(!current)fail()
     const when=new Date()
