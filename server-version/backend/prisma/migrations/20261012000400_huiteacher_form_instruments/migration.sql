@@ -35,7 +35,7 @@ CREATE INDEX "huiteacher_forms_org_status_idx"
 CREATE OR REPLACE FUNCTION protect_teacher_form_definition()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-  IF TG_OP='UPDATE' AND OLD."status"='PUBLISHED' THEN
+  IF OLD."status"='PUBLISHED' AND TG_OP IN ('UPDATE','DELETE') THEN
     RAISE EXCEPTION 'Published Teacher Form is immutable'
       USING ERRCODE='23514';
   END IF;

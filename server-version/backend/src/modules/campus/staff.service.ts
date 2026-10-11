@@ -135,6 +135,13 @@ export async function registerCampusStaff(input:{
         membershipId:membership.id,persona:invitation.persona,
         grantedByUserId:invitation.invitedByUserId,
       }})
+      if (invitation.adminRole) {
+        await tx.educationProductRoleGrant.create({data:{
+          id:randomUUID(),organizationId:invitation.organizationId,
+          membershipId:membership.id,product:'HUISCHOOL',role:'PRODUCT_ADMIN',
+          grantedByUserId:invitation.invitedByUserId,
+        }})
+      }
       if(invitation.psychologyStaff) {
         await tx.organizationCapabilityGrant.create({data:{
           id:randomUUID(),organizationId:invitation.organizationId,

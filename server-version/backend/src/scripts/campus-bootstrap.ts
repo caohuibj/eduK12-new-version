@@ -42,6 +42,10 @@ async function main(){
       organizationId:org.id,product:'HUISCHOOL',status:'ACTIVE',
       grantedByUserId:user.id,
     }})
+    await tx.educationProductRoleGrant.create({data:{
+      id:randomUUID(),organizationId:org.id,membershipId:membership.id,
+      product:'HUISCHOOL',role:'PRODUCT_ADMIN',grantedByUserId:user.id,
+    }})
     await appendAudit(tx,{
       organizationId:org.id,actorUserId:user.id,
       action:'CAMPUS_BOOTSTRAP_INITIAL_ADMIN',targetType:'MEMBERSHIP',
