@@ -68,6 +68,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
   const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
+  const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
   const [error,setError]=useState(''),[ticket,setTicket]=useState<Ticket|null>(null)
@@ -124,6 +125,10 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const result=await api<Ticket>(base+'/exports','POST',{
       format,...(format==='RAW_WAVE'?{waveId}:{}),
       ...(format.startsWith('RAW')?{includeFreeText}:{}),
+      ...(format==='RAW_WAVE'?{
+        ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
+        ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
+      }:{}),
     })
     setTicket(result)
     setMessage('加密数据已生成，可在十分钟有效期内按项目权限下载。')
@@ -255,7 +260,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       </div>
       <div className="border rounded-xl p-4 space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。当前交互式导出每次最多处理 250 份 FINAL，且生成文件总量不超过 2MB。大样本请分波次导出。</p>
+        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。当前交互式导出每次最多处理 250 份 FINAL，且生成文件总量不超过 2MB。大样本可对单波次按完成时间分段，分段仍遵守同样的安全上限。</p>
         <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
@@ -273,6 +278,13 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             <select className="input block" value={waveId} onChange={e=>setWaveId(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
+          {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
+            <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
+              value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);setTicket(null)}}/></label>
+            <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
+              value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);setTicket(null)}}/></label>
+            <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
+          </div>}
           <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
             onClick={createExport}>创建受控导出</button>
         </div>
