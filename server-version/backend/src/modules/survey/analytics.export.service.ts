@@ -36,7 +36,7 @@ const artifactFor=(format:Format,projectId:string,source:Awaited<ReturnType<type
   if(format==='RAW_LONG')return rawLongExport(projectId,source)
   if(format==='RAW_WIDE')return rawWideExport(projectId,source)
   if(format==='SCORE_LONG')return exportLong(projectId,source.scores)
-  return exportWide(projectId,source.scores)
+  return exportWide(projectId,source.scores,source.attendance)
 }
 async function guardedOwner(tx:import('@prisma/client').Prisma.TransactionClient,uid:string,pid:string){
   const rows=await tx.$queryRaw<Array<{id:string;revision:number}>>`

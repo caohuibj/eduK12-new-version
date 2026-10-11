@@ -123,14 +123,15 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
 }
 /** WIDE is legitimate ONLY in LINKED_WAVES. Rows with no stable researchCode
  * are rejected rather than synthesizing a false shared identity. */
-export function exportWide(projectId:string,observations:readonly FrozenScoreObservation[]):BoundedResearchExport{
+export function exportWide(projectId:string,observations:readonly FrozenScoreObservation[],
+  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[]):BoundedResearchExport{
   const source=sourceRows(projectId,observations)
   if(source.some(o=>!o.researchCode))
     throw new Error('Anonymous SINGLE_UNLINKED answers cannot be widened across waves')
   const mapped=new Map<string,ResearchExportCodebookRow>()
   for(const o of source)mapped.set(columnId(o),codebookFor(o))
   const codebook=[...mapped.values()].sort((a,b)=>a.ordinal-b.ordinal||a.column.localeCompare(b.column))
-  const columns=['research_code',...codebook.map(x=>x.column)]
+  const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing'])]
   if(columns.length>512)throw new Error('Wide format would produce too many columns; use LONG')
   const byCode=new Map<string,Map<string,number|null>>()
   for(const o of source){
@@ -141,7 +142,12 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
     record.set(column,o.missingReason?null:o.value)
     byCode.set(participant,record)
   }
+  const participation=new Map(attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
   const rows=[...byCode].sort(([a],[b])=>a.localeCompare(b)).map(([code,record])=>
-    [code,...codebook.map(c=>record.has(c.column)?record.get(c.column):null)])
+    [code,...codebook.flatMap(c=>{
+      if(record.has(c.column))return [record.get(c.column),record.get(c.column)===null?'SHOWN_MISSING':null]
+      const state=participation.get(code+':'+c.waveId)
+      return [null,state&&state!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+    })])
   return finalArtifact('WIDE',projectId,columns,rows,source,codebook)
 }

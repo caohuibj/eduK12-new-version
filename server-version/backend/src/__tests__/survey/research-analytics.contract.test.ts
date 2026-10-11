@@ -46,7 +46,7 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     expect(long.manifest).toMatchObject({format:'LONG',rowCount:6,columnCount:12})
     expect(long.codebook).toHaveLength(2)
     const wide=exportWide(project,data())
-    expect(wide.manifest).toMatchObject({format:'WIDE',rowCount:4,columnCount:3})
+    expect(wide.manifest).toMatchObject({format:'WIDE',rowCount:4,columnCount:5})
     expect(wide.codebook).toHaveLength(2)
     expect(wide.csv).toContain('"R-C"')
     expect(wide.csv).toContain('"R-D"')
