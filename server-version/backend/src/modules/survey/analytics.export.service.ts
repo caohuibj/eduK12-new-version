@@ -104,3 +104,18 @@ export async function downloadSurveyExport(req:Request,input:{projectId:string;e
     return {id:ticket.id,format:ticket.format,...data}
   })
 }
+
+/** Bounded hourly cleanup: permanently erase expired encrypted source files
+ * and metadata from the application database. The audit event remains.
+ */
+export async function cleanupExpiredSurveyExportTickets(now=new Date()):Promise<number>{
+  const ids=await prisma.surveyExportTicket.findMany({
+    where:{expiresAt:{lte:now}},select:{id:true},
+    orderBy:{expiresAt:'asc'},take:100,
+  })
+  if(!ids.length)return 0
+  const changed=await prisma.surveyExportTicket.deleteMany({
+    where:{id:{in:ids.map(x=>x.id)},expiresAt:{lte:now}},
+  })
+  return changed.count
+}

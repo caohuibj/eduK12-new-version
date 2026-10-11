@@ -185,7 +185,7 @@ export async function loadSurveySource(input:{
       }
     }
     return {projectId:input.projectId,collectionMode:project.collectionMode,
-      completeAttempts:finals.length,cutOff:new Date().toISOString(),
+      completeAttempts:new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,cutOff:new Date().toISOString(),
       scores,raw,codebook:[...codebook.values()]}
   })
 }

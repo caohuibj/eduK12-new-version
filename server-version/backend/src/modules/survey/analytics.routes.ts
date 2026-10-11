@@ -6,6 +6,12 @@ import * as service from './analytics.read'
 
 export const surveyAnalyticsRouter=Router()
 surveyAnalyticsRouter.use(authenticateSurvey)
+surveyAnalyticsRouter.use((_req,res,next)=>{
+  if(process.env.SURVEY_ANALYTICS_ENABLED!=='true')
+    return res.status(404).json({code:-1,message:'研究分析仍未完成正式验收',data:null})
+  res.setHeader('Cache-Control','no-store')
+  next()
+})
 const id=z.string().uuid()
 const matched=z.object({baselineWaveId:id,followupWaveId:id}).strict()
 const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
