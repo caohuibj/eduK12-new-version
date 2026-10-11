@@ -229,7 +229,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     await expect(loadSurveySource({actorUserId:foreign.id,projectId})).rejects.toThrow()
   })
   it('supports T3 draft revisions under ACTIVE project without mutating old FINAL; marks incompatible scoring',async()=>{
-    const earlier=await db.surveyWaveFinal.findMany({where:{projectId},select:{
+    const earlier=await db.surveyWaveFinal.findMany({where:{projectId},orderBy:{id:'asc'},select:{
       id:true,definitionDigest:true,resultsHash:true,
     }})
     expect(earlier.length).toBe(2)
@@ -276,7 +276,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })
     const after=await db.surveyWaveFinal.findMany({where:{
       id:{in:earlier.map(x=>x.id)},
-    },select:{id:true,definitionDigest:true,resultsHash:true}})
+    },orderBy:{id:'asc'},select:{id:true,definitionDigest:true,resultsHash:true}})
     expect(after).toEqual(earlier)
   })
   it('refuses frozen LINKED publication unless explicit linkage disclosure is confirmed',async()=>{
