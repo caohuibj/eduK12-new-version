@@ -2959,3 +2959,36 @@ model SurveyExportTicket {
   @@index([expiresAt],map:"survey_exports_expires_idx")
   @@map("survey_export_tickets")
 }
+
+//// Shared education identity: one SCHOOL account and Organization can opt
+//// into either product. The SQL migration owns restrictive FKs and audit
+//// constraints, including product-domain guards and active-role uniqueness.
+model EducationProductEntitlement {
+  organizationId  String   @map("organization_id")
+  product         String
+  status          String   @default("ACTIVE")
+  grantedByUserId String   @map("granted_by_user_id")
+  grantedAt       DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  suspendedAt     DateTime? @map("suspended_at") @db.Timestamptz(6)
+  changedByUserId String?  @map("changed_by_user_id")
+  revision        Int      @default(1)
+
+  @@id([organizationId, product])
+  @@index([product, status, organizationId], map: "education_product_entitlements_product_status_idx")
+  @@map("education_product_entitlements")
+}
+
+model EducationProductRoleGrant {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  membershipId    String   @map("membership_id")
+  product         String
+  role            String
+  grantedByUserId String   @map("granted_by_user_id")
+  grantedAt       DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?  @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  @@index([membershipId, product, revokedAt], map: "education_product_role_grants_membership_idx")
+  @@map("education_product_role_grants")
+}
