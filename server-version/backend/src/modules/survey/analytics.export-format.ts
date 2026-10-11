@@ -117,7 +117,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
     throw new Error('Expected score columns must belong to the authorized project')
   const codes=new Map<string,ResearchExportCodebookRow>()
   for(const column of expectedColumns)codes.set(columnId(column),codebookFor(column))
-  const columns=['research_code_or_attempt','wave_id','wave_ordinal','attempt_id',
+  const columns=['research_code_or_attempt','wave_id','wave_ordinal','attempt_code',
     'column','instrument_key','score_key','scoring_digest','response_signature',
     'value','missing_reason','source_final_hash']
   const data=source.map(o=>{
