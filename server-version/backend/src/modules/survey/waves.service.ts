@@ -135,10 +135,11 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     return {wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
-  if(input.wave.consentText.trim().length<20)
-    checks.push({key:'consent',ok:false,issues:['研究说明与知情同意至少需要 20 字']})
-  if(!input.selected.length)
-    checks.push({key:'instruments',ok:false,issues:['至少选择一个研究工具']})
+  const hasConsent=input.wave.consentText.trim().length>=20
+  checks.push({key:'consent',ok:hasConsent,
+    issues:hasConsent?[]:['研究说明与知情同意至少需要 20 字']})
+  checks.push({key:'instruments',ok:input.selected.length>0,
+    issues:input.selected.length?[]:['至少选择一个研究工具']})
   for(const draft of input.drafts){
     const compilation=previewResearchInstrument({
       kind:surveyKindSchema.parse(draft.kind),instrumentKey:draft.instrumentKey,
@@ -152,6 +153,6 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
-    ok:checks.length===input.selected.length+1&&checks.every(c=>c.ok),
+    ok:checks.length===input.selected.length+2&&checks.every(c=>c.ok),
     publicationReady:false,reason:'PR3 runtime adapter and anonymous FINAL not yet enabled'}
 }
