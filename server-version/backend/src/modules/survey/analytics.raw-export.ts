@@ -61,6 +61,9 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
       .map(x=>x.researchCode+':'+x.columnKey))
     const attendance=new Map(source.attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
     const participants=[...new Set(source.attendance.map(a=>a.researchCode))].sort()
+    // Reject before allocating millions of synthetic longitudinal cells.
+    if(participants.length*dictionary.length+rows.length>25000)
+      throw new Error('Long format exceeds 25000 bounded rows; narrow the Wave selection')
     for(const code of participants)for(const variable of dictionary){
       if(present.has(code+':'+variable.columnKey))continue
       const status=attendance.get(code+':'+variable.waveId)
