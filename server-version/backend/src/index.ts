@@ -61,6 +61,7 @@ import huiteacherStaffInviteRoutes from './modules/huiteacher/staffInvitation.ro
 import huiteacherOrganizationRoutes from './modules/huiteacher/organization.routes'
 import huiteacherEvaluationRoutes from './modules/huiteacher/evaluation.routes'
 import huiteacherFormsRoutes from './modules/huiteacher/forms.routes'
+import huiteacherRunRoutes from './modules/huiteacher/run.routes'
 import platformEducationRoutes from './modules/huiteacher/platform.routes'
 import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
@@ -294,6 +295,7 @@ app.use('/api/huiteacher',huiteacherStaffInviteRoutes)
 app.use('/api/huiteacher',huiteacherOrganizationRoutes)
 app.use('/api/huiteacher',huiteacherEvaluationRoutes)
 app.use('/api/huiteacher',huiteacherFormsRoutes)
+app.use('/api/huiteacher',huiteacherRunRoutes)
 app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
