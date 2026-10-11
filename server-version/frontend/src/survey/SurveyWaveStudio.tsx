@@ -1,8 +1,12 @@
 import { useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
+import type { FlowDraft } from './flow.client'
+import type { FormDraft } from './builder.types'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
-type Instrument={id:string;title:string;kind:string;status:string}
+type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
+type InstrumentDetails=Instrument&{definition:FormDraft|Record<string,unknown>}
 type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type Wave={
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
@@ -11,6 +15,7 @@ type Wave={
   opensAt:string|null;closesAt:string|null;finishUntil:string|null;
   quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean;
   hardStopAt:string|null
+  flowDefinition?:FlowDraft|null
 }
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
@@ -39,6 +44,7 @@ const message=(e:unknown)=>e instanceof Error?e.message:'研究波次操作失�
 const initial=()=>({
   title:'',consentText:'',generalText:'',linkageNoticeConfirmed:false,instrumentIds:[] as string[],
   opensAt:'',closesAt:'',quotaStarts:'',allowNewParticipants:false,
+  flowDefinition:null as FlowDraft|null,
 })
 type FormState=ReturnType<typeof initial>
 const localTime=(raw:string|null)=>{
@@ -49,6 +55,7 @@ const localTime=(raw:string|null)=>{
 export function SurveyWaveStudio({projectId}:{projectId:string}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
+  const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
   const [wavePage,setWavePage]=useState(1),[toolPage,setToolPage]=useState(1)
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
@@ -64,7 +71,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
     setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
     setWavePage(nextWavePage);setToolPage(nextToolPage)
   }
-  useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial())
+  useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
     void refresh().catch(e=>setError(message(e)))
   },[projectId])
   const act=async(action:()=>Promise<void>)=>{
@@ -73,6 +80,11 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
   }
   const select=(wave:Wave)=>void act(async()=>{
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
+    // Resolve selected draft identities by ID; a research may select tools
+    // from several pages of the paginated library.
+    const selected=await Promise.all(detail.instrumentIds.map(id=>
+      surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
+    setDetails(previous=>({...previous,...Object.fromEntries(selected.map(item=>[item.id,item]))}))
     setEditing(detail);setReady(null);setShareLink('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
@@ -81,6 +93,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
       opensAt:localTime(detail.opensAt),closesAt:localTime(detail.closesAt),
       quotaStarts:detail.quotaStarts===null?'':String(detail.quotaStarts),
       allowNewParticipants:detail.allowNewParticipants,
+      flowDefinition:detail.flowDefinition??null,
     })
   })
   const payload=()=>{
@@ -94,6 +107,7 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
       closesAt:stop?.toISOString()||null,
       quotaStarts:form.quotaStarts?Number(form.quotaStarts):null,
       allowNewParticipants:form.allowNewParticipants,
+      flowDefinition:form.flowDefinition,
     }
   }
   const save=(e:FormEvent)=>{e.preventDefault();void act(async()=>{
@@ -153,9 +167,25 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
         :'招募链接已撤销，现有研究参与者仍可凭私人凭证恢复合法作答。')
     })
   }
-  const toggle=(id:string,checked:boolean)=>setForm(old=>({
-    ...old,instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
-  }))
+  const toggle=(id:string,checked:boolean)=>{
+    setForm(old=>({...old,
+      instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
+    }))
+    if(checked&&!details[id]){
+      void surveyApi<InstrumentDetails>(path+'/instruments/'+id)
+        .then(item=>setDetails(previous=>({...previous,[id]:item})))
+        .catch(e=>setError(message(e)))
+    }
+  }
+  const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
+  const flowQuestions:FormQuestionInfo[]=Object.values(details)
+    .filter(d=>d.kind==='FORM').flatMap(d=>{
+      const form=d.definition as FormDraft
+      return (form.pages??[]).flatMap(p=>p.questions.map(q=>({
+        instrumentKey:d.instrumentKey,itemKey:q.itemKey,prompt:q.prompt,type:q.type,
+        options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
+      })))
+    })
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
       <p className="text-sm text-slate-600">
@@ -230,6 +260,10 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               onClick={()=>void act(()=>refresh(wavePage,toolPage+1))}>工具下一页</button>
           </div>
           </fieldset>
+          <SurveyFlowStudio value={form.flowDefinition}
+            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition}))}
+            tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
+            collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">计划开放时间<input type="datetime-local" className="input block w-full"
               value={form.opensAt} onChange={e=>setForm({...form,opensAt:e.target.value})}/></label>
